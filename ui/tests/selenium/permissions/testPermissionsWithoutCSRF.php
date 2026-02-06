@@ -553,7 +553,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM media',
 					'link' => 'zabbix.php?action=mediatype.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation media type create'
+					]
 				]
 			],
 			// #50 Script update.

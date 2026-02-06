@@ -18,34 +18,50 @@ class CControllerOauthCheck extends CController {
 
 	public function init() {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+	}
+
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'mediatypeid' => ['db media_type_oauth.mediatypeid'],
+			'redirection_url' => ['db media_type_oauth.redirection_url', 'required', 'not_empty'],
+			'client_id' => ['db media_type_oauth.client_id', 'required', 'not_empty'],
+			'client_secret' => ['db media_type_oauth.client_secret', 'not_empty'],
+			'authorization_url' => ['string', 'not_empty'],
+			'authorization_url_parameters' => ['objects', 'uniq' => ['value', 'name'],
+				'fields' => [
+					'value' => ['string'],
+					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				],
+				'messages' => ['uniq' => _('Name and value combination is not unique.')]
+			],
+			'token_url' => ['string', 'not_empty'],
+			'token_url_parameters' => ['objects', 'uniq' => ['value', 'name'],
+				'fields' => [
+					'value' => ['string'],
+					'name' => ['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+				],
+				'messages' => ['uniq' => _('Name and value combination is not unique.')]
+			],
+			'authorization_mode' => ['string', 'in' => ['auto', 'manual']],
+			'code' => ['string', 'required', 'not_empty', 'when' => ['authorization_mode', 'in' => ['manual']]]
+		]];
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'mediatypeid' =>					'id',
-			'redirection_url' =>				'db media_type_oauth.redirection_url|required|not_empty',
-			'client_id' => 						'db media_type_oauth.client_id|required|not_empty',
-			'client_secret' =>					'db media_type_oauth.client_secret|not_empty',
-			'authorization_url' =>				'string|not_empty',
-			'authorization_url_parameters' =>	'array',
-			'token_url' =>						'string|not_empty',
-			'token_url_parameters' =>			'array',
-			'authorization_mode' =>				'string|in auto,manual',
-			'code' =>							'string|not_empty'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Invalid OAuth configuration'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				(new CControllerResponseData([
-					'main_block' => json_encode([
-						'error' => [
-							'title' => _('Invalid OAuth configuration'),
-							'messages' => array_column(get_and_clear_messages(), 'message')
-						]
-					])
-				]))->disableView()
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 

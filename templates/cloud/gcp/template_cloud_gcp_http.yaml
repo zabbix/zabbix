@@ -23,54 +23,58 @@ zabbix_export:
       readme: |
         ## Overview
         
-        This template is designed to monitor Google Cloud Platform (hereinafter - GCP) by Zabbix.
+        This template is designed to monitor Google Cloud Platform (GCP) using Zabbix.
         It works without any external scripts and uses the script item.
-        The template currently supports the discovery of [Compute Engine](https://cloud.google.com/compute)/[Cloud SQL](https://cloud.google.com/sql) instances and Compute Engine project quota metrics.
+        
+        The template currently supports the discovery of [Compute Engine](https://cloud.google.com/compute)/[Cloud SQL](https://cloud.google.com/sql)/[Cloud Run services](https://cloud.google.com/run) and Compute Engine project quota metrics.
         
         
         ## Setup
         
-        1. Enable the `Stackdriver Monitoring API` for the GCP project you wish to monitor.
-        >Refer to the [vendor documentation](https://cloud.google.com/monitoring/api/enable-api).
-        2. Create a service account in Google Cloud console for the project you have to monitor.
-        >Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
+        1. Enable the Stackdriver Monitoring API for the GCP project you wish to monitor.
+        >More on [enabling Monitoring API](https://cloud.google.com/monitoring/api/enable-api).
+        2. Create a service account in Google Cloud Console for the same GCP project.
+        >More on [managing service accounts](https://cloud.google.com/iam/docs/creating-managing-service-accounts).
         3. Create and download the service account key in JSON format.
-        >Refer to the [vendor documentation](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
+        >More on [service account keys](https://cloud.google.com/iam/docs/creating-managing-service-account-keys).
         4. If you want to monitor Cloud SQL services - don't forget to activate the Cloud SQL Admin API.
-        >Refer to the [vendor documentation](https://cloud.google.com/sql/docs/mysql/admin-api) for the details.
-        5. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them to their corresponding host wizard configuration fields `GCP project ID`, `Private key id`, `Private key data`, `Client e-mail` in host wizard configuration fields.
+        >More on [Cloud SQL Admin API](https://cloud.google.com/sql/docs/mysql/admin-api).
+        5. For monitoring Cloud Run services - activate the Cloud Run Admin API.
+        >More on [Cloud Run APIs](https://docs.cloud.google.com/run/docs/apis).
+        6. Copy the `project_id`, `private_key_id`, `private_key`, `client_email` from the JSON key file and add them to their corresponding host wizard configuration fields `GCP project ID`, `Private key id`, `Private key data`, `Client e-mail` in host wizard configuration fields.
         
-        **Additional information**:
+        **Notes**
         
-            Make sure that you're creating the service account using the credentials with the `Project Owner/Project IAM Admin/service account Admin` role.
+            - Make sure that you're creating the Google Cloud Console service account using the credentials with the Project Owner/Project IAM Admin/Service Account Admin role.
         
-            The service account JSON key file can only be downloaded once: regenerate it if the previous key has been lost.
+            - The service account JSON key file can only be downloaded **once**: regenerate it if the previous key has been lost.
         
-            The service account should have `Project Viewer` permissions or granular permissions for the GCP Compute Engine API/GCP Cloud SQL.
+            - The service account should have Project Viewer permissions or granular permissions for the GCP Compute Engine API/GCP Cloud SQL/Cloud Run Viewer.
         
-            You can copy and paste private_key string data from the Service Account JSON key file as is or replace the new line metasymbol (\n) with an actual new line.
+            - You can copy and paste `private_key` string data from the Service Account JSON key file as is, or replace the new line metasymbol (`\n`) with actual line breaks.
         
-        >Please, refer to the [vendor documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts) about the service accounts management.
+        >Refer to the [vendor documentation](https://cloud.google.com/iam/docs/manage-access-service-accounts) on managing access to service accounts.
         
-        **IMPORTANT!!!**
+        **IMPORTANT**
         
-             Secret authorization token is defined as a plain text in host prototype settings by default due to Zabbix templates export/import limits: therefore, it is highly recommended to change the user macro `{$GCP.AUTH.TOKEN}` value type to `SECRET` for all host prototypes after the template `GCP by HTTP` import.
+             - The Zabbix secret authorization token (used for GCP API authentication) is defined as a plain text in host prototype settings by default due to template export/import limitations. It is highly recommended to change the user macro `{$GCP.AUTH.TOKEN}` value type to `SECRET` for all host prototypes after importing the *GCP by HTTP* template.
         
-             All the instances/quotas/metrics discovered are related to a particular GCP project.
-             To monitor several GCP projects - create their corresponding service accounts/Zabbix hosts.
+             - All the discovered instances/quotas/metrics are related to a particular GCP project. To monitor several GCP projects, create their corresponding service accounts and Zabbix hosts.
         
-             GCP Access Token is available for 1 hour (3600 seconds) after the generation request.
+             - The GCP Access Token is available for 1 hour (3600 seconds) after the generation request.
         
-             To avoid a GCP token inconsistency between Zabbix database and Zabbix server configuration cache, don't set Zabbix server configuration parameter CacheUpdateFrequency to a value over 45 minutes and don't set the update interval for the GCP Authorization item to more than 1 hour (maximum CacheUpdateFrequency value).
+             - To avoid GCP token inconsistencies between the Zabbix database and Zabbix server configuration cache, do not set the Zabbix server configuration parameter `CacheUpdateFrequency` above 45 minutes, and do not set the GCP authorization item update interval above 1 hour (the maximum `CacheUpdateFrequency` value).
         
-        Additional information about metrics and used API methods:
+        More on metrics and used API methods:
         
-          [Compute Engine](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-compute)
+          - [Compute Engine](https://docs.cloud.google.com/monitoring/api/metrics_gcp_c#gcp-compute)
         
-          [Cloud SQL](https://cloud.google.com/monitoring/api/metrics_gcp#gcp-cloudsql)
+          - [Cloud SQL](https://docs.cloud.google.com/monitoring/api/metrics_gcp_c#gcp-cloudsql)
+        
+          - [Cloud Run](https://docs.cloud.google.com/monitoring/api/metrics_gcp_p_z#gcp-run)
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -113,7 +117,7 @@ zabbix_export:
             	issued = Math.floor(new Date().getTime() / 1000),
             	expires = issued + 3600,
             	endpoint = 'https://www.googleapis.com/auth/',
-            	scopes = ['cloud-platform.read-only', 'monitoring', 'compute.readonly', 'sqlservice.admin'],
+            	scopes = ['cloud-platform', 'monitoring', 'compute.readonly', 'sqlservice.admin'],
             	scope = scopes.map(function (path) { return endpoint + path; }).join(' ');
             
             function base64url(source) {
@@ -188,7 +192,7 @@ zabbix_export:
             }
             
             function checkParams(params) {
-            	['pkey_id', 'private_key', 'email'].forEach(function (field) {
+            	['private_key_id', 'private_key', 'email'].forEach(function (field) {
             		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             			throw 'Required param is not set: ' + field + '.';
             		}
@@ -199,7 +203,7 @@ zabbix_export:
             var script_params = checkParams(JSON.parse(value)),
             	headers = {
             		alg: 'RS256',
-            		kid: script_params.pkey_id,
+            		kid: script_params.private_key_id,
             		typ: 'JWT'
             	},
             	payload = {
@@ -217,7 +221,9 @@ zabbix_export:
             	return token;
             }
             catch (err) {
-            	return JSON.stringify({ error: err });
+            	Zabbix.log(3, '[ GCP Auth] ERROR: ' + err);
+            	error_msg = 'Failed to get data from API: ' + err;
+            	return JSON.stringify({ error: error_msg });
             }
           description: |
             Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
@@ -228,10 +234,10 @@ zabbix_export:
           parameters:
             - name: email
               value: '{$GCP.CLIENT.EMAIL}'
-            - name: pkey_id
-              value: '{$GCP.PRIVATE.KEY.ID}'
             - name: private_key
               value: '{$GCP.PRIVATE.KEY}'
+            - name: private_key_id
+              value: '{$GCP.PRIVATE.KEY.ID}'
             - name: proxy
               value: '{$GCP.PROXY}'
           tags:
@@ -252,8 +258,10 @@ zabbix_export:
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
+                  
                   	for (var i = 0; i < steps.length; i++) {
                   		var step = steps[i];
+                  
                   		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                   			throw 'Required field "' + path + '" is not present in data received.';
                   		}
@@ -279,9 +287,11 @@ zabbix_export:
                   function getHttpData(url, token) {
                   	var request = new HttpRequest(),
                   		proxy = '{$GCP.PROXY}';
+                  
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
                   		request.setProxy(proxy);
-                  	};
+                  	}
+                  
                   	request.addHeader('Authorization: Bearer ' + token);
                   	request.addHeader('Content-Type: application/json');
                   
@@ -303,6 +313,7 @@ zabbix_export:
                   	}
                   
                   	if (request.getStatus() !== 200) {
+                  
                   		if (typeof (response.error && response.error.message) !== 'undefined') {
                   			throw response.error.message;
                   		}
@@ -311,7 +322,7 @@ zabbix_export:
                   		}
                   	}
                   	return response;
-                  };
+                  }
                   
                   var project = '{$GCP.PROJECT.ID}';
                   
@@ -458,12 +469,6 @@ zabbix_export:
               parameters:
                 - |
                   var token = value;
-                  function checkMacro(macro) {
-                  	if (!macro || macro.match(/^\{\$.*\}$/)) {
-                  		throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
-                  	}
-                  	return macro;
-                  }
                   
                   function getField(data, path) {
                   	var steps = path.split('.');
@@ -493,13 +498,14 @@ zabbix_export:
                   	return true;
                   }
                   
-                  
                   function getHttpData(url, token) {
                   	var request = new HttpRequest(),
                   		proxy = '{$GCP.PROXY}';
+                  
                   	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
                   		request.setProxy(proxy);
-                  	};
+                  	}
+                  
                   	request.addHeader('Authorization: Bearer ' + token);
                   	request.addHeader('Content-Type: application/json');
                   
@@ -521,6 +527,7 @@ zabbix_export:
                   	}
                   
                   	if (request.getStatus() !== 200) {
+                  
                   		if (typeof (response.error && response.error.message) !== 'undefined') {
                   			throw response.error.message;
                   		}
@@ -529,7 +536,7 @@ zabbix_export:
                   		}
                   	}
                   	return response;
-                  };
+                  }
                   
                   var project = '{$GCP.PROJECT.ID}';
                   
@@ -688,6 +695,153 @@ zabbix_export:
                   	});
                   
                   return JSON.stringify(qts_lst);
+          master_item:
+            key: gcp.authorization
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 0cb00461c01045be989f086857baa968
+          name: 'Cloud Run service total'
+          type: DEPENDENT
+          key: gcp.run.service.total
+          description: 'GCP Cloud Run services total count.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[*].length()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.services.get
+          tags:
+            - tag: component
+              value: environment
+        - uuid: 67d26f7e16494330ba29690da43a2a8b
+          name: 'Cloud Run service get'
+          type: DEPENDENT
+          key: gcp.run.services.get
+          history: '0'
+          value_type: TEXT
+          description: 'Get GCP Cloud Run services.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var token = value;
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  function getFieldBool(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			return false;
+                  		}
+                  		data = data[step];
+                  	}
+                  	return true;
+                  }
+                  
+                  function getHttpData(url, token) {
+                  	var request = new HttpRequest(),
+                  		proxy = '{$GCP.PROXY}';
+                  
+                  	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                  		request.setProxy(proxy);
+                  	}
+                  
+                  	request.addHeader('Authorization: Bearer ' + token);
+                  	request.addHeader('Content-Type: application/json');
+                  
+                  	var response = request.get(url);
+                  
+                  	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                  
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+                  		}
+                  	}
+                  
+                  	if (typeof response !== 'object' || response === null) {
+                  		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+                  	}
+                  
+                  	if (request.getStatus() !== 200) {
+                  
+                  		if (typeof (response.error && response.error.message) !== 'undefined') {
+                  			throw response.error.message;
+                  		}
+                  		else {
+                  			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                  		}
+                  	}
+                  	return response;
+                  }
+                  
+                  var project = '{$GCP.PROJECT.ID}';
+                  
+                  if (!project || project === '{' + '$GCP.PROJECT.ID}') {
+                  	throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
+                  }
+                  
+                  var services = [],
+                  	filter = '{$GCP.RUN.LOCATION.FILTER}';
+                  
+                  try {
+                  	result = getHttpData('https://compute.googleapis.com/compute/v1/projects/' + encodeURIComponent(project) + '/regions?filter=' + encodeURIComponent(filter) + '&fields=items.name', token);
+                  
+                  	if (Object.keys(result).length === 0) {
+                  		throw 'Cannot process filter regions. Please check the filter conditions.';
+                  	}
+                  
+                  	locations = getField(result, 'items');
+                  
+                  	for (var i in locations) {
+                  		location = getField(locations[i], 'name');
+                  		response_run = getHttpData('https://run.googleapis.com/v2/projects/' + encodeURIComponent(project) + '/locations/' + encodeURIComponent(location) + '/services', token);
+                  
+                  		if (Object.keys(response_run).length !== 0 && response_run.services !== undefined) {
+                  			response_run.services.forEach(function (service) {
+                  				services.push({
+                  					location: location,
+                  					project_id: project,
+                  					token: value,
+                  					name: getField(service, 'name').split("/")[5],
+                  					uid: getField(service, 'uid'),
+                  					launch_stage: getField(service, 'launchStage'),
+                  					container: getField(service, 'template.containers'),
+                  					condition: getField(service, 'terminalCondition.state')
+                  				});
+                  			});
+                  
+                  		}
+                  
+                  	}
+                  	return JSON.stringify(services);
+                  }
+                  catch (err) {
+                  	Zabbix.log(3, '[ GCP API] ERROR: ' + err);
+                  	error_msg = 'Failed to get data from GCP API: ' + err;
+                  	return JSON.stringify({ error: error_msg });
+                  }
           master_item:
             key: gcp.authorization
           tags:
@@ -950,7 +1104,7 @@ zabbix_export:
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
                 value: '{$GCP.PGSQL.INST.TYPE.MATCHES}'
               - macro: '{#CLOUD_SQL.INSTANCE.TYPE}'
-                value: '{$GCP.PGSQL.TYPE.NOT_MATCHES}'
+                value: '{$GCP.PGSQL.INST.TYPE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
               - macro: '{#CLOUD_SQL.INSTANCE.ZONE}'
                 value: '{$GCP.PGSQL.ZONE.MATCHES}'
@@ -1290,6 +1444,80 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
+        - uuid: adca45e3f9b6401c97c5d5a274679088
+          name: 'GCP Cloud Run: Service discovery'
+          type: DEPENDENT
+          key: gcp.run.service.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#CLOUD.RUN.SERVICE.CONDITION}'
+                value: '{$GCP.CLOUD.RUN.SERVICE.CONDITION.MATCHES}'
+              - macro: '{#CLOUD.RUN.SERVICE.CONDITION}'
+                value: '{$GCP.CLOUD.RUN.SERVICE.CONDITION.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#CLOUD.RUN.SERVICE.NAME}'
+                value: '{$GCP.CLOUD.RUN.SERVICE.NAME.MATCHES}'
+              - macro: '{#CLOUD.RUN.SERVICE.NAME}'
+                value: '{$GCP.CLOUD.RUN.SERVICE.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'GCP Cloud Run services discovery.'
+          host_prototypes:
+            - uuid: ea0d03e4f9a34edfae080832b78be985
+              host: '{#CLOUD.RUN.SERVICE.UID}'
+              name: '{#CLOUD.RUN.SERVICE.NAME}'
+              group_links:
+                - group:
+                    name: 'Virtual machines'
+              templates:
+                - name: 'GCP Cloud Run Service by HTTP'
+              macros:
+                - macro: '{$CLOUD.RUN.SERVICE.CONDITION}'
+                  value: '{#CLOUD.RUN.SERVICE.CONDITION}'
+                  description: 'Cloud Run Service condition.'
+                - macro: '{$CLOUD.RUN.SERVICE.CONTAINER}'
+                  value: '{#CLOUD.RUN.SERVICE.CONTAINER}'
+                  description: 'Cloud Run Service resources.'
+                - macro: '{$CLOUD.RUN.SERVICE.LOCATION}'
+                  value: '{#CLOUD.RUN.SERVICE.LOCATION}'
+                  description: 'Cloud Run Service location.'
+                - macro: '{$GCP.AUTH.TOKEN}'
+                  value: '{#GCP.AUTH.TOKEN}'
+                  description: 'Google Cloud Platform authorization token.'
+              tags:
+                - tag: launch-stage
+                  value: '{#CLOUD.RUN.SERVICE.LAUNCH.STAGE}'
+                - tag: location
+                  value: '{#CLOUD.RUN.SERVICE.LOCATION}'
+                - tag: project
+                  value: '{#GCP.PROJECT.ID}'
+                - tag: service
+                  value: cloud-run
+                - tag: service
+                  value: gcp
+          master_item:
+            key: gcp.run.services.get
+          lld_macro_paths:
+            - lld_macro: '{#CLOUD.RUN.SERVICE.CONDITION}'
+              path: $.condition
+            - lld_macro: '{#CLOUD.RUN.SERVICE.CONTAINER}'
+              path: $.container
+            - lld_macro: '{#CLOUD.RUN.SERVICE.LAUNCH.STAGE}'
+              path: $.launch_stage
+            - lld_macro: '{#CLOUD.RUN.SERVICE.LOCATION}'
+              path: $.location
+            - lld_macro: '{#CLOUD.RUN.SERVICE.NAME}'
+              path: $.name
+            - lld_macro: '{#CLOUD.RUN.SERVICE.UID}'
+              path: $.uid
+            - lld_macro: '{#GCP.AUTH.TOKEN}'
+              path: $.token
+            - lld_macro: '{#GCP.PROJECT.ID}'
+              path: $.project_id
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
       tags:
         - tag: class
           value: cloud
@@ -1328,21 +1556,57 @@ zabbix_export:
             label: 'Client e-mail'
             description: 'Service account client e-mail.'
             required: 'YES'
-        - macro: '{$GCP.DATA.TIMEOUT}'
-          value: 15s
-          description: 'A response timeout for an API.'
+        - macro: '{$GCP.CLOUD.RUN.SERVICE.CONDITION.MATCHES}'
+          value: '.*'
+          description: 'The filter to include GCP Cloud Run services by condition.'
           config:
             type: TEXT
-            priority: '8'
+            priority: '37'
+            section_name: Filters
+            label: 'Include GCP Cloud Run service condition filter'
+            description: 'Filter to include GCP Cloud Run services by condition.'
+        - macro: '{$GCP.CLOUD.RUN.SERVICE.CONDITION.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The filter to exclude GCP Cloud Run services by condition.'
+          config:
+            type: TEXT
+            priority: '38'
+            section_name: Filters
+            label: 'Exclude GCP Cloud Run service condition filter'
+            description: 'Filter to exclude GCP Cloud Run services by condition.'
+        - macro: '{$GCP.CLOUD.RUN.SERVICE.NAME.MATCHES}'
+          value: '.*'
+          description: 'The filter to include GCP Cloud Run services by name.'
+          config:
+            type: TEXT
+            priority: '35'
+            section_name: Filters
+            label: 'Include GCP Cloud Run service name filter'
+            description: 'Filter to include GCP Cloud Run services by name.'
+        - macro: '{$GCP.CLOUD.RUN.SERVICE.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'The filter to exclude GCP Cloud Run services by name.'
+          config:
+            type: TEXT
+            priority: '36'
+            section_name: Filters
+            label: 'Exclude GCP Cloud Run service name filter'
+            description: 'Filter to exclude GCP Cloud Run services by name.'
+        - macro: '{$GCP.DATA.TIMEOUT}'
+          value: 15s
+          description: 'Response timeout for API.'
+          config:
+            type: TEXT
+            priority: '9'
             section_name: Other
             label: 'Response timeout'
-            description: 'A response timeout for an API.'
+            description: 'Response timeout for API.'
         - macro: '{$GCP.GCE.INST.NAME.MATCHES}'
           value: '.*'
           description: 'The filter to include GCP Compute Engine instances by namespace.'
           config:
             type: TEXT
-            priority: '10'
+            priority: '11'
             section_name: Filters
             label: 'Include GCP Compute Engine namespace filter'
             description: 'Filter to include GCP Compute Engine instances by namespace.'
@@ -1351,7 +1615,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine instances by namespace.'
           config:
             type: TEXT
-            priority: '11'
+            priority: '12'
             section_name: Filters
             label: 'Exclude GCP Compute Engine namespace filter'
             description: 'Filter to exclude GCP Compute Engine instances by namespace.'
@@ -1360,7 +1624,7 @@ zabbix_export:
           description: 'The filter to include GCP Compute Engine project quotas by namespace.'
           config:
             type: TEXT
-            priority: '32'
+            priority: '33'
             section_name: Filters
             label: 'Include GCP Compute Engine project quotas by namespace filter'
             description: 'Filter to include GCP Compute Engine project quotas by namespace.'
@@ -1369,7 +1633,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine project quotas by namespace.'
           config:
             type: TEXT
-            priority: '33'
+            priority: '34'
             section_name: Filters
             label: 'Exclude GCP Compute Engine project quotas by namespace filter'
             description: 'Filter to exclude GCP Compute Engine project quotas by namespace.'
@@ -1378,7 +1642,7 @@ zabbix_export:
           description: 'GCP Compute Engine project quota critical quota utilization threshold.'
           config:
             type: TEXT
-            priority: '7'
+            priority: '8'
             section_name: Thresholds
             label: 'GCP Compute Engine critical utilization threshold'
             description: 'GCP Compute Engine project quota critical quota utilization threshold. In the range from 0 to 100 inclusive.'
@@ -1388,7 +1652,7 @@ zabbix_export:
           description: 'GCP Compute Engine project quota warning utilization threshold.'
           config:
             type: TEXT
-            priority: '6'
+            priority: '7'
             section_name: Thresholds
             label: 'GCP Compute Engine warning utilization threshold'
             description: 'GCP Compute Engine project quota warning utilization threshold. In the range from 0 to 100 inclusive.'
@@ -1398,7 +1662,7 @@ zabbix_export:
           description: 'The filter to include GCP Compute Engine instances by zone.'
           config:
             type: TEXT
-            priority: '12'
+            priority: '13'
             section_name: Filters
             label: 'Include GCP Compute Engine zone filter'
             description: 'Filter to include GCP Compute Engine instances by zone.'
@@ -1407,7 +1671,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Compute Engine instances by zone.'
           config:
             type: TEXT
-            priority: '13'
+            priority: '14'
             section_name: Filters
             label: 'Exclude GCP Compute Engine zone filter'
             description: 'Filter to exclude GCP Compute Engine instances by zone.'
@@ -1416,7 +1680,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MSSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '26'
+            priority: '27'
             section_name: Filters
             label: 'Include GCP Cloud SQL MSSQL namespace filter'
             description: 'Filter to include GCP Cloud SQL MSSQL instances by namespace.'
@@ -1425,7 +1689,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MSSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '27'
+            priority: '28'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MSSQL namespace filter'
             description: 'Filter to exclude GCP Cloud SQL MSSQL instances by namespace.'
@@ -1434,7 +1698,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MSSQL instances by type (standalone/replica).'
           config:
             type: TEXT
-            priority: '30'
+            priority: '31'
             section_name: Filters
             label: 'Include GCP Cloud SQL MSSQL instances by type filter'
             description: 'Filter to include GCP Cloud SQL MSSQL instances by type (standalone/replica).'
@@ -1445,7 +1709,7 @@ zabbix_export:
             Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
           config:
             type: TEXT
-            priority: '31'
+            priority: '32'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MSSQL instances by type filter'
             description: 'Filter to exclude GCP Cloud SQL MSSQL instances by type (standalone/replica).'
@@ -1454,7 +1718,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MSSQL instances by zone.'
           config:
             type: TEXT
-            priority: '28'
+            priority: '29'
             section_name: Filters
             label: 'Include GCP Cloud SQL MSSQL zone filter'
             description: 'Filter to include GCP Cloud SQL MSSQL instances by zone.'
@@ -1463,7 +1727,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MSSQL instances by zone.'
           config:
             type: TEXT
-            priority: '29'
+            priority: '30'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MSSQL zone filter'
             description: 'Filter to exclude GCP Cloud SQL MSSQL instances by zone.'
@@ -1472,7 +1736,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MySQL instances by namespace.'
           config:
             type: TEXT
-            priority: '14'
+            priority: '15'
             section_name: Filters
             label: 'Include GCP Cloud SQL MySQL namespace filter'
             description: 'Filter to include GCP Cloud SQL MySQL instances by namespace.'
@@ -1481,7 +1745,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MySQL instances by namespace.'
           config:
             type: TEXT
-            priority: '15'
+            priority: '16'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MySQL namespace filter'
             description: 'Filter to exclude GCP Cloud SQL MySQL instances by namespace.'
@@ -1490,7 +1754,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MySQL instances by type (standalone/replica).'
           config:
             type: TEXT
-            priority: '18'
+            priority: '19'
             section_name: Filters
             label: 'Include GCP Cloud SQL MySQL instances by type filter'
             description: 'Filter to include GCP Cloud SQL MySQL instances by type (standalone/replica).'
@@ -1501,7 +1765,7 @@ zabbix_export:
             Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
           config:
             type: TEXT
-            priority: '19'
+            priority: '20'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MySQL instances by type filter'
             description: 'Filter to exclude GCP Cloud SQL MySQL instances by type (standalone/replica).'
@@ -1510,7 +1774,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL MySQL instances by zone.'
           config:
             type: TEXT
-            priority: '16'
+            priority: '17'
             section_name: Filters
             label: 'Include GCP Cloud SQL MySQL zone filter'
             description: 'Filter to include GCP Cloud SQL MySQL instances by zone.'
@@ -1519,7 +1783,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MySQL instances by zone.'
           config:
             type: TEXT
-            priority: '17'
+            priority: '18'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL MySQL zone filter'
             description: 'Filter to exclude GCP Cloud SQL MySQL instances by zone.'
@@ -1528,7 +1792,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL PostgreSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '20'
+            priority: '21'
             section_name: Filters
             label: 'Include GCP Cloud SQL PostgreSQL namespace filter'
             description: 'Filter to include GCP Cloud SQL PostgreSQL instances by namespace.'
@@ -1537,7 +1801,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL PostgreSQL instances by namespace.'
           config:
             type: TEXT
-            priority: '21'
+            priority: '22'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL PostgreSQL namespace filter'
             description: 'Filter to exclude GCP Cloud SQL PostgreSQL instances by namespace.'
@@ -1546,7 +1810,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
           config:
             type: TEXT
-            priority: '24'
+            priority: '25'
             section_name: Filters
             label: 'Include GCP Cloud SQL PostgreSQL instances by type filter'
             description: 'Filter to include GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
@@ -1557,7 +1821,7 @@ zabbix_export:
             Set a macro value 'CLOUD_SQL_INSTANCE' to exclude standalone Instances or 'READ_REPLICA_INSTANCE' to exclude read-only Replicas.
           config:
             type: TEXT
-            priority: '25'
+            priority: '26'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL PostgreSQL instances by type filter'
             description: 'Filter to exclude GCP Cloud SQL PostgreSQL instances by type (standalone/replica).'
@@ -1566,7 +1830,7 @@ zabbix_export:
           description: 'The filter to include GCP Cloud SQL PostgreSQL instances by zone.'
           config:
             type: TEXT
-            priority: '22'
+            priority: '23'
             section_name: Filters
             label: 'Include GCP Cloud SQL PostgreSQL zone filter'
             description: 'Filter to include GCP Cloud SQL PostgreSQL instances by zone.'
@@ -1575,7 +1839,7 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL PostgreSQL instances by zone.'
           config:
             type: TEXT
-            priority: '23'
+            priority: '24'
             section_name: Filters
             label: 'Exclude GCP Cloud SQL PostgreSQL zone filter'
             description: 'Filter to exclude GCP Cloud SQL PostgreSQL instances by zone.'
@@ -1606,13 +1870,28 @@ zabbix_export:
             description: 'Google Cloud Platform project ID.'
             required: 'YES'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
           config:
             type: TEXT
-            priority: '9'
+            priority: '10'
             section_name: Other
             label: 'HTTP proxy'
             description: 'HTTP proxy to use for requests.'
+        - macro: '{$GCP.RUN.LOCATION.FILTER}'
+          description: |
+            Cloud Run Service filter locations. If empty - all locations are monitored.
+            The value must be a string. The operator must be either `=, !=, >, <, <=, >= or :`.
+            Example: `name="europe-west1" OR name="europe-north1" OR name="asia-southeast2"`, `name!= "us-central1"`, `name!= "me-*`.
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Filters
+            label: 'Cloud Run filter location'
+            description: |
+              Cloud Run service filter locations. If empty - all locations are monitored.
+              The value must be a string. The operator must be either `=, !=, >, <, <=, >= or :`.
+              Example: `name="europe-west1" OR name="europe-north1" OR name="asia-southeast2"`, `name!= "us-central1"`, `name!= "me-*`.
+            required: 'YES'
       dashboards:
         - uuid: 71df4601171e471ea74a291242028394
           name: 'Project resources'
@@ -1797,6 +2076,1503 @@ zabbix_export:
                     - type: INTEGER
                       name: show.1
                       value: '4'
+    - uuid: ac74c20e51854372a0db831f5f7d5f5e
+      template: 'GCP Cloud Run Service by HTTP'
+      name: 'GCP Cloud Run Service by HTTP'
+      description: |
+        Discover GCP Cloud Run services by HTTP with script item usage.
+        This template will be automatically connected to discovered entities with all their required parameters pre-defined.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback.
+        
+        Generated by official Zabbix template tool "Templator"
+      wizard_ready: 'YES'
+      readme: |
+        ## Setup
+        
+        This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
+      vendor:
+        name: Zabbix
+        version: 8.0-0
+      groups:
+        - name: Templates/Cloud
+      items:
+        - uuid: 25b0e0b5d65f4397b2439cb8cf2c1901
+          name: 'Google sent bytes per second'
+          type: DEPENDENT
+          key: gcp.gce.google.sent_bytes.rate
+          value_type: FLOAT
+          units: Bps
+          description: |
+            Outgoing response traffic, in bytes.
+            For responses returned through Google Cloud load balancers, response traffic is classified as `google`.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''google'')].sent_bytes.first()'
+          master_item:
+            key: gcp.run.http.traffic.get
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: traffic
+            - tag: type
+              value: google
+        - uuid: 959fff2d31ce4aa8baff5e741ec67246
+          name: 'Internet sent bytes per second'
+          type: DEPENDENT
+          key: gcp.gce.internet.sent_bytes.rate
+          value_type: FLOAT
+          units: Bps
+          description: 'Outgoing response traffic, in bytes. Traffic is sent over network type `internet`.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''internet'')].sent_bytes.first()'
+          master_item:
+            key: gcp.run.http.traffic.get
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: traffic
+            - tag: type
+              value: internet
+        - uuid: 0704a471e368411893f26f11088732be
+          name: 'Private sent bytes per second'
+          type: DEPENDENT
+          key: gcp.gce.private.sent_bytes.rate
+          value_type: FLOAT
+          units: Bps
+          description: 'Outgoing response traffic, in bytes. Traffic is sent over network type `private`.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''private'')].sent_bytes.first()'
+          master_item:
+            key: gcp.run.http.traffic.get
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: traffic
+            - tag: type
+              value: private
+        - uuid: 0b38461716174016b9dfd6d50b6eb37d
+          name: 'Active container instance count'
+          type: DEPENDENT
+          key: gcp.run.active.container.count
+          description: 'Number of active container instances for the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.state == ''active'')].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.container.count.get
+          tags:
+            - tag: component
+              value: container
+            - tag: component
+              value: environment
+          triggers:
+            - uuid: b7ef83334ec14be2bb0c1e36332091cf
+              expression: 'max(/GCP Cloud Run Service by HTTP/gcp.run.active.container.count,15m)=0'
+              name: 'GCP Cloud Run Service: No active container instances'
+              event_name: 'GCP Cloud Run Service: No active container instances'
+              priority: WARNING
+              description: 'There are no active container instances for the service. This may indicate that the service is not receiving traffic or there is an issue with scaling.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: f6b0e75ea5d94025937466693a2a4a31
+          name: 'Billable instance time'
+          type: HTTP_AGENT
+          key: gcp.run.billable.instance.time
+          delay: '{$GCP.TIME.WINDOW}'
+          value_type: FLOAT
+          units: '!s/s'
+          description: 'Total billable time (time multiplied by number of running containers).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.timeSeriesData..pointData..values..doubleValue.first()
+              error_handler: DISCARD_VALUE
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch cloud_run_revision
+            | metric 'run.googleapis.com/container/billable_instance_time'
+            | filter resource.service_name == '{HOST.NAME}'
+            | align rate()
+            | group_by [resource.service_name],
+                [value_billable_instance_time_aggregate:
+                  aggregate(value.billable_instance_time)]"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: billable
+            - tag: component
+              value: environment
+        - uuid: dd6476e311c24f39b8c3ea3dbaccc5c0
+          name: 'Max concurrent requests'
+          type: DEPENDENT
+          key: gcp.run.concurrent.request
+          value_type: FLOAT
+          units: '%'
+          description: 'Distribution of the maximum number of concurrent requests being served by each container instance over a minute.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $..requests.first()
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.utilization.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: type
+              value: concurrent
+          triggers:
+            - uuid: a05e5cf684be4c1bbf0440d2bb857c4a
+              expression: 'min(/GCP Cloud Run Service by HTTP/gcp.run.concurrent.request,15m) >= {$GCP.CONCURRENT.REQUEST.MAX}'
+              name: 'GCP Cloud Run Service: Concurrent requests too high'
+              event_name: 'GCP Cloud Run Service: Concurrent request (over {$GCP.CONCURRENT.REQUEST.MAX}% for 15m)'
+              opdata: 'Max concurrent request: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Fires when concurrent requests exceed the threshold `{$GCP.CONCURRENT.REQUEST.MAX}`%.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 65ef21f418a9463cb3af82f8c8857db5
+          name: 'Get container instance count'
+          type: HTTP_AGENT
+          key: gcp.run.container.count.get
+          delay: '{$GCP.TIME.WINDOW}'
+          history: '0'
+          value_type: TEXT
+          description: 'Raw data of container instances that exist for the service.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var request_count = getField(json_data, 'timeSeriesData'),
+                  	output_data = [];
+                  
+                  for (var entity in request_count) {
+                  	output_data.push({
+                  		state: getField(request_count[entity], 'labelValues.1.stringValue'),
+                  		value: getField(request_count[entity], 'pointData.0.values.0.int64Value')
+                  	});
+                  }
+                  
+                  return JSON.stringify(output_data);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch cloud_run_revision
+            | metric 'run.googleapis.com/container/instance_count'
+            | filter resource.service_name == '{HOST.NAME}'
+            | group_by window(), [value_instance_count_max: max(value.instance_count)]
+            | group_by [resource.service_name, metric.state],
+                [value_instance_count_max_aggregate: aggregate(value_instance_count_max)]"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+        - uuid: c2bcc97362a746f2916f7a60bdbb2b17
+          name: 'Container CPU utilization'
+          type: DEPENDENT
+          key: gcp.run.cpu.utilization
+          value_type: FLOAT
+          units: '%'
+          description: 'Container CPU utilization in percentage distribution across all container instances.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $..cpu.first()
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: gcp.run.utilization.get
+          tags:
+            - tag: component
+              value: cpu
+          triggers:
+            - uuid: f9567c7d60454b8b87c6ff490f78d43e
+              expression: 'min(/GCP Cloud Run Service by HTTP/gcp.run.cpu.utilization,15m) >= {$GCP.CPU.UTIL.MAX}'
+              name: 'GCP Cloud Run Service: High CPU utilization'
+              event_name: 'GCP Cloud Run Service: High CPU utilization (over {$GCP.CPU.UTIL.MAX}% for 15m)'
+              priority: AVERAGE
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: aa62c4d76ff9400b88ee040da2d0815d
+          name: 'End-to-end request latency'
+          type: DEPENDENT
+          key: gcp.run.e2e.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of request latencies in milliseconds measured from when the request enters Google Cloud''s network to when Cloud Run sends the response.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.e2e_latencies_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+        - uuid: a381b10ee48b4f52a3efd4cbb55e51e6
+          name: 'Google received bytes per second'
+          type: DEPENDENT
+          key: gcp.run.google.received_bytes.rate
+          value_type: FLOAT
+          units: Bps
+          description: 'Incoming request traffic, in bytes. Traffic is received over network type `google`.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''google'')].received_bytes.first()'
+          master_item:
+            key: gcp.run.http.traffic.get
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: traffic
+            - tag: type
+              value: google
+        - uuid: fb62b24c213e4a48a7c595f40a8dd8c1
+          name: 'Get HTTP response traffic'
+          type: HTTP_AGENT
+          key: gcp.run.http.traffic.get
+          delay: '{$GCP.TIME.WINDOW}'
+          history: '0'
+          value_type: TEXT
+          description: 'Raw data socket and HTTP response traffic.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var network = getField(json_data, 'timeSeriesData'),
+                  	output_data = [];
+                  
+                  for (var entity in network) {
+                  	output_data.push({
+                  		label_value: getField(network[entity], 'labelValues.0.stringValue'),
+                  		sent_bytes: getField(network[entity], 'pointData.0.values.0.doubleValue'),
+                  		received_bytes: getField(network[entity], 'pointData.0.values.1.doubleValue')
+                  	});
+                  }
+                  
+                  return JSON.stringify(output_data);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch cloud_run_revision
+            | {metric 'run.googleapis.com/container/network/sent_bytes_count';metric 'run.googleapis.com/container/network/received_bytes_count'}
+            | filter resource.service_name == '{HOST.NAME}'
+            | align rate({$GCP.TIME.WINDOW})
+            | group_by [metric.kind]
+            | join | within {$GCP.TIME.WINDOW}"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+        - uuid: a14d1d5e94ed41f2bc12119532441950
+          name: 'Idle container instance count'
+          type: DEPENDENT
+          key: gcp.run.idle.container.count
+          description: 'Number of idle container instances for the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.state == ''idle'')].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.container.count.get
+          tags:
+            - tag: component
+              value: container
+            - tag: component
+              value: environment
+        - uuid: d24bd1e4a62f43a0ba8cff8c92ce14cc
+          name: 'Ingress to region request latency'
+          type: DEPENDENT
+          key: gcp.run.ingress.region.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of request latencies in milliseconds measured from when the request enters Google Cloud''s network to when the request reaches the cloud region.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.ingress_to_region_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+        - uuid: 009836cc2772481b8c60cd55bb980039
+          name: 'Internet received bytes per second'
+          type: DEPENDENT
+          key: gcp.run.internet.received_bytes.rate
+          value_type: FLOAT
+          units: Bps
+          description: 'Incoming request traffic, in bytes. Traffic is received over network type `internet`.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''internet'')].received_bytes.first()'
+          master_item:
+            key: gcp.run.http.traffic.get
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: traffic
+            - tag: type
+              value: internet
+        - uuid: 5f4bc34eb5a14b968b5ccf85a5642222
+          name: 'Get latency'
+          type: HTTP_AGENT
+          key: gcp.run.latency.get
+          delay: '{$GCP.TIME.WINDOW}'
+          history: '0'
+          value_type: TEXT
+          description: 'Raw data of request latencies.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var output_data = {},
+                  	regexp_key = /(^t_\d+\.value_)/g,
+                  	keys = getField(json_data, 'timeSeriesDescriptor.pointDescriptors'),
+                  	values = getField(json_data, 'timeSeriesData.0.pointData.0.values');
+                  
+                  for (i in keys) {
+                  	output_data[getField(keys[i], 'key').replace(regexp_key, '')] = getField(values[i], 'doubleValue');
+                  }
+                  
+                  return JSON.stringify(output_data);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch cloud_run_revision
+            | {metric 'run.googleapis.com/request_latencies';metric 'run.googleapis.com/request_latency/e2e_latencies';metric 'run.googleapis.com/request_latency/ingress_to_region';metric 'run.googleapis.com/request_latency/routing';metric 'run.googleapis.com/request_latency/pending';metric 'run.googleapis.com/request_latency/user_execution';metric 'run.googleapis.com/request_latency/response_egress'}
+            | filter resource.service_name == '{HOST.NAME}'
+            | align delta({$GCP.TIME.WINDOW})
+            | every {$GCP.TIME.WINDOW}
+            | group_by [resource.service_name], percentile(val(), 99)
+            | join"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 934bd0440d72411093908ffd040fda03
+          name: 'Container memory utilization'
+          type: DEPENDENT
+          key: gcp.run.memory.utilization
+          value_type: FLOAT
+          units: '%'
+          description: 'Container memory utilization distribution across all container instances.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $..memory.first()
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '100'
+          master_item:
+            key: gcp.run.utilization.get
+          tags:
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: 0dbe97ca846b4317abc45db1559b512b
+              expression: 'min(/GCP Cloud Run Service by HTTP/gcp.run.memory.utilization,15m) >= {$GCP.MEMORY.UTIL.CRIT}'
+              name: 'GCP Cloud Run Service: High memory utilization'
+              event_name: 'GCP Cloud Run Service: High memory utilization (over {$GCP.MEMORY.UTIL.CRIT}% for 15m)'
+              priority: AVERAGE
+              description: 'Container memory utilization is too high. The system might be slow to respond.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 34c9c8f8fe5c44b78f41bb3dc01f69b3
+          name: 'Pending request latency'
+          type: DEPENDENT
+          key: gcp.run.pending.request.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of request latencies in milliseconds measured from when the request reaches Cloud Run to when the request is sent to an instance. Includes time spent waiting for a slot on an existing instance, or for a new instance to start (startup latency).'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pending_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+        - uuid: d73f80448d494ea5be7140207555374a
+          name: 'Private received bytes per second'
+          type: DEPENDENT
+          key: gcp.run.private.received_bytes.rate
+          value_type: FLOAT
+          units: Bps
+          description: 'Incoming request traffic, in bytes. Traffic is received over network type `private`.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''private'')].received_bytes.first()'
+          master_item:
+            key: gcp.run.http.traffic.get
+          tags:
+            - tag: component
+              value: network
+            - tag: component
+              value: traffic
+            - tag: type
+              value: private
+        - uuid: 8db2392400dc4908903ee887e53c709e
+          name: 'Requests 2xx per second'
+          type: DEPENDENT
+          key: gcp.run.request.2xx.rate
+          value_type: FLOAT
+          description: 'Number of `2xx` requests reaching the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''2xx'')].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.request.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 2xx
+        - uuid: b4122b379795426882be5bc726110e3d
+          name: 'Requests 3xx per second'
+          type: DEPENDENT
+          key: gcp.run.request.3xx.rate
+          value_type: FLOAT
+          description: 'Number of `3xx` requests reaching the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''3xx'')].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.request.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 3xx
+        - uuid: 0ce26db6ac094c3f801683affb288d13
+          name: 'Requests 4xx per second'
+          type: DEPENDENT
+          key: gcp.run.request.4xx.rate
+          value_type: FLOAT
+          description: 'Number of `4xx` requests reaching the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''4xx'')].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.request.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 4xx
+        - uuid: b80cecd02b4f42a59d284a333eff567f
+          name: 'Requests 5xx per second'
+          type: DEPENDENT
+          key: gcp.run.request.5xx.rate
+          value_type: FLOAT
+          description: 'Number of `5xx` requests reaching the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.label_value == ''5xx'')].value.first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: gcp.run.request.get
+          tags:
+            - tag: component
+              value: requests
+            - tag: http-code
+              value: 5xx
+          triggers:
+            - uuid: 17a07402bdb54198ac8d99ddf204cf71
+              expression: 'min(/GCP Cloud Run Service by HTTP/gcp.run.request.5xx.rate,5m)>{$GCP.HTTP.FAIL.MAX.WARN}'
+              name: 'GCP Cloud Run Service: Too many HTTP request failures'
+              event_name: 'GCP Cloud Run Service: Too many HTTP request failures (over {$GCP.HTTP.FAIL.MAX.WARN} for 5m)'
+              priority: WARNING
+              description: 'Too many requests failed on service with the `5xx` HTTP code.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 30c58b23cb1045fa8232c41d8756d6d2
+          name: 'Get request'
+          type: HTTP_AGENT
+          key: gcp.run.request.get
+          delay: '{$GCP.TIME.WINDOW}'
+          history: '0'
+          value_type: TEXT
+          description: 'Number of requests reaching the service.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var request_count = getField(json_data, 'timeSeriesData'),
+                  	output_data = [];
+                  
+                  for (var entity in request_count) {
+                  	output_data.push({
+                  		label_value: getField(request_count[entity], 'labelValues.0.stringValue'),
+                  		value: getField(request_count[entity], 'pointData.0.values.0.doubleValue')
+                  	});
+                  }
+                  
+                  return JSON.stringify(output_data);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+              "query": "fetch cloud_run_revision
+            | metric 'run.googleapis.com/request_count'
+            | filter resource.service_name == '{HOST.NAME}'
+            | align rate({$GCP.TIME.WINDOW})
+            | every {$GCP.TIME.WINDOW}
+            | group_by [metric.response_code_class],[value_request_count_aggregate: aggregate(value.request_count)]"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+            - tag: component
+              value: requests
+        - uuid: 026dd45d97984d1282a4fe015083127d
+          name: 'Request latencies'
+          type: DEPENDENT
+          key: gcp.run.request.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of request times in milliseconds reaching the service.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.request_latencies_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+          triggers:
+            - uuid: 5d0e3e188a774e43ae372990cd49a949
+              expression: 'min(/GCP Cloud Run Service by HTTP/gcp.run.request.latency,5m)>{$GCP.REQUEST.LATENCY.WARN}'
+              name: 'GCP Cloud Run Service: Request latency is too high'
+              event_name: 'GCP Cloud Run Service: Query latency is too high (over {$GCP.REQUEST.LATENCY.WARN}ms for 5m)'
+              opdata: 'Latency: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Fires when latency exceeds the threshold `{$GCP.REQUEST.LATENCY.WARN}`ms.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 5fa1e94d46004f1a929ef43529b77844
+          name: 'Response egress request latency'
+          type: DEPENDENT
+          key: gcp.run.response_egress.request.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of response latencies in milliseconds measured from when the container finished processing the request to when Cloud Run sends the response.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.response_egress_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+        - uuid: d6be76dd39944ec192e187bcbe499933
+          name: 'Routing request latency'
+          type: DEPENDENT
+          key: gcp.run.routing.request.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of request latencies in milliseconds measured from when the request reaches the cloud region to when the request reaches Cloud Run.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.routing_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+        - uuid: f88a42c143954930b7f6ad90c5352299
+          name: 'User execution request latency'
+          type: DEPENDENT
+          key: gcp.run.user_execution.request.latency
+          value_type: FLOAT
+          units: s
+          description: 'Distribution of request latencies in milliseconds measured from when the request reaches a running instance to when it exits. Only includes time spent in the user container.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.user_execution_percentile
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+          master_item:
+            key: gcp.run.latency.get
+          tags:
+            - tag: component
+              value: environment
+            - tag: component
+              value: latency
+        - uuid: 1a9fdee740a9440cb2e3844450b46159
+          name: 'Get container utilization'
+          type: HTTP_AGENT
+          key: gcp.run.utilization.get
+          delay: '{$GCP.TIME.WINDOW}'
+          history: '0'
+          value_type: TEXT
+          description: 'Raw data of utilization container.'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const json_data = JSON.parse(value);
+                  
+                  function getField(data, path) {
+                  	var steps = path.split('.');
+                  
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
+                  }
+                  
+                  
+                  var utilization = getField(json_data, 'timeSeriesData'),
+                  	output_data = [];
+                  
+                  for (var entity in utilization) {
+                  	output_data.push({
+                  		cpu: getField(utilization[entity], 'pointData.0.values.0.doubleValue'),
+                  		memory: getField(utilization[entity], 'pointData.0.values.1.doubleValue'),
+                  		requests: getField(utilization[entity], 'pointData.0.values.2.doubleValue')
+                  	});
+                  };
+                  
+                  return JSON.stringify(output_data);
+          timeout: '{$GCP.DATA.TIMEOUT}'
+          url: 'https://monitoring.googleapis.com/v3/projects/{$GCP.PROJECT.ID}/timeSeries:query'
+          posts: |
+            {
+            "query": "fetch cloud_run_revision
+            | {metric 'run.googleapis.com/container/cpu/utilizations';metric 'run.googleapis.com/container/memory/utilizations';metric 'run.googleapis.com/container/max_request_concurrencies'}
+            | filter resource.service_name == '{HOST.NAME}'
+            | group_by {$GCP.TIME.WINDOW}
+            | every {$GCP.TIME.WINDOW}
+            | group_by [resource.service_name] ,percentile(val(), 100)
+            | join"
+            }
+          headers:
+            - name: Content-Type
+              value: application/json
+            - name: Authorization
+              value: 'Bearer {$GCP.AUTH.TOKEN}'
+          request_method: POST
+          tags:
+            - tag: component
+              value: raw
+      tags:
+        - tag: class
+          value: cloud
+        - tag: subclass
+          value: automation
+        - tag: subclass
+          value: containers
+        - tag: target
+          value: cloud-run
+        - tag: target
+          value: gcp
+        - tag: target
+          value: google-cloud-platform
+      macros:
+        - macro: '{$GCP.CONCURRENT.REQUEST.MAX}'
+          value: '80'
+          description: 'GCP Cloud Run max concurrent request threshold.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Thresholds
+            label: 'Max concurrent request threshold'
+            description: 'Max concurrent request threshold In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCP.CPU.UTIL.MAX}'
+          value: '90'
+          description: 'GCP Cloud Run container instance CPU utilization threshold.'
+          config:
+            type: TEXT
+            priority: '5'
+            section_name: Thresholds
+            label: 'Warning CPU usage threshold'
+            description: 'CPU usage threshold. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCP.DATA.TIMEOUT}'
+          value: 15s
+          description: 'Response timeout for API.'
+          config:
+            type: TEXT
+            priority: '2'
+            section_name: Other
+            label: 'Response timeout'
+            description: 'Response timeout for API.'
+        - macro: '{$GCP.HTTP.FAIL.MAX.WARN}'
+          value: '5'
+          description: 'The maximum number of HTTP request failures for trigger expression.'
+          config:
+            type: TEXT
+            priority: '8'
+            section_name: Thresholds
+            label: 'Max HTTP request failures'
+            description: 'The maximum number of HTTP request failures for trigger expression.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCP.MEMORY.UTIL.CRIT}'
+          value: '90'
+          description: 'GCP Cloud Run container instance memory utilization threshold.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Thresholds
+            label: 'Warning memory usage threshold'
+            description: 'Memory usage threshold In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCP.PROJECT.ID}'
+          description: 'GCP project ID.'
+          config:
+            type: TEXT
+            priority: '1'
+            label: 'GCP project ID'
+            description: 'Google Cloud Platform project ID.'
+            required: 'YES'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
+          config:
+            type: TEXT
+            priority: '4'
+            section_name: Other
+            label: 'HTTP proxy'
+            description: 'HTTP proxy to use for requests.'
+        - macro: '{$GCP.REQUEST.LATENCY.WARN}'
+          value: '100'
+          description: 'Maximum of request latency in milliseconds for trigger expression.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Thresholds
+            label: 'Max request latency (ms)'
+            description: 'Warning threshold for request latency (in milliseconds).'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$GCP.TIME.WINDOW}'
+          value: 5m
+          description: |
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
+      dashboards:
+        - uuid: 46afdd814acb409aaacbf91d7ffa12a6
+          name: 'GCP Cloud Run: Service overview'
+          pages:
+            - name: Overview
+              widgets:
+                - type: problemsbysv
+                  width: '60'
+                  hide_header: 'YES'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: DTUCV
+                    - type: INTEGER
+                      name: severities.0
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '5'
+                - type: gauge
+                  'y': '2'
+                  width: '12'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: STRING
+                      name: description
+                      value: 'CPU utilization'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.cpu.utilization
+                    - type: INTEGER
+                      name: scale_size
+                      value: '10'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '70'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: svggraph
+                  name: 'Request count'
+                  'y': '6'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0080FF
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: f1e061
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.request.2xx.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.request.3xx.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.request.4xx.rate
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.request.5xx.rate
+                    - type: STRING
+                      name: reference
+                      value: GKYQO
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: gauge
+                  x: '12'
+                  'y': '2'
+                  width: '12'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: STRING
+                      name: description
+                      value: 'Memory utilization'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.memory.utilization
+                    - type: INTEGER
+                      name: scale_size
+                      value: '10'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '70'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: item
+                  x: '24'
+                  'y': '2'
+                  width: '12'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: description
+                      value: 'Active container'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.active.container.count
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: FFCA28
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: 81C784
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                - type: item
+                  x: '36'
+                  'y': '2'
+                  width: '12'
+                  height: '4'
+                  hide_header: 'YES'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: STRING
+                      name: description
+                      value: 'Idle container'
+                    - type: INTEGER
+                      name: desc_size
+                      value: '10'
+                    - type: INTEGER
+                      name: desc_v_pos
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.idle.container.count
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: INTEGER
+                      name: show.2
+                      value: '1'
+                - type: svggraph
+                  name: 'Request latencies'
+                  x: '36'
+                  'y': '6'
+                  width: '36'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 9575CD
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.request.latency
+                    - type: STRING
+                      name: reference
+                      value: QRHPT
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: hostcard
+                  x: '48'
+                  'y': '2'
+                  width: '24'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: sections.0
+                      value: '2'
+                    - type: INTEGER
+                      name: sections.1
+                      value: '1'
+                - type: clock
+                  x: '60'
+                  width: '12'
+                  fields:
+                    - type: INTEGER
+                      name: clock_type
+                      value: '1'
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: time_bold
+                      value: '1'
+            - name: Metrics
+              widgets:
+                - type: svggraph
+                  name: 'Sent bytes'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0080FF
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 9575CD
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.gce.google.sent_bytes.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.gce.internet.sent_bytes.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.gce.private.sent_bytes.rate
+                    - type: STRING
+                      name: reference
+                      value: CCPFS
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'Max concurrent requests'
+                  'y': '4'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: f1e061
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.concurrent.request
+                    - type: STRING
+                      name: reference
+                      value: KVHQY
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'Billable instance time'
+                  'y': '8'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: ds.0.approximation
+                      value: '4'
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0080FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.billable.instance.time
+                    - type: INTEGER
+                      name: ds.0.missingdatafunc
+                      value: '1'
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.0.type
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: EVXIN
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'Received bytes'
+                  x: '36'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 0080FF
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 9575CD
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.google.received_bytes.rate
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.internet.received_bytes.rate
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.private.received_bytes.rate
+                    - type: STRING
+                      name: reference
+                      value: ITMKP
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'Latency breakdown'
+                  x: '36'
+                  'y': '4'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 9575CD
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 81C784
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 0080FF
+                    - type: STRING
+                      name: ds.0.color.3
+                      value: f1e061
+                    - type: STRING
+                      name: ds.0.color.4
+                      value: d45c52
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.ingress.region.latency
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.pending.request.latency
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.response_egress.request.latency
+                    - type: ITEM
+                      name: ds.0.itemids.3
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.routing.request.latency
+                    - type: ITEM
+                      name: ds.0.itemids.4
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.user_execution.request.latency
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: STRING
+                      name: reference
+                      value: REFMA
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                - type: svggraph
+                  name: 'End-to-end request latency'
+                  x: '36'
+                  'y': '8'
+                  width: '36'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 9575CD
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'GCP Cloud Run Service by HTTP'
+                        key: gcp.run.e2e.latency
+                    - type: STRING
+                      name: reference
+                      value: HTZUI
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
     - uuid: 507d70db18554a4e9ee5e09bb29bc85f
       template: 'GCP Cloud SQL MSSQL by HTTP'
       name: 'GCP Cloud SQL MSSQL by HTTP'
@@ -1809,7 +3585,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -3508,16 +5284,16 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL MSSQL schedulers by namespace.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: 4233430037fc4570b3a5eb3f23ef02e6
           name: 'MSSQL instance'
@@ -3741,7 +5517,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -3980,16 +5756,16 @@ zabbix_export:
       macros:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: f50d9889ca3c4f6b91dd9e40902e37fb
           name: 'MSSQL replica'
@@ -4036,7 +5812,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -4873,16 +6649,16 @@ zabbix_export:
           description: 'GCP Cloud SQL MySQL instance RAM usage threshold.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: 5932cc56f6f146db8fac121b3817a407
           name: 'MySQL instance'
@@ -5076,7 +6852,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -5369,16 +7145,16 @@ zabbix_export:
       macros:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: 76eda12212f045388bef22cb382eff6b
           name: 'MySQL replica'
@@ -5504,7 +7280,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -6689,16 +8465,16 @@ zabbix_export:
           description: 'The filter to exclude GCP Cloud SQL PostgreSQL databases by namespace.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: 21636cfe7d2f4de28d07af09c9812075
           name: 'PostgreSQL instance'
@@ -6928,7 +8704,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -7235,16 +9011,16 @@ zabbix_export:
       macros:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: acb71f4a818d43e0b045ba87c2daa989
           name: 'PostgreSQL replica'
@@ -7304,7 +9080,7 @@ zabbix_export:
         Generated by official Zabbix template tool "Templator"
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Cloud
       items:
@@ -8497,16 +10273,16 @@ zabbix_export:
           description: 'GCP Compute Engine instance RAM utilization threshold.'
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
-          description: 'A response timeout for an API.'
+          description: 'Response timeout for API.'
         - macro: '{$GCP.PROXY}'
-          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
+          description: 'Sets HTTP proxy value. If this macro is empty, then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
-            Time interval for the data requests.
-            Supported usage type:
-            1. The default update interval for most of the items.
-            2. The minimal time window for the data requested in the Monitoring Query Language REST API request.
+            Time interval for data requests.
+            Supported usage types:
+            - Default update interval for most items.
+            - Minimal time window for data requested in Monitoring Query Language REST API request.
       dashboards:
         - uuid: b8b09f6833ec4ea78c4ac7d15cdb0cc5
           name: Hardware
