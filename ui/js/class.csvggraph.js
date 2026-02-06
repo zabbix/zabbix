@@ -136,7 +136,7 @@ class CSvgGraph {
 	}
 
 	activate() {
-		this.#svg.addEventListener('click', this.#mouseClickHandler)
+		this.#svg.addEventListener('click', this.#mouseClickHandler);
 		this.#svg.addEventListener('mousemove', this.#mouseMoveHandler);
 		this.#svg.addEventListener('mouseleave', this.#mouseLeaveHandler);
 		this.#svg.addEventListener('onShowStaticHint', this.#onStaticHintboxOpen);

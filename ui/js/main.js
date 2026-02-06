@@ -445,8 +445,8 @@ const hintBox = {
 		const hintboxid = hintBox.getUniqueId();
 		const box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue hintbox wordbreak');
 
-		for (let el = target; el && el !== document.body; el = el.parentElement) {
-			if (getComputedStyle(el).position === 'fixed') {
+		for (let element = target; element && element !== document.body; element = element.parentElement) {
+			if (getComputedStyle(element).position === 'fixed') {
 				box.addClass('hintbox-position-fixed');
 				break;
 			}
