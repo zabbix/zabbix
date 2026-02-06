@@ -814,7 +814,7 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$form = $this->query('name:graphForm')->waitUntilVisible()->asForm()->one();
-		$form->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$form->invalidate();
 
 		if (CTestArrayHelper::get($data, 'check_buttons')) {
