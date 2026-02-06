@@ -7966,7 +7966,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&hmacro_sync, "hostmacro", mode);
 	zbx_dbsync_init(&if_sync, "interface", mode);
 	zbx_dbsync_init_changelog(&items_sync, "items", changelog_sync_mode);
-	zbx_dbsync_init(&item_discovery_sync, "item_discovery", mode);
+	zbx_dbsync_init_changelog(&item_discovery_sync, "item_discovery", changelog_sync_mode);
 	zbx_dbsync_init_changelog(&triggers_sync, "triggers", changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, "trigger_depends", mode);
 	zbx_dbsync_init_changelog(&func_sync, "functions", changelog_sync_mode);

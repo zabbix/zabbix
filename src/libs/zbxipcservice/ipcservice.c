@@ -1339,7 +1339,7 @@ void	zbx_ipc_message_format(const zbx_ipc_message_t *message, char **data)
 		if (0 != i)
 			zbx_strcpy_alloc(data, &data_alloc, &data_offset, (0 == (i & 7) ? " | " : " "));
 
-		zbx_snprintf_alloc(data, &data_alloc, &data_offset, "%02x", (int)message->data[i]);
+		zbx_snprintf_alloc(data, &data_alloc, &data_offset, "%02x", (unsigned int)message->data[i]);
 	}
 
 	(*data)[data_offset] = '\0';
