@@ -1146,13 +1146,19 @@ class testDashboardPlainTextWidget extends CWebTest {
 		}
 
 		if (array_key_exists('host_select', $data)) {
-			$host_select = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
-			$host_select->fill($data['host_select']['without_data']);
+			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
+			$multiselect_field->fill($data['host_select']['without_data']);
+			$dashboard->waitUntilReady();
 			$this->assertEquals([], $this->getWidgetTableData($widget));
-			$host_select->overwrite($data['host_select']['with_data']);
+			$multiselect_field->fill($data['host_select']['with_data']);
+			$dashboard->waitUntilReady();
 			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
-			$host_select->clear();
-			$widget->waitUntilReady();
+			$multiselect_field->clear();
+			$dashboard->waitUntilReady();
+		}
+
+		if (array_key_exists('result', $data)) {
+			$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 		}
 	}
 
