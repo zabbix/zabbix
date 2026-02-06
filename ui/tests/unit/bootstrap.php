@@ -20,7 +20,6 @@ else {
 	error_reporting(E_ALL | E_STRICT);
 }
 
-require_once __DIR__.'/../../include/polyfill.inc.php';
 require_once __DIR__.'/../../include/defines.inc.php';
 require_once __DIR__.'/../../include/func.inc.php';
 require_once __DIR__.'/../../include/gettextwrapper.inc.php';
