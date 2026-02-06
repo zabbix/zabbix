@@ -799,6 +799,25 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Item_for_graph_2'
 					]
 				]
+			],
+			// #35 Click on Apply button restarts subfilter settings.
+			[
+				[
+					'filter' => [
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1'
+						],
+						'Tag values' => [
+							'tag_value_1'
+						]
+					],
+					'graphs_amount' => 3,
+					'resetSubfilter' => true,
+				]
+
 			]
 		];
 	}
@@ -848,10 +867,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			}
 		}
 
-		if(array_key_exists('output', $data)) {
-					$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])
-					->submit()->waitUntilStalled();
-					}
+		// Apply button restarts subfilter settings
+		if (array_key_exists('resetSubfilter', $data)) {
+			$form->fill($data['filter'])->submit()->waitUntilStalled();
+		}
 
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {
@@ -906,6 +925,28 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
 		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
+	}
+
+	/**
+	 * Apply button resets subfilter
+	 */
+	public function testPageMonitoringHostsGraph_ApplyResetsSubfilter() {
+		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
+				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
+
+		// If the filter is not visible - enable it.
+		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
+			$this->query('id:ui-id-2')->one()->click();
+		}
+
+		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$form->query('button:Reset')->one()->click()->waitUntilStalled();
+
+		$table = $this->getTable();
+		$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1'])->submit()->waitUntilStalled();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+
 	}
 
 	/**
