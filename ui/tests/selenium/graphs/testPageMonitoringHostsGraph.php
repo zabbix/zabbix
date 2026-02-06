@@ -854,7 +854,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			// Click on subfilter.
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
-					// TODO: need to figure out why the table needs to be initialized again
+					// TODO: need to figure out why the table needs to be initialized again.
 					$table = $this->getTable();
 					$xpath = 'xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 							CXPathHelper::escapeQuotes($value).']';
@@ -867,7 +867,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			}
 		}
 
-		// Apply button restarts subfilter settings
+		// Apply button restarts subfilter settings.
 		if (array_key_exists('resetSubfilter', $data)) {
 			$form->fill($data['filter'])->submit()->waitUntilStalled();
 		}
@@ -925,28 +925,6 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		// Check that Header and Filter are visible again.
 		$this->query('xpath://h1[@id="page-title-general"]')->waitUntilVisible();
 		$this->assertTrue($this->query('xpath://div[@aria-label="Filter"]')->exists());
-	}
-
-	/**
-	 * Apply button resets subfilter
-	 */
-	public function testPageMonitoringHostsGraph_ApplyResetsSubfilter() {
-		$this->page->login()->open('zabbix.php?view_as=showgraph&action=charts.view&from=now-1h&to='.
-				'now&filter_search_type=0&filter_set=1')->waitUntilReady();
-
-		// If the filter is not visible - enable it.
-		if ($this->query('xpath://li[@aria-labelledby="ui-id-2" and @aria-selected="false"]')->exists()) {
-			$this->query('id:ui-id-2')->one()->click();
-		}
-
-		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$form->query('button:Reset')->one()->click()->waitUntilStalled();
-
-		$table = $this->getTable();
-		$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1'])->submit()->waitUntilStalled();
-		$table->waitUntilReloaded();
-		$this->page->waitUntilReady();
-
 	}
 
 	/**
