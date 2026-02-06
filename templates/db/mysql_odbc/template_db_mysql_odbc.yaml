@@ -1633,12 +1633,13 @@ zabbix_export:
               units: B
               description: 'The amount of unused but allocated space.'
               preprocessing:
-                - type: CHECK_NOT_SUPPORTED
-                  parameters:
-                    - '-1'
                 - type: JSONPATH
                   parameters:
                     - $.DATA_FREE
+                - type: MULTIPLIER
+                  parameters:
+                    - '1'
+                  error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -1656,12 +1657,13 @@ zabbix_export:
               units: B
               description: 'The size of the data in the table.'
               preprocessing:
-                - type: CHECK_NOT_SUPPORTED
-                  parameters:
-                    - '-1'
                 - type: JSONPATH
                   parameters:
                     - $.DATA_LENGTH
+                - type: MULTIPLIER
+                  parameters:
+                    - '1'
+                  error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -1700,12 +1702,13 @@ zabbix_export:
               units: B
               description: 'The size occupied by the table''s indexes.'
               preprocessing:
-                - type: CHECK_NOT_SUPPORTED
-                  parameters:
-                    - '-1'
                 - type: JSONPATH
                   parameters:
                     - $.INDEX_LENGTH
+                - type: MULTIPLIER
+                  parameters:
+                    - '1'
+                  error_handler: DISCARD_VALUE
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1h
@@ -1750,6 +1753,9 @@ zabbix_export:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               tags:
                 - tag: database
                   value: '{#DATABASE}'
