@@ -551,7 +551,7 @@ zbx_int64_t	zbx_json_validate(const char *start, char **error)
 
 zbx_int64_t	zbx_json_validate_ext(const char *start, char **error)
 {
-	zbx_uint64_t	len = json_parse_value(start, NULL, 0, error);
+	zbx_int64_t	len = json_parse_value(start, NULL, 0, error);
 
 	start += len;
 	SKIP_WHITESPACE(start);
