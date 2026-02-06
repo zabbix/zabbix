@@ -57,10 +57,6 @@ class CControllerHostList extends CController {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
-	/**
-	 * @throws APIException
-	 * @throws Exception
-	 */
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);

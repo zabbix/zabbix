@@ -138,26 +138,6 @@ $filter_tags_table->addRow(
 	))->setColSpan(3)
 );
 
-$tag_format_line = (new CHorList())
-	->addItem((new CRadioButtonList('show_tags', (int) $data['show_tags']))
-		->addValue(_('None'), SHOW_TAGS_NONE, 'show_tags_'.SHOW_TAGS_NONE.'#{uniqid}')
-		->addValue(SHOW_TAGS_1, SHOW_TAGS_1, 'show_tags_'.SHOW_TAGS_1.'#{uniqid}')
-		->addValue(SHOW_TAGS_2, SHOW_TAGS_2, 'show_tags_'.SHOW_TAGS_2.'#{uniqid}')
-		->addValue(SHOW_TAGS_3, SHOW_TAGS_3, 'show_tags_'.SHOW_TAGS_3.'#{uniqid}')
-		->setModern(true)
-		->setId('show_tags_#{uniqid}')
-	)
-	->addItem((new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN))
-	->addItem(new CLabel(_('Tag name')))
-	->addItem((new CRadioButtonList('tag_name_format', (int) $data['tag_name_format']))
-		->addValue(_('Full'), TAG_NAME_FULL, 'tag_name_format_'.TAG_NAME_FULL.'#{uniqid}')
-		->addValue(_('Shortened'), TAG_NAME_SHORTENED, 'tag_name_format_'.TAG_NAME_SHORTENED.'#{uniqid}')
-		->addValue(_('None'), TAG_NAME_NONE, 'tag_name_format_'.TAG_NAME_NONE.'#{uniqid}')
-		->setModern(true)
-		->setEnabled((int) $data['show_tags'] !== SHOW_TAGS_NONE)
-		->setId('tag_name_format_#{uniqid}')
-	);
-
 $right_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([

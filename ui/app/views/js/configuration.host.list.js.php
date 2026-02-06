@@ -249,7 +249,9 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', '<?= _('Name'); ?>')
-						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status'])
+						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status', 'discoveryData',
+							'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
+							'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false),
@@ -285,7 +287,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setRenderer('status')
 						.setSortable(true),
 					new CDataTableColumn('availability', '<?= _('Availability'); ?>')
-						.setFields(['availability']),
+						.setFields(['availability', 'active_available']),
 					new CDataTableColumn('encryption', '<?= _('Agent encryption'); ?>')
 						.setFields(['tls_accept', 'tls_connect'])
 						.setRenderer('encryption'),

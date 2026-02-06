@@ -29,13 +29,9 @@ class CControllerLatestView extends CControllerLatest {
 			'groupids' =>				'array_db hosts_groups.groupid',
 			'hostids' =>				'array_db hosts.hostid',
 			'name' =>					'string',
-			'show_details' =>			'in 1,0',
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'state' =>					'in -1,'.ITEM_STATE_NORMAL.','.ITEM_STATE_NOTSUPPORTED,
-			'show_tags' =>				'in '.SHOW_TAGS_NONE.','.SHOW_TAGS_1.','.SHOW_TAGS_2.','.SHOW_TAGS_3,
-			'tag_name_format' =>		'in '.TAG_NAME_FULL.','.TAG_NAME_SHORTENED.','.TAG_NAME_NONE,
-			'tag_priority' =>			'string',
 
 			// table sorting inputs
 			'sort' =>					'in host,name',
@@ -183,27 +179,6 @@ class CControllerLatestView extends CControllerLatest {
 
 		$this->extendData($prepared_data);
 
-		$refresh_data = array_filter([
-			'groupids' => $filter['groupids'],
-			'hostids' => $filter['hostids'],
-			'name' => $filter['name'],
-			'show_details' => $filter['show_details'] ? 1 : 0,
-			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
-			'state' => $filter['state'],
-			'show_tags' => $filter['show_tags'],
-			'tag_name_format' => $filter['tag_name_format'],
-			'tag_priority' => $filter['tag_priority'],
-			'subfilter_hostids' => $filter['subfilter_hostids'],
-			'subfilter_tagnames' => $filter['subfilter_tagnames'],
-			'subfilter_tags' => $filter['tags'],
-			'subfilter_state' => $filter['subfilter_state'],
-			'subfilter_data' => $filter['subfilter_data'],
-			'sort' => $sort_field,
-			'sortorder' => $sort_order,
-			'page' => $this->hasInput('page') ? $this->getInput('page') : null
-		]);
-
 		$storage_idx = self::FILTER_IDX.'.datatable';
 
 		// display
@@ -231,20 +206,7 @@ class CControllerLatestView extends CControllerLatest {
 			'uncheck' => $this->hasInput('filter_reset'),
 			'storage_idx' => $storage_idx,
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
-				CProfile::getArray($storage_idx, [])),
-			'config' => [
-				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS),
-				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
-				'hk_history' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY),
-				'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
-			],
-			'tags' => CTagHelper::getTagsHtml($prepared_data['items'], ZBX_TAG_OBJECT_ITEM, [
-				'filter_tags' => $filter['tags'],
-				'tag_priority' => $filter['tag_priority'],
-				'show_tags_limit' => (int) $filter['show_tags'],
-				'tag_name_format' => (int) $filter['tag_name_format'],
-				'subfilter_tags' => array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : []
-			])
+				CProfile::getArray($storage_idx, []))
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

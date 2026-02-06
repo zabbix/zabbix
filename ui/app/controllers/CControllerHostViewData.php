@@ -20,10 +20,6 @@ class CControllerHostViewData extends CControllerDataTable {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
 	}
 
-	/**
-	 * @throws APIException
-	 * @throws Exception
-	 */
 	protected function getData(): array {
 		$columns = $this->getInput('columns');
 		$fields = $this->extractFields($columns);

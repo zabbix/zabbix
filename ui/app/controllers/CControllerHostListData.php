@@ -20,37 +20,12 @@ class CControllerHostListData extends CControllerDataTable {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function getData(): array {
 		$columns = $this->getInput('columns');
+		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', (int) CPagerHelper::loadPage('host.list'));
-		$sort_field = $this->getInput('sort_field', CProfile::get('web.hosts.sort', 'name'));
-		$sort_order = $this->getInput('sort_order', CProfile::get('web.hosts.sortorder', ZBX_SORT_UP));
-
-		$filter = array_merge([
-			'ip' => CProfile::get('web.hosts.filter_ip', ''),
-			'dns' => CProfile::get('web.hosts.filter_dns', ''),
-			'host' => CProfile::get('web.hosts.filter_host', ''),
-			'templates' => CProfile::getArray('web.hosts.filter_templates', []),
-			'groups' => CProfile::getArray('web.hosts.filter_groups', []),
-			'port' => CProfile::get('web.hosts.filter_port', ''),
-			'status' => CProfile::get('web.hosts.filter_status', -1),
-			'monitored_by' => CProfile::get('web.hosts.filter_monitored_by', ZBX_MONITORED_BY_ANY),
-			'proxyids' => CProfile::getArray('web.hosts.filter_proxyids', []),
-			'proxy_groupids' => CProfile::getArray('web.hosts.filter_proxy_groupids', []),
-			'evaltype' => CProfile::get('web.hosts.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
-			'tags' => []
-		], $this->getInput('filter', []));
-
-		foreach (CProfile::getArray('web.hosts.filter.tags.tag', []) as $i => $tag) {
-			$filter['tags'][] = [
-				'tag' => $tag,
-				'value' => CProfile::get('web.hosts.filter.tags.value', null, $i),
-				'operator' => CProfile::get('web.hosts.filter.tags.operator', null, $i)
-			];
-		}
+		$sort_field = $this->getInput('sort_field');
+		$sort_order = $this->getInput('sort_order');
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
@@ -131,10 +106,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 		$this->paging = $this->paginate($hosts, $page, $sort_order);
 
-		$fields = $this->extractFields($columns, [
-			'discovery' => ['discoveryData', 'discoveryRule', 'is_discovery_rule_editable'],
-			'maintenance' => ['maintenanceid', 'maintenance_type', 'maintenance_status']
-		]);
+		$fields = $this->extractFields($columns);
 
 		$hostids = array_column($hosts, 'hostid');
 		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);

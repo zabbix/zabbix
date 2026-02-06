@@ -20,36 +20,14 @@ class CControllerTemplateListData extends CControllerDataTable {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function getData(): array {
-		$filter = [
-			'name' => CProfile::get(CControllerTemplateList::FILTER_IDX.'.filter_name', ''),
-			'vendor_name' => CProfile::get(CControllerTemplateList::FILTER_IDX.'.filter_vendor_name', ''),
-			'vendor_version' => CProfile::get(CControllerTemplateList::FILTER_IDX.'.filter_vendor_version', ''),
-			'templates' => CProfile::getArray(CControllerTemplateList::FILTER_IDX.'.filter_templates'),
-			'groups' => CProfile::getArray(CControllerTemplateList::FILTER_IDX.'.filter_groups'),
-			'evaltype' => CProfile::get(CControllerTemplateList::FILTER_IDX.'.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
-			'tags' => []
-		];
-
-		foreach (CProfile::getArray(CControllerTemplateList::FILTER_IDX.'.filter.tags.tag', []) as $i => $tag) {
-			$filter['tags'][] = [
-				'tag' => $tag,
-				'value' => CProfile::get(CControllerTemplateList::FILTER_IDX.'.filter.tags.value', null, $i),
-				'operator' => CProfile::get(CControllerTemplateList::FILTER_IDX.'.filter.tags.operator', null, $i)
-			];
-		}
+		$columns = $this->getInput('columns');
+		$filter = $this->getInput('filter', []);
+		$page = $this->getInput('page', 1);
+		$sort_field = $this->getInput('sort_field');
+		$sort_order = $this->getInput('sort_order');
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
-
-		$columns = $this->getInput('columns');
-		$page = $this->getInput('page', 1);
-		$sort_field = $this->getInput('sort_field',
-			CProfile::get(CControllerTemplateList::FILTER_IDX.'.sort', 'name'));
-		$sort_order = $this->getInput('sort_order',
-			CProfile::get(CControllerTemplateList::FILTER_IDX.'.sortorder', ZBX_SORT_UP));
 
 		CProfile::update(CControllerTemplateList::FILTER_IDX.'.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update(CControllerTemplateList::FILTER_IDX.'.sortorder', $sort_order, PROFILE_TYPE_STR);
@@ -57,7 +35,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 		$filter['templates'] = $filter['templates']
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([
 				'output' => ['templateid', 'name'],
-				'templateids' => $filter['templates'],
+				'templateids' => array_column($filter['templates'], 'id'),
 				'preservekeys' => true
 			]), ['templateid' => 'id'])
 			: [];
@@ -66,7 +44,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 		$filter['groups'] = $filter['groups']
 			? CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groups'],
+				'groupids' => array_column($filter['groups'], 'id'),
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];

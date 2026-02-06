@@ -21,11 +21,6 @@ class CControllerProblemViewData extends CControllerDataTable
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
 
-	/**
-	 * @throws Exception
-	 *
-	 * @return array
-	 */
 	protected function getData(): array
 	{
 		$rows = [];
@@ -48,8 +43,8 @@ class CControllerProblemViewData extends CControllerDataTable
 	}
 
 	private static function addProblemRows(array &$rows, array &$data, array $problems, array $filter,
-		array $options, array $context_popup_data, bool $nested = false): void
-	{
+			array $options, array $context_popup_data, bool $nested = false): void {
+
 		foreach ($problems as $problem) {
 			if ($data['sort_field'] == 'clock' && $context_popup_data['show_timeline'] && !$options['compact_view']
 					&& $data['last_clock'] != 0) {
@@ -87,7 +82,7 @@ class CControllerProblemViewData extends CControllerDataTable
 					&& $data['allowed']['close'] && !$in_closing
 				);
 				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
-				$value_clock = $in_closing ? time() : $problem['clock'];
+				$value_clock = $in_closing ? time() : $clock;
 			}
 
 			$status = getEventStatusString($in_closing, $problem);
@@ -310,13 +305,6 @@ class CControllerProblemViewData extends CControllerDataTable
 		return $breakpoint;
 	}
 
-	/**
-	 * @param string $type
-	 *
-	 * @throws Exception
-	 *
-	 * @return string|null
-	 */
 	protected function export(string $type): ?string {
 		if ($type != 'csv') {
 			return null;
@@ -451,20 +439,14 @@ class CControllerProblemViewData extends CControllerDataTable
 		return zbx_toCSV($csv);
 	}
 
-	/**
-	 * @throws Exception
-	 *
-	 * @return array
-	 */
 	private function prepareData(): array {
 		$columns = $this->getInput('columns');
 		$fields = $this->extractFields($columns);
+		$filter = $this->getInput('filter', []);
+		$page = $this->getInput('page', 1);
 		$options = $this->getInput('options', []);
 		$context_popup_data = array_merge(...array_column($columns, 'context_popup_data'));
-		$export = $this->getInput('export_file');
-
-		$filter = $this->getInput('filter', []);
-		$page = $this->getInput('page');
+		$export = $this->getInput('export_file', '');
 
 		$sort_field = $this->getInput('sort_field', CControllerProblem::FILTER_FIELDS_DEFAULT['sort']);
 		$sort_order = $this->getInput('sort_order', CControllerProblem::FILTER_FIELDS_DEFAULT['sortorder']);
@@ -694,6 +676,7 @@ class CControllerProblemViewData extends CControllerDataTable
 			'columns' => $columns,
 			'fields' => $fields,
 			'filter' => $filter,
+			'page' => $page,
 			'options' => $options,
 			'context_popup_data' => $context_popup_data,
 			'triggers_hosts' => $triggers_hosts,

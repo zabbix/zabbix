@@ -46,9 +46,6 @@ abstract class CControllerDataTable extends CController {
 
 	abstract protected function getData(): array;
 
-	/**
-	 * @throws Exception
-	 */
 	protected function init(): void {
 		parent::init();
 
@@ -81,11 +78,6 @@ abstract class CControllerDataTable extends CController {
 		return $ret;
 	}
 
-	/**
-	 * @throws Exception
-	 *
-	 * @return array
-	 */
 	protected function paginate(array &$rows, int $page, string $sort_order): array {
 		$num_rows = count($rows);
 		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
@@ -122,9 +114,6 @@ abstract class CControllerDataTable extends CController {
 		return null;
 	}
 
-	/**
-	 * @throws Exception
-	 */
 	protected function doAction(): void {
 		$export = $this->getInput('export_file', '');
 		if ($export == 'csv') {
@@ -205,20 +194,9 @@ abstract class CControllerDataTable extends CController {
 		]));
 	}
 
-	/**
-	 * @param array $columns
-	 * @param array $additional_fields
-	 * @return array
-	 */
-	protected function extractFields(array $columns, array $additional_fields = []): array {
+	protected function extractFields(array $columns): array {
 		$visible_columns = array_filter($columns, static fn (array $column_config) => $column_config['visible']);
 		$fields = array_merge(...array_column($visible_columns, 'fields'));
-
-		foreach (array_keys($additional_fields) as $field) {
-			if (in_array($field, $fields)) {
-				$fields = array_merge($fields, $additional_fields[$field]);
-			}
-		}
 
 		return array_keys(array_flip($fields));
 	}

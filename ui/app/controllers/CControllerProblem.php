@@ -35,18 +35,9 @@ abstract class CControllerProblem extends CController {
 		'inventory' => [],
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
-//		'show_tags' => SHOW_TAGS_3,
 		'show_symptoms' => 0,
-//		'show_suppressed' => 0,
 		'acknowledgement_status' => ZBX_ACK_STATUS_ALL,
 		'acknowledged_by_me' => 0,
-//		'compact_view' => 0,
-//		'show_timeline' => ZBX_TIMELINE_ON,
-//		'details' => 0,
-//		'highlight_row' => ZBX_HIGHLIGHT_OFF,
-//		'show_opdata' => OPERATIONAL_DATA_SHOW_NONE,
-//		'tag_name_format' => TAG_NAME_FULL,
-//		'tag_priority' => '',
 		'page' => null,
 		'sort' => 'clock',
 		'sortorder' => ZBX_SORT_DOWN,
@@ -58,8 +49,6 @@ abstract class CControllerProblem extends CController {
 	 * Get count of resulting rows for specified filter.
 	 *
 	 * @param array $filter Filter fields values.
-	 *
-	 * @throws Exception
 	 *
 	 * @return int
 	 */

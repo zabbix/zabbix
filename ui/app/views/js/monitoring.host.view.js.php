@@ -135,7 +135,7 @@
 					new CDataTableColumn('interface', '<?= _('Interface') ?>')
 						.setFields(['interface']),
 					new CDataTableColumn('availability', '<?= _('Availability') ?>')
-						.setFields(['availability']),
+						.setFields(['availability', 'active_available']),
 					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
 						.setFields(['tags']),
 					new CDataTableColumn('status', '<?= _('Status') ?>')
