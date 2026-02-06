@@ -449,7 +449,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->openGlobalMacros();
 		$form = $this->query('name:macrosForm')->asForm()->one();
 		$form->fill(['id:macros_0_macro' => '']);
-
+sleep(1);
 		$this->page->removeFocus();
 		$this->assertInlineError($form, ['id:macros_0_macro' => 'Macro: This field cannot be empty.']);
 
