@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,6 +30,7 @@
 #include "zbxexpr.h"
 #include "zbxhash.h"
 #include "zbxinterface.h"
+#include "zbxip.h"
 #include "../server_constants.h"
 #include "zbx_item_constants.h"
 
@@ -5692,6 +5693,26 @@ static void	lld_host_interfaces_make(zbx_uint64_t hostid, zbx_vector_lld_host_pt
 	zbx_vector_if_update_destroy(&updates);
 }
 
+static void	lld_interface_port_trim(char *port)
+{
+	unsigned short	value;
+
+	zbx_lrtrim(port, ZBX_WHITESPACE);
+
+	if (SUCCEED != zbx_is_ushort(port, &value))
+		return;
+
+	if (0 == value)
+	{
+		*port++ = '0';
+		*port = '\0';
+
+		return;
+	}
+
+	zbx_ltrim(port, "0");
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: interfaces - [IN] Sorted list of interfaces which should be    *
@@ -5744,10 +5765,14 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 			new_interface->port_orig = NULL;
 
 			zbx_substitute_lld_macros(&new_interface->ip, host->lld_row->data, ZBX_MACRO_ANY, NULL, 0);
+			zbx_lrtrim(new_interface->ip, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->dns, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 					0);
+			zbx_lrtrim(new_interface->dns, ZBX_WHITESPACE);
 			zbx_substitute_lld_macros(&new_interface->port, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 					0);
+			lld_interface_port_trim(new_interface->port);
+
 
 			if (INTERFACE_TYPE_SNMP == interface->type)
 			{
@@ -5782,14 +5807,19 @@ static void	lld_interfaces_make(const zbx_vector_lld_interface_ptr_t *interfaces
 
 				zbx_substitute_lld_macros(&snmp->community, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 						0);
+				zbx_lrtrim(snmp->community, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->securityname, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 						0);
+				zbx_lrtrim(snmp->securityname, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->authpassphrase, host->lld_row->data, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->authpassphrase, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->privpassphrase, host->lld_row->data, ZBX_MACRO_ANY,
 						NULL, 0);
+				zbx_lrtrim(snmp->privpassphrase, ZBX_WHITESPACE);
 				zbx_substitute_lld_macros(&snmp->contextname, host->lld_row->data, ZBX_MACRO_ANY, NULL,
 						0);
+				zbx_lrtrim(snmp->contextname, ZBX_WHITESPACE);
 			}
 			else
 			{
@@ -5932,6 +5962,191 @@ static int	another_main_interface_exists(const zbx_vector_lld_interface_ptr_t *i
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: validate DNS name containing macros                               *
+ *                                                                            *
+ * Parameters: dns - [IN] DNS name string to validate                         *
+ *                                                                            *
+ * Return value: SUCCEED - DNS name is valid                                  *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Possible macro values are ignored.                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	lld_validate_dns(const char *dns)
+{
+	zbx_token_t	token;
+	int		pos = 0, start = 0, len = 0, end = 0;
+
+	while (SUCCEED == zbx_token_find(dns, pos, &token, ZBX_TOKEN_SEARCH_REFERENCES))
+	{
+		switch (token.type)
+		{
+			case ZBX_TOKEN_MACRO:
+			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
+				if (0 != start && '.' == dns[start])
+				{
+					start++;
+					len++;
+				}
+				if ((int)token.loc.l != start)
+				{
+					if (SUCCEED != zbx_validate_hostname_len(dns + start, (int)token.loc.l - start))
+						return FAIL;
+				}
+
+				len += (int)token.loc.l - start;
+				pos = (int)token.loc.r + 1;
+				start = pos;
+				continue;
+			default:
+				pos++;
+				continue;
+		}
+	}
+
+	if (0 != start && '.' == dns[start])
+		start++;
+
+	end = (int)strlen(dns);
+
+	if (ZBX_MAX_DNSNAME_LEN < len + end - start)
+		return FAIL;
+
+	if (start >= end)
+		return SUCCEED;
+
+	return zbx_validate_hostname_len(dns + start, end - start);
+}
+
+static int	lld_interface_validate_fields(const zbx_lld_interface_t *interface, const char *hostname, char **error)
+{
+	const char	*op;
+
+	op = (0 == interface->interfaceid ? "create" : "update");
+
+	if (ZBX_INTERFACE_PORT_LEN < zbx_strlen_utf8(interface->port))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"port is too long.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+
+	if ('\0' == *interface->port)
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"port cannot be empty.\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname);
+
+		return FAIL;
+	}
+
+	unsigned short	port_n;
+
+	if (FAIL == zbx_is_ushort(interface->port, &port_n) && FAIL == zbx_is_user_macro(interface->port))
+	{
+		*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid port value \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname, interface->port);
+
+		return FAIL;
+	}
+
+	if ('\0' == *interface->dns)
+	{
+		if (0 == interface->useip)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"DNS name cannot be empty.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+	}
+	else
+	{
+		if (ZBX_INTERFACE_DNS_LEN < zbx_strlen_utf8(interface->dns))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"DNS name is too long.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+
+		if (FAIL == lld_validate_dns(interface->dns))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid DNS name \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig),
+				hostname, interface->dns);
+
+			return FAIL;
+		}
+	}
+
+	if ('\0' == *interface->ip)
+	{
+		if (0 != interface->useip)
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"IP address cannot be empty.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+	}
+	else
+	{
+		if (ZBX_INTERFACE_IP_LEN < zbx_strlen_utf8(interface->ip))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+					"IP address is too long.\n",
+					op, zbx_interface_type_string(interface->type_orig),
+					hostname);
+
+			return FAIL;
+		}
+
+		if (SUCCEED != zbx_is_ip(interface->ip) && SUCCEED != zbx_is_user_macro(interface->ip))
+		{
+			*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+				"invalid IP Address \"%s\".\n",
+				op, zbx_interface_type_string(interface->type_orig), hostname, interface->ip);
+
+			return FAIL;
+		}
+	}
+
+	if (INTERFACE_TYPE_SNMP == interface->type)
+	{
+		if (ZBX_IF_SNMP_VERSION_3 > interface->lld_row.snmp->version)
+		{
+			if ('\0' == *interface->lld_row.snmp->community)
+			{
+				*error = zbx_strdcatf(*error, "Cannot %s \"%s\" interface on host \"%s\": "
+						"empty SNMP community.\n",
+						op, zbx_interface_type_string(interface->type_orig), hostname);
+
+				return FAIL;
+			}
+		}
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Parameters: hosts - [IN/OUT]                                               *
  *             error - [OUT]                                                  *
  *                                                                            *
@@ -6016,6 +6231,30 @@ static void	lld_interfaces_validate(zbx_vector_lld_host_ptr_t *hosts, char **err
 			}
 		}
 		zbx_db_free_result(result);
+	}
+
+	/* exclude interfaces with invalid fields */
+
+	for (int i = 0; i < hosts->values_num; i++)
+	{
+		host = hosts->values[i];
+
+		for (int j = 0; j < host->interfaces.values_num; )
+		{
+			interface = host->interfaces.values[j];
+
+			if (0 == (interface->flags & ZBX_FLAG_LLD_INTERFACE_REMOVE))
+			{
+				if (FAIL == lld_interface_validate_fields(interface, host->host, error))
+				{
+					lld_interface_free(interface);
+					zbx_vector_lld_interface_ptr_remove(&host->interfaces, j);
+					continue;
+				}
+			}
+
+			j++;
+		}
 	}
 
 	/* validate interfaces which should be deleted */

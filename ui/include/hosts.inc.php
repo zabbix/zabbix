@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -502,36 +502,6 @@ function getHostInterface(?array $interface): string {
 	}
 
 	return $ip_or_dns.':'.$interface['port'];
-}
-
-function get_host_by_itemid($itemids) {
-	$res_array = is_array($itemids);
-	zbx_value2array($itemids);
-	$result = false;
-	$hosts = [];
-
-	$db_hostsItems = DBselect(
-		'SELECT i.itemid,h.*'.
-		' FROM hosts h,items i'.
-		' WHERE i.hostid=h.hostid'.
-			' AND '.dbConditionInt('i.itemid', $itemids)
-	);
-	while ($hostItem = DBfetch($db_hostsItems)) {
-		$result = true;
-		$hosts[$hostItem['itemid']] = $hostItem;
-	}
-
-	if (!$res_array) {
-		foreach ($hosts as $itemid => $host) {
-			$result = $host;
-		}
-	}
-	elseif ($result) {
-		$result = $hosts;
-		unset($hosts);
-	}
-
-	return $result;
 }
 
 function get_host_by_hostid($hostid, $no_error_message = 0) {

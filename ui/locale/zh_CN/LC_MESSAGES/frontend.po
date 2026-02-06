@@ -342,6 +342,10 @@ msgstr "(0 - 使用默认动作)"
 msgid "(Only super admins can create groups)"
 msgstr "(仅超级管理员能创建群组)"
 
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
@@ -1270,6 +1274,10 @@ msgstr "无Agent"
 msgid "Aggregate"
 msgstr "聚合"
 
+#: widgets/topitems/views/column.edit.php:283
+msgid "Aggregate columns"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
 msgstr "聚合函数"
@@ -1287,6 +1295,12 @@ msgstr "聚合整个数据集。"
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
 msgstr "聚合函数"
+
+#: widgets/item/views/widget.edit.php:85 widgets/item/views/widget.edit.php:90
+#: widgets/tophosts/views/column.edit.php:330
+#: widgets/topitems/views/column.edit.php:256
+msgid "Aggregation function does not affect the sparkline."
+msgstr ""
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -1804,6 +1818,11 @@ msgstr "至少必须启用一个参数。"
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
 msgstr "至少需要添加一个时间段。"
+
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -5088,10 +5107,18 @@ msgstr "颜色插值"
 msgid "Colors"
 msgstr "颜色"
 
+#: widgets/topitems/views/column.edit.php:293
+msgid "Column aggregation function"
+msgstr ""
+
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
 msgid "Columns"
 msgstr "列数"
+
+#: widgets/topitems/views/column.edit.php:313
+msgid "Combined column name"
+msgstr ""
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -15157,6 +15184,16 @@ msgstr "名称"
 msgid "Name ID"
 msgstr "用户ID"
 
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
+
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "表单字段的名称不得超过255个字符。"
@@ -21425,6 +21462,11 @@ msgstr "标签显示顺序"
 msgid "Tag filter"
 msgstr "标签过滤器"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "匹配标记"
@@ -26942,6 +26984,11 @@ msgstr "UTF-8中无效的字节排序"
 msgid "invalid data type"
 msgstr "无效的数据类型"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "无效延迟"
@@ -28340,6 +28387,11 @@ msgstr "值必须介于“%1$s”和“%2$s”之间"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "值必须在'%1$s'到'%2$s'之间，且小数点后不超过'%3$s'位"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "值必须为空"
@@ -28355,6 +28407,16 @@ msgstr[0] "值必须为空或 %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "值必须大于“%1$s”"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

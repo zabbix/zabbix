@@ -1,7 +1,5 @@
-//go:build !windows
-
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,37 +13,6 @@
 **/
 
 package zabbixasync
-
-import (
-	"golang.zabbix.com/agent2/pkg/zbxlib"
-	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/plugin"
-)
-
-//nolint:gochecknoglobals
-var impl Plugin
-
-// Plugin structure.
-type Plugin struct {
-	plugin.Base
-}
-
-func init() { //nolint:gochecknoinits // such is current plugin implementation.
-	err := plugin.RegisterMetrics(&impl, "ZabbixAsync", getMetrics()...)
-	if err != nil {
-		panic(errs.Wrap(err, "failed to register metrics"))
-	}
-}
-
-// Export implements exporter interface.
-func (*Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
-	result, err := zbxlib.ExecuteCheck(key, params)
-	if err != nil {
-		return nil, errs.Wrap(err, "failed to execute check")
-	}
-
-	return result, nil
-}
 
 func getMetrics() []string {
 	return []string{

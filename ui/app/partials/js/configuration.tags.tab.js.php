@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -47,12 +47,15 @@
 				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
 				.textareaFlexible();
 			$table.on('click', '.element-table-disable', (e) => {
-				const type_input = e.target.closest('.form_row').querySelector('input[name$="[type]"]');
+				const row = e.target.closest('.form_row');
 
+				const type_input = row.querySelector('input[name$="[type]"]');
 				type_input.value &= ~<?= ZBX_PROPERTY_OWN ?>;
 				type_input.setAttribute('data-skip-from-submit', '');
-				type_input.closest('tr').querySelectorAll('textarea')
-					.forEach((node) => node.setAttribute('data-skip-from-submit', ''));
+
+				for (const element of row.querySelectorAll('textarea, input[name$="[automatic]"]')) {
+					element.setAttribute('data-skip-from-submit', '');
+				}
 			});
 		}
 		const tags_tab = $('#<?= $data['tags_tab_id'] ?>[aria-hidden="false"]');

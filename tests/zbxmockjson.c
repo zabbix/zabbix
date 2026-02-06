@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,8 +31,6 @@ do 											\
 	_fail(file, line);								\
 }											\
 while(0)
-
-void cm_print_error(const char * const format, ...);
 
 static void	json_flatten_contents(struct zbx_json_parse *jp, const char *prefix, zbx_vector_ptr_pair_t *props);
 

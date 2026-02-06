@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -617,6 +617,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->setAttribute('maxlength', 1),
 					(new CCheckBox('preprocessing['.$i.'][params_2]', ZBX_PREPROC_CSV_HEADER))
 						->setLabel(_('With header row'))
+						->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
 						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
 						->setReadonly($readonly)
 				];
@@ -896,128 +897,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 }
 
 /**
- * Prepares data to copy items/triggers/graphs.
- *
- * @param string      $elements_field
- * @param null|string $title
- *
- * @return array
- */
-function getCopyElementsFormData($elements_field, $title = null) {
-	$data = [
-		'title' => $title,
-		'elements_field' => $elements_field,
-		'elements' => getRequest($elements_field, []),
-		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_TEMPLATE_GROUP),
-		'copy_targetids' => getRequest('copy_targetids', []),
-		'hostid' => 0
-	];
-
-	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
-	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
-
-	if (count($filter_hostids) == 1) {
-		$data['hostid'] = reset($filter_hostids);
-	}
-
-	if (!$data['elements'] || !is_array($data['elements'])) {
-		show_error_message(_('Incorrect list of items.'));
-
-		return $data;
-	}
-
-	if ($data['copy_targetids']) {
-		switch ($data['copy_type']) {
-			case COPY_TYPE_TO_HOST_GROUP:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['groupid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_HOST:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['hostid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_TEMPLATE:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
-					'output' => ['templateid', 'name'],
-					'templateids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['templateid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_TEMPLATE_GROUP:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['groupid' => 'id']);
-				break;
-		}
-	}
-
-	return $data;
-}
-
-function getTriggerMassupdateFormData() {
-	$data = [
-		'visible' => getRequest('visible', []),
-		'dependencies' => getRequest('dependencies', []),
-		'tags' => getRequest('tags', []),
-		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
-		'massupdate' => getRequest('massupdate', 1),
-		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'g_triggerid' => getRequest('g_triggerid', []),
-		'priority' => getRequest('priority', 0),
-		'hostid' => getRequest('hostid', 0),
-		'context' => getRequest('context')
-	];
-
-	if ($data['dependencies']) {
-		$dependencyTriggers = API::Trigger()->get([
-			'output' => ['triggerid', 'description', 'flags'],
-			'selectHosts' => ['hostid', 'name'],
-			'triggerids' => $data['dependencies'],
-			'preservekeys' => true
-		]);
-
-		if ($data['parent_discoveryid']) {
-			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
-				'output' => ['triggerid', 'description', 'flags'],
-				'selectHosts' => ['hostid', 'name'],
-				'triggerids' => $data['dependencies'],
-				'preservekeys' => true
-			]);
-			$data['dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
-		}
-		else {
-			$data['dependencies'] = $dependencyTriggers;
-		}
-	}
-
-	foreach ($data['dependencies'] as &$dependency) {
-		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-	}
-	unset($dependency);
-
-	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
-
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-
-	return $data;
-}
-
-
-/**
  * Renders tag table row.
  *
  * @param array	     $tag
@@ -1086,6 +965,10 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 				$actions = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
 				break;
 
+			case 'trigger':
+				$actions = (new CSpan(_('(created by LLD)')))->addClass(ZBX_STYLE_GREY);
+				break;
+
 			default:
 				$actions = null;
 				break;
@@ -1107,8 +990,12 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		$value_field->setAttribute('data-skip-from-submit', '');
 		$tag_field->setAttribute('data-skip-from-submit', '');
 
-		if ($type_field) {
+		if ($type_field !== null) {
 			$type_field->setAttribute('data-skip-from-submit', '');
+		}
+
+		if ($automatic_field !== null) {
+			$automatic_field->setAttribute('data-skip-from-submit', '');
 		}
 	}
 

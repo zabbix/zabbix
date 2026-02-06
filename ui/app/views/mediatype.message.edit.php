@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -100,6 +100,7 @@ $form
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	->addItem(
 		(new CScriptTag('mediatype_message_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'message_templates' => CMediatypeHelper::getAllMessageTemplates()
 		]).');'))->setOnDocumentReady()
 	);
@@ -110,9 +111,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['params']['old_message_type'] == -1 ? _('Add') : _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mediatype_message_popup.submit();'
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.message.edit.js.php')

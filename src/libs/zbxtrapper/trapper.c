@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,6 +52,9 @@
 #include "zbx_rtc_constants.h"
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
+#endif
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
 #endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4
@@ -367,9 +370,10 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 }
 
 /* queue item comparison function used to sort queue by nextcheck */
-static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_t **d2)
+static int	queue_compare_by_nextcheck_asc(const void *a1, const void *a2)
 {
-	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
+	const zbx_queue_item_t	*i1 = *(const zbx_queue_item_t * const *)a1;
+	const zbx_queue_item_t	*i2 = *(const zbx_queue_item_t * const *)a2;
 
 	return i1->nextcheck - i2->nextcheck;
 }
@@ -504,7 +508,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
@@ -1458,6 +1462,9 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb,
 			zbx_dc_get_psk_by_identity);

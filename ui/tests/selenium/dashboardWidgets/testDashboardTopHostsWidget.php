@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -341,8 +341,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$visible_labels = ['Name', 'Data', 'Item name', 'Base colour', 'Display item value as', 'Display', 'Thresholds',
 			'Decimal places', 'Advanced configuration'
 		];
-		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'Aggregation function',
-			'Time period', 'Widget', 'From', 'To', 'History data'
+		$hidden_labels = ['Text', 'Sparkline', 'Min', 'Max', 'Highlights', 'Show thumbnail', 'History data',
+			'Aggregation function', 'Time period', 'Widget', 'From', 'To'
 		];
 		$this->assertEquals($visible_labels, array_values($column_form->getLabels()->filter(CElementFilter::VISIBLE)->asText()));
 		$this->assertEquals($hidden_labels, array_values($column_form->getLabels()->filter(CElementFilter::NOT_VISIBLE)->asText()));
@@ -383,6 +383,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'Highlights' => ['visible' => false],
 			'Decimal places' => ['value' => 2, 'maxlength' => 2],
 			'Advanced configuration' => ['visible' => true, 'enabled' => true],
+			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Aggregation function' => ['value' => 'not used', 'options' => ['not used', 'min', 'max', 'avg', 'count', 'sum',
 				'first', 'last']
 			],
@@ -396,7 +397,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 			'id:time_period_to' => ['value' => 'now', 'placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255,
 				'visible' => false, 'enabled' => false
 			],
-			'History data' => ['value' => 'Auto', 'labels' => ['Auto', 'History', 'Trends']],
 			'Show thumbnail' => ['value' => false, 'visible' => false, 'enabled' => false]
 		];
 		$this->checkFieldsAttributes($column_default_fields, $column_form);
@@ -495,6 +495,36 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$this->assertTrue($column_form->query('xpath:.//label[@for="sparkline_time_period_reference_ms"]')
 						->one()->hasClass('form-label-asterisk')
 				);
+			}
+		}
+
+		// Check hintbox message when "Aggregation function≠not used" and sparkline is selected.
+		$warning_visibility = [
+				'not used' => false,
+				'min' => true,
+				'max' => true,
+				'avg' => true,
+				'count' => true,
+				'sum' => true,
+				'first' => true,
+				'last' => true
+		];
+
+		foreach ($warning_visibility as $option => $visible) {
+			$column_form->fill(['Aggregation function' => $option]);
+			$warning_button = $column_form->getFieldContainer('Aggregation function')->query('xpath:.//button[@data-hintbox]')->one();
+			$this->assertTrue($warning_button->isVisible($visible));
+
+			if ($visible) {
+				$warning_button->click();
+
+				// Check hintbox text.
+				$hint_text = 'Aggregation function does not affect the sparkline.';
+				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+				$this->assertEquals($hint_text, $hint_dialog->getText());
+
+				// Close the hintbox.
+				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();
 			}
 		}
 

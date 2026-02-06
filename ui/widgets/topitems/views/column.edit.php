@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@
  */
 
 use Widgets\TopItems\Includes\CWidgetFieldColumnsList;
+use Widgets\TopItems\Widget;
 use Zabbix\Widgets\Fields\CWidgetFieldSparkline;
 
 $form = (new CForm())
@@ -222,10 +223,22 @@ $form_grid->addItem([
 // Advanced configuration.
 $advanced_configuration = new CWidgetFormFieldsetCollapsibleView(_('Advanced configuration'));
 
+// History data.
+$advanced_configuration->addItem([
+	(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
+	(new CFormField(
+		(new CRadioButtonList('history', (int) $data['history']))
+			->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
+			->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
+			->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
+			->setModern()
+	))->addClass('js-history-row')
+]);
+
 // Aggregation function.
 $advanced_configuration->addItem([
-	new CLabel(_('Aggregation function'), 'column_aggregate_function'),
-	new CFormField(
+	new CLabel(_('Aggregation function'), 'aggregate_function'),
+	new CFormField([
 		(new CSelect('aggregate_function'))
 			->setId('aggregate_function')
 			->setValue($data['aggregate_function'])
@@ -239,8 +252,10 @@ $advanced_configuration->addItem([
 				AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
 				AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 			]))
-			->setFocusableElementId('column_aggregate_function')
-	)
+			->setFocusableElementId('aggregate_function'),
+		(makeWarningIcon(_('Aggregation function does not affect the sparkline.')))
+			->addClass('js-aggregate-function-warning')
+	])
 ]);
 
 // Time period.
@@ -263,18 +278,45 @@ $advanced_configuration->addItem(new CScriptTag([
 	$time_period_field_view->getJavaScript()
 ]));
 
-// History data.
-$advanced_configuration
-	->addItem([
-		(new CLabel(_('History data'), 'history'))->addClass('js-history-row'),
-		(new CFormField(
-			(new CRadioButtonList('history', (int) $data['history']))
-				->addValue(_('Auto'), CWidgetFieldColumnsList::HISTORY_DATA_AUTO)
-				->addValue(_('History'), CWidgetFieldColumnsList::HISTORY_DATA_HISTORY)
-				->addValue(_('Trends'), CWidgetFieldColumnsList::HISTORY_DATA_TRENDS)
-				->setModern()
-		))->addClass('js-history-row')
-	]);
+// Aggregate.
+$advanced_configuration->addItem([
+	(new CLabel(_('Aggregate columns'), 'aggregate_columns'))
+		->addClass('js-aggregate-grouping-row'),
+	(new CFormField(
+		(new CCheckBox('aggregate_columns'))
+			->setChecked((bool) $data['aggregate_columns'])
+	))->addClass('js-aggregate-grouping-row')
+]);
+
+// Column aggregation function.
+$advanced_configuration->addItem([
+	(new CLabel(_('Column aggregation function'), 'column_aggregate_function'))
+		->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+		->addClass('js-combined-row'),
+	(new CFormField(
+		(new CSelect('column_aggregate_function'))
+			->setId('column_aggregate_function')
+			->setValue($data['column_aggregate_function'])
+			->addOptions(CSelect::createOptionsFromArray([
+				AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+				AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+				AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+				AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+				AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM)
+			]))
+			->setFocusableElementId('column_aggregate_function')
+	))->addClass('js-combined-row')
+]);
+
+// Combined column name.
+$advanced_configuration->addItem([
+	(new CLabel(_('Combined column name'), 'combined_column_name'))
+		->addClass(ZBX_STYLE_FIELD_LABEL_ASTERISK)
+		->addClass('js-combined-row'),
+	(new CFormField(
+		(new CTextBox('combined_column_name', $data['combined_column_name']))
+	))->addClass('js-combined-row')
+]);
 
 $form_grid->addItem($advanced_configuration);
 
