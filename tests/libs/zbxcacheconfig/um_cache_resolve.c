@@ -103,7 +103,9 @@ void	zbx_mock_test_entry(void **state)
 	um_mock_cache_clear(&mock_cache0);
 	um_mock_cache_clear(&mock_cache);
 
+	zbx_config_wlock_set_locked();
 	um_mock_config_destroy();
+	zbx_config_wlock_set_unlocked();
 
 	zbx_vector_uint64_destroy(&hostids);
 }
