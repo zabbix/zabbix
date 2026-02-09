@@ -1060,7 +1060,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	}
 
 	/**
-	 * Get widget table data.
+	 * Get widget table data, including handling of HTML content in iframes.
 	 *
 	 * @param CWidgetElement $widget    widget element
 	 *
