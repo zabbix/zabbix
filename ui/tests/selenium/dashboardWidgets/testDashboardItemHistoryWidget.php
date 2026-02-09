@@ -2738,7 +2738,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
 
-			if (array_key_exists('screenshot', $data)) {
+			if (CTestArrayHelper::get($data, 'screenshot')) {
 				// Find all the values ​​of the Timestamp column to hide them in the screenshot, since the values ​​are dynamic.
 				$timestamp_cells = $widget->query('xpath:.//tbody/tr/*[1]')->all()->asArray();
 				$this->assertScreenshotExcept($widget, $timestamp_cells, 'HTML encode check');
