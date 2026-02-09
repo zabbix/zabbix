@@ -23,9 +23,6 @@ class CUserMacroParser extends CParser {
 	const STATE_END_OF_MACRO = 4;
 	public const REGEX_PREFIX = 'regex:';
 
-	// Must be aligned with class.form.validator.js #isMacro used variable.
-	const FRONTEND_VALIDATOR_REGEX = '/^\{\$[A-Z0-9._]+(:[^)"]+)?\}$/';
-
 	private $macro = '';
 	private $context = null;
 	private $context_quoted = false;

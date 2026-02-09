@@ -2678,7 +2678,16 @@ class CFormValidatorTest extends TestCase {
 			['{$MACRO:/tmp}', true,
 				['usermacros' => true, 'lldmacros' => false]
 			],
+			['{$MACRO:as""d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:as"")d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
 			['{$MACRO:"as}d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"as\"}\"d"}', true,
 				['usermacros' => true, 'lldmacros' => false]
 			],
 			['{$MACRO:regex:^/tmp$}', true,
@@ -2700,6 +2709,12 @@ class CFormValidatorTest extends TestCase {
 				['usermacros' => true, 'lldmacros' => false]
 			],
 			['{{$MACRO}.tr(,)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(   ,   )}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr( "asd asd," ,  asd asdsd   , asd"asd   )}', true,
 				['usermacros' => true, 'lldmacros' => false]
 			],
 			['{{$MACRO}.tr("\n", "*")}', true,
@@ -2780,6 +2795,12 @@ class CFormValidatorTest extends TestCase {
 			['{$MACRO:"context}', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
+			['{$MACRO:"conte"xt"}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:conte}xt}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
 			['{$MACRO}.func()', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
@@ -2795,10 +2816,7 @@ class CFormValidatorTest extends TestCase {
 			['{#MACRO}}', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
-			['{{#MACRO}', false,
-				['usermacros' => true, 'lldmacros' => true]
-			],
-			['{{#MACRO}}', false,
+			['{$MACRO:conte}xt}', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
 			['{#MACRO}.func()', false,
@@ -2830,6 +2848,9 @@ class CFormValidatorTest extends TestCase {
 
 			// No closing brackets, unfinished quotes to function parameters.
 			['{{$MACRO}.tr({{$MACRO}.tr(aa, bb)},cc)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.test("a".b)}', false,
 				['usermacros' => true, 'lldmacros' => false]
 			],
 			['{{$MACRO}.tr("aaa)\",bbb)}', false,
@@ -2894,25 +2915,49 @@ class CFormValidatorTest extends TestCase {
 			"Expected result doesn't match validator result"
 		);
 
-		$regexps = [];
-		$value = preg_replace('/"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"/', 'Text', $value);
+		$macro_name = '(?<macro_name>[A-Z0-9._]+)';
+		$quoted_param = '("((\\\")|[^"])*[^\\\]")';
+		$unquoted_context = '([^"}]([^}])*)';
+		$macro_context = '(:(?<context>('.$unquoted_context.'|'.$quoted_param.')))';
+
+		$macro_regexps = [];
 
 		if ($macro_rules['usermacros']) {
-			$regexps[] = CUserMacroParser::FRONTEND_VALIDATOR_REGEX;
-			$regexps[] = CUserMacroFunctionParser::FRONTEND_VALIDATOR_REGEX;
+			$macro_regexps[] = '/^(?<macro>\{\$'.$macro_name.$macro_context.'?\})$/';
 		}
 
 		if ($macro_rules['lldmacros']) {
-			$regexps[] = CLLDMacroParser::FRONTEND_VALIDATOR_REGEX;
-			$regexps[] = CLLDMacroFunctionParser::FRONTEND_VALIDATOR_REGEX;
+			$macro_regexps[] = '/^(?<macro>\{#'.$macro_name.'})$/';
 		}
 
-		$regex_result = false;
+		$regex_result = self::validateMacro($macro_regexps, $value);
 
-		foreach ($regexps as $regexp) {
-			$regex_result = $regex_result || preg_match($regexp, $value) == 1;
+		if (!$regex_result) {
+			$function_regex = '/^(?<macro_function>\{(?<macro>{.*})\.(?<func>[a-z]+)\((?<params>.*)\)})$/';
+
+			if (preg_match($function_regex, $value, $function_match)) {
+				if (self::validateMacro($macro_regexps, $function_match['macro'])) {
+					$unquoted_param = '([^"][^),]*)';
+					$single_param = '[ ]*([ ]*|'.$unquoted_param.'|'.$quoted_param.')[ ]*';
+					$params_regex = '/^('.$single_param.',)*'.$single_param.'$/';
+
+					if (preg_match($params_regex, $function_match['params'])) {
+						$regex_result = true;
+					}
+				}
+			}
 		}
 
 		$this->assertSame($regex_result, $expected_result, "Regular expression result doesn't match validator result");
+	}
+
+	private static function validateMacro(array $macro_regexps, string $macro): bool {
+		foreach ($macro_regexps as $regexp) {
+			if (preg_match($regexp, $macro)) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

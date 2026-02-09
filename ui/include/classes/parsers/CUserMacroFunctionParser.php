@@ -19,9 +19,6 @@
  */
 class CUserMacroFunctionParser extends CParser {
 
-	// Must be aligned with class.form.validator.js #isMacro used variable.
-	const FRONTEND_VALIDATOR_REGEX = '/^\{{\$[A-Z0-9._]+(:[^)"]+)?\}\.[a-z]+\([^)"]*\)}$/';
-
 	/**
 	 * Parser for user macros.
 	 *

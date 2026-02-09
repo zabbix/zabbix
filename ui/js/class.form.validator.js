@@ -1626,29 +1626,45 @@ class CFormValidator {
 	 * @returns {boolean}
 	 */
 	#isMacro(macro_types, value) {
-		// All quoted texts are replaced with "Text", which neither valid function name or macro.
-		value = value.replace(/"[^"\\]*(?:\\.[^"\\]*)*"/g, 'Text');
+		const validate_macro = (macro_regexps, macro) => {
+			for (let  i = 0; i < macro_regexps.length; i++) {
+				if (macro.match(macro_regexps[i])) {
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		const macro_name = '(?<macro_name>[A-Z0-9._]+)';
+		const quoted_param = '("((\\\\")|[^"])*[^\\\\]")';
+		const unquoted_context = '([^"}]([^}])*)';
+		const macro_context = '(:(?<context>('+unquoted_context+'|'+quoted_param+')))';
+
+		const macro_regexps = [];
 
 		if (macro_types.usermacros) {
-			// CUserMacroParser::FRONTEND_VALIDATOR_REGEX
-			if (value.match(/^\{\$[A-Z0-9._]+(:[^)"]+)?\}$/) !== null) {
-				return true;
-			}
-
-			// CUserMacroFunctionParser::FRONTEND_VALIDATOR_REGEX
-			if (value.match(/^\{{\$[A-Z0-9._]+(:[^)"]+)?\}\.[a-z]+\([^)"]*\)}$/) !== null) {
-				return true;
-			}
+			macro_regexps.push(new RegExp('^(?<macro>\{\\$'+macro_name+macro_context+'?\})$'));
 		}
 
 		if (macro_types.lldmacros) {
-			// CLLDMacroParser::FRONTEND_VALIDATOR_REGEX
-			if (value.match(/^\{#[A-Z0-9._]+}$/) !== null) {
-				return true;
-			}
+			macro_regexps.push(new RegExp('^(?<macro>\{#'+macro_name+'})$'));
+		}
 
-			// CLLDMacroFunctionParser::FRONTEND_VALIDATOR_REGEX
-			if (value.match(/^\{\{#[A-Z0-9._]+}\.[a-z]+\([^)"]*\)}$/) !== null) {
+		if (validate_macro(macro_regexps, value)) {
+			return true;
+		}
+
+		const match = value.match(
+			new RegExp('^(?<macro_function>\\{(?<macro>{.*})\\.(?<func>[a-z]+)\\((?<params>.*)\\)})$')
+		);
+
+		if (match && validate_macro(macro_regexps, match.groups.macro)) {
+			const unquoted_param = '([^"][^),]*)';
+			const single_param = '[ ]*([ ]*|'+unquoted_param+'|'+quoted_param+')[ ]*';
+			const params_regex = new RegExp('^('+single_param+',)*'+single_param+'$');
+
+			if (match.groups.params.match(params_regex)) {
 				return true;
 			}
 		}
