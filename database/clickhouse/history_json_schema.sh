@@ -5,7 +5,7 @@
 echo "DROP TABLE IF EXISTS $CH_DB.history_json" | curl $CH_URL --data-binary @-
 
 cat << EOF | curl $CH_URL --data-binary @-
-CREATE TABLE $CH_DB.history_str
+CREATE TABLE $CH_DB.history_json
 (
 	itemid UInt64,
 	clock_ns DateTime64(9),
