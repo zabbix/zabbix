@@ -86,7 +86,7 @@ $graph_tab
 		)
 	])
 	->addItem([
-		new CLabel(_('Show legend')),
+		new CLabel(_('Show legend'), 'show_legend'),
 		new CFormField(
 			(new CCheckBox('show_legend'))
 				->setChecked($data['show_legend'] == 1)
@@ -94,7 +94,7 @@ $graph_tab
 		)
 	])
 	->addItem([
-		new CLabel(_('Show working time')),
+		new CLabel(_('Show working time'), 'show_work_period'),
 		(new CFormField(
 			(new CCheckBox('show_work_period'))
 				->setChecked($data['show_work_period'] == 1)
@@ -102,7 +102,7 @@ $graph_tab
 		))->setId('show_work_period_field')
 	])
 	->addItem([
-		new CLabel(_('Show triggers')),
+		new CLabel(_('Show triggers'), 'show_triggers'),
 		(new CFormField(
 			(new CCheckbox('show_triggers'))
 				->setchecked($data['show_triggers'] == 1)
@@ -124,7 +124,7 @@ elseif($data['percent_left'] == 0) {
 }
 
 $graph_tab->addItem([
-	new CLabel(_('Percentile line (left)')),
+	new CLabel(_('Percentile line (left)'), 'visible_percent_left'),
 	(new CFormField([
 		$percent_left_checkbox,
 		NBSP(),
@@ -148,7 +148,7 @@ elseif ($data['percent_right'] == 0) {
 }
 
 $graph_tab->addItem([
-	new CLabel(_('Percentile line (right)')),
+	new CLabel(_('Percentile line (right)'), 'visible_percent_right'),
 	(new CFormField([
 		$percent_right_checkbox,
 		NBSP(),
