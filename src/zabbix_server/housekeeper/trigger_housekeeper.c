@@ -69,7 +69,7 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 		sql_offset = 0;
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids_offset, count);
 
-		int	commited_problems, commited_events;
+		int	committed_problems = 0, committed_events = 0;
 
 		do
 		{
@@ -78,13 +78,13 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 			zbx_db_begin();
 
 			if (ZBX_DB_OK < (res = zbx_db_execute("delete from problem where%s", sql)))
-				commited_problems = res;
+				committed_problems = res;
 
 			if (ZBX_HK_OPTION_DISABLED != events_mode)
 			{
 				zbx_db_execute("delete from event_recovery where%s", sql);
 				if (ZBX_DB_OK < (res = zbx_db_execute("delete from events where%s", sql)))
-					commited_events = res;
+					committed_events = res;
 			}
 		}
 		while (ZBX_DB_DOWN == (txn_rc = zbx_db_commit()));
@@ -92,8 +92,8 @@ static int	housekeep_problems_events(const zbx_vector_uint64_t *eventids, int ev
 		if (ZBX_DB_OK != txn_rc)
 			break;
 
-		*deleted_problems += commited_problems;
-		*deleted_events += commited_events;
+		*deleted_problems += committed_problems;
+		*deleted_events += committed_events;
 
 		offset += count;
 	}
