@@ -26641,6 +26641,11 @@ msgstr "UTF-8のバイトシーケンスが正しくありません"
 msgid "invalid data type"
 msgstr "データタイプが正しくありません"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "監視間隔が正しくありません"
@@ -28039,6 +28044,11 @@ msgstr "値は\"%1$s\"から\"%2$s\"までにしてください"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "値は \"%1$s\" から \"%2$s\" の範囲で、小数点以下は \"%3$s\" 桁以下である必要があります。"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "値は空にしてください"
@@ -28054,6 +28064,16 @@ msgstr[0] "値は空か%1$sを指定してください"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "指定する値は\"%1$s\"以上にしてください。"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
