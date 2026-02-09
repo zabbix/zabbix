@@ -315,8 +315,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 				// Check Thresholds warning icon text.
 				$thresholds_icon->click();
-				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-					->one()->waitUntilVisible();
+				$hint_dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 				$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint_dialog->waitUntilNotPresent();
@@ -384,8 +383,7 @@ class testDashboardItemValueWidget extends testWidgets {
 							$warning_button->click();
 
 							// Check hintbox text.
-							$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-								->one()->waitUntilVisible();
+							$hint_dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 							$this->assertEquals($hint_text, $hint_dialog->getText());
 
 							// Close the hintbox.
@@ -2444,8 +2442,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
-				->one()->waitUntilVisible();
+			$hint = $form->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 			$this->assertEquals($data['warning_message'], $hint->getText());
 
 			// Close the hint-box.
@@ -3288,8 +3285,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Check hint-box.
 		$dashboard->query($time_icon)->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
-				->one()->waitUntilVisible();
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 		$this->assertEquals('Last 1 hour', $hint->getText());
 
 		// Close the hint-box.

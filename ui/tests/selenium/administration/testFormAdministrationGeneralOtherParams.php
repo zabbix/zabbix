@@ -146,8 +146,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 
 		foreach ($hints as $label => $hint_text) {
 			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
-					->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($hint_text, $hint->getText());
 			$hint->close();
 		}
