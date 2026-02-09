@@ -1069,19 +1069,22 @@ class testDashboardPlainTextWidget extends CWebTest {
 	protected function getWidgetTableData($widget) {
 		$widget->waitUntilReady();
 
+		// Return empty array if no data is present in the widget.
 		if ($widget->query('class:no-data-message')->one(false)->isVisible() || $widget->query('class:nothing-to-show')
 				->one(false)->isVisible()) {
 			return [];
 		}
 
 		$table = $widget->getContent()->asTable();
-		$table->query('xpath:.//tbody/tr')->waitUntilPresent();
+		$table->query('xpath:.//tbody')->waitUntilPresent();
 
 		$headers = $table->getHeadersText();
 		$data = [];
 
 		foreach ($table->getRows() as $row) {
 			$raw_row = [];
+
+			// The Plain Text widget table contain both <th> and <td> elements in a single row.
 			$cells = $row->query('xpath:./*')->all();
 
 			foreach ($headers as $i => $name) {
@@ -1090,15 +1093,28 @@ class testDashboardPlainTextWidget extends CWebTest {
 					$iframe = $column->query('class:js-iframe')->one(false);
 
 					if ($iframe->isValid()) {
-						$value = $iframe->getAttribute('srcdoc');
-						$value = preg_match('/<body[^>]*>(.*)<\/body>/is', $value, $matches) ? $matches[1] : $value;
-						$value = strip_tags(htmlspecialchars_decode($value, ENT_QUOTES));
+						// Extract HTML content from iframe's srcdoc attribute.
+						$raw_html = $iframe->getAttribute('srcdoc');
+
+						/**
+						 * preg_match is used to extract only the inner content of the <body> tag.
+						 * $matches[1] contains the string captured between <body> tags.
+						 */
+						$body_content = (preg_match('/<body[^>]*>(.*)<\/body>/is', $raw_html, $matches))
+							? $matches[1]
+							: $raw_html;
+
+						/**
+						 * 1. htmlspecialchars_decode: Converts HTML entities (like &nbsp; or &quot;) back to plain characters.
+						 * 2. strip_tags: Removes any remaining HTML tags to get the final text.
+						 */
+						$value = strip_tags(htmlspecialchars_decode($body_content, ENT_QUOTES));
 					}
 					else {
 						$value = $column->getText();
 					}
 
-					$raw_row[$name] = trim($value);
+					$raw_row[$name] = $value;
 				}
 			}
 
@@ -1134,12 +1150,14 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 		if (array_key_exists('fields', $data)) {
 			$this->widgetConfigurationChange($data['fields'], $dashboard);
-			$expected_result = array_key_exists('result', $data) ? $data['result'] : $data['initial_data'];
-			$this->assertEquals($expected_result, $this->getWidgetTableData($widget));
+			$this->assertEquals(CTestArrayHelper::get($data, 'result', $data['initial_data']),
+					$this->getWidgetTableData($widget)
+			);
 
-			// Compare a screenshots to check HTML encode.
-			if (array_key_exists('screenshot', $data)) {
-				$this->assertScreenshot($widget, 'HTML encode'.$data['screenshot']);
+			if (CTestArrayHelper::get($data, 'screenshot')) {
+				// Find all the values ​​of the Timestamp column to hide them in the screenshot, since the values ​​are dynamic.
+				$timestamp_cells = $widget->query('xpath:.//tbody/tr/*[1]')->all()->asArray();
+				$this->assertScreenshotExcept($widget, $timestamp_cells, 'HTML encode check');
 			}
 
 			$this->widgetConfigurationChange($default_values, $dashboard);
