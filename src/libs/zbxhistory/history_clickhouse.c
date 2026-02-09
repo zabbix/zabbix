@@ -503,6 +503,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
 						&post_data_offset);
 				break;
