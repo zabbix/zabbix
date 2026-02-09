@@ -42,6 +42,10 @@
 #	include "zbxnix.h"
 #endif
 
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
+
 typedef struct
 {
 	zbx_uint64_t	itemid;
@@ -1949,6 +1953,9 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	zbx_cfg_set_process_num(process_num);
 
 #ifndef _WINDOWS
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 	zbx_set_sigusr_handler(zbx_active_checks_sigusr_handler);
 #endif
 
