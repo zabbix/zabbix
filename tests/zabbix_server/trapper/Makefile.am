@@ -10,7 +10,7 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
-	$(top_srcdir)/src/libs/zbxsupervisor/libzbxsupervisor_client.a \
+	$(top_srcdir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \

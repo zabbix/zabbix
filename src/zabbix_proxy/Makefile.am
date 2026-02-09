@@ -69,7 +69,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_builddir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	stats/libzbxstats_proxy.a \
-	$(top_builddir)/src/libs/zbxsupervisor/libzbxsupervisor_client.a \
+	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \

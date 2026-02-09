@@ -78,7 +78,7 @@ zabbix_server_LDADD = \
 	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
 	pgmanager/libzbxpgmanager.a \
-	$(top_builddir)/src/libs/zbxsupervisor/libzbxsupervisor_client.a \
+	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
