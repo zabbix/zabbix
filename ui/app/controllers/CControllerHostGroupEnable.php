@@ -54,13 +54,15 @@ class CControllerHostGroupEnable extends CController {
 			'editable' => true
 		]);
 
+		foreach ($hosts as &$host) {
+			$host['status'] = HOST_STATUS_MONITORED;
+		}
+		unset($host);
+
 		$result = true;
 
 		if ($hosts) {
-			$result = API::Host()->massUpdate([
-				'hosts' => $hosts,
-				'status' => HOST_STATUS_MONITORED
-			]);
+			$result = API::Host()->update($hosts);
 		}
 
 		$result = DBend($result);
