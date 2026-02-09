@@ -41,6 +41,7 @@ then
 	CFLAGS+=" -Wcast-function-type"
 	CFLAGS+=" -fstrict-aliasing"
 	CFLAGS+=" -Wpedantic"
+	CFLAGS+=" -Werror=vla"
 
 	# flags for gcc
 	CFLAGS+=" -Wno-maybe-uninitialized"
