@@ -2644,41 +2644,31 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			return [];
 		}
 
-		$table = $widget->getContent()->asTable();
-		$table->query('xpath:.//tbody')->waitUntilPresent();
+		$table = $widget->getContent()->asTable()->waitUntilPresent();
 
 		$headers = $table->getHeadersText();
 		$data = [];
 
 		foreach ($table->getRows() as $row) {
 			$raw_row = [];
-			$columns = $row->query('xpath:./td')->all();
 
 			foreach ($headers as $i => $name) {
-				if ($name !== '' && $columns->exists($i)) {
-					$column = $columns->get($i);
-					$iframe = $column->query('class:js-iframe')->one(false);
+				$column = $row->getColumn($i);
+				$iframe = $column->query('class:js-iframe')->one(false);
 
-					if ($iframe->isValid()) {
-						// Extract HTML content from iframe's srcdoc attribute.
-						$raw_html = $iframe->getAttribute('srcdoc');
-
-						/**
-						* preg_match is used to extract only the inner content of the <body> tag.
-						* $matches[1] contains the string captured between <body> tags.
-						*/
-						$body_content = (preg_match('/<body[^>]*>(.*)<\/body>/is', $raw_html, $matches))
-							? $matches[1]
-							: $raw_html;
-
-						$value = htmlspecialchars_decode($body_content, ENT_QUOTES);
-					}
-					else {
-						$value = $column->getText();
-					}
-
-					$raw_row[$name] = $value;
+				if ($iframe->isValid()) {
+					/**
+					 * The content is stored as encoded HTML inside the iframe's 'srcdoc' attribute.
+					 * 1. getAttribute: Retrieves the raw encoded string.
+					 * 2. htmlspecialchars_decode: Converts entities (like &lt;) back to tags (<).
+					 */
+					$value = htmlspecialchars_decode($iframe->getAttribute('srcdoc'));
 				}
+				else {
+					$value = $column->getText();
+				}
+
+				$raw_row[$name] = $value;
 			}
 
 			/**
@@ -2699,8 +2689,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$data[] = $formatted_row;
 			}
 			else {
-				// Remove empty cells to match expected data provider format.
-				$data[] = array_filter($raw_row);
+				$data[] = $raw_row;
 			}
 		}
 
