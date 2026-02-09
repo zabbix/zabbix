@@ -1074,8 +1074,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 			return [];
 		}
 
-		$table = $widget->getContent()->asTable();
-		$table->query('xpath:.//tbody')->waitUntilPresent();
+		$table = $widget->getContent()->asTable()->waitUntilPresent();
 
 		$headers = $table->getHeadersText();
 		$data = [];
@@ -1092,17 +1091,18 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 				if ($iframe->isValid()) {
 					/**
-					* The content is stored as encoded HTML inside the iframe's 'srcdoc' attribute.
-					* 1. getAttribute: Retrieves the raw encoded string.
-					* 2. htmlspecialchars_decode: Converts entities (like &lt;) back to tags (<).
-					* 3. strip_tags: Removes the tags to leave only the visible plain text.
-					*/
-					$raw_row[$name] = strip_tags(htmlspecialchars_decode($iframe->getAttribute('srcdoc'), ENT_QUOTES));
+					 * The content is stored as encoded HTML inside the iframe's 'srcdoc' attribute.
+					 * 1. getAttribute: Retrieves the raw encoded string.
+					 * 2. htmlspecialchars_decode: Converts entities (like &lt;) back to tags (<).
+					 * 3. strip_tags: Removes the tags to leave only the visible plain text.
+					 */
+					$raw_row[$name] = strip_tags(htmlspecialchars_decode($iframe->getAttribute('srcdoc')));
 				}
 				else {
 					$raw_row[$name] = $column->getText();
 				}
 			}
+			// Clear empty array elements.
 			$data[] = array_filter($raw_row);
 		}
 		return $data;
