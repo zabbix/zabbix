@@ -367,7 +367,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: d0e1f2a3b4c54123ab0c1d2e3f4a5b78
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.csv.space.utilization[{#CSV.ID}])>{$HYPERV.TRIGGER.CSV.SPACE.UTILIZATION:"{#CSV.NAME}"}'
-                  name: 'Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}] high space utilization'
+                  name: 'Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}]: High space utilization'
                   opdata: 'Space utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Trigger fires when the space utilization on Hyper-V Cluster CSV {#CSV.NAME} exceeds {$HYPERV.TRIGGER.CSV.SPACE.UTILIZATION:"{#CSV.NAME}"}%.'
@@ -523,7 +523,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7cf253224f4a489099ccc0e6364d94f9
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.cpu.utilization[{#NODE.ID}])>{$HYPERV.TRIGGER.NODE.CPU.UTILIZATION:"{#NODE.NAME}"}'
-                  name: 'Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] high CPU utilization'
+                  name: 'Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}]: High CPU utilization'
                   opdata: 'CPU utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Trigger fires when the CPU utilization on Hyper-V Cluster node {#NODE.NAME} exceeds {$HYPERV.TRIGGER.NODE.CPU.UTILIZATION:"{#NODE.NAME}"}%.'
@@ -613,7 +613,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 1b22634f16504885a9a8d44213dc7fab
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.memory.utilization[{#NODE.ID}])>{$HYPERV.TRIGGER.NODE.MEMORY.UTILIZATION:"{#NODE.NAME}"}'
-                  name: 'Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] high memory utilization'
+                  name: 'Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}]: High memory utilization'
                   opdata: 'Memory utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Trigger fires when the memory utilization on Hyper-V Cluster node {#NODE.NAME} exceeds {$HYPERV.TRIGGER.NODE.MEMORY.UTILIZATION:"{#NODE.NAME}"}%.'
@@ -759,7 +759,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b3c4d5e6f7a84123ab0c1d2e3f4a5b90
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.disk.health[{#DISK.ID}])<>0'
-                  name: 'Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}] unhealthy'
+                  name: 'Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}]: Unhealthy'
                   opdata: 'S2D Physical Disk health: {ITEM.LASTVALUE}'
                   priority: HIGH
                   description: 'Trigger fires when the Hyper-V S2D Physical Disk {#DISK.ID} on Node {#DISK.NODE} is unhealthy.'
@@ -812,7 +812,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: d5e6f7a8b9c04123ab0c1d2e3f4a5b92
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.disk.status[{#DISK.ID}])<>2'
-                  name: 'Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}] not ready'
+                  name: 'Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}]: Not ready'
                   opdata: 'S2D Physical Disk operational status: {ITEM.LASTVALUE}'
                   priority: HIGH
                   description: 'Trigger fires when the Hyper-V S2D Physical Disk {#DISK.ID} on Node {#DISK.NODE} is not ready.'
@@ -952,7 +952,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: e1f2a3b4c5d64123ab0c1d2e3f4a5b97
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.health[{#POOL.NAME}])<>0'
-                  name: 'Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}] unhealthy'
+                  name: 'Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}]: Unhealthy'
                   opdata: 'S2D Pool health: {ITEM.LASTVALUE}'
                   priority: HIGH
                   description: 'Trigger fires when the Hyper-V S2D Pool {#POOL.NAME} is unhealthy.'
@@ -1053,7 +1053,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: c5d6e7f8a9b04123ab0c1d2e3f4a5b9b
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.utilization[{#POOL.NAME}])>{$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION:"{#POOL.NAME}"}'
-                  name: 'Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}] high space utilization'
+                  name: 'Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}]: High space utilization'
                   opdata: 'S2D Pool space utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Trigger fires when the space utilization on Hyper-V S2D Pool {#POOL.NAME} exceeds {$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION:"{#POOL.NAME}"}%.'
@@ -1243,7 +1243,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: d3e4f5a6b7c84123ab0c1d2e3f4a5b90
                   expression: 'last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}'
-                  name: 'Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}] high memory utilization'
+                  name: 'Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}]: High memory utilization'
                   opdata: 'Memory utilization: {ITEM.LASTVALUE}'
                   priority: WARNING
                   description: 'Trigger fires when the memory utilization on Hyper-V Virtual machine {#VM.NAME} exceeds {$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}%.'

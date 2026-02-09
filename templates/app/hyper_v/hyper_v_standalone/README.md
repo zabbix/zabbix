@@ -161,7 +161,7 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |----|-----------|----------|--------|--------------------------------|
 |Hyper-V Standalone: Virtual machine [{#VM.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Virtual Machine {#VM.NAME} is not normal status.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.status[{#VM.ID}])<>{$HYPERV.TRIGGER.VM.STATUS.NORMAL:"{#VM.NAME}"}`|Average||
 |Hyper-V Standalone: Virtual machine [{#VM.NAME}] has rebooted|<p>Trigger fires when the uptime of Hyper-V Virtual machine {#VM.NAME} is less than 15 minutes, which may indicate that the VM has recently rebooted.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.uptime[{#VM.ID}])<900 and last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.uptime[{#VM.ID}])<>0`|Info||
-|Hyper-V Standalone: Virtual machine [{#VM.NAME}] high memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Virtual machine {#VM.NAME} exceeds {$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}%.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`|Warning||
+|Hyper-V Standalone: Virtual machine [{#VM.NAME}]: High memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Virtual machine {#VM.NAME} exceeds {$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}%.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`|Warning||
 
 ## Feedback
 

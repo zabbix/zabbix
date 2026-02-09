@@ -202,8 +202,8 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |----|-----------|----------|--------|--------------------------------|
 |Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Cluster node {#NODE.NAME} is down.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.status[{#NODE.ID}])=1 or last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.status[{#NODE.ID}])=-1`|High||
 |Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Cluster node {#NODE.NAME} is not up.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.status[{#NODE.ID}])<>0`|Info|**Depends on**:<br><ul><li>Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] {ITEM.VALUE}</li></ul>|
-|Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] high memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Cluster node {#NODE.NAME} exceeds {$HYPERV.TRIGGER.NODE.MEMORY.UTILIZATION:"{#NODE.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.memory.utilization[{#NODE.ID}])>{$HYPERV.TRIGGER.NODE.MEMORY.UTILIZATION:"{#NODE.NAME}"}`|Warning||
-|Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}] high CPU utilization|<p>Trigger fires when the CPU utilization on Hyper-V Cluster node {#NODE.NAME} exceeds {$HYPERV.TRIGGER.NODE.CPU.UTILIZATION:"{#NODE.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.cpu.utilization[{#NODE.ID}])>{$HYPERV.TRIGGER.NODE.CPU.UTILIZATION:"{#NODE.NAME}"}`|Warning||
+|Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}]: High memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Cluster node {#NODE.NAME} exceeds {$HYPERV.TRIGGER.NODE.MEMORY.UTILIZATION:"{#NODE.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.memory.utilization[{#NODE.ID}])>{$HYPERV.TRIGGER.NODE.MEMORY.UTILIZATION:"{#NODE.NAME}"}`|Warning||
+|Hyper-V Failover Cluster: Cluster node [{#NODE.NAME}]: High CPU utilization|<p>Trigger fires when the CPU utilization on Hyper-V Cluster node {#NODE.NAME} exceeds {$HYPERV.TRIGGER.NODE.CPU.UTILIZATION:"{#NODE.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.node.cpu.utilization[{#NODE.ID}])>{$HYPERV.TRIGGER.NODE.CPU.UTILIZATION:"{#NODE.NAME}"}`|Warning||
 
 ### LLD rule CSV discovery
 
@@ -229,7 +229,7 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |----|-----------|----------|--------|--------------------------------|
 |Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Cluster CSV {#CSV.NAME} {ITEM.VALUE}.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.csv.status[{#CSV.ID}])=-1 or last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.csv.status[{#CSV.ID}])>=3`|High||
 |Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Cluster CSV {#CSV.NAME} is not online.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.csv.status[{#CSV.ID}])<>2`|Info|**Depends on**:<br><ul><li>Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}] {ITEM.VALUE}</li></ul>|
-|Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}] high space utilization|<p>Trigger fires when the space utilization on Hyper-V Cluster CSV {#CSV.NAME} exceeds {$HYPERV.TRIGGER.CSV.SPACE.UTILIZATION:"{#CSV.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.csv.space.utilization[{#CSV.ID}])>{$HYPERV.TRIGGER.CSV.SPACE.UTILIZATION:"{#CSV.NAME}"}`|Warning||
+|Hyper-V Failover Cluster: Cluster CSV [{#CSV.NAME}]: High space utilization|<p>Trigger fires when the space utilization on Hyper-V Cluster CSV {#CSV.NAME} exceeds {$HYPERV.TRIGGER.CSV.SPACE.UTILIZATION:"{#CSV.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.cluster.csv.space.utilization[{#CSV.ID}])>{$HYPERV.TRIGGER.CSV.SPACE.UTILIZATION:"{#CSV.NAME}"}`|Warning||
 
 ### LLD rule VM discovery
 
@@ -260,7 +260,7 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Virtual machine {#VM.NAME} is not normal state.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.status[{#VM.ID}])<>{$HYPERV.TRIGGER.VM.STATUS.NORMAL:"{#VM.NAME}"}`|Average||
 |Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}] has rebooted|<p>Trigger fires when the uptime of Hyper-V Virtual machine {#VM.NAME} is less than 15 minutes, which may indicate that the VM has recently rebooted.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.uptime[{#VM.ID}])<900 and last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.uptime[{#VM.ID}])<>0`|Info||
 |Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}] owner changed|<p>Trigger fires when the owner node of Hyper-V Virtual machine {#VM.NAME} changes.</p>|`change(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.owner[{#VM.ID}])`|Info||
-|Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}] high memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Virtual machine {#VM.NAME} exceeds {$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`|Warning||
+|Hyper-V Failover Cluster: Virtual machine [{#VM.NAME}]: High memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Virtual machine {#VM.NAME} exceeds {$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`|Warning||
 
 ### LLD rule S2D pools discovery
 
@@ -284,8 +284,8 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}] not ready|<p>Trigger fires when the Hyper-V S2D Pool {#POOL.NAME} is not ready.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.status[{#POOL.NAME}])<>2`|High||
-|Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}] unhealthy|<p>Trigger fires when the Hyper-V S2D Pool {#POOL.NAME} is unhealthy.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.health[{#POOL.NAME}])<>0`|High||
-|Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}] high space utilization|<p>Trigger fires when the space utilization on Hyper-V S2D Pool {#POOL.NAME} exceeds {$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION:"{#POOL.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.utilization[{#POOL.NAME}])>{$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION:"{#POOL.NAME}"}`|Warning||
+|Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}]: Unhealthy|<p>Trigger fires when the Hyper-V S2D Pool {#POOL.NAME} is unhealthy.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.health[{#POOL.NAME}])<>0`|High||
+|Hyper-V Failover Cluster: S2D Pool [{#POOL.NAME}]: High space utilization|<p>Trigger fires when the space utilization on Hyper-V S2D Pool {#POOL.NAME} exceeds {$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION:"{#POOL.NAME}"}%.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.pool.utilization[{#POOL.NAME}])>{$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION:"{#POOL.NAME}"}`|Warning||
 
 ### LLD rule S2D physical disks discovery
 
@@ -306,8 +306,8 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}] unhealthy|<p>Trigger fires when the Hyper-V S2D Physical Disk {#DISK.ID} on Node {#DISK.NODE} is unhealthy.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.disk.health[{#DISK.ID}])<>0`|High||
-|Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}] not ready|<p>Trigger fires when the Hyper-V S2D Physical Disk {#DISK.ID} on Node {#DISK.NODE} is not ready.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.disk.status[{#DISK.ID}])<>2`|High||
+|Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}]: Unhealthy|<p>Trigger fires when the Hyper-V S2D Physical Disk {#DISK.ID} on Node {#DISK.NODE} is unhealthy.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.disk.health[{#DISK.ID}])<>0`|High||
+|Hyper-V Failover Cluster: S2D Physical Disk [{#DISK.NODE}/{#DISK.SLOT}/{#DISK.MODEL}]: Not ready|<p>Trigger fires when the Hyper-V S2D Physical Disk {#DISK.ID} on Node {#DISK.NODE} is not ready.</p>|`last(/Microsoft Hyper-V Failover Cluster by SSH/hyperv.s2d.disk.status[{#DISK.ID}])<>2`|High||
 
 ## Feedback
 
