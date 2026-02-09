@@ -74,6 +74,8 @@ class CControllerTokenEdit extends CController {
 	protected function doAction() {
 		if ($this->hasInput('tokenid')) {
 			$data = $this->token[0];
+			$data['js_validation_rules'] = (new CFormValidator(CControllerTokenUpdate::getValidationRules()))
+				->getRules();
 
 			if ($data['expires_at'] != 0) {
 				$data['expires_at'] = date(ZBX_FULL_DATE_TIME, (int) $data['expires_at']);
@@ -86,6 +88,7 @@ class CControllerTokenEdit extends CController {
 		}
 		else {
 			$data = [
+				'js_validation_rules' => (new CFormValidator(CControllerTokenCreate::getValidationRules()))->getRules(),
 				'tokenid' => 0,
 				'userid' => 0,
 				'name' => '',

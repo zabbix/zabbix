@@ -41,12 +41,15 @@
 
 			$table.dynamicRows({template: '#tag-row-tmpl', allow_empty: true});
 			$table.on('click', '.element-table-disable', (e) => {
-				const type_input = e.target.closest('.form_row').querySelector('input[name$="[type]"]');
+				const row = e.target.closest('.form_row');
 
+				const type_input = row.querySelector('input[name$="[type]"]');
 				type_input.value &= ~<?= ZBX_PROPERTY_OWN ?>;
 				type_input.setAttribute('data-skip-from-submit', '');
-				type_input.closest('tr').querySelectorAll('textarea')
-					.forEach((node) => node.setAttribute('data-skip-from-submit', ''));
+
+				for (const element of row.querySelectorAll('textarea, input[name$="[automatic]"]')) {
+					element.setAttribute('data-skip-from-submit', '');
+				}
 			});
 		}
 		const tags_tab = $('#<?= $data['tags_tab_id'] ?>[aria-hidden="false"]');
