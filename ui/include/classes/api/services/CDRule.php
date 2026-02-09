@@ -929,7 +929,6 @@ class CDRule extends CApiService {
 		);
 
 		DB::delete('dhosts', ['druleid' => $druleids]);
-
 		DB::delete('dchecks', ['druleid' => $druleids]);
 		DB::delete('drules', ['druleid' => $druleids]);
 
