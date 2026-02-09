@@ -2764,7 +2764,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$widget->waitUntilReady();
 			$this->assertEquals([], $this->getWidgetTableData($widget));
 
-			// Check "No data" widget text.
+			// Check "No data found" widget text.
 			$this->assertEquals('No data found', $widget->getContent()->query('class:no-data-message')->one()->getText());
 
 			$multiselect_field->fill($data['host_select']['with_data']);
