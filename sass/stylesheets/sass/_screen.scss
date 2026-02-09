@@ -4217,6 +4217,21 @@ z-select {
 	}
 }
 
+.skip-link {
+	left: -999px;
+	overflow: hidden;
+	position: absolute;
+	top: 12px;
+	width: 134px;
+	z-index: 99999;
+
+	&:focus-visible {
+		height: auto;
+		left: 10px;
+		overflow: visible;
+	}
+}
+
 // Dynamically generated classes:
 //  .color-accent
 //  .orange
