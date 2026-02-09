@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -286,9 +286,10 @@ class CControllerMenuPopup extends CController {
 	 * Prepare data for item latest data context menu popup.
 	 *
 	 * @param array  $data
-	 * @param string $data['itemid']
+	 *        string $data['itemid']
+	 *        bool   $data['combined']  (optional) is item aggregated using combined function or not
 	 *
-	 * @return mixed
+	 * @return array|null
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
@@ -305,16 +306,13 @@ class CControllerMenuPopup extends CController {
 			$is_executable = false;
 
 			if ($db_item['type'] != ITEM_TYPE_HTTPTEST) {
-				if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {
-					$is_writable = true;
-				}
-				elseif (CWebUser::getType() == USER_TYPE_ZABBIX_ADMIN) {
-					$is_writable = (bool) API::Host()->get([
+				$is_writable = CWebUser::getType() == USER_TYPE_SUPER_ADMIN
+					? true
+					: (bool) API::Host()->get([
 						'output' => ['hostid'],
 						'hostids' => $db_item['hostid'],
 						'editable' => true
 					]);
-				}
 			}
 
 			if (in_array($db_item['type'], checkNowAllowedTypes())) {
@@ -324,6 +322,7 @@ class CControllerMenuPopup extends CController {
 			return [
 				'type' => 'item',
 				'backurl' => $data['backurl'],
+				'combined' => $data['combined'] ?? false,
 				'itemid' => $data['itemid'],
 				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],

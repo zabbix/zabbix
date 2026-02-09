@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -370,7 +370,9 @@ void	dbconn_close(zbx_dbconn_t *db)
  ******************************************************************************/
 static int	dbconn_open(zbx_dbconn_t *db)
 {
-	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	int			ret = ZBX_DB_OK, last_txn_error, last_txn_level;
+	zbx_dbconn_mode_t	last_mode;
+
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
 #elif defined(HAVE_POSTGRESQL)
@@ -393,9 +395,11 @@ static int	dbconn_open(zbx_dbconn_t *db)
 
 	last_txn_error = db->txn_error;
 	last_txn_level = db->txn_level;
+	last_mode = db->mode;
 
 	db->txn_error = ZBX_DB_OK;
 	db->txn_level = 0;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 #if defined(HAVE_MYSQL)
 	if (NULL == (db->conn = mysql_init(NULL)))
@@ -793,6 +797,7 @@ out:
 
 	db->txn_error = last_txn_error;
 	db->txn_level = last_txn_level;
+	db->mode = last_mode;
 
 	return ret;
 }
@@ -842,6 +847,8 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 	int		err;
 	char		*error = NULL;
 #endif
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
+		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
@@ -1077,11 +1084,19 @@ static int	dbconn_commit(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
+		{
+			db->mode = DBCONN_MODE_DEFAULT;
+			return ZBX_DB_OK;
+		}
+
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: commit without transaction."
 				" Please report it to Zabbix Team.");
 		zbx_this_should_never_happen_backtrace();
 		assert(0);
 	}
+
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	if (ZBX_DB_OK != db->txn_error)
 		return ZBX_DB_FAIL; /* commit called on failed transaction */
@@ -1116,6 +1131,12 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	if (0 == db->txn_level)
 	{
+		if (DBCONN_MODE_DEFERRED_BEGIN == db->mode)
+		{
+			db->mode = DBCONN_MODE_DEFAULT;
+			return ZBX_DB_OK;
+		}
+
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: rollback without transaction."
 				" Please report it to Zabbix Team.");
 		zbx_this_should_never_happen_backtrace();
@@ -1126,6 +1147,7 @@ static int	dbconn_rollback(zbx_dbconn_t *db)
 
 	/* allow rollback of failed transaction */
 	db->txn_error = ZBX_DB_OK;
+	db->mode = DBCONN_MODE_DEFAULT;
 
 	rc = dbconn_execute(db, "rollback;");
 
@@ -1164,6 +1186,8 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 	int		ret = FAIL;
 	char		*error = NULL;
 #endif
+	if (DBCONN_MODE_DEFERRED_BEGIN == db->mode && 0 == db->txn_level)
+		zbx_dbconn_begin(db);
 
 	if (0 != db->config->log_slow_queries)
 		sec = zbx_time();
@@ -1561,6 +1585,11 @@ int	zbx_dbconn_begin(zbx_dbconn_t *db)
 	}
 
 	return rc;
+}
+
+void	zbx_dbconn_begin_deferred(zbx_dbconn_t *db)
+{
+	db->mode = DBCONN_MODE_DEFERRED_BEGIN;
 }
 
 /******************************************************************************
@@ -2569,7 +2598,7 @@ static int	db_large_query_select(zbx_db_large_query_t *query)
 	if (NULL != query->suffix)
 		zbx_strcpy_alloc(query->sql, query->sql_alloc, query->sql_offset, query->suffix);
 
-	query->result = dbconn_select(query->db, "%s", *query->sql);
+	query->result = zbx_dbconn_select(query->db, "%s", *query->sql);
 
 	return SUCCEED;
 }

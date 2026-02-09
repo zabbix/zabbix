@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -418,6 +418,8 @@ $translate_strings = [
 	],
 	'class.form.validator.js' => [
 		'An array is expected.' => _('An array is expected.'),
+		'At least %1$d items based on field "%2$s" rules' => _('At least %1$d items based on field "%2$s" rules'),
+		'No more than %1$d items based on field "%2$s" rules' => _('No more than %1$d items based on field "%2$s" rules'),
 		'Required field is missing.' => _('Required field is missing.'),
 		'This value does not match pattern.' => _('This value does not match pattern.'),
 		'This value is not a valid identifier.' => _('This value is not a valid identifier.'),

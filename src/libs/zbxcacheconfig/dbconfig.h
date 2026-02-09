@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -94,6 +94,8 @@ typedef struct
 	zbx_uint64_t	itemid;
 	const char	*function;
 	const char	*parameter;
+	unsigned int	sz_function;
+	unsigned int	sz_parameter;
 	zbx_uint64_t	revision;
 	zbx_uint64_t	timer_revision;
 	unsigned char	type;
@@ -251,6 +253,9 @@ typedef struct
 {
 	const char	*units;
 	const char	*trends_period;
+	unsigned int	sz_units;
+	unsigned int	sz_trends_period;
+	int		trends_sec;
 }
 ZBX_DC_NUMITEM;
 
@@ -290,6 +295,8 @@ typedef struct
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;
+	unsigned int		sz_key;
+	unsigned int		sz_history_period;
 	const char		*timeout;
 	ZBX_DC_TRIGGER		**triggers;
 	ZBX_DC_ITEMTYPE		itemtype;
@@ -299,6 +306,7 @@ typedef struct
 	ZBX_DC_PREPROCITEM	*preproc_item;
 	ZBX_DC_MASTERITEM	*master_item;
 	zbx_vector_dc_item_tag_t	tags;
+	int			history_sec;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
@@ -406,6 +414,7 @@ typedef struct
 	int		data_expected_from;
 	zbx_uint64_t	flags;
 	zbx_uint64_t	revision;
+	unsigned int	sz_host;
 
 	unsigned char	maintenance_status;
 	unsigned char	maintenance_type;
@@ -1064,6 +1073,7 @@ typedef struct
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
 	zbx_um_cache_t		*um_cache;
+	zbx_hashset_t		um_hosts;
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
@@ -1181,9 +1191,9 @@ unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *src_item);
 #define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
-
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
-		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault);
+		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
+		double *um_cache_dup_sec, zbx_int64_t *um_cache_dup_size);
 
 void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
 void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);

@@ -32,6 +32,7 @@ POLLER_LIBS = \
 	$(top_srcdir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
