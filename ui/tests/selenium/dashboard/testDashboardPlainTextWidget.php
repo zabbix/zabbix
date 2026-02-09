@@ -1070,8 +1070,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$widget->waitUntilReady();
 
 		// Return empty array if no data is present in the widget.
-		if ($widget->query('class:no-data-message')->one(false)->isVisible() || $widget->query('class:nothing-to-show')
-				->one(false)->isVisible()) {
+		if ($widget->query('class:nothing-to-show')->one(false)->isVisible()) {
 			return [];
 		}
 
@@ -1088,40 +1087,24 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$cells = $row->query('xpath:./*')->all();
 
 			foreach ($headers as $i => $name) {
-				if ($name !== '' && $cells->exists($i)) {
-					$column = $cells->get($i);
-					$iframe = $column->query('class:js-iframe')->one(false);
+				$column = $cells->get($i);
+				$iframe = $column->query('class:js-iframe')->one(false);
 
-					if ($iframe->isValid()) {
-						// Extract HTML content from iframe's srcdoc attribute.
-						$raw_html = $iframe->getAttribute('srcdoc');
-
-						/**
-						 * preg_match is used to extract only the inner content of the <body> tag.
-						 * $matches[1] contains the string captured between <body> tags.
-						 */
-						$body_content = (preg_match('/<body[^>]*>(.*)<\/body>/is', $raw_html, $matches))
-							? $matches[1]
-							: $raw_html;
-
-						/**
-						 * 1. htmlspecialchars_decode: Converts HTML entities (like &nbsp; or &quot;) back to plain characters.
-						 * 2. strip_tags: Removes any remaining HTML tags to get the final text.
-						 */
-						$value = strip_tags(htmlspecialchars_decode($body_content, ENT_QUOTES));
-					}
-					else {
-						$value = $column->getText();
-					}
-
-					$raw_row[$name] = $value;
+				if ($iframe->isValid()) {
+					/**
+					* The content is stored as encoded HTML inside the iframe's 'srcdoc' attribute.
+					* 1. getAttribute: Retrieves the raw encoded string.
+					* 2. htmlspecialchars_decode: Converts entities (like &lt;) back to tags (<).
+					* 3. strip_tags: Removes the tags to leave only the visible plain text.
+					*/
+					$raw_row[$name] = strip_tags(htmlspecialchars_decode($iframe->getAttribute('srcdoc'), ENT_QUOTES));
+				}
+				else {
+					$raw_row[$name] = $column->getText();
 				}
 			}
-
-			// Clear empty array elements.
-			$data[] = array_filter($raw_row, 'strlen');
+			$data[] = array_filter($raw_row);
 		}
-
 		return $data;
 	}
 
@@ -1168,6 +1151,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$multiselect_field->fill($data['host_select']['without_data']);
 			$dashboard->waitUntilReady();
 			$this->assertEquals([], $this->getWidgetTableData($widget));
+
+			// Check "No data found." widget text.
+			$this->assertEquals('No data found.', $widget->getContent()->query('class:nothing-to-show')->one()->getText());
+
 			$multiselect_field->fill($data['host_select']['with_data']);
 			$dashboard->waitUntilReady();
 			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
