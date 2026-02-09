@@ -2640,7 +2640,8 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$widget->waitUntilReady();
 
 		// Return empty array if no data is present in the widget.
-		if ($widget->query('class:no-data-message')->one(false)->isVisible()) {
+		if ($widget->query('class:no-data-message')->one(false)->isVisible() || $widget->query('class:nothing-to-show')
+				->one(false)->isVisible()) {
 			return [];
 		}
 
@@ -2661,13 +2662,17 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 					if ($iframe->isValid()) {
 						// Extract HTML content from iframe's srcdoc attribute.
-						$value = $iframe->getAttribute('srcdoc');
+						$raw_html = $iframe->getAttribute('srcdoc');
 
-						if (preg_match('/<body[^>]*>(.*)<\/body>/is', $value, $matches)) {
-							$value = $matches[1];
-						}
+						/**
+						* preg_match is used to extract only the inner content of the <body> tag.
+						* $matches[1] contains the string captured between <body> tags.
+						*/
+						$body_content = (preg_match('/<body[^>]*>(.*)<\/body>/is', $raw_html, $matches))
+							? $matches[1]
+							: $raw_html;
 
-						$value = htmlspecialchars_decode(trim($value), ENT_QUOTES);
+						$value = htmlspecialchars_decode($body_content, ENT_QUOTES);
 					}
 					else {
 						$value = $column->getText();
@@ -2745,9 +2750,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 
 			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
 
-			// Check HTML encode.
-			if (CTestArrayHelper::get($data, 'screenshot')) {
-				$this->assertScreenshot($widget, 'HTML encode check');
+			if (array_key_exists('screenshot', $data)) {
+				// Find all the values ​​of the Timestamp column to hide them in the screenshot, since the values ​​are dynamic.
+				$timestamp_cells = $widget->query('xpath:.//tbody/tr/*[1]')->all()->asArray();
+				$this->assertScreenshotExcept($widget, $timestamp_cells, 'HTML encode check');
 			}
 
 			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
