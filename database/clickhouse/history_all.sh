@@ -4,4 +4,5 @@
 ./history_log_schema.sh $@
 ./history_uint_schema.sh $@
 ./history_text_schema.sh $@
+./history_json_schema.sh $@
 
