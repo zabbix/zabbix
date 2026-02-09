@@ -2640,8 +2640,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$widget->waitUntilReady();
 
 		// Return empty array if no data is present in the widget.
-		if ($widget->query('class:no-data-message')->one(false)->isVisible() || $widget->query('class:nothing-to-show')
-				->one(false)->isVisible()) {
+		if ($widget->query('class:no-data-message')->one(false)->isVisible()) {
 			return [];
 		}
 
@@ -2764,6 +2763,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$multiselect_field->fill($data['host_select']['without_data']);
 			$widget->waitUntilReady();
 			$this->assertEquals([], $this->getWidgetTableData($widget));
+
+			// Check "No data" widget text.
+			$this->assertEquals('No data found', $widget->getContent()->query('class:no-data-message')->one()->getText());
+
 			$multiselect_field->fill($data['host_select']['with_data']);
 			$widget->waitUntilReady();
 
