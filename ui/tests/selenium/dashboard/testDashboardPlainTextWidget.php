@@ -1082,11 +1082,8 @@ class testDashboardPlainTextWidget extends CWebTest {
 		foreach ($table->getRows() as $row) {
 			$raw_row = [];
 
-			// The Plain Text widget table contain both <th> and <td> elements in a single row.
-			$cells = $row->query('xpath:./*')->all();
-
 			foreach ($headers as $i => $name) {
-				$column = $cells->get($i);
+				$column = $row->getColumn($i);
 				$iframe = $column->query('class:js-iframe')->one(false);
 
 				if ($iframe->isValid()) {
