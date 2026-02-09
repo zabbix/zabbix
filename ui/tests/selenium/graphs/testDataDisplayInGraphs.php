@@ -17,6 +17,7 @@
 require_once __DIR__ . '/../../include/CWebTest.php';
 
 /**
+ * @backup profiles
  *
  * @onBefore prepareGraphData
  */
@@ -5739,7 +5740,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			],
 			[
 				[
-					'page' => 'SVG graphs with axes scale'
+					'page' => 'SVG graphs with axes scale with host name'
 				]
 			],
 			[
