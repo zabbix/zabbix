@@ -2248,6 +2248,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
 	src/libs/zbxsupervisor/Makefile
+    src/libs/zbxsupervisor_client/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
