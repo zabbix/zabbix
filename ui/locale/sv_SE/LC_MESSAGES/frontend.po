@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-13 20:16+0000\n"
+"PO-Revision-Date: 2026-01-16 15:22+0000\n"
 "Last-Translator: Daniel Nylander <zabbix@danielnylander.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv_SE\n"
@@ -316,7 +316,7 @@ msgstr "%1$s: filen är inte läsbar."
 #: include/classes/setup/CSetupWizard.php:1463
 #, c-format
 msgid "%1$s: invalid path or file not found."
-msgstr ""
+msgstr "%1$s: ogiltig sökväg eller filen finns inte."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -355,6 +355,10 @@ msgstr "(0 - använd standardåtgärd)"
 #: app/views/configuration.templategroup.list.php:36
 msgid "(Only super admins can create groups)"
 msgstr "(Endast superadministratörer kan skapa grupper)"
+
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
@@ -1774,7 +1778,7 @@ msgstr "Det måste finnas minst en aktiv användare med rollen \"%1$s\"."
 
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:40
 msgid "At least one day must be selected."
-msgstr ""
+msgstr "Minst en dag måste väljas."
 
 #: include/classes/api/services/CMaintenance.php:686
 msgid "At least one day of the week or day of the month must be specified."
@@ -1782,12 +1786,12 @@ msgstr "Minst en veckodag eller en dag i månaden måste anges."
 
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
-msgstr ""
+msgstr "Minst en krypteringsnivå måste väljas."
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
 msgid "At least one expression must be added."
-msgstr ""
+msgstr "Minst ett uttryck måste läggas till."
 
 #: app/controllers/CControllerMaintenanceCreate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:63
@@ -1801,7 +1805,7 @@ msgstr "Minst en värdgrupp eller värd måste väljas."
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
 msgid "At least one month must be selected."
-msgstr ""
+msgstr "Minst en månad måste väljas."
 
 #: include/classes/helpers/CItemGeneralHelper.php:411
 msgid "At least one of \"min\" or \"max\" parameters should be specified."
@@ -1835,6 +1839,11 @@ msgstr "Minst en parameter måste vara aktiverad."
 #: app/controllers/CControllerMaintenanceCreate.php:40
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
+msgstr "Minst en period måste läggas till."
+
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
 msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
@@ -1859,7 +1868,7 @@ msgstr "Minst en användare eller användargrupp måste anges."
 #: app/controllers/CControllerMaintenanceUpdate.php:62
 #: app/controllers/CControllerMaintenanceUpdate.php:66
 msgid "At least one weekday must be selected."
-msgstr ""
+msgstr "Minst en veckodag måste väljas."
 
 #: app/views/administration.mediatype.edit.php:354
 #: app/views/mediatype.edit.php:464
@@ -2105,7 +2114,7 @@ msgstr "Undvik lösenord som är lätta att gissa sig till"
 
 #: app/views/host.wizard.edit.php:473
 msgid "Avoid including sensitive data."
-msgstr ""
+msgstr "Undvik att inkludera känslig data."
 
 #: jsLoader.php:172
 msgid "Awaiting data"
@@ -2219,7 +2228,7 @@ msgstr "Blå"
 
 #: include/classes/core/ZBase.php:376
 msgid "Blue (classic)"
-msgstr ""
+msgstr "Blå (klassisk)"
 
 #: app/views/webscenario.step.edit.php:250
 #: include/views/configuration.host.discovery.edit.php:383
@@ -3654,7 +3663,7 @@ msgstr "Kan inte hitta värdekartan \"%1$s\" som används för objektprototypen 
 
 #: app/views/oauth.authorize.php:33
 msgid "Cannot get authentication tokens"
-msgstr ""
+msgstr "Kan inte hämta autentiseringstokens"
 
 #: app/views/oauth.edit.php:230
 msgid "Cannot get authorization code."
@@ -4190,7 +4199,7 @@ msgstr "Det går inte att läsa YAML: %1$s."
 #: include/classes/server/CZabbixServer.php:511
 #, c-format
 msgid "Cannot read response from Zabbix server \"%1$s\"."
-msgstr ""
+msgstr "Kan inte läsa svaret från Zabbix-servern \"%1$s\"."
 
 #: include/classes/server/CZabbixServer.php:567
 #, c-format
@@ -4256,7 +4265,7 @@ msgstr "Det går inte att ställa in \"Aggregering av datauppsättning\" när ob
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Kan inte ställa in teckenuppsättning."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4776,7 +4785,7 @@ msgstr "Ändra"
 
 #: app/views/administration.authentication.edit.php:316
 msgid "Change IdP certificate"
-msgstr ""
+msgstr "Ändra IdP-certifikat"
 
 #: app/partials/configuration.host.edit.html.php:449
 #: app/views/administration.autoreg.edit.php:82
@@ -4787,7 +4796,7 @@ msgstr "Ändra PSK"
 
 #: app/views/administration.authentication.edit.php:367
 msgid "Change SP certificate"
-msgstr ""
+msgstr "Ändra SP-certifikat"
 
 #: app/views/administration.authentication.edit.php:342
 msgid "Change SP private key"
@@ -4974,7 +4983,7 @@ msgstr "Kinesiska (zh_TW)"
 #: app/views/administration.authentication.edit.php:354
 #: app/views/administration.authentication.edit.php:379
 msgid "Choose file"
-msgstr ""
+msgstr "Välj fil"
 
 #: include/classes/import/importers/CTemplateImporter.php:294
 #, c-format
@@ -6364,7 +6373,7 @@ msgstr "Mörk"
 
 #: include/classes/core/ZBase.php:378
 msgid "Dark (classic)"
-msgstr ""
+msgstr "Mörk (klassisk)"
 
 #: app/controllers/CControllerAuditLogList.php:227
 #: app/controllers/CControllerDashboardPrint.php:71
@@ -6762,7 +6771,7 @@ msgstr "Standardläge för värdinventering"
 
 #: app/views/administration.iconmap.edit.php:87
 msgid "Default icon"
-msgstr ""
+msgstr "Standardikon"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
@@ -11046,7 +11055,7 @@ msgstr "Ikoner"
 
 #: app/views/administration.authentication.edit.php:312
 msgid "IdP certificate"
-msgstr ""
+msgstr "IdP-certifikat"
 
 #: app/views/administration.authentication.edit.php:291
 msgid "IdP entity ID"
@@ -12237,7 +12246,7 @@ msgstr "Ärvda objekt"
 
 #: include/classes/helpers/CTagHelper.php:222
 msgid "Inherited tag"
-msgstr ""
+msgstr "Ärvd tagg"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -12412,7 +12421,7 @@ msgstr "Intervall"
 
 #: widgets/itemcard/includes/CWidgetFieldItemSectionsView.php:76
 msgid "Interval and storage"
-msgstr ""
+msgstr "Intervall och lagring"
 
 #: include/classes/api/services/CRole.php:731
 #, c-format
@@ -12496,7 +12505,7 @@ msgstr "Ogiltigt åtgärdsvillkor: %1$s."
 #: app/controllers/CControllerProxyUpdate.php:51
 #: app/controllers/CControllerProxyUpdate.php:62
 msgid "Invalid address."
-msgstr ""
+msgstr "Ogiltig adress."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1629
 #, c-format
@@ -15086,7 +15095,7 @@ msgstr "Måste vara minst %1$s."
 #: app/controllers/CControllerMaintenanceUpdateGeneral.php:32
 #, c-format
 msgid "Must be greater than \"%1$s\"."
-msgstr ""
+msgstr "Måste vara större än \"%1$s\"."
 
 #: include/classes/validators/CFormValidator.php:340
 msgid "Must be selected."
@@ -15095,7 +15104,7 @@ msgstr "Måste väljas."
 #: app/partials/administration.system.info.php:254
 #, c-format
 msgid "Must not be higher than %1$s."
-msgstr ""
+msgstr "Får inte vara högre än %1$s."
 
 #: jsLoader.php:284
 msgid "Mute"
@@ -15330,6 +15339,16 @@ msgstr "Namn "
 #: app/views/administration.authentication.edit.php:397
 msgid "Name ID"
 msgstr "Namn ID"
+
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
 
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
@@ -15872,63 +15891,63 @@ msgstr "Ingen behörighet att anropa \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
-msgstr ""
+msgstr "Inga behörigheter för att importera upptäcktsregler."
 
 #: include/classes/api/services/CConfiguration.php:313
 msgid "No permissions to import graphs."
-msgstr ""
+msgstr "Inga behörigheter för att importera grafer."
 
 #: include/classes/api/services/CConfiguration.php:314
 msgid "No permissions to import host groups."
-msgstr ""
+msgstr "Inga behörigheter för att importera värdgrupper."
 
 #: include/classes/api/services/CConfiguration.php:316
 msgid "No permissions to import hosts."
-msgstr ""
+msgstr "Inga behörigheter för att importera värdar."
 
 #: include/classes/api/services/CConfiguration.php:318
 msgid "No permissions to import images."
-msgstr ""
+msgstr "Inga behörigheter för att importera bilder."
 
 #: include/classes/api/services/CConfiguration.php:319
 msgid "No permissions to import items."
-msgstr ""
+msgstr "Inga behörigheter för att importera objekt."
 
 #: include/classes/api/services/CConfiguration.php:320
 msgid "No permissions to import maps."
-msgstr ""
+msgstr "Inga behörigheter för att importera kartor."
 
 #: include/classes/api/services/CConfiguration.php:321
 msgid "No permissions to import media types."
-msgstr ""
+msgstr "Inga behörigheter för att importera mediatyper."
 
 #: include/classes/api/services/CConfiguration.php:324
 msgid "No permissions to import template dashboards."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallar för kontrollpaneler."
 
 #: include/classes/api/services/CConfiguration.php:315
 msgid "No permissions to import template groups."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallgrupper."
 
 #: include/classes/api/services/CConfiguration.php:322
 msgid "No permissions to import template links."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallänkar."
 
 #: include/classes/api/services/CConfiguration.php:323
 msgid "No permissions to import templates."
-msgstr ""
+msgstr "Inga behörigheter för att importera mallar."
 
 #: include/classes/api/services/CConfiguration.php:325
 msgid "No permissions to import triggers."
-msgstr ""
+msgstr "Inga behörigheter för att importera utlösare."
 
 #: include/classes/api/services/CConfiguration.php:326
 msgid "No permissions to import value maps."
-msgstr ""
+msgstr "Inga behörigheter för att importera värdekartor."
 
 #: include/classes/api/services/CConfiguration.php:317
 msgid "No permissions to import web scenarios."
-msgstr ""
+msgstr "Inga behörigheter för att importera webbscenarior."
 
 #: app/controllers/CControllerChartsView.php:133
 #: app/controllers/CControllerDashboardPrint.php:99
@@ -19590,7 +19609,7 @@ msgstr "SNMPv3-agent"
 
 #: app/views/administration.authentication.edit.php:363
 msgid "SP certificate"
-msgstr ""
+msgstr "SP-certifikat"
 
 #: app/views/administration.authentication.edit.php:334
 msgid "SP entity ID"
@@ -20504,13 +20523,13 @@ msgstr "Förkortad"
 #: app/views/administration.housekeeping.edit.php:187
 #, c-format
 msgid "Should be at least %1$s."
-msgstr ""
+msgstr "Bör vara minst %1$s."
 
 #: app/partials/administration.system.info.php:262
 #: app/views/administration.housekeeping.edit.php:197
 #, c-format
 msgid "Should not be higher than %1$s."
-msgstr ""
+msgstr "Bör inte vara högre än %1$s."
 
 #: app/partials/monitoring.problem.filter.php:27
 #: app/views/monitoring.charts.view.php:80
@@ -21612,6 +21631,11 @@ msgstr "Prioritet för visning av tagg"
 msgid "Tag filter"
 msgstr "Taggfilter"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "Tagg för matchning"
@@ -21855,7 +21879,7 @@ msgstr "Behörighet för mallar"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "Malltaggar"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -25145,7 +25169,7 @@ msgstr "Varningsmeddelande"
 #: app/partials/administration.system.info.php:243
 #: app/partials/administration.system.info.php:262
 msgid "Warning!"
-msgstr ""
+msgstr "Varning!"
 
 #: app/partials/administration.system.info.php:198
 msgid "Warning! Support for Oracle DB is deprecated since Zabbix 7.0 and will be removed in future versions."
@@ -25458,7 +25482,7 @@ msgstr "X"
 #: widgets/scatterplot/includes/WidgetForm.php:194
 #: widgets/scatterplot/includes/WidgetForm.php:199
 msgid "X axis"
-msgstr ""
+msgstr "X-axel"
 
 #: widgets/scatterplot/includes/WidgetForm.php:80
 msgid "X axis MAX value must be greater than X axis MIN value"
@@ -25529,7 +25553,7 @@ msgstr "Y"
 #: widgets/scatterplot/includes/WidgetForm.php:226
 #: widgets/scatterplot/includes/WidgetForm.php:231
 msgid "Y axis"
-msgstr ""
+msgstr "Y-axel"
 
 #: include/views/configuration.graph.edit.php:357
 msgid "Y axis MAX value"
@@ -25558,7 +25582,7 @@ msgstr "Y-axel"
 #: widgets/scatterplot/includes/CWidgetFieldDataSetView.php:362
 #: widgets/scatterplot/includes/WidgetForm.php:216
 msgid "Y-Axis"
-msgstr ""
+msgstr "Y-axel"
 
 #: widgets/scatterplot/includes/CWidgetFieldAxisThresholdsView.php:41
 msgid "Y-Axis threshold"
@@ -25886,7 +25910,7 @@ msgstr "ZABBIX-fångare"
 #: widgets/geomap/includes/WidgetForm.php:68
 #: widgets/geomap/includes/WidgetForm.php:72
 msgid "Zoom level"
-msgstr ""
+msgstr "Zoomnivå"
 
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"

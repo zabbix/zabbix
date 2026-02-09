@@ -8,4 +8,5 @@ libzbxescalator_a_SOURCES = \
 	macro_ctx_msg.c
 
 libzbxescalator_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)

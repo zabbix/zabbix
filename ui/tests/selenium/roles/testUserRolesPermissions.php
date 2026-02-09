@@ -461,6 +461,13 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getProblemActionsData
 	 */
 	public function testUserRolesPermissions_ProblemAction($data) {
+		// Remove event status blinking to get correct status in table column.
+		CAPIHelper::authorize('user_for_role', 'zabbixzabbix');
+		CAPIHelper::call('settings.update', [
+			'blink_period' => 0
+		]);
+		CAPIHelper::reset();
+
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
 		foreach ([true, false] as $action_status) {
@@ -1886,10 +1893,12 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_ExecuteNowContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
-		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$this->page->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
+		$table = $this->getTable();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		foreach ($data['test_cases'] as $test_case) {

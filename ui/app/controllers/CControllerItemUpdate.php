@@ -22,7 +22,7 @@ class CControllerItemUpdate extends CControllerItem {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules()) && $this->validateInputExtended();
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
@@ -110,8 +110,11 @@ class CControllerItemUpdate extends CControllerItem {
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'query_fields' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
 					'value' => ['string', 'length' => 255],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
@@ -139,14 +142,17 @@ class CControllerItemUpdate extends CControllerItem {
 			],
 			'headers' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
-					'value' => ['string', 'length' => 2000]
+					'value' => ['string', 'length' => 2000],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'status_codes' => ['db items.status_codes',
 				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => false, 'with_minus' => true]],
-				'messages' => ['use' => _('Invalid range expression.')],
+				'messages' => ['use' => _('Invalid HTTP status code or range.')],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'follow_redirects' => ['db items.follow_redirects', 'in' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
@@ -287,7 +293,7 @@ class CControllerItemUpdate extends CControllerItem {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}']]],
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']]],
 				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
 			],
 			'inventory_link' => ['db items.inventory_link', 'in' => array_keys([0 => null] + getHostInventories())],
