@@ -2558,7 +2558,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
 							->one()->click();
 						$this->assertTableData([$popup_values], 'xpath://div[contains(@class, "hintbox-static")]');
-						$this->query('xpath://div[containt(@class, "hintbox-static")]')->query('class:btn-overlay-close')
+						$this->query('xpath://div[contains(@class, "hintbox-static")]')->query('class:btn-overlay-close')
 							->one()->click();
 					}
 					break;

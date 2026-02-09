@@ -803,7 +803,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 					if ($class !== 'color-positive') {
 						// Click on icon and open hint.
 						$icon->click();
-						$hint = $this->query('xpath://div[constains(@class, "hintbox-static")]')->asOverlayDialog()
+						$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
 							->waitUntilReady()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 
