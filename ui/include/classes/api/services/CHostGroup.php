@@ -25,7 +25,6 @@ class CHostGroup extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'propagate' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
@@ -420,7 +419,7 @@ class CHostGroup extends CApiService {
 	public function delete(array $groupids): array {
 		$this->validateDelete($groupids, $db_groups);
 
-		$this->deleteForce($db_groups);
+		self::deleteForce($db_groups);
 
 		return ['groupids' => $groupids];
 	}
@@ -428,32 +427,18 @@ class CHostGroup extends CApiService {
 	/**
 	 * @param array $db_groups
 	 */
-	public function deleteForce(array $db_groups): void {
+	public static function deleteForce(array $db_groups): void {
 		self::validateDeleteForce($db_groups);
 
 		$groupids = array_keys($db_groups);
 
-		// delete sysmap element
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
-		$this->unlinkHosts($db_groups);
+		API::Host()->unlinkGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_HOST_GROUP, $db_groups);
-	}
-
-	private function unlinkHosts(array $db_groups): void {
-		$data = [
-			'groups' => [],
-			'hosts' => []
-		];
-
-		foreach ($db_groups as $db_group) {
-			$data['groups'][] = ['groupid' => $db_group['groupid']];
-		}
-
-		$this->massUpdate($data);
 	}
 
 	/**
@@ -982,121 +967,6 @@ class CHostGroup extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-	}
-
-	/**
-	 * Replace hosts on the given host groups.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function massUpdate(array $data): array {
-		$this->validateMassUpdate($data, $hosts, $db_hosts);
-
-		API::Host()->updateForce($hosts, $db_hosts);
-
-		return ['groupids' => array_column($data['groups'], 'groupid')];
-	}
-
-	private function validateMassUpdate(array &$data, ?array &$hosts, ?array &$db_hosts): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'hosts' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['hostid']], 'fields' => [
-				'hostid'=>		['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_groups = $this->get([
-			'output' => [],
-			'groupids' => array_column($data['groups'], 'groupid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($data['groups'] as $i => $group) {
-			if (!array_key_exists($group['groupid'], $db_groups)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/groups/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
-		}
-
-		$db_hosts = API::Host()->get([
-			'output' => ['hostid', 'host', 'flags'],
-			'groupids' => array_column($data['groups'], 'groupid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if ($data['hosts']) {
-			$db_hosts += API::Host()->get([
-				'output' => ['hostid', 'host', 'flags'],
-				'hostids' => array_column($data['hosts'], 'hostid'),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
-
-		foreach ($data['hosts'] as $i => $host) {
-			if (!array_key_exists($host['hostid'], $db_hosts)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/hosts/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
-			elseif ($db_hosts[$host['hostid']]['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-					'/hosts/'.($i + 1),
-					_s('cannot update readonly parameter "%1$s" of discovered object', 'groups')
-				));
-			}
-		}
-
-		$hosts = [];
-		$del_hosts = [];
-
-		if (!$db_hosts) {
-			return;
-		}
-
-		$hostids = array_column($data['hosts'], 'hostid');
-
-		foreach ($db_hosts as $db_host) {
-			if (in_array($db_host['hostid'], $hostids)) {
-				$hosts[$db_host['hostid']] = [
-					'hostid' => $db_host['hostid'],
-					'groups' => $data['groups']
-				];
-			}
-			else {
-				$del_hosts[$db_host['hostid']] = [
-					'hostid' => $db_host['hostid'],
-					'groups' => []
-				];
-			}
-		}
-
-		API::Host()->addAffectedGroups($hosts + $del_hosts, $db_hosts);
-
-		if ($hosts) {
-			API::Host()->addUnchangedGroups($hosts, $db_hosts);
-		}
-
-		if ($del_hosts) {
-			API::Host()->addUnchangedGroups($del_hosts, $db_hosts,
-				['groupids' => array_column($data['groups'], 'groupid')]
-			);
-		}
-
-		$hosts += $del_hosts;
-
-		API::Host()->checkHostsWithoutGroups($hosts, $db_hosts);
 	}
 
 	/**

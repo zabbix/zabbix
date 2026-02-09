@@ -341,7 +341,7 @@ $child_services_filter = (new CList())
 
 $child_service_row = (new CTemplateTag('child-service-tmpl'))->addItem([
 	(new CRow([
-		(new CCol('#{*name}'))
+		(new CCol('#{name}'))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 		(new CCol('#{*problem_tags_html}'))->addClass(ZBX_STYLE_WORDWRAP)->addClass(ZBX_STYLE_TAGS_WRAPPER),

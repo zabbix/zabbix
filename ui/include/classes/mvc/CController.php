@@ -334,24 +334,6 @@ abstract class CController {
 		return $this->validation_result == self::VALIDATION_OK;
 	}
 
-	public function addFormError(string $path, string $message, $level = CFormValidator::ERROR_LEVEL_UNKNOWN): void {
-		if (!array_key_exists($path, $this->validation_errors)) {
-			$this->validation_errors[$path] = [];
-		}
-
-		$same_error = array_filter($this->validation_errors[$path],
-			static fn ($error) => $error['message'] === $message && $error['level'] == $level
-		);
-
-		if (!$same_error) {
-			$this->validation_errors[$path][] = [
-				'message' => $message,
-				'level' => $level
-			];
-			$this->validation_result = self::VALIDATION_ERROR;
-		}
-	}
-
 	/**
 	 * Validate input using CNewValidator.
 	 *

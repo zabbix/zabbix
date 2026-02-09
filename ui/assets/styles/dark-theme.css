@@ -2422,7 +2422,7 @@ button {
   margin-top: 4px;
   white-space: break-spaces;
   word-break: break-word;
-  line-height: 1.4em;
+  line-height: 17px;
   color: #ff5555; }
 
 z-select.has-error button.focusable:active,
