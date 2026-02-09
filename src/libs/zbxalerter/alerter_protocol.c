@@ -1264,13 +1264,15 @@ out:
  *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
- * Parameters: dispatch   - [IN] dispatcher                                   *
- *             mediatype  - [IN] media type to use for sending                *
- *             recipients - [IN] dispatch recipients                          *
- *             error      - [OUT]                                             *
+ * Parameters: dispatch     - [IN] dispatcher                                 *
+ *             mediatype    - [IN] media type to use for sending              *
+ *             recipients   - [IN] dispatch recipients                        *
+ *             eventid      - [IN]                                            *
+ *             message_type - [IN]                                            *
+ *             error        - [OUT]                                           *
  *                                                                            *
- * Return value: SUCCEED - the dispatch sent successfully                     *
- *               FAIL    - otherwise                                          *
+ * Return value: SUCCEED   - the dispatch sent successfully                   *
+ *               FAIL      - otherwise                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,

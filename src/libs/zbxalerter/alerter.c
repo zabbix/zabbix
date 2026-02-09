@@ -144,11 +144,11 @@ static char	*generate_sendto_hash(const char *sendto)
 static char	*create_email_messageid(zbx_uint64_t mediatypeid, const char *sendto_hash, zbx_uint64_t eventid,
 		zbx_uint64_t actionid, zbx_uint64_t alertid, int message_type, int process_num)
 {
-	static unsigned short	counter = 0;
-	time_t			utc_time;
-	struct tm		tm;
-	char			*str = NULL;
-	size_t			str_alloc = 0, str_offset = 0;
+	static ZBX_THREAD_LOCAL unsigned short	counter = 0;
+	time_t					utc_time;
+	struct tm				tm;
+	char					*str = NULL;
+	size_t					str_alloc = 0, str_offset = 0;
 
 	switch (message_type)
 	{
@@ -295,6 +295,7 @@ static int	macro_alert_email_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
  *             ipc_message            - [IN] ipc message with media type and alert data *
  *             config_source_ip       - [IN]                                            *
  *             config_ssl_ca_location - [IN]                                            *
+ *             process_num            - [IN] sequential number of alerter process       *
  *                                                                                      *
  ****************************************************************************************/
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
