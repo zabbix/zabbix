@@ -815,7 +815,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						]
 					],
 					'graphs_amount' => 3,
-					'resetSubfilter' => true,
+					'resetSubfilter' => true
 				]
 
 			]
