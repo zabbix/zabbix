@@ -381,7 +381,7 @@
 		#setLoadingStatus(loading_btn_class) {
 			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-			this.form_element.querySelectorAll('.form-actions button:not(.js-cancel').forEach(button => {
+			this.form_element.querySelectorAll('.form-actions button:not(.js-cancel)').forEach(button => {
 				button.disabled = true;
 
 				if (button.classList.contains(loading_btn_class)) {
@@ -391,7 +391,7 @@
 		}
 
 		#unsetLoadingStatus() {
-			this.form_element.querySelectorAll('.form-actions button:not(.js-cancel').forEach(button => {
+			this.form_element.querySelectorAll('.form-actions button:not(.js-cancel)').forEach(button => {
 				button.classList.remove('is-loading');
 				button.disabled = false;
 			});
