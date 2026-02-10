@@ -161,9 +161,9 @@ typedef struct
 	zbx_uint64_t			hostid;
 	char				*host_host;
 	char				*host_name;
-	const zbx_uint64_t 		itemid;
-	const char	 		*key_orig;
-	const char	 		*key;
+	const zbx_uint64_t		itemid;
+	const char			*key_orig;
+	const char			*key;
 }
 http_raw_resolv_args_t;
 
@@ -230,7 +230,7 @@ static int	macro_http_raw_resolv(zbx_macro_resolv_data_t *p, va_list args, char 
 	return ret;
 }
 
-static void 	substitute_macros_http_raw_resolv(char **data, const zbx_dc_um_handle_t *um_handle,
+static void	substitute_macros_http_raw_resolv(char **data, const zbx_dc_um_handle_t *um_handle,
 		zbx_uint64_t hostid, char *host_host, char *host_name, const zbx_uint64_t itemid,
 		const char *key_orig, const char *key)
 {
@@ -258,7 +258,7 @@ static int	macro_http_json_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 	return ret;
 }
 
-static void 	substitute_macros_http_json_resolv(char **data, const zbx_dc_um_handle_t *um_handle,
+static void	substitute_macros_http_json_resolv(char **data, const zbx_dc_um_handle_t *um_handle,
 		zbx_uint64_t hostid, char *host_host, char *host_name, const zbx_uint64_t itemid,
 		const char *key_orig, const char *key)
 {
@@ -486,7 +486,7 @@ static int	item_resolver(char **data, char *error, size_t maxerrlen, va_list arg
 	return SUCCEED;
 }
 
-static int 	xml_traverse_item_resolver(char **data, char *error, int maxerrlen,
+static int	xml_traverse_item_resolver(char **data, char *error, int maxerrlen,
 		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
 		const zbx_uint64_t itemid, const char *key_orig, const char *key)
 {
@@ -1339,6 +1339,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		const char *config_ssh_key_location, const char *config_webdriver_url)
 {
 	zbx_dc_item_t			item, *items;
+	zbx_dc_poller_item_t		poller_item;
 	AGENT_RESULT			results[ZBX_MAX_POLLER_ITEMS];
 	int				errcodes[ZBX_MAX_POLLER_ITEMS];
 	zbx_timespec_t			timespec;
@@ -1349,8 +1350,9 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	items = &item;
-	num = zbx_dc_config_get_poller_items(poller_type, config_comms->config_timeout, 0, 0, &items);
+	poller_item.dc_items = &item;
+	num = zbx_dc_config_get_poller_items(poller_type, config_comms->config_timeout, 0, 0, &poller_item);
+	items = poller_item.dc_items;
 
 	if (0 == num)
 	{

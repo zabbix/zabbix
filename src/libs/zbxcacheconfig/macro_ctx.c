@@ -319,7 +319,7 @@ int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char
 	return ret;
 }
 
-int 	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxerrlen,
+int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxerrlen,
 		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
 		const zbx_uint64_t itemid, const zbx_dc_interface_t *interface)
 {

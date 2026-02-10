@@ -311,12 +311,13 @@ zbx_dc_httpagent_item_t;
 
 typedef union
 {
-	zbx_dc_agent_item_t 	*agent_items;
+	zbx_dc_agent_item_t	*agent_items;
 	zbx_dc_snmp_item_t	*snmp_items;
 	zbx_dc_httpagent_item_t *httpagent_items;
-	void 			*any;
+	zbx_dc_item_t		*dc_items;
+	void			*any;
 }
-zbx_dc_item_ptr_union;
+zbx_dc_poller_item_t;
 
 typedef struct
 {
@@ -1041,9 +1042,7 @@ int	zbx_dc_get_interface_value_itemid(zbx_uint64_t itemid, char **replace_to, in
 
 int	zbx_dc_config_get_poller_nextcheck(unsigned char poller_type);
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_item_t **items);
-int	zbx_dc_config_get_async_poller_items(unsigned char poller_type, int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_item_ptr_union *items);
+		int config_max_concurrent_checks, zbx_dc_poller_item_t *items);
 #ifdef HAVE_OPENIPMI
 int	zbx_dc_config_get_ipmi_poller_items(int now, int items_num, int config_timeout, zbx_dc_item_t *items,
 		int *nextcheck);
@@ -1708,7 +1707,7 @@ typedef struct
 	zbx_uint64_t			hostid;
 	const char			*host_host;
 	const char			*host_name;
-	const zbx_uint64_t 		itemid;
+	const zbx_uint64_t		itemid;
 	const zbx_dc_interface_t	*interface;
 }
 zbx_macro_field_params_resolv_args_t;
@@ -1724,7 +1723,7 @@ int	zbx_macro_query_filter_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 
 int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char **param, va_list args);
 
-int 	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxerrlen,
+int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxerrlen,
 		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
 		const zbx_uint64_t itemid, const zbx_dc_interface_t *interface);
 

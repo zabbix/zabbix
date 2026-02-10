@@ -223,7 +223,7 @@ static void	async_wake(evutil_socket_t fd, short events, void *arg)
 
 static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, const char *zbx_progname)
 {
-	zbx_dc_item_ptr_union 		items = { .any = NULL };
+	zbx_dc_poller_item_t		items = { .any = NULL };
 	AGENT_RESULT			*results;
 	int				*errcodes, total = 0;
 	zbx_timespec_t			timespec;
@@ -325,10 +325,10 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		{
 			if (SUCCEED != errcodes[i])
 			{
-				uint64_t 	itemid = 0;
-				unsigned char 	value_type = 0;
-				unsigned char 	flags = 0;
-				unsigned char 	preprocessing = 0;
+				uint64_t	itemid = 0;
+				unsigned char	value_type = 0;
+				unsigned char	flags = 0;
+				unsigned char	preprocessing = 0;
 
 				switch (poller_type) {
 					case ZBX_POLLER_TYPE_AGENT:

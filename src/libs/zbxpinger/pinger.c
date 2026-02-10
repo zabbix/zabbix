@@ -483,6 +483,7 @@ static void	add_icmpping_item(zbx_hashset_t *pinger_items, zbx_pinger_t *pinger_
 static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 {
 	zbx_dc_item_t		item, *items;
+	zbx_dc_poller_item_t	poller_item;
 	int			num, errcode = SUCCEED, items_count = 0;
 	char			error[MAX_STRING_LEN], *addr = NULL, *errmsg = NULL;
 	icmpping_t		icmpping;
@@ -493,15 +494,16 @@ static void	get_pinger_hosts(zbx_hashset_t *pinger_items, int config_timeout)
 
 	um_handle = zbx_dc_open_user_macros_masked();
 
-	items = &item;
-	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, 0, 0, &items);
+	poller_item.dc_items = &item;
+	num = zbx_dc_config_get_poller_items(ZBX_POLLER_TYPE_PINGER, config_timeout, 0, 0, &poller_item);
+	items = poller_item.dc_items;
 
 	for (int i = 0; i < num; i++)
 	{
 		zbx_pinger_t	pinger_local;
 
 		ZBX_STRDUP(items[i].key, items[i].key_orig);
-		int 	rc = zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error), um_handle,
+		int	rc = zbx_substitute_item_key_params_default(&items[i].key, error, sizeof(error), um_handle,
 				items[i].host.hostid, items[i].host.host, items[i].host.name, items[i].itemid,
 				&items[i].interface);
 
