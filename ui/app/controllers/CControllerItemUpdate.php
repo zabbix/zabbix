@@ -207,7 +207,11 @@ class CControllerItemUpdate extends CControllerItem {
 				['db items.password', 'required', 'not_empty', 'when' => [
 					['type', 'in' => [ITEM_TYPE_JMX]],
 					['username', 'not_empty']
-				]]
+				]],
+				['db items.password', 'required', 'in' => [''],
+					'when' => [['type', 'in' => [ITEM_TYPE_JMX]], ['username', 'in' => ['']]],
+					'messages' => ['in' => _('Both username and password should be either present or empty.')]
+				]
 			],
 			'params_es' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]],
 			'params_ap' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]],
