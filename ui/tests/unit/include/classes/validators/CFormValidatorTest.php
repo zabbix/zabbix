@@ -3190,9 +3190,6 @@ class CFormValidatorTest extends TestCase {
 			['{$MACRO:"conte"xt"}', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
-			['{$MACRO:conte}xt}', false,
-				['usermacros' => true, 'lldmacros' => true]
-			],
 			['{$MACRO}.func()', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
@@ -3208,7 +3205,7 @@ class CFormValidatorTest extends TestCase {
 			['{#MACRO}}', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
-			['{$MACRO:conte}xt}', false,
+			['{{#MACRO}}', false,
 				['usermacros' => true, 'lldmacros' => true]
 			],
 			['{#MACRO}.func()', false,
