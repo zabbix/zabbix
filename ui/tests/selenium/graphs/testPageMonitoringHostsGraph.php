@@ -528,6 +528,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -549,6 +550,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -567,6 +569,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -584,6 +587,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -608,6 +612,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -628,6 +633,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -647,6 +653,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -667,6 +674,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -687,6 +695,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -708,6 +717,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -729,6 +739,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -757,6 +768,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -781,6 +793,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -800,10 +813,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #35 Click on Apply button restarts subfilter settings.
+			// #35 Reset subfilter by submitting the filter.
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -815,9 +829,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						]
 					],
 					'graphs_amount' => 3,
-					'resetSubfilter' => true
+					'reset_subfilter' => true
 				]
-
 			]
 		];
 	}
@@ -838,20 +851,13 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->query('button:Reset')->one()->click()->waitUntilStalled();
-
 		$table = $this->getTable();
 		$form->fill($data['filter'])->submit()->waitUntilStalled();
 		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
-		// Filter using tags.
+		// Click on subfilter.
 		if (array_key_exists('subfilter', $data)) {
-			$table = $this->getTable();
-			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1',...$data['filter']])->submit()->waitUntilStalled();
-			$table->waitUntilReloaded();
-			$this->page->waitUntilReady();
-
-			// Click on subfilter.
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
 					// TODO: need to figure out why the table needs to be initialized again.
@@ -867,8 +873,8 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			}
 		}
 
-		// Apply button restarts subfilter settings.
-		if (array_key_exists('resetSubfilter', $data)) {
+		// Reset subfilter configuration by pressing the "Apply" button in filter form.
+		if (array_key_exists('reset_subfilter', $data)) {
 			$form->fill($data['filter'])->submit()->waitUntilStalled();
 		}
 
