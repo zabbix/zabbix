@@ -145,7 +145,7 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 		case CWidgetFieldColumnsList::DISPLAY_AS_IS:
 			if (array_key_exists('thresholds', $column)) {
 				foreach ($column['thresholds'] as $threshold) {
-					if ($value < $threshold['threshold']) { 
+					if ($value < $threshold['threshold']) {
 						break;
 					}
 
