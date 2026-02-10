@@ -24,8 +24,12 @@
 #include "zbxjson.h"
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbx_rtc_constants.h"
+#include "zbxipcservice.h"
+#include "zbxrtc.h"
 
-static char	*approle_token;
+static char		*approle_token;
+static double		next_renew;
 
 static int	zbx_vault_app_role_login(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
@@ -91,6 +95,31 @@ fail:
 	return ret;
 }
 
+#ifdef HAVE_LIBCURL
+static void	zbx_trigger_vault_renew_notify(const zbx_uint32_t cmd)
+{
+	zbx_ipc_async_socket_t	rtc_socket;
+	char			*error = NULL;
+
+	if (FAIL == zbx_ipc_async_socket_open(&rtc_socket, ZBX_IPC_SERVICE_RTC, SEC_PER_MIN, &error))
+	{
+		zbx_free(error);
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	if (FAIL == zbx_ipc_async_socket_send(&rtc_socket, cmd, (unsigned char*)approle_token,
+			strlen(approle_token) + 1) ||
+			FAIL == zbx_ipc_async_socket_flush(&rtc_socket, SEC_PER_MIN))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	zbx_ipc_async_socket_close(&rtc_socket);
+}
+#endif
+
 int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
@@ -114,7 +143,6 @@ int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 	struct zbx_json_parse	jp, jp_data, jp_data_data;
 	int			ret = FAIL;
 	long			response_code;
-	int			retry_login = 0;
 
 	if (NULL == approle_token && NULL != config_vault->app_role_id)
 	{
@@ -144,31 +172,21 @@ int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 	else
 		url = zbx_dsprintf(NULL, "%s%s%s", config_vault->url, config_vault->prefix, path);
 
-	for (;;)
+	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s",
+		(NULL != approle_token) ? approle_token : config_vault->token);
+
+	if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
+			&response_code, error))
 	{
-		zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s",
-			(NULL != approle_token) ? approle_token : config_vault->token);
+		goto fail;
+	}
 
-		if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
-				&response_code, error))
-		{
-			goto fail;
-		}
-
-		if (403 == response_code && 0 == retry_login)
-		{
-			if (FAIL == (ret = zbx_vault_app_role_login(config_vault, ssl_cert_file, ssl_key_file,
-					config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
-					config_ssl_key_location, timeout, error)))
-			{
-				goto fail;
-			}
-
-			retry_login = 1;
-			continue;
-		}
-		break;
+	if (403 == response_code && NULL != approle_token)
+	{
+		zbx_trigger_vault_renew_notify(ZBX_RTC_VAULT_RELOGIN);
+		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\" try relogin", response_code);
+		goto fail;
 	}
 
 	if (200 != response_code && 204 != response_code)
@@ -208,6 +226,46 @@ fail:
 #endif
 }
 
+void	zbx_vault_update_token_hashicorp(const zbx_config_vault_t *config_vault, const unsigned char *token,
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location)
+{
+#ifndef HAVE_LIBCURL
+	ZBX_UNUSED(config_vault);
+	ZBX_UNUSED(token);
+	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+	ZBX_UNUSED(config_ssl_cert_location);
+	ZBX_UNUSED(config_ssl_key_location);
+#else
+	int	ret;
+	char	*error = NULL;
+
+	if (NULL != config_vault)
+	{
+		if (0 != strcmp((char*)token, approle_token))
+			return;
+
+		if (FAIL != (ret = zbx_vault_app_role_login(config_vault, config_vault->tls_cert_file,
+				config_vault->tls_key_file,
+				config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+				config_ssl_key_location, ZBX_VAULT_TIMEOUT, &error)))
+		{
+			next_renew = 0;
+			zbx_trigger_vault_renew_notify(ZBX_RTC_VAULT_NEW_TOKEN);
+		}
+		else
+		{
+			zbx_free(error);
+		}
+	}
+	else
+	{
+		approle_token = zbx_strdup(approle_token, (char*)token);
+	}
+#endif
+}
+
 void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout)
@@ -229,7 +287,7 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *token, c
 	long			response_code;
 	int			status = FAIL;
 	static int		renewable, last_status = SUCCEED;
-	static double		next_renew, next_try_after_error;
+	static double		next_try_after_error;
 
 	if (NULL != approle_token)
 		token = approle_token;

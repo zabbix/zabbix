@@ -2652,7 +2652,12 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else
 		{
-			if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
+			if (ZBX_RTC_VAULT_RELOGIN == message->code)
+			{
+				zbx_vault_update_token(&zbx_config_vault, message->data, zbx_config_source_ip,
+					config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location);
+			}
+			else if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
 			{
 				zbx_rtc_dispatch(&rtc, client, message, rtc_process_request_ex_server);

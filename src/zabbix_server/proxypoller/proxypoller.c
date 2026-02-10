@@ -688,7 +688,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
 	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_PROXYPOLLER_PROCESS};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_PROXYPOLLER_PROCESS, ZBX_RTC_VAULT_NEW_TOKEN};
 
 	zbx_get_program_type_cb = proxy_poller_args_in->zbx_get_program_type_cb_arg;
 
@@ -761,7 +761,9 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
+				zbx_vault_update_token(NULL, rtc_data, NULL, NULL, NULL, NULL);
+			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}
 	}

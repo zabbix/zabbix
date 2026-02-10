@@ -20,8 +20,6 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 
-#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
-
 typedef	int (*zbx_vault_get_kvs_cb_t)(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
@@ -31,8 +29,13 @@ typedef	void (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *to
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout);
 
+typedef	void (*zbx_vault_update_token_cb_t)(const zbx_config_vault_t *config_vault, const unsigned char *token,
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location);
+
 static zbx_vault_get_kvs_cb_t		zbx_vault_get_kvs_cb;
 static zbx_vault_renew_token_cb_t	zbx_vault_renew_token_cb;
+static zbx_vault_update_token_cb_t	zbx_vault_update_token_cb;
 static const char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
@@ -71,6 +74,7 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 
 		zbx_vault_get_kvs_cb = zbx_vault_get_kvs_hashicorp;
 		zbx_vault_renew_token_cb = zbx_vault_renew_token_hashicorp;
+		zbx_vault_update_token_cb = zbx_vault_update_token_hashicorp;
 		zbx_vault_dbuser_key = ZBX_HASHICORP_DBUSER_KEY;
 		zbx_vault_dbpassword_key = ZBX_HASHICORP_DBPASSWORD_KEY;
 	}
@@ -102,6 +106,17 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 #undef ZBX_CYBERARK_NAME
 #undef ZBX_CYBERARK_DBUSER_KEY
 #undef ZBX_CYBERARK_DBPASSWORD_KEY
+}
+
+void	zbx_vault_update_token(const zbx_config_vault_t *config_vault, const unsigned char *token,
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location)
+{
+	if (NULL == zbx_vault_update_token_cb)
+		return;
+
+	zbx_vault_update_token_cb(config_vault, token, config_source_ip, config_ssl_ca_location,
+			config_ssl_cert_location, config_ssl_key_location);
 }
 
 void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,

@@ -17,6 +17,8 @@
 
 #include "zbxkvs.h"
 
+#define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
+
 typedef struct
 {
 	char	*name;
@@ -43,5 +45,8 @@ void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location);
 
 int	zbx_vault_token_from_env_get(char **token, char **error);
+void	zbx_vault_update_token(const zbx_config_vault_t *config_vault, const unsigned char *token,
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location);
 
 #endif

@@ -837,6 +837,14 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 		case ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT:
 			rtc_process_db_set_idle_timeout((const char *)data, result);
 			return;
+		case ZBX_RTC_VAULT_NEW_TOKEN:
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_CONFSYNCER, 0, ZBX_RTC_VAULT_NEW_TOKEN,
+					(const char*)data, (zbx_uint32_t)strlen((char*)data) + 1);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_TRAPPER, 0, ZBX_RTC_VAULT_NEW_TOKEN,
+					(const char*)data, (zbx_uint32_t)strlen((char*)data) + 1);
+			zbx_rtc_notify(rtc, ZBX_PROCESS_TYPE_PROXYPOLLER, 0, ZBX_RTC_VAULT_NEW_TOKEN,
+					(const char*)data, (zbx_uint32_t)strlen((char*)data) + 1);
+			return;
 		default:
 			*result = zbx_strdup(*result, "Unknown runtime control option\n");
 	}

@@ -46,7 +46,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD,
+						ZBX_RTC_VAULT_NEW_TOKEN};
 
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
 					(((zbx_thread_args_t *)args)->args);
@@ -88,6 +89,8 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
+			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
+				zbx_vault_update_token(NULL, rtc_data, NULL, NULL, NULL, NULL);
 			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 			{
 				if (0 == cache_reload)
