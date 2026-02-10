@@ -34,10 +34,6 @@ $html_page
 
 $tabs = new CTabView();
 
-if ($data['form_refresh'] == 0) {
-	$tabs->setSelected(0);
-}
-
 if ($data['readonly'] == true) {
 	CMessageHelper::addWarning(
 		_('This user is IdP provisioned. Manual changes for provisioned fields are not allowed.')
@@ -47,18 +43,17 @@ if ($data['readonly'] == true) {
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setName('userprofile_notification_form')
 	->setId('userprofile-notification-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('action', $data['action'])
-	->addVar('userid', $data['userid']);
+	->addVar('userid', $data['userid'])
+	->addVar('can_edit_media', $data['can_edit_media']);
 
 // Media tab.
 $media = new CPartial('user.edit.media.tab', [
 	'form' => $form,
-	'can_edit_media' => CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
+	'can_edit_media' => $data['can_edit_media']
 ] + $data);
 $tabs->addTab('mediaTab', _('Media'), $media, TAB_INDICATOR_MEDIA);
 
@@ -69,9 +64,8 @@ $messaging_form_list = (new CFormList())
 			->setChecked($data['messages']['enabled'] == 1)
 			->setUncheckedValue(0)
 	)
-	->addRow(_('Message timeout'),
-		(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH),
-		'timeout_row'
+	->addRow((new CLabel(_('Message timeout')))->setAsteriskMark(),
+		(new CTextBox('messages[timeout]', $data['messages']['timeout']))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	)
 	->addRow(new CLabel(_('Play sound'), 'label-sounds'),
 		(new CSelect('messages[sounds.repeat]'))
@@ -82,8 +76,7 @@ $messaging_form_list = (new CFormList())
 				1 => _('Once'),
 				10 => _n('%1$s second', '%1$s seconds', 10),
 				-1 => _('Message timeout')
-			])),
-		'repeat_row'
+			]))
 	);
 
 $zbx_sounds = array_flip(getSounds());
@@ -141,7 +134,7 @@ for ($severity = TRIGGER_SEVERITY_NOT_CLASSIFIED; $severity < TRIGGER_SEVERITY_C
 }
 
 $messaging_form_list
-	->addRow(_('Trigger severity'), $triggers_table, 'triggers_row')
+	->addRow(_('Trigger severity'), $triggers_table)
 	->addRow(_('Show suppressed problems'),
 		(new CCheckBox('messages[show_suppressed]'))
 			->setChecked($data['messages']['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
@@ -154,7 +147,7 @@ $tabs->addTab('notificationsTab', _('Frontend notifications'), $messaging_form_l
 
 // Append buttons to form.
 $tabs->setFooter(makeFormFooter(
-	(new CSubmitButton(_('Update'), 'action', 'userprofile.notification.update'))->setId('update'),
+	new CSubmit('update', _('Update')),
 	[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
 ));
 
@@ -164,6 +157,8 @@ $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+	'rules' => $data['js_validation_rules']
+]).');'))
 	->setOnDocumentReady()
 	->show();
