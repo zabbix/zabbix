@@ -92,8 +92,9 @@ typedef struct
 }
 zbx_clickhouse_data_t;
 
+/* history_bin is not used */
 static char	*clickhouse_history_tables[] = {"history", "history_str", "history_log", "history_uint", "history_text",
-					"unsupported"};
+					"history_bin", "history_json", "unsupported"};
 
 static void	clickhouse_conn_free(zbx_clickhouse_conn_t *conn)
 {
@@ -440,6 +441,17 @@ static void	history_clickhouse_write_uint32(zbx_uint32_t ui32, char **post_data,
 	zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, (const char *)&number, sizeof(number));
 }
 
+static int	is_json_object(const char *json_str)
+{
+	if (NULL != json_str)
+		return FAIL;
+
+	while (*json_str && isspace((unsigned char)*json_str))
+		json_str++;
+
+	return (*json_str == '{');
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: write history data to ClickHouse                                  *
@@ -462,6 +474,10 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	size_t			post_data_alloc = 0, post_data_offset = 0;
 	CURLcode		err;
 	int			ret = FAIL;
+
+	/* bin is not supported */
+	if (ITEM_VALUE_TYPE_BIN == value_type)
+		return;
 
 	conn = history_clickhouse_get_conn(d, value_type);
 
@@ -494,7 +510,6 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		history_clickhouse_write_uint64(entry->itemid, &post_data, &post_data_alloc, &post_data_offset);
 		history_clickhouse_write_uint64((zbx_uint64_t)entry->ts.sec * 1000000000ULL + entry->ts.ns,
 				&post_data, &post_data_alloc, &post_data_offset);
-
 		switch (value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
@@ -503,9 +518,24 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
-			case ITEM_VALUE_TYPE_JSON:
 				history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
 						&post_data_offset);
+				break;
+			case ITEM_VALUE_TYPE_JSON:
+				if (is_json_object(entry->value.str))
+				{
+					history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
+							&post_data_offset);
+					history_clickhouse_write_text("", &post_data, &post_data_alloc,
+							&post_data_offset);
+				}
+				else
+				{
+					history_clickhouse_write_text("", &post_data, &post_data_alloc,
+							&post_data_offset);
+					history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
+							&post_data_offset);
+				}
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				history_clickhouse_write_text(entry->value.log->value, &post_data, &post_data_alloc,

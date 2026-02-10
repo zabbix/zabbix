@@ -9,7 +9,8 @@ CREATE TABLE $CH_DB.history_json
 (
 	itemid UInt64,
 	clock_ns DateTime64(9),
-	value JSON
+	value_json JSON,
+	value_str String
 )
 ENGINE = MergeTree()
 PARTITION BY $CH_PARTITION(clock_ns)
