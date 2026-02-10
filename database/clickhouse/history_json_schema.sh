@@ -9,7 +9,7 @@ CREATE TABLE $CH_DB.history_json
 (
 	itemid UInt64,
 	clock_ns DateTime64(9),
-	value_json JSON,
+	value JSON,
 	value_str String
 )
 ENGINE = MergeTree()
