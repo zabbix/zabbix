@@ -53,8 +53,6 @@
 				.getElementById('service-write-access')
 				.addEventListener('change', () => this.serviceWriteAccessChange());
 
-			document.getElementById('delete')?.addEventListener('click', () => this.delete());
-
 			this.updateServicesWriteAccessFields();
 
 			jQuery('#service_write_list_')
@@ -75,11 +73,10 @@
 					this.selectServiceAccessList(jQuery('#service_read_list_'));
 				});
 
-			const clone_button = document.getElementById('clone');
+			this.form_element.querySelector('.form-actions .js-delete')?.addEventListener('click', () => this.delete());
 
-			if (clone_button !== null) {
-				clone_button.addEventListener('click', () => this.clone(rules_create));
-			}
+			this.form_element
+				.querySelector('.form-actions .js-clone')?.addEventListener('click', () => this.clone(rules_create));
 		}
 
 		updateAccessUiElementsFieldsGroup(user_type) {
@@ -296,7 +293,7 @@
 
 				const update_button = document.getElementById('update');
 				update_button.textContent = <?= json_encode(_('Add')) ?>;
-				update_button.setAttribute('id', 'add');
+				update_button.addClass('js-submit');
 
 				document.getElementById('name').focus();
 				clearMessages();
@@ -306,7 +303,7 @@
 
 		submit(e) {
 			e.preventDefault();
-			this.#setLoadingStatus(['add', 'update']);
+			this.#setLoadingStatus('js-submit');
 			clearMessages();
 			const fields = this.form.getAllValues();
 
@@ -317,15 +314,11 @@
 						return;
 					}
 
-					var curl = new Curl('zabbix.php');
-
 					const action = document.getElementById('roleid') !== null
 						? 'userrole.update'
 						: 'userrole.create';
 
-					curl.setArgument('action', action);
-
-					fetch(curl.getUrl(), {
+					fetch(zabbixUrl({action}), {
 						method: 'POST',
 						headers: {'Content-Type': 'application/json'},
 						body: JSON.stringify(fields)
@@ -358,11 +351,16 @@
 		}
 
 		delete() {
-			if (window.confirm('<?= json_encode(_('Delete selected role?')) ?>')) {
-				this.#setLoadingStatus(['delete']);
-				redirect(document.getElementById('delete').getAttribute('data-redirect-url'), 'post', 'action',
-					undefined, true
-				);
+			if (window.confirm(<?= json_encode(_('Delete selected role?')) ?>)) {
+				this.#setLoadingStatus('js-delete');
+
+				const params = {
+					action: 'userrole.delete',
+					roleids: [this.form.findFieldByName('roleid').getValue()]
+				};
+				params[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('userrole')) ?>;
+
+				redirect(zabbixUrl(params), 'post', 'action', undefined, true);
 			}
 		}
 
@@ -380,13 +378,13 @@
 			addMessage(makeMessageBox('bad', messages, title));
 		}
 
-		#setLoadingStatus(loading_ids) {
+		#setLoadingStatus(loading_btn_class) {
 			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
 			this.form_element.querySelectorAll('.form-actions button:not(.js-cancel').forEach(button => {
 				button.disabled = true;
 
-				if (loading_ids.includes(button.id)) {
+				if (button.classList.contains(loading_btn_class)) {
 					button.classList.add('is-loading');
 				}
 			});
@@ -394,10 +392,8 @@
 
 		#unsetLoadingStatus() {
 			this.form_element.querySelectorAll('.form-actions button:not(.js-cancel').forEach(button => {
-				if (button) {
-					button.classList.remove('is-loading');
-					button.disabled = false;
-				}
+				button.classList.remove('is-loading');
+				button.disabled = false;
 			});
 
 			this.form_element.classList.remove('is-loading', 'is-loading-fadein');

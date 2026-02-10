@@ -387,21 +387,20 @@ $cancel_button = (new CRedirectButton(_('Cancel'),
 		->setArgument('action', 'userrole.list')
 		->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
 ))
-	->setId('cancel')
 	->addClass('js-cancel');
 
 $buttons = [$cancel_button];
 
 if ($data['roleid'] !== null) {
 	$buttons = [
-		(new CSimpleButton(_('Clone')))->setId('clone'),
+		(new CSimpleButton(_('Clone')))->addClass('js-clone'),
 		(new CSimpleButton(_('Delete')))
 			->setAttribute('data-redirect-url', (new CUrl('zabbix.php'))
 				->setArgument('action', 'userrole.delete')
 				->setArgument('roleids', [$data['roleid']])
 				->setArgument(CSRF_TOKEN_NAME, $csrf_token)
 			)
-			->setId('delete')
+			->addClass('js-delete')
 			->setEnabled(!$data['readonly']),
 		$cancel_button
 	];
@@ -411,9 +410,9 @@ $form_grid->addItem(
 	new CFormActions(
 		($data['roleid'] !== null)
 			? (new CSubmitButton(_('Update'), 'action', 'userrole.update'))
-				->setId('update')
+				->addClass('js-submit')
 				->setEnabled(!$data['readonly'])
-			: (new CSubmitButton(_('Add'), 'action', 'userrole.create'))->setId('add'),
+			: (new CSubmitButton(_('Add'), 'action', 'userrole.create'))->addClass('js-submit'),
 		$buttons
 	)
 );
