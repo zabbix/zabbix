@@ -3168,12 +3168,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					? false
 					: true;
 
-				if (array_key_exists('User group mapping', $ldap)) {
-					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping', $success);
-				}
-
-				if (array_key_exists('Media type mapping', $ldap)) {
-					$this->setMapping($ldap['Media type mapping'], $ldap_form, 'Media type mapping', $success);
+				foreach (['User group', 'Media type'] as $mapping_type) {
+					if (array_key_exists($mapping_type.' mapping', $ldap)) {
+						$this->setMapping($ldap[$mapping_type.' mapping'], $ldap_form, $mapping_type.' mapping', $success);
+					}
 				}
 			}
 
