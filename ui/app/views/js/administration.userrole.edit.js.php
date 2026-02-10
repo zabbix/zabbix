@@ -276,7 +276,7 @@
 			}
 		}
 
-		clone (rules) {
+		clone(rules) {
 			if (this.readonly) {
 				const fields = {
 					action: 'userrole.edit',
