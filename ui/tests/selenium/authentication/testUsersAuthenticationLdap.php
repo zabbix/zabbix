@@ -372,7 +372,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #9 test with incorrect Bind DN.
 			[
 				[
-					'expected' => TEST_BAD,
 					'servers_settings' => [
 						'Name' => 'Test Name',
 						'Host' => PHPUNIT_LDAP_HOST,
@@ -395,7 +394,6 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #10 test with incorrect Bind password.
 			[
 				[
-					'expected' => TEST_BAD,
 					'servers_settings' => [
 						'Name' => 'Test Name',
 						'Host' => PHPUNIT_LDAP_HOST,
@@ -497,12 +495,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$server_form->fill($data['servers_settings']);
 
 		if (CTestArrayHelper::get($data['servers_settings'], 'Configure JIT provisioning')) {
-			if (array_key_exists('User group mapping', $data)) {
-				$this->setMapping($data['User group mapping'], $server_form, 'User group mapping');
-			}
-
-			if (array_key_exists('Media type mapping', $data)) {
-				$this->setMapping($data['Media type mapping'], $server_form, 'Media type mapping');
+			foreach (['User group', 'Media type'] as $mapping_type) {
+				if (array_key_exists($mapping_type.' mapping', $data)) {
+					$this->setMapping($data[$mapping_type.' mapping'], $server_form, $mapping_type.' mapping');
+				}
 			}
 		}
 
@@ -527,7 +523,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			if (array_key_exists('inline_errors', $data)) {
 				$this->assertInlineError($last_dialog->asForm(), $data['inline_errors']);
 			}
-			if (array_key_exists('test_error', $data)) {
+			else {
 				$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
 			}
 		if (array_key_exists('check_provisioning', $data)) {
@@ -1483,7 +1479,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'inline_errors' => [
-						'form' => 'form',
+						'form' => 'auth_form',
 						'errors' => [
 							'Default authentication' => 'LDAP is not configured.'
 						]
@@ -2006,7 +2002,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Provisioning period' => '3599'
 					],
 					'inline_errors' => [
-						'form' => 'form',
+						'form' => 'auth_form',
 						'errors' => [
 							'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 						]
@@ -2022,7 +2018,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Provisioning period' => '788400001'
 					],
 					'inline_errors' => [
-						'form' => 'form',
+						'form' => 'auth_form',
 						'errors' => [
 							'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 						]
@@ -2038,7 +2034,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Provisioning period' => '59m'
 					],
 					'inline_errors' => [
-						'form' => 'form',
+						'form' => 'auth_form',
 						'errors' => [
 							'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 						]
@@ -2054,7 +2050,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Provisioning period' => '1q'
 					],
 					'inline_errors' => [
-						'form' => 'form',
+						'form' => 'auth_form',
 						'errors' => [
 							'id:jit_provision_interval' => 'A time unit is expected.'
 						]
@@ -2963,7 +2959,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	}
 
 	private function testLdapCreate($data) {
-		$this->checkLdap($data, 'button:Add', true);
+		$this->checkLdap($data, 'button:Add');
 
 		// Check error messages.
 		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
@@ -2993,7 +2989,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 	 * @param array $inline_errors  array containing information about error text, error field and error form.
 	 */
 	protected function assertLdapInlineErrors($inline_errors) {
-		if ($inline_errors['form'] === 'form') {
+		if ($inline_errors['form'] === 'auth_form') {
 			$form = $this->query('id:authentication-form')->asForm()->one();
 		}
 		else {
@@ -3005,7 +3001,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$this->page->removeFocus();
 		$this->assertInlineError($form, $inline_errors['errors']);
 
-		if ($inline_errors['form'] !== 'form') {
+		if ($inline_errors['form'] !== 'auth_form') {
 			COverlayDialogElement::closeAll();
 		}
 	}

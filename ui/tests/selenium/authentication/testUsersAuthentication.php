@@ -149,7 +149,6 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Default authentication' => 'LDAP'],
-					'check_alert' => true,
 					'inline_errors' => [
 						'Default authentication' => 'LDAP is not configured.'
 					]
@@ -177,10 +176,6 @@ class testUsersAuthentication extends CWebTest {
 
 		$form->submit();
 
-		if ($this->page->isAlertPresent()) {
-			$this->page->acceptAlert();
-		}
-
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
@@ -194,9 +189,8 @@ class testUsersAuthentication extends CWebTest {
 			]));
 		}
 
-		/*
+		/**
 		 * !!! All password related checks are performed in testUsersPasswordComplexity test !!!
 		 */
-
 	}
 }
