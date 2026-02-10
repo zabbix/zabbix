@@ -2450,7 +2450,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	 * Close popup or dialog that is opened when clicking on element in broadcaster widget.
 	 */
 	protected function closeOpenedPopup() {
-		if ($this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one(false)->isValid()) {
+		if ($this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')->one(false)->isValid()) {
 			$this->query('class:btn-overlay-close')->all()->last()->click();
 		}
 
@@ -2557,9 +2557,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					foreach ($values as $icon_index => $popup_values) {
 						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
 								->one()->click();
-						$this->assertTableData([$popup_values], 'xpath://div[@class="overlay-dialogue wordbreak"]');
-						$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->query('class:btn-overlay-close')
-								->one()->click();
+						$this->assertTableData([$popup_values], 'xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]');
+						$this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
+								->query('class:btn-overlay-close')->one()->click();
 					}
 					break;
 

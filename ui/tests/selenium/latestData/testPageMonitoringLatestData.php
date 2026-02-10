@@ -880,7 +880,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one();
+			$overlay = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')->one();
 
 			// Verify the real description with the expected one.
 			$this->assertEquals($data['description'], $overlay->getText());

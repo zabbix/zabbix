@@ -605,7 +605,8 @@ class testPageLowLevelDiscoveryPrototypes extends testPagePrototypes {
 
 		if (CTestArrayHelper::get($data, 'hidden')) {
 			$lld_navigation->query('class:btn-icon')->one()->click();
-			$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+			$popup = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-static"]')
+					->waitUntilVisible()->one();
 			$popup->query('link', $data['link'])->waitUntilClickable()->one()->click();
 		}
 		else {
