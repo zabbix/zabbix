@@ -66,9 +66,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_dbsync_init(&htmpls, NULL, ZBX_DBSYNC_UPDATE);
 
 	um_mock_cache_diff(&mock_cache0, &mock_cache, &gmacros, &hmacros, &htmpls);
-	cache = um_cache_create();
 
 	zbx_config_wlock_set_locked();
+	cache = um_cache_create();
 	cache = um_cache_sync(cache, 0, &gmacros, &hmacros, &htmpls, &config_vault, &um_cache_dup_sec,
 			&um_cache_dup_size);
 	zbx_config_wlock_set_unlocked();
