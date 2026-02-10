@@ -32,7 +32,11 @@ window.popup_import_compare = new class {
 	 */
 	#form;
 
-	init() {
+	init({no_changes}) {
+		if (no_changes) {
+			return;
+		}
+
 		this.#overlay = overlays_stack.getById('popup_import_compare');
 		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
 

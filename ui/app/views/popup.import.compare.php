@@ -49,7 +49,9 @@ else {
 		'header' => $data['title'],
 		'script_inline' => implode('', [
 			$this->readJsFile('popup.import.compare.js.php'),
-			'popup_import_compare.init();'
+			'popup_import_compare.init('.json_encode([
+				'no_changes' => !$data['diff']
+			]).');'
 		]),
 		'body' => !$data['diff']
 			? (new CTableInfo())
