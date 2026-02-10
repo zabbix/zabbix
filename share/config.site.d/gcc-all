@@ -40,7 +40,7 @@ then
 	CFLAGS+=" -Wformat-security"
 	CFLAGS+=" -Wcast-function-type"
 	CFLAGS+=" -fstrict-aliasing"
-
+	CFLAGS+=" -Werror=vla"
 
 	# flags for gcc
 	CFLAGS+=" -Wno-maybe-uninitialized"

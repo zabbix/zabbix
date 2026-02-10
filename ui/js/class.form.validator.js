@@ -19,10 +19,11 @@ class CFormValidator {
 	static ERROR = 1;
 
 	static ERROR_LEVEL_PRIMARY = 0;
-	static ERROR_LEVEL_DELAYED = 1;
-	static ERROR_LEVEL_UNIQ = 2;
-	static ERROR_LEVEL_API = 3;
-	static ERROR_LEVEL_UNKNOWN = 4;
+	static ERROR_LEVEL_OBJECTS_COUNT = 1;
+	static ERROR_LEVEL_DELAYED = 2;
+	static ERROR_LEVEL_UNIQ = 3;
+	static ERROR_LEVEL_API = 4;
+	static ERROR_LEVEL_UNKNOWN = 1000;
 
 	/**
 	 * AbortSignal object instance used to abort currently running validation.
@@ -741,6 +742,13 @@ class CFormValidator {
 						}
 					});
 				}
+				else if (key === 'count_values') {
+					// count_values rules should be included only if objects key is included to not validate
+					// if subitems, that don't affect count is changed
+					if (fields.includes(rule_path)) {
+						rule[key] = value;
+					}
+				}
 				else {
 					// 'when' rule should be kept in the rules, only if this 'when' rule value matches any of fields
 					// that will need to be validated. Necessary for multilevel 'when' rules on 'object' type rules.
@@ -794,6 +802,28 @@ class CFormValidator {
 			return rules;
 		};
 
+		const extractReferencedFieldNames = (object) => {
+			let parameter_fields = [];
+			const reference_to_field_name = (reference) => reference.slice(1, -1);
+			const is_named_reference = (value) => is_string(value) && value.startsWith('{')
+				&& value.endsWith('}');
+
+			for (let api_field of Object.values(object)) {
+				if (is_object(api_field)) {
+					for (let nested_api_field of Object.values(api_field)) {
+						if (is_named_reference(nested_api_field)) {
+							parameter_fields.push(reference_to_field_name(nested_api_field));
+						}
+					}
+				}
+				else if (is_named_reference(api_field)) {
+					parameter_fields.push(reference_to_field_name(api_field));
+				}
+			}
+
+			return [...new Set(parameter_fields)];
+		};
+
 		const findRelatedFieldPaths = (lookup_field_path) => {
 			const scan = (lookup_rule_path, rules, current_rule_path) => {
 				const current_field_name = current_rule_path.split('/').at(-1);
@@ -808,14 +838,24 @@ class CFormValidator {
 							}
 						});
 					}
+					else if (rule_key === 'count_values') {
+						rule_value.forEach((count_rule) => {
+							count_rule.field_rules.forEach((count_field_rule) => {
+								const count_field_path = this.#getFieldAbsolutePath(count_field_rule[0],
+									current_rule_path + '/'
+								);
+
+								if (lookup_rule_path === count_field_path) {
+									related_fields.push(current_rule_path);
+								}
+							});
+						});
+					}
 					else if (rule_key === 'api_uniq') {
 						// If lookup field is used in API uniqueness check then all fields used in that API
 						// check should be validated.
 						rule_value.forEach((api_uniq) => {
-							let parameter_fields = Object.values(api_uniq[1])
-								.filter(value => String(value).startsWith('{') && String(value).endsWith('}'))
-								.map(field => field.slice(1, -1));
-
+							let parameter_fields = extractReferencedFieldNames(api_uniq[1]);
 							const has_match = parameter_fields.some((field) => {
 								return this.#getFieldAbsolutePath(field, current_rule_path + '/') === lookup_rule_path;
 							});
@@ -1361,6 +1401,72 @@ class CFormValidator {
 					normalized_values[key] = value;
 				}
 			}
+		}
+
+		if ('count_values' in rules) {
+			rules.count_values.forEach(count_rule => {
+				let counted_fields = {};
+				const field_names = {};
+
+				for (const [key, obj] of Object.entries(objects_values)) {
+					if (typeof(obj) !== 'object' || obj === null) {
+						continue;
+					}
+
+					let keep = true;
+					count_rule.field_rules.forEach((count_field_rule) => {
+						field_names[count_field_rule[0]] = true;
+
+						if (count_field_rule[0] in obj) {
+							if ('in' in count_field_rule) {
+								keep = keep && count_field_rule['in'].includes(obj[count_field_rule[0]]);
+							}
+
+							if ('not_in' in count_field_rule) {
+								keep = keep && !count_field_rule['not_in'].includes(obj[count_field_rule[0]]);
+							}
+						}
+						else {
+							keep = false;
+						}
+					});
+
+					if (keep) {
+						counted_fields[key] = true
+					}
+				}
+
+				counted_fields = Object.keys(counted_fields);
+				const valid_count = counted_fields.length;
+
+				if ('min' in count_rule && valid_count < count_rule.min) {
+					const message = 'message' in count_rule
+						? count_rule['message']
+						: sprintf(t('At least %1$d items based on field "%2$s" rules'), count_rule.min,
+							Object.keys(field_names).join(', ')
+						);
+
+					this.#addError(path, message, CFormValidator.ERROR_LEVEL_OBJECTS_COUNT);
+					has_error = true;
+				}
+				else if ('max' in count_rule && valid_count > count_rule.max) {
+					const message = 'message' in count_rule
+						? count_rule.message
+						: sprintf(t('No more than %1$d items based on field "%2$s" rules'), count_rule.max,
+							Object.keys(field_names).join(', ')
+						);
+
+					const field_name = Object.keys(field_names).pop();
+
+					for (let i = count_rule.max; i < valid_count; i++) {
+						this.#addError(`${path}/${counted_fields[i]}/${field_name}`, message,
+							CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+						);
+					}
+
+					has_error = true;
+				}
+			})
 		}
 
 		if (has_error) {

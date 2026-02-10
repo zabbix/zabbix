@@ -1,6 +1,8 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-9744] added inline validation for media type form (gberzina)
+.........T [ZBXNEXT-10335] added GCP Cloud Run Service by HTTP template (egordymov)
 ..F....... [ZBXNEXT-10301] simplified user experience when editing problem filter tags by removing extra radio buttons and making an empty tags list equivalent to "All tags" (Ivo)
 A.F.I...S. [ZBXNEXT-5467] added possibility to add custom tags to triggers created from trigger prototypes (mprihodko, wczerneha)
 ...G...PS. [ZBXNEXT-1002] added ability to use c-ares with DNS caching and failover for all DNS requests on Zabbix server, Zabbix proxy and Zabbix agent (vso)
@@ -30,6 +32,9 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+.......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
+.......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
+...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)
 A......... [ZBX-27236] improved performance of the event.get and problem.get methods when using the "suppressed" and "symptom" options (Sasha)
 .......PS. [ZBX-27447] fixed JSON error check with numeric value type (vso)
 ..F....... [ZBX-27459] updated MFA library duosecurity/duo_universal_php to version 1.1.1 (gcalenko)
@@ -147,6 +152,12 @@ A.F....... [ZBXNEXT-9816] added ability to convert to JSON for discovery rule wi
 Bug fixes:
 ..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (averza)
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.7rc2
+
+Bug fixes:
+.......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc1
@@ -1394,6 +1405,12 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.23rc2
+
+Bug fixes:
+.......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23rc1
