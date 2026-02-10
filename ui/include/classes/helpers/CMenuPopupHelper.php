@@ -45,22 +45,6 @@ class CMenuPopupHelper {
 	}
 
 	/**
-	 * Prepare data for item history menu popup.
-	 *
-	 * @param string $itemid
-	 *
-	 * @return array
-	 */
-	public static function getHistory($itemid) {
-		return [
-			'type' => 'history',
-			'data' => [
-				'itemid' => $itemid
-			]
-		];
-	}
-
-	/**
 	 * Prepare data for Ajax host menu popup.
 	 *
 	 * @param string $hostid
