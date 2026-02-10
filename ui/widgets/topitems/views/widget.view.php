@@ -143,6 +143,16 @@ function makeTableCellViewsNumeric(array $cell, array $data, $formatted_value, b
 
 	switch ($column['display']) {
 		case CWidgetFieldColumnsList::DISPLAY_AS_IS:
+			if (array_key_exists('thresholds', $column)) {
+				foreach ($column['thresholds'] as $threshold) {
+					if ($value < $threshold['threshold']) { 
+						break;
+					}
+
+					$color = $threshold['color'];
+				}
+			}
+
 			$style = $color !== '' ? 'background-color: #'.$color : null;
 			$value_cell->addStyle($style);
 
@@ -233,7 +243,7 @@ function makeTableCellViewsText(array $cell, array $data, $formatted_value, bool
 	$value = $cell[Widget::CELL_VALUE];
 	$column = $data['configuration'][$cell[Widget::CELL_METADATA]['column_index']];
 
-	$color = '';
+	$color = $column['base_color'];
 	if (array_key_exists('highlights', $column)) {
 		foreach ($column['highlights'] as $highlight) {
 			if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/', $value)) {
