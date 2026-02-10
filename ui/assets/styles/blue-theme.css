@@ -1618,58 +1618,11 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: start; }
-  .columns-wrapper.columns-nowrap {
-    flex-wrap: nowrap; }
   .columns-wrapper.columns-2 > div,
   .columns-wrapper.columns-2 > li {
     display: block;
     flex: 0 0 50%;
     max-width: 50%; }
-  .columns-wrapper.columns-3 > div,
-  .columns-wrapper.columns-3 > li {
-    display: block;
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
-  .columns-wrapper .column-5 {
-    flex: 0 0 5%;
-    max-width: 5%; }
-  .columns-wrapper .column-10 {
-    flex: 0 0 10%;
-    max-width: 10%; }
-  .columns-wrapper .column-15 {
-    flex: 0 0 15%;
-    max-width: 15%; }
-  .columns-wrapper .column-20 {
-    flex: 0 0 20%;
-    max-width: 20%; }
-  .columns-wrapper .column-33 {
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
-  .columns-wrapper .column-35 {
-    flex: 0 0 35%;
-    max-width: 35%; }
-  .columns-wrapper .column-40 {
-    flex: 0 0 40%;
-    max-width: 40%; }
-  .columns-wrapper .column-50 {
-    flex: 0 0 50%;
-    max-width: 50%; }
-  .columns-wrapper .column-75 {
-    flex: 0 0 75%;
-    max-width: 75%; }
-  .columns-wrapper .column-90 {
-    flex: 0 0 90%;
-    max-width: 90%; }
-  .columns-wrapper .column-95 {
-    flex: 0 0 95%;
-    max-width: 95%; }
-  .columns-wrapper .column-center {
-    display: flex;
-    justify-content: center;
-    text-align: center; }
-  .columns-wrapper .column-middle {
-    display: flex;
-    align-items: center; }
   .columns-wrapper > div:not(:last-child) section,
   .columns-wrapper > ul:not(:last-child) section {
     margin-right: 10px; }
@@ -7048,12 +7001,6 @@ form.is-loading {
 .border-left {
   border-left: 1px solid #ebeef0; }
 
-.form-new-group {
-  border: 5px solid #c5e3c6;
-  border-radius: 2px;
-  margin-left: -5px;
-  padding: 4px 0; }
-
 .list-check-radio li {
   display: block;
   line-height: 24px; }
@@ -7643,8 +7590,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
           position: absolute;
           top: 5px;
           right: 8px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
-        margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0 0 10px; }
@@ -7947,9 +7892,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .notif-indic .zi-bell-off {
     color: #768d99; }
 
-.dashed-border td {
-  border: 1px dashed #ebeef0; }
-
 .top {
   vertical-align: top !important; }
 
@@ -8097,10 +8039,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
       border-bottom: none; }
   .tag:last-of-type {
     margin-right: 0; }
-  .tag.green-bg {
-    color: #0e4123; }
-  .tag.yellow-bg {
-    color: #734d00; }
   .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before {
     margin-right: 3px;
     font-size: 10px;
@@ -8115,15 +8053,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .tag-inherited-title {
   margin-bottom: 3px;
   color: #768d99; }
-
-.green-bg {
-  background-color: #59db8f; }
-
-.red-bg {
-  background-color: #e45959; }
-
-.yellow-bg {
-  background-color: #ffc859; }
 
 .na-bg {
   color: #2a353a;
@@ -8256,7 +8185,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
 div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
-div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover {
   background-color: #fcf7c2; }
 
 @keyframes is-loading-kf {
@@ -8459,9 +8388,6 @@ main .server-name {
   .flickerfreescreen.is-loading {
     min-height: 64px; }
 
-.graph-wrapper {
-  display: inline; }
-
 .clock {
   display: flex;
   justify-content: center;
@@ -8470,14 +8396,6 @@ main .server-name {
 
 .clock-svg {
   flex-grow: 1; }
-
-.time-zone {
-  margin: 0 0 .5em;
-  white-space: nowrap; }
-
-.local-clock {
-  margin: .5em 0 0;
-  white-space: nowrap; }
 
 .clock-face {
   fill: #ebebeb; }

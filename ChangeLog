@@ -156,8 +156,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc2
 
-New features:
-
 Bug fixes:
 .......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 

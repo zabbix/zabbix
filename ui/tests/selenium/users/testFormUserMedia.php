@@ -253,7 +253,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'MS Teams',
 						'Send to' => ''
 					],
-					'error_message' => 'Incorrect value for field "sendto": cannot be empty.'
+					'error_message' => ['Send to' => 'This field cannot be empty.']
 				]
 			],
 			// Empty SMS recipient.
@@ -264,7 +264,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'SMS',
 						'Send to' => ''
 					],
-					'error_message' => 'Incorrect value for field "sendto": cannot be empty.'
+					'error_message' => ['Send to' => 'This field cannot be empty.']
 				]
 			],
 			// Empty Test script recipient.
@@ -275,7 +275,7 @@ class testFormUserMedia extends CWebTest {
 						'Type' => 'Test script',
 						'Send to' => ''
 					],
-					'error_message' => 'Incorrect value for field "sendto": cannot be empty.'
+					'error_message' => ['Send to' => 'This field cannot be empty.']
 				]
 			],
 			// String in when active.
@@ -287,7 +287,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '192.168.0.1',
 						'When active' => 'always'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// Only time period in when active.
@@ -299,7 +299,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '00:00-24:00'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// Only days in when active.
@@ -311,7 +311,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '1-5'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// When active value is set to a specific moment.
@@ -323,7 +323,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '1-5,15:00-15:00'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// When active defined with incorrect order.
@@ -335,7 +335,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '15:00-18:00,1-5'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// When active defined using a regular macro.
@@ -347,7 +347,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '{TIME}'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// When active defined using a LLD macro.
@@ -359,7 +359,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '{#DATE.TIME}'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			],
 			// Multiple When active periods separated by comma.
@@ -371,7 +371,7 @@ class testFormUserMedia extends CWebTest {
 						'Send to' => '12345678',
 						'When active' => '1-5,09:00-18:00,6-7,12:00-15:00'
 					],
-					'error_message' => 'Incorrect value for field "period": a time period is expected'
+					'error_message' => ['When active' => 'Invalid period.']
 				]
 			]
 		];
@@ -392,7 +392,7 @@ class testFormUserMedia extends CWebTest {
 		// Add media.
 		$add_button = $this->query('button:Add')->one();
 		$add_button->click();
-		$this->setMediaValues($data);
+		$media_form = $this->setMediaValues($data);
 
 		// Check if media was added and its configuration.
 		if ($data['expected'] === TEST_GOOD) {
@@ -411,7 +411,12 @@ class testFormUserMedia extends CWebTest {
 			}
 		}
 		else {
-			$this->assertMessage(TEST_BAD, null, $data['error_message']);
+			if (is_array($data['error_message'])) {
+				$this->assertInlineError($media_form, $data['error_message']);
+			}
+			else {
+				$this->assertMessage(TEST_BAD, null, $data['error_message']);
+			}
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
 		}
 	}
@@ -426,14 +431,19 @@ class testFormUserMedia extends CWebTest {
 		$edit_row = $this->getUserMediaTab('Admin')->asTable()->query('xpath:.//tr[@id="medias_0"]')->one()->asTableRow();
 		$original_period = $edit_row->getColumn('When active')->getText();
 		$edit_row->query('button:Edit')->one()->click();
-		$this->setMediaValues($data);
+		$media_form = $this->setMediaValues($data);
 
 		// Check if media was updated and its configuration.
 		if ($data['expected'] === TEST_GOOD) {
 			$this->checkMediaConfiguration($data, $original_period, true);
 		}
 		else {
-			$this->assertMessage(TEST_BAD, null, $data['error_message']);
+			if (is_array($data['error_message'])) {
+				$this->assertInlineError($media_form, $data['error_message']);
+			}
+			else {
+				$this->assertMessage(TEST_BAD, null, $data['error_message']);
+			}
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::$mediatype_sql));
 		}
 	}
@@ -716,6 +726,8 @@ class testFormUserMedia extends CWebTest {
 
 		$media_form->submit();
 		$this->page->waitUntilReady();
+
+		return $media_form;
 	}
 
 	/**

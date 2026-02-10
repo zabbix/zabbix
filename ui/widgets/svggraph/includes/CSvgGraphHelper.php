@@ -1199,16 +1199,4 @@ class CSvgGraphHelper {
 	private static function processPattern(array $patterns): ?array {
 		return in_array('*', $patterns, true) ? null : $patterns;
 	}
-
-	/**
-	 * Sort data points by clock field.
-	 * Do not use this function directly. It serves as value_compare_func function for usort.
-	 */
-	private static function sortByClock(array $a, array $b): int {
-		if ($a['clock'] == $b['clock']) {
-			return 0;
-		}
-
-		return ($a['clock'] < $b['clock']) ? -1 : 1;
-	}
 }
