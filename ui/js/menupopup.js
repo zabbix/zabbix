@@ -14,62 +14,6 @@
 
 
 /**
- * Get menu popup history section data.
- *
- * @param string options['itemid']           Item ID.
- * @param bool   options['hasLatestGraphs']  Link to history page with showgraph action (optional).
- *
- * @return array
- */
-function getMenuPopupHistory(options) {
-	var items = [],
-		url = new Curl('history.php');
-
-	if (!options.allowed_ui_latest_data) {
-		return [];
-	}
-
-	url.setArgument('itemids[]', options.itemid);
-
-	// latest graphs
-	if (options.hasLatestGraphs !== undefined && options.hasLatestGraphs) {
-		url.setArgument('action', 'showgraph');
-		url.setArgument('to', 'now');
-
-		url.setArgument('from', 'now-1h');
-		items.push({
-			label: t('Last hour graph'),
-			url: url.getUrl()
-		});
-
-		url.setArgument('from', 'now-7d');
-		items.push({
-			label: t('Last week graph'),
-			url: url.getUrl()
-		});
-
-		url.setArgument('from', 'now-1M');
-		items.push({
-			label: t('Last month graph'),
-			url: url.getUrl()
-		});
-	}
-
-	// latest values
-	url.setArgument('action', 'showvalues');
-	url.setArgument('from', 'now-1h');
-	items.push({
-		label: t('Latest values'),
-		url: url.getUrl()
-	});
-
-	return [{
-		label: t('History'),
-		items: items
-	}];
-}
-
-/**
  * Get menu popup host section data.
  *
  * @param {string} options['hostid']                  Host ID.

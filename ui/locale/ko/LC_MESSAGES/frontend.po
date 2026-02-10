@@ -339,6 +339,10 @@ msgstr "(0 - 기본 액션을 사용)"
 msgid "(Only super admins can create groups)"
 msgstr "(최고관리자만 그룹을 작성할 수 있습니다)"
 
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
@@ -1810,6 +1814,11 @@ msgstr "하나 이상의 매개변수를 활성화해야 합니다."
 #: app/controllers/CControllerMaintenanceCreate.php:40
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
+msgstr ""
+
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
 msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
@@ -15173,6 +15182,16 @@ msgstr "이름"
 msgid "Name ID"
 msgstr "이름 ID"
 
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
+
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "폼 필드 이름의 길이는 255 문자까지 가능합니다."
@@ -21440,6 +21459,11 @@ msgstr "태그 표시 우선도"
 #: app/views/connector.edit.php:71
 msgid "Tag filter"
 msgstr "태그 필터"
+
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"

@@ -16,37 +16,37 @@
 
 class CControllerMediatypeMessageCheck extends CController {
 
-	/**
-	 * @var array  An array with all message template types.
-	 */
-	protected $message_types = [];
-
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
+	}
 
-		$this->message_types = CMediatypeHelper::getAllMessageTypes();
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'type' => ['integer', 'required', 'in' => array_keys(CMediatypeHelper::getMediaTypes())],
+			'message_format' => ['integer', 'required',
+				'in' => [ZBX_MEDIA_MESSAGE_FORMAT_TEXT, ZBX_MEDIA_MESSAGE_FORMAT_HTML]
+			],
+			'message_type' => ['integer', 'required', 'in' => array_keys(CMediatypeHelper::getAllMessageTypes())],
+			'subject' => ['db media_type_message.subject'],
+			'message' => ['db media_type_message.message']
+		]];
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'type' =>			'in '.implode(',', array_keys(CMediatypeHelper::getMediaTypes())),
-			'message_format' =>	'in '.ZBX_MEDIA_MESSAGE_FORMAT_TEXT.','.ZBX_MEDIA_MESSAGE_FORMAT_HTML,
-			'message_type' =>	'required|in '.implode(',', $this->message_types),
-			'subject' =>		'db media_type_message.subject',
-			'message' =>		'db media_type_message.message'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				(new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])]))->disableView()
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update media type'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

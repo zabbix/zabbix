@@ -136,7 +136,8 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, zbx_vector_addr
 
 			if (SUCCEED != zbx_socket_connect(&tcpsvc_context->s, SOCK_STREAM,
 					tcpsvc_context->config_source_ip, addresses->values[0].ip,
-					tcpsvc_context->item.interface.port, tcpsvc_context->config_timeout))
+					tcpsvc_context->item.interface.port, tcpsvc_context->config_timeout,
+					ZBX_DNS_FAILOVER_DISABLED, &event_new))
 			{
 				tcpsvc_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"

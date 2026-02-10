@@ -27,6 +27,8 @@ import (
 	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
+const notAllowedCharacters = "\\'\"`*?[]{}~$!&;()<>|#@%\n"
+
 type parameterInfo struct {
 	cmd      string
 	flexible bool
@@ -71,7 +73,7 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 				if int(s[i]-'0') <= len(params) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
-						if j := strings.IndexAny(param, "\\'\"`*?[]{}~$!&;()<>|#@\n"); j != -1 {
+						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
 							if unicode.IsPrint(rune(param[j])) {
 								return "", fmt.Errorf("Character \"%c\" is not allowed", param[j])
 							}
