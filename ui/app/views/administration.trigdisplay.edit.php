@@ -156,8 +156,8 @@ $form = (new CForm())
 		(new CTabView())
 			->addTab('triggerdo', _('Trigger displaying options'), $form_list)
 			->setFooter(makeFormFooter(
-				new CSubmit('update', _('Update')),
-				[new CButton('resetDefaults', _('Reset defaults'))]
+				(new CSubmit('', _('Update')))->addClass('js-submit'),
+				[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 			))
 	);
 

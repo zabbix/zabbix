@@ -40,7 +40,8 @@ const view = new class {
 			document.getElementById('iframe_sandboxing_exceptions').disabled = !e.target.checked;
 		});
 
-		document.getElementById('resetDefaults').addEventListener('click', (e) => this.#resetDefaults(e.target));
+		this.form_element.querySelector('.table-forms .tfoot-buttons .js-reset-defaults')
+			.addEventListener('click', (e) => this.#resetDefaults(e.target));
 	}
 
 	#resetDefaults(reset_button) {
@@ -93,7 +94,7 @@ const view = new class {
 
 	#submit(e) {
 		e.preventDefault();
-		this.#setLoadingStatus(['update']);
+		this.#setLoadingStatus('js-submit');
 		clearMessages();
 		const fields = this.form.getAllValues();
 
@@ -153,31 +154,22 @@ const view = new class {
 		addMessage(makeMessageBox('bad', messages, title)[0]);
 	}
 
-	#setLoadingStatus(loading_ids) {
+	#setLoadingStatus(loading_btn_class) {
 		this.form_element.classList.add('is-loading', 'is-loading-fadein');
-		[
-			document.getElementById('update'),
-			document.getElementById('resetDefaults')
-		].forEach(button => {
-			if (button) {
-				button.setAttribute('disabled', 'disabled');
 
-				if (loading_ids.includes(button.id)) {
-					button.classList.add('is-loading');
-				}
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.disabled = true;
+
+			if (button.classList.contains(loading_btn_class)) {
+				button.classList.add('is-loading');
 			}
 		});
 	}
 
 	#unsetLoadingStatus() {
-		[
-			document.getElementById('update'),
-			document.getElementById('resetDefaults')
-		].forEach(button => {
-			if (button) {
-				button.classList.remove('is-loading');
-				button.removeAttribute('disabled');
-			}
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.classList.remove('is-loading');
+			button.disabled = false;
 		});
 
 		this.form_element.classList.remove('is-loading', 'is-loading-fadein');

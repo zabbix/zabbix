@@ -71,8 +71,8 @@ $form->addItem(
 	(new CTabView())
 		->addTab('audit-settings', _('Audit log'), $audit_settings_tab)
 		->setFooter(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			[new CButton('resetDefaults', _('Reset defaults'))]
+			(new CSubmit('', _('Update')))->addClass('js-submit'),
+			[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 		))
 );
 

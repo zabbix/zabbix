@@ -196,7 +196,10 @@ $form_grid = (new CFormGrid())
 			])
 	)
 	->addItem(
-		new CFormActions(new CSubmit('update', _('Update')), [new CButton('resetDefaults', _('Reset defaults'))])
+		new CFormActions(
+			(new CSubmit('', _('Update')))->addClass('js-submit'),
+			[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
+		)
 	);
 
 $form->addItem(
