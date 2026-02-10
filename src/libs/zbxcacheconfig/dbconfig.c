@@ -11636,7 +11636,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 {
 	int			now, num = 0, max_items, items_alloc = 0;
 	zbx_binary_heap_t	*queue;
-	size_t			item_size = 0;
+	size_t			item_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
 
