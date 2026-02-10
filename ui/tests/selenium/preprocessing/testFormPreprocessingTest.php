@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../../include/items.inc.php';
 require_once __DIR__.'/../behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup items
@@ -29,12 +30,15 @@ require_once __DIR__.'/../behaviors/CPreprocessingBehavior.php';
 class testFormPreprocessingTest extends CWebTest {
 
 	/**
-	 * Attach PreprocessingBehavior to the test.
+	 * Attach MessageBehavior and PreprocessingBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CPreprocessingBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
 	}
 
 	const HOST_ID = 40001;		//'Simple form test host'
@@ -295,8 +299,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Simple change'],
 						['type' => 'Change per second']
 					],
-					'error' => 'Invalid parameter "/2": only one object can exist within '.
-							'the combinations of (type)=((9, 10)).'
+					'error' => ['id:preprocessing_1_type' => 'One "Change" step allowed per item.']
 				]
 			],
 			[
@@ -306,7 +309,7 @@ class testFormPreprocessingTest extends CWebTest {
 						['type' => 'Discard unchanged'],
 						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
 					],
-					'error' => 'Invalid parameter "/2": only one object can exist within the combinations of (type)=((19, 20)).'
+					'error' => ['id:preprocessing_1_type' => 'One "Throttling" step allowed per item.']
 				]
 			],
 			[
@@ -317,7 +320,7 @@ class testFormPreprocessingTest extends CWebTest {
 								'parameter_3' => 'label_name'],
 						['type' => 'Prometheus to JSON', 'parameter_1' => '']
 					],
-					'error' => 'Invalid parameter "/2": only one object can exist within the combinations of (type)=((22, 23)).'
+					'error' => ['id:preprocessing_1_type' => 'One "Prometheus" step allowed per item.']
 				]
 			]
 		];
@@ -445,16 +448,14 @@ class testFormPreprocessingTest extends CWebTest {
 	 */
 	private function checkTestOverlay($data, $selector, $prev_enabled, $id = null) {
 		$this->query($selector)->waitUntilPresent()->one()->click();
-		$dialog = COverlayDialogElement::find(1)->waitUntilPresent()->one()->waitUntilReady();
 
 		switch ($data['expected']) {
 			case TEST_BAD:
-				$message = $dialog->query('tag:output')->asMessage()->waitUntilPresent()->one();
-				$this->assertTrue($message->isBad());
-				$dialog->close();
+				$this->assertInlineError($this->query('name:itemForm')->asForm()->one(), $data['error']);
 				break;
 
 			case TEST_GOOD:
+				$dialog = COverlayDialogElement::find(1)->waitUntilPresent()->one()->waitUntilReady();
 				$form = $this->query('id:preprocessing-test-form')->asForm()->waitUntilPresent()->one();
 				$this->assertEquals('Test item', $dialog->getTitle());
 

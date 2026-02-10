@@ -156,8 +156,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc2
 
-New features:
-
 Bug fixes:
 .......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 
@@ -1410,8 +1408,6 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23rc2
-
-New features:
 
 Bug fixes:
 .......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)

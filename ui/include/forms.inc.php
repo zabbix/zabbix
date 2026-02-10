@@ -650,9 +650,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
 							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
 						]))
-							->setAttribute('data-prevent-validation-on-change', '')
 							->setAttribute('placeholder', _('error-matching'))
 							->addClass('js-preproc-param-error-matching')
+							->setErrorContainer('preprocessing-'.$i.'-error-container')
 							->setValue($step_param_0_value)
 							->setReadonly($readonly),
 					$step_param_1
