@@ -135,7 +135,7 @@ class testFormApiTokens extends CWebTest {
 		// Check the hintbox text in the Auth token field.
 		$auth_token->query('xpath:./button[@data-hintbox]')->one()->click();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
-				$this->query('xpath://div[contains(@class, "hintbox-static"]')->one()->waitUntilVisible()->getText()
+				$this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible()->getText()
 		);
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 		$dialog->close();
