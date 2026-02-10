@@ -1967,6 +1967,7 @@ select {
 		flex-direction: column;
 		box-sizing: border-box;
 		overflow: hidden;
+		padding-top: 20px;
 
 		&.hintbox-position-fixed {
 			position: fixed;
@@ -1980,8 +1981,7 @@ select {
 			padding-top: 0;
 
 			.hintbox-draggable-handle {
-				min-height: 17px;
-				max-height: 17px;
+				height: 20px;
 				width: 100%;
 				cursor: grab;
 			}
@@ -1989,6 +1989,7 @@ select {
 
 		.hintbox-container {
 			overflow: auto;
+			padding-bottom: 1px; // for table correct size
 
 			@extend %webkit-scrollbar;
 		}
@@ -2564,6 +2565,7 @@ select {
 
 	li {
 		display: flex;
+		width: fit-content;
 		align-items: center;
 
 		.svg-graph-hintbox-item-color,

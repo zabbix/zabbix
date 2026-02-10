@@ -466,13 +466,16 @@ const hintBox = {
 			}
 		}
 
-		if (typeof hintText === 'string') {
-			hintText = hintText.replace(/\n/g, '<br />');
-		}
-
 		const hintbox_container = document.createElement('div');
 		hintbox_container.classList.add('hintbox-container');
-		hintbox_container.innerHTML = hintText;
+
+		if (typeof hintText === 'string') {
+			hintText = hintText.replace(/\n/g, '<br />');
+			hintbox_container.innerHTML = hintText;
+		}
+		else {
+			hintbox_container.append(hintText);
+		}
 
 		if (!empty(className)) {
 			hintbox_container.classList.add(...className.split(' '));
@@ -487,6 +490,9 @@ const hintBox = {
 
 			box.addClass('hintbox-static');
 
+			const hintbox_header = document.createElement('div');
+			hintbox_header.classList.add('hintbox-header');
+
 			const draggable_header = document.createElement('div');
 			draggable_header.classList.add('hintbox-draggable-handle');
 			draggable_header.addEventListener('mousedown', hintBox.drag_listeners.dragStart);
@@ -500,8 +506,10 @@ const hintBox = {
 				hintBox.hideHint(target, true);
 			});
 
-			box.prepend(close_link)
-			box.prepend(draggable_header);
+			hintbox_header.prepend(draggable_header);
+			hintbox_header.prepend(close_link);
+
+			box.prepend(hintbox_header);
 		}
 
 		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {

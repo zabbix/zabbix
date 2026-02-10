@@ -7637,7 +7637,8 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     display: flex;
     flex-direction: column;
     box-sizing: border-box;
-    overflow: hidden; }
+    overflow: hidden;
+    padding-top: 20px; }
     .overlay-dialogue.hintbox.hintbox-position-fixed {
       position: fixed; }
     .overlay-dialogue.hintbox:not(.hintbox-static) {
@@ -7645,12 +7646,12 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.hintbox.hintbox-static {
       padding-top: 0; }
       .overlay-dialogue.hintbox.hintbox-static .hintbox-draggable-handle {
-        min-height: 17px;
-        max-height: 17px;
+        height: 20px;
         width: 100%;
         cursor: grab; }
     .overlay-dialogue.hintbox .hintbox-container {
-      overflow: auto; }
+      overflow: auto;
+      padding-bottom: 1px; }
   .overlay-dialogue .hintbox-raw-data {
     white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
@@ -8002,6 +8003,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
         font-size: 14px; }
   .svg-graph-hintbox li {
     display: flex;
+    width: fit-content;
     align-items: center; }
     .svg-graph-hintbox li .svg-graph-hintbox-item-color,
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
