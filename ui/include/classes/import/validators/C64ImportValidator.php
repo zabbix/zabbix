@@ -15,9 +15,9 @@
 
 
 /**
- * Validate import data from Zabbix 7.0.x.
+ * Validate import data from Zabbix 6.4.x.
  */
-class C70XmlValidator extends CXmlValidatorGeneral {
+class C64ImportValidator extends CImportValidatorGeneral {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -48,15 +48,13 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
-		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_DRULE = [
 		CXmlConstantValue::REGEX => CXmlConstantName::REGEX,
 		CXmlConstantValue::XMLPATH => CXmlConstantName::XMLPATH,
 		CXmlConstantValue::JSONPATH => CXmlConstantName::JSONPATH,
-		CXmlConstantValue::MATCHES_REGEX => CXmlConstantName::MATCHES_REGEX,
 		CXmlConstantValue::NOT_MATCHES_REGEX => CXmlConstantName::NOT_MATCHES_REGEX,
 		CXmlConstantValue::CHECK_JSON_ERROR => CXmlConstantName::CHECK_JSON_ERROR,
 		CXmlConstantValue::CHECK_XML_ERROR => CXmlConstantName::CHECK_XML_ERROR,
@@ -67,8 +65,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
-		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_PARAMS = [
@@ -91,10 +88,8 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::PROMETHEUS_TO_JSON => CXmlConstantName::PROMETHEUS_TO_JSON,
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::STR_REPLACE => CXmlConstantName::STR_REPLACE,
-		CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
-		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
 	];
 
 	private $PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET = [
@@ -118,8 +113,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CSV_TO_JSON => CXmlConstantName::CSV_TO_JSON,
 		CXmlConstantValue::XML_TO_JSON => CXmlConstantName::XML_TO_JSON,
 		CXmlConstantValue::SNMP_WALK_VALUE => CXmlConstantName::SNMP_WALK_VALUE,
-		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON,
-		CXmlConstantValue::SNMP_GET_VALUE => CXmlConstantName::SNMP_GET_VALUE
+		CXmlConstantValue::SNMP_WALK_TO_JSON => CXmlConstantName::SNMP_WALK_TO_JSON
 	];
 
 	private $GRAPH_GRAPH_ITEM_CALC_FNC = [
@@ -285,8 +279,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
 	];
 
 	private $ITEM_TYPE_DRULE = [
@@ -304,8 +297,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
 	];
 
 	private $ITEM_TYPE_DELAY_SUBSET = [
@@ -321,8 +313,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
 	];
 
 	private $ITEM_TYPE_TIMEOUT = [
@@ -335,8 +326,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
 		CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT,
 		CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
 	];
 
 	private $ITEM_TYPE_INTERFACE = [
@@ -373,8 +363,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH,
 		CXmlConstantValue::ITEM_TYPE_TELNET => CXmlConstantName::TELNET,
 		CXmlConstantValue::ITEM_TYPE_CALCULATED => CXmlConstantName::CALCULATED,
-		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT,
-		CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER
+		CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT
 	];
 
 	private $ITEM_VALUE_TYPE = [
@@ -382,8 +371,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::CHAR => CXmlConstantName::CHAR,
 		CXmlConstantValue::LOG => CXmlConstantName::LOG,
 		CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED,
-		CXmlConstantValue::TEXT => CXmlConstantName::TEXT,
-		CXmlConstantValue::BINARY => CXmlConstantName::BINARY
+		CXmlConstantValue::TEXT => CXmlConstantName::TEXT
 	];
 
 	private $TRIGGER_PRIORITY = [
@@ -479,37 +467,6 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
 	];
 
-	private $OPERATION_OBJECT_TARGETS = [
-		'status' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
-		],
-		'delay' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
-		],
-		'history' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
-		],
-		'trends' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE
-		],
-		'severity' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE
-		],
-		'tag' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE,
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_TRIGGER_PROTOTYPE,
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
-		],
-		'template' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
-		],
-		'inventory_mode' => [
-			CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE => CXmlConstantName::LLD_OVERRIDE_OPERATION_OBJECT_HOST_PROTOTYPE
-		]
-	];
-
 	private $CONDITION_OPERATOR = [
 		CXmlConstantValue::CONDITION_OPERATOR_EQUAL => CXmlConstantName::CONDITION_OPERATOR_EQUAL,
 		CXmlConstantValue::CONDITION_OPERATOR_NOT_EQUAL => CXmlConstantName::CONDITION_OPERATOR_NOT_EQUAL,
@@ -537,13 +494,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MAP => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MAP,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SLA => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SLA,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_USER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_USER,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ACTION => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ACTION,
-		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE
+		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE
 	];
 
 	private $VALUEMAP_MAPPING_TYPE = [
@@ -561,12 +512,6 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::NTLM => CXmlConstantName::NTLM,
 		CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS,
 		CXmlConstantValue::DIGEST => CXmlConstantName::DIGEST
-	];
-
-	private $ENABLED_LIFETIME_TYPES = [
-		CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER,
-		CXmlConstantValue::LLD_DISABLE_NEVER => CXmlConstantName::LLD_DISABLE_NEVER,
-		CXmlConstantValue::LLD_DISABLE_IMMEDIATELY => CXmlConstantName::LLD_DISABLE_IMMEDIATELY
 	];
 
 	/**
@@ -588,11 +533,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'host' =>					['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING, 'default' => ''],
 					'description' =>			['type' => XML_STRING, 'default' => ''],
-					'monitored_by' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::SERVER, 'in' => [CXmlConstantValue::SERVER => CXmlConstantName::SERVER, CXmlConstantValue::PROXY => CXmlConstantName::PROXY, CXmlConstantValue::PROXY_GROUP => CXmlConstantName::PROXY_GROUP]],
 					'proxy' =>					['type' => XML_ARRAY, 'rules' => [
-						'name' =>					['type' => XML_STRING | XML_REQUIRED]
-					]],
-					'proxy_group' =>			['type' => XML_ARRAY, 'rules' => [
 						'name' =>					['type' => XML_STRING | XML_REQUIRED]
 					]],
 					'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
@@ -651,7 +592,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
 															['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
 							]],
-							'history' =>				['type' => XML_STRING, 'default' => '31d'],
+							'history' =>				['type' => XML_STRING, 'default' => '90d'],
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
@@ -770,7 +711,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => '3s'],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -787,7 +728,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 										'name' =>				['type' => XML_STRING | XML_REQUIRED],
 										'value' =>				['type' => XML_STRING, 'default' => '']
@@ -900,121 +841,33 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 						'discovery_rule' =>			['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-							'snmp_oid' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
-							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
-																['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
-															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
-															['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
-							]],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'allow_traps' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'allowed_hosts' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'params' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ipmi_sensor' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'authtype' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'username' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'password' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'publickey' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' =>[
-																['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'privatekey' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' =>[
-																['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'filter' =>					['type' => XML_ARRAY, 'rules' => [
+							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
+							'params' =>					['type' => XML_STRING, 'default' => ''],
+							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+							'username' =>				['type' => XML_STRING, 'default' => ''],
+							'password' =>				['type' => XML_STRING, 'default' => ''],
+							'publickey' =>				['type' => XML_STRING, 'default' => ''],
+							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-								'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-										'condition' =>		['type' => XML_ARRAY, 'rules' => [
-											'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-											'value' =>			['type' => XML_STRING, 'default' => ''],
-											'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-											'formulaid' =>		['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-										'condition' =>		['type' => XML_ARRAY, 'rules' => [
-											'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-											'value' =>			['type' => XML_STRING, 'default' => ''],
-											'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-											'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
-										]]
+								'formula' =>				['type' => XML_STRING, 'default' => ''],
+								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+									'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+										'value' =>					['type' => XML_STRING, 'default' => ''],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
 							]],
-							'lifetime_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
-							'lifetime' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
-															['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
-							]],
-							'enabled_lifetime_type' =>	['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'enabled_lifetime' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
-							'interface_ref' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_INTERFACE], 'type' => XML_STRING],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'interface_ref' =>			['type' => XML_STRING],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
@@ -1032,7 +885,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
 																	['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
 									]],
-									'history' =>				['type' => XML_STRING, 'default' => '31d'],
+									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
@@ -1148,7 +1001,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => '3s'],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -1165,7 +1018,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 											'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 												'name' =>				['type' => XML_STRING | XML_REQUIRED],
 												'value' =>				['type' => XML_STRING, 'default' => '']
@@ -1454,99 +1307,43 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
-							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
+							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
+							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-									'key' =>				['type' => XML_STRING | XML_REQUIRED]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
+							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+							'url' =>					['type' => XML_STRING, 'default' => ''],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
 							]],
-							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
+							'parameters' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								'parameter' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
 							]],
-							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
+							'posts' =>					['type' => XML_STRING, 'default' => ''],
+							'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
+							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+							'http_proxy' =>				['type' => XML_STRING, 'default' => ''],
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
 							]],
-							'query_fields' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-									'query_field' =>		['type' => XML_ARRAY, 'rules' => [
-										'name' =>				['type' => XML_STRING | XML_REQUIRED],
-										'value' =>				['type' => XML_STRING, 'default' => '']
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
-										'name' =>				['type' => XML_STRING | XML_REQUIRED],
-										'value' =>				['type' => XML_STRING, 'default' => '']
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'status_codes' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'follow_redirects' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'post_type' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'posts' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'http_proxy' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'headers' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-									'header' =>				['type' => XML_ARRAY, 'rules' => [
-										'name' =>				['type' => XML_STRING | XML_REQUIRED],
-										'value' =>				['type' => XML_STRING | XML_REQUIRED]
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ssl_key_file' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ssl_key_password' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'verify_peer' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'verify_host' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+							'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'ssl_cert_file' =>			['type' => XML_STRING, 'default' => ''],
+							'ssl_key_file' =>			['type' => XML_STRING, 'default' => ''],
+							'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
 								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
 									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -1556,24 +1353,11 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-											'parameter' =>			['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => ['']]
+									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
+										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
-																	['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'error_handler_params' =>	['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
-																		['else' => true, 'type' => XML_IGNORE_TAG]
-																	]],
-																	['else' => true, 'type' => XML_IGNORE_TAG]
-									]]
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
 							'overrides'	=>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
@@ -1583,26 +1367,13 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-										'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
-																		['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
-																		['else' => true, 'type' => XML_IGNORE_TAG]
-										]],
-										'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
-											['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-												'condition' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-													'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-													'value' =>			['type' => XML_STRING, 'default' => ''],
-													'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-													'formulaid' =>		['type' => XML_STRING | XML_REQUIRED]
-												]]
-											]],
-											['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-												'condition' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-													'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-													'value' =>			['type' => XML_STRING, 'default' => ''],
-													'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-													'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
-												]]
+										'formula' =>				['type' => XML_STRING, 'default' => ''],
+										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+												'value' =>					['type' => XML_STRING, 'default' => ''],
+												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
 									]],
@@ -1611,48 +1382,24 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE, 'export_always' => true],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
+											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-											'status' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
+											'delay' =>					['type' => XML_STRING, 'default' => ''],
+											'history' =>				['type' => XML_STRING, 'default' => ''],
+											'trends' =>					['type' => XML_STRING, 'default' => ''],
+											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING, 'default' => '']
+												]]
 											]],
-											'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
+											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+												'template' =>				['type' => XML_ARRAY, 'rules' => [
+													'name' =>					['type' => XML_STRING | XML_REQUIRED]
+												]]
 											]],
-											'history' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'severity' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'tags' =>					['type' => XML_MULTIPLE, 'rules' => [
-												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-													'tag' =>				['type' => XML_ARRAY, 'rules' => [
-														'tag' =>				['type' => XML_STRING | XML_REQUIRED],
-														'value' =>				['type' => XML_STRING, 'default' => '']
-													]]
-												]],
-												['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'templates' =>				['type' => XML_MULTIPLE, 'rules' => [
-												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-													'template' =>			['type' => XML_ARRAY, 'rules' => [
-														'name' =>				['type' => XML_STRING | XML_REQUIRED]
-													]]
-												]],
-												['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'inventory_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]]
+											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
 										]]
 									]]
 								]]
@@ -1870,7 +1617,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
 															['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
 							]],
-							'history' =>				['type' => XML_STRING, 'default' => '31d'],
+							'history' =>				['type' => XML_STRING, 'default' => '90d'],
 							'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 							'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
 															['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
@@ -1985,7 +1732,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => '3s'],
 															['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -2002,7 +1749,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 								['else' => true, 'type' => XML_IGNORE_TAG]
 							]],
 							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 										'name' =>				['type' => XML_STRING | XML_REQUIRED],
 										'value' =>				['type' => XML_STRING, 'default' => '']
@@ -2117,116 +1864,31 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'uuid' =>					['type' => XML_STRING | XML_REQUIRED, 'flags' => CImportDataNormalizer::LOWERCASE],
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
 							'type' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ITEM_TYPE_ZABBIX_PASSIVE, 'in' => $this->ITEM_TYPE_DRULE],
-							'snmp_oid' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SNMP => CXmlConstantName::SNMP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'snmp_oid' =>				['type' => XML_STRING, 'default' => ''],
 							'key' =>					['type' => XML_STRING | XML_REQUIRED],
-							'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_ZABBIX_ACTIVE => CXmlConstantName::ZABBIX_ACTIVE]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => static fn(array $data): bool => strncmp($data['key'], 'mqtt.get', 8) != 0, 'type' => XML_STRING, 'default' => '1m'],
-																['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
-															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
-															['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
-							]],
+							'delay' =>					['type' => XML_STRING, 'default' => '1m'],
 							'status' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::ENABLED, 'in' => [CXmlConstantValue::ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::DISABLED => CXmlConstantName::DISABLED]],
-							'allow_traps' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'allowed_hosts' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'allow_traps', 'in' => [CXmlConstantValue::YES => CXmlConstantName::YES]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_TRAP => CXmlConstantName::TRAP]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'params' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_PARAMS], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ipmi_sensor' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_IPMI => CXmlConstantName::IPMI]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'authtype' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => $this->HTTP_ITEM_AUTHTYPE],
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'username' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'password' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'authtype', 'in' => array_diff_key($this->HTTP_ITEM_AUTHTYPE, array_flip([CXmlConstantValue::NONE]))], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_CREDENTIALS_SUBSET], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'publickey' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' =>[
-																['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'privatekey' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SSH => CXmlConstantName::SSH]], 'type' => XML_MULTIPLE, 'rules' =>[
-																['if' => ['tag' => 'authtype', 'in' => [CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'filter' =>					['type' => XML_ARRAY, 'rules' => [
+							'allowed_hosts' =>			['type' => XML_STRING, 'default' => ''],
+							'params' =>					['type' => XML_STRING, 'default' => ''],
+							'ipmi_sensor' =>			['type' => XML_STRING, 'default' => ''],
+							'authtype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'ex_validate' => [$this, 'validateAuthType'], 'ex_rules' => [$this, 'getAuthTypeExtendedRules']],
+							'username' =>				['type' => XML_STRING, 'default' => ''],
+							'password' =>				['type' => XML_STRING, 'default' => ''],
+							'publickey' =>				['type' => XML_STRING, 'default' => ''],
+							'privatekey' =>				['type' => XML_STRING, 'default' => ''],
+							'filter' =>					['type' => XML_ARRAY, 'import' => [$this, 'itemFilterImport'], 'rules' => [
 								'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-								'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-								]],
-								'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
-									['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-										'condition' =>		['type' => XML_ARRAY, 'rules' => [
-											'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-											'value' =>			['type' => XML_STRING, 'default' => ''],
-											'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-											'formulaid' =>		['type' => XML_STRING | XML_REQUIRED]
-										]]
-									]],
-									['else' => true, 'type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
-										'condition' =>		['type' => XML_ARRAY, 'rules' => [
-											'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-											'value' =>			['type' => XML_STRING, 'default' => ''],
-											'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-											'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
-										]]
+								'formula' =>				['type' => XML_STRING, 'default' => ''],
+								'conditions' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'condition', 'rules' => [
+									'condition' =>				['type' => XML_ARRAY, 'rules' => [
+										'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+										'value' =>					['type' => XML_STRING, 'default' => ''],
+										'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+										'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
 							]],
-							'lifetime_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DELETE_AFTER, 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER, CXmlConstantValue::LLD_DELETE_IMMEDIATELY => CXmlConstantName::LLD_DELETE_IMMEDIATELY]],
-							'lifetime' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER]], 'type' => XML_STRING, 'default' => '7d'],
-															['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
-							]],
-							'enabled_lifetime_type' =>	['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_STRING, 'default' => CXmlConstantValue::LLD_DISABLE_IMMEDIATELY, 'in' => $this->ENABLED_LIFETIME_TYPES],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'enabled_lifetime' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'lifetime_type', 'in' => [CXmlConstantValue::LLD_DELETE_AFTER => CXmlConstantName::LLD_DELETE_AFTER, CXmlConstantValue::LLD_DELETE_NEVER => CXmlConstantName::LLD_DELETE_NEVER]], 'type' => XML_MULTIPLE, 'rules' => [
-																['if' => ['tag' => 'enabled_lifetime_type', 'in' => [CXmlConstantValue::LLD_DISABLE_AFTER => CXmlConstantName::LLD_DISABLE_AFTER]], 'type' => XML_STRING, 'default' => '0'],
-																['else' => true, 'type' => XML_IGNORE_TAG]
-															]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'lifetime' =>				['type' => XML_STRING, 'default' => '30d'],
 							'description' =>			['type' => XML_STRING, 'default' => ''],
 							'item_prototypes' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'item_prototype', 'rules' => [
 								'item_prototype' =>			['type' => XML_ARRAY, 'rules' => [
@@ -2246,7 +1908,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_DELAY_SUBSET], 'type' => XML_STRING, 'default' => '1m'],
 																	['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => '0']
 									]],
-									'history' =>				['type' => XML_STRING, 'default' => '31d'],
+									'history' =>				['type' => XML_STRING, 'default' => '90d'],
 									'value_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::UNSIGNED, 'in' => $this->ITEM_VALUE_TYPE],
 									'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
 																	['if' => ['tag' => 'value_type', 'in' => [CXmlConstantValue::FLOAT => CXmlConstantName::FLOAT, CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED]], 'type' => XML_STRING, 'default' => '365d'],
@@ -2358,7 +2020,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
+																	['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => '3s'],
 																	['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'url' =>					['type' => XML_MULTIPLE, 'rules' => [
@@ -2375,7 +2037,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 										['else' => true, 'type' => XML_IGNORE_TAG]
 									]],
 									'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+										['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
 											'parameter' =>			['type' => XML_ARRAY, 'rules' => [
 												'name' =>				['type' => XML_STRING | XML_REQUIRED],
 												'value' =>				['type' => XML_STRING, 'default' => '']
@@ -2668,99 +2330,43 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									]]
 								]]
 							]],
-							'jmx_endpoint' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_JMX => CXmlConstantName::JMX]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
+							'jmx_endpoint' =>			['type' => XML_STRING, 'default' => ''],
+							'master_item' =>			['type' => XML_ARRAY, 'ex_validate' => [$this, 'validateMasterItem'], 'rules' => [
+								'key' =>					['type' => XML_STRING | XML_REQUIRED]
 							]],
-							'master_item' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_DEPENDENT => CXmlConstantName::DEPENDENT]], 'type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-									'key' =>				['type' => XML_STRING | XML_REQUIRED]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
+							'timeout' =>				['type' => XML_STRING, 'default' => '3s'],
+							'url' =>					['type' => XML_STRING, 'default' => ''],
+							'query_fields' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
+								'query_field' =>			['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
 							]],
-							'timeout' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => $this->ITEM_TYPE_TIMEOUT], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
+							'parameters' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
+								'parameter' =>				['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING, 'default' => '']
+								]]
 							]],
-							'url' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
+							'posts' =>					['type' => XML_STRING, 'default' => ''],
+							'status_codes' =>			['type' => XML_STRING, 'default' => '200'],
+							'follow_redirects' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'post_type' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
+							'http_proxy' =>				['type' => XML_STRING, 'default' => ''],
+							'headers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
+								'header' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'value' =>					['type' => XML_STRING | XML_REQUIRED]
+								]]
 							]],
-							'query_fields' =>			['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'query_field', 'rules' => [
-									'query_field' =>		['type' => XML_ARRAY, 'rules' => [
-										'name' =>				['type' => XML_STRING | XML_REQUIRED],
-										'value' =>				['type' => XML_STRING, 'default' => '']
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_SCRIPT => CXmlConstantName::SCRIPT, CXmlConstantValue::ITEM_TYPE_BROWSER => CXmlConstantName::BROWSER]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'parameter', 'rules' => [
-									'parameter' =>			['type' => XML_ARRAY, 'rules' => [
-										'name' =>				['type' => XML_STRING | XML_REQUIRED],
-										'value' =>				['type' => XML_STRING, 'default' => '']
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'status_codes' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => '200'],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'follow_redirects' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'post_type' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::RAW, 'in' => $this->ITEM_POST_TYPE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'posts' =>					['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'http_proxy' =>				['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'headers' =>				['type' => XML_MULTIPLE, 'rules' => [
-								['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'header', 'rules' => [
-									'header' =>				['type' => XML_ARRAY, 'rules' => [
-										'name' =>				['type' => XML_STRING | XML_REQUIRED],
-										'value' =>				['type' => XML_STRING | XML_REQUIRED]
-									]]
-								]],
-								['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'retrieve_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'request_method' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ssl_cert_file' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ssl_key_file' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'ssl_key_password' =>		['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => ''],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'verify_peer' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
-							'verify_host' =>			['type' => XML_MULTIPLE, 'rules' => [
-															['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::ITEM_TYPE_HTTP_AGENT => CXmlConstantName::HTTP_AGENT]], 'type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
-															['else' => true, 'type' => XML_IGNORE_TAG]
-							]],
+							'retrieve_mode' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::BODY, 'in' => $this->ITEM_RETRIEVE_MODE],
+							'request_method' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::GET, 'in' => $this->ITEM_REQUEST_METHOD],
+							'allow_traps' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'ssl_cert_file' =>			['type' => XML_STRING, 'default' => ''],
+							'ssl_key_file' =>			['type' => XML_STRING, 'default' => ''],
+							'ssl_key_password' =>		['type' => XML_STRING, 'default' => ''],
+							'verify_peer' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+							'verify_host' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
 							'lld_macro_paths' =>		['type' => XML_INDEXED_ARRAY, 'prefix' => 'lld_macro_path', 'rules' => [
 								'lld_macro_path' =>			['type' => XML_ARRAY, 'rules' => [
 									'lld_macro' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -2770,24 +2376,11 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 							'preprocessing' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'step', 'rules' => [
 								'step' =>					['type' => XML_ARRAY, 'rules' => [
 									'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->PREPROCESSING_STEP_TYPE_DRULE],
-									'parameters' =>				['type' => XML_MULTIPLE, 'rules' => [
-										['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_PARAMS], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
-											'parameter' =>			['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
-										]],
-										['else' => true, 'type' => XML_IGNORE_TAG, 'export_default' => ['']]
+									'parameters' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'parameter', 'rules' => [
+										'parameter' =>				['type' => XML_STRING, 'flags' => CImportDataNormalizer::EOL_LF]
 									]],
-									'error_handler' =>			['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET], 'type' => XML_STRING, 'default' => CXmlConstantValue::ORIGINAL_ERROR, 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
-																	['if' => ['tag' => 'type', 'in' => [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_STRING, 'default' => CXmlConstantValue::DISCARD_VALUE, 'in' => array_diff_key($this->ITEM_PREPROCESSING_ERROR_HANDLER, array_flip([CXmlConstantValue::ORIGINAL_ERROR]))],
-																	['else' => true, 'type' => XML_IGNORE_TAG]
-									]],
-									'error_handler_params' =>	['type' => XML_MULTIPLE, 'rules' => [
-																	['if' => ['tag' => 'type', 'in' => $this->PREPROCESSING_STEP_TYPE_ERROR_HANDLING_SUBSET + [CXmlConstantValue::CHECK_NOT_SUPPORTED => CXmlConstantName::CHECK_NOT_SUPPORTED]], 'type' => XML_MULTIPLE, 'rules' => [
-																		['if' => ['tag' => 'error_handler', 'in' => [CXmlConstantValue::CUSTOM_VALUE => CXmlConstantName::CUSTOM_VALUE, CXmlConstantValue::CUSTOM_ERROR => CXmlConstantName::CUSTOM_ERROR]], 'type' => XML_STRING, 'default' => ''],
-																		['else' => true, 'type' => XML_IGNORE_TAG]
-																	]],
-																	['else' => true, 'type' => XML_IGNORE_TAG]
-									]]
+									'error_handler' =>			['type' => XML_STRING, 'ex_default' => [$this, 'defaultPreprocErrHandler'], 'ex_validate' => [$this, 'validatePreprocErrHandler'], 'in' => $this->ITEM_PREPROCESSING_ERROR_HANDLER],
+									'error_handler_params' =>	['type' => XML_STRING, 'default' => '']
 								]]
 							]],
 							'overrides'	=>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'override', 'rules' => [
@@ -2797,26 +2390,13 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 									'stop' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::LLD_OVERRIDE_STOP_NO, 'in' => $this->LLD_OVERRIDE_STOP],
 									'filter' =>					['type' => XML_ARRAY, 'rules' => [
 										'evaltype' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::AND_OR, 'in' => $this->EVALTYPE],
-										'formula' =>				['type' => XML_MULTIPLE, 'rules' => [
-																		['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_STRING, 'default' => ''],
-																		['else' => true, 'type' => XML_IGNORE_TAG]
-										]],
-										'conditions' =>			['type' => XML_MULTIPLE, 'rules' => [
-											['if' => ['tag' => 'evaltype', 'in' => [CXmlConstantValue::FORMULA => CXmlConstantName::FORMULA]], 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-												'condition' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-													'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-													'value' =>			['type' => XML_STRING, 'default' => ''],
-													'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-													'formulaid' =>		['type' => XML_STRING | XML_REQUIRED]
-												]]
-											]],
-											['else' => true, 'type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
-												'condition' =>		['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
-													'macro' =>			['type' => XML_STRING | XML_REQUIRED],
-													'value' =>			['type' => XML_STRING, 'default' => ''],
-													'operator' =>		['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
-													'formulaid' =>		['type' => XML_IGNORE_TAG, 'export_always' => true]
-												]]
+										'formula' =>				['type' => XML_STRING, 'default' => ''],
+										'conditions' =>				['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'condition', 'rules' => [
+											'condition' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+												'macro' =>					['type' => XML_STRING | XML_REQUIRED],
+												'value' =>					['type' => XML_STRING, 'default' => ''],
+												'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_MATCHES_REGEX, 'in' => $this->FILTER_CONDITION_OPERATOR],
+												'formulaid' =>				['type' => XML_STRING | XML_REQUIRED]
 											]]
 										]]
 									]],
@@ -2825,48 +2405,24 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 											'operationobject' =>		['type' => XML_STRING, 'in' => $this->LLD_OVERRIDE_OPERATION_OBJECT, 'default' => CXmlConstantValue::LLD_OVERRIDE_OPERATION_OBJECT_ITEM_PROTOTYPE, 'export_always' => true],
 											'operator' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::CONDITION_OPERATOR_EQUAL, 'in' => $this->CONDITION_OPERATOR],
 											'value' =>					['type' => XML_STRING, 'default' => ''],
+											'status' =>					['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
 											'discover' =>				['type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_DISCOVER => CXmlConstantName::DISCOVER, CXmlConstantValue::LLD_OVERRIDE_OPERATION_NO_DISCOVER => CXmlConstantName::NO_DISCOVER]],
-											'status' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['status']], 'type' => XML_STRING, 'in' => [CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_ENABLED => CXmlConstantName::ENABLED, CXmlConstantValue::LLD_OVERRIDE_OPERATION_STATUS_DISABLED => CXmlConstantName::DISABLED]],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
+											'delay' =>					['type' => XML_STRING, 'default' => ''],
+											'history' =>				['type' => XML_STRING, 'default' => ''],
+											'trends' =>					['type' => XML_STRING, 'default' => ''],
+											'severity' =>				['type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
+											'tags' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
+												'tag' =>					['type' => XML_ARRAY, 'rules' => [
+													'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+													'value' =>					['type' => XML_STRING, 'default' => '']
+												]]
 											]],
-											'delay' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['delay']], 'type' => XML_STRING, 'default' => ''],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
+											'templates' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
+												'template' =>				['type' => XML_ARRAY, 'rules' => [
+													'name' =>					['type' => XML_STRING | XML_REQUIRED]
+												]]
 											]],
-											'history' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['history']], 'type' => XML_STRING, 'default' => ''],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'trends' =>					['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['trends']], 'type' => XML_STRING, 'default' => ''],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'severity' =>				['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['severity']], 'type' => XML_STRING, 'in' => $this->TRIGGER_PRIORITY],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'tags' =>					['type' => XML_MULTIPLE, 'rules' => [
-												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['tag']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'tag', 'rules' => [
-													'tag' =>				['type' => XML_ARRAY, 'rules' => [
-														'tag' =>				['type' => XML_STRING | XML_REQUIRED],
-														'value' =>				['type' => XML_STRING, 'default' => '']
-													]]
-												]],
-												['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'templates' =>				['type' => XML_MULTIPLE, 'rules' => [
-												['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['template']], 'type' => XML_INDEXED_ARRAY, 'prefix' => 'template', 'rules' => [
-													'template' =>			['type' => XML_ARRAY, 'rules' => [
-														'name' =>				['type' => XML_STRING | XML_REQUIRED]
-													]]
-												]],
-												['else' => true, 'type' => XML_IGNORE_TAG]
-											]],
-											'inventory_mode' =>			['type' => XML_MULTIPLE, 'rules' => [
-																			['if' => ['tag' => 'operationobject', 'in' => $this->OPERATION_OBJECT_TARGETS['inventory_mode']], 'type' => XML_STRING, 'in' => $this->INVENTORY_MODE],
-																			['else' => true, 'type' => XML_IGNORE_TAG]
-											]]
+											'inventory_mode' =>			['type' => XML_STRING, 'in' => $this->INVENTORY_MODE]
 										]]
 									]]
 								]]
@@ -3232,7 +2788,7 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'smtp_authentication' =>	['type' => XML_STRING, 'default' => CXmlConstantValue::SMTP_AUTHENTICATION_NONE, 'in' => $this->SMTP_AUTHENTICATION],
 					'username' =>				['type' => XML_STRING, 'default' => ''],
 					'password' =>				['type' => XML_STRING, 'default' => ''],
-					'message_format' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
+					'content_type' =>			['type' => XML_STRING, 'default' => CXmlConstantValue::MESSAGE_FORMAT_HTML, 'in' => [CXmlConstantValue::MESSAGE_FORMAT_TEXT => CXmlConstantName::MESSAGE_FORMAT_TEXT, CXmlConstantValue::MESSAGE_FORMAT_HTML => CXmlConstantName::MESSAGE_FORMAT_HTML]],
 					'script_name' =>			['type' => XML_STRING, 'default' => ''],
 					'parameters' =>				['type' => 0, 'ex_validate' => [$this, 'validateMediaTypeParameters'], 'ex_rules' => [$this, 'getMediaTypeParametersExtendedRules']],
 					'gsm_modem' =>				['type' => XML_STRING, 'default' => ''],
@@ -3307,6 +2863,21 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		$rules = $this->getMapElementsExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
+	}
+
+	/**
+	 * Chooses default value for preprocessing step error handler.
+	 *
+	 * @param array $parent_data  Data's parent array.
+	 *
+	 * @return int
+	 */
+	public function defaultPreprocErrHandler(array $parent_data): int {
+		if ($parent_data['type'] == CXmlConstantValue::CHECK_NOT_SUPPORTED) {
+			return CXmlConstantValue::DISCARD_VALUE;
+		}
+
+		return CXmlConstantValue::ORIGINAL_ERROR;
 	}
 
 	/**
@@ -3393,6 +2964,41 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 	}
 
 	/**
+	 * Validate master item.
+	 *
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
+	 *
+	 * @return array
+	 */
+	public function validateMasterItem($data, ?array $parent_data, $path) {
+		$prefix = substr(strrchr($path, '/'), 1);
+		$rules = ['type' => XML_ARRAY | XML_REQUIRED, 'prefix' => $prefix, 'rules' => ['key' => ['type' => XML_STRING]]];
+
+		if ($parent_data['type'] == ITEM_TYPE_DEPENDENT) {
+			$rules['rules']['key']['type'] |= XML_REQUIRED;
+		}
+
+		return $this->doValidate($rules, $data, $path);
+	}
+
+	/**
+	 * Validate authtype.
+	 *
+	 * @param string      $data         Import data.
+	 * @param array|null  $parent_data  Data's parent array.
+	 * @param string      $path         XML path.
+	 *
+	 * @return array
+	 */
+	public function validateAuthType($data, ?array $parent_data, $path) {
+		$rules = $this->getAuthTypeExtendedRules($parent_data);
+
+		return $this->doValidate($rules, $data, $path);
+	}
+
+	/**
 	 * Validate graph_items tag.
 	 *
 	 * @param array       $data         Import data.
@@ -3412,6 +3018,27 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 	}
 
 	/**
+	 * Validate preprocessing step error handler.
+	 *
+	 * @param string|array  $data         Import data.
+	 * @param array|null    $parent_data  Data's parent array.
+	 * @param string        $path         XML path.
+	 *
+	 * @return string|array
+	 */
+	public function validatePreprocErrHandler($data, ?array $parent_data, $path) {
+		$in = $this->ITEM_PREPROCESSING_ERROR_HANDLER;
+
+		if ($parent_data['type'] == CXmlConstantName::CHECK_NOT_SUPPORTED) {
+			unset($in[CXmlConstantValue::ORIGINAL_ERROR]);
+		}
+
+		$rules = ['type' => XML_STRING, 'in' => $in];
+
+		return $this->doValidate($rules, $data, $path);
+	}
+
+	/**
 	 * Validate widget field "value" tag.
 	 *
 	 * @param string|array  $data         Import data.
@@ -3424,6 +3051,23 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 		$rules = $this->getWidgetFieldValueExtendedRules($parent_data);
 
 		return $this->doValidate($rules, $data, $path);
+	}
+
+	/**
+	 * Get extended validation rules.
+	 *
+	 * @param array $data  Import data.
+	 *
+	 * @return array
+	 */
+	public function getAuthTypeExtendedRules(array $data) {
+		if (array_key_exists('type', $data)) {
+			if ($data['type'] == CXmlConstantValue::ITEM_TYPE_SSH || $data['type'] == CXmlConstantName::SSH) {
+				return ['type' => XML_STRING, 'default' => CXmlConstantValue::PASSWORD, 'in' => [CXmlConstantValue::PASSWORD => CXmlConstantName::PASSWORD, CXmlConstantValue::PUBLIC_KEY => CXmlConstantName::PUBLIC_KEY]];
+			}
+		}
+
+		return ['type' => XML_STRING, 'default' => CXmlConstantValue::NONE, 'in' => [CXmlConstantValue::NONE => CXmlConstantName::NONE, CXmlConstantValue::BASIC => CXmlConstantName::BASIC, CXmlConstantValue::NTLM => CXmlConstantName::NTLM, CXmlConstantValue::KERBEROS => CXmlConstantName::KERBEROS, CXmlConstantValue::DIGEST => CXmlConstantName::DIGEST]];
 	}
 
 	/**
@@ -3570,26 +3214,28 @@ class C70XmlValidator extends CXmlValidatorGeneral {
 					'host' => ['type' => XML_STRING | XML_REQUIRED],
 					'name' => ['type' => XML_STRING | XML_REQUIRED]
 				]];
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MAP:
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE:
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SLA:
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ACTION:
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MAP:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SLA:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ACTION:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE:
-				return ['type' => XML_ARRAY, 'rules' => [
-					'name' => ['type' => XML_STRING | XML_REQUIRED]
-				]];
-			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_USER:
-			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_USER:
-				return ['type' => XML_ARRAY, 'rules' => [
-					'username' => ['type' => XML_STRING | XML_REQUIRED]
-				]];
 			default:
 				return ['type' => XML_STRING | XML_REQUIRED];
 		}
+	}
+
+	/**
+	 * Import check for filter tag.
+	 * API validation throws an error when filter tag is an empty array.
+	 *
+	 * @param array $data  Import data.
+	 *
+	 * @return array
+	 */
+	public function itemFilterImport(array $data) {
+		if (!array_key_exists('filter', $data)) {
+			return [
+				'conditions' => '',
+				'evaltype' => CXmlConstantName::AND_OR,
+				'formula' => ''
+			];
+		}
+
+		return $data['filter'];
 	}
 }

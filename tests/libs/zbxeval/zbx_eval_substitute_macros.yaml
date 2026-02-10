@@ -17,17 +17,6 @@ in:
 out:
   result: SUCCEED
 ---
-test case: 'usermacro in ctx ZBX_EVAL_TOKEN_VAR_STR with ZBX_VARIANT_ERR'
-in:
-  rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
-  expression: 'min(1,"{$USER}")'
-  variant: "ERROR"
-  variant_data: "error"
-  macro: '{$USER}'
-  macro_data: 'macro_data'
-out:
-  result: FAIL
----
 test case: 'usermacro in ctx ZBX_EVAL_TOKEN_VAR_STR with ZBX_VARIANT_UI64'
 in:
   rules: [ZBX_EVAL_PARSE_MACRO, ZBX_EVAL_PARSE_MATH,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]

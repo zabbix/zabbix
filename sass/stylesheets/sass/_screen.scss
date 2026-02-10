@@ -884,17 +884,6 @@ form {
 	border-left: 1px solid $table-border-color;
 }
 
-.drag-drop-area {
-	@extend %found-bg;
-}
-
-.form-new-group {
-	border: 5px solid $lighter-green;
-	border-radius: 2px;
-	margin-left: -5px;
-	padding: 4px 0;
-}
-
 .list-check-radio {
 	li {
 		display: block;
@@ -1890,12 +1879,6 @@ select {
 					}
 				}
 			}
-
-			.columns-wrapper {
-				.column-50:last-of-type {
-					margin-left: 10px;
-				}
-			}
 		}
 
 		.overlay-dialogue-controls {
@@ -2410,12 +2393,6 @@ select {
 	}
 }
 
-.dashed-border {
-	td {
-		border: 1px dashed $table-border-color;
-	}
-}
-
 .top {
 	vertical-align: top !important;
 }
@@ -2631,14 +2608,6 @@ select {
 		margin-right: 0;
 	}
 
-	&.green-bg {
-		color: darken($alt-green, 45%);
-	}
-
-	&.yellow-bg {
-		color: darken($alt-yellow, 45%);
-	}
-
 	&.tag-inherited::before,
 	&.tag-inherited-duplicate::before {
 		@extend %icons-font;
@@ -2662,18 +2631,6 @@ select {
 .tag-inherited-title {
 	margin-bottom: 3px;
 	color: $font-alt-color;
-}
-
-.green-bg {
-	background-color: $alt-green;
-}
-
-.red-bg {
-	background-color: $alt-red;
-}
-
-.yellow-bg {
-	background-color: $alt-yellow;
 }
 
 @each $severity-type, $color in (
@@ -3072,10 +3029,6 @@ main {
 	}
 }
 
-.graph-wrapper {
-	display: inline;
-}
-
 // Analog Clock.
 .clock {
 	display: flex;
@@ -3086,16 +3039,6 @@ main {
 
 .clock-svg {
 	flex-grow: 1;
-}
-
-.time-zone {
-	margin: 0 0 .5em;
-	white-space: nowrap;
-}
-
-.local-clock {
-	margin: .5em 0 0;
-	white-space: nowrap;
 }
 
 .clock-face {

@@ -52,7 +52,8 @@ $user_form = (new CForm())
 	->setName('user_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
-	->addVar('userid', $data['userid']);
+	->addVar('userid', $data['userid'])
+	->addVar('change_password', $data['change_password'] ? 1 : 0);
 
 // Create form list and user tab.
 $user_form_list = new CFormList('user_form_list');
@@ -98,7 +99,7 @@ $user_form_list
 			->setAriaRequired()
 	);
 
-if ($data['change_password']) {
+if (!$data['readonly'] && $data['internal_auth'] && $data['db_user']['username'] !== ZBX_GUEST_USER) {
 	$user_form->disablePasswordAutofill();
 
 	$password_requirements = [];
@@ -143,54 +144,65 @@ if ($data['change_password']) {
 		])
 		: null;
 
-	$current_password = (new CPassBox('current_password'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autocomplete', 'off')
-		->setAttribute('autofocus', 'autofocus');
-
 	if (CWebUser::$data['userid'] == $data['userid']) {
+		$current_password = (new CPassBox('current_password'))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+			->setAttribute('data-notrim', '')
+			->setAttribute('autocomplete', 'off')
+			->setAttribute('autofocus', 'autofocus');
+
 		$user_form_list
-			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
+			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(),
+				$current_password, null, 'password-change-active'
+			);
 	}
 
+	$user_form_list->addRow(_('Password'),
+		[
+			(new CSimpleButton(_('Change password')))
+				->setId('change-password-button')
+				->addClass(ZBX_STYLE_BTN_GREY),
+			null
+		],
+		null,
+		'password-change-inactive'
+	);
+
 	$user_form_list
-		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
-			// Hidden dummy login field for protection against chrome error when password autocomplete.
-			(new CInput('text', null, null))
-				->setAttribute('tabindex', '-1')
-				->addStyle('position: absolute; left: -100vw;'),
-			(new CPassBox('password1', $data['password1']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-				->setAttribute('autocomplete', 'off')
-		])
+		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(),
+			[
+				// Hidden dummy login field for protection against chrome error when password autocomplete.
+				(new CInput('text', null, null))
+					->setAttribute('tabindex', '-1')
+					->addStyle('position: absolute; left: -100vw;'),
+				(new CPassBox('password1', $data['password1']))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAriaRequired()
+					->setAttribute('data-notrim', '')
+					->setAttribute('autocomplete', 'off')
+			],
+			null,
+			'password-change-active'
+		)
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
-				->setAttribute('autocomplete', 'off')
+				->setAttribute('data-notrim', '')
+				->setAttribute('autocomplete', 'off'),
+			null,
+			'password-change-active'
 		)
-		->addRow('', _('Password is not mandatory for non internal authentication type.'));
+		->addRow('', _('Password is not mandatory for non internal authentication type.'), null, 'password-change-active');
 }
 else {
-	$change_password_enabled = !$data['readonly'] && $data['internal_auth'];
-
-	if ($change_password_enabled) {
-		$change_password_enabled = $data['db_user']['username'] !== ZBX_GUEST_USER;
-	}
-
-	$hint = !$change_password_enabled
-		? $hint = makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
-		: null;
-
 	$user_form_list->addRow(_('Password'), [
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($change_password_enabled)
+			->setEnabled(false)
 			->setAttribute('autofocus', 'autofocus')
-			->onClick('submitFormWithParam("'.$user_form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY),
-		$hint
+		makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
 	]);
 }
 
@@ -208,12 +220,8 @@ $theme_select = (new CSelect('theme'))
 
 $language_error = null;
 if ($data['db_user']['username'] === ZBX_GUEST_USER) {
-	$lang_select
-		->setName(null)
-		->setReadonly();
-	$theme_select
-		->setName(null)
-		->setReadonly();
+	$lang_select->setReadonly();
+	$theme_select->setReadonly();
 	$timezone_select
 		->addOption(new CSelectOption(TIMEZONE_DEFAULT, $data['timezones'][TIMEZONE_DEFAULT]))
 		->setValue(TIMEZONE_DEFAULT)
@@ -275,9 +283,9 @@ if ($data['db_user']['username'] !== ZBX_GUEST_USER) {
 			->setChecked($data['autologin'])
 	);
 	$user_form_list->addRow(_('Auto-logout'), [
-		(new CCheckBox(null))
-			->setId('autologout_visible')
-			->setChecked($data['autologout'] !== '0'),
+		(new CCheckBox('autologout_visible'))
+			->setChecked($data['autologout'] !== '0')
+			->setUncheckedValue(0),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -608,14 +616,10 @@ $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 
 if ($data['userid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmitButton(_('Update'), 'action', 'user.update'))->setId('update'),
+		new CSubmit('update', _('Update')),
 		[
-			(new CRedirectButton(_('Delete'), (new CUrl('zabbix.php'))
-				->setArgument('action', 'user.delete')
-				->setArgument('userids', [$data['userid']])
-				->setArgument(CSRF_TOKEN_NAME, $csrf_token),
-				_('Delete selected user?')
-			))
+			(new CSimpleButton(_('Delete')))
+				->setId('delete')
 				->setEnabled(bccomp(CWebUser::$data['userid'], $data['userid']) != 0)
 				->setId('delete'),
 			$cancel_button
@@ -624,10 +628,8 @@ if ($data['userid'] != 0) {
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		(new CSubmitButton(_('Add'), 'action', 'user.create'))->setId('add'),
-		[
-			$cancel_button
-		]
+		new CSubmit('add', _('Add')),
+		[$cancel_button]
 	));
 }
 
@@ -639,7 +641,7 @@ $html_page
 	->show();
 
 (new CScriptTag('view.init('.json_encode([
-	'userid' => $data['userid'] ?: null
+	'rules' => $data['js_validation_rules']
 ]).');'))
 	->setOnDocumentReady()
 	->show();
