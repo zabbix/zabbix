@@ -1,0 +1,1 @@
+A.F.I..... [ZBXNEXT-10387] removed support of massupdate method for host, template, hostgroup and templategroup API objects; removed support for hostinterface.replacehostinterfaces method (arimdjonoks, jfreibergs, vmaksimovs)
