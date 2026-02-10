@@ -58,8 +58,6 @@
 #include "zbxhistory.h"
 #include "zbx_expression_constants.h"
 #include "zbxhash.h"
-#include <stdint.h>
-#include <sys/socket.h>
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
@@ -11778,7 +11776,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			}
 
 			if (1 < max_items && 0 == items_alloc)
-				items->any = zbx_malloc(NULL, item_size * max_items);
+				items->dc_items = zbx_malloc(NULL, item_size * max_items);
 		}
 
 		dc_item_prev = dc_item;
