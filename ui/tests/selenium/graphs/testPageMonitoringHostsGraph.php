@@ -856,12 +856,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
-		// Click on subfilter.
+		// Apply subfilter.
 		if (array_key_exists('subfilter', $data)) {
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
-					// TODO: need to figure out why the table needs to be initialized again.
-					$table = $this->getTable();
 					$xpath = 'xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 							CXPathHelper::escapeQuotes($value).']';
 					$this->query($xpath)->waitUntilClickable()->one()->click();
