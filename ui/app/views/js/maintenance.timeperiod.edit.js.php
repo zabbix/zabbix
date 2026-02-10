@@ -42,6 +42,16 @@ window.maintenance_timeperiod_edit = new class {
 
 		document.getElementById('maintenance-timeperiod-form').style.display = '';
 		this.form_element.querySelector('[name="timeperiod_type"]').focus();
+
+		this.form.findFieldByName('period_hours')._field.onchange = () => {
+			this.form.findFieldByName('period_minutes').setChanged();
+			this.form.validateChanges(['period_minutes']);
+		};
+
+		this.form.findFieldByName('period_days')._field.onchange = () => {
+			this.form.findFieldByName('period_minutes').setChanged();
+			this.form.validateChanges(['period_minutes']);
+		};
 	}
 
 	#update() {
