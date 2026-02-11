@@ -349,7 +349,8 @@ int	vfs_file_exists(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 int	vfs_file_contents(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-#define ZBX_MAX_VFS_FILE_SIZE	16 * ZBX_MEBIBYTE	/* file contents larger than 64 KB will be truncated in the database */
+/* file contents larger than 64 KB will be truncated in the database (for non-JSON value type) */
+#define ZBX_MAX_VFS_FILE_SIZE	16 * ZBX_MEBIBYTE
 	char		*filename, *tmp, encoding[32];
 	char		read_buf[MAX_BUFFER_LEN], *utf8, *contents = NULL;
 	size_t		contents_alloc = 0, contents_offset = 0;

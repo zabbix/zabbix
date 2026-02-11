@@ -25,7 +25,6 @@ abstract class CHostGeneral extends CHostBase {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
@@ -87,14 +86,14 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	public function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('groups', $host) && !$host['groups']
 					&& (!array_key_exists('nopermissions_groups', $db_hosts[$host[$id_field_name]])
 						|| !$db_hosts[$host[$id_field_name]]['nopermissions_groups'])) {
-				$error = $this instanceof CTemplate
+				$error = self::isTemplate()
 					? _s('Template "%1$s" cannot be without template group.', $db_hosts[$host[$id_field_name]]['host'])
 					: _s('Host "%1$s" cannot be without host group.', $db_hosts[$host[$id_field_name]]['host']);
 
@@ -1364,8 +1363,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	public function addAffectedGroups(array $hosts, array &$db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addAffectedGroups(array $hosts, array &$db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$hostids = [];
 
@@ -1383,7 +1382,7 @@ abstract class CHostGeneral extends CHostBase {
 		$editable_groups = null;
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if ($this instanceof CTemplate) {
+			if (self::isTemplate()) {
 				$permitted_groups = API::TemplateGroup()->get([
 					'output' => [],
 					'templateids' => $hostids,
@@ -1439,30 +1438,8 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	protected function addHostMacroIds(array &$hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		foreach ($hosts as &$host) {
-			$db_hostmacroids = [];
-
-			foreach ($db_hosts[$host[$id_field_name]]['macros'] as $db_macro) {
-				$db_hostmacroids[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro['hostmacroid'];
-			}
-
-			foreach ($host['macros'] as &$macro) {
-				$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
-
-				if (array_key_exists($trimmed_macro, $db_hostmacroids)) {
-					$macro['hostmacroid'] = $db_hostmacroids[$trimmed_macro];
-				}
-			}
-			unset($macro);
-		}
-		unset($host);
-	}
-
-	public function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		if (!array_key_exists('groups', reset($hosts))) {
 			return;

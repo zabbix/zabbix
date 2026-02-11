@@ -17,7 +17,7 @@
 /**
  * General XML validator
  */
-abstract class CXmlValidatorGeneral {
+abstract class CImportValidatorGeneral {
 
 	public const YAML = 'yaml';
 	public const XML = 'xml';
