@@ -1,6 +1,6 @@
 <?php declare(strict_types=0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,7 +22,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules()) && $this->validateInputExtended();
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
@@ -130,8 +130,11 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'query_fields' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
 					'value' => ['string', 'length' => 255],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
@@ -157,29 +160,27 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'posts' => [
+				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_XML]],
-					'use' => [CXmlValidator::class, []]
-				],
-				['db items.posts', 'required', 'not_empty',
-					'when' => ['post_type', 'in' => [ZBX_POSTTYPE_JSON]],
-					'use' => [CJsonValidator::class, ['macros_n' => CItemTypeHttpAgent::POSTS_JSON_MACROS_N, 'usermacros' => true, 'lldmacros' => true]]
-				],
-				['db items.posts', 'required', 'not_empty', 'when' => [
-					['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
-					['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
-				]]
+					'when' => [
+						['post_type', 'in' => [ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML]],
+						['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+					]
+				]
 			],
 			'headers' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
-					'value' => ['string', 'length' => 2000]
+					'value' => ['string', 'length' => 2000],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'status_codes' => ['db items.status_codes',
 				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => true, 'with_minus' => true]],
-				'messages' => ['use' => _('Invalid range expression.')],
+				'messages' => ['use' => _('Invalid HTTP status code or range.')],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'follow_redirects' => ['db items.follow_redirects', 'in' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
@@ -348,7 +349,7 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOSTNAME}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{IPADDRESS}', '{HOST.DNS}']]],
+				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']]],
 				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
 			],
 			'description' => ['db items.description'],
@@ -357,7 +358,10 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db item_tag.value'],
-					'tag' => ['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db item_tag.tag'],
+						['db item_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'discover' => ['db items.discover', 'in' => [ZBX_PROTOTYPE_DISCOVER, ZBX_PROTOTYPE_NO_DISCOVER]],

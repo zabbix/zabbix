@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,62 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
-/**
- * Get menu popup history section data.
- *
- * @param string options['itemid']           Item ID.
- * @param bool   options['hasLatestGraphs']  Link to history page with showgraph action (optional).
- *
- * @return array
- */
-function getMenuPopupHistory(options) {
-	var items = [],
-		url = new Curl('history.php');
-
-	if (!options.allowed_ui_latest_data) {
-		return [];
-	}
-
-	url.setArgument('itemids[]', options.itemid);
-
-	// latest graphs
-	if (options.hasLatestGraphs !== undefined && options.hasLatestGraphs) {
-		url.setArgument('action', 'showgraph');
-		url.setArgument('to', 'now');
-
-		url.setArgument('from', 'now-1h');
-		items.push({
-			label: t('Last hour graph'),
-			url: url.getUrl()
-		});
-
-		url.setArgument('from', 'now-7d');
-		items.push({
-			label: t('Last week graph'),
-			url: url.getUrl()
-		});
-
-		url.setArgument('from', 'now-1M');
-		items.push({
-			label: t('Last month graph'),
-			url: url.getUrl()
-		});
-	}
-
-	// latest values
-	url.setArgument('action', 'showvalues');
-	url.setArgument('from', 'now-1h');
-	items.push({
-		label: t('Latest values'),
-		url: url.getUrl()
-	});
-
-	return [{
-		label: t('History'),
-		items: items
-	}];
-}
 
 /**
  * Get menu popup host section data.

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -152,10 +152,6 @@
 					ZBX_EVAL_COMPOSE_LLD)
 
 #define ZBX_EVAL_EXPRESSION_MACRO_LLD	(ZBX_EVAL_PARSE_EXPRESSION_MACRO | \
-					ZBX_EVAL_PARSE_LLDMACRO | \
-					ZBX_EVAL_COMPOSE_LLD)
-
-#define ZBX_EVAL_QUERY_EXPRESSION_LLD	(ZBX_EVAL_PARSE_QUERY_EXPRESSION | \
 					ZBX_EVAL_PARSE_LLDMACRO | \
 					ZBX_EVAL_COMPOSE_LLD)
 

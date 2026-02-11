@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1198,17 +1198,5 @@ class CSvgGraphHelper {
 	 */
 	private static function processPattern(array $patterns): ?array {
 		return in_array('*', $patterns, true) ? null : $patterns;
-	}
-
-	/**
-	 * Sort data points by clock field.
-	 * Do not use this function directly. It serves as value_compare_func function for usort.
-	 */
-	private static function sortByClock(array $a, array $b): int {
-		if ($a['clock'] == $b['clock']) {
-			return 0;
-		}
-
-		return ($a['clock'] < $b['clock']) ? -1 : 1;
 	}
 }

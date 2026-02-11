@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,7 +25,6 @@ class CTemplateGroup extends CApiService {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'propagate' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
@@ -89,8 +88,9 @@ class CTemplateGroup extends CApiService {
 
 		$sqlParts = [
 			'select' => ['hstgrp' => 'g.groupid'],
-			'from' => ['hstgrp' => 'hstgrp g'],
+			'from' => 'hstgrp g',
 			'where' => ['g.type='.HOST_GROUP_TYPE_TEMPLATE_GROUP],
+			'group' => [],
 			'order' => []
 		];
 
@@ -121,31 +121,24 @@ class CTemplateGroup extends CApiService {
 
 		// templateids
 		if ($options['templateids'] !== null) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
 			$sqlParts['where'][] = dbConditionInt('hg.hostid', $options['templateids']);
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// triggerids
 		if ($options['triggerids'] !== null) {
-			$sqlParts['from']['hosts_groups'] = 'hosts_groups hg';
-			$sqlParts['from']['functions'] = 'functions f';
-			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
+			$sqlParts['join']['i'] = ['left_table' => 'hg', 'table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['f'] = ['left_table' => 'i', 'table' => 'functions', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('f.triggerid', $options['triggerids']);
-			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
 		}
 
 		// graphids
 		if ($options['graphids'] !== null) {
-			$sqlParts['from']['gi'] = 'graphs_items gi';
-			$sqlParts['from']['i'] = 'items i';
-			$sqlParts['from']['hg'] = 'hosts_groups hg';
+			$sqlParts['join']['hg'] = ['table' => 'hosts_groups', 'using' => 'groupid'];
+			$sqlParts['join']['i'] = ['left_table' => 'hg', 'table' => 'items', 'using' => 'hostid'];
+			$sqlParts['join']['gi'] = ['left_table' => 'i', 'table' => 'graphs_items', 'using' => 'itemid'];
 			$sqlParts['where'][] = dbConditionInt('gi.graphid', $options['graphids']);
-			$sqlParts['where']['hgg'] = 'hg.groupid=g.groupid';
-			$sqlParts['where']['igi'] = 'i.itemid=gi.itemid';
-			$sqlParts['where']['hgi'] = 'hg.hostid=i.hostid';
 		}
 
 		$sub_sql_common = [];
@@ -369,7 +362,7 @@ class CTemplateGroup extends CApiService {
 	public function delete(array $groupids): array {
 		$this->validateDelete($groupids, $db_groups);
 
-		$this->unlinkTemplates($db_groups);
+		API::Template()->unlinkGroups($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -460,19 +453,6 @@ class CTemplateGroup extends CApiService {
 		if (count($db_groups) != count($groupids)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-	}
-
-	private function unlinkTemplates(array $db_groups): void {
-		$data = [
-			'groups' => [],
-			'templates' => []
-		];
-
-		foreach ($db_groups as $db_group) {
-			$data['groups'][] = ['groupid' => $db_group['groupid']];
-		}
-
-		$this->massUpdate($data);
 	}
 
 	/**
@@ -712,115 +692,6 @@ class CTemplateGroup extends CApiService {
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-	}
-
-	/**
-	 * Replace templates on the given template groups.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function massUpdate(array $data): array {
-		$this->validateMassUpdate($data, $templates, $db_templates);
-
-		API::Template()->updateForce($templates, $db_templates);
-
-		return ['groupids' => array_column($data['groups'], 'groupid')];
-	}
-
-	private function validateMassUpdate(array &$data, ?array &$templates, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'groups' =>		['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'templates' =>	['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid'=>	['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_groups = $this->get([
-			'output' => [],
-			'groupids' => array_column($data['groups'], 'groupid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($data['groups'] as $i => $group) {
-			if (!array_key_exists($group['groupid'], $db_groups)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/groups/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
-		}
-
-		$db_templates = API::Template()->get([
-			'output' => ['templateid', 'host'],
-			'groupids' => array_column($data['groups'], 'groupid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		if ($data['templates']) {
-			$db_templates += API::Template()->get([
-				'output' => ['templateid', 'host'],
-				'templateids' => array_column($data['templates'], 'templateid'),
-				'editable' => true,
-				'preservekeys' => true
-			]);
-		}
-
-		foreach ($data['templates'] as $i => $template) {
-			if (!array_key_exists($template['templateid'], $db_templates)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/templates/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
-		}
-
-		$templates = [];
-		$del_templates = [];
-
-		if (!$db_templates) {
-			return;
-		}
-
-		$templateids = array_column($data['templates'], 'templateid');
-
-		foreach ($db_templates as $db_template) {
-			if (in_array($db_template['templateid'], $templateids)) {
-				$templates[$db_template['templateid']] = [
-					'templateid' => $db_template['templateid'],
-					'groups' => $data['groups']
-				];
-			}
-			else {
-				$del_templates[$db_template['templateid']] = [
-					'templateid' => $db_template['templateid'],
-					'groups' => []
-				];
-			}
-		}
-
-		API::Template()->addAffectedGroups($templates + $del_templates, $db_templates);
-
-		if ($templates) {
-			API::Template()->addUnchangedGroups($templates, $db_templates);
-		}
-
-		if ($del_templates) {
-			API::Template()->addUnchangedGroups($del_templates, $db_templates,
-				['groupids' => array_column($data['groups'], 'groupid')]
-			);
-		}
-
-		$templates += $del_templates;
-
-		API::Template()->checkHostsWithoutGroups($templates, $db_templates);
 	}
 
 	/**

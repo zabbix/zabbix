@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,29 +42,13 @@ window.tag_filter_edit = new class {
 			this.group_tag_filters = result;
 		}
 
-		const indices = Object.keys(this.group_tag_filters);
-		const first_index = indices[0];
-
-		if (this.group_tag_filters.length !== 0 && this.group_tag_filters[first_index]['tag'] !== '') {
-			const tag_list_option = document.querySelector(
-				`input[name="new_tag_filter_type"][value='<?=TAG_FILTER_LIST ?>']`
-			);
-
-			tag_list_option.checked = true;
-
-			for (const tag of this.group_tag_filters) {
-				this.#addTagFilterRow(tag);
-			}
+		for (const tag of this.group_tag_filters) {
+			this.#addTagFilterRow(tag);
 		}
-		else {
+
+		if (this.group_tag_filters.length == 0) {
 			this.#addTagFilterRow();
 		}
-
-		this.#toggleTagList();
-
-		document.querySelectorAll('[name=new_tag_filter_type]').forEach((type) =>
-			type.addEventListener('change', () => this.#toggleTagList())
-		);
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 
@@ -105,19 +89,6 @@ window.tag_filter_edit = new class {
 		const placeholder_row = document.querySelector('.js-tag-filter-row-placeholder');
 
 		placeholder_row.insertAdjacentHTML('beforebegin', new_row);
-	}
-
-	/**
-	 * Toggles the visibility of the tag list form fields based on the selected filter type.
-	 */
-	#toggleTagList() {
-		const tag_list_radio = this.form_element.querySelector('[name="new_tag_filter_type"]:checked').value;
-		const tags = document.getElementById('tag-list-form-field');
-		const tags_label = this.form_element.querySelector("label[for='new_tag_filters']");
-		const show_tags = tag_list_radio == '<?= TAG_FILTER_LIST ?>';
-
-		tags.style.display = show_tags ? '' : 'none';
-		tags_label.style.display = show_tags ? '' : 'none';
 	}
 
 	submit() {

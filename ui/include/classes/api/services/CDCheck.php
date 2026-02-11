@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -32,7 +32,7 @@ class CDCheck extends CApiService {
 
 		$sqlParts = [
 			'select'	=> ['dchecks' => 'dc.dcheckid'],
-			'from'		=> ['dchecks' => 'dchecks dc'],
+			'from'		=> 'dchecks dc',
 			'where'		=> [],
 			'group'		=> [],
 			'order'		=> [],
@@ -90,12 +90,9 @@ class CDCheck extends CApiService {
 		if (!is_null($options['dserviceids'])) {
 			zbx_value2array($options['dserviceids']);
 
-			$sqlParts['from']['dhosts'] = 'dhosts dh';
-			$sqlParts['from']['dservices'] = 'dservices ds';
-
+			$sqlParts['join']['dh'] = ['table' => 'dhosts', 'using' => 'druleid'];
+			$sqlParts['join']['ds'] = ['left_table' => 'dh', 'table' => 'dservices', 'using' => 'dhostid'];
 			$sqlParts['where']['ds'] = dbConditionInt('ds.dserviceid', $options['dserviceids']);
-			$sqlParts['where']['dcdh'] = 'dc.druleid=dh.druleid';
-			$sqlParts['where']['dhds'] = 'dh.dhostid=ds.dhostid';
 
 			if ($options['groupCount']) {
 				$sqlParts['group']['dserviceid'] = 'ds.dserviceid';

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,23 +25,6 @@ function check_target(e, type) {
 
 	for (var i = 0; i < targets.length; ++i) {
 		targets[i].checked = targets[i] == e;
-	}
-}
-
-/**
- * Remove part of expression.
- *
- * @param string id		Expression temporary ID.
- * @param number type	Expression (type = 0) or recovery expression (type = 1).
- */
-function delete_expression(id, type) {
-	// If type is expression.
-	if (type == 0) {
-		jQuery('#remove_expression').val(id);
-	}
-	// Type is recovery expression.
-	else {
-		jQuery('#remove_recovery_expression').val(id);
 	}
 }
 
@@ -989,22 +972,6 @@ function convertRGBToHSL(r, g, b) {
 	const h = c && ((v === r) ? (g - b) / c : ((v === g) ? 2 + (b - r) / c : 4 + (r - g) / c));
 
 	return [60 * (h < 0 ? h + 6 : h), f ? c / f : 0, (v * 2 - c) / 2];
-}
-
-/**
- * Convert HSL encoded color into RGB encoded color.
- *
- * @param {number} h  Hue component in range of 0-360.
- * @param {number} s  Saturation component in range of 0-1.
- * @param {number} l  Lightness component in range of 0-1.
- *
- * @returns [{number}, {number}, {number}]  Red, green and blue components in range 0-1.
- */
-function convertHSLToRGB(h, s, l) {
-	const a = s * Math.min(l, 1 - l);
-	const f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-
-	return [f(0), f(8), f(4)];
 }
 
 /**
