@@ -555,7 +555,6 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
  *                                                                            *
  * Parameter: tm      - [IN/OUT] the time structure                           *
  *            seconds - [IN] the seconds to add (can be negative)             *
- *            tz      - [IN] time zone                                        *
  *                                                                            *
  ******************************************************************************/
 static void	tm_add_seconds(struct tm *tm, int seconds)
