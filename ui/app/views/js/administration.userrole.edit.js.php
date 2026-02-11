@@ -287,13 +287,13 @@
 				redirect(zabbixUrl(fields), 'post', 'action', undefined, true);
 			}
 			else {
-				document.querySelectorAll('#roleid, #delete, #clone').forEach((element) => {
-					element.remove();
-				});
+				document.getElementById('roleid').remove();
 
-				const update_button = document.getElementById('update');
+				this.form_element.querySelectorAll('.form-actions .js-delete, .form-actions .js-clone')
+					.forEach((element) => element.remove());
+
+				const update_button = this.form_element.querySelector('.form-actions .js-submit');
 				update_button.textContent = <?= json_encode(_('Add')) ?>;
-				update_button.addClass('js-submit');
 
 				document.getElementById('name').focus();
 				clearMessages();
