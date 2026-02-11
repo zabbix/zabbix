@@ -408,7 +408,7 @@ class testFormServicesSla extends CWebTest {
 						'Friday' => false
 					],
 					'inline_errors' => [
-						'id:schedule-table' => 'Must have at least one selected.'
+						'id:schedule-table' => 'At least one entry should be selected.'
 					]
 				]
 			],
@@ -1104,6 +1104,7 @@ class testFormServicesSla extends CWebTest {
 
 		if (array_key_exists('inline_errors', $data)) {
 			$this->page->removeFocus();
+			$form->getField(array_keys($data['inline_errors'])[0])->waitUntilClassesPresent('has-error');
 			$this->assertInlineError($form, $data['inline_errors']);
 		}
 
