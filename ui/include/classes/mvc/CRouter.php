@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -385,13 +385,13 @@ class CRouter {
 		'trigger.prototype.massupdate'				=> [CControllerTriggerMassupdate::class,							'layout.json',			'trigger.massupdate'],
 		'trigger.prototype.update'					=> [CControllerTriggerPrototypeUpdate::class,						'layout.json',			null],
 		'trigger.update'							=> [CControllerTriggerUpdate::class,								'layout.json',			null],
-		'user.create'								=> [CControllerUserCreate::class,									null,					null],
+		'user.create'								=> [CControllerUserCreate::class,									'layout.json',			null],
 		'user.delete'								=> [CControllerUserDelete::class,									null,					null],
 		'user.edit'									=> [CControllerUserEdit::class,										'layout.htmlpage',		'administration.user.edit'],
 		'user.list'									=> [CControllerUserList::class,										'layout.htmlpage',		'administration.user.list'],
 		'user.token.list'							=> [CControllerUserTokenList::class,								'layout.htmlpage',		'administration.user.token.list'],
 		'user.unblock'								=> [CControllerUserUnblock::class,									null,					null],
-		'user.update'								=> [CControllerUserUpdate::class,									null,					null],
+		'user.update'								=> [CControllerUserUpdate::class,									'layout.json',			null],
 		'user.provision'							=> [CControllerUserProvision::class,								null,					null],
 		'user.reset.totp'							=> [CControllerUserResetTotp::class,								null,					null],
 		'usergroup.create'							=> [CControllerUsergroupCreate::class,								null,					null],
@@ -404,9 +404,9 @@ class CRouter {
 		'usergroup.tagfilter.list'					=> [CControllerUsergroupTagFilterList::class,						'layout.json',			'usergroup.tagfilter.list'],
 		'usergroup.update'							=> [CControllerUsergroupUpdate::class,								null,					null],
 		'userprofile.edit'							=> [CControllerUserProfileEdit::class,								'layout.htmlpage',		'userprofile.edit'],
-		'userprofile.update'						=> [CControllerUserProfileUpdate::class,							null,					null],
+		'userprofile.update'						=> [CControllerUserProfileUpdate::class, 							'layout.json',			null],
 		'userprofile.notification.edit'				=> [CControllerUserProfileNotificationEdit::class,					'layout.htmlpage',		'userprofile.notification.edit'],
-		'userprofile.notification.update'			=> [CControllerUserProfileNotificationUpdate::class,				null,					null],
+		'userprofile.notification.update'			=> [CControllerUserProfileNotificationUpdate::class, 				'layout.json',			null],
 		'userrole.create'							=> [CControllerUserroleCreate::class,								null,					null],
 		'userrole.delete'							=> [CControllerUserroleDelete::class,								null,					null],
 		'userrole.edit'								=> [CControllerUserroleEdit::class,									'layout.htmlpage',		'administration.userrole.edit'],

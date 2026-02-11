@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1732,13 +1732,13 @@ class testFormHost extends CWebTest {
 		];
 
 		$form = $this->openForm($this->link, self::HOST_UPDATE_VISIBLE_NAME);
-		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
+		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 		$this->page->removeFocus();
 
 		if (!array_key_exists('inline_errors', $data) || CTestArrayHelper::get($data, 'submit_form')) {

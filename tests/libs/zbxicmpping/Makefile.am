@@ -20,6 +20,7 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
@@ -30,7 +31,7 @@ ICMPPING_LIBS = \
 	$(top_srcdir)/src/libs/zbxmutexs/libzbxmutexs.a \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
-	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS) $(ZLIB_LIBS)
+	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS) $(ZLIB_LIBS) $(ARES_LIBS)
 
 line_process_SOURCES = \
 	line_process.c \
@@ -42,7 +43,7 @@ line_process_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_fgets
 
 line_process_LDADD = $(ICMPPING_LIBS)
-line_process_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) $(ZLIB_LDFLAGS)
+line_process_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) $(ZLIB_LDFLAGS) $(ARES_LDFLAGS)
 
 line_process_CFLAGS = \
 	-I@top_srcdir@/tests \
@@ -64,13 +65,14 @@ get_interval_option_WRAP_FUNCS = \
 	-Wl,--wrap=write
 
 get_interval_option_LDADD = $(ICMPPING_LIBS)
-get_interval_option_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+get_interval_option_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS) $(ARES_LDFLAGS)
 
 get_interval_option_CFLAGS = \
 	-I@top_srcdir@/tests \
 	$(get_interval_option_WRAP_FUNCS) \
 	$(CMOCKA_CFLAGS) \
 	$(YAML_CFLAGS) \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(ARES_CFLAGS)
 
 endif

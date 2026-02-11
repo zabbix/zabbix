@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -160,7 +160,8 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, zb
 
 			if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM,
 					agent_context->config_source_ip, addresses->values[0].ip,
-					agent_context->item.interface.port, agent_context->config_timeout))
+					agent_context->item.interface.port, agent_context->config_timeout,
+					ZBX_DNS_FAILOVER_DISABLED, &event_new))
 			{
 				if (1 < addresses->values_num)
 				{

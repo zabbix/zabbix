@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -887,7 +887,7 @@ int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *par
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(value->data.str, &jp))
+	if (FAIL == zbx_json_open(value_str.data.str, &jp))
 		goto out;
 
 	if (FAIL == (ret = zbx_jsonpath_query(&jp, params, error)))

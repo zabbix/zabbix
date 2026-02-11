@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -454,7 +454,12 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM token',
 					'link' => 'zabbix.php?action=token.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'API token create',
+						'xpath://div[@id="userid"]/..' => 'Admin',
+						'id:expires_at' => '2038-01-01 00:00:00'
+					]
 				]
 			],
 			// #39 API token update.
@@ -523,8 +528,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'link' => 'zabbix.php?action=user.edit&userid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=user.edit&userid=1'
 				]
 			],
 			// #47 User create.
@@ -532,7 +536,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM users',
 					'link' => 'zabbix.php?action=user.edit',
-					'return_button' => true
+					'form' => [
+						'selector' => 'id:user-form',
+						'tab' => 'Permissions',
+						'fields' => [
+							'Role' => 'Admin role'
+						]
+					],
+					'fields' => [
+						'id:username' => 'CSRF user test',
+						'id:password1' => 'ZaBB1x26',
+						'id:password2' => 'ZaBB1x26'
+					]
 				]
 			],
 			// #48 Media update.
@@ -548,7 +563,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM media',
 					'link' => 'zabbix.php?action=mediatype.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation media type create'
+					]
 				]
 			],
 			// #50 Script update.
@@ -571,8 +589,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
-					'link' => 'zabbix.php?action=userprofile.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=userprofile.edit'
 				]
 			],
 			// #53 User role update.
@@ -596,7 +613,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM token',
 					'link' => 'zabbix.php?action=user.token.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'User API token create',
+						'id:expires_at' => '2038-01-01 00:00:00'
+					]
 				]
 			],
 			// #56 User API token update.
@@ -628,7 +649,11 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM connector',
 					'link' => 'zabbix.php?action=connector.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF connector test name',
+						'id:url' => 'csrfurl.com'
+					]
 				]
 			],
 			// #60 Connector update.
@@ -763,6 +788,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			}
 		}
 
+		// Fill in mandatory fields that are not editable from initial form view.
+		if (CTestArrayHelper::get($data, 'form')) {
+			$form = $this->query($data['form']['selector'])->asForm()->one();
+			$form->selectTab($data['form']['tab']);
+			$form->fill(CTestArrayHelper::get($data, 'form.fields'));
+		}
+
 		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
 		if (array_key_exists('secondary_dialog', $data)) {
 			$this->query($data['secondary_dialog']['field'])->one()->query('button:Add')->one()->click();
@@ -778,7 +810,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Submit Update or Create form.
 		$update_button = 'xpath://div[contains(@class, "tfoot-buttons")]//button[text()="Update"] |'.
-				'//div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
+				' //div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
 				' //div[contains(@class, "form-actions")]//button[text()="Update"]';
 		$add_button = 'xpath://button[text()="Add" and @type="submit"] | '.
 				' //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
