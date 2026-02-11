@@ -481,12 +481,11 @@ static int	DBpatch_7050034(void)
 	/* 0 - ZBX_HK_OBJECT_ITEM */
 	/* 1 - ZBX_HK_OBJECT_TRIGGER */
 	/* 2 - ZBX_HK_OBJECT_SERVICE */
-	/* TODO: add 'history_json' to tablename in (...) */
 	if (ZBX_DB_OK > zbx_db_execute("insert into housekeeper(object,objectid)"
 			"select distinct"
 			" case"
 				" when tablename in ('history','history_str','history_log','history_uint',"
-					"'history_text','history_bin','trends','trends_uint') then 0"
+					"'history_text','history_bin','history_json','trends','trends_uint') then 0"
 				" when tablename = 'events' and field = 'triggerid' then 1"
 				" when tablename = 'events' and field = 'itemid' then 0"
 				" when tablename = 'events' and field = 'lldruleid' then 0"

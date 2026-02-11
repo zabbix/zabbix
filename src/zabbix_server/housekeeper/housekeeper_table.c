@@ -84,7 +84,7 @@ static hk_cleanup_table_t	hk_item_cleanup_order[] = {
 	{"history_uint",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
 	{"history_text",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
 	{"history_bin",		"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
-	/* TODO: history_json */
+	{"history_json",	"itemid=" ZBX_FS_UI64,	&hk_cfg_history_mode,	HK_STATS_HISTORY_TRENDS},
 	{"trends",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode,	HK_STATS_HISTORY_TRENDS},
 	{"trends_uint",		"itemid=" ZBX_FS_UI64,	&hk_cfg_trends_mode,	HK_STATS_HISTORY_TRENDS},
 	{"problem",		ITEM_PROBLEM_FILTER, 	NULL,			HK_STATS_PROBLEM},
