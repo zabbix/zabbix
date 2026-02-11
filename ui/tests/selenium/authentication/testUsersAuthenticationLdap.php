@@ -1811,7 +1811,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'mapping',
 						'errors' => [
-							'id:period' => 'Invalid string.'
+							'id:period' => 'Invalid period.'
 						]
 					]
 				]
@@ -1840,7 +1840,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'mapping',
 						'errors' => [
-							'id:period' => 'Invalid string.'
+							'id:period' => 'Invalid period.'
 						]
 					]
 				]
@@ -1869,7 +1869,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'mapping',
 						'errors' => [
-							'id:period' => 'Invalid string.'
+							'id:period' => 'Invalid period.'
 						]
 					]
 				]
@@ -1898,7 +1898,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'mapping',
 						'errors' => [
-							'id:period' => 'Invalid string.'
+							'id:period' => 'Invalid period.'
 						]
 					]
 				]
@@ -1927,7 +1927,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'mapping',
 						'errors' => [
-							'id:period' => 'Invalid string.'
+							'id:period' => 'Invalid period.'
 						]
 					]
 				]
@@ -1956,7 +1956,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'inline_errors' => [
 						'form' => 'mapping',
 						'errors' => [
-							'id:period' => 'Invalid string.'
+							'id:period' => 'Invalid period.'
 						]
 					]
 				]
