@@ -373,9 +373,6 @@ static zbx_am_db_mediatype_t	*am_db_update_mediatype(zbx_am_db_t *amdb, time_t n
 
 	ZBX_UPDATE_VALUE(mediatype->process_tags, process_tags, ret);
 
-	ZBX_UPDATE_STR(mediatype->adapter.adapter_address, adapter_address, ret);
-	ZBX_UPDATE_STR(mediatype->adapter.adapter_psk, adapter_psk, ret);
-
 	return SUCCEED == ret ? mediatype : NULL;
 }
 

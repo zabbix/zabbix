@@ -374,6 +374,11 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_free(script_bin);
 }
 
+static void allerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+{
+
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically check table alerts and send notifications if needed  *

@@ -70,7 +70,6 @@ typedef struct
 	unsigned char		message_format;
 	unsigned char		flags;
 
-	zbx_am_adapter_t	adapter;
 }
 zbx_am_mediatype_t;
 
@@ -120,7 +119,6 @@ typedef struct
 	unsigned char		process_tags;
 	time_t			last_access;
 
-	zbx_am_db_adapter_t	adapter;
 }
 zbx_am_db_mediatype_t;
 
@@ -164,20 +162,6 @@ typedef struct
 	char		*error;
 }
 zbx_am_result_t;
-
-typedef struct
-{
-	char		*adapter_address;
-	char		*adapter_psk;
-}
-zbx_am_db_adapter_t;
-
-typedef struct
-{
-	char		*adapter_address;
-	char		*adapter_psk;
-}
-zbx_am_adapter_t;
 
 ZBX_PTR_VECTOR_DECL(am_result_ptr, zbx_am_result_t *)
 
@@ -274,5 +258,9 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx
 		const zbx_vector_str_t *recipients);
 void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t
 		*recipients);
+
+zbx_uint32_t	zbx_alerter_serialize_push(unsigned char **data, zbx_uint64_t alertid, const char *params);
+
+void	zbx_alerter_deserialize_push(const unsigned char *data, zbx_uint64_t *alertid, char **params);
 
 #endif
