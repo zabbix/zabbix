@@ -201,6 +201,8 @@ window.correlation_edit_popup = new class {
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+
+		this.form.discoverAllFields();
 	}
 
 	delete() {
