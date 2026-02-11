@@ -3813,9 +3813,6 @@ out:
 
 	zbx_free_agent_request(&request);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
-			snmp_context->item.itemid);
-
 	return ret;
 }
 
@@ -3825,6 +3822,7 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 		struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
+	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
@@ -3893,8 +3891,13 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 	snmp_context->probe_processed = 0;
 
-	return async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
+	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
 		dnsbase, resolve_reverse_dns, item->snmp_oid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+		snmp_context->item.itemid);
+
+	return ret;
 }
 
 int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
@@ -3903,6 +3906,7 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		struct evdns_base *dnsbase, const char *config_source_ip,
 		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
+	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
@@ -3969,8 +3973,13 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 	snmp_context->probe_processed = 0;
 
-	return async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
+	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
 		dnsbase, resolve_reverse_dns, item->snmp_oid);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+		snmp_context->item.itemid);
+
+	return ret;
 }
 
 static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items, AGENT_RESULT *results,
