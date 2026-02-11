@@ -77,6 +77,11 @@ int	zbx_prometheus_filter_parse(const char *data, zbx_prometheus_condition_test_
 	return SUCCEED;
 }
 
+static void	zbx_prometheus_label_free_wrap(zbx_prometheus_label_t *label)
+{
+	zbx_ptr_free(label);
+}
+
 int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pair_t *labels, char **value,
 		zbx_strloc_t *loc, char **error)
 {
@@ -110,7 +115,7 @@ int	zbx_prometheus_row_parse(const char *data, char **metric, zbx_vector_ptr_pai
 	}
 
 	/* free only label structure not internals - they're used */
-	zbx_vector_prometheus_label_clear_ext(&prow->labels, (zbx_prometheus_label_free_func_t)zbx_ptr_free);
+	zbx_vector_prometheus_label_clear_ext(&prow->labels, zbx_prometheus_label_free_wrap);
 	prometheus_row_free(prow);
 
 	return SUCCEED;

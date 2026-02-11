@@ -37,6 +37,8 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
+int	zbx_is_user_macro(const char *str);
+
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
 char	*zbx_function_param_unquote_dyn_ext(const char *param, size_t len, int *quoted, int esc_bs);
