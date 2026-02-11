@@ -112,8 +112,8 @@ class CControllerItemUpdate extends CControllerItem {
 				]
 			],
 			'value_type' => ['db items.value_type', 'required',
-				'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR,
-					ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+				'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+					ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
 				]
 			],
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
@@ -222,10 +222,9 @@ class CControllerItemUpdate extends CControllerItem {
 				]
 			],
 			'snmp_oid' => ['db items.snmp_oid', 'not_empty', 'required', 'when' => ['type', 'in' => [ITEM_TYPE_SNMP]]],
-			'ipmi_sensor' => ['db items.ipmi_sensor', 'not_empty', 'required', 'when' => [
-				['key', 'not_in' => ['ipmi.get']],
-				['type', 'in' => [ITEM_TYPE_IPMI]]
-			]],
+			'ipmi_sensor' => ['db items.ipmi_sensor', 'not_empty', 'required',
+				'when' => [['key', 'not_in' => ['ipmi.get']], ['type', 'in' => [ITEM_TYPE_IPMI]]]
+			],
 			'authtype' => ['db items.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY],
 				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT]]
 			],
@@ -297,7 +296,9 @@ class CControllerItemUpdate extends CControllerItem {
 					'when' => ['delay_flex', 'empty']
 				],
 				['db items.delay', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class,
+						['max' => SEC_PER_DAY, 'usermacros' => true]
+					],
 					'when' => ['type',
 						'in' => [ITEM_TYPE_CALCULATED, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_EXTERNAL, ITEM_TYPE_HTTPAGENT,
 							ITEM_TYPE_INTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SCRIPT, ITEM_TYPE_SIMPLE,
@@ -306,7 +307,9 @@ class CControllerItemUpdate extends CControllerItem {
 					]
 				],
 				['db items.delay', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class,
+						['max' => SEC_PER_DAY, 'usermacros' => true]
+					],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_ZABBIX_ACTIVE]],
 						['key', 'regex' => '/^(?!mqtt\\.get)/']

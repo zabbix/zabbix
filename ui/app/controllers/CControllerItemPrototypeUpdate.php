@@ -202,12 +202,10 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			],
 			'http_username' => ['db items.username', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'http_password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'verify_peer' => ['db items.verify_peer',
-				'in' => [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON],
+			'verify_peer' => ['db items.verify_peer', 'in' => [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
-			'verify_host' => ['db items.verify_host',
-				'in' => [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON],
+			'verify_host' => ['db items.verify_host', 'in' => [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'ssl_cert_file' => ['db items.ssl_cert_file', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
@@ -273,8 +271,8 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 				'use' => [CCalcFormulaValidator::class, ['lldmacros' => true]],
 				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
 			],
-			'units' => ['db items.units', 'when' => ['value_type',
-				'in' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
+			'units' => ['db items.units',
+				'when' => ['value_type', 'in' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
 			],
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
