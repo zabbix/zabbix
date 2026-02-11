@@ -112,7 +112,8 @@ class CControllerItemCreate extends CControllerItem {
 				]
 			],
 			'value_type' => ['db items.value_type', 'required', 'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT,
-				ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY
+				ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY,
+				ITEM_VALUE_TYPE_JSON
 			]],
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'query_fields' => ['objects',

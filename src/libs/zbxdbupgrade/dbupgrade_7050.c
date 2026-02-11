@@ -434,6 +434,23 @@ static int	DBpatch_7050030(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_7050031(void)
+{
+	const zbx_db_table_t	table =
+			{"history_json", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 0, ZBX_TYPE_JSON, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
 #endif
 
 DBPATCH_START(7050)
@@ -471,5 +488,6 @@ DBPATCH_ADD(7050027, 0, 1)
 DBPATCH_ADD(7050028, 0, 1)
 DBPATCH_ADD(7050029, 0, 1)
 DBPATCH_ADD(7050030, 0, 1)
+DBPATCH_ADD(7050031, 0, 1)
 
 DBPATCH_END()

@@ -63,4 +63,34 @@ in:
 out:
   return: Value of type "string" is not suitable for value type "Numeric (float)". Value ""
   ret: FAIL
+---
+test case: 7. valid JSON string to JSON
+in:
+  value:
+    type: ZBX_VARIANT_STR
+    value: "{\"name\":\"John\"}"
+  value_type: ITEM_VALUE_TYPE_JSON
+out:
+  return: "{\"name\":\"John\"}"
+  ret: SUCCEED
+---
+test case: 8. JSON empty string converted fine to JSON, there is no JSON validation in variant convert
+in:
+  value:
+    type: ZBX_VARIANT_STR
+    value: ""
+  value_type: ITEM_VALUE_TYPE_JSON
+out:
+  return: ""
+  ret: SUCCEED
+---
+test case: 9. invalid JSON string converted fine to JSON, as there is no JSON validation in variant convert
+in:
+  value:
+    type: ZBX_VARIANT_STR
+    value: "{{{{"
+  value_type: ITEM_VALUE_TYPE_JSON
+out:
+  return: "{{{{"
+  ret: SUCCEED
 ...
