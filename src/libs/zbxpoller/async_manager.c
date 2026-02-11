@@ -228,8 +228,6 @@ void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			zbx_clean_httpagent_items(poller_item->items.httpagent_items, poller_item->num,
 				poller_item->results);
-			zbx_dc_config_clean_httpagent_items(poller_item->items.httpagent_items, NULL,
-				(size_t)poller_item->num);
 			break;
 	}
 	zbx_free(poller_item->results);

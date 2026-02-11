@@ -9912,20 +9912,6 @@ void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 	}
 }
 
-void	zbx_dc_config_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, size_t num)
-{
-	size_t	i;
-
-	for (i = 0; i < num; i++)
-	{
-		if (NULL != errcodes && SUCCEED != errcodes[i])
-			continue;
-
-		zbx_free(items[i].headers);
-		zbx_free(items[i].posts);
-	}
-}
-
 void	DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function)
 {
 	dst_function->functionid = src_function->functionid;
