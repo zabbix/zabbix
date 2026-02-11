@@ -1440,9 +1440,7 @@ class CSvgGraph extends CSvg {
 							(int) $bar_y1,
 							(int) $bar_y2,
 							convertUnits([
-								'value' => $invert_values == SVG_GRAPH_INVERT_VALUES_ON
-									? -$point_value
-									: $point_value,
+								'value' => $invert_values == SVG_GRAPH_INVERT_VALUES_ON ? -$point_value	: $point_value,
 								'units' => $this->metrics[$metric_index]['units']
 							]),
 							(int) ($this->canvas_x + $group_x1)
