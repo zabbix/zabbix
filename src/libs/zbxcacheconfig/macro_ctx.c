@@ -164,7 +164,7 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		char *error, size_t maxerrlen)
 {
 	/* Passed arguments */
-	zbx_macro_field_params_resolv_args_t arg_struct = va_arg(args, zbx_macro_field_params_resolv_args_t);
+	zbx_macro_resolv_item_t item = va_arg(args, zbx_macro_resolv_item_t);
 
 	int	ret = SUCCEED;
 
@@ -176,26 +176,26 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 	{
 		if ((ZBX_TOKEN_USER_MACRO == p->token.type || (ZBX_TOKEN_USER_FUNC_MACRO == p->token.type)))
 		{
-			zbx_dc_get_user_macro(arg_struct.um_handle, p->macro, &arg_struct.hostid, 1, replace_to);
+			zbx_dc_get_user_macro(item.um_handle, p->macro, &item.hostid, 1, replace_to);
 
 			p->pos = (int)p->token.loc.r;
 		}
 		else if (0 == strcmp(p->macro, MVAR_HOST_PORT))
 		{
-			if (INTERFACE_TYPE_UNKNOWN != arg_struct.interface->type)
+			if (INTERFACE_TYPE_UNKNOWN != item.interface->type)
 			{
-				*replace_to = zbx_dsprintf(*replace_to, "%hu", arg_struct.interface->port);
+				*replace_to = zbx_dsprintf(*replace_to, "%hu", item.interface->port);
 			}
 			else
 			{
-				ret = zbx_dc_get_interface_value(arg_struct.hostid, arg_struct.itemid, replace_to,
+				ret = zbx_dc_get_interface_value(item.hostid, item.itemid, replace_to,
 						ZBX_DC_REQUEST_HOST_PORT);
 			}
 		}
 		else
 		{
-			ret = common_resolv(p, arg_struct.hostid, arg_struct.host_host, arg_struct.host_name,
-				arg_struct.interface, arg_struct.itemid, replace_to);
+			ret = common_resolv(p, item.hostid, item.host_host, item.host_name,
+				item.interface, item.itemid, replace_to);
 		}
 	}
 
@@ -267,7 +267,7 @@ static int	item_key_subst_cb(const char *data, int level, int num, int quoted, c
 	int	ret = SUCCEED;
 
 	/* Passed parameters */
-	zbx_macro_field_params_resolv_args_t arg_struct = va_arg(args, zbx_macro_field_params_resolv_args_t);
+	zbx_macro_resolv_item_t item = va_arg(args, zbx_macro_resolv_item_t);
 
 	ZBX_UNUSED(num);
 
@@ -279,7 +279,7 @@ static int	item_key_subst_cb(const char *data, int level, int num, int quoted, c
 	if (0 != level)
 		zbx_unquote_key_param(*param);
 
-	zbx_substitute_macros(param, NULL, 0, zbx_macro_field_params_resolv, arg_struct);
+	zbx_substitute_macros(param, NULL, 0, zbx_macro_field_params_resolv, item);
 
 	if (0 != level)
 	{
@@ -323,7 +323,7 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 		const zbx_dc_um_handle_t *um_handle, zbx_uint64_t hostid, char *host_host, char *host_name,
 		const zbx_uint64_t itemid, const zbx_dc_interface_t *interface)
 {
-	zbx_macro_field_params_resolv_args_t args = {
+	zbx_macro_resolv_item_t item = {
 		.um_handle = um_handle,
 		.hostid = hostid,
 		.host_host = host_host,
@@ -332,5 +332,5 @@ int	zbx_substitute_item_key_params_default(char **data, char *error, size_t maxe
 		.interface = interface,
 	};
 
-	return zbx_substitute_item_key_params(data, error, maxerrlen, item_key_subst_cb, args);
+	return zbx_substitute_item_key_params(data, error, maxerrlen, item_key_subst_cb, item);
 }

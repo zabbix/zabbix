@@ -1709,7 +1709,7 @@ typedef struct
 	const zbx_uint64_t		itemid;
 	const zbx_dc_interface_t	*interface;
 }
-zbx_macro_field_params_resolv_args_t;
+zbx_macro_resolv_item_t;
 
 int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char **replace_to, char **data,
 		char *error, size_t maxerrlen);
