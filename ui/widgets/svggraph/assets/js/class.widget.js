@@ -220,10 +220,6 @@ class CWidgetSvgGraph extends CWidget {
 			});
 	}
 
-	getGraph() {
-		return this.#graph;
-	}
-
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
 		const menu = super.getActionsContextMenu({can_copy_widget, can_paste_widget});
 
