@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-01-22 20:12+0000\n"
+"PO-Revision-Date: 2026-01-23 18:27+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -355,6 +355,10 @@ msgstr "(0 - utiliser les paramètres par défaut de l'action)"
 #: app/views/configuration.templategroup.list.php:36
 msgid "(Only super admins can create groups)"
 msgstr "(Seuls les super administrateurs peuvent créer des groupes)"
+
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
@@ -5217,7 +5221,7 @@ msgstr "Colonnes"
 
 #: widgets/topitems/views/column.edit.php:313
 msgid "Combined column name"
-msgstr ""
+msgstr "Nom de colonne combinée"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -15335,6 +15339,16 @@ msgstr "Nom "
 #: app/views/administration.authentication.edit.php:397
 msgid "Name ID"
 msgstr "ID du nom"
+
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
 
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."

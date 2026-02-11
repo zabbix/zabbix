@@ -17,7 +17,7 @@
 /**
  * Validate import data from Zabbix 1.8.
  */
-class C10XmlValidator extends CXmlValidatorGeneral {
+class C10ImportValidator extends CImportValidatorGeneral {
 
 	/**
 	 * Base validation function.
