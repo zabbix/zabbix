@@ -124,7 +124,10 @@ class CControllerItemUpdate extends CControllerItem {
 			'parameters' => ['objects', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['db item_parameter.value'],
-					'name' => ['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
+					'name' => [
+						['db item_parameter.name'],
+						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]]
