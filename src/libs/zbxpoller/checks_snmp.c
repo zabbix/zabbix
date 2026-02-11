@@ -3716,7 +3716,26 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context);
 }
 
-static int async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RESULT *result,
+static void	async_check_snmp_init_context(zbx_snmp_context_t *snmp_context, void *arg, void *arg_action,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+{
+	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
+	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
+	snmp_context->reverse_dns = NULL;
+	snmp_context->ssp = NULL;
+	zbx_init_agent_result(&snmp_context->item.result);
+	snmp_context->retries = retries;
+	snmp_context->arg = arg;
+	snmp_context->arg_action = arg_action;
+	snmp_context->results = NULL;
+	snmp_context->results_alloc = 0;
+	snmp_context->results_offset = 0;
+	snmp_context->i = 0;
+	snmp_context->config_source_ip = config_source_ip;
+	snmp_context->probe_processed = 0;
+}
+
+static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RESULT *result,
 		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, struct event_base *base,
 		zbx_channel_t *channel, struct evdns_base *dnsbase, zbx_async_resolve_reverse_dns_t resolve_reverse_dns,
 		char *snmp_oid)
@@ -3808,9 +3827,6 @@ static int async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RESU
 
 	ret = SUCCEED;
 out:
-	if (SUCCEED != ret)
-		zbx_async_check_snmp_clean(snmp_context);
-
 	zbx_free_agent_request(&request);
 
 	return ret;
@@ -3831,11 +3847,8 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
-	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
-	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
-	snmp_context->reverse_dns = NULL;
+	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns, retries);
 
-	snmp_context->ssp = NULL;
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
@@ -3858,20 +3871,8 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 		snmp_context->item.key = zbx_strdup(NULL, item->key);
 
 	snmp_context->item.version = item->interface.version;
-
-	zbx_init_agent_result(&snmp_context->item.result);
-
 	snmp_context->config_timeout = item->timeout;
-
 	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
-	snmp_context->retries = retries;
-	snmp_context->arg = arg;
-	snmp_context->arg_action = arg_action;
-	snmp_context->results = NULL;
-	snmp_context->results_alloc = 0;
-	snmp_context->results_offset = 0;
-	snmp_context->i = 0;
-
 	snmp_context->snmp_version = item->snmp_version;
 	snmp_context->snmp_community = item->snmp_community;
 	item->snmp_community = NULL;
@@ -3886,13 +3887,14 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
 	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
 	item->snmpv3_privpassphrase = NULL;
-	snmp_context->config_source_ip = config_source_ip;
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
-	snmp_context->probe_processed = 0;
 
 	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
 		dnsbase, resolve_reverse_dns, item->snmp_oid);
+
+	if (SUCCEED != ret)
+		zbx_async_check_snmp_clean(snmp_context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
 		snmp_context->item.itemid);
@@ -3915,11 +3917,8 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
-	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
-	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
-	snmp_context->reverse_dns = NULL;
+	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns, retries);
 
-	snmp_context->ssp = NULL;
 	snmp_context->item.interface = item->interface;
 	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
 			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
@@ -3940,20 +3939,8 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 		snmp_context->item.key = zbx_strdup(NULL, item->key);
 
 	snmp_context->item.version = item->interface.version;
-
-	zbx_init_agent_result(&snmp_context->item.result);
-
 	snmp_context->config_timeout = item->timeout;
-
 	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
-	snmp_context->retries = retries;
-	snmp_context->arg = arg;
-	snmp_context->arg_action = arg_action;
-	snmp_context->results = NULL;
-	snmp_context->results_alloc = 0;
-	snmp_context->results_offset = 0;
-	snmp_context->i = 0;
-
 	snmp_context->snmp_version = item->snmp_version;
 	snmp_context->snmp_community = item->snmp_community;
 	item->snmp_community = NULL;
@@ -3968,13 +3955,14 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
 	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
 	item->snmpv3_privpassphrase = NULL;
-	snmp_context->config_source_ip = config_source_ip;
 
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
-	snmp_context->probe_processed = 0;
 
 	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
 		dnsbase, resolve_reverse_dns, item->snmp_oid);
+
+	if (SUCCEED != ret)
+		zbx_async_check_snmp_clean(snmp_context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
 		snmp_context->item.itemid);
