@@ -310,7 +310,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, zbx_channel_t *channel, st
 	const char *addr, void *data, int timeout, zbx_async_task_process_task_cb_t async_task_process_task_func,
 	zbx_async_task_process_result_cb_t async_task_process_result_func)
 {
- #define	ZBX_VECTOR_ARRAY_RESERVE	3
+ #define ZBX_VECTOR_ARRAY_RESERVE	3
 	zbx_async_task_t	*task;
 
 	task = (zbx_async_task_t *)zbx_malloc(NULL, sizeof(zbx_async_task_t));
