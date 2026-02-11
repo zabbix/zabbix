@@ -48,6 +48,7 @@
 #	define ZBX_TYPE_UINT_STR		"bigint unsigned"
 #	define ZBX_TYPE_LONGTEXT_STR		"longtext"
 #	define ZBX_TYPE_BLOB_STR		"longblob"
+#	define ZBX_TYPE_JSON_STR		"json"
 #	define ZBX_TYPE_SERIAL_STR		"bigint unsigned"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	"auto_increment"
 #elif defined(HAVE_POSTGRESQL)
@@ -56,6 +57,7 @@
 #	define ZBX_TYPE_UINT_STR		"numeric(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"text"
 #	define ZBX_TYPE_BLOB_STR		"bytea"
+#	define ZBX_TYPE_JSON_STR		"jsonb"
 #	define ZBX_TYPE_SERIAL_STR		"bigserial"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #endif
@@ -95,6 +97,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_BLOB:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_BLOB_STR);
 			break;
+		case ZBX_TYPE_JSON:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_JSON_STR);
+			break;
 		case ZBX_TYPE_CUID:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
 			break;
@@ -120,6 +125,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_BLOB:
+		case ZBX_TYPE_JSON:
 		case ZBX_TYPE_CUID:
 			return;
 		case ZBX_TYPE_SERIAL:
@@ -151,7 +157,18 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 			default:
 #endif
 				default_value_esc = zbx_db_dyn_escape_string(field->default_value);
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
+
+				if (field->type == ZBX_TYPE_JSON)
+				{
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'::json",
+							default_value_esc);
+				}
+				else
+				{
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'",
+							default_value_esc);
+				}
+
 				zbx_free(default_value_esc);
 #if defined(HAVE_MYSQL)
 		}

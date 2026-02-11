@@ -25,6 +25,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
+#include "zbxdbhigh.h"
 
 #define PACKED_FIELD_RAW	0
 #define PACKED_FIELD_STRING	1
@@ -135,10 +136,10 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, const char *error)
 {
-	zbx_uint32_t	data_len = 0, value_len, source_len;
+	zbx_uint32_t	data_len = 0, value_len = 0, source_len = 0;
 	unsigned char	var_type = ZBX_VARIANT_NONE, opt_flags = 0;
 	zbx_timespec_t	ts_local;
-	const char	*errmsg;
+	const char	*errmsg = NULL;
 
 	if (NULL == ts)
 	{
@@ -199,6 +200,11 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
+		}
+		else if (ZBX_ISSET_JSON(result))
+		{
+			var_type = ZBX_VARIANT_JSON;
+			zbx_serialize_prepare_str_len(data_len, result->json, value_len);
 		}
 	}
 
@@ -282,6 +288,8 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 			ptr += zbx_serialize_str(ptr, result->str, value_len);
 		else if (ZBX_ISSET_TEXT(result))
 			ptr += zbx_serialize_str(ptr, result->text, value_len);
+		else if (ZBX_ISSET_JSON(result))
+			ptr += zbx_serialize_str(ptr, result->json, value_len);
 	}
 
 	ptr += zbx_serialize_value(ptr, ts->sec);
@@ -323,6 +331,9 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 			break;
 		case ZBX_VARIANT_STR:
 			ptr += zbx_deserialize_str(ptr, &value->data.str, len);
+			break;
+		case ZBX_VARIANT_JSON:
+			ptr += zbx_deserialize_str(ptr, &value->data.json, len);
 			break;
 		case ZBX_VARIANT_ERR:
 			ptr += zbx_deserialize_str(ptr, &value->data.err, len);
@@ -410,10 +421,21 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 			fields[offset++] = PACKED_FIELD(value->data.err, 0);
 			break;
 
+		case ZBX_VARIANT_JSON:
+			fields[offset++] = PACKED_FIELD(value->data.json, 0);
+			break;
+
 		case ZBX_VARIANT_BIN:
 			fields[offset++] = PACKED_FIELD(value->data.bin, sizeof(zbx_uint32_t) +
 					zbx_variant_data_bin_get(value->data.bin, NULL));
 			break;
+
+		case ZBX_VARIANT_NONE:
+			break;
+
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 
 	return offset;
@@ -509,6 +531,9 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 			break;
 		case ZBX_VARIANT_BIN:
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
+			break;
+		case ZBX_VARIANT_JSON:
+			offset += zbx_deserialize_str(offset, &value->data.json, value_len);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_VECTOR:
@@ -1106,6 +1131,12 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			exit(EXIT_FAILURE);
 		}
 
+		if (0 != ZBX_ISSET_JSON(result))
+		{
+			if (value_len < (len = strlen(result->json)))
+				value_len = len;
+		}
+
 		if (ZBX_MAX_RECV_DATA_SIZE < value_len)
 		{
 			result = NULL;
@@ -1123,9 +1154,68 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 	}
 	else
 	{
-		zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
-	}
+		/* When received value from passive agent, all item value types have TEXT type at this stage. */
+		/* When received from trapper - the value type is correlated with item_value_type.            */
+		/* If item_value_type is JSON, then must use result type, depending on result->type.          */
 
+		if (ITEM_VALUE_TYPE_JSON == item_value_type && ITEM_STATE_NOTSUPPORTED != state)
+		{
+			char	*json_val, *dyn_error = NULL;
+
+			if (ZBX_ISSET_JSON(result))
+			{
+				json_val = result->json;
+			}
+			else if (ZBX_ISSET_TEXT(result))
+			{
+				json_val = result->text;
+			}
+			else if (ZBX_ISSET_STR(result))
+			{
+				json_val = result->str;
+			}
+			else if (ZBX_ISSET_LOG(result))
+			{
+				json_val = result->log->value;
+			}
+			else if (ZBX_ISSET_DBL(result) || ZBX_ISSET_UI64(result))
+			{
+				/* double and uint are valid JSON and do not require limit checks */
+				zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+				goto out;
+			}
+			else if (ZBX_ISSET_BIN(result))
+			{
+				json_val = result->bin;
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
+						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
+				goto out;
+			}
+			else
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "unexpected result type: %d and item_value_type: %hhu combo "
+						"for itemid: " ZBX_FS_UI64, result->type, item_value_type, itemid);
+				THIS_SHOULD_NEVER_HAPPEN;
+				goto out;
+			}
+
+			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(json_val))
+			{
+				state = ITEM_STATE_NOTSUPPORTED;
+				dyn_error = zbx_strdup(NULL, "JSON is too large.");
+			}
+			else if (0 == zbx_json_validate_ext(json_val, &dyn_error))
+			{
+				state = ITEM_STATE_NOTSUPPORTED;
+			}
+
+			zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, dyn_error);
+			zbx_free(dyn_error);
+		}
+		else
+			zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+	}
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 

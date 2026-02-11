@@ -43,6 +43,7 @@ my %c = (
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_cuid"	=>	"ZBX_TYPE_CUID",
+	"t_json"	=>	"ZBX_TYPE_JSON",
 );
 
 $c{"before"} = "/*
@@ -87,6 +88,7 @@ my %mysql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"json",
 );
 
 my %postgresql = (
@@ -108,6 +110,7 @@ my %postgresql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"jsonb",
 );
 
 my %sqlite3 = (
@@ -129,6 +132,7 @@ my %sqlite3 = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"jsonb",
 );
 
 sub rtrim($)
@@ -657,7 +661,7 @@ EOF
 
 	my $flags = "migrate_data => true, if_not_exists => true";
 
-	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin")
+	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin", "history_json")
 	{
 		print<<EOF
 	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);
