@@ -174,7 +174,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 
 	memset(&item, 0, sizeof(zbx_dc_snmp_item_t));
 	item.key_orig = zbx_strdup(NULL, dcheck->key_);
-	item.key = item.key_orig;
+	item.key = zbx_strdup(NULL, dcheck->key_);
 
 	item.interface.useip = 1;
 	zbx_strscpy(item.interface.ip_orig, ip);
@@ -234,12 +234,11 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_free(item.snmpv3_privpassphrase);
 	zbx_free(item.snmpv3_contextname);
 	zbx_free_agent_result(&result);
+	zbx_free(item.key_orig);
+	zbx_free(item.key);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
-		ip, port, item.key_orig, ret);
-
-	zbx_free(item.key_orig);
-	item.key = NULL;
+		ip, port, dcheck->key_, ret);
 
 	return ret;
 }
@@ -302,7 +301,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 
 	memset(&item, 0, sizeof(zbx_dc_agent_item_t));
 	item.key_orig = zbx_strdup(NULL, dcheck->key_);
-	item.key = item.key_orig;
+	item.key = zbx_strdup(NULL, dcheck->key_);
 
 	item.interface.useip = 1;
 	zbx_strscpy(item.interface.ip_orig, ip);
@@ -329,11 +328,12 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 		poller_config->processing++;
 
 	zbx_free_agent_result(&result);
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
-			ip, port, item.key_orig, ret);
 
 	zbx_free(item.key_orig);
-	item.key = NULL;
+	zbx_free(item.key);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
+		ip, port, dcheck->key_, ret);
 
 	return ret;
 }

@@ -3861,14 +3861,8 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 
 	snmp_context->item.key_orig = item->key_orig;
 	item->key_orig = NULL;
-
-	if (item->key != snmp_context->item.key_orig)
-	{
-		snmp_context->item.key = item->key;
-		item->key = NULL;
-	}
-	else
-		snmp_context->item.key = zbx_strdup(NULL, item->key);
+	snmp_context->item.key = item->key;
+	item->key = NULL;
 
 	snmp_context->item.version = item->interface.version;
 	snmp_context->config_timeout = item->timeout;

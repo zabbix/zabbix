@@ -360,14 +360,8 @@ int	zbx_async_check_agent(zbx_dc_agent_item_t *item, AGENT_RESULT *result,
 
 	agent_context->item.key_orig = item->key_orig;
 	item->key_orig = NULL;
-
-	if (item->key != agent_context->item.key_orig)
-	{
-		agent_context->item.key = item->key;
-		item->key = NULL;
-	}
-	else
-		agent_context->item.key = zbx_strdup(NULL, item->key);
+	agent_context->item.key = item->key;
+	item->key = NULL;
 
 	agent_context->resolve_reverse_dns = resolve_reverse_dns;
 	agent_context->rdns_step = ZABBIX_ASYNC_STEP_DEFAULT;

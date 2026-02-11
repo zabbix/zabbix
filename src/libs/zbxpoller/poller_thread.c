@@ -1128,9 +1128,6 @@ void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *re
 {
 	for (int i = 0; i < num; i++)
 	{
-		if (items[i].key == items[i].key_orig)
-			items[i].key = NULL;
-
 		zbx_free(items[i].key_orig);
 		zbx_free(items[i].key);
 
@@ -1142,9 +1139,6 @@ void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *resu
 {
 	for (int i = 0; i < num; i++)
 	{
-		if (items[i].key == items[i].key_orig)
-			items[i].key = NULL;
-
 		zbx_free(items[i].key_orig);
 		zbx_free(items[i].key);
 
