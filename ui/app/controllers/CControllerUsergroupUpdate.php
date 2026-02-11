@@ -61,7 +61,10 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 					'groupid' => ['db tag_filter.groupid', 'required'],
 					'tags' => ['objects', 'fields' => [
 						'value' => ['db tag_filter.value'],
-						'tag' => ['db tag_filter.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+						'tag' => [
+							['db tag_filter.tag'],
+							['db tag_filter.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+						]
 					]]
 				]
 			]
