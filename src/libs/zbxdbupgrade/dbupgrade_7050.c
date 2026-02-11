@@ -439,7 +439,7 @@ static int	DBpatch_7050031(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		ret = FAIL;
+	int				ret;
 	zbx_db_insert_t	db_insert;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
