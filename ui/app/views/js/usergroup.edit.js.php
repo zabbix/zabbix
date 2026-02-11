@@ -87,11 +87,8 @@
 				}
 			})
 
-			const delete_btn = document.getElementById('delete');
-
-			if (delete_btn) {
-				delete_btn.addEventListener('click', () => this.#delete());
-			}
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')
+				.addEventListener('click', (e) => this.#delete(e.target));
 
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
@@ -337,7 +334,7 @@
 
 		submit (e) {
 			e.preventDefault();
-			this.#setLoadingStatus(['add', 'update'])
+			this.#setLoadingStatus('js-submit');
 			clearMessages();
 			const fields = this.form.getAllValues();
 
@@ -391,7 +388,7 @@
 
 		#delete() {
 			if (window.confirm(<?= json_encode(_('Delete selected group?')) ?>)) {
-				this.#setLoadingStatus(['delete']);
+				this.#setLoadingStatus('js-delete');
 				const fields = this.form.getAllValues();
 
 				const curl = new Curl('zabbix.php');
@@ -417,37 +414,23 @@
 			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
 
-		#setLoadingStatus(loading_ids) {
+		#setLoadingStatus(loading_btn_class) {
 			this.form_element.classList.add('is-loading', 'is-loading-fadein');
-			[
-				document.getElementById('add'),
-				document.getElementById('update'),
-				document.getElementById('delete')
-			].forEach(button => {
-				if (button) {
-					button.setAttribute('disabled', 'disabled');
 
-					if (loading_ids.includes(button.id)) {
-						button.classList.add('is-loading');
-					}
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)').forEach(button => {
+				button.disabled = true;
+
+				if (button.classList.contains(loading_btn_class)) {
+					button.classList.add('is-loading');
 				}
 			});
 		}
 
 		#unsetLoadingStatus() {
-			[
-				document.getElementById('add'),
-				document.getElementById('update'),
-				document.getElementById('delete')
-			].forEach(button => {
-				if (button) {
-					button.classList.remove('is-loading');
-					button.removeAttribute('disabled');
-				}
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)').forEach(button => {
+				button.classList.remove('is-loading');
+				button.disabled = false;
 			});
-
-			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
-
 	};
 </script>

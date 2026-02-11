@@ -118,9 +118,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['edit'] == 0 ? _('Add') : _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'window.tag_filter_edit.submit();'
+			'isSubmit' => true
 		]
 	]
 ];

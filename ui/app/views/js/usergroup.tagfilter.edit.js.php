@@ -24,6 +24,7 @@ window.tag_filter_edit = new class {
 	init({rules, tag_filters, groupid}) {
 		this.overlay = overlays_stack.getById('tag-filter-edit');
 		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.tag_filters = tag_filters;
 		this.rules = rules;
@@ -49,6 +50,8 @@ window.tag_filter_edit = new class {
 		if (this.group_tag_filters.length == 0) {
 			this.#addTagFilterRow();
 		}
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 
@@ -91,7 +94,7 @@ window.tag_filter_edit = new class {
 		placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 	}
 
-	submit() {
+	#submit() {
 		this.overlay.setLoading();
 		this.#removePopupMessages();
 

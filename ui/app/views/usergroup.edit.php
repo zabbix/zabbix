@@ -325,20 +325,20 @@ $tabs = (new CTabView())
 $cancel_button = (new CRedirectButton(_('Cancel'), (new CUrl('zabbix.php'))
 	->setArgument('action', 'usergroup.list')
 	->setArgument('page', CPagerHelper::loadPage('usergroup.list', null))
-))->setId('cancel');
+))->addClass('js-cancel');
 
 if ($data['usrgrpid'] != 0) {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('update', _('Update')),
+		(new CSubmit('', _('Update')))->addClass('js-submit'),
 		[
-			(new CSimpleButton(_('Delete')))->setId('delete'),
+			(new CSimpleButton(_('Delete')))->addClass('js-delete'),
 			$cancel_button
 		]
 	));
 }
 else {
 	$tabs->setFooter(makeFormFooter(
-		new CSubmit('add', _('Add')),
+		(new CSubmit('', _('Add')))->addClass('js-submit'),
 		[
 			$cancel_button
 		]
