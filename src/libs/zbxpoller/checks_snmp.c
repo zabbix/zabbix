@@ -3740,14 +3740,17 @@ static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RES
 		zbx_channel_t *channel, struct evdns_base *dnsbase, zbx_async_resolve_reverse_dns_t resolve_reverse_dns,
 		char *snmp_oid)
 {
+#define ZBX_VECTOR_ARRAY_RESERVE	3
 	int			ret = SUCCEED, pdu_type, is_oid_plain = 0;
 	AGENT_REQUEST		request;
 	char			error[MAX_STRING_LEN];
 
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
+	zbx_vector_bulkwalk_context_reserve(&snmp_context->bulkwalk_contexts, ZBX_VECTOR_ARRAY_RESERVE);
 
 	zbx_init_agent_request(&request);
 	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
+	zbx_vector_snmp_oid_reserve(&snmp_context->param_oids, ZBX_VECTOR_ARRAY_RESERVE);
 
 	if (0 == strncmp(snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 	{
@@ -3830,6 +3833,7 @@ out:
 	zbx_free_agent_request(&request);
 
 	return ret;
+#undef ZBX_VECTOR_ARRAY_RESERVE
 }
 
 int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
