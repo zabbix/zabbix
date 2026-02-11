@@ -167,7 +167,7 @@ class CControllerItemCreate extends CControllerItem {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'status_codes' => ['db items.status_codes',
-				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => false, 'with_minus' => true]],
+				'use' => [CRangesParser::class, ['usermacros' => true, 'with_minus' => true]],
 				'messages' => ['use' => _('Invalid range expression.')],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
@@ -252,7 +252,7 @@ class CControllerItemCreate extends CControllerItem {
 				ITEM_TYPE_DB_MONITOR
 			]]],
 			'params_f' => ['db items.params', 'required', 'not_empty',
-				'use' => [CCalcFormulaValidator::class, ['lldmacros' => false]],
+				'use' => [CCalcFormulaValidator::class, []],
 				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
 			],
 			'units' => ['db items.units', 'when' => ['value_type', 'in' => [ITEM_VALUE_TYPE_FLOAT,
