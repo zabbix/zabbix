@@ -404,8 +404,8 @@ var hintBox = {
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo, reposition_on_resize = true) {
 		var hintboxid = hintBox.getUniqueId();
-		var box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak'),
-			appendTo = appendTo || '.wrapper';
+		var box = jQuery('<div>', {'data-hintboxid': hintboxid}).addClass('overlay-dialogue wordbreak');
+		var appendTo = appendTo || '.wrapper';
 
 		if (!isStatic) {
 			id = 'hintbox-'+hintboxid;
