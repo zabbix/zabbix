@@ -563,26 +563,20 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 	struct tm	tm_new = *tm;
 	int		tm_isdst = tm->tm_isdst;
 
-	if (0 == (tm->tm_hour + tm->tm_min + tm->tm_sec) || -1 == tm_isdst)
+	if (0 == (tm->tm_hour + tm->tm_min + tm->tm_sec))
 	{
-		tm_new.tm_isdst = -1;	/* we don't know DST state after round(up/down) manipulation */
-
-		if (-1 == (time_new = mktime(&tm_new)))
-		{
-			THIS_SHOULD_NEVER_HAPPEN;
-			return;
-		}
-
-		tm_isdst = zbx_localtime(&time_new, NULL)->tm_isdst;
+		tm_isdst = -1;	/* we don't know DST state after round(up/down) manipulation */
+		tm_new.tm_isdst = tm_isdst;
 	}
-
-	tm_new.tm_isdst = tm_isdst;
 
 	if (-1 == (time_new = mktime(&tm_new)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		return;
 	}
+
+	if (-1 == tm_isdst)
+		tm_isdst = tm_new.tm_isdst;
 
 	time_new += seconds;
 	tm_new = *zbx_localtime(&time_new, NULL);
