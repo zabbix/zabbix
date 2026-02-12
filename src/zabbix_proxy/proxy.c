@@ -2109,7 +2109,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 				break;
 			}
 
-			if (!ZBX_IS_RUNNING())
+			/* don't check for termination when suppervisor is not yet started (runlevel 1 reached) */
+			if (1 < i && !ZBX_IS_RUNNING())
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue proxy startup because of termination");
 				break;
