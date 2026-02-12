@@ -443,13 +443,16 @@ static void	history_clickhouse_write_uint32(zbx_uint32_t ui32, char **post_data,
 
 static int	is_json_object(const char *json_str)
 {
-	if (NULL != json_str)
+	if (NULL == json_str)
 		return FAIL;
 
-	while (*json_str && isspace((unsigned char)*json_str))
+	while ('\0' != *json_str && 0 != isspace((unsigned char)*json_str))
 		json_str++;
 
-	return (*json_str == '{');
+	if ('{' == *json_str)
+		return SUCCEED;
+
+	return FAIL;
 }
 
 /******************************************************************************
