@@ -493,7 +493,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		goto out;
 	}
 
-	if (ITEM_VALUE_TYPE_JSON)
+	if (ITEM_VALUE_TYPE_JSON == value_type)
 	{
 		zbx_snprintf(url, sizeof(url), "%s?database=%s"
 			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary&input_format_binary_read_json_as_string=1",
