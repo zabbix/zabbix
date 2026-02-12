@@ -29,7 +29,7 @@ void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history)
 	zbx_free(dc_history);
 }
 
-zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_BIN + 1];
+zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_JSON + 1];
 
 /************************************************************************************
  *                                                                                  *
@@ -45,9 +45,9 @@ int	zbx_history_init(const char *config_history_storage_url, const char *config_
 {
 	/* TODO: support per value type specific configuration */
 
-	const char	*opts[] = {"dbl", "str", "log", "uint", "text", "bin"};
+	const char	*opts[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
 
-	for (int i = ITEM_VALUE_TYPE_FLOAT; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = ITEM_VALUE_TYPE_FLOAT; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 
 		if (NULL == config_history_storage_url || NULL == strstr(config_history_storage_opts, opts[i]))
@@ -86,7 +86,7 @@ void	zbx_history_destroy(void)
 {
 	int	i;
 
-	for (i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -117,7 +117,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -125,7 +125,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 			flags |= (1 << i);
 	}
 
-	for (int i = 0; i <= ITEM_VALUE_TYPE_BIN; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -261,6 +261,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 			zbx_free(value->value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
@@ -302,6 +303,9 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 			zbx_strlcpy(buffer, value->str, size);
+			break;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_strlcpy_utf8(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
@@ -348,6 +352,7 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 			for (i = 0; i < vector->values_num; i++)
 				zbx_free(vector->values[i].value.str);
 
@@ -447,6 +452,7 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 			zbx_variant_set_str(var, zbx_strdup(NULL, value->log->value));
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
