@@ -262,7 +262,6 @@ typedef struct
 	zbx_dc_interface_t	interface;
 	zbx_uint64_t		itemid;
 	unsigned char		value_type;
-	unsigned char		state;
 	unsigned char		authtype;
 	unsigned char		flags;
 	unsigned char		follow_redirects;

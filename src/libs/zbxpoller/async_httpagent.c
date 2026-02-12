@@ -41,7 +41,6 @@ int	zbx_async_check_httpagent(zbx_dc_httpagent_item_t *item, AGENT_RESULT *resul
 	httpagent_context->item_context.itemid = item->itemid;
 	httpagent_context->item_context.value_type = item->value_type;
 	httpagent_context->item_context.flags = item->flags;
-	httpagent_context->item_context.state = item->state;
 	httpagent_context->item_context.posts = item->posts;
 	item->posts = NULL;
 	httpagent_context->item_context.status_codes = item->status_codes;

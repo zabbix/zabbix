@@ -9844,8 +9844,6 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->value_type = src_item->value_type;
 
-	dst_item->state = src_item->state;
-
 	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
 	dst_item->itemid = src_item->itemid;
