@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -46,9 +46,6 @@ zbx_supervisor_client_t;
 int	zbx_supervisor_client_init(zbx_supervisor_client_t *svc, char **error);
 void	zbx_supervisor_client_clear(zbx_supervisor_client_t *svc);
 int	zbx_supervisor_client_poll(zbx_supervisor_client_t *svc, int runlevel, char **error);
-
-void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *owner, int *runlevel);
-int	zbx_supervisor_get_process_count(const int *config_forks);
 
 void	zbx_supervisor_worklog_init(void);
 void	zbx_supervisor_worklog_clear(void);

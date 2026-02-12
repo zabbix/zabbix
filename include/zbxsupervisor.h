@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,6 +19,20 @@
 #include "zbxalgo.h"
 #include "zbxnix.h"
 #include "zbxcomms.h"
+
+#define ZBX_RUNLEVEL_UNKNOWN		-1
+#define ZBX_RUNLEVEL_SUPERVISOR		0
+#define ZBX_RUNLEVEL_CACHESYNC		1
+#define ZBX_RUNLEVEL_TASKMANAGER	2
+#define ZBX_RUNLEVEL_DEFAULT		3
+
+typedef enum
+{
+	PROCESS_OWNER_UNKNOWN,
+	PROCESS_OWNER_MAIN,
+	PROCESS_OWNER_SUPERVISOR,
+}
+zbx_proc_owner_t;
 
 typedef struct
 {
@@ -60,6 +74,8 @@ typedef struct
 #endif
 }
 zbx_thread_supervisor_args_t;
+
+int	zbx_supervisor_get_process_count(const int *config_forks);
 
 zbx_proc_startup_t	*zbx_proc_startup_create(int threads_num,
 		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb);

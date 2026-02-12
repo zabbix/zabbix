@@ -314,22 +314,8 @@ const char	*get_program_type_string(unsigned char program_type);
 
 #define ZBX_PROCESS_TYPE_UNKNOWN		255
 
-#define ZBX_RUNLEVEL_UNKNOWN		-1
-#define ZBX_RUNLEVEL_SUPERVISOR		0
-#define ZBX_RUNLEVEL_CACHESYNC		1
-#define ZBX_RUNLEVEL_TASKMANAGER	2
-#define ZBX_RUNLEVEL_DEFAULT		3
-
 const char	*get_process_type_string(unsigned char proc_type);
 int		get_process_type_by_name(const char *proc_type_str);
-
-typedef enum
-{
-	PROCESS_OWNER_UNKNOWN,
-	PROCESS_OWNER_MAIN,
-	PROCESS_OWNER_SUPERVISOR,
-}
-zbx_proc_owner_t;
 
 /* user permissions */
 typedef enum
