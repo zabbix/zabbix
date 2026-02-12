@@ -1,1 +1,0 @@
-A......... [ZBX-26749] removed inability to unlink and clear the template which has triggers that other host/template triggers depend on (kkuzmina)
