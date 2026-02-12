@@ -477,7 +477,11 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 
 	/* bin is not supported */
 	if (ITEM_VALUE_TYPE_BIN == value_type)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "bin item value type is not supported in ClickHouse ");
+		THIS_SHOULD_NEVER_HAPPEN;
 		return;
+	}
 
 	conn = history_clickhouse_get_conn(d, value_type);
 
@@ -489,9 +493,18 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		goto out;
 	}
 
-	zbx_snprintf(url, sizeof(url), "%s?database=%s"
-		"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary", d->base_url, d->db,
-		clickhouse_history_tables[value_type]);
+	if (ITEM_VALUE_TYPE_JSON)
+	{
+		zbx_snprintf(url, sizeof(url), "%s?database=%s"
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary&input_format_binary_read_json_as_string=1",
+			d->base_url, d->db, clickhouse_history_tables[value_type]);
+	}
+	else
+	{
+		zbx_snprintf(url, sizeof(url), "%s?database=%s"
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary", d->base_url, d->db,
+			clickhouse_history_tables[value_type]);
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
 	{
@@ -522,7 +535,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 						&post_data_offset);
 				break;
 			case ITEM_VALUE_TYPE_JSON:
-				if (is_json_object(entry->value.str))
+				if (SUCCEED == is_json_object(entry->value.str))
 				{
 					history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
 							&post_data_offset);
@@ -531,7 +544,7 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 				}
 				else
 				{
-					history_clickhouse_write_text("", &post_data, &post_data_alloc,
+					history_clickhouse_write_text("null", &post_data, &post_data_alloc,
 							&post_data_offset);
 					history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
 							&post_data_offset);
