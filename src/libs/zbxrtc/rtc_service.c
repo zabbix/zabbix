@@ -29,6 +29,7 @@
 #include "zbxdb.h"
 #include "zbxlog.h"
 #include "zbxsupervisor_client.h"
+#include "zbxtime.h"
 
 ZBX_VECTOR_IMPL(rtc_msg, zbx_rtc_msg_t)
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
@@ -813,28 +814,6 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 		zbx_free(service);
 
 	(void)rtc_deserialize_msgs(data, process_type, process_num, &sub->msgs);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: send shutdown to the service attempting to subscribe for RTC      *
- *          notifications                                                     *
- *                                                                            *
- ******************************************************************************/
-static void	rtc_shutdown_subscribe_service_request(const unsigned char *data)
-{
-	zbx_uint32_t	service_len;
-	zbx_rtc_sub_t	sub = {0};
-	zbx_rtc_msg_t	msg = {.code = ZBX_RTC_SHUTDOWN};
-
-	(void)zbx_deserialize_str(data, &sub.source.service, service_len);
-
-	sub.type = ZBX_RTC_SUB_SERVICE;
-	zbx_vector_rtc_msg_create(&sub.msgs);
-	rtc_notify_service(&sub, &msg, NULL, 0, 1);
-
-	zbx_free(sub.source.service);
-	zbx_vector_rtc_msg_destroy(&sub.msgs);
 }
 
 /******************************************************************************
