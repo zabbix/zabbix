@@ -62,7 +62,7 @@ net_count_info_t;
 #define NET_CONN_TYPE_TCP	0
 #define NET_CONN_TYPE_UDP	1
 
-#define ZBX_PROC_NET_DEV_PRX		"/proc/net/dev"
+#define ZBX_PROC_NET_DEV		"/proc/net/dev"
 /* number of columns in a line from /proc/net/dev which represents a network interface */
 #define ZBX_PROC_NET_DEV_COLS_NUM	17
 #define ZBX_SYS_CLASS_NET_PFX		"/sys/class/net/"
@@ -294,9 +294,9 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 		return SYSINFO_RET_FAIL;
 	}
 
-	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
+	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV, zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -322,7 +322,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 	if (SYSINFO_RET_FAIL == ret)
 	{
 		*error = zbx_dsprintf(NULL, "Cannot find information for this network interface in \"%s\".",
-				ZBX_PROC_NET_DEV_PRX);
+				ZBX_PROC_NET_DEV);
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -616,9 +616,9 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ZBX_UNUSED(request);
 
-	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
+	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV_PRX,
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV,
 				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
@@ -1456,9 +1456,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 	}
 
-	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
+	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV_PRX,
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV,
 				zbx_strerror(errno)));
 
 		ret = SYSINFO_RET_FAIL;
@@ -1482,7 +1482,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (1 > (num_filled = net_if_row_scan(line, if_name, &ns)))
 		{
 			/* we need the interface name for getting metrics via sysfs */
-			THIS_SHOULD_NEVER_HAPPEN_MSG("cannot read interface name from of \"%s\"", ZBX_PROC_NET_DEV_PRX);
+			THIS_SHOULD_NEVER_HAPPEN_MSG("cannot read interface name from of \"%s\"", ZBX_PROC_NET_DEV);
 			continue;
 		}
 
@@ -1527,7 +1527,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 		{
 			THIS_SHOULD_NEVER_HAPPEN_MSG("could read just %d values from \"%s\" for interface \"%s\"",
-					num_filled, ZBX_PROC_NET_DEV_PRX, if_name);
+					num_filled, ZBX_PROC_NET_DEV, if_name);
 		}
 
 		if_type_add(if_name, &jval);
