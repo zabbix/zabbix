@@ -1,6 +1,9 @@
 Changes for 8.0.0alpha2
 
 New features:
+A.F....PS. [ZBXNEXT-10069] added support for new JSON item value type (arimdjonoks, gcalenko, kkuzmina)
+..F....... [ZBXNEXT-9748] implemented inline validation for user, profile and notifications forms (gberzina)
+A.F.I..... [ZBXNEXT-10387] removed support of massupdate method for host, template, hostgroup and templategroup API objects; removed support for hostinterface.replacehostinterfaces method (arimdjonoks, jfreibergs, vmaksimovs)
 ..F....... [ZBXNEXT-9744] added inline validation for media type form (gberzina)
 .........T [ZBXNEXT-10335] added GCP Cloud Run Service by HTTP template (egordymov)
 ..F....... [ZBXNEXT-10301] simplified user experience when editing problem filter tags by removing extra radio buttons and making an empty tags list equivalent to "All tags" (Ivo)
@@ -159,6 +162,7 @@ Changes for 7.4.7rc3
 New features:
 
 Bug fixes:
+..F....... [ZBX-27508] fixed inline validation rules for item and item prototype forms (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc2
