@@ -17,7 +17,6 @@
 #include "async_manager.h"
 
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"

@@ -132,7 +132,7 @@ int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **key)
 		char			*key_tmp = zbx_strdup(NULL, dc_item.key_orig);
 
 		zbx_substitute_item_key_params_default(&key_tmp, NULL, 0, um_handle, dc_item.host.hostid,
-			dc_item.host.host, dc_item.host.name, dc_item.itemid, &dc_item.interface);
+				dc_item.host.host, dc_item.host.name, dc_item.itemid, &dc_item.interface);
 		zbx_dc_close_user_macros(um_handle);
 
 		zbx_free(*key);

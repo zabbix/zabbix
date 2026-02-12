@@ -237,7 +237,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 	zbx_free(item.key);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
-		ip, port, dcheck->key_, ret);
+			ip, port, dcheck->key_, ret);
 
 	return ret;
 }
@@ -332,7 +332,7 @@ static int	discovery_agent(discovery_poller_config_t *poller_config, const zbx_d
 	zbx_free(item.key);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
-		ip, port, dcheck->key_, ret);
+			ip, port, dcheck->key_, ret);
 
 	return ret;
 }

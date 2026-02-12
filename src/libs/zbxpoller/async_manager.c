@@ -227,7 +227,7 @@ void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			zbx_clean_httpagent_items(poller_item->items.httpagent_items, poller_item->num,
-				poller_item->results);
+					poller_item->results);
 			break;
 	}
 	zbx_free(poller_item->results);

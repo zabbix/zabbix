@@ -279,7 +279,8 @@ static void	substitute_macros_http_json_resolv(char **data, const zbx_dc_um_hand
 }
 
 static int	parse_query_fields(zbx_uint64_t hostid, char *host_host, char *host_name, zbx_uint64_t itemid,
-	const char *key_orig, const char *key, const char *url, char **query_fields, unsigned char expand_macros)
+		const char *key_orig, const char *key, const char *url, char **query_fields,
+		unsigned char expand_macros)
 {
 	struct zbx_json_parse	jp_array, jp_object;
 	char			name[MAX_STRING_LEN], value[MAX_STRING_LEN], *str = NULL;
@@ -337,7 +338,7 @@ static int	parse_query_fields(zbx_uint64_t hostid, char *host_host, char *host_n
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			substitute_macros_http_raw_resolv(&data, um_handle, hostid, host_host, host_name, itemid,
-				key_orig, key);
+					key_orig, key);
 		}
 
 		zbx_url_encode(data, &data);
@@ -348,7 +349,7 @@ static int	parse_query_fields(zbx_uint64_t hostid, char *host_host, char *host_n
 		if (ZBX_MACRO_EXPAND_YES == expand_macros)
 		{
 			substitute_macros_http_raw_resolv(&data, um_handle_unmasked, hostid, host_host, host_name,
-				itemid, key_orig, key);
+					itemid, key_orig, key);
 		}
 
 		zbx_url_encode(data, &data);
@@ -960,7 +961,8 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 		}
 
 		if (FAIL == parse_query_fields(items[i].hostid, items[i].host_host, items[i].host_name, items[i].itemid,
-			items[i].key_orig, items[i].key, items[i].url, &items[i].query_fields, ZBX_MACRO_EXPAND_YES))
+				items[i].key_orig, items[i].key, items[i].url, &items[i].query_fields,
+				ZBX_MACRO_EXPAND_YES))
 		{
 			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query fields"));
 			errcodes[i] = CONFIG_ERROR;
@@ -971,8 +973,8 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 		{
 			case ZBX_POSTTYPE_XML:
 				if (SUCCEED != xml_traverse_item_resolver(&items[i].posts, error, sizeof(error),
-					um_handle_secure, items[i].hostid, items[i].host_host, items[i].host_name,
-					items[i].itemid, items[i].key_orig, items[i].key))
+						um_handle_secure, items[i].hostid, items[i].host_host,
+						items[i].host_name, items[i].itemid, items[i].key_orig, items[i].key))
 				{
 					SET_MSG_RESULT(&results[i], zbx_dsprintf(NULL, "%s.", error));
 					errcodes[i] = CONFIG_ERROR;
@@ -981,13 +983,13 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 				break;
 			case ZBX_POSTTYPE_JSON:
 				substitute_macros_http_json_resolv(&items[i].posts, um_handle_secure,
-					items[i].hostid, items[i].host_host, items[i].host_name,
-					items[i].itemid, items[i].key_orig, items[i].key);
+						items[i].hostid, items[i].host_host, items[i].host_name,
+						items[i].itemid, items[i].key_orig, items[i].key);
 				break;
 			default:
 				substitute_macros_http_raw_resolv(&items[i].posts, um_handle_secure,
-					items[i].hostid, items[i].host_host, items[i].host_name,
-					items[i].itemid, items[i].key_orig, items[i].key);
+						items[i].hostid, items[i].host_host, items[i].host_name,
+						items[i].itemid, items[i].key_orig, items[i].key);
 				break;
 		}
 
@@ -1001,12 +1003,10 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 		zbx_dc_expand_user_and_func_macros(um_handle, &items[i].http_proxy,
 				&items[i].hostid, 1, NULL);
 
-		substitute_macros_http_raw_resolv(&items[i].ssl_cert_file, um_handle,
-					items[i].hostid, items[i].host_host, items[i].host_name,
-					items[i].itemid, items[i].key_orig, items[i].key);
-		substitute_macros_http_raw_resolv(&items[i].ssl_key_file, um_handle,
-					items[i].hostid, items[i].host_host, items[i].host_name,
-					items[i].itemid, items[i].key_orig, items[i].key);
+		substitute_macros_http_raw_resolv(&items[i].ssl_cert_file, um_handle, items[i].hostid,
+			items[i].host_host, items[i].host_name, items[i].itemid, items[i].key_orig, items[i].key);
+		substitute_macros_http_raw_resolv(&items[i].ssl_key_file, um_handle, items[i].hostid,
+			items[i].host_host, items[i].host_name, items[i].itemid, items[i].key_orig, items[i].key);
 
 		zbx_dc_expand_user_and_func_macros(um_handle_secure,  &items[i].ssl_key_password,
 				&items[i].hostid, 1, NULL);

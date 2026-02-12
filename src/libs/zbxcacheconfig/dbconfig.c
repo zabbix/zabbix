@@ -9647,9 +9647,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->retrieve_mode = src_item->itemtype.httpitem->retrieve_mode;
 			dst_item->request_method = src_item->itemtype.httpitem->request_method;
 			dst_item->output_format = src_item->itemtype.httpitem->output_format;
-			zbx_strscpy(dst_item->ssl_cert_file_orig, src_item->itemtype.httpitem->ssl_cert_file);
-			zbx_strscpy(dst_item->ssl_key_file_orig, src_item->itemtype.httpitem->ssl_key_file);
-			zbx_strscpy(dst_item->ssl_key_password_orig, src_item->itemtype.httpitem->ssl_key_password);
 			dst_item->verify_peer = src_item->itemtype.httpitem->verify_peer;
 			dst_item->verify_host = src_item->itemtype.httpitem->verify_host;
 			dst_item->authtype = src_item->itemtype.httpitem->authtype;

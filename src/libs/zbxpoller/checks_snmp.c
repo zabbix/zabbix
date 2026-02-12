@@ -3894,10 +3894,9 @@ out:
 }
 
 int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
-		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
-		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
-		struct evdns_base *dnsbase, const char *config_source_ip,
-		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
+		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
 	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
@@ -3951,10 +3950,9 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 }
 
 int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
-		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
-		struct evdns_base *dnsbase, const char *config_source_ip,
-		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
+		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
 	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
@@ -4003,7 +4001,7 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
 
 	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
-		dnsbase, resolve_reverse_dns, item->snmp_oid);
+			dnsbase, resolve_reverse_dns, item->snmp_oid);
 
 	if (SUCCEED != ret)
 		zbx_async_check_snmp_clean(snmp_context);

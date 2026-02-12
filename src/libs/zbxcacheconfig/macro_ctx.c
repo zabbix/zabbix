@@ -195,7 +195,7 @@ int	zbx_macro_field_params_resolv(zbx_macro_resolv_data_t *p, va_list args, char
 		else
 		{
 			ret = common_resolv(p, item.hostid, item.host_host, item.host_name,
-				item.interface, item.itemid, replace_to);
+					item.interface, item.itemid, replace_to);
 		}
 	}
 
@@ -266,7 +266,7 @@ static int	item_key_subst_cb(const char *data, int level, int num, int quoted, c
 	int	ret = SUCCEED;
 
 	/* Passed parameters */
-	zbx_macro_resolv_item_t item = va_arg(args, zbx_macro_resolv_item_t);
+	zbx_macro_resolv_item_t	item = va_arg(args, zbx_macro_resolv_item_t);
 
 	ZBX_UNUSED(num);
 

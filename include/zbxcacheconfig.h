@@ -198,9 +198,9 @@ typedef struct
 	char			*status_codes;
 	char			*http_proxy;
 	char			*headers;
-	char			ssl_cert_file_orig[ZBX_ITEM_SSL_CERT_FILE_LEN_MAX], *ssl_cert_file;
-	char			ssl_key_file_orig[ZBX_ITEM_SSL_KEY_FILE_LEN_MAX], *ssl_key_file;
-	char			ssl_key_password_orig[ZBX_ITEM_SSL_KEY_PASSWORD_LEN_MAX], *ssl_key_password;
+	char			*ssl_cert_file;
+	char			*ssl_key_file;
+	char			*ssl_key_password;
 	zbx_vector_ptr_pair_t 	script_params;
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	unsigned char		*formula_bin;
