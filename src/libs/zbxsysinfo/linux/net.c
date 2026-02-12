@@ -27,6 +27,7 @@
 #include <linux/wireless.h>
 #include <linux/ethtool.h>
 #include <linux/sockios.h>
+#include <linux/if_arp.h>
 
 typedef struct
 {
@@ -64,6 +65,7 @@ net_count_info_t;
 #define ZBX_PROC_NET_DEV_PRX		"/proc/net/dev"
 /* number of columns in a line from /proc/net/dev which represents a network interface */
 #define ZBX_PROC_NET_DEV_COLS_NUM	17
+#define ZBX_SYS_CLASS_NET_PFX		"/sys/class/net/"
 
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
@@ -1315,6 +1317,83 @@ static void	get_link_flags(const char *interface, struct zbx_json *j)
 	close(sock);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: adds network interface type to JSON                               *
+ *                                                                            *
+ * Comments:                                                                  *
+ *          if /sys/class/net/<name>/type contains ARPHRD_LOOPBACK value then *
+ *              type = "loopback"                                             *
+ *          else if /sys/class/net/<name>/device symlink is present and       *
+ *                  /sys/class/net/<name>/device/virtfn* symlinks             *
+ *                  are not present then                                      *
+ *              type = "physical"                                             *
+ *          else                                                              *
+ *              type = "virtual"                                              *
+ *                                                                            *
+ *          Presence of /sys/class/net/<name>/device/virtfn* symlinks         *
+ *          indicates that <name> is a single root input/output               *
+ *          virtualization SR-IOV virtual interface.                          *
+ *                                                                            *
+ ******************************************************************************/
+static void	if_type_add(const char *ifname, struct zbx_json *j)
+{
+#define JSON_KEY_TYPE		"type"
+#define VIRTFN_PFX		"virtfn"
+	FILE		*f;
+	char		buf[MAX_STRING_LEN];
+	int		type = ARPHRD_VOID;
+	zbx_stat_t	st;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/type", ifname);
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+			type = atoi(buf);
+		zbx_fclose(f);
+	}
+
+	if (ARPHRD_LOOPBACK == type)
+	{
+		zbx_json_addstring(j, JSON_KEY_TYPE, "loopback", ZBX_JSON_TYPE_STRING);
+		return;
+	}
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/device", ifname);
+
+	if (0 == lstat(buf, &st))
+	{
+		int		found = 0;
+		DIR		*dir;
+		struct dirent	*entry;
+		char		*value;
+
+		if (NULL != (dir = opendir(buf)))
+		{
+			while (NULL != (entry = readdir(dir)))
+			{
+				if (0 == strncmp(entry->d_name, VIRTFN_PFX, ZBX_CONST_STRLEN(VIRTFN_PFX)))
+				{
+					found = 1;
+					break;
+				}
+			}
+			closedir(dir);
+		}
+
+		if (0 == found)
+		{
+			zbx_json_addstring(j, JSON_KEY_TYPE, "physical", ZBX_JSON_TYPE_STRING);
+			return;
+		}
+	}
+
+	zbx_json_addstring(j, JSON_KEY_TYPE, "virtual", ZBX_JSON_TYPE_STRING);
+#undef JSON_KEY_TYPE
+#undef VIRTFN_PFX
+}
+
 static void	fill_net_if_get_params(const char *name, const char *param,
 		const char *jsonname, const int as_int, struct zbx_json *j)
 {
@@ -1451,7 +1530,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 					num_filled, ZBX_PROC_NET_DEV_PRX, if_name);
 		}
 
-		fill_net_if_get_params(if_name, "type",  NULL, 1, &jval);
+		if_type_add(if_name, &jval);
 		fill_net_if_get_params(if_name, "carrier", NULL, 1, &jval);
 		fill_net_if_get_params(if_name, "speed", NULL, 1, &jval);
 		fill_net_if_get_params(if_name, "duplex", NULL, 0, &jval);
