@@ -53,7 +53,7 @@ class CControllerPopupTokenView extends CController {
 			return false;
 		}
 
-		if ($this->getInput('admin_mode') === '0') {
+		if ($this->getInput('admin_mode') == 0) {
 			return $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS);
 		}
 

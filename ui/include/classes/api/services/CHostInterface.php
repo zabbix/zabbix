@@ -24,7 +24,6 @@ class CHostInterface extends CApiService {
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'replacehostinterfaces' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];

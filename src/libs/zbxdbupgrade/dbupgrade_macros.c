@@ -172,8 +172,10 @@ out:
 	return ret;
 }
 
-void	dbpatch_function_free(zbx_dbpatch_function_t *func)
+void	dbpatch_function_free(void *ptr)
 {
+	zbx_dbpatch_function_t	*func = (zbx_dbpatch_function_t*)ptr;
+
 	zbx_free(func->name);
 	zbx_free(func->parameter);
 	zbx_free(func->arg0);
@@ -957,7 +959,7 @@ void	dbpatch_convert_simple_macro(const char *expression, const zbx_token_simple
 
 	zbx_free(key);
 	zbx_free(host);
-	zbx_vector_ptr_clear_ext(&functions, (zbx_clean_func_t)dbpatch_function_free);
+	zbx_vector_ptr_clear_ext(&functions, dbpatch_function_free);
 	zbx_vector_ptr_destroy(&functions);
 
 #undef HOSTHOST_IDX_POS

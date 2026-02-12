@@ -394,6 +394,66 @@ static int	DBpatch_7050027(void)
 
 static int	DBpatch_7050028(void)
 {
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
+}
+
+static int	DBpatch_7050029(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update trigger_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where triggerid in ("
+				"select triggerid"
+				" from trigger_discovery"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050030(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'*.massupdate',"
+					"'host.massupdate',"
+					"'hostgroup.massupdate',"
+					"'template.massupdate',"
+					"'templategroup.massupdate',"
+					"'*.replacehostinterfaces',"
+					"'hostinterface.replacehostinterfaces'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050031(void)
+{
+	const zbx_db_table_t	table =
+			{"history_json", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 0, ZBX_TYPE_JSON, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050032(void)
+{
 	const zbx_db_table_t	table =
 			{"devices", "id", 0,
 				{
@@ -418,17 +478,17 @@ static int	DBpatch_7050028(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050029(void)
+static int	DBpatch_7050033(void)
 {
 	return DBcreate_index("devices", "devices_1", "user_ref", 0);
 }
 
-static int	DBpatch_7050030(void)
+static int	DBpatch_7050034(void)
 {
 	return DBcreate_index("devices", "devices_2", "token_ref", 0);
 }
 
-static int	DBpatch_7050031(void)
+static int	DBpatch_7050035(void)
 {
 	const zbx_db_field_t	field = {"user_ref", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -436,7 +496,7 @@ static int	DBpatch_7050031(void)
 	return DBadd_foreign_key("devices", 1, &field);
 }
 
-static int	DBpatch_7050032(void)
+static int	DBpatch_7050036(void)
 {
 	const zbx_db_field_t	field = {"token_ref", NULL, "token", "tokenid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -444,25 +504,11 @@ static int	DBpatch_7050032(void)
 	return DBadd_foreign_key("devices", 2, &field);
 }
 
-static int	DBpatch_7050033(void)
+static int	DBpatch_7050037(void)
 {
 	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0};
 
 	return DBadd_field("token", &field);
-}
-
-static int	DBpatch_7050034(void)
-{
-	const zbx_db_table_t	table =
-			{"bridge_adapter",
-				{
-					{"adapter_address", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"adapter_psk", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				},
-				NULL
-			};
-
-	return DBcreate_table(&table);
 }
 #endif
 
@@ -505,5 +551,7 @@ DBPATCH_ADD(7050031, 0, 1)
 DBPATCH_ADD(7050032, 0, 1)
 DBPATCH_ADD(7050033, 0, 1)
 DBPATCH_ADD(7050034, 0, 1)
-
+DBPATCH_ADD(7050035, 0, 1)
+DBPATCH_ADD(7050036, 0, 1)
+DBPATCH_ADD(7050037, 0, 1)
 DBPATCH_END()

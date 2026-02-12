@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-06 22:05+0000\n"
+"PO-Revision-Date: 2026-01-25 03:59+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -354,6 +354,10 @@ msgstr "(0 - emprar l'acció per defecte)"
 #: app/views/configuration.templategroup.list.php:36
 msgid "(Only super admins can create groups)"
 msgstr "(Només els superadministradors poden crear grups)"
+
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
 
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
@@ -1291,7 +1295,7 @@ msgstr "Agregat"
 
 #: widgets/topitems/views/column.edit.php:283
 msgid "Aggregate columns"
-msgstr ""
+msgstr "Afegir columnes"
 
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
@@ -1315,7 +1319,7 @@ msgstr "Funció d'agregació"
 #: widgets/tophosts/views/column.edit.php:330
 #: widgets/topitems/views/column.edit.php:256
 msgid "Aggregation function does not affect the sparkline."
-msgstr ""
+msgstr "La funció d'afegir no permet pas minigràfics."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -1839,7 +1843,7 @@ msgstr "Com a mínim heu d'afegir un període."
 #: app/controllers/CControllerConnectorCreate.php:44
 #: app/controllers/CControllerConnectorUpdate.php:45
 msgid "At least one type of information must be selected."
-msgstr ""
+msgstr "S'ha de triar com a mínim un tipus d'informació."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -5207,7 +5211,7 @@ msgstr "Colors"
 
 #: widgets/topitems/views/column.edit.php:293
 msgid "Column aggregation function"
-msgstr ""
+msgstr "Funció d'afegir columnes"
 
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
@@ -5216,7 +5220,7 @@ msgstr "Columnes"
 
 #: widgets/topitems/views/column.edit.php:313
 msgid "Combined column name"
-msgstr ""
+msgstr "Nom de la columna combinada"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -15335,6 +15339,16 @@ msgstr "Nom"
 msgid "Name ID"
 msgstr "ID del nom"
 
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
+
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "El nom del camp del formulari no ha de superar els 255 caràcters."
@@ -21619,7 +21633,7 @@ msgstr "Filtre d'etiquetes"
 #: app/controllers/CControllerConnectorCreate.php:120
 #: app/controllers/CControllerConnectorUpdate.php:121
 msgid "Tag filter name, operator and value combination is not unique."
-msgstr ""
+msgstr "La combinació de filtre de nom, operador i valor no és única."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -27166,7 +27180,7 @@ msgstr "tipus de dades no vàlid"
 #: include/classes/validators/CAbsoluteTimeValidator.php:45
 #: include/classes/validators/CAbsoluteTimeValidator.php:53
 msgid "invalid date"
-msgstr ""
+msgstr "informació no vàlida"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28570,7 +28584,7 @@ msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\
 #: include/classes/validators/CTimeUnitValidator.php:84
 #, c-format
 msgid "value must be between %1$s and %2$s"
-msgstr ""
+msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
@@ -28592,12 +28606,12 @@ msgstr "el valor ha d'ésser més gran de \"%1$s\""
 #: include/classes/validators/CAbsoluteTimeValidator.php:59
 #, c-format
 msgid "value must be greater than or equal to %1$s"
-msgstr ""
+msgstr "el valor ha d'ésser més gran o igual que \"%1$s\""
 
 #: include/classes/validators/CAbsoluteTimeValidator.php:64
 #, c-format
 msgid "value must be less than or equal to %1$s"
-msgstr ""
+msgstr "el valor ha d'ésser més petit o igual que \"%1$s\""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

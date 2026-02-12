@@ -264,7 +264,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					break;
 			}
 
-			$db_items_values = API::History()->get([
+			$options = [
 				'output' => $output,
 				'history' => $value_type,
 				'itemids' => $itemids,
@@ -273,7 +273,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'sortfield' => ['clock', 'ns'],
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $this->fields_values['show_lines'] * count($itemids)
-			]);
+			];
+
+			if ($value_type == ITEM_VALUE_TYPE_BINARY || $value_type == ITEM_VALUE_TYPE_JSON) {
+				// Extra byte to trim values that exceeds length limit.
+				$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
+			}
+
+			$db_items_values = API::History()->get($options);
 
 			foreach ($db_items_values as $db_item_value) {
 				$result[CWidgetFieldColumnsList::HISTORY_DATA_HISTORY][$db_item_value['itemid']][] = $db_item_value

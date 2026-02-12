@@ -23,6 +23,7 @@
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
+const ITEM_TYPE_CALCULATED = <?= ITEM_TYPE_CALCULATED ?>;
 const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
 const ITEM_TYPE_IPMI = <?= ITEM_TYPE_IPMI ?>;
 const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
@@ -30,7 +31,6 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
-const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
 const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
@@ -103,10 +103,8 @@ window.item_edit_form = new class {
 
 		this.updateFieldsVisibility();
 
-		this.initial_tags_state = {
-			tags: Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]),
-			show_inherited_tags: this.form.findFieldByName('show_inherited_tags')?.getValue() || '0'
-		};
+		this.form.discoverAllFields();
+		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
@@ -240,7 +238,7 @@ window.item_edit_form = new class {
 
 	initEvents() {
 		// Item tab events.
-		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandler.bind(this));
+		this.field.key.addEventListener('help_items.paste', this.#keyChangeHandlerPopUp.bind(this));
 		this.field.key.addEventListener('keyup', this.#keyChangeHandler.bind(this));
 		this.field.key_button?.addEventListener('click', this.#keySelectClickHandler.bind(this));
 		this.field.snmp_oid.addEventListener('keyup', this.updateFieldsVisibility.bind(this));
@@ -285,7 +283,6 @@ window.item_edit_form = new class {
 					this.field.url.value = url.url;
 
 					if (has_pairs) {
-						this.form.discoverAllFields();
 						setTimeout(() => {
 							const fields = this.form.findFieldByName('query_fields').getFields();
 							Object.values(fields).entries().forEach(([index, field]) => field.setChanged());
@@ -360,10 +357,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		const tags = Object.values(this.form.findFieldByName('tags')?.getValue() || [{tag: '', value: ''}]);
-		const show_inherited_tags = this.form.findFieldByName('show_inherited_tags')?.getValue() || '';
-
-		return JSON.stringify(this.initial_tags_state) === JSON.stringify({tags, show_inherited_tags})
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.#getFormFields())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -431,16 +425,17 @@ window.item_edit_form = new class {
 		for (const field of Object.values(this.form.findFieldByName('preprocessing').getFields())) {
 			field.setChanged();
 		}
-		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules).then((result) => {
-			this.overlay.unsetLoading();
-			this.#updateActionButtons();
+		this.form.validateFieldsForAction(['key', 'preprocessing', 'params_f'], rules)
+			.then((result) => {
+				this.overlay.unsetLoading();
+				this.#updateActionButtons();
 
-			if (!result) {
-				return;
-			}
+				if (!result) {
+					return;
+				}
 
-			this.#testDialog();
-		});
+				this.#testDialog();
+			});
 	}
 
 	delete() {
@@ -526,6 +521,8 @@ window.item_edit_form = new class {
 	#getFormFields() {
 		const values = this.form.getAllValues();
 
+		delete values.show_inherited_tags;
+
 		if (values.delay === undefined) {
 			values.delay = '';
 		}
@@ -591,7 +588,17 @@ window.item_edit_form = new class {
 			headers.push({name, value});
 		}
 
-		return {...values, ...{query_fields, headers, delay_flex, parameters}};
+		const tags = [];
+		for (let key in values.tags) {
+			let {tag, value} = values.tags[key];
+
+			if (tag === '' && value === '') {
+				continue;
+			}
+			tags.push({tag, value});
+		}
+
+		return {...values, ...{tags, query_fields, headers, delay_flex, parameters}};
 	}
 
 	#post(url, data, keep_open = false) {
@@ -691,7 +698,7 @@ window.item_edit_form = new class {
 		const fields = this.#getFormFields();
 		const data = {
 			tags: fields.tags,
-			show_inherited_tags: fields.show_inherited_tags,
+			show_inherited_tags,
 			itemid: fields.itemid,
 			hostid: fields.hostid
 		}
@@ -803,6 +810,7 @@ window.item_edit_form = new class {
 
 	#updateValueTypeOptionVisibility() {
 		const disable_binary = this.field.type.value != ITEM_TYPE_DEPENDENT;
+		const disable_json = this.field.type.value == ITEM_TYPE_CALCULATED;
 
 		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
 			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
@@ -813,6 +821,16 @@ window.item_edit_form = new class {
 
 		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+
+		if (disable_json && this.field.value_type.value == ITEM_VALUE_TYPE_JSON) {
+			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_JSON).value;
+
+			this.field.value_type.value = value;
+			this.field.value_type_steps.value = value;
+		}
+
+		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_JSON).hidden = disable_json;
+		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_JSON).hidden = disable_json;
 	}
 
 	#getInferredValueType(key) {
@@ -867,6 +885,11 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 	}
 
+	#keyChangeHandlerPopUp() {
+		this.#keyChangeHandler();
+		this.form.validateChanges(['key']);
+	}
+
 	#keyChangeHandler() {
 		const inferred_type = this.#getInferredValueType(this.field.key.value);
 
@@ -877,10 +900,10 @@ window.item_edit_form = new class {
 		this.last_inferred_type = inferred_type;
 
 		this.updateFieldsVisibility();
-		this.form.validateChanges(['key']);
 	}
 
 	#keySelectClickHandler() {
+		// This will emit a custom "help_items.paste" event on the key choice.
 		PopUp('popup.generic', {
 			srctbl: 'help_items',
 			srcfld1: 'key',

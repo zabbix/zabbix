@@ -22,7 +22,7 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 	}
 
 	protected function checkInput(): bool {
-		$ret = $this->validateInput(self::getValidationRules()) && $this->validateInputExtended();
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$form_errors = $this->getValidationError();
@@ -107,12 +107,15 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 					'when' => ['type', 'in' => [ITEM_TYPE_TELNET]]
 				]
 			],
-			'value_type' => ['db items.value_type', 'required', 'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]],
+			'value_type' => ['db items.value_type', 'required', 'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]],
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'query_fields' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
 					'value' => ['string', 'length' => 255],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
@@ -140,14 +143,17 @@ class CControllerItemPrototypeUpdate extends CControllerItemPrototype {
 			],
 			'headers' => ['objects',
 				'fields' => [
-					'name' => ['string', 'required', 'not_empty', 'length' => 255],
-					'value' => ['string', 'length' => 2000]
+					'value' => ['string', 'length' => 2000],
+					'name' => [
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'status_codes' => ['db items.status_codes',
 				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => true, 'with_minus' => true]],
-				'messages' => ['use' => _('Invalid range expression.')],
+				'messages' => ['use' => _('Invalid HTTP status code or range.')],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'follow_redirects' => ['db items.follow_redirects', 'in' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],

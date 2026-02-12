@@ -43,7 +43,7 @@
 #define HK_MIN_CLOCK_ALWAYS_RECHECK	-1
 
 /* trends table offsets in the hk_cleanup_tables[] mapping  */
-#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_BIN + 1)
+#define HK_UPDATE_CACHE_OFFSET_TREND_FLOAT	(ITEM_VALUE_TYPE_JSON + 1)
 #define HK_UPDATE_CACHE_OFFSET_TREND_UINT	(HK_UPDATE_CACHE_OFFSET_TREND_FLOAT + 1)
 #define HK_UPDATE_CACHE_TREND_COUNT		2
 
@@ -172,6 +172,7 @@ static zbx_hk_cleanup_table_t	hk_cleanup_tables[] = {
 	{"history_str",		&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_text",	&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_bin",		&cfg.hk.history_mode,	&cfg.hk.history_global},
+	{"history_json",	&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"history_uint",	&cfg.hk.history_mode,	&cfg.hk.history_global},
 	{"trends",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
 	{"trends_uint",		&cfg.hk.trends_mode,	&cfg.hk.trends_global},
@@ -201,6 +202,9 @@ static zbx_hk_history_rule_t	hk_history_rules[] = {
 	{.table = "history_bin",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
 			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
 			.type = ITEM_VALUE_TYPE_BIN},
+	{.table = "history_json",	.history = "history",	.poption_mode = &cfg.hk.history_mode,
+			.poption_global = &cfg.hk.history_global,	.poption = &cfg.hk.history,
+			.type = ITEM_VALUE_TYPE_JSON},
 	{.table = "trends",		.history = "trends",	.poption_mode = &cfg.hk.trends_mode,
 			.poption_global = &cfg.hk.trends_global,	.poption = &cfg.hk.trends,
 			.type = ITEM_VALUE_TYPE_FLOAT},
@@ -414,7 +418,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 		value_type = atoi(row[1]);
 		ZBX_STR2UINT64(hostid, row[4]);
 
-		if (value_type <= ITEM_VALUE_TYPE_BIN &&
+		if (value_type <= ITEM_VALUE_TYPE_JSON &&
 				ZBX_HK_MODE_REGULAR == *(rule = rules + value_type)->poption_mode)
 		{
 			int	history;
@@ -438,7 +442,7 @@ static void	hk_history_update(zbx_hk_history_rule_t *rules, int now)
 			if (0 != history && ZBX_HK_OPTION_DISABLED != *rule->poption_global)
 				history = *rule->poption;
 
-			hk_history_item_update(rules, ITEM_VALUE_TYPE_BIN + 1, rule, now, itemid, history);
+			hk_history_item_update(rules, ITEM_VALUE_TYPE_JSON + 1, rule, now, itemid, history);
 		}
 
 		/* trend rules are shared between all trend types, so we can default to floating type */

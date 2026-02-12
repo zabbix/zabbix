@@ -4,27 +4,27 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "a98d050ee9c3d295a850dd5aecb81a59",
+    "content-hash": "fc29242ee7a5148a7816092b0a902021",
     "packages": [
         {
             "name": "duosecurity/duo_universal_php",
-            "version": "1.0.2",
+            "version": "1.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/duosecurity/duo_universal_php.git",
-                "reference": "8734a47480d2d2f0539e8ee782675e052025d026"
+                "reference": "4ee7253863d84653a60a8cad4b03aa3b66fcfd35"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/duosecurity/duo_universal_php/zipball/8734a47480d2d2f0539e8ee782675e052025d026",
-                "reference": "8734a47480d2d2f0539e8ee782675e052025d026",
+                "url": "https://api.github.com/repos/duosecurity/duo_universal_php/zipball/4ee7253863d84653a60a8cad4b03aa3b66fcfd35",
+                "reference": "4ee7253863d84653a60a8cad4b03aa3b66fcfd35",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
                 "firebase/php-jwt": "^6.0",
-                "php": ">=7.3"
+                "php": ">=7.4"
             },
             "require-dev": {
                 "phpunit/phpunit": "^9.0",
@@ -37,14 +37,17 @@
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
             "description": "A PHP implementation of the Duo Universal SDK.",
             "homepage": "https://duo.com/",
             "support": {
                 "email": "support@duosecurity.com",
                 "issues": "https://github.com/duosecurity/duo_universal_php/issues",
-                "source": "https://github.com/duosecurity/duo_universal_php/tree/1.0.2"
+                "source": "https://github.com/duosecurity/duo_universal_php/tree/1.1.1"
             },
-            "time": "2023-01-13T18:47:58+00:00"
+            "time": "2025-08-13T14:05:56+00:00"
         },
         {
             "name": "erusev/parsedown",
@@ -602,5 +605,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.3.0"
+    "plugin-api-version": "2.6.0"
 }

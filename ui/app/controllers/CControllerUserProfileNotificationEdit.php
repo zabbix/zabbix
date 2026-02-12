@@ -20,44 +20,6 @@
 class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral {
 
 	protected function checkInput(): bool {
-		$fields = [
-			'messages' =>		'array',
-			'form_refresh' =>	'int32'
-		];
-
-		if (CWebUser::$data['type'] > USER_TYPE_ZABBIX_USER) {
-			$fields += [
-				'medias' =>			'array'
-			];
-		}
-
-		$ret = $this->validateInput($fields) && $this->validateMedias();
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
-	}
-
-	protected function validateMedias(): bool {
-		$validation_rules = [
-			'mediaid' =>		'id',
-			'mediatypeid' =>	'required|db media_type.mediatypeid',
-			'sendto' =>			'required',
-			'period' =>			'required|time_periods',
-			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
-			'severity' =>		'int32|ge 0|le '.(pow(2, TRIGGER_SEVERITY_COUNT) - 1)
-		];
-
-		foreach ($this->getInput('medias', []) as $media) {
-			$validator = new CNewValidator($media, $validation_rules);
-
-			if ($validator->isError()) {
-				return false;
-			}
-		}
-
 		return true;
 	}
 
@@ -87,25 +49,20 @@ class CControllerUserProfileNotificationEdit extends CControllerUserEditGeneral 
 	 */
 	protected function doAction(): void {
 		$data = [
-			'form_refresh' => 0
+			'medias' => $this->user['medias'],
+			'userid' => CWebUser::$data['userid'],
+			'messages' => getMessageSettings(),
+			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
+			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES,
+			'can_edit_media' => $this->checkAccess(CRoleHelper::ACTIONS_EDIT_OWN_MEDIA)
 		];
 
-		// Overwrite with input variables.
-		$this->getInputs($data, array_keys($data));
-
-		$data['medias'] = $data['form_refresh'] != 0
-			? $this->getInput('medias', [])
-			: $this->user['medias'];
+		$data['js_validation_rules'] = (new CFormValidator(
+				CControllerUserProfileNotificationUpdate::getValidationRules($data['can_edit_media'])
+			))
+			->getRules();
 
 		$data = $this->setUserMedias($data);
-
-		$data += [
-			'userid' => CWebUser::$data['userid'],
-			'messages' => $this->getInput('messages', []) + getMessageSettings(),
-			'action' => $this->getAction(),
-			'internal_auth' => CWebUser::$data['auth_type'] == ZBX_AUTH_INTERNAL,
-			'readonly' => $this->user['provisioned'] == CUser::PROVISION_STATUS_YES
-		];
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Notifications'));

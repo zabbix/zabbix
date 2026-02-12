@@ -827,7 +827,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => STYLE_TOP
+										'value' => 1 // WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -1628,7 +1628,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => STYLE_TOP
+										'value' => 1 // WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -3124,10 +3124,10 @@ class WidgetCommunication {
 										'name' => 'hostids._reference',
 										'value' => 'CEPBS._hostids'
 									],
-																		[
+									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'layout',
-										'value' => 1
+										'value' => 1 // WidgetForm::LAYOUT_VERTICAL
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,

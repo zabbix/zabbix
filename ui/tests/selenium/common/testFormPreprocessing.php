@@ -1790,9 +1790,8 @@ abstract class testFormPreprocessing extends CWebTest {
 					'preprocessing' => [
 						['type' => 'In range', 'parameter_1' => '8', 'parameter_2' => '-8']
 					],
-					'inline_errors' => [
-						'id:preprocessing_0_params_1' => 'Max: Cannot be less than or equal to "Min".'
-					]
+					'error' => 'Invalid parameter "/1/preprocessing/1/params/2": cannot be less than or equal '.
+							'to the value of parameter "/1/preprocessing/1/params/1".'
 				]
 			],
 			// Validation - Matches regular expression.
@@ -1887,7 +1886,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						['type' => 'Check for not supported value']
 					],
 					'inline_errors' => [
-						'id:preprocessing_1_type' => 'Preprocessing step with such Name and Parameters combination'.
+						'name:preprocessing[1][params_0_not_supported]' => 'Preprocessing step with such Name and Parameters combination'.
 								' already exists.'
 					]
 				]
@@ -4271,7 +4270,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 
 			// Check 'Type of information' options.
-			$this->assertEquals(['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'],
+			$this->assertEquals(['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'JSON'],
 					$form->query('name:value_type_steps')->asDropdown()->one()->getOptions()->asText()
 			);
 		}

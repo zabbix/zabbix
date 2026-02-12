@@ -21,27 +21,6 @@ class CArrayHelper {
 	 */
 	protected static $fields;
 
-	private function __construct() {}
-
-	/**
-	 * Copies keys according to given map for given array of the objects.
-	 *
-	 * @param array $array
-	 * @param array $field_map
-	 *
-	 * @return array
-	 */
-	public static function copyObjectsKeys(array $array, array $field_map) {
-		foreach ($array as &$object) {
-			foreach ($field_map as $old_key => $new_key) {
-				$object[$new_key] = $object[$old_key];
-			}
-		}
-		unset($object);
-
-		return $array;
-	}
-
 	/**
 	 * Get from array only values with given keys.
 	 * If requested key is not in given array exception is thrown.
@@ -79,26 +58,6 @@ class CArrayHelper {
 		foreach ($keys as $key) {
 			if (array_key_exists($key, $array)) {
 				$result[$key] = $array[$key];
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Select sub-array of array items with keys in given numeric range.
-	 *
-	 * @param array $array    Array with numeric keys to test for given range.
-	 * @param int   $start    Range start value.
-	 * @param int   $end      Range end value.
-	 *
-	 * @return array
-	 */
-	public static function getByKeysRange(array $array, $start, $end) {
-		$result = [];
-		foreach ($array as $key => $val) {
-			if ($key >= $start && $key <= $end) {
-				$result[$key] = $val;
 			}
 		}
 
@@ -192,16 +151,6 @@ class CArrayHelper {
 			}
 		}
 		return 0;
-	}
-
-	/**
-	 * Sort array by keys in ascending order.
-	 * Performs case-insensitive string comparisons using a "natural order" algorithm.
-	 *
-	 * @param array $array
-	 */
-	public static function ksort(array &$array): void {
-		uksort($array, 'strnatcasecmp');
 	}
 
 	/**

@@ -537,7 +537,7 @@ function stepInstallAgent($agent_script_data): array {
 							(new CListItem(
 								(new CDiv())
 									->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-									->addclass('js-install-agent-readme')
+									->addClass('js-install-agent-readme')
 							))
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 								->addClass(ZBX_STYLE_GRID_COLUMNS)

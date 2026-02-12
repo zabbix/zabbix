@@ -44,6 +44,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Profile');
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'User updated');
 		$this->zbxTestCheckHeader('Global view');
 
 		$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
@@ -94,19 +95,19 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'password1' => '',
 				'password2' => '',
-				'error_msg' => 'Incorrect value for field "Password": cannot be empty.'
+				'error_msg' => ['Password' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'password1' => 'abcd1234',
 				'password2' => 'abCD1235',
-				'error_msg' => 'Both passwords must be equal.'
+				'error_msg' => ['Password' => 'Must not be one of common or context-specific passwords.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'password1' => '12345',
 				'password2' => '123456',
-				'error_msg' => 'Both passwords must be equal.'
+				'error_msg' => ['Password' => 'Must be at least 8 characters long.']
 			]],
 			[[
 				'expected' => TEST_BAD,
@@ -120,7 +121,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				'old_password' => '',
 				'password1' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
 				'password2' => "'\'$\"\"!$@$#^%$+-=~`\`\\",
-				'error_msg' => 'Incorrect value for field "Current password": cannot be empty.'
+				'error_msg' => ['Current password' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_GOOD,
@@ -150,9 +151,9 @@ class testFormUserProfile extends CLegacyWebTest {
 			$form->query('id', $id)->waitUntilVisible()->one();
 		}
 		$form->fill([
-				'Current password' => (array_key_exists('old_password', $data)) ? $data['old_password'] : self::$old_password,
-				'Password' => $data['password1'],
-				'Password (once again)' => $data['password2']
+			'Current password' => (array_key_exists('old_password', $data)) ? $data['old_password'] : self::$old_password,
+			'Password' => $data['password1'],
+			'Password (once again)' => $data['password2']
 		]);
 		$form->submit();
 
@@ -160,12 +161,10 @@ class testFormUserProfile extends CLegacyWebTest {
 			$this->page->acceptAlert();
 		}
 
-		$this->page->waitUntilReady();
-
 		switch ($data['expected']) {
 			case TEST_GOOD:
+				$this->assertTrue($this->query('button:Sign in')->waitUntilVisible()->one()->isClickable());
 				$this->page->assertTitle('Zabbix');
-				$this->assertTrue($this->query('button:Sign in')->one()->isClickable());
 				$this->page->userLogin('Admin', $data['password1']);
 				$this->assertTrue($this->query('xpath://a[@title="Admin (Zabbix Administrator)" and text()='.
 						'"User settings"]')->exists()
@@ -175,7 +174,12 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->page->logout();
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , $data['error_msg']);
+				if (is_array($data['error_msg'])) {
+					$this->assertInlineError($form, $data['error_msg']);
+				}
+				else {
+					$this->assertMessage(TEST_BAD, 'Cannot update user', $data['error_msg']);
+				}
 				$this->zbxTestCheckTitle('Profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
@@ -187,37 +191,38 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => ' ',
-				'error_msg' => 'Incorrect value for field "refresh": cannot be empty.'
+				'error_msg' => ['Refresh' => 'This field cannot be empty.']
+
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => 's',
-				'error_msg' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+				'error_msg' => ['Refresh' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => '1.5',
-				'error_msg' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+				'error_msg' => ['Refresh' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => '{$DEFAULT_DELAY}',
-				'error_msg' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+				'error_msg' => ['Refresh' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => '1d',
-				'error_msg' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+				'error_msg' => ['Refresh' => 'Value must be between 0 and 3600s (1h).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => '36001',
-				'error_msg' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+				'error_msg' => ['Refresh' => 'Value must be between 0 and 3600s (1h).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'refresh' => '1y',
-				'error_msg' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+				'error_msg' => ['Refresh' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_GOOD,
@@ -253,11 +258,12 @@ class testFormUserProfile extends CLegacyWebTest {
 	/**
 	 * @dataProvider refresh
 	 */
-	public function ttestFormUserProfile_RefreshTime($data) {
+	public function testFormUserProfile_RefreshTime($data) {
 		$sqlHashUsers = 'select * from users order by userid';
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
+		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
 
 		$this->zbxTestInputTypeOverwrite('refresh', $data['refresh']);
 		$this->zbxTestClickWait('update');
@@ -270,9 +276,8 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertEquals($data['refresh'] , $row['refresh']);
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
-				$this->zbxTestTextPresent($data['error_msg']);
-				$this->zbxTestCheckTitle('User profile');
+				$this->assertInlineError($form, $data['error_msg']);
+				$this->zbxTestCheckTitle('Profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
 		}
@@ -283,57 +288,57 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => ' ',
-				'error_msg' => 'Incorrect value for field "autologout": cannot be empty.'
+				'error_msg' => ['Auto-logout' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => 's',
-				'error_msg' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+				'error_msg' => ['Auto-logout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '1.5',
-				'error_msg' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+				'error_msg' => ['Auto-logout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '{$DEFAULT_DELAY}',
-				'error_msg' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+				'error_msg' => ['Auto-logout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '1s',
-				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				'error_msg' => ['Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '1m',
-				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				'error_msg' => ['Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '25h',
-				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				'error_msg' => ['Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '2d',
-				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				'error_msg' => ['Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '89',
-				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				'error_msg' => ['Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '86401',
-				'error_msg' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+				'error_msg' => ['Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'autologout' => '1y',
-				'error_msg' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+				'error_msg' => ['Auto-logout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_GOOD,
@@ -366,6 +371,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$oldHashUsers = CDBHelper::getHash($sqlHashUsers);
 
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
+		$form = $this->query('name:userprofile_form')->asForm()->waitUntilVisible()->one();
 
 		$this->zbxTestCheckboxSelect('autologout_visible', true);
 		$this->zbxTestInputTypeOverwrite('autologout', $data['autologout']);
@@ -379,8 +385,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertEquals($data['autologout'] , $row['autologout']);
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
-				$this->zbxTestTextPresent($data['error_msg']);
+				$this->assertInlineError($form, $data['error_msg']);
 				$this->zbxTestCheckTitle('Profile');
 				$this->assertEquals($oldHashUsers, CDBHelper::getHash($sqlHashUsers));
 				break;
@@ -392,67 +397,67 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => ' ',
-				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+				'error_msg' => ['Message timeout' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => 's',
-				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+				'error_msg' => ['Message timeout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '1.5',
-				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+				'error_msg' => ['Message timeout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '{$DEFAULT_DELAY}',
-				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+				'error_msg' => ['Message timeout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '0',
-				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
+				'error_msg' => ['Message timeout' => 'Value must be between 30s and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '1s',
-				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
+				'error_msg' => ['Message timeout' => 'Value must be between 30s and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '29',
-				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
+				'error_msg' => ['Message timeout' => 'Value must be between 30s and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '25h',
-				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
+				'error_msg' => ['Message timeout' => 'Value must be between 30s and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '2d',
-				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
+				'error_msg' => ['Message timeout' => 'Value must be between 30s and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '86401',
-				'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.'
+				'error_msg' => ['Message timeout' => 'Value must be between 30s and 86400s (1d).']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => '1y',
-				'error_msg' => 'Incorrect value for field "timeout": a time unit is expected.'
+				'error_msg' => ['Message timeout' => 'A time unit is expected.']
 			]],
 			[[
 				'expected' => TEST_GOOD,
@@ -482,6 +487,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.notification.edit');
 		$this->zbxTestCheckHeader('Notifications');
 		$this->zbxTestTabSwitch('Frontend notifications');
+		$form = $this->query('id:userprofile-notification-form')->asForm()->waitUntilVisible()->one();
 
 		if (array_key_exists('messages_disabled', $data)) {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='messages_timeout'][@disabled]");
@@ -526,8 +532,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestCheckHeader('Global view');
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' , 'Cannot update user');
-				$this->zbxTestTextPresent($data['error_msg']);
+				$this->assertInlineError($form, $data['error_msg']);
 				break;
 		}
 	}
@@ -537,43 +542,43 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => '',
-				'error_msg' => 'Incorrect value for field "sendto": cannot be empty.'
+				'error_msg' => ['Send to' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test',
 				'period' => ' ',
-				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
+				'error_msg' => ['When active' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '0-0,00:00-00:00',
-				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
+				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '1-11,00:00-24:00',
-				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
+				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '1-7,00:00-25:00',
-				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
+				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => '1-7,24:00-00:00',
-				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
+				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
 				'period' => 'test',
-				'error_msg' => 'Incorrect value for field "period": a time period is expected.'
+				'error_msg' => ['When active' => 'Invalid period.']
 			]]
 		];
 	}
@@ -585,7 +590,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=userprofile.notification.edit');
 		$this->zbxTestCheckHeader('Notifications');
 		$this->zbxTestClickButtonText('Add');
-		$this->zbxTestLaunchOverlayDialog('New media');
+		$form = COverlayDialogElement::get('New media')->asForm();
 
 		if (array_key_exists('type', $data)) {
 			$this->zbxTestDropdownSelect('mediatypeid', $data['type']);
@@ -610,8 +615,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->assertEquals(1, CDBHelper::getCount($sql));
 				break;
 			case TEST_BAD:
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//div[@class='overlay-dialogue-body']//div[@class='msg-details']"));
-				$this->zbxTestTextPresent($data['error_msg']);
+				$this->assertInlineError($form, $data['error_msg']);
 				break;
 		}
 	}

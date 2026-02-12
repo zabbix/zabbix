@@ -152,7 +152,7 @@ class testFormUserPermissions extends CWebTest {
 		$form->submit();
 
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update user', 'Field "roleid" is mandatory.');
+			$this->assertInlineError($form, ['Role' => 'This field cannot be empty.']);
 			$this->page->open('zabbix.php?action=user.list');
 			$this->assertEquals($standard_role, $table->findRow('Username', $data['user_name'])->getColumn('User role')->getText());
 			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM users'));

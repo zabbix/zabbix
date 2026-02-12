@@ -617,6 +617,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->setAttribute('maxlength', 1),
 					(new CCheckBox('preprocessing['.$i.'][params_2]', ZBX_PREPROC_CSV_HEADER))
 						->setLabel(_('With header row'))
+						->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
 						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
 						->setReadonly($readonly)
 				];
@@ -649,9 +650,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
 							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
 						]))
-							->setAttribute('data-prevent-validation-on-change', '')
 							->setAttribute('placeholder', _('error-matching'))
 							->addClass('js-preproc-param-error-matching')
+							->setErrorContainer('preprocessing-'.$i.'-error-container')
 							->setValue($step_param_0_value)
 							->setReadonly($readonly),
 					$step_param_1
@@ -964,6 +965,10 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 				$actions = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
 				break;
 
+			case 'trigger':
+				$actions = (new CSpan(_('(created by LLD)')))->addClass(ZBX_STYLE_GREY);
+				break;
+
 			default:
 				$actions = null;
 				break;
@@ -985,8 +990,12 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		$value_field->setAttribute('data-skip-from-submit', '');
 		$tag_field->setAttribute('data-skip-from-submit', '');
 
-		if ($type_field) {
+		if ($type_field !== null) {
 			$type_field->setAttribute('data-skip-from-submit', '');
+		}
+
+		if ($automatic_field !== null) {
+			$automatic_field->setAttribute('data-skip-from-submit', '');
 		}
 	}
 

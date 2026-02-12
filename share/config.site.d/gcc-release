@@ -8,7 +8,7 @@ fi
 
 if [ -z "$CFLAGS" ]
 then
-	CFLAGS="-std=gnu99"
+	CFLAGS="-std=gnu11"
 	CFLAGS+=" -O2"
 	CFLAGS+=" -fPIE"
 fi
