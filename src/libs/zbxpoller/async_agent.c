@@ -259,8 +259,7 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, zb
 			}
 
 			agent_context->step = ZABBIX_AGENT_STEP_RECV;
-			zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context,
-					agent_context->item.flags);
+			zbx_tcp_recv_context_init(&agent_context->s, &agent_context->tcp_recv_context, 0);
 
 			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_AGENT_STEP_RECV_CLOSE:
@@ -276,7 +275,7 @@ static int	async_task_process_task_agent_cb(short event, void *data, int *fd, zb
 			if (ZABBIX_AGENT_STEP_RECV == agent_context->step)
 			{
 				if (FAIL == zbx_tcp_recv_context(&agent_context->s, &agent_context->tcp_recv_context,
-					agent_context->item.flags, &event_new))
+						0, &event_new))
 				{
 					if (ZBX_ASYNC_TASK_STOP != (state = zbx_async_poller_get_task_state_for_event(event_new)))
 						return state;
