@@ -164,7 +164,7 @@ function get_icon($type, $params = []): ?CSimpleButton {
 				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR_FILLED)
 					->setHint(_('Remove from favorites'), '', false)
-					->setAttribute('aria-label', $params['fav'] === "web.favorite.sysmapids"
+					->setAttribute('aria-label', $params['fav'] === 'web.favorite.sysmapids'
 						? _('Remove map from the Favorite maps widget')
 						: _('Remove graph from the Favorite graphs widget'))
 					->onClick('rm4favorites("'.$params['elname'].'", "'.$params['elid'].'");');
@@ -173,7 +173,7 @@ function get_icon($type, $params = []): ?CSimpleButton {
 				$icon = (new CSimpleButton())
 					->addClass(ZBX_ICON_STAR)
 					->setHint(_('Add to favorites'), '', false)
-					->setAttribute('aria-label', $params['fav'] === "web.favorite.sysmapids"
+					->setAttribute('aria-label', $params['fav'] === 'web.favorite.sysmapids'
 						? _('Add map to Favorite maps widget')
 						: _('Add graph to Favorite graphs widget'))
 					->onClick('add2favorites("'.$params['elname'].'", "'.$params['elid'].'");');
