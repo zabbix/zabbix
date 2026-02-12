@@ -61,7 +61,9 @@ net_count_info_t;
 #define NET_CONN_TYPE_TCP	0
 #define NET_CONN_TYPE_UDP	1
 
-#define ZBX_PROC_NET_DEV_PRX	"/proc/net/dev"
+#define ZBX_PROC_NET_DEV_PRX		"/proc/net/dev"
+/* number of columns in a line from /proc/net/dev which represents a network interface */
+#define ZBX_PROC_NET_DEV_COLS_NUM	17
 
 #if HAVE_INET_DIAG
 #	include <sys/socket.h>
@@ -242,49 +244,46 @@ out:
 }
 #endif
 
-static int	parse_net_dev_line(const char *line, char *if_name, net_stat_t *result)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: scans one line from /proc/net/dev representing network interface  *
+ *                                                                            *
+ * Returns: sscanf return value, number of items successfully filled          *
+ *                                                                            *
+ * Comments: the line input parameter must be a line from /proc/net/dev       *
+ *           representing network interface with ":" replaced by "\t" symbol  *
+ *                                                                            *
+ ******************************************************************************/
+static int	net_if_row_scan(const char *line, char *if_name, net_stat_t *net_stat)
 {
-	char	*p;
-
-	if (17 != sscanf(line, "%2047s\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
-			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\n",
+	return sscanf(line, "%s\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
+			ZBX_FS_UI64 "\n",
 			if_name,
-			&result->ibytes,	/* bytes */
-			&result->ipackets,	/* packets */
-			&result->ierr,		/* errs */
-			&result->idrop,		/* drop */
-			&result->ififo,		/* fifo (overruns) */
-			&result->iframe,	/* frame */
-			&result->icompressed,	/* compressed */
-			&result->imulticast,	/* multicast */
-			&result->obytes,	/* bytes */
-			&result->opackets,	/* packets */
-			&result->oerr,		/* errs */
-			&result->odrop,		/* drop */
-			&result->ofifo,		/* fifo (overruns)*/
-			&result->ocolls,	/* colls (collisions) */
-			&result->ocarrier,	/* carrier */
-			&result->ocompressed))	/* compressed */
-	{
-		return FAIL;
-	}
-
-	if (NULL != (p = strchr(if_name, ':')))
-		*p = '\0';
-
-	return SUCCEED;
+			&net_stat->ibytes,		/* bytes */
+			&net_stat->ipackets,		/* packets */
+			&net_stat->ierr,		/* errs */
+			&net_stat->idrop,		/* drop */
+			&net_stat->ififo,		/* fifo (overruns) */
+			&net_stat->iframe,		/* frame */
+			&net_stat->icompressed,		/* compressed */
+			&net_stat->imulticast,		/* multicast */
+			&net_stat->obytes,		/* bytes */
+			&net_stat->opackets,		/* packets */
+			&net_stat->oerr,		/* errs */
+			&net_stat->odrop,		/* drop */
+			&net_stat->ofifo,		/* fifo (overruns)*/
+			&net_stat->ocolls,		/* colls (collisions) */
+			&net_stat->ocarrier,		/* carrier */
+			&net_stat->ocompressed);	/* compressed */
 }
 
 static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 {
-	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN];
 	int	ret = SYSINFO_RET_FAIL;
+	char	line[MAX_STRING_LEN], name[MAX_STRING_LEN], *p;
 	FILE	*f;
 
 	if (NULL == if_name || '\0' == *if_name)
@@ -295,19 +294,24 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (NULL == strchr(line, ':'))
+		if (NULL == (p = strstr(line, ":")))
 			continue;
 
-		if (SUCCEED == parse_net_dev_line(line, name, result) && 0 == strcmp(name, if_name))
+		*p = '\t';
+
+		if (ZBX_PROC_NET_DEV_COLS_NUM == net_if_row_scan(line, name, result))
 		{
-			ret = SYSINFO_RET_OK;
-			break;
+			if (0 == strcmp(name, if_name))
+			{
+				ret = SYSINFO_RET_OK;
+				break;
+			}
 		}
 	}
 
@@ -315,11 +319,12 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		*error = zbx_dsprintf(NULL, "Cannot find information for this network interface in %s.",
+		*error = zbx_dsprintf(NULL, "Cannot find information for this network interface in \"%s\".",
 				ZBX_PROC_NET_DEV_PRX);
+		return SYSINFO_RET_FAIL;
 	}
 
-	return ret;
+	return SYSINFO_RET_OK;
 }
 
 /******************************************************************************
@@ -611,8 +616,8 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s",
-				ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV_PRX,
+				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -1345,40 +1350,40 @@ static void	fill_net_if_get_params(const char *name, const char *param,
 
 int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	FILE			*f;
-	struct zbx_json		jcfg, jval, j;
-	zbx_regexp_t		*rxp = NULL;
-	char			line[MAX_STRING_LEN], if_name[MAX_STRING_LEN], *pattern = NULL, *error = NULL;
-	net_stat_t		ns;
+	int		ret = SYSINFO_RET_OK;
+	FILE		*f;
+	struct zbx_json	jcfg, jval, j;
+	zbx_regexp_t	*rxp = NULL;
+	char		line[MAX_STRING_LEN], if_name[MAX_STRING_LEN], *pattern, *error = NULL;
+	net_stat_t	ns;
 
 	if (1 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
-	if (1 == request->nparam)
+	pattern = get_rparam(request, 0);
+
+	if (NULL != pattern && '\0' != *pattern)
 	{
-		pattern = get_rparam(request, 0);
-
-		if (FAIL == zbx_regexp_compile(pattern, &rxp, &error))
+		if (SUCCEED != zbx_regexp_compile(pattern, &rxp, &error))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid regular expression: %s", error));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "invalid regular expression: \"%s\"", error));
 			zbx_free(error);
-
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out;
 		}
 	}
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV_PRX, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s",
-				ZBX_PROC_NET_DEV_PRX, zbx_strerror(errno)));
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV_PRX,
+				zbx_strerror(errno)));
 
-		if (NULL != rxp)
-			zbx_regexp_free(rxp);
-
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out;
 	}
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
@@ -1387,8 +1392,20 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		if (FAIL == parse_net_dev_line(line, if_name, &ns))
+		int	num_filled;
+		char	*p;
+
+		if (NULL == (p = strstr(line, ":")))
 			continue;
+
+		*p = '\t';
+
+		if (1 > (num_filled = net_if_row_scan(line, if_name, &ns)))
+		{
+			/* we need the interface name for getting metrics via sysfs */
+			THIS_SHOULD_NEVER_HAPPEN_MSG("cannot read interface name from of \"%s\"", ZBX_PROC_NET_DEV_PRX);
+			continue;
+		}
 
 		if (NULL != rxp && 0 != zbx_regexp_match_precompiled(if_name, rxp))
 			continue;
@@ -1403,27 +1420,36 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
 		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jval);
 		fill_net_if_get_params(if_name, "address", "mac", 0, &jval);
-		zbx_json_addobject(&jval, "in");
-		zbx_json_adduint64(&jval, "bytes", ns.ibytes);
-		zbx_json_adduint64(&jval, "packets", ns.ipackets);
-		zbx_json_adduint64(&jval, "errors", ns.ierr);
-		zbx_json_adduint64(&jval, "dropped", ns.idrop);
-		zbx_json_adduint64(&jval, "overruns", ns.ififo);
-		zbx_json_adduint64(&jval, "frame", ns.iframe);
-		zbx_json_adduint64(&jval, "compressed", ns.icompressed);
-		zbx_json_adduint64(&jval, "multicast", ns.imulticast);
-		zbx_json_close(&jval);
 
-		zbx_json_addobject(&jval, "out");
-		zbx_json_adduint64(&jval, "bytes", ns.obytes);
-		zbx_json_adduint64(&jval, "packets", ns.opackets);
-		zbx_json_adduint64(&jval, "errors", ns.oerr);
-		zbx_json_adduint64(&jval, "dropped", ns.odrop);
-		zbx_json_adduint64(&jval, "overruns", ns.ofifo);
-		zbx_json_adduint64(&jval, "collisions", ns.ocolls);
-		zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
-		zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
-		zbx_json_close(&jval);
+		if (ZBX_PROC_NET_DEV_COLS_NUM == num_filled)
+		{
+			zbx_json_addobject(&jval, "in");
+			zbx_json_adduint64(&jval, "bytes", ns.ibytes);
+			zbx_json_adduint64(&jval, "packets", ns.ipackets);
+			zbx_json_adduint64(&jval, "errors", ns.ierr);
+			zbx_json_adduint64(&jval, "dropped", ns.idrop);
+			zbx_json_adduint64(&jval, "overruns", ns.ififo);
+			zbx_json_adduint64(&jval, "frame", ns.iframe);
+			zbx_json_adduint64(&jval, "compressed", ns.icompressed);
+			zbx_json_adduint64(&jval, "multicast", ns.imulticast);
+			zbx_json_close(&jval);
+
+			zbx_json_addobject(&jval, "out");
+			zbx_json_adduint64(&jval, "bytes", ns.obytes);
+			zbx_json_adduint64(&jval, "packets", ns.opackets);
+			zbx_json_adduint64(&jval, "errors", ns.oerr);
+			zbx_json_adduint64(&jval, "dropped", ns.odrop);
+			zbx_json_adduint64(&jval, "overruns", ns.ofifo);
+			zbx_json_adduint64(&jval, "collisions", ns.ocolls);
+			zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
+			zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
+			zbx_json_close(&jval);
+		}
+		else
+		{
+			THIS_SHOULD_NEVER_HAPPEN_MSG("could read just %d values from \"%s\" for interface \"%s\"",
+					num_filled, ZBX_PROC_NET_DEV_PRX, if_name);
+		}
 
 		fill_net_if_get_params(if_name, "type",  NULL, 1, &jval);
 		fill_net_if_get_params(if_name, "carrier", NULL, 1, &jval);
@@ -1448,8 +1474,10 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&jval);
 	zbx_json_free(&jcfg);
 
+
+out:
 	if (NULL != rxp)
 		zbx_regexp_free(rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
