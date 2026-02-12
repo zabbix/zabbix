@@ -1732,47 +1732,37 @@ class CFormValidator {
 	 * @returns {boolean}
 	 */
 	#isMacro(macro_types, value) {
-		const validate_macro = (macro_regexps, macro) => {
-			for (let  i = 0; i < macro_regexps.length; i++) {
-				if (macro.match(macro_regexps[i])) {
-					return true;
-				}
-			}
-
-			return false;
-		};
-
-		const macro_name = '(?<macro_name>[A-Z0-9._]+)';
-		const quoted_param = '("((\\\\")|[^"])*[^\\\\]")';
-		const unquoted_context = '([^"}]([^}])*)';
-		const macro_context = '(:(?<context>('+unquoted_context+'|'+quoted_param+')))';
+		const macro_name = '([A-Z0-9._]+)';
+		const quoted_param = '([ ]*"((\\\\.)|[^"\\\\])*"[ ]*)';
+		const unquoted_context = '([ ]*[^"} ]([^}])*)';
+		const macro_context = `(:([ ]*|${unquoted_context}|${quoted_param}))`;
 
 		const macro_regexps = [];
 
 		if (macro_types.usermacros) {
-			macro_regexps.push(new RegExp('^(?<macro>\{\\$'+macro_name+macro_context+'?\})$'));
+			macro_regexps.push(`({\\$${macro_name}${macro_context}?})`);
 		}
 
 		if (macro_types.lldmacros) {
-			macro_regexps.push(new RegExp('^(?<macro>\{#'+macro_name+'})$'));
+			macro_regexps.push(`({#${macro_name}})`);
 		}
 
-		if (validate_macro(macro_regexps, value)) {
+		if (macro_regexps.length == 0) {
+			return false;
+		}
+
+		const macro = `(${macro_regexps.join('|')})`;
+
+		if (value.match(new RegExp(`^${macro}$`))) {
 			return true;
 		}
 
-		const match = value.match(
-			new RegExp('^(?<macro_function>\\{(?<macro>{.*})\\.(?<func>[a-z]+)\\((?<params>.*)\\)})$')
-		);
+		const unquoted_param = '([^"][^),]*)';
+		const single_param = `[ ]*([ ]*|${unquoted_param}|${quoted_param})[ ]*`;
+		const params_regex = `(${single_param},)*${single_param}`;
 
-		if (match && validate_macro(macro_regexps, match.groups.macro)) {
-			const unquoted_param = '([^"][^),]*)';
-			const single_param = '[ ]*([ ]*|'+unquoted_param+'|'+quoted_param+')[ ]*';
-			const params_regex = new RegExp('^('+single_param+',)*'+single_param+'$');
-
-			if (match.groups.params.match(params_regex)) {
-				return true;
-			}
+		if (value.match(new RegExp(`^({${macro}\\.(?<func>[a-z]+)\\((${params_regex})\\)})$`))) {
+			return true;
 		}
 
 		return false;
