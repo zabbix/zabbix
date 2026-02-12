@@ -1510,6 +1510,10 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 
 	zbx_thread_proxyconfig_args		proxyconfig_args =
 		{
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+			.zbx_find_psk_in_cache_cb_arg = zbx_dc_get_psk_by_identity,
+#endif
+			.zbx_get_program_type_cb_arg = get_zbx_program_type,
 			.config_tls = zbx_config_tls,
 			.config_vault = &zbx_config_vault,
 			.config_timeout = zbx_config_timeout,
@@ -1520,6 +1524,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_ssl_cert_location = config_ssl_cert_location,
 			.config_ssl_key_location = config_ssl_key_location,
 			.config_proxyconfig_frequency = config_proxyconfig_frequency
+
 		};
 
 	zbx_thread_datasender_args		datasender_args =
@@ -1655,11 +1660,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 			.config_timeout = zbx_config_timeout,
 			.program_type = zbx_program_type,
 			.unit_defs = {{0}},
-			.config_tls = zbx_config_tls,
-			.zbx_get_program_type_cb_arg = get_zbx_program_type,
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-			.zbx_find_psk_in_cache_cb_arg = zbx_dc_get_psk_by_identity
-#endif
+			.config_tls = zbx_config_tls
 		};
 
 	thread_args.info.program_type = zbx_program_type;

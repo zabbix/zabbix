@@ -31,6 +31,11 @@ typedef struct
 	const char		*config_ssl_cert_location;
 	const char		*config_ssl_key_location;
 	int			config_proxyconfig_frequency;
+	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_find_psk_in_cache_f		zbx_find_psk_in_cache_cb_arg;
+#endif
+
 }
 zbx_thread_proxyconfig_args;
 

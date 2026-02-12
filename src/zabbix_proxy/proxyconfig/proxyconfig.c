@@ -308,6 +308,13 @@ void	*zbx_proxyconfig_thread(void *args)
 
 	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
+		proxyconfig_args_in->zbx_find_psk_in_cache_cb_arg);
+#else
+	ZBX_UNUSED(args);
+#endif
+
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxyconfig_args_in->config_timeout,
 			&rtc);
 
