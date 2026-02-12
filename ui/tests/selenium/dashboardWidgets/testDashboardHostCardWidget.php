@@ -1310,7 +1310,7 @@ class testDashboardHostCardWidget extends testWidgets {
 			$icon->waitUntilClickable()->click();
 			$dialog_text =  $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->getText();
 			$this->assertEquals($data['Maintenance']['Name']."\n".$data['Maintenance']['Description'], $dialog_text);
-			$this->query('xpath://div[contains(@class, "hintbox-static")]/button[@title="Close"]')->one()->click();
+			$this->query('xpath://div[contains(@class, "hintbox-static")]//button[@title="Close"]')->one()->click();
 		}
 
 		if (array_key_exists('Severity', $data)) {

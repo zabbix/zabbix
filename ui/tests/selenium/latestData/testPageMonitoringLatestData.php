@@ -894,7 +894,7 @@ class testPageMonitoringLatestData extends CWebTest {
 			}
 
 			// Verify that the tool-tip can be closed.
-			$overlay->query('xpath:./button[@title="Close"]')->one()->click();
+			$overlay->query('xpath:.//button[@title="Close"]')->one()->click();
 			$this->assertFalse($overlay->isDisplayed());
 		}
 		// If the item has no description the description icon should not be there.
