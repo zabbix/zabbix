@@ -374,9 +374,16 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_free(script_bin);
 }
 
-static void allerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message)
+static void	alerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
+		const char *push_adapter_url, const char *push_ca_file, const char *push_cert_file,
+		const char *push_key_file)
 {
-
+	ZBX_UNUSED(socket);
+	ZBX_UNUSED(ipc_message);
+	ZBX_UNUSED(push_adapter_url);
+	ZBX_UNUSED(push_ca_file);
+	ZBX_UNUSED(push_cert_file);
+	ZBX_UNUSED(push_key_file);
 }
 
 /******************************************************************************
@@ -471,6 +478,13 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
 				alerter_process_webhook(&alerter_socket, &message, alerter_args_in->config_source_ip);
+				break;
+			case ZBX_IPC_ALERTER_PUSH:
+				alerter_process_push(&alerter_socket, &message,
+						alerter_args_in->config_push_adapter_url,
+						alerter_args_in->config_push_ca_file,
+						alerter_args_in->config_push_cert_file,
+						alerter_args_in->config_push_key_file);
 				break;
 		}
 

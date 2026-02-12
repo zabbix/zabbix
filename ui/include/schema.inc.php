@@ -10231,9 +10231,9 @@ return [
 		]
 	],
 	'devices' => [
-		'key' => 'id',
+		'key' => 'deviceid',
 		'fields' => [
-			'id' => [
+			'deviceid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
@@ -10264,18 +10264,6 @@ return [
 				'length' => 10,
 				'default' => '0'
 			],
-			'app_identity_key' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
-			'app_encryption_key' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
-				'default' => ''
-			],
 			'push_token' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -10301,6 +10289,42 @@ return [
 				'default' => '0'
 			],
 			'enrollment_token_used' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'device_keys' => [
+		'key' => '',
+		'fields' => [
+			'device_ref' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'devices',
+				'ref_field' => 'deviceid'
+			],
+			'scope' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'kid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'key' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'active' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,

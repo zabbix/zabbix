@@ -399,6 +399,12 @@ static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
+/* push mediatype */
+static char	*config_push_adapter_url;
+static char	*config_push_ca_file;
+static char	*config_push_cert_file;
+static char	*config_push_key_file;
+
 struct zbx_db_version_info_t	db_version_info;
 
 static	const zbx_events_funcs_t	events_cbs = {
@@ -1185,6 +1191,14 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
+		{"PushAdapterURL",		&config_push_adapter_url,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"PushTLSCAFile",		&config_push_ca_file,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"PushTLSCertFile",		&config_push_cert_file,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"PushTLSKeyFile",		&config_push_key_file,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1727,7 +1741,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		{
 			.config_source_ip = zbx_config_source_ip,
 			.config_ssl_ca_location = config_ssl_ca_location,
-			.config_sms_devices = config_sms_devices
+			.config_sms_devices = config_sms_devices,
+			.config_push_adapter_url = config_push_adapter_url,
+			.config_push_ca_file = config_push_ca_file,
+			.config_push_cert_file = config_push_cert_file,
+			.config_push_key_file = config_push_key_file
 		};
 
 	zbx_thread_pinger_args		pinger_args =
