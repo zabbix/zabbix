@@ -282,14 +282,13 @@ static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyco
  ******************************************************************************/
 void	*zbx_proxyconfig_thread(void *args)
 {
-	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)
-							(((zbx_thread_args_t *)args)->args);
 	size_t				data_size;
 	double				sec, last_template_cleanup_sec = 0, interval;
 	zbx_ipc_async_socket_t		rtc;
 	int				sleeptime = 1;
 	zbx_synced_new_config_t		synced = ZBX_SYNCED_NEW_CONFIG_NO;
 	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
+	zbx_thread_proxyconfig_args	*proxyconfig_args_in = (zbx_thread_proxyconfig_args *)unit_args->args.args;
 	const zbx_thread_info_t		*info = &unit_args->args.info;
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
