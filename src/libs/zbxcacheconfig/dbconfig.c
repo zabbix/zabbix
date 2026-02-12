@@ -9616,16 +9616,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->snmpv3_privpassphrase = NULL;
 			dst_item->snmpv3_contextname = NULL;
 			break;
-		case ITEM_TYPE_TRAPPER:
-			if (NULL != (trapitem = src_item->itemtype.trapitem))
-			{
-				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
-			}
-			else
-			{
-				*dst_item->trapper_hosts = '\0';
-			}
-			break;
 		case ITEM_TYPE_IPMI:
 			zbx_strscpy(dst_item->ipmi_sensor, src_item->itemtype.ipmiitem->ipmi_sensor);
 			break;
@@ -9671,8 +9661,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.httpitem->username);
 			zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
 			dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
-			dst_item->allow_traps = src_item->itemtype.httpitem->allow_traps;
-			zbx_strscpy(dst_item->trapper_hosts, src_item->itemtype.httpitem->trapper_hosts);
 
 			dst_item->timeout = 0;
 			dst_item->url = NULL;
@@ -9766,20 +9754,12 @@ static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *s
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->value_type = src_item->value_type;
 
-	dst_item->state = src_item->state;
-	dst_item->lastlogsize = src_item->lastlogsize;
-	dst_item->mtime = src_item->mtime;
-
-	dst_item->status = src_item->status;
-
 	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
 	dst_item->itemid = src_item->itemid;
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 	dst_item->timeout = 0;
-
-	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
 
@@ -9791,20 +9771,17 @@ static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *s
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 }
 
-static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src_item, const ZBX_DC_HOST *src_host)
 {
-	const ZBX_DC_LOGITEM		*logitem;
 	const ZBX_DC_SNMPINTERFACE	*snmp;
 	const ZBX_DC_INTERFACE		*dc_interface;
 
+	dst_item->hostid = src_host->hostid;
+	zbx_strscpy(dst_item->host_host, src_host->host);
+	zbx_strscpy(dst_item->host_name, src_host->name);
+
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->value_type = src_item->value_type;
-
-	dst_item->state = src_item->state;
-	dst_item->lastlogsize = src_item->lastlogsize;
-	dst_item->mtime = src_item->mtime;
-
-	dst_item->status = src_item->status;
 
 	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
@@ -9812,8 +9789,6 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 	dst_item->timeout = 0;
-
-	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
 
@@ -9823,18 +9798,6 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
 	else
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
-
-	switch (src_item->value_type)
-	{
-		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = src_item->itemvaluetype.logitem))
-			{
-				zbx_strscpy(dst_item->logtimefmt, logitem->logtimefmt);
-			}
-			else
-				*dst_item->logtimefmt = '\0';
-			break;
-	}
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
 			&src_item->interfaceid);
@@ -9877,18 +9840,19 @@ static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src
 	dst_item->snmpv3_contextname = NULL;
 }
 
-static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC_ITEM *src_item,
+		const ZBX_DC_HOST *src_host)
 {
 	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->hostid = src_host->hostid;
+	zbx_strscpy(dst_item->host_host, src_host->host);
+	zbx_strscpy(dst_item->host_name, src_host->name);
 
 	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
 	dst_item->value_type = src_item->value_type;
 
 	dst_item->state = src_item->state;
-	dst_item->lastlogsize = src_item->lastlogsize;
-	dst_item->mtime = src_item->mtime;
-
-	dst_item->status = src_item->status;
 
 	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
 
@@ -9896,8 +9860,6 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	dst_item->flags = src_item->flags;
 	dst_item->key = NULL;
 	dst_item->timeout = 0;
-
-	memcpy(dst_item->error_hash, src_item->error_hash, sizeof(dst_item->error_hash));
 
 	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
 
@@ -9927,8 +9889,6 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	zbx_strscpy(dst_item->username_orig, src_item->itemtype.httpitem->username);
 	zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
 	dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
-	dst_item->allow_traps = src_item->itemtype.httpitem->allow_traps;
-	zbx_strscpy(dst_item->trapper_hosts, src_item->itemtype.httpitem->trapper_hosts);
 
 	dst_item->timeout = 0;
 	dst_item->url = NULL;
@@ -11841,19 +11801,13 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		{
 			case ZBX_POLLER_TYPE_AGENT:
 				DCget_host(&items->agent_items[num].host, dc_host);
-				DCget_agent_item(&(items->agent_items)[num], dc_item);
+				DCget_agent_item(&items->agent_items[num], dc_item);
 				break;
 			case ZBX_POLLER_TYPE_SNMP:
-				DCget_snmp_item(&(items->snmp_items)[num], dc_item);
-				items->snmp_items[num].hostid = dc_host->hostid;
-				zbx_strscpy(items->snmp_items[num].host_host, dc_host->host);
-				zbx_strscpy(items->snmp_items[num].host_name, dc_host->name);
+				DCget_snmp_item(&items->snmp_items[num], dc_item, dc_host);
 				break;
 			case ZBX_POLLER_TYPE_HTTPAGENT:
-				DCget_httpagent_item(&(items->httpagent_items)[num], dc_item);
-				items->httpagent_items[num].hostid = dc_host->hostid;
-				zbx_strscpy(items->httpagent_items[num].host_host, dc_host->host);
-				zbx_strscpy(items->httpagent_items[num].host_name, dc_host->name);
+				DCget_httpagent_item(&items->httpagent_items[num], dc_item, dc_host);
 				break;
 			default:
 				DCget_host(&items->dc_items[num].host, dc_host);
