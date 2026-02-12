@@ -159,8 +159,6 @@ Bug fixes:
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc3
 
-New features:
-
 Bug fixes:
 ..F....... [ZBX-27508] fixed inline validation rules for item and item prototype forms (gberzina)
 
