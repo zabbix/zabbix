@@ -26,7 +26,7 @@ void	zbx_discovery_update_service_proxy(void *handle, zbx_uint64_t druleid, zbx_
 		int status, const char *value, time_t now, zbx_vector_uint64_t *dserviceids,
 		zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_service_down_proxy(const zbx_uint64_t dhostid, const char *ip, const time_t now,
-		zbx_vector_uint64_t *dserviceids, zbx_add_event_func_t add_event_cb);
+		const zbx_vector_uint64_t *dserviceids, const zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_drule_proxy(void *handle, zbx_uint64_t druleid, const char *error, time_t now);
 void	zbx_discovery_close_proxy(void *handle);
 

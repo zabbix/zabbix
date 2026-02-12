@@ -2067,7 +2067,7 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 	zbx_vector_ptr_create(&drules);
 	zbx_vector_discoverer_drule_error_create(&drule_errors);
 	zbx_vector_dc_drule_ptr_create(&valid_drules);
-	zbx_dc_drules_get_monitored(&valid_drules, proxyid);
+	zbx_dc_drules_get_monitored(proxyid, &valid_drules);
 
 	value = (char *)zbx_malloc(value, value_alloc);
 

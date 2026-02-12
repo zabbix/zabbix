@@ -16756,11 +16756,11 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
  *                                                                            *
  * Purpose: get active drules for a specified proxy                           *
  *                                                                            *
- * Parameter: drules  - [OUT] active drules                                   *
- *            proxyid - [IN] the id of proxy to get drules for                *
+ * Parameter: proxyid - [IN] the id of proxy to get drules for                *
+ *            drules  - [OUT] active drules                                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_drules_get_monitored(zbx_vector_dc_drule_ptr_t *drules, const zbx_uint64_t proxyid)
+void	zbx_dc_drules_get_monitored(const zbx_uint64_t proxyid, zbx_vector_dc_drule_ptr_t *drules)
 {
 	zbx_hashset_iter_t	iter_drule, iter_dcheck;
 	zbx_dc_drule_t		*drule, *drule_out;
