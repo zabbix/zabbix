@@ -393,19 +393,20 @@ class testFormServicesSla extends CWebTest {
 					]
 				]
 			],
+			// TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty custom schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => false,
 						'Tuesday' => false,
 						'Wednesday' => false,
 						'Thursday' => false,
-						'Friday' => false
+						'Friday' => false,
+						'Name' => 'Empty custom schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
 						'id:schedule-table' => 'At least one entry should be selected.'
@@ -417,12 +418,12 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Non time format custom schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => true,
-						'id:schedule_periods_1_period' => 'all day'
+						'id:schedule_periods_1_period' => 'all day',
+						'Name' => 'Non time format custom schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
 						'id:schedule_periods_1_period' => 'Comma separated list of time periods is expected.'
@@ -434,12 +435,12 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => '0 seconds custom schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => true,
-						'id:schedule_periods_1_period' => '00:01-00:01'
+						'id:schedule_periods_1_period' => '00:01-00:01',
+						'Name' => '0 seconds custom schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
 						'id:schedule_periods_1_period' => 'Start time must be less than end time.'
@@ -451,12 +452,12 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'wrongly formatted time custom schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => true,
-						'id:schedule_periods_1_period' => '00:01-00:61'
+						'id:schedule_periods_1_period' => '00:01-00:61',
+						'Name' => 'wrongly formatted time custom schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
 						'id:schedule_periods_1_period' => 'Comma separated list of time periods is expected.'
@@ -468,12 +469,12 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Incorrect 2nd part of schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => true,
-						'id:schedule_periods_1_period' => '00:01-00:03,00:09-00:09'
+						'id:schedule_periods_1_period' => '00:01-00:03,00:09-00:09',
+						'Name' => 'Incorrect 2nd part of schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
 					'inline_errors' => [
 						'id:schedule_periods_1_period' => 'Start time must be less than end time.'
