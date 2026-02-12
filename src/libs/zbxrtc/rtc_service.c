@@ -817,6 +817,28 @@ static void	rtc_subscribe_service(zbx_rtc_t *rtc, const unsigned char *data)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: send shutdown to the service attempting to subscribe for RTC      *
+ *          notifications                                                     *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_shutdown_subscribe_service_request(const unsigned char *data)
+{
+	zbx_uint32_t	service_len;
+	zbx_rtc_sub_t	sub = {0};
+	zbx_rtc_msg_t	msg = {.code = ZBX_RTC_SHUTDOWN};
+
+	(void)zbx_deserialize_str(data, &sub.source.service, service_len);
+
+	sub.type = ZBX_RTC_SUB_SERVICE;
+	zbx_vector_rtc_msg_create(&sub.msgs);
+	rtc_notify_service(&sub, &msg, NULL, 0, 1);
+
+	zbx_free(sub.source.service);
+	zbx_vector_rtc_msg_destroy(&sub.msgs);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: unsubscribe service from RTC notifications                        *
  *                                                                            *
  ******************************************************************************/
@@ -1054,6 +1076,41 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
  ******************************************************************************/
 void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc)
 {
+	zbx_timespec_t	rtc_timeout = {0, 0};
+
+	/* process pending subscriptions */
+	while (1)
+	{
+		zbx_ipc_client_t	*client;
+		zbx_ipc_message_t	*message;
+
+		(void)zbx_ipc_service_recv(&rtc->service, &rtc_timeout, &client, &message);
+
+		if (NULL == client)
+			break;
+
+		if (NULL != message)
+		{
+			switch (message->code)
+			{
+				case ZBX_RTC_SUBSCRIBE:
+					rtc_subscribe(rtc, client, message->data);
+					break;
+				case ZBX_RTC_SUBSCRIBE_SERVICE:
+					rtc_subscribe_service(rtc, message->data);
+					break;
+				default:
+					zabbix_log(LOG_LEVEL_DEBUG, "ignoring rtc message %d during shutdown",
+							message->code);
+					break;
+			}
+
+			zbx_ipc_message_free(message);
+		}
+
+		zbx_ipc_client_release(client);
+	}
+
 	rtc_notify(rtc, ZBX_PROCESS_TYPE_UNKNOWN, 0, ZBX_RTC_SHUTDOWN, NULL, 0, 0);
 }
 

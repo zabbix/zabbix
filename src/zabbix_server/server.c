@@ -2173,7 +2173,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				break;
 			}
 
-			if (!ZBX_IS_RUNNING())
+			/* don't check for termination when suppervisor is not yet started (runlevel 1 reached) */
+			if (1 < i && !ZBX_IS_RUNNING())
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot continue server startup because of termination");
 				break;
