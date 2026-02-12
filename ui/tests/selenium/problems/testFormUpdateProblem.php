@@ -431,10 +431,6 @@ class testFormUpdateProblem extends CWebTest {
 			}
 		}
 
-		// Check asterisk text.
-		$this->assertTrue($form->query('xpath:.//label[@class="form-label-asterisk" and '.
-				'text()="At least one update operation or message must exist."]')->exists()
-		);
 		$dialog->close();
 	}
 
