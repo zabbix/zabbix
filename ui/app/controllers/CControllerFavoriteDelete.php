@@ -61,7 +61,7 @@ class CControllerFavoriteDelete extends CController {
 		$result = CFavorite::remove($profile[$object], $objectid, $object);
 		$result = DBend($result);
 
-		$aria_label = $object == 'sysmapid' ? _('Add map to Favorite maps widget')
+		$aria_label = $object === 'sysmapid' ? _('Add map to Favorite maps widget')
 			: _('Add graph to Favorite graphs widget');
 
 		if ($result) {

@@ -50,7 +50,7 @@ class CControllerFavoriteCreate extends CController {
 		$result = CFavorite::add($profile[$object], $objectid, $object);
 		$result = DBend($result);
 
-		$aria_label = $object == 'sysmapid' ? _('Remove map from the Favorite maps widget')
+		$aria_label = $object === 'sysmapid' ? _('Remove map from the Favorite maps widget')
 			: _('Remove graph from the Favorite graphs widget');
 
 		if ($result) {
