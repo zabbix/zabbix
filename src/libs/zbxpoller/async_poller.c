@@ -260,8 +260,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 	for (int j = 0; j < poller_items.values_num; j++)
 	{
-		int	num;
-		unsigned char poller_type;
+		int		num;
+		unsigned char 	poller_type;
 
 		items = poller_items.values[j]->items;
 		poller_type = poller_items.values[j]->poller_type;
@@ -276,42 +276,43 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			switch (poller_type)
+			if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 			{
-				case ZBX_POLLER_TYPE_HTTPAGENT:
 #ifdef HAVE_LIBCURL
-					errcodes[i] = zbx_async_check_httpagent(&items.httpagent_items[i], &results[i],
+				errcodes[i] = zbx_async_check_httpagent(&items.httpagent_items[i], &results[i],
 						poller_config->config_source_ip, poller_config->config_ssl_ca_location,
 						poller_config->config_ssl_cert_location,
 						poller_config->config_ssl_key_location, poller_config->curl_handle);
 #else
-					errcodes[i] = NOTSUPPORTED;
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
+				errcodes[i] = NOTSUPPORTED;
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
 						"Support for HTTP agent was not compiled in: missing cURL library"));
 #endif
-					break;
-				case ZBX_POLLER_TYPE_AGENT:
-					errcodes[i] = zbx_async_check_agent(&items.agent_items[i], &results[i],
+			}
+			else if (ZBX_POLLER_TYPE_AGENT == poller_type)
+			{
+				errcodes[i] = zbx_async_check_agent(&items.agent_items[i], &results[i],
 						process_agent_result, poller_config, poller_config,
 						poller_config->base, poller_config->channel, poller_config->dnsbase,
 						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
-
-					break;
-				default: /* ZBX_POLLER_TYPE_SNMP */
+			}
+			else /* ZBX_POLLER_TYPE_SNMP */
+			{
 #ifdef HAVE_NETSNMP
-					zbx_set_snmp_bulkwalk_options(zbx_progname);
+				zbx_set_snmp_bulkwalk_options(zbx_progname);
 
-					errcodes[i] = zbx_async_check_snmp(&items.snmp_items[i], &results[i],
+				errcodes[i] = zbx_async_check_snmp(&items.snmp_items[i], &results[i],
 						process_snmp_result, poller_config, poller_config,
 						poller_config->base, poller_config->channel, poller_config->dnsbase,
 						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO,
 						ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
 #else
-					errcodes[i] = NOTSUPPORTED;
-					SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
+				errcodes[i] = NOTSUPPORTED;
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
 						"Support for SNMP checks was not compiled in."));
 #endif
 			}
+
 			if (SUCCEED == errcodes[i])
 				poller_config->processing++;
 		}
@@ -321,44 +322,44 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		/* process item values */
 		for (int i = 0; i < num; i++)
 		{
-			if (SUCCEED != errcodes[i])
+			if (SUCCEED == errcodes[i])
+				continue;
+
+			zbx_uint64_t	itemid;
+			unsigned char	value_type;
+			unsigned char	flags;
+			unsigned char	preprocessing;
+
+			switch (poller_type)
 			{
-				zbx_uint64_t	itemid;
-				unsigned char	value_type;
-				unsigned char	flags;
-				unsigned char	preprocessing;
-
-				switch (poller_type)
-				{
-					case ZBX_POLLER_TYPE_HTTPAGENT:
-						itemid = items.httpagent_items[i].itemid;
-						value_type = items.httpagent_items[i].value_type;
-						flags = items.httpagent_items[i].flags;
-						preprocessing = items.httpagent_items[i].preprocessing;
-						break;
-					case ZBX_POLLER_TYPE_AGENT:
-						itemid = items.agent_items[i].itemid;
-						value_type = items.agent_items[i].value_type;
-						flags = items.agent_items[i].flags;
-						preprocessing = items.agent_items[i].preprocessing;
-						break;
-					default: /* ZBX_POLLER_TYPE_SNMP */
-						itemid = items.snmp_items[i].itemid;
-						value_type = items.snmp_items[i].value_type;
-						flags = items.snmp_items[i].flags;
-						preprocessing = items.snmp_items[i].preprocessing;
-				}
-
-				if (ZBX_IS_RUNNING())
-				{
-					zbx_preprocess_item_value(itemid, value_type, flags,
-							preprocessing, NULL, &timespec,
-							ITEM_STATE_NOTSUPPORTED, results[i].msg);
-				}
-
-				zbx_async_manager_requeue(poller_config->manager, itemid, errcodes[i],
-						timespec.sec);
+				case ZBX_POLLER_TYPE_HTTPAGENT:
+					itemid = items.httpagent_items[i].itemid;
+					value_type = items.httpagent_items[i].value_type;
+					flags = items.httpagent_items[i].flags;
+					preprocessing = items.httpagent_items[i].preprocessing;
+					break;
+				case ZBX_POLLER_TYPE_AGENT:
+					itemid = items.agent_items[i].itemid;
+					value_type = items.agent_items[i].value_type;
+					flags = items.agent_items[i].flags;
+					preprocessing = items.agent_items[i].preprocessing;
+					break;
+				default: /* ZBX_POLLER_TYPE_SNMP */
+					itemid = items.snmp_items[i].itemid;
+					value_type = items.snmp_items[i].value_type;
+					flags = items.snmp_items[i].flags;
+					preprocessing = items.snmp_items[i].preprocessing;
 			}
+
+			if (ZBX_IS_RUNNING())
+			{
+				zbx_preprocess_item_value(itemid, value_type, flags,
+						preprocessing, NULL, &timespec,
+						ITEM_STATE_NOTSUPPORTED, results[i].msg);
+			}
+
+			zbx_async_manager_requeue(poller_config->manager, itemid, errcodes[i],
+					timespec.sec);
 		}
 
 		zbx_poller_item_free(poller_items.values[j]);
