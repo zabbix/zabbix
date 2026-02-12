@@ -321,7 +321,7 @@ $graph_tab
 		]))->setId('yaxis_max_field')
 	])
 	->addItem([
-		new CLabel(_('3D view')),
+		new CLabel(_('3D view'), 'show_3d'),
 		(new CFormField(
 			(new CCheckBox('show_3d'))
 				->setChecked($data['show_3d'] == 1)
@@ -383,7 +383,7 @@ $graph_tab->addItem([
 
 if (array_key_exists('parent_discoveryid', $data)) {
 	$graph_tab->addItem([
-		new CLabel(_('Discover')),
+		new CLabel(_('Discover'), 'discover'),
 		new CFormField(
 			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
 				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
