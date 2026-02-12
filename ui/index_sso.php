@@ -155,8 +155,6 @@ if (array_key_exists('security', $SSO['SETTINGS'])) {
 	}
 }
 
-$button_switch_sso_user = null;
-
 try {
 	CMessageHelper::clear();
 	$auth = new Auth($settings);
@@ -171,7 +169,7 @@ try {
 		exit;
 	}
 
-	if (hasRequest('acs') && !CSessionHelper::has('saml_data')) {
+	if (isRequestMethod('post') && hasRequest('acs') && !CSessionHelper::has('saml_data')) {
 		$auth->processResponse();
 
 		if (!$auth->isAuthenticated()) {
@@ -326,33 +324,34 @@ try {
 		redirect(reset($redirect));
 	}
 
-	$auth->login(null, [], hasRequest('switch_sso_user'));
+	$auth->login(null, [], hasRequest('force_authn'));
 }
 catch (Exception $e) {
-	if (CSessionHelper::has('saml_data')) {
-		error(_('You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed.'));
-		error(_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'));
+	error($e->getMessage());
+}
 
-		$button_switch_sso_user = (new CButton('logout', _('Switch SSO user')))
-			->setAttribute('data-url',
-				(new CUrl('index_sso.php'))
-					->setArgument('switch_sso_user')
-					->getUrl()
-			)
-			->onClick('document.location = this.dataset.url;');
+$sso_authorized = CSessionHelper::has('saml_data');
+CSessionHelper::unset(['saml_data']);
 
-		CSessionHelper::unset(['saml_data']);
-	}
-	else {
-		error($e->getMessage());
-	}
+if ($sso_authorized) {
+	error(_('You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed.'));
+	error(_('If you think this message is wrong, please consult your administrators about getting the necessary permissions.'));
 }
 
 echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
-		$button_switch_sso_user,
+		$sso_authorized && !CWebUser::isLoggedIn()
+			? (new CButton('force_authn', _('Switch SSO user')))
+					->setAttribute('data-url',
+						(new CUrl('index_sso.php'))
+							->setArgument('force_authn')
+							->setArgument('request', $request)
+							->getUrl()
+					)
+					->onClick('document.location = this.dataset.url;')
+			: null,
 		(new CButton('login', _('Login')))
 			->setAttribute('data-url',
 				$redirect_to
