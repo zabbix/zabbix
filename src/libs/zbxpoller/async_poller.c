@@ -297,7 +297,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 
 					break;
-				case ZBX_POLLER_TYPE_SNMP:
+				default: /* ZBX_POLLER_TYPE_SNMP */
 #ifdef HAVE_NETSNMP
 					zbx_set_snmp_bulkwalk_options(zbx_progname);
 
@@ -311,10 +311,6 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 					SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
 						"Support for SNMP checks was not compiled in."));
 #endif
-					break;
-				default:
-					THIS_SHOULD_NEVER_HAPPEN;
-					assert(0);
 			}
 			if (SUCCEED == errcodes[i])
 				poller_config->processing++;
@@ -346,15 +342,11 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						flags = items.agent_items[i].flags;
 						preprocessing = items.agent_items[i].preprocessing;
 						break;
-					case ZBX_POLLER_TYPE_SNMP:
+					default: /* ZBX_POLLER_TYPE_SNMP */
 						itemid = items.snmp_items[i].itemid;
 						value_type = items.snmp_items[i].value_type;
 						flags = items.snmp_items[i].flags;
 						preprocessing = items.snmp_items[i].preprocessing;
-						break;
-					default:
-						THIS_SHOULD_NEVER_HAPPEN;
-						assert(0);
 				}
 
 				if (ZBX_IS_RUNNING())
