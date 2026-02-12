@@ -417,20 +417,24 @@
 		#setLoadingStatus(loading_btn_class) {
 			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)').forEach(button => {
-				button.disabled = true;
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
 
-				if (button.classList.contains(loading_btn_class)) {
-					button.classList.add('is-loading');
-				}
-			});
+					if (button.classList.contains(loading_btn_class)) {
+						button.classList.add('is-loading');
+					}
+				});
 		}
 
 		#unsetLoadingStatus() {
-			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)').forEach(button => {
-				button.classList.remove('is-loading');
-				button.disabled = false;
-			});
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.classList.remove('is-loading');
+					button.disabled = false;
+				});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
 	};
 </script>
