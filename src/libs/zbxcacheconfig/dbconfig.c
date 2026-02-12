@@ -9641,12 +9641,8 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_HTTPAGENT:
-			zbx_strscpy(dst_item->url_orig, src_item->itemtype.httpitem->url);
-			zbx_strscpy(dst_item->query_fields_orig, src_item->itemtype.httpitem->query_fields);
-			zbx_strscpy(dst_item->status_codes_orig, src_item->itemtype.httpitem->status_codes);
 			dst_item->follow_redirects = src_item->itemtype.httpitem->follow_redirects;
 			dst_item->post_type = src_item->itemtype.httpitem->post_type;
-			zbx_strscpy(dst_item->http_proxy_orig, src_item->itemtype.httpitem->http_proxy);
 			dst_item->headers = zbx_strdup(NULL, src_item->itemtype.httpitem->headers);
 			dst_item->retrieve_mode = src_item->itemtype.httpitem->retrieve_mode;
 			dst_item->request_method = src_item->itemtype.httpitem->request_method;
