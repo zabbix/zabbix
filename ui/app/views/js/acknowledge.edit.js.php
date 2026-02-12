@@ -38,14 +38,9 @@ window.update_problem_popup = new class {
 	#initEvents () {
 		this.form_element.querySelectorAll('.js-operation-checkbox').forEach((input) => {
 			input.addEventListener('change', (e) => {
-				if (e.target.getAttribute('id') === 'change_severity') {
-					document.querySelectorAll('#severity input').forEach((el) => {
-						if (e.target.checked) {
-							el.removeAttribute('disabled');
-						}
-						else {
-							el.setAttribute('disabled', 'disabled');
-						}
+				if (e.target.name === 'change_severity') {
+					this.form_element.querySelectorAll('[name="severity"]').forEach(el => {
+						el.disabled = !e.target.checked;
 					});
 				}
 
@@ -89,6 +84,7 @@ window.update_problem_popup = new class {
 	#update_unsuppress_problem_state(state) {
 		if (this.problem_unsuppressible) {
 			document.getElementById('unsuppress_problem').disabled = state;
+
 			if (state) {
 				document.getElementById('unsuppress_problem').checked = false;
 			}
