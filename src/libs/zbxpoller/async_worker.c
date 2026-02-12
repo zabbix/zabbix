@@ -48,7 +48,8 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 		poller_item->results = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(AGENT_RESULT));
 		poller_item->errcodes = zbx_malloc(NULL, (size_t)poller_item->num * sizeof(int));
 
-		switch (poller_type) {
+		switch (poller_type)
+		{
 			case ZBX_POLLER_TYPE_AGENT:
 				zbx_prepare_agent_items(poller_item->items.agent_items, poller_item->errcodes,
 						poller_item->num, poller_item->results);

@@ -652,7 +652,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_TELNET:
 			case ITEM_TYPE_DB_MONITOR:
-				{    // FIXME: probably refactor the block
+				{
 					if (ZBX_MACRO_EXPAND_NO == expand_macros)
 						break;
 
@@ -666,7 +666,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					};
 
 					zbx_substitute_macros(&items[i].params, NULL, 0, zbx_macro_field_params_resolv,
-						macro_resolv_item);
+							macro_resolv_item);
 				}
 				ZBX_FALLTHROUGH;
 			case ITEM_TYPE_SIMPLE:
