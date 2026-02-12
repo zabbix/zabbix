@@ -1690,7 +1690,7 @@ int	zbx_get_report_nextcheck(int now, unsigned char cycle, unsigned char weekday
 	time_t		yesterday = now - SEC_PER_DAY;
 	int		nextcheck, tm_hour, tm_min, tm_sec;
 
-	tm = *zbx_localtime(&yesterday, NULL);	/* zbx_tm_(add/sub) calls zbx_localtime again */
+	tm = *zbx_localtime(&yesterday, NULL);	/* zbx_tm_(add/sub) should call zbx_localtime again */
 
 	tm_sec = start_time % 60;
 	start_time /= 60;
