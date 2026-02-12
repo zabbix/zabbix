@@ -3794,6 +3794,11 @@ static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RES
 	AGENT_REQUEST		request;
 	char			error[MAX_STRING_LEN];
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
+			" max_repetitions:%d", __func__, snmp_context->item.itemid, snmp_context->item.key,
+			snmp_context->item.host, snmp_context->item.interface.addr, snmp_context->config_timeout,
+			snmp_context->retries, snmp_context->snmp_max_repetitions);
+
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
 	zbx_vector_bulkwalk_context_reserve(&snmp_context->bulkwalk_contexts, ZBX_VECTOR_ARRAY_RESERVE);
 
@@ -3881,6 +3886,9 @@ static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RES
 out:
 	zbx_free_agent_request(&request);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
+		snmp_context->item.itemid);
+
 	return ret;
 #undef ZBX_VECTOR_ARRAY_RESERVE
 }
@@ -3893,10 +3901,6 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 {
 	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
-			" max_repetitions:%d", __func__, item->itemid, item->key, item->host_host,
-			item->interface.addr, item->timeout, retries, item->snmp_max_repetitions);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
@@ -3943,9 +3947,6 @@ int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
 	if (SUCCEED != ret)
 		zbx_async_check_snmp_clean(snmp_context);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
-		snmp_context->item.itemid);
-
 	return ret;
 }
 
@@ -3957,10 +3958,6 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 {
 	int 			ret;
 	zbx_snmp_context_t	*snmp_context;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
-			" max_repetitions:%d", __func__, item->itemid, item->key, item->host.host,
-			item->interface.addr, item->timeout, retries, item->snmp_max_repetitions);
 
 	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
 
@@ -4010,9 +4007,6 @@ int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
 
 	if (SUCCEED != ret)
 		zbx_async_check_snmp_clean(snmp_context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
-		snmp_context->item.itemid);
 
 	return ret;
 }

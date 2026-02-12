@@ -9521,7 +9521,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	const ZBX_DC_LOGITEM		*logitem;
 	const ZBX_DC_SNMPINTERFACE	*snmp;
-	const ZBX_DC_TRAPITEM		*trapitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 
