@@ -446,7 +446,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => '2020-08-01 00:00:00'
 					],
-					'get_time' => [
+					'suppress_until_error' => [
 						'field' => 'id:suppress_until_problem',
 						'error' => 'Value must be greater than or equal to '
 					]
@@ -524,7 +524,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now-1d'
 					],
-					'get_time' => [
+					'suppress_until_error' => [
 						'field' => 'id:suppress_until_problem',
 						'error' => 'Value must be greater than or equal to '
 					]
@@ -824,18 +824,19 @@ class testFormUpdateProblem extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			$this->page->removeFocus();
 
-			// Validate inline error for "suppress_until_problem" field.
-			if (CTestArrayHelper::get($data, 'get_time')) {
+			if (CTestArrayHelper::get($data, 'suppress_until_error')) {
+
+				// Validate inline error for "suppress_until_problem" field.
 				$time = time();
 
 				$error_array = [];
-				for ($i = 0; $i <=2; $i++) {
-					$error_array[$i] = $data['get_time']['error'].date('Y-m-d H:i:s', $time + $i).'.';
+				for ($i = 0; $i <= 3; $i++) {
+					$error_array[$i] = $data['suppress_until_error']['error'].date('Y-m-d H:i:s', $time + $i).'.';
 				}
 
-				$error = $form->getField($data['get_time']['field'])->query('xpath:./../span[@class="error"]')
-					->waitUntilPresent()->one()->getText();
-				$this->assertTrue(in_array($error, $error_array), 'String "'.$error.'" was not found in error message');
+				$error = $form->getField($data['suppress_until_error']['field'])->query('xpath:./../span[@class="error"]')
+						->waitUntilPresent()->one()->getText();
+				$this->assertTrue(in_array($error, $error_array), 'Error "'.$error.'" was not found in reference error messages array.');
 			}
 			else {
 				$this->assertInlineError($form, $data['inline_errors']);
