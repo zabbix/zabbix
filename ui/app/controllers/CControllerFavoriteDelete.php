@@ -69,8 +69,8 @@ class CControllerFavoriteDelete extends CController {
 				var addrm_fav = document.getElementById("addrm_fav");
 
 				if (addrm_fav !== null) {
-					addrm_fav.setAttribute("aria-label", "'.$aria_label.'");
-					addrm_fav.setAttribute("data-hintbox-contents", "'._('Add to favorites').'");
+					addrm_fav.setAttribute("aria-label", '.json_encode($aria_label).');
+					addrm_fav.setAttribute("data-hintbox-contents", '.json_encode(_('Add to favorites')).');
 					addrm_fav.onclick = () => add2favorites("'.$object.'", "'.$objectid.'");
 					addrm_fav.classList.add("'.ZBX_ICON_STAR.'");
 					addrm_fav.classList.remove("'.ZBX_ICON_STAR_FILLED.'");
