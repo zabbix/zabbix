@@ -1338,8 +1338,8 @@ static void	get_link_flags(const char *interface, struct zbx_json *j)
  ******************************************************************************/
 static void	if_type_add(const char *ifname, struct zbx_json *j)
 {
-#define JSON_KEY_TYPE		"type"
-#define VIRTFN_PFX		"virtfn"
+#define JSON_KEY_TYPE	"type"
+#define VIRTFN_PFX	"virtfn"
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
 	int		type = ARPHRD_VOID;
@@ -1394,13 +1394,13 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 #undef VIRTFN_PFX
 }
 
-static void	fill_net_if_get_params(const char *name, const char *param,
-		const char *jsonname, const int as_int, struct zbx_json *j)
+static void	sys_class_net_uint_add(const char *if_name, const char *filename, const char *key, struct zbx_json *j)
 {
 	FILE	*f;
 	char	buf[MAX_STRING_LEN];
+	int	found = 0;
 
-	zbx_snprintf(buf, sizeof(buf), "/sys/class/net/%s/%s", name, param);
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/%s", if_name, filename);
 
 	if (NULL != (f = fopen(buf, "r")))
 	{
@@ -1408,22 +1408,50 @@ static void	fill_net_if_get_params(const char *name, const char *param,
 		{
 			zbx_rtrim(buf, "\n");
 
-			if (NULL != jsonname)
-				param = jsonname;
+			zbx_uint64_t	ui64_speed;
+			int		i_speed;
 
-			if (0 == as_int)
+			if (SUCCEED == zbx_is_uint64(buf, &ui64_speed))
 			{
-				zbx_json_addstring(j, param, buf, ZBX_JSON_TYPE_STRING);
-			}
-			else
-			{
-				zbx_uint64_t	uintvalue;
-
-				if (SUCCEED == zbx_is_uint64(buf, &uintvalue))
-					zbx_json_adduint64(j, param, uintvalue);
+				found = 1;
+				zbx_json_adduint64(j, key, ui64_speed);
 			}
 		}
 		zbx_fclose(f);
+	}
+
+	if (0 == found)
+		zbx_json_adduint64(j, key, 0);
+}
+
+static void	sys_class_net_str_add(const char *if_name, const char *filename, const char *key,
+		struct zbx_json *j1, struct zbx_json *j2)
+{
+	FILE	*f;
+	char	buf[MAX_STRING_LEN];
+	int	found = 0;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/%s", if_name, filename);
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			zbx_rtrim(buf, "\n");
+
+			found = 1;
+			zbx_json_addstring(j1, key, buf, ZBX_JSON_TYPE_STRING);
+			if (NULL != j2)
+				zbx_json_addstring(j2, key, buf, ZBX_JSON_TYPE_STRING);
+		}
+		zbx_fclose(f);
+	}
+
+	if (0 == found)
+	{
+		zbx_json_addstring(j1, key, "", ZBX_JSON_TYPE_STRING);
+		if (NULL != j2)
+			zbx_json_addstring(j2, key, "", ZBX_JSON_TYPE_STRING);
 	}
 }
 
@@ -1492,13 +1520,10 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addobject(&jcfg, NULL);
 		zbx_json_addobject(&jval, NULL);
 		zbx_json_addstring(&jcfg, "name", if_name, ZBX_JSON_TYPE_STRING);
-		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jcfg);
-		fill_net_if_get_params(if_name, "address", "mac", 0, &jcfg);
-		get_link_flags(if_name, &jcfg);
-
 		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
-		fill_net_if_get_params(if_name, "ifalias",  NULL, 0, &jval);
-		fill_net_if_get_params(if_name, "address", "mac", 0, &jval);
+		sys_class_net_str_add(if_name, "ifalias",  "ifalias", &jcfg, &jval);
+		sys_class_net_str_add(if_name, "address", "mac", &jcfg, &jval);
+		get_link_flags(if_name, &jcfg);
 
 		if (ZBX_PROC_NET_DEV_COLS_NUM == num_filled)
 		{
@@ -1531,9 +1556,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		}
 
 		if_type_add(if_name, &jval);
-		fill_net_if_get_params(if_name, "carrier", NULL, 1, &jval);
-		fill_net_if_get_params(if_name, "speed", NULL, 1, &jval);
-		fill_net_if_get_params(if_name, "duplex", NULL, 0, &jval);
+		sys_class_net_uint_add(if_name, "carrier", "carrier", &jval);
+		sys_class_net_uint_add(if_name, "speed", "speed", &jval);
+		sys_class_net_str_add(if_name, "duplex", "duplex", &jval, NULL);
 		get_link_settings(if_name, &jval);
 
 		get_wifi_info(if_name, &jval);
