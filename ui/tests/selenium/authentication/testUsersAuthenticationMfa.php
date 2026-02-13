@@ -160,7 +160,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 
 		// Check the hintbox next to the Name fields.
 		$dialog_form->getLabel('Name')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->all()->last();
+		$hintbox = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent()->all()->last();
 		$this->assertEquals('Shown as the label to all MFA users in authenticator apps.', $hintbox->getText());
 		$hintbox->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 

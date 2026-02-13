@@ -23,6 +23,7 @@
 const INTERFACE_TYPE_OPT = <?= INTERFACE_TYPE_OPT ?>;
 const ITEM_DELAY_FLEXIBLE = <?= ITEM_DELAY_FLEXIBLE ?>;
 const ITEM_STORAGE_OFF = <?= ITEM_STORAGE_OFF ?>;
+const ITEM_TYPE_CALCULATED = <?= ITEM_TYPE_CALCULATED ?>;
 const ITEM_TYPE_DEPENDENT = <?= ITEM_TYPE_DEPENDENT ?>;
 const ITEM_TYPE_IPMI = <?= ITEM_TYPE_IPMI ?>;
 const ITEM_TYPE_SIMPLE = <?= ITEM_TYPE_SIMPLE ?>;
@@ -30,7 +31,6 @@ const ITEM_TYPE_SSH = <?= ITEM_TYPE_SSH ?>;
 const ITEM_TYPE_SNMP = <?= ITEM_TYPE_SNMP ?>;
 const ITEM_TYPE_TELNET = <?= ITEM_TYPE_TELNET ?>;
 const ITEM_TYPE_ZABBIX_ACTIVE = <?= ITEM_TYPE_ZABBIX_ACTIVE ?>;
-const ITEM_VALUE_TYPE_BINARY = <?= ITEM_VALUE_TYPE_BINARY ?>;
 const HTTPCHECK_REQUEST_HEAD = <?= HTTPCHECK_REQUEST_HEAD ?>;
 const ZBX_PROPERTY_OWN = <?= ZBX_PROPERTY_OWN ?>;
 const ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED = <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED ?>;
@@ -810,6 +810,7 @@ window.item_edit_form = new class {
 
 	#updateValueTypeOptionVisibility() {
 		const disable_binary = this.field.type.value != ITEM_TYPE_DEPENDENT;
+		const disable_json = this.field.type.value == ITEM_TYPE_CALCULATED;
 
 		if (disable_binary && this.field.value_type.value == ITEM_VALUE_TYPE_BINARY) {
 			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_BINARY).value;
@@ -820,6 +821,16 @@ window.item_edit_form = new class {
 
 		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
 		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_BINARY).hidden = disable_binary;
+
+		if (disable_json && this.field.value_type.value == ITEM_VALUE_TYPE_JSON) {
+			const value = this.field.value_type.getOptions().find(o => o.value != ITEM_VALUE_TYPE_JSON).value;
+
+			this.field.value_type.value = value;
+			this.field.value_type_steps.value = value;
+		}
+
+		this.field.value_type.getOptionByValue(ITEM_VALUE_TYPE_JSON).hidden = disable_json;
+		this.field.value_type_steps.getOptionByValue(ITEM_VALUE_TYPE_JSON).hidden = disable_json;
 	}
 
 	#getInferredValueType(key) {
