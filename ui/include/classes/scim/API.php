@@ -38,12 +38,7 @@ class API {
 		$method = strtolower($request->method());
 		$input = $this->getRequestData($request);
 		$response->setRequestDetails($endpoint, $method, $input);
-		$response->setResponse(
-			$client->callMethod($endpoint, $method, $input, [
-				'type' => CJsonRpc::AUTH_TYPE_HEADER,
-				'auth' => $request->getAuthBearerValue()
-			])
-		);
+		$response->setResponse($client->callMethod($endpoint, $method, $input, $request->getAuthenticationData()));
 
 		return $response;
 	}

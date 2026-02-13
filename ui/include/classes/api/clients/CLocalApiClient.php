@@ -93,7 +93,7 @@ class CLocalApiClient extends CApiClient {
 		try {
 			// authenticate
 			if ($requiresAuthentication) {
-				$this->authenticate($auth['auth']);
+				$this->authenticate($auth, $requestApi.'.'.$requestMethod);
 
 				// check permissions
 				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
@@ -168,16 +168,31 @@ class CLocalApiClient extends CApiClient {
 	/**
 	 * Checks if the authentication token is valid.
 	 *
-	 * @param string $auth
+	 * @param array  $auth
+	 * @param string $request_api_method
 	 *
 	 * @throws APIException
 	 */
-	protected function authenticate($auth) {
-		if (zbx_empty($auth)) {
+	protected function authenticate(array $auth, string $request_api_method): void {
+		if ($auth['auth'] === null) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$auth_data = strlen($auth) == 64 ? ['token' => $auth] : ['sessionid' => $auth];
+		if ($auth['type'] === ZBX_API_HEADER_AUTHENTICATE_BEARER) {
+			$auth_data = strlen($auth['auth']) == 64
+				? ['token' => $auth['auth']]
+				: ['sessionid' => $auth['auth']];
+		}
+		elseif ($auth['type'] === ZBX_API_HEADER_AUTHENTICATE_DPOP) {
+			$auth_data = [
+				'token' => $auth['auth'],
+				'signature' => $auth['sign'],
+				'request_api_method' => $request_api_method
+			];
+		}
+		else {
+			$auth_data = ['sessionid' => $auth['auth']];
+		}
 
 		$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
 		if (array_key_exists('debug_mode', $user)) {

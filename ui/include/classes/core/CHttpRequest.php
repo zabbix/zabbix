@@ -114,20 +114,29 @@ class CHttpRequest {
 		return $this->headers;
 	}
 
-	/**
-	 * Get authentication header bearer value, return null when no authentication header exists or
-	 * authentication method is not bearer type.
-	 *
-	 * @return string|null
-	 */
-	public function getAuthBearerValue() {
-		$auth = $this->header('AUTHORIZATION');
+	public function getAuthenticationData(): array {
+		$auth_data = [
+			'type' => null,
+			'auth' => null
+		];
 
-		if (is_string($auth) && substr($auth, 0, 7) === ZBX_API_HEADER_AUTHENTICATE_PREFIX) {
-			return substr($auth, 7);
+		$authorization = $this->header('AUTHORIZATION');
+
+		if (is_string($authorization)) {
+			$auth_type = explode(' ', $authorization)[0];
+
+			if ($auth_type === ZBX_API_HEADER_AUTHENTICATE_BEARER) {
+				$auth_data['type'] = ZBX_API_HEADER_AUTHENTICATE_BEARER;
+				$auth_data['auth'] = substr($authorization, 7);
+			}
+			elseif ($auth_type === ZBX_API_HEADER_AUTHENTICATE_DPOP) {
+				$auth_data['type'] = ZBX_API_HEADER_AUTHENTICATE_DPOP;
+				$auth_data['auth'] = substr($authorization, 5);
+				$auth_data['sign'] = (string) $this->header('DPOP');
+			}
 		}
 
-		return null;
+		return $auth_data;
 	}
 
 	/**

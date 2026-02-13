@@ -73,20 +73,12 @@ class CJsonRpc {
 
 			list($api, $method) = explode('.', $call['method']) + [1 => ''];
 
-			$header = $request->getAuthBearerValue();
-			if ($header != null) {
-				$auth = [
-					'type' => self::AUTH_TYPE_HEADER,
-					'auth' => $header
-				];
-			}
-			else {
+			$auth = $request->getAuthenticationData();
+
+			if ($auth['type'] === null) {
 				$session = new CEncryptedCookieSession();
 
-				$auth = [
-					'type' => self::AUTH_TYPE_COOKIE,
-					'auth' => $session->extractSessionId()
-				];
+				$auth['auth'] = $session->extractSessionId();
 			}
 
 			$result = $this->apiClient->callMethod($api, $method, $call['params'], $auth);

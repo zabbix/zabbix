@@ -66,6 +66,11 @@ class CUser extends CApiService {
 	public const PROVISION_STATUS_YES = 1;
 	public const PROVISION_STATUS_NO = 0;
 
+	public const TOKEN_AUTH_TYPES = [
+		ZBX_API_HEADER_AUTHENTICATE_BEARER => 0,
+		ZBX_API_HEADER_AUTHENTICATE_DPOP => 1
+	];
+
 	/**
 	 * Acceptable execution time of user verification process in seconds and nanoseconds.
 	 *
@@ -2902,21 +2907,25 @@ class CUser extends CApiService {
 	 */
 	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' => ['type' => API_STRING_UTF8],
+			'sessionid' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
 			'extend' => ['type' => API_MULTIPLE, 'rules' => [
-				['if' => function (array $data): bool {
-					return !array_key_exists('token', $data);
-				}, 'type' => API_BOOLEAN, 'default' => true],
+				['if' => static fn(array $data): bool => $data['sessionid'] !== null, 'type' => API_BOOLEAN, 'default' => true],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'token' => ['type' => API_STRING_UTF8]
+			'token' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
+			'signature' => ['type' => API_MULTIPLE, 'rules' => [
+				['if' => static fn(array $data): bool => $data['token'] !== null, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'default' => null],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'request_api_method' => ['type' => API_MULTIPLE, 'rules' => [
+				['if' => static fn(array $data): bool => $data['token'] !== null, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'default' => null],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
-
-		$session += ['sessionid' => null, 'token' => null];
 
 		if (($session['sessionid'] === null && $session['token'] === null)
 				|| ($session['sessionid'] !== null && $session['token'] !== null)) {
@@ -2938,7 +2947,10 @@ class CUser extends CApiService {
 			$userid = $db_session['userid'];
 		}
 		else {
-			$db_token = self::tokenAuthentication($session['token'], $time);
+			$db_token = self::tokenAuthentication($session['token'], $time, $session['signature'],
+				$session['request_api_method']
+			);
+
 			$userid = $db_token['userid'];
 		}
 
@@ -3018,16 +3030,19 @@ class CUser extends CApiService {
 	/**
 	 * Authenticates user based on API token.
 	 *
-	 * @param string $auth_token API token.
-	 * @param int    $time       Current time unix timestamp.
+	 * @param string	  $auth_token		   API token.
+	 * @param int		  $time				   Current time unix timestamp.
+	 * @param null|string $signature           DPoP header content.
+	 * @param null|string $request_api_method  Requested API method <API name>.<method name> (ex.: 'user.get').
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	private static function tokenAuthentication(string $auth_token, int $time): array {
+	private static function tokenAuthentication(string $auth_token, int $time, ?string $signature,
+			?string $request_api_method): array {
 		$db_tokens = DB::select('token', [
-			'output' => ['userid', 'expires_at', 'tokenid'],
+			'output' => ['userid', 'auth_type', 'client_public_key', 'expires_at', 'tokenid'],
 			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
 		]);
 
@@ -3038,11 +3053,35 @@ class CUser extends CApiService {
 
 		$db_token = $db_tokens[0];
 
+		// mock data to choice DPoP auth type
+		$db_token['auth_type'] = self::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_DPOP];
+		$db_token['client_public_key'] = CApiDpopHelper::PUBLIC_KEY_PEM;
+
 		if ($db_token['expires_at'] != 0 && $db_token['expires_at'] < $time) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		return $db_token;
+		if ($db_token['auth_type'] == self::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_DPOP]) {
+			if ($signature === null || $request_api_method === null) {
+				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			// To test the DPoP verification implementation using one of the libraries
+			// (firebase/php-jwt or web-token/jwt-library), is necessary to uncomment
+			// the corresponding code below.
+
+//			if (CApiDpopHelper::verifyDpopSignatureUsingFirebase($signature, $db_token['client_public_key'],
+//					$auth_token, $request_api_method)) {
+//				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+//			}
+
+			if (CApiDpopHelper::verifyDpopSignatureUsingJose($signature, $db_token['client_public_key'],
+					$auth_token, $request_api_method)) {
+				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+		}
+
+		return array_diff_key($db_token, array_flip(['expires_at', 'flags', 'public_key_pem']));
 	}
 
 	/**

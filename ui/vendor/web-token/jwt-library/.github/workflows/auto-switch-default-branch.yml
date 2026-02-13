@@ -1,0 +1,110 @@
+name: Auto-switch default branch on new tag
+
+on:
+    push:
+        tags:
+            - '*.*.*'   # tags du type a.b.c (1.2.3, 2.0.0, etc.)
+
+jobs:
+    update-default-branch:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write   # nécessaire pour modifier le repo via l'API
+        
+        steps:
+            - name: Parse tag and compute target branch
+              id: vars
+              run: |
+                  ref="${GITHUB_REF#refs/tags/}"    # ex: 1.2.3 ou 1.2.3.
+                  # On enlève un éventuel '.' final (au cas où : 1.2.3. -> 1.2.3)
+                  version="${ref%.}"
+                  
+                  echo "Tag ref: $ref"
+                  echo "Version: $version"
+                  
+                  IFS='.' read -r major minor patch <<< "$version"
+                  
+                  echo "Major: $major"
+                  echo "Minor: $minor"
+                  echo "Patch: $patch"
+                  
+                  target_branch="${major}.${minor}.x"
+                  echo "Target branch: $target_branch"
+                  
+                  echo "major=$major" >> "$GITHUB_OUTPUT"
+                  echo "minor=$minor" >> "$GITHUB_OUTPUT"
+                  echo "target_branch=$target_branch" >> "$GITHUB_OUTPUT"
+
+            - name: Get current default branch
+              id: repo
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  default_branch=$(gh repo view "${GITHUB_REPOSITORY}" --json defaultBranchRef --jq .defaultBranchRef.name)
+                  echo "Current default branch: $default_branch"
+                  echo "default_branch=$default_branch" >> "$GITHUB_OUTPUT"
+
+            - name: Check target branch exists
+              id: exists
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  target="${{ steps.vars.outputs.target_branch }}"
+                  
+                  echo "Checking if branch $target exists..."
+                  if gh api "repos/${GITHUB_REPOSITORY}/branches/$target" >/dev/null 2>&1; then
+                    echo "Branch $target exists."
+                    echo "exists=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "Branch $target does not exist, skipping."
+                    echo "exists=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Decide whether to switch
+              id: decide
+              run: |
+                  target="${{ steps.vars.outputs.target_branch }}"
+                  current="${{ steps.repo.outputs.default_branch }}"
+                  major="${{ steps.vars.outputs.major }}"
+                  minor="${{ steps.vars.outputs.minor }}"
+                  
+                  echo "Current default: $current"
+                  echo "Target branch: $target"
+                  echo "Tag version: $major.$minor"
+                  
+                  # Si le target branch n'existe pas -> on ne fait rien
+                  if [ "${{ steps.exists.outputs.exists }}" != "true" ]; then
+                    echo "switch_needed=false" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  
+                  # On ne s'intéresse qu'aux default branches de type a.b.x
+                  if [[ "$current" =~ ^([0-9]+)\.([0-9]+)\.x$ ]]; then
+                    current_major="${BASH_REMATCH[1]}"
+                    current_minor="${BASH_REMATCH[2]}"
+                    echo "Current parsed version: $current_major.$current_minor"
+                  else
+                    echo "Current default branch is not of the form a.b.x, skipping."
+                    echo "switch_needed=false" >> "$GITHUB_OUTPUT"
+                    exit 0
+                  fi
+                  
+                  # Comparaison (major, minor)
+                  if [ "$major" -gt "$current_major" ] || { [ "$major" -eq "$current_major" ] && [ "$minor" -gt "$current_minor" ]; }; then
+                    echo "New version $major.$minor is higher than $current_major.$current_minor → will switch."
+                    echo "switch_needed=true" >> "$GITHUB_OUTPUT"
+                  else
+                    echo "New version $major.$minor is not higher than $current_major.$current_minor → no switch."
+                    echo "switch_needed=false" >> "$GITHUB_OUTPUT"
+                  fi
+
+            - name: Update default branch
+              if: steps.decide.outputs.switch_needed == 'true'
+              env:
+                  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              run: |
+                  target="${{ steps.vars.outputs.target_branch }}"
+                  echo "Switching default branch to: $target"
+                  
+                  gh api -X PATCH "repos/${GITHUB_REPOSITORY}" \
+                    -f default_branch="$target"
