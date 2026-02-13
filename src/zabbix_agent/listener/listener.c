@@ -29,6 +29,9 @@
 #elif !defined(_WINDOWS)
 #	include "zbxnix.h"
 #endif
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 #ifndef _WINDOWS
 static volatile sig_atomic_t	need_update_userparam;
@@ -246,6 +249,9 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 #endif
 
 #ifndef _WINDOWS
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 	zbx_set_sigusr_handler(zbx_listener_sigusr_handler);
 #endif
 	zbx_cfg_set_process_num(process_num);

@@ -83,7 +83,8 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
 	{"history_uint", "value", row2value_ui64},
 	{"history_text", "value", row2value_str},
-	{"history_bin", "value", row2value_str}
+	{"history_bin", "value", row2value_str},
+	{"history_json", "value", row2value_str}
 };
 
 /******************************************************************************************************************
@@ -301,6 +302,25 @@ static void	add_history_bin(const zbx_vector_dc_history_ptr_t *history)
 		const zbx_dc_history_t	*h = history->values[i];
 
 		if (ITEM_VALUE_TYPE_BIN != h->value_type)
+			continue;
+
+		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
+	}
+
+	sql_writer_add_dbinsert(db_insert);
+}
+
+static void	add_history_json(const zbx_vector_dc_history_ptr_t *history)
+{
+	zbx_db_insert_t	*db_insert = (zbx_db_insert_t *)zbx_malloc(NULL, sizeof(zbx_db_insert_t));
+
+	zbx_db_insert_prepare(db_insert, "history_json", "itemid", "clock", "ns", "value", (char *)NULL);
+
+	for (int i = 0; i < history->values_num; i++)
+	{
+		const zbx_dc_history_t	*h = history->values[i];
+
+		if (ITEM_VALUE_TYPE_JSON != h->value_type)
 			continue;
 
 		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
@@ -728,6 +748,9 @@ void	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type)
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 			hist->data.sql_history_func = add_history_bin;
+			break;
+		case ITEM_VALUE_TYPE_JSON:
+			hist->data.sql_history_func = add_history_json;
 			break;
 		case ITEM_VALUE_TYPE_NONE:
 		default:

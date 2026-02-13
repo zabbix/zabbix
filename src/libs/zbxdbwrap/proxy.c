@@ -711,8 +711,15 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 
 				SET_LOG_RESULT(&result, log);
 			}
-			else
-				zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
+			else if (ITEM_VALUE_TYPE_JSON == item->value_type)
+			{
+				if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_JSON, value->value))
+					return FAIL;
+			}
+			else if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value))
+			{
+				return FAIL;
+			}
 		}
 
 		if (0 != value->meta)

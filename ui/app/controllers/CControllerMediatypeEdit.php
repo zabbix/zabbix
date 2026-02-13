@@ -117,7 +117,8 @@ class CControllerMediatypeEdit extends CController {
 			'description' => '',
 			'message_format' => $email_defaults['message_format'],
 			'message_templates' => [],
-			'providers' => CMediatypeHelper::getEmailProviders()
+			'providers' => CMediatypeHelper::getEmailProviders(),
+			'tokens_status' => 0
 		];
 
 		$message_templates = [];
@@ -176,6 +177,13 @@ class CControllerMediatypeEdit extends CController {
 		if ($curl_status['result'] != CFrontendSetup::CHECK_OK) {
 			$data['curl_error'] = $curl_status['error'];
 		}
+
+		$data['js_validation_rules'] = $data['mediatypeid'] == null
+			? (new CFormValidator(CControllerMediatypeCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerMediatypeUpdate::getValidationRules()))->getRules();
+
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerMediatypeCreate::getValidationRules()))
+			->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of media types'));

@@ -470,7 +470,10 @@ class CApiService {
 			}
 		}
 
-		$sql_select = ($sql_parts['distinct'] ? 'DISTINCT ' : '').implode(',', array_unique($sql_parts['select']));
+		$sql_select = implode(',', array_unique($sql_parts['select']));
+		if (!str_starts_with($sql_select, 'COUNT(')) {
+			$sql_select = (self::dbDistinct($sql_parts) ? 'DISTINCT ' : '').$sql_select;
+		}
 		$sql_where = $sql_parts['where'] ? ' WHERE '.implode(' AND ', array_unique($sql_parts['where'])) : '';
 		$sql_group = $sql_parts['group'] ? ' GROUP BY '.implode(',', array_unique($sql_parts['group'])) : '';
 		$sql_order = $sql_parts['order'] ? ' ORDER BY '.implode(',', array_unique($sql_parts['order'])) : '';
@@ -495,8 +498,6 @@ class CApiService {
 		$pk = $this->pk($table_name);
 		$pk_composite = strpos($pk, ',') !== false;
 
-		$sql_parts['distinct'] = self::dbDistinct($sql_parts);
-
 		if (array_key_exists('countOutput', $options) && $options['countOutput']
 				&& !$this->requiresPostSqlFiltering($options)) {
 			$has_joins = array_key_exists('join', $sql_parts) && $sql_parts['join'];
@@ -506,11 +507,9 @@ class CApiService {
 			}
 
 			$sql_parts['select'] = $has_joins
-				? ['COUNT('.($sql_parts['distinct'] ? 'DISTINCT ' : '').$this->fieldId($pk, $table_alias).')'.
+				? ['COUNT('.(self::dbDistinct($sql_parts) ? 'DISTINCT ' : '').$this->fieldId($pk, $table_alias).')'.
 					' AS rowscount']
 				: ['COUNT(*) AS rowscount'];
-
-			$sql_parts['distinct'] = false;
 
 			// Select columns used by group count.
 			if (array_key_exists('groupCount', $options) && $options['groupCount']) {

@@ -139,7 +139,8 @@ class CScreenHistory extends CScreenBase {
 
 		$iv_string = [
 			ITEM_VALUE_TYPE_LOG => 1,
-			ITEM_VALUE_TYPE_TEXT => 1
+			ITEM_VALUE_TYPE_TEXT => 1,
+			ITEM_VALUE_TYPE_JSON => 1
 		];
 
 		if ($this->action == HISTORY_VALUES || $this->action == HISTORY_LATEST) {
@@ -172,7 +173,7 @@ class CScreenHistory extends CScreenBase {
 
 			/**
 			 * View type: As plain text.
-			 * Item type: numeric (unsigned, char), float, text, log.
+			 * Item type: numeric (unsigned, char), float, text, log, binary, JSON.
 			 */
 			if ($this->plaintext) {
 				if (!$numeric_items && $this->filter !== ''
@@ -194,6 +195,13 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
+
+					if ($value_type == ITEM_VALUE_TYPE_BINARY || $value_type == ITEM_VALUE_TYPE_JSON) {
+						$options['maxValueSize'] = null;
+					}
+					else {
+						unset($options['maxValueSize']);
+					}
 
 					$item_data = API::History()->get($options);
 
@@ -235,7 +243,7 @@ class CScreenHistory extends CScreenBase {
 			}
 			/**
 			 * View type: Values, 500 latest values
-			 * Item type: text, log
+			 * Item type: text, log, JSON.
 			 */
 			elseif (!$numeric_items) {
 				$use_log_item = false;
@@ -282,6 +290,15 @@ class CScreenHistory extends CScreenBase {
 				foreach ($items_by_type as $value_type => $itemids) {
 					$options['history'] = $value_type;
 					$options['itemids'] = $itemids;
+
+					if ($value_type == ITEM_VALUE_TYPE_JSON) {
+						// Extra byte to trim values that exceeds length limit.
+						$options['maxValueSize'] = 64 * ZBX_KIBIBYTE + 1;
+					}
+					else {
+						unset($options['maxValueSize']);
+					}
+
 					$item_data = API::History()->get($options);
 
 					if ($item_data) {
@@ -308,8 +325,9 @@ class CScreenHistory extends CScreenBase {
 						$value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
 					}
 					else {
-						$data['value'] = rtrim($data['value'], " \t\r\n");
-						$value = zbx_nl2br($data['value']);
+						$value = $value_type == ITEM_VALUE_TYPE_JSON
+							? (new CTrim($data['value'], 64 * ZBX_KIBIBYTE))
+							: rtrim($data['value'], " \t\r\n");
 
 						if ($this->filter !== '') {
 							$haystack = mb_strtolower($data['value']);

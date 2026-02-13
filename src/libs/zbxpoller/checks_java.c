@@ -214,7 +214,7 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 	zbx_json_close(&json);
 
 	if (SUCCEED == (err = zbx_tcp_connect(&s, config_source_ip, config_java_gateway, config_java_gateway_port,
-			config_timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+			config_timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL, ZBX_DNS_FAILOVER_ENABLED)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);
 

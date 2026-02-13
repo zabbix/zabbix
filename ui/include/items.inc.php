@@ -128,6 +128,8 @@ function itemValueTypeString($value_type): string {
 			return _('Text');
 		case ITEM_VALUE_TYPE_BINARY:
 			return _('Binary');
+		case ITEM_VALUE_TYPE_JSON:
+			return _('JSON');
 	}
 
 	return _('Unknown');
@@ -909,6 +911,7 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_LOG:
+		case ITEM_VALUE_TYPE_JSON:
 			if ($trim && mb_strlen($value) > 20) {
 				$value = mb_substr($value, 0, 20).'...';
 			}
