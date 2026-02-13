@@ -139,10 +139,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['edit'] ? _('Update') : _('Add'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'return valuemap_edit_popup.submit(overlay);'
+			'isSubmit' => true
 		]
 	]
 ];

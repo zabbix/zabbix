@@ -17,7 +17,8 @@
 
 window.service_edit_popup = new class {
 
-	init({rules, tabs_id, serviceid, children, children_problem_tags_html, problem_tags, status_rules, search_limit}) {
+	init({rules, clone_rules, serviceid, tabs_id, children, children_problem_tags_html, problem_tags, status_rules,
+			 search_limit}) {
 		this.serviceid = serviceid;
 		this.search_limit = search_limit;
 		this.overlay = overlays_stack.getById('service.edit');
@@ -25,6 +26,7 @@ window.service_edit_popup = new class {
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.footer = this.overlay.$dialogue.$footer[0];
+		this.clone_rules = clone_rules;
 		this.status_rules = status_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
@@ -160,6 +162,10 @@ window.service_edit_popup = new class {
 		this.#update();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 	}
 
 	#update() {
@@ -290,15 +296,6 @@ window.service_edit_popup = new class {
 		this.#update();
 	}
 
-	#removeAllChildren() {
-		document.querySelector('#children tbody').innerHTML = '';
-
-		this.children.clear();
-		this.#updateChildrenFilterStats();
-		this.#updateTabIndicator();
-		this.#update();
-	}
-
 	#filterChildren() {
 		const container = document.querySelector('#children tbody');
 		const filter_name = document.getElementById('children-filter-name').value.toLowerCase();
@@ -395,43 +392,63 @@ window.service_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons, rules}) {
+	#clone() {
 		this.serviceid = null;
+		this.form_element.querySelector('[name=serviceid]').remove();
 
-		this.form.reload(rules);
-
-		this.#removeAllChildren();
+		const title = <?= json_encode(_('New service')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+		this.form.reload(this.clone_rules);
 	}
 
-	delete() {
-		this.overlay.setLoading();
+	#delete() {
+		if (window.confirm(<?= json_encode(_('Delete selected service?')) ?>)) {
+			this.#removePopupMessages();
 
-		const curl = new Curl('zabbix.php');
+			const post_data = {
+				serviceids: [this.form.findFieldByName('serviceid').getValue()],
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('service')) ?>
+			};
 
-		curl.setArgument('action', 'service.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('service')) ?>);
+			const curl = new Curl('zabbix.php');
 
-		this.#post(curl.getUrl(), {serviceids: [this.serviceid]}, response => {
-			if ('form_errors' in response) {
-				this.form.setErrors(response.form_errors, true, true);
-				this.form.renderErrors();
-			}
-			else if ('error' in response) {
-				throw {error: response.error};
-			}
-			else {
+			curl.setArgument('action', 'service.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('service')) ?>);
+
+			this.#post(curl.getUrl(), post_data, (response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
+
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-			}
-		});
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
-	submit() {
+	#submit() {
+		this.#removePopupMessages();
 		const fields = this.form.getAllValues();
 
 		fields.child_serviceids = [...this.children.keys()];
@@ -439,33 +456,21 @@ window.service_edit_popup = new class {
 			delete fields.problem_tags;
 		}
 
-		this.overlay.$dialogue.find('.msg-bad').remove();
-		this.overlay.setLoading();
-
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
-
 		this.form.validateSubmit(fields)
 			.then(result => {
-				this.overlay.unsetLoading();
-
 				if (!result) {
+					this.overlay.unsetLoading();
+
 					return;
 				}
 
+				const curl = new Curl('zabbix.php');
+
+				curl.setArgument('action', this.serviceid !== null ? 'service.update' : 'service.create');
+
 				this.#post(curl.getUrl(), fields, response => {
-					if ('form_errors' in response) {
-						this.form.setErrors(response.form_errors, true, true);
-						this.form.renderErrors();
-					}
-					else if ('error' in response) {
-						throw {error: response.error};
-					}
-					else {
-						overlayDialogueDestroy(this.overlay.dialogueid);
-						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-					}
+					overlayDialogueDestroy(this.overlay.dialogueid);
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				});
 			});
 	}
@@ -476,29 +481,46 @@ window.service_edit_popup = new class {
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)
 		})
-			.then(response => response.json())
-			.then(success_callback)
-			.catch(exception => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
+			.then((response) => response.json())
+			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
 				}
 
-				let title, messages;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+					return;
 				}
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
+				success_callback(response);
 			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
+	}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }

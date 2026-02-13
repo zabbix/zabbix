@@ -375,65 +375,28 @@ $tabs = (new CTabView())
 	->addTab('tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('child-services-tab', _('Child services'), $child_services_tab, TAB_INDICATOR_CHILD_SERVICES);
 
-$form
-	->addItem($tabs)
-	->addItem(
-		(new CScriptTag('
-			service_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'tabs_id' => $tabs->getId(),
-				'serviceid' => $data['serviceid'],
-				'children' => $data['form']['children'],
-				'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
-				'problem_tags' => $data['form']['problem_tags'],
-				'status_rules' => $data['form']['status_rules'],
-				'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
-			]).');
-		'))->setOnDocumentReady()
-	);
+$form->addItem($tabs);
 
 if ($data['serviceid'] !== null) {
 	$title = _('Service');
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'service_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'service_edit_popup.clone('.json_encode([
-				'title' => _('New service'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'service_edit_popup.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true,
-						'action' => ''
-					]
-				],
-				'rules' => (new CFormValidator(CControllerServiceCreate::getValidationRules()))->getRules()
-			]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete selected service?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'service_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -442,10 +405,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'service_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -456,7 +418,19 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('service.edit.js.php'),
+		$this->readJsFile('service.edit.js.php').
+		'service_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'tabs_id' => $tabs->getId(),
+			'serviceid' => $data['serviceid'],
+			'children' => $data['form']['children'],
+			'children_problem_tags_html' => $data['form']['children_problem_tags_html'],
+			'problem_tags' => $data['form']['problem_tags'],
+			'status_rules' => $data['form']['status_rules'],
+			'search_limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT)
+		]).');'
+	,
 	'dialogue_class' => 'modal-popup-medium'
 ];
 
