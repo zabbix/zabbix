@@ -18,7 +18,7 @@
 window.service_edit_popup = new class {
 
 	init({rules, clone_rules, serviceid, tabs_id, children, children_problem_tags_html, problem_tags, status_rules,
-			 search_limit}) {
+			search_limit}) {
 		this.serviceid = serviceid;
 		this.search_limit = search_limit;
 		this.overlay = overlays_stack.getById('service.edit');
