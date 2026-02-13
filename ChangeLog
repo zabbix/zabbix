@@ -1,6 +1,7 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F.I..... [ZBXNEXT-4769] implemented Graph widget and Scatter plot improvements (dfofanovs)
 A.F....PS. [ZBXNEXT-10069] added support for new JSON item value type (arimdjonoks, gcalenko, kkuzmina)
 ..F....... [ZBXNEXT-9748] implemented inline validation for user, profile and notifications forms (gberzina)
 A.F.I..... [ZBXNEXT-10387] removed support of massupdate method for host, template, hostgroup and templategroup API objects; removed support for hostinterface.replacehostinterfaces method (arimdjonoks, jfreibergs, vmaksimovs)
@@ -35,6 +36,7 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+..F....... [ZBX-27508] fixed inline validation rules for item and item prototype forms (gberzina)
 .......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 .......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
 ...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)
