@@ -100,5 +100,12 @@ void	mock_read_variant(const char *path, zbx_variant_t *variant)
 		return;
 	}
 
+	if (0 == strcmp(type, "ZBX_VARIANT_JSON"))
+	{
+		zbx_variant_set_json(variant, zbx_strdup(NULL, value));
+
+		return;
+	}
+
 	fail_msg("Invalid variant type: %s", type);
 }
