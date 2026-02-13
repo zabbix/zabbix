@@ -122,9 +122,6 @@ void	zbx_vps_monitor_add_collected(zbx_uint64_t values_num)
  *                                                                            *
  * Purpose: add number of written values to the monitor                       *
  *                                                                            *
- * Comments: This function is called before processes are spawned -           *
- *           no locking is needed.                                            *
- *                                                                            *
  ******************************************************************************/
 void	zbx_vps_monitor_add_written(zbx_uint64_t values_num)
 {
