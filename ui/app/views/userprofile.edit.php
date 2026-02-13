@@ -34,10 +34,6 @@ $html_page
 
 $tabs = new CTabView();
 
-if ($data['form_refresh'] == 0) {
-	$tabs->setSelected(0);
-}
-
 if ($data['readonly'] == true) {
 	CMessageHelper::addWarning(
 		_('This user is IdP provisioned. Manual changes for provisioned fields are not allowed.')
@@ -47,13 +43,13 @@ if ($data['readonly'] == true) {
 
 // Create form.
 $form = (new CForm())
-	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('userprofile-form')
 	->setName('userprofile_form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
-	->addVar('action', $data['action'])
-	->addVar('userid', $data['userid']);
+	->addVar('userid', $data['userid'])
+	->addVar('change_password', $data['change_password'] ? 1 : 0)
+	->addVar('allow_empty_password', $data['allow_empty_password'] ? 1 : 0);
 
 $form_list = new CFormList('user_form_list');
 
@@ -66,7 +62,7 @@ $form_list
 		(new CSpan($user_full_name))
 	);
 
-if ($data['change_password']) {
+if (!$data['readonly'] && $data['internal_auth']) {
 	$form->disablePasswordAutofill();
 
 	$password_requirements = [];
@@ -111,50 +107,68 @@ if ($data['change_password']) {
 		])
 		: null;
 
-	$current_password = (new CPassBox('current_password'))
-		->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-		->setAriaRequired()
-		->setAttribute('autocomplete', 'off');
-
-	$current_password->setAttribute('autofocus', 'autofocus');
-
 	if (CWebUser::$data['userid'] == $data['userid']) {
+		$current_password = (new CPassBox('current_password'))
+			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setAriaRequired()
+			->setAttribute('data-notrim', '')
+			->setAttribute('autocomplete', 'off')
+			->setAttribute('disabled', 'disabled')
+			->setAttribute('autofocus', 'autofocus');
+
 		$form_list
-			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(), $current_password);
+			->addRow((new CLabel(_('Current password'), 'current_password'))->setAsteriskMark(),
+				$current_password, null, 'password-change-active'
+			);
 	}
 
+	$form_list->addRow(_('Password'),
+		[
+			(new CSimpleButton(_('Change password')))
+				->setId('change-password-button')
+				->addClass(ZBX_STYLE_BTN_GREY),
+			null
+		],
+		null,
+		'password-change-inactive'
+	);
+
 	$form_list
-		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(), [
-			// Hidden dummy login field for protection against chrome error when password autocomplete.
-			(new CInput('text', null, null))
-				->setAttribute('tabindex', '-1')
-				->addStyle('position: absolute; left: -100vw;'),
-			(new CPassBox('password1', $data['password1']))
-				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-				->setAriaRequired()
-				->setAttribute('autocomplete', 'off')
-		])
+		->addRow((new CLabel([_('Password'), $password_hint_icon], 'password1'))->setAsteriskMark(),
+			[
+				// Hidden dummy login field for protection against chrome error when password autocomplete.
+				(new CInput('text', null, null))
+					->setAttribute('tabindex', '-1')
+					->addStyle('position: absolute; left: -100vw;'),
+				(new CPassBox('password1', $data['password1']))
+					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+					->setAriaRequired()
+					->setAttribute('data-notrim', '')
+					->setAttribute('disabled', 'disabled')
+					->setAttribute('autocomplete', 'off')
+			],
+			null,
+			'password-change-active'
+		)
 		->addRow((new CLabel(_('Password (once again)'), 'password2'))->setAsteriskMark(),
 			(new CPassBox('password2', $data['password2']))
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 				->setAriaRequired()
-				->setAttribute('autocomplete', 'off')
+				->setAttribute('data-notrim', '')
+				->setAttribute('disabled', 'disabled')
+				->setAttribute('autocomplete', 'off'),
+			null,
+			'password-change-active'
 		)
-		->addRow('', _('Password is not mandatory for non internal authentication type.'));
+		->addRow('', _('Password is not mandatory for non internal authentication type.'), null, 'password-change-active');
 }
 else {
-	$change_password_enabled = !$data['readonly'] && $data['internal_auth'];
-	$hint = !$change_password_enabled
-		? $hint = makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
-		: null;
-
 	$form_list->addRow(_('Password'), [
 		(new CSimpleButton(_('Change password')))
-			->setEnabled($change_password_enabled)
+			->setEnabled(false)
 			->setAttribute('autofocus', 'autofocus')
-			->onClick('submitFormWithParam("'.$form->getName().'", "change_password", "1");')
 			->addClass(ZBX_STYLE_BTN_GREY),
-		$hint
+		makeErrorIcon(_('Password can only be changed for users using the internal Zabbix authentication.'))
 	]);
 }
 
@@ -225,9 +239,9 @@ if ($data['username'] !== ZBX_GUEST_USER) {
 			->setChecked($data['autologin'])
 	);
 	$form_list->addRow(_('Auto-logout'), [
-		(new CCheckBox(null))
-			->setId('autologout_visible')
-			->setChecked($data['autologout'] !== '0'),
+		(new CCheckBox('autologout_visible'))
+			->setChecked($data['autologout'] !== '0')
+			->setUncheckedValue(0),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
@@ -254,7 +268,7 @@ $tabs->addTab('userTab', _('User'), $form_list);
 
 // Append buttons to form.
 $tabs->setFooter(makeFormFooter(
-	(new CSubmitButton(_('Update'), 'action', 'userprofile.update'))->setId('update'),
+	new CSubmit('update', _('Update')),
 	[(new CRedirectButton(_('Cancel'), CMenuHelper::getFirstUrl()))->setId('cancel')]
 ));
 
@@ -264,6 +278,8 @@ $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag('view.init();'))
+(new CScriptTag('view.init('.json_encode([
+	'rules' => $data['js_validation_rules']
+]).');'))
 	->setOnDocumentReady()
 	->show();

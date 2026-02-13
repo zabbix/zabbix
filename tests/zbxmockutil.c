@@ -54,6 +54,21 @@ const char	*zbx_mock_get_optional_parameter_string(const char *path)
 	return parameter;
 }
 
+const char	*zbx_mock_get_optional_object_member_string(zbx_mock_handle_t object, const char *name)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	const char		*member;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &member)))
+	{
+		return NULL;
+	}
+
+	return member;
+}
+
 const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name)
 {
 	zbx_mock_error_t	err;
@@ -184,6 +199,9 @@ unsigned char	zbx_mock_str_to_value_type(const char *str)
 	if (0 == strcmp(str, "ITEM_VALUE_TYPE_BIN"))
 		return ITEM_VALUE_TYPE_BIN;
 
+	if (0 == strcmp(str, "ITEM_VALUE_TYPE_JSON"))
+		return ITEM_VALUE_TYPE_JSON;
+
 	fail_msg("Unknown value type \"%s\"", str);
 
 	return ITEM_VALUE_TYPE_NONE;
@@ -268,6 +286,9 @@ unsigned char	zbx_mock_str_to_variant(const char *str)
 
 	if (0 == strcmp(str, "ZBX_VARIANT_UI64"))
 		return ZBX_VARIANT_UI64;
+
+	if (0 == strcmp(str, "ZBX_VARIANT_JSON"))
+		return ZBX_VARIANT_JSON;
 
 	fail_msg("Unknown variant \"%s\"", str);
 	return ZBX_VARIANT_NONE;
