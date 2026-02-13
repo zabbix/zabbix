@@ -231,6 +231,7 @@ class testFormApiTokens extends CWebTest {
 				$auth_token = $form->getField('Auth token:');
 				$this->checkAuthToken($auth_token, $original_token);
 				$dialog->close();
+				$this->page->waitUntilReady();
 			}
 			else {
 				$dialog->ensureNotPresent();
