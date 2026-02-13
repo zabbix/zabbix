@@ -90,7 +90,12 @@ class CControllerItemUpdate extends CControllerItem {
 
 			// Form.
 			'name' => ['db items.name', 'required', 'not_empty'],
-			'type' => ['db items.type', 'required', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_HTTPTEST, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]],
+			'type' => ['db items.type', 'required', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE,
+				ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER,
+				ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH,
+				ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
+				ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
+			]],
 			'key' => [
 				['db items.key_', 'required', 'not_empty', 'use' => [CItemKeyValidator::class, []]],
 				['string', 'regex' => '/^(?!'.preg_quote(ZBX_DEFAULT_KEY_DB_MONITOR, '/').')/',
@@ -106,7 +111,11 @@ class CControllerItemUpdate extends CControllerItem {
 					'when' => ['type', 'in' => [ITEM_TYPE_TELNET]]
 				]
 			],
-			'value_type' => ['db items.value_type', 'required', 'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]],
+			'value_type' => ['db items.value_type', 'required',
+				'in' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+					ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON
+				]
+			],
 			'url' => ['db items.url', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'query_fields' => ['objects',
 				'fields' => [
@@ -122,15 +131,26 @@ class CControllerItemUpdate extends CControllerItem {
 			'parameters' => ['objects', 'uniq' => ['name'],
 				'fields' => [
 					'value' => ['db item_parameter.value'],
-					'name' => ['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
+					'name' => [
+						['db item_parameter.name'],
+						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					],
 					'sortorder' => ['integer']
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]]
 			],
 			'script' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SCRIPT]]],
-			'browser_script' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_BROWSER]]],
-			'request_method' => ['db items.request_method', 'required', 'in' => [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'post_type' => ['db items.request_method', 'required', 'in' => [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
+			'browser_script' => ['db items.params', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_BROWSER]]
+			],
+			'request_method' => ['db items.request_method', 'required',
+				'in' => [HTTPCHECK_REQUEST_GET, HTTPCHECK_REQUEST_POST, HTTPCHECK_REQUEST_PUT, HTTPCHECK_REQUEST_HEAD],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
+			'post_type' => ['db items.request_method', 'required',
+				'in' => [ZBX_POSTTYPE_RAW, ZBX_POSTTYPE_JSON, ZBX_POSTTYPE_XML],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
 			'posts' => [
 				['db items.posts'],
 				['db items.posts', 'required', 'not_empty',
@@ -151,23 +171,44 @@ class CControllerItemUpdate extends CControllerItem {
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
 			'status_codes' => ['db items.status_codes',
-				'use' => [CRangesParser::class, ['usermacros' => true, 'lldmacros' => false, 'with_minus' => true]],
+				'use' => [CRangesParser::class, ['usermacros' => true, 'with_minus' => true]],
 				'messages' => ['use' => _('Invalid HTTP status code or range.')],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
-			'follow_redirects' => ['db items.follow_redirects', 'in' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'retrieve_mode' => ['db items.retrieve_mode', 'in' => [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS, HTTPTEST_STEP_RETRIEVE_MODE_BOTH], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'output_format' => ['db items.output_format', 'in' => [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
+			'follow_redirects' => ['db items.follow_redirects',
+				'in' => [HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF, HTTPTEST_STEP_FOLLOW_REDIRECTS_ON],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
+			'retrieve_mode' => ['db items.retrieve_mode',
+				'in' => [HTTPTEST_STEP_RETRIEVE_MODE_CONTENT, HTTPTEST_STEP_RETRIEVE_MODE_HEADERS,
+					HTTPTEST_STEP_RETRIEVE_MODE_BOTH
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
+			'output_format' => ['db items.output_format', 'in' => [HTTPCHECK_STORE_RAW, HTTPCHECK_STORE_JSON],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
 			'http_proxy' => ['db items.http_proxy', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'http_authtype' => ['db items.authtype', 'in' => [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS, ZBX_HTTP_AUTH_DIGEST], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
+			'http_authtype' => ['db items.authtype',
+				'in' => [ZBX_HTTP_AUTH_NONE, ZBX_HTTP_AUTH_BASIC, ZBX_HTTP_AUTH_NTLM, ZBX_HTTP_AUTH_KERBEROS,
+					ZBX_HTTP_AUTH_DIGEST
+				],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
 			'http_username' => ['db items.username', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'http_password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'verify_peer' => ['db items.verify_peer', 'in' => [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'verify_host' => ['db items.verify_host', 'in' => [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON], 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
+			'verify_peer' => ['db items.verify_peer', 'in' => [ZBX_HTTP_VERIFY_PEER_OFF, ZBX_HTTP_VERIFY_PEER_ON],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
+			'verify_host' => ['db items.verify_host', 'in' => [ZBX_HTTP_VERIFY_HOST_OFF, ZBX_HTTP_VERIFY_HOST_ON],
+				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
+			],
 			'ssl_cert_file' => ['db items.ssl_cert_file', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'ssl_key_file' => ['db items.ssl_key_file', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
 			'ssl_key_password' => ['db items.ssl_key_password', 'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]],
-			'master_itemid' => ['db items.master_itemid', 'required', 'when' => ['type', 'in' => [ITEM_TYPE_DEPENDENT]]],
+			'master_itemid' => ['db items.master_itemid', 'required',
+				'when' => ['type', 'in' => [ITEM_TYPE_DEPENDENT]]
+			],
 			'interfaceid' => ['db items.interfaceid', 'required',
 				'messages' => ['required' => _('No interface found')],
 				'when' => [
@@ -179,33 +220,55 @@ class CControllerItemUpdate extends CControllerItem {
 				]
 			],
 			'snmp_oid' => ['db items.snmp_oid', 'not_empty', 'required', 'when' => ['type', 'in' => [ITEM_TYPE_SNMP]]],
-			'ipmi_sensor' => ['db items.ipmi_sensor', 'not_empty', 'required', 'when' => [
-				['key', 'not_in' => ['ipmi.get']],
-				['type', 'in' => [ITEM_TYPE_IPMI]]
-			]],
-			'authtype' => ['db items.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY], 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT]]],
-			'jmx_endpoint' => ['db items.jmx_endpoint', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_JMX]]],
-			'username' => [
-				['db items.username', 'when' => ['type', 'in' => [ITEM_TYPE_JMX, ITEM_TYPE_SIMPLE]]],
-				['db items.username', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]]
+			'ipmi_sensor' => ['db items.ipmi_sensor', 'not_empty', 'required',
+				'when' => [['key', 'not_in' => ['ipmi.get']], ['type', 'in' => [ITEM_TYPE_IPMI]]]
 			],
-			'publickey' => ['db items.publickey', 'required', 'not_empty', 'when' => [
-				['type', 'in' => [ITEM_TYPE_SSH]],
-				['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
-			]],
-			'privatekey' => ['db items.privatekey', 'required', 'not_empty', 'when' => [
-				['type', 'in' => [ITEM_TYPE_SSH]],
-				['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]
-			]],
+			'authtype' => ['db items.authtype', 'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY],
+				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_HTTPAGENT]]
+			],
+			'jmx_endpoint' => ['db items.jmx_endpoint', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_JMX]]
+			],
+			'username' => [
+				['db items.username',
+					'when' => ['type', 'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_JMX, ITEM_TYPE_DB_MONITOR]]
+				],
+				['db items.username', 'required', 'not_empty',
+					'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
+				]
+			],
+			'publickey' => ['db items.publickey', 'required', 'not_empty',
+				'when' => [['type', 'in' => [ITEM_TYPE_SSH]], ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]]
+			],
+			'privatekey' => ['db items.privatekey', 'required', 'not_empty',
+				'when' => [['type', 'in' => [ITEM_TYPE_SSH]], ['authtype', 'in' => [ITEM_AUTHTYPE_PUBLICKEY]]]
+			],
 			'passphrase' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
-			'password' => ['db items.password', 'when' => ['type', 'in' => [ITEM_TYPE_SSH]]],
-			'params_es' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]],
-			'params_ap' => ['db items.params', 'required', 'not_empty', 'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]],
+			'password' => [
+				['db items.password', 'when' => ['type',
+					'in' => [ITEM_TYPE_SIMPLE, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX]
+				]],
+				['db items.password', 'required', 'not_empty',
+					'when' => [['type', 'in' => [ITEM_TYPE_JMX]], ['username', 'not_empty']]
+				],
+				['db items.password', 'required', 'in' => [''],
+					'when' => [['type', 'in' => [ITEM_TYPE_JMX]], ['username', 'in' => ['']]],
+					'messages' => ['in' => _('Both username and password should be either present or empty.')]
+				]
+			],
+			'params_es' => ['db items.params', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_SSH, ITEM_TYPE_TELNET]]
+			],
+			'params_ap' => ['db items.params', 'required', 'not_empty',
+				'when' => ['type', 'in' => [ITEM_TYPE_DB_MONITOR]]
+			],
 			'params_f' => ['db items.params', 'required', 'not_empty',
-				'use' => [CCalcFormulaValidator::class, ['lldmacros' => false]],
+				'use' => [CCalcFormulaValidator::class, []],
 				'when' => ['type', 'in' => [ITEM_TYPE_CALCULATED]]
 			],
-			'units' => ['db items.units', 'when' => ['value_type', 'in' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]],
+			'units' => ['db items.units',
+				'when' => ['value_type', 'in' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
+			],
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
 				'schedule' => ['string', 'required', 'not_empty',
@@ -225,30 +288,40 @@ class CControllerItemUpdate extends CControllerItem {
 				]
 			]],
 			'delay' => [
-				['string', 'not_in' => ['0', ...array_map(fn (string $suffix) => "0$suffix", str_split(ZBX_TIME_SUFFIXES))],
+				['string',
+					'not_in' => ['0', ...array_map(fn (string $suffix) => "0$suffix", str_split(ZBX_TIME_SUFFIXES))],
 					'messages' => ['not_in' => _('This field cannot be set to "0" without defining custom intervals.')],
 					'when' => ['delay_flex', 'empty']
 				],
 				['db items.delay', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
-					'when' => ['type', 'in' => [
-						ITEM_TYPE_CALCULATED, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_EXTERNAL, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_INTERNAL,
-						ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SCRIPT, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SSH,
-						ITEM_TYPE_TELNET, ITEM_TYPE_ZABBIX, ITEM_TYPE_BROWSER
-					]]
+					'use' => [CTimeUnitValidator::class,
+						['max' => SEC_PER_DAY, 'usermacros' => true]
+					],
+					'when' => ['type',
+						'in' => [ITEM_TYPE_CALCULATED, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_EXTERNAL, ITEM_TYPE_HTTPAGENT,
+							ITEM_TYPE_INTERNAL, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SCRIPT, ITEM_TYPE_SIMPLE,
+							ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_ZABBIX, ITEM_TYPE_BROWSER
+						]
+					]
 				],
 				['db items.delay', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['max' => SEC_PER_DAY, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class,
+						['max' => SEC_PER_DAY, 'usermacros' => true]
+					],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_ZABBIX_ACTIVE]],
 						['key', 'regex' => '/^(?!mqtt\\.get)/']
 					]
 				]
 			],
-			'custom_timeout' => ['integer', 'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED, ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED]],
+			'custom_timeout' => ['integer',
+				'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED, ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED]
+			],
 			'timeout' => [
 				['db items.timeout', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class,
+						['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]
+					],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_SIMPLE]],
 						['custom_timeout', 'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]],
@@ -256,7 +329,9 @@ class CControllerItemUpdate extends CControllerItem {
 					]
 				],
 				['db items.timeout', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class,
+						['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]
+					],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_SNMP]],
 						['custom_timeout', 'in' => [ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED]],
@@ -264,7 +339,9 @@ class CControllerItemUpdate extends CControllerItem {
 					]
 				],
 				['db items.timeout', 'required', 'not_empty',
-					'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]],
+					'use' => [CTimeUnitValidator::class,
+						['min' => 1, 'max' => 10 * SEC_PER_MIN, 'usermacros' => true]
+					],
 					'when' => [
 						['type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
 							ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_HTTPAGENT,
@@ -276,12 +353,16 @@ class CControllerItemUpdate extends CControllerItem {
 			],
 			'history_mode' => ['integer', 'in' => [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]],
 			'history' => ['db items.history', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class,
+					['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR, 'usermacros' => true]
+				],
 				'when' => ['history_mode', 'in' => [ITEM_STORAGE_CUSTOM]]
 			],
 			'trends_mode' => ['integer', 'in' => [ITEM_STORAGE_OFF, ITEM_STORAGE_CUSTOM]],
 			'trends' => ['db items.trends', 'required', 'not_empty',
-				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR, 'usermacros' => true]],
+				'use' => [CTimeUnitValidator::class,
+					['min' => SEC_PER_DAY, 'max' => 25 * SEC_PER_YEAR, 'usermacros' => true]
+				],
 				'when' => [
 					['value_type', 'in' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
 					['trends_mode', 'in' => [ITEM_STORAGE_CUSTOM]]
@@ -292,9 +373,19 @@ class CControllerItemUpdate extends CControllerItem {
 			'allow_traps' => ['db items.allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_OFF, HTTPCHECK_ALLOW_TRAPS_ON],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
 			],
-			'trapper_hosts' => ['db items.trapper_hosts',
-				'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true, 'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']]],
-				'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
+			'trapper_hosts' => [
+				['db items.trapper_hosts',
+					'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
+						'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']
+					]],
+					'when' => ['allow_traps', 'in' => [HTTPCHECK_ALLOW_TRAPS_ON]]
+				],
+				['db items.trapper_hosts',
+					'use' => [CIPRangeParser::class, ['v6' => ZBX_HAVE_IPV6, 'dns' => true, 'usermacros' => true,
+						'macros' => ['{HOST.HOST}', '{HOST.NAME}', '{HOST.CONN}', '{HOST.IP}', '{HOST.DNS}']
+					]],
+					'when' => ['type', 'in' => [ITEM_TYPE_TRAPPER]]
+				]
 			],
 			'inventory_link' => ['db items.inventory_link', 'in' => array_keys([0 => null] + getHostInventories())],
 			'description' => ['db items.description'],
