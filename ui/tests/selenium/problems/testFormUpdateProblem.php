@@ -825,7 +825,6 @@ class testFormUpdateProblem extends CWebTest {
 			$this->page->removeFocus();
 
 			if (CTestArrayHelper::get($data, 'suppress_until_error')) {
-
 				// Validate inline error for "suppress_until_problem" field.
 				$time = time();
 
