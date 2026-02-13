@@ -96,7 +96,7 @@ FVYsajjgjBE0FLCjNfOpwqeQUrXHxCTF4Vi/euCMvHNipe50AjfMIVJHag==
 			JWT::decode($signature, new Key($pem, 'ES256'));
 		}
 		catch (Exception $e) {
-			throw new Exception('Invalid signature: '.$e->getMessage());
+			return false;
 		}
 
 		[$encoded_header, $encoded_payload] = explode('.', $signature);
