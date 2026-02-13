@@ -546,7 +546,6 @@ $translate_strings = [
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'class.csvggraph.js' => [
-		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'Unexpected server error.' => _('Unexpected server error.')
 	],

@@ -1945,6 +1945,39 @@ select {
 		}
 	}
 
+	&.hintbox {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		overflow: hidden;
+		padding-top: 20px;
+
+		&.hintbox-position-fixed {
+			position: fixed;
+		}
+
+		&:not(.hintbox-static) {
+			pointer-events: none;
+		}
+
+		&.hintbox-static {
+			padding-top: 0;
+
+			.hintbox-draggable-handle {
+				height: 20px;
+				width: 100%;
+				cursor: grab;
+			}
+		}
+
+		.hintbox-container {
+			overflow: auto;
+			padding-bottom: 1px; // for table correct size
+
+			@extend %webkit-scrollbar;
+		}
+	}
+
 	.hintbox-raw-data {
 		white-space: pre-wrap;
 	}
@@ -2452,7 +2485,7 @@ select {
 	font-size: 12px;
 	line-height: 18px;
 	white-space: nowrap;
-	min-width: 145px;
+	min-width: 160px;
 
 	.table-paging {
 		min-height: 18px;
@@ -2470,27 +2503,59 @@ select {
 		box-shadow: none;
 	}
 
-	li {
-		padding-left: 23px;
+	.has-broadcast-data {
+		cursor: pointer;
 
-		.svg-graph-hintbox-icon-color {
-			@extend %icon-small;
-
-			display: inline-block;
-			float: left;
-			width: 12px;
-			height: 12px;
-			margin-left: -20px;
-			margin-top: -1px;
+		&:hover {
+			background-color: $action-hover-color;
 		}
+
+		&.selected {
+			@extend %found-bg;
+
+			&:hover {
+				@extend %found-bg;
+			}
+		}
+	}
+
+	.scatter-plot-hintbox-row {
+		&:not(:first-child) {
+			margin-top: 10px;
+		}
+
+		.scatter-plot-hintbox-row-axis {
+			display: flex;
+			flex-wrap: nowrap;
+			align-items: center;
+			padding-left: 3px;
+			white-space: pre;
+
+			.scatter-plot-hintbox-icon-color {
+				display: inline-block;
+				width: 12px;
+				height: 18px;
+				margin-right: 10px;
+
+				&::before {
+					font-size: 14px;
+				}
+			}
+		}
+	}
+
+	li {
+		display: flex;
+		width: fit-content;
+		align-items: center;
 
 		.svg-graph-hintbox-item-color,
 		.svg-graph-hintbox-trigger-color {
-			margin: 3px 10px 3px -20px;
-			width: 10px;
+			display: inline-block;
+			min-width: 10px;
 			height: 10px;
-			float: left;
-			display: block;
+			margin-left: 3px;
+			margin-right: 10px
 		}
 
 		.svg-graph-hintbox-trigger-color {

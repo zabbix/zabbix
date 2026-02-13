@@ -451,6 +451,42 @@ static int	DBpatch_7050031(void)
 
 	return DBcreate_table(&table);
 }
+
+static int	DBpatch_7050032(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int				ret;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			(char *)NULL);
+
+	result = zbx_db_select("select w.widgetid"
+			" from widget w"
+			" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+			" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
+			" where w.type='scatterplot' or w.type='svggraph'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_hostnames", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -489,5 +525,6 @@ DBPATCH_ADD(7050028, 0, 1)
 DBPATCH_ADD(7050029, 0, 1)
 DBPATCH_ADD(7050030, 0, 1)
 DBPATCH_ADD(7050031, 0, 1)
+DBPATCH_ADD(7050032, 0, 1)
 
 DBPATCH_END()
