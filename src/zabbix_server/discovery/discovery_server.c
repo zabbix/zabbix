@@ -78,15 +78,15 @@ static zbx_db_result_t	discovery_get_dhost_by_ip_port(zbx_uint64_t druleid, cons
 	return result;
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: prepares interface list for specified host                           *
- *                                                                               *
- * Parameters:                                                                   *
- *    dhostid    - [IN]                                                          *
- *    interfaces - [OUT]                                                         *
- *                                                                               *
- *********************************************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: prepares interface list for specified host                        *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    dhostid    - [IN]                                                       *
+ *    interfaces - [OUT]                                                      *
+ *                                                                            *
+ ******************************************************************************/
 static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 		zbx_vector_discoverer_interface_ptr_t *interfaces)
 {
@@ -106,7 +106,7 @@ static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (0 < interfaces->values_num &&
+		if (0 != interfaces->values_num &&
 				0 == strcmp(row[0], interfaces->values[last_interface_idx]->ip) &&
 				DOBJECT_STATUS_UP == atoi(row[1]))
 		{
@@ -127,17 +127,20 @@ static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: Determines host status based on known interfaces.                    *
- *          Host is considered DOWN only if all interfaces are DOWN              *
- *          and interface_ip has IP of last interface.                           *
- *                                                                               *
- * Parameters:                                                                   *
- *    interface_ip - [IN]                                                        *
- *    interfaces   - [IN]                                                        *
- *                                                                               *
- *********************************************************************************/
+/******************************************************************************
+ *                                                                            *
+ * Purpose: determines host status based on known interfaces                  *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    interface_ip - [IN]                                                     *
+ *    interfaces   - [IN]                                                     *
+ *                                                                            *
+ * Return value: DOBJECT_STATUS_DOWN, DOBJECT_STATUS_UP, FAIL                 *
+ *                                                                            *
+ * Comments: host is considered DOWN only if all interfaces are DOWN          *
+ *           and interface_ip is NULL or has IP of last interface.            *
+ *                                                                            *
+ ******************************************************************************/
 static int	discovery_get_host_status(const char *interface_ip,
 		const zbx_vector_discoverer_interface_ptr_t *interfaces)
 {
@@ -243,6 +246,12 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, const int status, 
  *    now          - [IN]                                                     *
  *    add_event_cb - [IN]                                                     *
  *                                                                            *
+ * Comments: If we are separating dhost interface with largest ip address,    *
+ *           we also need to update status of current dhost using states of   *
+ *           remaining interfaces. This interface is expected to be last      *
+ *           processed interface for current dhost and removal without dhost  *
+ *           status update could result in invalid dhost state.               *
+ *                                                                            *
  ******************************************************************************/
 static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const int now,
 		const zbx_add_event_func_t add_event_cb)
@@ -314,8 +323,8 @@ static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_db_dhost *dh
  *    druleid         - [IN]                                                  *
  *    dcheckid        - [IN]                                                  *
  *    unique_dcheckid - [IN]                                                  *
- *    dhost           - [OUT]                                                  *
- *    ip              - [IN] host ip address                                 *
+ *    dhost           - [OUT]                                                 *
+ *    ip              - [IN] host ip address                                  *
  *    port            - [IN]                                                  *
  *    status          - [IN]                                                  *
  *    value           - [IN]                                                  *
@@ -657,9 +666,9 @@ void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db
 		zbx_vector_discoverer_interface_ptr_create(&interfaces);
 		discovery_get_host_interfaces(dhost->dhostid, &interfaces);
 
-		// There is a chance that interfaces.values_num can be 0 if SQL error stops SQL queries from executing
-		// during current SQL transaction. One known scenario is when discovery results are being processed
-		// before dcheck removal from drules in database gets synced to server DB cache.
+		/* There is a chance that interfaces.values_num can be 0 if SQL error stops SQL queries from     */
+		/* executing during current SQL transaction. One known scenario is when discovery results are    */
+		/* being processed before dcheck removal from drules in database gets synced to server DB cache. */
 		if (0 < interfaces.values_num && FAIL != (status = discovery_get_host_status(ip, &interfaces)))
 			discovery_update_host_status(dhost, status, (int)now, add_event_cb);
 
@@ -723,7 +732,7 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	char		buffer[MAX_STRING_LEN], *sql = NULL, *ip_esc;
+	char		*sql = NULL, *ip_esc;
 	size_t		sql_alloc = 0, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dhostid:" ZBX_FS_UI64 " ip:'%s' dserviceids:%d now:" ZBX_FS_TIME_T,
@@ -742,7 +751,7 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 	}
 	else
 	{
-		zbx_snprintf(buffer, sizeof(buffer),
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select dserviceid,status,lastup,lastdown,value"
 				" from dservices"
 				" where dhostid=" ZBX_FS_UI64
@@ -750,7 +759,9 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 					" and not",
 				dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
 
-		zbx_db_prepare_multiple_query(buffer, "dserviceid", dserviceids, &sql, &sql_alloc, &sql_offset);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
+			dserviceids->values, dserviceids->values_num);
+
 		result = zbx_db_select("%s", sql);
 		zbx_free(sql);
 	}

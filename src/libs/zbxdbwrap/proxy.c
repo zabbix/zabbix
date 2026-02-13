@@ -2059,8 +2059,8 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 	zbx_dservice_t				*service;
 	zbx_vector_discoverer_drule_error_t	drule_errors;
 	zbx_vector_dc_drule_ptr_t		valid_drules;
-	zbx_dc_drule_t				valid_drule;
-	zbx_dc_dcheck_t				valid_dcheck;
+	zbx_dc_drule_t				cmp_drule;
+	zbx_dc_dcheck_t				cmp_dcheck;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2085,9 +2085,9 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 			goto json_parse_error;
 
 		ZBX_STR2UINT64(druleid, tmp);
-		valid_drule.druleid = druleid;
+		cmp_drule.druleid = druleid;
 
-		if (FAIL == (vdr_idx = zbx_vector_dc_drule_ptr_search(&valid_drules, &valid_drule,
+		if (FAIL == (vdr_idx = zbx_vector_dc_drule_ptr_bsearch(&valid_drules, &cmp_drule,
 				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
 			continue;
@@ -2118,17 +2118,17 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, zbx_u
 		if ('\0' != *tmp)
 		{
 			ZBX_STR2UINT64(dcheckid, tmp);
-			valid_dcheck.dcheckid = dcheckid;
+			cmp_dcheck.dcheckid = dcheckid;
 
 			if (0 != dcheckid &&
-					FAIL == zbx_vector_dc_dcheck_ptr_search(&valid_drules.values[vdr_idx]->dchecks,
-							&valid_dcheck, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+					FAIL == zbx_vector_dc_dcheck_ptr_bsearch(&valid_drules.values[vdr_idx]->dchecks,
+							&cmp_dcheck, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "%s(): check [" ZBX_FS_UI64 "] does not exist",
 						__func__, dcheckid);
 
 				zbx_discovery_drule_free(valid_drules.values[vdr_idx]);
-				zbx_vector_dc_drule_ptr_remove_noorder(&valid_drules, vdr_idx);
+				zbx_vector_dc_drule_ptr_remove(&valid_drules, vdr_idx);
 
 				if (FAIL != (i = zbx_vector_ptr_search(&drules, &druleid,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))

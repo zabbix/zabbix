@@ -16829,9 +16829,12 @@ void	zbx_dc_drules_get_monitored(const zbx_uint64_t proxyid, zbx_vector_dc_drule
 				zbx_vector_dc_dcheck_ptr_append(&drule_out->dchecks, dcheck_out);
 			}
 
+			zbx_vector_dc_dcheck_ptr_sort(&drule_out->dchecks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 			zbx_vector_dc_drule_ptr_append(drules, drule_out);
 		}
 	}
+
+	zbx_vector_dc_drule_ptr_sort(drules, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 	UNLOCK_CACHE;
 }

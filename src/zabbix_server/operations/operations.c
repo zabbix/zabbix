@@ -589,7 +589,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				if (INTERFACE_TYPE_AGENT == d_if->type)
 				{
-					if (d_ifs_agent.values_num > 0 && 0 == strcmp(
+					if (0 != d_ifs_agent.values_num && 0 == strcmp(
 							d_ifs_agent.values[d_ifs_agent.values_num - 1]->ip, d_if->ip))
 					{
 						zbx_free(d_if);
@@ -597,9 +597,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					else
 						zbx_vector_op_dinterface_ptr_append(&d_ifs_agent, d_if);
 				}
-				else  // INTERFACE_TYPE_SNMP
+				else	/* INTERFACE_TYPE_SNMP */
 				{
-					if (d_ifs_snmp.values_num > 0 && 0 == strcmp(
+					if (0 != d_ifs_snmp.values_num && 0 == strcmp(
 							d_ifs_snmp.values[d_ifs_snmp.values_num - 1]->ip, d_if->ip))
 					{
 						zbx_free(d_if);
@@ -613,7 +613,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 		char if_ip[ZBX_INTERFACE_IP_LEN_MAX];
 		int if_idx;
 
-		if (d_ifs_agent.values_num > 0)
+		if (0 != d_ifs_agent.values_num)
 		{
 			if_idx = FAIL;
 			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_AGENT, if_ip, sizeof(if_ip)))
@@ -642,7 +642,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			zbx_vector_op_dinterface_ptr_clear_ext(&d_ifs_agent, dinterface_free);
 		}
 
-		if (d_ifs_snmp.values_num > 0)
+		if (0 != d_ifs_snmp.values_num)
 		{
 			if_idx = FAIL;
 			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_SNMP, if_ip, sizeof(if_ip)))

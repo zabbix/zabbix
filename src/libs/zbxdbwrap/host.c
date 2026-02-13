@@ -6034,16 +6034,20 @@ clean:
 int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char type,
 			char *ip_buffer, const size_t sz_ip_buffer)
 {
+	char		*sql;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	result = zbx_db_select(
+	sql = zbx_dsprintf(NULL,
 			"select ip"
 			" from interface"
 			" where hostid=" ZBX_FS_UI64
 				" and type=%d"
 				" and main<>0",
 			hostid, (int)type);
+
+	result = zbx_db_select_n(sql, 1);
+	zbx_free(sql);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
