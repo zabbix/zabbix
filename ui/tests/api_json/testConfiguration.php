@@ -18,8 +18,19 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup hosts, hstgrp
+ *
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
  */
 class testConfiguration extends CAPITest {
+
+	public static function prepareTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(true);
+	}
+
+	public static function cleanTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(false);
+	}
 
 	public static function export_fail_data() {
 		return [

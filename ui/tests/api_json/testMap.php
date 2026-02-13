@@ -18,8 +18,20 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup sysmaps
+ *
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
  */
 class testMap extends CAPITest {
+
+	public static function prepareTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(true);
+	}
+
+	public static function cleanTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(false);
+	}
+
 	/**
 	 * Create map tests data provider.
 	 *

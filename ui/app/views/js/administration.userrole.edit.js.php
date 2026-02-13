@@ -159,6 +159,9 @@
 				}
 			}
 
+			document.getElementById('<?= CRoleHelper::API_ACCESS ?>').checked
+				= user_type > <?= USER_TYPE_ZABBIX_USER ?>;
+
 			const access_max = <?= json_encode([
 					CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW => USER_TYPE_ZABBIX_ADMIN
 			], JSON_FORCE_OBJECT) ?>;

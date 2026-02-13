@@ -18,10 +18,21 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 
 /**
  * @backup token
+ *
+ * @onBefore prepareTestData
+ * @onAfter  cleanTestData
  */
 class testToken extends CAPITest {
 
 	protected static $unique_counter = 1;
+
+	public static function prepareTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(true);
+	}
+
+	public static function cleanTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(false);
+	}
 
 	protected static function uniqueName(): string {
 		return 'name'.static::$unique_counter ++;

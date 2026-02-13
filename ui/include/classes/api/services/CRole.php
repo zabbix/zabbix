@@ -134,6 +134,8 @@ class CRole extends CApiService {
 
 		$this->validateCreate($roles);
 
+		self::addFieldDefaultsByType($roles);
+
 		$ins_roles = [];
 
 		foreach ($roles as $role) {
@@ -216,6 +218,15 @@ class CRole extends CApiService {
 
 		$this->checkDuplicates($roles);
 		$this->checkRules($roles);
+	}
+
+	private static function addFieldDefaultsByType(array &$roles): void {
+		foreach ($roles as &$role) {
+			if ($role['type'] < USER_TYPE_ZABBIX_ADMIN) {
+				$role['rules'] += ['api.access' => ZBX_ROLE_RULE_DISABLED];
+			}
+		}
+		unset($role);
 	}
 
 	/**
@@ -868,7 +879,6 @@ class CRole extends CApiService {
 			'modules' => [],
 			'modules.default_access' => ZBX_ROLE_RULE_ENABLED,
 			'api' => [],
-			'api.access' => ZBX_ROLE_RULE_ENABLED,
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
 			'actions' => [],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED
@@ -878,7 +888,15 @@ class CRole extends CApiService {
 
 		foreach ($roles as $roleid => $role) {
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
-			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
+
+			if ($db_roles !== null) {
+				$old_rules = $db_roles[$roleid]['rules'];
+			}
+			else {
+				$api_access_default = $type > USER_TYPE_ZABBIX_USER ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED;
+				$old_rules = $default_rules + ['api.access' => $api_access_default];
+			}
+
 			$new_rules = array_key_exists('rules', $role) ? $role['rules'] + $old_rules : $old_rules;
 
 			$rules[$roleid] = array_merge(
@@ -1289,7 +1307,7 @@ class CRole extends CApiService {
 					$this->getRelatedServicesReadRules($roles_rules[$roleid], $output),
 					$this->getRelatedServicesWriteRules($roles_rules[$roleid], $output),
 					$this->getRelatedModulesRules($roles_rules[$roleid], $output),
-					$this->getRelatedApiRules($roles_rules[$roleid], $output),
+					$this->getRelatedApiRules($roles_rules[$roleid], $output, (int) $role['type']),
 					$this->getRelatedActionsRules($roles_rules[$roleid], $output, (int) $role['type'])
 				);
 			}
@@ -1485,13 +1503,18 @@ class CRole extends CApiService {
 	 *
 	 * @return array
 	 */
-	private function getRelatedApiRules(array $rules, array $output): array {
+	private function getRelatedApiRules(array $rules, array $output, int $type): array {
 		$result = [];
 
 		if (in_array('api.access', $output, true)) {
-			$result['api.access'] = array_key_exists('api.access', $rules)
-				? $rules['api.access']
-				: (string) ZBX_ROLE_RULE_ENABLED;
+			if (array_key_exists('api.access', $rules)) {
+				$result['api.access'] = $rules['api.access'];
+			}
+			else {
+				$result['api.access'] = $type > USER_TYPE_ZABBIX_USER
+					? (string) ZBX_ROLE_RULE_ENABLED
+					: (string) ZBX_ROLE_RULE_DISABLED;
+			}
 		}
 
 		if (in_array('api.mode', $output, true)) {

@@ -705,7 +705,6 @@ class testScripts extends CAPITest {
 
 		self::$data['usrgrpids'] = array_combine(array_keys($usergroups_data), $usergroups['usrgrpids']);
 
-		// Create user roles with defaults.
 		$roles_data = [
 			'admin' => [
 				'name' => 'API test role admin',
@@ -713,7 +712,8 @@ class testScripts extends CAPITest {
 			],
 			'user' => [
 				'name' => 'API test role user',
-				'type' => USER_TYPE_ZABBIX_USER
+				'type' => USER_TYPE_ZABBIX_USER,
+				'rules' => ['api.access' => ZBX_ROLE_RULE_ENABLED]
 			]
 		];
 

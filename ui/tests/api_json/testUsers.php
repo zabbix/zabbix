@@ -19,6 +19,7 @@ require_once dirname(__FILE__).'/../../include/classes/api/CAudit.php';
 
 /**
  * @onBefore prepareUsersData
+ * @onAfter  cleanTestData
  *
  * @backup users, usrgrp, role, token, mfa, mfa_totp_secret, settings
  */
@@ -106,6 +107,8 @@ class testUsers extends CAPITest {
 	 * Prepare data for user.checkAuthentication tests.
 	 */
 	public function prepareUsersData() {
+		CTestDataHelper::setUserRoleApiAccessAllowed(true);
+
 		$usergroup_data = [
 			[
 				'name' => 'API test users status enabled',
@@ -288,19 +291,19 @@ class testUsers extends CAPITest {
 				'name' => 'API test disabled token',
 				'userid' => self::$data['userids']['user_for_token_tests'],
 				'status' => ZBX_AUTH_TOKEN_DISABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + 200
 			],
 			[
 				'name' => 'API test valid token',
 				'userid' => self::$data['userids']['user_with_valid_session'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + 200
 			],
 			[
 				'name' => 'API test valid token for user with disabled user group',
 				'userid' => self::$data['userids']['user_with_disabled_usergroup'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + 200
 			]
 		];
 
@@ -477,6 +480,10 @@ class testUsers extends CAPITest {
 		$user_medias = array_column($db_user['medias'], null, 'userdirectory_mediaid');
 		self::$data['mediaid']['Provision media mapping email'] = $user_medias[$email_userdirectory_mediaid]['mediaid'];
 		self::$data['mediaid']['Provision media mapping sms'] = $user_medias[$sms_userdirectory_mediaid]['mediaid'];
+	}
+
+	public static function cleanTestData(): void {
+		CTestDataHelper::setUserRoleApiAccessAllowed(false);
 	}
 
 	public static function dataProviderUserMediaUpdate() {

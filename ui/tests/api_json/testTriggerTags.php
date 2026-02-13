@@ -14,7 +14,6 @@
 **/
 
 require_once __DIR__.'/../include/CAPITest.php';
-require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CArrayHelper.php';
 
 /**

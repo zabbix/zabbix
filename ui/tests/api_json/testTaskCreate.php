@@ -39,6 +39,8 @@ class testTaskCreate extends CAPITest {
 	private static $clear_taskids = [];
 
 	public function prepareItemsData() {
+		CTestDataHelper::setUserRoleApiAccessAllowed(true);
+
 		/**
 		 * Permission-related records missing in test SQL data. Force recalculation for zabbix-user and zabbix-admin by
 		 * removing them from, and then adding back to a common user group.
@@ -1487,6 +1489,8 @@ class testTaskCreate extends CAPITest {
 	 * Delete all created data after test.
 	 */
 	public static function clearData() {
+		CTestDataHelper::setUserRoleApiAccessAllowed(false);
+
 		// Delete hosts and templates.
 		CDataHelper::call('host.delete', [
 			self::$data['hostids']['monitored'],
