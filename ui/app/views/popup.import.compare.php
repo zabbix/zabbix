@@ -144,7 +144,9 @@ function drawEntity(array $entity): CTag {
 		(new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
 			->addItem(
-				(new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))->addClass(ZBX_STYLE_TOC_ITEM)
+				(new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))
+					->addClass(ZBX_STYLE_TOC_ITEM)
+					->setHint($entity['name'], '', false)
 			)
 	);
 }
