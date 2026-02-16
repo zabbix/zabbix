@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -145,7 +145,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		for ($batch = 0; $batch < $batches && count($cells) < $limit; $batch++) {
 			$batch_items = array_slice($items, $batch * $limit, $limit);
-			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period);
+			// Extra byte to trim values that exceeds length limit.
+			$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+			$db_history = Manager::History()->getLastValues($batch_items, 1, $history_period, $length);
 
 			foreach ($batch_items as $item) {
 				if (!array_key_exists($item['itemid'], $db_history)) {

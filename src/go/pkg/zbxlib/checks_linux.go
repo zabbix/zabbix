@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -79,12 +79,8 @@ import (
 
 func resolveMetric(key string) (cfunc unsafe.Pointer) {
 	switch key {
-	case "system.boottime":
-		cfunc = unsafe.Pointer(C.system_boottime)
 	case "net.tcp.listen":
 		cfunc = unsafe.Pointer(C.net_tcp_listen)
-	case "net.udp.listen":
-		cfunc = unsafe.Pointer(C.net_udp_listen)
 	case "sensor":
 		cfunc = unsafe.Pointer(C.get_sensor)
 	case "system.cpu.load":

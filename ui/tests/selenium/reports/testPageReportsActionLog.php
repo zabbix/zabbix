@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -711,7 +711,7 @@ class testPageReportsActionLog extends CWebTest {
 		// Check hintbox.
 		$table->findRow('Status', 'Failed')->getColumn('Info')->query("xpath:.//button[@data-hintbox]")
 				->waitUntilClickable()->one()->click();
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hintbox = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent();
 		$this->assertEquals('Get value from agent failed: cannot connect to [[127.0.0.1]:10050]: [111] Connection refused',
 				$hintbox->one()->getText()
 		);

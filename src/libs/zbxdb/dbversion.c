@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -308,7 +308,8 @@ out:
 
 void	zbx_dbconn_tsdb_extract_compressed_chunk_flags(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info)
 {
-#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_bin'"
+#define ZBX_TSDB_HISTORY_TABLES "'history_uint','history_log','history_str','history_text','history','history_bin',\
+		'history_json'"
 #define ZBX_TSDB_TRENDS_TABLES "'trends','trends_uint'"
 
 	version_info->history_compressed_chunks =

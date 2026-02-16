@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -158,13 +158,11 @@ class CPieGraphDraw extends CGraphDraw {
 		}
 
 		$items = [];
+		$from_time = $this->from_time;
+		$to_time = $this->to_time;
 
 		for ($i = 0; $i < $this->num; $i++) {
 			$item = $this->items[$i];
-
-			$from_time = $this->from_time;
-			$to_time = $this->to_time;
-
 			$to_resolve = [];
 
 			// Override item history setting with housekeeping settings, if they are enabled in config.

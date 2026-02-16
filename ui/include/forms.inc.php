@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -617,6 +617,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->setAttribute('maxlength', 1),
 					(new CCheckBox('preprocessing['.$i.'][params_2]', ZBX_PREPROC_CSV_HEADER))
 						->setLabel(_('With header row'))
+						->setUncheckedValue(ZBX_PREPROC_CSV_NO_HEADER)
 						->setChecked($step_param_2_value == ZBX_PREPROC_CSV_HEADER)
 						->setReadonly($readonly)
 				];
@@ -649,9 +650,9 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 							ZBX_PREPROC_MATCH_ERROR_REGEX => _('error matches'),
 							ZBX_PREPROC_MATCH_ERROR_NOT_REGEX => _('error does not match')
 						]))
-							->setAttribute('data-prevent-validation-on-change', '')
 							->setAttribute('placeholder', _('error-matching'))
 							->addClass('js-preproc-param-error-matching')
+							->setErrorContainer('preprocessing-'.$i.'-error-container')
 							->setValue($step_param_0_value)
 							->setReadonly($readonly),
 					$step_param_1
@@ -896,128 +897,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 }
 
 /**
- * Prepares data to copy items/triggers/graphs.
- *
- * @param string      $elements_field
- * @param null|string $title
- *
- * @return array
- */
-function getCopyElementsFormData($elements_field, $title = null) {
-	$data = [
-		'title' => $title,
-		'elements_field' => $elements_field,
-		'elements' => getRequest($elements_field, []),
-		'copy_type' => getRequest('copy_type', COPY_TYPE_TO_TEMPLATE_GROUP),
-		'copy_targetids' => getRequest('copy_targetids', []),
-		'hostid' => 0
-	];
-
-	$prefix = (getRequest('context') === 'host') ? 'web.hosts.' : 'web.templates.';
-	$filter_hostids = getRequest('filter_hostids', CProfile::getArray($prefix.'triggers.filter_hostids', []));
-
-	if (count($filter_hostids) == 1) {
-		$data['hostid'] = reset($filter_hostids);
-	}
-
-	if (!$data['elements'] || !is_array($data['elements'])) {
-		show_error_message(_('Incorrect list of items.'));
-
-		return $data;
-	}
-
-	if ($data['copy_targetids']) {
-		switch ($data['copy_type']) {
-			case COPY_TYPE_TO_HOST_GROUP:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['groupid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_HOST:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
-					'output' => ['hostid', 'name'],
-					'hostids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['hostid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_TEMPLATE:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
-					'output' => ['templateid', 'name'],
-					'templateids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['templateid' => 'id']);
-				break;
-
-			case COPY_TYPE_TO_TEMPLATE_GROUP:
-				$data['copy_targetids'] = CArrayHelper::renameObjectsKeys(API::TemplateGroup()->get([
-					'output' => ['groupid', 'name'],
-					'groupids' => $data['copy_targetids'],
-					'editable' => true
-				]), ['groupid' => 'id']);
-				break;
-		}
-	}
-
-	return $data;
-}
-
-function getTriggerMassupdateFormData() {
-	$data = [
-		'visible' => getRequest('visible', []),
-		'dependencies' => getRequest('dependencies', []),
-		'tags' => getRequest('tags', []),
-		'mass_update_tags' => getRequest('mass_update_tags', ZBX_ACTION_ADD),
-		'manual_close' => getRequest('manual_close', ZBX_TRIGGER_MANUAL_CLOSE_NOT_ALLOWED),
-		'massupdate' => getRequest('massupdate', 1),
-		'parent_discoveryid' => getRequest('parent_discoveryid'),
-		'g_triggerid' => getRequest('g_triggerid', []),
-		'priority' => getRequest('priority', 0),
-		'hostid' => getRequest('hostid', 0),
-		'context' => getRequest('context')
-	];
-
-	if ($data['dependencies']) {
-		$dependencyTriggers = API::Trigger()->get([
-			'output' => ['triggerid', 'description', 'flags'],
-			'selectHosts' => ['hostid', 'name'],
-			'triggerids' => $data['dependencies'],
-			'preservekeys' => true
-		]);
-
-		if ($data['parent_discoveryid']) {
-			$dependencyTriggerPrototypes = API::TriggerPrototype()->get([
-				'output' => ['triggerid', 'description', 'flags'],
-				'selectHosts' => ['hostid', 'name'],
-				'triggerids' => $data['dependencies'],
-				'preservekeys' => true
-			]);
-			$data['dependencies'] = $dependencyTriggers + $dependencyTriggerPrototypes;
-		}
-		else {
-			$data['dependencies'] = $dependencyTriggers;
-		}
-	}
-
-	foreach ($data['dependencies'] as &$dependency) {
-		order_result($dependency['hosts'], 'name', ZBX_SORT_UP);
-	}
-	unset($dependency);
-
-	order_result($data['dependencies'], 'description', ZBX_SORT_UP);
-
-	if (!$data['tags']) {
-		$data['tags'][] = ['tag' => '', 'value' => ''];
-	}
-
-	return $data;
-}
-
-
-/**
  * Renders tag table row.
  *
  * @param array	     $tag
@@ -1027,7 +906,6 @@ function getTriggerMassupdateFormData() {
  * @param int        $tag['automatic']                    (optional) Tag automatic flag.
  * @param array      $tag['parent_templates']             (optional) List of templates that tags are inherited from.
  * @param array      $options
- * @param bool       $options['add_post_js']              (optional) Parameter passed to CTextAreaFlexible.
  * @param bool       $options['show_inherited_tags']      (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
  * @param bool       $options['with_automatic']           (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
  * @param string     $options['field_name']               (optional) Re-define default field name.
@@ -1051,18 +929,20 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		$tag['automatic'] = ZBX_TAG_MANUAL;
 	}
 
-	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
+	$textarea_options = array_intersect_key($options, array_flip(['readonly']));
 
 	$tag += [
 		'type' => ZBX_PROPERTY_OWN,
 		'parent_templates' => []
 	];
 
-	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag']))
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-		->setAttribute('placeholder', _('tag'));
+		->setMaxlength(DB::getFieldLength('host_tag', 'tag'))
+		->setAttribute('placeholder', _('tag'))
+		->setReadonly($textarea_options['readonly']);
 
 	$type_field = $options['show_inherited_tags']
 		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
@@ -1072,18 +952,27 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		? new CVar($options['field_name'].'['.$index.'][automatic]', $tag['automatic'])
 		: null;
 
-	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
-			$textarea_options
-		))
+	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value']))
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
+		->setMaxlength(DB::getFieldLength('host_tag', 'value'))
+		->setAttribute('placeholder', _('value'))
+		->setReadonly($textarea_options['readonly']);
+
+	if (array_key_exists('maxlength', $textarea_options)) {
+		$tag_field->setMaxlength($textarea_options['maxlength']);
+		$value_field->setMaxlength($textarea_options['maxlength']);
+	}
 
 	if ($options['with_automatic'] && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
 		switch ($options['source']) {
 			case 'host':
 				$actions = (new CSpan(_('(created by host discovery)')))->addClass(ZBX_STYLE_GREY);
+				break;
+
+			case 'trigger':
+				$actions = (new CSpan(_('(created by LLD)')))->addClass(ZBX_STYLE_GREY);
 				break;
 
 			default:
@@ -1107,8 +996,12 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		$value_field->setAttribute('data-skip-from-submit', '');
 		$tag_field->setAttribute('data-skip-from-submit', '');
 
-		if ($type_field) {
+		if ($type_field !== null) {
 			$type_field->setAttribute('data-skip-from-submit', '');
+		}
+
+		if ($automatic_field !== null) {
+			$automatic_field->setAttribute('data-skip-from-submit', '');
 		}
 	}
 

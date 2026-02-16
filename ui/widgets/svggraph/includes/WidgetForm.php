@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -260,6 +260,14 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldCheckBox('working_time', _('Working time'))
+			)
+			->addField(!$this->isTemplateDashboard()
+				? (new CWidgetFieldRadioButtonList('show_hostnames', _('Host names in labels'), [
+					SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO => _('Auto'),
+					SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW => _('Show'),
+					SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE => _('Hide')
+				]))->setDefault(SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO)
+				: null
 			)
 			->addField(
 				new CWidgetFieldCheckBox('percentile_left', _('Percentile line (left)'))

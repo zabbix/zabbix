@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -211,7 +211,8 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
-	ITEM_VALUE_TYPE_BIN,	/* Last real value. In some places it is also used in size of array or */
+	ITEM_VALUE_TYPE_BIN,
+	ITEM_VALUE_TYPE_JSON,	/* Last real value. In some places it is also used in size of array or */
 				/* upper bound for iteration. Do not forget to update when adding new types. */
 	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
@@ -617,6 +618,7 @@ void	zbx_unsetenv(const char *envname);
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len);
 int	zbx_validate_hostname(const char *hostname);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);

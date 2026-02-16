@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1725,7 +1725,7 @@ class testPageProblems extends CWebTest {
 			: count($data['result'])
 		);
 
-		$dialog_selector = 'xpath://div[@class="overlay-dialogue wordbreak"]';
+		$dialog_selector = 'xpath://div[contains(@class, "hintbox-static")]';
 		if (array_key_exists('check_trigger_description', $data)) {
 			foreach ($data['check_trigger_description'] as $i => $description) {
 				$cell = $table->getRow($i)->getColumn('Problem');

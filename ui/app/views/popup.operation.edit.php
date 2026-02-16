@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -351,17 +351,15 @@ $form_grid->addItem(
 			->addItem(
 				(new CRow([
 					(new CCol(
-						(new CTextAreaFlexible('operation[optag][#{row_index}][tag]', '#{tag}',
-							['add_post_js' => false]
-						))
+						(new CTextAreaFlexible('operation[optag][#{row_index}][tag]', '#{tag}'))
 							->setWidth(ZBX_TEXTAREA_TAG_WIDTH)
+							->setMaxlength(DB::getFieldLength('host_tag', 'tag'))
 							->setAttribute('placeholder', _('tag'))
 					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 					(new CCol(
-						(new CTextAreaFlexible('operation[optag][#{row_index}][value]', '#{value}',
-							['add_post_js' => false]
-						))
+						(new CTextAreaFlexible('operation[optag][#{row_index}][value]', '#{value}'))
 							->setWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
+							->setMaxlength(DB::getFieldLength('host_tag', 'value'))
 							->setAttribute('placeholder', _('value'))
 					))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 					(new CCol(

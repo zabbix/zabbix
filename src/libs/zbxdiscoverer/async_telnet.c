@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -227,7 +227,8 @@ static int	async_task_process_task_telnet_cb(short event, void *data, int *fd, z
 
 			if (SUCCEED != zbx_socket_connect(&telnet_context->s, SOCK_STREAM,
 					telnet_context->config_source_ip, addresses->values[0].ip,
-					telnet_context->item.interface.port, telnet_context->config_timeout))
+					telnet_context->item.interface.port, telnet_context->config_timeout,
+					ZBX_DNS_FAILOVER_DISABLED, &event_new))
 			{
 				telnet_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&telnet_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"

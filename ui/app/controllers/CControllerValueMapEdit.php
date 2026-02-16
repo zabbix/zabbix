@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,7 @@ class CControllerValueMapEdit extends CController {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'edit' => 'in 1',
 			'mappings' => 'array',
@@ -45,11 +45,11 @@ class CControllerValueMapEdit extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return true;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$data = [
 			'action' => 'popup.valuemap.check',
 			'edit' => 0,
@@ -83,33 +83,12 @@ class CControllerValueMapEdit extends CController {
 			$data['mappings'] = $mappings;
 		}
 
-		if ($this->getInput('source') === 'host') {
-			$rules = CControllerHostCreate::getValidationRules()['fields']['valuemaps'];
-
-			if ($data['valuemap_names']) {
-				$rules['fields']['name'] += ['not_in' => $data['valuemap_names']];
-
-				if (!array_key_exists('messages', $rules['fields']['name'])) {
-					$rules['fields']['name']['messages'] = [];
-				}
-				$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
-			}
-
-			$data += ['js_validation_rules' => (new CFormValidator($rules))->getRules()];
-		}
-		elseif ($this->getInput('source') === 'template') {
-			$rules = CControllerTemplateCreate::getValidationRules()['fields']['valuemaps'];
-
-			if ($data['valuemap_names']) {
-				$rules['fields']['name'] += ['not_in' => $data['valuemap_names']];
-
-				if (!array_key_exists('messages', $rules['fields']['name'])) {
-					$rules['fields']['name']['messages'] = [];
-				}
-				$rules['fields']['name']['messages'] += ['not_in' => _('Given valuemap name is already taken.')];
-			}
-
-			$data += ['js_validation_rules' => (new CFormValidator($rules))->getRules()];
+		switch ($this->getInput('source')) {
+			case 'host':
+			case 'template':
+				$rules = CControllerValueMapCheck::getValidationRules($data['valuemap_names']);
+				$data += ['js_validation_rules' => (new CFormValidator($rules))->getRules()];
+				break;
 		}
 
 		$data += [
