@@ -32,7 +32,7 @@ zbx_func_profile_t;
 ZBX_PTR_VECTOR_DECL(func_profiles, zbx_func_profile_t*)
 ZBX_PTR_VECTOR_IMPL(func_profiles, zbx_func_profile_t*)
 
-static volatile int					zbx_prof_scope_requested;
+static ZBX_THREAD_LOCAL volatile int			zbx_prof_scope_requested;
 
 static ZBX_THREAD_LOCAL zbx_vector_func_profiles_t	zbx_func_profiles;
 static ZBX_THREAD_LOCAL zbx_prof_scope_t		zbx_prof_scope;

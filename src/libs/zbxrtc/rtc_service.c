@@ -197,7 +197,7 @@ static void	rtc_process_loglevel_option(zbx_rtc_t *rtc, zbx_uint32_t code, const
  * Purpose: dispatch profiler runtime control option                          *
  *                                                                            *
  ******************************************************************************/
-static void	rtc_process_profiler_option(zbx_uint32_t code, const char *data, char **result)
+static void	rtc_process_profiler_option(zbx_rtc_t *rtc, zbx_uint32_t code, const char *data, char **result)
 {
 	pid_t	pid;
 	int	proc_type, proc_num, scope;
@@ -222,7 +222,8 @@ static void	rtc_process_profiler_option(zbx_uint32_t code, const char *data, cha
 		return;
 	}
 
-	zbx_signal_process_by_type(proc_type, proc_num, (int)ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
+	if (0 == zbx_rtc_notify(rtc, (unsigned char)proc_type, proc_num, code, data, (zbx_uint32_t)strlen(data) + 1))
+		zbx_signal_process_by_type(proc_type, proc_num, (int)ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
 }
 #endif
 
@@ -875,7 +876,7 @@ static void	rtc_process_request(zbx_rtc_t *rtc, zbx_uint32_t code, const unsigne
 			return;
 		case ZBX_RTC_PROF_ENABLE:
 		case ZBX_RTC_PROF_DISABLE:
-			rtc_process_profiler_option(code, (const char *)data, result);
+			rtc_process_profiler_option(rtc, code, (const char *)data, result);
 			return;
 #endif
 		case ZBX_RTC_HOUSEKEEPER_EXECUTE:

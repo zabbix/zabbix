@@ -1169,6 +1169,22 @@ static void	preprocessor_change_loglevel(zbx_pp_manager_t *manager, int directio
 	pp_manager_change_worker_loglevel(manager, proc_num, direction);
 }
 
+static void	pp_prof_enable(const unsigned char *data)
+{
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
+	char	*error = NULL;
+
+	if (SUCCEED != zbx_rtc_get_command_target((const char *)data, &pid, &proc_type, &proc_num, &scope, &error))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("cannot get rtc target: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_prof_enable(scope);
+}
+
 void	*zbx_pp_manager_thread(void *args)
 {
 #define PP_MANAGER_DELAY_SEC	0
@@ -1189,7 +1205,10 @@ void	*zbx_pp_manager_thread(void *args)
 	const zbx_thread_pp_manager_args_t	*pp_args = (const zbx_thread_pp_manager_args_t *)unit_args->args.args;
 	zbx_pp_manager_t			*manager;
 	zbx_vector_pp_task_ptr_t		tasks;
-	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE, ZBX_RTC_LOG_LEVEL_DECREASE};
+	zbx_uint32_t				rtc_worker_msgs[] = {ZBX_RTC_LOG_LEVEL_INCREASE,
+									ZBX_RTC_LOG_LEVEL_DECREASE};
+	zbx_uint32_t				rtc_manager_msgs[] = {ZBX_RTC_PROF_ENABLE,
+									ZBX_RTC_PROF_DISABLE};
 	zbx_uint64_t				pending_num, finished_num, processed_num = 0, queued_num = 0,
 						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
@@ -1226,7 +1245,9 @@ void	*zbx_pp_manager_thread(void *args)
 	}
 
 	/* subscribe for worker log level rtc messages */
-	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_msgs, ARRSIZE(rtc_msgs),
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCESSOR, 0, rtc_worker_msgs, ARRSIZE(rtc_worker_msgs),
+			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_PREPROCMAN, 0, rtc_manager_msgs, ARRSIZE(rtc_worker_msgs),
 			pp_args->config_timeout, ZBX_IPC_SERVICE_PREPROCESSING);
 
 	zbx_vector_pp_task_ptr_create(&tasks);
@@ -1320,6 +1341,12 @@ void	*zbx_pp_manager_thread(void *args)
 					break;
 				case ZBX_RTC_LOG_LEVEL_DECREASE:
 					preprocessor_change_loglevel(manager, -1, (const char *)message->data);
+					break;
+				case ZBX_RTC_PROF_ENABLE:
+					pp_prof_enable(message->data);
+					break;
+				case ZBX_RTC_PROF_DISABLE:
+					zbx_prof_disable();
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, ignoring");

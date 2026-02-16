@@ -14,6 +14,7 @@
 
 #include "dbconfig_server.h"
 
+#include "zbxcommon.h"
 #include "zbxsupervisor_client.h"
 #include "../dbconfigworker/dbconfigworker.h"
 
@@ -33,6 +34,22 @@
 #include "zbxthreads.h"
 #include "zbxprof.h"
 
+static void	dbconfig_prof_enable(const unsigned char *data)
+{
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
+	char	*error = NULL;
+
+	if (SUCCEED != zbx_rtc_get_command_target((const char *)data, &pid, &proc_type, &proc_num, &scope, &error))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("cannot get rtc target: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_prof_enable(scope);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically synchronises database data with memory cache         *
@@ -51,7 +68,8 @@ void	*zbx_dbconfig_thread(void *args)
 	unsigned char			process_type = info->process_type;
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD,
+							ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)unit_args->args.args;
 	char				*process_title;
 	sigjmp_buf			jmp_ret;
@@ -99,36 +117,45 @@ void	*zbx_dbconfig_thread(void *args)
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
+			switch (rtc_cmd)
 			{
-				if (0 == cache_reload)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-					cache_reload = 1;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING,
-							"configuration cache reloading is already in progress");
-				}
+				case ZBX_RTC_CONFIG_CACHE_RELOAD:
+					if (0 == cache_reload)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration"
+								" cache");
+						cache_reload = 1;
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING,
+								"configuration cache reloading is already in progress");
+					}
+					break;
+				case ZBX_RTC_SECRETS_RELOAD:
+					if (0 == secrets_reload)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the secrets");
+						secrets_reload = 1;
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING,
+								"configuration cache reloading is already in progress");
+					}
+					break;
+				case ZBX_RTC_PROF_ENABLE:
+					dbconfig_prof_enable(rtc_data);
+					break;
+				case ZBX_RTC_PROF_DISABLE:
+					zbx_prof_disable();
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					goto stop;
 			}
-			else if (ZBX_RTC_SECRETS_RELOAD == rtc_cmd)
-			{
-				if (0 == secrets_reload)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the secrets");
-					secrets_reload = 1;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING,
-							"configuration cache reloading is already in progress");
-				}
-			}
-			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				goto stop;
 
 			sleeptime = 0;
+			zbx_free(rtc_data);
 		}
 
 		sleeptime = time(NULL) < (time_t)nextcheck ? 1 : 0;
