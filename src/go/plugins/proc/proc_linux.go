@@ -277,7 +277,7 @@ func getUIDByName(userName string) (*uid, error) {
 	var pwd C.struct_passwd
 	var passwdC *C.struct_passwd
 
-	const bufSize = 4096
+	const bufSize = 16384
 	buf := C.malloc(C.size_t(bufSize))
 	if buf == nil {
 		return nil, errMallocFailed
