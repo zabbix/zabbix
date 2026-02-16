@@ -87,9 +87,9 @@ static int	runlevel_index_compare(const void *d1, const void *d2)
 
 typedef struct
 {
-	pthread_t		handle;
-	unsigned char		running;
-	zbx_log_component_t	logger;
+	pthread_t				handle;
+	zbx_log_component_t			logger;
+	_Atomic zbx_supervisor_runstate_t	runstate;
 }
 zbx_supervisor_unit_t;
 
@@ -505,7 +505,7 @@ static void	supervisor_clear(zbx_supervisor_t *sv)
 		{
 			zbx_supervisor_unit_t	*unit = &set->units[j];
 
-			if (0 == unit->running)
+			if (UNIT_IDLE == unit->runstate)
 				continue;
 
 			void	*retval;
@@ -678,6 +678,8 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 	unit_args = (zbx_supervisor_unit_args_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_unit_args_t));
 	unit_args->args = *args;
 	unit_args->logger = &unit->logger;
+	unit_args->runstate = &unit->runstate;
+	unit->runstate = UNIT_RUNNING;
 
 	zbx_pthread_init_attr(&attr);
 	if (0 != (err = pthread_create(&unit->handle, &attr, thread_entry, (void *)unit_args)))
@@ -685,8 +687,6 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create thread: %s", zbx_strerror(err));
 		zbx_exit(EXIT_FAILURE);
 	}
-
-	unit->running = 1;
 }
 
 /******************************************************************************
@@ -929,6 +929,22 @@ static void	supervisor_handle_log(double time_now)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: set run state for all units                                       *
+ *                                                                            *
+ ******************************************************************************/
+static void	supervisor_set_unit_runstate(zbx_supervisor_t *sv, zbx_supervisor_runstate_t runstate)
+{
+	for (int i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+	{
+		zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
+
+		for (int j = 0; j < set->unit_num; j++)
+			set->units[j].runstate = runstate;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process entry function                                            *
  *                                                                            *
  ******************************************************************************/
@@ -1057,9 +1073,14 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 		supervisor_handle_log(time_now);
 	}
 out:
-
-	if (ZBX_RUNLEVEL_DEFAULT != sv.runlevel || 0 != sv.states[sv.runlevel].pending_local_num)
-		zbx_supervisor_stop_units();
+	if (ZBX_RUNLEVEL_DEFAULT != sv.runlevel || 0 != sv.states[sv.runlevel].pending_local_num ||
+		SUCCEED != ZBX_IS_NORMAL_EXIT())
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "forced supervisor unit shutdown");
+		supervisor_set_unit_runstate(&sv, UNIT_ABORTING);
+	}
+	else
+		supervisor_set_unit_runstate(&sv, UNIT_STOPPING);
 
 	supervisor_clear(&sv);
 	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);

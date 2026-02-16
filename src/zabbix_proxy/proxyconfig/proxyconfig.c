@@ -335,7 +335,7 @@ void	*zbx_proxyconfig_thread(void *args)
 
 	zbx_supervisor_set_process_running(server_num);
 
-	while (SUCCEED == zbx_supervisor_is_running())
+	while (UNIT_RUNNING == *unit_args->runstate)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;

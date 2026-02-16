@@ -1195,7 +1195,6 @@ void	*zbx_pp_manager_thread(void *args)
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
 						pending_peak_num = 0, counter_processed_num = 0;
 	sigjmp_buf				jmp_ret;
-	int					shutdown = 0;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
@@ -1244,7 +1243,7 @@ void	*zbx_pp_manager_thread(void *args)
 
 	zbx_supervisor_set_process_running(server_num);
 
-	while (1)
+	for (;;)
 	{
 		double		time_now = zbx_time();
 		zbx_uint64_t	direct_num = 0;
@@ -1323,8 +1322,7 @@ void	*zbx_pp_manager_thread(void *args)
 					preprocessor_change_loglevel(manager, -1, (const char *)message->data);
 					break;
 				case ZBX_RTC_SHUTDOWN:
-					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
-					shutdown = 1;
+					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, ignoring");
 					break;
 			}
 
@@ -1397,11 +1395,10 @@ void	*zbx_pp_manager_thread(void *args)
 			time_trim = sec;
 		}
 
-		if (SUCCEED != zbx_supervisor_is_running() ||
-				(1 == shutdown && 0 == pending_num && 0 == processing_num))
-		{
+		zbx_supervisor_runstate_t	runstate = *unit_args->runstate;
+
+		if (UNIT_ABORTING == runstate || (UNIT_STOPPING == runstate && 0 == pending_num && 0 == processing_num))
 			break;
-		}
 	}
 
 	zbx_dc_flush_history();

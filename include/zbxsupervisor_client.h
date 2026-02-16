@@ -27,10 +27,20 @@
 #define ZBX_SUPERVISOR_RUNLEVEL_WAIT	(ZBX_IPC_RTC_MAX + 10)
 #define ZBX_SUPERVISOR_RUNLEVEL_OK	(ZBX_IPC_RTC_MAX + 11)
 
+typedef enum
+{
+	UNIT_IDLE,
+	UNIT_RUNNING,
+	UNIT_STOPPING,
+	UNIT_ABORTING
+}
+zbx_supervisor_runstate_t;
+
 typedef struct
 {
-	zbx_thread_args_t	args;
-	zbx_log_component_t	*logger;
+	zbx_thread_args_t			args;
+	zbx_log_component_t			*logger;
+	_Atomic zbx_supervisor_runstate_t	*runstate;
 }
 zbx_supervisor_unit_args_t;
 
@@ -52,7 +62,5 @@ void	zbx_supervisor_worklog_clear(void);
 void	zbx_supervisor_update_activity(const char *fmt, ...);
 char	*zbx_supervisor_get_activities(void);
 
-void	zbx_supervisor_stop_units(void);
-int	zbx_supervisor_is_running(void);
 
 #endif
