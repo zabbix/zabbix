@@ -36,7 +36,6 @@ static zbx_metric_t	parameters_specific[] =
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"en0,bytes"},
 	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"en0,bytes"},
 	{"net.if.collisions",   CF_HAVEPARAMS,	net_if_collisions,      "en0"},
-	{"net.if.get",		CF_HAVEPARAMS,	net_if_get,		"en0"},
 
 	{"system.cpu.num",	CF_HAVEPARAMS,	system_cpu_num,		"online"},
 	{"system.cpu.load",	CF_HAVEPARAMS,	system_cpu_load,	"all,avg1"},

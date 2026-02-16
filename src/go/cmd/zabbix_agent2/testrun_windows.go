@@ -69,7 +69,6 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.if.out[MS TCP Loopback interface,bytes]`,
 		`net.if.total[MS TCP Loopback interface,bytes]`,
 		`net.if.discovery`,
-		`net.if.get`,
 		`net.if.list`,
 		`vm.memory.size[free]`,
 		`proc.num[svchost.exe]`,

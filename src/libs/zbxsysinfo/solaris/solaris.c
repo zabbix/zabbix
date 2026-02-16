@@ -37,7 +37,6 @@ static zbx_metric_t	parameters_specific[] =
 	{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"hme0,bytes"},
 	{"net.if.collisions",	CF_HAVEPARAMS,	net_if_collisions,	"hme0"},
 	{"net.if.discovery",	0,		net_if_discovery,	NULL},
-	{"net.if.get",		CF_HAVEPARAMS,	net_if_get,		NULL},
 
 	{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 

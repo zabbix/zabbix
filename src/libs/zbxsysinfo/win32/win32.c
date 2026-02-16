@@ -35,7 +35,6 @@ zbx_metric_t	*get_parameters_specific(void)
 		{"net.if.total",	CF_HAVEPARAMS,	net_if_total,		"MS TCP Loopback interface,bytes"},
 		{"net.if.discovery",	0,		net_if_discovery,	NULL},
 		{"net.if.list",		0,		net_if_list,		NULL},
-		{"net.if.get",		CF_HAVEPARAMS,	net_if_get,		NULL},
 
 		{"vm.memory.size",	CF_HAVEPARAMS,	vm_memory_size,		"free"},
 

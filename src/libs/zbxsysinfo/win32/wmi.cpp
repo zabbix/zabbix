@@ -965,45 +965,6 @@ extern "C" int	convert_wmi_json(zbx_vector_wmi_instance_t *wmi_values, char **js
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Wrapper function for zbx_wmi_get_variant(), stores the retrieved  *
- *          WMI values as UTF-8 encoded string.                               *
- *                                                                            *
- * Parameters: wmi_namespace - [IN] object path of WMI namespace (UTF-8)      *
- *             wmi_query     - [IN] WQL query (UTF-8)                         *
- *             timeout       - [IN] query timeout in seconds                  *
- *             utf8_value    - [OUT] address of pointer to retrieved value    *
- *                                   (dynamically allocated)                  *
- *                                                                            *
- ******************************************************************************/
-extern "C" void	zbx_wmi_getall(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value)
-{
-	zbx_vector_wmi_instance_t	wmi_values;
-	char				*error = NULL, *jd = NULL;
-
-	*utf8_value = NULL;
-	zbx_vector_wmi_instance_create(&wmi_values);
-
-	if (SUCCEED != zbx_co_initialize())
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot initialize COM library for querying WMI");
-		goto out;
-	}
-
-	if (SYSINFO_RET_OK == zbx_wmi_get_variant(wmi_namespace, wmi_query, parse_wmi_value_all, timeout,
-			&wmi_values, &error))
-	{
-		if (SYSINFO_RET_OK == convert_wmi_json(&wmi_values, &jd, &error))
-			*utf8_value = jd;
-	}
-
-out:
-	zbx_vector_wmi_instance_clear_ext(&wmi_values, wmi_instance_clear);
-	zbx_vector_wmi_instance_destroy(&wmi_values);
-	zbx_free(error);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: wrapper function for wmi.getall metric                            *
  *                                                                            *
  * Parameters: request - [IN] WMI request parameters                          *

@@ -19,13 +19,10 @@ import (
 	"errors"
 	"fmt"
 	"net"
-	"regexp"
-	"strconv"
 	"unsafe"
 
 	"golang.org/x/sys/windows"
 	"golang.zabbix.com/agent2/pkg/win32"
-	"golang.zabbix.com/agent2/pkg/wmi"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -35,17 +32,6 @@ const (
 	errorCannotFindIf = "Cannot obtain network interface information."
 	guidStringLen     = 38
 )
-
-type wmiAdapterData struct {
-	Name       string
-	Speed      *uint64
-	FullDuplex *bool
-}
-
-type wmiAdvancedData struct {
-	Name         string
-	DisplayValue string
-}
 
 func init() {
 	impl := &Plugin{}
@@ -57,7 +43,6 @@ func init() {
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
 		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
-		"net.if.get", "Returns list of network interfaces.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
@@ -136,11 +121,8 @@ func (p *Plugin) getNetStats(networkIf, statName string, direction networkDirect
 	var row *win32.MIB_IF_ROW2
 	for i := range ifs {
 		if len(networkIf) == guidStringLen && networkIf[0] == '{' && networkIf[guidStringLen-1] == '}' &&
-			networkIf == p.getGuidString(ifs[i].InterfaceGuid) {
-			row = &ifs[i]
-			break
-		}
-		if networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
+			networkIf == p.getGuidString(ifs[i].InterfaceGuid) ||
+			networkIf == windows.UTF16ToString(ifs[i].Description[:]) {
 			row = &ifs[i]
 			break
 		}
@@ -200,200 +182,6 @@ func (p *Plugin) getDevDiscovery() (devices []msgIfDiscovery, err error) {
 	for i := range rows {
 		guid := p.getGuidString(rows[i].InterfaceGuid)
 		devices = append(devices, msgIfDiscovery{windows.UTF16ToString(rows[i].Description[:]), &guid})
-	}
-	return
-}
-
-func (p *Plugin) getMacAddress(physAddr [32]byte, physAddrLen uint32) string {
-	if physAddrLen == 0 {
-		return ""
-	}
-	mac := make([]byte, physAddrLen)
-	for i := uint32(0); i < physAddrLen; i++ {
-		mac[i] = physAddr[i]
-	}
-	return net.HardwareAddr(mac).String()
-}
-
-func uint64Ptr(v uint64) *uint64 {
-	return &v
-}
-
-func (p *Plugin) getWMIAdapterDataBatch() (map[string]wmiAdapterData, error) {
-	query := "SELECT Name, Speed, FullDuplex FROM MSFT_NetAdapter"
-	results, err := wmi.QueryTable("root\\StandardCimv2", query)
-	if err != nil {
-		return nil, err
-	}
-
-	dataMap := make(map[string]wmiAdapterData)
-	for _, item := range results {
-		data := wmiAdapterData{}
-
-		if name, ok := item["Name"].(string); ok {
-			data.Name = name
-		} else {
-			continue
-		}
-
-		if s, ok := item["Speed"]; ok {
-			if valStr, ok := s.(string); ok {
-				if u, err := strconv.ParseUint(valStr, 10, 64); err == nil {
-					data.Speed = &u
-				}
-			} else if valUint, ok := s.(uint64); ok {
-				data.Speed = &valUint
-			}
-		}
-
-		if duplex, ok := item["FullDuplex"].(bool); ok {
-			data.FullDuplex = &duplex
-		}
-
-		dataMap[data.Name] = data
-	}
-
-	return dataMap, nil
-}
-
-func (p *Plugin) getWMIAdvancedDataBatch() (map[string]string, error) {
-	query := "SELECT Name, DisplayValue FROM MSFT_NetAdapterAdvancedPropertySettingData WHERE DisplayName = 'Speed & Duplex'"
-	results, err := wmi.QueryTable("root\\StandardCimv2", query)
-	if err != nil {
-		return nil, err
-	}
-
-	dataMap := make(map[string]string)
-	for _, item := range results {
-		name, nameOk := item["Name"].(string)
-		displayValue, displayOk := item["DisplayValue"].(string)
-
-		if nameOk && displayOk {
-			dataMap[name] = displayValue
-		}
-	}
-
-	return dataMap, nil
-}
-
-func (p *Plugin) getDevGet(regexExpr string) (result netIfResult, err error) {
-	var table *win32.MIB_IF_TABLE2
-	var compiledRegex *regexp.Regexp
-
-	if table, err = win32.GetIfTable2(); err != nil {
-		return
-	}
-	defer win32.FreeMibTable(table)
-
-	if regexExpr != "" {
-		compiledRegex, err = regexp.Compile(regexExpr)
-		if err != nil {
-			err = fmt.Errorf("invalid regex expression '%s': %w", regexExpr, err)
-			return
-		}
-	}
-
-	wmiAdapters, wmiErr := p.getWMIAdapterDataBatch()
-	if wmiErr != nil {
-		wmiAdapters = make(map[string]wmiAdapterData)
-	}
-
-	wmiAdvanced, wmiErr := p.getWMIAdvancedDataBatch()
-	if wmiErr != nil {
-		wmiAdvanced = make(map[string]string)
-	}
-
-	result.Config = make([]ifConfigData, 0, table.NumEntries)
-	result.Values = make([]IfValuesData, 0, table.NumEntries)
-
-	rows := (*win32.RGMIB_IF_ROW2)(unsafe.Pointer(&table.Table[0]))[:table.NumEntries:table.NumEntries]
-
-	for i := range rows {
-		ifName := windows.UTF16ToString(rows[i].Description[:])
-
-		if compiledRegex != nil {
-			if !compiledRegex.MatchString(ifName) {
-				continue
-			}
-		}
-
-		mac := p.getMacAddress(rows[i].PhysicalAddress, rows[i].PhysicalAddressLength)
-
-		operState := "down"
-		if rows[i].OperStatus == windows.IfOperStatusUp {
-			operState = "up"
-		}
-
-		admStateVal := "down"
-		if rows[i].AdminStatus == 1 {
-			admStateVal = "up"
-		}
-
-		ifAliasVal := windows.UTF16ToString(rows[i].Alias[:])
-
-		negotiationStatus := ""
-		if displayValue, ok := wmiAdvanced[ifAliasVal]; ok {
-			if displayValue == "Auto Negotiation" {
-				negotiationStatus = "on"
-			} else {
-				negotiationStatus = "off"
-			}
-		}
-
-		duplexStatus := ""
-		var speedPtr *uint64
-
-		if adapterData, ok := wmiAdapters[ifAliasVal]; ok {
-			if adapterData.FullDuplex != nil {
-				if *adapterData.FullDuplex {
-					duplexStatus = "full"
-				} else {
-					duplexStatus = "half"
-				}
-			}
-
-			if adapterData.Speed != nil {
-				val := *adapterData.Speed / 1000000
-				speedPtr = &val
-			}
-		}
-
-		result.Config = append(result.Config, ifConfigData{
-			Ifname:      ifName,
-			Ifmac:       mac,
-			Ifalias:     ifAliasVal,
-			IfAdmState:  &admStateVal,
-			IfOperState: &operState,
-		})
-
-		ifTypeVal := uint64(rows[i].Type)
-		ifType := &ifTypeVal
-
-		carrierVal := uint64(rows[i].InterfaceAndOperStatusFlags & 1)
-		result.Values = append(result.Values, IfValuesData{
-			Ifname: ifName,
-			Ifmac:  mac,
-			Iftype: ifType,
-			In: IfStatistics{
-				Ifbytes:   uint64Ptr(rows[i].InOctets),
-				Ifpackets: uint64Ptr(rows[i].InUcastPkts + rows[i].InNUcastPkts),
-				Iferrors:  uint64Ptr(rows[i].InErrors),
-				Ifdropped: uint64Ptr(rows[i].InDiscards + rows[i].InUnknownProtos),
-			},
-
-			Out: IfStatistics{
-				Ifbytes:   uint64Ptr(rows[i].OutOctets),
-				Ifpackets: uint64Ptr(rows[i].OutUcastPkts + rows[i].OutNUcastPkts),
-				Iferrors:  uint64Ptr(rows[i].OutErrors),
-				Ifdropped: uint64Ptr(rows[i].OutDiscards),
-			},
-
-			Ifcarrier:     &carrierVal,
-			Ifalias:       ifAliasVal,
-			Ifnegotiation: negotiationStatus,
-			Ifduplex:      duplexStatus,
-			Ifspeed:       speedPtr,
-		})
 	}
 	return
 }
@@ -482,24 +270,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 		var b []byte
 		if b, err = json.Marshal(devices); err != nil {
-			return
-		}
-		return string(b), nil
-	case "net.if.get":
-		if len(params) > 1 {
-			return nil, errors.New(errorTooManyParams)
-		}
-		expression := ""
-		if len(params) > 0 {
-			expression = params[0]
-		}
-
-		var res netIfResult
-		if res, err = p.getDevGet(expression); err != nil {
-			return
-		}
-		var b []byte
-		if b, err = json.Marshal(res); err != nil {
 			return
 		}
 		return string(b), nil

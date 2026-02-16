@@ -628,7 +628,6 @@ void	uint64_array_remove(zbx_uint64_t *values, int *num, const zbx_uint64_t *rm_
 #if defined(_WINDOWS) || defined(__MINGW32__)
 const OSVERSIONINFOEX	*zbx_win_getversion(void);
 void	zbx_wmi_get(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
-void	zbx_wmi_getall(const char *wmi_namespace, const char *wmi_query, double timeout, char **utf8_value);
 #endif
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
