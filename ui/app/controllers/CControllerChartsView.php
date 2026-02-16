@@ -70,62 +70,35 @@ class CControllerChartsView extends CControllerCharts {
 
 	protected function doAction() {
 		if ($this->hasInput('filter_rst')) {
-			CProfile::deleteIdx('web.charts.filter.hostids');
-			CProfile::deleteIdx('web.charts.filter.name');
-			CProfile::deleteIdx('web.charts.filter.show');
-			CProfile::deleteIdx('web.charts.subfilter.tagnames');
-			CProfile::deleteIdx('web.charts.subfilter.tags');
+			$this->deleteProfiles();
 		}
 		elseif ($this->hasInput('subfilter_set')) {
 			CProfile::updateArray('web.charts.subfilter.tagnames', $this->getInput('subfilter_tagnames', []), PROFILE_TYPE_STR);
 			CProfile::update('web.charts.subfilter.tags', json_encode($this->getInput('subfilter_tags', [])), PROFILE_TYPE_STR);
 		}
 		elseif ($this->hasInput('filter_set')) {
-			CProfile::updateArray('web.charts.filter.hostids', $this->getInput('filter_hostids', []), PROFILE_TYPE_ID);
-			CProfile::update('web.charts.filter.name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.charts.filter.show',
-				$this->getInput('filter_show', GRAPH_FILTER_ALL), PROFILE_TYPE_INT
-			);
+			$this->updateProfiles();
 		}
 
-		$filter_hostids = CProfile::getArray('web.charts.filter.hostids', []);
-		$filter_name = CProfile::get('web.charts.filter.name', '');
-		$filter_show = (int) CProfile::get('web.charts.filter.show', GRAPH_FILTER_ALL);
-
-		$subfilter_tagnames = CProfile::getArray('web.charts.subfilter.tagnames', []);
-		$subfilter_tags = json_decode(CProfile::get('web.charts.subfilter.tags', '{}'), true);
-
-		$timeselector_options = [
-			'profileIdx' => 'web.charts.filter',
-			'profileIdx2' => 0,
-			'from' => $this->hasInput('from') ? $this->getInput('from') : null,
-			'to' => $this->hasInput('to') ? $this->getInput('to') : null
-		];
-		updateTimeSelectorPeriod($timeselector_options);
-
-		$data = [
+		updateTimeSelectorPeriod($this->getTimeSelectorOptions());
+		$data = $this->getInputFilters(true) + [
 			'view_as' => $this->getInput('view_as', HISTORY_GRAPH),
 			'ms_hosts' => [],
-			'timeline' => getTimeSelectorPeriod($timeselector_options),
 			'active_tab' => CProfile::get('web.charts.filter.active', 1),
-			'filter_hostids' => $filter_hostids,
-			'filter_name' => $filter_name,
-			'filter_show' => $filter_show,
-			'subfilter_tagnames' => $subfilter_tagnames,
-			'subfilter_tags' => $subfilter_tags,
 			'error' => '',
 			'page' => $this->getInput('page', 1)
 		];
 
-		if ($filter_hostids) {
+		if ($data['filter_hostids']) {
 			$data['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
 				'output' => ['name', 'hostid'],
-				'hostids' => $filter_hostids
+				'hostids' => $data['filter_hostids']
 			]), ['hostid' => 'id']);
 
 			// Continue with readable hosts only.
-			if (count($filter_hostids) != count($data['ms_hosts'])) {
-				$filter_hostids = array_column($data['ms_hosts'], 'id');
+			if (count($data['filter_hostids']) != count($data['ms_hosts'])) {
+				$data['filter_hostids'] = array_column($data['ms_hosts'], 'id');
+
 				if ($this->hasInput('filter_set')) {
 					$data['error'] = _('No permissions to referred object or it does not exist!');
 				}
@@ -135,13 +108,13 @@ class CControllerChartsView extends CControllerCharts {
 		$host_graphs = [];
 		$simple_graphs = [];
 
-		if ($filter_hostids) {
-			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
-				$host_graphs = $this->getHostGraphs($filter_hostids, $filter_name);
+		if ($data['filter_hostids']) {
+			if (in_array($data['filter_show'], [GRAPH_FILTER_ALL, GRAPH_FILTER_HOST])) {
+				$host_graphs = $this->getHostGraphs($data['filter_hostids'], $data['filter_name']);
 			}
 
-			if (in_array($filter_show, [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
-				$simple_graphs = $this->getSimpleGraphs($filter_hostids, $filter_name);
+			if (in_array($data['filter_show'], [GRAPH_FILTER_ALL, GRAPH_FILTER_SIMPLE])) {
+				$simple_graphs = $this->getSimpleGraphs($data['filter_hostids'], $data['filter_name']);
 			}
 		}
 
@@ -149,8 +122,8 @@ class CControllerChartsView extends CControllerCharts {
 
 		// Prepare subfilter data.
 		$subfilters_fields = self::getSubfilterFields([
-			'subfilter_tagnames' => $subfilter_tagnames,
-			'subfilter_tags' => $subfilter_tags
+			'subfilter_tagnames' => $data['subfilter_tagnames'],
+			'subfilter_tags' => $data['subfilter_tags']
 		]);
 		$data['subfilters'] = self::getSubfilters($graphs, $subfilters_fields);
 		$graphs = self::applySubfilters($graphs);
@@ -167,5 +140,74 @@ class CControllerChartsView extends CControllerCharts {
 		$response->setTitle(_('Custom graphs'));
 
 		$this->setResponse($response);
+	}
+
+	private function deleteProfiles(): void {
+		CProfile::deleteIdx('web.charts.filter.hostids');
+		CProfile::deleteIdx('web.charts.filter.name');
+		CProfile::deleteIdx('web.charts.filter.show');
+		CProfile::deleteIdx('web.charts.subfilter.tagnames');
+		CProfile::deleteIdx('web.charts.subfilter.tags');
+	}
+
+	private function getTimeSelectorOptions(): array {
+		return [
+			'profileIdx' => 'web.charts.filter',
+			'profileIdx2' => 0,
+			'from' => $this->hasInput('from')
+				? $this->getInput('from')
+				: CProfile::get('web.charts.filter.from', 'now-'.CSettingsHelper::get(CSettingsHelper::PERIOD_DEFAULT)),
+			'to' => $this->hasInput('to') ? $this->getInput('to') : CProfile::get('web.charts.filter.to', 'now')
+		];
+	}
+
+	/**
+	 * Get used filters.
+	 *
+	 * @param bool $use_profile  Set true to load filters from profile if there aren't any input filters.
+	 *
+	 * @return array
+	 */
+	private function getInputFilters(bool $use_profile = false): array {
+		$input_filters = [
+			'filter_hostids' => $this->getInput('filter_hostids', []),
+			'filter_name' => $this->getInput('filter_name', ''),
+			'filter_show' => (int) $this->getInput('filter_show', GRAPH_FILTER_ALL),
+			'subfilter_tagnames' => $this->getInput('subfilter_tagnames', []),
+			'subfilter_tags' => $this->getInput('subfilter_tags', [])
+		];
+
+		if ($use_profile && count(array_intersect_key($input_filters, $this->getInputAll())) == 0) {
+			$input_filters = $this->getProfiles();
+		}
+
+		if ($this->hasInput('filter_set') || $this->hasInput('filter_rst')) {
+			$input_filters['subfilter_tagnames'] = [];
+			$input_filters['subfilter_tags'] = [];
+		}
+
+		$input_filters['timeline'] = getTimeSelectorPeriod($this->getTimeSelectorOptions());
+
+		return $input_filters;
+	}
+
+	private function updateProfiles(): void {
+		$input_filters = $this->getInputFilters();
+
+		CProfile::updateArray('web.charts.filter.hostids', $input_filters['filter_hostids'], PROFILE_TYPE_ID);
+		CProfile::update('web.charts.filter.name', $input_filters['filter_name'], PROFILE_TYPE_STR);
+		CProfile::update('web.charts.filter.show', $input_filters['filter_show'], PROFILE_TYPE_INT);
+		CProfile::updateArray('web.charts.subfilter.tagnames', [], PROFILE_TYPE_STR);
+		CProfile::update('web.charts.subfilter.tags', json_encode([]), PROFILE_TYPE_STR);
+	}
+
+	private function getProfiles(): array {
+		return [
+			'filter_hostids' => CProfile::getArray('web.charts.filter.hostids', []),
+			'filter_name' => CProfile::get('web.charts.filter.filter_name', ''),
+			'filter_show' => (int) CProfile::get('web.charts.filter.filter_show', GRAPH_FILTER_ALL),
+			'subfilter_tagnames' => CProfile::getArray('web.charts.filter.subfilter_tagnames', []),
+			'subfilter_tags' => json_decode(CProfile::get('web.charts.filter.subfilter_tags', '{}'), true)
+		];
 	}
 }
