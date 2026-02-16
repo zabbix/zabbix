@@ -573,6 +573,9 @@ pre {
   font-family: var(--font-stack-mono);
   font-size: 1em; }
 
+.trimmed-content::after {
+  content: '\2026'; }
+
 a {
   color: #555555;
   text-decoration: none; }
@@ -1514,7 +1517,7 @@ button {
 .problem-icon-list .problem-icon-list-item::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, .svg-graph-hintbox li .svg-graph-hintbox-icon-color::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -1593,58 +1596,11 @@ button {
   display: flex;
   flex-wrap: wrap;
   align-items: start; }
-  .columns-wrapper.columns-nowrap {
-    flex-wrap: nowrap; }
   .columns-wrapper.columns-2 > div,
   .columns-wrapper.columns-2 > li {
     display: block;
     flex: 0 0 50%;
     max-width: 50%; }
-  .columns-wrapper.columns-3 > div,
-  .columns-wrapper.columns-3 > li {
-    display: block;
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
-  .columns-wrapper .column-5 {
-    flex: 0 0 5%;
-    max-width: 5%; }
-  .columns-wrapper .column-10 {
-    flex: 0 0 10%;
-    max-width: 10%; }
-  .columns-wrapper .column-15 {
-    flex: 0 0 15%;
-    max-width: 15%; }
-  .columns-wrapper .column-20 {
-    flex: 0 0 20%;
-    max-width: 20%; }
-  .columns-wrapper .column-33 {
-    flex: 0 0 33.33333%;
-    max-width: 33.33333%; }
-  .columns-wrapper .column-35 {
-    flex: 0 0 35%;
-    max-width: 35%; }
-  .columns-wrapper .column-40 {
-    flex: 0 0 40%;
-    max-width: 40%; }
-  .columns-wrapper .column-50 {
-    flex: 0 0 50%;
-    max-width: 50%; }
-  .columns-wrapper .column-75 {
-    flex: 0 0 75%;
-    max-width: 75%; }
-  .columns-wrapper .column-90 {
-    flex: 0 0 90%;
-    max-width: 90%; }
-  .columns-wrapper .column-95 {
-    flex: 0 0 95%;
-    max-width: 95%; }
-  .columns-wrapper .column-center {
-    display: flex;
-    justify-content: center;
-    text-align: center; }
-  .columns-wrapper .column-middle {
-    display: flex;
-    align-items: center; }
   .columns-wrapper > div:not(:last-child) section,
   .columns-wrapper > ul:not(:last-child) section {
     margin-right: 10px; }
@@ -2356,7 +2312,7 @@ button {
   margin-top: 4px;
   white-space: break-spaces;
   word-break: break-word;
-  line-height: 1.4em;
+  line-height: 17px;
   color: #ad1f1f; }
 
 z-select.has-error button.focusable:active,
@@ -3892,6 +3848,14 @@ section {
 
 .svg-graph {
   display: block; }
+  .svg-graph.highlighted .svg-graph-points,
+  .svg-graph.highlighted .svg-graph-line,
+  .svg-graph.highlighted .svg-graph-bar {
+    opacity: 0.15; }
+    .svg-graph.highlighted .svg-graph-points.highlighted,
+    .svg-graph.highlighted .svg-graph-line.highlighted,
+    .svg-graph.highlighted .svg-graph-bar.highlighted {
+      opacity: 1; }
 
 .svg-point-highlight {
   fill: #000000;
@@ -6998,12 +6962,6 @@ form.is-loading {
 .border-left {
   border-left: 1px solid #888888; }
 
-.form-new-group {
-  border: 5px solid #00cc00;
-  border-radius: 2px;
-  margin-left: -5px;
-  padding: 4px 0; }
-
 .list-check-radio li {
   display: block;
   line-height: 24px; }
@@ -7589,8 +7547,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
           position: absolute;
           top: 5px;
           right: 8px; }
-      .overlay-dialogue.modal .overlay-dialogue-body .columns-wrapper .column-50:last-of-type {
-        margin-left: 10px; }
     .overlay-dialogue.modal .overlay-dialogue-controls {
       text-align: right;
       padding: 0 0 10px; }
@@ -7622,6 +7578,25 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       --modal-width: calc(100vw - 40px);
       --modal-max-width: calc(100vw - 40px); }
+  .overlay-dialogue.hintbox {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding-top: 20px; }
+    .overlay-dialogue.hintbox.hintbox-position-fixed {
+      position: fixed; }
+    .overlay-dialogue.hintbox:not(.hintbox-static) {
+      pointer-events: none; }
+    .overlay-dialogue.hintbox.hintbox-static {
+      padding-top: 0; }
+      .overlay-dialogue.hintbox.hintbox-static .hintbox-draggable-handle {
+        height: 20px;
+        width: 100%;
+        cursor: grab; }
+    .overlay-dialogue.hintbox .hintbox-container {
+      overflow: auto;
+      padding-bottom: 1px; }
   .overlay-dialogue .hintbox-raw-data {
     white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
@@ -7850,6 +7825,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     float: left;
     margin-top: 0; }
 
+.hintbox-wrap {
+  display: block; }
+
 .notif.overlay-dialogue {
   width: 250px; }
   .notif.overlay-dialogue .overlay-dialogue-header ul {
@@ -7890,9 +7868,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     margin-top: 20px; }
   .notif-indic .zi-bell-off {
     color: #555555; }
-
-.dashed-border td {
-  border: 1px dashed #888888; }
 
 .top {
   vertical-align: top !important; }
@@ -7941,7 +7916,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   font-size: 12px;
   line-height: 18px;
   white-space: nowrap;
-  min-width: 145px; }
+  min-width: 160px; }
   .svg-graph-hintbox .table-paging {
     min-height: 18px;
     padding: 0 0 2px;
@@ -7952,22 +7927,36 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .svg-graph-hintbox .list-table tbody tr:last-child td {
     border-bottom-style: none;
     box-shadow: none; }
-  .svg-graph-hintbox li {
-    padding-left: 23px; }
-    .svg-graph-hintbox li .svg-graph-hintbox-icon-color {
+  .svg-graph-hintbox .has-broadcast-data {
+    cursor: pointer; }
+    .svg-graph-hintbox .has-broadcast-data:hover {
+      background-color: #f4f4f4; }
+  .svg-graph-hintbox .scatter-plot-hintbox-row:not(:first-child) {
+    margin-top: 10px; }
+  .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding-left: 3px;
+    white-space: pre; }
+    .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
       display: inline-block;
-      float: left;
       width: 12px;
-      height: 12px;
-      margin-left: -20px;
-      margin-top: -1px; }
+      height: 18px;
+      margin-right: 10px; }
+      .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color::before {
+        font-size: 14px; }
+  .svg-graph-hintbox li {
+    display: flex;
+    width: fit-content;
+    align-items: center; }
     .svg-graph-hintbox li .svg-graph-hintbox-item-color,
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
-      margin: 3px 10px 3px -20px;
-      width: 10px;
+      display: inline-block;
+      min-width: 10px;
       height: 10px;
-      float: left;
-      display: block; }
+      margin-left: 3px;
+      margin-right: 10px; }
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
       border-radius: 50%; }
   .svg-graph-hintbox .header {
@@ -8041,10 +8030,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
       border-bottom: none; }
   .tag:last-of-type {
     margin-right: 0; }
-  .tag.green-bg {
-    color: #0e4123; }
-  .tag.yellow-bg {
-    color: #734d00; }
   .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before {
     margin-right: 3px;
     font-size: 10px;
@@ -8059,15 +8044,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .tag-inherited-title {
   margin-bottom: 3px;
   color: #333333; }
-
-.green-bg {
-  background-color: #59db8f; }
-
-.red-bg {
-  background-color: #e45959; }
-
-.yellow-bg {
-  background-color: #ffc859; }
 
 .na-bg {
   color: #2a353a;
@@ -8200,7 +8176,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
 div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
-div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .drag-drop-area {
+div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .svg-graph-hintbox .has-broadcast-data.selected, .svg-graph-hintbox .has-broadcast-data.selected:hover {
   background-color: #f4f4f4; }
 
 @keyframes is-loading-kf {
@@ -8343,26 +8319,26 @@ span.is-loading {
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
+z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
   z-select .focusable::-webkit-scrollbar, .z-select .list::-webkit-scrollbar,
-  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
+  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px;
     height: 9px; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
   z-select .focusable::-webkit-scrollbar-track, .z-select .list::-webkit-scrollbar-track,
-  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-track, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
+  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-track, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #999999; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
   z-select .focusable::-webkit-scrollbar-thumb, .z-select .list::-webkit-scrollbar-thumb,
-  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-thumb, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
+  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-thumb, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #f9f9f9;
@@ -8403,9 +8379,6 @@ main .server-name {
   .flickerfreescreen.is-loading {
     min-height: 64px; }
 
-.graph-wrapper {
-  display: inline; }
-
 .clock {
   display: flex;
   justify-content: center;
@@ -8414,14 +8387,6 @@ main .server-name {
 
 .clock-svg {
   flex-grow: 1; }
-
-.time-zone {
-  margin: 0 0 .5em;
-  white-space: nowrap; }
-
-.local-clock {
-  margin: .5em 0 0;
-  white-space: nowrap; }
 
 .clock-face {
   fill: #ffffff; }
@@ -9294,9 +9259,6 @@ a.link-action {
 .paging-selected:focus {
   background-color: #777777 !important; }
 
-.tag.green-bg, .tag.yellow-bg {
-  background-color: #333333;
-  color: #ffffff; }
 .tag.tag-inherited::before, .tag.tag-inherited-duplicate::before {
   opacity: 1; }
 

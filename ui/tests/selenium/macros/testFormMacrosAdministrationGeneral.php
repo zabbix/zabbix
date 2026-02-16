@@ -850,7 +850,6 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	 * @backupOnce globalmacro
 	 */
 	public function testFormMacrosAdministrationGeneral_CreateVaultMacros($data) {
-		$this->selectVault($data['vault']);
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'clear_globalmacros')) {
@@ -860,6 +859,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			$this->page->acceptAlert();
 			$this->assertMessage(TEST_GOOD, 'Macros updated');
 		}
+		$this->selectVault($data['vault']);
 
 		$this->fillMacros([$data['macro_fields']]);
 

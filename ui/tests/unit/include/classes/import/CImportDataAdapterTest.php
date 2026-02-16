@@ -3143,7 +3143,7 @@ class CImportDataAdapterTest extends TestCase {
 		$import_validator_factory = new CImportValidatorFactory(CImportReaderFactory::XML);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CImportXmlValidator($import_validator_factory, CImportReaderFactory::XML);
+		$validator = new CImportValidator($import_validator_factory, CImportReaderFactory::XML);
 
 		$source = $validator
 			->setStrict(true)

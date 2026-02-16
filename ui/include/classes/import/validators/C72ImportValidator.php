@@ -17,7 +17,7 @@
 /**
  * Validate import data from Zabbix 7.2.x.
  */
-class C72XmlValidator extends CXmlValidatorGeneral {
+class C72ImportValidator extends CImportValidatorGeneral {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,

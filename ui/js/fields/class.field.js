@@ -188,10 +188,11 @@ class CField {
 	}
 
 	errorHint() {
+		const row_level_error_levels = [CFormValidator.ERROR_LEVEL_OBJECTS_COUNT, CFormValidator.ERROR_LEVEL_UNIQ];
 		const error_hint = document.createElement(this._error_container !== null ? 'li' : 'span');
 
 		error_hint.classList.add('error');
-		error_hint.textContent = this._error_label !== null && this._error_level != CFormValidator.ERROR_LEVEL_UNIQ
+		error_hint.textContent = this._error_label !== null && !row_level_error_levels.includes(this._error_level)
 			? sprintf(t('%1$s: %2$s'), this._error_label, this._error_msg)
 			: this._error_msg;
 
