@@ -149,7 +149,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(1)
 			)
 			->addField(
-				(new CWidgetFieldTextBox('primary_label_units', _('Units')))->setMaxLength(255)
+				(new CWidgetFieldTextBox('primary_label_units', _('Units')))->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldSelect('primary_label_units_pos', _('Position'), [
@@ -199,7 +199,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(1)
 			)
 			->addField(
-				(new CWidgetFieldTextBox('secondary_label_units', _('Units')))->setMaxLength(255)
+				(new CWidgetFieldTextBox('secondary_label_units', _('Units')))->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldSelect('secondary_label_units_pos', _('Position'), [
