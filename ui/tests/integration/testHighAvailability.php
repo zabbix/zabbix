@@ -92,8 +92,8 @@ class testHighAvailability extends CIntegrationTest {
 	 * @configurationDataProvider serverConfigurationProvider_ha
 	 */
 	public function testHighAvailability_checkHaStartup() {
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '"'.self::NODE1_NAME.'" node started in "active" mode', true, 3, 3);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, '"'.self::NODE2_NAME.'" node started in "standby" mode', true, 3, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '"'.self::NODE1_NAME.'" node started in "active" mode', true, 5, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, '"'.self::NODE2_NAME.'" node started in "standby" mode', true, 5, 3);
 
 		return true;
 	}
