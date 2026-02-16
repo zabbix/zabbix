@@ -1320,6 +1320,35 @@ out:
   return: FAIL
   error: error message
 ---
+test case: test with float
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_FLOAT
+    variant: ZBX_VARIANT_DBL
+    time: 2017-10-29 03:15:00 +03:00
+    data: |-
+      0
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: test with numeric
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_UINT64
+    variant: ZBX_VARIANT_UI64
+    time: 2017-10-29 03:15:00 +03:00
+    data: 0
+  step:
+    type: ZBX_PREPROC_ERROR_FIELD_JSON
+    params: $.error
+out:
+  return: SUCCEED
+  value: 0
+---
 test case: xmlerror(x, //error)
 in:
   value:
@@ -2193,19 +2222,6 @@ in:
 out:
   return: SUCCEED
   value: "OK"
----
-test case: Missing second parameter
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: "a"
-  step:
-    type: ZBX_PREPROC_STR_REPLACE
-    params: "OK"
-out:
-  return: FAIL
-  value: "a"
 ---
 test case: Missing first parameter
 in:

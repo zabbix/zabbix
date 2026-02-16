@@ -20,6 +20,7 @@
 
 const char	*zbx_mock_get_parameter_string(const char *path);
 const char	*zbx_mock_get_optional_parameter_string(const char *path);
+const char	*zbx_mock_get_optional_object_member_string(zbx_mock_handle_t object, const char *name);
 const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name);
 
 zbx_mock_handle_t	zbx_mock_get_parameter_handle(const char *path);

@@ -241,41 +241,61 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, const int status, 
  *                                                                            *
  * Parameters:                                                                *
  *    druleid      - [IN] ID of discovery rule                                *
+ *    dcheckid     - [IN] unique dcheck id (0 to separate by IP only)         *
+ *    value        - [IN] unique dcheck value (NULL to separate by IP only)   *
  *    dhost        - [IN/OUT]                                                 *
  *    ip           - [IN] host ip address                                     *
  *    now          - [IN]                                                     *
  *    add_event_cb - [IN]                                                     *
  *                                                                            *
- * Comments: If we are separating dhost interface with largest ip address,    *
+ * Comments: Separates when dhost has services with different IPs.            *
+ *           When dcheckid!=0 and value!=NULL, separates only if different    *
+ *           IPs contain different values for the unique check.               *
+ *           If we are separating dhost interface with largest ip address,    *
  *           we also need to update status of current dhost using states of   *
  *           remaining interfaces. This interface is expected to be last      *
  *           processed interface for current dhost and removal without dhost  *
  *           status update could result in invalid dhost state.               *
  *                                                                            *
  ******************************************************************************/
-static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_db_dhost *dhost, const char *ip, const int now,
-		const zbx_add_event_func_t add_event_cb)
+static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_uint64_t dcheckid, const char *value,
+		zbx_db_dhost *dhost, const char *ip, const int now, const zbx_add_event_func_t add_event_cb)
 {
 	zbx_db_result_t				result;
 	char					*ip_esc, *sql = NULL;
 	zbx_uint64_t				dhostid;
 	zbx_vector_discoverer_interface_ptr_t	interfaces;
+	size_t					sql_alloc = 0, sql_offset = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' value:'%s'", __func__, ip, ZBX_NULL2EMPTY_STR(value));
 
 	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
 
-	sql = zbx_dsprintf(sql,
+	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select dserviceid"
 			" from dservices"
-			" where dhostid=" ZBX_FS_UI64
-				" and ip" ZBX_SQL_STRCMP,
-			dhost->dhostid, ZBX_SQL_STRVAL_NE(ip_esc));
+			" where dhostid=");
+
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64, dhost->dhostid);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and ip" ZBX_SQL_STRCMP, ZBX_SQL_STRVAL_NE(ip_esc));
+
+	if (0 != dcheckid && NULL != value)
+	{
+		char	*value_esc;
+
+		value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dcheckid=" ZBX_FS_UI64, dcheckid);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and value" ZBX_SQL_STRCMP,
+				ZBX_SQL_STRVAL_NE(value_esc));
+		zbx_free(value_esc);
+	}
 
 	result = zbx_db_select_n(sql, 1);
 
 	if (NULL != zbx_db_fetch(result))
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "separating host at ip '%s'", ip);
+
 		zbx_vector_discoverer_interface_ptr_create(&interfaces);
 		discovery_get_host_interfaces(dhost->dhostid, &interfaces);
 
@@ -307,6 +327,7 @@ static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_db_dhost *dh
 		zbx_vector_discoverer_interface_ptr_clear_ext(&interfaces, discoverer_interface_free);
 		zbx_vector_discoverer_interface_ptr_destroy(&interfaces);
 	}
+
 	zbx_db_free_result(result);
 
 	zbx_free(sql);
@@ -389,8 +410,11 @@ static void	discovery_register_host(const zbx_uint64_t druleid, const zbx_uint64
 		dhost->lastdown = atoi(row[3]);
 
 		if (0 == match_value)
-			discovery_separate_host(druleid, dhost, ip, now, add_event_cb);
+			discovery_separate_host(druleid, 0, NULL, dhost, ip, now, add_event_cb);
+		else
+			discovery_separate_host(druleid, unique_dcheckid, value, dhost, ip, now, add_event_cb);
 	}
+
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

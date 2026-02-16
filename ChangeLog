@@ -1,31 +1,57 @@
+Changes for 7.0.24rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.23
+
+7.0.23rc2 was released as 7.0.23 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.23rc2
+
+Bug fixes:
+.......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.23rc1
 
 New features:
-.........T [ZBXNEXT-10377] added new OID metrics and updated the dashboard in Vyatta Virtual Router by SNMP template (mruszczyk)
+.........T [ZBXNEXT-10377] added new OID metrics and updated dashboard in Vyatta Virtual Router by SNMP template (mruszczyk)
 .........T [ZBXNEXT-10384] added filesystem and CPU load items to Ciena 3906 by SNMP template (kflorowski)
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
-.......PS. [ZBX-26712] fixed errors that occurred when polling snmp agent items for walk on BITS values (mkorotkov)
-.......PS. [ZBX-27391] fixed memory fragmentation when adding new hosts, global macros or user macros (vso)
+...G...... [ZBX-26276] fixed issue with failed Oracle connections causing memory leak in Zabbix agent 2 (opucka)
+A......... [ZBX-27236] improved performance of event.get and problem.get methods when using "suppressed" and "symptom" options (Sasha)
+.......PS. [ZBX-27447] fixed JSON error check with numeric value type (vso)
+..F....... [ZBX-27459] updated MFA library duosecurity/duo_universal_php to version 1.1.1 (gcalenko)
+..F....... [ZBX-22722] updated time period format to support both single-day (d) and interval (d–d) (msnihach)
+........S. [ZBX-25080] optimized item_discovery table sync to use copy of item table changelog (wiper)
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
+.......PS. [ZBX-21645] fixed SNMP availability icon staying green when all SNMP agent items are not supported (vso)
+.......PS. [ZBX-26712] fixed errors that occurred when polling SNMP agent items for walk on BITS values (mkorotkov)
+.......PS. [ZBX-27391] fixed memory fragmentation when adding new hosts, global macros, or user macros (vso)
 .D........ [ZBX-26754] improved ServerActive configuration option description (sboidenko)
-A......... [ZBX-26749] removed inability to unlink and clear the template which has triggers that other host/template triggers depend on (kkuzmina)
+A......... [ZBX-26749] removed inability to unlink and clear template which has triggers that other host/template triggers depend on (kkuzmina)
 ........S. [ZBX-26664] added interface field validation in LLD (wiper)
 .........T [ZBX-27235] fixed MS Teams workflow webhook handling success message (kflorowski)
 A......... [ZBX-25974] prevented creation of duplicate host prototype on re-linking template (jfreibergs)
 ..F....... [ZBX-26461] fixed undefined index error in template edit form when one of vendor fields is empty (dpankins)
-A......... [ZBX-24435] fixed slow query when selecting more than 950 ids on PostgreSQL (agriscenko, vso)
-A......... [ZBX-27083] implemented full macros support for "In range" preprocessing step, now available for all fields (dpankins)
+A......... [ZBX-24435] fixed slow query when selecting more than 950 IDs on PostgreSQL (agriscenko, vso)
+A......... [ZBX-27083] implemented full macro support for "In range" preprocessing step, now available for all fields (dpankins)
 .D.....PS. [ZBX-27233] updated process type list for for Zabbix server/proxy help message and man page (rtrizna)
-........S. [ZBX-27238] improved host low level discovery performance when matching existing hosts (vso)
+........S. [ZBX-27238] improved host low-level discovery performance when matching existing hosts (vso)
 ...G...... [ZBX-27268] fixed problem where test flags would not work with running agent2 (opucka)
 .........T [ZBX-27201] fixed healthcheck HTTP response code regex in RabbitMQ templates (kflorowski)
-..F....... [ZBX-23823] fixed inability to remove macros with the same context via mass update in templates and hosts (kkuzmina)
-A......... [ZBX-22866] fixed inability to create maps for users without a group (kkuzmina)
-..F....... [ZBX-27214] fixed host dashboards reloading once a minute (averza)
+..F....... [ZBX-23823] fixed inability to remove macros with same context via mass update in templates and hosts (kkuzmina)
+A......... [ZBX-22866] fixed inability to create maps for users without group (kkuzmina)
+..F....... [ZBX-27214] fixed host dashboards reloading once per minute (averza)
 ..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
-..F....... [ZBX-27231] fixed unresponsive header of the URL widget (averza)
-........S. [ZBX-27205] fixed issue of event created from trigger using web scenarios items missing tags inherited from templates (arimdjonoks)
+..F....... [ZBX-27231] fixed unresponsive header of URL widget (averza)
+........S. [ZBX-27205] fixed issue of event created from trigger using web scenario items missing tags inherited from templates (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.22
@@ -3920,12 +3946,19 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.44
+
+6.0.44rc1 was released as 6.0.44 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.44rc1
 
 New features:
 A.......S. [ZBXNEXT-10394] updated maximum supported TimescaleDB version to 2.24 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-26276] fixed issue with failed Oracle connections causing memory leak in Zabbix agent 2 (opucka)
+...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
 
 --------------------------------------------------------------------------------

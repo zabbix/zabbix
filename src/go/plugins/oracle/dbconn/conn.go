@@ -233,15 +233,18 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 
 	var serverVersion godror.VersionInfo
 
-	var errVer error
-
 	if c.versionCheckF == nil {
 		panic("unassigned Oracle server version check function")
 	}
 
-	serverVersion, errVer = c.versionCheckF(ctx, client)
-	if errVer != nil {
-		return nil, errs.Wrap(errVer, "server version check failed")
+	serverVersion, err = c.versionCheckF(ctx, client)
+	if err != nil {
+		clientCloseErr := client.Close()
+		if clientCloseErr != nil {
+			c.logr.Debugf("Error closing connection: %s", clientCloseErr.Error())
+		}
+
+		return nil, errs.Wrap(err, "server version check failed")
 	}
 
 	log.Debugf("[Oracle] Created new connection: %s", cd.Uri.Addr())

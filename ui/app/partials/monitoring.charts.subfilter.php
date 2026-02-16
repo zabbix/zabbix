@@ -47,6 +47,8 @@ if (count($data['tagnames']) > 0) {
 			$subfilter_options['tagnames'][] = (new CSpan([
 				(new CLinkAction($element['name']))
 					->addClass('js-subfilter-unset')
+					->setAttribute('data-name', 'subfilter_tagnames[]')
+					->setAttribute('data-value', $tag_name)
 					->setAttribute('data-tag', $tag_name),
 				' ',
 				new CSup($element['count'])
@@ -68,6 +70,8 @@ if (count($data['tagnames']) > 0) {
 				$subfilter_options['tagnames'][] = (new CSpan([
 					(new CLinkAction($element['name']))
 						->addClass('js-subfilter-set')
+						->setAttribute('data-name', 'subfilter_tagnames[]')
+						->setAttribute('data-value', $tag_name)
 						->setAttribute('data-tag', $tag_name),
 					' ',
 					new CSup(($subfilter_used ? '+' : '').$element['count'])
@@ -116,6 +120,7 @@ if (count($data['tags']) > 0) {
 						->addClass('js-subfilter-unset')
 						->addStyle($element_style)
 						->setAttribute('data-tag', $tag_name)
+						->setAttribute('data-name', 'subfilter_tags['.$tag_name .'][]')
 						->setAttribute('data-value', $element['name']),
 					' ',
 					new CSup($element['count'])
@@ -141,6 +146,7 @@ if (count($data['tags']) > 0) {
 							->addClass('js-subfilter-set')
 							->addStyle($element_style)
 							->setAttribute('data-tag', $tag_name)
+							->setAttribute('data-name', 'subfilter_tags['.$tag_name .'][]')
 							->setAttribute('data-value', $element['name']),
 						' ',
 						new CSup(($subfilter_used ? '+' : '').$element['count'])
