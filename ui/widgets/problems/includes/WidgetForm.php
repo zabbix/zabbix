@@ -107,7 +107,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('tag_priority', _('Tag display priority')))
 					->setFlags($this->show_tags ? 0x00 : CWidgetField::FLAG_DISABLED)
-					->setMaxLength(255)
+					->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('show_opdata', _('Show operational data'), [
