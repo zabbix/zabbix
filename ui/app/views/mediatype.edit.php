@@ -107,7 +107,7 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('smtp-security-field')
 	])
 	->addItem([
-		(new CLabel(_('SSL verify peer')))->setId('verify-peer-label'),
+		(new CLabel(_('SSL verify peer'), 'smtp_verify_peer'))->setId('verify-peer-label'),
 		(new CFormField(
 			(new CCheckBox('smtp_verify_peer'))
 				->setChecked($data['smtp_verify_peer'])
@@ -115,7 +115,7 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('verify-peer-field')
 	])
 	->addItem([
-		(new CLabel(_('SSL verify host')))->setId('verify-host-label'),
+		(new CLabel(_('SSL verify host'), 'smtp_verify_host'))->setId('verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('smtp_verify_host'))
 				->setChecked($data['smtp_verify_host'])
