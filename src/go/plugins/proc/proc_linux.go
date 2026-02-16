@@ -276,13 +276,14 @@ func getUIDByName(userName string) (*uid, error) {
 	var pwd C.struct_passwd
 	var passwdC *C.struct_passwd
 
-	buf := make([]byte, 16384)
+	const bufSize = 16384
+	buf := make([]byte, bufSize)
 
 	//nolint:gocritic,nlreturn //false positive
 	errCode := C.getpwnam_r(
 		userNameC,
 		&pwd,
-		(*C.char)(unsafe.Pointer(&buf[0])),
+		(*C.char)(unsafe.Pointer(unsafe.SliceData(buf))),
 		C.size_t(len(buf)),
 		&passwdC,
 	)
