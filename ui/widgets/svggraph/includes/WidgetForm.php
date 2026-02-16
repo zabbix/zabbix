@@ -275,6 +275,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('percentile_left_value', null))
 					->setFlags(!$this->percentile_left_on ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(255)
 			)
 			->addField(
 				new CWidgetFieldCheckBox('percentile_right', _('Percentile line (right)'))
@@ -282,6 +283,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('percentile_right_value', null))
 					->setFlags(!$this->percentile_right_on ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(255)
 			);
 	}
 
@@ -429,6 +431,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldTextBox('problem_name', _('Problem')))
 					->setFlags(!$this->problems_on ? CWidgetField::FLAG_DISABLED : 0x00)
+					->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('evaltype', _('Problem tags'), [
