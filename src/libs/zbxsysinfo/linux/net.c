@@ -1218,6 +1218,38 @@ static void	get_link_flags(const char *interface, struct zbx_json *j)
 	close(sock);
 }
 
+static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
+{
+#define JSON_KEY_ADMIN_STATE	"administrative_state"
+	FILE	*f;
+	char	buf[MAX_STRING_LEN];
+	int	found = 0;
+
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/flags", if_name);
+
+	if (NULL != (f = fopen(buf, "r")))
+	{
+		if (NULL != fgets(buf, sizeof(buf), f))
+		{
+			char	*endptr;
+
+			unsigned int flags = (unsigned int)strtoul(buf, &endptr, 16);
+
+			if (0 != flags && errno != ERANGE && endptr != buf)
+			{
+				found = 1;
+				zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, ((flags & IFF_UP) != 0 ? "up" : "down"),
+						ZBX_JSON_TYPE_STRING);
+			}
+		}
+		zbx_fclose(f);
+	}
+
+	if (0 == found)
+		zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, "unknown", ZBX_JSON_TYPE_STRING);
+#undef JSON_KEY_ADMIN_STATE
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds network interface type to JSON                               *
@@ -1424,7 +1456,8 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
 		sys_class_net_str_add(if_name, "ifalias",  "ifalias", &jcfg, &jval);
 		sys_class_net_str_add(if_name, "address", "mac", &jcfg, &jval);
-		get_link_flags(if_name, &jcfg);
+		if_admin_state_add(if_name, &jcfg);
+		sys_class_net_str_add(if_name, "operstate", "operational_state", &jcfg, NULL);
 
 		if (ZBX_PROC_NET_DEV_COLS_NUM == num_filled)
 		{
