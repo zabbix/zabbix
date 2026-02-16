@@ -34,6 +34,7 @@ class CImportHelper {
 				$list[] = match ($type) {
 					'items' => $object['host'].NAME_DELIMITER.$object['key'],
 					'graphs' => $object['host'].NAME_DELIMITER.$object['name'],
+					'users' => $object['username'],
 					default => $object['name']
 				};
 			}
