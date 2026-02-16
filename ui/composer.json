@@ -4,6 +4,7 @@
 	"homepage": "https://www.zabbix.com",
 	"license": "GPL-2.0-or-later",
 	"require": {
+		"php": ">=7.2.5 <8.4",
 		"symfony/yaml": "v5.1.3",
 		"onelogin/php-saml": "^4.0"
 	}
