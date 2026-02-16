@@ -158,13 +158,12 @@ class CScatterPlot extends CSvg {
 		foreach ($metrics as $index => $metric) {
 			$this->metrics[$index] = [
 				'data_set' => $metric['data_set'],
-				'x_axis_name' => $metric['x_axis_items_name'],
-				'y_axis_name' => $metric['y_axis_items_name'],
-				'x_axis_items' => $metric['x_axis_items'],
-				'y_axis_items' => $metric['y_axis_items'],
+				'aggregation_name' => $metric['aggregation_name'],
+				'x_axis_items_name' => $metric['x_axis_items_name'],
+				'y_axis_items_name' => $metric['y_axis_items_name'],
 				'x_units' => $metric['x_units'],
 				'y_units' => $metric['y_units'],
-				'options' => ['order' => $index] + $metric['options']
+				'options' => $metric['options']
 			];
 
 			if (!array_key_exists('points', $metric) || !$metric['points']) {
@@ -184,7 +183,16 @@ class CScatterPlot extends CSvg {
 	 * @return self
 	 */
 	public function addHelper(): self {
-		$this->addItem((new CSvgLine(0, 0, 0, 0))->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER));
+		$this->addItem(
+			(new CSvgLine(0, 0, 0, 0))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER)
+				->addClass(CSvgTag::ZBX_STYLE_SCATTER_PLOT_VERTICAL_HELPER)
+		)
+		->addItem(
+			(new CSvgLine(0, 0, 0, 0))
+				->addClass(CSvgTag::ZBX_STYLE_GRAPH_HELPER)
+				->addClass(CSvgTag::ZBX_STYLE_SCATTER_PLOT_HORIZONTAL_HELPER)
+		);
 
 		return $this;
 	}
@@ -494,7 +502,10 @@ class CScatterPlot extends CSvg {
 		foreach ($this->metrics as $index => $metric) {
 			if (array_key_exists($index, $this->paths)) {
 				foreach ($this->paths[$index] as $key => $path) {
-					$this->addItem(new CScatterPlotMetricPoint($path, $metric + ['key' => $key]));
+					$this->addItem(new CScatterPlotMetricPoint($path, $metric + [
+						'order' => $index,
+						'key' => $key
+					]));
 				}
 			}
 		}

@@ -131,9 +131,9 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		for ($i = 0; $i < $count; $i += 3) {
 			$macro = [];
 			$row = $table->getRow($i);
-			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $row->query('xpath:./td[1]/z-textarea-flexible')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
-			$macro['description'] = $table->getRow($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['description'] = $table->getRow($i + 1)->query('tag:z-textarea-flexible')->one()->getValue();
 			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
 
 			$macros['frontend'][] = $macro;

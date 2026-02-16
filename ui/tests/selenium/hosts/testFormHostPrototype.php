@@ -122,7 +122,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$count = $rows->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
-			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/z-textarea-flexible/textarea')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
 			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
 			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';

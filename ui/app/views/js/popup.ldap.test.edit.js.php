@@ -21,69 +21,85 @@
 
 window.ldap_test_edit_popup = new class {
 
-	constructor() {
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
+	#overlay;
+	#dialogue;
+	#form;
+	#form_element;
+
+	init({rules}) {
+		this.#overlay = overlays_stack.getById('ldap_test_edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
+
+		this.#initEvents();
 	}
 
-	init() {
-		this.overlay = overlays_stack.getById('ldap_test_edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	#initEvents() {
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
 	}
 
-	submit() {
-		this.removePopupMessages();
-		this.overlay.setLoading();
+	#submit() {
+		this.#removePopupMessages();
+		this.#overlay.setLoading();
 
-		const fields = this.trimFields(getFormFields(this.form));
-		const curl = new Curl(this.form.getAttribute('action'));
+		const fields = this.#form.getAllValues();
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('provisioning' in response) {
-					this.appendProvisioning(document.getElementById('provisioning_role'), response.provisioning.role);
-					this.appendProvisioning(document.getElementById('provisioning_groups'), response.provisioning.groups);
-					this.appendProvisioning(document.getElementById('provisioning_medias'), response.provisioning.medias);
-				}
+		this.#form.validateSubmit(fields).then(result => {
+			if (!result) {
+				this.#overlay.unsetLoading();
 
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-				else if ('success' in response) {
-					const message_box = makeMessageBox('good', [], response.success.title, false, true)[0];
+				return;
+			}
 
-					this.form.parentNode.insertBefore(message_box, this.form);
-				}
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'popup.ldap.test.send');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
 			})
-			.catch((exception) => {
-				let title;
-				let messages = [];
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-				}
+					if ('form_errors' in response) {
+						this.#form.setErrors(response.form_errors, true, true);
+						this.#form.renderErrors();
 
-				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
+						return;
+					}
 
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+					if ('provisioning' in response) {
+						this.#appendProvisioning(document.getElementById('provisioning_role'),
+							response.provisioning.role
+						);
+						this.#appendProvisioning(document.getElementById('provisioning_groups'),
+							response.provisioning.groups
+						);
+						this.#appendProvisioning(document.getElementById('provisioning_medias'),
+							response.provisioning.medias
+						);
+					}
+
+					if ('success' in response) {
+						const message_box = makeMessageBox('good', [], response.success.title, false, true)[0];
+
+						this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
+					}
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.finally(() => {
+					this.#overlay.unsetLoading();
+				});
+		});
 	}
 
-	appendProvisioning(parent, names) {
+	#appendProvisioning(parent, names) {
 		let span;
 		parent.innerHTML = '';
 
@@ -104,17 +120,27 @@ window.ldap_test_edit_popup = new class {
 		}
 	}
 
-	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
+	#removePopupMessages() {
+		for (const element of this.#form_element.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
 			}
 		}
 	}
 
-	trimFields(fields) {
-		fields.test_username = fields.test_username.trim();
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-		return fields;
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 };

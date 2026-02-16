@@ -770,3 +770,13 @@ INSERT INTO hosts_groups (hostgroupid, hostid, groupid) VALUES (50025, 99015, 50
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, posts, headers) VALUES (158738, 99015, 50022, 0, 0, 'master.for.binary', 'master.for.binary', '1d', '90d', 0, '','', '', '', '');
 INSERT INTO items (itemid, hostid, interfaceid, type, value_type, name, key_, delay, history, status, params,query_fields, description, master_itemid, posts, headers) VALUES (158739, 99015, NULL, 18, 5, 'dependent.valuetype.binary', 'dependent.valuetype.binary', 0, 0, 0, '','', '', 158738, '', '');
 INSERT INTO history_bin (itemid, clock, value, ns) VALUES (158739, 1549350962, 'This should be binary', 594538048);
+
+-- test history binary value type
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers) VALUES (158741, 120005, 'item6', 18, 'item6', 5, '90d', 0, '133762', NULL, '','', '', '', '');
+INSERT INTO history_bin (itemid, clock, value, ns) VALUES
+(158741, 1549351002, 'aб', 164888032);
+
+-- test history json value type
+INSERT INTO items (itemid, hostid, name, type, key_, value_type, history, status, master_itemid, templateid, params,query_fields, description, posts, headers) VALUES (158742, 120005, 'item7', 2, 'item7', 6, '90d', 0, NULL, NULL, '','', '', '', '');
+INSERT INTO history_json (itemid, clock, value, ns) VALUES
+(158742, 1549351003, '{"nameж":"a"}', 354370019);

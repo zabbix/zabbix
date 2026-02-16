@@ -23,6 +23,7 @@ $form = (new CForm('post'))
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->addVar('advanced_form', $data['advanced_form'])
 	->addVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('oauth'))
+	->addVar('update', $data['update'])
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
@@ -33,8 +34,7 @@ $buttons = [
 		'title' => $data['update'] ? _('Update') : _('Add'),
 		'class' => 'js-add',
 		'keepOpen' => true,
-		'isSubmit' => true,
-		'action' => 'oauth_edit_popup.submit();'
+		'isSubmit' => true
 	]
 ];
 
@@ -116,20 +116,27 @@ $form_grid->addItem([
 
 if ($data['advanced_form']) {
 	$form->addItem(
-		new CTemplateTag('oauth-parameter-row-tmpl',
+		new CTemplateTag('oauth-parameter-row-tmpl', [
 			(new CRow([
 				(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CTextBox('#{input_name}_parameters[#{rowNum}][name]', '#{name}', false))
 					->setAttribute('style', 'width: 100%;')
+					->setAttribute('data-error-container', '#{input_name}-parameters-#{rowNum}-error-container')
 					->removeId(),
 				RARR(),
 				(new CTextBox('#{input_name}_parameters[#{rowNum}][value]', '#{value}', false))
 					->setAttribute('style', 'width: 100%;')
+					->setAttribute('data-error-container', '#{input_name}-parameters-#{rowNum}-error-container')
 					->removeId(),
 				(new CButtonLink(_('Remove')))
 					->addClass('element-table-remove')
-			]))->addClass('form_row')->addStyle('')
-		)
+			]))->addClass('form_row')->addStyle(''),
+			(new CRow([
+				(new CCol((new CDiv())
+					->setId('#{input_name}-parameters-#{rowNum}-error-container')))
+					->setColSpan(3)
+			]))->addClass('error-container-row')
+		])
 	);
 	$form_grid->addItem([
 		(new CLabel([
@@ -157,6 +164,8 @@ if ($data['advanced_form']) {
 							->addClass('element-table-add')
 						))->setColSpan(5)
 					)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'authorization_url_parameters')
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; vertical-align: top;')
@@ -209,6 +218,8 @@ if ($data['advanced_form']) {
 							->addClass('element-table-add')
 						))->setColSpan(5)
 					)
+					->setAttribute('data-field-type', 'set')
+					->setAttribute('data-field-name', 'token_url_parameters')
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px; vertical-align: top;')
@@ -223,6 +234,7 @@ else {
 $form_grid->addItem(
 	(new CScriptTag('
 		oauth_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'is_advanced_form' => $data['advanced_form'] == 1,
 			'messages' => [
 				'popup_closed' => _('Complete authentication to get tokens.'),

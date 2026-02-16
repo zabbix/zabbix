@@ -1,1 +1,0 @@
-A......... [ZBX-27236] improved performance of the event.get and problem.get methods when using the "suppressed" and "symptom" options (Sasha)

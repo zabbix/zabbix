@@ -15,9 +15,9 @@
 
 
 /**
- * Validate import data from Zabbix 3.0.x.
+ * Validate import data from Zabbix 3.2.x.
  */
-class C30XmlValidator extends CXmlValidatorGeneral {
+class C32ImportValidator extends CImportValidatorGeneral {
 
 	/**
 	 * Legacy screen resource types.
@@ -238,16 +238,28 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
 								'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+									'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+									'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
 									'status' =>					['type' => XML_STRING | XML_REQUIRED],
 									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 									'description' =>			['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'expression' =>				['type' => XML_STRING | XML_REQUIRED]
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]]
 								]]
@@ -310,6 +322,43 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 											'name' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]]
+								]]
+							]]
+						]]
+					]],
+					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
+						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'application' =>			['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+								'name' =>					['type' => XML_STRING]
+							]],
+							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
+							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
+							'agent' =>					['type' => XML_STRING | XML_REQUIRED],
+							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
+							'variables' =>				['type' => XML_STRING | XML_REQUIRED],
+							'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+							'status' =>					['type' => XML_STRING | XML_REQUIRED],
+							'authentication' =>			['type' => XML_STRING | XML_REQUIRED],
+							'http_user' =>				['type' => XML_STRING | XML_REQUIRED],
+							'http_password' =>			['type' => XML_STRING | XML_REQUIRED],
+							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_cert_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
+							'steps' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'posts' =>					['type' => XML_STRING | XML_REQUIRED],
+									'variables' =>				['type' => XML_STRING | XML_REQUIRED],
+									'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+									'follow_redirects' =>		['type' => XML_STRING | XML_REQUIRED],
+									'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+									'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
+									'required' =>				['type' => XML_STRING | XML_REQUIRED],
+									'status_codes' =>			['type' => XML_STRING | XML_REQUIRED]
 								]]
 							]]
 						]]
@@ -557,16 +606,28 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 							'trigger_prototypes' =>		['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'trigger_prototype', 'rules' => [
 								'trigger_prototype' =>		['type' => XML_ARRAY, 'rules' => [
 									'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+									'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+									'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+									'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+									'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
 									'name' =>					['type' => XML_STRING | XML_REQUIRED],
 									'url' =>					['type' => XML_STRING | XML_REQUIRED],
 									'status' =>					['type' => XML_STRING | XML_REQUIRED],
 									'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 									'description' =>			['type' => XML_STRING | XML_REQUIRED],
 									'type' =>					['type' => XML_STRING | XML_REQUIRED],
+									'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
 									'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 										'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 											'name' =>					['type' => XML_STRING | XML_REQUIRED],
-											'expression' =>				['type' => XML_STRING | XML_REQUIRED]
+											'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+											'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+										]]
+									]],
+									'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+										'tag' =>					['type' => XML_ARRAY, 'rules' => [
+											'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+											'value' =>					['type' => XML_STRING | XML_REQUIRED]
 										]]
 									]]
 								]]
@@ -633,6 +694,43 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 							]]
 						]]
 					]],
+					'httptests' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'httptest', 'rules' => [
+						'httptest' =>				['type' => XML_ARRAY, 'rules' => [
+							'name' =>					['type' => XML_STRING | XML_REQUIRED],
+							'application' =>			['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
+								'name' =>					['type' => XML_STRING]
+							]],
+							'delay' =>					['type' => XML_STRING | XML_REQUIRED],
+							'attempts' =>				['type' => XML_STRING | XML_REQUIRED],
+							'agent' =>					['type' => XML_STRING | XML_REQUIRED],
+							'http_proxy' =>				['type' => XML_STRING | XML_REQUIRED],
+							'variables' =>				['type' => XML_STRING | XML_REQUIRED],
+							'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+							'status' =>					['type' => XML_STRING | XML_REQUIRED],
+							'authentication' =>			['type' => XML_STRING | XML_REQUIRED],
+							'http_user' =>				['type' => XML_STRING | XML_REQUIRED],
+							'http_password' =>			['type' => XML_STRING | XML_REQUIRED],
+							'verify_peer' =>			['type' => XML_STRING | XML_REQUIRED],
+							'verify_host' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_cert_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_file' =>			['type' => XML_STRING | XML_REQUIRED],
+							'ssl_key_password' =>		['type' => XML_STRING | XML_REQUIRED],
+							'steps' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'step', 'rules' => [
+								'step' =>					['type' => XML_ARRAY, 'rules' => [
+									'name' =>					['type' => XML_STRING | XML_REQUIRED],
+									'url' =>					['type' => XML_STRING | XML_REQUIRED],
+									'posts' =>					['type' => XML_STRING | XML_REQUIRED],
+									'variables' =>				['type' => XML_STRING | XML_REQUIRED],
+									'headers' =>				['type' => XML_STRING | XML_REQUIRED],
+									'follow_redirects' =>		['type' => XML_STRING | XML_REQUIRED],
+									'retrieve_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+									'timeout' =>				['type' => XML_STRING | XML_REQUIRED],
+									'required' =>				['type' => XML_STRING | XML_REQUIRED],
+									'status_codes' =>			['type' => XML_STRING | XML_REQUIRED]
+								]]
+							]]
+						]]
+					]],
 					'macros' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'macro', 'rules' => [
 						'macro' =>				['type' => XML_ARRAY, 'rules' => [
 							'macro' =>				['type' => XML_STRING | XML_REQUIRED],
@@ -674,16 +772,28 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 			'triggers' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'trigger', 'rules' => [
 				'trigger' =>				['type' => XML_ARRAY, 'rules' => [
 					'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+					'recovery_mode' =>			['type' => XML_STRING | XML_REQUIRED],
+					'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED],
+					'correlation_mode' =>		['type' => XML_STRING | XML_REQUIRED],
+					'correlation_tag' =>		['type' => XML_STRING | XML_REQUIRED],
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
 					'url' =>					['type' => XML_STRING | XML_REQUIRED],
 					'status' =>					['type' => XML_STRING | XML_REQUIRED],
 					'priority' =>				['type' => XML_STRING | XML_REQUIRED],
 					'description' =>			['type' => XML_STRING | XML_REQUIRED],
 					'type' =>					['type' => XML_STRING | XML_REQUIRED],
+					'manual_close' =>			['type' => XML_STRING | XML_REQUIRED],
 					'dependencies' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'dependency', 'rules' => [
 						'dependency' =>				['type' => XML_ARRAY, 'rules' => [
 							'name' =>					['type' => XML_STRING | XML_REQUIRED],
-							'expression' =>				['type' => XML_STRING | XML_REQUIRED]
+							'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+							'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
+						]]
+					]],
+					'tags' =>					['type' => XML_INDEXED_ARRAY | XML_REQUIRED, 'prefix' => 'tag', 'rules' => [
+						'tag' =>					['type' => XML_ARRAY, 'rules' => [
+							'tag' =>					['type' => XML_STRING | XML_REQUIRED],
+							'value' =>					['type' => XML_STRING | XML_REQUIRED]
 						]]
 					]]
 				]]
@@ -821,7 +931,8 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 									'color' =>					['type' => XML_STRING | XML_REQUIRED],
 									'trigger' =>				['type' => XML_ARRAY | XML_REQUIRED, 'rules' => [
 										'description' =>			['type' => XML_STRING | XML_REQUIRED],
-										'expression' =>				['type' => XML_STRING | XML_REQUIRED]
+										'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+										'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
 									]]
 								]]
 							]]
@@ -898,26 +1009,27 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 			switch ($parent_data['elementtype']) {
 				case SYSMAP_ELEMENT_TYPE_HOST:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'host' =>			['type' => XML_STRING | XML_REQUIRED]
+						'host' =>					['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_MAP:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING | XML_REQUIRED]
+						'name' =>					['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_TRIGGER:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'description' =>	['type' => XML_STRING | XML_REQUIRED],
-						'expression' =>		['type' => XML_STRING | XML_REQUIRED]
+						'description' =>			['type' => XML_STRING | XML_REQUIRED],
+						'expression' =>				['type' => XML_STRING | XML_REQUIRED],
+						'recovery_expression' =>	['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
 
 				case SYSMAP_ELEMENT_TYPE_HOST_GROUP:
 					$rules = ['type' => XML_ARRAY, 'rules' => [
-						'name' =>			['type' => XML_STRING | XML_REQUIRED]
+						'name' =>					['type' => XML_STRING | XML_REQUIRED]
 					]];
 					break;
 
@@ -936,7 +1048,7 @@ class C30XmlValidator extends CXmlValidatorGeneral {
 	 *
 	 * @param string     $data         Import data.
 	 * @param array|null $parent_data  Data's parent array.
-	 * @param string     $path         XML path
+	 * @param string     $path         XML path.
 	 *
 	 * @return mixed
 	 */
