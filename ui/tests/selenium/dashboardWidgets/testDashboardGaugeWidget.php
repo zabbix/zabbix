@@ -224,7 +224,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			'Angle' => ['value' => '180°', 'enabled' => true, 'labels' => ['180°', '270°'], 'visible' => false],
 
 			// Description.
-			'id:description' => ['value' => '{ITEM.NAME}', 'maxlength' => 2048, 'enabled' => true, 'visible' => false],
+			'id:description' => ['value' => '{ITEM.NAME}', 'maxlength' => 65535, 'enabled' => true, 'visible' => false],
 			'id:desc_size' => ['value' => '15', 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:desc_v_pos' => ['value' => 'Bottom', 'enabled' => true, 'labels' => ['Top', 'Bottom'], 'visible' => false],
 			'id:desc_bold' => ['value' => false, 'enabled' => true, 'visible' => false],
