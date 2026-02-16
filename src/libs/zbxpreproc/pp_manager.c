@@ -1397,8 +1397,11 @@ void	*zbx_pp_manager_thread(void *args)
 			time_trim = sec;
 		}
 
-		if (!ZBX_IS_RUNNING() || (1 == shutdown && 0 == pending_num && 0 == processing_num))
+		if (SUCCEED != zbx_supervisor_is_running() ||
+				(1 == shutdown && 0 == pending_num && 0 == processing_num))
+		{
 			break;
+		}
 	}
 
 	zbx_dc_flush_history();

@@ -19,8 +19,11 @@
 #include "zbxtypes.h"
 #include "zbxserialize.h"
 #include "zbxipcservice.h"
+#include "zbxtypes_ext.h"
 
 #define SUPERVISOR_TIMEOUT	5
+
+static zbx_atomic_uint32_t	supervisor_unit_stop = 0;
 
 /******************************************************************************
  *                                                                            *
@@ -152,3 +155,17 @@ char	*supervisor_client_get_activities(void)
 
 	return (char *)message.data;
 }
+
+void	zbx_supervisor_stop_units(void)
+{
+	atomic_store(&supervisor_unit_stop, 1);
+}
+
+int	zbx_supervisor_is_running(void)
+{
+	if (0 == atomic_load(&supervisor_unit_stop))
+		return SUCCEED;
+
+	return FAIL;
+}
+

@@ -52,4 +52,7 @@ void	zbx_supervisor_worklog_clear(void);
 void	zbx_supervisor_update_activity(const char *fmt, ...);
 char	*zbx_supervisor_get_activities(void);
 
+void	zbx_supervisor_stop_units(void);
+int	zbx_supervisor_is_running(void);
+
 #endif

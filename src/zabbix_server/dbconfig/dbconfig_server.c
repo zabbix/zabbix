@@ -92,7 +92,7 @@ void	*zbx_dbconfig_thread(void *args)
 
 	zbx_supervisor_set_process_running(server_num);
 
-	while (ZBX_IS_RUNNING())
+	while (SUCCEED == zbx_supervisor_is_running())
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;

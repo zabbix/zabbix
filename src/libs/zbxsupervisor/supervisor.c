@@ -1057,6 +1057,10 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 		supervisor_handle_log(time_now);
 	}
 out:
+
+	if (ZBX_RUNLEVEL_DEFAULT != sv.runlevel || 0 != sv.states[sv.runlevel].pending_local_num)
+		zbx_supervisor_stop_units();
+
 	supervisor_clear(&sv);
 	zabbix_log(LOG_LEVEL_INFORMATION, "[%s #%d] stopped", get_process_type_string(process_type), process_num);
 
