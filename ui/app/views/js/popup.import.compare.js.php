@@ -53,7 +53,15 @@ window.popup_import_compare = new class {
 	}
 
 	#addEventListeners() {
-		this.#form.addEventListener('click', (e) => {
+		// Restore the default behavior of links, prevented by the hints' functionality.
+		this.#form.querySelector('.<?= ZBX_STYLE_TOC_LIST ?>')
+			.addEventListener('click', e => {
+				if (e.target.matches('a.<?= ZBX_STYLE_TOC_ITEM ?>')) {
+					location.href = e.target.href;
+				}
+			});
+
+		this.#form.addEventListener('click', e => {
 			if (e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')
 					|| e.target.parentNode.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>')) {
 				const btn = e.target.classList.contains('<?= ZBX_STYLE_TOC_ARROW ?>') ? e.target : e.target.parentNode;
