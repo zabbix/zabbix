@@ -39,13 +39,7 @@
 		const bindTagsTableEvents = ($panel) => {
 			const $table = $panel.find('.tags-table');
 
-			$table
-				.dynamicRows({template: '#tag-row-tmpl', allow_empty: true})
-				.on('afteradd.dynamicRows', () => {
-					$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
-				})
-				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-				.textareaFlexible();
+			$table.dynamicRows({template: '#tag-row-tmpl', allow_empty: true});
 			$table.on('click', '.element-table-disable', (e) => {
 				const row = e.target.closest('.form_row');
 
