@@ -1458,6 +1458,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if_type_add(if_name, &jval);
 		sys_class_net_uint_add(if_name, "carrier", "carrier", &jval);
+		sys_class_net_uint_add(if_name, "carrier_changes", "carrier_changes", &jval);
+		sys_class_net_uint_add(if_name, "carrier_up_count", "carrier_up_count", &jval);
+		sys_class_net_uint_add(if_name, "carrier_down_count", "carrier_down_count", &jval);
 		sys_class_net_uint_add(if_name, "speed", "speed", &jval);
 		sys_class_net_str_add(if_name, "duplex", "duplex", &jval, NULL);
 
