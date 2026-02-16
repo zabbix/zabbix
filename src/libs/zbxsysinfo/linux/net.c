@@ -1192,34 +1192,6 @@ int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
 
-static void	get_link_settings(const char *interface, struct zbx_json *j)
-{
-	int			sock;
-	struct ifreq		ifr;
-	struct ethtool_cmd	ecmd;
-
-	sock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (0 > sock)
-		return;
-
-	memset(&ifr, 0, sizeof(ifr));
-	memset(&ecmd, 0, sizeof(ecmd));
-
-	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ - 1);
-
-	ecmd.cmd = ETHTOOL_GSET;
-	ifr.ifr_data = (char *)&ecmd;
-
-	if (0 > ioctl(sock, SIOCETHTOOL, &ifr))
-	{
-		close(sock);
-		return;
-	}
-
-	zbx_json_addstring(j, "negotiation", ecmd.autoneg == AUTONEG_ENABLE ? "on" : "off", ZBX_JSON_TYPE_STRING);
-	close(sock);
-}
-
 static void	get_link_flags(const char *interface, struct zbx_json *j)
 {
 	int		sock;
@@ -1488,7 +1460,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		sys_class_net_uint_add(if_name, "carrier", "carrier", &jval);
 		sys_class_net_uint_add(if_name, "speed", "speed", &jval);
 		sys_class_net_str_add(if_name, "duplex", "duplex", &jval, NULL);
-		get_link_settings(if_name, &jval);
 
 		zbx_json_close(&jval);
 		zbx_json_close(&jcfg);
