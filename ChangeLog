@@ -1423,6 +1423,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.24rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.23
 
 7.0.23rc2 was released as 7.0.23 without any changes
