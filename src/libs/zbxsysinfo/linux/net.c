@@ -1192,77 +1192,6 @@ int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
 
-static void	get_wifi_info(const char *interface, struct zbx_json *j)
-{
-	struct	iwreq wreq;
-	struct	iw_statistics stats;
-	struct	iw_range range;
-	char	buffer[IW_ESSID_MAX_SIZE + 1];
-	int	sockfd, signal_level, link_quality, noise_level;
-	uint64_t	bitrate;
-
-	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
-	if (-1 == sockfd)
-		return;
-
-	memset(&wreq, 0, sizeof(struct iwreq));
-	zbx_strlcpy(wreq.ifr_name, interface, IFNAMSIZ);
-
-	wreq.u.data.pointer = (caddr_t)&stats;
-	wreq.u.data.length = sizeof(struct iw_statistics);
-	wreq.u.data.flags = 1;
-
-	if (ioctl(sockfd, SIOCGIWSTATS, &wreq) == 0)
-	{
-		memset(&range, 0, sizeof(struct iw_range));
-		wreq.u.data.pointer = (caddr_t)&range;
-		wreq.u.data.length = sizeof(struct iw_range);
-		wreq.u.data.flags = 0;
-
-		if (0 == ioctl(sockfd, SIOCGIWRANGE, &wreq))
-		{
-			if (0 != (stats.qual.updated & IW_QUAL_DBM))
-				signal_level = stats.qual.level - 256;
-			else
-				signal_level = stats.qual.level;
-
-			zbx_json_addint64(j, "signal_level", signal_level);
-
-			if (range.max_qual.qual != 0)
-				link_quality = (stats.qual.qual * 100) / range.max_qual.qual;
-			else
-				link_quality = stats.qual.qual;
-
-			zbx_json_addint64(j, "link_quality", link_quality);
-
-			if (0 != (stats.qual.updated & IW_QUAL_DBM))
-				noise_level = stats.qual.noise - 256;
-			else
-				noise_level = stats.qual.noise;
-
-			zbx_json_addint64(j, "noise_level", noise_level);
-		}
-	}
-
-	memset(buffer, 0, sizeof(buffer));
-	wreq.u.essid.pointer = buffer;
-	wreq.u.essid.length = IW_ESSID_MAX_SIZE;
-	wreq.u.essid.flags = 0;
-
-	if (0 == ioctl(sockfd, SIOCGIWESSID, &wreq))
-	{
-		zbx_json_addstring(j, "ssid", buffer, ZBX_JSON_TYPE_STRING);
-	}
-
-	if (0 == ioctl(sockfd, SIOCGIWRATE, &wreq))
-	{
-		bitrate = (uint64_t)wreq.u.bitrate.value / 1000000;
-		zbx_json_adduint64(j, "bitrate", bitrate);
-	}
-
-	close(sockfd);
-}
-
 static void	get_link_settings(const char *interface, struct zbx_json *j)
 {
 	int			sock;
@@ -1561,7 +1490,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		sys_class_net_str_add(if_name, "duplex", "duplex", &jval, NULL);
 		get_link_settings(if_name, &jval);
 
-		get_wifi_info(if_name, &jval);
 		zbx_json_close(&jval);
 		zbx_json_close(&jcfg);
 	}
