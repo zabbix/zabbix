@@ -296,6 +296,15 @@ window.service_edit_popup = new class {
 		this.#update();
 	}
 
+	#removeAllChildren() {
+		document.querySelector('#children tbody').innerHTML = '';
+
+		this.children.clear();
+		this.#updateChildrenFilterStats();
+		this.#updateTabIndicator();
+		this.#update();
+	}
+
 	#filterChildren() {
 		const container = document.querySelector('#children tbody');
 		const filter_name = document.getElementById('children-filter-name').value.toLowerCase();
@@ -395,6 +404,7 @@ window.service_edit_popup = new class {
 	#clone() {
 		this.serviceid = null;
 		this.form_element.querySelector('[name=serviceid]').remove();
+		this.#removeAllChildren();
 
 		const title = <?= json_encode(_('New service')) ?>;
 		const buttons = [
