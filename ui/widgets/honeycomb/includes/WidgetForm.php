@@ -124,6 +124,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault('{HOST.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->prefixLabel(_('Primary label'))
+					->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
@@ -148,7 +149,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('primary_label_units_show'))->setDefault(1)
 			)
 			->addField(
-				new CWidgetFieldTextBox('primary_label_units', _('Units'))
+				(new CWidgetFieldTextBox('primary_label_units', _('Units')))->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldSelect('primary_label_units_pos', _('Position'), [
@@ -173,6 +174,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault('{{ITEM.LASTVALUE}.fmtnum(2)}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->prefixLabel(_('Secondary label'))
+					->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
@@ -197,7 +199,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('secondary_label_units_show'))->setDefault(1)
 			)
 			->addField(
-				(new CWidgetFieldTextBox('secondary_label_units', _('Units')))
+				(new CWidgetFieldTextBox('secondary_label_units', _('Units')))->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldSelect('secondary_label_units_pos', _('Position'), [
