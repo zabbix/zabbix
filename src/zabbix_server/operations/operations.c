@@ -616,6 +616,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 		if (0 != d_ifs_agent.values_num)
 		{
 			if_idx = FAIL;
+
 			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_AGENT, if_ip, sizeof(if_ip)))
 			{
 				for (int i = 0; i < d_ifs_agent.values_num; i++)
@@ -645,6 +646,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 		if (0 != d_ifs_snmp.values_num)
 		{
 			if_idx = FAIL;
+
 			if ( FAIL != zbx_db_get_main_interface_ip(hostid, INTERFACE_TYPE_SNMP, if_ip, sizeof(if_ip)))
 			{
 				for (int i = 0; i < d_ifs_snmp.values_num; i++)

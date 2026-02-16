@@ -270,23 +270,23 @@ static void	discovery_separate_host(const zbx_uint64_t druleid, zbx_uint64_t dch
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s' value:'%s'", __func__, ip, ZBX_NULL2EMPTY_STR(value));
 
 	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
-
-	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select dserviceid"
 			" from dservices"
-			" where dhostid=");
-
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ZBX_FS_UI64, dhost->dhostid);
-	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and ip" ZBX_SQL_STRCMP, ZBX_SQL_STRVAL_NE(ip_esc));
+			" where dhostid=" ZBX_FS_UI64
+				" and ip" ZBX_SQL_STRCMP,
+			dhost->dhostid, ZBX_SQL_STRVAL_NE(ip_esc));
 
 	if (0 != dcheckid && NULL != value)
 	{
 		char	*value_esc;
 
 		value_esc = zbx_db_dyn_escape_field("dservices", "value", value);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and dcheckid=" ZBX_FS_UI64, dcheckid);
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " and value" ZBX_SQL_STRCMP,
-				ZBX_SQL_STRVAL_NE(value_esc));
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				" and dcheckid=" ZBX_FS_UI64
+				" and value" ZBX_SQL_STRCMP,
+				dcheckid, ZBX_SQL_STRVAL_NE(value_esc));
+
 		zbx_free(value_esc);
 	}
 
@@ -693,7 +693,7 @@ void	zbx_discovery_update_host_server(void *handle, zbx_uint64_t druleid, zbx_db
 		/* There is a chance that interfaces.values_num can be 0 if SQL error stops SQL queries from     */
 		/* executing during current SQL transaction. One known scenario is when discovery results are    */
 		/* being processed before dcheck removal from drules in database gets synced to server DB cache. */
-		if (0 < interfaces.values_num && FAIL != (status = discovery_get_host_status(ip, &interfaces)))
+		if (0 != interfaces.values_num && FAIL != (status = discovery_get_host_status(ip, &interfaces)))
 			discovery_update_host_status(dhost, status, (int)now, add_event_cb);
 
 		zbx_vector_discoverer_interface_ptr_clear_ext(&interfaces, discoverer_interface_free);
@@ -763,34 +763,21 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 			__func__, dhostid, ip, dserviceids->values_num, (zbx_fs_time_t)now);
 
 	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select dserviceid,status,lastup,lastdown,value"
+			" from dservices"
+			" where dhostid=" ZBX_FS_UI64
+				" and ip" ZBX_SQL_STRCMP,
+			dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
 
-	if (0 == dserviceids->values_num)
+	if (0 != dserviceids->values_num)
 	{
-		result = zbx_db_select(
-				"select dserviceid,status,lastup,lastdown,value"
-				" from dservices"
-				" where dhostid=" ZBX_FS_UI64
-					" and ip" ZBX_SQL_STRCMP,
-				dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
-	}
-	else
-	{
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select dserviceid,status,lastup,lastdown,value"
-				" from dservices"
-				" where dhostid=" ZBX_FS_UI64
-					" and ip" ZBX_SQL_STRCMP
-					" and not",
-				dhostid, ZBX_SQL_STRVAL_EQ(ip_esc));
-
+		zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and not");
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid",
 			dserviceids->values, dserviceids->values_num);
-
-		result = zbx_db_select("%s", sql);
-		zbx_free(sql);
 	}
 
-	zbx_free(ip_esc);
+	result = zbx_db_select("%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -806,6 +793,8 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 	}
 
 	zbx_db_free_result(result);
+	zbx_free(sql);
+	zbx_free(ip_esc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
