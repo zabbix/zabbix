@@ -207,15 +207,14 @@ zbx_dstatus_t;
 typedef enum
 {
 	ITEM_VALUE_TYPE_FLOAT = 0,
-	ITEM_VALUE_TYPE_STR = 1,
-	ITEM_VALUE_TYPE_LOG = 2,
-	ITEM_VALUE_TYPE_UINT64 = 3,
-	ITEM_VALUE_TYPE_TEXT = 4,
-	ITEM_VALUE_TYPE_BIN = 5,
-	ITEM_VALUE_TYPE_JSON = 6,
-	ITEM_VALUE_TYPE_COUNT = 7,	/* Counter value. */
-
-	ITEM_VALUE_TYPE_NONE = 7	/* Artificial value, not written into DB, used internally in server. */
+	ITEM_VALUE_TYPE_STR,
+	ITEM_VALUE_TYPE_LOG,
+	ITEM_VALUE_TYPE_UINT64,
+	ITEM_VALUE_TYPE_TEXT,
+	ITEM_VALUE_TYPE_BIN,
+	ITEM_VALUE_TYPE_JSON,	/* Last real value. In some places it is also used in size of array or */
+				/* upper bound for iteration. Do not forget to update when adding new types. */
+	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }
 zbx_item_value_type_t;
 const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type);

@@ -77,7 +77,7 @@ typedef struct
 }
 zbx_curlpage_t;
 
-static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_COUNT];
+static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_JSON + 1];
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {

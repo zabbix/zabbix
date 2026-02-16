@@ -29,7 +29,7 @@ void	zbx_dc_history_shallow_free(zbx_dc_history_t *dc_history)
 	zbx_free(dc_history);
 }
 
-zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_COUNT];
+zbx_history_iface_t	history_ifaces[ITEM_VALUE_TYPE_JSON + 1];
 
 /************************************************************************************
  *                                                                                  *
@@ -47,7 +47,7 @@ int	zbx_history_init(const char *config_history_storage_url, const char *config_
 
 	const char	*opts[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
 
-	for (int i = ITEM_VALUE_TYPE_FLOAT; i < ITEM_VALUE_TYPE_COUNT; i++)
+	for (int i = ITEM_VALUE_TYPE_FLOAT; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 
 		if (NULL == config_history_storage_url || NULL == strstr(config_history_storage_opts, opts[i]))
@@ -86,7 +86,7 @@ void	zbx_history_destroy(void)
 {
 	int	i;
 
-	for (i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
+	for (i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -117,7 +117,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
@@ -125,7 +125,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, int *ret_
 			flags |= (1 << i);
 	}
 
-	for (int i = 0; i < ITEM_VALUE_TYPE_COUNT; i++)
+	for (int i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		zbx_history_iface_t	*writer = &history_ifaces[i];
 
