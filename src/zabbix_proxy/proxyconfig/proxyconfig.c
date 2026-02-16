@@ -36,7 +36,7 @@
 #include "zbxjson.h"
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
-		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)
+		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args, zbx_ipc_async_socket_t *rtc)
 {
 	zbx_socket_t			sock;
 	struct	zbx_json_parse		jp, jp_kvs_paths = {0};
@@ -138,7 +138,7 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		{
 			zbx_dc_sync_kvs_paths(&jp_kvs_paths, args->config_vault, args->config_source_ip,
 					args->config_ssl_ca_location, args->config_ssl_cert_location,
-					args->config_ssl_key_location);
+					args->config_ssl_key_location, rtc);
 		}
 
 		zbx_dc_update_interfaces_availability();
@@ -247,7 +247,8 @@ fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() removed:%d", __func__, removed_num);
 }
 
-static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyconfig_args_in)
+static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyconfig_args_in,
+			zbx_ipc_async_socket_t *rtc)
 {
 	zbx_config_t	cfg;
 
@@ -258,7 +259,7 @@ static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyco
 
 	zbx_dc_sync_kvs_paths(NULL, proxyconfig_args_in->config_vault, proxyconfig_args_in->config_source_ip,
 			proxyconfig_args_in->config_ssl_ca_location, proxyconfig_args_in->config_ssl_cert_location,
-			proxyconfig_args_in->config_ssl_key_location);
+			proxyconfig_args_in->config_ssl_key_location, rtc);
 }
 
 /******************************************************************************
@@ -302,7 +303,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
-	proxyconfig_update_vault_macros(proxyconfig_args_in);
+	proxyconfig_update_vault_macros(proxyconfig_args_in, &rtc);
 	zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
 			get_process_type_string(process_type), &rtc);
 
@@ -316,7 +317,10 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
+
+			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
+				zbx_vault_update_token(rtc_data);
+			else if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 				config_cache_reload = 1;
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				goto stop;
@@ -339,7 +343,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 
-				proxyconfig_update_vault_macros(proxyconfig_args_in);
+				proxyconfig_update_vault_macros(proxyconfig_args_in, &rtc);
 				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
 					ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
 
@@ -362,8 +366,8 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 		zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-		process_configuration_sync(&data_size, &synced, info, proxyconfig_args_in);
-		proxyconfig_update_vault_macros(proxyconfig_args_in);
+		process_configuration_sync(&data_size, &synced, info, proxyconfig_args_in, &rtc);
+		proxyconfig_update_vault_macros(proxyconfig_args_in, &rtc);
 
 		interval = zbx_time() - sec;
 

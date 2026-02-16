@@ -21,14 +21,17 @@
 int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, const char *path, long timeout, zbx_hashset_t *kvs, char **error);
+		const char *config_ssl_key_location, const char *path, long timeout, zbx_hashset_t *kvs,
+		void *rtc, char **error);
 
 void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout);
 
-void	zbx_vault_update_token_hashicorp(const zbx_config_vault_t *config_vault, const unsigned char *token,
+int	zbx_vault_relogin_hashicorp(const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location);
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **token, char **error);
+
+void	zbx_vault_update_token_hashicorp(char *token);
 
 #endif

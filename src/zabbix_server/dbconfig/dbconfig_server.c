@@ -70,7 +70,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
-			dbconfig_args_in->config_ssl_key_location);
+			dbconfig_args_in->config_ssl_key_location, &rtc);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec),
 			dbconfig_args_in->config_confsyncer_frequency);
@@ -90,8 +90,9 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
-				zbx_vault_update_token(NULL, rtc_data, NULL, NULL, NULL, NULL);
-			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
+				zbx_vault_update_token(rtc_data);
+
+			else if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 			{
 				if (0 == cache_reload)
 				{
@@ -143,7 +144,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location);
+					dbconfig_args_in->config_ssl_key_location, &rtc);
 
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
@@ -166,7 +167,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location);
+					dbconfig_args_in->config_ssl_key_location, &rtc);
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}

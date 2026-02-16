@@ -80,7 +80,7 @@ static void	key_path_free(zbx_keys_path_t *keys_path)
 static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, struct zbx_json *j,
 		const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, zbx_ipc_async_socket_t *rtc)
 {
 	zbx_kvs_t	kvs;
 
@@ -97,7 +97,8 @@ static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, stru
 		zbx_hashset_iter_t	iter;
 
 		if (FAIL == zbx_vault_get_kvs(keys_path->path, &kvs, config_vault, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, (void *)rtc,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
 			zbx_free(error);
@@ -1452,7 +1453,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		if (ZBX_PROXY_SECRETS_PROVIDER_SERVER == proxy_secrets_provider)
 		{
 			get_macro_secrets(&keys_paths, j, config_vault, config_source_ip, config_ssl_ca_location,
-					config_ssl_cert_location, config_ssl_key_location);
+					config_ssl_cert_location, config_ssl_key_location, NULL);
 		}
 	}
 
