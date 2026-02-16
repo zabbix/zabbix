@@ -77,7 +77,7 @@ class testPageUsers extends CLegacyWebTest {
 		$sqlHashMedia = 'select * from media where userid='.$userid.' order by mediaid';
 		$oldHashMedia = CDBHelper::getHash($sqlHashMedia);
 
-		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$this->page->login()->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of users');
 		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
 		$this->zbxTestTextPresent($alias);
