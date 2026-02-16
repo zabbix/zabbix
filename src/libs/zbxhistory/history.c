@@ -1418,6 +1418,74 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks if a database entry represents a history storage database  *
+ *                                                                            *
+ * Parameters: jp       - [IN] JSON object containing database information    *
+ *             info     - [IN] history provoder information                   *
+ *             info_num - [IN] number of history providers                    *
+ *                                                                            *
+ ******************************************************************************/
+static int	history_dbversion_is_history(zbx_json_parse_t *jp,zbx_history_provider_info_t *info, int info_num)
+{
+	char	dbname[MAX_STRING_LEN];
+
+	if (SUCCEED == zbx_json_value_by_name(jp, "database", dbname, sizeof(dbname), NULL))
+	{
+		for (int i = 0; i < info_num; i++)
+		{
+			if (0 == strcmp(dbname, info[i].database))
+				return SUCCEED;
+		}
+	}
+
+	return FAIL;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies database version status entries to JSON, excluding history *
+ *          provider databases                                                *
+ *                                                                            *
+ * Parameters: j        - [IN/OUT] output JSON object for filtered entries    *
+ *             info     - [IN] history provoder information                   *
+ *             info_num - [IN] number of history providers                    *
+ *                                                                            *
+ ******************************************************************************/
+static void	history_copy_dbversion_status(struct zbx_json *j, zbx_history_provider_info_t *info, int info_num)
+{
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+	zbx_json_parse_t	jp, jp_db;
+	char			*str = NULL;
+	size_t			str_alloc = 0, str_offset;
+
+	result = zbx_db_select("select value_str from settings where name='dbversion_status'");
+
+	if (NULL == (row = zbx_db_fetch(result)))
+		goto out;
+
+	if (SUCCEED != zbx_json_open(row[0], &jp))
+		goto out;
+
+	for (const char *p = zbx_json_next(&jp, NULL); NULL != p; p = zbx_json_next(&jp, p))
+	{
+		if (SUCCEED != zbx_json_brackets_open(p, &jp_db))
+			continue;
+
+		if (SUCCEED == history_dbversion_is_history(&jp_db, info, info_num))
+			continue;
+
+		str_offset = 0;
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, jp_db.start, jp_db.end - jp_db.start + 1);
+		zbx_json_addraw(j, NULL, str);
+	}
+out:
+	zbx_db_free_result(result);
+	zbx_free(str);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: relays the version retrieval logic to the history implementation  *
  *          functions                                                         *
  *                                                                            *
@@ -1437,6 +1505,8 @@ int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned
 	}
 
 	zbx_json_initarray(&json, 1024);
+
+	history_copy_dbversion_status(&json, info, info_num);
 
 	for (int i = 0; i < info_num; i++)
 	{
@@ -1461,8 +1531,7 @@ int	zbx_history_check_version(int config_allow_unsupported_db_versions, unsigned
 
 	zbx_free(info);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "History providers: %s", json.buffer);
-	(void)zbx_db_settings_set_value("dbversion_history_status", json.buffer, ZBX_SETTING_TYPE_STR);
+	(void)zbx_db_settings_set_value("dbversion_status", json.buffer, ZBX_SETTING_TYPE_STR);
 
 	zbx_json_free(&json);
 

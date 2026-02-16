@@ -56,7 +56,6 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"db_extension",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	/* dbversion_status is used only directly */
 	{"dbversion_status",		ZBX_SETTING_TYPE_STR, 		0,			""},
-	{"dbversion_history_status",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	{"default_inventory_mode",	ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"-1"},
 	{"default_lang",		ZBX_SETTING_TYPE_STR, 		0,			"en_US"},
 	{"default_theme",		ZBX_SETTING_TYPE_STR, 		0,			"blue-theme"},
@@ -496,7 +495,7 @@ static void	update_hk_history_overrides(const char *history_status)
 
 	if (SUCCEED != zbx_json_open(history_status, &jp))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot parse dbversion_history_status");
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot parse dbversion_status");
 		return;
 	}
 
@@ -688,7 +687,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 		config->config->hk.history_mode = value_int;
 	}
 
-	if (0 == found && SUCCEED == setting_get_str(values, "dbversion_history_status", defaults_log_level,
+	if (0 == found && SUCCEED == setting_get_str(values, "dbversion_status", defaults_log_level,
 			&value_str))
 	{
 		update_hk_history_overrides(value_str);
