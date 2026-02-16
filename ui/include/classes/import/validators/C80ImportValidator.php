@@ -17,7 +17,7 @@
 /**
  * Validate import data from Zabbix 8.0.x.
  */
-class C80XmlValidator extends CXmlValidatorGeneral {
+class C80ImportValidator extends CImportValidatorGeneral {
 
 	private $PREPROCESSING_STEP_TYPE = [
 		CXmlConstantValue::MULTIPLIER => CXmlConstantName::MULTIPLIER,
@@ -384,7 +384,8 @@ class C80XmlValidator extends CXmlValidatorGeneral {
 		CXmlConstantValue::LOG => CXmlConstantName::LOG,
 		CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED,
 		CXmlConstantValue::TEXT => CXmlConstantName::TEXT,
-		CXmlConstantValue::BINARY => CXmlConstantName::BINARY
+		CXmlConstantValue::BINARY => CXmlConstantName::BINARY,
+		CXmlConstantValue::VALUE_TYPE_JSON => CXmlConstantName::JSON
 	];
 
 	private $TRIGGER_PRIORITY = [

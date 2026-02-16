@@ -1448,7 +1448,9 @@ class GraphDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const names = ['source', 'simple_triggers', 'working_time', 'percentile_left', 'percentile_right'];
+		const names = ['source', 'simple_triggers', 'working_time', 'show_hostnames', 'percentile_left',
+			'percentile_right'
+		];
 
 		for (const name of names) {
 			const elem = document.querySelector("[name='" + name + "']:checked");
@@ -1928,7 +1930,7 @@ class ScatterPlotDisplayOptionsTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		const names = ['source'];
+		const names = ['source', 'show_hostnames'];
 
 		for (const name of names) {
 			const elem = document.querySelector("[name='" + name + "']:checked");
