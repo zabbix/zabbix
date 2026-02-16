@@ -2332,7 +2332,7 @@ button {
   margin-top: 4px;
   white-space: break-spaces;
   word-break: break-word;
-  line-height: 17px;
+  line-height: 1.4em;
   color: #cc0000; }
 
 z-select.has-error button.focusable:active,
