@@ -80,6 +80,10 @@ pre {
 	}
 }
 
+.trimmed-content::after {
+	content: '\2026';
+}
+
 a {
 	color: $link-color;
 	text-decoration: none;

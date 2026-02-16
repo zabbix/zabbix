@@ -158,7 +158,7 @@ function cleanPreviousTestResults() {
 function itemGetValueTest(overlay) {
 	var $body = overlay.$dialogue.$body,
 		$form = overlay.$dialogue.find('form'),
-		form_data = $form.serializeJSON(),
+		form_data = getFormFields($form[0]),
 		post_data = getItemTestProperties('#preprocessing-test-form'),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		url = new Curl('zabbix.php');
@@ -254,7 +254,7 @@ function itemGetValueTest(overlay) {
 function itemCompleteTest(overlay) {
 	const $body = overlay.$dialogue.$body;
 	const $form = overlay.$dialogue.find('form');
-	const form_data = $form.serializeJSON();
+	const form_data = getFormFields($form[0]);
 	let post_data = getItemTestProperties('#preprocessing-test-form');
 	const interface = (form_data['interface'] !== undefined) ? form_data['interface'] : null;
 	const url = new Curl('zabbix.php');
@@ -511,7 +511,7 @@ function saveItemTestInputs() {
 			not_supported: jQuery('[name="not_supported"]').is(':checked') ? 1 : 0,
 			eol: jQuery('#eol').find(':checked').val()
 		},
-		form_data = $form.serializeJSON(),
+		form_data = getFormFields($form[0]),
 		interface = (typeof form_data['interface'] !== 'undefined') ? form_data['interface'] : null,
 		macros = {};
 
@@ -737,6 +737,4 @@ jQuery(document).ready(function($) {
 			itemGetValueTest(overlays_stack.getById('item-test'));
 		});
 	<?php endif ?>
-
-	$('#preprocessing-test-form .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 });

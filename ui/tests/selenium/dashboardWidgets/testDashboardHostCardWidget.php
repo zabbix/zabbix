@@ -1308,9 +1308,9 @@ class testDashboardHostCardWidget extends testWidgets {
 			$icon = $host_selector->query('class:zi-wrench-alt-small')->one();
 			$this->assertTrue($icon->isVisible());
 			$icon->waitUntilClickable()->click();
-			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->getText();
+			$dialog_text =  $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->getText();
 			$this->assertEquals($data['Maintenance']['Name']."\n".$data['Maintenance']['Description'], $dialog_text);
-			$this->query('xpath://div[@class="overlay-dialogue wordbreak"]/button[@title="Close"]')->one()->click();
+			$this->query('xpath://div[contains(@class, "hintbox-static")]//button[@title="Close"]')->one()->click();
 		}
 
 		if (array_key_exists('Severity', $data)) {
@@ -1330,7 +1330,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 			foreach ($availabilities as $availability) {
 				$availability->click();
-				$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+				$dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
 						->waitUntilPresent()->one();
 				$this->assertTrue($dialog->isVisible());
 				$dialog->close();

@@ -453,4 +453,52 @@ db data:
   - [1484035210, 0, '🌭🌭']
   - [1484035209, 500000000, 'YQo=']
   - [1484035209, 0, '🌭Cg==']
+---
+test case: Test JSON value type empty
+in:
+    itemid: 28244
+    value type: ITEM_VALUE_TYPE_JSON
+    seconds: 10
+    count: 10
+    end: 2017-01-10 09:00:00.000000000 +02:00
+out:
+  values: []
+db data:
+  history_json: []
+---
+test case: Test JSON value type empty object
+in:
+    itemid: 28244
+    value type: ITEM_VALUE_TYPE_JSON
+    seconds: 10
+    count: 10
+    end: 2017-01-10 10:00:00.000000000 +02:00
+out:
+  values:
+  - value: '{}'
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+db data:
+  history_json:
+  - [1484035210, 500000000, '{}']
+---
+test case: Test JSON value type several values
+in:
+    itemid: 28244
+    value type: ITEM_VALUE_TYPE_JSON
+    seconds: 10
+    count: 10
+    end: 2017-01-10 10:00:10.000000000 +02:00
+out:
+  values:
+  - value: '{ "face": "😐" }'
+    ts: 2017-01-10 10:00:10.500000000 +02:00
+  - value: '["alpha", 1, 0.1]'
+    ts: 2017-01-10 10:00:10.000000000 +02:00
+  - value: '" "'
+    ts: 2017-01-10 10:00:09.500000000 +02:00
+db data:
+  history_json:
+  - [1484035210, 500000000, '{ "face": "😐" }']
+  - [1484035210, 0, '["alpha", 1, 0.1]']
+  - [1484035209, 500000000, '" "']
 ...

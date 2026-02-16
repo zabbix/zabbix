@@ -63,10 +63,20 @@ class CSvgGraphHelper {
 	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
 		$errors = [];
+		$show_hostnames = $options['displaying']['show_hostnames'] != SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE;
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
-		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
-		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
+		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid'],
+			$show_hostnames
+		);
+		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid'],
+			$show_hostnames
+		);
+
+		if ($options['displaying']['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
+			$show_hostnames = self::hasMetricsMultipleHosts($metrics);
+		}
+
 		CGraphHelper::calculateMetricsDelay($metrics);
 		self::sortByDataset($metrics);
 		// Apply overrides for previously selected $metrics.
@@ -79,11 +89,14 @@ class CSvgGraphHelper {
 		// Find what data source (history or trends) will be used for each metric.
 		self::getGraphDataSource($metrics, $errors, $options['data_source'], $width);
 		// Load Data for each metric.
-		self::getMetricsData($metrics, $width);
+		self::getMetricsData($metrics, $width, $show_hostnames);
 		// Additional data processing for items with the preprocessing step "Discard unchanged".
 		self::populateValuesBetweenHeartbeats($metrics, $width);
 		// Load aggregated Data for each dataset.
-		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'], $options['legend']['show_aggregation']);
+		self::getMetricsAggregatedData($metrics, $width, $options['data_sets'], $options['legend']['show_aggregation'],
+			$show_hostnames
+		);
+		self::setMetricsItemidsForBroadcasting($metrics);
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
@@ -109,9 +122,22 @@ class CSvgGraphHelper {
 		// Add mouse following helper line.
 		$graph->addHelper();
 
+		$first_metric_to_broadcast = null;
+
+		if ($metrics) {
+			$metric = reset($metrics);
+
+			$first_metric_to_broadcast = [
+				'itemid' => $metric['itemid'],
+				'itemids' => $metric['itemids'],
+				'ds' => $metric['data_set']
+			];
+		}
+
 		return [
 			'svg' => $graph,
 			'legend' => $legend ?? '',
+			'first_metric_to_broadcast' => $first_metric_to_broadcast,
 			'data' => [
 				'dims' => [
 					'x' => $graph->getCanvasX(),
@@ -129,7 +155,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getMetricsPattern(array &$metrics, array $data_sets, string $templateid,
-			string $override_hostid): void {
+			string $override_hostid, bool $show_hostnames): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
@@ -159,7 +185,7 @@ class CSvgGraphHelper {
 					'value_type'
 				],
 				'selectPreprocessing' => ['type', 'params'],
-				'selectHosts' => ['name'],
+				'selectHosts' => $show_hostnames ? ['name'] : null,
 				'webitems' => true,
 				'evaltype' => $data_set['item_tags_evaltype'],
 				'tags' => $data_set['item_tags'] ?: null,
@@ -249,7 +275,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getMetricsItems(array &$metrics, array $data_sets, string $templateid,
-			string $override_hostid): void {
+			string $override_hostid, int $show_hostnames): void {
 		$max_metrics = SVG_GRAPH_MAX_NUMBER_OF_METRICS;
 
 		foreach ($data_sets as $index => $data_set) {
@@ -323,7 +349,7 @@ class CSvgGraphHelper {
 					$resolve_macros ? 'name_resolved' : 'name', 'history', 'trends', 'units', 'value_type'
 				],
 				'selectPreprocessing' => ['type', 'params'],
-				'selectHosts' => ['name'],
+				'selectHosts' => $show_hostnames ? ['name'] : null,
 				'webitems' => true,
 				'filter' => [
 					'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -367,6 +393,23 @@ class CSvgGraphHelper {
 			}
 		}
 	}
+
+	private static function hasMetricsMultipleHosts(array $metrics): bool {
+		$unique_hosts = [];
+
+		foreach ($metrics as $metric) {
+			if (!array_key_exists($metric['hostid'], $unique_hosts)) {
+				$unique_hosts[$metric['hostid']] = true;
+
+				if (count($unique_hosts) > 1) {
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
 
 	private static function sortByDataset(array &$metrics): void {
 		usort($metrics, static function(array $a, array $b): int {
@@ -664,7 +707,7 @@ class CSvgGraphHelper {
 	/**
 	 * Select data to show in graph for each metric.
 	 */
-	private static function getMetricsData(array &$metrics, int $width): void {
+	private static function getMetricsData(array &$metrics, int $width, bool $show_hostname): void {
 		// To reduce number of requests, group metrics by time range.
 		$tr_groups = [];
 
@@ -673,7 +716,9 @@ class CSvgGraphHelper {
 				continue;
 			}
 
-			$metric['name'] = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+			$metric['name'] = $show_hostname
+				? $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name']
+				: $metric['name'];
 			$metric['points'] = [];
 
 			$key = $metric['time_period']['time_from'].$metric['time_period']['time_to'];
@@ -793,7 +838,7 @@ class CSvgGraphHelper {
 	 * Select aggregated data to show in graph for each metric.
 	 */
 	private static function getMetricsAggregatedData(array &$metrics, int $width, array $data_sets,
-			bool $legend_aggregation_show): void {
+			bool $legend_aggregation_show, bool $show_hostnames): void {
 		$dataset_metrics = [];
 
 		foreach ($metrics as $metric_num => &$metric) {
@@ -804,12 +849,13 @@ class CSvgGraphHelper {
 			$dataset_num = $metric['data_set'];
 
 			if ($metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_ITEM) {
+				$name = $show_hostnames
+					? $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name']
+					: $metric['name'];
+
 				if ($legend_aggregation_show) {
 					$name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']).
-						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
-				}
-				else {
-					$name = $metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'];
+						'('.$name.')';
 				}
 			}
 			else {
@@ -1198,5 +1244,13 @@ class CSvgGraphHelper {
 	 */
 	private static function processPattern(array $patterns): ?array {
 		return in_array('*', $patterns, true) ? null : $patterns;
+	}
+
+	private static function setMetricsItemidsForBroadcasting(array &$metrics): void {
+		foreach ($metrics as &$metric) {
+			$metric['itemids'] = $metric['options']['aggregate_grouping'] == GRAPH_AGGREGATE_BY_DATASET
+				? array_column($metric['items'], 'itemid')
+				: [$metric['itemid']];
+		}
 	}
 }
