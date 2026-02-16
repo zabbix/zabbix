@@ -273,6 +273,22 @@ static void	proxyconfig_update_vault_macros(zbx_thread_proxyconfig_args *proxyco
 			proxyconfig_args_in->config_ssl_key_location);
 }
 
+static void	proxyconfig_prof_enable(const unsigned char *data)
+{
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
+	char	*error = NULL;
+
+	if (SUCCEED != zbx_rtc_get_command_target((const char *)data, &pid, &proc_type, &proc_num, &scope, &error))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("cannot get rtc target: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_prof_enable(scope);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: periodically request config data                                  *
@@ -343,10 +359,20 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
-				config_cache_reload = 1;
-			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				goto stop;
+			switch (rtc_cmd)
+			{
+				case ZBX_RTC_CONFIG_CACHE_RELOAD:
+					config_cache_reload = 1;
+					break;
+				case ZBX_RTC_PROF_ENABLE:
+					proxyconfig_prof_enable(rtc_data);
+					break;
+				case ZBX_RTC_PROF_DISABLE:
+					zbx_prof_disable();
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					goto stop;
+			}
 
 			sleeptime = 0;
 		}
