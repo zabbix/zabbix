@@ -470,6 +470,9 @@ static int	DBpatch_7000030(void)
 			" where it.itemid=i.itemid and it.tag=t.tag"
 		")");
 
+	if (NULL == result)
+		return FAIL;
+
 	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 
 	while (NULL != (row = zbx_db_fetch(result)))
