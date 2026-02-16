@@ -1,6 +1,10 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F.I..... [ZBXNEXT-4769] implemented Graph widget and Scatter plot improvements (dfofanovs)
+A.F....PS. [ZBXNEXT-10069] added support for new JSON item value type (arimdjonoks, gcalenko, kkuzmina)
+..F....... [ZBXNEXT-9748] implemented inline validation for user, profile and notifications forms (gberzina)
+A.F.I..... [ZBXNEXT-10387] removed support of massupdate method for host, template, hostgroup and templategroup API objects; removed support for hostinterface.replacehostinterfaces method (arimdjonoks, jfreibergs, vmaksimovs)
 ..F....... [ZBXNEXT-9744] added inline validation for media type form (gberzina)
 .........T [ZBXNEXT-10335] added GCP Cloud Run Service by HTTP template (egordymov)
 ..F....... [ZBXNEXT-10301] simplified user experience when editing problem filter tags by removing extra radio buttons and making an empty tags list equivalent to "All tags" (Ivo)
@@ -32,6 +36,7 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+..F....... [ZBX-27508] fixed inline validation rules for item and item prototype forms (gberzina)
 .......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 .......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
 ...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)
@@ -152,6 +157,24 @@ A.F....... [ZBXNEXT-9816] added ability to convert to JSON for discovery rule wi
 Bug fixes:
 ..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (averza)
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.8rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.7
+
+7.4.7rc3 was released as 7.4.7 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.7rc3
+
+Bug fixes:
+..F....... [ZBX-27508] fixed inline validation rules for item and item prototype forms (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.7rc2
@@ -1405,6 +1428,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.23
+
+7.0.23rc2 was released as 7.0.23 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23rc2
@@ -5341,6 +5376,11 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.44
+
+6.0.44rc1 was released as 6.0.44 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44rc1

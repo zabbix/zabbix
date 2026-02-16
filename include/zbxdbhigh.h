@@ -114,6 +114,8 @@
 /* Binary item type can only be as a dependent item. */
 #define ZBX_HISTORY_BIN_VALUE_LEN		(ZBX_MEBIBYTE * 16)
 
+#define ZBX_HISTORY_JSON_VALUE_LEN		(ZBX_MEBIBYTE * 127)
+
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
 

@@ -1721,7 +1721,7 @@ class testDashboardProblemsBySeverityWidget extends testWidgets {
 		else {
 			$widget->query('xpath:.//div[@class="average-bg"]//a[@data-hintbox-static="1"]')->one()->click();
 		}
-		$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]//table')->asTable()->one();
+		$popup = $this->query('xpath://div[contains(@class, "hintbox-static")]//table')->asTable()->one();
 		$this->assertEquals($rows_count, $popup->getRows()->count());
 
 		$row = $popup->findRow('Problem', $expected_popup['fields']['Problem'])->asTableRow();

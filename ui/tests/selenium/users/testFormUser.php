@@ -277,7 +277,7 @@ class testFormUser extends CWebTest {
 			}
 
 			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilReady();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilReady();
 			$help_message = "Password requirements:\n".
 					"must be at least 8 characters long\n".
 					"must not contain user's name, surname or username\n".
@@ -294,7 +294,7 @@ class testFormUser extends CWebTest {
 		// Check hintbox contains correct text message.
 		foreach ($data['hintbox_warning'] as $field => $text) {
 			$form->getField($field)->query('xpath:./..//button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->close();
 		}

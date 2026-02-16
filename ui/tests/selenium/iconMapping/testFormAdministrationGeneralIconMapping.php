@@ -888,17 +888,21 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->page->login()->open('zabbix.php?action=iconmap.list');
+		$this->page->login()->open('zabbix.php?action=iconmap.list')->waitUntilReady();
 
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 2') as $iconmap) {
 			$new_name = $iconmap['name'].' (cloned)';
 			$this->query('link', $iconmap['name'])->waitUntilClickable()->one()->click();
+			// TODO: remove redundant page->waitUntilReady after ZBX-27065 is fixed.
+			$this->page->waitUntilReady();
 			$form = $this->query('id:iconmap')->waitUntilVisible()->asForm()->one();
 			$form->fill(['Name' => $new_name]);
 			$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
+			$this->page->waitUntilReady();
 			$form->waitUntilReloaded();
 			$form->checkValue(['Name' => $new_name]);
 			$form->query('button:Cancel')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
+			$this->page->waitUntilReady();
 
 			// Check the results in frontend.
 			$this->page->assertTitle('Configuration of icon mapping');

@@ -547,37 +547,37 @@ class testFormUserProfile extends CLegacyWebTest {
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test',
-				'period' => ' ',
+				'When active' => ' ',
 				'error_msg' => ['When active' => 'This field cannot be empty.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
-				'period' => '0-0,00:00-00:00',
+				'When active' => '0-0,00:00-00:00',
 				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
-				'period' => '1-11,00:00-24:00',
+				'When active' => '1-11,00:00-24:00',
 				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
-				'period' => '1-7,00:00-25:00',
+				'When active' => '1-7,00:00-25:00',
 				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
-				'period' => '1-7,24:00-00:00',
+				'When active' => '1-7,24:00-00:00',
 				'error_msg' => ['When active' => 'Invalid period.']
 			]],
 			[[
 				'expected' => TEST_BAD,
 				'send_to' => 'test@zabbix.com',
-				'period' => 'test',
+				'When active' => 'test',
 				'error_msg' => ['When active' => 'Invalid period.']
 			]]
 		];
@@ -598,8 +598,8 @@ class testFormUserProfile extends CLegacyWebTest {
 
 		$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="sendto"]', $data['send_to']);
 
-		if (array_key_exists('period', $data)) {
-			$this->zbxTestInputClearAndTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="period"]', $data['period']);
+		if (array_key_exists('When active', $data)) {
+			$form->fill(['When active' => $data['When active']]);
 		}
 
 		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');

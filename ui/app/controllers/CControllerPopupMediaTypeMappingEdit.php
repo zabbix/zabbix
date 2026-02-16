@@ -70,7 +70,9 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 			'period' => ZBX_DEFAULT_INTERVAL,
 			'severity' => $this->hasInput('add_media_type_mapping')
 				? DB::getDefault('userdirectory_media', 'severity') : 0,
-			'active' => MEDIA_STATUS_ACTIVE
+			'active' => MEDIA_STATUS_ACTIVE,
+			'js_validation_rules' => (new CFormValidator(CControllerPopupMediaTypeMappingCheck::getValidationRules()))
+				->getRules()
 		];
 		$this->getInputs($data, array_keys($data));
 		$data += [

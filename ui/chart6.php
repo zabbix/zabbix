@@ -107,9 +107,7 @@ $resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
-	if ($db_items[$gItem['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
-	}
+	$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
 }
 
 $hostName = '';
