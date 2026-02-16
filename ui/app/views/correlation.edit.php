@@ -437,28 +437,15 @@ foreach ($data['correlation']['filter']['conditions'] as $index => $condition) {
 }
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag(
-			'correlation_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'templates_data' => $templates_data,
-				'templates_types' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
-					ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
-					ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
-				]
-			], JSON_THROW_ON_ERROR).');'
-		))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 if ($data['correlation']['correlationid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'correlation_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -466,43 +453,21 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'correlation_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'correlation_edit_popup.clone('.json_encode([
-				'title' => _('New event correlation'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => '',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'correlation_edit_popup.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => ZBX_STYLE_BTN_ALT,
-						'cancel' => true,
-						'action' => ''
-					]
-				],
-				'rules' => (new CFormValidator(CControllerCorrelationCreate::getValidationRules()))->getRules()
-			]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete event correlation?'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'correlation_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -512,7 +477,17 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('correlation.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('correlation.edit.js.php').
+		'correlation_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'templates_data' => $templates_data,
+			'templates_types' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
+				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
+				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
+			]
+		]).');',
 	'dialogue_class' => 'modal-popup-medium'
 ];
 

@@ -21,11 +21,13 @@
 
 window.correlation_edit_popup = new class {
 
-	init({rules, templates_data, templates_types}) {
+	init({rules, clone_rules, templates_data, templates_types}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
+		this.clone_rules = clone_rules;
 
 		this.row_templates = {}
 		for (const type of templates_types) {
@@ -64,6 +66,10 @@ window.correlation_edit_popup = new class {
 
 		document.getElementById('evaltype').onchange = () => this.#processTypeOfCalculation();
 		this.#processTypeOfCalculation();
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 	}
 
 	/**
@@ -94,12 +100,12 @@ window.correlation_edit_popup = new class {
 		if (show_formula) {
 			expression.style.display = 'none';
 			formula.style.display = '';
-			formula.removeAttribute('disabled');
+			formula.disabled = false;
 		}
 		else {
 			expression.style.display = '';
 			formula.style.display = 'none';
-			formula.setAttribute('disabled', true);
+			formula.disabled = true;
 		}
 
 		const conditions = [];
@@ -193,31 +199,59 @@ window.correlation_edit_popup = new class {
 		return result.some((element) => element === true);
 	}
 
-	clone({title, buttons, rules}) {
+	#clone() {
 		document.getElementById('correlationid').remove();
-		this.form.reload(rules);
 
-		this.overlay.setProperties({title, buttons});
+		const title = <?= json_encode(_('New event correlation')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
+
 		this.overlay.unsetLoading();
+		this.overlay.setProperties({title, buttons});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+		this.form.reload(this.clone_rules);
 	}
 
-	delete() {
-		const curl = new Curl('zabbix.php');
+	#delete() {
+		if (window.confirm(<?= json_encode(_('Delete event correlation?')) ?>)) {
+			this.#removePopupMessages();
+			const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'correlation.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
+			curl.setArgument('action', 'correlation.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('correlation')) ?>);
 
-		const correlationid = this.form.findFieldByName('correlationid').getValue();
-		this.#post(curl.getUrl(), {correlationids: [correlationid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			const correlationid = this.form.findFieldByName('correlationid').getValue();
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+			this.#post(curl.getUrl(), {correlationids: [correlationid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
+
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
-	submit() {
+	#submit() {
+		this.#removePopupMessages();
+
 		const fields = this.form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
@@ -225,26 +259,15 @@ window.correlation_edit_popup = new class {
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
-				this.overlay.unsetLoading();
-
 				if (!result) {
+					this.overlay.unsetLoading();
 					return;
 				}
 
 				this.#post(curl.getUrl(), fields, (response) => {
-					if ('form_errors' in response) {
-						this.form.setErrors(response.form_errors, true, true);
-						this.form.renderErrors();
+					overlayDialogueDestroy(this.overlay.dialogueid);
 
-						return;
-					}
-					else if ('error' in response) {
-						throw {error: response.error};
-					}
-					else {
-						overlayDialogueDestroy(this.overlay.dialogueid);
-						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-					}
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				});
 		});
 	}
@@ -268,22 +291,29 @@ window.correlation_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				success_callback(response);
 			})
-			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
 
-	#ajaxExceptionHandler(exception) {
-		for (const element of this.form_element.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
 			}
 		}
+	}
 
-		let title,
-			messages;
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
@@ -297,4 +327,4 @@ window.correlation_edit_popup = new class {
 
 		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
-}
+};

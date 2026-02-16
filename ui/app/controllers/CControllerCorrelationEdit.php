@@ -85,6 +85,8 @@ class CControllerCorrelationEdit extends CController {
 			'correlation' => $correlation,
 			'hostgroup_names' => $this->fetchHostGroupNames($correlation),
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
+			'js_clone_validation_rules' => (new CFormValidator(CControllerCorrelationCreate::getValidationRules()))
+				->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 

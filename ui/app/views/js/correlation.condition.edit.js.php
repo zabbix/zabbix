@@ -24,6 +24,7 @@ window.correlation_condition_popup = new class {
 	init({rules}) {
 		this.overlay = overlays_stack.getById('correlation-condition-form');
 		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
@@ -37,23 +38,30 @@ window.correlation_condition_popup = new class {
 				[...this.form_element.querySelectorAll('[name^="groupid[]"]')].map((input) => input.value)
 			);
 		});
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 	}
 
-	submit() {
+	#submit() {
+		this.#removePopupMessages();
 		const fields = this.form.getAllValues();
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
+					this.overlay.unsetLoading();
+
 					return;
 				}
 
 				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'correlation.condition.check');
-				this.#post(curl.getUrl(), fields);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
+
+				this.#post(curl.getUrl(), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+				});
 			});
 	}
 
@@ -63,7 +71,7 @@ window.correlation_condition_popup = new class {
 	 * @param {string} url   The URL to send the POST request to.
 	 * @param {object} data  The data to send with the POST request.
 	 */
-	#post(url, data) {
+	#post(url, data, success_callback) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -71,41 +79,44 @@ window.correlation_condition_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				if ('form_errors' in response) {
 					this.form.setErrors(response.form_errors, true, true);
 					this.form.renderErrors();
-				}
-				else if ('error' in response) {
-					throw {error: response.error};
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid, true);
 
-					this.dialogue.dispatchEvent(new CustomEvent('condition.dialogue.submit', {detail: response}));
+					return;
 				}
+
+				success_callback(response);
 			})
-			.catch((exception) => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title,
-					messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
-}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+};

@@ -169,24 +169,22 @@ switch ($condition_type) {
 }
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('correlation_condition_popup.init('.json_encode([
-			'rules' => $data['js_validation_rules']
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
-	'script_inline' => getPagePostJs().$this->readJsFile('correlation.condition.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('correlation.condition.edit.js.php').
+		'correlation_condition_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');',
 	'body' => $form->toString(),
 	'buttons' => [
 		[
 			'title' => _('Add'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'correlation_condition_popup.submit()'
+			'isSubmit' => true
 		]
 	]
 ];
