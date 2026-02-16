@@ -184,22 +184,24 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_description');
 			$this->zbxTestAssertElementPresentId('macros_'.$i.'_remove');
 
-			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "maxlength", 255);
-			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "placeholder",'{$MACRO}');
-			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_macro"]', "class", 'textarea-flexible macro');
+			$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="macros_'.$i.'_macro"]', "maxlength", 255);
+			$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="macros_'.$i.'_macro"]', "placeholder",'{$MACRO}');
+			$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="macros_'.$i.'_macro"]', "data-field-type",
+					'z-textarea-flexible'
+			);
 
 			$macro_name = $this->query('id:macros_'.$i.'_macro')->one()->getAttribute('value');
 			if ($macro_name !== '' && $this->getValueField($macro_name)->getInputType() === CInputGroupElement::TYPE_SECRET) {
 				$element = 'input';
 			}
 			else {
-				$element = 'textarea';
+				$element = 'z-textarea-flexible';
 				$this->zbxTestAssertAttribute('//'.$element.'[@id="macros_'.$i.'_value"]', 'placeholder', 'value');
 			}
 			$this->zbxTestAssertAttribute('//'.$element.'[@id="macros_'.$i.'_value"]', "maxlength", 2048);
 
-			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_description"]', "maxlength", 65535);
-			$this->zbxTestAssertAttribute('//textarea[@id="macros_'.$i.'_description"]', "placeholder", 'description');
+			$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="macros_'.$i.'_description"]', "maxlength", 65535);
+			$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="macros_'.$i.'_description"]', "placeholder", 'description');
 		}
 	}
 
@@ -255,9 +257,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestClick('macro_add');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
 
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', $macro);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill($macro);
+		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
+		$this->query('id:macros_'.$countGlobalMacros.'_description')->one()->fill(self::NEW_DESCRIPTION);
 
 		$this->page->removeFocus();
 
@@ -265,9 +267,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 				'id:macros_'.$countGlobalMacros.'_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 		]);
 
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', $macro);
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->assertEquals($macro, $this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->getValue());
+		$this->assertEquals(self::NEW_VALUE, $this->query('id:macros_'.$countGlobalMacros.'_value')->one()->getValue());
+		$this->assertEquals(self::NEW_DESCRIPTION, $this->query('id:macros_'.$countGlobalMacros.'_description')->one()->getValue());
 
 		$this->checkGlobalMacrosOrder();
 
@@ -284,18 +286,18 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestClick('macro_add');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
 
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', '');
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill('');
+		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
+		$this->query('id:macros_'.$countGlobalMacros.'_description')->one()->fill(self::NEW_DESCRIPTION);
 
 		$this->page->removeFocus();
 		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), [
 				'id:macros_'.$countGlobalMacros.'_macro' => 'Macro: This field cannot be empty.'
 		]);
 
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', '');
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->assertEquals('', $this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->getValue());
+		$this->assertEquals(self::NEW_VALUE, $this->query('id:macros_'.$countGlobalMacros.'_value')->one()->getValue());
+		$this->assertEquals(self::NEW_DESCRIPTION, $this->query('id:macros_'.$countGlobalMacros.'_description')->one()->getValue());
 
 		$this->checkGlobalMacrosOrder();
 
@@ -314,9 +316,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestClick('macro_add');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
 
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', self::NEW_MACRO);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill(self::NEW_MACRO);
+		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
+		$this->query('id:macros_'.$countGlobalMacros.'_description')->one()->fill(self::NEW_DESCRIPTION);
 
 		$this->saveGlobalMacros();
 		$this->assertMessage(TEST_GOOD, 'Macros updated');
@@ -346,9 +348,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestClick('macro_add');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
 
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro', self::NEW_EMPTY_MACRO);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', '');
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', '');
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill(self::NEW_EMPTY_MACRO);
+		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill('');
+		$this->query('id:macros_'.$countGlobalMacros.'_description')->one()->fill('');
 
 		$this->saveGlobalMacros();
 		$this->assertMessage(TEST_GOOD, 'Macros updated');
@@ -376,18 +378,18 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->zbxTestClick('macro_add');
 		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('macros_'.$countGlobalMacros.'_macro'));
 
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_macro',  self::NEW_MACRO);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestInputType('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->fill(self::NEW_MACRO);
+		$this->query('id:macros_'.$countGlobalMacros.'_value')->one()->fill(self::NEW_VALUE);
+		$this->query('id:macros_'.$countGlobalMacros.'_description')->one()->fill(self::NEW_DESCRIPTION);
 
 		$this->page->removeFocus();
 		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), [
 				'id:macros_'.$countGlobalMacros.'_macro' => 'Macro name is not unique.'
 		]);
 
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_macro', self::NEW_MACRO);
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_value', self::NEW_VALUE);
-		$this->zbxTestAssertElementValue('macros_'.$countGlobalMacros.'_description', self::NEW_DESCRIPTION);
+		$this->assertEquals(self::NEW_MACRO, $this->query('id:macros_'.$countGlobalMacros.'_macro')->one()->getValue());
+		$this->assertEquals(self::NEW_VALUE, $this->query('id:macros_'.$countGlobalMacros.'_value')->one()->getValue());
+		$this->assertEquals(self::NEW_DESCRIPTION, $this->query('id:macros_'.$countGlobalMacros.'_description')->one()->getValue());
 
 		$this->checkGlobalMacrosOrder();
 
@@ -402,18 +404,18 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 		$this->openGlobalMacros();
 
-		$this->zbxTestInputType('macros_0_macro', $macro);
-		$this->zbxTestInputType('macros_0_value', self::UPDATE_VALUE);
-		$this->zbxTestInputType('macros_0_description', self::UPDATE_DESCRIPTION);
+		$this->query('id:macros_0_macro')->one()->fill($macro);
+		$this->query('id:macros_0_value')->one()->fill(self::UPDATE_VALUE);
+		$this->query('id:macros_0_description')->one()->fill(self::UPDATE_DESCRIPTION);
 
 		$this->page->removeFocus();
 		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), [
 				'id:macros_0_macro' => 'Macro: Expected user macro format is "{$MACRO}".'
 		]);
 
-		$this->zbxTestAssertElementValue('macros_0_macro', $macro);
-		$this->zbxTestAssertElementValue('macros_0_value', self::UPDATE_VALUE);
-		$this->zbxTestAssertElementValue('macros_0_description', self::UPDATE_DESCRIPTION);
+		$this->assertEquals($macro, $this->query('id:macros_0_macro')->one()->getValue());
+		$this->assertEquals(self::UPDATE_VALUE, $this->query('id:macros_0_value')->one()->getValue());
+		$this->assertEquals(self::UPDATE_DESCRIPTION, $this->query('id:macros_0_description')->one()->getValue());
 
 		$this->checkGlobalMacrosOrder(0);
 
@@ -425,32 +427,38 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 
 		$this->openGlobalMacros();
 
-		$this->zbxTestInputType('macros_0_macro', '');
-		$this->zbxTestInputType('macros_0_value', self::UPDATE_VALUE);
-		$this->zbxTestInputType('macros_0_description', self::UPDATE_DESCRIPTION);
+		$this->query('id:macros_0_macro')->one()->fill('');
+		$this->query('id:macros_0_value')->one()->fill(self::UPDATE_VALUE);
+		$this->query('id:macros_0_description')->one()->fill(self::UPDATE_DESCRIPTION);
 
 		$this->page->removeFocus();
 		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), [
 				'id:macros_0_macro' => 'Macro: This field cannot be empty.'
 		]);
 
-		$this->zbxTestAssertElementValue('macros_0_macro', '');
-		$this->zbxTestAssertElementValue('macros_0_description', self::UPDATE_DESCRIPTION);
+		$this->assertEquals('', $this->query('id:macros_0_macro')->one()->getValue());
+		$this->assertEquals(self::UPDATE_VALUE, $this->query('id:macros_0_value')->one()->getValue());
+		$this->assertEquals(self::UPDATE_DESCRIPTION, $this->query('id:macros_0_description')->one()->getValue());
 
 		$this->checkGlobalMacrosOrder(0);
 
 		$this->verifyHash();
 	}
 
-	public function testFormMacrosAdministrationGeneral_UpdateWrongEmptyMacroValue() {
+	/**
+	 * @backupOnce !globalmacro
+	 */
+	public function testFormMacrosAdministrationGeneral_EmptyMacroFieldValues() {
 		$this->openGlobalMacros();
 		$form = $this->query('name:macrosForm')->asForm()->one();
-		$form->fill(['id:macros_0_macro' => '']);
+		$form->fill(['id:macros_0_macro' => '', 'id:macros_0_value' => '', 'id:macros_0_description' => '']);
 
-		$this->page->removeFocus();
-		$this->assertInlineError($form, ['id:macros_0_macro' => 'Macro: This field cannot be empty.']);
-
-		$this->checkGlobalMacrosOrder(0);
+		$form->submit();
+		$this->page->waitUntilAlertIsPresent();
+		$this->assertEquals('Are you sure you want to delete? 1 macro(s)?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 	}
 
 	public function testFormMacrosAdministrationGeneral_Update() {
@@ -466,9 +474,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->zbxTestInputType('macros_'.$i.'_macro', self::UPDATE_MACRO);
-		$this->zbxTestInputType('macros_'.$i.'_value', self::UPDATE_VALUE);
-		$this->zbxTestInputType('macros_'.$i.'_description', self::UPDATE_DESCRIPTION);
+		$this->query('id:macros_'.$i.'_macro')->one()->fill(self::UPDATE_MACRO);
+		$this->query('id:macros_'.$i.'_value')->one()->fill(self::UPDATE_VALUE);
+		$this->query('id:macros_'.$i.'_description')->one()->fill(self::UPDATE_DESCRIPTION);
 
 		$this->saveGlobalMacros();
 		$this->assertMessage(TEST_GOOD, 'Macros updated');
@@ -503,9 +511,9 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->zbxTestInputType('macros_'.$i.'_macro', self::UPDATE_MACRO);
-		$this->zbxTestInputType('macros_'.$i.'_value', '');
-		$this->zbxTestInputType('macros_'.$i.'_description', '');
+		$this->query('id:macros_'.$i.'_macro')->one()->fill(self::UPDATE_MACRO);
+		$this->query('id:macros_'.$i.'_value')->one()->fill('');
+		$this->query('id:macros_'.$i.'_description')->one()->fill('');
 
 		$this->saveGlobalMacros();
 		$this->assertMessage(TEST_GOOD, 'Macros updated');
@@ -540,18 +548,18 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		}
 		$this->assertNotEquals($i, $countGlobalMacros);
 
-		$this->zbxTestInputType('macros_'.$i.'_macro', self::NEW_MACRO);
-		$this->zbxTestInputType('macros_'.$i.'_value', self::NEW_VALUE);
-		$this->zbxTestInputType('macros_'.$i.'_description', self::NEW_DESCRIPTION);
+		$this->query('id:macros_'.$i.'_macro')->one()->fill(self::NEW_MACRO);
+		$this->query('id:macros_'.$i.'_value')->one()->fill(self::NEW_VALUE);
+		$this->query('id:macros_'.$i.'_description')->one()->fill(self::NEW_DESCRIPTION);
 
 		$this->page->removeFocus();
 		$this->assertInlineError($this->query('name:macrosForm')->asForm()->one(), [
 				'id:macros_'.$i.'_macro' => 'Macro name is not unique.'
 		]);
 
-		$this->zbxTestAssertElementValue('macros_'.$i.'_macro', self::NEW_MACRO);
-		$this->zbxTestAssertElementValue('macros_'.$i.'_value', self::NEW_VALUE);
-		$this->zbxTestAssertElementValue('macros_'.$i.'_description', self::NEW_DESCRIPTION);
+		$this->assertEquals(self::NEW_MACRO, $this->query('id:macros_'.$i.'_macro')->one()->getValue());
+		$this->assertEquals(self::NEW_VALUE, $this->query('id:macros_'.$i.'_value')->one()->getValue());
+		$this->assertEquals(self::NEW_DESCRIPTION, $this->query('id:macros_'.$i.'_description')->one()->getValue());
 
 		$this->checkGlobalMacrosOrder($i);
 
@@ -673,20 +681,20 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->assertEquals($data['macro_fields']['value']['type'], $value_field->getInputType());
 		$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		// Check that textarea input element is not available for secret text macros.
-		$textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
 		if ($value_field->getInputType() === CInputGroupElement::TYPE_SECRET) {
-			$this->assertFalse($value_field->query($textarea_xpath)->exists());
+			$this->assertFalse($value_field->query('tag:z-textarea-flexible')->exists());
 		}
 
 		// If needed, change value type back to "Text" and verify that value is accessible.
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
 			$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
 			$this->assertEquals(CInputGroupElement::TYPE_TEXT, $value_field->getInputType());
-			$this->assertTrue($value_field->query($textarea_xpath)->exists());
+			$this->assertTrue($value_field->query('tag:z-textarea-flexible')->exists());
 			$this->assertEquals($data['macro_fields']['value']['text'], $value_field->getValue());
 		}
 
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
 		$value_field = $this->getValueField($data['macro_fields']['macro']);
 
 		if (CTestArrayHelper::get($data, 'back_to_text', false)) {
@@ -830,6 +838,8 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		// Press revert button and save the changes and make sure that changes were reverted.
 		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
+		$this->assertMessage(TEST_GOOD, 'Macros updated');
+
 		// Check that no macro value changes took place.
 		$this->assertEquals('******', $this->getValueField($data['macro_fields']['macro'])->getValue());
 		$this->assertEquals($old_values, CDBHelper::getRow($sql));
@@ -847,7 +857,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	/**
 	 * @dataProvider getCreateVaultMacrosData
 	 *
-	 * @backupOnce globalmacro
+	 * @backupOnce !globalmacro
 	 */
 	public function testFormMacrosAdministrationGeneral_CreateVaultMacros($data) {
 		$this->page->login()->open('zabbix.php?action=macros.edit')->waitUntilReady();
@@ -920,7 +930,8 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$this->assertMessage(TEST_GOOD, 'Macros updated');
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
-			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
+			$result[] = $this->query('xpath://z-textarea-flexible[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')
+					->one()->getValue();
 		}
 		$this->assertEquals([$data['fields']['macro'], $data['fields']['value']['text'],
 				$data['fields']['description']], $result);

@@ -80,7 +80,6 @@ $available_js = [
 	'multiselect.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
-	'textareaflexible.js' => '',
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
@@ -95,6 +94,7 @@ $available_js = [
 	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-textarea-flexible.js' => '',
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
@@ -176,7 +176,8 @@ $available_js = [
 	'class.field.set.js' => 'fields/',
 	'class.field.textarea.js' => 'fields/',
 	'class.field.textbox.js' => 'fields/',
-	'class.field.zselect.js' => 'fields/'
+	'class.field.zselect.js' => 'fields/',
+	'class.field.ztextarea-flexible.js' => 'fields/'
 ];
 
 $translate_strings = [
@@ -602,6 +603,7 @@ if (empty($_GET['files'])) {
 		'component.z-color-picker.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
+		'component.z-textarea-flexible.js',
 		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
@@ -625,6 +627,7 @@ if (empty($_GET['files'])) {
 		'class.field.textarea.js',
 		'class.field.textbox.js',
 		'class.field.zselect.js',
+		'class.field.ztextarea-flexible.js',
 		'class.form.js',
 		'class.form.validator.js',
 		'class.menu.js',
@@ -653,7 +656,6 @@ if (empty($_GET['files'])) {
 		'class.expandable.subfilter.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
-		'textareaflexible.js',
 		'class.popup-manager.js',
 		'class.popup-manager.event.js',
 		'items.js',

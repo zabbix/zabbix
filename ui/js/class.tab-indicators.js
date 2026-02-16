@@ -378,7 +378,7 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
-				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const macro = row.querySelector('z-textarea-flexible[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
@@ -402,7 +402,7 @@ class HostMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -420,7 +420,7 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
-				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const macro = row.querySelector('z-textarea-flexible[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
@@ -444,7 +444,7 @@ class HostPrototypeMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -462,7 +462,7 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll('#tbl_macros .form_row')]
 			.filter((row) => {
-				const macro = row.querySelector('textarea[name$="[macro]"]');
+				const macro = row.querySelector('z-textarea-flexible[name$="[macro]"]');
 				const inherited_type = row.querySelector('input[name$="[inherited_type]"]');
 
 				if (inherited_type !== null
@@ -486,7 +486,7 @@ class TemplateMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -504,7 +504,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 	getValue() {
 		return [...document.querySelectorAll(this.getElement().getAttribute('href') + ' .tags-table .form_row')]
 			.filter((row) => {
-				const tag = row.querySelector('textarea[name$="[tag]"]');
+				const tag = row.querySelector('z-textarea-flexible[name$="[tag]"]');
 				const type = row.querySelector('input[name$="[type]"]');
 
 				if (type !== null && type.value == TagsTabIndicatorItem.ZBX_PROPERTY_INHERITED) {
@@ -527,7 +527,7 @@ class TagsTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}
@@ -869,8 +869,10 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 	}
 
 	getValue() {
-		return document
-			.querySelectorAll('#lld_macro_paths tbody tr.form_row > td:first-child > textarea:not(:placeholder-shown)')
+		return [...document.querySelectorAll(
+				'#lld_macro_paths tbody tr.form_row > td:first-child > z-textarea-flexible'
+			)]
+			.filter(z_textarea_flexible => z_textarea_flexible.value !== '')
 			.length;
 	}
 
@@ -885,7 +887,7 @@ class LldMacrosTabIndicatorItem extends TabIndicatorItem {
 			observer.observe(target_node, {
 				childList: true,
 				attributes: true,
-				attributeFilter: ['value', 'style'], // Use style because textarea don't have value attribute.
+				attributeFilter: ['value'],
 				subtree: true
 			});
 		}

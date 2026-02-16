@@ -2318,6 +2318,7 @@ button {
 z-select.has-error button.focusable:active,
 z-select.has-error button.focusable:hover,
 z-select.has-error button.focusable,
+z-textarea-flexible.has-error textarea,
 input[type="text"].has-error,
 input[type="password"].has-error,
 input[type="search"].has-error,
@@ -2330,6 +2331,7 @@ textarea.has-error {
   z-select.has-error button.focusable:active:focus,
   z-select.has-error button.focusable:hover:focus,
   z-select.has-error button.focusable:focus,
+  z-textarea-flexible.has-error textarea:focus,
   input[type="text"].has-error:focus,
   input[type="password"].has-error:focus,
   input[type="search"].has-error:focus,
@@ -2377,7 +2379,7 @@ div[data-field-type="set"].has-error {
 
 .macro-input-group textarea.has-error, .macro-input-group textarea.has-error:focus {
   border-width: 1px 0 1px 1px; }
-.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
+.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error:focus-within + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
   border-color: #ad1f1f; }
 .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle {
   border-color: #ad1f1f; }
@@ -4566,6 +4568,19 @@ z-sparkline {
     right: 0;
     bottom: 0;
     left: 0; }
+
+z-textarea-flexible {
+  display: inline-block; }
+  z-textarea-flexible textarea {
+    width: 100%;
+    height: 24px;
+    overflow: hidden;
+    resize: none;
+    line-height: 14px;
+    white-space: break-spaces;
+    word-break: break-word; }
+    z-textarea-flexible textarea[readonly]:focus {
+      border-color: #000000; }
 
 .widget-field-sparkline {
   display: grid;
@@ -7134,7 +7149,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
 
 .multiselect, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
+z-select .list, z-textarea-flexible textarea, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #ffffff;
   border: 1px solid #888888;
   box-sizing: border-box;
@@ -7260,14 +7275,14 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
 .multiselect[aria-readonly], .z-select[readonly] .focusable,
-z-select[readonly] .focusable, input[readonly], textarea[readonly] {
+z-select[readonly] .focusable, z-textarea-flexible textarea[readonly], input[readonly], textarea[readonly] {
   color: #000000;
   -webkit-text-fill-color: #000000;
   background-color: #f0f0f0;
   border-color: #9f9f9f; }
 
 .multiselect[aria-disabled], .radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label, .z-select[disabled] .focusable,
-z-select[disabled] .focusable, input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
+z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
   color: #9f9f9f;
   -webkit-text-fill-color: #9f9f9f;
   background-color: #f0f0f0;
@@ -7727,15 +7742,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     margin-left: 10px; }
   .textarea-flexible-container td button {
     line-height: normal; }
-
-.textarea-flexible {
-  min-height: 24px;
-  overflow: hidden;
-  resize: none;
-  word-break: break-word;
-  height: 24px;
-  line-height: 14px;
-  white-space: break-spaces; }
 
 .overlay-dialogue-body {
   margin: 0 0 25px;
@@ -8319,7 +8325,7 @@ span.is-loading {
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .overlay-dialogue .hintbox-wrap,
+z-select .list, z-textarea-flexible textarea, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
@@ -8718,6 +8724,7 @@ svg {
     display: none; }
   .macro-input-group .btn-undo {
     display: none;
+    height: auto;
     color: #555555;
     background-color: #ffffff;
     border-width: 1px 0;
@@ -8730,6 +8737,15 @@ svg {
       border-color: #000000; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #000000; }
+  .macro-input-group z-textarea-flexible {
+    flex: 1; }
+    .macro-input-group z-textarea-flexible textarea {
+      border-right: 0; }
+      .macro-input-group z-textarea-flexible textarea:focus + .btn-undo {
+        border-color: #000000; }
+
+.macro-value-secret z-textarea-flexible textarea {
+  -webkit-text-security: disc; }
 
 .input-secret {
   position: relative;
@@ -8947,12 +8963,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   top: 0;
   background: #f3f3f3;
   z-index: 3; }
-.modal-popup-medium .textarea-flexible,
-.modal-popup-large .textarea-flexible,
-.modal-popup-static .textarea-flexible,
-.modal-popup-preprocessing .textarea-flexible {
-  max-height: 200px;
-  overflow-y: auto; }
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,

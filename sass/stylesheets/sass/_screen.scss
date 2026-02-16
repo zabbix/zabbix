@@ -79,6 +79,7 @@ $browser-sprite: '../img/browser-sprite.png?20220722';
 @import "components/z-color-picker";
 @import "components/z-select";
 @import "components/z-sparkline";
+@import "components/z-textarea-flexible";
 
 @import "components/dashboard/widget-field-sparkline";
 
@@ -2202,16 +2203,6 @@ select {
 	}
 }
 
-.textarea-flexible {
-	min-height: 24px;
-	overflow: hidden;
-	resize: none;
-	word-break: break-word;
-	height: 24px;
-	line-height: 14px;
-	white-space: break-spaces;
-}
-
 .overlay-dialogue-body {
 	margin: 0 0 25px;
 	white-space: nowrap;
@@ -3652,6 +3643,7 @@ svg {
 
 	.btn-undo {
 		display: none;
+		height: auto;
 		color: $icon-color;
 		background-color: $form-bg-color;
 		border-width: 1px 0;
@@ -3670,6 +3662,28 @@ svg {
 
 		&.is-focused {
 			border-color: $form-focus-border-color;
+		}
+	}
+
+	z-textarea-flexible {
+		flex: 1;
+
+		textarea {
+			border-right: 0;
+
+			&:focus {
+				+ .btn-undo {
+					border-color: $form-focus-border-color;
+				}
+			}
+		}
+	}
+}
+
+.macro-value-secret {
+	z-textarea-flexible {
+		textarea {
+			-webkit-text-security: disc;
 		}
 	}
 }
@@ -4042,11 +4056,6 @@ z-select {
 		top: 0;
 		background: $header-bg-color;
 		z-index: 3;
-	}
-
-	.textarea-flexible {
-		max-height: 200px;
-		overflow-y: auto;
 	}
 }
 
