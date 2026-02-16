@@ -30,7 +30,7 @@ typedef	void (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *to
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
 		const char *config_ssl_cert_location, const char *config_ssl_key_location, long timeout);
 
-typedef	int (*zbx_vault_update_token_cb_t)(char *token);
+typedef	void (*zbx_vault_update_token_cb_t)(char *token);
 
 typedef	int (*zbx_vault_relogin_cb_t)(const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location,
@@ -119,7 +119,8 @@ int	zbx_vault_update_token(char *token)
 	if (NULL == zbx_vault_update_token_cb)
 		return FAIL;
 
-	return zbx_vault_update_token_cb(token);
+	zbx_vault_update_token_cb(token);
+	return SUCCEED;
 }
 
 int	zbx_vault_relogin(const zbx_config_vault_t *config_vault,

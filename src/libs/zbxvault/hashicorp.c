@@ -29,9 +29,9 @@
 #include "zbxnum.h"
 
 static char		*approle_token;
+#ifdef HAVE_LIBCURL
 static double		next_renew;
 
-#ifdef HAVE_LIBCURL
 static int	zbx_vault_app_role_login(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,

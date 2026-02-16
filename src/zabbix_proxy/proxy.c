@@ -2054,13 +2054,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			if (ZBX_RTC_VAULT_RELOGIN == message->code)
 			{
-				char *token = message->data;
+				char *token = (char *)message->data;
 
 				if (SUCCEED == zbx_vault_relogin(&zbx_config_vault,zbx_config_source_ip,
 					config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
 					&token, &error))
 				{
-					zbx_ipc_client_send(client, ZBX_RTC_VAULT_NEW_TOKEN, token, strlen(token) + 1);
+					zbx_ipc_client_send(client, ZBX_RTC_VAULT_NEW_TOKEN,
+						(unsigned char *)token, strlen(token) + 1);
 				}
 				else
 				{
