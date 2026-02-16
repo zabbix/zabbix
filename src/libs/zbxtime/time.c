@@ -555,13 +555,19 @@ int	zbx_tm_parse_period(const char *period, size_t *len, int *multiplier, zbx_ti
  *                                                                            *
  * Parameter: tm      - [IN/OUT] the time structure                           *
  *            seconds - [IN] the seconds to add (can be negative)             *
- *            tz      - [IN] time zone                                        *
  *                                                                            *
  ******************************************************************************/
 static void	tm_add_seconds(struct tm *tm, int seconds)
 {
 	time_t		time_new;
 	struct tm	tm_new = *tm;
+	int		tm_isdst = tm->tm_isdst;
+
+	if (0 == (tm->tm_hour + tm->tm_min + tm->tm_sec))
+	{
+		tm_isdst = -1;	/* we don't know DST state after round(up/down) manipulation */
+		tm_new.tm_isdst = tm_isdst;
+	}
 
 	if (-1 == (time_new = mktime(&tm_new)))
 	{
@@ -569,10 +575,13 @@ static void	tm_add_seconds(struct tm *tm, int seconds)
 		return;
 	}
 
+	if (-1 == tm_isdst)
+		tm_isdst = tm_new.tm_isdst;
+
 	time_new += seconds;
 	tm_new = *zbx_localtime(&time_new, NULL);
 
-	if (tm->tm_isdst != tm_new.tm_isdst && -1 != tm->tm_isdst && -1 != tm_new.tm_isdst)
+	if (tm_isdst != tm_new.tm_isdst && -1 != tm_isdst && -1 != tm_new.tm_isdst)
 	{
 		if (0 == tm_new.tm_isdst)
 			tm_add(&tm_new, 1, ZBX_TIME_UNIT_HOUR);
