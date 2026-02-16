@@ -30,8 +30,8 @@
 #define ZBX_HK_OBJECT_NUM	5
 
 typedef struct {
-	zbx_uint64_t	housekeeperid;
 	zbx_uint64_t	objectid;
+	zbx_uint64_t	housekeeperid;
 	unsigned int	progress;
 } hk_entry_t;
 
@@ -151,7 +151,7 @@ static void	hk_item_cleanup(const zbx_vector_hk_housekeeper_t *hk_entries, int c
 
 			if (NULL == (entry = zbx_hashset_search(&hk_cache, &objectid)))
 			{
-				hk_entry_t	entry_local = {housekeeperid, objectid, 0};
+				hk_entry_t	entry_local = {objectid, housekeeperid, 0};
 
 				entry = zbx_hashset_insert(&hk_cache, &entry_local, sizeof(entry_local));
 			}
