@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0alpha2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050030);
+define('ZABBIX_DB_VERSION',		7050032);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -639,6 +639,7 @@ define('ITEM_VALUE_TYPE_LOG',		2);
 define('ITEM_VALUE_TYPE_UINT64',	3);
 define('ITEM_VALUE_TYPE_TEXT',		4);
 define('ITEM_VALUE_TYPE_BINARY',	5);
+define('ITEM_VALUE_TYPE_JSON',		6);
 
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT',	0x01);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR',		0x02);
@@ -646,6 +647,7 @@ define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG',		0x04);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64',	0x08);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT',	0x10);
 define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN',		0x20);
+define('ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON',	0x40);
 
 define('ITEM_DATA_TYPE_DECIMAL',		0);
 define('ITEM_DATA_TYPE_OCTAL',			1);
@@ -1298,6 +1300,10 @@ define('SVG_GRAPH_TYPE_BAR',		3);
 
 define('SVG_GRAPH_STACKED_OFF',	0);
 define('SVG_GRAPH_STACKED_ON',	1);
+
+define('SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO',	0);
+define('SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW',	1);
+define('SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE',	2);
 
 define('SVG_GRAPH_MISSING_DATA_NONE',			0);
 define('SVG_GRAPH_MISSING_DATA_CONNECTED',		1);
@@ -2219,6 +2225,7 @@ define('ZBX_STYLE_TIMELINE_DOT', 'timeline-dot');
 define('ZBX_STYLE_TIMELINE_DOT_BIG', 'timeline-dot-big');
 define('ZBX_STYLE_TIMELINE_TD', 'timeline-td');
 define('ZBX_STYLE_TIMELINE_TH', 'timeline-th');
+define('ZBX_STYLE_TRIMMED_CONTENT', 'trimmed-content');
 define('ZBX_STYLE_PROBLEM_EXPAND_TD', 'problem-expand-td');
 define('ZBX_STYLE_PROBLEM_NESTED', 'problem-nested');
 define('ZBX_STYLE_PROBLEM_NESTED_SMALL', 'problem-nested-small');
@@ -2252,6 +2259,7 @@ define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR', 'zabbix-logo-sidebar');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT', 'zabbix-logo-sidebar-compact');
 define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
 define('ZBX_STYLE_OVERLAY_DIALOGUE_HEADER', 'overlay-dialogue-header');
+define('ZBX_STYLE_Z_TEXTAREA_FLEXIBLE', 'z-textarea-flexible');
 
 // HTML column layout.
 define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');

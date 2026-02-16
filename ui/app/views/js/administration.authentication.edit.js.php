@@ -22,13 +22,23 @@
 <script>
 	const view = new class {
 
-		init({ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
+		/**
+		 * @type {HTMLFormElement}
+		 */
+		#form_element;
+
+		/**
+		 * @type {CForm}
+		 */
+		#form;
+
+		init({rules, ldap_servers, ldap_default_row_index, db_authentication_type, saml_provision_groups,
 				saml_provision_media, templates, mfa_methods, mfa_default_row_index, is_http_auth_allowed,
 				saml_idp_certificate_exists, saml_sp_certificate_exists, saml_sp_private_key_exists,
-				saml_certificate_max_filesize, saml_private_key_max_filesize, saml_filesize_error_message,
-				saml_certs_editable
+				saml_filesize_error_message, saml_certs_editable
 		}) {
-			this.form = document.getElementById('authentication-form');
+			this.#form_element = document.getElementById('authentication-form');
+			this.#form = new CForm(this.#form_element, rules);
 			this.db_authentication_type = db_authentication_type;
 			this.saml_provision_status = document.getElementById('saml_provision_status');
 			this.saml_provision_groups_table = document.getElementById('saml-group-table');
@@ -37,22 +47,21 @@
 			this.ldap_servers_table = document.getElementById('ldap-servers');
 			this.templates = templates;
 			this.is_http_auth_allowed = is_http_auth_allowed;
-			this.ldap_provisioning_fields = this.form.querySelectorAll(
+			this.ldap_provisioning_fields = this.#form_element.querySelectorAll(
 				'[name="ldap_jit_status"],[name="ldap_case_sensitive"],[name="jit_provision_interval"]'
 			);
-			this.jit_provision_interval = this.form.querySelector('[name="jit_provision_interval"]');
-			this.ldap_auth_enabled = this.form.querySelector('[type="checkbox"][name="ldap_auth_enabled"]');
+			this.jit_provision_interval = this.#form_element.querySelector('[name="jit_provision_interval"]');
+			this.ldap_auth_enabled = this.#form_element.querySelector('[type="checkbox"][name="ldap_auth_enabled"]');
 			this.mfa_table = document.getElementById('mfa-methods');
 			this.saml_idp_certificate_exists = saml_idp_certificate_exists;
 			this.saml_sp_certificate_exists = saml_sp_certificate_exists;
 			this.saml_sp_private_key_exists = saml_sp_private_key_exists;
-			this.saml_certificate_max_filesize = saml_certificate_max_filesize;
-			this.saml_private_key_max_filesize = saml_private_key_max_filesize;
 			this.saml_filesize_error_message = saml_filesize_error_message;
 			this.saml_certs_editable = saml_certs_editable;
-			const saml_readonly = !this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
+			const saml_readonly = !this.#form_element
+				.querySelector('[type="checkbox"][name="saml_auth_enabled"]').checked;
 			const ldap_disabled = this.ldap_auth_enabled === null || !this.ldap_auth_enabled.checked;
-			const mfa_readonly = !this.form.querySelector('[type="checkbox"][name="mfa_status"]').checked;
+			const mfa_readonly = !this.#form_element.querySelector('[type="checkbox"][name="mfa_status"]').checked;
 
 			this._addEventListeners();
 			this._addLdapServers(ldap_servers, ldap_default_row_index);
@@ -70,7 +79,10 @@
 				this.#updateSpCertificateRequiredState();
 			}
 
-			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').dispatchEvent(new Event('change'));
+			this.#form_element.querySelector('[type="checkbox"][name="saml_auth_enabled"]')
+				.dispatchEvent(new Event('change'));
+
+			this.#form.discoverAllFields();
 		}
 
 		_addEventListeners() {
@@ -78,14 +90,14 @@
 
 			if (this.is_http_auth_allowed) {
 				document.getElementById('http_auth_enabled').addEventListener('change', (e) => {
-					this.form.querySelectorAll('[name^=http_]').forEach(field => {
+					this.#form_element.querySelectorAll('[name^=http_]').forEach(field => {
 						if (!field.isSameNode(e.target)) {
 							field.disabled = !e.target.checked;
 						}
 					});
 
 					if (e.target.checked) {
-						let form_fields = this.form.querySelectorAll('[name^=http_]');
+						let form_fields = this.#form_element.querySelectorAll('[name^=http_]');
 
 						const http_auth_enabled = document.getElementById('http_auth_enabled');
 						overlayDialogue({
@@ -123,10 +135,11 @@
 				});
 			}
 
-			this.form.querySelector('[type="checkbox"][name="saml_auth_enabled"]').addEventListener('change', (e) => {
+			this.#form_element.querySelector('[type="checkbox"][name="saml_auth_enabled"]')
+					.addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
 
-				this.form.querySelectorAll('.saml-enabled').forEach(field => {
+				this.#form_element.querySelectorAll('.saml-enabled').forEach(field => {
 					field.toggleAttribute('readonly', is_readonly);
 					field.toggleAttribute('disabled', is_readonly);
 					field.setAttribute('tabindex', is_readonly ? -1 : 0);
@@ -136,12 +149,12 @@
 			});
 
 			this.saml_provision_status.addEventListener('change', (e) => {
-				this.form.querySelectorAll('.saml-provision-status').forEach(field =>
+				this.#form_element.querySelectorAll('.saml-provision-status').forEach(field =>
 					field.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !e.target.checked)
 				);
 			});
 
-			for (const button of this.form.querySelectorAll('.js-saml-cert-change-button')) {
+			for (const button of this.#form_element.querySelectorAll('.js-saml-cert-change-button')) {
 				button.addEventListener('click', e => {
 					const container = button.nextElementSibling.classList.contains('js-saml-cert-input') ? button.nextElementSibling : null;
 
@@ -155,7 +168,7 @@
 				});
 			}
 
-			for (const button of this.form.querySelectorAll('.js-saml-cert-file-button')) {
+			for (const button of this.#form_element.querySelectorAll('.js-saml-cert-file-button')) {
 				button.addEventListener('click', e => {
 					const textarea = e.target.parentNode.querySelector('textarea');
 					const extension_filter = textarea.name === 'sp_private_key'
@@ -197,10 +210,9 @@
 					}
 				});
 
-			this.form.addEventListener('submit', (e) => {
-				if (!this._authFormSubmit()) {
-					e.preventDefault();
-				}
+			this.#form_element.addEventListener('submit', (e) => {
+				e.preventDefault();
+				this.#submit();
 			});
 
 			this.mfa_table.addEventListener('click', (e) => {
@@ -223,7 +235,8 @@
 						input.type = 'hidden';
 						input.name = 'mfa_removed_mfaids[]';
 						input.value = mfaid_input.value;
-						this.form.appendChild(input);
+						input.setAttribute('data-field-type', 'hidden');
+						document.getElementById('mfa_removed_mfaids').appendChild(input);
 					}
 
 					e.target.closest('tr').remove();
@@ -233,22 +246,23 @@
 
 						if (default_mfa !== null) {
 							default_mfa.checked = true;
+							document.getElementById('mfa_default_row_index').value = default_mfa.value;
 						}
 					}
 				}
+				else if (e.target.name === 'mfa_default_row_index') {
+					document.getElementById('mfa_default_row_index').value = e.target.value;
+				}
 			});
 
-			this.form.querySelector('[type="checkbox"][name="mfa_status"]').addEventListener('change', (e) => {
+			document.getElementById('mfa_status').addEventListener('change', (e) => {
 				const is_readonly = !e.target.checked;
-				const default_index = this.form.querySelector('input[name="mfa_default_row_index"]:checked');
-				const default_index_hidden = this.form.querySelector('[type="hidden"][name="mfa_default_row_index"]');
+				const default_index = this.#form_element.querySelector('input[name="mfa_default_row_index"]:checked');
 
 				this.#setTableVisiblityState(this.mfa_table, is_readonly);
 				this.#disableRemoveLinksWithUserGroups(this.mfa_table);
 
-				if (is_readonly && default_index) {
-					default_index_hidden.value = default_index.value;
-				}
+				document.getElementById('mfa_default_row_index').value = default_index ? default_index.value : 0;
 			});
 
 			if (this.saml_certs_editable) {
@@ -266,7 +280,7 @@
 				'sign_logout_responses', 'encrypt_nameid', 'encrypt_assertions'
 			].map(n => `[name="${n}"]`).join(',');
 
-			return this.form.querySelectorAll(selector);
+			return this.#form_element.querySelectorAll(selector);
 		}
 
 		#isSpCertificateRequired() {
@@ -278,13 +292,13 @@
 		#updateSpCertificateRequiredState() {
 			const required = this.#isSpCertificateRequired();
 
-			this.form.querySelector('label[for="sp_private_key"]')
+			this.#form_element.querySelector('label[for="sp_private_key"]')
 				.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
-			this.form.querySelector('textarea[name="sp_private_key"]')
+			this.#form_element.querySelector('textarea[name="sp_private_key"]')
 				.toggleAttribute('aria-required', ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
-			this.form.querySelector('label[for="sp_certificate"]')
+			this.#form_element.querySelector('label[for="sp_certificate"]')
 				.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
-			this.form.querySelector('textarea[name="sp_certificate"]')
+			this.#form_element.querySelector('textarea[name="sp_certificate"]')
 				.toggleAttribute('aria-required', ZBX_STYLE_FIELD_LABEL_ASTERISK, required);
 		}
 
@@ -310,27 +324,11 @@
 					return;
 				}
 
-				const max_filesize = textarea.id === 'sp_private_key'
-					? this.saml_private_key_max_filesize
-					: this.saml_certificate_max_filesize;
-
-				if (file.size > max_filesize) {
-					const error_span = document.createElement('span');
-
-					error_span.className = 'error';
-					error_span.textContent = this.saml_filesize_error_message.replace('%1$s', max_filesize);
-					wrapper.append(error_span);
-
-					textarea.classList.add('has-error');
-					textarea.value = '';
-
-					return;
-				}
-
 				const reader = new FileReader();
 
-				reader.onload = function(e) {
+				reader.onload = (e) => {
 					textarea.value = e.target.result;
+					this.#form.validateChanges([textarea.getAttribute('name')]);
 				};
 
 				reader.readAsText(file);
@@ -363,7 +361,8 @@
 						input.type = 'hidden';
 						input.name = 'ldap_removed_userdirectoryids[]';
 						input.value = userdirectoryid_input.value;
-						this.form.appendChild(input);
+						input.setAttribute('data-field-type', 'hidden');
+						document.getElementById('ldap_removed_userdirectoryids').appendChild(input);
 					}
 
 					e.target.closest('tr').remove();
@@ -373,8 +372,12 @@
 
 						if (default_ldap !== null) {
 							default_ldap.checked = true;
+							document.getElementById('ldap_default_row_index').value = default_ldap.value;
 						}
 					}
+				}
+				else if (e.target.name === 'ldap_default_row_index') {
+					document.getElementById('ldap_default_row_index').value = e.target.value;
 				}
 			});
 
@@ -483,7 +486,7 @@
 				popup_params.name = row.querySelector(`[name="saml_provision_groups[${row_index}][name]"`).value;
 
 				const user_groups = row.querySelectorAll(
-					`[name="saml_provision_groups[${row_index}][user_groups][][usrgrpid]"`
+					`[name="saml_provision_groups[${row_index}][user_groups][]"`
 				);
 				if (user_groups.length) {
 					popup_params.usrgrpid = [...user_groups].map(usrgrp => usrgrp.value);
@@ -493,6 +496,8 @@
 				if (roleid) {
 					popup_params.roleid = roleid.value;
 				}
+
+				popup_params.existing_names = this.#getExistingNames('saml_provision_groups', row_index);
 			}
 			else {
 				while (this.saml_provision_groups_table.querySelector(`[data-row_index="${row_index}"]`) !== null) {
@@ -501,7 +506,8 @@
 
 				popup_params = {
 					add_group: 1,
-					name: ''
+					name: '',
+					existing_names: this.#getExistingNames('saml_provision_groups')
 				};
 			}
 
@@ -580,7 +586,7 @@
 
 				const provision_groups = provision_group_indexes.map((i) => {
 					let user_groups = row.querySelectorAll(
-						`[name="ldap_servers[${row_index}][provision_groups][${i}][user_groups][][usrgrpid]"`
+						`[name^="ldap_servers[${row_index}][provision_groups][${i}][user_groups]"`
 					);
 					let group_name = row.querySelector(
 						`[name="ldap_servers[${row_index}][provision_groups][${i}][name]"`
@@ -636,7 +642,8 @@
 					user_username: row.querySelector(`[name="ldap_servers[${row_index}][user_username]"`).value,
 					user_lastname: row.querySelector(`[name="ldap_servers[${row_index}][user_lastname]"`).value,
 					provision_groups,
-					provision_media
+					provision_media,
+					existing_names: this.#getExistingNames('ldap_servers', row_index)
 				};
 
 				const userdirectoryid_input = row.querySelector(`[name="ldap_servers[${row_index}][userdirectoryid]"`);
@@ -657,7 +664,8 @@
 
 				popup_params = {
 					row_index,
-					add_ldap_server: 1
+					add_ldap_server: 1,
+					existing_names: this.#getExistingNames('ldap_servers')
 				};
 			}
 
@@ -699,19 +707,30 @@
 				for (const [group_index, provision_group] of Object.entries(ldap.provision_groups)) {
 					for (const [name, value] of Object.entries(provision_group)) {
 						if (name === 'user_groups') {
+							const div = document.createElement('div');
+							div.setAttribute('data-field-type', 'array');
+							div.setAttribute('data-field-name',
+								'ldap_servers[' + ldap.row_index + '][provision_groups]['+group_index+'][user_groups]'
+							);
+
 							for (const usrgrp of value) {
 								const input = document.createElement('input');
-								input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][user_groups][][usrgrpid]';
+								input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups]['
+									+ group_index + '][user_groups][]';
 								input.value = usrgrp.usrgrpid;
 								input.type = 'hidden';
-								row.appendChild(input);
+								input.setAttribute('data-field-type', 'hidden');
+								div.appendChild(input);
 							}
+
+							row.appendChild(div);
 						}
 						else {
 							const input = document.createElement('input');
 							input.name = 'ldap_servers[' + ldap.row_index + '][provision_groups][' + group_index + '][' + name + ']';
 							input.value = value;
 							input.type = 'hidden';
+							input.setAttribute('data-field-type', 'hidden');
 							row.appendChild(input);
 						}
 					}
@@ -728,6 +747,7 @@
 						input.name = 'ldap_servers[' + ldap.row_index + '][provision_media][' + group_index + '][' + name + ']';
 						input.value = value;
 						input.type = 'hidden';
+						input.setAttribute('data-field-type', 'hidden');
 						row.appendChild(input);
 					}
 				}
@@ -760,13 +780,16 @@
 			const row = template.content.firstChild;
 
 			if ('user_groups' in saml_provision_group) {
+				const div = row.querySelector(`#saml-provision-groups-${saml_provision_group.row_index}-user-groups`);
+
 				for (const user_group of Object.values(saml_provision_group.user_groups)) {
 					const input = document.createElement('input');
-					input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][][usrgrpid]';
+					input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][user_groups][]';
 					input.value = user_group.usrgrpid;
 					input.type = 'hidden';
+					input.setAttribute('data-field-type', 'hidden');
 
-					row.appendChild(input);
+					div.appendChild(input);
 				}
 			}
 
@@ -775,6 +798,7 @@
 				input.name = 'saml_provision_groups[' + saml_provision_group.row_index + '][roleid]';
 				input.value = saml_provision_group.roleid;
 				input.type = 'hidden';
+				input.setAttribute('data-field-type', 'hidden');
 
 				row.appendChild(input);
 			}
@@ -784,15 +808,14 @@
 
 		_renderProvisionMediaRow(saml_media) {
 			const template_saml_media_mapping_row = new Template(this.templates.saml_provisioning_media_row);
-			const template = document.createElement('template');
 
-			template.innerHTML = template_saml_media_mapping_row.evaluate(saml_media).trim();
+			const template = template_saml_media_mapping_row.evaluateToElement(saml_media);
 
 			if (saml_media.userdirectory_mediaid === undefined) {
 				template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
 			}
 
-			return template.content.firstChild;
+			return template.content;
 		}
 
 		#addMfaMethods(mfa_methods, mfa_default_row_index) {
@@ -832,6 +855,21 @@
 			return row;
 		}
 
+		#getExistingNames(fieldname, exclude_row_index = null) {
+			const fields = this.#form.getAllValues();
+			const result = [];
+
+			if (fieldname in fields && typeof fields[fieldname] === 'object') {
+				Object.entries(fields[fieldname]).forEach(([key, row]) => {
+					if (key !== exclude_row_index) {
+						result.push(row.name);
+					}
+				});
+			}
+
+			return result;
+		}
+
 		editMfaMethod(row = null) {
 			let popup_params;
 			let row_index = 0;
@@ -848,7 +886,8 @@
 					code_length: row.querySelector(`[name="mfa_methods[${row_index}][code_length]"`)?.value,
 					api_hostname: row.querySelector(`[name="mfa_methods[${row_index}][api_hostname]"`)?.value,
 					clientid: row.querySelector(`[name="mfa_methods[${row_index}][clientid]"`)?.value,
-					client_secret: row.querySelector(`[name="mfa_methods[${row_index}][client_secret]"`)?.value
+					client_secret: row.querySelector(`[name="mfa_methods[${row_index}][client_secret]"`)?.value,
+					existing_names: this.#getExistingNames('mfa_methods', row_index)
 				};
 
 				const mfaid_input = row.querySelector(`[name="mfa_methods[${row_index}][mfaid]"`);
@@ -864,6 +903,7 @@
 
 				popup_params = {
 					row_index,
+					existing_names: this.#getExistingNames('mfa_methods'),
 					add_mfa_method: 1
 				};
 			}
@@ -892,6 +932,101 @@
 					row.remove();
 				}
 			});
+		}
+
+		#submit() {
+			clearMessages();
+			this.#setLoadingStatus(['update']);
+			const fields = this.#form.getAllValues();
+
+			this.#form.validateSubmit(fields)
+				.then((result) => {
+					if (!result) {
+						this.#unsetLoadingStatus();
+						return;
+					}
+
+					if (this._authFormSubmit()) {
+						const curl = new Curl('zabbix.php');
+						curl.setArgument('action', 'authentication.update');
+
+						fetch(curl.getUrl(), {
+							method: 'POST',
+							headers: {'Content-Type': 'application/json'},
+							body: JSON.stringify(fields)
+						})
+							.then((response) => response.json())
+							.then((response) => {
+								if ('error' in response) {
+									throw {error: response.error};
+								}
+
+
+								if ('form_errors' in response) {
+									this.#form.setErrors(response.form_errors, true, true);
+									this.#form.renderErrors();
+									return;
+								}
+
+								if ('success' in response) {
+									postMessageOk(response.success.title);
+
+									if ('messages' in response.success) {
+										postMessageDetails('success', response.success.messages);
+									}
+
+									location.href = new URL(response.success.redirect, location.href).href;
+								}
+							})
+							.catch((exception) => this.#ajaxExceptionHandler(exception))
+							.finally(() => this.#unsetLoadingStatus());
+					}
+					else {
+						this.#unsetLoadingStatus();
+					}
+				});
+		}
+
+		#ajaxExceptionHandler(exception) {
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			addMessage(makeMessageBox('bad', messages, title)[0]);
+		}
+
+		#setLoadingStatus(loading_ids) {
+			this.#form_element.classList.add('is-loading', 'is-loading-fadein');
+			[
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.setAttribute('disabled', 'disabled');
+
+					if (loading_ids.includes(button.id)) {
+						button.classList.add('is-loading');
+					}
+				}
+			});
+		}
+
+		#unsetLoadingStatus() {
+			[
+				document.getElementById('update')
+			].forEach(button => {
+				if (button) {
+					button.classList.remove('is-loading');
+					button.removeAttribute('disabled');
+				}
+			});
+
+			this.#form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
 	};
 </script>

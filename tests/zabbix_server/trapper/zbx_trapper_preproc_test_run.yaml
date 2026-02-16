@@ -1562,5 +1562,45 @@ out:
   return: SUCCEED
   expected_len: 524288
   expected_truncated: true
+---
+test case: 'Test JSON item value type with discard on fail'
+in:
+  request: |
+    {
+      "data": {
+        "item": {
+          "steps": [
+            {
+              "type": "26",
+              "params": "$",
+              "error_handler": "1",
+              "error_handler_params": ""
+            }
+          ],
+          "value_type": "6",
+          "value": "invalid_value"
+        },
+        "options": {
+          "state": "1"
+        }
+      },
+      "request": "preprocessing.test",
+      "sid": "400b58fe5ca56f23553bc68b35c9b571"
+    }
+out:
+  return: SUCCEED
+  response: |
+    {
+      "steps": [
+        {
+          "action": 1,
+          "error": {
+            "value":"invalid_value"
+          },
+          "result": null
+        }
+      ],
+      "result": null
+    }
 ...
 

@@ -80,7 +80,7 @@ class CDocHelper {
 	const DATA_COLLECTION_MAINTENANCE_EDIT =					'maintenance#configuration';
 	const DATA_COLLECTION_MAINTENANCE_LIST =					'web_interface/frontend_sections/data_collection/maintenance';
 	const DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT =				'discovery/low_level_discovery/graph_prototypes';
-	const DATA_COLLECTION_TEMPLATE_GROUPS_EDIT =				'config/templates/template#creating-a-template-group';
+	const DATA_COLLECTION_TEMPLATE_GROUPS_EDIT =				'config/templates/template_groups#configuration';
 	const DATA_COLLECTION_TEMPLATE_GROUPS_LIST =				'web_interface/frontend_sections/data_collection/templategroups';
 	const DATA_COLLECTION_TEMPLATE_GRAPH_LIST =					'web_interface/frontend_sections/data_collection/templates/graphs';
 	const DATA_COLLECTION_TEMPLATES_GRAPH_PROTOTYPE_LIST =		'web_interface/frontend_sections/data_collection/templates/discovery/graph_prototypes';
