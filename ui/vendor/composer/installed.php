@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'zabbix/ui',
-        'pretty_version' => '1.0.0+no-version-set',
-        'version' => '1.0.0.0',
-        'reference' => NULL,
+        'pretty_version' => 'dev-master',
+        'version' => 'dev-master',
+        'reference' => '2dd4beb0a0666e6a4dd5fc283a4f26924dfa1b33',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -101,9 +101,9 @@
             'dev_requirement' => false,
         ),
         'zabbix/ui' => array(
-            'pretty_version' => '1.0.0+no-version-set',
-            'version' => '1.0.0.0',
-            'reference' => NULL,
+            'pretty_version' => 'dev-master',
+            'version' => 'dev-master',
+            'reference' => '2dd4beb0a0666e6a4dd5fc283a4f26924dfa1b33',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
