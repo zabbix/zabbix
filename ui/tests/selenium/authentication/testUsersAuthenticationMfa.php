@@ -241,7 +241,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			'TOTP name already used' => [
 				[
 					'expected_authentication_form' => TEST_BAD,
-					'error' => 'MFA method "Pre-existing TOTP" already exists.',
+					'error' => ['Name' => 'Name already exists.'],
 					'fields' => [
 						'Name' => 'Pre-existing TOTP'
 					]
@@ -250,7 +250,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			'TOTP name already used - leading and trailing spaces' => [
 				[
 					'expected_authentication_form' => TEST_BAD,
-					'error' => 'MFA method "Pre-existing TOTP" already exists.',
+					'error' => ['Name' => 'Name already exists.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => '  Pre-existing TOTP  '
@@ -261,7 +261,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			'Duo name already used' => [
 				[
 					'expected_authentication_form' => TEST_BAD,
-					'error' => 'MFA method "Pre-existing Duo" already exists.',
+					'error' => ['Name' => 'Name already exists.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Pre-existing Duo'
@@ -274,8 +274,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			 */
 			'Duo with Client secret field missing' => [
 				[
-					'expected_method_form' => TEST_BAD,
-					'error' => 'Incorrect value for field "client_secret": cannot be empty.',
+					'expected_authentication_form' => TEST_BAD,
+					'error' => ['Client secret' => 'This field cannot be empty.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo missing Client secret',
@@ -386,7 +386,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			'TOTP name already used' => [
 				[
 					'expected_authentication_form' => TEST_BAD,
-					'error' => 'value (name)=(Pre-existing TOTP) already exists.',
+					'error' => ['Name' => 'Name already exists.'],
 					'fields' => [
 						'Name' => 'Pre-existing TOTP'
 					],
@@ -396,7 +396,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			'Duo name already used' => [
 				[
 					'expected_authentication_form' => TEST_BAD,
-					'error' => 'value (name)=(Pre-existing Duo) already exists.',
+					'error' => ['Name' => 'Name already exists.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Pre-existing Duo'
@@ -657,8 +657,7 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		$mfa_form = $this->openMfaForm();
 		$this->assertScreenshot($this->query('id:tabs')->one(), 'empty_mfa_form');
 		$mfa_form->query('button:Update')->one()->click();
-		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'Default MFA method must be specified.');
-		CMessageElement::find()->one()->close();
+		$this->assertInlineError($mfa_form, ['xpath:.//div[@data-field-name="mfa_methods"]' => 'This field cannot be empty.']);
 
 		// Take screenshots.
 		$mfa_form->getFieldContainer('Methods')->query('button:Add')->one()->click();
@@ -722,44 +721,35 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 		}
 
 		// If a validation error expected in the Method edit form.
-		if (CTestArrayHelper::get($data, 'expected_method_form', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Invalid MFA configuration', $data['error']);
+		if (CTestArrayHelper::get($data, 'expected_authentication_form', TEST_GOOD) === TEST_BAD) {
+			$this->assertInlineError($dialog_form, $data['error']);
 			$dialog->close();
 		}
 		else {
 			$dialog->ensureNotPresent();
 
-			// If an error is expected only when saving the Authentication configuration because an MFA method name already exists.
-			if (CTestArrayHelper::get($data, 'expected_authentication_form', TEST_GOOD) === TEST_BAD) {
-				// Save changes to the Authentication configuration.
-				$this->assertEquals(2, $this->getTable(self::TABLE)->findRows('Name', trim($fields['Name']))->count());
-				$mfa_form->query('button:Update')->waitUntilClickable()->one()->click();
-				$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
+			// Transform the field data to what is expected in UI.
+			$fields['Type'] = CTestArrayHelper::get($fields, 'Type', 'TOTP');
+			if ($fields['Type'] === 'TOTP') {
+				$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', self::TOTP_HASH);
+				$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', self::TOTP_LENGTH);
 			}
-			else {
-				// Transform the field data to what is expected in UI.
-				$fields['Type'] = CTestArrayHelper::get($fields, 'Type', 'TOTP');
-				if ($fields['Type'] === 'TOTP') {
-					$fields['Hash function'] = CTestArrayHelper::get($fields, 'Hash function', self::TOTP_HASH);
-					$fields['Code length'] = CTestArrayHelper::get($fields, 'Code length', self::TOTP_LENGTH);
-				}
 
-				// Trim text fields, it is expected that any leading and trailing spaces are not saved.
-				if (CTestArrayHelper::get($data, 'trim')) {
-					$fields = CTestArrayHelper::trim($fields);
-				}
-
-				// Open the Method edit form to verify data is still there.
-				$this->checkMethodsTableAndMethodForm($dialog, $fields);
-				$mfa_form->query('button:Update')->waitUntilClickable()->one()->click();
-
-				// If no error expected, verify the data after saving.
-				$this->page->waitUntilReady();
-				$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
-				$mfa_form->invalidate();
-				$mfa_form->selectTab('MFA settings');
-				$this->checkMethodsTableAndMethodForm($dialog, $fields);
+			// Trim text fields, it is expected that any leading and trailing spaces are not saved.
+			if (CTestArrayHelper::get($data, 'trim')) {
+				$fields = CTestArrayHelper::trim($fields);
 			}
+
+			// Open the Method edit form to verify data is still there.
+			$this->checkMethodsTableAndMethodForm($dialog, $fields);
+			$mfa_form->query('button:Update')->waitUntilClickable()->one()->click();
+
+			// If no error expected, verify the data after saving.
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+			$mfa_form->invalidate();
+			$mfa_form->selectTab('MFA settings');
+			$this->checkMethodsTableAndMethodForm($dialog, $fields);
 		}
 	}
 
@@ -777,8 +767,8 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 			],
 			'TOTP with Name field missing' => [
 				[
-					'expected_method_form' => TEST_BAD,
-					'error' => 'Incorrect value for field "name": cannot be empty.',
+					'expected_authentication_form' => TEST_BAD,
+					'error' => ['Name' => 'This field cannot be empty.'],
 					'fields' => [
 						'Name' => ''
 					]
@@ -807,40 +797,65 @@ class testUsersAuthenticationMfa extends testFormAuthentication {
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Name: 👍©æ<script>alert("hi!")</script>&nbsp;',
 						'API hostname' => 'API: 👍©æ<script>alert("hi!")</script>&nbsp;',
-						'Client ID' => '👍©æ<script>alert("hi!")</script>',
+						'Client ID' => '👍©æ<script>alert("h!")</script>',
 						'Client secret' => 'Pass: 👍©æ<script>alert("hi!")</script>&nbsp;'
 					]
 				]
 			],
 			'Duo with Name field missing' => [
 				[
-					'expected_method_form' => TEST_BAD,
-					'error' => 'Incorrect value for field "name": cannot be empty.',
+					'expected_authentication_form' => TEST_BAD,
+					'error' => ['Name' => 'This field cannot be empty.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
-						'Name' => ''
+						'Name' => '',
+						'API hostname' => 'test',
+						'Client ID' => 'test',
+						'Client secret' => 'test'
 					]
 				]
 			],
 			'Duo with API hostname field missing' => [
 				[
-					'expected_method_form' => TEST_BAD,
-					'error' => 'Incorrect value for field "api_hostname": cannot be empty.',
+					'expected_authentication_form' => TEST_BAD,
+					'error' => ['API hostname' => 'This field cannot be empty.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
 						'Name' => 'Duo missing API',
-						'API hostname' => ''
+						'API hostname' => '',
+						'Client ID' => 'test',
+						'Client secret' => 'test'
 					]
 				]
 			],
 			'Duo with Client ID field missing' => [
 				[
-					'expected_method_form' => TEST_BAD,
-					'error' => 'Incorrect value for field "clientid": cannot be empty.',
+					'expected_authentication_form' => TEST_BAD,
+					'error' => ['Client ID' => 'This field cannot be empty.'],
 					'fields' => [
 						'Type' => 'Duo Universal Prompt',
-						'Name' => 'Duo missing Client ID',
-						'Client ID' => ''
+						'Name' => 'Duo missing API',
+						'API hostname' => 'test',
+						'Client ID' => '',
+						'Client secret' => 'test'
+					]
+				]
+			],
+			'All fields missing' => [
+				[
+					'expected_authentication_form' => TEST_BAD,
+					'error' => [
+						'Name' => 'This field cannot be empty.',
+						'Client ID' => 'This field cannot be empty.',
+						'API hostname' => 'This field cannot be empty.',
+						'Client secret' => 'This field cannot be empty.'
+					],
+					'fields' => [
+						'Type' => 'Duo Universal Prompt',
+						'Name' => '',
+						'API hostname' => '',
+						'Client ID' => '',
+						'Client secret' => ''
 					]
 				]
 			]

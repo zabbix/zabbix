@@ -86,31 +86,36 @@ class testUsersPasswordComplexity extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => ['Minimum password length' => '0']
+					'fields' => ['Minimum password length' => '0'],
+					'error' => 'This value must be no less than "1".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => ['Minimum password length' => '71']
+					'fields' => ['Minimum password length' => '71'],
+					'error' => 'This value must be no greater than "70".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => ['Minimum password length' => '-ab']
+					'fields' => ['Minimum password length' => '-a'],
+					'error' => 'This value must be no less than "1".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => ['Minimum password length' => '!@']
+					'fields' => ['Minimum password length' => '!@'],
+					'error' => 'This value must be no less than "1".'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' => ['Minimum password length' => '']
+					'fields' => ['Minimum password length' => ''],
+					'error' => 'This value must be no less than "1".'
 				]
 			],
 			[
@@ -154,15 +159,14 @@ class testUsersPasswordComplexity extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=authentication.edit');
 		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->fill($data['fields']);
-		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update authentication',
-					'Invalid parameter "/passwd_min_length": value must be one of 1-70.'
-			);
+			$this->page->removeFocus();
+			$this->assertInlineError($form, ['Minimum password length' => $data['error']]);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
+			$form->submit();
 			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 			// Check length fields saved in db, other fields remained default.
 			$db_expected = [

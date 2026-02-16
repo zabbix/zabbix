@@ -110,7 +110,7 @@ class testUsersAuthentication extends CWebTest {
 
 	public function getFormData() {
 		return [
-			// Save default config without changes.
+			// #1 Save default config without changes.
 			[
 				[
 					'db_check' => [
@@ -121,7 +121,7 @@ class testUsersAuthentication extends CWebTest {
 					]
 				]
 			],
-			// Add Deprovisioned user group.
+			// #2 Add Deprovisioned user group.
 			[
 				[
 					'fields' => ['Deprovisioned users group' => 'Disabled'],
@@ -133,7 +133,7 @@ class testUsersAuthentication extends CWebTest {
 					]
 				]
 			],
-			// Remove Deprovisioned user group.
+			// #3 Remove Deprovisioned user group.
 			[
 				[
 					'fields' => ['Deprovisioned users group' => ''],
@@ -149,8 +149,9 @@ class testUsersAuthentication extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => ['Default authentication' => 'LDAP'],
-					'check_alert' => true,
-					'error_message' => 'Incorrect value for field "authentication_type": LDAP is not configured.'
+					'inline_errors' => [
+						'Default authentication' => 'LDAP is not configured.'
+					]
 				]
 			]
 		];
@@ -175,18 +176,8 @@ class testUsersAuthentication extends CWebTest {
 
 		$form->submit();
 
-		if (CTestArrayHelper::get($data, 'check_alert')) {
-			$this->assertEquals('Changing the authentication method will reset all sessions, except the current one.',
-					$this->page->getAlertText()
-			);
-		}
-
-		if ($this->page->isAlertPresent()) {
-			$this->page->acceptAlert();
-		}
-
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error_message']);
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {
@@ -198,9 +189,8 @@ class testUsersAuthentication extends CWebTest {
 			]));
 		}
 
-		/*
+		/**
 		 * !!! All password related checks are performed in testUsersPasswordComplexity test !!!
 		 */
-
 	}
 }
