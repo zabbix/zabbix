@@ -34,6 +34,11 @@ window.mfa_edit = new class {
 	/**
 	 * @type {HTMLFormElement}
 	 */
+	#form_element;
+
+	/**
+	 * @type {CForm}
+	 */
 	#form;
 
 	/**
@@ -42,24 +47,30 @@ window.mfa_edit = new class {
 	#mfaid;
 
 	/**
+	 * @type {array}
+	 */
+	#existing_names
+	/**
 	 * @type {Object}
 	 */
 	#change_sensitive_data;
 
-	init({mfaid, change_sensitive_data}) {
+	init({rules, mfaid, change_sensitive_data, existing_names}) {
 		this.#overlay = overlays_stack.getById('mfa_edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
-		this.#form = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 
 		this.#mfaid = mfaid;
 		this.#change_sensitive_data = change_sensitive_data;
+		this.#existing_names = existing_names;
 
 		this.#addEventListeners();
 		this.#updateForm();
 	}
 
 	#addEventListeners() {
-		this.#form.querySelector('[name=type]').addEventListener('change', () => {
+		this.#form_element.querySelector('[name=type]').addEventListener('change', () => {
 			this.#updateForm();
 		});
 
@@ -68,19 +79,22 @@ window.mfa_edit = new class {
 		if (client_secret_button !== null) {
 			client_secret_button.addEventListener('click', this.#showClientSecretField);
 		}
+
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
 	}
 
 	#updateForm() {
-		const type = this.#form.querySelector('[name="type"]').value;
+		const type = this.#form_element.querySelector('[name="type"]').value;
 
 		for (const element_class of ['js-hash-function', 'js-code-length']) {
-			for (const element of this.#form.querySelectorAll(`.${element_class}`)) {
+			for (const element of this.#form_element.querySelectorAll(`.${element_class}`)) {
 				element.style.display = type == MFA_TYPE_TOTP ? '' : 'none';
 			}
 		}
 
 		for (const element_class of ['js-api-hostname', 'js-clientid', 'js-client-secret']) {
-			for (const element of this.#form.querySelectorAll(`.${element_class}`)) {
+			for (const element of this.#form_element.querySelectorAll(`.${element_class}`)) {
 				element.style.display = type == MFA_TYPE_DUO ? '' : 'none';
 			}
 		}
@@ -91,16 +105,15 @@ window.mfa_edit = new class {
 
 		const client_secret_field = form_field.querySelector('[name="client_secret"][type="password"]');
 		client_secret_field.style.display = '';
+		client_secret_field.value = '';
 		client_secret_field.disabled = false;
 
-		const client_secret_var = form_field.querySelector('[name="client_secret"][type="hidden"]');
-		if (client_secret_var !== null) {
-			form_field.removeChild(client_secret_var);
-		}
 		form_field.removeChild(e.target);
 	}
 
-	submit() {
+	#submit() {
+		this.#removePopupMessages();
+
 		if (this.#mfaid !== null && this.#isSensitiveDataModified() && !this.#confirmSubmit()) {
 			this.#overlay.unsetLoading();
 
@@ -108,13 +121,21 @@ window.mfa_edit = new class {
 		}
 
 		this.#overlay.setLoading();
+		const fields = this.#form.getAllValues();
+		fields.existing_names = this.#existing_names;
 
-		const fields = this.#getFormFields();
+		this.#form.validateSubmit(fields).then(result => {
+			if (!result) {
+				this.#overlay.unsetLoading();
 
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'mfa.check');
+				return;
+			}
 
-		this.#post(curl.getUrl(), fields);
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'mfa.check');
+
+			this.#post(curl.getUrl(), fields);
+		});
 	}
 
 	#post(url, data) {
@@ -128,31 +149,19 @@ window.mfa_edit = new class {
 				if ('error' in response) {
 					throw {error: response.error};
 				}
+
+				if ('form_errors' in response) {
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
+
+					return;
+				}
+
 				overlayDialogueDestroy(this.#overlay.dialogueid);
 
 				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.catch((exception) => {
-				for (const element of this.#form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.#form.parentNode.insertBefore(message_box, this.#form);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => {
 				this.#overlay.unsetLoading();
 			});
@@ -169,7 +178,7 @@ window.mfa_edit = new class {
 			return false;
 		}
 
-		const form_fields = this.#getFormFields();
+		const form_fields = this.#form.getAllValues();
 
 		for (const key in this.#change_sensitive_data) {
 			if (form_fields.hasOwnProperty(key)) {
@@ -182,15 +191,27 @@ window.mfa_edit = new class {
 		return false;
 	}
 
-	#getFormFields() {
-		const fields = getFormFields(this.#form);
-
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'confirmation') {
-				fields[key] = fields[key].trim();
+	#removePopupMessages() {
+		for (const element of this.#form_element.parentNode.children) {
+			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
+				element.parentNode.removeChild(element);
 			}
 		}
+	}
 
-		return fields;
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 }

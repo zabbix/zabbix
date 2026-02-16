@@ -2324,18 +2324,19 @@ class testFormHost extends CWebTest {
 
 					$expected_tags = [
 						[
-							'tag' => 'action',
-							'value' => 'update'
+							'Name' => 'action',
+							'Value' => 'update'
 						],
 						[
-							'tag' => 'tag without value',
-							'value' => ''
+							'Name' => 'tag without value',
+							'Value' => ''
 						],
 						[
-							'tag' => 'test',
-							'value' => 'update'
+							'Name' => 'test',
+							'Value' => 'update'
 						]
 					];
+
 					$tags_table->checkValue($expected_tags);
 
 					$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeadersText());

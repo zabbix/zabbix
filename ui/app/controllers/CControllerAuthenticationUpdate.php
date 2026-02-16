@@ -16,95 +16,438 @@
 
 class CControllerAuthenticationUpdate extends CController {
 
-	/**
-	 * @var CControllerResponseRedirect
-	 */
-	private $response;
+	public static function getValidationRules(): array {
+		global $ALLOW_HTTP_AUTH;
+
+		$rules = ['object', 'fields' => [
+			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
+			'passwd_check_rules' => ['array', 'field' => ['setting passwd_check_rules',
+				'in' => [0, PASSWD_CHECK_CASE, PASSWD_CHECK_DIGITS, PASSWD_CHECK_SPECIAL, PASSWD_CHECK_SIMPLE]
+			]],
+			'ldap_auth_enabled' => ['setting ldap_auth_enabled',
+				'in' => [ZBX_AUTH_LDAP_DISABLED, ZBX_AUTH_LDAP_ENABLED]
+			],
+			'authentication_type' => [
+				['setting authentication_type', 'required', 'in' => [ZBX_AUTH_INTERNAL, ZBX_AUTH_LDAP]],
+				['setting authentication_type', 'not_in' => [ZBX_AUTH_LDAP],
+					'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_DISABLED]],
+					'messages' => ['not_in' => _('LDAP is not configured.')]
+				]
+			],
+			'ldap_jit_status' => ['setting ldap_jit_status',
+				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
+				'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
+			],
+			'ldap_servers' => [
+				[
+					'objects', 'uniq' => ['name'],
+					'fields' =>  [
+						'userdirectoryid' => ['db userdirectory.userdirectoryid'],
+						'name' => ['db userdirectory.name', 'required', 'not_empty'],
+						'host' => ['db userdirectory_ldap.host', 'required', 'not_empty'],
+						'port' => ['db userdirectory_ldap.port', 'required', 'min' => ZBX_MIN_PORT_NUMBER,
+							'max' => ZBX_MAX_PORT_NUMBER
+						],
+						'base_dn' => ['db userdirectory_ldap.base_dn', 'required', 'not_empty'],
+						'search_attribute' => ['db userdirectory_ldap.search_attribute', 'required', 'not_empty'],
+						'bind_dn' => ['db userdirectory_ldap.bind_dn'],
+						'bind_password' => ['db userdirectory_ldap.bind_password'],
+						'description' => ['db userdirectory.description'],
+						'provision_status' => ['db userdirectory.provision_status',
+							'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
+						],
+						'group_basedn' => ['db userdirectory_ldap.group_basedn',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_name' => ['db userdirectory_ldap.group_name',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_membership' => ['db userdirectory_ldap.group_membership',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_member' => ['db userdirectory_ldap.group_member',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_ref_attr' => ['db userdirectory_ldap.user_ref_attr',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_filter' => ['db userdirectory_ldap.group_filter',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_username' => ['db userdirectory_ldap.user_username',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_lastname' => ['db userdirectory_ldap.user_lastname',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_groups' => ['objects', 'not_empty', 'uniq' => ['name'],
+							'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
+							'fields' => [
+								'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+								'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+								'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+								'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+								'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+									'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+								],
+								'severity' => ['db userdirectory_media.severity', 'min' => 0,
+									'max' => (pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+								],
+								'active' => ['db userdirectory_media.active', 'required',
+									'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+								]
+							],
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]],
+							'messages' => ['uniq' => _('Media type and attribute is not unique.')]
+						],
+						'start_tls' => ['db userdirectory_ldap.start_tls',
+							'in' => [ZBX_AUTH_START_TLS_OFF, ZBX_AUTH_START_TLS_ON]
+						],
+						'search_filter' => ['db userdirectory_ldap.search_filter']
+					],
+					'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_DISABLED]]
+				],
+				[
+					'objects', 'required', 'not_empty', 'uniq' => ['name'],
+					'fields' =>  [
+						'userdirectoryid' => ['db userdirectory.userdirectoryid'],
+						'name' => ['db userdirectory.name', 'required', 'not_empty'],
+						'host' => ['db userdirectory_ldap.host', 'required', 'not_empty'],
+						'port' => ['db userdirectory_ldap.port', 'required', 'min' => ZBX_MIN_PORT_NUMBER,
+							'max' => ZBX_MAX_PORT_NUMBER
+						],
+						'base_dn' => ['db userdirectory_ldap.base_dn', 'required', 'not_empty'],
+						'search_attribute' => ['db userdirectory_ldap.search_attribute', 'required', 'not_empty'],
+						'bind_dn' => ['db userdirectory_ldap.bind_dn'],
+						'bind_password' => ['db userdirectory_ldap.bind_password'],
+						'description' => ['db userdirectory.description'],
+						'provision_status' => ['db userdirectory.provision_status',
+							'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
+						],
+						'group_basedn' => ['db userdirectory_ldap.group_basedn',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_name' => ['db userdirectory_ldap.group_name',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_membership' => ['db userdirectory_ldap.group_membership',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_member' => ['db userdirectory_ldap.group_member',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_ref_attr' => ['db userdirectory_ldap.user_ref_attr',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'group_filter' => ['db userdirectory_ldap.group_filter',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_username' => ['db userdirectory_ldap.user_username',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'user_lastname' => ['db userdirectory_ldap.user_lastname',
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_groups' => ['objects', 'not_empty', 'uniq' => ['name'],
+							'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+						],
+						'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
+							'fields' => [
+								'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+								'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+								'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+								'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+								'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+									'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+								],
+								'severity' => ['db userdirectory_media.severity', 'min' => 0,
+									'max' => (pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+								],
+								'active' => ['db userdirectory_media.active', 'required',
+									'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+								]
+							],
+							'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]],
+							'messages' => ['uniq' => _('Media type and attribute is not unique.')]
+						],
+						'start_tls' => ['db userdirectory_ldap.start_tls',
+							'in' => [ZBX_AUTH_START_TLS_OFF, ZBX_AUTH_START_TLS_ON]
+						],
+						'search_filter' => ['db userdirectory_ldap.search_filter']
+					],
+					'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
+				]
+			],
+			'ldap_default_row_index' =>	['integer', 'required'],
+			'ldap_case_sensitive' => ['setting ldap_case_sensitive',
+				'in' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
+				'when' => ['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]]
+			],
+			'ldap_removed_userdirectoryids' => ['array', 'field' => ['db userdirectory_ldap.userdirectoryid']],
+			'jit_provision_interval' =>	['setting jit_provision_interval',
+				'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 25 * SEC_PER_YEAR]],
+				'when' => [
+					['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]],
+					['ldap_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'saml_auth_enabled' => ['setting saml_auth_enabled',
+				'in' => [ZBX_AUTH_SAML_DISABLED, ZBX_AUTH_SAML_ENABLED]
+			],
+			'saml_jit_status' => ['setting saml_jit_status',
+				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'disabled_usrgrpid' => [
+				['setting disabled_usrgrpid'],
+				['setting disabled_usrgrpid', 'required',
+					'when' => [
+						['ldap_auth_enabled', 'in' => [ZBX_AUTH_LDAP_ENABLED]],
+						['ldap_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+					]
+				],
+				['setting disabled_usrgrpid', 'required',
+					'when' => [
+						['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+						['saml_jit_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+					]
+				]
+			],
+			'idp_entityid' => ['db userdirectory_saml.idp_entityid', 'required', 'not_empty',
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'sso_url' => ['db userdirectory_saml.sso_url', 'required', 'not_empty',
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'slo_url' => ['db userdirectory_saml.slo_url',
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'username_attribute' =>	['db userdirectory_saml.username_attribute', 'not_empty',
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'sp_entityid' => ['db userdirectory_saml.sp_entityid', 'required', 'not_empty',
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'nameid_format' => ['db userdirectory_saml.nameid_format',
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'sign_messages' => ['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'sign_assertions' => ['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'sign_authn_requests' => ['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'sign_logout_requests' => ['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'sign_logout_responses' => ['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'encrypt_nameid' =>	['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'encrypt_assertions' =>	['boolean', 'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]],
+			'saml_case_sensitive' => ['integer', 'in' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'saml_provision_status' => ['integer', 'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED],
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'saml_group_name' => ['db userdirectory_saml.group_name', 'required', 'not_empty',
+				'when' => [
+					['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+					['saml_provision_status', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+				]
+			],
+			'saml_user_username' =>	['db userdirectory_saml.user_username',
+				'when' => [
+					['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+					['saml_provision_status', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+				]
+			],
+			'saml_user_lastname' =>	['db userdirectory_saml.user_lastname',
+				'when' => [
+					['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+					['saml_provision_status', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+				]
+			],
+			'saml_provision_groups' => ['objects', 'not_empty', 'uniq' => ['name'],
+				'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
+				'when' => [
+					['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+					['saml_provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'saml_provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
+				'fields' => [
+					'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+					'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+					'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+					'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+					'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+						'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+					],
+					'severity' => ['db userdirectory_media.severity', 'min' => 0,
+						'max' => (pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+					],
+					'active' => ['db userdirectory_media.active', 'required',
+						'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+					]
+				],
+				'when' => [
+					['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]],
+					['saml_provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				],
+				'messages' => ['uniq' => _('Media type and attribute is not unique.')]
+			],
+			'scim_status' => ['db userdirectory_saml.scim_status',
+				'in' => [ZBX_AUTH_SCIM_PROVISIONING_DISABLED, ZBX_AUTH_SCIM_PROVISIONING_ENABLED],
+				'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+			],
+			'mfa_status' => ['setting mfa_status', 'in' => [MFA_DISABLED, MFA_ENABLED]],
+			'mfa_methods' => [
+				[
+					'objects', 'uniq' => ['name'],
+					'fields' => [
+						'mfaid' => ['db mfa.mfaid'],
+						'type' => ['db mfa.type', 'required', 'in' => [MFA_TYPE_TOTP, MFA_TYPE_DUO]],
+						'name' => ['db mfa.name', 'required', 'not_empty'],
+						'hash_function' => ['db mfa.hash_function', 'required',
+							'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'code_length' => ['db mfa.code_length', 'required',
+							'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'clientid' => ['db mfa.clientid', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'client_secret' => ['db mfa.client_secret', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						]
+					],
+					'when' => ['mfa_status', 'in' => [MFA_DISABLED]]
+				],
+				[
+					'objects', 'required', 'not_empty', 'uniq' => ['name'],
+					'fields' => [
+						'mfaid' => ['db mfa.mfaid'],
+						'type' => ['db mfa.type', 'required', 'in' => [MFA_TYPE_TOTP, MFA_TYPE_DUO]],
+						'name' => ['db mfa.name', 'required', 'not_empty'],
+						'hash_function' => ['db mfa.hash_function', 'required',
+							'in' => [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'code_length' => ['db mfa.code_length', 'required',
+							'in' => [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8],
+							'when' => ['type', 'in' => [MFA_TYPE_TOTP]]
+						],
+						'api_hostname' => ['db mfa.api_hostname', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'clientid' => ['db mfa.clientid', 'required', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						],
+						'client_secret' => ['db mfa.client_secret', 'not_empty',
+							'when' => ['type', 'in' => [MFA_TYPE_DUO]]
+						]
+					],
+					'when' => ['mfa_status', 'in' => [MFA_ENABLED]]
+				]
+			],
+			'mfa_default_row_index' => ['integer', 'required'],
+			'mfa_removed_mfaids' =>	['array', 'field' => ['db mfa.mfaid']]
+		]];
+
+		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
+			$rules['fields'] += [
+				'idp_certificate' => ['string', 'not_empty',
+					'length' => CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH,
+					'use' => [CSslCertificateValidator::class],
+					'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+				],
+				'sp_private_key' => [
+					[
+						'string', 'length' => CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH,
+						'use' => [CSslPrivateKeyValidator::class],
+						'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+					],
+					['string', 'not_empty', 'when' => ['sign_messages', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_assertions', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_authn_requests', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_logout_requests', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_logout_responses', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['encrypt_nameid', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['encrypt_assertions', 'in' => [1]]]
+				],
+				'sp_certificate' => [
+					[
+						'string', 'length' => CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH,
+						'use' => [CSslCertificateValidator::class],
+						'when' => ['saml_auth_enabled', 'in' => [ZBX_AUTH_SAML_ENABLED]]
+					],
+					['string', 'not_empty', 'when' => ['sign_messages', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_assertions', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_authn_requests', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_logout_requests', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['sign_logout_responses', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['encrypt_nameid', 'in' => [1]]],
+					['string', 'not_empty', 'when' => ['encrypt_assertions', 'in' => [1]]]
+				]
+			];
+		}
+
+		if ($ALLOW_HTTP_AUTH) {
+			$rules['fields'] += [
+				'http_auth_enabled' => ['setting http_auth_enabled',
+					'in' => [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]
+				],
+				'http_login_form' => ['setting http_login_form',
+					'in' => [ZBX_AUTH_FORM_ZABBIX, ZBX_AUTH_FORM_HTTP],
+					'when' => ['http_auth_enabled', 'in' => [ZBX_AUTH_HTTP_ENABLED]]
+				],
+				'http_strip_domains' => ['setting http_strip_domains',
+					'when' => ['http_auth_enabled', 'in' => [ZBX_AUTH_HTTP_ENABLED]]
+				],
+				'http_case_sensitive' => ['setting http_case_sensitive',
+					'in' => [ZBX_AUTH_CASE_INSENSITIVE, ZBX_AUTH_CASE_SENSITIVE],
+					'when' => ['http_auth_enabled', 'in' => [ZBX_AUTH_HTTP_ENABLED]]
+				]
+			];
+		}
+
+		return $rules;
+	}
 
 	private const PROVISION_ENABLED_FIELDS = ['group_basedn', 'group_member', 'group_membership',  'group_name',
 		'user_username', 'user_lastname', 'uer_ref_attr', 'provision_groups', 'provision_media'
 	];
 
 	protected function init() {
-		$this->response = new CControllerResponseRedirect(
-			(new CUrl('zabbix.php'))->setArgument('action', 'authentication.edit')
-		);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 	}
 
 	protected function checkInput() {
-		global $ALLOW_HTTP_AUTH;
-
-		$fields = [
-			'form_refresh' =>					'int32',
-			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
-			'disabled_usrgrpid' =>				'id',
-			'ldap_auth_enabled' =>				'in '.ZBX_AUTH_LDAP_DISABLED.','.ZBX_AUTH_LDAP_ENABLED,
-			'ldap_servers' =>					'array',
-			'ldap_default_row_index' =>			'int32',
-			'ldap_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'ldap_removed_userdirectoryids' =>	'array_id',
-			'ldap_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'jit_provision_interval' =>			'time_unit_year '.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]),
-			'saml_auth_enabled' =>				'in '.ZBX_AUTH_SAML_DISABLED.','.ZBX_AUTH_SAML_ENABLED,
-			'saml_jit_status' =>				'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'idp_entityid' =>					'db userdirectory_saml.idp_entityid',
-			'sso_url' =>						'db userdirectory_saml.sso_url',
-			'slo_url' =>						'db userdirectory_saml.slo_url',
-			'username_attribute' =>				'db userdirectory_saml.username_attribute',
-			'sp_entityid' =>					'db userdirectory_saml.sp_entityid',
-			'nameid_format' =>					'db userdirectory_saml.nameid_format',
-			'sign_messages' =>					'in 0,1',
-			'sign_assertions' =>				'in 0,1',
-			'sign_authn_requests' =>			'in 0,1',
-			'sign_logout_requests' =>			'in 0,1',
-			'sign_logout_responses' =>			'in 0,1',
-			'encrypt_nameid' =>					'in 0,1',
-			'encrypt_assertions' =>				'in 0,1',
-			'saml_case_sensitive' =>			'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE,
-			'saml_provision_status' =>			'in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'saml_group_name' =>				'db userdirectory_saml.group_name',
-			'saml_user_username' =>				'db userdirectory_saml.user_username',
-			'saml_user_lastname' =>				'db userdirectory_saml.user_lastname',
-			'saml_provision_groups' =>			'array',
-			'saml_provision_media' =>			'array',
-			'scim_status' =>					'in '.ZBX_AUTH_SCIM_PROVISIONING_DISABLED.','.ZBX_AUTH_SCIM_PROVISIONING_ENABLED,
-			'passwd_min_length' =>				'int32',
-			'passwd_check_rules' =>				'array',
-			'mfa_status' =>						'in '.MFA_DISABLED.','.MFA_ENABLED,
-			'mfa_methods' =>					'array',
-			'mfa_default_row_index' =>			'int32',
-			'mfa_removed_mfaids' =>				'array_id'
-		];
-
-		if (CAuthenticationHelper::isSamlCertsStorageDatabase()) {
-			$fields += [
-				'idp_certificate' => 'db userdirectory_saml.idp_certificate',
-				'sp_certificate' => 'db userdirectory_saml.sp_certificate',
-				'sp_private_key' => 'db userdirectory_saml.sp_private_key'
-			];
-		}
-
-		if ($ALLOW_HTTP_AUTH) {
-			$fields += [
-				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
-				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
-				'http_strip_domains' =>		'setting http_strip_domains',
-				'http_case_sensitive' =>	'in '.ZBX_AUTH_CASE_INSENSITIVE.','.ZBX_AUTH_CASE_SENSITIVE
-			];
-		}
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if ($ret) {
 			$ret = $this->validateLdap() && $this->validateSamlAuth() && $this->validateMfa();
 		}
 
 		if (!$ret) {
-			if (CMessageHelper::getTitle() === null) {
-				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
-			}
-			$this->response->setFormData($this->getInputAll());
-			$this->setResponse($this->response);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => CMessageHelper::getTitle() === null
+						? _('Cannot update authentication')
+						: CMessageHelper::getTitle(),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(
+				new CControllerResponseData(['main_block' => json_encode($response)])
+			);
 		}
 
 		return $ret;
@@ -128,45 +471,12 @@ class CControllerAuthenticationUpdate extends CController {
 
 			$ldap_servers = $this->getInput('ldap_servers', []);
 
-			if (!$ldap_servers) {
-				error(_('At least one LDAP server must exist.'));
-
-				return false;
-			}
-
 			if (!$this->hasInput('ldap_default_row_index')
 					|| !array_key_exists($this->getInput('ldap_default_row_index'), $ldap_servers)) {
 				error(_('Default LDAP server must be specified.'));
 
 				return false;
 			}
-
-			foreach ($ldap_servers as $ldap_server) {
-				if (!array_key_exists('provision_status', $ldap_server)
-						|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
-					continue;
-				}
-
-				if (!array_key_exists('provision_groups', $ldap_server)
-						|| !$this->validateProvisionGroups($ldap_server['provision_groups'])) {
-					error(_('Invalid LDAP JIT provisioning user group mapping configuration.'));
-
-					return false;
-				}
-
-				if (array_key_exists('provision_media', $ldap_server)
-						&& !$this->validateProvisionMedia($ldap_server['provision_media'])) {
-					error(_('Invalid LDAP JIT provisioning media type mapping configuration.'));
-
-					return false;
-				}
-			}
-		}
-		elseif ($this->getInput('authentication_type', CSettingsSchema::getDefault('authentication_type'))
-				== ZBX_AUTH_LDAP) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'authentication_type', _('LDAP is not configured')));
-
-			return false;
 		}
 
 		return true;
@@ -195,30 +505,6 @@ class CControllerAuthenticationUpdate extends CController {
 			'username_attribute',
 			'sp_entityid'
 		]);
-
-		if ($this->getInput('saml_provision_status', JIT_PROVISIONING_DISABLED) == JIT_PROVISIONING_ENABLED) {
-			$saml_fields['saml_group_name'] = $this->getInput('saml_group_name', '');
-
-			if (!$this->validateProvisionGroups($this->getInput('saml_provision_groups', []))) {
-				error(_('Invalid SAML JIT provisioning user group mapping configuration.'));
-
-				return false;
-			}
-
-			if (!$this->validateProvisionMedia($this->getInput('saml_provision_media', []))) {
-				error(_('Invalid SAML JIT provisioning media type mapping configuration.'));
-
-				return false;
-			}
-		}
-
-		foreach ($saml_fields as $field_name => $field_value) {
-			if ($field_value === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', $field_name, _('cannot be empty')));
-
-				return false;
-			}
-		}
 
 		return true;
 	}
@@ -314,11 +600,11 @@ class CControllerAuthenticationUpdate extends CController {
 				$result = $this->processGeneralAuthenticationSettings($ldap_userdirectoryid, $mfaid);
 			}
 
-			if ($result && $this->hasInput('ldap_removed_userdirectoryids')) {
+			if ($result && $this->getInput('ldap_removed_userdirectoryids', []) !== []) {
 				$result = (bool) API::UserDirectory()->delete($this->getInput('ldap_removed_userdirectoryids'));
 			}
 
-			if ($result && $this->hasInput('mfa_removed_mfaids')) {
+			if ($result && $this->getInput('mfa_removed_mfaids', []) !== []) {
 				$result = (bool) API::Mfa()->delete($this->getInput('mfa_removed_mfaids'));
 			}
 
@@ -332,17 +618,24 @@ class CControllerAuthenticationUpdate extends CController {
 			DBend(false);
 		}
 
+		$output = [];
+
 		if ($result) {
-			CMessageHelper::setSuccessTitle(_('Authentication settings updated'));
+			$output['success'] = [
+				'title' => _('Authentication settings updated'),
+				'redirect' => (new CUrl('zabbix.php'))->setArgument('action', 'authentication.edit')->getUrl()
+			];
 		}
 		else {
-			if (CMessageHelper::getTitle() === null) {
-				CMessageHelper::setErrorTitle(_('Cannot update authentication'));
-			}
-			$this->response->setFormData($this->getInputAll());
+			$output['error'] = [
+				'title' => CMessageHelper::getTitle() === null
+					? _('Cannot update authentication')
+					: CMessageHelper::getTitle(),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($this->response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
 	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid, int $mfaid): bool {
@@ -457,10 +750,17 @@ class CControllerAuthenticationUpdate extends CController {
 		$upd_ldap_servers = [];
 		$userdirectoryid_map = [];
 
-		foreach ($ldap_servers as $row_index => $ldap_server) {
+		foreach ($ldap_servers as $row_index => &$ldap_server) {
 			if (!array_key_exists('provision_status', $ldap_server)
 					|| $ldap_server['provision_status'] != JIT_PROVISIONING_ENABLED) {
 				$ldap_server = array_diff_key($ldap_server, array_flip(self::PROVISION_ENABLED_FIELDS));
+			}
+
+			if (array_key_exists('provision_groups', $ldap_server)) {
+				foreach ($ldap_server['provision_groups'] as &$group) {
+					$group['user_groups'] = zbx_toObject($group['user_groups'], 'usrgrpid');
+				}
+				unset($group);
 			}
 
 			if (array_key_exists('userdirectoryid', $ldap_server)) {
@@ -472,6 +772,7 @@ class CControllerAuthenticationUpdate extends CController {
 				$ins_ldap_servers[] = ['idp_type' => IDP_TYPE_LDAP] + $ldap_server;
 			}
 		}
+		unset($ldap_server);
 
 		$result = $upd_ldap_servers ? API::UserDirectory()->update($upd_ldap_servers) : [];
 		$result = $result !== false && $ins_ldap_servers ? API::UserDirectory()->create($ins_ldap_servers) : $result;
@@ -578,6 +879,12 @@ class CControllerAuthenticationUpdate extends CController {
 				'saml_provision_media' => []
 			];
 			$this->getInputs($provisioning_fields, array_keys($provisioning_fields));
+
+			foreach ($provisioning_fields['saml_provision_groups'] as &$group) {
+				$group['user_groups'] = zbx_toObject($group['user_groups'], 'usrgrpid');
+			}
+			unset($group);
+
 			$provisioning_fields = CArrayHelper::renameKeys($provisioning_fields, [
 				'saml_group_name' => 'group_name',
 				'saml_user_username' => 'user_username',
@@ -630,40 +937,6 @@ class CControllerAuthenticationUpdate extends CController {
 				'values' => ['status' => ZBX_SESSION_PASSIVE],
 				'where' => ['userid' => array_keys($internal_auth_users)]
 			]);
-		}
-
-		return true;
-	}
-
-	private function validateProvisionGroups(array $provision_group): bool {
-		foreach ($provision_group as $group) {
-			if (!is_array($group)) {
-				return false;
-			}
-
-			if (!array_key_exists('user_groups', $group) || !is_array($group['user_groups'])
-					|| !array_key_exists('roleid', $group) || !ctype_digit($group['roleid'])
-					|| !array_key_exists('name', $group) || !is_string($group['name']) || $group['name'] === '') {
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	private function validateProvisionMedia(array $provision_media): bool {
-		if (!$provision_media) {
-			return true;
-		}
-
-		foreach ($provision_media as $media) {
-			if (!is_array($media)
-					|| !array_key_exists('name', $media) || !is_string($media['name']) || $media['name'] === ''
-					|| !array_key_exists('attribute', $media) || !is_string($media['attribute'])
-					|| $media['attribute'] === ''
-					|| !array_key_exists('mediatypeid', $media) || !ctype_digit($media['mediatypeid'])) {
-				return false;
-			}
 		}
 
 		return true;

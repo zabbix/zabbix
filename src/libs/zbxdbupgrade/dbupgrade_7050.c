@@ -18,6 +18,7 @@
 
 #include "zbxdbschema.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 8.0 development database patches
@@ -454,10 +455,46 @@ static int	DBpatch_7050031(void)
 
 static int	DBpatch_7050032(void)
 {
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int				ret;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			(char *)NULL);
+
+	result = zbx_db_select("select w.widgetid"
+			" from widget w"
+			" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+			" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
+			" where w.type='scatterplot' or w.type='svggraph'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_hostnames", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+
+static int	DBpatch_7050033(void)
+{
 	return DBrename_table("housekeeper", "housekeeper_old");
 }
 
-static int	DBpatch_7050033(void)
+static int	DBpatch_7050034(void)
 {
 	const zbx_db_table_t	table =
 			{"housekeeper", "housekeeperid", 0,
@@ -473,7 +510,7 @@ static int	DBpatch_7050033(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050034(void)
+static int	DBpatch_7050035(void)
 {
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
@@ -500,12 +537,12 @@ static int	DBpatch_7050034(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050035(void)
+static int	DBpatch_7050036(void)
 {
 	return DBdrop_table("housekeeper_old");
 }
 
-static int	DBpatch_7050036(void)
+static int	DBpatch_7050037(void)
 {
 #ifdef HAVE_POSTGRESQL
 	if (FAIL == zbx_db_index_exists("housekeeper", "housekeeper_pkey1"))
@@ -518,32 +555,32 @@ static int	DBpatch_7050036(void)
 #endif
 }
 
-static int	DBpatch_7050037(void)
+static int	DBpatch_7050038(void)
 {
 	return DBcreate_housekeeper_trigger("items", "itemid");
 }
 
-static int	DBpatch_7050038(void)
+static int	DBpatch_7050039(void)
 {
 	return DBcreate_housekeeper_trigger("triggers", "triggerid");
 }
 
-static int	DBpatch_7050039(void)
+static int	DBpatch_7050040(void)
 {
 	return DBcreate_housekeeper_trigger("services", "serviceid");
 }
 
-static int	DBpatch_7050040(void)
+static int	DBpatch_7050041(void)
 {
 	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
 }
 
-static int	DBpatch_7050041(void)
+static int	DBpatch_7050042(void)
 {
 	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
 }
 
-static int	DBpatch_7050042(void)
+static int	DBpatch_7050043(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
 		return FAIL;
@@ -551,36 +588,36 @@ static int	DBpatch_7050042(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050043(void)
+static int	DBpatch_7050044(void)
 {
 	return DBdrop_foreign_key("dhosts", 1);
 }
 
-static int	DBpatch_7050044(void)
+static int	DBpatch_7050045(void)
 {
 	const zbx_db_field_t	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("dhosts", 1, &field);
 }
 
-static int	DBpatch_7050045(void)
+static int	DBpatch_7050046(void)
 {
 	return DBdrop_foreign_key("dservices", 1);
 }
 
-static int	DBpatch_7050046(void)
+static int	DBpatch_7050047(void)
 {
 	const zbx_db_field_t	field = {"dhostid", NULL, "dhosts", "dhostid", 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_foreign_key("dservices", 1, &field);
 }
 
-static int	DBpatch_7050047(void)
+static int	DBpatch_7050048(void)
 {
 	return DBdrop_foreign_key("dservices", 2);
 }
 
-static int	DBpatch_7050048(void)
+static int	DBpatch_7050049(void)
 {
 	const zbx_db_field_t	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, ZBX_TYPE_ID, 0, 0};
 
@@ -642,5 +679,6 @@ DBPATCH_ADD(7050045, 0, 1)
 DBPATCH_ADD(7050046, 0, 1)
 DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
+DBPATCH_ADD(7050049, 0, 1)
 
 DBPATCH_END()

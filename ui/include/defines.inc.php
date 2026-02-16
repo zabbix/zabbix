@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0alpha2');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050048);
+define('ZABBIX_DB_VERSION',		7050049);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1301,6 +1301,10 @@ define('SVG_GRAPH_TYPE_BAR',		3);
 define('SVG_GRAPH_STACKED_OFF',	0);
 define('SVG_GRAPH_STACKED_ON',	1);
 
+define('SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO',	0);
+define('SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW',	1);
+define('SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE',	2);
+
 define('SVG_GRAPH_MISSING_DATA_NONE',			0);
 define('SVG_GRAPH_MISSING_DATA_CONNECTED',		1);
 define('SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO',	2);
@@ -2255,6 +2259,7 @@ define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR', 'zabbix-logo-sidebar');
 define('ZBX_STYLE_ZABBIX_LOGO_SIDEBAR_COMPACT', 'zabbix-logo-sidebar-compact');
 define('ZBX_STYLE_DEFAULT_OPTION', 'default-option');
 define('ZBX_STYLE_OVERLAY_DIALOGUE_HEADER', 'overlay-dialogue-header');
+define('ZBX_STYLE_Z_TEXTAREA_FLEXIBLE', 'z-textarea-flexible');
 
 // HTML column layout.
 define('ZBX_STYLE_GRID_COLUMNS', 'grid-columns');
