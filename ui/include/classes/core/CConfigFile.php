@@ -334,26 +334,19 @@ $ZBX_SERVER_NAME		= \''.addcslashes($this->config['ZBX_SERVER_NAME'], "'\\").'\'
 $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 
 // Uncomment this block if you are using Elasticsearch or ClickHouse for storing history data.
-// The provider configuration consists of one or more array entries with the following parameters:
-// \'types\' - an array with one or more type strings (dbl, str, log, uint, text, binary).
-// \'provider\' - a string containing provider (elastic, clickhouse).
-// \'url\' - a string pointing to the service instance.
-// \'db\' - a string with database name. Required for ClickHouse.
-// \'username\' and \'password\' - service credential strings. Required for ClickHouse.
-//$HISTORY_PROVIDERS = [
-//	[
-//		\'types\' => [\'uint\', \'text\'],
-//		\'provider\' => \'clickhouse\',
-//		\'url\' => \'http://localhost:8123\',
-//		\'db\' => \'zabbix\',
-//		\'username\' =>\'zabbix\',
-//		\'password\' =>\'zabbix\'
-//	],
-//	[
-//		\'types\' => [\'str\'],
-//		\'provider\' => \'elastic\',
-//		\'url\' => \'http://localhost:9200\'
-//	]
+// Supported configuration parameters:
+// \'types\' - An array with provider supported value types.
+// \'provider\' - History provider type, (elastic, clickhouse).
+// \'url\' - History provider URL.
+// \'db\' - Database name. Used for ClickHouse.
+// \'username\' and \'password\' - Database user and password. Used for ClickHouse.
+//$HISTORY_PROVIDERS[] = [
+//	\'types\' => [\'dbl\', \'str\', \'log\', \'uint\', \'text\', \'binary\'],
+//	\'provider\' => \'<provider>\',
+//	\'url\' => \'<url>\',
+//	\'db\' => \'zabbix\',
+//	\'username\' => \'zabbix\',
+//	\'password\' => \'zabbix\'
 //];
 
 // Used for SAML authentication.
