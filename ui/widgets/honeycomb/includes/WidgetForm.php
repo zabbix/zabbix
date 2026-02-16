@@ -124,7 +124,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault('{HOST.NAME}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->prefixLabel(_('Primary label'))
-					->setMaxLength(2048)
+					->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('primary_label_size_type', null, [
@@ -174,7 +174,7 @@ class WidgetForm extends CWidgetForm {
 					->setDefault('{{ITEM.LASTVALUE}.fmtnum(2)}')
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 					->prefixLabel(_('Secondary label'))
-					->setMaxLength(2048)
+					->setMaxLength(255)
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('secondary_label_size_type', null, [
