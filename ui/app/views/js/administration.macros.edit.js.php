@@ -22,7 +22,7 @@
 <script type="text/x-jquery-tmpl" id="macro-row-tmpl">
 	<?= (new CRow([
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
@@ -36,7 +36,7 @@
 					->setErrorLabel(_('Value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setMaxlength(DB::getFieldLength('globalmacro' , 'description'))
 					->setAttribute('placeholder', _('description'))
@@ -160,20 +160,15 @@
 			.dynamicRows({template: '#macro-row-tmpl', allow_empty: true, counter: <?= count($data['macros']) ?>})
 			.on('afteradd.dynamicRows', function() {
 				$('.macro-input-group', table).macroValue();
-				$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', table).textareaFlexible();
 			})
 			.find('.macro-input-group')
 			.macroValue();
 
 		table
-			.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
+			.on('change keydown', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
 				if (event.type === 'change' || event.which === 13) {
-					$(this)
-						.val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')))
-						.textareaFlexible();
+					$(this).val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')));
 				}
-			})
-			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-			.textareaFlexible();
+			});
 	});
 </script>

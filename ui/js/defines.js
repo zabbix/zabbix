@@ -50,6 +50,7 @@ const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
+const ZBX_STYLE_Z_TEXTAREA_FLEXIBLE = 'z-textarea-flexible';
 
 const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 
@@ -249,5 +250,5 @@ const NAME_DELIMITER = ': ';
 
 const WRAPPER_PADDING_RIGHT = 10;
 
-const GRAPH_HINTBOX_TYPE_SVG_GRAPH = 0;
-const GRAPH_HINTBOX_TYPE_SCATTER_PLOT = 1;
+const GRAPH_TYPE_SVG_GRAPH = 0;
+const GRAPH_TYPE_SCATTER_PLOT = 1;

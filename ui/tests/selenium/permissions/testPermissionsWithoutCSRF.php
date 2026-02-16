@@ -504,8 +504,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM settings',
-					'link' => 'zabbix.php?action=authentication.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=authentication.edit'
 				]
 			],
 			// #44 User group update.

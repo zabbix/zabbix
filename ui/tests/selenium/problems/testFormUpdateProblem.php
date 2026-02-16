@@ -313,7 +313,7 @@ class testFormUpdateProblem extends CWebTest {
 		if (CTestArrayHelper::get($data, 'hintboxes')) {
 			foreach ($data['hintboxes'] as $field => $text) {
 				$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent()->one();
 				$this->assertEquals($text, $hint->getText());
 				$hint->query('class:btn-overlay-close')->waitUntilClickable()->one()->click();
 			}
@@ -934,8 +934,8 @@ class testFormUpdateProblem extends CWebTest {
 		$row->invalidate();
 		$unsuppress_button = 'xpath:.//button['.CXPathHelper::fromClass('zi-eye').']';
 		$row->getColumn('Actions')->query($unsuppress_button)->waitUntilClickable()->one()->click();
-		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue wordbreak"]')->asOverlayDialog()
-				->one()->waitUntilReady();
+		$hint = $this->query('xpath://div[@data-hintboxid and @class="overlay-dialogue hintbox wordbreak hintbox-static"]')
+				->asOverlayDialog()->one()->waitUntilReady();
 		$this->checkHistoryTable($hint->query('class:list-table')->asTable()->one(), 'User', 'Action');
 		$hint->close();
 

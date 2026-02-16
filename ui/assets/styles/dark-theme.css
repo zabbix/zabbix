@@ -1547,7 +1547,7 @@ button {
 .zi-chevron-up::before, .zi-users-filled-small::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before, .svg-graph-hintbox li .svg-graph-hintbox-icon-color::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-copy::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-link-external-small::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, form.dashboard-widget-scatterplot .dataset-body .form-grid .marker-config .radio-list-control .icon::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -2384,6 +2384,7 @@ button {
 z-select.has-error button.focusable:active,
 z-select.has-error button.focusable:hover,
 z-select.has-error button.focusable,
+z-textarea-flexible.has-error textarea,
 input[type="text"].has-error,
 input[type="password"].has-error,
 input[type="search"].has-error,
@@ -2396,6 +2397,7 @@ textarea.has-error {
   z-select.has-error button.focusable:active:focus,
   z-select.has-error button.focusable:hover:focus,
   z-select.has-error button.focusable:focus,
+  z-textarea-flexible.has-error textarea:focus,
   input[type="text"].has-error:focus,
   input[type="password"].has-error:focus,
   input[type="search"].has-error:focus,
@@ -2443,7 +2445,7 @@ div[data-field-type="set"].has-error {
 
 .macro-input-group textarea.has-error, .macro-input-group textarea.has-error:focus {
   border-width: 1px 0 1px 1px; }
-.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
+.macro-input-group .has-error + .btn-undo, .macro-input-group .has-error:focus + .btn-undo, .macro-input-group .has-error:focus-within + .btn-undo, .macro-input-group .has-error + .btn-undo:focus {
   border-color: #ff5555; }
 .macro-input-group .has-error ~ .btn-dropdown-container .btn-dropdown-toggle {
   border-color: #ff5555; }
@@ -3923,6 +3925,14 @@ section {
 
 .svg-graph {
   display: block; }
+  .svg-graph.highlighted .svg-graph-points,
+  .svg-graph.highlighted .svg-graph-line,
+  .svg-graph.highlighted .svg-graph-bar {
+    opacity: 0.15; }
+    .svg-graph.highlighted .svg-graph-points.highlighted,
+    .svg-graph.highlighted .svg-graph-line.highlighted,
+    .svg-graph.highlighted .svg-graph-bar.highlighted {
+      opacity: 1; }
 
 .svg-point-highlight {
   fill: #f2f2f2;
@@ -4651,6 +4661,19 @@ z-sparkline {
     right: 0;
     bottom: 0;
     left: 0; }
+
+z-textarea-flexible {
+  display: inline-block; }
+  z-textarea-flexible textarea {
+    width: 100%;
+    height: 24px;
+    overflow: hidden;
+    resize: none;
+    line-height: 14px;
+    white-space: break-spaces;
+    word-break: break-word; }
+    z-textarea-flexible textarea[readonly]:focus {
+      border-color: #768d99; }
 
 .widget-field-sparkline {
   display: grid;
@@ -7184,7 +7207,7 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
 
 .multiselect, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
+z-select .list, z-textarea-flexible textarea, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #383838;
   border: 1px solid #4f4f4f;
   box-sizing: border-box;
@@ -7313,14 +7336,14 @@ z-select .list, input[type="text"], input[type="password"], input[type="search"]
   box-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); }
 
 .multiselect[aria-readonly], .z-select[readonly] .focusable,
-z-select[readonly] .focusable, input[readonly], textarea[readonly] {
+z-select[readonly] .focusable, z-textarea-flexible textarea[readonly], input[readonly], textarea[readonly] {
   color: #f2f2f2;
   -webkit-text-fill-color: #f2f2f2;
   background-color: #2b2b2b;
   border-color: #3d3d3d; }
 
 .multiselect[aria-disabled], .radio-list-control input[type="radio"][readonly] + label, .radio-list-control input[type="radio"][disabled] + label, .z-select[disabled] .focusable,
-z-select[disabled] .focusable, input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
+z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span {
   color: #525252;
   -webkit-text-fill-color: #525252;
   background-color: #2b2b2b;
@@ -7632,6 +7655,25 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     .overlay-dialogue.modal-popup.modal-popup-fullscreen {
       --modal-width: calc(100vw - 40px);
       --modal-max-width: calc(100vw - 40px); }
+  .overlay-dialogue.hintbox {
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden;
+    padding-top: 20px; }
+    .overlay-dialogue.hintbox.hintbox-position-fixed {
+      position: fixed; }
+    .overlay-dialogue.hintbox:not(.hintbox-static) {
+      pointer-events: none; }
+    .overlay-dialogue.hintbox.hintbox-static {
+      padding-top: 0; }
+      .overlay-dialogue.hintbox.hintbox-static .hintbox-draggable-handle {
+        height: 20px;
+        width: 100%;
+        cursor: grab; }
+    .overlay-dialogue.hintbox .hintbox-container {
+      overflow: auto;
+      padding-bottom: 1px; }
   .overlay-dialogue .hintbox-raw-data {
     white-space: pre-wrap; }
   .overlay-dialogue .hintbox-wrap,
@@ -7762,15 +7804,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     margin-left: 10px; }
   .textarea-flexible-container td button {
     line-height: normal; }
-
-.textarea-flexible {
-  min-height: 24px;
-  overflow: hidden;
-  resize: none;
-  word-break: break-word;
-  height: 24px;
-  line-height: 14px;
-  white-space: break-spaces; }
 
 .overlay-dialogue-body {
   margin: 0 0 25px;
@@ -7953,7 +7986,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   font-size: 12px;
   line-height: 18px;
   white-space: nowrap;
-  min-width: 145px; }
+  min-width: 160px; }
   .svg-graph-hintbox .table-paging {
     min-height: 18px;
     padding: 0 0 2px;
@@ -7964,22 +7997,36 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .svg-graph-hintbox .list-table tbody tr:last-child td {
     border-bottom-style: none;
     box-shadow: none; }
-  .svg-graph-hintbox li {
-    padding-left: 23px; }
-    .svg-graph-hintbox li .svg-graph-hintbox-icon-color {
+  .svg-graph-hintbox .has-broadcast-data {
+    cursor: pointer; }
+    .svg-graph-hintbox .has-broadcast-data:hover {
+      background-color: #454545; }
+  .svg-graph-hintbox .scatter-plot-hintbox-row:not(:first-child) {
+    margin-top: 10px; }
+  .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis {
+    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    padding-left: 3px;
+    white-space: pre; }
+    .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color {
       display: inline-block;
-      float: left;
       width: 12px;
-      height: 12px;
-      margin-left: -20px;
-      margin-top: -1px; }
+      height: 18px;
+      margin-right: 10px; }
+      .svg-graph-hintbox .scatter-plot-hintbox-row .scatter-plot-hintbox-row-axis .scatter-plot-hintbox-icon-color::before {
+        font-size: 14px; }
+  .svg-graph-hintbox li {
+    display: flex;
+    width: fit-content;
+    align-items: center; }
     .svg-graph-hintbox li .svg-graph-hintbox-item-color,
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
-      margin: 3px 10px 3px -20px;
-      width: 10px;
+      display: inline-block;
+      min-width: 10px;
       height: 10px;
-      float: left;
-      display: block; }
+      margin-left: 3px;
+      margin-right: 10px; }
     .svg-graph-hintbox li .svg-graph-hintbox-trigger-color {
       border-radius: 50%; }
   .svg-graph-hintbox .header {
@@ -8199,7 +8246,7 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info, .navigation-tree .navigation-tree-node-is-selected > .navigation-tree-node-info:hover, div.dashboard-widget-itemhistory .list-table tr.selected td,
 div.dashboard-widget-itemhistory .list-table td.selected, div.dashboard-widget-itemhistory .list-table tr.selected td:hover,
-div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover {
+div.dashboard-widget-itemhistory .list-table td.selected:hover, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row, div.dashboard-widget-navtree .navtree .tree .tree-item.selected > .tree-row:hover, .svg-graph-hintbox .has-broadcast-data.selected, .svg-graph-hintbox .has-broadcast-data.selected:hover {
   background-color: #2f280a; }
 
 @keyframes is-loading-kf {
@@ -8342,26 +8389,26 @@ span.is-loading {
 
 .dashboard-grid-widget-contents, output .msg-details ul, .multiselect-available, .z-select .focusable,
 z-select .focusable, .z-select .list,
-z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap,
+z-select .list, z-textarea-flexible textarea, div.dashboard-widget-item .dashboard-grid-widget-body a, .modal-popup-host-wizard .templates-card-list .template-info, textarea, select, .setup-right-body, .menu-popup, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue.hintbox .hintbox-container, .overlay-dialogue .hintbox-wrap,
 .overlay-dialogue .hintbox-wrap-horizontal, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-contents::-webkit-scrollbar, output .msg-details ul::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, .z-select .focusable::-webkit-scrollbar,
   z-select .focusable::-webkit-scrollbar, .z-select .list::-webkit-scrollbar,
-  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
+  z-select .list::-webkit-scrollbar, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .menu-popup::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
     width: 9px;
     height: 9px; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-track, output .msg-details ul::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, .z-select .focusable::-webkit-scrollbar-track,
   z-select .focusable::-webkit-scrollbar-track, .z-select .list::-webkit-scrollbar-track,
-  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-track, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
+  z-select .list::-webkit-scrollbar-track, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-track, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .menu-popup::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
   .dashboard-grid-widget-contents::-webkit-scrollbar-thumb, output .msg-details ul::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, .z-select .focusable::-webkit-scrollbar-thumb,
   z-select .focusable::-webkit-scrollbar-thumb, .z-select .list::-webkit-scrollbar-thumb,
-  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-thumb, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
+  z-select .list::-webkit-scrollbar-thumb, div.dashboard-widget-item .dashboard-grid-widget-body a::-webkit-scrollbar-thumb, .modal-popup-host-wizard .templates-card-list .template-info::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .menu-popup::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue.hintbox .hintbox-container::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb,
   .overlay-dialogue .hintbox-wrap-horizontal::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #383838;
@@ -8741,6 +8788,7 @@ svg {
     display: none; }
   .macro-input-group .btn-undo {
     display: none;
+    height: auto;
     color: #69808d;
     background-color: #383838;
     border-width: 1px 0;
@@ -8753,6 +8801,15 @@ svg {
       border-color: #768d99; }
     .macro-input-group .btn-undo.is-focused {
       border-color: #768d99; }
+  .macro-input-group z-textarea-flexible {
+    flex: 1; }
+    .macro-input-group z-textarea-flexible textarea {
+      border-right: 0; }
+      .macro-input-group z-textarea-flexible textarea:focus + .btn-undo {
+        border-color: #768d99; }
+
+.macro-value-secret z-textarea-flexible textarea {
+  -webkit-text-security: disc; }
 
 .input-secret {
   position: relative;
@@ -8971,12 +9028,6 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   top: 0;
   background: #2b2b2b;
   z-index: 3; }
-.modal-popup-medium .textarea-flexible,
-.modal-popup-large .textarea-flexible,
-.modal-popup-static .textarea-flexible,
-.modal-popup-preprocessing .textarea-flexible {
-  max-height: 200px;
-  overflow-y: auto; }
 
 .global-macro-table .table-col-value,
 .global-macro-table .table-col-template-value,

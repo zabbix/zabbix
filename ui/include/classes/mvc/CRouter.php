@@ -56,7 +56,7 @@ class CRouter {
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class,							null,					null],
 		'auditlog.list'								=> [CControllerAuditLogList::class,									'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'						=> [CControllerAuthenticationEdit::class,							'layout.htmlpage',		'administration.authentication.edit'],
-		'authentication.update'						=> [CControllerAuthenticationUpdate::class,							null,					null],
+		'authentication.update'						=> [CControllerAuthenticationUpdate::class, 						'layout.json',			null],
 		'autoreg.edit'								=> [CControllerAutoregEdit::class,									'layout.htmlpage',		'administration.autoreg.edit'],
 		'autoreg.update'							=> [CControllerAutoregUpdate::class,								'layout.json',			null],
 		'availabilityreport.list'					=> [CControllerAvailabilityReportList::class,						'layout.htmlpage',		'reports.availabilityreport.list'],

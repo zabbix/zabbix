@@ -1858,7 +1858,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		if (array_key_exists('Error text', $data)) {
 			$item_selector->query('class:zi-i-negative')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($data['Error text'], $hint->getText());
 			$hint->close();
 			$this->assertEquals($data['Error text'], $widget->query('class:section-error')->one()->getText());
@@ -1866,7 +1866,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		if (array_key_exists('Warning', $data)) {
 			$widget->query('class:item-name')->query('class:zi-i-warning')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($data['Warning'], $hint->getText());
 			$hint->close();
 		}
@@ -1971,7 +1971,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 			// Check table pop-up with trigger data.
 			$widget->query('class:section-triggers')->query('class:link-action')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$table = $hint->query('class:list-table')->asTable()->one();
 
 			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'], $table->getHeadersText());
