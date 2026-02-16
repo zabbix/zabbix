@@ -47,7 +47,6 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
-var errMallocFailed = errors.New("malloc failed")
 var errGetPwnamRFailed = errors.New("getpwnam_r failed")
 
 // Plugin -
@@ -277,21 +276,14 @@ func getUIDByName(userName string) (*uid, error) {
 	var pwd C.struct_passwd
 	var passwdC *C.struct_passwd
 
-	const bufSize = 16384
-	buf := C.malloc(C.size_t(bufSize))
-	if buf == nil {
-		return nil, errMallocFailed
-	}
-
-	//nolint:nlreturn // false positive
-	defer C.free(buf)
+	buf := make([]byte, 16384)
 
 	//nolint:gocritic,nlreturn //false positive
 	errCode := C.getpwnam_r(
 		userNameC,
 		&pwd,
-		(*C.char)(buf),
-		C.size_t(bufSize),
+		(*C.char)(unsafe.Pointer(&buf[0])),
+		C.size_t(len(buf)),
 		&passwdC,
 	)
 
