@@ -276,8 +276,8 @@ func getUIDByName(userName string) (*uid, error) {
 	var pwd C.struct_passwd
 	var passwdC *C.struct_passwd
 
-	const bufSize = 16384
-	buf := make([]byte, bufSize)
+	//nolint:makezero // false positive
+	buf := make([]byte, 16384)
 
 	//nolint:gocritic,nlreturn //false positive
 	errCode := C.getpwnam_r(
