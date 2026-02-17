@@ -15,52 +15,22 @@
 package netif
 
 import (
-	"bufio"
 	"encoding/json"
-	"errors"
-	"fmt"
-	"strconv"
-	"strings"
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
-	"golang.zabbix.com/sdk/std"
 )
 
 const (
-	errorCannotFindIf     = "Cannot find information for this network interface in /proc/net/dev."
-	errorCannotOpenNetDev = "Cannot open /proc/net/dev: %s"
+	errorCannotFindIf = "Cannot find information for this network interface in /proc/net/dev."
+	netDevFilepath    = "/proc/net/dev"
 )
 
-var stdOs std.Os
-
-var mapNetStatIn = map[string]uint{
-	"bytes":      0,
-	"packets":    1,
-	"errors":     2,
-	"dropped":    3,
-	"overruns":   4,
-	"frame":      5,
-	"compressed": 6,
-	"multicast":  7,
-}
-
-var mapNetStatOut = map[string]uint{
-	"bytes":      8,
-	"packets":    9,
-	"errors":     10,
-	"dropped":    11,
-	"overruns":   12,
-	"collisions": 13,
-	"carrier":    14,
-	"compressed": 15,
-}
-
-func init() {
-	stdOs = std.NewOs()
+func init() { //nolint:gochecknoinits // legacy implementation
+	impl := &Plugin{}
 
 	err := plugin.RegisterMetrics(
-		&impl, "NetIf",
+		impl, "NetIf",
 		"net.if.collisions", "Returns number of out-of-window collisions.",
 		"net.if.in", "Returns incoming traffic statistics on network interface.",
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
@@ -70,134 +40,81 @@ func init() {
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
+
+	impl.netDevFilepath = netDevFilepath
 }
 
-func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
-	if statNum, ok := mapNetStat[statName]; ok {
-		*statNums = append(*statNums, statNum)
-	} else {
-		return errors.New(errorInvalidSecondParam)
-	}
-	return nil
-}
-
-func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (result uint64, err error) {
-	var statNums []uint
-
-	if dir&dirIn != 0 {
-		if err = p.addStatNum(statName, mapNetStatIn, &statNums); err != nil {
-			return
-		}
-	}
-
-	if dir&dirOut != 0 {
-		if err = p.addStatNum(statName, mapNetStatOut, &statNums); err != nil {
-			return
-		}
-	}
-
-	file, err := stdOs.Open("/proc/net/dev")
-	if err != nil {
-		return 0, fmt.Errorf(errorCannotOpenNetDev, err)
-	}
-	defer file.Close()
-
-	var total uint64
-loop:
-	for sLines := bufio.NewScanner(file); sLines.Scan(); {
-		dev := strings.Split(sLines.Text(), ":")
-
-		if len(dev) > 1 && networkIf == strings.TrimSpace(dev[0]) {
-			stats := strings.Fields(dev[1])
-
-			if len(stats) >= 16 {
-				for _, statNum := range statNums {
-					var res uint64
-
-					if res, err = strconv.ParseUint(stats[statNum], 10, 64); err != nil {
-						break loop
-					}
-					total += res
-				}
-				return total, nil
-			}
-			break
-		}
-	}
-	err = errors.New(errorCannotFindIf)
-	return
-}
-
-func (p *Plugin) getDevDiscovery() (netInterfaces []msgIfDiscovery, err error) {
-	var f std.File
-	if f, err = stdOs.Open("/proc/net/dev"); err != nil {
-		return nil, fmt.Errorf(errorCannotOpenNetDev, err)
-	}
-	defer f.Close()
-
-	netInterfaces = make([]msgIfDiscovery, 0)
-	for sLines := bufio.NewScanner(f); sLines.Scan(); {
-		dev := strings.Split(sLines.Text(), ":")
-		if len(dev) > 1 {
-			netInterfaces = append(netInterfaces, msgIfDiscovery{strings.TrimSpace(dev[0]), nil})
-		}
-	}
-
-	return netInterfaces, nil
-}
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	var direction dirFlag
-	var mode string
-
+// Export implements plugin.Exporter interface.
+//
+//nolint:cyclop // export function delegates its requests, so high cyclo is expected.
+func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (any, error) {
 	switch key {
 	case "net.if.discovery":
 		if len(params) > 0 {
-			return nil, errors.New(errorParametersNotAllowed)
+			return nil, errs.New(errorParametersNotAllowed)
 		}
-		var devices []msgIfDiscovery
-		if devices, err = p.getDevDiscovery(); err != nil {
-			return
+
+		devices, err := p.getDevDiscovery()
+		if err != nil {
+			return nil, err
 		}
-		var b []byte
-		if b, err = json.Marshal(devices); err != nil {
-			return
+
+		b, err := json.Marshal(devices)
+		if err != nil {
+			return nil, errs.Wrap(err, "failed to marshal devices")
 		}
+
 		return string(b), nil
 	case "net.if.collisions":
-		if len(params) > 1 {
-			return nil, errors.New(errorTooManyParams)
+		err := validateParams(params, 1, 1)
+		if err != nil {
+			return nil, err
 		}
 
-		if len(params) < 1 || params[0] == "" {
-			return nil, errors.New(errorEmptyIfName)
-		}
-		return p.getNetStats(params[0], "collisions", dirOut)
+		return p.getNetStats(params[0], "collisions", directionOut)
+
 	case "net.if.in":
-		direction = dirIn
+		return p.handleNetIfMetric(params, directionIn)
+
 	case "net.if.out":
-		direction = dirOut
+		return p.handleNetIfMetric(params, directionOut)
+
 	case "net.if.total":
-		direction = dirIn | dirOut
+		return p.handleNetIfMetric(params, directionTotal)
 	default:
 		/* SHOULD_NEVER_HAPPEN */
-		return nil, errors.New(errorUnsupportedMetric)
+		return nil, errs.New(errorUnsupportedMetric)
+	}
+}
+
+func (p *Plugin) handleNetIfMetric(
+	params []string, direction networkDirection,
+) (any, error) {
+	err := validateParams(params, 1, 2)
+	if err != nil {
+		return nil, err
 	}
 
-	if len(params) < 1 || params[0] == "" {
-		return nil, errors.New(errorEmptyIfName)
-	}
-
-	if len(params) > 2 {
-		return nil, errors.New(errorTooManyParams)
-	}
-
+	mode := "bytes"
 	if len(params) == 2 && params[1] != "" {
 		mode = params[1]
-	} else {
-		mode = "bytes"
 	}
 
 	return p.getNetStats(params[0], mode, direction)
+}
+
+func validateParams(params []string, minParams, maxParams int) error {
+	if len(params) < minParams {
+		return errs.New(errorEmptyIfName)
+	}
+
+	if len(params) > maxParams {
+		return errs.New(errorTooManyParams)
+	}
+
+	if params[0] == "" {
+		return errs.New(errorEmptyIfName)
+	}
+
+	return nil
 }

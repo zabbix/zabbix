@@ -273,7 +273,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 	}
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, source_ip, host, port, config_get_timeout + 1,
-			zbx_config_tls->connect_mode, tls_arg1, tls_arg2)))
+			zbx_config_tls->connect_mode, tls_arg1, tls_arg2, ZBX_DNS_FAILOVER_ENABLED)))
 	{
 		struct zbx_json	j;
 		const char	*ptr;

@@ -1,0 +1,115 @@
+publiccodeYmlVersion: 0.5.0
+name: Zabbix Monitoring and Observability Platform
+url: https://github.com/zabbix/zabbix
+softwareVersion: Zabbix 7.4.7
+releaseDate: 2026-02-13
+logo: https://assets.zabbix.com/img/logo.svg
+platforms:
+  - windows
+  - mac
+  - web
+  - linux
+categories:
+  - monitoring
+  - data-collection
+  - data-visualization
+  - data-analytics
+  - it-asset-management
+  - it-management
+  - it-service-management
+  - network-management
+fundedBy:
+  - name: ZABBIX SIA
+    uri: https://www.zabbix.com/
+usedBy:
+  - State Revenue Service of Latvia
+  - State Social Insurance Agency of Latvia
+  - Ministry of Infrastructure and Water Management in Netherlands
+  - Dubai Police
+  - City of Mesa
+  - South Carolina Department of Natural Resources, USA
+  - San Francisco - Department of Technology
+  - Department for Infrastructure and Transport - South Australia
+roadmap: https://www.zabbix.com/roadmap
+developmentStatus: stable
+softwareType: standalone/backend
+description:
+  en:
+    localisedName: ZABBIX
+    shortDescription: Zabbix is an enterprise-grade monitoring and observability platform
+    longDescription: >-
+      Zabbix is an enterprise-class open source distributed monitoring solution
+      designed to monitor and track performance and availability of network
+      servers, devices, services and other IT resources.
+
+
+      Zabbix is an all-in-one monitoring solution that allows users to collect,
+      store, manage and analyze information received from IT infrastructure, as
+      well as display on-screen, and alert by e-mail, SMS or Jabber when
+      thresholds are reached.
+
+
+      Zabbix allows administrators to recognize server and device problems
+      within a short period of time and therefore reduces the system downtime
+      and risk of system failure. The monitoring solution is being actively used
+      by SMBs and large enterprises across all industries and almost in every
+      country of the world.
+    documentation: https://www.zabbix.com/manuals
+    apiDocumentation: https://www.zabbix.com/documentation/current/en/manual/api
+    features:
+      - Metric collection
+      - Problems detection
+      - Alerting
+      - Data visualization
+      - Single pane of glass
+      - Business monitoring
+      - Integrations
+      - Security
+      - Deployment
+      - Scalability
+    screenshots:
+      - https://assets.zabbix.com/img/screenshots/Dashboard_70_1400x810.png
+      - https://assets.zabbix.com/img/screenshots/Dashboard_70_gauge_pie_1400x704.png
+      - https://assets.zabbix.com/img/screenshots/Generic_dashboard_Geomap_2.png
+    awards:
+      - "Interop Tokyo 2024, Best of Show Grand Prize: Management and Monitoring
+        category"
+      - "2025 & 2023 SoftwareReviews Data Quadrant Champion: Recognized for high
+        performance and customer experience in network monitoring"
+      - "2021 IT Central Station Peer Award: Ranked as a top monitoring solution
+        based on verified user reviews"
+      - "The Most Open Solution: Awarded by the Latvian Open Technology
+        Association"
+legal:
+  license: AGPL-3.0-only
+maintenance:
+  type: internal
+  contacts:
+    - name: ZABBIX SIA
+      email: sales@zabbix.com
+      phone: "+37167784742"
+localisation:
+  localisationReady: true
+  availableLanguages:
+    - en
+    - ca
+    - zh
+    - cs
+    - da
+    - fr
+    - ka
+    - de
+    - he
+    - it
+    - ko
+    - ja
+    - no
+    - pl
+    - pt
+    - sk
+    - es
+    - tr
+    - uk
+    - vi
+    - uz
+    - ru

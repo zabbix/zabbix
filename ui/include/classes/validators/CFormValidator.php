@@ -34,11 +34,11 @@ class CFormValidator {
 	const ERROR_FATAL = 2;
 
 	const ERROR_LEVEL_PRIMARY = 0;
-	const ERROR_LEVEL_DELAYED = 1;
-	const ERROR_LEVEL_UNIQ = 2;
-	const ERROR_LEVEL_API = 3;
-	const ERROR_LEVEL_UNKNOWN = 4;
-	const ERROR_LEVEL_OBJECTS_COUNT = 5;
+	const ERROR_LEVEL_OBJECTS_COUNT = 1;
+	const ERROR_LEVEL_DELAYED = 2;
+	const ERROR_LEVEL_UNIQ = 3;
+	const ERROR_LEVEL_API = 4;
+	const ERROR_LEVEL_UNKNOWN = 1000;
 
 	public function __construct(array $rules) {
 		$this->rules = $this->normalizeRules($rules);
@@ -568,6 +568,10 @@ class CFormValidator {
 	}
 
 	private function normalizeCountValuesCountFieldRules(array &$count_fields_rules, string $rule_path): array {
+		if (count($count_fields_rules) == 0 || !array_key_exists(0, $count_fields_rules)) {
+			throw new Exception('[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+		}
+
 		if (!is_array($count_fields_rules[0])) {
 			$count_fields_rules = [$count_fields_rules];
 		}
@@ -575,15 +579,23 @@ class CFormValidator {
 		$results = [];
 
 		foreach ($count_fields_rules as $count_rule) {
+			if (!array_key_exists(0, $count_rule)) {
+				throw new Exception('[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+			}
+
 			$result = [];
 
 			foreach ($count_rule as $key => $value) {
 				switch ($key) {
 					case 0:
-						$field_path = $rule_path.'/'.$value;
+						if (!is_string($value) || $value == '') {
+							throw new Exception('[RULES ERROR] Invalid field name for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+						}
+
+						$field_path = $rule_path . '/' . $value;
 
 						if (!in_array($field_path, $this->existing_rule_paths)) {
-							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: ' . $field_path . ')');
+							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: ' . $rule_path . ', Field path: '. $field_path .')');
 						}
 
 						$result[0] = $value;
@@ -591,6 +603,10 @@ class CFormValidator {
 
 					case 'in':
 					case 'not_in':
+						if (!is_array($value) || self::validateInOptions($value) === false) {
+							throw new Exception('[RULES ERROR] Invalid value for rule "in" or "not_in" in "count_values" check (Path: ' . $rule_path . ', Field path: '. $count_rule[0] .')');
+						}
+
 						$result[$key] = $value;
 						break;
 
@@ -605,7 +621,7 @@ class CFormValidator {
 		return $results;
 	}
 
-	private function normalizeCountValuesRules(array $count_rules, string $rule_path): array {
+	private function normalizeCountValuesRules($count_rules, string $rule_path): array {
 		if (!is_array($count_rules)) {
 			throw new Exception('[RULES ERROR] Count values condition should be an array (Path: ' . $rule_path . ')');
 		}
@@ -615,6 +631,10 @@ class CFormValidator {
 		}
 
 		foreach ($count_rules as &$count_rule) {
+			if (!is_array($count_rule)) {
+				throw new Exception('[RULES ERROR] Count values rule should be an array (Path: ' . $rule_path . ')');
+			}
+
 			$result = [];
 
 			foreach ($count_rule as $key => $value) {

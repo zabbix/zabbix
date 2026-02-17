@@ -151,4 +151,62 @@
    }
 }
 
+# json mapping
 
+{
+  "settings": {
+    "number_of_shards": 5,
+    "number_of_replicas": 1
+  },
+  "mappings": {
+    "dynamic": false,
+    "properties": {
+      "itemid": {
+         "type": "long"
+      },
+      "clock": {
+         "type": "date",
+         "format": "epoch_second"
+      },
+      "ns": {
+         "type": "long"
+      },
+      "value_parsed": {
+         "type": "flattened"
+      },
+      "value_raw": {
+         "type": "keyword",
+         "ignore_above": 1000000
+      }
+    }
+  }
+}
+
+# json pipeline
+
+{
+  "processors": [
+    {
+      "json": {
+        "field": "value",
+        "target_field": "value_parsed",
+        "ignore_failure": true
+      }
+    },
+    {
+      "set": {
+        "if": "ctx.value_parsed == null",
+        "field": "value_raw",
+        "value": "{{{ value }}}"
+      }
+    }
+  ],
+  "on_failure": [
+    {
+      "set": {
+        "field": "value_raw",
+        "value": "{{{ value }}}"
+      }
+    }
+  ]
+}

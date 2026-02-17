@@ -18,7 +18,6 @@
 #include "zbxdb.h"
 #include "zbxhistory.h"
 #include "zbxtypes.h"
-#include "zbxvariant.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"
@@ -82,6 +81,7 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				pvalue = h->value.str;
 				break;
 			default:
@@ -241,6 +241,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				if (0 != (h->flags & ZBX_DC_FLAG_META))
 					dc_add_proxy_history_meta(handle, h, now);
 				else
@@ -361,7 +362,7 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 		}
 	}
 
-	zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
+	zbx_dc_config_clean_history_sync_items(items, (size_t)history_num);
 	zbx_free(items);
 	zbx_free(errcodes);
 	zbx_vector_uint64_destroy(&itemids);
