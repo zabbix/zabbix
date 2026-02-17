@@ -698,7 +698,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM sla',
 					'link' => 'zabbix.php?action=sla.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF SLA create',
+						'id:slo' => '66.6',
+						'id:service_tags_0_tag' => 'csrf_tag',
+						'id:service_tags_0_value' => 'csrf_tag_value'
+					]
 				]
 			],
 			// #65 SLA update.
