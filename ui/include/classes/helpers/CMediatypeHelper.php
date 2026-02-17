@@ -150,6 +150,27 @@ class CMediatypeHelper {
 	}
 
 	/**
+	 * Returns supported media types names.
+	 *
+	 * @return array
+	 */
+	public static function getSupportedMediaTypes() {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$media_type_enabled = $config->getMediaTypeFlag();
+
+		$types = self::getMediaTypes();
+
+		if ($media_type_enabled != null) {
+			$media_types = array_change_key_case(array_flip($types));
+			$supported_media_types = array_diff_key($media_types, array_flip($media_type_enabled));
+			$types = array_intersect_key($types, array_flip($supported_media_types));
+		}
+
+		return $types;
+	}
+
+	/**
 	 * Returns an array of message templates.
 	 *
 	 * @return array

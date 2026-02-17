@@ -398,7 +398,20 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$media_type_enabled = $config->getMediaTypeFlag();
+
+		$all_media_types = ['sms', 'email', 'script', 'webhook'];
+
+		if ($media_type_enabled !== null) {
+			$allowed_media_types = (array_diff($all_media_types, $media_type_enabled) != []);
+		}
+		else {
+			$allowed_media_types = true;
+		}
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$allowed_media_types) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -498,7 +511,8 @@ class CMediatype extends CApiService {
 		$db_mediatypes = $this->get([
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
-			'preservekeys' => true
+			'filter' => ['type' => self::getSupportedTypes()],
+			'preservekeys' => true,
 		]);
 
 		if (count($db_mediatypes) != count($mediatypes)) {
@@ -523,8 +537,19 @@ class CMediatype extends CApiService {
 			]
 			: [];
 
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$media_type_enabled = $config->getMediaTypeFlag();
+
+		$specific_fields += $media_type_enabled === null
+			? [
+				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])]
+			]
+			: [
+				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', self::getSupportedTypes())]
+			];
+
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -541,6 +566,26 @@ class CMediatype extends CApiService {
 				'message' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
 			]]
 		]];
+	}
+
+	private static function getSupportedTypes(): array {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$media_type_enabled = $config->getMediaTypeFlag();
+
+		$all_types = [
+			MEDIA_TYPE_EMAIL => 'email',
+			MEDIA_TYPE_EXEC => 'script',
+			MEDIA_TYPE_SMS => 'sms',
+			MEDIA_TYPE_WEBHOOK => 'webhook'
+		];
+
+		if ($media_type_enabled === null) {
+			return array_flip($all_types);
+		}
+		else {
+			return array_diff_key(array_flip($all_types), array_flip($media_type_enabled));
+		}
 	}
 
 	/**
@@ -1264,8 +1309,9 @@ class CMediatype extends CApiService {
 		}
 
 		$db_mediatypes = DB::select('media_type', [
-			'output' => ['mediatypeid', 'name'],
+			'output' => ['mediatypeid', 'name', 'type'],
 			'mediatypeids' => $mediatypeids,
+			'filter' => ['type' => self::getSupportedTypes()],
 			'preservekeys' => true
 		]);
 
