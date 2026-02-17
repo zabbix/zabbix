@@ -21,12 +21,6 @@
 #include "zbxregexp.h"
 #include "zbxstr.h"
 
-#ifdef HAVE_NET_IF_H
-	#define _LINUX_IF_H
-#endif
-#include <linux/wireless.h>
-#include <linux/ethtool.h>
-#include <linux/sockios.h>
 #include <linux/if_arp.h>
 
 typedef struct
