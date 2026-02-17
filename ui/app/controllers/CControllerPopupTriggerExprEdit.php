@@ -46,7 +46,7 @@ class CControllerPopupTriggerExprEdit extends CController {
 			: '';
 		$values = $this->extractFunction($expression);
 
-		if ($values['item_value_type'] == ITEM_VALUE_TYPE_BINARY && $values['item_value_type'] === ITEM_VALUE_TYPE_JSON) {
+		if ($values['item_value_type'] == ITEM_VALUE_TYPE_BINARY || $values['item_value_type'] == ITEM_VALUE_TYPE_JSON) {
 			error(_s('Item "%1$s" cannot be used in trigger: unsupported data type.', $values['item_key']));
 			$values['itemid'] = '';
 			$values['item_description'] = '';
