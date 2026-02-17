@@ -1057,7 +1057,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:description',
 									'value' => '{ITEM.NAME}',
 									'attributes' => [
-										'maxlength' => 2048,
+										'maxlength' => 65535,
 										'aria-required' => 'true',
 										'rows' => 7
 									]
@@ -1483,7 +1483,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:description',
 									'value' => '{ITEM.NAME}',
 									'attributes' => [
-										'maxlength' => 2048,
+										'maxlength' => 65535,
 										'aria-required' => 'true',
 										'rows' => 7
 									]

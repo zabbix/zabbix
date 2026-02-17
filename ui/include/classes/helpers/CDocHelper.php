@@ -72,7 +72,7 @@ class CDocHelper {
 	const DATA_COLLECTION_HOST_TRIGGERS_LIST =					'web_interface/frontend_sections/data_collection/hosts/triggers';
 	const DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes';
 	const DATA_COLLECTION_HOST_WIZARD =							'config/hosts/host_wizard';
-	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host#creating-a-host-group';
+	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host_groups#configuration';
 	const DATA_COLLECTION_HOSTGROUPS_LIST =						'web_interface/frontend_sections/data_collection/hostgroups';
 	const DATA_COLLECTION_HTTPCONF_EDIT =						'web_monitoring#configuring-a-web-scenario';
 	const DATA_COLLECTION_ITEM_EDIT =							'config/items/item#configuration';
