@@ -1048,7 +1048,7 @@ class CHistoryManager {
 					'terms' => [
 						'size' => $width,
 						'order' => [
-							'_key' => 'asc'
+							'_key' => ZBX_SORT_UP
 						],
 						'value_type' => 'integer',
 						'script' => $script
@@ -1131,7 +1131,7 @@ class CHistoryManager {
 	private function getGraphAggregationByWidthFromSql(array $items, $time_from, $time_to, $width) {
 		$sql_select_extra = '';
 		$group_by = 'itemid';
-		$order_by = 'itemid';
+		$order_by = '';
 
 		if ($width !== null) {
 			$period = $time_to - $time_from;
@@ -1141,7 +1141,7 @@ class CHistoryManager {
 
 			$sql_select_extra = ','.$calc_field.' AS i';
 			$group_by .= ','.$calc_field;
-			$order_by .= ',i';
+			$order_by .= ' ORDER BY itemid,i';
 		}
 
 		$results = [];
@@ -1179,7 +1179,7 @@ class CHistoryManager {
 						' AND clock>='.zbx_dbstr($_time_from).
 						' AND clock<='.zbx_dbstr($time_to).
 					' GROUP BY '.$group_by.
-					' ORDER BY '.$order_by
+					$order_by
 				);
 
 				while (($row = DBfetch($result)) !== false) {
