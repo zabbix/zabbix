@@ -14,6 +14,10 @@
 
 #include "../sysinfo.h"
 
+#ifdef HAVE_IPV6
+#	include "zbxcomms.h"
+#endif
+
 #include "zbxjson.h"
 #include "zbxnum.h"
 
