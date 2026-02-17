@@ -14,8 +14,11 @@
 
 #include "../sysinfo.h"
 
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxcomms.h"
+#endif
+
 #include "zbxjson.h"
-#include "zbxcomms.h"
 #include "zbxnum.h"
 
 #if !defined(WITH_AGENT2_METRICS)
