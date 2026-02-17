@@ -3026,6 +3026,66 @@ class CFormValidatorTest extends TestCase {
 				]],
 				CFormValidator::SUCCESS,
 				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min' => strtotime('2025-02-01')]]
+					]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
+						'messages' => ['use' => 'Must be in the future']
+					]
+				]],
+				['value' => '2025-01-01'],
+				['value' => '2025-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Must be in the future',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]]
+					]
+				]],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, []]
+					]
+				]],
+				['value' => '2040-01-01'],
+				['value' => '2040-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
 			]
 		];
 	}
