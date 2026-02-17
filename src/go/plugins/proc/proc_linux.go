@@ -307,7 +307,8 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 		uid, err = getUIDByName(q.user)
 
 		if err != nil {
-			if errors.Is(err, &userNotFoundError{}) {
+			u := &userNotFoundError{}
+			if errors.As(err, &u) {
 				return query, err
 			}
 
@@ -626,7 +627,8 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 			uid, err = getUIDByName(username)
 
 			if err != nil {
-				if errors.Is(err, &userNotFoundError{}) {
+				u := &userNotFoundError{}
+				if errors.As(err, &u) {
 					return 0, nil
 				}
 
@@ -868,7 +870,8 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 			_, err := getUIDByName(userName)
 
 			if err != nil {
-				if errors.Is(err, &userNotFoundError{}) {
+				u := &userNotFoundError{}
+				if errors.As(err, &u) {
 					return "[]", nil
 				}
 
