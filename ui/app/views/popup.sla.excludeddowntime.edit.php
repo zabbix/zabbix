@@ -77,14 +77,7 @@ $form_grid = (new CFormGrid())
 	]);
 
 $form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			sla_excluded_downtime_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules']
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($form_grid);
 
 $output = [
 	'header' => $data['title'],
@@ -98,7 +91,10 @@ $output = [
 		]
 	],
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('popup.sla.excludeddowntime.edit.js.php'),
+		$this->readJsFile('popup.sla.excludeddowntime.edit.js.php').
+		'sla_excluded_downtime_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');',
 	'dialogue_class' => 'modal-popup-medium'
 ];
 

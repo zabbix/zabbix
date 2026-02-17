@@ -25,7 +25,7 @@ window.sla_excluded_downtime_edit_popup = new class {
 	}
 
 	submit() {
-		this._removePopupMessages();
+		this.#removePopupMessages();
 
 		const fields = this.form.getAllValues();
 
@@ -42,11 +42,11 @@ window.sla_excluded_downtime_edit_popup = new class {
 				const curl = new Curl('zabbix.php');
 				curl.setArgument('action', 'sla.excludeddowntime.validate');
 
-				this._post(curl.getUrl(), fields);
+				this.#post(curl.getUrl(), fields);
 			});
 	}
 
-	_post(url, data) {
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -69,15 +69,11 @@ window.sla_excluded_downtime_edit_popup = new class {
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 			})
-			.catch((exception) => {
-				this._ajaxExceptionHandler(exception);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
 	}
 
-	_removePopupMessages() {
+	#removePopupMessages() {
 		for (const el of this.form_element.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
@@ -85,9 +81,8 @@ window.sla_excluded_downtime_edit_popup = new class {
 		}
 	}
 
-	_ajaxExceptionHandler(exception) {
-		let title;
-		let messages;
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
 			title = exception.error.title;
@@ -97,16 +92,8 @@ window.sla_excluded_downtime_edit_popup = new class {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		this._addMessageBox(makeMessageBox('bad', messages, title)[0]);
-	}
-
-	_addMessageBox(message_box) {
-		this._removeMessageBoxes();
+		const message_box = makeMessageBox('bad', messages, title)[0];
 
 		this.form_element.parentNode.insertBefore(message_box, this.form_element);
-	}
-
-	_removeMessageBoxes() {
-		this.dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
 	}
 };

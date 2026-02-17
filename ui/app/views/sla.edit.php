@@ -288,16 +288,7 @@ $tabs = (new CTabView())
 // Output.
 
 $form
-	->addItem($tabs)
-	->addItem(
-		(new CScriptTag('
-			sla_edit_popup.init('.json_encode([
-				'rules' => $data['js_validation_rules'],
-				'service_tags' => $data['form']['service_tags'],
-				'excluded_downtimes' => $data['form']['excluded_downtimes']
-			]).');
-		'))->setOnDocumentReady()
-	);
+	->addItem($tabs);
 
 if ($data['slaid'] !== null) {
 	$title = _('SLA');
@@ -363,7 +354,12 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('sla.edit.js.php'),
+		$this->readJsFile('sla.edit.js.php').
+		'sla_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'service_tags' => $data['form']['service_tags'],
+			'excluded_downtimes' => $data['form']['excluded_downtimes']
+		]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];
 

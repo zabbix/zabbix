@@ -165,18 +165,18 @@ window.sla_edit_popup = new class {
 	}
 
 	delete() {
-		this._removePopupMessages();
+		this.#removePopupMessages();
 		this.overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'sla.delete');
 		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('sla')) ?>);
 
-		this._post(curl.getUrl(), {slaids: [document.getElementById('slaid').value]});
+		this.#post(curl.getUrl(), {slaids: [document.getElementById('slaid').value]});
 	}
 
 	submit() {
-		this._removePopupMessages();
+		this.#removePopupMessages();
 
 		const fields = this.form.getAllValues();
 		this.overlay.setLoading();
@@ -202,11 +202,11 @@ window.sla_edit_popup = new class {
 					return;
 				}
 
-				this._post(curl.getUrl(), fields);
+				this.#post(curl.getUrl(), fields);
 			});
 	}
 
-	_post(url, data) {
+	#post(url, data) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -229,15 +229,11 @@ window.sla_edit_popup = new class {
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.catch((exception) => {
-				this._ajaxExceptionHandler(exception)
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
 	}
 
-	_removePopupMessages() {
+	#removePopupMessages() {
 		for (const el of this.form_element.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
@@ -245,9 +241,7 @@ window.sla_edit_popup = new class {
 		}
 	}
 
-	_ajaxExceptionHandler(exception) {
-		this._removePopupMessages();
-
+	#ajaxExceptionHandler(exception) {
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -260,16 +254,6 @@ window.sla_edit_popup = new class {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		this._addMessageBox(message_box);
-	}
-
-	_addMessageBox(message_box) {
-		this._removeMessageBoxes();
-
 		this.form_element.parentNode.insertBefore(message_box, this.form_element);
-	}
-
-	_removeMessageBoxes() {
-		this.dialogue.querySelectorAll('.overlay-dialogue-body .msg-bad').forEach(message_box => message_box.remove());
 	}
 };
