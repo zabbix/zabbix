@@ -249,8 +249,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			foreach ($maintenances as &$maintenance) {
 				$maintenance['maintenance_type'] = (int) $maintenance['maintenance_type'];
-				$maintenance['name'] = htmlspecialchars($maintenance['name'], ENT_QUOTES, 'UTF-8');
-				$maintenance['description'] = htmlspecialchars($maintenance['description'], ENT_QUOTES, 'UTF-8');
 
 				unset($maintenance['maintenanceid']);
 			}

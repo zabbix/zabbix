@@ -24,9 +24,19 @@
 $view = (new CWidgetView($data))->setVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('widget'));
 
 foreach ($data['vars'] as $name => $value) {
-	if ($value !== null) {
-		$view->setVar($name, $value);
+	if ($value === null) {
+		continue;
 	}
+
+	if ($name === 'maintenances') {
+		foreach ($value as &$maintenance) {
+			$maintenance['name'] = htmlspecialchars($maintenance['name'], ENT_QUOTES, 'UTF-8');
+			$maintenance['description'] = htmlspecialchars($maintenance['description'], ENT_QUOTES, 'UTF-8');
+		}
+		unset($maintenance);
+	}
+
+	$view->setVar($name, $value);
 }
 
 $view->show();
