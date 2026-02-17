@@ -14,10 +14,16 @@
 
 #include "../sysinfo.h"
 
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxcomms.h"
+#endif
+
 #include "zbxjson.h"
-#include "zbxcomms.h"
 #include "zbxnum.h"
-#include "zbxip.h"
+
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxip.h"
+#endif
 
 typedef struct
 {
@@ -782,6 +788,7 @@ out:
 	return ret;
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 static unsigned char	get_connection_state_tcp(const char *name)
 {
 	unsigned char	state;
@@ -986,7 +993,7 @@ static int	get_addr_info(const char *ip_in, const char *port_in, struct addrinfo
 		{
 			*cidr_sep = '\0';
 
-			if (FAIL == validate_cidr(ip, cidr_sep + 1, &prefix_sz_local))
+			if (FAIL == zbx_validate_cidr(ip, cidr_sep + 1, &prefix_sz_local))
 			{
 				*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s/%s\"", ip, cidr_sep + 1);
 				goto err;
@@ -1162,3 +1169,4 @@ int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
+#endif
