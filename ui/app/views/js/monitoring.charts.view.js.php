@@ -32,8 +32,6 @@
 			this.initCharts();
 			this.initEvents();
 
-			timeControl.refreshPage = false;
-
 			timeControl.addObject('charts_view', timeline, {
 				id: 'timeline_1',
 				domid: 'charts_view',
