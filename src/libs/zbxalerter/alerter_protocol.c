@@ -1173,7 +1173,7 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx
 	zbx_free(recipients_len);
 
 	ptr += zbx_serialize_value(ptr, eventid);
-	ptr += zbx_serialize_value(ptr, message_type);
+	(void)zbx_serialize_value(ptr, message_type);
 
 	return data_len + data_offset;
 }
@@ -1197,7 +1197,7 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_med
 	}
 
 	data += zbx_deserialize_value(data, eventid);
-	data += zbx_deserialize_value(data, message_type);
+	(void)zbx_deserialize_value(data, message_type);
 }
 
 /******************************************************************************
