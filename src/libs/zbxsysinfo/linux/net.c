@@ -14,7 +14,7 @@
 
 #include "../sysinfo.h"
 
-#ifdef HAVE_IPV6
+#if !defined(WITH_AGENT2_METRICS)
 #	include "zbxcomms.h"
 #endif
 
