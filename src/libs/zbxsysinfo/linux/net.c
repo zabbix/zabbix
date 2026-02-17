@@ -1321,7 +1321,8 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 #undef VIRTFN_PFX
 }
 
-static void	sys_class_net_uint_add(const char *if_name, const char *filename, const char *key, struct zbx_json *j)
+static void	sys_class_net_uint_add(const char *if_name, const char *filename, const char *key, struct zbx_json *j1,
+		struct zbx_json *j2)
 {
 	FILE	*f;
 	char	buf[MAX_STRING_LEN];
@@ -1341,14 +1342,20 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 			if (SUCCEED == zbx_is_uint64(buf, &ui64_speed))
 			{
 				found = 1;
-				zbx_json_adduint64(j, key, ui64_speed);
+				zbx_json_adduint64(j1, key, ui64_speed);
+				if (NULL != j2)
+					zbx_json_adduint64(j2, key, ui64_speed);
 			}
 		}
 		zbx_fclose(f);
 	}
 
 	if (0 == found)
-		zbx_json_adduint64(j, key, 0);
+	{
+		zbx_json_adduint64(j1, key, 0);
+		if (NULL != j2)
+			zbx_json_adduint64(j2, key, 0);
+	}
 }
 
 static void	sys_class_net_str_add(const char *if_name, const char *filename, const char *key,
@@ -1450,8 +1457,15 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_json_addstring(&jval, "name", if_name, ZBX_JSON_TYPE_STRING);
 		sys_class_net_str_add(if_name, "ifalias",  "ifalias", &jcfg, &jval);
 		sys_class_net_str_add(if_name, "address", "mac", &jcfg, &jval);
+		if_type_add(if_name, &jcfg);
+		sys_class_net_uint_add(if_name, "speed", "speed", &jcfg, NULL);
+		sys_class_net_str_add(if_name, "duplex", "duplex", &jcfg, NULL);
 		if_admin_state_add(if_name, &jcfg);
 		sys_class_net_str_add(if_name, "operstate", "operational_state", &jcfg, NULL);
+		sys_class_net_uint_add(if_name, "carrier", "carrier", &jcfg, &jval);
+		sys_class_net_uint_add(if_name, "carrier_changes", "carrier_changes", &jval, NULL);
+		sys_class_net_uint_add(if_name, "carrier_up_count", "carrier_up_count", &jval, NULL);
+		sys_class_net_uint_add(if_name, "carrier_down_count", "carrier_down_count", &jval, NULL);
 
 		if (ZBX_PROC_NET_DEV_COLS_NUM == num_filled)
 		{
@@ -1483,14 +1497,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 					num_filled, ZBX_PROC_NET_DEV, if_name);
 		}
 
-		if_type_add(if_name, &jval);
-		sys_class_net_uint_add(if_name, "carrier", "carrier", &jval);
-		sys_class_net_uint_add(if_name, "carrier_changes", "carrier_changes", &jval);
-		sys_class_net_uint_add(if_name, "carrier_up_count", "carrier_up_count", &jval);
-		sys_class_net_uint_add(if_name, "carrier_down_count", "carrier_down_count", &jval);
-		sys_class_net_uint_add(if_name, "speed", "speed", &jval);
-		sys_class_net_str_add(if_name, "duplex", "duplex", &jval, NULL);
-
 		zbx_json_close(&jval);
 		zbx_json_close(&jcfg);
 	}
@@ -1506,8 +1512,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_free(&j);
 	zbx_json_free(&jval);
 	zbx_json_free(&jcfg);
-
-
 out:
 	if (NULL != rxp)
 		zbx_regexp_free(rxp);
