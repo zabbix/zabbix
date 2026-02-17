@@ -1186,32 +1186,6 @@ int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
 
-static void	get_link_flags(const char *interface, struct zbx_json *j)
-{
-	int		sock;
-	struct ifreq	ifr;
-
-	sock = socket(AF_INET, SOCK_DGRAM, 0);
-	if (sock < 0)
-		return;
-
-	memset(&ifr, 0, sizeof(ifr));
-	zbx_strlcpy(ifr.ifr_name, interface, IFNAMSIZ);
-
-	if (ioctl(sock, SIOCGIFFLAGS, &ifr) < 0)
-	{
-		close(sock);
-		return;
-	}
-
-	zbx_json_addstring(j, "administrative_state",
-			(0 != (ifr.ifr_flags & IFF_UP)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "operational_state",
-			(0 != (ifr.ifr_flags & IFF_RUNNING)) ? "up" : "down", ZBX_JSON_TYPE_STRING);
-
-	close(sock);
-}
-
 static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 {
 #define JSON_KEY_ADMIN_STATE	"administrative_state"
@@ -1294,7 +1268,6 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 		int		found = 0;
 		DIR		*dir;
 		struct dirent	*entry;
-		char		*value;
 
 		if (NULL != (dir = opendir(buf)))
 		{
@@ -1337,7 +1310,6 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 			zbx_rtrim(buf, "\n");
 
 			zbx_uint64_t	ui64_speed;
-			int		i_speed;
 
 			if (SUCCEED == zbx_is_uint64(buf, &ui64_speed))
 			{
