@@ -146,9 +146,10 @@ void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipi
 }
 
 zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t alertid, zbx_uint64_t mediatypeid,
-		const char *name, int maxattempts, zbx_uint64_t eventid, int source, int object, zbx_uint64_t objectid,
-		const char *sendto, const char *subject, const char *message, const char *smtp_server,
-		unsigned short smtp_port, const char *smtp_helo, const char *smtp_email, unsigned char smtp_security,
+		const char *name, int maxattempts, zbx_uint64_t eventid, zbx_uint64_t p_eventid, zbx_uint64_t actionid,
+		int source, int object, zbx_uint64_t objectid, int message_type, const char *sendto,
+		const char *subject, const char *message, const char *smtp_server, unsigned short smtp_port,
+		const char *smtp_helo, const char *smtp_email, unsigned char smtp_security,
 		unsigned char smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
 		const char *username, const char *password, unsigned char message_format, const char *expression,
 		const char *recovery_expression)
@@ -162,9 +163,12 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 	zbx_serialize_prepare_str(data_len, name);
 	zbx_serialize_prepare_value(data_len, maxattempts);
 	zbx_serialize_prepare_value(data_len, eventid);
+	zbx_serialize_prepare_value(data_len, p_eventid);
+	zbx_serialize_prepare_value(data_len, actionid);
 	zbx_serialize_prepare_value(data_len, source);
 	zbx_serialize_prepare_value(data_len, object);
 	zbx_serialize_prepare_value(data_len, objectid);
+	zbx_serialize_prepare_value(data_len, message_type);
 	zbx_serialize_prepare_str(data_len, sendto);
 	zbx_serialize_prepare_str(data_len, subject);
 	zbx_serialize_prepare_str(data_len, message);
@@ -190,9 +194,12 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 	ptr += zbx_serialize_str(ptr, name, name_len);
 	ptr += zbx_serialize_value(ptr, maxattempts);
 	ptr += zbx_serialize_value(ptr, eventid);
+	ptr += zbx_serialize_value(ptr, p_eventid);
+	ptr += zbx_serialize_value(ptr, actionid);
 	ptr += zbx_serialize_value(ptr, source);
 	ptr += zbx_serialize_value(ptr, object);
 	ptr += zbx_serialize_value(ptr, objectid);
+	ptr += zbx_serialize_value(ptr, message_type);
 	ptr += zbx_serialize_str(ptr, sendto, sendto_len);
 	ptr += zbx_serialize_str(ptr, subject, subject_len);
 	ptr += zbx_serialize_str(ptr, message, message_len);
@@ -214,11 +221,12 @@ zbx_uint32_t	zbx_alerter_serialize_email(unsigned char **data, zbx_uint64_t aler
 }
 
 void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *alertid, zbx_uint64_t *mediatypeid,
-		char **name, int *maxattempts, zbx_uint64_t *eventid, int *source, int *object, zbx_uint64_t *objectid,
-		char **sendto, char **subject, char **message, char **smtp_server, unsigned short *smtp_port,
-		char **smtp_helo, char **smtp_email, unsigned char *smtp_security, unsigned char *smtp_verify_peer,
-		unsigned char *smtp_verify_host, unsigned char *smtp_authentication, char **username, char **password,
-		unsigned char *message_format, char **expression, char **recovery_expression)
+		char **name, int *maxattempts, zbx_uint64_t *eventid, zbx_uint64_t *p_eventid, zbx_uint64_t *actionid,
+		int *source, int *object, zbx_uint64_t *objectid, int *message_type, char **sendto, char **subject,
+		char **message, char **smtp_server, unsigned short *smtp_port, char **smtp_helo, char **smtp_email,
+		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
+		unsigned char *smtp_authentication, char **username, char **password, unsigned char *message_format,
+		char **expression, char **recovery_expression)
 {
 	zbx_uint32_t	len;
 
@@ -227,9 +235,12 @@ void	zbx_alerter_deserialize_email(const unsigned char *data, zbx_uint64_t *aler
 	data += zbx_deserialize_str(data, name, len);
 	data += zbx_deserialize_value(data, maxattempts);
 	data += zbx_deserialize_value(data, eventid);
+	data += zbx_deserialize_value(data, p_eventid);
+	data += zbx_deserialize_value(data, actionid);
 	data += zbx_deserialize_value(data, source);
 	data += zbx_deserialize_value(data, object);
 	data += zbx_deserialize_value(data, objectid);
+	data += zbx_deserialize_value(data, message_type);
 	data += zbx_deserialize_str(data, sendto, len);
 	data += zbx_deserialize_str(data, subject, len);
 	data += zbx_deserialize_str(data, message, len);
@@ -413,7 +424,7 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
 		const char *attempt_interval, unsigned char message_format, const char *script, const char *timeout,
-		const char *sendto, const char *subject, const char *message, const char *params)
+		int message_type, const char *sendto, const char *subject, const char *message, const char *params)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, sendto_len, subject_len, message_len,
@@ -425,6 +436,7 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 			smtp_verify_host, smtp_authentication, maxsessions, maxattempts, attempt_interval,
 			message_format, script, timeout);
 
+	zbx_serialize_prepare_value(data_len, message_type);
 	zbx_serialize_prepare_str(data_len, sendto);
 	zbx_serialize_prepare_str(data_len, subject);
 	zbx_serialize_prepare_str(data_len, message);
@@ -437,6 +449,7 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	}
 
 	ptr = *data + data_offset;
+	ptr += zbx_serialize_value(ptr, message_type);
 	ptr += zbx_serialize_str(ptr, sendto, sendto_len);
 	ptr += zbx_serialize_str(ptr, subject, subject_len);
 	ptr += zbx_serialize_str(ptr, message, message_len);
@@ -445,13 +458,13 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 	return data_len + data_offset;
 }
 
-void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid, unsigned char *type,
-		char **name, char **smtp_server, char **smtp_helo, char **smtp_email, char **exec_path,
-		char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
+void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t *mediatypeid,
+		unsigned char *type, char **name, char **smtp_server, char **smtp_helo, char **smtp_email,
+		char **exec_path, char **gsm_modem, char **username, char **passwd, unsigned short *smtp_port,
 		unsigned char *smtp_security, unsigned char *smtp_verify_peer, unsigned char *smtp_verify_host,
 		unsigned char *smtp_authentication, int *maxsessions, int *maxattempts, char **attempt_interval,
-		unsigned char *message_format, char **script, char **timeout, char **sendto, char **subject,
-		char **message, char **params)
+		unsigned char *message_format, char **script, char **timeout, int *message_type, char **sendto,
+		char **subject, char **message, char **params)
 {
 	zbx_uint32_t	len;
 
@@ -460,6 +473,7 @@ void	zbx_alerter_deserialize_alert_send(const unsigned char *data, zbx_uint64_t 
 			smtp_verify_host, smtp_authentication, maxsessions, maxattempts, attempt_interval,
 			message_format, script, timeout);
 
+	data += zbx_deserialize_value(data, message_type);
 	data += zbx_deserialize_str(data, sendto, len);
 	data += zbx_deserialize_str(data, subject, len);
 	data += zbx_deserialize_str(data, message, len);
@@ -568,6 +582,9 @@ zbx_uint32_t	zbx_alerter_serialize_alerts(unsigned char **data, zbx_am_db_alert_
 		zbx_serialize_prepare_value(data_len, alert->source);
 		zbx_serialize_prepare_value(data_len, alert->object);
 		zbx_serialize_prepare_value(data_len, alert->objectid);
+		zbx_serialize_prepare_value(data_len, alert->actionid);
+		zbx_serialize_prepare_value(data_len, alert->min_alertid);
+		zbx_serialize_prepare_value(data_len, alert->message_type);
 		zbx_serialize_prepare_str_len(data_len, alert->sendto, sendto_len);
 		zbx_serialize_prepare_str_len(data_len, alert->subject, subject_len);
 		zbx_serialize_prepare_str_len(data_len, alert->message, message_len);
@@ -590,6 +607,9 @@ zbx_uint32_t	zbx_alerter_serialize_alerts(unsigned char **data, zbx_am_db_alert_
 		ptr += zbx_serialize_value(ptr, alert->source);
 		ptr += zbx_serialize_value(ptr, alert->object);
 		ptr += zbx_serialize_value(ptr, alert->objectid);
+		ptr += zbx_serialize_value(ptr, alert->actionid);
+		ptr += zbx_serialize_value(ptr, alert->min_alertid);
+		ptr += zbx_serialize_value(ptr, alert->message_type);
 		ptr += zbx_serialize_str(ptr, alert->sendto, sendto_len);
 		ptr += zbx_serialize_str(ptr, alert->subject, subject_len);
 		ptr += zbx_serialize_str(ptr, alert->message, message_len);
@@ -624,6 +644,9 @@ void	zbx_alerter_deserialize_alerts(const unsigned char *data, zbx_am_db_alert_t
 		data += zbx_deserialize_value(data, &alert->source);
 		data += zbx_deserialize_value(data, &alert->object);
 		data += zbx_deserialize_value(data, &alert->objectid);
+		data += zbx_deserialize_value(data, &alert->actionid);
+		data += zbx_deserialize_value(data, &alert->min_alertid);
+		data += zbx_deserialize_value(data, &alert->message_type);
 		data += zbx_deserialize_str(data, &alert->sendto, len);
 		data += zbx_deserialize_str(data, &alert->subject, len);
 		data += zbx_deserialize_str(data, &alert->message, len);
@@ -1118,7 +1141,7 @@ void	zbx_alerter_deserialize_begin_dispatch(const unsigned char *data, char **su
  ******************************************************************************/
 
 zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx_db_mediatype *mt,
-		const zbx_vector_str_t *recipients)
+		const zbx_vector_str_t *recipients, zbx_uint64_t eventid, int message_type)
 {
 	unsigned char	*ptr;
 	zbx_uint32_t	data_len = 0, data_alloc = 1024, data_offset = 0, *recipients_len;
@@ -1131,6 +1154,9 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx
 	recipients_len = (zbx_uint32_t *)zbx_malloc(NULL, sizeof(zbx_uint32_t) * recipients->values_num);
 	for (int i = 0; i < recipients->values_num; i++)
 		zbx_serialize_prepare_str_len(data_len, recipients->values[i], recipients_len[i]);
+
+	zbx_serialize_prepare_value(data_len, eventid);
+	zbx_serialize_prepare_value(data_len, message_type);
 
 	if (data_alloc - data_offset < data_len)
 	{
@@ -1146,11 +1172,14 @@ zbx_uint32_t	zbx_alerter_serialize_send_dispatch(unsigned char **data, const zbx
 
 	zbx_free(recipients_len);
 
+	ptr += zbx_serialize_value(ptr, eventid);
+	ptr += zbx_serialize_value(ptr, message_type);
+
 	return data_len + data_offset;
 }
 
 void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_mediatype *mt,
-		zbx_vector_str_t *recipients)
+		zbx_vector_str_t *recipients, zbx_uint64_t *eventid, int *message_type)
 {
 	zbx_uint32_t	len;
 	int		recipients_num;
@@ -1166,6 +1195,9 @@ void	zbx_alerter_deserialize_send_dispatch(const unsigned char *data, zbx_db_med
 		data += zbx_deserialize_str(data, &recipient, len);
 		zbx_vector_str_append(recipients, recipient);
 	}
+
+	data += zbx_deserialize_value(data, eventid);
+	data += zbx_deserialize_value(data, message_type);
 }
 
 /******************************************************************************
@@ -1232,17 +1264,19 @@ out:
  *                                                                            *
  * Purpose: dispatch data                                                     *
  *                                                                            *
- * Parameters: dispatch   - [IN] dispatcher                                   *
- *             mediatype  - [IN] media type to use for sending                *
- *             recipients - [IN] dispatch recipients                          *
- *             error      - [OUT]                                             *
+ * Parameters: dispatch     - [IN] dispatcher                                 *
+ *             mediatype    - [IN] media type to use for sending              *
+ *             recipients   - [IN] dispatch recipients                        *
+ *             eventid      - [IN]                                            *
+ *             message_type - [IN]                                            *
+ *             error        - [OUT]                                           *
  *                                                                            *
- * Return value: SUCCEED - the dispatch sent successfully                     *
- *               FAIL    - otherwise                                          *
+ * Return value: SUCCEED   - the dispatch sent successfully                   *
+ *               FAIL      - otherwise                                        *
  *                                                                            *
  ******************************************************************************/
 int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
-		const zbx_vector_str_t *recipients, char **error)
+		const zbx_vector_str_t *recipients, zbx_uint64_t eventid, int message_type, char **error)
 {
 	unsigned char	*data;
 	zbx_uint32_t	size;
@@ -1251,7 +1285,7 @@ int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_med
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() mediatypeid:" ZBX_FS_UI64 " recipients_num:%d", __func__,
 			mediatype->mediatypeid, recipients->values_num);
 
-	size = zbx_alerter_serialize_send_dispatch(&data, mediatype, recipients);
+	size = zbx_alerter_serialize_send_dispatch(&data, mediatype, recipients, eventid, message_type);
 
 	if (FAIL == zbx_ipc_async_socket_send(&dispatch->alerter, ZBX_IPC_ALERTER_SEND_DISPATCH, data, size))
 	{

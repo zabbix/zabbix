@@ -394,19 +394,6 @@ class CWidgetItemHistory extends CWidget {
 				container.innerHTML = '';
 				container.append(content);
 
-				e.target.resize_observer = new ResizeObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.contentBoxSize) {
-							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
-							const size = entry.contentBoxSize[0];
-
-							overlay.style.width = `${size.inlineSize}px`;
-							overlay.style.height = `${size.blockSize}px`;
-						}
-					})
-				});
-				e.target.resize_observer.observe(content);
-
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
 
@@ -421,14 +408,6 @@ class CWidgetItemHistory extends CWidget {
 					});
 				}
 			});
-
-			button.addEventListener('onHideHint.hintBox', e => {
-				if (e.target.resize_observer !== undefined) {
-					e.target.resize_observer.disconnect();
-
-					delete e.target.resize_observer;
-				}
-			})
 		}
 		else {
 			if (curl !== null) {

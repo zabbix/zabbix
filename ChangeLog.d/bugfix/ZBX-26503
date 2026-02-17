@@ -1,0 +1,1 @@
+..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype, maintenance form; implemented unique object validation; renamed import validator class names (gberzina, vmurzins)

@@ -41,6 +41,7 @@ class CRouter {
 	private array $routes = [
 		// action									controller															layout					view
 		'acknowledge.edit'							=> [CControllerAcknowledgeEdit::class,								'layout.json',			'acknowledge.edit'],
+		'acknowledge.rank.change'					=> [CControllerAcknowledgeRankChange::class,						'layout.json',			null],
 		'action.create'								=> [CControllerActionCreate::class,									'layout.json',			null],
 		'action.delete'								=> [CControllerActionDelete::class,									'layout.json',			null],
 		'action.disable'							=> [CControllerActionDisable::class,								'layout.json',			null],
@@ -56,7 +57,7 @@ class CRouter {
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class,							null,					null],
 		'auditlog.list'								=> [CControllerAuditLogList::class,									'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'						=> [CControllerAuthenticationEdit::class,							'layout.htmlpage',		'administration.authentication.edit'],
-		'authentication.update'						=> [CControllerAuthenticationUpdate::class,							null,					null],
+		'authentication.update'						=> [CControllerAuthenticationUpdate::class, 						'layout.json',			null],
 		'autoreg.edit'								=> [CControllerAutoregEdit::class,									'layout.htmlpage',		'administration.autoreg.edit'],
 		'autoreg.update'							=> [CControllerAutoregUpdate::class,								'layout.json',			null],
 		'availabilityreport.list'					=> [CControllerAvailabilityReportList::class,						'layout.htmlpage',		'reports.availabilityreport.list'],

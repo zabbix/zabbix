@@ -287,7 +287,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
  ******************************************************************************/
 
 zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_mediatype *mt,
-		const zbx_vector_str_t *emails)
+		const zbx_vector_str_t *emails, zbx_uint64_t reportid, int message_type)
 {
 	zbx_uint32_t	*params_len, data_len = 0, data_alloc = 1024, data_offset = 0;
 	unsigned char	*ptr;
@@ -300,6 +300,9 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_med
 
 	for (int i = 0; i < emails->values_num; i++)
 		zbx_serialize_prepare_str_len(data_len, emails->values[i], params_len[i]);
+
+	zbx_serialize_prepare_value(data_len, reportid);
+	zbx_serialize_prepare_value(data_len, message_type);
 
 	if (data_alloc - data_offset < data_len)
 	{
@@ -315,10 +318,14 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_med
 
 	zbx_free(params_len);
 
+	ptr += zbx_serialize_value(ptr, reportid);
+	ptr += zbx_serialize_value(ptr, message_type);
+
 	return data_offset + data_len;
 }
 
-void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos)
+void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos,
+			zbx_uint64_t *reportid, int *message_type)
 {
 	zbx_uint32_t	len;
 	int		sendto_num;
@@ -334,6 +341,9 @@ void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype 
 		data += zbx_deserialize_str(data, &sendto, len);
 		zbx_vector_str_append(sendtos, sendto);
 	}
+
+	data += zbx_deserialize_value(data, reportid);
+	data += zbx_deserialize_value(data, message_type);
 }
 
 static void	report_clear_ptr_pairs(zbx_vector_ptr_pair_t *params)
