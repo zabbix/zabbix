@@ -762,7 +762,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
-				zbx_vault_update_token(rtc_data);
+				zbx_vault_update_token((char*)rtc_data);
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}

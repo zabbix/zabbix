@@ -319,7 +319,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		{
 
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
-				zbx_vault_update_token(rtc_data);
+				zbx_vault_update_token((char *)rtc_data);
 			else if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 				config_cache_reload = 1;
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
