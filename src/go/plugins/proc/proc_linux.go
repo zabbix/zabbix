@@ -293,7 +293,7 @@ func getUIDByName(userName string) (*uid, error) {
 	}
 
 	if passwdC == nil {
-		return nil, nil
+		return nil, &userNotFoundError{}
 	}
 
 	return &uid{uint32(passwdC.pw_uid)}, nil
@@ -306,12 +306,11 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 		var uid *uid
 		uid, err = getUIDByName(q.user)
 
-		if uid == nil {
-			if err != nil {
-				return nil, err
+		if err != nil {
+			if errors.Is(err, &userNotFoundError{}) {
+				return query, err
 			}
-
-			return query, &userNotFoundError{}
+			return nil, err
 		}
 
 		query.userid = int64(uid.uid)
@@ -625,12 +624,11 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		if username := params[1]; username != "" {
 			uid, err = getUIDByName(username)
 
-			if uid == nil {
-				if err != nil {
-					return nil, err
+			if err != nil {
+				if errors.Is(err, &userNotFoundError{}) {
+					return 0, nil
 				}
-
-				return 0, nil
+				return nil, err
 			}
 		}
 		fallthrough
@@ -865,14 +863,13 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 	case 2:
 		userName = params[1]
 		if userName != "" {
-			uid, err := getUIDByName(userName)
+			_, err := getUIDByName(userName)
 
-			if uid == nil {
-				if err != nil {
-					return nil, err
+			if err != nil {
+				if errors.Is(err, &userNotFoundError{}) {
+					return "[]", nil
 				}
-
-				return "[]", nil
+				return nil, err
 			}
 		}
 		fallthrough
