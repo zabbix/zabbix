@@ -831,7 +831,6 @@ static unsigned char	get_connection_state_udp(const char *name)
 
 	return state;
 }
-#endif
 
 #ifdef HAVE_IPV6
 static int	scan_ipv6_addr(const char *addr, struct sockaddr_in6 *sa6)
@@ -918,7 +917,6 @@ static void	get_proc_net_count_ipv6(const char *filename, unsigned char state, n
 }
 #endif
 
-#if !defined(WITH_AGENT2_METRICS)
 static void	get_proc_net_count_ipv4(const char *filename, unsigned char state, net_count_info_t *exp_l,
 		net_count_info_t *exp_r, zbx_uint64_t *count)
 {
