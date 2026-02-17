@@ -2107,7 +2107,6 @@ class testFormItem extends CLegacyWebTest {
 				$itemCount ++;
 
 				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
-				$add->click();
 				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
 				try {
 					$add->click();

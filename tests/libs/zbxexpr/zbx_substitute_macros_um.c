@@ -139,7 +139,9 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
+	zbx_config_wlock_set_locked();
 	load_um_cache(&mock_cache, hconfig);
+	zbx_config_wlock_set_unlocked();
 
 	hostid = zbx_mock_get_parameter_uint64("in.hostid");
 	um = zbx_mock_get_parameter_uint64("in.user_macro");
