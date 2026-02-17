@@ -83,8 +83,9 @@ if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
-if (CWebUser::$data && CWebUser::getType() < USER_TYPE_SUPER_ADMIN
-		&& CSessionHelper::get('step') != CSetupWizard::STAGE_INSTALL) {
+$config_file = 'conf/zabbix.conf.php';
+
+if (CWebUser::$data && file_exists($config_file)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 
