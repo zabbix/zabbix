@@ -15,7 +15,6 @@
 #include "../sysinfo.h"
 
 #include "zbxjson.h"
-#include "zbxcomms.h"
 #include "zbxnum.h"
 
 #if !defined(WITH_AGENT2_METRICS)
