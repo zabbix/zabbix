@@ -22,7 +22,7 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'type' => 'required|in history,host,item,item_prototype,map_element,trigger,trigger_macro,drule',
+			'type' => 'required|in host,item,item_prototype,map_element,trigger,trigger_macro,drule',
 			'data' => 'array'
 		];
 
@@ -49,12 +49,6 @@ class CControllerMenuPopup extends CController {
 				$rules = [
 					'hostid' => 'required|db hosts.hostid',
 					'has_goto' => 'in 0'
-				];
-				break;
-
-			case 'history':
-				$rules = [
-					'itemid' => 'required|db items.itemid'
 				];
 				break;
 
@@ -114,37 +108,6 @@ class CControllerMenuPopup extends CController {
 
 	protected function checkPermissions() {
 		return true;
-	}
-
-	/**
-	 * Prepare data for history context menu popup.
-	 *
-	 * @param array  $data
-	 * @param string $data['itemid']
-	 *
-	 * @return mixed
-	 */
-	private static function getMenuDataHistory(array $data) {
-		$db_items = API::Item()->get([
-			'output' => ['value_type'],
-			'itemids' => $data['itemid'],
-			'webitems' => true
-		]);
-
-		if ($db_items) {
-			$db_item = $db_items[0];
-
-			return [
-				'type' => 'history',
-				'itemid' => $data['itemid'],
-				'hasLatestGraphs' => in_array($db_item['value_type'], [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]),
-				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
-			];
-		}
-
-		error(_('No permissions to referred object or it does not exist!'));
-
-		return null;
 	}
 
 	/**
@@ -339,7 +302,8 @@ class CControllerMenuPopup extends CController {
 				'isWriteable' => $is_writable,
 				'allowed_ui_latest_data' => CWebUser::checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
-				'binary_value_type' => $db_item['value_type'] == ITEM_VALUE_TYPE_BINARY
+				'is_trigger_supported' => $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY
+					&& $db_item['value_type'] != ITEM_VALUE_TYPE_JSON
 			];
 		}
 
@@ -377,7 +341,8 @@ class CControllerMenuPopup extends CController {
 				'itemid' => $data['itemid'],
 				'name' => $db_item_prototype['name'],
 				'key' => $db_item_prototype['key_'],
-				'is_binary_value_type' => $db_item_prototype['value_type'] == ITEM_VALUE_TYPE_BINARY,
+				'is_trigger_supported' => $db_item_prototype['value_type'] != ITEM_VALUE_TYPE_BINARY
+					&& $db_item_prototype['value_type'] != ITEM_VALUE_TYPE_JSON,
 				'is_discovered_prototype' => $db_item_prototype['flags'] & ZBX_FLAG_DISCOVERY_CREATED,
 				'hostid' => $db_item_prototype['hosts'][0]['hostid'],
 				'host' => $db_item_prototype['hosts'][0]['host'],
@@ -1014,10 +979,6 @@ class CControllerMenuPopup extends CController {
 		$data = $this->hasInput('data') ? $this->getInput('data') : [];
 
 		switch ($this->getInput('type')) {
-			case 'history':
-				$menu_data = self::getMenuDataHistory($data);
-				break;
-
 			case 'host':
 				$menu_data = self::getMenuDataHost($data);
 				break;

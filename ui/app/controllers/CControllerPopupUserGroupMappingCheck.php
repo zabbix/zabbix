@@ -18,27 +18,48 @@ class CControllerPopupUserGroupMappingCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'roleid' =>				'required|db users.roleid',
-			'name' =>				'required|string|not_empty',
-			'user_groups' =>		'required|array_id'
-		];
+	public static function getFieldsValidationRules(array $existing_names = []): array {
+		$name_extra_rules = ['string'];
 
-		$ret = $this->validateInput($fields);
+		if (count($existing_names) > 0) {
+			$name_extra_rules += ['not_in' => $existing_names,
+				'messages' => ['not_in' => _('Name already exists.')]
+			];
+		}
+
+		return [
+			'name' => [
+				['db userdirectory_idpgroup.name', 'required', 'not_empty'],
+				$name_extra_rules
+			],
+			'user_groups' => ['array', 'required', 'not_empty', 'field' => ['db userdirectory_usrgrp.usrgrpid']],
+			'roleid' => ['db userdirectory_idpgroup.roleid', 'required']
+		];
+	}
+
+	public static function getValidationRules(array $existing_names = []): array {
+		return ['object', 'fields' => self::getFieldsValidationRules($existing_names)];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Invalid user group mapping configuration.'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+			$form_errors = $this->getValidationError();
+			$this->setResponse(new CControllerResponseFatal());
+
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Invalid user group mapping configuration.'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

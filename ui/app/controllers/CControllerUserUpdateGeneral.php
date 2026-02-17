@@ -26,17 +26,32 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 */
 	protected $allow_empty_password;
 
-
-	/**
-	 * @var array
-	 */
-	protected $timezones;
-
 	protected function init() {
 		parent::init();
 
-		$this->timezones = array_keys(CTimezoneHelper::getList());
-		$this->timezones[] = TIMEZONE_DEFAULT;
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+	}
+
+	public static function getAllowedTimezones(): array {
+		$timezones = array_keys(CTimezoneHelper::getList());
+		$timezones[] = TIMEZONE_DEFAULT;
+
+		return $timezones;
+	}
+
+	public static function getAllowedLocales(): array {
+		$locales = array_keys(getLocales());
+		$locales[] = LANG_DEFAULT;
+
+		return $locales;
+	}
+
+	public static function getAllowedThemes(): array {
+		$themes = array_keys(APP::getThemes());
+		$themes[] = THEME_DEFAULT;
+
+		return $themes;
 	}
 
 	/**
@@ -47,7 +62,7 @@ abstract class CControllerUserUpdateGeneral extends CController {
 	 *
 	 * @return int
 	 */
-	private static function hasInternalAuth($usrgrps) {
+	public static function hasInternalAuth($usrgrps) {
 		$system_gui_access =
 			(CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL)
 				? GROUP_GUI_ACCESS_INTERNAL

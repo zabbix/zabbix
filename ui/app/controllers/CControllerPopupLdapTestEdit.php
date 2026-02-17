@@ -74,7 +74,9 @@ class CControllerPopupLdapTestEdit extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'test_username' => CWebUser::$data['username']
+			'test_username' => CWebUser::$data['username'],
+			'js_validation_rules' => (new CFormValidator(CControllerPopupLdapTestSend::getValidationRules()))
+				->getRules()
 		];
 
 		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn',
