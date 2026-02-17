@@ -1355,14 +1355,6 @@ class CFormValidator {
 			};
 		}
 
-		if ('not_empty' in rules && !Object.keys(data).length) {
-			this.#addError(path, this.#getMessage(rules, 'not_empty', t('This field cannot be empty.')),
-				CFormValidator.ERROR_LEVEL_PRIMARY
-			);
-
-			return {result: CFormValidator.ERROR};
-		}
-
 		if (!Object.keys(data).length) {
 			return {result: CFormValidator.SUCCESS};
 		}
