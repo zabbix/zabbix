@@ -560,9 +560,9 @@ class CConfigurationImport {
 			foreach ($dashboards as $dashboard) {
 				$template_dashboards_refs[$dashboard['uuid']]['name'] = $dashboard['name'];
 
-				$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
-					$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
-					$host_groups_refs, $hosts_refs, $templates_refs
+				$this->gatherDashboardReferences($dashboard, true, $host_groups_refs, $hosts_refs, $templates_refs,
+					$items_refs, $graphs_refs, $maps_refs, $services_refs, $slas_refs, $users_refs, $actions_refs,
+					$media_types_refs
 				);
 			}
 		}
@@ -590,9 +590,9 @@ class CConfigurationImport {
 		foreach ($this->getFormattedDashboards() as $dashboard) {
 			$dashboards_refs[$dashboard['name']] = [];
 
-			$this->gatherDashboardReferences($dashboard, $items_refs, $graphs_refs, $maps_refs,
-				$services_refs, $slas_refs, $users_refs, $actions_refs, $media_types_refs,
-				$host_groups_refs, $hosts_refs
+			$this->gatherDashboardReferences($dashboard, false, $host_groups_refs, $hosts_refs, $templates_refs,
+				$items_refs, $graphs_refs, $maps_refs, $services_refs, $slas_refs, $users_refs, $actions_refs,
+				$media_types_refs
 			);
 		}
 
@@ -625,10 +625,11 @@ class CConfigurationImport {
 		$this->referencer->addDashboards($dashboards_refs);
 	}
 
-	private function gatherDashboardReferences(array $dashboard, array &$items_refs, array &$graphs_refs,
-			array &$maps_refs, array &$services_refs, array &$slas_refs, array &$users_refs, array &$actions_refs,
-			array &$media_types_refs, array &$host_groups_refs = [], array &$hosts_refs = [],
-			array &$templates_refs = []): void {
+	private function gatherDashboardReferences(array $dashboard, bool $is_templated, array &$host_groups_refs,
+			array &$hosts_refs, array &$templates_refs, array &$items_refs, array &$graphs_refs, array &$maps_refs,
+			array &$services_refs, array &$slas_refs, array &$users_refs, array &$actions_refs,
+			array &$media_types_refs): void {
+
 		if (!array_key_exists('pages', $dashboard)) {
 			return;
 		}
@@ -653,8 +654,12 @@ class CConfigurationImport {
 
 						case ZBX_WIDGET_FIELD_TYPE_ITEM:
 						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-							$hosts_refs += [$value['host'] => []];
-							$templates_refs += [$value['host'] => []];
+							if ($is_templated) {
+								$templates_refs += [$value['host'] => []];
+							}
+							else {
+								$hosts_refs += [$value['host'] => []];
+							}
 
 							if (!array_key_exists($value['host'], $items_refs)
 									|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
@@ -664,7 +669,12 @@ class CConfigurationImport {
 
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
 						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-							$templates_refs += [$value['host'] => []];
+							if ($is_templated) {
+								$templates_refs += [$value['host'] => []];
+							}
+							else {
+								$hosts_refs += [$value['host'] => []];
+							}
 
 							if (!array_key_exists($value['host'], $graphs_refs)
 									|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
