@@ -939,7 +939,10 @@ static void	supervisor_set_unit_runstate(zbx_supervisor_t *sv, zbx_supervisor_ru
 		zbx_supervisor_unit_set_t	*set = &sv->unitsets[i];
 
 		for (int j = 0; j < set->unit_num; j++)
-			set->units[j].runstate = runstate;
+		{
+			if (UNIT_RUNNING == set->units[j].runstate)
+				set->units[j].runstate = runstate;
+		}
 	}
 }
 

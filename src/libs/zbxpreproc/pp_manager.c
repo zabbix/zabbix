@@ -862,11 +862,13 @@ static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t 
  *                                                                            *
  * Purpose: flush processed value task                                        *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             tasks   - [IN] processed tasks                                 *
+ * Parameters: manager  - [IN] preprocessing manager                          *
+ *             tasks    - [IN] processed tasks                                *
+ *             runstate - [IN] preprocesing manager run state                 *
  *                                                                            *
  ******************************************************************************/
-static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task)
+static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task,
+		zbx_supervisor_runstate_t runstate)
 {
 	zbx_variant_t		*value;
 	unsigned char		value_type, flags;
@@ -876,7 +878,10 @@ static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_t
 	zbx_pp_value_task_get_data(task, &value_type, &flags, &value, &ts, &value_opt);
 
 	if (SUCCEED == preproc_prepare_value_func_cb(value, value_opt))
-		preproc_flush_value_func_cb(manager, task->itemid, value_type, flags, value, ts, value_opt);
+	{
+		if (0 == (flags & ZBX_FLAG_DISCOVERY_RULE) || UNIT_RUNNING == runstate)
+			preproc_flush_value_func_cb(manager, task->itemid, value_type, flags, value, ts, value_opt);
+	}
 }
 
 /******************************************************************************
@@ -910,11 +915,13 @@ static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
  *                                                                            *
  * Purpose: flush processed tasks                                             *
  *                                                                            *
- * Parameters: manager - [IN] preprocessing manager                           *
- *             tasks   - [IN] processed tasks                                 *
+ * Parameters: manager  - [IN] preprocessing manager                          *
+ *             tasks    - [IN] processed tasks                                *
+ *             runstate - [IN] preprocesing manager run state                 *
  *                                                                            *
  ******************************************************************************/
-static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks)
+static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
+		zbx_supervisor_runstate_t runstate)
 {
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -922,7 +929,7 @@ static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_ta
 		{
 			case ZBX_PP_TASK_VALUE:
 			case ZBX_PP_TASK_VALUE_SEQ:	/* value and value_seq task contents are identical */
-				prpeprocessor_flush_value_result(manager, tasks->values[i]);
+				prpeprocessor_flush_value_result(manager, tasks->values[i], runstate);
 				break;
 			case ZBX_PP_TASK_TEST:
 				preprocessor_reply_test_result(tasks->values[i]);
@@ -1371,7 +1378,7 @@ void	*zbx_pp_manager_thread(void *args)
 		{
 			processed_num += (unsigned int)tasks.values_num;
 			counter_processed_num += tasks.values_num;
-			preprocessor_flush_tasks(manager, &tasks);
+			preprocessor_flush_tasks(manager, &tasks, *unit_args->runstate);
 			zbx_pp_tasks_clear(&tasks);
 		}
 

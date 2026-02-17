@@ -94,6 +94,9 @@ void	*zbx_dbconfig_thread(void *args)
 
 	sec = zbx_time();
 	zbx_supervisor_update_activity("%s [syncing configuration]", process_title);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "starting initial configuration cache synchronization");
+
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
@@ -105,6 +108,8 @@ void	*zbx_dbconfig_thread(void *args)
 
 	/* update maintenance states */
 	zbx_dc_update_maintenances(MAINTENANCE_TIMER_PENDING);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "finished initial configuration cache synchronization");
 
 	nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
 

@@ -592,6 +592,17 @@ static void	lld_process_top_items(zbx_lld_manager_t *manager, zbx_ipc_client_t *
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+static void	lld_manager_shutdown_workers(zbx_lld_manager_t *manager)
+{
+	for (int i = 0; i < manager->workers.values_num; i++)
+	{
+		if (NULL == manager->workers.values[i]->client)
+			continue;
+
+		zbx_ipc_client_send(manager->workers.values[i]->client, ZBX_RTC_SHUTDOWN, NULL, 0);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: main processing loop                                              *
@@ -712,6 +723,7 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 			break;
 	}
 
+	lld_manager_shutdown_workers(&manager);
 	zbx_ipc_service_close(&lld_service);
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);

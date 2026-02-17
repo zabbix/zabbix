@@ -1293,11 +1293,17 @@ static void	am_deinit(zbx_am_t *manager)
 		zbx_am_alerter_t	*alerter = manager->alerters.values[i];
 
 		if (NULL != alerter->client)
+		{
+			zbx_ipc_client_send(alerter->client, ZBX_RTC_SHUTDOWN, NULL, 0);
 			zbx_ipc_client_close(alerter->client);
+		}
 	}
 
 	if (NULL != manager->syncer_client)
+	{
+		zbx_ipc_client_send(manager->syncer_client, ZBX_RTC_SHUTDOWN, NULL, 0);
 		zbx_ipc_client_close(manager->syncer_client);
+	}
 
 	zbx_ipc_service_close(&manager->ipc);
 

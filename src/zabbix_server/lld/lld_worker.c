@@ -18,6 +18,7 @@
 
 #include "../events/events.h"
 
+#include "zbx_rtc_constants.h"
 #include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxlog.h"
@@ -414,6 +415,9 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 				lld_value_clear(&lld_value);
 				zbx_ipc_socket_write(&lld_socket, ZBX_IPC_LLD_DONE, NULL, 0);
 				processed_num++;
+				break;
+			case ZBX_RTC_SHUTDOWN:
+				zbx_set_exiting_with_succeed();
 				break;
 		}
 

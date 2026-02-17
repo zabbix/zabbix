@@ -3755,6 +3755,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
 					timeout.sec = 0;
 					timeout.ns = 1e8;
+					running = 0;
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;

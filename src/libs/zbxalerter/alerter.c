@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbx_rtc_constants.h"
 #include "zbxalerter.h"
 
 #include "alerter_defs.h"
@@ -471,6 +472,9 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_WEBHOOK:
 				alerter_process_webhook(&alerter_socket, &message, alerter_args_in->config_source_ip);
+				break;
+			case ZBX_RTC_SHUTDOWN:
+				zbx_set_exiting_with_succeed();
 				break;
 		}
 

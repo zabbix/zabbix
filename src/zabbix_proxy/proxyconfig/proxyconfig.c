@@ -339,10 +339,15 @@ void	*zbx_proxyconfig_thread(void *args)
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	zbx_supervisor_update_activity("%s [syncing configuration]", process_title);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "starting initial configuration cache synchronization");
+
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, proxyconfig_args_in->config_vault,
 			proxyconfig_args_in->config_proxyconfig_frequency);
 
 	proxyconfig_update_vault_macros(proxyconfig_args_in);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "finished initial configuration cache synchronization");
 
 	if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		nextcheck = 0;
