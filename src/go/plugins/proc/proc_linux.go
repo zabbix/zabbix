@@ -310,6 +310,7 @@ func newCPUUtilQuery(q *procQuery, pattern *regexp.Regexp) (*cpuUtilQuery, error
 			if errors.Is(err, &userNotFoundError{}) {
 				return query, err
 			}
+
 			return nil, err
 		}
 
@@ -628,6 +629,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 				if errors.Is(err, &userNotFoundError{}) {
 					return 0, nil
 				}
+
 				return nil, err
 			}
 		}
@@ -869,6 +871,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 				if errors.Is(err, &userNotFoundError{}) {
 					return "[]", nil
 				}
+
 				return nil, err
 			}
 		}
