@@ -22,6 +22,16 @@ window.sla_excluded_downtime_edit_popup = new class {
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
+
+		this.form.findFieldByName('duration_hours')._field.onchange = () => {
+			this.form.findFieldByName('duration_minutes').setChanged();
+			this.form.validateChanges(['duration_minutes']);
+		};
+
+		this.form.findFieldByName('duration_days')._field.onchange = () => {
+			this.form.findFieldByName('duration_minutes').setChanged();
+			this.form.validateChanges(['duration_minutes']);
+		};
 	}
 
 	submit() {
