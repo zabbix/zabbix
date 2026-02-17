@@ -2028,11 +2028,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_threads = (pid_t *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(pid_t));
 	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
 
+	zbx_block_signals(&orig_mask);
+
+	if (!ZBX_IS_RUNNING())
+		zbx_exit(EXIT_FAILURE);
+
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		exit_args.listen_sock = &listen_sock;
-
-		zbx_block_signals(&orig_mask);
 
 		if (FAIL == zbx_tcp_listen(&listen_sock, config_listen_ip, (unsigned short)config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
@@ -2047,8 +2050,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_free(error);
 			zbx_exit(EXIT_FAILURE);
 		}
-
-		zbx_unblock_signals(&orig_mask);
 	}
 
 	/* not running zbx_tls_init_parent() since proxy is only run on Unix*/
@@ -2079,6 +2080,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_unset_child_signal_handler();
 	start_processes(&listen_sock, &config_comms, runlevels, 0);
+
+	/* prevent from shutdown being initiated before supervisor has started */
+	zbx_unblock_signals(&orig_mask);
 
 	zbx_supervisor_client_t	svc;
 

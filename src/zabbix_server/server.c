@@ -2105,15 +2105,20 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	if (0 != config_forks[ZBX_PROCESS_TYPE_DISCOVERYMANAGER])
 		zbx_discoverer_init();
 
+	zbx_block_signals(&orig_mask);
+
+	if (!ZBX_IS_RUNNING())
+		return FAIL;
+
 	if (0 != config_forks[ZBX_PROCESS_TYPE_TRAPPER])
 	{
 		exit_args->listen_sock = listen_sock;
-		zbx_block_signals(&orig_mask);
 
 		if (FAIL == zbx_tcp_listen(listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
 				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
+			zbx_unblock_signals(&orig_mask);
 			return FAIL;
 		}
 
@@ -2121,9 +2126,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot initialize commands cache: %s", error);
 			zbx_free(error);
+			zbx_unblock_signals(&orig_mask);
 			return FAIL;
 		}
-		zbx_unblock_signals(&orig_mask);
 	}
 
 	zbx_threads_num = zbx_supervisor_get_process_count(config_forks);
@@ -2137,7 +2142,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	runlevels = zbx_proc_startup_create(zbx_threads_num, get_process_info_by_thread);
 
 	zbx_unset_child_signal_handler();
+
 	start_processes(listen_sock, runlevels, 0);
+
+	/* prevent from shutdown being initiated before supervisor has started */
+	zbx_unblock_signals(&orig_mask);
 
 	zbx_supervisor_client_t	svc;
 
