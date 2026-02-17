@@ -32,8 +32,6 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	protected function checkInput() {
-		global $ALLOW_HTTP_AUTH;
-
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
@@ -84,7 +82,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if ($ALLOW_HTTP_AUTH) {
+		if (CAuthenticationHelper::isHttpAuthentication()) {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
@@ -346,8 +344,6 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid, int $mfaid): bool {
-		global $ALLOW_HTTP_AUTH;
-
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::DISABLED_USER_GROUPID,
@@ -377,7 +373,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfaid' => $mfaid
 		];
 
-		if ($ALLOW_HTTP_AUTH) {
+		if (CAuthenticationHelper::isHttpAuthentication()) {
 			$auth_params = array_merge($auth_params, [
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,

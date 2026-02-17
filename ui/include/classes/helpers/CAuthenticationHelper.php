@@ -163,4 +163,16 @@ class CAuthenticationHelper {
 
 		return is_array($SSO) && array_key_exists('CERT_STORAGE', $SSO) && ($SSO['CERT_STORAGE'] === 'database');
 	}
+
+	/**
+	 *
+	 *
+	 * @return bool
+	 */
+	public static function isHttpAuthentication(): bool {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+
+		return $config->getHttpAuthFlag();
+	}
 }

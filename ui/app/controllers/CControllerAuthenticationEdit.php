@@ -26,8 +26,6 @@ class CControllerAuthenticationEdit extends CController {
 	 * @return bool
 	 */
 	protected function checkInput() {
-		global $ALLOW_HTTP_AUTH;
-
 		$fields = [
 			'form_refresh' =>					'int32',
 			'authentication_type' =>			'in '.ZBX_AUTH_INTERNAL.','.ZBX_AUTH_LDAP,
@@ -78,7 +76,7 @@ class CControllerAuthenticationEdit extends CController {
 			];
 		}
 
-		if ($ALLOW_HTTP_AUTH) {
+		if (CAuthenticationHelper::isHttpAuthentication()) {
 			$fields += [
 				'http_auth_enabled' =>		'in '.ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED,
 				'http_login_form' =>		'in '.ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP,
@@ -106,15 +104,13 @@ class CControllerAuthenticationEdit extends CController {
 	}
 
 	protected function doAction() {
-		global $ALLOW_HTTP_AUTH;
-
 		$ldap_status = (new CFrontendSetup())->checkPhpLdapModule();
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 		$data = [
 			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
-			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
+			'is_http_auth_allowed' => CAuthenticationHelper::isHttpAuthentication(),
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'saml_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),
@@ -138,7 +134,7 @@ class CControllerAuthenticationEdit extends CController {
 			CAuthenticationHelper::MFAID
 		];
 
-		if ($ALLOW_HTTP_AUTH) {
+		if (CAuthenticationHelper::isHttpAuthentication()) {
 			$auth_params = array_merge($auth_params, [
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,
@@ -208,7 +204,7 @@ class CControllerAuthenticationEdit extends CController {
 				];
 			}
 
-			if ($ALLOW_HTTP_AUTH) {
+			if (CAuthenticationHelper::isHttpAuthentication()) {
 				$config_fields += [
 					'http_auth_enabled' => CSettingsSchema::getDefault('http_auth_enabled'),
 					'http_login_form' => CSettingsSchema::getDefault('http_login_form'),
