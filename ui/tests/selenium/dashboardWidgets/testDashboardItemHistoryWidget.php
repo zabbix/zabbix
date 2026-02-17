@@ -2798,7 +2798,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$this->assertScreenshotExcept($widget, $timestamp_cells, 'HTML encode check');
 			}
 
-			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
+			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['items']);
 		}
 
 		if (array_key_exists('host_select', $data)) {
