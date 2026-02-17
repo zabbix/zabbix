@@ -328,6 +328,10 @@ class CMenuHelper {
 			);
 		}
 
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
@@ -351,9 +355,11 @@ class CMenuHelper {
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Geographical maps')))
 							->setAction('geomaps.edit'),
-						(new CMenuItem(_('Modules')))
-							->setAction('module.list')
-							->setAliases(['module.edit', 'module.scan']),
+						$module_enabled
+							? (new CMenuItem(_('Modules')))
+								->setAction('module.list')
+								->setAliases(['module.edit', 'module.scan'])
+							: null,
 						(new CMenuItem(_('Connectors')))
 							->setAction('connector.list')
 							->setAliases(['connector.edit']),

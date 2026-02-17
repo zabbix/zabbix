@@ -42,6 +42,14 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if (!$module_enabled) {
+			return false;
+		}
+
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)) {
 			return false;
 		}

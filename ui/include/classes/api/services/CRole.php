@@ -162,10 +162,25 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateCreate(array &$roles): void {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		$specific_fields = $module_enabled
+			? [
+				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				]],
+				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED]
+			]
+			: [];
+
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
-			'rules' =>			['type' => API_OBJECT, 'default' => [], 'fields' => [
+			'rules' =>			['type' => API_OBJECT, 'default' => [], 'fields' => $specific_fields + [
 				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
@@ -187,11 +202,6 @@ class CRole extends CApiService {
 					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
-				]],
-				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],
@@ -261,11 +271,25 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$roles, ?array &$db_roles): void {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		$specific_fields = $module_enabled
+			? [
+				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
+					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
+				]],
+				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED]
+			]
+			: [];
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'roleid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('role', 'name')],
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])],
-			'rules' =>			['type' => API_OBJECT, 'fields' => [
+			'rules' =>			['type' => API_OBJECT, 'fields' => $specific_fields + [
 				'ui' =>						['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
@@ -287,11 +311,6 @@ class CRole extends CApiService {
 					'tag' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'value' =>					['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('role_rule', 'value_str'), 'default' => '']
 				]],
-				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
-					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
-					'status' =>					['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED, 'default' => ZBX_ROLE_RULE_ENABLED]
-				]],
-				'modules.default_access' =>	['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'uniq' => true],
 				'api.access' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_DISABLED.','.ZBX_ROLE_RULE_ENABLED],
 				'api.mode' =>				['type' => API_INT32, 'in' => ZBX_ROLE_RULE_API_MODE_DENY.','.ZBX_ROLE_RULE_API_MODE_ALLOW],

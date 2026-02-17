@@ -24,7 +24,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'name' => 										'required|not_empty|db role.name',
 			'type' => 										'required|in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
 			'ui_default_access' => 							'required|in 0,1',
-			'modules_default_access' => 					'required|in 0,1',
 			'actions_default_access' => 					'required|in 0,1',
 			'api_access' => 								'required|in 0,1',
 			'ui_monitoring_dashboard' => 					'in 0,1',
@@ -87,7 +86,6 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'actions_change_problem_ranking' =>				'in 0,1',
 			'actions_edit_own_media' =>						'in 0,1',
 			'actions_edit_user_media' =>					'in 0,1',
-			'modules' => 									'array',
 			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 								'array',
 			'service_read_access' => 						'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
@@ -100,6 +98,17 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'service_write_tag_value' => 					'string',
 			'form_refresh' => 								'int32'
 		];
+
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if ($module_enabled) {
+			$fields += [
+				'modules' => 									'array',
+				'modules_default_access' => 					'required|in 0,1',
+			];
+		}
 
 		$ret = $this->validateInput($fields);
 		$result = $this->getValidationResult();

@@ -44,7 +44,16 @@ class CControllerModuleList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if (!$module_enabled) {
+			return false;
+		}
+		else {
+			return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+		}
 	}
 
 	protected function doAction(): void {

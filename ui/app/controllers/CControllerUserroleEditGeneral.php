@@ -23,10 +23,14 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function getRulesInput(int $user_type): array {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
 		return array_merge(
 			$this->getUiSectionRules($user_type),
 			$this->getServiceSectionRules(),
-			$this->getModuleSectionRules(),
+			$module_enabled ? $this->getModuleSectionRules() : [],
 			$this->getApiSectionRules(),
 			$this->getActionSectionRules($user_type)
 		);

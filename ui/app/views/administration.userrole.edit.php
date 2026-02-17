@@ -235,58 +235,62 @@ $form_grid
 			->addStyle('display: none;')
 	]);
 
-$form_grid->addItem(
-	new CFormField(
-		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
-	)
-);
-
-$modules = [];
-
-foreach ($data['labels']['modules'] as $moduleid => $module_name) {
-	$module = new CDiv(
-		(new CCheckBox('modules['.$moduleid.']', 1))
-			->setChecked(
-				array_key_exists($moduleid, $data['rules']['modules'])
-					? $data['rules']['modules'][$moduleid]
-					: !array_key_exists($moduleid, $data['disabled_moduleids'])
-			)
-			->setReadonly($data['readonly'])
-			->setLabel($module_name)
-			->setUncheckedValue(0)
-	);
-
-	if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
-		$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
-	}
-
-	$modules[] = $module;
-}
-
-if ($modules) {
-	$form_grid->addItem(
-		new CFormField($modules)
-	);
-}
-else {
+if (!array_key_exists('modules_config_enabled', $data['rules'])) {
 	$form_grid->addItem(
 		new CFormField(
-			new CLabel(_('No enabled modules found.'))
+			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
 		)
 	);
+
+	$modules = [];
+
+	foreach ($data['labels']['modules'] as $moduleid => $module_name) {
+		$module = new CDiv(
+			(new CCheckBox('modules['.$moduleid.']', 1))
+				->setChecked(
+					array_key_exists($moduleid, $data['rules']['modules'])
+						? $data['rules']['modules'][$moduleid]
+						: !array_key_exists($moduleid, $data['disabled_moduleids'])
+				)
+				->setReadonly($data['readonly'])
+				->setLabel($module_name)
+				->setUncheckedValue(0)
+		);
+
+		if (array_key_exists($moduleid, $data['disabled_moduleids'])) {
+			$module->addItem((new CSpan([' (', _('Disabled'), ')']))->addClass(ZBX_STYLE_RED));
+		}
+
+		$modules[] = $module;
+	}
+
+	if ($modules) {
+		$form_grid->addItem(
+			new CFormField($modules)
+		);
+	}
+	else {
+		$form_grid->addItem(
+			new CFormField(
+				new CLabel(_('No enabled modules found.'))
+			)
+		);
+	}
+
+	$form_grid
+		->addItem([
+			new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
+			new CFormField(
+				(new CCheckBox('modules_default_access', 1))
+					->setId('modules.default_access')
+					->setChecked($data['rules']['modules.default_access'])
+					->setReadonly($data['readonly'])
+					->setUncheckedValue(0)
+			)
+		]);
 }
 
 $form_grid
-	->addItem([
-		new CLabel(_('Default access to new modules'), $data['readonly'] ? '' : 'modules.default_access'),
-		new CFormField(
-			(new CCheckBox('modules_default_access', 1))
-				->setId('modules.default_access')
-				->setChecked($data['rules']['modules.default_access'])
-				->setReadonly($data['readonly'])
-				->setUncheckedValue(0)
-		)
-	])
 	->addItem(
 		new CFormField(
 			(new CTag('h4', true, _('Access to API')))->addClass('input-section-header')

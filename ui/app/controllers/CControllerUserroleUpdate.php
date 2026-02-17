@@ -87,9 +87,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'actions_edit_own_media' =>						'in 0,1',
 			'actions_edit_user_media' =>					'in 0,1',
 			'ui_default_access' => 							'in 0,1',
-			'modules_default_access' => 					'in 0,1',
 			'actions_default_access' => 					'in 0,1',
-			'modules' => 									'array',
 			'api_access' => 								'in 0,1',
 			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 								'array',
@@ -103,6 +101,17 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			'service_write_tag_value' => 					'string',
 			'form_refresh' => 								'int32'
 		];
+
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if ($module_enabled) {
+			$fields += [
+				'modules' => 									'array',
+				'modules_default_access' => 					'in 0,1',
+			];
+		}
 
 		$ret = $this->validateInput($fields);
 		$result = $this->getValidationResult();

@@ -39,7 +39,12 @@ class CModule extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = [], bool $api_call = true) {
-		if ($api_call && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+				|| !$module_enabled)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -102,7 +107,11 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function create(array $modules): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
 			);
@@ -153,7 +162,11 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function update(array $modules): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
 			);
@@ -226,7 +239,11 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $moduleids): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
 			);

@@ -91,9 +91,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_edit_own_media' =>						'in 0,1',
 			'actions_edit_user_media' =>					'in 0,1',
 			'ui_default_access' => 							'in 0,1',
-			'modules_default_access' => 					'in 0,1',
 			'actions_default_access' => 					'in 0,1',
-			'modules' => 									'array',
 			'api_access' => 								'in 0,1',
 			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 								'array',
@@ -108,6 +106,17 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'form_refresh' => 								'int32',
 			'super_admin_role_clone' =>						'in 1'
 		];
+
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if ($module_enabled) {
+			$fields += [
+				'modules' => 									'array',
+				'modules_default_access' => 					'in 0,1',
+			];
+		}
 
 		$ret = $this->validateInput($fields);
 
@@ -216,17 +225,28 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 		}
 
-		$db_modules = API::Module()->get([
-			'output' => ['moduleid', 'relative_path', 'status']
-		]);
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
 
-		$disabled_modules = array_filter($db_modules,
-			static function(array $db_module): bool {
-				return $db_module['status'] == MODULE_STATUS_DISABLED;
-			}
-		);
+		$db_modules = $module_enabled
+			? API::Module()->get([
+				'output' => ['moduleid', 'relative_path', 'status']
+			])
+			: [];
 
-		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+		if ($db_modules) {
+			$disabled_modules = array_filter($db_modules,
+				static function (array $db_module): bool {
+					return $db_module['status'] == MODULE_STATUS_DISABLED;
+				}
+			);
+
+			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+		}
+		else {
+			$data['rules']['modules_config_enabled'] = true;
+		}
 
 		$data['labels'] = $this->getLabels($db_modules);
 
@@ -394,12 +414,22 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	 * @throws APIException
 	 */
 	private function getRulesByRoleid(string $roleid): array {
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
+			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
+			'services.write.mode', 'services.write.list', 'services.write.tag'
+		];
+
+		if ($module_enabled) {
+			$select_rules = array_merge($select_rules, ['modules', 'modules.default_access']);
+		}
+
 		$roles = API::Role()->get([
 			'output' => ['roleid'],
-			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api', 'api.access',
-				'api.mode', 'actions', 'actions.default_access', 'services.read.mode', 'services.read.list',
-				'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag'
-			],
+			'selectRules' => $select_rules,
 			'roleids' => $roleid
 		]);
 
@@ -439,8 +469,16 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$rules['service_write_list'] = $input['services.write.list'];
 		$rules['service_write_tag'] = $input['services.write.tag'];
 
-		foreach ($input['modules'] as $rule) {
-			$rules['modules'][$rule['moduleid']] = $rule['status'];
+		/** @var CConfigFile $config */
+		$config = APP::Component()->get('config');
+		$module_enabled = $config->getModuleFlag();
+
+		if ($module_enabled) {
+			foreach ($input['modules'] as $rule) {
+				$rules['modules'][$rule['moduleid']] = $rule['status'];
+			}
+
+			$rules['modules.default_access'] = $input['modules.default_access'];
 		}
 
 		if ($input['api']) {
@@ -460,7 +498,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		}
 
 		$rules['ui.default_access'] = $input['ui.default_access'];
-		$rules['modules.default_access'] = $input['modules.default_access'];
 		$rules['api.access'] = $input['api.access'];
 		$rules['api.mode'] = $input['api.mode'];
 		$rules['actions.default_access'] = $input['actions.default_access'];
