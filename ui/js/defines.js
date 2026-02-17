@@ -125,6 +125,8 @@ const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large
 const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
 
+const ZBX_PREG_NUMBER = /(?<number>-?((?<int>\d+)(\.(?<frac>\d*))?|\.(?<frac_only>\d+))([Ee](?<exp>[+-]?\d+))?)/;
+
 const ITEM_VALUE_TYPE_FLOAT = 0;
 const ITEM_VALUE_TYPE_STR = 1;
 const ITEM_VALUE_TYPE_LOG = 2;

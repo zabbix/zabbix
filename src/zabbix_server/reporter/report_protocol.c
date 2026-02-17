@@ -319,7 +319,7 @@ zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_med
 	zbx_free(params_len);
 
 	ptr += zbx_serialize_value(ptr, reportid);
-	ptr += zbx_serialize_value(ptr, message_type);
+	(void)zbx_serialize_value(ptr, message_type);
 
 	return data_offset + data_len;
 }
@@ -343,7 +343,7 @@ void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype 
 	}
 
 	data += zbx_deserialize_value(data, reportid);
-	data += zbx_deserialize_value(data, message_type);
+	(void)zbx_deserialize_value(data, message_type);
 }
 
 static void	report_clear_ptr_pairs(zbx_vector_ptr_pair_t *params)

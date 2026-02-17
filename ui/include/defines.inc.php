@@ -1486,7 +1486,7 @@ define('GEOMAP_LNG_MIN', -180);
 define('GEOMAP_LNG_MAX', 180);
 
 // Regular expressions.
-define('ZBX_PREG_NUMBER', '(?<number>-?(\d+(\.\d*)?|\.\d+)([Ee][+-]?\d+)?)');
+define('ZBX_PREG_NUMBER', '(?<number>-?((?<int>\d+)(\.(?<frac>\d*))?|\.(?<frac_only>\d+))([Ee](?<exp>[+-]?\d+))?)');
 define('ZBX_PREG_INT', '(?<int>-?\d+)');
 define('ZBX_PREG_DEF_FONT_STRING', '/^[0-9.:% ]+$/');
 define('ZBX_TLS_PSK_PATTERN', '/^(.{2}){1,}$/');
