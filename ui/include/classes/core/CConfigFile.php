@@ -188,8 +188,26 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
-		if (isset($ALLOW_HTTP_AUTH)) {
+		if (isset($ALLOW_HTTP_AUTH) && $ALLOW_HTTP_AUTH !== '') {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
+		}
+
+		if (isset($ALLOW_HTTP_AUTH) && isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
+			self::exception('Can not use both $ALLOW_HTTP_AUTH and $ZBX_FEATURE_FLAGS at the same time.');
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS) && is_array($ZBX_FEATURE_FLAGS)) {
+			if (array_key_exists('http_auth_enabled', $ZBX_FEATURE_FLAGS)) {
+				$this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] = $ZBX_FEATURE_FLAGS['http_auth_enabled'];
+			}
+
+			if (array_key_exists('modules_config_enabled', $ZBX_FEATURE_FLAGS)) {
+				$this->config['ZBX_FEATURE_FLAGS']['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
+			}
+
+			if (array_key_exists('media_type_denylist', $ZBX_FEATURE_FLAGS)) {
+				$this->config['ZBX_FEATURE_FLAGS']['media_type_denylist'] = $ZBX_FEATURE_FLAGS['media_type_denylist'];
+			}
 		}
 
 		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
@@ -225,7 +243,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+			$ALLOW_HTTP_AUTH, $ZBX_FEATURE_FLAGS, $ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -235,6 +253,7 @@ class CConfigFile {
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
+		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -273,6 +292,31 @@ class CConfigFile {
 			return false;
 		}
 	}
+
+	public function getHttpAuthFlag() {
+		if (!isset($this->config['ZBX_FEATURE_FLAGS'])) {
+			return null;
+		}
+
+		return $this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] ?? null;
+	}
+
+	public function getModuleFlag() {
+		if (!isset($this->config['ZBX_FEATURE_FLAGS'])) {
+			return null;
+		}
+
+		return $this->config['ZBX_FEATURE_FLAGS']['modules_config_enabled'] ?? null;
+	}
+
+	public function getMediaTypeFlag() {
+		if (!isset($this->config['ZBX_FEATURE_FLAGS'])) {
+			return null;
+		}
+
+		return $this->config['ZBX_FEATURE_FLAGS']['media_type_denylist'] ?? null;
+	}
+
 
 	public function getString() {
 		return
@@ -338,8 +382,14 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 //$SSO[\'SP_CERT\']		= \'conf/certs/sp.crt\';
 //$SSO[\'IDP_CERT\']		= \'conf/certs/idp.crt\';
 
-// If set to false, support for HTTP authentication will be disabled.
-// $ALLOW_HTTP_AUTH = true;
+// Possible values true/false to enable/disable user HTTP authentication.
+//$ZBX_FEATURE_FLAGS[\'http_auth_enabled\'] = true;
+
+// Possible values true/false to enable/disable access to Modules.
+//$ZBX_FEATURE_FLAGS[\'modules_config_enabled\'] = true;
+
+// Possible values \'email\', \'script\', \'sms\', \'webhook\'. Can be defined one or several.
+//$ZBX_FEATURE_FLAGS[\'media_type_denylist\'] = [];
 
 $ZBX_SERVER_TLS[\'ACTIVE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['ACTIVE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
@@ -380,7 +430,12 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
-		$this->config['ALLOW_HTTP_AUTH'] = true;
+		$this->config['ALLOW_HTTP_AUTH'] = null; // Deprecated. Use ZBX_FEATURE_FLAGS instead.
+		$this->config['ZBX_FEATURE_FLAGS'] = [
+			'http_auth_enabled' => true,
+			'modules_config_enabled' => true,
+			'media_type_denylist' => null
+		];
 		$this->config['ZBX_SERVER_TLS'] = [
 			'ACTIVE' => 0,
 			'CA_FILE' => '',

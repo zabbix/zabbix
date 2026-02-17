@@ -60,8 +60,14 @@ $SSO['CERT_STORAGE']		= 'database';
 //$SSO['SP_CERT']		= 'conf/certs/sp.crt';
 //$SSO['IDP_CERT']		= 'conf/certs/idp.crt';
 
-// If set to false, support for HTTP authentication will be disabled.
-// $ALLOW_HTTP_AUTH = true;
+// Possible values true/false to enable/disable user HTTP authentication.
+//$ZBX_FEATURE_FLAGS['http_auth_enabled'] = true;
+
+// Possible values true/false to enable/disable access to Modules.
+//$ZBX_FEATURE_FLAGS['modules_config_enabled'] = true;
+
+// Possible values 'email', 'script', 'sms', 'webhook'. Can be defined one or several.
+//$ZBX_FEATURE_FLAGS['media_type_denylist'] = [];
 
 $ZBX_SERVER_TLS['ACTIVE'] = '0';
 $ZBX_SERVER_TLS['CA_FILE'] = '';
