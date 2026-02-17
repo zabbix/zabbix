@@ -1856,7 +1856,7 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
 
-	for (int j = 0; j < processes->values_num; j++)
+	for (int j = 0; j < processes->values_num && ZBX_IS_RUNNING(); j++)
 	{
 		zbx_proc_info_t	*info = &processes->values[j];
 		int		i = info->index - 1;
