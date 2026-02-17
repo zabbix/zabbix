@@ -288,8 +288,12 @@ func getUIDByName(userName string) (*uid, error) {
 		&passwdC,
 	)
 
-	if passwdC == nil {
+	if errCode != 0 {
 		return nil, fmt.Errorf("%w getpwnam_r failed with code %d", errGetPwnamRFailed, int(errCode))
+	}
+
+	if passwdC == nil {
+		return nil, nil
 	}
 
 	return &uid{uint32(passwdC.pw_uid)}, nil
