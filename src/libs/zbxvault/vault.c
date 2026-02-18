@@ -12,7 +12,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "zbxvault.h"
 #include "hashicorp.h"
 #include "cyberark.h"
 

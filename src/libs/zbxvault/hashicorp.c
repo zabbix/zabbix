@@ -113,7 +113,7 @@ int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 	ZBX_UNUSED(config_ssl_cert_location);
 	ZBX_UNUSED(config_ssl_key_location);
 	ZBX_UNUSED(kvs);
-	ZBX_UNUSED(rtc);
+	ZBX_UNUSED(relog_token);
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;
 #else
