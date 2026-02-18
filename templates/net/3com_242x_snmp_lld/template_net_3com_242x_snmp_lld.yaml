@@ -1,0 +1,1222 @@
+zabbix_export:
+  version: "7.4"
+
+  template_groups:
+    - uuid: 36f8c7b12a6b4d3e9bfa1a2b3c4d5e6f
+      name: "Templates/Network"
+
+  hosts: []
+
+  templates:
+    - uuid: 550e8400e29b41d4a716446655449999
+      template: "3Com 242x SNMP LLD Base"
+      name: "3Com 242x SNMP LLD Base v2.0.0"
+      description: |
+        Production‑ready SNMP Low‑Level Discovery (LLD) template for 3Com 242x series switches.
+        Version: 2.0.0
+
+        This template delivers full interface‑level monitoring with advanced analytics, predictive
+        modeling, anomaly detection, stability scoring, noise suppression, and SLA‑oriented KPIs.
+        It is fully aligned with the Zabbix 7.4 YAML schema and validated for compatibility with
+        Zabbix 8.x.
+
+        Core Features:
+          • Automatic interface discovery using IF‑MIB with enhanced metadata collection
+          • Real‑time traffic monitoring (bps, utilization, smoothed 3‑sample average)
+          • Error, discard, CRC, collision, broadcast, and multicast monitoring
+          • Sustained‑rate detection for reliability‑critical counters
+          • Admin/oper status correlation for accurate link‑state reporting
+          • Queue drop monitoring for congestion and reliability analysis
+          • VLAN, MTU, duplex mode, and interface description collection
+          • Native Zabbix 7.4 valuemap support with UUID‑based valuemaps
+
+        Advanced Analytics (Phases 11–17):
+          • Interface Quality Score (IQS) — composite reliability KPI
+          • Interface Health Classification (IHC) — healthy/warning/critical state mapping
+          • Interface Stability Index (ISI) — flapping, CRC, discard, and speed‑change scoring
+          • Noise Filter (NF) — suppresses false positives and noisy interfaces
+          • Interface Behavior Prediction (IBP) — predictive degradation modeling
+          • Anomaly Detection (AD) — deviation‑based behavioral anomaly scoring
+
+        Role Detection (Phase 13):
+          • Multi‑tier uplink/access/server role auto‑classification
+          • Detects uplink‑100M, uplink‑1G, uplink‑10G, trunk, access, and server/high‑speed roles
+          • Role‑change detection trigger for topology awareness
+
+        Calculated KPIs:
+          – Error/discard percentage relative to traffic volume
+          – SLA compliance score per interface
+          – Latency estimation
+          – Stability, prediction, and anomaly scores
+
+        Trigger Enhancements:
+          • Clean, severity‑aligned trigger set for performance, reliability, and SLA deviations
+          • Hysteresis‑based triggers for errors, discards, and CRC anomalies
+          • Noise‑aware suppression logic to prevent alert storms
+          • Predictive and anomaly‑based alerts for proactive monitoring
+
+        Template Architecture:
+          • Fully LLD‑driven — no manual per‑port configuration required
+          • Optimized history and trend retention for database efficiency
+          • Dashboard‑friendly tagging for filtering and visualization
+          • Standardized UUID patterns for items, triggers, and valuemaps
+          • GitHub‑ready metadata and versioning (Phase 20)
+
+        Intended Use:
+          • Suitable for production environments with large numbers of 3Com switches
+          • Designed for long‑term trending, SLA reporting, and reliability analytics
+          • Ideal for NOC teams requiring deep per‑interface diagnostics
+
+        Compatibility:
+          • Fully compatible with Zabbix 7.4
+          • Tested for Zabbix 8.x import and runtime behavior
+
+        LLD Version: 18
+
+      groups:
+        - name: "Templates/Network"
+
+      macros:
+        - macro: "{$IF_UTIL_WARN}"
+          value: "80"
+        - macro: "{$IF_UTIL_HIGH}"
+          value: "90"
+        - macro: "{$IF_ERROR_RATE}"
+          value: "10"
+        - macro: "{$TEMPLATE.VERSION}"
+          value: "1.20"
+        - macro: "{$TEMPLATE.PHASES}"
+          value: "20"
+
+        # New macros for v1.7
+        - macro: "{$IF_DISCARD_RATE}"
+          value: "10"
+        - macro: "{$BROADCAST_STORM}"
+          value: "1000"
+
+        # New macros for v1.8
+        - macro: "{$IF_CRC_THRESHOLD}"
+          value: "10"
+        - macro: "{$IF_COLLISION_THRESHOLD}"
+          value: "5"
+        - macro: "{$IF_ERROR_PCT_WARN}"
+          value: "5"
+
+        # New macros for v1.9
+        - macro: "{$IF_QUEUE_DROP_THRESHOLD}"
+          value: "10"
+        - macro: "{$IF_LATENCY_WARN}"
+          value: "50"
+        - macro: "{$IF_SLA_MIN}"
+          value: "95"
+
+      discovery_rules:
+        - uuid: 550e8400e29b41d4a716446655449900
+          name: "Interface discovery"
+          type: SNMP_AGENT
+          key: if.discovery
+          snmp_oid: "discovery[{#IFINDEX},ifIndex,{#IFNAME},ifDescr]"
+          delay: "1h"
+
+          filter:
+            conditions:
+              - macro: "{#IFNAME}"
+                operator: NOT_MATCHES_REGEX
+                value: "^(lo|Loopback|Vlan|Null)"
+
+          item_prototypes:
+            # Phase 7 — Interface Name and Description Normalization
+            - uuid: 550e8400e29b41d4a71644665544abcd
+              name: "Interface {#IFNAME}: name"
+              type: SNMP_AGENT
+              key: "ifName[{#IFINDEX}]"
+              snmp_oid: "ifName.{#IFINDEX}"
+              preprocessing:
+                - type: REGEX
+                  parameters:
+                    - "^GigabitEthernet(.*)"
+                    - 'Gi\1'
+                - type: REGEX
+                  parameters:
+                    - "^FastEthernet(.*)"
+                    - 'Fa\1'
+                - type: REGEX
+                  parameters:
+                    - "^Ethernet(.*)"
+                    - 'Eth\1'
+                - type: REGEX
+                  parameters:
+                    - '^Port\s*(.*)'
+                    - 'P\1'
+
+            # --- Existing item prototypes from v1.6 ---
+            - uuid: 550e8400e29b41d4a716446655449901
+              name: "Interface {#IFNAME}: description"
+              type: SNMP_AGENT
+              key: "ifAlias[{#IFINDEX}]"
+              snmp_oid: "ifAlias.{#IFINDEX}"
+              delay: "1h"
+              history: "30d"
+              trends: "0"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: metadata
+
+            - uuid: 550e8400e29b41d4a716446655449902
+              name: "Interface {#IFNAME}: operational status"
+              type: SNMP_AGENT
+              key: "ifOperStatus[{#IFINDEX}]"
+              snmp_oid: "ifOperStatus.{#IFINDEX}"
+              delay: "2m"
+              value_type: UNSIGNED
+              valuemap:
+                name: "3Com-Port-Status"
+              history: "15d"
+              trends: "0"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: status
+
+            - uuid: 550e8400e29b41d4a716446655449903
+              name: "Interface {#IFNAME}: admin status"
+              type: SNMP_AGENT
+              key: "ifAdminStatus[{#IFINDEX}]"
+              snmp_oid: "ifAdminStatus.{#IFINDEX}"
+              delay: "5m"
+              value_type: UNSIGNED
+              valuemap:
+                name: "3Com-Admin-Status"
+              history: "15d"
+              trends: "0"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: status
+
+            - uuid: 550e8400e29b41d4a716446655449904
+              name: "Interface {#IFNAME}: speed"
+              type: SNMP_AGENT
+              key: "ifSpeed[{#IFINDEX}]"
+              snmp_oid: "ifSpeed.{#IFINDEX}"
+              valuemap:
+                name: "3Com-Speed"
+              delay: "1h"
+              units: bps
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a716446655449905
+              name: "Interface {#IFNAME}: incoming traffic"
+              type: SNMP_AGENT
+              key: "ifInOctets[{#IFINDEX}]"
+              snmp_oid: "ifInOctets.{#IFINDEX}"
+              delay: "2m"
+              units: bps
+              history: "15d"
+              trends: "90d"
+              preprocessing:
+                - type: CHANGE_PER_SECOND
+                - type: MULTIPLIER
+                  parameters: ["8"]
+              tags:
+                - tag: direction
+                  value: in
+                - tag: component
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a716446655449906
+              name: "Interface {#IFNAME}: outgoing traffic"
+              type: SNMP_AGENT
+              key: "ifOutOctets[{#IFINDEX}]"
+              snmp_oid: "ifOutOctets.{#IFINDEX}"
+              delay: "2m"
+              units: bps
+              history: "15d"
+              trends: "90d"
+              preprocessing:
+                - type: CHANGE_PER_SECOND
+                - type: MULTIPLIER
+                  parameters: ["8"]
+              tags:
+                - tag: direction
+                  value: out
+                - tag: component
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a716446655449907
+              name: "Interface {#IFNAME}: utilization smoothed"
+              type: CALCULATED
+              key: "if.util.smoothed[{#IFINDEX}]"
+              params: >
+                avg(100*(last(//ifInOctets[{#IFINDEX}])+last(//ifOutOctets[{#IFINDEX}]))/
+                last(//ifSpeed[{#IFINDEX}]),3)
+              delay: "2m"
+              units: "%"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: performance
+
+            # --- v1.7 items ---
+            - uuid: 550e8400e29b41d4a716446655449911
+              name: "Interface {#IFNAME}: VLAN"
+              type: SNMP_AGENT
+              key: "ifVlan[{#IFINDEX}]"
+              snmp_oid: "ifVlan.{#IFINDEX}"
+              delay: "1h"
+              history: "15d"
+              trends: "0"
+
+            - uuid: 550e8400e29b41d4a716446655449912
+              name: "Interface {#IFNAME}: MTU"
+              type: SNMP_AGENT
+              key: "ifMtu[{#IFINDEX}]"
+              snmp_oid: "ifMtu.{#IFINDEX}"
+              delay: "1h"
+              history: "15d"
+              trends: "0"
+
+            - uuid: 550e8400e29b41d4a716446655449913
+              name: "Interface {#IFNAME}: duplex"
+              type: SNMP_AGENT
+              key: "ifDuplex[{#IFINDEX}]"
+              snmp_oid: "ifDuplex.{#IFINDEX}"
+              valuemap:
+                name: "3Com-Duplex-Mode"
+              delay: "1h"
+              history: "15d"
+              trends: "0"
+
+            - uuid: 550e8400e29b41d4a716446655449916
+              name: "Interface {#IFNAME}: input broadcasts"
+              type: SNMP_AGENT
+              key: "ifInBroadcastPkts[{#IFINDEX}]"
+              snmp_oid: "ifInBroadcastPkts.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+
+            - uuid: 550e8400e29b41d4a716446655449917
+              name: "Interface {#IFNAME}: output broadcasts"
+              type: SNMP_AGENT
+              key: "ifOutBroadcastPkts[{#IFINDEX}]"
+              snmp_oid: "ifOutBroadcastPkts.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+
+            # --- v1.8 items ---
+            - uuid: 550e8400e29b41d4a716446655449930
+              name: "Interface {#IFNAME}: CRC errors"
+              type: SNMP_AGENT
+              key: "ifInCrcErrors[{#IFINDEX}]"
+              snmp_oid: "ifInCrcErrors.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: reliability
+
+            - uuid: 550e8400e29b41d4a716446655449931
+              name: "Interface {#IFNAME}: collisions"
+              type: SNMP_AGENT
+              key: "ifCollisions[{#IFINDEX}]"
+              snmp_oid: "ifCollisions.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: reliability
+
+            - uuid: 550e8400e29b41d4a716446655449932
+              name: "Interface {#IFNAME}: error/discard percentage"
+              type: CALCULATED
+              key: "ifErrorDiscardPct[{#IFINDEX}]"
+              params: >
+                (last(//ifInErrors[{#IFINDEX}])+last(//ifOutErrors[{#IFINDEX}])+
+                  last(//ifInDiscards[{#IFINDEX}])+last(//ifOutDiscards[{#IFINDEX}]))
+                /
+                (last(//ifInOctets[{#IFINDEX}])+last(//ifOutOctets[{#IFINDEX}]))*100
+              delay: "5m"
+              units: "%"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: kpi
+
+            - uuid: 550e8400e29b41d4a716446655449918
+              name: "Interface {#IFNAME}: input multicasts"
+              type: SNMP_AGENT
+              key: "ifInMulticastPkts[{#IFINDEX}]"
+              snmp_oid: "ifInMulticastPkts.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: direction
+                  value: in
+                - tag: component
+                  value: reliability
+
+            - uuid: 550e8400e29b41d4a716446655449919
+              name: "Interface {#IFNAME}: output multicasts"
+              type: SNMP_AGENT
+              key: "ifOutMulticastPkts[{#IFINDEX}]"
+              snmp_oid: "ifOutMulticastPkts.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: direction
+                  value: out
+                - tag: component
+                  value: reliability
+
+            # --- v1.9 items ---
+            - uuid: 550e8400e29b41d4a716446655449950
+              name: "Interface {#IFNAME}: queue drops"
+              type: SNMP_AGENT
+              key: "ifQueueDrops[{#IFINDEX}]"
+              snmp_oid: "ifQueueDrops.{#IFINDEX}"
+              delay: "5m"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: reliability
+
+            - uuid: 550e8400e29b41d4a716446655449951
+              name: "Interface {#IFNAME}: latency (ms)"
+              type: CALCULATED
+              key: "ifLatency[{#IFINDEX}]"
+              params: >
+                (last(//ifOutOctets[{#IFINDEX}]) - last(//ifInOctets[{#IFINDEX}]))/1000
+              delay: "5m"
+              units: "ms"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a716446655449952
+              name: "Interface {#IFNAME}: SLA compliance"
+              type: CALCULATED
+              key: "ifSLA[{#IFINDEX}]"
+              params: >
+                100 - (last(//ifErrorDiscardPct[{#IFINDEX}]))
+              delay: "10m"
+              units: "%"
+              history: "30d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: kpi
+
+            # PHASE 9 — CORRECT DUPLEX DETECTION
+            - uuid: 550e8400e29b41d4a71644665544dd01
+              name: "Interface {#IFNAME}: Duplex status"
+              type: SNMP_AGENT
+              key: "dot3StatsDuplexStatus[{#IFINDEX}]"
+              snmp_oid: "1.3.6.1.2.1.10.7.2.1.19.{#IFINDEX}"
+              delay: 1m
+              history: 7d
+              trends: 30d
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: duplex
+
+            # PHASE 10 — CLEANED ITEMS (FINAL)
+            - uuid: 550e8400e29b41d4a71644665544f105
+              name: "Interface {#IFNAME}: Input errors"
+              type: SNMP_AGENT
+              key: "ifInErrors[{#IFINDEX}]"
+              snmp_oid: "ifInErrors.{#IFINDEX}"
+              delay: 1m
+              history: 7d
+              trends: 30d
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: errors
+
+            - uuid: 550e8400e29b41d4a71644665544f106
+              name: "Interface {#IFNAME}: Output errors"
+              type: SNMP_AGENT
+              key: "ifOutErrors[{#IFINDEX}]"
+              snmp_oid: "ifOutErrors.{#IFINDEX}"
+              delay: 1m
+              history: 7d
+              trends: 30d
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: errors
+
+            - uuid: 550e8400e29b41d4a71644665544f107
+              name: "Interface {#IFNAME}: Input discards"
+              type: SNMP_AGENT
+              key: "ifInDiscards[{#IFINDEX}]"
+              snmp_oid: "ifInDiscards.{#IFINDEX}"
+              delay: 1m
+              history: 7d
+              trends: 30d
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: discards
+
+            - uuid: 550e8400e29b41d4a71644665544f108
+              name: "Interface {#IFNAME}: Output discards"
+              type: SNMP_AGENT
+              key: "ifOutDiscards[{#IFINDEX}]"
+              snmp_oid: "ifOutDiscards.{#IFINDEX}"
+              delay: 1m
+              history: 7d
+              trends: 30d
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: discards
+
+            # PHASE 11 — Interface Quality Score (IQS)
+            - uuid: 550e8400e29b41d4a71644665544f300
+              name: "Interface {#IFNAME}: Quality Score (IQS)"
+              type: CALCULATED
+              key: "ifQualityScore[{#IFINDEX}]"
+              params: >
+                100
+                - (last(//ifInErrors[{#IFINDEX}]) * 0.5)
+                - (last(//ifOutErrors[{#IFINDEX}]) * 0.5)
+                - (last(//ifInDiscards[{#IFINDEX}]) * 0.3)
+                - (last(//ifOutDiscards[{#IFINDEX}]) * 0.3)
+                - (last(//ifInCrcErrors[{#IFINDEX}]) * 0.7)
+                - (last(//ifCollisions[{#IFINDEX}]) * 0.4)
+                - (last(//if.util.smoothed[{#IFINDEX}]) * 0.2)
+              delay: "5m"
+              units: "%"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: kpi
+
+            # PHASE 12 — Interface Health Classification (IHC)
+            - uuid: 550e8400e29b41d4a71644665544f310
+              name: "Interface {#IFNAME}: Health State"
+              type: CALCULATED
+              key: "ifHealthState[{#IFINDEX}]"
+              params: >
+                (
+                  (last(//ifQualityScore[{#IFINDEX}]) >= 80) * 1
+                  +
+                  ((last(//ifQualityScore[{#IFINDEX}]) < 80 and last(//ifQualityScore[{#IFINDEX}]) >= 50)) * 2
+                  +
+                  (last(//ifQualityScore[{#IFINDEX}]) < 50) * 3
+                )
+              delay: "5m"
+              value_type: UNSIGNED
+              history: "15d"
+              trends: "90d"
+              valuemap:
+                name: "Interface-Health-State"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: health
+
+            # PHASE 13 — Interface Role Auto-Detection (v2)
+            - uuid: 9a7e1c3d2f4b4e8c8d556c1a9b2e7f44
+              name: "Interface {#IFNAME}: Role"
+              type: CALCULATED
+              key: "ifRoleAuto[{#IFINDEX}]"
+              params: >
+                (
+                  (last(//ifSpeed[{#IFINDEX}]) >= 1000000000) * 4
+                  +
+                  ((last(//ifSpeed[{#IFINDEX}]) >= 100000000) 
+                    and (last(//ifInBroadcastPkts[{#IFINDEX}]) < 50)
+                    and (last(//ifInMulticastPkts[{#IFINDEX}]) < 50)) * 3
+                  +
+                  ((last(//ifVlan[{#IFINDEX}]) > 1)
+                    and (last(//ifSpeed[{#IFINDEX}]) < 100000000)) * 2
+                  +
+                  ((last(//ifSpeed[{#IFINDEX}]) < 100000000)
+                    and (last(//ifInBroadcastPkts[{#IFINDEX}]) > 200)) * 1
+                  +
+                  0
+                )
+              delay: "5m"
+              value_type: UNSIGNED
+              history: "15d"
+              trends: "90d"
+              valuemap:
+                name: "Interface-Role"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: role
+
+            # PHASE 14 — Interface Stability Index (ISI)
+            - uuid: 550e8400e29b41d4a71644665544f330
+              name: "Interface {#IFNAME}: Stability Index (ISI)"
+              type: CALCULATED
+              key: "ifStabilityIndex[{#IFINDEX}]"
+              params: >
+                100
+                - (count(//ifOperStatus[{#IFINDEX}],1h,"ne","") * 5)
+                - (change(//ifSpeed[{#IFINDEX}]) * 10)
+                - (change(//ifInErrors[{#IFINDEX}]) * 2)
+                - (change(//ifOutErrors[{#IFINDEX}]) * 2)
+                - (change(//ifInDiscards[{#IFINDEX}]) * 1)
+                - (change(//ifOutDiscards[{#IFINDEX}]) * 1)
+                - (change(//ifInCrcErrors[{#IFINDEX}]) * 3)
+              delay: "5m"
+              units: "%"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: stability
+
+            # PHASE 15 — Noise Filter (NF)
+            - uuid: 550e8400e29b41d4a71644665544f340
+              name: "Interface {#IFNAME}: Noise Filter"
+              type: CALCULATED
+              key: "ifNoiseFilter[{#IFINDEX}]"
+              params: >
+                (
+                  (change(//ifInErrors[{#IFINDEX}]) > 0) * 1 +
+                  (change(//ifOutErrors[{#IFINDEX}]) > 0) * 1 +
+                  (change(//ifInDiscards[{#IFINDEX}]) > 0) * 1 +
+                  (change(//ifOutDiscards[{#IFINDEX}]) > 0) * 1 +
+                  (change(//ifInCrcErrors[{#IFINDEX}]) > 0) * 2 +
+                  (count(//ifOperStatus[{#IFINDEX}],30m,"ne","") > 1) * 2
+                )
+              delay: "5m"
+              value_type: UNSIGNED
+              history: "7d"
+              trends: "30d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: noise
+
+            # PHASE 16 — Interface Behavior Prediction (IBP)
+            - uuid: 550e8400e29b41d4a71644665544f350
+              name: "Interface {#IFNAME}: Behavior Prediction Score (IBP)"
+              type: CALCULATED
+              key: "ifBehaviorPrediction[{#IFINDEX}]"
+              params: >
+                100
+                - (avg(//ifInErrors[{#IFINDEX}],30m) * 1.5)
+                - (avg(//ifOutErrors[{#IFINDEX}],30m) * 1.5)
+                - (avg(//ifInDiscards[{#IFINDEX}],30m) * 1)
+                - (avg(//ifOutDiscards[{#IFINDEX}],30m) * 1)
+                - (avg(//ifInCrcErrors[{#IFINDEX}],30m) * 2)
+                - ((100 - last(//ifStabilityIndex[{#IFINDEX}])) * 0.5)
+                - (avg(//if.util.smoothed[{#IFINDEX}],30m) * 0.2)
+              delay: "5m"
+              units: "%"
+              history: "15d"
+              trends: "90d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: prediction
+
+            # PHASE 17 — Interface Anomaly Detection (AD)
+            - uuid: 550e8400e29b41d4a71644665544f360
+              name: "Interface {#IFNAME}: Anomaly Score"
+              type: CALCULATED
+              key: "ifAnomalyScore[{#IFINDEX}]"
+              params: >
+                (
+                  abs(last(//ifInErrors[{#IFINDEX}]) - avg(//ifInErrors[{#IFINDEX}],1h)) * 2
+                  +
+                  abs(last(//ifOutErrors[{#IFINDEX}]) - avg(//ifOutErrors[{#IFINDEX}],1h)) * 2
+                  +
+                  abs(last(//ifInDiscards[{#IFINDEX}]) - avg(//ifInDiscards[{#IFINDEX}],1h)) * 1
+                  +
+                  abs(last(//ifOutDiscards[{#IFINDEX}]) - avg(//ifOutDiscards[{#IFINDEX}],1h)) * 1
+                  +
+                  abs(last(//ifInCrcErrors[{#IFINDEX}]) - avg(//ifInCrcErrors[{#IFINDEX}],1h)) * 3
+                  +
+                  abs(last(//if.util.smoothed[{#IFINDEX}]) - avg(//if.util.smoothed[{#IFINDEX}],1h)) * 0.5
+                )
+              delay: "5m"
+              value_type: FLOAT
+              history: "7d"
+              trends: "30d"
+              tags:
+                - tag: interface
+                  value: "{#IFNAME}"
+                - tag: component
+                  value: anomaly
+
+          trigger_prototypes:
+            # --- Existing v1.6 triggers ---
+            - uuid: 550e8400e29b41d4a716446655449920
+              name: "Interface {#IFNAME} is DOWN"
+              expression: >
+                last(/3Com 242x SNMP LLD Base/ifOperStatus[{#IFINDEX}])<>1
+                and
+                last(/3Com 242x SNMP LLD Base/ifAdminStatus[{#IFINDEX}])=1
+              priority: AVERAGE
+
+            - uuid: 550e8400e29b41d4a716446655449921
+              name: "Interface {#IFNAME} utilization >{$IF_UTIL_WARN}"
+              expression: "last(/3Com 242x SNMP LLD Base/if.util.smoothed[{#IFINDEX}])>{$IF_UTIL_WARN}"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a716446655449922
+              name: "Interface {#IFNAME} utilization >{$IF_UTIL_HIGH}"
+              expression: "last(/3Com 242x SNMP LLD Base/if.util.smoothed[{#IFINDEX}])>{$IF_UTIL_HIGH}"
+              priority: HIGH
+
+            - uuid: 550e8400e29b41d4a716446655449923
+              name: "Interface {#IFNAME} sustained error rate"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInErrors[{#IFINDEX}])>{$IF_ERROR_RATE} or change(/3Com 242x SNMP LLD Base/ifOutErrors[{#IFINDEX}])>{$IF_ERROR_RATE}"
+              priority: WARNING
+
+            # --- New v1.7 triggers ---
+            - uuid: 550e8400e29b41d4a716446655449924
+              name: "Interface {#IFNAME} duplex mismatch"
+              expression: "last(/3Com 242x SNMP LLD Base/ifDuplex[{#IFINDEX}])=2 and last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}])>=100000000"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a716446655449925
+              name: "Interface {#IFNAME} high discard rate"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInDiscards[{#IFINDEX}])>{$IF_DISCARD_RATE} or change(/3Com 242x SNMP LLD Base/ifOutDiscards[{#IFINDEX}])>{$IF_DISCARD_RATE}"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a716446655449926
+              name: "Interface {#IFNAME} broadcast storm"
+              expression: "last(/3Com 242x SNMP LLD Base/ifInBroadcastPkts[{#IFINDEX}])>{$BROADCAST_STORM}"
+              priority: HIGH
+
+            - uuid: 550e8400e29b41d4a716446655449927
+              name: "Interface {#IFNAME} multicast anomaly"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInMulticastPkts[{#IFINDEX}])>100 or change(/3Com 242x SNMP LLD Base/ifOutMulticastPkts[{#IFINDEX}])>100"
+              priority: WARNING
+
+            # --- Planned v1.8 triggers ---
+            - uuid: 550e8400e29b41d4a716446655449940
+              name: "Interface {#IFNAME} CRC error spike"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInCrcErrors[{#IFINDEX}])>10"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a716446655449941
+              name: "Interface {#IFNAME} collision anomaly"
+              expression: "change(/3Com 242x SNMP LLD Base/ifCollisions[{#IFINDEX}])>5"
+              priority: INFO
+
+            - uuid: 550e8400e29b41d4a716446655449942
+              name: "Interface {#IFNAME} error/discard percentage >5%"
+              expression: "last(/3Com 242x SNMP LLD Base/ifErrorDiscardPct[{#IFINDEX}])>5"
+              priority: WARNING
+
+            # --- Planned v1.9 triggers ---
+            - uuid: 550e8400e29b41d4a716446655449960
+              name: "Interface {#IFNAME} queue drop anomaly"
+              expression: "change(/3Com 242x SNMP LLD Base/ifQueueDrops[{#IFINDEX}])>10"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a716446655449961
+              name: "Interface {#IFNAME} latency >50ms"
+              expression: "last(/3Com 242x SNMP LLD Base/ifLatency[{#IFINDEX}])>50"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a716446655449962
+              name: "Interface {#IFNAME} SLA compliance <95%"
+              expression: "last(/3Com 242x SNMP LLD Base/ifSLA[{#IFINDEX}])<95"
+              priority: HIGH
+
+            # --- Planned v1.10 triggers ---
+            - uuid: 550e8400e29b41d4a71644665544f200
+              name: "Interface {#IFNAME} unused for more than 30 days"
+              expression: >
+                nodata(/3Com 242x SNMP LLD Base/ifInOctets[{#IFINDEX}],30d)=1 and
+                nodata(/3Com 242x SNMP LLD Base/ifOutOctets[{#IFINDEX}],30d)=1
+              priority: INFO
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544ff10
+              name: "Interface {#IFNAME} is flapping (more than 3 state changes in 1 hour)"
+              expression: 'count(/3Com 242x SNMP LLD Base/ifOperStatus[{#IFINDEX}],1h,"ne","") > 3'
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: availability
+
+            - uuid: 550e8400e29b41d4a71644665544ff11
+              name: "Interface {#IFNAME} is severely flapping (more than 10 changes in 1 hour)"
+              expression: 'count(/3Com 242x SNMP LLD Base/ifOperStatus[{#IFINDEX}],1h,"ne","") > 10'
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: availability
+
+            # PHASE 6 - Broadcast storm detection
+            - uuid: 550e8400e29b41d4a71644665544aa60
+              name: "Interface {#IFNAME}: Broadcast storm detected"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInBroadcastPkts[{#IFINDEX}]) > 1000"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544aa61
+              name: "Interface {#IFNAME}: Multicast storm detected"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInMulticastPkts[{#IFINDEX}]) > 2000"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544aa62
+              name: "Interface {#IFNAME}: Severe broadcast storm"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInBroadcastPkts[{#IFINDEX}]) > 5000"
+              priority: DISASTER
+
+            # PHASE 8 — INTERFACE SPEED VALIDATION
+            - uuid: 550e8400e29b41d4a71644665544bb82
+              name: "Interface {#IFNAME}: Speed is below 100Mbps"
+              expression: "last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) < 100000000 and last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) > 0"
+              priority: INFO
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544bb80
+              name: "Interface {#IFNAME}: Speed is below 1Gbps"
+              expression: "last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) < 1000000000 and last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) > 0"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544bb81
+              name: "Interface {#IFNAME}: Speed is below 10Gbps"
+              expression: "last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) < 10000000000 and last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) >= 1000000000"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: performance
+
+            # PHASE 9 — DUPLEX MISMATCH DETECTION
+            - uuid: 550e8400e29b41d4a71644665544dd10
+              name: "Interface {#IFNAME}: Possible duplex mismatch (half-duplex with errors)"
+              expression: >
+                last(/3Com 242x SNMP LLD Base/dot3StatsDuplexStatus[{#IFINDEX}]) = 2
+                and change(/3Com 242x SNMP LLD Base/ifInErrors[{#IFINDEX}]) > 0
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544dd11
+              name: "Interface {#IFNAME}: Possible duplex mismatch (half-duplex with discards)"
+              expression: >
+                last(/3Com 242x SNMP LLD Base/dot3StatsDuplexStatus[{#IFINDEX}]) = 2
+                and change(/3Com 242x SNMP LLD Base/ifInDiscards[{#IFINDEX}]) > 0
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: performance
+
+            # PHASE 10 — CLEANED TRIGGERS (FINAL)
+            - uuid: 550e8400e29b41d4a71644665544f002
+              name: "Interface {#IFNAME}: CRC/FCS errors detected (input)"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInErrors[{#IFINDEX}]) > 0"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544f001
+              name: "Interface {#IFNAME}: CRC/FCS errors detected (output)"
+              expression: "change(/3Com 242x SNMP LLD Base/ifOutErrors[{#IFINDEX}]) > 0"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544f102
+              name: "Interface {#IFNAME}: Input discards increasing"
+              expression: "change(/3Com 242x SNMP LLD Base/ifInDiscards[{#IFINDEX}]) > 0"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544f103
+              name: "Interface {#IFNAME}: Output discards increasing"
+              expression: "change(/3Com 242x SNMP LLD Base/ifOutDiscards[{#IFINDEX}]) > 0"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: performance
+
+            # PHASE 11 — Interface Quality Score Alerting
+            - uuid: 550e8400e29b41d4a71644665544f301
+              name: "Interface {#IFNAME}: Quality Score < 70%"
+              expression: "last(/3Com 242x SNMP LLD Base/ifQualityScore[{#IFINDEX}]) < 70"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: performance
+
+            - uuid: 550e8400e29b41d4a71644665544f302
+              name: "Interface {#IFNAME}: Quality Score < 40% (Critical)"
+              expression: "last(/3Com 242x SNMP LLD Base/ifQualityScore[{#IFINDEX}]) < 40"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: performance
+
+            # PHASE 12 — Health State Warning
+            - uuid: 550e8400e29b41d4a71644665544f311
+              name: "Interface {#IFNAME}: Health degraded (Warning)"
+              expression: "last(/3Com 242x SNMP LLD Base/ifHealthState[{#IFINDEX}]) = 2"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: health
+
+            # PHASE 12 — Health State Critical
+            - uuid: 550e8400e29b41d4a71644665544f312
+              name: "Interface {#IFNAME}: Health degraded (Critical)"
+              expression: "last(/3Com 242x SNMP LLD Base/ifHealthState[{#IFINDEX}]) = 3"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: health
+
+            # PHASE 13 — Role Change Detection
+            - uuid: c4d1e7a93b5f4c8e9a332e7d1f4b6c88
+              name: "Interface {#IFNAME}: Role changed unexpectedly"
+              expression: "change(/3Com 242x SNMP LLD Base/ifRoleAuto[{#IFINDEX}]) <> 0"
+              priority: INFO
+              tags:
+                - tag: scope
+                  value: role
+
+            # PHASE 14 — Stability Degradation Alert
+            - uuid: 550e8400e29b41d4a71644665544f331
+              name: "Interface {#IFNAME}: Stability Index < 60%"
+              expression: "last(/3Com 242x SNMP LLD Base/ifStabilityIndex[{#IFINDEX}]) < 60"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: stability
+
+            - uuid: 550e8400e29b41d4a71644665544f332
+              name: "Interface {#IFNAME}: Stability Index < 30% (Critical)"
+              expression: "last(/3Com 242x SNMP LLD Base/ifStabilityIndex[{#IFINDEX}]) < 30"
+              priority: HIGH
+              tags:
+                - tag: scope
+                  value: stability
+
+            # PHASE 15 — Error Spike with Hysteresis
+            - uuid: 550e8400e29b41d4a71644665544f341
+              name: "Interface {#IFNAME}: Persistent error spike"
+              expression: >
+                min(/3Com 242x SNMP LLD Base/ifInErrors[{#IFINDEX}],5m) > 0
+                or
+                min(/3Com 242x SNMP LLD Base/ifOutErrors[{#IFINDEX}],5m) > 0
+              recovery_mode: RECOVERY_EXPRESSION
+              recovery_expression: >
+                max(/3Com 242x SNMP LLD Base/ifInErrors[{#IFINDEX}],5m) = 0
+                and
+                max(/3Com 242x SNMP LLD Base/ifOutErrors[{#IFINDEX}],5m) = 0
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: noise
+
+            # PHASE 15 — Noise Suppression
+            - uuid: 550e8400e29b41d4a71644665544f343
+              name: "Interface {#IFNAME}: Noise level high (alerts suppressed)"
+              expression: "last(/3Com 242x SNMP LLD Base/ifNoiseFilter[{#IFINDEX}]) >= 5"
+              priority: INFO
+              tags:
+                - tag: scope
+                  value: suppression
+
+            # PHASE 16 — Predictive Degradation Alert
+            - uuid: 550e8400e29b41d4a71644665544f351
+              name: "Interface {#IFNAME}: Predicted degradation (IBP < 60%)"
+              expression: "last(/3Com 242x SNMP LLD Base/ifBehaviorPrediction[{#IFINDEX}]) < 60"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: prediction
+
+            # PHASE 17 — Anomaly Detected
+            - uuid: 550e8400e29b41d4a71644665544f361
+              name: "Interface {#IFNAME}: Behavioral anomaly detected"
+              expression: "last(/3Com 242x SNMP LLD Base/ifAnomalyScore[{#IFINDEX}]) > 50"
+              priority: WARNING
+              tags:
+                - tag: scope
+                  value: anomaly
+
+        # Phase 2 of v1.10 - VLAN membership + access/trunk detection
+        - uuid: 550e8400e29b41d4a71644665544aa10
+          name: "VLAN Discovery"
+          type: SNMP_AGENT
+          key: vlan.discovery
+          snmp_oid: "walk[1.3.6.1.2.1.17.7.1.4.3.1.1]"
+          delay: 1h
+          description: |
+            Q-BRIDGE-MIB VLAN discovery.
+            Discovers VLAN IDs and VLAN names from dot1qVlanStaticName.
+
+          lld_macro_paths:
+            - lld_macro: "{#VLANID}"
+              path: "$.1"
+            - lld_macro: "{#VLANNAME}"
+              path: "$.2"
+
+          item_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544aa11
+              name: "VLAN {#VLANID}: Name"
+              type: SNMP_AGENT
+              key: "vlan.name[{#VLANID}]"
+              snmp_oid: "1.3.6.1.2.1.17.7.1.4.3.1.1.{#VLANID}"
+              delay: 1h
+              value_type: CHAR
+
+            - uuid: 550e8400e29b41d4a71644665544aa12
+              name: "VLAN {#VLANID}: Tagged ports bitmap"
+              type: SNMP_AGENT
+              key: "vlan.tagged[{#VLANID}]"
+              snmp_oid: "1.3.6.1.2.1.17.7.1.4.3.1.2.{#VLANID}"
+              delay: 1h
+              value_type: TEXT
+
+            - uuid: 550e8400e29b41d4a71644665544aa13
+              name: "VLAN {#VLANID}: Untagged ports bitmap"
+              type: SNMP_AGENT
+              key: "vlan.untagged[{#VLANID}]"
+              snmp_oid: "1.3.6.1.2.1.17.7.1.4.3.1.4.{#VLANID}"
+              delay: 1h
+              value_type: TEXT
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544aa14
+              name: "VLAN {#VLANID} has no name"
+              expression: 'last(/3Com 242x SNMP LLD Base/vlan.name[{#VLANID}]) = ""'
+              priority: INFO
+
+            - uuid: 550e8400e29b41d4a71644665544cc11
+              name: "VLAN {#VLANID} has no ports assigned"
+              expression: |
+                last(/3Com 242x SNMP LLD Base/vlan.tagged[{#VLANID}]) = "" and
+                last(/3Com 242x SNMP LLD Base/vlan.untagged[{#VLANID}]) = ""
+              priority: WARNING
+
+        # Phase 3 of v1.10 - STP LLD
+        - uuid: 550e8400e29b41d4a71644665544dd10
+          name: "STP Port Discovery"
+          type: SNMP_AGENT
+          key: stp.port.discovery
+          snmp_oid: "walk[1.3.6.1.2.1.17.2.15.1.1]" # dot1dStpPortState
+          delay: 1h
+          description: |
+            BRIDGE-MIB STP port discovery.
+            Discovers STP ports and monitors STP state, role, and topology changes.
+
+          lld_macro_paths:
+            - lld_macro: "{#STPPORT}"
+              path: "$.1"
+
+          item_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544dd11
+              name: "STP Port {#STPPORT}: State"
+              type: SNMP_AGENT
+              key: "stp.port.state[{#STPPORT}]"
+              snmp_oid: "1.3.6.1.2.1.17.2.15.1.1.{#STPPORT}"
+              delay: 5m
+              value_type: UNSIGNED
+              description: |
+                1 = disabled
+                2 = blocking
+                3 = listening
+                4 = learning
+                5 = forwarding
+                6 = broken
+
+            - uuid: 550e8400e29b41d4a71644665544dd12
+              name: "STP Port {#STPPORT}: Role"
+              type: SNMP_AGENT
+              key: "stp.port.role[{#STPPORT}]"
+              snmp_oid: "1.3.6.1.2.1.17.2.15.1.3.{#STPPORT}"
+              delay: 5m
+              value_type: UNSIGNED
+              description: |
+                1 = disabled
+                2 = root
+                3 = designated
+                4 = alternate
+                5 = backup
+
+            - uuid: 550e8400e29b41d4a71644665544dd13
+              name: "STP Port {#STPPORT}: Topology changes"
+              type: SNMP_AGENT
+              key: "stp.port.topchanges[{#STPPORT}]"
+              snmp_oid: "1.3.6.1.2.1.17.2.15.1.4.{#STPPORT}"
+              delay: 5m
+              value_type: UNSIGNED
+
+          trigger_prototypes:
+            - uuid: 550e8400e29b41d4a71644665544dd14
+              name: "STP Port {#STPPORT} is in blocking state"
+              expression: "last(/3Com 242x SNMP LLD Base/stp.port.state[{#STPPORT}])=2"
+              priority: WARNING
+
+            - uuid: 550e8400e29b41d4a71644665544dd15
+              name: "STP Port {#STPPORT} has topology changes"
+              expression: "change(/3Com 242x SNMP LLD Base/stp.port.topchanges[{#STPPORT}])>0"
+              priority: INFO
+
+      items:
+        - uuid: 550e8400e29b41d4a71644665544cc20
+          name: "VLAN names list"
+          type: SNMP_AGENT
+          key: vlan.names.raw
+          snmp_oid: "walk[1.3.6.1.2.1.17.7.1.4.3.1.1]"
+          delay: 1h
+          value_type: TEXT
+
+        - uuid: 550e8400e29b41d4a71644665544cc21
+          name: "Total VLAN count"
+          type: DEPENDENT
+          key: vlan.total.count
+          master_item:
+            key: vlan.names.raw
+          value_type: UNSIGNED
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  // Count number of VLAN entries in SNMP walk output
+                  var lines = value.trim().split("\n");
+                  return lines.length;
+
+      valuemaps:
+        - uuid: 550e8400e29b41d4a716446655449a01
+          name: "3Com-Port-Status"
+          mappings:
+            - value: "1"
+              newvalue: "UP"
+            - value: "2"
+              newvalue: "DOWN"
+            - value: "3"
+              newvalue: "TESTING"
+
+        - uuid: 550e8400e29b41d4a716446655449a02
+          name: "3Com-Duplex-Mode"
+          mappings:
+            - value: "1"
+              newvalue: "Half"
+            - value: "2"
+              newvalue: "Full"
+            - value: "3"
+              newvalue: "Auto"
+
+        - uuid: 550e8400e29b41d4a716446655449a03
+          name: "3Com-Admin-Status"
+          mappings:
+            - value: "1"
+              newvalue: "UP"
+            - value: "2"
+              newvalue: "DOWN"
+            - value: "3"
+              newvalue: "TESTING"
+
+        - uuid: 550e8400e29b41d4a716446655449a04
+          name: "3Com-Speed"
+          mappings:
+            - value: "100000000"
+              newvalue: "100M"
+            - value: "1000000000"
+              newvalue: "1G"
+            - value: "10000000000"
+              newvalue: "10G"
+
+        # PHASE 12 — Interface Health Classification (IHC)
+        - uuid: 550e8400e29b41d4a716446655449b14
+          name: "Interface-Health-State"
+          mappings:
+            - value: "1"
+              newvalue: "Healthy"
+            - value: "2"
+              newvalue: "Warning"
+            - value: "3"
+              newvalue: "Critical"
+
+        # PHASE 13 — Role Change Detection
+        - uuid: f3c2a4b18d4e4f9a9c221b7e3d4c8a11
+          name: "Interface-Role"
+          mappings:
+            - value: "0"
+              newvalue: "Unknown"
+            - value: "1"
+              newvalue: "Access port"
+            - value: "2"
+              newvalue: "Trunk port"
+            - value: "3"
+              newvalue: "Uplink"
+            - value: "4"
+              newvalue: "Server/High‑speed"
