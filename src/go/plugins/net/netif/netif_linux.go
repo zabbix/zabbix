@@ -15,7 +15,6 @@
 package netif
 
 import (
-	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
@@ -26,6 +25,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -279,13 +279,15 @@ func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
 		result        netIfResult
 	)
 
-	f, err := os.Open(p.netDevFilepath)
-	if err != nil {
-		return result, fmt.Errorf("cannot open %s: %w", p.netDevFilepath, err)
-	}
+	parser := procfs.NewParser().
+		SetScanStrategy(procfs.StrategyOSReadFile).
+		SetMatchMode(procfs.ModeContains).
+		SetPattern(":")
 
-	//nolint:errcheck
-	defer f.Close()
+	data, err := parser.Parse(p.netDevFilepath)
+	if err != nil {
+		return result, errs.Wrapf(err, "failed to parse %s file", p.netDevFilepath)
+	}
 
 	if regexExpr != "" {
 		compiledRegex, err = regexp.Compile(regexExpr)
@@ -297,12 +299,7 @@ func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
 	result.Config = make([]ifConfigData, 0)
 	result.Values = make([]IfValuesData, 0)
 
-	for sLines := bufio.NewScanner(f); sLines.Scan(); {
-		line := sLines.Text()
-		if !strings.Contains(line, ":") {
-			continue
-		}
-
+	for _, line := range data {
 		dev := strings.Split(line, ":")
 		ifName := strings.TrimSpace(dev[0])
 
@@ -310,10 +307,8 @@ func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
 			continue
 		}
 
-		if compiledRegex != nil {
-			if !compiledRegex.MatchString(ifName) {
-				continue
-			}
+		if compiledRegex != nil && !compiledRegex.MatchString(ifName) {
+			continue
 		}
 
 		stats := strings.Fields(dev[1])
