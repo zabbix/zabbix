@@ -3,6 +3,13 @@ Changes for 7.0.24rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
+..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
+...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
+.......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
+..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
+..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
+..F....... [ZBX-27416] fixed message box display bug in Monitoring Problems page (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23
