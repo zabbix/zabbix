@@ -262,7 +262,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		$config = APP::Component()->get('config');
 		$module_enabled = $config->getModuleFlag();
 
-		$db_modules = ($module_enabled)
+		$db_modules = $module_enabled
 			? API::Module()->get([
 				'output' => ['moduleid', 'relative_path', 'status']
 			])
@@ -278,19 +278,20 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 					$data['modules'][$db_module['moduleid']] = $manifest['name'];
 				}
 			}
-
-			natcasesort($data['modules']);
-
-			$disabled_modules = array_filter($db_modules,
-				static function (array $db_module): bool {
-					return $db_module['status'] == MODULE_STATUS_DISABLED;
-				}
-			);
-
-			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 		}
-		else {
-			$data['modules_config_enabled'] = true;
+
+		natcasesort($data['modules']);
+
+		$disabled_modules = array_filter($db_modules,
+			static function (array $db_module): bool {
+				return $db_module['status'] == MODULE_STATUS_DISABLED;
+			}
+		);
+
+		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+
+		if (!$module_enabled) {
+			$data['modules_config_enabled'] = false;
 		}
 
 		$data['js_validation_rules'] = $data['userid'] === null

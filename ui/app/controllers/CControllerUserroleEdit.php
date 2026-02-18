@@ -244,8 +244,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 		}
-		else {
-			$data['rules']['modules_config_enabled'] = true;
+
+		if (!$module_enabled) {
+			$data['rules']['modules_config_enabled'] = false;
 		}
 
 		$data['labels'] = $this->getLabels($db_modules);
