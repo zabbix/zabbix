@@ -2991,7 +2991,7 @@ static void	lld_rule_process_nested_rules(const zbx_vector_lld_item_full_ptr_t *
  ******************************************************************************/
 int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
-		char **error, int lastcheck, zbx_hashset_t *items_index)
+		char **error, int lastcheck, zbx_hashset_t *items_index, int auditlog_enabled, int auditlog_mode)
 {
 	int					ret = SUCCEED;
 	zbx_hashset_t				prototype_rules;
@@ -3077,7 +3077,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 
 		if (FAIL == lld_update_items(hostid, item_prototype->itemid,  &prules->lld_rows, error, &lifetime,
 				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index,
-				&ruleids))
+				&ruleids, auditlog_enabled, auditlog_mode))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 					" processing lld rule");
@@ -3087,7 +3087,8 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		lld_item_links_sort(&prules->lld_rows);
 
 		if (SUCCEED != lld_update_triggers(hostid, item_prototype->itemid, &prules->lld_rows, error, &lifetime,
-				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &ruleids))
+				&enabled_lifetime, lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &ruleids, auditlog_enabled,
+				auditlog_mode))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 					" processing lld rule");
@@ -3095,7 +3096,7 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		}
 
 		if (SUCCEED != lld_update_graphs(hostid, item_prototype->itemid, &prules->lld_rows, error, &lifetime,
-				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &ruleids))
+				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &ruleids, auditlog_enabled, auditlog_mode))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 					" processing lld rule");
@@ -3103,7 +3104,8 @@ int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_p
 		}
 
 		lld_update_hosts(item_prototype->itemid, &prules->lld_rows, error, &lifetime, &enabled_lifetime,
-				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index, &ruleids);
+				lastcheck, ZBX_FLAG_DISCOVERY_PROTOTYPE, &prules->rule_index, &ruleids,
+				auditlog_enabled, auditlog_mode);
 
 		zbx_vector_uint64_clear(&ruleids);
 	}

@@ -4856,7 +4856,8 @@ static void	lld_item_prototype_dump(zbx_lld_item_prototype_t *item_prototype)
  ******************************************************************************/
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids)
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids, int auditlog_enabled,
+		int auditlog_mode)
 {
 	zbx_vector_lld_item_prototype_ptr_t	item_prototypes;
 	zbx_hashset_t				items_index;
@@ -4898,6 +4899,8 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 
 	lld_items_validate(hostid, &items, error);
 
+	zbx_audit_init(auditlog_enabled, auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
+
 	zbx_db_begin();
 
 	if (SUCCEED == lld_items_save(hostid, &item_prototypes, &items, &items_index, &host_record_is_locked,
@@ -4912,19 +4915,24 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 		if (ZBX_DB_OK != zbx_db_commit())
 		{
 			ret = FAIL;
+			zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 			goto clean;
 		}
 	}
 	else
 	{
 		zbx_db_rollback();
+		zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 		goto clean;
 	}
 
 	lld_item_links_populate(&item_prototypes, lld_rows, &items_index);
 	lld_process_lost_items(&items, lifetime, enabled_lifetime, lastcheck);
 
-	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lastcheck, &items_index);
+	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
+
+	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lastcheck, &items_index,
+		auditlog_enabled, auditlog_mode);
 clean:
 	zbx_hashset_destroy(&items_index);
 
