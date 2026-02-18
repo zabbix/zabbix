@@ -488,6 +488,10 @@ msgstr "Ytterligare några steg"
 msgid "A floating point value is expected."
 msgstr "Ett värde med flyttal förväntas."
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:89
+msgid "A message or at least one operation is required."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
 msgstr "En mall är en uppsättning fördefinierade konfigurationer (mätvärden som ska samlas in, villkor för att generera varningar etc.) som utformats för ditt övervakningsobjekt."
@@ -1749,6 +1753,11 @@ msgstr "Vid %1$s på dag %2$s av varje %3$s"
 msgid "At (hour:minute)"
 msgstr "Vid (timme:minut)"
 
+#: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
+#, c-format
+msgid "At least %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Minst en LDAP-server måste finnas."
@@ -1787,6 +1796,11 @@ msgstr "Minst en veckodag eller en dag i månaden måste anges."
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
 msgstr "Minst en krypteringsnivå måste väljas."
+
+#: app/controllers/CControllerSlaCreate.php:53
+#: app/controllers/CControllerSlaUpdate.php:54
+msgid "At least one entry should be selected."
+msgstr ""
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
@@ -2297,6 +2311,13 @@ msgstr "Både fälten \"tls_psk_identity\" och \"tls_psk\" måste anges när du 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Båda lösenorden måste vara lika."
+
+#: app/controllers/CControllerItemCreate.php:256
+#: app/controllers/CControllerItemPrototypeCreate.php:269
+#: app/controllers/CControllerItemPrototypeUpdate.php:257
+#: app/controllers/CControllerItemUpdate.php:256
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3495,6 +3516,11 @@ msgstr "Det går inte att hitta värdgrupp \"%1$s\" för värdprototyp \"%2$s\" 
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "Det går inte att hitta värdgrupp \"%1$s\" för värdprototyp \"%2$s\" för upptäcktsregelprototyp \"%3$s\" på \"%4$s\"."
+
+#: include/classes/import/importers/CDashboardImporterGeneral.php:57
+#, c-format
+msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4879,6 +4905,14 @@ msgstr "Information om chassit. Returnerar sträng"
 #: app/views/js/discovery.check.edit.js.php:256
 msgid "Check already exists."
 msgstr "Kontrollen finns redan."
+
+#: app/controllers/CControllerPopupImportCompare.php:121
+msgid "Check and reconfigure widgets after the import is completed."
+msgstr ""
+
+#: app/controllers/CControllerPopupImport.php:136
+msgid "Check and reconfigure widgets."
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
@@ -6420,6 +6454,10 @@ msgstr "Lista över kontrollpaneler"
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
 msgstr "Egenskaper för Dashboard-sidan"
+
+#: app/controllers/CControllerPopupImportCompare.php:216
+msgid "Dashboard pages"
+msgstr ""
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -8221,6 +8259,10 @@ msgctxt "compact table header"
 msgid "Duration"
 msgstr "Varaktighet"
 
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
+msgid "Duration must be no less than a minute."
+msgstr ""
+
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
 msgstr "Nederländska (nl_NL)"
@@ -8950,6 +8992,16 @@ msgstr "Utesluta värdgrupper"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "Excluded downtime"
 msgstr "Exklusive stilleståndstid"
+
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
+#, c-format
+msgid "Excluded downtime must not extend beyond %1$s."
+msgstr ""
+
+#: app/controllers/CControllerSlaCreate.php:74
+#: app/controllers/CControllerSlaUpdate.php:75
+msgid "Excluded downtime periods must be unique."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -10182,6 +10234,11 @@ msgstr "Hexadecimal till decimal"
 msgid "Hidden"
 msgstr "Dold"
 
+#: widgets/scatterplot/includes/WidgetForm.php:176
+#: widgets/svggraph/includes/WidgetForm.php:268
+msgid "Hide"
+msgstr ""
+
 #: jsLoader.php:395
 msgid "Hide debug"
 msgstr "Dölj felsökning"
@@ -10643,6 +10700,11 @@ msgstr "Metadata för värd"
 #: widgets/tophosts/views/column.edit.php:65
 msgid "Host name"
 msgstr "Värdnamn"
+
+#: widgets/scatterplot/includes/WidgetForm.php:173
+#: widgets/svggraph/includes/WidgetForm.php:265
+msgid "Host names in labels"
+msgstr ""
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -12428,6 +12490,13 @@ msgstr "Intervall och lagring"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ogiltig API-metod \"%2$s\" för användarrollen \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:175
+#: app/controllers/CControllerItemPrototypeCreate.php:188
+#: app/controllers/CControllerItemPrototypeUpdate.php:176
+#: app/controllers/CControllerItemUpdate.php:175
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -13003,6 +13072,11 @@ msgstr "Italienska (it_IT)"
 msgid "Item"
 msgstr "Objekt"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
+#, c-format
+msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
+msgstr ""
+
 #: items.php:667
 msgid "Item added"
 msgstr "Objekt lades till"
@@ -13408,6 +13482,10 @@ msgstr "LDAP-gruppmönster"
 #: app/controllers/CControllerAuthenticationUpdate.php:117
 msgid "LDAP is not configured"
 msgstr "LDAP är inte konfigurerat"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:34
+msgid "LDAP is not configured."
+msgstr ""
 
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
@@ -14562,6 +14640,13 @@ msgstr "Mediatyp \"%1$s\" används av åtgärd \"%2$s\"."
 msgid "Media type added"
 msgstr "Mediatyp tillagd"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:104
+#: app/controllers/CControllerAuthenticationUpdate.php:175
+#: app/controllers/CControllerAuthenticationUpdate.php:296
+#: app/controllers/CControllerPopupLdapCheck.php:116
+msgid "Media type and attribute is not unique."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
@@ -15340,6 +15425,12 @@ msgstr "Namn "
 msgid "Name ID"
 msgstr "Namn ID"
 
+#: app/controllers/CControllerMfaCheck.php:30
+#: app/controllers/CControllerPopupLdapCheck.php:30
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
+msgid "Name already exists."
+msgstr ""
+
 #: app/controllers/CControllerOauthCheck.php:36
 #: app/controllers/CControllerOauthCheck.php:44
 msgid "Name and value combination is not unique."
@@ -15830,6 +15921,11 @@ msgstr "Inga kartor har lagts till."
 msgid "No matches found"
 msgstr "Ingen matchning hittad"
 
+#: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "Inga nya moduler upptäckta"
@@ -15888,6 +15984,10 @@ msgstr "Inga behörigheter för systemåtkomst."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Ingen behörighet att anropa \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:337
+msgid "No permissions to import dashboards."
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16818,6 +16918,11 @@ msgstr "Öppna installationsanvisningar"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "Öppen logg"
+
+#: include/classes/validators/CSslCertificateValidator.php:28
+#: include/classes/validators/CSslPrivateKeyValidator.php:28
+msgid "OpenSSL extension is not available"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -18585,6 +18690,14 @@ msgstr "Slutpunkt för omdirigering"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Referensattribut"
+
+#: app/controllers/CControllerPopupImport.php:135
+msgid "References to missing objects were ignored:"
+msgstr ""
+
+#: app/controllers/CControllerPopupImportCompare.php:120
+msgid "References to missing objects will be ignored:"
+msgstr ""
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -22383,6 +22496,11 @@ msgstr[1] "Detta värde kan inte vara ett av %1$s."
 #, c-format
 msgid "This value cannot be one of %1$s."
 msgstr "Detta värde kan inte vara ett av %1$s."
+
+#: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
+#, c-format
+msgid "This value cannot have more than %1$s decimal places."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -26676,6 +26794,11 @@ msgstr "cirkulärt objektberoende är inte tillåtet"
 msgid "color"
 msgstr "färg"
 
+#: include/classes/validators/CTimeRangesValidator.php:33
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
+msgid "comma separated list of time periods is expected"
+msgstr ""
+
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
 msgstr "kommaseparerad lista över tidsperioder förväntas för schemalagda veckodagar"
@@ -27875,6 +27998,11 @@ msgstr "mönster"
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - Percentil P för en period T"
 
+#: include/classes/validators/CTimeRangesValidator.php:56
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
+msgid "periods must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() - Returnerar konstanten Pi"
@@ -28094,6 +28222,11 @@ msgstr "skewness() - Mäter sannolikhetsfördelningens asymmetri"
 #: app/controllers/CControllerPopupTriggerExpr.php:1020
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt() - Kvadratroten av ett värde"
+
+#: include/classes/validators/CTimeRangesValidator.php:44
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
+msgid "start time must be less than end time"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28409,6 +28542,10 @@ msgstr "okänd"
 #, c-format
 msgid "unknown function \"%1$s\""
 msgstr "okänd funktion \"%1$s\""
+
+#: include/classes/api/services/CMap.php:1999
+msgid "unsupported data type"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
