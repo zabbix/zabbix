@@ -450,6 +450,7 @@ Overlay.prototype.unmount = function() {
 	window.removeEventListener('resize', this._listeners.window_resize);
 	document.removeEventListener('debug.click', this._listeners.debug_click);
 
+	this._body_mutation_observer.disconnect();
 	this._body_resize_observer.disconnect();
 	this._cancelFixPositionOnAnimationFrame();
 
@@ -497,6 +498,7 @@ Overlay.prototype.mount = function() {
 		});
 	}
 
+	this._body_mutation_observer = new MutationObserver(() => this._fixPositionOnAnimationFrame());
 	this._body_resize_observer = new ResizeObserver(() => this._fixPositionOnAnimationFrame());
 
 	const observable_elements = [this.$dialogue.$controls[0], this.$dialogue.$head[0], this.$dialogue.$body[0],
@@ -504,6 +506,11 @@ Overlay.prototype.mount = function() {
 	];
 
 	for (const observable_element of observable_elements) {
+		this._body_mutation_observer.observe(observable_element, {
+			childList: true,
+			subtree: true,
+			attributeFilter: ['style', 'class', 'hidden']
+		});
 		this._body_resize_observer.observe(observable_element);
 	}
 
