@@ -1763,7 +1763,6 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, cha
 	}
 
 	// TODO SAVE MET and URL to DB
-	//zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 out:
 	zbx_free(payload);
