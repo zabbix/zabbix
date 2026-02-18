@@ -1736,8 +1736,8 @@ static char	*build_push_params(const zbx_db_event *event, zbx_uint64_t userid, c
 	zbx_json_addstring(&json, "event_id", event->eventid, ZBX_JSON_TYPE_INT);
 	//hostid? TODO
 	zbx_json_addstring(&json, "trigger_id", event->trigger.triggerid, ZBX_JSON_TYPE_INT);
-	zbx_json_addint(&json, "user_id", userid, ZBX_JSON_TYPE_INT);
-	zbx_json_addint(&json, "severity", zbx_severity_to_str(event->severity), ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "user_id", userid, ZBX_JSON_TYPE_INT);
+	zbx_json_addstring(&json, "severity", zbx_severity_to_str(event->severity), ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "body", message, ZBX_JSON_TYPE_STRING);

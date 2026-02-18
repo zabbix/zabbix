@@ -1529,6 +1529,7 @@ FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|clock		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ttl		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|proxyid	|t_id		|	|NULL		|0			|1|proxy	|proxyid
+FIELD		|device_ref	|t_id		|	|NULL		|0			|1|devices	|deviceid
 INDEX		|1		|status,proxyid
 INDEX		|2		|proxyid
 
@@ -2293,7 +2294,7 @@ INDEX		|1		|itemid
 TABLE|devices|deviceid|0
 FIELD		|deviceid		|t_id		|	|NOT NULL	|0
 FIELD		|user_ref		|t_id		|	|NOT NULL	|0|1|users|userid
-FIELD		|token_ref		|t_id		|	|NOT NULL	|0|2|token|tokenid
+FIELD		|token_ref		|t_id		|	|NULL		|0|2|token|tokenid
 FIELD		|device_id		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|name			|t_varchar(255)	|''	|NULL		|0
 FIELD		|status			|t_integer	|'0'	|NOT NULL	|0
@@ -2305,18 +2306,13 @@ FIELD		|enrollment_token_used	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1			|user_ref
 INDEX		|2			|token_ref
 
-TABLE|device_keys|device_ref|scope|kid|0
+TABLE|device_keys|device_ref|0
 FIELD		|device_ref		|t_id		|	|NOT NULL	|0|1|devices|deviceid
 FIELD		|scope			|t_integer	|'0'	|NOT NULL	|0
 FIELD		|kid			|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|key			|t_varchar(511)	|''	|NOT NULL	|0
 FIELD		|active			|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1			|device_ref
-
-TABLE|task_device_enroll|taskid|0
-FIELD		|taskid		|t_id		|	|NOT NULL|0	|1|task|taskid
-FIELD		|device_ref	|t_id		|	|NOT NULL|0	|1|devices|deviceid
-INDEX		|1		|device_ref
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
