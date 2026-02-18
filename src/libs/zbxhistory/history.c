@@ -101,6 +101,7 @@ static void	history_provider_info_clear(zbx_history_provider_info_t *info)
 {
 	zbx_vector_history_provider_value_type_info_destroy(&info->value_types);
 	zbx_free(info->database);
+	zbx_free(info->provider);
 	zbx_free(info->friendly_current_version);
 	zbx_free(info->friendly_min_version);
 	zbx_free(info->friendly_max_version);
@@ -1373,6 +1374,7 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 	zbx_json_addobject(json, NULL);
 
 	zbx_json_addstring(json, "database", info->database, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(json, "provider", info->provider, ZBX_JSON_TYPE_STRING);
 
 	if (NULL != info->friendly_current_version)
 		zbx_json_addstring(json, "current_version", info->friendly_current_version, ZBX_JSON_TYPE_STRING);

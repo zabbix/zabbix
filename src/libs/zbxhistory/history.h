@@ -70,6 +70,7 @@ ZBX_VECTOR_DECL(history_provider_value_type_info, zbx_history_provider_value_typ
 typedef struct
 {
 	char		*database;
+	char		*provider;
 
 	zbx_uint32_t	current_version;
 	zbx_uint32_t	min_version;

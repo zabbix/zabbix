@@ -1606,6 +1606,7 @@ static int	history_clickhouse_get_info(void *data, zbx_history_provider_info_t *
 	}
 
 	info->database = zbx_strdup(NULL, "ClickHouse");
+	info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_CLICKHOUSE);
 	info->current_version = v1 * 1000000 + v2 * 1000 + v3;
 	info->min_version = ZBX_CLICKHOUSE_MIN_VERSION;
 	info->max_version = ZBX_CLICKHOUSE_MAX_VERSION;

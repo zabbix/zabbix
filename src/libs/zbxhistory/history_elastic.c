@@ -1680,6 +1680,7 @@ out:
 		}
 
 		info->database = zbx_strdup(NULL, "Elasticsearch");
+		info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTIC);
 		info->current_version = version;
 		info->min_version = ZBX_ELASTIC_MIN_VERSION;
 		info->max_version = ZBX_ELASTIC_MAX_VERSION;

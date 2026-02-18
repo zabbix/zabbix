@@ -803,7 +803,10 @@ static int	history_sql_get_info(void *data, zbx_history_provider_info_t *info, c
 		return FAIL;
 
 	if (NULL != vi.database)
+	{
 		info->database = zbx_strdup(NULL, vi.database);
+		info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_SQL);
+	}
 
 	if (NULL != vi.friendly_current_version)
 	{
