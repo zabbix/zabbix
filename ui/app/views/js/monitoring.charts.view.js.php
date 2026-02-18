@@ -32,6 +32,8 @@
 			this.initCharts();
 			this.initEvents();
 
+			timeControl.refreshPage = false;
+
 			timeControl.addObject('charts_view', timeline, {
 				id: 'timeline_1',
 				domid: 'charts_view',
@@ -145,6 +147,13 @@
 			Object.keys(overwriteFilters).forEach(
 				filter_key => url.searchParams.set(filter_key, overwriteFilters[filter_key])
 			);
+
+			const {from, to} = timeControl.objectList['charts_view'].timeline ?? {};
+
+			if (from && to) {
+				url.searchParams.set('from', from);
+				url.searchParams.set('to', to);
+			}
 
 			window.location.href = url.href;
 		},
