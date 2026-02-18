@@ -37,6 +37,7 @@
 #define ZBX_TM_TASK_DATA_RESULT				8
 #define ZBX_TM_PROXYDATA				9
 #define ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES		10
+#define ZBX_TM_TASK_ENROLL_DEVICE			11
 
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1

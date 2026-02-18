@@ -44,6 +44,10 @@
 #include "zbxstr.h"
 #include "zbxserialize.h"
 
+#if defined(HAVE_LIBCURL)
+#	include "zbxcurl.h"
+#endif
+
 zbx_export_file_t		*problems_export = NULL;
 static zbx_export_file_t	*get_problems_export(void)
 {
@@ -1287,7 +1291,8 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid
  * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, char *adapter_url, char *config_push_ca_file,
+		char *config_push_cert_file, char *config_push_key_file)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -1404,6 +1409,11 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 				tm_process_data_result(taskid);
 				processed_num++;
 				break;
+			case ZBX_TM_TASK_ENROLL_DEVICE:
+				tm_process_device_enroll(taskid, adapter_url, config_push_ca_file,
+						config_push_cert_file, config_push_key_file);
+				processed_num++;
+			break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
 				break;
@@ -1619,6 +1629,122 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 	zbx_vector_tm_task_destroy(&tasks_active);
 }
 
+static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, char *config_push_ca_file,
+		char *config_push_cert_file, char *config_push_key_file)
+{
+#if !defined(HAVE_LIBCURL)
+	ZBX_UNUSED(taskid);
+	ZBX_UNUSED(adapter_url);
+	ZBX_UNUSED(config_push_ca_file);
+	ZBX_UNUSED(config_push_cert_file);
+	ZBX_UNUSED(config_push_key_file);
+
+	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+
+#else
+
+	zbx_db_result_t	result = NULL;
+	zbx_db_row_t	row;
+	const char	*device_id;
+	char		*payload = NULL;
+
+	result = zbx_db_select(
+			"select d.device_id"
+			" from task_device_enroll te"
+			" join devices d"
+			" on d.deviceid=te.device_ref"
+			" where te.taskid=" ZBX_FS_UI64,
+			taskid);
+
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed enroll task " ZBX_FS_UI64 ": no row in task_device_enroll.",
+				taskid);
+
+		zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+		goto out;
+	}
+
+	device_id = row[0];
+
+	struct zbx_json	json;
+
+	zbx_json_init(&json, 512);
+
+	zbx_json_addobject(&json, "device_enrollment");
+	zbx_json_addstring(&json, "device_id", device_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&json);
+
+	payload = zbx_strdup(NULL, json.buffer);
+
+	CURL			*curl = NULL;
+	CURLcode		err;
+	CURLoption		opt;
+	struct curl_slist	*headers = NULL;
+	long			http_code = 0;
+
+	if (NULL == (curl = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
+		goto out;
+	}
+
+	headers = curl_slist_append(headers, "Content-Type:application/json");
+
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, adapter_url)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECTTIMEOUT_MS, 2000L)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_https(curl, error))
+		goto out;
+
+	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, error))
+		goto out;
+
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_push_ca_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_push_cert_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_push_key_file)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK != (err = curl_easy_perform(curl)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot connect to adapter service: %s", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain adapter response code: %s", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (200 >= http_code)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed enroll task " ZBX_FS_UI64 ": adapter returned HTTP %ld",
+				taskid, http_code);
+	}
+
+	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+
+out:
+	zbx_free(payload);
+	zbx_db_free_result(result);
+	zbx_json_free(&json);
+	curl_easy_cleanup(curl);
+#endif
+}
+
 ZBX_THREAD_ENTRY(taskmanager_thread, args)
 {
 #define ZBX_TM_PROCESS_PERIOD		5
@@ -1633,6 +1759,11 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
+
+	char			*adapter_url = taskmanager_args_in->config_adapter_url,
+				*config_push_ca_file = taskmanager_args_in->config_push_ca_file,
+				*config_push_cert_file = taskmanager_args_in->config_push_cert_file,
+				*config_push_key_file = taskmanager_args_in->config_push_key_file;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -1675,7 +1806,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 		zbx_setproctitle("%s [processing tasks]", get_process_type_string(process_type));
 
-		tasks_num = tm_process_tasks(&rtc, (time_t)sec1);
+		tasks_num = tm_process_tasks(&rtc, (time_t)sec1, adapter_url, config_push_ca_file,
+				config_push_cert_file, config_push_key_file);
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)
 		{
 			tm_remove_old_tasks((time_t)sec1);
