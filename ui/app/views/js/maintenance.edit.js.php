@@ -92,7 +92,7 @@ window.maintenance_edit = new class {
 		tags_container.querySelectorAll('[name$="[tag]"], [name$="[value]"]').forEach((text_input) => {
 			text_input.disabled = !tags_enabled;
 
-			const field = this.form.findFieldByName(text_input.name);
+			const field = this.form.findFieldByName(text_input.getAttribute('name'));
 
 			if (field && text_input.disabled) {
 				field.unsetErrors();

@@ -7032,6 +7032,9 @@ form.is-loading {
     .table-forms-separator .tags-wrapper {
       max-width: 452px; } }
 
+.align-top {
+  vertical-align: top; }
+
 .border-left {
   border-left: 1px solid #383838; }
 
@@ -7705,6 +7708,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-top: 1px solid #383838; }
   .overlay-dialogue .table-forms-td-right td label {
     display: block; }
+  .overlay-dialogue #lldoperation_form .table-forms-td-right:has(z-textarea-flexible) {
+    display: flex;
+    align-items: flex-start; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -8577,7 +8583,8 @@ svg {
     line-height: 24px;
     padding-right: 5px; }
   .preprocessing-list input[type=text],
-  .preprocessing-list select {
+  .preprocessing-list select,
+  .preprocessing-list z-textarea-flexible {
     width: 100%;
     min-width: 0; }
   .preprocessing-list .btn-link:not(:first-child) {
@@ -8593,6 +8600,8 @@ svg {
     display: flex;
     align-items: center;
     box-sizing: border-box; }
+  .preprocessing-list .step-parameters {
+    align-items: flex-start; }
   .preprocessing-list .step-name,
   .preprocessing-list .step-parameters,
   .preprocessing-list .step-on-fail,
@@ -8618,7 +8627,8 @@ svg {
     .preprocessing-list .step-parameters z-select {
       flex: 0 0 auto; }
     .preprocessing-list .step-parameters > input[type=text]:not(:last-child),
-    .preprocessing-list .step-parameters z-select:not(:last-child) {
+    .preprocessing-list .step-parameters z-select:not(:last-child),
+    .preprocessing-list .step-parameters z-textarea-flexible:not(:last-child) {
       margin-right: 5px; }
   .preprocessing-list .step-on-fail {
     flex: 0 0 100px;

@@ -42,11 +42,12 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['name'], $data['readonly'], DB::getFieldLength('role', 'name')))
+			(new CTextAreaFlexible('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('role', 'name'))
+				->setReadonly($data['readonly'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
-				->setAttribute('maxlength', DB::getFieldLength('role', 'name'))
 		)
 ]);
 
@@ -182,11 +183,11 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField(
 			new CHorList([
-				(new CTextBox('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
+				(new CTextAreaFlexible('service_write_tag_tag', $data['rules']['service_write_tag']['tag']))
 					->setId('service-write-tag-tag')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_write_tag_value', $data['rules']['service_write_tag']['value']))
+				(new CTextAreaFlexible('service_write_tag_value', $data['rules']['service_write_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			])))
@@ -223,11 +224,11 @@ $form_grid
 			->addStyle('display: none;'),
 		(new CFormField(
 			new CHorList([
-				(new CTextBox('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
+				(new CTextAreaFlexible('service_read_tag_tag', $data['rules']['service_read_tag']['tag']))
 					->setId('service-read-tag-tag')
 					->setAttribute('placeholder', _('tag'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH),
-				(new CTextBox('service_read_tag_value', $data['rules']['service_read_tag']['value']))
+				(new CTextAreaFlexible('service_read_tag_value', $data['rules']['service_read_tag']['value']))
 					->setAttribute('placeholder', _('value'))
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 			])))

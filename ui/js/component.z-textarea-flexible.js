@@ -128,7 +128,11 @@ class ZTextareaFlexible extends HTMLElement {
 				break;
 
 			case 'placeholder':
-				this.#textarea.placeholder = value ?? '';
+				this.#textarea.placeholder = this.#singleline
+					? (value ?? '').replace(/[\r\n]+/g, ' ')
+					: value ?? '';
+
+				this.#updateHeight();
 				break;
 
 			case 'readonly':
@@ -177,7 +181,14 @@ class ZTextareaFlexible extends HTMLElement {
 			const styles = getComputedStyle(this.#textarea);
 
 			this.#textarea.style.height = '0';
-			this.#textarea.style.height = `${this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2}px`;
+
+			const paddingTop = parseFloat(styles.paddingTop) || 0;
+			const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+			const lineHeight = parseFloat(styles.lineHeight);
+			const baseHeight = lineHeight + paddingTop + paddingBottom + parseInt(styles.borderWidth) * 2;
+			const scrollHeight = this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2;
+
+			this.#textarea.style.height = `${Math.max(baseHeight, scrollHeight)}px`;
 			this.#is_resize_locked = false;
 		});
 	}

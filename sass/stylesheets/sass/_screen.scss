@@ -881,6 +881,10 @@ form {
 	}
 }
 
+.align-top {
+	vertical-align: top;
+}
+
 .border-left {
 	border-left: 1px solid $table-border-color;
 }
@@ -2033,6 +2037,13 @@ select {
 			label {
 				display: block;
 			}
+		}
+	}
+
+	#lldoperation_form {
+		.table-forms-td-right:has(z-textarea-flexible) {
+			display: flex;
+			align-items: flex-start;
 		}
 	}
 
@@ -3284,7 +3295,8 @@ svg {
 	}
 
 	input[type=text],
-	select {
+	select,
+	z-textarea-flexible {
 		width: 100%;
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
@@ -3306,6 +3318,10 @@ svg {
 		display: flex;
 		align-items: center;
 		box-sizing: border-box;
+	}
+
+	.step-parameters {
+		align-items: flex-start;
 	}
 
 	.step-name,
@@ -3346,7 +3362,8 @@ svg {
 		}
 
 		> input[type=text],
-		z-select {
+		z-select,
+		z-textarea-flexible {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}

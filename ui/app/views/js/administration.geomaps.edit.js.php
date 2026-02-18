@@ -66,7 +66,7 @@
 				const attribution_label = view.attribution.parentNode.previousElementSibling;
 
 				if (e.target.value !== '') {
-					view.tile_url.readOnly = true;
+					view.tile_url.readonly = true;
 					view.max_zoom.readOnly = true;
 					view.tile_url.tabIndex = -1;
 					view.max_zoom.tabIndex = -1;
@@ -75,7 +75,7 @@
 					attribution_label.classList.add('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 				else {
-					view.tile_url.readOnly = false;
+					view.tile_url.readonly = false;
 					view.max_zoom.readOnly = false;
 					view.tile_url.removeAttribute('tabIndex');
 					view.max_zoom.removeAttribute('tabIndex');

@@ -87,14 +87,16 @@ $mapping_row_tmpl = (new CTemplateTag('mapping-row-tmpl', [
 				VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp'),
 				VALUEMAP_MAPPING_TYPE_DEFAULT => _('default')
 			])),
-		(new CTextBox('mappings[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
+		(new CTextAreaFlexible('mappings[#{rowNum}][value]', '#{value}'))
 			->setErrorContainer($data['has_inline_validation'] ? 'mappings_#{rowNum}_error_container' : null)
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setMaxlength(DB::getFieldLength('valuemap_mapping', 'value'))
 			->setErrorLabel($data['has_inline_validation'] ? _('Value') : null),
 		RARR(),
-		(new CTextBox('mappings[#{rowNum}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
+		(new CTextAreaFlexible('mappings[#{rowNum}][newvalue]', '#{newvalue}'))
 			->setErrorContainer($data['has_inline_validation'] ? 'mappings_#{rowNum}_error_container' : null)
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->setMaxlength(DB::getFieldLength('valuemap_mapping', 'newvalue'))
 			->setAriaRequired()
 			->setErrorLabel($data['has_inline_validation'] ? _('Mapped to') : null),
 		(new CButton('mappings[#{rowNum}][remove]', _('Remove')))

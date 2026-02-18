@@ -424,14 +424,14 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$step_param_0_value = array_key_exists('params', $step) && array_key_exists(0, $step['params'])
 				? $step['params'][0]
 				: '';
-			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params_0]', $step_param_0_value))
+			$step_param_0 = (new CTextAreaFlexible('preprocessing['.$i.'][params_0]', $step_param_0_value))
 				->setReadonly($readonly);
 
 			// Create a secondary param text box, so it can be hidden if necessary.
 			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
 				? $step['params'][1]
 				: '';
-			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params_1]', $step_param_1_value))
+			$step_param_1 = (new CTextAreaFlexible('preprocessing['.$i.'][params_1]', $step_param_1_value))
 				->setReadonly($readonly);
 		}
 		elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
@@ -439,14 +439,14 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$step_param_0_value = array_key_exists('params', $step) && array_key_exists(0, $step['params'])
 				? $step['params'][0]
 				: '';
-			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params_0_not_supported]', $step_param_0_value))
+			$step_param_0 = (new CTextAreaFlexible('preprocessing['.$i.'][params_0_not_supported]', $step_param_0_value))
 				->setReadonly($readonly);
 
 			// Create a secondary param text box, so it can be hidden if necessary.
 			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
 				? $step['params'][1]
 				: '';
-			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params_1_not_supported]', $step_param_1_value))
+			$step_param_1 = (new CTextAreaFlexible('preprocessing['.$i.'][params_1_not_supported]', $step_param_1_value))
 				->setReadonly($readonly);
 		}
 

@@ -35,8 +35,9 @@ $mediatype_form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], false, DB::getFieldLength('media_type', 'name')))
+			(new CTextAreaFlexible('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media_type', 'name'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		))->setId('name-field')
@@ -416,10 +417,9 @@ $mediatype_form_grid
 			->setId('webhook_event_menu_url_label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('event_menu_url', $data['event_menu_url'], false,
-				DB::getFieldLength('media_type', 'event_menu_url')
-			))
+			(new CTextAreaFlexible('event_menu_url', $data['event_menu_url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media_type', 'event_menu_url'))
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
 				->setAriaRequired()

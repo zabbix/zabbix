@@ -111,7 +111,7 @@ window.host_edit_popup = {
 	initHostTab(host_interfaces, host_is_discovered) {
 		const host_field = this.form_element.querySelector('#host');
 
-		['input', 'paste'].forEach((event_type) => {
+		['input', 'keydown', 'paste'].forEach((event_type) => {
 			host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
 		});
 

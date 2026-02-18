@@ -646,6 +646,7 @@ window.operation_popup = new class {
 					document.getElementById(field).removeAttribute('disabled');
 				});
 
+				document.querySelector('#operation-opmessage-subject textarea').style.display='';
 				document.querySelector('#operation_opmessage_default_msg').value = 0;
 			}
 			else {

@@ -512,11 +512,11 @@ window.script_edit_popup = new class {
 		this.form.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
 
 		if (this.user_input_checked) {
-			document.querySelector(`label[for="${validator.name}"]`).classList
+			document.querySelector(`label[for="${validator.getAttribute('name')}"]`).classList
 				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 		else {
-			document.querySelector(`label[for="${validator.name}"]`).classList
+			document.querySelector(`label[for="${validator.getAttribute('name')}"]`).classList
 				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		}
 
