@@ -1,7 +1,64 @@
 CHANGELOG
 =========
+
+v4.3.1
+* Update xmlseclibs version requirement to 3.1.4 due [CVE-2025-66475](https://github.com/advisories/GHSA-c4cc-x928-vjw9)
+
+v4.3.0
+* PHP 8.4 Compatibility via #600 and #607.
+* [#619](https://github.com/SAML-Toolkits/php-saml/pull/619) Add Parameter checking on validateBinarySign, inspired on CVE-2025-27773
+* [#603](https://github.com/SAML-Toolkits/php-saml/issues/603) Fix typo in ignoreValidUntil that breaks metadata. Add a new parameter to exclude validUntil on Settings getSPMetadata
+* [#594](https://github.com/SAML-Toolkits/php-saml/pull/594) Add support for encrypted name id in encrypted assertion
+* Fix buildWithBaseURLPath. See #581
+* Doc fix typo
+* Remove Travis CI references
+
+v4.2.0
+* [#586](https://github.com/SAML-Toolkits/php-saml/pull/586) IdPMetadataParser::parseRemoteXML - Add argument for setting whether to validate peer SSL certificate
+* [#585](https://github.com/SAML-Toolkits/php-saml/pull/585) Declare conditional return types
+* [#577](https://github.com/SAML-Toolkits/php-saml/pull/577) Allow empty NameID value when no strict or wantNameId is false
+* [#570](https://github.com/SAML-Toolkits/php-saml/pull/570) Support X509 cert comments
+* [#569](https://github.com/SAML-Toolkits/php-saml/pull/569) Add parameter to exclude validUntil on SP Metadata XML
+* [#551](https://github.com/SAML-Toolkits/php-saml/pull/551) Fix compatibility with proxies that extends HTTP_X_FORWARDED_HOST
+* LogoutRequest and the LogoutResponse object to separate functions
+* Make Saml2\Auth can accept a param $spValidationOnly
+* Fix typos on readme.
+* [#480](https://github.com/SAML-Toolkits/php-saml/pull/480) Fix typo on SPNameQualifier mismatch error message
+* Remove unbound version constraints on xmlseclibs
+* Update dependencies
+* Fix test payloads
+* Remove references to OneLogin.
+
+v4.1.0
+* Add pipe through for the $spValidationOnly setting in the Auth class.
+
+v4.0.1
+* Add compatibility with PHP 8.1
+* [#487](https://github.com/SAML-Toolkits/php-saml/issues/487) Enable strict check on in_array method
+* Add warning about Open Redirect and Reply attacks
+* Add warning about the use of IdpMetadataParser class. If Metadata URLs
+  are provided by 3rd parties, the URL inputs MUST be validated to avoid issues like SSRF
+
 v4.0.0
+* [#467](https://github.com/onelogin/php-saml/issues/467) Fix bug on getSelfRoutedURLNoQuery method
 * Supports PHP 8.X
+
+v3.7.0
+* [#586](https://github.com/SAML-Toolkits/php-saml/pull/586) IdPMetadataParser::parseRemoteXML - Add argument for setting whether to validate peer SSL certificate
+* [#585](https://github.com/SAML-Toolkits/php-saml/pull/585) Declare conditional return types
+* Make Saml2\Auth can accept a param $spValidationOnly
+* [#577](https://github.com/SAML-Toolkits/php-saml/pull/577) Allow empty NameID value when no strict or wantNameId is false
+* [#570](https://github.com/SAML-Toolkits/php-saml/pull/570) Support X509 cert comments
+* [#569](https://github.com/SAML-Toolkits/php-saml/pull/569) Add parameter to exclude validUntil on SP Metadata XML
+* [#551](https://github.com/SAML-Toolkits/php-saml/pull/551) Fix compatibility with proxies that extends HTTP_X_FORWARDED_HOST
+* [#487](https://github.com/SAML-Toolkits/php-saml/issues/487) Enable strict check on in_array method
+* Make Saml2\Auth can accept a param $spValidationOnly
+* Fix typos on readme.
+* Add warning about Open Redirect and Reply attacks
+* Add warning about the use of IdpMetadataParser class. If Metadata URLs
+  are provided by 3rd parties, the URL inputs MUST be validated to avoid issues like SSRF
+* Fix test payloads
+* Remove references to OneLogin.
 
 v3.6.1
 * [#467](https://github.com/onelogin/php-saml/issues/467) Fix bug on getSelfRoutedURLNoQuery method
@@ -18,7 +75,7 @@ v3.5.0
 * [#433](https://github.com/onelogin/php-saml/issues/443) Fix Incorrect Destination in LogoutResponse when using responseUrl #443
 * Update xmlseclibs to 3.1.1
 * Add support for SMARTCARD_PKI and RSA_TOKEN Auth Contexts
-* Get lib path dinamically
+* Get lib path dynamically
 * Check for x509Cert of the IdP when loading settings, even if the security index was not provided
 * Support Statements with Attribute elements with the same name enabling the allowRepeatAttributeName setting
 
@@ -41,7 +98,7 @@ v.3.3.1
 
 v.3.3.0
 * Set true as the default value for strict setting
-* Relax comparision of false on SignMetadata
+* Relax comparison of false on SignMetadata
 * Fix CI
 
 v.3.2.1
@@ -61,11 +118,45 @@ v.3.1.1
 
 v.3.1.0
 * Security improvement suggested by Nils Engelbertz to prevent DDOS by expansion of internally defined entities (XEE)
-* Fix setting_example.php servicename parameter 
+* Fix setting_example.php servicename parameter
 
 v.3.0.0
 * Remove mcrypt dependency. Compatible with PHP 7.2
 * xmlseclibs now is not part of the toolkit and need to be installed from original source
+
+v.2.20.0
+* [#586](https://github.com/SAML-Toolkits/php-saml/pull/586) IdPMetadataParser::parseRemoteXML - Add argument for setting whether to validate peer SSL certificate
+* [#585](https://github.com/SAML-Toolkits/php-saml/pull/585) Declare conditional return types
+* Make Saml2\Auth can accept a param $spValidationOnly
+* [#577](https://github.com/SAML-Toolkits/php-saml/pull/577) Allow empty NameID value when no strict or wantNameId is false
+* [#570](https://github.com/SAML-Toolkits/php-saml/pull/570) Support X509 cert comments
+* [#569](https://github.com/SAML-Toolkits/php-saml/pull/569) Add parameter to exclude validUntil on SP Metadata XML
+* [#551](https://github.com/SAML-Toolkits/php-saml/pull/551) Fix compatibility with proxies that extends HTTP_X_FORWARDED_HOST
+* [#487](https://github.com/SAML-Toolkits/php-saml/issues/487) Enable strict check on in_array method
+* Fix typos on readme.
+* [#480](https://github.com/SAML-Toolkits/php-saml/pull/480) Fix typo on SPNameQualifier mismatch
+* Add $spValidationOnly param to Auth
+* Update xmlseclibs (3.1.2 without AES-GCM and OAEP support)
+* Add warning about Open Redirect and Reply attacks
+* Add warning about the use of IdpMetadataParser class. If Metadata URLs
+  are provided by 3rd parties, the URL inputs MUST be validated to avoid issues like SSRF
+* Update dependencies
+* Fix test payloads
+* Remove references to OneLogin.
+
+v.2.19.1
+* [#467](https://github.com/onelogin/php-saml/issues/467) Fix bug on getSelfRoutedURLNoQuery method
+
+v.2.19.0
+* [#412](https://github.com/onelogin/php-saml/pull/412) Empty instead of unset the $_SESSION variable
+* [#433](https://github.com/onelogin/php-saml/issues/443) Fix Incorrect Destination in LogoutResponse when using responseUrl #443
+* Add support for SMARTCARD_PKI and RSA_TOKEN Auth Contexts
+* Support Statements with Attribute elements with the same name enabling the allowRepeatAttributeName setting
+* Get lib path dinamically
+* Check for x509Cert of the IdP when loading settings, even if the security index was not provided
+
+v.2.18.1
+* Add setSchemasPath to Auth class and fix backward compatibility
 
 v.2.18.0
 * Support rejecting unsolicited SAMLResponses.
@@ -123,7 +214,7 @@ v.2.12.0
 * [#263](https://github.com/onelogin/php-saml/issues/263) Fix incompatibility with ADFS on SLO. When on php saml settings NameID Format is set as unspecified but the SAMLResponse has no NameID Format, no NameID Format should be specified on LogoutRequest.
 
 v.2.11.0
-* [#236](https://github.com/onelogin/php-saml/pull/236) Exclude unnecesary files from Composer production downloads
+* [#236](https://github.com/onelogin/php-saml/pull/236) Exclude unnecessary files from Composer production downloads
 * [#226](https://github.com/onelogin/php-saml/pull/226) Add possibility to handle nameId NameQualifier attribute in SLO Request
 * Improve logout documentation on Readme.
 * Improve multi-certificate support
@@ -229,14 +320,14 @@ v.2.7.0
 * Fix PHP 7 error (used continue outside a loop/switch).
 * Fix bug on organization element of the SP metadata builder.
 * Fix typos on documentation. Fix ALOWED Misspell.
-* Be able to extract RequestID. Add RequestID validation on demo1. 
+* Be able to extract RequestID. Add RequestID validation on demo1.
 * Add $stay parameter to login, logout and processSLO method.
 
 v.2.6.1
 -------
 * Fix bug on cacheDuration of the Metadata XML generated.
 * Make SPNameQualifier optional on the generateNameId method. Avoid the use of SPNameQualifier when generating the NameID on the LogoutRequest builder.
-* Allows the authn comparsion attribute to be set via config.
+* Allows the authn comparison attribute to be set via config.
 * Retrieve Session Timeout after processResponse with getSessionExpiration().
 * Improve readme readability.
 * Allow single log out to work for applications not leveraging php session_start. Added a callback parameter in order to close the session at processSLO.
@@ -254,8 +345,8 @@ v.2.6.0
 
 v.2.5.0
 -------
-* Do accesible the ID of the object Logout Request (id attribute).
-* Add note about the fact that PHP 5.3 is unssuported.
+* Do accessible the ID of the object Logout Request (id attribute).
+* Add note about the fact that PHP 5.3 is unsupported.
 * Add fingerprint algorithm support.
 * Add dependences to composer.
 
@@ -283,7 +374,7 @@ v.2.2.0
 -------
 * Fix bug with Encrypted nameID on LogoutRequest.
 * Fixed usability bug. SP will inform about AuthFail status after process a Response.
-* Added SessionIndex support on LogoutRequest, and know is accesible from the Auth class.
+* Added SessionIndex support on LogoutRequest, and know is accessible from the Auth class.
 * LogoutRequest and LogoutResponse classes now accept non deflated xml.
 * Improved the XML metadata/ Decrypted Assertion output. (prettyprint).
 * Fix bug in formatPrivateKey method, the key could be not RSA.

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1057,7 +1057,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:description',
 									'value' => '{ITEM.NAME}',
 									'attributes' => [
-										'maxlength' => 2048,
+										'maxlength' => 65535,
 										'aria-required' => 'true',
 										'rows' => 7
 									]
@@ -1483,7 +1483,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:description',
 									'value' => '{ITEM.NAME}',
 									'attributes' => [
-										'maxlength' => 2048,
+										'maxlength' => 65535,
 										'aria-required' => 'true',
 										'rows' => 7
 									]

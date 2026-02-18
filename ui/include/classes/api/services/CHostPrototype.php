@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2359,7 +2359,7 @@ class CHostPrototype extends CHostBase {
 			foreach ($lld_links[$host['ruleid']] as $lld_rule) {
 				if (!in_array($lld_rule['itemid'], $ruleids)
 						|| (array_key_exists($lld_rule['itemid'], $upd_host_names)
-							&& in_array($host['name'], $upd_host_names[$lld_rule['itemid']]))) {
+							&& in_array($host['host'], $upd_host_names[$lld_rule['itemid']]))) {
 					continue;
 				}
 
@@ -2736,7 +2736,7 @@ class CHostPrototype extends CHostBase {
 		), 'groupid');
 
 		if ($db_groups) {
-			API::HostGroup()->deleteForce($db_groups);
+			CHostGroup::deleteForce($db_groups);
 		}
 
 		DB::delete('group_discovery', ['parent_group_prototypeid' => $group_prototypeids]);

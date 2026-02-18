@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,7 +72,6 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 	$(obj.querySelector('#tbl_macros'))
 		.on('afteradd.dynamicRows', () => {
 			$('.macro-input-group', $(obj.querySelector('#tbl_macros'))).macroValue();
-			$('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $(obj.querySelector('#tbl_macros'))).textareaFlexible();
 			obj.querySelector('#macro_add').scrollIntoView({block: 'nearest'});
 		});
 
@@ -81,20 +80,14 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 		.macroValue();
 
 	$(obj.querySelector('#tbl_macros'))
-		.on('change keydown', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
+		.on('change keydown', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?>.macro', function(event) {
 			if (event.type === 'change' || event.which === 13) {
-				$(this)
-					.val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')))
-					.textareaFlexible();
+				$(this).val($(this).val().replace(/([^:]+)/, (value) => value.toUpperCase('$1')));
 			}
 		});
 
 	$(obj.querySelector('#tbl_macros'))
-		.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-		.textareaFlexible();
-
-	$(obj.querySelector('#tbl_macros'))
-		.on('resize', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', () => {
+		.on('resize', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?> textarea', () => {
 			$(window).resize();
 		});
 })();
@@ -113,10 +106,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 	$(obj.querySelector('.tags-table')).dynamicRows({template: '#tag-row-tmpl', allow_empty: true});
 	$(obj.querySelector('.tags-table'))
-		.on('click', 'button.element-table-add', () => {
-			$('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-		})
-		.on('resize', '.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', () => {
+		.on('resize', '<?= ZBX_STYLE_Z_TEXTAREA_FLEXIBLE ?> textarea', () => {
 			$(window).resize();
 		});
 })();
@@ -465,7 +455,7 @@ function submitPopup(overlay) {
 	fetch(url.getUrl(), {
 		method: 'post',
 		headers: {'Content-Type': 'application/x-www-form-urlencoded;charset=UTF-8'},
-		body: $(form).serialize()
+		body: new URLSearchParams(new FormData($(form)[0])).toString()
 	})
 	.then((response) => response.json())
 	.then((response) => {

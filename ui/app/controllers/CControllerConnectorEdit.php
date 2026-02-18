@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -84,6 +84,8 @@ class CControllerConnectorEdit extends CController {
 		if ($this->connector !== null) {
 			$data = [
 				'connectorid' => $this->connector['connectorid'],
+				'js_validation_rules' => (new CFormValidator(CControllerConnectorUpdate::getValidationRules()))
+					->getRules(),
 				'form' => [
 					'name' => $this->connector['name'],
 					'protocol' => $this->connector['protocol'],
@@ -124,6 +126,8 @@ class CControllerConnectorEdit extends CController {
 		else {
 			$data = [
 				'connectorid' => null,
+				'js_validation_rules' => (new CFormValidator(CControllerConnectorCreate::getValidationRules()))
+					->getRules(),
 				'form' => [
 					'name' => $db_defaults['name'],
 					'protocol' => (int) $db_defaults['protocol'],
@@ -155,6 +159,8 @@ class CControllerConnectorEdit extends CController {
 		}
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerConnectorCreate::getValidationRules()))
+			->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

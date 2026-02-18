@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -784,7 +784,7 @@ class testDashboardsForm extends CWebTest {
 				$action = CTestArrayHelper::get($share, 'action', USER_ACTION_ADD);
 
 				switch ($action) {
-					case USER_ACTION_ADD;
+					case USER_ACTION_ADD:
 						$rows = $table->getRows()->count();
 						$table->query('button:Add')->one()->click();
 						$dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
@@ -810,12 +810,12 @@ class testDashboardsForm extends CWebTest {
 						}
 						break;
 
-					case USER_ACTION_UPDATE;
+					case USER_ACTION_UPDATE:
 						$row = $table->findRow($list, $share['name']);
 						$row->getColumn('Permissions')->asSegmentedRadio()->fill($share['permissions']);
 						break;
 
-					case USER_ACTION_REMOVE;
+					case USER_ACTION_REMOVE:
 						$row = $table->findRow($list, $share['name']);
 						$row->getColumn('Action')->query('button:Remove')->one()->click();
 						// Wait until table row disappears.

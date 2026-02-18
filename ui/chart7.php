@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -123,9 +123,7 @@ $graph->setHeight(getRequest('height', 300));
 $resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 foreach ($items as $item) {
-	if ($db_items[$item['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($item['itemid'], $resolve_macros, $item['calc_fnc'], $item['color'], $item['type']);
-	}
+	$graph->addItem($item['itemid'], $resolve_macros, $item['calc_fnc'], $item['color'], $item['type']);
 }
 $graph->draw();
 

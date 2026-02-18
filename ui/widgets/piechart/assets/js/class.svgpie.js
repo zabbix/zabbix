@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -358,7 +358,6 @@ class CSVGPie {
 			.attr('class', CSVGPie.ZBX_STYLE_ARC_CONTAINER)
 			.attr('data-hintbox', 1)
 			.attr('data-hintbox-static', 1)
-			.attr('data-hintbox-track-mouse', 1)
 			.attr('data-hintbox-delay', 0)
 			.attr('data-hintbox-ignore-position-change', 1)
 			.each((d, index, nodes) => {

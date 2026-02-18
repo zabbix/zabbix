@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -246,6 +246,7 @@ class CXmlConstantName {
 	const UNSIGNED = 'UNSIGNED';
 	const TEXT = 'TEXT';
 	const BINARY = 'BINARY';
+	// const JSON = 'JSON'; // Duplicate.
 
 	const ORIGINAL_ERROR = 'ORIGINAL_ERROR';
 	const DISCARD_VALUE = 'DISCARD_VALUE';

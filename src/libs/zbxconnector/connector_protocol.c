@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,6 @@
 #include "zbxserialize.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "zbxtime.h"
 
 void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		const zbx_connector_object_t *connector_object)

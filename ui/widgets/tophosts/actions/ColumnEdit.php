@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -99,7 +99,7 @@ class ColumnEdit extends CController {
 	}
 
 	protected function doAction(): void {
-		$input = $this->getInputAll() + self::getColumnDefaults();
+		$input = $this->getInputAll();
 		unset($input['update']);
 
 		if (!$this->hasInput('update')) {
@@ -111,7 +111,7 @@ class ColumnEdit extends CController {
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]
-			] + $input;
+			] + $input + self::getColumnDefaults();
 
 			$data['time_period_field'] = (new CWidgetFieldTimePeriod('time_period', _('Time period')))
 				->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
@@ -125,31 +125,33 @@ class ColumnEdit extends CController {
 			$this->setResponse(new CControllerResponseData($data));
 		}
 		else {
-			$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+			if (array_key_exists('thresholds', $input)) {
+				$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
 
-			$thresholds = [];
+				$thresholds = [];
 
-			foreach ($input['thresholds'] as $threshold) {
-				$order_threshold = trim($threshold['threshold']);
+				foreach ($input['thresholds'] as $threshold) {
+					$order_threshold = trim($threshold['threshold']);
 
-				if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
-					$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
-				}
-			}
-
-			$input['thresholds'] = [];
-
-			if ($thresholds) {
-				uasort($thresholds,
-					static function (array $threshold_1, array $threshold_2): int {
-						return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+					if ($order_threshold !== '' && $number_parser->parse($order_threshold) == CParser::PARSE_SUCCESS) {
+						$thresholds[] = $threshold + ['order_threshold' => $number_parser->calcValue()];
 					}
-				);
+				}
 
-				foreach ($thresholds as $threshold) {
-					unset($threshold['order_threshold']);
+				$input['thresholds'] = [];
 
-					$input['thresholds'][] = $threshold;
+				if ($thresholds) {
+					uasort($thresholds,
+						static function (array $threshold_1, array $threshold_2): int {
+							return $threshold_1['order_threshold'] <=> $threshold_2['order_threshold'];
+						}
+					);
+
+					foreach ($thresholds as $threshold) {
+						unset($threshold['order_threshold']);
+
+						$input['thresholds'][] = $threshold;
+					}
 				}
 			}
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -345,7 +345,7 @@ class CConfiguration extends CApiService {
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CImportXmlValidator($import_validator_factory, $params['format']);
+		$validator = new CImportValidator($import_validator_factory, $params['format']);
 
 		$data = $validator
 			->setStrict(true)
@@ -411,7 +411,7 @@ class CConfiguration extends CApiService {
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
 
-		$validator = new CImportXmlValidator($import_validator_factory, $params['format']);
+		$validator = new CImportValidator($import_validator_factory, $params['format']);
 
 		$data = $validator
 			->setStrict(true)

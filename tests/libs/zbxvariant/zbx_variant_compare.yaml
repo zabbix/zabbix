@@ -371,6 +371,28 @@ in:
 out:
   return: less
 ---
+test case: json > string
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: 12 34 56 78 90
+  value2:
+    type: ZBX_VARIANT_STR
+    value: 12 34 56 78
+out:
+  return: greater
+---
+test case: string < json
+in:
+  value1:
+    type: ZBX_VARIANT_STR
+    value: 12 34
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: 12 34 45 78 90
+out:
+  return: less
+---
 test case: binary > floating
 in:
   value1:
@@ -415,6 +437,105 @@ in:
 out:
   return: less
 ---
+test case: json < floating
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: 1
+  value2:
+    type: ZBX_VARIANT_DBL
+    value: 1234567890
+out:
+  return: less
+---
+test case: floating > json, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_DBL
+    value: -1234567890
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: -1
+out:
+  return: greater
+---
+test case: json > uint64, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: 12345678901234567891
+  value2:
+    type: ZBX_VARIANT_UI64
+    value: 12345678901234567890
+out:
+  return: greater
+
+test case: uint64 > json, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_UI64
+    value: 12345678901234567890
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: 012345678901234567891
+out:
+  return: greater
+---
+test case: json < json, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: -1
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: -2
+out:
+  return: less
+---
+test case: json > json, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: 12345678901234567891
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: 12345678901234567890
+out:
+  return: greater
+---
+test case: json = json, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: 12345678901234567890
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: 12345678901234567890
+out:
+  return: equal
+---
+test case: json = json, 2, WARNING - STRING comparison is used
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: 0.1234567890123456789
+  value2:
+    type: ZBX_VARIANT_JSON
+    value: 0.1234567890123456789
+out:
+  return: equal
+---
+test case: json = json, 3
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value:  '[{"foo":"barX"}, {"foo":"bazX"}]'
+  value2:
+    type: ZBX_VARIANT_JSON
+    value:  '[{"foo":"barX"}, {"foo":"bazX"}]'
+out:
+  return: equal
+---
 test case: none < uint64
 in:
   value1:
@@ -431,6 +552,17 @@ in:
   value1:
     type: ZBX_VARIANT_UI64
     value: 123
+  value2:
+    type: ZBX_VARIANT_NONE
+    value:
+out:
+  return: greater
+---
+test case: json > none
+in:
+  value1:
+    type: ZBX_VARIANT_JSON
+    value: '{}'
   value2:
     type: ZBX_VARIANT_NONE
     value:

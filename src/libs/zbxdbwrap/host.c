@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1727,6 +1727,7 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 		zbx_vector_str_append(&hk_history, "history_log");
 		zbx_vector_str_append(&hk_history, "history_text");
 		zbx_vector_str_append(&hk_history, "history_bin");
+		zbx_vector_str_append(&hk_history, "history_json");
 	}
 
 	if (ZBX_HK_MODE_REGULAR == trends_mode)

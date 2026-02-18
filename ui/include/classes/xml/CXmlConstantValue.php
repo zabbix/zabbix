@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -247,6 +247,7 @@ class CXmlConstantValue {
 	const UNSIGNED = ITEM_VALUE_TYPE_UINT64;
 	const TEXT = ITEM_VALUE_TYPE_TEXT;
 	const BINARY = ITEM_VALUE_TYPE_BINARY;
+	const VALUE_TYPE_JSON = ITEM_VALUE_TYPE_JSON;
 
 	const ORIGINAL_ERROR = ZBX_PREPROC_FAIL_DEFAULT;
 	const DISCARD_VALUE = ZBX_PREPROC_FAIL_DISCARD_VALUE;

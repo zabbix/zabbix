@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -315,7 +315,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 				// Check Thresholds warning icon text.
 				$thresholds_icon->click();
-				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+				$hint_dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 				$this->assertEquals('This setting applies only to numeric data.', $hint_dialog->getText());
 				$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint_dialog->waitUntilNotPresent();
@@ -336,10 +336,10 @@ class testDashboardItemValueWidget extends testWidgets {
 						'min' => true,
 						'max' => true,
 						'avg' => true,
-						'count' => false,
+						'count' => true,
 						'sum' => true,
-						'first' => false,
-						'last' => false
+						'first' => true,
+						'last' => true
 					],
 					'History data' => [
 						'Auto' => false,
@@ -349,29 +349,46 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 
 				foreach ($warning_visibility as $warning_label => $options) {
-					$hint_text = ($warning_label === 'History data')
-						? 'This setting applies only to numeric data. Non-numeric data will always be taken from history.'
-						: 'With this setting only numeric items will be displayed.';
-					$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					if ($warning_label === 'History data') {
+						$hint_text = 'This setting applies only to numeric data. Non-numeric data will always be taken from history.';
+						$warning_button = $form->getLabel($warning_label)->query('xpath:.//button[@data-hintbox]')->one();
+					}
 
 					foreach ($options as $option => $visible) {
 						$form->fill([$warning_label => $option]);
-						$this->assertTrue($warning_button->isVisible($visible));
+
+						if ($warning_label === 'Aggregation function') {
+							$hint_text = in_array($option, ['count', 'first', 'last'])
+								? 'Aggregation function does not affect the sparkline.'
+								: "With this setting only numeric items will be displayed.\n".
+									"Aggregation function does not affect the sparkline.";
+
+							// Check that only one warning button is visible among all three.
+							$warning_button = $form->getFieldContainer($warning_label)->query('xpath:.//button[@data-hintbox]')
+									->all()->filter(CElementFilter::VISIBLE);
+							$this->assertEquals($visible ? 1 : 0, $warning_button->count());
+
+							if ($option === 'not used') {
+								$this->assertFalse($form->getLabel('Time period')->isDisplayed());
+							}
+							else {
+								$this->assertTrue($form->getLabel('Time period')->isDisplayed());
+							}
+						}
+						else {
+							$this->assertTrue($warning_button->isVisible($visible));
+						}
 
 						if ($visible) {
 							$warning_button->click();
 
 							// Check hintbox text.
-							$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+							$hint_dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 							$this->assertEquals($hint_text, $hint_dialog->getText());
 
 							// Close the hintbox.
 							$hint_dialog->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 							$hint_dialog->waitUntilNotPresent();
-						}
-
-						if ($warning_label === 'Aggregation function' && $option !== 'not used') {
-							$this->assertTrue($form->getLabel('Time period')->isDisplayed());
 						}
 					}
 				}
@@ -386,7 +403,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'placeholder' => 'type here to search'
 					],
 					'id:description' => [
-						'maxlength' => 2048
+						'maxlength' => 65535
 					],
 					'id:desc_size' => [
 						'maxlength' => 3
@@ -2087,7 +2104,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2101,7 +2118,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2115,7 +2132,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2129,7 +2146,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function',
 					'warning_message' => 'With this setting only numeric items will be displayed.'
 				]
@@ -2186,7 +2203,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2200,7 +2217,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2214,7 +2231,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2228,7 +2245,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2265,7 +2282,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'not used'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2278,7 +2295,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2291,7 +2308,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2304,7 +2321,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2317,7 +2334,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2330,7 +2347,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2343,7 +2360,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2356,7 +2373,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
-					'selector' => 'id:item-aggregate-function-warning',
+					'selector' => 'id:numeric-items-warning',
 					'label' => 'Aggregation function'
 				]
 			],
@@ -2402,23 +2419,30 @@ class testDashboardItemValueWidget extends testWidgets {
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
 		$form->fill($data['fields']);
 
+		if ($data['label'] === 'Aggregation function') {
+			$element = $form->getFieldContainer($data['label']);
+		}
+		else {
+			$element = $form->getLabel($data['label']);
+		}
+
 		if ($data['numeric'] === true || array_key_exists('any_type_of_information', $data)) {
 			// Check that warning item is not displayed.
 			$form->query($data['selector'])->one()->waitUntilNotVisible();
 
 			// Check that info icon is not displayed.
-			$this->assertFalse($form->getLabel($data['label'])->query($info)->one()->isVisible());
+			$this->assertFalse($element->query($info)->one()->isVisible());
 		}
 		else {
 			// Check that warning item is displayed.
 			$form->query($data['selector'])->one()->waitUntilVisible();
 
 			// Check that info icon is displayed.
-			$this->assertTrue($form->getLabel($data['label'])->query($info)->one()->isVisible());
+			$this->assertTrue($element->query($info)->one()->isVisible());
 
 			// Check hint-box.
 			$form->query($data['selector'])->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+			$hint = $form->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 			$this->assertEquals($data['warning_message'], $hint->getText());
 
 			// Close the hint-box.
@@ -3261,7 +3285,7 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Check hint-box.
 		$dashboard->query($time_icon)->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible();
 		$this->assertEquals('Last 1 hour', $hint->getText());
 
 		// Close the hint-box.
