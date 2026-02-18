@@ -24,7 +24,7 @@ typedef	int (*zbx_vault_get_kvs_cb_t)(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs,
-		void *rtc, char **error);
+		char **relog_token, char **error);
 
 typedef	void (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
 		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
@@ -148,13 +148,13 @@ void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault,
 
 int	zbx_vault_get_kvs(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, void *rtc,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **relog_token,
 		char **error)
 {
 	return zbx_vault_get_kvs_cb(config_vault,
 			config_vault->tls_cert_file, config_vault->tls_key_file, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, path,
-			ZBX_VAULT_TIMEOUT, kvs, rtc, error);
+			ZBX_VAULT_TIMEOUT, kvs, relog_token, error);
 }
 
 int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,

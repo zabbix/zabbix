@@ -70,7 +70,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
-			dbconfig_args_in->config_ssl_key_location, &rtc);
+			dbconfig_args_in->config_ssl_key_location, NULL);
 	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
 			get_process_type_string(process_type), (sec = zbx_time() - sec),
 			dbconfig_args_in->config_confsyncer_frequency);
@@ -84,6 +84,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
+		char		*relog_token = NULL;
 
 		sleeptime = nextcheck - (int)time(NULL);
 
@@ -144,7 +145,13 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location, &rtc);
+					dbconfig_args_in->config_ssl_key_location, &relog_token);
+
+			if (NULL != relog_token)
+			{
+				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
+					(unsigned char*)relog_token, strlen(relog_token) + 1);
+			}
 
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
@@ -167,7 +174,13 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location, &rtc);
+					dbconfig_args_in->config_ssl_key_location, &relog_token);
+
+			if (NULL != relog_token)
+			{
+				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
+					(unsigned char*)relog_token, strlen(relog_token) + 1);
+			}
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}

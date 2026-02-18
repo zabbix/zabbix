@@ -18,9 +18,6 @@
 #ifdef HAVE_LIBCURL
 #	include "zbxhttp.h"
 #	include "zbxstr.h"
-#	include "zbx_rtc_constants.h"
-#	include "zbxipcservice.h"
-#	include "zbxrtc.h"
 #endif
 
 #include "zbxkvs.h"
@@ -97,22 +94,13 @@ fail:
 	return ret;
 }
 
-static void	zbx_trigger_vault_token_update(zbx_ipc_async_socket_t *rtc)
-{
-	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_VAULT_RELOGIN, (unsigned char*)approle_token,
-			strlen(approle_token) + 1))
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
-	}
-}
 #endif
 
 int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs,
-		void *rtc, char **error)
+		char **relog_token, char **error)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(config_vault);
@@ -172,9 +160,9 @@ int	zbx_vault_get_kvs_hashicorp(const zbx_config_vault_t *config_vault,
 		goto fail;
 	}
 
-	if (403 == response_code && NULL != approle_token && NULL != rtc)
+	if (403 == response_code && NULL != approle_token && NULL != relog_token)
 	{
-		zbx_trigger_vault_token_update((zbx_ipc_async_socket_t*)rtc);
+		*relog_token = approle_token;
 		*error = zbx_dsprintf(*error, "unsuccessful response code \"%ld\" try relogin", response_code);
 		goto fail;
 	}

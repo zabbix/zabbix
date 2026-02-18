@@ -80,7 +80,7 @@ static void	key_path_free(zbx_keys_path_t *keys_path)
 static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, struct zbx_json *j,
 		const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, zbx_ipc_async_socket_t *rtc)
+		const char *config_ssl_key_location, char **relog_token)
 {
 	zbx_kvs_t	kvs;
 
@@ -97,7 +97,7 @@ static void	get_macro_secrets(const zbx_vector_keys_path_ptr_t *keys_paths, stru
 		zbx_hashset_iter_t	iter;
 
 		if (FAIL == zbx_vault_get_kvs(keys_path->path, &kvs, config_vault, config_source_ip,
-				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, (void *)rtc,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, relog_token,
 				&error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", keys_path->path, error);
@@ -1213,7 +1213,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, struct zbx_json *j, zbx_proxyconfig_status_t *status,
 		zbx_uint64_t proxy_secrets_provider, zbx_uint64_t proxy_revision, zbx_uint64_t macro_revision,
-		char **error)
+		char **relog_token, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1453,7 +1453,7 @@ static int	proxyconfig_get_tables(zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_conf
 		if (ZBX_PROXY_SECRETS_PROVIDER_SERVER == proxy_secrets_provider)
 		{
 			get_macro_secrets(&keys_paths, j, config_vault, config_source_ip, config_ssl_ca_location,
-					config_ssl_cert_location, config_ssl_key_location, NULL);
+					config_ssl_cert_location, config_ssl_key_location, relog_token);
 		}
 	}
 
@@ -1497,7 +1497,7 @@ out:
 int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp_request, struct zbx_json *j,
 		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error)
+		const char *config_ssl_key_location, char **relog_token, char **error)
 {
 	int			ret = FAIL;
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1], *failover_delay = NULL;
@@ -1585,7 +1585,8 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 				hostmap_sync, proxy_hostmap_revision, hostmap_revision, failover_delay,
 				&del_hostproxyids, config_vault, config_source_ip, config_ssl_ca_location,
 				config_ssl_cert_location, config_ssl_key_location, j, status,
-				(zbx_uint64_t)cfg.proxy_secrets_provider, proxy_revision, macro_revision, error)))
+				(zbx_uint64_t)cfg.proxy_secrets_provider, proxy_revision, macro_revision,
+				relog_token, error)))
 		{
 			goto out;
 		}
@@ -1633,7 +1634,7 @@ out:
 void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location)
+		const char *config_ssl_key_location, char **relog_token)
 {
 	char				*error = NULL, *buffer = NULL, *version_str = NULL;
 	struct zbx_json			j;
@@ -1677,7 +1678,7 @@ void	zbx_send_proxyconfig(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	if (SUCCEED != zbx_proxyconfig_get_data(&proxy, jp, &j, &status, config_vault, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, relog_token, &error))
 	{
 		(void)zbx_send_response_ext(sock, FAIL, error, NULL, flags, config_timeout);
 		zabbix_log(LOG_LEVEL_WARNING, "cannot collect configuration data for proxy \"%s\" at \"%s\": %s",

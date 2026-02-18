@@ -2663,13 +2663,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 					zbx_ipc_client_send(client, ZBX_RTC_VAULT_NEW_TOKEN, (unsigned char *)token,
 							strlen(token) + 1);
 				}
-				else
+				else if (NULL != error)
 				{
-					if (NULL != error)
-					{
-						zabbix_log(LOG_LEVEL_WARNING, "vault relogin error: %s", error);
-						zbx_free(error);
-					}
+					zabbix_log(LOG_LEVEL_WARNING, "vault relogin error: %s", error);
+					zbx_free(error);
 				}
 			}
 			else if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||

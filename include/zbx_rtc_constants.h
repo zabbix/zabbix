@@ -39,7 +39,6 @@
 #define ZBX_RTC_DBPOOL_SET_MAX_OPEN		24
 #define ZBX_RTC_DBPOOL_SET_IDLE_TIMEOUT		25
 #define ZBX_RTC_DBPOOL_STATUS			26
-#define ZBX_RTC_VAULT_NEW_TOKEN			27
 
 /* internal rtc messages */
 #define ZBX_RTC_SUBSCRIBE			100
@@ -49,6 +48,7 @@
 #define ZBX_RTC_UNSUBSCRIBE_SERVICE		104
 #define ZBX_RTC_NOTIFY				105
 #define ZBX_RTC_VAULT_RELOGIN			106
+#define ZBX_RTC_VAULT_NEW_TOKEN			107
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999

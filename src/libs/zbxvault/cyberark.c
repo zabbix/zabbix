@@ -24,9 +24,9 @@ int	zbx_vault_get_kvs_cyberark(const zbx_config_vault_t *config_vault,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs,
-		void *rtc, char **error)
+		char **relog_token, char **error)
 {
-	ZBX_UNUSED(rtc);
+	ZBX_UNUSED(relog_token);
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(config_vault);
 	ZBX_UNUSED(ssl_cert_file);
