@@ -423,6 +423,8 @@ $translate_strings = [
 		'This value is not a valid floating-point value.' => _('This value is not a valid floating-point value.'),
 		'This value is not a valid string.' => _('This value is not a valid string.'),
 		'This field cannot be empty.' => _('This field cannot be empty.'),
+		'This value cannot have more than %1$s decimal places.' =>
+			_('This value cannot have more than %1$s decimal places.'),
 		'This value is too long.' => _('This value is too long.'),
 		'This value cannot be one of %1$s.' => _('This value cannot be one of %1$s.'),
 		'This value cannot be %1$s.' => _('This value cannot be %1$s.'),

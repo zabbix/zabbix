@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema 
+<xs:schema
   xmlns:xs="http://www.w3.org/2001/XMLSchema"
   elementFormDefault="qualified"
   version="2.0">
@@ -10,7 +10,7 @@
       Location: http://docs.oasis-open.org/security/saml/v2.0/
       Revision history:
           V2.0 (March, 2005):
-          New core authentication context schema types for SAML V2.0. 
+          New core authentication context schema types for SAML V2.0.
     </xs:documentation>
   </xs:annotation>
 
@@ -63,7 +63,7 @@
   <xs:element name="TechnicalProtection" type="TechnicalProtectionBaseType">
     <xs:annotation>
       <xs:documentation>
-        Refers to those characterstics that describe how the
+        Refers to those characteristics that describe how the
         'secret' (the knowledge or possession
         of which allows the Principal to authenticate to the
         Authentication Authority) is kept secure
@@ -402,7 +402,7 @@
       </xs:documentation>
     </xs:annotation>
   </xs:element>
-  
+
   <xs:element name="WTLS" type="ExtensionOnlyType">
     <xs:annotation>
       <xs:documentation>
@@ -429,12 +429,12 @@
     <xs:annotation>
       <xs:documentation>
         This element indicates that the Authenticator has been
-        transmitted using a transport mechnanism protected by an SSL or TLS
+        transmitted using a transport mechanism protected by an SSL or TLS
         session.
       </xs:documentation>
     </xs:annotation>
   </xs:element>
-  
+
   <xs:element name="PSTN" type="ExtensionOnlyType"/>
   <xs:element name="ISDN" type="ExtensionOnlyType"/>
   <xs:element name="ADSL" type="ExtensionOnlyType"/>
@@ -483,7 +483,7 @@
     </xs:sequence>
     <xs:attribute name="ID" type="xs:ID" use="optional"/>
   </xs:complexType>
-  
+
   <xs:complexType name="IdentificationType">
     <xs:sequence>
       <xs:element ref="PhysicalVerification" minOccurs="0"/>
@@ -550,7 +550,7 @@
     </xs:sequence>
     <xs:attribute name="preauth" type="xs:integer" use="optional"/>
   </xs:complexType>
-  
+
   <xs:group name="AuthenticatorChoiceGroup">
     <xs:choice>
       <xs:element ref="PreviousSession"/>
@@ -569,7 +569,7 @@
       <xs:element ref="ComplexAuthenticator"/>
     </xs:choice>
   </xs:group>
-  
+
   <xs:group name="AuthenticatorSequenceGroup">
     <xs:sequence>
       <xs:element ref="PreviousSession" minOccurs="0"/>
@@ -595,14 +595,14 @@
       <xs:group ref="AuthenticatorSequenceGroup"/>
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:complexType name="ComplexAuthenticatorType">
     <xs:sequence>
       <xs:group ref="AuthenticatorChoiceGroup"/>
       <xs:group ref="AuthenticatorSequenceGroup"/>
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:complexType name="AuthenticatorTransportProtocolType">
     <xs:sequence>
       <xs:choice minOccurs="0">
@@ -665,7 +665,7 @@
       </xs:restriction>
     </xs:complexContent>
   </xs:complexType>
-  
+
   <xs:complexType name="RestrictedLengthType">
     <xs:complexContent>
       <xs:restriction base="LengthType">
@@ -690,41 +690,41 @@
       <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:element name="Alphabet" type="AlphabetType"/>
   <xs:complexType name="AlphabetType">
     <xs:attribute name="requiredChars" type="xs:string" use="required"/>
     <xs:attribute name="excludedChars" type="xs:string" use="optional"/>
     <xs:attribute name="case" type="xs:string" use="optional"/>
   </xs:complexType>
-  
+
   <xs:complexType name="TokenType">
     <xs:sequence>
       <xs:element ref="TimeSyncToken"/>
       <xs:element ref="Extension" minOccurs="0" maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:simpleType name="DeviceTypeType">
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="hardware"/>
       <xs:enumeration value="software"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:simpleType name="booleanType">
     <xs:restriction base="xs:NMTOKEN">
       <xs:enumeration value="true"/>
       <xs:enumeration value="false"/>
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:complexType name="TimeSyncTokenType">
     <xs:attribute name="DeviceType" type="DeviceTypeType" use="required"/>
     <xs:attribute name="SeedLength" type="xs:integer" use="required"/>
     <xs:attribute name="DeviceInHand" type="booleanType" use="required"/>
   </xs:complexType>
-  
+
   <xs:complexType name="ActivationLimitType">
     <xs:choice>
       <xs:element ref="ActivationLimitDuration"/>
@@ -732,7 +732,7 @@
       <xs:element ref="ActivationLimitSession"/>
     </xs:choice>
   </xs:complexType>
-  
+
   <xs:element name="ActivationLimitDuration" type="ActivationLimitDurationType">
     <xs:annotation>
       <xs:documentation>
@@ -741,7 +741,7 @@
       </xs:documentation>
     </xs:annotation>
   </xs:element>
-  
+
   <xs:element name="ActivationLimitUsages" type="ActivationLimitUsagesType">
     <xs:annotation>
       <xs:documentation>
@@ -750,7 +750,7 @@
       </xs:documentation>
     </xs:annotation>
   </xs:element>
-  
+
   <xs:element name="ActivationLimitSession" type="ActivationLimitSessionType">
     <xs:annotation>
       <xs:documentation>
@@ -759,17 +759,17 @@
       </xs:documentation>
     </xs:annotation>
   </xs:element>
-  
+
   <xs:complexType name="ActivationLimitDurationType">
     <xs:attribute name="duration" type="xs:duration" use="required"/>
   </xs:complexType>
-  
+
   <xs:complexType name="ActivationLimitUsagesType">
     <xs:attribute name="number" type="xs:integer" use="required"/>
   </xs:complexType>
-  
+
   <xs:complexType name="ActivationLimitSessionType"/>
-  
+
   <xs:complexType name="LengthType">
     <xs:attribute name="min" type="xs:integer" use="required"/>
     <xs:attribute name="max" type="xs:integer" use="optional"/>
@@ -809,7 +809,7 @@
       <xs:element ref="Extension" minOccurs="0"  maxOccurs="unbounded"/>
     </xs:sequence>
   </xs:complexType>
-  
+
   <xs:element name="Extension" type="ExtensionType"/>
 
   <xs:complexType name="ExtensionType">

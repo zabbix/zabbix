@@ -29,6 +29,11 @@
 #define MEDIA_STATUS_ACTIVE	0
 #define MEDIA_STATUS_DISABLED	1
 
+#define ZBX_ALERT_MESSAGE_EVENT		0
+#define ZBX_ALERT_MESSAGE_REPORT	1
+#define ZBX_ALERT_MESSAGE_TEST		2
+#define ZBX_ALERT_MESSAGE_WATCHDOG	3
+
 #define ZBX_IPC_SERVICE_ALERTER	"alerter"
 
 #define ZBX_IPC_ALERTER_SYNC_ALERTS	1400
@@ -102,7 +107,7 @@ zbx_uint32_t	zbx_alerter_serialize_alert_send(unsigned char **data, zbx_uint64_t
 		unsigned short smtp_port, unsigned char smtp_security, unsigned char smtp_verify_peer,
 		unsigned char smtp_verify_host, unsigned char smtp_authentication, int maxsessions, int maxattempts,
 		const char *attempt_interval, unsigned char message_format, const char *script, const char *timeout,
-		const char *sendto, const char *subject, const char *message, const char *params);
+		int message_type, const char *sendto, const char *subject, const char *message, const char *params);
 
 void	zbx_alerter_deserialize_result_ext(const unsigned char *data, char **recipient, char **value, int *errcode,
 		char **error, char **debug);
@@ -111,7 +116,7 @@ int	zbx_alerter_begin_dispatch(zbx_alerter_dispatch_t *dispatch, const char *sub
 		const char *content_name, const char *message_format, const char *content, zbx_uint32_t content_size,
 		char **error);
 int	zbx_alerter_send_dispatch(zbx_alerter_dispatch_t *dispatch, const zbx_db_mediatype *mediatype,
-		const zbx_vector_str_t *recipients, char **error);
+		const zbx_vector_str_t *recipients, zbx_uint64_t eventid, int message_type, char **error);
 int	zbx_alerter_end_dispatch(zbx_alerter_dispatch_t *dispatch, char **error);
 void	zbx_alerter_clear_dispatch(zbx_alerter_dispatch_t *dispatch);
 void	zbx_alerter_dispatch_result_free(zbx_alerter_dispatch_result_t *result);

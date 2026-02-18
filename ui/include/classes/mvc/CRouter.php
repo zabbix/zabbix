@@ -41,6 +41,7 @@ class CRouter {
 	private array $routes = [
 		// action									controller															layout					view
 		'acknowledge.edit'							=> [CControllerAcknowledgeEdit::class,								'layout.json',			'acknowledge.edit'],
+		'acknowledge.rank.change'					=> [CControllerAcknowledgeRankChange::class,						'layout.json',			null],
 		'action.create'								=> [CControllerActionCreate::class,									'layout.json',			null],
 		'action.delete'								=> [CControllerActionDelete::class,									'layout.json',			null],
 		'action.disable'							=> [CControllerActionDisable::class,								'layout.json',			null],
