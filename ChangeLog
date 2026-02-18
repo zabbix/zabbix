@@ -45,6 +45,7 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 .......PS. [ZBXNEXT-10411] allowed building Zabbix agent with c-ares on Windows (MVekslers)
 
 Bug fixes:
+..F....... [ZBX-27419] fixed dialogue not resizing properly when hiding/expanding error message details (gklavins)
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 ..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype, maintenance form; implemented unique object validation; renamed import validator class names (gberzina, vmurzins)
 .......PS. [ZBX-27279] fixed daylight savings time error for scheduled reports (MVekslers)
@@ -179,6 +180,7 @@ Changes for 7.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27419] fixed dialogue not resizing properly when hiding/expanding error message details (gklavins)
 ..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype (gberzina, vmurzins)
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 .......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
