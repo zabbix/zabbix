@@ -155,7 +155,11 @@ class CWidgetNavTree extends CWidget {
 			this.#has_content = true;
 
 			this.#navtree = response.navtree_data.navtree;
-			this.#navtree_item_selected = response.navtree_data.navtree_item_selected;
+
+			if (this.isReferred()) {
+				this.#navtree_item_selected = response.navtree_data.navtree_item_selected;
+			}
+
 			this.#navtree_items_opened = response.navtree_data.navtree_items_opened;
 
 			this.#problems = response.navtree_data.problems;
