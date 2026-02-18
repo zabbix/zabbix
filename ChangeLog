@@ -1,6 +1,13 @@
 Changes for 8.0.0alpha2
 
 New features:
+.........T [ZBXNEXT-10319] added new metrics, expanded discovery rules for tables and replicas and improved dashboard in MySQL by ODBC template (mruszczyk)
+.........T [ZBXNEXT-10324] added MariaDB by ODBC template (mruszczyk)
+........S. [ZBXNEXT-10244] updated email header generation by adding Message-ID field and updating In-Reply-To field (aetatsu)
+..F....... [ZBXNEXT-9731] implemented inline form validation for SLA form (talbergs)
+..F....... [ZBXNEXT-9728] implemented inline validate for update problems form (gberzina)
+..F.I..... [ZBXNEXT-10445] increased the maximum length of widget field string values (aluchko, mkorotkov)
+..F....... [ZBXNEXT-9750] implemented inline validation to authentication form (gberzina)
 ..F.I..... [ZBXNEXT-4769] implemented Graph widget and Scatter plot improvements (dfofanovs)
 A.F....PS. [ZBXNEXT-10069] added support for new JSON item value type (arimdjonoks, gcalenko, kkuzmina)
 ..F....... [ZBXNEXT-9748] implemented inline validation for user, profile and notifications forms (gberzina)
@@ -36,6 +43,11 @@ A.F....... [ZBXNEXT-9595] allowed use of not formally valid JSON or XML in HTTP 
 ........S. [ZBXNEXT-10291] fixed EVENT.RECOVERY.TAGS macro not being resolved when problem is closed manually (wiper)
 
 Bug fixes:
+..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
+..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype, maintenance form; implemented unique object validation; renamed import validator class names (gberzina, vmurzins)
+.......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
+...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
+..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
 ..F....... [ZBX-27508] fixed inline validation rules for item and item prototype forms (gberzina)
 .......P.. [ZBX-27387] fixed deadlock during auto registration and SQLite (vso)
 .......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
@@ -164,6 +176,11 @@ Changes for 7.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
+.......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
+...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
+.......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
+..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.7
@@ -1435,6 +1452,13 @@ Changes for 7.0.24rc1
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
+..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
+...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
+.......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
+..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
+..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
+..F....... [ZBX-27416] fixed message box display bug in Monitoring Problems page (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23
