@@ -145,43 +145,43 @@ class testFormServicesSla extends CWebTest {
 				'maxlength' => 65535
 			],
 			[
-				'field' => 'id:schedule_periods_0',
+				'field' => 'id:schedule_periods_0_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'disabled' => 'true'
 			],
 			[
-				'field' => 'id:schedule_periods_1',
+				'field' => 'id:schedule_periods_1_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'value' => '8:00-17:00'
 			],
 			[
-				'field' => 'id:schedule_periods_2',
+				'field' => 'id:schedule_periods_2_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'value' => '8:00-17:00'
 			],
 			[
-				'field' => 'id:schedule_periods_3',
+				'field' => 'id:schedule_periods_3_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'value' => '8:00-17:00'
 			],
 			[
-				'field' => 'id:schedule_periods_4',
+				'field' => 'id:schedule_periods_4_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'value' => '8:00-17:00'
 			],
 			[
-				'field' => 'id:schedule_periods_5',
+				'field' => 'id:schedule_periods_5_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'value' => '8:00-17:00'
 			],
 			[
-				'field' => 'id:schedule_periods_6',
+				'field' => 'id:schedule_periods_6_period',
 				'maxlength' => 255,
 				'placeholder' => '8:00-17:00, …',
 				'disabled' => 'true'
@@ -290,8 +290,9 @@ class testFormServicesSla extends CWebTest {
 				'Start time' => date('Y-m-d', strtotime(date('Y-m-d')."+1 days")).' 00:00',
 				'Duration' => '1h',
 				'Name' => '!@#$%^&*()_+123Zabbix',
-				'Actions' => 'Edit Remove'
-			]
+				'Actions' => 'EditRemove'
+			],
+			[]
 		];
 		$this->assertTableData($table_data, 'id:excluded-downtimes');
 
@@ -308,7 +309,9 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -319,7 +322,9 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// Duplicate SLA name
@@ -331,7 +336,9 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '99.9',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'SLA "'.self::$sla_with_downtimes.'" already exists.'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
+					]
 				]
 			],
 			[
@@ -342,7 +349,9 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect value for field "slo": cannot be empty.'
+					'inline_errors' => [
+						'SLO' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -353,7 +362,9 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '123abc',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Invalid parameter "/1/slo": a floating point value is expected.'
+					'inline_errors' => [
+						'SLO' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			[
@@ -364,7 +375,9 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '-66.6',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Invalid parameter "/1/slo": value must be within the range of 0-100'
+					'inline_errors' => [
+						'SLO' => 'This value must be no less than "0".'
+					]
 				]
 			],
 			[
@@ -375,24 +388,29 @@ class testFormServicesSla extends CWebTest {
 						'SLO' => '100.001',
 						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Invalid parameter "/1/slo": value must be within the range of 0-100'
+					'inline_errors' => [
+						'SLO' => 'This value must be no greater than "100".'
+					]
 				]
 			],
+			// TODO: move "Schedule", days and period fields to the end of the fields array when DEV-4776 is merged.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty custom schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => false,
 						'Tuesday' => false,
 						'Wednesday' => false,
 						'Thursday' => false,
-						'Friday' => false
+						'Friday' => false,
+						'Name' => 'Empty custom schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect schedule: cannot be empty.'
+					'inline_errors' => [
+						'id:schedule-table' => 'At least one entry should be selected.'
+					]
 				]
 			],
 			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
@@ -400,14 +418,16 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Schedule' => 'Custom',
+						'Monday' => true,
+						'id:schedule_periods_1_period' => 'all day',
 						'Name' => 'Non time format custom schedule',
 						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
-						'Schedule' => 'Custom',
-						'Monday' => true,
-						'id:schedule_periods_1' => 'all day'
+						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
+					'inline_errors' => [
+						'id:schedule_periods_1_period' => 'Comma separated list of time periods is expected.'
+					]
 				]
 			],
 			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
@@ -415,14 +435,16 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Schedule' => 'Custom',
+						'Monday' => true,
+						'id:schedule_periods_1_period' => '00:01-00:01',
 						'Name' => '0 seconds custom schedule',
 						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
-						'Schedule' => 'Custom',
-						'Monday' => true,
-						'id:schedule_periods_1' => '00:01-00:01'
+						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
+					'inline_errors' => [
+						'id:schedule_periods_1_period' => 'Start time must be less than end time.'
+					]
 				]
 			],
 			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
@@ -430,14 +452,16 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
+						'Schedule' => 'Custom',
+						'Monday' => true,
+						'id:schedule_periods_1_period' => '00:01-00:61',
 						'Name' => 'wrongly formatted time custom schedule',
 						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
-						'Schedule' => 'Custom',
-						'Monday' => true,
-						'id:schedule_periods_1' => '00:01-00:61'
+						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
+					'inline_errors' => [
+						'id:schedule_periods_1_period' => 'Comma separated list of time periods is expected.'
+					]
 				]
 			],
 			// TODO: remove the "'id:schedule_enabled_1' => true" line when ZBX-21084 is fixed.
@@ -445,14 +469,16 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Incorrect 2nd part of schedule',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag',
 						'Schedule' => 'Custom',
 						'Monday' => true,
-						'id:schedule_periods_1' => '00:01-00:03,00:09-00:09'
+						'id:schedule_periods_1_period' => '00:01-00:03,00:09-00:09',
+						'Name' => 'Incorrect 2nd part of schedule',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
 					],
-					'error' => 'Incorrect schedule: comma separated list of time periods is expected for scheduled week days.'
+					'inline_errors' => [
+						'id:schedule_periods_1_period' => 'Start time must be less than end time.'
+					]
 				]
 			],
 			[
@@ -464,7 +490,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag',
 						'Effective date' => ''
 					],
-					'error' => 'Incorrect value for field "effective_date": a date is expected.'
+					'inline_errors' => [
+						'id:effective_date' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -476,7 +504,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag',
 						'Effective date' => '10-10-2022'
 					],
-					'error' => 'Incorrect value for field "effective_date": a date is expected.'
+					'inline_errors' => [
+						'id:effective_date' => 'Invalid date.'
+					]
 				]
 			],
 			[
@@ -488,7 +518,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag',
 						'Effective date' => '2022-02-30'
 					],
-					'error' => 'Incorrect value for field "effective_date": a date is expected.'
+					'inline_errors' => [
+						'id:effective_date' => 'Invalid date.'
+					]
 				]
 			],
 			[
@@ -500,7 +532,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag',
 						'Effective date' => '2060-01-01'
 					],
-					'error' => 'Invalid parameter "/1/effective_date": a number is too large'
+					'inline_errors' => [
+						'id:effective_date' => 'Value must be less than or equal to 2038-01-19 05:14:07.'
+					]
 				]
 			],
 			// TODO: change the error message when ZBX-21085 will be fixed.
@@ -513,7 +547,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => 'tag',
 						'Effective date' => '1965-01-01'
 					],
-					'error' => 'Invalid parameter "/1/effective_date": value must be one of 0-2147483647.'
+					'inline_errors' => [
+						'id:effective_date' => 'Invalid date.'
+					]
 				]
 			],
 			[
@@ -525,7 +561,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => '',
 						'id:service_tags_0_value' => 'value'
 					],
-					'error' => 'Invalid parameter "/1/service_tags/1/tag": cannot be empty.'
+					'inline_errors' => [
+						'id:service_tags_0_tag' => 'Name: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -537,7 +575,9 @@ class testFormServicesSla extends CWebTest {
 						'id:service_tags_0_tag' => ' ',
 						'id:service_tags_0_value' => 'value'
 					],
-					'error' => 'Invalid parameter "/1/service_tags/1/tag": cannot be empty.'
+					'inline_errors' => [
+						'id:service_tags_0_tag' => 'Name: This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -553,7 +593,9 @@ class testFormServicesSla extends CWebTest {
 							'Name' => ''
 						]
 					],
-					'downtime_error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_downtime_errors' => [
+						'id:name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			[
@@ -569,62 +611,67 @@ class testFormServicesSla extends CWebTest {
 							'Name' => ' '
 						]
 					],
-					'downtime_error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_downtime_errors' => [
+						'id:name' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// TODO: Uncomment data provider when ZBX-21085 will be fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Name' => 'Excluded downtime start too far in the future',
-//						'SLO' => '99.9',
-//						'id:service_tags_0_tag' => 'tag'
-//					],
-//					'excluded_downtimes' => [
-//						[
-//							'Name' => 'Starts too far in the future',
-//							'Start time' =>  '2222-01-01 00:00'
-//						]
-//					],
-//					'downtime_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too large.'
-//				]
-//			],
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Name' => 'Excluded downtime start too far in the past',
-//						'SLO' => '99.9',
-//						'id:service_tags_0_tag' => 'tag'
-//					],
-//					'excluded_downtimes' => [
-//						[
-//							'Name' => 'Start too far in the past',
-//							'Start time' =>  '1965-01-01 00:00'
-//						]
-//					],
-//					'downtime_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_from": a number is too far in the past.'
-//				]
-//			],
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'fields' => [
-//						'Name' => 'Excluded downtime ends too far in the future',
-//						'SLO' => '99.9',
-//						'id:service_tags_0_tag' => 'tag'
-//					],
-//					'excluded_downtimes' => [
-//						[
-//							'Name' => 'Ends too far in the future',
-//							'Start time' =>  '2038-01-01 00:00',
-//							'id:duration_days' => 9999
-//						]
-//					],
-//					'downtime_error' => 'Invalid parameter "/1/excluded_downtimes/1/period_to": a number is too large.'
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Excluded downtime start too far in the future',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
+					],
+					'excluded_downtimes' => [
+						[
+							'Name' => 'Starts too far in the future',
+							'Start time' =>  '2222-01-01 00:00'
+						]
+					],
+					'inline_downtime_errors' => [
+						'id:start_time' => 'Value must be less than or equal to 2038-01-19 05:14:07.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Excluded downtime start too far in the past',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
+					],
+					'excluded_downtimes' => [
+						[
+							'Name' => 'Start too far in the past',
+							'Start time' =>  '1965-01-01 00:00'
+						]
+					],
+					'inline_downtime_errors' => [
+						'id:start_time' => 'Invalid date.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Excluded downtime ends too far in the future',
+						'SLO' => '99.9',
+						'id:service_tags_0_tag' => 'tag'
+					],
+					'excluded_downtimes' => [
+						[
+							'Name' => 'Ends too far in the future',
+							'Start time' =>  '2038-01-01 00:00',
+							'id:duration_days' => 9999
+						]
+					],
+					'downtime_error' => 'Excluded downtime must not extend beyond 2038-01-19 05:14:07.'
+				]
+			],
 			[
 				[
 					'expected' => TEST_BAD,
@@ -639,7 +686,9 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '00:00'
 						]
 					],
-					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
+					'inline_downtime_errors' => [
+						'id:start_time' => 'Invalid date.'
+					]
 				]
 			],
 			[
@@ -656,7 +705,9 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '2022-02-30 00:00'
 						]
 					],
-					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
+					'inline_downtime_errors' => [
+						'id:start_time' => 'Invalid date.'
+					]
 				]
 			],
 			[
@@ -673,24 +724,9 @@ class testFormServicesSla extends CWebTest {
 							'Start time' => '2022-05-20 24:01'
 						]
 					],
-					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Trailing and leading spaces in excluded downtime start time',
-						'SLO' => '99.9',
-						'id:service_tags_0_tag' => 'tag'
-					],
-					'excluded_downtimes' => [
-						[
-							'Name' => 'Trailing and leading spaces in downtime',
-							'Start time' => '  2022-05-20  '
-						]
-					],
-					'downtime_error' => 'Incorrect value for field "start_time": a time is expected.'
+					'inline_downtime_errors' => [
+						'id:start_time' => 'Invalid date.'
+					]
 				]
 			],
 			[
@@ -726,8 +762,9 @@ class testFormServicesSla extends CWebTest {
 							'name:duration_minutes' => 1
 						]
 					],
-					'error' => 'Invalid parameter "/1/excluded_downtimes/2": value (period_from, period_to)='.
-							'(1906531860, 1906798320) already exists.'
+					'inline_errors' => [
+						'name:excluded_downtimes[1][period_from]' => 'Excluded downtime periods must be unique.'
+					]
 				]
 			],
 			[
@@ -748,8 +785,8 @@ class testFormServicesSla extends CWebTest {
 						'Wednesday' => false,
 						'Thursday' => false,
 						'Friday' => false,
-						'id:schedule_periods_0' => '01:33-02:44, 03:55-04:11',
-						'id:schedule_periods_6' => '20:33-21:22, 22:55-23:44',
+						'id:schedule_periods_0_period' => '01:33-02:44, 03:55-04:11',
+						'id:schedule_periods_6_period' => '20:33-21:22, 22:55-23:44',
 						'Description' => 'SLA description',
 						'Enabled' => false
 					],
@@ -789,15 +826,15 @@ class testFormServicesSla extends CWebTest {
 						'Friday' => false,
 						'Saturday' => false,
 						'Sunday' => false,
-						'id:schedule_periods_1' => '   00:00-24:00   ',
-						'id:schedule_periods_2' => '   01:23-02:34, 03:45-04:56   ',
+						'id:schedule_periods_1_period' => '   00:00-24:00   ',
+						'id:schedule_periods_2_period' => '   01:23-02:34, 03:45-04:56   ',
 						'Description' => '   SLA description   ',
 						'Enabled' => false
 					],
 					'excluded_downtimes' => [
 						[
 							'Name' => '   !@#$%^&*()_+   ',
-							'Start time' => '2020-01-01 00:00',
+							'Start time' => '  2020-01-01 00:00  ',
 							'name:duration_days' => 6,
 							'name:duration_hours' => 6,
 							'name:duration_minutes' => 6
@@ -809,10 +846,14 @@ class testFormServicesSla extends CWebTest {
 							'SLO',
 							'id:service_tags_0_tag',
 							'id:service_tags_0_value',
-							'id:schedule_periods_1',
-							'id:schedule_periods_2'
+							'id:schedule_periods_1_period',
+							'id:schedule_periods_2_period',
+							'Description'
 						],
-						'excluded_downtimes' => 'Name'
+						'excluded_downtimes' => [
+							'Name',
+							'Start time'
+						]
 					]
 				]
 			]
@@ -989,7 +1030,7 @@ class testFormServicesSla extends CWebTest {
 		}
 
 		// Excluded downtimes dialog validation is made without attempting to save the SLA, so no hash needed.
-		if ($expected === TEST_BAD && array_key_exists('error', $data)) {
+		if ($expected === TEST_BAD && array_key_exists('inline_errors', $data)) {
 			$old_hash = CDBHelper::getHash(self::$sla_sql);
 		}
 
@@ -1008,7 +1049,7 @@ class testFormServicesSla extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Add a prefix to the name of the SLA in case of update scenario to avoid duplicate names.
-		if ($update && CTesTArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+		if ($update && $expected === TEST_GOOD) {
 			$data['fields']['Name'] = 'Update: '.$data['fields']['Name'];
 		}
 
@@ -1030,7 +1071,7 @@ class testFormServicesSla extends CWebTest {
 
 					$downtimes_form->submit();
 
-					if ($expected === TEST_GOOD || !array_key_exists('downtime_error', $data)) {
+					if (!array_key_exists('inline_downtime_errors', $data) && !array_key_exists('downtime_error', $data)) {
 						$downtimes_form->waitUntilNotVisible();
 
 						// Make sure that row was added to table.
@@ -1045,22 +1086,35 @@ class testFormServicesSla extends CWebTest {
 			}
 
 			// Excluded downtimes ar validated in their configuration dialog, so the error message should be checked here.
-			if (array_key_exists('downtime_error', $data)) {
-				$this->assertMessage(TEST_BAD, null, $data['downtime_error']);
+			if (array_key_exists('inline_downtime_errors', $data) || array_key_exists('downtime_error', $data)) {
+				if (array_key_exists('inline_downtime_errors', $data)) {
+					$this->assertInlineError($this->query('id:sla-excluded-downtime-form')->one()->asForm(),
+							$data['inline_downtime_errors']
+					);
+				}
+				else {
+					$this->assertMessage(TEST_BAD, null, $data['downtime_error']);
+				}
+
 				$downtimes_dialog->close();
 				$dialog->close();
 
 				return;
 			}
 		}
+
+		if (array_key_exists('inline_errors', $data)) {
+			$this->page->removeFocus();
+			$form->getField(array_keys($data['inline_errors'])[0])->waitUntilClassesPresent('has-error');
+			$this->assertInlineError($form, $data['inline_errors']);
+		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
 		if ($expected === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, null, $data['error']);
-			$this->assertEquals($old_hash, CDBHelper::getHash(self::$sla_sql));
-
 			$dialog->close();
+			$this->assertEquals($old_hash, CDBHelper::getHash(self::$sla_sql));
 		}
 		else {
 			$this->assertMessage(TEST_GOOD, ($update ? 'SLA updated' : 'SLA created'));
@@ -1069,7 +1123,9 @@ class testFormServicesSla extends CWebTest {
 			if (array_key_exists('trim', $data)) {
 				foreach ($data['trim'] as $section => $fields) {
 					if ($section === 'excluded_downtimes') {
-						$data[$section][0][$fields] = trim($data[$section][0][$fields]);
+						foreach ($fields as $field) {
+							$data[$section][0][$field] = trim($data[$section][0][$field]);
+						}
 					}
 					else {
 						foreach ($fields as $field) {

@@ -14,62 +14,6 @@
 
 
 /**
- * Get menu popup history section data.
- *
- * @param string options['itemid']           Item ID.
- * @param bool   options['hasLatestGraphs']  Link to history page with showgraph action (optional).
- *
- * @return array
- */
-function getMenuPopupHistory(options) {
-	var items = [],
-		url = new Curl('history.php');
-
-	if (!options.allowed_ui_latest_data) {
-		return [];
-	}
-
-	url.setArgument('itemids[]', options.itemid);
-
-	// latest graphs
-	if (options.hasLatestGraphs !== undefined && options.hasLatestGraphs) {
-		url.setArgument('action', 'showgraph');
-		url.setArgument('to', 'now');
-
-		url.setArgument('from', 'now-1h');
-		items.push({
-			label: t('Last hour graph'),
-			url: url.getUrl()
-		});
-
-		url.setArgument('from', 'now-7d');
-		items.push({
-			label: t('Last week graph'),
-			url: url.getUrl()
-		});
-
-		url.setArgument('from', 'now-1M');
-		items.push({
-			label: t('Last month graph'),
-			url: url.getUrl()
-		});
-	}
-
-	// latest values
-	url.setArgument('action', 'showvalues');
-	url.setArgument('from', 'now-1h');
-	items.push({
-		label: t('Latest values'),
-		url: url.getUrl()
-	});
-
-	return [{
-		label: t('History'),
-		items: items
-	}];
-}
-
-/**
  * Get menu popup host section data.
  *
  * @param {string} options['hostid']                  Host ID.
@@ -873,7 +817,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		let items = [];
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'popup.acknowledge.create');
+		curl.setArgument('action', 'acknowledge.rank.change');
 
 		/*
 		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause events
@@ -1080,7 +1024,7 @@ function getMenuPopupItem(options) {
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: options.binary_value_type || options.triggers.length === 0
+			disabled: !options.is_trigger_supported || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1144,7 +1088,7 @@ function getMenuPopupItem(options) {
 
 		config_urls.push({
 			label: t('Create trigger'),
-			disabled: options.binary_value_type,
+			disabled: !options.is_trigger_supported,
 			clickCallback: function() {
 				ZABBIX.PopupManager.open('trigger.edit', {
 					hostid: options.hostid,
@@ -1155,25 +1099,18 @@ function getMenuPopupItem(options) {
 			}
 		});
 
-		if (options.isDiscovery) {
-			config_urls.push({
-				label: t('Create dependent item'),
-				disabled: true
-			});
-		}
-		else {
-			config_urls.push({
-				label: t('Create dependent item'),
-				clickCallback: () => {
-					ZABBIX.PopupManager.open('item.edit', {
-						context: options.context,
-						hostid: options.hostid,
-						master_itemid: options.itemid,
-						type: 18 // ITEM_TYPE_DEPENDENT
-					});
-				}
-			});
-		}
+		config_urls.push({
+			label: t('Create dependent item'),
+			disabled: options.isDiscovery,
+			clickCallback: () => {
+				ZABBIX.PopupManager.open('item.edit', {
+					context: options.context,
+					hostid: options.hostid,
+					master_itemid: options.itemid,
+					type: 18 // ITEM_TYPE_DEPENDENT
+				});
+			}
+		});
 
 		url = new Curl('host_discovery.php');
 		url.setArgument('form', 'create');
@@ -1283,7 +1220,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		disabled: options.is_binary_value_type || options.is_discovered_prototype,
+		disabled: !options.is_trigger_supported || options.is_discovered_prototype,
 		clickCallback: () => {
 			ZABBIX.PopupManager.open('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,

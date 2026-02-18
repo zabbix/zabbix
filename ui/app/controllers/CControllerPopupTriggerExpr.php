@@ -1467,8 +1467,10 @@ class CControllerPopupTriggerExpr extends CController {
 		}
 
 		if ($item) {
-			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-				throw new Exception(_s('Binary item "%1$s" cannot be used in trigger', $item['key_']));
+			if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY || $item['value_type'] == ITEM_VALUE_TYPE_JSON) {
+				throw new Exception(_s(
+					'Item "%1$s" cannot be used in trigger: unsupported data type.', $item['key_']
+				));
 			}
 
 			$itemid = $item['itemid'];

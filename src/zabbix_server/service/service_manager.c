@@ -1414,8 +1414,11 @@ static zbx_service_update_t	*update_service(zbx_hashset_t *service_updates, zbx_
  * Purpose: sorts service updates by source id                                *
  *                                                                            *
  ******************************************************************************/
-static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
+static int	its_updates_compare(const void *a1, const void *a2)
 {
+	const zbx_status_update_t * const	*update1 = (const zbx_status_update_t * const *)a1;
+	const zbx_status_update_t * const	*update2 = (const zbx_status_update_t * const *)a2;
+
 	ZBX_RETURN_IF_NOT_EQUAL((*update1)->sourceid, (*update2)->sourceid);
 
 	return 0;
@@ -1463,7 +1466,7 @@ static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *ala
 
 	if (0 != updates.values_num)
 	{
-		zbx_vector_status_update_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
+		zbx_vector_status_update_ptr_sort(&updates, its_updates_compare);
 
 		for (int i = 0; i < updates.values_num; i++)
 		{

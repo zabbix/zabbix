@@ -355,6 +355,10 @@ msgstr "(0 - שימוש בבררת המחדל של המשימה)"
 msgid "(Only super admins can create groups)"
 msgstr "(רק מנהלי על יכולים ליצור קבוצות)"
 
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
@@ -15343,6 +15347,16 @@ msgstr "שם"
 #: app/views/administration.authentication.edit.php:397
 msgid "Name ID"
 msgstr "מזהה שם"
+
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
 
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
