@@ -924,7 +924,7 @@ class CDRule extends CApiService {
 				'SELECT NULL'.
 				' FROM dhosts dh'.
 				' WHERE dservices.dhostid=dh.dhostid'.
-					' AND '.dbConditionId('druleid', $druleids).
+					' AND '.dbConditionId('dh.druleid', $druleids).
 			')'
 		);
 
