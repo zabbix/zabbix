@@ -1,6 +1,7 @@
 Changes for 8.0.0alpha2
 
 New features:
+..F....... [ZBXNEXT-5419] implemented dashboard import and export functionality (averza, gberzina)
 .........T [ZBXNEXT-10319] added new metrics, expanded discovery rules for tables and replicas, and improved dashboard in MySQL by ODBC template (mruszczyk)
 .........T [ZBXNEXT-10324] added MariaDB by ODBC template (mruszczyk)
 ........S. [ZBXNEXT-10244] updated email header generation by adding Message-ID field and updating In-Reply-To field (aetatsu)
@@ -178,6 +179,7 @@ Changes for 7.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype (gberzina, vmurzins)
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 .......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
 ...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
