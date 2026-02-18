@@ -1647,6 +1647,7 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, cha
 	zbx_db_row_t	row;
 	const char	*device_id;
 	char		*payload = NULL;
+	zbx_http_response_t	body = {0}, response_header = {0};
 
 	result = zbx_db_select(
 			"select d.device_id"
@@ -1690,6 +1691,13 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, cha
 		goto out;
 	}
 
+	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb, zbx_curl_write_cb,
+			errbuf, &error))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error));
+		goto out;
+	}
+
 	headers = curl_slist_append(headers, "Content-Type:application/json");
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, adapter_url)) ||
@@ -1713,19 +1721,19 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, cha
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_push_cert_file)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_push_key_file)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot connect to adapter service: %s", curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "failed connect to adapter service: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot obtain adapter response code: %s", curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "failed obtain adapter response code: %s", curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -1735,12 +1743,34 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, cha
 				taskid, http_code);
 	}
 
-	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
+	struct	zbx_json_parse jp;
+	char	met[256];
+	char	enrollment_url[256];
+
+	if (FAIL == zbx_json_open(ZBX_NULL2EMPTY_STR(body.data), &jp))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid JSON from adapter: %s", ZBX_NULL2EMPTY_STR(body.data));
+		goto out;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp, "MET", met, sizeof(met), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp, "Enrollment_URL", enrollment_url, sizeof(enrollment_url),
+			NULL))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "missing MET/Enrollment_URL in adapter body: %s",
+				ZBX_NULL2EMPTY_STR(body.data));
+		goto out;
+	}
+
+	// TODO SAVE MET and URL to DB
+	//zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
 out:
 	zbx_free(payload);
 	zbx_db_free_result(result);
 	zbx_json_free(&json);
+	zbx_free(body.data);
+	zbx_free(response_header.data);
 	curl_easy_cleanup(curl);
 #endif
 }
