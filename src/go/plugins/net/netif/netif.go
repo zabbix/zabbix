@@ -21,7 +21,6 @@ import (
 const (
 	errorInvalidSecondParam   = "invalid second parameter"
 	errorEmptyIfName          = "network interface name cannot be empty"
-	errorTooManyParams        = "too many parameters"
 	errorUnsupportedMetric    = "unsupported metric"
 	errorParametersNotAllowed = "item does not allow parameters"
 )

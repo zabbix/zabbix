@@ -28,6 +28,7 @@ import (
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -191,16 +192,21 @@ func (p *Plugin) exportDiscovery(params []string) (any, error) {
 }
 
 func (p *Plugin) exportGet(params []string) (any, error) {
+	var err error
+	var rgx *regexp.Regexp
+
 	if len(params) > 1 {
-		return nil, errs.New(errorTooManyParams)
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
-	expression := ""
-	if len(params) > 0 {
-		expression = params[0]
+	if len(params) > 0 && params[0] != "" {
+		rgx, err = regexp.Compile(params[0])
+		if err != nil {
+			return nil, errs.Wrapf(err, "invalid regular expression %q", params[0])
+		}
 	}
 
-	devices, err := p.getIfGet(expression)
+	devices, err := p.getIfGet(rgx)
 	if err != nil {
 		return nil, err
 	}
@@ -235,7 +241,7 @@ func validateParams(params []string, minParams, maxParams int) error {
 	}
 
 	if len(params) > maxParams {
-		return errs.New(errorTooManyParams)
+		return zbxerr.ErrorTooManyParameters
 	}
 
 	if params[0] == "" {
@@ -273,11 +279,8 @@ func parseUintPointer(s string) *uint64 {
 }
 
 // getIfGet retrieves interface data.
-func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
-	var (
-		compiledRegex *regexp.Regexp
-		result        netIfResult
-	)
+func (p *Plugin) getIfGet(rgx *regexp.Regexp) (netIfResult, error) {
+	var result netIfResult
 
 	parser := procfs.NewParser().
 		SetScanStrategy(procfs.StrategyOSReadFile).
@@ -286,14 +289,7 @@ func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
 
 	data, err := parser.Parse(p.netDevFilepath)
 	if err != nil {
-		return result, errs.Wrapf(err, "failed to parse %s file", p.netDevFilepath)
-	}
-
-	if regexExpr != "" {
-		compiledRegex, err = regexp.Compile(regexExpr)
-		if err != nil {
-			return result, fmt.Errorf("invalid regex expression '%s': %w", regexExpr, err)
-		}
+		return result, errs.Wrapf(err, "failed to parse file %s", p.netDevFilepath)
 	}
 
 	result.Config = make([]ifConfigData, 0)
@@ -303,11 +299,7 @@ func (p *Plugin) getIfGet(regexExpr string) (netIfResult, error) {
 		dev := strings.Split(line, ":")
 		ifName := strings.TrimSpace(dev[0])
 
-		if len(dev) <= 1 {
-			continue
-		}
-
-		if compiledRegex != nil && !compiledRegex.MatchString(ifName) {
+		if rgx != nil && !rgx.MatchString(ifName) {
 			continue
 		}
 
