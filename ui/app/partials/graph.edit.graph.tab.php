@@ -90,6 +90,7 @@ $graph_tab
 		new CFormField(
 			(new CCheckBox('show_legend'))
 				->setChecked($data['show_legend'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		)
 	])
@@ -98,6 +99,7 @@ $graph_tab
 		(new CFormField(
 			(new CCheckBox('show_work_period'))
 				->setChecked($data['show_work_period'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		))->setId('show_work_period_field')
 	])
@@ -106,6 +108,7 @@ $graph_tab
 		(new CFormField(
 			(new CCheckbox('show_triggers'))
 				->setchecked($data['show_triggers'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		))->setId('show_triggers_field')
 	]);
@@ -113,6 +116,7 @@ $graph_tab
 // Percent left.
 $percent_left_checkbox = (new CCheckBox('visible[percent_left]'))
 	->setChecked(true)
+	->setUncheckedValue(0)
 	->addClass('js-toggle-percent')
 	->setReadonly($data['readonly']);
 
@@ -137,6 +141,7 @@ $graph_tab->addItem([
 // Percent right.
 $percent_right_checkbox = (new CCheckBox('visible[percent_right]'))
 	->setChecked(true)
+	->setUncheckedValue(0)
 	->addClass('js-toggle-percent')
 	->setReadonly($data['readonly']);
 
@@ -318,13 +323,16 @@ $graph_tab
 		(new CLabel(_('Y axis MAX value'), 'ymax_type_label')),
 		(new CFormField([
 			$yaxis_max_type, $yaxis_max_value, $yaxis_max_itemid, $yaxis_max_item_prototpye
-		]))->setId('yaxis_max_field')
+		]))
+			->setId('yaxis_max_field')
+			->addClass('align-top')
 	])
 	->addItem([
 		new CLabel(_('3D view')),
 		(new CFormField(
 			(new CCheckBox('show_3d'))
 				->setChecked($data['show_3d'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		))->setId('show_3d_field')
 	]);
@@ -373,9 +381,16 @@ foreach (graph_item_drawtypes() as $drawtype) {
 
 $graph_tab->addItem([
 	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
-	(new CDiv($items_table))
-		->addClass('graph-items')
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+	((new CDiv())
+		->addItem((new CDiv($items_table))
+			->addClass('graph-items')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'items')
+			->setAttribute('data-error-container', 'items_error_container'),
+		)
+		->addItem((new CDiv())->setId('items_error_container'))
+	),
 	getItemTemplateNormal($data['readonly'], $graph_item_drawtypes),
 	getItemTemplateStacked($data['readonly']),
 	getItemTemplatePieAndExploded($data['readonly'])
@@ -386,6 +401,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 		new CLabel(_('Discover')),
 		new CFormField(
 			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+				->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
 				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
 				->setReadonly($data['is_discovered_prototype'])
 		)

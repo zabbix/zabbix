@@ -16,6 +16,11 @@
 
 class CGraphGeneralHelper {
 
+	const GRAPH_WIDTH_MIN = 20;
+	const GRAPH_WIDTH_MAX = 65535;
+	const GRAPH_HEIGHT_MIN = 20;
+	const GRAPH_HEIGHT_MAX = 65535;
+
 	/**
 	 * @param array  $src_graphs
 	 * @param array  $dst_options
