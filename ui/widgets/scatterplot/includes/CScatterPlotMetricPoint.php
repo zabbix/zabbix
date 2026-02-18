@@ -58,8 +58,9 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 	private const ZBX_STYLE_CLASS = 'svg-graph-points';
 
 	private ?array $point;
-	private string $item_x_name;
-	private string $item_y_name;
+	private string $aggregation_name;
+	private array $item_x_names;
+	private array $item_y_names;
 
 	protected array $options;
 
@@ -67,13 +68,15 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 		parent::__construct();
 
 		$this->point = $point;
-		$this->item_x_name = $metric['x_axis_name'];
-		$this->item_y_name = $metric['y_axis_name'];
+		$this->aggregation_name = $metric['aggregation_name'];
+		$this->item_x_names = $metric['x_axis_items_name'];
+		$this->item_y_names = $metric['y_axis_items_name'];
 
 		$this->options = $metric['options'] + [
 			'color' => CSvgGraph::SVG_GRAPH_DEFAULT_COLOR,
-			'order' => 1,
-			'key' => $metric['key']
+			'order' => $metric['order'],
+			'key' => $metric['key'],
+			'data_set' => $metric['data_set']
 		];
 	}
 
@@ -173,8 +176,10 @@ class CScatterPlotMetricPoint extends CSvgGroup {
 	public function toString($destroy = true): string {
 		$this
 			->setAttribute('data-set', 'points')
-			->setAttribute('data-metric-x', $this->item_x_name)
-			->setAttribute('data-metric-y', $this->item_y_name)
+			->setAttribute('data-aggregation-name', $this->aggregation_name)
+			->setAttribute('data-x-items', $this->item_x_names)
+			->setAttribute('data-y-items', $this->item_y_names)
+			->setAttribute('data-ds', $this->options['data_set'])
 			->draw();
 
 		return parent::toString($destroy);

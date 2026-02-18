@@ -18,6 +18,7 @@
 
 #include "zbxdbschema.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 8.0 development database patches
@@ -454,6 +455,48 @@ static int	DBpatch_7050031(void)
 
 static int	DBpatch_7050032(void)
 {
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int				ret;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			(char *)NULL);
+
+	result = zbx_db_select("select w.widgetid"
+			" from widget w"
+			" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+			" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
+			" where w.type='scatterplot' or w.type='svggraph'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_hostnames", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7050033(void)
+{
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget_field", &field, NULL);
+}
+
+static int	DBpatch_7050034(void)
+{
 	const zbx_db_table_t	table =
 			{"devices", "id", 0,
 				{
@@ -478,17 +521,17 @@ static int	DBpatch_7050032(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050033(void)
+static int	DBpatch_7050035(void)
 {
 	return DBcreate_index("devices", "devices_1", "user_ref", 0);
 }
 
-static int	DBpatch_7050034(void)
+static int	DBpatch_7050036(void)
 {
 	return DBcreate_index("devices", "devices_2", "token_ref", 0);
 }
 
-static int	DBpatch_7050035(void)
+static int	DBpatch_7050037(void)
 {
 	const zbx_db_field_t	field = {"user_ref", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -496,7 +539,7 @@ static int	DBpatch_7050035(void)
 	return DBadd_foreign_key("devices", 1, &field);
 }
 
-static int	DBpatch_7050036(void)
+static int	DBpatch_7050038(void)
 {
 	const zbx_db_field_t	field = {"token_ref", NULL, "token", "tokenid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -504,12 +547,13 @@ static int	DBpatch_7050036(void)
 	return DBadd_foreign_key("devices", 2, &field);
 }
 
-static int	DBpatch_7050037(void)
+static int	DBpatch_7050039(void)
 {
 	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 0, ZBX_TYPE_INT, 0, 0};
 
 	return DBadd_field("token", &field);
 }
+
 #endif
 
 DBPATCH_START(7050)
@@ -554,4 +598,6 @@ DBPATCH_ADD(7050034, 0, 1)
 DBPATCH_ADD(7050035, 0, 1)
 DBPATCH_ADD(7050036, 0, 1)
 DBPATCH_ADD(7050037, 0, 1)
+DBPATCH_ADD(7050038, 0, 1)
+DBPATCH_ADD(7050039, 0, 1)
 DBPATCH_END()

@@ -128,6 +128,7 @@ typedef struct
 {
 	zbx_uint64_t		access_userid;
 	zbx_uint64_t		batchid;
+	zbx_uint64_t		reportid;
 	char			*url;
 	char			*report_name;
 	unsigned char		is_test_report;
@@ -598,6 +599,7 @@ static char	*rm_get_report_name(const char *name, int report_time)
  *             access_userid - [IN] user accessing the dashboard              *
  *             report_time   - [IN]                                           *
  *             period        - [IN] report period                             *
+ *             reportid      - [IN]                                           *
  *             userids       - [IN] recipient user identifiers                *
  *             userids_num   - [IN] number of recipients                      *
  *             params        - [IN] viewing and processing parameters         *
@@ -605,8 +607,8 @@ static char	*rm_get_report_name(const char *name, int report_time)
  *                                                                            *
  ******************************************************************************/
 static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, zbx_uint64_t dashboardid,
-		zbx_uint64_t access_userid, int report_time, unsigned char period, zbx_uint64_t *userids,
-		int userids_num, const zbx_vector_ptr_pair_t *params, char **error)
+		zbx_uint64_t access_userid, int report_time, unsigned char period, zbx_uint64_t reportid,
+		zbx_uint64_t *userids, int userids_num, const zbx_vector_ptr_pair_t *params, char **error)
 {
 	size_t		url_alloc = 0, url_offset = 0;
 	struct tm	from, to;
@@ -626,6 +628,7 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 	zbx_rm_job_t	*job = (zbx_rm_job_t *)zbx_malloc(NULL, sizeof(zbx_rm_job_t));
 	memset(job, 0, sizeof(zbx_rm_job_t));
 
+	job->reportid = reportid;
 	job->report_name = rm_get_report_name(report_name, report_time);
 
 	zbx_vector_ptr_pair_create(&job->params);
@@ -1549,7 +1552,10 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 
 			if (0 != recipients.values_num)
 			{
-				size = report_serialize_send_report(&data, &mt, &recipients);
+				size = report_serialize_send_report(&data, &mt, &recipients, job->reportid,
+						0 == job->is_test_report ?
+						ZBX_ALERT_MESSAGE_REPORT : ZBX_ALERT_MESSAGE_TEST);
+
 				ret = zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_SEND_REPORT, data, size);
 				zbx_free(data);
 			}
@@ -1618,7 +1624,7 @@ static int	rm_jobs_add_user(zbx_rm_t *manager, zbx_rm_report_t *report, zbx_uint
 	if (i == jobs->values_num)
 	{
 		if (NULL == (job = rm_create_job(manager, report->name, report->dashboardid, access_userid, now,
-				report->period, &userid, 1, params, error)))
+				report->period, report->reportid, &userid, 1, params, error)))
 		{
 			return FAIL;
 		}
@@ -1906,7 +1912,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
 		}
-
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);
@@ -2107,7 +2112,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 		}
 	}
 
-	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
+	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, 0, &userid, 1,
 			&params, error)))
 	{
 		job->is_test_report = 1;

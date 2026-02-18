@@ -50,6 +50,7 @@ const ZBX_STYLE_FORMATED_TEXT = 'formated-text';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER = 'textarea-flexible-container';
 const ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT = 'textarea-flexible-parent';
+const ZBX_STYLE_Z_TEXTAREA_FLEXIBLE = 'z-textarea-flexible';
 
 const ZBX_STYLE_COLOR_PICKER = 'color-picker';
 
@@ -123,6 +124,8 @@ const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';
 const ZBX_ICON_WIDGET_NOT_CONFIGURED_LARGE = ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE;
 const ZBX_ICON_WRENCH_ALT_SMALL = 'zi-wrench-alt-small';
+
+const ZBX_PREG_NUMBER = /(?<number>-?((?<int>\d+)(\.(?<frac>\d*))?|\.(?<frac_only>\d+))([Ee](?<exp>[+-]?\d+))?)/;
 
 const ITEM_VALUE_TYPE_FLOAT = 0;
 const ITEM_VALUE_TYPE_STR = 1;
@@ -249,5 +252,5 @@ const NAME_DELIMITER = ': ';
 
 const WRAPPER_PADDING_RIGHT = 10;
 
-const GRAPH_HINTBOX_TYPE_SVG_GRAPH = 0;
-const GRAPH_HINTBOX_TYPE_SCATTER_PLOT = 1;
+const GRAPH_TYPE_SVG_GRAPH = 0;
+const GRAPH_TYPE_SCATTER_PLOT = 1;

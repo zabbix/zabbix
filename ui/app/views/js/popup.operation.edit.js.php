@@ -126,8 +126,6 @@ window.operation_popup = new class {
 
 		optags.forEach((optag) => {
 			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(optag));
-
-			$(`#operation_optag_${optag.row_index}_tag, #operation_optag_${optag.row_index}_value`).textareaFlexible();
 		});
 	}
 
@@ -273,7 +271,7 @@ window.operation_popup = new class {
 			label.style.display = 'none';
 		}
 
-		for (const input of this.form.querySelectorAll('input, textarea')) {
+		for (const input of this.form.querySelectorAll('input, textarea, z-textarea-flexible')) {
 			if (['operation_eventsource', 'operation_recovery', 'submit'].includes(input.id)) {
 				continue;
 			}
@@ -363,7 +361,7 @@ window.operation_popup = new class {
 			if (fields.includes(field.id)) {
 				field.style.display = '';
 
-				for (const input of field.querySelectorAll('input, textarea')) {
+				for (const input of field.querySelectorAll('input, textarea, z-textarea-flexible')) {
 					input.removeAttribute('disabled');
 					input.style.display = '';
 				}

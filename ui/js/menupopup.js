@@ -817,7 +817,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		let items = [];
 		const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'popup.acknowledge.create');
+		curl.setArgument('action', 'acknowledge.rank.change');
 
 		/*
 		 * Some widgets cannot show symptoms. So it is not possible to convert to symptoms cause if only cause events

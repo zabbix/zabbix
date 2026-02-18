@@ -1,8 +1,8 @@
 publiccodeYmlVersion: 0.5.0
 name: Zabbix Monitoring and Observability Platform
 url: https://github.com/zabbix/zabbix
-softwareVersion: Zabbix 7.4.6
-releaseDate: 2025-12-18
+softwareVersion: Zabbix 7.4.7
+releaseDate: 2026-02-13
 logo: https://assets.zabbix.com/img/logo.svg
 platforms:
   - windows

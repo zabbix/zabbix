@@ -582,7 +582,8 @@ class CElementQuery implements IWaitable {
 			'CElement'					=> [
 				// TODO: change after DEV-1630 (1) is resolved.
 				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
-				'/textarea[@name]'
+				'/textarea[@name]',
+				'/z-textarea-flexible[@name]'
 			],
 			'CListElement'				=> '/select[@name]',
 			'CDropdownElement'			=> '/z-select[@name]',

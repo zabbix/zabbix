@@ -305,9 +305,10 @@ class testFormPreprocessingTest extends CWebTest {
 			[
 				[
 					'expected' => TEST_BAD,
+					// TODO: move "Discard unchanged with heartbeat" to the end of the preprocessing array when DEV-4776 is merged.
 					'preprocessing' => [
-						['type' => 'Discard unchanged'],
-						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1']
+						['type' => 'Discard unchanged with heartbeat', 'parameter_1' => '1'],
+						['type' => 'Discard unchanged']
 					],
 					'error' => ['id:preprocessing_1_type' => 'One "Throttling" step allowed per item.']
 				]
@@ -486,8 +487,8 @@ class testFormPreprocessingTest extends CWebTest {
 						 * (0)macro (1)=> (2)value
 						 */
 						$macros['actual'][] = [
-							'macro' => $columns[0]->getText(),
-							'value' => $columns[2]->getText()
+							'macro' => $columns[0]->query('tag:z-textarea-flexible')->one()->getValue(),
+							'value' => $columns[2]->query('tag:z-textarea-flexible')->one()->getValue()
 						];
 					}
 

@@ -271,8 +271,9 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'host' => ['not_empty', 'integer']
 				]],
-				null,
-				'[RULES ERROR] Rule "not_empty" is not compatible with type "integer" (Path: /host)'
+				['type' => 'object', 'fields' => [
+					'host' => [['not_empty' => true, 'type' => 'integer']]
+				]]
 			],
 			[
 				['object', 'fields' => [
@@ -3026,6 +3027,217 @@ class CFormValidatorTest extends TestCase {
 				]],
 				CFormValidator::SUCCESS,
 				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min' => strtotime('2025-02-01')]]
+					]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
+						'messages' => ['use' => 'Must be in the future']
+					]
+				]],
+				['value' => '2025-01-01'],
+				['value' => '2025-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Must be in the future',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]]
+					]
+				]],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, []]
+					]
+				]],
+				['value' => '2040-01-01'],
+				['value' => '2040-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.0001],
+				['value' => 5.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 4.9999],
+				['value' => 4.9999],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '455.01E-2'],
+				['value' => 4.5501],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '4.51E1'],
+				['value' => 45.1],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.00001],
+				['value' => 5.00001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => '1.22E-3'],
+				['value' => 0.00122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
 			]
 		];
 	}
