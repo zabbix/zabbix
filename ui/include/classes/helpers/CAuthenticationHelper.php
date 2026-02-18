@@ -165,7 +165,7 @@ class CAuthenticationHelper {
 	}
 
 	/**
-	 *
+	 * Determines if HTTP authentication is set.
 	 *
 	 * @return bool
 	 */

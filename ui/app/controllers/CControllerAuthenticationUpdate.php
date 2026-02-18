@@ -17,8 +17,6 @@
 class CControllerAuthenticationUpdate extends CController {
 
 	public static function getValidationRules(): array {
-		global $ALLOW_HTTP_AUTH;
-
 		$rules = ['object', 'fields' => [
 			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
 			'passwd_check_rules' => ['array', 'field' => ['setting passwd_check_rules',
@@ -396,7 +394,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if ($ALLOW_HTTP_AUTH) {
+		if (CAuthenticationHelper::isHttpAuthentication()) {
 			$rules['fields'] += [
 				'http_auth_enabled' => ['setting http_auth_enabled',
 					'in' => [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]

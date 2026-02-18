@@ -188,7 +188,7 @@ class CConfigFile {
 			$this->config['SSO'] = $SSO;
 		}
 
-		if (isset($ALLOW_HTTP_AUTH) && $ALLOW_HTTP_AUTH !== '') {
+		if (isset($ALLOW_HTTP_AUTH)) {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
