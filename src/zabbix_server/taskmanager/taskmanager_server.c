@@ -1762,7 +1762,7 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, char *adapter_url, cha
 		goto out;
 	}
 
-	//TODO SAVE MET and URL to DB
+	/* TODO save MET and URL to DB */
 
 out:
 	zbx_free(payload);
