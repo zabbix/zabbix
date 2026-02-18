@@ -539,6 +539,7 @@ class C80ImportValidator extends CImportValidatorGeneral {
 	private $DASHBOARD_WIDGET_FIELD_TYPE = [
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_INTEGER,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_STRING => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
+		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GROUP => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GROUP,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_HOST => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_HOST,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM,
 		CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE,
@@ -3390,6 +3391,37 @@ class C80ImportValidator extends CImportValidatorGeneral {
 						]]
 					]]
 				]]
+			]],
+			'dashboards' =>				['type' => XML_INDEXED_ARRAY, 'prefix' => 'dashboard', 'rules' => [
+				'dashboard' =>				['type' => XML_ARRAY, 'rules' => [
+					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'display_period' =>				['type' => XML_STRING, 'default' => '30'],
+					'auto_start' =>					['type' => XML_STRING, 'default' => CXmlConstantValue::YES, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+					'pages' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'page', 'rules' => [
+						'page' =>						['type' => XML_ARRAY, 'rules' => [
+							'name' =>						['type' => XML_STRING, 'default' => ''],
+							'display_period' =>				['type' => XML_STRING, 'default' => '0'],
+							'widgets' =>					['type' => XML_INDEXED_ARRAY, 'prefix' => 'widget', 'rules' => [
+								'widget' =>						['type' => XML_ARRAY, 'rules' => [
+									'type' =>						['type' => XML_STRING | XML_REQUIRED],
+									'name' =>						['type' => XML_STRING, 'default' => ''],
+									'x' =>							['type' => XML_STRING, 'default' => '0'],
+									'y' =>							['type' => XML_STRING, 'default' => '0'],
+									'width' =>						['type' => XML_STRING, 'default' => '1'],
+									'height' =>						['type' => XML_STRING, 'default' => '2'],
+									'hide_header' =>				['type' => XML_STRING, 'default' => CXmlConstantValue::NO, 'in' => [CXmlConstantValue::NO => CXmlConstantName::NO, CXmlConstantValue::YES => CXmlConstantName::YES]],
+									'fields' =>						['type' => XML_INDEXED_ARRAY, 'prefix' => 'field', 'rules' => [
+										'field' =>						['type' => XML_ARRAY, 'rules' => [
+											'type' =>						['type' => XML_STRING | XML_REQUIRED, 'in' => $this->DASHBOARD_WIDGET_FIELD_TYPE],
+											'name' =>						['type' => XML_STRING | XML_REQUIRED],
+											'value' =>						['type' => XML_REQUIRED, 'ex_validate' => [$this, 'validateWidgetFieldValue'], 'ex_rules' => [$this, 'getWidgetFieldValueExtendedRules']]
+										]]
+									]]
+								]]
+							]]
+						]]
+					]]
+				]]
 			]]
 		]];
 	}
@@ -3704,11 +3736,13 @@ class C80ImportValidator extends CImportValidatorGeneral {
 					'host' => ['type' => XML_STRING | XML_REQUIRED],
 					'name' => ['type' => XML_STRING | XML_REQUIRED]
 				]];
+			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_GROUP:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MAP:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_SLA:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_ACTION:
 			case CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_GROUP:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_MAP:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SERVICE:
 			case CXmlConstantValue::DASHBOARD_WIDGET_FIELD_TYPE_SLA:
