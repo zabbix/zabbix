@@ -176,6 +176,7 @@ $available_js = [
 	'class.field.set.js' => 'fields/',
 	'class.field.textarea.js' => 'fields/',
 	'class.field.textbox.js' => 'fields/',
+	'class.field.zcolorpicker.js' => 'fields/',
 	'class.field.zselect.js' => 'fields/',
 	'class.field.ztextarea-flexible.js' => 'fields/'
 ];
@@ -628,6 +629,7 @@ if (empty($_GET['files'])) {
 		'class.field.set.js',
 		'class.field.textarea.js',
 		'class.field.textbox.js',
+		'class.field.zcolorpicker.js',
 		'class.field.zselect.js',
 		'class.field.ztextarea-flexible.js',
 		'class.form.js',
