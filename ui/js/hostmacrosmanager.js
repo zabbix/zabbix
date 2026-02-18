@@ -21,7 +21,6 @@ class HostMacrosManager {
 	static ZBX_MACRO_TYPE_TEXT = 0;
 	static ZBX_MACRO_TYPE_SECRET = 1;
 	static ZBX_MACRO_TYPE_VAULT = 2;
-	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 	static DISCOVERY_STATE_AUTOMATIC = 0x1;
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
@@ -71,10 +70,7 @@ class HostMacrosManager {
 					this.$container.append(response.body);
 
 					// Initialize macros.
-					if (this.readonly) {
-						$('.' + HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, this.getMacroTable()).textareaFlexible();
-					}
-					else {
+					if (!this.readonly) {
 						this.initMacroTable(show_inherited_macros);
 					}
 
@@ -100,7 +96,7 @@ class HostMacrosManager {
 	 * Get macros from UI.
 	 */
 	getMacros() {
-		const $macros = $('input[name^="macros"], textarea[name^="macros"]', this.$container).not(':disabled');
+		const $macros = $('input[name^="macros"], z-textarea-flexible[name^="macros"]', this.$container).not(':disabled');
 		const macros = {};
 
 		// Find the correct macro inputs and prepare to submit them via AJAX.
@@ -149,7 +145,7 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type & ~HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_description')
-						.prop('readonly', true)
+						.attr('readonly', true)
 						.val($('#macros_' + macro_num + '_inherited_description').val())
 						.trigger('input');
 					$('#macros_' + macro_num + '_type_button')
@@ -161,7 +157,7 @@ class HostMacrosManager {
 						.val(macro_type)
 						.trigger('change');
 					$('#macros_' + macro_num + '_value')
-						.prop(inherited_value_field_state)
+						.attr(inherited_value_field_state)
 						.val($('#macros_' + macro_num + '_inherited_value').val())
 						.trigger('input');
 					$('#macros_' + macro_num + '_value')
@@ -180,12 +176,12 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_value')
-						.prop('disabled', false)
-						.prop('readonly', false)
+						.attr('disabled', false)
+						.attr('readonly', false)
 						.attr({'placeholder': t('value')})
 						.val('')
 						.focus();
-					$('#macros_' + macro_num + '_description').prop('readonly', false);
+					$('#macros_' + macro_num + '_description').attr('readonly', false);
 					$('#macros_' + macro_num + '_type_button')
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
@@ -221,7 +217,7 @@ class HostMacrosManager {
 						.trigger('change');
 					$('#macros_' + num + '_value', $row)
 						.val(original_value)
-						.prop(original_value_field_state)
+						.attr(original_value_field_state)
 						.trigger('input');
 					$('#macros_' + num + '_value', $row)
 						.closest('.macro-input-group')
@@ -229,7 +225,7 @@ class HostMacrosManager {
 						.hide();
 					$('#macros_' + num + '_description')
 						.val(original_descr)
-						.prop('readonly', true)
+						.attr('readonly', true)
 						.trigger('input');
 					$('#macros_' + num + '_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_AUTOMATIC);
@@ -237,13 +233,13 @@ class HostMacrosManager {
 				}
 				else {
 					$('#macros_' + num + '_value', $row)
-						.prop('readonly', false)
+						.attr('readonly', false)
 						.focus();
 					$('#macros_' + num + '_value_btn', $row).prop('disabled', false);
 					$('#macros_' + num + '_type_button', $row)
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
-					$('#macros_' + num + '_description').prop('readonly', false);
+					$('#macros_' + num + '_description').attr('readonly', false);
 					$('#macros_' + num + '_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_CONVERTING);
 					$('#macros_' + num + '_change_state').text(t('Revert'));
@@ -257,22 +253,17 @@ class HostMacrosManager {
 	}
 
 	initMacroFields($parent) {
-		$('.'+HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field')
-				.each((index, textarea) => {
+		$(ZBX_STYLE_Z_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field')
+		.each((index, textarea) => {
 			const $textarea = $(textarea);
 
 			if ($textarea.hasClass('macro')) {
 				$textarea.on('change keydown', (e) => {
 					if (e.type === 'change' || e.which === 13) {
 						this.macroToUpperCase($textarea);
-						$textarea.textareaFlexible();
 					}
 				});
 			}
-
-			$textarea
-				.addClass('initialized-field')
-				.textareaFlexible();
 		});
 	}
 

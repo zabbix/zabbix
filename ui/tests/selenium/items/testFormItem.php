@@ -700,9 +700,12 @@ class testFormItem extends CLegacyWebTest {
 				$this->assertFalse($form->getField('Update interval')->isDisplayed());
 		}
 
-		$value_types = ($type === 'Dependent item')
-			? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary']
-			: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'];
+		$value_types = ($type === 'Dependent item') ?
+				['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary', 'JSON']
+				: (($type === 'Calculated')
+					? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text']
+					: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'JSON']
+				);
 
 		if (isset($templateid)) {
 			$this->assertEquals('true', $form->getField('Type of information')->getAttribute('readonly'));
@@ -710,7 +713,7 @@ class testFormItem extends CLegacyWebTest {
 		else {
 			$this->assertEquals($value_types, $form->getField('Type of information')->asDropdown()->getOptions()->asText());
 
-			foreach (['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'] as $info_type) {
+			foreach ($value_types as $info_type) {
 				$this->zbxTestIsEnabled('//*[@id="value_type"]//li[text()='.CXPathHelper::escapeQuotes($info_type).']');
 			}
 		}
@@ -2107,7 +2110,6 @@ class testFormItem extends CLegacyWebTest {
 				$itemCount ++;
 
 				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
-				$add->click();
 				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
 				try {
 					$add->click();
@@ -2298,10 +2300,14 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->item);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak']", 'Overridden by global housekeeping settings (99d)');
-		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak'][2]", 'Overridden by global housekeeping settings (455d)');
+		$form->getLabel('History')->query('xpath:span[@class="js-hint"]/button')->one()->click();
+		$this->zbxTestAssertElementText('//div[contains(@class, "hintbox-static")]',
+				'Overridden by global housekeeping settings (99d)'
+		);
+		$form->getLabel('Trends')->query('xpath:span[@class="js-hint"]/button')->one()->click();
+		$this->zbxTestAssertElementText('//div[contains(@class, "hintbox-static")][2]',
+				'Overridden by global housekeeping settings (455d)'
+		);
 		$dialog->close();
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');

@@ -31,7 +31,7 @@ class CControllerItemList extends CControllerItem {
 			'filter_key'				=> 'string',
 			'filter_valuemapids'		=> 'array_db valuemap.valuemapid',
 			'filter_type'				=> 'in '.implode(',', [-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_SNMP, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_INTERNAL, ITEM_TYPE_TRAPPER, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]),
-			'filter_value_type'			=> 'in '.implode(',', [-1, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
+			'filter_value_type'			=> 'in '.implode(',', [-1, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]),
 			'filter_snmp_oid'			=> 'string',
 			'filter_history'			=> 'string',
 			'filter_trends'				=> 'string',
@@ -246,7 +246,8 @@ class CControllerItemList extends CControllerItem {
 			ITEM_VALUE_TYPE_STR => _('Character'),
 			ITEM_VALUE_TYPE_LOG => _('Log'),
 			ITEM_VALUE_TYPE_TEXT => _('Text'),
-			ITEM_VALUE_TYPE_BINARY => _('Binary')
+			ITEM_VALUE_TYPE_BINARY => _('Binary'),
+			ITEM_VALUE_TYPE_JSON => _('JSON')
 		];
 
 		// Status

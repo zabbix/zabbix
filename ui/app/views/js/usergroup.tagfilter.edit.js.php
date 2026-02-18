@@ -41,27 +41,13 @@ window.tag_filter_edit = new class {
 			this.group_tag_filters = result;
 		}
 
-		const indices = Object.keys(this.group_tag_filters);
-		const first_index = indices[0];
-
-		if (this.group_tag_filters.length !== 0 && this.group_tag_filters[first_index]['tag'] !== '') {
-			const tag_list_option = document.querySelector(`input[name="filter_type"][value='<?= TAG_FILTER_LIST ?>']`);
-
-			tag_list_option.checked = true;
-
-			for (const tag of this.group_tag_filters) {
-				this.#addTagFilterRow(tag);
-			}
+		for (const tag of this.group_tag_filters) {
+			this.#addTagFilterRow(tag);
 		}
-		else {
+
+		if (this.group_tag_filters.length == 0) {
 			this.#addTagFilterRow();
 		}
-
-		this.#toggleTagList();
-
-		document.querySelectorAll('[name=filter_type]').forEach((type) =>
-			type.addEventListener('change', () => this.#toggleTagList())
-		);
 
 		document.querySelector('.js-add-tag-filter-row').addEventListener('click', () => this.#addTagFilterRow());
 
@@ -102,19 +88,6 @@ window.tag_filter_edit = new class {
 		placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 	}
 
-	/**
-	 * Toggles the visibility of the tag list form fields based on the selected filter type.
-	 */
-	#toggleTagList() {
-		const tag_list_radio = document.querySelector('[name="filter_type"]:checked').value;
-		const tags = document.getElementById('tag-list-form-field');
-		const tags_label = document.querySelector("label[for='tag_filters']");
-		const show_tags = tag_list_radio == '<?= TAG_FILTER_LIST ?>';
-
-		tags.style.display = show_tags ? '' : 'none';
-		tags_label.style.display = show_tags ? '' : 'none';
-	}
-
 	submit() {
 		const curl = new Curl('zabbix.php');
 
@@ -124,10 +97,6 @@ window.tag_filter_edit = new class {
 
 		fields.tag_filters = this.tag_filters;
 		fields.groupid = this.groupid;
-
-		if (fields.filter_type == '<?= TAG_FILTER_ALL ?>') {
-			delete fields.new_tag_filter;
-		}
 
 		if ('new_tag_filter' in fields) {
 			for (const tag_filter of Object.values(fields.new_tag_filter)) {

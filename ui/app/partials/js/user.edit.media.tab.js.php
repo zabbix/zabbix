@@ -169,13 +169,21 @@
 			if (sendto_array !== null) {
 				const sendto_input = row.querySelector(`[name="medias[${media.row_index}][sendto]"`);
 
+				const container = document.createElement('div');
+
+				container.setAttribute('data-field-type', 'array');
+				container.setAttribute('data-field-name', `medias[${media.row_index}][sendto]`);
+
+				sendto_input.parentNode.insertBefore(container, sendto_input);
+
 				for (const [index, sendto] of Object.entries(sendto_array)) {
 					const hInput = document.createElement('input');
 					hInput.setAttribute('type', 'hidden');
 					hInput.setAttribute('id', `medias_${media.row_index}_sendto_${index}`);
 					hInput.setAttribute('name', `medias[${media.row_index}][sendto][]`);
 					hInput.setAttribute('value', sendto);
-					sendto_input.parentNode.insertBefore(hInput, sendto_input);
+					hInput.setAttribute('data-field-type', 'hidden');
+					container.appendChild(hInput);
 				}
 
 				sendto_input.remove();

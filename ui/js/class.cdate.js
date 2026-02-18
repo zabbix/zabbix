@@ -120,37 +120,6 @@ CDate.prototype = {
 		}
 	},
 
-	getZBXDate: function() {
-		var thedate = [];
-		thedate[0] = this.serverDate.getDate();
-		thedate[1] = this.serverDate.getMonth() + 1;
-		thedate[2] = this.serverDate.getFullYear();
-		thedate[3] = this.serverDate.getHours();
-		thedate[4] = this.serverDate.getMinutes();
-		thedate[5] = this.serverDate.getSeconds();
-
-		for (var i = 0; i < thedate.length; i++) {
-			if ((thedate[i] + '').length < 2) {
-				thedate[i] = '0' + thedate[i];
-			}
-		}
-
-		return '' + thedate[2] + thedate[1] + thedate[0] + thedate[3] + thedate[4] + thedate[5];
-	},
-
-	setZBXDate: function(strdate) {
-		this.setTimeObject(
-			strdate.toString().substr(0, 4),
-			strdate.toString().substr(4, 2) - 1,
-			strdate.toString().substr(6, 2),
-			strdate.toString().substr(8, 2),
-			strdate.toString().substr(10, 2),
-			strdate.toString().substr(12, 2)
-		);
-
-		return this.getTime();
-	},
-
 	toString: function() {
 		return this.serverDate.toString();
 	},

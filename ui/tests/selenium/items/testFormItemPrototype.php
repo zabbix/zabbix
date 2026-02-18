@@ -908,14 +908,17 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->assertFalse($form->getField('Update interval')->isDisplayed());
 		}
 
-		$value_types = ($type === 'Dependent item')
-			? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary']
-			: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'];
+		$value_types = ($type === 'Dependent item') ?
+				['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary', 'JSON']
+				: (($type === 'Calculated')
+					? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text']
+					: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'JSON']
+				);
 
 		if (!isset($templateid)) {
 			$this->assertEquals($value_types, $form->getField('Type of information')->asDropdown()->getOptions()->asText());
 
-			foreach (['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'] as $info_type) {
+			foreach ($value_types as $info_type) {
 				$this->zbxTestIsEnabled('//*[@id="value_type"]//li[text()='.CXPathHelper::escapeQuotes($info_type).']');
 			}
 		}

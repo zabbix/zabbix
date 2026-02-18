@@ -29,7 +29,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'groupid' =>			'db hosts_groups.groupid',
-			'filter_type' =>		'in 1,0',
 			'tag_filters' =>		'array',
 			'ms_new_tag_filter' =>	'array',
 			'new_tag_filter' =>		'array'
@@ -79,7 +78,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 		}
 
 		if ($this->hasInput('new_tag_filter')) {
-			$empty_tags = 0;
 			$unique_tag_filters = [];
 
 			foreach ($this->getInput('new_tag_filter') as $tag_filter) {
@@ -105,7 +103,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 				}
 
 				if ($tag === '' && $value === '') {
-					$empty_tags++;
 					continue;
 				}
 
@@ -120,17 +117,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 					$unique_tag_filters[$tag] = $value;
 				}
 			}
-
-			if (count($this->getInput('new_tag_filter')) == $empty_tags) {
-				error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
-
-				return false;
-			}
-		}
-		elseif ($this->getInput('filter_type') == TAG_FILTER_LIST) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', _('Tags'), _('cannot be empty')));
-
-			return false;
 		}
 
 		return true;
@@ -142,7 +128,6 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 	protected function doAction(): void {
 		$data['tag_filters'] = $this->getInput('tag_filters', []);
-		$filter_type = $this->getInput('filter_type', TAG_FILTER_ALL);
 		$opened_groupid = $this->getInput('groupid');
 		$ms_groups = $this->getInput('ms_new_tag_filter', []);
 		$groupids = $ms_groups['groupids'];
@@ -163,31 +148,25 @@ class CControllerUsergroupTagFilterCheck extends CController {
 			if (array_key_exists($groupid, $data['tag_filters'])) {
 				$existing_tag_filters = &$data['tag_filters'][$groupid]['tags'];
 
-				if ($filter_type == TAG_FILTER_ALL) {
-					$existing_tag_filters = [['tag' => '', 'value' => '']];
-				}
+				foreach ($existing_tag_filters as $key => $existing_tag_filter) {
+					if ($existing_tag_filter['tag'] === '') {
+						unset($existing_tag_filters[$key]);
+						break;
+					}
+					else {
+						$is_still_present = false;
 
-				if ($filter_type == TAG_FILTER_LIST) {
-					foreach ($existing_tag_filters as $key => $existing_tag_filter) {
-						if ($existing_tag_filter['tag'] === '') {
-							unset($existing_tag_filters[$key]);
-							break;
+						foreach ($new_tag_filters as $new_tag_filter) {
+							if ($existing_tag_filter['tag'] === $new_tag_filter['tag']
+									&& $existing_tag_filter['value'] === $new_tag_filter['value']) {
+								$is_still_present = true;
+								break;
+							}
 						}
-						else {
-							$is_still_present = false;
 
-							foreach ($new_tag_filters as $new_tag_filter) {
-								if ($existing_tag_filter['tag'] == $new_tag_filter['tag']
-										&& $existing_tag_filter['value'] == $new_tag_filter['value']) {
-									$is_still_present = true;
-									break;
-								}
-							}
-
-							// If the existing tag is not found in the opened for edit group's new tags list, remove it.
-							if (!$is_still_present && $groupid == $opened_groupid) {
-								unset($existing_tag_filters[$key]);
-							}
+						// If the existing tag is not found in the opened for edit group's new tags list, remove it.
+						if (!$is_still_present && bccomp($groupid, $opened_groupid) == 0) {
+							unset($existing_tag_filters[$key]);
 						}
 					}
 				}
@@ -197,8 +176,8 @@ class CControllerUsergroupTagFilterCheck extends CController {
 
 					foreach ($existing_tag_filters as $existing_tag_filter) {
 						// Skip duplicate tags.
-						if ($new_tag_filter['tag'] == $existing_tag_filter['tag'] &&
-								$new_tag_filter['value'] == $existing_tag_filter['value']) {
+						if ($new_tag_filter['tag'] === $existing_tag_filter['tag']
+								&& $new_tag_filter['value'] === $existing_tag_filter['value']) {
 							$is_duplicate = true;
 							break;
 						}
@@ -209,6 +188,10 @@ class CControllerUsergroupTagFilterCheck extends CController {
 						$existing_tag_filters[] = $new_tag_filter;
 					}
 				}
+
+				if (!$existing_tag_filters) {
+					$existing_tag_filters = [['tag' => '', 'value' => '']];
+				}
 			}
 			else {
 				$key = array_search($groupid, array_column($this->host_groups, 'groupid'));
@@ -217,7 +200,7 @@ class CControllerUsergroupTagFilterCheck extends CController {
 				$data['tag_filters'][$groupid] = [
 					'groupid' => $groupid,
 					'name' => $name,
-					'tags' => $filter_type == TAG_FILTER_ALL ? [['tag' => '', 'value' => '']] : $new_tag_filters
+					'tags' => !$new_tag_filters ? [['tag' => '', 'value' => '']] : $new_tag_filters
 				];
 			}
 		}

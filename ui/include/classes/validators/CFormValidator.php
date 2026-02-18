@@ -34,10 +34,11 @@ class CFormValidator {
 	const ERROR_FATAL = 2;
 
 	const ERROR_LEVEL_PRIMARY = 0;
-	const ERROR_LEVEL_DELAYED = 1;
-	const ERROR_LEVEL_UNIQ = 2;
-	const ERROR_LEVEL_API = 3;
-	const ERROR_LEVEL_UNKNOWN = 4;
+	const ERROR_LEVEL_OBJECTS_COUNT = 1;
+	const ERROR_LEVEL_DELAYED = 2;
+	const ERROR_LEVEL_UNIQ = 3;
+	const ERROR_LEVEL_API = 4;
+	const ERROR_LEVEL_UNKNOWN = 1000;
 
 	public function __construct(array $rules) {
 		$this->rules = $this->normalizeRules($rules);
@@ -231,6 +232,15 @@ class CFormValidator {
 						$result[$key] = $value;
 						break;
 
+					case 'decimal_limit':
+						if (!is_int($value)) {
+							// Value should be a number.
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a number (Path: '.$rule_path.')');
+						}
+
+						$result[$key] = $value;
+						break;
+
 					case 'length':
 						if (array_key_exists($key, $result)) {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" is specified multiple times (Path: '.$rule_path.')');
@@ -282,7 +292,10 @@ class CFormValidator {
 						}
 
 						$result[$key] = $value;
+						break;
 
+					case 'count_values':
+						$result[$key] = $this->normalizeCountValuesRules($value, $rule_path);
 						break;
 
 					default:
@@ -297,7 +310,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('not_empty', $result)) {
-			if (!in_array($result['type'], ['string', 'objects', 'array', 'file'])) {
+			if (!in_array($result['type'], ['string', 'objects', 'array', 'file', 'integer', 'float'])) {
 				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
@@ -334,6 +347,11 @@ class CFormValidator {
 		if ((array_key_exists('min', $result) || array_key_exists('max', $result))
 				&& !in_array($result['type'], ['integer', 'float'])) {
 			throw new Exception('[RULES ERROR] Rule "min" or "max" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
+		}
+
+		if ((array_key_exists('decimal_limit', $result))
+				&& $result['type'] != 'float') {
+			throw new Exception('[RULES ERROR] Rule "decimal_limit" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('length', $result) && $result['type'] !== 'string') {
@@ -547,6 +565,119 @@ class CFormValidator {
 		unset($api_uniq_check);
 
 		return $value;
+	}
+
+	private function normalizeCountValuesCountFieldRules(array &$count_fields_rules, string $rule_path): array {
+		if (count($count_fields_rules) == 0 || !array_key_exists(0, $count_fields_rules)) {
+			throw new Exception('[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+		}
+
+		if (!is_array($count_fields_rules[0])) {
+			$count_fields_rules = [$count_fields_rules];
+		}
+
+		$results = [];
+
+		foreach ($count_fields_rules as $count_rule) {
+			if (!array_key_exists(0, $count_rule)) {
+				throw new Exception('[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+			}
+
+			$result = [];
+
+			foreach ($count_rule as $key => $value) {
+				switch ($key) {
+					case 0:
+						if (!is_string($value) || $value == '') {
+							throw new Exception('[RULES ERROR] Invalid field name for "field_rules" option of "count_values" check (Path: ' . $rule_path . ')');
+						}
+
+						$field_path = $rule_path . '/' . $value;
+
+						if (!in_array($field_path, $this->existing_rule_paths)) {
+							throw new Exception('[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: ' . $rule_path . ', Field path: '. $field_path .')');
+						}
+
+						$result[0] = $value;
+						break;
+
+					case 'in':
+					case 'not_in':
+						if (!is_array($value) || self::validateInOptions($value) === false) {
+							throw new Exception('[RULES ERROR] Invalid value for rule "in" or "not_in" in "count_values" check (Path: ' . $rule_path . ', Field path: '. $count_rule[0] .')');
+						}
+
+						$result[$key] = $value;
+						break;
+
+					default:
+						throw new Exception('[RULES ERROR] Unknown count values field rule "' . $key . '" (Path: ' . $rule_path . ')');
+				}
+			}
+
+			$results[] = $result;
+		}
+
+		return $results;
+	}
+
+	private function normalizeCountValuesRules($count_rules, string $rule_path): array {
+		if (!is_array($count_rules)) {
+			throw new Exception('[RULES ERROR] Count values condition should be an array (Path: ' . $rule_path . ')');
+		}
+
+		if (array_key_exists('field_rules', $count_rules)) {
+			$count_rules = [$count_rules];
+		}
+
+		foreach ($count_rules as &$count_rule) {
+			if (!is_array($count_rule)) {
+				throw new Exception('[RULES ERROR] Count values rule should be an array (Path: ' . $rule_path . ')');
+			}
+
+			$result = [];
+
+			foreach ($count_rule as $key => $value) {
+				switch ($key) {
+					case 'field_rules':
+						if (!is_array($value)) {
+							throw new Exception('[RULES ERROR] Count values field condition should be an array (Path: ' . $rule_path . ')');
+						}
+
+						$result['field_rules'] = $this->normalizeCountValuesCountFieldRules($value, $rule_path);
+						break;
+
+					case 'min':
+					case 'max':
+						if (!is_int($value)) {
+							throw new Exception('[RULES ERROR] Rule "' . $key . '" should contain a number (Path: ' . $rule_path . ')');
+						}
+
+						$result[$key] = $value;
+						break;
+
+					case 'message':
+						$result[$key] = $value;
+						break;
+
+					default:
+						throw new Exception('[RULES ERROR] Unknown count values rule "' . $key . '" (Path: ' . $rule_path . ')');
+				}
+			}
+
+			if (!array_key_exists('field_rules', $result)) {
+				throw new Exception('[RULES ERROR] Counted field_rules is required (Path: ' . $rule_path . ')');
+			}
+
+			if (count(array_intersect(array_keys($result), ['min', 'max'])) == 0) {
+				throw new Exception('[RULES ERROR] Counted field requires min or max rule (Path: ' . $rule_path . ')');
+			}
+
+			$count_rule = $result;
+		}
+		unset($count_rule);
+
+		return $count_rules;
 	}
 
 	/**
@@ -891,6 +1022,7 @@ class CFormValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rules
+	 * @param bool   $rules['not_empty']  (optional) pass if value must be filled.
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
@@ -901,6 +1033,12 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateInt32(array $rules, &$value, ?string &$error = null): bool {
+		if (array_key_exists('not_empty', $rules) && $value === '') {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+
+			return false;
+		}
+
 		if (!self::isInt32($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
 
@@ -945,6 +1083,7 @@ class CFormValidator {
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
+	 * @param int    $rules['decimal_limit']
 	 * @param array  $rules['messages']   (optional) Error messages to use when some check fails.
 	 * @param mixed  $value
 	 * @param string $error
@@ -952,6 +1091,12 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateFloat($rules, &$value, ?string &$error = null): bool {
+		if (array_key_exists('not_empty', $rules) && $value == '') {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+
+			return false;
+		}
+
 		if (!self::is_float($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid floating-point value.'));
 
@@ -970,16 +1115,36 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('min', $rules) && bccomp($value, $rules['min']) == -1) {
+		if (array_key_exists('min', $rules) && $value < $rules['min']) {
 			$error = self::getMessage($rules, 'min', _s('This value must be no less than "%1$s".', $rules['min']));
 
 			return false;
 		}
 
-		if (array_key_exists('max', $rules) && bccomp($value, $rules['max']) == 1) {
+		if (array_key_exists('max', $rules) && $rules['max'] < $value) {
 			$error = self::getMessage($rules, 'max', _s('This value must be no greater than "%1$s".', $rules['max']));
 
 			return false;
+		}
+
+		if (array_key_exists('decimal_limit', $rules)) {
+			preg_match('/^'.ZBX_PREG_NUMBER.'/', $value, $matches);
+
+			$decimals_before_e = array_key_exists('frac', $matches)
+				? strlen($matches['frac'])
+				: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
+
+			$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
+
+			$decimal_count = max(0, $decimals_before_e - $exponent);
+
+			if ($decimal_count > $rules['decimal_limit']) {
+				$error = self::getMessage($rules, 'decimal_limit',
+					_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1095,7 +1260,10 @@ class CFormValidator {
 
 			// Some parsers may return empty string as error.
 			if ($error === '') {
-				$error = _('Invalid string.');
+				$error = match ($parser_class) {
+					CAbsoluteTimeParser::class => _('Invalid date.'),
+					default => _('Invalid string.')
+				};
 			}
 		}
 	}
@@ -1128,6 +1296,7 @@ class CFormValidator {
 	 * @param array  $rules
 	 * @param array  $rules['fields']
 	 * @param string $rules['fields'][<field_name>][<role_name>]
+	 * @param bool   $rules['not_empty']
 	 * @param mixed  $value
 	 * @param string $error
 	 * @param string $path
@@ -1212,16 +1381,24 @@ class CFormValidator {
 			];
 		}
 
-		foreach ($objects_values as $index => &$value) {
-			$path_to_test = $path.'/'.$index;
-			if (!$this->validateObject(['fields' => $rules['fields']], $value, $error, $path_to_test)) {
-				// Through the reference, give back to the caller which field failed.
-				$path = $path_to_test;
+		if (array_key_exists('fields', $rules)) {
+			foreach ($objects_values as $index => &$value) {
+				$path_to_test = $path . '/' . $index;
+				if (!$this->validateObject(['fields' => $rules['fields']], $value, $error, $path_to_test)) {
+					// Through the reference, give back to the caller which field failed.
+					$path = $path_to_test;
 
-				return false;
+					return false;
+				}
+			}
+			unset($value);
+		}
+
+		if (array_key_exists('count_values', $rules)) {
+			foreach ($rules['count_values'] as $count_rule) {
+				$this->validateObjectsCount($count_rule, $objects_values, $path);
 			}
 		}
-		unset($value);
 
 		return true;
 	}
@@ -2101,6 +2278,68 @@ class CFormValidator {
 				}
 
 				return true;
+		}
+	}
+
+	private function validateObjectsCount(array $count_rules, array $objects, string $path): void {
+		$counted_fields = [];
+		$field_names = [];
+
+		foreach ($objects as $key => $object_values) {
+			$keep = true;
+
+			foreach ($count_rules['field_rules'] as $field_count_rules) {
+				$field_names[$field_count_rules[0]] = true;
+
+				if (array_key_exists($field_count_rules[0], $object_values)) {
+					if (array_key_exists('in', $field_count_rules)) {
+						$keep = $keep && in_array($object_values[$field_count_rules[0]], $field_count_rules['in']);
+					}
+
+					if (array_key_exists('not_in', $field_count_rules)) {
+						$keep = $keep && !in_array($object_values[$field_count_rules[0]], $field_count_rules['not_in']);
+					}
+				}
+				else {
+					$keep = false;
+				}
+
+				if (!$keep) {
+					break;
+				}
+			}
+
+			if ($keep) {
+				$counted_fields[$key] = true;
+			}
+		}
+
+		$counted_fields = array_keys($counted_fields);
+		$valid_count = count($counted_fields);
+
+		if (array_key_exists('min', $count_rules) && $count_rules['min'] > count($counted_fields)) {
+			$error = array_key_exists('message', $count_rules)
+				? $count_rules['message']
+				: _s('At least %1$d items based on field "%2$s" rules', $count_rules['min'],
+					implode('", "', array_keys($field_names))
+				);
+
+			$this->addError(self::ERROR, $path, $error, self::ERROR_LEVEL_OBJECTS_COUNT);
+		}
+		elseif (array_key_exists('max', $count_rules) && $count_rules['max'] < $valid_count) {
+			$error = array_key_exists('message', $count_rules)
+				? $count_rules['message']
+				: _s('No more than %1$d items based on field "%2$s" rules', $count_rules['max'],
+					implode('", "', array_keys($field_names))
+				);
+
+			$field_name = array_keys($field_names)[0];
+
+			for ($i = $count_rules['max']; $i < $valid_count; $i++) {
+				$this->addError(self::ERROR, $path.'/'.$counted_fields[$i].'/'.$field_name, $error,
+					self::ERROR_LEVEL_OBJECTS_COUNT
+				);
+			}
 		}
 	}
 }

@@ -155,7 +155,7 @@ class CControllerItemPrototypeList extends CControllerItemPrototype {
 
 		foreach ($items as &$item) {
 			if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT,
-					ITEM_VALUE_TYPE_BINARY])) {
+					ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])) {
 				$item['trends'] = '';
 			}
 

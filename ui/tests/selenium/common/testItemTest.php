@@ -1168,8 +1168,8 @@ class testItemTest extends CWebTest {
 						 * (0)macro (1)=> (2)value
 						 */
 						$macros['actual'][] = [
-							'macro' => $columns[0]->getText(),
-							'value' => $columns[2]->getText()
+							'macro' => $columns[0]->query('tag:z-textarea-flexible')->one()->getValue(),
+							'value' => $columns[2]->query('tag:z-textarea-flexible')->one()->getValue()
 						];
 					}
 					foreach ($macros as &$array) {
