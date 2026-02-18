@@ -109,8 +109,6 @@ class CControllerDashboardList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
-		CDashboardHelper::updateEditableFlag($data['dashboards']);
-
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));
 		$this->setResponse($response);

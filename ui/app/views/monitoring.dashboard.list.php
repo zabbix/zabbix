@@ -108,8 +108,7 @@ foreach ($data['dashboards'] as $dashboard) {
 	}
 
 	$table->addRow([
-		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
-			->setEnabled($dashboard['editable']),
+		new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']),
 		new CDiv([
 			(new CLink($dashboard['name'],
 				(new CUrl('zabbix.php'))
