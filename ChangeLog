@@ -3,6 +3,7 @@ Changes for 7.4.8rc1
 New features:
 
 Bug fixes:
+..F....... [ZBX-27419] fixed dialogue not resizing properly when hiding/expanding error message details (gklavins)
 ..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype (gberzina, vmurzins)
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
 .......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
