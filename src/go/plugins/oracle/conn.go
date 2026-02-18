@@ -252,6 +252,11 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 
 	serverVersion, err := godror.ServerVersion(ctx, client)
 	if err != nil {
+		clientCloseErr := client.Close()
+		if clientCloseErr != nil {
+			log.Debugf("[%s] Error closing connection: %s", pluginName, clientCloseErr.Error())
+		}
+
 		return nil, err
 	}
 
