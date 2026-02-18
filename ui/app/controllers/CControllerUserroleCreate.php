@@ -106,7 +106,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 		if ($module_enabled) {
 			$fields += [
 				'modules' => 									'array',
-				'modules_default_access' => 					'required|in 0,1',
+				'modules_default_access' => 					'required|in 0,1'
 			];
 		}
 

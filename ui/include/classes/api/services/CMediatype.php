@@ -512,7 +512,7 @@ class CMediatype extends CApiService {
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
 			'filter' => ['type' => self::getSupportedTypes()],
-			'preservekeys' => true,
+			'preservekeys' => true
 		]);
 
 		if (count($db_mediatypes) != count($mediatypes)) {
