@@ -826,69 +826,6 @@ class CDRule extends CApiService {
 		return ['druleids' => $druleids];
 	}
 
-	private static function updateDchecks(array $drules, ?array $db_drules = null): void {
-		$ins_dchecks = [];
-		$upd_dchecks = [];
-		$del_dcheckids = [];
-
-		foreach ($drules as $drule) {
-			if (!array_key_exists('dchecks', $drule)) {
-				continue;
-			}
-
-			$db_dchecks = $db_drules !== null
-				? array_column($db_drules[$drule['druleid']]['dchecks'], null, 'dcheckid')
-				: [];
-
-			foreach ($drule['dchecks'] as $dcheck) {
-				if (array_key_exists('dcheckid', $dcheck)) {
-					$upd_dcheck = DB::getUpdatedValues('dchecks', $dcheck, $db_dchecks[$dcheck['dcheckid']]);
-
-					if ($upd_dcheck) {
-						$upd_dchecks[] = [
-							'values' => $upd_dcheck,
-							'where' => ['dcheckid' => $dcheck['dcheckid']]
-						];
-					}
-
-					unset($db_dchecks[$dcheck['dcheckid']]);
-				}
-				else {
-					$ins_dchecks[] = ['druleid' => $drule['druleid']] + $dcheck;
-				}
-			}
-
-			$del_dcheckids = array_merge($del_dcheckids, array_keys($db_dchecks));
-		}
-
-		if ($del_dcheckids) {
-			DB::delete('dservices', ['dcheckid' => $del_dcheckids]);
-			DB::delete('dchecks', ['dcheckid' => $del_dcheckids]);
-		}
-
-		if ($upd_dchecks) {
-			DB::update('dchecks', $upd_dchecks);
-		}
-
-		if ($ins_dchecks) {
-			$dcheckids = DB::insert('dchecks', $ins_dchecks);
-
-			foreach ($drules as &$drule) {
-				if (!array_key_exists('dchecks', $drule)) {
-					continue;
-				}
-
-				foreach ($drule['dchecks'] as &$dcheck) {
-					if (!array_key_exists('dcheckid', $dcheck)) {
-						$dcheck['dcheckid'] = array_shift($dcheckids);
-					}
-				}
-				unset($dcheck);
-			}
-			unset($drule);
-		}
-	}
-
 	/**
 	 * Update existing drules.
 	 *
@@ -958,6 +895,69 @@ class CDRule extends CApiService {
 		$this->addAuditBulk(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DISCOVERY_RULE, $drules, $db_drules);
 
 		return ['druleids' => $druleids];
+	}
+
+	private static function updateDchecks(array $drules, ?array $db_drules = null): void {
+		$ins_dchecks = [];
+		$upd_dchecks = [];
+		$del_dcheckids = [];
+
+		foreach ($drules as $drule) {
+			if (!array_key_exists('dchecks', $drule)) {
+				continue;
+			}
+
+			$db_dchecks = $db_drules !== null
+				? array_column($db_drules[$drule['druleid']]['dchecks'], null, 'dcheckid')
+				: [];
+
+			foreach ($drule['dchecks'] as $dcheck) {
+				if (array_key_exists('dcheckid', $dcheck)) {
+					$upd_dcheck = DB::getUpdatedValues('dchecks', $dcheck, $db_dchecks[$dcheck['dcheckid']]);
+
+					if ($upd_dcheck) {
+						$upd_dchecks[] = [
+							'values' => $upd_dcheck,
+							'where' => ['dcheckid' => $dcheck['dcheckid']]
+						];
+					}
+
+					unset($db_dchecks[$dcheck['dcheckid']]);
+				}
+				else {
+					$ins_dchecks[] = ['druleid' => $drule['druleid']] + $dcheck;
+				}
+			}
+
+			$del_dcheckids = array_merge($del_dcheckids, array_keys($db_dchecks));
+		}
+
+		if ($del_dcheckids) {
+			DB::delete('dservices', ['dcheckid' => $del_dcheckids]);
+			DB::delete('dchecks', ['dcheckid' => $del_dcheckids]);
+		}
+
+		if ($upd_dchecks) {
+			DB::update('dchecks', $upd_dchecks);
+		}
+
+		if ($ins_dchecks) {
+			$dcheckids = DB::insert('dchecks', $ins_dchecks);
+
+			foreach ($drules as &$drule) {
+				if (!array_key_exists('dchecks', $drule)) {
+					continue;
+				}
+
+				foreach ($drule['dchecks'] as &$dcheck) {
+					if (!array_key_exists('dcheckid', $dcheck)) {
+						$dcheck['dcheckid'] = array_shift($dcheckids);
+					}
+				}
+				unset($dcheck);
+			}
+			unset($drule);
+		}
 	}
 
 	/**
