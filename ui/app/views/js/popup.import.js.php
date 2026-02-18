@@ -138,19 +138,21 @@ window.popup_import = new class {
 				{
 					title: <?= json_encode(_('OK')) ?>,
 					focused: true,
-					action: function() {
+					action: () => {
 						if (compare_overlay !== undefined) {
 							overlayDialogueDestroy(compare_overlay.dialogueid);
 						}
-						popup_import.submitImportPopup();
+
+						this.submitImportPopup();
 					}
 				},
 				{
 					title: <?= json_encode(_('Cancel')) ?>,
 					cancel: true,
 					class: '<?= ZBX_STYLE_BTN_ALT ?>',
-					action: function() {
-						(compare_overlay || popup_import.overlay).unsetLoading();
+					action: () => {
+						(compare_overlay || this.#overlay).unsetLoading();
+
 						return true;
 					}
 				}
