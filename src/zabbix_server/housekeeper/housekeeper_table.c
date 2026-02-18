@@ -356,7 +356,7 @@ void	housekeeper_process(int config_max_hk_delete, int *deleted_history, int *de
 						EVENT_OBJECT_SERVICE, config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_DHOST:
-				*deleted_events += hk_problem_cleanup(&ids[object],"events", EVENT_SOURCE_DISCOVERY,
+				*deleted_events += hk_problem_cleanup(&ids[object], "events", EVENT_SOURCE_DISCOVERY,
 						EVENT_OBJECT_DHOST, config_max_hk_delete, &deleteids);
 				break;
 			case ZBX_HK_OBJECT_DSERVICE:
