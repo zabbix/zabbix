@@ -72,7 +72,7 @@ class CDocHelper {
 	const DATA_COLLECTION_HOST_TRIGGERS_LIST =					'web_interface/frontend_sections/data_collection/hosts/triggers';
 	const DATA_COLLECTION_HOST_TRIGGER_PROTOTYPE_LIST =			'web_interface/frontend_sections/data_collection/hosts/discovery/trigger_prototypes';
 	const DATA_COLLECTION_HOST_WIZARD =							'config/hosts/host_wizard';
-	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host#creating-a-host-group';
+	const DATA_COLLECTION_HOSTGROUPS_EDIT =						'config/hosts/host_groups#configuration';
 	const DATA_COLLECTION_HOSTGROUPS_LIST =						'web_interface/frontend_sections/data_collection/hostgroups';
 	const DATA_COLLECTION_HTTPCONF_EDIT =						'web_monitoring#configuring-a-web-scenario';
 	const DATA_COLLECTION_ITEM_EDIT =							'config/items/item#configuration';
@@ -121,6 +121,7 @@ class CDocHelper {
 	const MONITORING_WEB_VIEW =									'web_interface/frontend_sections/monitoring/hosts/web';
 	const POPUP_ACKNOWLEDGMENT_EDIT =							'acknowledgment#updating-problems';
 	const POPUP_CONNECTOR_EDIT =								'config/export/streaming#configuration';
+	const POPUP_DASHBOARD_IMPORT =								'xml_export_import/dashboards#importing';
 	const POPUP_HOST_IMPORT =									'xml_export_import/hosts#importing';
 	const POPUP_HTTP_STEP_EDIT =								'web_monitoring#configuring-steps';
 	const POPUP_MAPS_IMPORT =									'xml_export_import/maps#importing';
