@@ -810,9 +810,18 @@ class CDRule extends CApiService {
 			$drule['druleid'] = $druleids[$index];
 		});
 
-		self::updateDchecks($drules);
-
 		$this->addAuditBulk(CAudit::ACTION_ADD, CAudit::RESOURCE_DISCOVERY_RULE, $drules);
+
+		$create_dchecks = [];
+
+		foreach ($drules as $dnum => $drule) {
+			foreach ($drule['dchecks'] as $dcheck) {
+				$dcheck['druleid'] = $druleids[$dnum];
+				$create_dchecks[] = $dcheck;
+			}
+		}
+
+		DB::insert('dchecks', $create_dchecks);
 
 		return ['druleids' => $druleids];
 	}
