@@ -15,7 +15,7 @@
 #ifndef ZABBIX_ZBXAUDIT_H
 #define ZABBIX_ZBXAUDIT_H
 
-#include "zbxjson.h"
+#include "zbxalgo.h"
 #include "zbxdb.h"
 
 /* audit logging mode */
@@ -116,14 +116,14 @@ int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const c
 
 typedef struct zbx_audit_entry
 {
-	zbx_uint64_t	id;
-	char		*cuid;
-	int		id_table;
-	char		*name;
-	struct zbx_json	details_json;
-	int		audit_action;
-	int		resource_type;
-	char		audit_cuid[CUID_LEN];
+	zbx_uint64_t		id;
+	char			*cuid;
+	int			id_table;
+	char			*name;
+	zbx_vector_str_t	details;
+	int			audit_action;
+	int			resource_type;
+	char			audit_cuid[CUID_LEN];
 }
 zbx_audit_entry_t;
 
