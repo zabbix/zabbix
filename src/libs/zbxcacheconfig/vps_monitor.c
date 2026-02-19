@@ -178,6 +178,32 @@ void	zbx_vps_monitor_get_stats(zbx_vps_monitor_stats_t *stats)
 	stats->overcommit_limit = monitor->overcommit_limit;
 }
 
+void	zbx_vps_monitor_stats_ext_get_data(struct zbx_json *json, const void *arg)
+{
+	zbx_vps_monitor_stats_t	stats;
+
+	ZBX_UNUSED(arg);
+
+	zbx_vps_monitor_get_stats(&stats);
+
+	zbx_json_addobject(json, "vps");
+	zbx_json_adduint64(json, "status", (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0));
+	zbx_json_adduint64(json, "written_total", stats.written_num);
+	zbx_json_adduint64(json, "limit", stats.values_limit);
+
+	if (0 != stats.values_limit)
+	{
+		zbx_json_addobject(json, "overcommit");
+		zbx_json_adduint64(json, "limit", stats.overcommit_limit);
+		zbx_json_adduint64(json, "available", stats.overcommit_limit - stats.overcommit);
+		zbx_json_addfloat(json, "pavailable", (double)(stats.overcommit_limit - stats.overcommit) *
+				100 / stats.overcommit_limit);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: return data collection status string to append to process title   *
