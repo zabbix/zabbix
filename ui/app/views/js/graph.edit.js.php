@@ -509,9 +509,9 @@ window.graph_edit_popup = new class {
 			tbody.querySelector(`input[name="items[${number}][gitemid]"]`).remove();
 			const button_row = document.getElementById('item-buttons-row');
 
-			for (const row of tbody.children) {
+			tbody.querySelectorAll('tr').forEach(row => {
 				button_row.parentNode.insertBefore(row, button_row);
-			}
+			});
 		}
 	}
 
@@ -524,6 +524,8 @@ window.graph_edit_popup = new class {
 
 		this.form.findFieldByName('graphid').getField().remove();
 		this.graph.graphid = 0;
+
+		this.form.release();
 
 		reloadPopup(this.form_element, this.action);
 	}
