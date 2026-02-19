@@ -142,7 +142,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'service' => $this->service,
-			'inaccessible_service' => $this->inaccessible_service,
+			'inaccessible_service' => $this->inaccessible_service
 		];
 
 		if ($this->service !== null && !$filter['filter_set']) {
