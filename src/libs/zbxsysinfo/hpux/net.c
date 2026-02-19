@@ -24,6 +24,12 @@
 #include <sys/dlpi_ext.h>
 #include <sys/mib.h>
 
+#if defined(__ia64) && HPUX_VERSION < 1131
+#	define _NET_NETMP_INCLUDED 1
+#	include <net/if.h>
+#	include <net/if6.h>
+#endif
+
 static char	buf_ctl[1024];
 
 /* Low Level Discovery needs a way to get the list of network interfaces available */
