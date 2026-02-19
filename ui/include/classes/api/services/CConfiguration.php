@@ -347,6 +347,13 @@ class CConfiguration extends CApiService {
 
 		$validator = new CImportValidator($import_validator_factory, $params['format']);
 
+		$config = APP::Component()->get('config');
+		$denied_media_types = $config->getMediaTypeFlag();
+
+		if (is_array($denied_media_types)) {
+			$validator->setDeniedMediaTypes($denied_media_types);
+		}
+
 		$data = $validator
 			->setStrict(true)
 			->validate($data, '/');

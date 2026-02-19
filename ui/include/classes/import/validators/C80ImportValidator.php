@@ -410,6 +410,14 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
 	];
 
+	public function setDeniedMediaTypes (array $denied_media_types)	{
+		$all_media_types = array_change_key_case(array_flip($this->MEDIA_TYPE));
+		$supported_media_types = array_diff_key($all_media_types, array_flip($denied_media_types));
+		$supported_media_types = array_flip(array_change_key_case($supported_media_types, 1));
+
+		$this->MEDIA_TYPE = $supported_media_types;
+	}
+
 	private $MEDIA_PROVIDER = [
 		CXmlConstantValue::GENERIC_SMTP => CXmlConstantName::GENERIC_SMTP,
 		CXmlConstantValue::GMAIL => CXmlConstantName::GMAIL,
@@ -588,27 +596,6 @@ class C80ImportValidator extends CImportValidatorGeneral {
 	 * @return array
 	 */
 	public function getSchema() {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$media_type_enabled = $config->getMediaTypeFlag();
-
-		if ($media_type_enabled != null) {
-			$all_media_types = array_change_key_case(array_flip($this->MEDIA_TYPE));
-			$supported_media_types = array_diff_key($all_media_types, array_flip($media_type_enabled));
-			$supported_media_types = array_flip(array_change_key_case($supported_media_types, 1));
-		}
-
-		if (empty($media_type_enabled)) {
-			$specific_rules = [
-				'type' =>	['type' => XML_STRING | XML_REQUIRED, 'in' => $this->MEDIA_TYPE]
-			];
-		}
-		else {
-			$specific_rules = [
-				'type' =>	['type' => XML_STRING | XML_REQUIRED, 'in' => $supported_media_types]
-			];
-		}
-
 		return ['type' => XML_ARRAY, 'rules' => [
 			'version' =>				['type' => XML_STRING | XML_REQUIRED],
 			'host_groups' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'host_group', 'rules' => [
@@ -3368,8 +3355,9 @@ class C80ImportValidator extends CImportValidatorGeneral {
 				]]
 			]],
 			'media_types' =>			['type' => XML_INDEXED_ARRAY, 'prefix' => 'media_type', 'rules' => [
-				'media_type' =>				['type' => XML_ARRAY, 'rules' => $specific_rules + [
+				'media_type' =>				['type' => XML_ARRAY, 'rules' => [
 					'name' =>					['type' => XML_STRING | XML_REQUIRED],
+					'type' =>					['type' => XML_STRING | XML_REQUIRED, 'in' => $this->MEDIA_TYPE],
 					'provider' =>				['type' => XML_STRING, 'in' => $this->MEDIA_PROVIDER, 'default' => '0'],
 					'smtp_server' =>			['type' => XML_STRING, 'default' => ''],
 					'smtp_port' =>				['type' => XML_STRING, 'default' => '25'],
