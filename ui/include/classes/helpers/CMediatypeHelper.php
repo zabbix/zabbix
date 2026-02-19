@@ -149,13 +149,13 @@ class CMediatypeHelper {
 	public static function getSupportedMediaTypes() {
 		/** @var CConfigFile $config */
 		$config = APP::Component()->get('config');
-		$media_type_enabled = $config->getMediaTypeFlag();
+		$denied_media_types = $config->getMediaTypeFlag();
 
 		$types = self::getMediaTypes();
 
-		if ($media_type_enabled != null) {
+		if (is_array($denied_media_types)) {
 			$media_types = array_change_key_case(array_flip($types));
-			$supported_media_types = array_diff_key($media_types, array_flip($media_type_enabled));
+			$supported_media_types = array_diff_key($media_types, array_flip($denied_media_types));
 			$types = array_intersect_key($types, array_flip($supported_media_types));
 		}
 

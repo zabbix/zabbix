@@ -23,12 +23,12 @@ $this->includeJsFile('mediatype.list.js.php');
 
 /** @var CConfigFile $config */
 $config = APP::Component()->get('config');
-$media_type_enabled = $config->getMediaTypeFlag();
+$denied_media_types = $config->getMediaTypeFlag();
 
 $all_media_types = ['sms', 'email', 'script', 'webhook'];
 
-if ($media_type_enabled !== null) {
-	$allowed_media_types = (array_diff($all_media_types, $media_type_enabled) != []);
+if (is_array($denied_media_types)) {
+	$allowed_media_types = (array_diff($all_media_types, $denied_media_types) != []);
 }
 else {
 	$allowed_media_types = true;
@@ -197,18 +197,27 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
-		? (new CSpan(_('Enabled')))
-			->addClass(ZBX_STYLE_GREEN)
-			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
-		: (new CSpan(_('Disabled')))
-			->addClass(ZBX_STYLE_RED)
-			->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
-
 	if (in_array($media_type['type'], $supported_types)) {
-		$status
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'] ? 'js-disable' : 'js-enable');
+		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
+			? (new CLink(_('Enabled')))
+				->addClass(ZBX_STYLE_GREEN)
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass('js-disable')
+			: (new CLink(_('Disabled')))
+				->addClass(ZBX_STYLE_RED)
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass('js-enable');
+	}
+	else {
+		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
+			? (new CSpan(_('Enabled')))
+				->addClass(ZBX_STYLE_GREEN)
+				->setAttribute('data-mediatypeid', (int)$media_type['mediatypeid'])
+			: (new CSpan(_('Disabled')))
+				->addClass(ZBX_STYLE_RED)
+				->setAttribute('data-mediatypeid', (int)$media_type['mediatypeid']);
 	}
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))

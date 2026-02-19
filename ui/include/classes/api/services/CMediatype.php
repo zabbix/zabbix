@@ -400,12 +400,12 @@ class CMediatype extends CApiService {
 	public function create(array $mediatypes): array {
 		/** @var CConfigFile $config */
 		$config = APP::Component()->get('config');
-		$media_type_enabled = $config->getMediaTypeFlag();
+		$denied_media_types = $config->getMediaTypeFlag();
 
 		$all_media_types = ['sms', 'email', 'script', 'webhook'];
 
-		if ($media_type_enabled !== null) {
-			$allowed_media_types = (array_diff($all_media_types, $media_type_enabled) != []);
+		if (is_array($denied_media_types)) {
+			$allowed_media_types = (array_diff($all_media_types, $denied_media_types) != []);
 		}
 		else {
 			$allowed_media_types = true;
@@ -539,9 +539,9 @@ class CMediatype extends CApiService {
 
 		/** @var CConfigFile $config */
 		$config = APP::Component()->get('config');
-		$media_type_enabled = $config->getMediaTypeFlag();
+		$denied_media_types = $config->getMediaTypeFlag();
 
-		$specific_fields += $media_type_enabled === null
+		$specific_fields += (!is_array($denied_media_types))
 			? [
 				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])]
 			]
@@ -571,7 +571,7 @@ class CMediatype extends CApiService {
 	private static function getSupportedTypes(): array {
 		/** @var CConfigFile $config */
 		$config = APP::Component()->get('config');
-		$media_type_enabled = $config->getMediaTypeFlag();
+		$denied_media_types = $config->getMediaTypeFlag();
 
 		$all_types = [
 			MEDIA_TYPE_EMAIL => 'email',
@@ -580,11 +580,11 @@ class CMediatype extends CApiService {
 			MEDIA_TYPE_WEBHOOK => 'webhook'
 		];
 
-		if ($media_type_enabled === null) {
+		if (!is_array($denied_media_types)) {
 			return array_flip($all_types);
 		}
 		else {
-			return array_diff_key(array_flip($all_types), array_flip($media_type_enabled));
+			return array_diff_key(array_flip($all_types), array_flip($denied_media_types));
 		}
 	}
 
