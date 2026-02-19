@@ -36,6 +36,7 @@
 #define	ZBX_TYPE_LONGTEXT	8
 #define ZBX_TYPE_CUID		9
 #define	ZBX_TYPE_SERIAL		10
+#define ZBX_TYPE_JSON		11
 
 #define ZBX_MAX_FIELDS		73 /* maximum number of fields in a table plus one for null terminator in dbschema.c */
 #define ZBX_TABLENAME_LEN	26
