@@ -286,6 +286,18 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
+	 * Format global dashboards.
+	 *
+	 * @param array $schema      Tag schema from validation class.
+	 * @param array $dashboards  Export data.
+	 */
+	public function buildDashboards(array $schema, array $dashboards): void {
+		$dashboards = $this->formatDashboards($dashboards);
+
+		$this->data['dashboards'] = self::build($schema, $dashboards, 'dashboards');
+	}
+
+	/**
 	 * Separate simple triggers.
 	 *
 	 * @param array $triggers
@@ -343,7 +355,7 @@ class CConfigurationExportBuilder {
 				'httptests' => $this->formatHttpTests($template['httptests']),
 				'macros' => $this->formatTemplateMacros($template['macros']),
 				'templates' => $this->formatTemplateLinkage($template['parentTemplates']),
-				'dashboards' => $this->formatDashboards($template['dashboards']),
+				'dashboards' => $this->formatTemplateDashboards($template['dashboards']),
 				'tags' => $this->formatTags($template['tags']),
 				'valuemaps' => $this->formatValueMaps($template['valuemaps'])
 			];
@@ -1382,13 +1394,37 @@ class CConfigurationExportBuilder {
 	}
 
 	/**
-	 * Format dashboards.
+	 * Format global dashboards.
 	 *
 	 * @param array $dashboards
 	 *
 	 * @return array
 	 */
 	protected function formatDashboards(array $dashboards) {
+		$result = [];
+
+		CArrayHelper::sort($dashboards, ['name']);
+
+		foreach ($dashboards as $dashboard) {
+			$result[] = [
+				'name' => $dashboard['name'],
+				'display_period' => $dashboard['display_period'],
+				'auto_start' => $dashboard['auto_start'],
+				'pages' => $this->formatDashboardPages($dashboard['pages'])
+			];
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Format template dashboards.
+	 *
+	 * @param array $dashboards
+	 *
+	 * @return array
+	 */
+	protected function formatTemplateDashboards(array $dashboards): array {
 		$result = [];
 
 		CArrayHelper::sort($dashboards, ['name']);
@@ -1498,6 +1534,10 @@ class CConfigurationExportBuilder {
 			}
 
 			switch ($widget_field_a['type']) {
+				case ZBX_WIDGET_FIELD_TYPE_GROUP:
+					$value_fields = ['name'];
+					break;
+
 				case ZBX_WIDGET_FIELD_TYPE_HOST:
 					$value_fields = ['host'];
 					break;
