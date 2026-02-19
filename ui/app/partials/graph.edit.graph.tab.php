@@ -132,7 +132,9 @@ $graph_tab->addItem([
 	(new CFormField([
 		$percent_left_checkbox,
 		NBSP(),
-		(new CTextBox('percent_left', $data['percent_left'], $data['readonly'], 7))
+		(new CTextBox('percent_left', $data['percent_left'] == 0 ? '' : $data['percent_left'],
+			$data['readonly'], 7
+		))
 			->setId('percent_left')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]))->setId('percent_left_field')
@@ -157,7 +159,9 @@ $graph_tab->addItem([
 	(new CFormField([
 		$percent_right_checkbox,
 		NBSP(),
-		(new CTextBox('percent_right', $data['percent_right'], $data['readonly'], 7))
+		(new CTextBox('percent_right', $data['percent_right'] == 0 ? '' : $data['percent_right'],
+			$data['readonly'], 7
+		))
 			->setId('percent_right')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]))->setId('percent_right_field')
