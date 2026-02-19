@@ -50,6 +50,7 @@ abstract class CControllerServiceListGeneral extends CController {
 				$this->service = $db_service[0];
 			}
 			else {
+				error(_('No permissions to referred object or it does not exist!'));
 				$this->inaccessible_service = true;
 			}
 		}

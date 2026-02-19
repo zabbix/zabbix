@@ -144,14 +144,7 @@ $page = (new CHtmlPage())
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	);
 
-if ($data['inaccessible_service']) {
-	$page->addItem(
-		(new CTag('output'))
-			->addItem(new CSpan(_('Inaccessible service')))
-			->addClass(ZBX_STYLE_MSG_BAD)
-	);
-}
-else {
+if (!$data['inaccessible_service']) {
 	$page
 		->addItem($filter)
 		->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
