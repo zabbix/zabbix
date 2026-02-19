@@ -173,7 +173,8 @@ $yaxis_min_type = (new CSelect('ymin_type'))
 	]))
 	->setReadonly($data['readonly'])
 	->setFocusableElementId('ymin_type_label')
-	->addClass('yaxis-select');
+	->addClass('yaxis-select')
+	->addClass('align-top');
 
 $yaxis_min_value = (new CDiv(
 	(new CTextBox('yaxismin', $data['yaxismin'], $data['readonly']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -254,7 +255,8 @@ $yaxis_max_type = (new CSelect('ymax_type'))
 	]))
 	->setReadonly($data['readonly'])
 	->setFocusableElementId('ymax_type_label')
-	->addClass('yaxis-select');
+	->addClass('yaxis-select')
+	->addClass('align-top');
 
 $yaxis_max_value = (new CDiv(
 	(new CTextBox('yaxismax', $data['yaxismax'], $data['readonly']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -323,9 +325,7 @@ $graph_tab
 		(new CLabel(_('Y axis MAX value'), 'ymax_type_label')),
 		(new CFormField([
 			$yaxis_max_type, $yaxis_max_value, $yaxis_max_itemid, $yaxis_max_item_prototpye
-		]))
-			->setId('yaxis_max_field')
-			->addClass('align-top')
+		]))->setId('yaxis_max_field')
 	])
 	->addItem([
 		new CLabel(_('3D view')),
@@ -387,9 +387,9 @@ $graph_tab->addItem([
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('data-field-type', 'set')
 			->setAttribute('data-field-name', 'items')
-			->setAttribute('data-error-container', 'items_error_container'),
+			->setAttribute('data-error-container', 'items-error-container'),
 		)
-		->addItem((new CDiv())->setId('items_error_container'))
+		->addItem((new CDiv())->setId('items-error-container'))
 	),
 	getItemTemplateNormal($data['readonly'], $graph_item_drawtypes),
 	getItemTemplateStacked($data['readonly']),
