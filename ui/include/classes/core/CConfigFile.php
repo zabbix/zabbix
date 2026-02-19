@@ -193,7 +193,7 @@ class CConfigFile {
 		}
 
 		if (isset($ALLOW_HTTP_AUTH) && isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
-			self::exception('Can not use both $ALLOW_HTTP_AUTH and $ZBX_FEATURE_FLAGS at the same time.');
+			self::exception(_('Can not use both $ALLOW_HTTP_AUTH and $ZBX_FEATURE_FLAGS at the same time.'));
 		}
 
 		if (isset($ZBX_FEATURE_FLAGS) && is_array($ZBX_FEATURE_FLAGS)) {
