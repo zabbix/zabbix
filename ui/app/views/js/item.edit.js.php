@@ -561,37 +561,7 @@ window.item_edit_form = new class {
 			delay_flex.push(values.delay_flex[key]);
 		}
 
-		const query_fields = [];
-		for (let key in values.query_fields) {
-			let {name, value} = values.query_fields[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			query_fields.push({name, value});
-		}
-
-		const parameters = [];
-		for (let key in values.parameters) {
-			let {name, value} = values.parameters[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			parameters.push({name, value});
-		}
-
-		const headers = [];
-		for (let key in values.headers) {
-			let {name, value} = values.headers[key];
-
-			if (name === '' && value === '') {
-				continue;
-			}
-			headers.push({name, value});
-		}
-
-		return {...values, ...{query_fields, headers, delay_flex, parameters}};
+		return {...values, ...{delay_flex}};
 	}
 
 	#post(url, data, keep_open = false) {
