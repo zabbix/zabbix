@@ -117,7 +117,7 @@ $filter->addFilterTab(_('Filter'), [
 		])
 ]);
 
-(new CHtmlPage())
+$page = (new CHtmlPage())
 	->setTitle(_('Services'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SERVICE_EDIT))
 	->setControls(
@@ -142,13 +142,25 @@ $filter->addFilterTab(_('Filter'), [
 	)
 	->setNavigation(
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
-	)
-	->addItem($filter)
-	->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
-		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
-		'paging', 'back_url'
-	]))))
-	->show();
+	);
+
+if ($data['inaccessible_service']) {
+	$page->addItem(
+		(new CTag('output'))
+			->addItem(new CSpan(_('Inaccessible service')))
+			->addClass(ZBX_STYLE_MSG_BAD)
+	);
+}
+else {
+	$page
+		->addItem($filter)
+		->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
+			'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
+			'paging', 'back_url'
+		]))));
+}
+
+$page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
