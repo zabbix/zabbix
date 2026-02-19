@@ -83,9 +83,7 @@ if (hasRequest('cancel') || hasRequest('finish')) {
 	redirect('index.php');
 }
 
-$config_file = 'conf/zabbix.conf.php';
-
-if (CWebUser::$data && file_exists($config_file)) {
+if (file_exists(APP::getRootDir().CConfigFile::CONFIG_FILE_PATH)) {
 	access_deny(ACCESS_DENY_PAGE);
 }
 
