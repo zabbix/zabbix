@@ -22,8 +22,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"syscall"
-	"unsafe"
 
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
@@ -34,6 +32,7 @@ import (
 const (
 	errorCannotFindIf = "Cannot find information for this network interface in /proc/net/dev."
 	netDevFilepath    = "/proc/net/dev"
+	netDevStatsCount  = 16
 
 	siocGiwStats = 0x8B0F
 	siocGiwRange = 0x8B0B
@@ -140,6 +139,7 @@ func init() { //nolint:gochecknoinits // legacy implementation
 	}
 
 	impl.netDevFilepath = netDevFilepath
+	impl.netDevStatsCount = netDevStatsCount
 }
 
 // Export implements plugin.Exporter interface.
@@ -278,8 +278,53 @@ func parseUintPointer(s string) *uint64 {
 	return &val
 }
 
+// ifRowScan scans one line from /proc/net/dev representing network interface.
+func (p *Plugin) ifRowScan(line string) (string, []uint64, error) {
+	dev := strings.Split(line, ":")
+
+	/* should never happen */
+	if len(dev) == 1 {
+		return "", nil, errs.Errorf(
+			"cannot read interface name from of \"%s\"",
+			p.netDevFilepath,
+		)
+
+	}
+
+	name := strings.TrimSpace(dev[0])
+	stats := strings.Fields(dev[1])
+
+	/* should never happen */
+	if len(stats) != p.netDevStatsCount {
+		return name, nil, errs.Errorf(
+			"unexpected number of %d values read from \"%s\" for interface \"%s\"",
+			len(stats),
+			p.netDevFilepath,
+			name,
+		)
+	}
+
+	ui64 := make([]uint64, 0, len(stats)-1)
+
+	for i, s := range stats {
+		n, err := strconv.ParseUint(s, 10, 64)
+		if err != nil {
+			/* should never happen */
+			return name, nil, errs.Errorf(
+				"could convert to integer just %d values from \"%s\" for interface \"%s\"",
+				i,
+				p.netDevFilepath,
+				name,
+			)
+		}
+		ui64 = append(ui64, n)
+	}
+
+	return name, ui64, nil
+}
+
 // getIfGet retrieves interface data.
-func (p *Plugin) getIfGet(rgx *regexp.Regexp) (netIfResult, error) {
+func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 	var result netIfResult
 
 	parser := procfs.NewParser().
@@ -289,35 +334,32 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (netIfResult, error) {
 
 	data, err := parser.Parse(p.netDevFilepath)
 	if err != nil {
-		return result, errs.Wrapf(err, "failed to parse file %s", p.netDevFilepath)
+		return nil, errs.Wrapf(err, "failed to parse file \"%s\"", p.netDevFilepath)
 	}
 
 	result.Config = make([]ifConfigData, 0)
 	result.Values = make([]IfValuesData, 0)
 
 	for _, line := range data {
-		dev := strings.Split(line, ":")
-		ifName := strings.TrimSpace(dev[0])
+		ifName, stats, err := p.ifRowScan(line)
+		if err != nil {
+			return nil, errs.Wrapf(err, "failed to parse file \"%s\"", p.netDevFilepath)
+		}
 
 		if rgx != nil && !rgx.MatchString(ifName) {
 			continue
 		}
 
-		stats := strings.Fields(dev[1])
-		if len(stats) < 16 {
-			continue
-		}
-
 		conf, val := p.getInterfaceMetrics(ifName, stats)
-		result.Config = append(result.Config, conf)
-		result.Values = append(result.Values, val)
+		result.Config = append(result.Config, *conf)
+		result.Values = append(result.Values, *val)
 	}
 
-	return result, nil
+	return &result, nil
 }
 
 // returns single interface config and values.
-func (p *Plugin) getInterfaceMetrics(ifName string, stats []string) (ifConfigData, IfValuesData) {
+func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigData, *IfValuesData) {
 	var admState, operState *string
 
 	iface, err := net.InterfaceByName(ifName)
@@ -337,10 +379,6 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []string) (ifConfigDat
 		operState = &oper
 	}
 
-	wData := p.getWirelessDetails(ifName)
-
-	autoneg := p.getAutoneg(ifName)
-
 	speedPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "speed"))
 	typePtr := parseUintPointer(p.fillNetIfGetParams(ifName, "type"))
 	carrierPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "carrier"))
@@ -349,239 +387,40 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []string) (ifConfigDat
 		Ifname:      ifName,
 		Ifalias:     p.fillNetIfGetParams(ifName, "ifalias"),
 		Ifmac:       p.fillNetIfGetParams(ifName, "address"),
-		IfOperState: operState,
+		Iftype:      typePtr,
+		Ifspeed:     speedPtr,
+		Ifduplex:    p.fillNetIfGetParams(ifName, "duplex"),
 		IfAdmState:  admState,
+		IfOperState: operState,
 	}
 
 	values := IfValuesData{
-		Ifname:  ifName,
-		Ifalias: p.fillNetIfGetParams(ifName, "ifalias"),
-		Ifmac:   p.fillNetIfGetParams(ifName, "address"),
-		Iftype:  typePtr,
-
-		In: IfStatistics{
-			Ifbytes:      parseUintPointer(stats[0]),
-			Ifpackets:    parseUintPointer(stats[1]),
-			Iferrors:     parseUintPointer(stats[2]),
-			Ifdropped:    parseUintPointer(stats[3]),
-			Ifoverrruns:  parseUintPointer(stats[4]),
-			Ifframe:      parseUintPointer(stats[5]),
-			Ifcompressed: parseUintPointer(stats[6]),
-			Ifmulticast:  parseUintPointer(stats[7]),
+		Ifname:    ifName,
+		Ifalias:   p.fillNetIfGetParams(ifName, "ifalias"),
+		Ifmac:     p.fillNetIfGetParams(ifName, "address"),
+		Iftype:    typePtr,
+		Ifcarrier: carrierPtr,
+		StatsIn: ifStatsIn{
+			Bytes:      stats[0],
+			Packets:    stats[1],
+			Err:        stats[2],
+			Drop:       stats[3],
+			Fifo:       stats[4],
+			Frame:      stats[5],
+			Compressed: stats[6],
+			Multicast:  stats[7],
 		},
-		Out: IfStatistics{
-			Ifbytes:      parseUintPointer(stats[8]),
-			Ifpackets:    parseUintPointer(stats[9]),
-			Iferrors:     parseUintPointer(stats[10]),
-			Ifdropped:    parseUintPointer(stats[11]),
-			Ifoverrruns:  parseUintPointer(stats[12]),
-			Ifcollisions: parseUintPointer(stats[13]),
-			Ifcarrier:    parseUintPointer(stats[14]),
-			Ifcompressed: parseUintPointer(stats[15]),
+		StatsOut: ifStatsOut{
+			Bytes:      stats[8],
+			Packets:    stats[9],
+			Err:        stats[10],
+			Drop:       stats[11],
+			Colls:      stats[12],
+			Fifo:       stats[13],
+			Carrier:    stats[14],
+			Compressed: stats[15],
 		},
-		Ifcarrier:     carrierPtr,
-		Ifnegotiation: autoneg,
-		Ifduplex:      p.fillNetIfGetParams(ifName, "duplex"),
-		Ifspeed:       speedPtr,
-		Ifslevel:      wData.level,
-		Iflquality:    wData.qual,
-		Ifnoiselevel:  wData.noise,
-		Ifssid:        wData.ssid,
-		Ifbitrate:     wData.bitrate,
 	}
 
-	return config, values
-}
-
-// retrieves interface wireless metrics using IOCTLs.
-func (p *Plugin) getWirelessDetails(ifName string) *wirelessData {
-	out := &wirelessData{}
-
-	if len(ifName) >= ifNamSiz {
-		return out
-	}
-
-	fd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, 0)
-	if err != nil {
-		return out
-	}
-
-	//nolint:errcheck
-	defer syscall.Close(fd)
-
-	out.level, out.noise, out.qual = p.getWirelessStatsAndRange(fd, ifName)
-	out.ssid = p.getWirelessSSID(fd, ifName)
-	out.bitrate = p.getWirelessBitrate(fd, ifName)
-
-	return out
-}
-
-func (*Plugin) getWirelessStatsAndRange(fd int, ifName string) (*int64, *int64, *int64) {
-	var (
-		stats  iwStats
-		wr     iwreq
-		wrange iwRange
-	)
-
-	//nolint:gosec
-	wr.Data = iwPoint{Pointer: uintptr(unsafe.Pointer(&stats)), Length: uint16(unsafe.Sizeof(stats)), Flags: 1}
-
-	copy(wr.Name[:], ifName)
-
-	//nolint:gosec
-	_, _, errno := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		uintptr(fd),
-		siocGiwStats,
-		uintptr(unsafe.Pointer(&wr)),
-	)
-
-	if errno != 0 {
-		return nil, nil, nil
-	}
-
-	l := int64(stats.Qual.Level)
-	n := int64(stats.Qual.Noise)
-
-	if stats.Qual.Updated&iwQualDbm != 0 {
-		l -= 256
-		n -= 256
-	}
-
-	level := &l
-	noise := &n
-
-	//nolint:gosec
-	wr.Data.Pointer = uintptr(unsafe.Pointer(&wrange))
-	wr.Data.Length = uint16(unsafe.Sizeof(wrange))
-	wr.Data.Flags = 0
-
-	//nolint:gosec
-	_, _, errnoRange := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		uintptr(fd),
-		siocGiwRange,
-		uintptr(unsafe.Pointer(&wr)),
-	)
-
-	q := int64(stats.Qual.Qual)
-
-	if errnoRange == 0 && wrange.MaxQual.Qual != 0 {
-		q = (q * 100) / int64(wrange.MaxQual.Qual)
-	}
-
-	qual := &q
-
-	return level, noise, qual
-}
-
-func (*Plugin) getWirelessSSID(fd int, ifName string) *string {
-	var (
-		buf [iwEssidMax + 1]byte
-		wr  iwreq
-	)
-
-	copy(wr.Name[:], ifName)
-
-	//nolint:gosec
-	wr.Data.Pointer = uintptr(unsafe.Pointer(&buf[0]))
-	wr.Data.Length = uint16(len(buf))
-	wr.Data.Flags = 0
-
-	//nolint:gosec
-	_, _, errno := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		uintptr(fd),
-		siocGiwEssid,
-		uintptr(unsafe.Pointer(&wr)),
-	)
-
-	if errno != 0 {
-		return nil
-	}
-
-	length := int(wr.Data.Length)
-	length = min(length, len(buf))
-
-	if length > 0 {
-		s := strings.TrimRight(string(buf[:length]), "\x00")
-		if s != "" {
-			return &s
-		}
-	}
-
-	return nil
-}
-
-func (*Plugin) getWirelessBitrate(fd int, ifName string) *int64 {
-	var (
-		rate iwParam
-		wr   iwreq
-	)
-
-	copy(wr.Name[:], ifName)
-
-	//nolint:gosec
-	wr.Data.Pointer = uintptr(unsafe.Pointer(&rate))
-	wr.Data.Flags = 0
-
-	//nolint:gosec
-	_, _, errno := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		uintptr(fd),
-		siocGiwRate,
-		uintptr(unsafe.Pointer(&wr)),
-	)
-
-	if errno != 0 {
-		return nil
-	}
-
-	val := int64(rate.Value) / 1000000
-
-	return &val
-}
-
-// retrieves autonegotiation using SIOCETHTOOL.
-func (*Plugin) getAutoneg(ifName string) *string {
-	if len(ifName) >= ifNamSiz {
-		return nil
-	}
-
-	fd, err := syscall.Socket(syscall.AF_INET, syscall.SOCK_DGRAM, 0)
-	if err != nil {
-		return nil
-	}
-
-	//nolint:errcheck
-	defer syscall.Close(fd)
-
-	var ec ethtoolCmd
-
-	ec.Cmd = ethtoolGset
-
-	var ifr ifreqEthtool
-
-	copy(ifr.Name[:], ifName)
-	//nolint:gosec
-	ifr.Data = uintptr(unsafe.Pointer(&ec))
-
-	_, _, errno := syscall.Syscall(
-		syscall.SYS_IOCTL,
-		uintptr(fd),
-		uintptr(siocEthtool),
-		//nolint:gosec
-		uintptr(unsafe.Pointer(&ifr)),
-	)
-
-	if errno != 0 {
-		return nil
-	}
-
-	result := "off"
-	if ec.Autoneg != 0 {
-		result = "on"
-	}
-
-	return &result
+	return &config, &values
 }

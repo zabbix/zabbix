@@ -35,7 +35,8 @@ const (
 type Plugin struct {
 	plugin.Base
 
-	netDevFilepath string
+	netDevFilepath   string
+	netDevStatsCount int
 }
 
 type networkDirection uint8
@@ -47,43 +48,59 @@ type msgIfDiscovery struct {
 
 type ifConfigData struct {
 	Ifname      string  `json:"name"`
-	Ifalias     string  `json:"ifalias,omitempty"`
-	Ifmac       string  `json:"mac,omitempty"`
+	Ifalias     string  `json:"ifalias"`
+	Ifmac       string  `json:"mac"`
+	Iftype      *uint64 `json:"type"`
+	Ifspeed     *uint64 `json:"speed"`
+	Ifduplex    string  `json:"duplex"`
 	IfAdmState  *string `json:"administrative_state"`
 	IfOperState *string `json:"operational_state"`
 }
 
-// IfStatistics aggregates incoming and outgoing network interface traffic data.
-type IfStatistics struct {
-	Ifbytes      *uint64 `json:"bytes,omitempty"`
-	Ifpackets    *uint64 `json:"packets,omitempty"`
-	Iferrors     *uint64 `json:"errors,omitempty"`
-	Ifdropped    *uint64 `json:"dropped,omitempty"`
-	Ifoverrruns  *uint64 `json:"overruns,omitempty"`
-	Ifframe      *uint64 `json:"frame,omitempty"`
-	Ifcompressed *uint64 `json:"compressed,omitempty"`
-	Ifmulticast  *uint64 `json:"multicast,omitempty"`
-	Ifcollisions *uint64 `json:"collisions,omitempty"`
-	Ifcarrier    *uint64 `json:"carrier,omitempty"`
+// // IfStatistics aggregates incoming and outgoing network interface traffic data.
+// type IfStatistics struct {
+// 	Ifbytes      *uint64 `json:"bytes,omitempty"`
+// 	Ifpackets    *uint64 `json:"packets,omitempty"`
+// 	Iferrors     *uint64 `json:"errors,omitempty"`
+// 	Ifdropped    *uint64 `json:"dropped,omitempty"`
+// 	Ifoverrruns  *uint64 `json:"overruns,omitempty"`
+// 	Ifframe      *uint64 `json:"frame,omitempty"`
+// 	Ifcompressed *uint64 `json:"compressed,omitempty"`
+// 	Ifmulticast  *uint64 `json:"multicast,omitempty"`
+// 	Ifcollisions *uint64 `json:"collisions,omitempty"`
+// 	Ifcarrier    *uint64 `json:"carrier,omitempty"`
+// }
+
+type ifStatsIn struct {
+	Bytes      uint64 `json:"bytes"`
+	Packets    uint64 `json:"packets"`
+	Err        uint64 `json:"errors"`
+	Drop       uint64 `json:"dropped"`
+	Fifo       uint64 `json:"overruns"`
+	Frame      uint64 `json:"frame"`
+	Compressed uint64 `json:"compressed"`
+	Multicast  uint64 `json:"multicast"`
+}
+type ifStatsOut struct {
+	Bytes      uint64 `json:"bytes"`
+	Packets    uint64 `json:"packets"`
+	Err        uint64 `json:"errors"`
+	Drop       uint64 `json:"dropped"`
+	Colls      uint64 `json:"collisions"`
+	Fifo       uint64 `json:"overruns"`
+	Carrier    uint64 `json:"carrier"`
+	Compressed uint64 `json:"compressed"`
 }
 
 // IfValuesData contains the combined configuration and statistical values for an interface.
 type IfValuesData struct {
-	Ifname        string       `json:"name"`
-	In            IfStatistics `json:"in"`
-	Out           IfStatistics `json:"out"`
-	Iftype        *uint64      `json:"type,omitempty"`
-	Ifmac         string       `json:"mac,omitempty"`
-	Ifalias       string       `json:"ifalias,omitempty"`
-	Ifcarrier     *uint64      `json:"carrier,omitempty"`
-	Ifspeed       *uint64      `json:"speed,omitempty"`
-	Ifduplex      string       `json:"duplex,omitempty"`
-	Ifnegotiation *string      `json:"negotiation,omitempty"`
-	Ifslevel      *int64       `json:"signal_level,omitempty"`
-	Iflquality    *int64       `json:"link_quality,omitempty"`
-	Ifnoiselevel  *int64       `json:"noise_level,omitempty"`
-	Ifssid        *string      `json:"ssid,omitempty"`
-	Ifbitrate     *int64       `json:"bitrate,omitempty"`
+	Ifname    string     `json:"name"`
+	Ifalias   string     `json:"ifalias"`
+	Ifmac     string     `json:"mac"`
+	Iftype    *uint64    `json:"type"`
+	Ifcarrier *uint64    `json:"carrier"`
+	StatsIn   ifStatsIn  `json:"in"`
+	StatsOut  ifStatsOut `json:"out"`
 }
 
 type netIfResult struct {
