@@ -90,7 +90,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 
 		$breadcrumbs = $this->getBreadcrumbs($path, $filter['filter_set']);
 
-		$parent_url = count($breadcrumbs) > 1
+		$parent_url = count($breadcrumbs) > 1 && array_key_exists('curl', $breadcrumbs[count($breadcrumbs) - 2])
 			? $breadcrumbs[count($breadcrumbs) - 2]['curl']->getUrl()
 			: $breadcrumbs[0]['curl']->getUrl();
 
@@ -141,7 +141,8 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'refresh_url' => $refresh_curl->getUrl(),
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
-			'service' => $this->service
+			'service' => $this->service,
+			'inaccessible_service' => $this->inaccessible_service,
 		];
 
 		if ($this->service !== null && !$filter['filter_set']) {
@@ -154,18 +155,23 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		CPagerHelper::savePage('service.list.edit', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
-		$data['services'] = API::Service()->get([
-			'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
-			'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
-			'selectChildren' => API_OUTPUT_COUNT,
-			'selectProblemTags' => API_OUTPUT_COUNT,
-			'selectProblemEvents' => ['eventid', 'severity', 'name'],
-			'selectTags' => ['tag', 'value'],
-			'serviceids' => $db_serviceids,
-			'sortfield' => ['sortorder', 'name'],
-			'sortorder' => ZBX_SORT_UP,
-			'preservekeys' => true
-		]);
+		if ($this->inaccessible_service) {
+			$data['services'] = [];
+		}
+		else {
+			$data['services'] = API::Service()->get([
+				'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
+				'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
+				'selectChildren' => API_OUTPUT_COUNT,
+				'selectProblemTags' => API_OUTPUT_COUNT,
+				'selectProblemEvents' => ['eventid', 'severity', 'name'],
+				'selectTags' => ['tag', 'value'],
+				'serviceids' => $db_serviceids,
+				'sortfield' => ['sortorder', 'name'],
+				'sortorder' => ZBX_SORT_UP,
+				'preservekeys' => true
+			]);
+		}
 
 		self::extendProblemEvents($data['services']);
 

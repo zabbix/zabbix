@@ -30,6 +30,8 @@ abstract class CControllerServiceListGeneral extends CController {
 	 */
 	protected $service;
 
+	protected $inaccessible_service = false;
+
 	/**
 	 * @throws APIException
 	 *
@@ -44,11 +46,12 @@ abstract class CControllerServiceListGeneral extends CController {
 				'selectTags' => ['tag', 'value']
 			]);
 
-			if (!$db_service) {
-				return false;
+			if ($db_service) {
+				$this->service = $db_service[0];
 			}
-
-			$this->service = $db_service[0];
+			else {
+				$this->inaccessible_service = true;
+			}
 		}
 
 		return true;
@@ -95,11 +98,13 @@ abstract class CControllerServiceListGeneral extends CController {
 	 * @return array
 	 */
 	protected function getPath(): array {
-		if ($this->service === null) {
-			return [];
-		}
-
 		$path_serviceids = $this->getInput('path', []);
+
+		if ($this->service === null) {
+			return $this->inaccessible_service
+				? array_merge($path_serviceids, [$this->getInput('serviceid')])
+				: [];
+		}
 
 		$path = [];
 		$db_service = $this->service;
@@ -155,13 +160,18 @@ abstract class CControllerServiceListGeneral extends CController {
 		$parent_serviceids = [];
 
 		foreach ($path as $serviceid) {
-			$breadcrumbs[] = [
-				'name' => $db_services[$serviceid]['name'],
-				'curl' => (new CUrl('zabbix.php'))
-					->setArgument('action', $this->getAction())
-					->setArgument('path', $parent_serviceids)
-					->setArgument('serviceid', $serviceid)
-			];
+			if (array_key_exists($serviceid, $db_services)) {
+				$breadcrumbs[] = [
+					'name' => $db_services[$serviceid]['name'],
+					'curl' => (new CUrl('zabbix.php'))
+						->setArgument('action', $this->getAction())
+						->setArgument('path', $parent_serviceids)
+						->setArgument('serviceid', $serviceid)
+				];
+			}
+			else {
+				$breadcrumbs[] = ['name' => _('Inaccessible service')];
+			}
 
 			$parent_serviceids[] = $serviceid;
 		}

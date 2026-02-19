@@ -62,6 +62,18 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
+		if ($this->inaccessible_service) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => [_('Inaccessible service')]
+					]
+				])]))->disableView()
+			);
+
+			return;
+		}
+
 		parent::doAction();
 
 		$path = $this->getPath();
