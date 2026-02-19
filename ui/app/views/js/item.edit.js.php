@@ -545,23 +545,7 @@ window.item_edit_form = new class {
 			}
 		}
 
-		const delay_flex = [];
-		for (let key in values.delay_flex) {
-			let { schedule, period, type, delay } = values.delay_flex[key];
-			type = parseInt(type);
-
-			if (type == <?= ITEM_DELAY_FLEXIBLE ?> && delay === '' && period === '') {
-				continue;
-			}
-
-			if (type == <?= ITEM_DELAY_SCHEDULING ?> && schedule === '') {
-				continue;
-			}
-
-			delay_flex.push(values.delay_flex[key]);
-		}
-
-		return {...values, ...{delay_flex}};
+		return values;
 	}
 
 	#post(url, data, keep_open = false) {

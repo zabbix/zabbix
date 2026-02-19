@@ -132,8 +132,8 @@ class CControllerItemUpdate extends CControllerItem {
 				'fields' => [
 					'value' => ['db item_parameter.value'],
 					'name' => [
-						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
-						['db item_parameter.name']
+						['db item_parameter.name'],
+						['db item_parameter.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 					],
 					'sortorder' => ['integer']
 				],
@@ -279,20 +279,32 @@ class CControllerItemUpdate extends CControllerItem {
 			],
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
-				'schedule' => ['string', 'required', 'not_empty',
+				'schedule' => ['string', 'required',
 					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
-				'delay' => ['string', 'required', 'not_empty',
-					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
-					'messages' => ['use' => _('Invalid interval.')],
-					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+				'delay' => [
+					[
+						'string', 'required',
+						'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
+						'messages' => ['use' => _('Invalid interval.')],
+						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+					]
 				],
-				'period' => ['string', 'required', 'not_empty',
-					'use' => [CTimePeriodParser::class, ['usermacros' => true]],
-					'messages' => ['use' => _('Invalid period.')],
-					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
+				'period' => [
+					[
+						'string', 'required', 'not_empty',
+						'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+						'messages' => ['use' => _('Invalid period.')],
+						'when' => [['type', 'in' => [ITEM_DELAY_FLEXIBLE]], ['delay', 'not_empty']]
+					],
+					[
+						'string', 'required',
+						'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+						'messages' => ['use' => _('Invalid period.')],
+						'when' => [['type', 'in' => [ITEM_DELAY_FLEXIBLE]]]
+					]
 				]
 			]],
 			'delay' => [
