@@ -108,7 +108,7 @@ class CControllerGraphPrototypeCreate extends CControllerGraphUpdateGeneral {
 					'yaxisside' => ['db graphs_items.yaxisside', 'required',
 						'in' => [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT]
 					],
-					'color' => ['db graphs_items.color', 'required']
+					'color' => ['db graphs_items.color', 'required', 'rgb']
 				],
 				'count_values' => [
 					[
