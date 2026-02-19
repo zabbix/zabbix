@@ -138,28 +138,28 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |{$HYPERV.TRIGGER.VM.STATUS.NORMAL}|<p>Normal state for Hyper-V Virtual machine status trigger. Support context `{#VM.NAME}`</p>|`2`|
 |{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION}|<p>Threshold for Hyper-V Virtual Machine memory utilization trigger. Support context `{#VM.NAME}`</p>|`85`|
 |{$HYPERV.TRIGGER.POOL.SPACE.UTILIZATION}|<p>Threshold for Hyper-V Pool space utilization trigger. Support context `{#POOL.NAME}`</p>|`85`|
-|{$HYPERV.FILTER.LLD.NODE.NAME.MATCHES}|<p>LLD filter for Hyper-V Cluster Nodes based on node name.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.NODE.NAME.NOT_MATCHES}|<p>LLD filter for Hyper-V Cluster Nodes based on node name.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.NODE.STATUS.MATCHES}|<p>LLD filter for Hyper-V Cluster node status.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.NODE.STATUS.NOT_MATCHES}|<p>LLD filter for Hyper-V Cluster node status.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.CSV.NAME.MATCHES}|<p>LLD filter for Hyper-V Cluster CSVs based on CSV name.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.CSV.NAME.NOT_MATCHES}|<p>LLD filter for Hyper-V Cluster CSVs based on CSV name.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.CSV.STATUS.MATCHES}|<p>LLD filter for Hyper-V Cluster CSV Status.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.CSV.STATUS.NOT_MATCHES}|<p>LLD filter for Hyper-V Cluster CSV Status.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.VM.NAME.MATCHES}|<p>LLD filter for Hyper-V Virtual Machines based on VM name.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.VM.NAME.NOT_MATCHES}|<p>LLD filter for Hyper-V Virtual Machines based on VM name.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.VM.STATUS.MATCHES}|<p>LLD filter for Hyper-V Virtual machine status.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.VM.STATUS.NOT_MATCHES}|<p>LLD filter for Hyper-V Virtual machine status.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.POOL.NAME.MATCHES}|<p>LLD filter for Hyper-V Pools based on Pool name.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.POOL.NAME.NOT_MATCHES}|<p>LLD filter for Hyper-V Pools based on Pool name.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.POOL.STATUS.MATCHES}|<p>LLD filter for Hyper-V Pool Status.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.POOL.STATUS.NOT_MATCHES}|<p>LLD filter for Hyper-V Pool Status.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.DISK.NODE_NAME.MATCHES}|<p>LLD filter for Hyper-V Disks based on Disk node name.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.DISK.NODE_NAME.NOT_MATCHES}|<p>LLD filter for Hyper-V Disks based on Disk node name.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.DISK.SLOT.MATCHES}|<p>LLD filter for Hyper-V Disks based on Disk slot.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.DISK.SLOT.NOT_MATCHES}|<p>LLD filter for Hyper-V Disks based on Disk slot.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.DISK.MODEL.MATCHES}|<p>LLD filter for Hyper-V Disks based on Disk model.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.DISK.MODEL.NOT_MATCHES}|<p>LLD filter for Hyper-V Disks based on Disk model.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.NODE.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Cluster Nodes based on their names. Only nodes with names matching this regex will be monitored. Default is '.*' (matches all nodes).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.NODE.NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Cluster Nodes based on their names. Nodes with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.NODE.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Cluster node status. Only nodes with statuses matching this regex will be monitored. Default is '.*'. See value mappings for possible status values.</p>|`.*`|
+|{$HYPERV.FILTER.LLD.NODE.STATUS.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Cluster node status. Nodes with statuses matching this regex will be excluded from monitoring. See value mappings for possible status values.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.CSV.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Cluster CSVs based on their names. Only CSVs with names matching this regex will be monitored. Default is '.*' (matches all CSVs).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.CSV.NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Cluster CSVs based on their names. CSVs with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.CSV.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Cluster CSV Status. Only CSVs with statuses matching this regex will be monitored. Default is '.*'. See value mappings for possible status values.</p>|`.*`|
+|{$HYPERV.FILTER.LLD.CSV.STATUS.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Cluster CSV Status. CSVs with statuses matching this regex will be excluded from monitoring. See value mappings for possible status values.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.VM.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. Only VMs with names matching this regex will be monitored. Default is '.*' (matches all VMs).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.VM.NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. VMs with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.VM.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Virtual machine status. Only VMs with statuses matching this regex will be monitored. Default is '.*'. See value mappings for possible status values.</p>|`.*`|
+|{$HYPERV.FILTER.LLD.VM.STATUS.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Virtual machine status. VMs with statuses matching this regex will be excluded from monitoring. See value mappings for possible status values.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.POOL.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Pools based on their names. Only Pools with names matching this regex will be monitored. Default is '.*' (matches all Pools).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.POOL.NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Pools based on their names. Pools with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.POOL.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Pool Status. Only Pools with statuses matching this regex will be monitored. Default is '.*'. See value mappings for possible status values.</p>|`.*`|
+|{$HYPERV.FILTER.LLD.POOL.STATUS.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Pool Status. Pools with statuses matching this regex will be excluded from monitoring. See value mappings for possible status values.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.DISK.NODE_NAME.MATCHES}|<p>Regular expression to filter Hyper-V Disks based on their node names. Only Disks with node names matching this regex will be monitored. Default is '.*' (matches all Disks).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.DISK.NODE_NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Disks based on their node names. Disks with node names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.DISK.SLOT.MATCHES}|<p>Regular expression to filter Hyper-V Disks based on their slots. Only Disks with slots matching this regex will be monitored. Default is '.*' (matches all Disks).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.DISK.SLOT.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Disks based on their slots. Disks with slots matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.DISK.MODEL.MATCHES}|<p>Regular expression to filter Hyper-V Disks based on their models. Only Disks with models matching this regex will be monitored. Default is '.*' (matches all Disks).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.DISK.MODEL.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Disks based on their models. Disks with models matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 

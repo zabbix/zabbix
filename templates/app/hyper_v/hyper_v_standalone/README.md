@@ -115,10 +115,10 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |{$HYPERV.SSH.PORT}|<p>SSH port.</p>|`22`|
 |{$HYPERV.TRIGGER.VM.STATUS.NORMAL}|<p>Normal state for Hyper-V Virtual machine status trigger. Support context `{#VM.NAME}`</p>|`2`|
 |{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION}|<p>Threshold for Hyper-V Virtual Machine memory utilization trigger. Support context `{#VM.NAME}`</p>|`85`|
-|{$HYPERV.FILTER.LLD.VM.NAME.MATCHES}|<p>LLD filter for Hyper-V Virtual Machines based on VM name.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.VM.NAME.NOT_MATCHES}|<p>LLD filter for Hyper-V Virtual Machines based on VM name.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.VM.STATUS.MATCHES}|<p>LLD filter for Hyper-V Virtual Machine Status.</p>|`.*`|
-|{$HYPERV.FILTER.LLD.VM.STATUS.NOT_MATCHES}|<p>LLD filter for Hyper-V Virtual Machine Status.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.VM.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. Only VMs with names matching this regex will be monitored. Default is '.*' (matches all VMs).</p>|`.*`|
+|{$HYPERV.FILTER.LLD.VM.NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. VMs with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
+|{$HYPERV.FILTER.LLD.VM.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machine Status. Only VMs with statuses matching this regex will be monitored. Default is '.*'. See value mappings for possible status values.</p>|`.*`|
+|{$HYPERV.FILTER.LLD.VM.STATUS.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machine Status. VMs with statuses matching this regex will be excluded from monitoring. See value mappings for possible status values.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
