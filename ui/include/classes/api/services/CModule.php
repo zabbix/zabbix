@@ -43,8 +43,7 @@ class CModule extends CApiService {
 		$config = APP::Component()->get('config');
 		$module_enabled = $config->getModuleFlag();
 
-		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
-				|| !$module_enabled)) {
+		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
