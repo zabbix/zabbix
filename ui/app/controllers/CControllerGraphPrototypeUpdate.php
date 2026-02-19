@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerGraphPrototypeUpdate extends CController {
+class CControllerGraphPrototypeUpdate extends CControllerGraphUpdateGeneral {
 
 	protected function init(): void {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
@@ -45,11 +45,24 @@ class CControllerGraphPrototypeUpdate extends CController {
 			'show_3d' => ['boolean'],
 			'show_work_period' => ['boolean'],
 			'show_triggers' => ['boolean'],
-			'percent_left' => ['float', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+			'visible' => ['object',
+				'fields' => [
+					'percent_left' => ['boolean'],
+					'percent_right' => ['boolean']
+				],
 				'when' => ['graphtype', 'in' => [GRAPH_TYPE_NORMAL]]
 			],
+			'percent_left' => ['float', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+				'when' => [
+					['graphtype', 'in' => [GRAPH_TYPE_NORMAL]],
+					['visible/percent_left', 'in' => [1]]
+				]
+			],
 			'percent_right' => ['float', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
-				'when' => ['graphtype', 'in' => [GRAPH_TYPE_NORMAL]]
+				'when' => [
+					['graphtype', 'in' => [GRAPH_TYPE_NORMAL]],
+					['visible/percent_right', 'in' => [1]]
+				]
 			],
 			'ymin_type' => ['db graphs.ymin_type',
 				'in' => [GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE]
@@ -171,9 +184,7 @@ class CControllerGraphPrototypeUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$graph_prototype = $this->getInputAll();
-		$graph_prototype['gitems'] = $graph_prototype['items'];
-		unset($graph_prototype['items']);
+		$graph_prototype = self::processGraph($this->getInputAll());
 
 		try {
 			DBstart();

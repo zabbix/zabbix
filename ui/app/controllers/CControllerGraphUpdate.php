@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerGraphUpdate extends CController {
+class CControllerGraphUpdate extends CControllerGraphUpdateGeneral {
 
 	protected function init(): void {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
@@ -44,11 +44,24 @@ class CControllerGraphUpdate extends CController {
 			'show_3d' => ['boolean'],
 			'show_work_period' => ['boolean'],
 			'show_triggers' => ['boolean'],
-			'percent_left' => ['float', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+			'visible' => ['object',
+				'fields' => [
+					'percent_left' => ['boolean'],
+					'percent_right' => ['boolean']
+				],
 				'when' => ['graphtype', 'in' => [GRAPH_TYPE_NORMAL]]
 			],
+			'percent_left' => ['float', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
+				'when' => [
+					['graphtype', 'in' => [GRAPH_TYPE_NORMAL]],
+					['visible/percent_left', 'in' => [1]]
+				]
+			],
 			'percent_right' => ['float', 'min' => 0, 'max' => 100, 'decimal_limit' => 4,
-				'when' => ['graphtype', 'in' => [GRAPH_TYPE_NORMAL]]
+				'when' => [
+					['graphtype', 'in' => [GRAPH_TYPE_NORMAL]],
+					['visible/percent_right', 'in' => [1]]
+				]
 			],
 			'ymin_type' => ['db graphs.ymin_type',
 				'in' => [GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE]
@@ -143,21 +156,7 @@ class CControllerGraphUpdate extends CController {
 	}
 
 	protected function doAction(): void {
-		$graph = $this->getInputAll();
-		$graph['gitems'] = $graph['items'];
-		unset($graph['items']);
-
-		if (array_key_exists('visible', $graph)) {
-			$graph['percent_left'] = $graph['visible']['percent_left'] && array_key_exists('percent_left', $graph)
-				? $graph['percent_left']
-				: 0;
-
-			$graph['percent_right'] = $graph['visible']['percent_right'] && array_key_exists('percent_right', $graph)
-				? $graph['percent_right']
-				: 0;
-
-			unset($graph['visible']);
-		}
+		$graph = self::processGraph($this->getInputAll());
 
 		try {
 			DBstart();

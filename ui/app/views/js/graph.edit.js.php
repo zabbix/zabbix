@@ -538,9 +538,9 @@ window.graph_edit_popup = new class {
 			this.#removePopupMessages();
 
 			const fields = {
-				action: this.action === 'graph.edit' ? 'graph.delete' : 'graph.prototype.delete'
+				action: this.action === 'graph.edit' ? 'graph.delete' : 'graph.prototype.delete',
+				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('graph')) ?>
 			};
-			fields[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('graph')) ?>;
 
 			this.#post(zabbixUrl(fields), {graphids: [this.graph.graphid]}, (response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
