@@ -16,23 +16,25 @@ package netif
 
 import (
 	"encoding/json"
-	"fmt"
 	"net"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
-	errorCannotFindIf = "Cannot find information for this network interface in /proc/net/dev."
-	netDevFilepath    = "/proc/net/dev"
-	netDevStatsCount  = 16
+	errorCannotFindIf  = "Cannot find information for this network interface in /proc/net/dev."
+	netDevFilepath     = "/proc/net/dev"
+	netDevStatsCount   = 16
+	sysClassNetDirpath = "/sys/class/net/"
 
 	siocGiwStats = 0x8B0F
 	siocGiwRange = 0x8B0B
@@ -140,6 +142,7 @@ func init() { //nolint:gochecknoinits // legacy implementation
 
 	impl.netDevFilepath = netDevFilepath
 	impl.netDevStatsCount = netDevStatsCount
+	impl.sysClassNetDirpath = sysClassNetDirpath
 }
 
 // Export implements plugin.Exporter interface.
@@ -251,15 +254,19 @@ func validateParams(params []string, minParams, maxParams int) error {
 	return nil
 }
 
-// fillNetIfGetParams reads sysfs parameters.
-func (*Plugin) fillNetIfGetParams(ifName, param string) string {
-	if strings.Contains(ifName, "/") {
+// sysClassNetStrGet reads sysfs parameters.
+func (p *Plugin) sysClassNetStrGet(ifName, filename string) string {
+	path, err := filepath.Abs(filepath.Join(p.sysClassNetDirpath, ifName, filename))
+	if err != nil || !strings.HasPrefix(path, p.sysClassNetDirpath) {
+		/* should never happen */
+		log.Errf("path traversal was prevented, network interface %q, filename = %q, absolute file path = %q",
+			ifName,
+			filename,
+			path,
+		)
 		return ""
 	}
 
-	path := fmt.Sprintf("/sys/class/net/%s/%s", ifName, param)
-
-	//nolint:gosec // G304: The path is sanitized
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return ""
@@ -268,14 +275,19 @@ func (*Plugin) fillNetIfGetParams(ifName, param string) string {
 	return strings.TrimSpace(string(data))
 }
 
-// parseUintPointer attempts to parse a string into a uint64.
-func parseUintPointer(s string) *uint64 {
-	val, err := strconv.ParseUint(s, 10, 64)
-	if err != nil {
-		return nil
+// sysClassNetUintGet reads sysfs parameters.
+func (p *Plugin) sysClassNetUintGet(ifName, filename string) uint64 {
+	s := p.sysClassNetStrGet(ifName, filename)
+	if s == "" {
+		return 0
 	}
 
-	return &val
+	val, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return val
 }
 
 // ifRowScan scans one line from /proc/net/dev representing network interface.
@@ -379,27 +391,30 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 		operState = &oper
 	}
 
-	speedPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "speed"))
-	typePtr := parseUintPointer(p.fillNetIfGetParams(ifName, "type"))
-	carrierPtr := parseUintPointer(p.fillNetIfGetParams(ifName, "carrier"))
+	alias := p.sysClassNetStrGet(ifName, "ifalias")
+	mac := p.sysClassNetStrGet(ifName, "address")
+	speed := p.sysClassNetUintGet(ifName, "speed")
+	ifType := p.sysClassNetUintGet(ifName, "type")
+	carrier := p.sysClassNetUintGet(ifName, "carrier")
+	duplex := p.sysClassNetStrGet(ifName, "duplex")
 
 	config := ifConfigData{
 		Ifname:      ifName,
-		Ifalias:     p.fillNetIfGetParams(ifName, "ifalias"),
-		Ifmac:       p.fillNetIfGetParams(ifName, "address"),
-		Iftype:      typePtr,
-		Ifspeed:     speedPtr,
-		Ifduplex:    p.fillNetIfGetParams(ifName, "duplex"),
+		Ifalias:     alias,
+		Ifmac:       mac,
+		Iftype:      ifType,
+		Ifspeed:     speed,
+		Ifduplex:    duplex,
 		IfAdmState:  admState,
 		IfOperState: operState,
 	}
 
 	values := IfValuesData{
 		Ifname:    ifName,
-		Ifalias:   p.fillNetIfGetParams(ifName, "ifalias"),
-		Ifmac:     p.fillNetIfGetParams(ifName, "address"),
-		Iftype:    typePtr,
-		Ifcarrier: carrierPtr,
+		Ifalias:   alias,
+		Ifmac:     mac,
+		Iftype:    ifType,
+		Ifcarrier: carrier,
 		StatsIn: ifStatsIn{
 			Bytes:      stats[0],
 			Packets:    stats[1],

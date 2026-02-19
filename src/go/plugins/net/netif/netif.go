@@ -35,8 +35,9 @@ const (
 type Plugin struct {
 	plugin.Base
 
-	netDevFilepath   string
-	netDevStatsCount int
+	netDevFilepath     string
+	netDevStatsCount   int
+	sysClassNetDirpath string
 }
 
 type networkDirection uint8
@@ -50,26 +51,12 @@ type ifConfigData struct {
 	Ifname      string  `json:"name"`
 	Ifalias     string  `json:"ifalias"`
 	Ifmac       string  `json:"mac"`
-	Iftype      *uint64 `json:"type"`
-	Ifspeed     *uint64 `json:"speed"`
+	Iftype      uint64  `json:"type"`
+	Ifspeed     uint64  `json:"speed"`
 	Ifduplex    string  `json:"duplex"`
 	IfAdmState  *string `json:"administrative_state"`
 	IfOperState *string `json:"operational_state"`
 }
-
-// // IfStatistics aggregates incoming and outgoing network interface traffic data.
-// type IfStatistics struct {
-// 	Ifbytes      *uint64 `json:"bytes,omitempty"`
-// 	Ifpackets    *uint64 `json:"packets,omitempty"`
-// 	Iferrors     *uint64 `json:"errors,omitempty"`
-// 	Ifdropped    *uint64 `json:"dropped,omitempty"`
-// 	Ifoverrruns  *uint64 `json:"overruns,omitempty"`
-// 	Ifframe      *uint64 `json:"frame,omitempty"`
-// 	Ifcompressed *uint64 `json:"compressed,omitempty"`
-// 	Ifmulticast  *uint64 `json:"multicast,omitempty"`
-// 	Ifcollisions *uint64 `json:"collisions,omitempty"`
-// 	Ifcarrier    *uint64 `json:"carrier,omitempty"`
-// }
 
 type ifStatsIn struct {
 	Bytes      uint64 `json:"bytes"`
@@ -97,8 +84,8 @@ type IfValuesData struct {
 	Ifname    string     `json:"name"`
 	Ifalias   string     `json:"ifalias"`
 	Ifmac     string     `json:"mac"`
-	Iftype    *uint64    `json:"type"`
-	Ifcarrier *uint64    `json:"carrier"`
+	Iftype    uint64     `json:"type"`
+	Ifcarrier uint64     `json:"carrier"`
 	StatsIn   ifStatsIn  `json:"in"`
 	StatsOut  ifStatsOut `json:"out"`
 }
