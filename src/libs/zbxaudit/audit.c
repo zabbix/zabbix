@@ -178,7 +178,7 @@ static void	delete_json(struct zbx_json *json, const char *audit_op, const char 
 
 static void	push_json_details(zbx_vector_str_t *details, struct zbx_json *json)
 {
-	char *stripped = zbx_malloc(NULL, json->buffer_size + 1);
+	char	*stripped = zbx_malloc(NULL, json->buffer_size + 1);
 
 	/* -2 to remove '{' and '}', + 1 for '\0' */
 	zbx_strlcpy(stripped, json->buffer + 1, json->buffer_size - 1);
@@ -187,7 +187,8 @@ static void	push_json_details(zbx_vector_str_t *details, struct zbx_json *json)
 
 static void	append_str_details(zbx_vector_str_t *details, const char *audit_op, const char *key, const char *val)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	append_str_json(&json, audit_op, key, val);
@@ -199,7 +200,8 @@ static void	append_str_details(zbx_vector_str_t *details, const char *audit_op, 
 static void	append_uint64_details(zbx_vector_str_t *details, const char *audit_op, const char *key,
 		const uint64_t val)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	append_uint64_json(&json, audit_op, key, val);
@@ -210,7 +212,8 @@ static void	append_uint64_details(zbx_vector_str_t *details, const char *audit_o
 
 static void	append_int_details(zbx_vector_str_t *details, const char *audit_op, const char *key, int val)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	append_int_json(&json, audit_op, key, val);
@@ -221,7 +224,8 @@ static void	append_int_details(zbx_vector_str_t *details, const char *audit_op, 
 
 static void	append_double_details(zbx_vector_str_t *details, const char *audit_op, const char *key, double val)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	append_double_json(&json, audit_op, key, val);
@@ -232,7 +236,8 @@ static void	append_double_details(zbx_vector_str_t *details, const char *audit_o
 
 static void	append_no_value_details(zbx_vector_str_t *details, const char *audit_op, const char *key)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	append_no_value_json(&json, audit_op, key);
@@ -243,7 +248,8 @@ static void	append_no_value_details(zbx_vector_str_t *details, const char *audit
 
 static void	update_str_details(zbx_vector_str_t *details, const char *key, const char *val_old, const char *val_new)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	update_str_json(&json, key, val_old, val_new);
@@ -254,7 +260,8 @@ static void	update_str_details(zbx_vector_str_t *details, const char *key, const
 
 static void	update_uint64_details(zbx_vector_str_t *details, const char *key, uint64_t val_old, uint64_t val_new)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	update_uint64_json(&json, key, val_old, val_new);
@@ -265,7 +272,8 @@ static void	update_uint64_details(zbx_vector_str_t *details, const char *key, ui
 
 static void	update_int_details(zbx_vector_str_t *details, const char *key, int val_old, int val_new)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	update_int_json(&json, key, val_old, val_new);
@@ -276,7 +284,8 @@ static void	update_int_details(zbx_vector_str_t *details, const char *key, int v
 
 static void	update_double_details(zbx_vector_str_t *details, const char *key, double val_old, double val_new)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	update_double_json(&json, key, val_old, val_new);
@@ -287,7 +296,8 @@ static void	update_double_details(zbx_vector_str_t *details, const char *key, do
 
 static void	delete_details(zbx_vector_str_t *details, const char *audit_op, const char *key)
 {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	delete_json(&json, audit_op, key);
@@ -452,7 +462,8 @@ static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
 }
 
 static void	zbx_audit_details_to_json(zbx_vector_str_t *details, char **out_json) {
-	struct zbx_json json;
+	struct zbx_json	json;
+
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
 	for (int i = 0; i < details->values_num; i++)
@@ -471,7 +482,7 @@ void	zbx_audit_flush(int audit_context_mode)
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
-	char *details_json_str = NULL;
+	char 			*details_json_str = NULL;
 
 	RETURN_IF_AUDIT_OFF(audit_context_mode);
 

@@ -4932,7 +4932,7 @@ int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_ll
 	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 
 	lld_rule_discover_prototypes(hostid, lld_rows, &item_prototypes, &items, error, lastcheck, &items_index,
-		auditlog_enabled, auditlog_mode);
+			auditlog_enabled, auditlog_mode);
 clean:
 	zbx_hashset_destroy(&items_index);
 
