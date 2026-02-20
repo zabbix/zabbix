@@ -101,8 +101,10 @@ func (p *Plugin) exportDiscovery(params []string) (any, error) {
 }
 
 func (p *Plugin) exportGet(params []string) (any, error) {
-	var err error
-	var rgx *regexp.Regexp
+	var (
+		err error
+		rgx *regexp.Regexp
+	)
 
 	if len(params) > 1 {
 		return nil, zbxerr.ErrorTooManyParameters
