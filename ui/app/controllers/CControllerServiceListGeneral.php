@@ -99,13 +99,11 @@ abstract class CControllerServiceListGeneral extends CController {
 	 * @return array
 	 */
 	protected function getPath(): array {
-		$path_serviceids = $this->getInput('path', []);
-
 		if ($this->service === null) {
-			return $this->inaccessible_service
-				? array_merge($path_serviceids, [$this->getInput('serviceid')])
-				: [];
+			return $this->inaccessible_service ? [$this->getInput('serviceid')] : [];
 		}
+
+		$path_serviceids = $this->getInput('path', []);
 
 		$path = [];
 		$db_service = $this->service;
