@@ -17,7 +17,7 @@ package main
 var options serviceOptions
 
 type serviceOptions struct {
-	ListenPort          string `conf:"optional,range=1024:32767,default=10053"`
+	ListenPort          string `conf:"optional,range=1024:65535,default=10053"`
 	AllowedIP           string `conf:"optional"`
 	LogType             string `conf:"optional,default=file"`
 	LogFile             string `conf:"optional,default=/tmp/zabbix_web_service.log"`
