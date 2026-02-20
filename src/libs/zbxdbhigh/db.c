@@ -748,34 +748,41 @@ int	zbx_db_update_software_update_checkid(void)
 	return ret;
 }
 
-int	zbx_db_update_serverid(void)
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks serverid value in settings table and generates new         *
+ *          serverid if it is not present                                     *
+ *                                                                            *
+ * Return value: SUCCEED - valid serverid either exists or was created        *
+ *               FAIL    - no valid serverid exists and could not create one  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_serverid(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
-	result = zbx_db_select("select value_str from settings where name='serverid'");
-	if (NULL != (row = zbx_db_fetch(result)))
+	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
 	{
-		if (SUCCEED == zbx_db_is_null(row[0]) || '\0' == *row[0])
-		{
-			char	*uuid7 = zbx_gen_uuid7();
-
-			if (ZBX_DB_OK > zbx_db_execute("update settings set value_str='%s'"
-					" where name='serverid'", uuid7))
-			{
-				zabbix_log(LOG_LEVEL_ERR, "cannot update serverid in settings table");
-				ret = FAIL;
-			}
-			zbx_free(uuid7);
-		}
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot read settings record from database");
 		ret = FAIL;
+		goto out;
 	}
-	zbx_db_free_result(result);
 
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		char	*uuid7 = zbx_gen_uuid7();
+
+		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+				"('serverid',1,'%s',0)", uuid7))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot setup serverid in settings table");
+			ret = FAIL;
+		}
+		zbx_free(uuid7);
+	}
+
+	zbx_db_free_result(result);
+out:
 	return ret;
 }
