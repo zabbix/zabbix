@@ -519,7 +519,7 @@ int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode)
 			break;
 	}
 
-	zbx_json_clean(&details_json);
+	zbx_json_free(&details_json);
 	zbx_audit_clean(audit_context_mode);
 
 	return ret;
