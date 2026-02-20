@@ -3,6 +3,8 @@ Changes for 7.0.24rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
 .......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
 ..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
 ...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
