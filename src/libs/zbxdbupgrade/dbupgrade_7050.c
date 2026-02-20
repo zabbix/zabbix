@@ -496,11 +496,15 @@ static int	DBpatch_7050033(void)
 	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
-
 static int	DBpatch_7050034(void)
 {
 	int	ret = SUCCEED;
-	char	*uuid7 = zbx_gen_uuid7();
+	char	*uuid7;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		goto out;
+
+	uuid7 = zbx_gen_uuid7();
 
 	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str, value_int)"
 			" values ('serverid', 1, '%s', 0)", uuid7))
@@ -509,7 +513,7 @@ static int	DBpatch_7050034(void)
 		ret = FAIL;
 	}
 	zbx_free(uuid7);
-
+out:
 	return ret;
 }
 
