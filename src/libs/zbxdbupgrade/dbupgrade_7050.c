@@ -18,6 +18,7 @@
 
 #include "zbxdbschema.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 8.0 development database patches
@@ -487,6 +488,13 @@ static int	DBpatch_7050032(void)
 	return ret;
 }
 
+static int	DBpatch_7050033(void)
+{
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget_field", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -526,5 +534,6 @@ DBPATCH_ADD(7050029, 0, 1)
 DBPATCH_ADD(7050030, 0, 1)
 DBPATCH_ADD(7050031, 0, 1)
 DBPATCH_ADD(7050032, 0, 1)
+DBPATCH_ADD(7050033, 0, 1)
 
 DBPATCH_END()

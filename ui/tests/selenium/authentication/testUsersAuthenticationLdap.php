@@ -222,11 +222,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			[
 				[
 					'servers_settings' => [],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "host": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Host' => 'This field cannot be empty.',
+						'Base DN' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -236,10 +236,10 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'servers_settings' => [
 						'Host' => 'ldap.forumsys.com'
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Base DN' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -250,9 +250,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Host' => 'ldap.forumsys.com',
 						'Base DN' => 'dc=example,dc=com'
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Search attribute' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -268,10 +268,9 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Login' => '',
 						'User password' => ''
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "test_username": cannot be empty.',
-						'Incorrect value for field "test_password": cannot be empty.'
+					'inline_errors' => [
+						'Login' => 'This field cannot be empty.',
+						'User password' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -287,9 +286,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Login' => 'galieleo',
 						'User password' => ''
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "test_password": cannot be empty.'
+					'inline_errors' => [
+						'User password' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -305,9 +303,8 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Login' => '',
 						'User password' => 'password'
 					],
-					'test_error' => 'Invalid LDAP configuration',
-					'test_error_details' => [
-						'Incorrect value for field "test_username": cannot be empty.'
+					'inline_errors' => [
+						'Login' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -498,43 +495,46 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		$server_form->fill($data['servers_settings']);
 
 		if (CTestArrayHelper::get($data['servers_settings'], 'Configure JIT provisioning')) {
-			if (array_key_exists('User group mapping', $data)) {
-				$this->setMapping($data['User group mapping'], $server_form, 'User group mapping');
-			}
-
-			if (array_key_exists('Media type mapping', $data)) {
-				$this->setMapping($data['Media type mapping'], $server_form, 'Media type mapping');
+			foreach (['User group', 'Media type'] as $mapping_type) {
+				if (array_key_exists($mapping_type.' mapping', $data)) {
+					$this->setMapping($data[$mapping_type.' mapping'], $server_form, $mapping_type.' mapping');
+				}
 			}
 		}
 
 		$this->query('button:Test')->waitUntilClickable()->one()->click();
-		$test_form_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 
 		// Fill login and user password in Test authentication form.
 		if (array_key_exists('test_settings', $data)) {
-			$test_form_dialog->asForm()->fill($data['test_settings'])->submit();
-			$test_form_dialog->waitUntilReady();
+			$this->query('class:overlay-dialogue-body')->waitUntilCount(2);
+			$last_dialog = COverlayDialogElement::find(1)->waitUntilReady()->one();
+			$last_dialog->asForm()->fill($data['test_settings'])->submit();
+			$last_dialog->waitUntilReady();
+		}
+		else {
+			$last_dialog = $server_form_dialog;
 		}
 
 		// Check error messages testing LDAP settings.
 		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, 'Login successful');
 		}
-		else {
-			$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
-		}
-
+		else
+			if (array_key_exists('inline_errors', $data)) {
+				$this->assertInlineError($last_dialog->asForm(), $data['inline_errors']);
+			}
+			else {
+				$this->assertMessage(TEST_BAD, $data['test_error'], $data['test_error_details']);
+			}
 		if (array_key_exists('check_provisioning', $data)) {
 			foreach ($data['check_provisioning'] as $id => $text) {
-				$this->assertEquals($text, $test_form_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
+				$this->assertEquals($text, $last_dialog->query('id:provisioning_'.$id)->waitUntilVisible()
 						->one()->getText()
 				);
 			}
 		}
 
-		$test_form_dialog->query('button:Cancel')->waitUntilClickable()->one()->click();
-		$test_form_dialog->waitUntilNotVisible();
-		$server_form_dialog->close();
+		COverlayDialogElement::closeAll();
 	}
 
 	/**
@@ -561,7 +561,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		// Check that the last server can't be removed while LDAP authentication is still on.
 		$table->query('button:Remove')->one()->click();
 		$form->submit();
-		$this->assertMessage(TEST_BAD, 'Cannot update authentication', 'At least one LDAP server must exist');
+		$this->assertInlineError($form, ['xpath:.//table[@id="ldap-servers"]/..' => 'This field cannot be empty.']);
 		$this->assertEquals(1, CDBHelper::getCount('SELECT * FROM userdirectory_ldap'));
 
 		// Uncheck LDAP authentication and try saving again. Make sure the server is not deleted from DB before saving.
@@ -650,12 +650,14 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "host": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Host' => 'This field cannot be empty.',
+							'Base DN' => 'This field cannot be empty.',
+							'Search attribute' => 'This field cannot be empty.'
+						]
 					]
 				]
 			],
@@ -672,11 +674,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Base DN' => 'This field cannot be empty.',
+							'Search attribute' => 'This field cannot be empty.'
+						]
 					]
 				]
 			],
@@ -693,10 +697,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Search attribute' => 'This field cannot be empty.'
+						]
 					]
 				]
 			],
@@ -713,9 +719,11 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.'
+						]
 					]
 				]
 			],
@@ -1405,6 +1413,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Search attribute' => 'test_update'
 					]
 			));
+			$server_settings['expected'] = TEST_GOOD;
 
 			if (array_key_exists('start_group_mapping', $data)) {
 				$server_settings['servers_settings'][0]['User group mapping'] =	$data['start_group_mapping'];
@@ -1415,7 +1424,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 
 			$this->checkLdap($server_settings, 'button:Add');
-			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+			$this->submitLdapForm(true);
 		}
 
 		if (!array_key_exists('expected', $data)) {
@@ -1423,7 +1432,17 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		}
 
 		$this->checkLdap($data, 'xpath://table[@id="ldap-servers"]//a[contains(text(), "test_")]');
-		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+
+		// Get the auth_type that was set before this case to determine whether alert is expected or not when saving form.
+		$auth_type = CDataHelper::call('authentication.get', ['output' => ['authentication_type']])['authentication_type'];
+		$alert = ($auth_type == ZBX_AUTH_LDAP) ? false : true;
+
+		if (array_key_exists('inline_errors', $data)) {
+			$this->page->removeFocus();
+			$this->assertLdapInlineErrors($data['inline_errors']);
+		}
+
+		$this->submitLdapForm($alert);
 
 		if (!array_key_exists('expected', $data)) {
 			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM userdirectory_ldap'));
@@ -1459,7 +1478,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			// #0 Only default authentication added.
 			[
 				[
-					'error' => 'Incorrect value for field "authentication_type": LDAP is not configured.'
+					'inline_errors' => [
+						'form' => 'auth_form',
+						'errors' => [
+							'Default authentication' => 'LDAP is not configured.'
+						]
+					]
 				]
 			],
 			// #1 LDAP server without any parameters.
@@ -1470,14 +1494,15 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							'fields' => []
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "host": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Host' => 'This field cannot be empty.',
+							'Base DN' => 'This field cannot be empty.',
+							'Search attribute' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #2 LDAP server without name, Base DN and Search attribute.
@@ -1494,13 +1519,14 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "base_dn": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Base DN' => 'This field cannot be empty.',
+							'Search attribute' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #3 LDAP server without name and search attribute.
@@ -1514,12 +1540,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "search_attribute": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Search attribute' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #4 LDAP server without name.
@@ -1534,11 +1561,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "name": cannot be empty.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #5 LDAP server with too big integer in Port.
@@ -1555,11 +1583,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Incorrect value for field "port": value must be no greater than "65535".'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Port' => 'This value must be no greater than "65535".'
+						]
+					]
 				]
 			],
 			// #6 Two LDAP servers with same names.
@@ -1583,8 +1612,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'dialog_submit' => true,
-					'error' => 'Invalid parameter "/2": value (name)=(TEST) already exists.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'Name' => 'Name already exists.'
+						]
+					]
 				]
 			],
 			// #7 LDAP server with JIT, but without Group mapping.
@@ -1593,20 +1626,21 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 					'servers_settings' => [
 						[
 							'fields' => [
+								'Configure JIT provisioning' => true,
 								'Name' => 'LDAP',
 								'Host' => 'test',
 								'Port' => '001',
 								'Base DN' => 'test',
-								'Search attribute' => 'test',
-								'Configure JIT provisioning' => true
+								'Search attribute' => 'test'
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'xpath:.//div[@data-field-name="provision_groups"]' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #8 Group mapping dialog form validation.
@@ -1621,20 +1655,23 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 								'Search attribute' => 'test',
 								'Configure JIT provisioning' => true
 							],
-							'User group mapping' => [[]]
+							'User group mapping' => [
+								[
+									'LDAP group pattern' => '',
+									'User groups' => '',
+									'User role' => ''
+								]
+							]
 						]
 					],
-					'mapping_error' => 'Invalid user group mapping configuration.',
-					'mapping_error_details' => [
-						'Field "roleid" is mandatory.',
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "user_groups" is mandatory.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'jit',
+						'errors' => [
+							'LDAP group pattern' => 'This field cannot be empty.',
+							'User groups' => 'This field cannot be empty.',
+							'User role' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #9 Media mapping dialog form validation with default values.
@@ -1652,16 +1689,13 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							'Media type mapping' => [[]]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "attribute": cannot be empty.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Attribute' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #10 Media mapping dialog form validation with missing data in name, attribute, time period fields.
@@ -1683,17 +1717,14 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "attribute": cannot be empty.',
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Attribute' => 'This field cannot be empty.',
+							'id:period' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #11 Media mapping dialog form validation with spaces in name, attribute, time period fields.
@@ -1717,17 +1748,14 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "attribute": cannot be empty.',
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'Name' => 'This field cannot be empty.',
+							'Attribute' => 'This field cannot be empty.',
+							'id:period' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #12 Media mapping dialog form validation with missing time period only.
@@ -1751,15 +1779,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'This field cannot be empty.'
+						]
+					]
 				]
 			],
 			// #13 Media mapping dialog form validation with invalid characters in time period field.
@@ -1783,15 +1808,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'Invalid period.'
+						]
+					]
 				]
 			],
 			// #14 Media mapping dialog form validation with invalid time used in time period field #1.
@@ -1815,15 +1837,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'Invalid period.'
+						]
+					]
 				]
 			],
 			// #15 Media mapping dialog form validation with invalid time used in time period field #2.
@@ -1847,15 +1866,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'Invalid period.'
+						]
+					]
 				]
 			],
 			// #16 Media mapping dialog form validation with invalid time used in time period field #3.
@@ -1879,15 +1895,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'Invalid period.'
+						]
+					]
 				]
 			],
 			// #17 Media mapping dialog form validation with invalid time used in time period field #4.
@@ -1911,15 +1924,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'Invalid period.'
+						]
+					]
 				]
 			],
 			// #18 Media mapping dialog form validation with invalid time used in time period field #5.
@@ -1943,15 +1953,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "period": a time period is expected.'
-					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'mapping',
+						'errors' => [
+							'id:period' => 'Invalid period.'
+						]
+					]
 				]
 			],
 			// #19 Media mapping validation with two mappings, that contain same type and attribute.
@@ -1978,11 +1985,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 							]
 						]
 					],
-					'ldap_error' => 'Invalid LDAP configuration',
-					'ldap_error_details' => [
-						'Invalid user group mapping configuration.'
-					],
-					'error' => 'At least one LDAP server must exist.'
+					'inline_errors' => [
+						'form' => 'server',
+						'errors' => [
+							'name:provision_media[1][mediatypeid]' => 'Media type and attribute is not unique.'
+						]
+					]
 				]
 			],
 			// #20 Time (in seconds) value below the boundary in Provisioning period.
@@ -1993,7 +2001,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '3599'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+					'inline_errors' => [
+						'form' => 'auth_form',
+						'errors' => [
+							'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+						]
+					]
 				]
 			],
 			// #21 Time (in seconds) value above the boundary in Provisioning period.
@@ -2004,7 +2017,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '788400001'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+					'inline_errors' => [
+						'form' => 'auth_form',
+						'errors' => [
+							'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+						]
+					]
 				]
 			],
 			// #22 Time (in minutes) value below the boundary in Provisioning period.
@@ -2015,7 +2033,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '59m'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": value must be one of 3600-788400000.'
+					'inline_errors' => [
+						'form' => 'auth_form',
+						'errors' => [
+							'id:jit_provision_interval' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
+						]
+					]
 				]
 			],
 			// #23 Invalid time unit used in Provisioning period.
@@ -2026,7 +2049,12 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 						'Enable JIT provisioning' => true,
 						'Provisioning period' => '1q'
 					],
-					'error' => 'Incorrect value for field "jit_provision_interval": a time unit is expected.'
+					'inline_errors' => [
+						'form' => 'auth_form',
+						'errors' => [
+							'id:jit_provision_interval' => 'A time unit is expected.'
+						]
+					]
 				]
 			]
 		];
@@ -2935,7 +2963,7 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 
 		// Check error messages.
 		if (CTestArrayHelper::get($data, 'expected', TEST_BAD) === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
+			$this->submitLdapForm(true);
 
 			// Check LDAP configuration in DB.
 			foreach ($data['db_check'] as $table => $rows) {
@@ -2950,7 +2978,31 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 		}
 		else {
-			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
+			$this->page->removeFocus();
+			$this->assertLdapInlineErrors($data['inline_errors']);
+		}
+	}
+
+	/**
+	 * Check the inline error in the form that is defined in the data provider key "inline_errors.form".
+	 *
+	 * @param array $inline_errors  array containing information about error text, error field and error form.
+	 */
+	protected function assertLdapInlineErrors($inline_errors) {
+		if ($inline_errors['form'] === 'auth_form') {
+			$form = $this->query('id:authentication-form')->asForm()->one();
+		}
+		else {
+			$dialog_count = ($inline_errors['form'] === 'server') ? 1 : 2;
+			$this->query('class:overlay-dialogue-body')->waitUntilCount($dialog_count);
+			$form = COverlayDialogElement::find()->all()->waitUntilReady()->last()->asForm();
+		}
+
+		$this->page->removeFocus();
+		$this->assertInlineError($form, $inline_errors['errors']);
+
+		if ($inline_errors['form'] !== 'auth_form') {
+			COverlayDialogElement::closeAll();
 		}
 	}
 
@@ -3112,14 +3164,14 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 			}
 
 			if (CTestArrayHelper::get($ldap['fields'], 'Configure JIT provisioning')) {
-				$success = (array_key_exists('mapping_error', $data)) ? false : true;
+				$success = (in_array(CTestArrayHelper::get($data, 'inline_errors.form'), ['jit', 'mapping']))
+					? false
+					: true;
 
-				if (array_key_exists('User group mapping', $ldap)) {
-					$this->setMapping($ldap['User group mapping'], $ldap_form, 'User group mapping', $success);
-				}
-
-				if (array_key_exists('Media type mapping', $ldap)) {
-					$this->setMapping($ldap['Media type mapping'], $ldap_form, 'Media type mapping', $success);
+				foreach (['User group', 'Media type'] as $mapping_type) {
+					if (array_key_exists($mapping_type.' mapping', $ldap)) {
+						$this->setMapping($ldap[$mapping_type.' mapping'], $ldap_form, $mapping_type.' mapping', $success);
+					}
 				}
 			}
 
@@ -3149,23 +3201,29 @@ class testUsersAuthenticationLdap extends testFormAuthentication {
 		// Configuration of LDAP servers.
 		if (array_key_exists('servers_settings', $data)) {
 			$this->setLdap($data, $query);
-
-			// Check error message in ldap creation form.
-			if (array_key_exists('ldap_error', $data)) {
-				$this->assertMessage(TEST_BAD, $data['ldap_error'], $data['ldap_error_details']);
-				COverlayDialogElement::find()->all()->last()->close();
-			}
 		}
 
 		// Configuration of LDAP form.
 		if (array_key_exists('ldap_fields', $data)) {
 			$form->fill($data['ldap_fields']);
 		}
+	}
 
+	/**
+	 * Save authentication settings form.
+	 *
+	 * @param boolean $alert     flag that determines whether an alert should be submitted while saving the form.
+	 */
+	protected function submitLdapForm($alert) {
+		$form = $this->query('id:authentication-form')->asForm()->one();
 		$form->submit();
 
-		if ($this->page->isAlertPresent()) {
+		// isAlertPresent method can't be used as is completes before the alert actually appears (due to inline validation).
+		if ($alert) {
+			$this->page->waitUntilAlertIsPresent();
 			$this->page->acceptAlert();
 		}
+
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 	}
 }
