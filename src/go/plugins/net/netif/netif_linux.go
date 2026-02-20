@@ -467,10 +467,13 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 	}
 
 	values := IfValuesData{
-		Ifname:    ifName,
-		Ifalias:   alias,
-		Ifmac:     mac,
-		Ifcarrier: carrier,
+		Name:           ifName,
+		Alias:          alias,
+		Mac:            mac,
+		Carrier:        carrier,
+		CarrierChanges: p.sysClassNetUintGet(ifName, "carrier_changes"),
+		CarrierUpCnt:   p.sysClassNetUintGet(ifName, "carrier_up_count"),
+		CarrierDnCnt:   p.sysClassNetUintGet(ifName, "carrier_down_count"),
 		StatsIn: ifStatsIn{
 			Bytes:      stats[0],
 			Packets:    stats[1],

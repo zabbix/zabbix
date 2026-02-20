@@ -82,12 +82,16 @@ type ifStatsOut struct {
 
 // IfValuesData contains the combined configuration and statistical values for an interface.
 type IfValuesData struct {
-	Ifname    string     `json:"name"`
-	Ifalias   string     `json:"ifalias"`
-	Ifmac     string     `json:"mac"`
-	Ifcarrier uint64     `json:"carrier"`
-	StatsIn   ifStatsIn  `json:"in"`
-	StatsOut  ifStatsOut `json:"out"`
+	Name           string `json:"name"`
+	Alias          string `json:"ifalias"`
+	Mac            string `json:"mac"`
+	Carrier        uint64 `json:"carrier"`
+	CarrierChanges uint64 `json:"carrier_changes"`
+	CarrierUpCnt   uint64 `json:"carrier_up_count"`
+	CarrierDnCnt   uint64 `json:"carrier_down_count"`
+
+	StatsIn  ifStatsIn  `json:"in"`
+	StatsOut ifStatsOut `json:"out"`
 }
 
 type netIfResult struct {
