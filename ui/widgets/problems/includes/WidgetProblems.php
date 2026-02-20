@@ -83,7 +83,7 @@ class WidgetProblems extends CTableInfo {
 
 		$this->setHeader(array_merge($header, [
 			$show_recovery_data
-				? _x('Recovery time', 'compact table header')
+				? _x('Recovery Time', 'compact table header')
 				: null,
 			$show_recovery_data
 				? _x('Status', 'compact table header')
