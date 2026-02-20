@@ -115,10 +115,7 @@ window.graph_edit_popup = new class {
 				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				freeze_end: 1,
 				enable_sorting: !this.readonly
-			}).on(CSortable.EVENT_SORT, () => {
-				this.form_element.querySelectorAll('#items-table [name*="sortorder"]')
-					.forEach((node, index) => node.value = index);
-			});
+			}).on(CSortable.EVENT_SORT, this.#recalculateSortOrder);
 		}
 
 		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
@@ -322,6 +319,42 @@ window.graph_edit_popup = new class {
 		});
 	}
 
+	#recalculateSortOrder() {
+		document.querySelectorAll('#items-table tbody tr.graph-item [id]').forEach(element => {
+			element.id = 'tmp' + element.id;
+		});
+
+		document.querySelectorAll('#items-table tbody tr.graph-item').forEach(element => {
+			element.id = 'tmp' + element.id;
+		});
+
+		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
+			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
+
+			row.querySelectorAll('[id]').forEach(element => {
+				element.id = element.id.substring(3).replace(/\d+/, `${index}`);
+
+				if (element.id.includes('sortorder')) {
+					element.value = index;
+				}
+			});
+
+			row.querySelectorAll('[name]').forEach(element => {
+				element.name = element.name.replace(/\d+/, `${index}`);
+			});
+		}
+
+		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
+			const remove_element = document.getElementById('items_' + index + '_remove');
+
+			if (remove_element) {
+				remove_element.setAttribute('data-remove', index);
+			}
+		});
+
+		this.form.discoverAllFields();
+	}
+
 	#openEditItemPopup(target) {
 		const item_num = target.id.match(/\d+/g);
 		const flag_field = this.form.findFieldByName(`items[${item_num}][flags]`);
@@ -384,6 +417,8 @@ window.graph_edit_popup = new class {
 
 		row.nextSibling.remove();
 		row.remove();
+
+		this.#recalculateSortOrder();
 	}
 
 	#updateItemsTable(graph_type) {

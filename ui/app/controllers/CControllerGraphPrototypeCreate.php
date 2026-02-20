@@ -69,10 +69,10 @@ class CControllerGraphPrototypeCreate extends CControllerGraphUpdateGeneral {
 			'ymax_type' => ['db graphs.ymax_type',
 				'in' => [GRAPH_YAXIS_TYPE_CALCULATED, GRAPH_YAXIS_TYPE_FIXED, GRAPH_YAXIS_TYPE_ITEM_VALUE]
 			],
-			'yaxismin' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class],
+			'yaxismin' => ['float', 'required', 'not_empty',
 				'when' => ['ymin_type', 'in' => [GRAPH_YAXIS_TYPE_FIXED]]
 			],
-			'yaxismax' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class],
+			'yaxismax' => ['float', 'required', 'not_empty',
 				'when' => ['ymax_type', 'in' => [GRAPH_YAXIS_TYPE_FIXED]]
 			],
 			'ymin_itemid' => ['db graphs.ymin_itemid', 'required',
