@@ -77,7 +77,7 @@ type netIfResult struct {
 	Values []ifValuesData `json:"values"`
 }
 
-// sysClassNetPathSanitize sanitizes /sys/class/net/<interface>/ directory path
+// sysClassNetPathSanitize sanitizes /sys/class/net/<interface>/ directory path.
 func (p *Plugin) sysClassNetPathSanitize(ifName string) error {
 	dirPath, err := filepath.Abs(filepath.Join(p.sysClassNetDirpath, ifName))
 	if err != nil || !strings.HasPrefix(dirPath, p.sysClassNetDirpath) {
@@ -104,6 +104,7 @@ func (p *Plugin) sysClassNetStrGet(ifName, filename string) string {
 
 func (p *Plugin) sysClassNetUintGet(ifName, filename string) uint64 {
 	s := p.sysClassNetStrGet(ifName, filename)
+
 	if s == "" {
 		return 0
 	}
@@ -193,7 +194,6 @@ func (p *Plugin) ifRowScan(line string) (string, []uint64, error) {
 			"cannot read interface name from of \"%s\"",
 			p.netDevFilepath,
 		)
-
 	}
 
 	name := strings.TrimSpace(dev[0])
@@ -222,6 +222,7 @@ func (p *Plugin) ifRowScan(line string) (string, []uint64, error) {
 				name,
 			)
 		}
+
 		ui64 = append(ui64, n)
 	}
 
@@ -272,7 +273,6 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 
 // returns single interface config and values.
 func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigData, *ifValuesData) {
-
 	alias := p.sysClassNetStrGet(ifName, "ifalias")
 	mac := p.sysClassNetStrGet(ifName, "address")
 	carrier := p.sysClassNetUintGet(ifName, "carrier")
