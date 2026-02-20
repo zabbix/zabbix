@@ -321,7 +321,7 @@ include: &include um_cache_resolve_01.inc.yaml
 in:
   config: *include
   macro: '{$HOST_VALUE}'
-  hostids: [4]
+  hostids: [2]
 out:
   result: SUCCEED
   value: 'Host 1 value'

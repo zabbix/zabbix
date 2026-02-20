@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -120,10 +120,11 @@ class testWidgets extends CWebTest {
 
 		// Find the table where items will be expected.
 		$table = $items_dialog->query(self::TABLE_SELECTOR)->asTable()->one()->waitUntilVisible();
+		$button = $items_dialog->query('button:Select')->one();
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
-		$items_dialog->query('button:Select')->one()->waitUntilStalled();
+		$button->waitUntilStalled();
 		$table->waitUntilReloaded();
 		$items_dialog->query('button:Select')->waitUntilClickable();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
@@ -347,9 +348,8 @@ class testWidgets extends CWebTest {
 	 */
 	public function checkColorPickerState($data) {
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker->isSubmittionDisabled());
-			$color_picker->close();
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
+			CColorPickerElement::close();
 		}
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,7 @@
  */
 class CFrontendSetup {
 
-	const MIN_PHP_VERSION = '8.0.0';
+	const MIN_PHP_VERSION = '8.2.0';
 	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
 	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
 	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
@@ -263,7 +263,7 @@ class CFrontendSetup {
 		$allowed_db = [];
 
 		if (zbx_is_callable(['mysqli_close', 'mysqli_fetch_assoc', 'mysqli_free_result', 'mysqli_init', 'mysqli_query',
-				'mysqli_real_escape_string', 'mysqli_report'])) {
+				'mysqli_real_escape_string', 'mysqli_report', 'mysqli_set_charset'])) {
 			$allowed_db[ZBX_DB_MYSQL] = 'MySQL';
 		}
 

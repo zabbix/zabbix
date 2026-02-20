@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -122,7 +122,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$count = $rows->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
-			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/z-textarea-flexible/textarea')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
 			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
 			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
@@ -746,6 +746,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->page->open('zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.self::DISCOVERY_RULE_ID.
 				'&hostid='.self::HOST_PROTOTYPE_ID.'&context=host'
 		);
+
 		$prototype_form = $this->query('id:host-prototype-form')->asForm()->waitUntilVisible()->one();
 		$prototype_form->selectTab('IPMI');
 

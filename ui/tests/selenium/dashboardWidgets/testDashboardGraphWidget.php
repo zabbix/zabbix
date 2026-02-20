@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -347,10 +347,9 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Verify that it is not possible to submit color-picker dialog with invalid color and exit this scenario.
 		if (CTestArrayHelper::get($data, 'invalid_color')) {
-			$color_picker_dialog = $this->query('class:color-picker-dialog')->one()->asColorPicker();
-			$this->assertTrue($color_picker_dialog->isSubmittionDisabled());
+			$this->assertTrue(CColorPickerElement::isSubmitable(false));
 
-			$color_picker_dialog->close();
+			CColorPickerElement::close();
 			COverlayDialogElement::find()->one()->close();
 
 			return;
@@ -2780,7 +2779,7 @@ class testDashboardGraphWidget extends testWidgets {
 			$this->assertFalse($input->isEnabled());
 			$this->assertEquals('', $input->getValue());
 
-			foreach (['maxlength' => 2048, 'placeholder' => 'value'] as $attribute => $value) {
+			foreach (['maxlength' => 255, 'placeholder' => 'value'] as $attribute => $value) {
 				$this->assertEquals($value, $input->getAttribute($attribute));
 			}
 		}
@@ -2810,12 +2809,12 @@ class testDashboardGraphWidget extends testWidgets {
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
 		$tag_elements = [
-			'id:evaltype',				// Tag type.
-			'id:tags_0_tag',			// Tag name.
-			'id:tags_0_operator',		// Tag operator.
-			'id:tags_0_value',			// Tag value
-			'id:tags_0_remove',			// Tag remove button.
-			'id:tags_add'				// Tag add button.
+			'id:evaltype',													// Tag type.
+			'id:tags_0_tag',												// Tag name.
+			'id:tags_0_operator',											// Tag operator.
+			'id:tags_0_value',												// Tag value
+			'id:tags_0_remove',												// Tag remove button.
+			'xpath:.//table[@id="tags_table_tags"]//button[@id="tags_add"]'	// Tag add button.
 		];
 		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
 
@@ -2907,7 +2906,7 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 
-			case 'Both';
+			case 'Both':
 				$this->assertEnabledFields($lefty_fields, true);
 				$this->assertEnabledFields($righty_fields, true);
 				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());
@@ -2948,6 +2947,9 @@ class testDashboardGraphWidget extends testWidgets {
 					'Aggregate' => 'Data set'
 				]
 			],
+			'Displaying options' => [
+				'Host names in labels' => 'Show'
+			],
 			'Legend' => [
 				'Show aggregation function' => true
 			]
@@ -2969,7 +2971,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Check hint next to the "Data set label" field.
 		$form->getLabel('Data set label')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent()->one();
 		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 
 		$this->fillForm($input_data, $form);

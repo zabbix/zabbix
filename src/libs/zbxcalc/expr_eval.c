@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1230,6 +1230,7 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
 		case ITEM_VALUE_TYPE_NONE:
 			return;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return;

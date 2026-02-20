@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -81,7 +81,14 @@ class CControllerScriptUserInputCheck extends CController {
 			}
 		}
 		else {
-			$regular_expression = '/'.str_replace('/', '\/', $manualinput_validator).'/';
+			if ($manualinput_validator === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator',
+					_('Expression cannot be empty')
+				));
+
+				return false;
+			}
+
 			$regex_validator = new CRegexValidator([
 				'messageInvalid' => _('Regular expression must be a string'),
 				'messageRegex' => _('Incorrect regular expression "%1$s": "%2$s"')
@@ -94,14 +101,8 @@ class CControllerScriptUserInputCheck extends CController {
 
 				return false;
 			}
-			if ($manualinput_validator === '') {
-				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput_validator',
-					_('Expression cannot be empty')
-				));
 
-				return false;
-			}
-			if (!preg_match($regular_expression, trim($manualinput))) {
+			if (!preg_match('/'.CRegexHelper::handleSlashEscaping($manualinput_validator).'/', trim($manualinput))) {
 				error(_s('Incorrect value for field "%1$s": %2$s.', 'manualinput',
 					_s('input does not match the provided pattern: %1$s', $manualinput_validator)
 				));

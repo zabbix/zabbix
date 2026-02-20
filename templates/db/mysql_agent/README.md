@@ -12,9 +12,9 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- MySQL 5.7, 8.0
-- Percona 8.0
-- MariaDB 10.4, 10.6.8
+- MySQL 5.7, 8.0, 9.4
+- Percona 8.4
+- MariaDB 10.6, 11.8
 
 ## Configuration
 
@@ -52,7 +52,7 @@ GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* T
 
 For more information, please read the [`MariaDB documentation`](https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/).
 
-NOTE: Linux distributions that use SELinux may require additional steps for access configuration.
+**NOTE:** Linux distributions that use SELinux may require additional steps for access configuration.
 
 For example, the following rule could be added to the SELinux policy:
 
@@ -193,11 +193,11 @@ EOF
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication Slave status {#MASTER_HOST}|<p>The item gets status information on the essential parameters of the slave threads.</p>|Zabbix agent|mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#MASTER_HOST}"]|
+|Replication Slave status {#MASTER_HOST}|<p>The item gets status information on the essential parameters of the slave threads.</p>|Zabbix agent|mysql.slave_status["{$MYSQL.HOST}","{$MYSQL.PORT}","{#SQL_STATEMENT}"]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Replication Slave SQL Running State {#MASTER_HOST}|<p>This shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Replication Seconds Behind Master {#MASTER_HOST}|<p>The number of seconds that the slave SQL thread is behind processing the master binary log.</p><p>A high number (or an increasing one) can indicate that the slave is unable to handle events</p><p>from the master in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Seconds_Behind_Master']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li><li><p>Does not match regular expression: `null`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li></ul>|
-|Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running.</p><p>Normally, you want this to be Yes unless you have not yet started replication or have</p><p>explicitly stopped it with STOP SLAVE.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_IO_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be Yes.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_SQL_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication Slave IO Running {#MASTER_HOST}|<p>Whether the I/O thread for reading the master's binary log is running.</p><p>Normally, you want this to be `Yes` unless you have not yet started replication or have</p><p>explicitly stopped it with `STOP SLAVE`.</p>|Dependent item|mysql.slave_io_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_IO_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication Slave SQL Running {#MASTER_HOST}|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#MASTER_HOST}"]<p>**Preprocessing**</p><ul><li><p>XML XPath: `/resultset/row/field[@name='Slave_SQL_Running']/text()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for Replication discovery
 

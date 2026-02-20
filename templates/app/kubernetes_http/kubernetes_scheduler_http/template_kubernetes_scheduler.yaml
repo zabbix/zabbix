@@ -32,15 +32,15 @@ zabbix_export:
         
         Set the following fields: `Scheduler metrics endpoint URL`, `API Authorization Token`.
         
-        *NOTE.* You might need to set the `--binding-address` option for Scheduler to the address where Zabbix proxy can reach it.
+        **Note:** You might need to set the `--binding-address` option for Scheduler to the address where Zabbix proxy can reach it.
         For example, for clusters created with `kubeadm` it can be set in the following manifest file (changes will be applied immediately):
         
         - /etc/kubernetes/manifests/kube-scheduler.yaml
         
-        *NOTE.* Some metrics may not be collected depending on your Kubernetes Scheduler instance version and configuration.
+        **Note:** Some metrics may not be collected depending on your Kubernetes Scheduler instance version and configuration.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:

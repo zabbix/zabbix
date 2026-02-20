@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -66,7 +66,7 @@ static zbx_sync_history_cache_f	sync_history_cache_cb = NULL;
 
 #define ZBX_TRENDS_CLEANUP_TIME	(SEC_PER_MIN * 55)
 
-/* the maximum number of characters for history cache values (except binary) */
+/* the maximum number of characters for history cache values (except binary and JSON) */
 #define ZBX_HISTORY_VALUE_LEN		(1024 * 64)
 
 typedef struct
@@ -308,6 +308,10 @@ void	*zbx_dc_get_stats(int request)
 			break;
 		case ZBX_STATS_HISTORY_BIN_COUNTER:
 			value_uint = cache->stats.history_bin_counter;
+			ret = (void *)&value_uint;
+			break;
+		case ZBX_STATS_HISTORY_JSON_COUNTER:
+			value_uint = cache->stats.history_json_counter;
 			ret = (void *)&value_uint;
 			break;
 		default:
@@ -1393,7 +1397,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 		}
 
 		if (0 == connector_object.ids.values_num &&
-				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type))
+				(FAIL == history_export_enabled || ITEM_VALUE_TYPE_BIN == h->value_type ||
+				ITEM_VALUE_TYPE_JSON == h->value_type))
 		{
 			continue;
 		}
@@ -1444,6 +1449,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				zbx_json_addstring(&json, ZBX_PROTO_TAG_VALUE, h->value.str, ZBX_JSON_TYPE_STRING);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
@@ -1474,8 +1480,11 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			zbx_vector_uint64_clear(&connector_object.ids);
 		}
 
-		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->value_type)
+		if (SUCCEED == history_export_enabled && ITEM_VALUE_TYPE_BIN != h->value_type &&
+				ITEM_VALUE_TYPE_JSON != h->value_type)
+		{
 			zbx_history_export_write(json.buffer, json.buffer_size);
+		}
 	}
 
 	if (SUCCEED == history_export_enabled)
@@ -1633,7 +1642,7 @@ void	zbx_dc_export_history_and_trends(const zbx_dc_history_t *history, int histo
 
 	zbx_hashset_destroy(&hosts_info);
 clean:
-	zbx_dc_config_clean_history_sync_items(trend_items, trend_errcodes, (size_t)trend_itemids.values_num);
+	zbx_dc_config_clean_history_sync_items(trend_items, (size_t)trend_itemids.values_num);
 	zbx_hashset_destroy(&items_info);
 	zbx_vector_uint64_destroy(&item_info_ids);
 	zbx_vector_uint64_destroy(&hostids);
@@ -1825,6 +1834,7 @@ void	zbx_dc_history_clean_value(zbx_dc_history_t *history)
 			zbx_free(history->value.log->source);
 			zbx_free(history->value.log);
 			break;
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
@@ -2175,7 +2185,7 @@ static void	dc_local_add_history_uint(zbx_uint64_t itemid, unsigned char item_va
 		item_value->value.value_uint = value_orig;
 }
 
-static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_uint64_t itemid,
+static void	dc_local_add_history_text_bin_json_helper(unsigned char value_type, zbx_uint64_t itemid,
 		unsigned char item_value_type, const zbx_timespec_t *ts, const char *value_orig,
 		zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
 {
@@ -2196,8 +2206,28 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 
 	if (0 == (item_value->flags & ZBX_DC_FLAG_NOVALUE))
 	{
-		size_t	maxlen = (ITEM_VALUE_TYPE_BIN == item_value_type ? ZBX_HISTORY_BIN_VALUE_LEN :
-				ZBX_HISTORY_VALUE_LEN);
+		size_t	maxlen;
+
+		switch (item_value_type)
+		{
+			case ITEM_VALUE_TYPE_JSON:
+				maxlen = ZBX_HISTORY_JSON_VALUE_LEN;
+				break;
+			case ITEM_VALUE_TYPE_BIN:
+				maxlen = ZBX_HISTORY_BIN_VALUE_LEN;
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_LOG:
+			case ITEM_VALUE_TYPE_UINT64:
+			case ITEM_VALUE_TYPE_TEXT:
+				maxlen = ZBX_HISTORY_VALUE_LEN;
+				break;
+			case ITEM_VALUE_TYPE_NONE:
+			default:
+				THIS_SHOULD_NEVER_HAPPEN;
+				exit(EXIT_FAILURE);
+		}
 
 		item_value->value.value_str.len = zbx_db_strlen_n(value_orig, maxlen) + 1;
 		dc_string_buffer_realloc(item_value->value.value_str.len);
@@ -2208,20 +2238,6 @@ static void	dc_local_add_history_text_bin_helper(unsigned char value_type, zbx_u
 	}
 	else
 		item_value->value.value_str.len = 0;
-}
-
-static void	dc_local_add_history_text(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
-		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
-{
-	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts, value_orig,
-			lastlogsize, mtime, flags);
-}
-
-static void	dc_local_add_history_bin(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
-		const char *value_orig, zbx_uint64_t lastlogsize, int mtime, unsigned char flags)
-{
-	dc_local_add_history_text_bin_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts, value_orig,
-			lastlogsize, mtime, flags);
 }
 
 static void	dc_local_add_history_log(zbx_uint64_t itemid, unsigned char item_value_type, const zbx_timespec_t *ts,
@@ -2400,7 +2416,6 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 	/* Add data to the local history cache if:                                           */
 	/*   1) the NOVALUE flag is set                                                      */
 	/*   2) the NOVALUE flag is not set and value conversion succeeded                   */
-
 	if (0 == (value_flags & ZBX_DC_FLAG_NOVALUE))
 	{
 		if (0 != (ZBX_FLAG_DISCOVERY_RULE & item_flags))
@@ -2432,18 +2447,23 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		}
 		else if (ZBX_ISSET_STR(result))
 		{
-			dc_local_add_history_text(itemid, item_value_type, ts, result->str, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts,
+					result->str, result->lastlogsize, result->mtime, value_flags);
 		}
 		else if (ZBX_ISSET_TEXT(result))
 		{
-			dc_local_add_history_text(itemid, item_value_type, ts, result->text, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, item_value_type, ts,
+					result->text, result->lastlogsize, result->mtime, value_flags);
 		}
 		else if (ZBX_ISSET_BIN(result))
 		{
-			dc_local_add_history_bin(itemid, item_value_type, ts, result->bin, result->lastlogsize,
-					result->mtime, value_flags);
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_BIN, itemid, item_value_type, ts,
+					result->bin, result->lastlogsize, result->mtime, value_flags);
+		}
+		else if (ZBX_ISSET_JSON(result))
+		{
+			dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, item_value_type, ts,
+					result->json, result->lastlogsize, result->mtime, value_flags);
 		}
 		else
 		{
@@ -2460,6 +2480,30 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 		else
 			dc_local_add_history_empty(itemid, item_value_type, ts, value_flags);
 	}
+}
+
+static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char value_type,
+		const zbx_variant_t *value, zbx_timespec_t ts, unsigned char value_flags, int mtime,
+		zbx_uint64_t lastlogsize)
+{
+	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
+	{
+		dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ", lastlogsize, mtime, value_flags);
+		return;
+	}
+
+	char	*err = NULL;
+
+	if (0 == zbx_json_validate_ext(value->data.json, &err))
+	{
+		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
+		zbx_free(err);
+
+		return;
+	}
+
+	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.json,
+			lastlogsize, mtime, value_flags);
 }
 
 /******************************************************************************
@@ -2582,9 +2626,21 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 						value_flags);
 				return;
 			}
-
-			dc_local_add_history_text(itemid, value_type, &ts, value->data.str, lastlogsize, mtime,
-					value_flags);
+			else if (ITEM_VALUE_TYPE_JSON == value_type)
+			{
+				/* JSON item value type when passive agent is used with preprocessing */
+				validate_json_and_add_to_history(itemid, value_type, value, ts, value_flags, mtime,
+						lastlogsize);
+			}
+			else
+			{
+				dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, value_type, &ts,
+						value->data.str, lastlogsize, mtime, value_flags);
+			}
+			break;
+		case ZBX_VARIANT_JSON:
+			validate_json_and_add_to_history(itemid, value_type, value, ts, value_flags, mtime,
+					lastlogsize);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:
@@ -2597,13 +2653,10 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 
 size_t	zbx_dc_flush_history(void)
 {
-	LOCK_CACHE;
-
 	if (0 == item_values_num)
-	{
-		UNLOCK_CACHE;
 		return 0;
-	}
+
+	LOCK_CACHE;
 
 	hc_add_item_values(item_values, item_values_num);
 
@@ -2643,11 +2696,8 @@ static int	hc_queue_elem_compare_func(const void *d1, const void *d2)
 	const zbx_binary_heap_elem_t	*e1 = (const zbx_binary_heap_elem_t *)d1;
 	const zbx_binary_heap_elem_t	*e2 = (const zbx_binary_heap_elem_t *)d2;
 
-	const zbx_hc_item_t	*item1 = (const zbx_hc_item_t *)e1->data;
-	const zbx_hc_item_t	*item2 = (const zbx_hc_item_t *)e2->data;
-
 	/* compare by timestamp of the oldest value */
-	return zbx_timespec_compare(&item1->tail->ts, &item2->tail->ts);
+	return zbx_timespec_compare(&((const zbx_hc_item_t *)e1->data)->ts, &((const zbx_hc_item_t *)e2->data)->ts);
 }
 
 /******************************************************************************
@@ -2672,6 +2722,7 @@ static void	hc_free_data(zbx_hc_data_t *data)
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 				case ITEM_VALUE_TYPE_BIN:
+				case ITEM_VALUE_TYPE_JSON:
 					__hc_shmem_free_func(data->value.str);
 					break;
 				case ITEM_VALUE_TYPE_LOG:
@@ -2737,9 +2788,33 @@ static zbx_hc_item_t	*hc_get_item(zbx_uint64_t itemid)
  ******************************************************************************/
 static zbx_hc_item_t	*hc_add_item(zbx_uint64_t itemid, zbx_hc_data_t *data)
 {
-	zbx_hc_item_t	item_local = {itemid, ZBX_HC_ITEM_STATUS_NORMAL, 0, data, data};
+	zbx_hc_item_t	item_local = {.itemid = itemid, .status = ZBX_HC_ITEM_STATUS_NORMAL,
+			.cache = ZBX_HC_ITEM_CACHE_TRUE, .values_num = 0, .tail = data, .head = data};
 
 	return (zbx_hc_item_t *)zbx_hashset_insert(&cache->history_items, &item_local, sizeof(item_local));
+}
+
+void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids)
+{
+	LOCK_CACHE;
+
+	for (int i = 0; i < itemids->values_num; i++)
+	{
+		zbx_hc_item_t	*item = hc_get_item(itemids->values[i]);
+
+		if (NULL == item)
+			continue;
+
+		if (NULL == item->tail)
+		{
+			zbx_hashset_remove_direct(&cache->history_items, item);
+			continue;
+		}
+
+		item->cache = ZBX_HC_ITEM_CACHE_FALSE;
+	}
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************
@@ -2775,6 +2850,8 @@ int	zbx_hc_clear_item_middle(zbx_uint64_t itemid)
 				i++;
 			}
 		}
+		else
+			item->cache = ZBX_HC_ITEM_CACHE_FALSE;
 
 		cache->history_num -= i;
 	}
@@ -2947,6 +3024,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				if (SUCCEED != hc_clone_history_str_data(&(*data)->value.str,
 						&item_value->value.value_str))
 				{
@@ -2982,6 +3060,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				break;
 			case ITEM_VALUE_TYPE_BIN:
 				cache->stats.history_bin_counter++;
+				break;
+			case ITEM_VALUE_TYPE_JSON:
+				cache->stats.history_json_counter++;
 				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
@@ -3135,6 +3216,14 @@ static void	hc_add_item_values(dc_item_value_t *values, int values_num)
 		if (NULL == item)
 		{
 			item = hc_add_item(item_value->itemid, data);
+			item->ts = data->ts;
+			hc_queue_item(item);
+		}
+		else if (NULL == item->tail)
+		{
+			item->tail = data;
+			item->head = data;
+			item->ts = data->ts;
 			hc_queue_item(item);
 		}
 		else
@@ -3189,6 +3278,7 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				history->value.str = zbx_strdup(NULL, data->value.str);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
@@ -3267,6 +3357,21 @@ void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t 
 	}
 }
 
+static void	hc_remove_item(zbx_hc_item_t *item)
+{
+	while (NULL != item->tail)
+	{
+		zbx_hc_data_t	*next = item->tail->next;
+
+		hc_free_data(item->tail);
+		item->tail = next;
+	}
+
+	cache->history_num -= item->values_num - 1;
+
+	zbx_hashset_remove_direct(&cache->history_items, item);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: push back the processed history items into history cache          *
@@ -3297,14 +3402,25 @@ void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items)
 				hc_queue_item(item);
 				break;
 			case ZBX_HC_ITEM_STATUS_NORMAL:
+				if (ZBX_HC_ITEM_CACHE_FALSE == item->cache)
+				{
+					hc_remove_item(item);
+					break;
+				}
+
 				item->values_num--;
 				data_free = item->tail;
 				item->tail = item->tail->next;
 				hc_free_data(data_free);
 				if (NULL == item->tail)
-					zbx_hashset_remove(&cache->history_items, item);
+				{
+					item->head = NULL;
+				}
 				else
+				{
+					item->ts = item->tail->ts;
 					hc_queue_item(item);
+				}
 				break;
 		}
 	}
@@ -3328,7 +3444,7 @@ int	zbx_hc_get_history_compression_age(void)
 	zbx_config_t	cfg;
 	int		compression_age = 0;
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_EXTENSION);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION);
 
 	if (ON == cfg.db.history_compression_status && 0 != cfg.db.history_compress_older)
 	{
@@ -3404,7 +3520,7 @@ static int	init_trend_cache(zbx_uint64_t *trends_cache_size, char **error)
 					/* item hashset size in configuration cache.              */
 
 	zbx_hashset_create_ext(&cache->trends, INIT_HASHSET_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__trend_shmem_malloc_func, __trend_shmem_realloc_func, __trend_shmem_free_func);
 
 #undef INIT_HASHSET_SIZE
@@ -3461,7 +3577,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	memset(ids, 0, sizeof(ZBX_DC_IDS));
 
 	zbx_hashset_create_ext(&cache->history_items, ZBX_HC_ITEMS_INIT_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
 	zbx_binary_heap_create_ext(&cache->history_queue, hc_queue_elem_compare_func, ZBX_BINARY_HEAP_OPTION_EMPTY,
@@ -3470,7 +3586,7 @@ int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,
 	if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_hashset_create_ext(&(cache->proxyqueue.index), ZBX_HC_SYNC_MAX,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__hc_index_shmem_malloc_func, __hc_index_shmem_realloc_func, __hc_index_shmem_free_func);
 
 		zbx_list_create_ext(&(cache->proxyqueue.list), __hc_index_shmem_malloc_func,
@@ -3690,11 +3806,12 @@ void	zbx_hc_get_mem_stats(zbx_shmem_stats_t *data, zbx_shmem_stats_t *index)
  ******************************************************************************/
 int	zbx_hc_is_itemid_cached(zbx_uint64_t itemid)
 {
-	int	ret = FAIL;
+	int		ret = FAIL;
+	zbx_hc_item_t	*item;
 
 	LOCK_CACHE;
 
-	if (NULL != zbx_hashset_search(&cache->history_items, &itemid))
+	if (NULL != (item = (zbx_hc_item_t *)zbx_hashset_search(&cache->history_items, &itemid)) && NULL != item->tail)
 		ret = SUCCEED;
 
 	UNLOCK_CACHE;
@@ -3717,8 +3834,12 @@ static void	hc_get_items(zbx_vector_uint64_pair_t *items)
 	zbx_hashset_iter_reset(&cache->history_items, &iter);
 	while (NULL != (item = (zbx_hc_item_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
-		zbx_vector_uint64_pair_append_ptr(items, &pair);
+		if (0 != item->values_num)
+		{
+			zbx_uint64_pair_t	pair = {item->itemid, item->values_num};
+
+			zbx_vector_uint64_pair_append_ptr(items, &pair);
+		}
 	}
 }
 

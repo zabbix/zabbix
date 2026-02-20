@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -94,7 +94,9 @@ class CControllerAcknowledgeEdit extends CController {
 			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
 			'allowed_change_problem_ranking' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING),
-			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d')
+			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d'),
+			'js_validation_rules' => (new CFormValidator(CControllerPopupAcknowledgeCreate::getValidationRules()))
+				->getRules()
 		];
 
 		// Select events.

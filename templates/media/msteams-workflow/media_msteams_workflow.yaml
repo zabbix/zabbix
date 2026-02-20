@@ -501,9 +501,10 @@ zabbix_export:
         	this.request.addHeaders({ "Content-Type": "application/json" });
         	var response = this.request.plainRequest('POST', this.params.teams_endpoint, JSON.stringify(this.body));
         
-        	if (this.request.getStatus() !== 202) {
-        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus() + '. Endpoint response:' + response);
-        		throw 'HTTP code: ' + this.request.getStatus() + '. Endpoint response:' + response;
+        	var status = this.request.getStatus();
+        	if (status < 200 || status >= 300) {
+        		Logger.log(Logger.INFO, 'HTTP code: ' + status + '. Endpoint response: ' + response);
+        		throw 'HTTP code: ' + status + '. Endpoint response: ' + response;
         	}
         
         	return 'OK';

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,6 +96,13 @@ void	mock_read_variant(const char *path, zbx_variant_t *variant)
 		}
 		zbx_variant_set_bin(variant, zbx_variant_data_bin_create(data, size));
 		zbx_free(data);
+
+		return;
+	}
+
+	if (0 == strcmp(type, "ZBX_VARIANT_JSON"))
+	{
+		zbx_variant_set_json(variant, zbx_strdup(NULL, value));
 
 		return;
 	}

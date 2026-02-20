@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -335,6 +335,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Web monitoring widget',
 					'copy to' => 'same page'
 				]
@@ -413,6 +425,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Host card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another page'
+				]
+			],
+			[
+				[
 					'name' => 'Web monitoring widget',
 					'copy to' => 'another page'
 				]
@@ -450,7 +474,19 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
-					'copy to' => 'another page'
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another dashboard'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
+					'copy to' => 'another dashboard'
 				]
 			],
 			[
@@ -510,6 +546,18 @@ class testDashboardCopyWidgets extends CWebTest {
 			[
 				[
 					'name' => 'Honeycomb widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Host card widget',
+					'copy to' => 'another template'
+				]
+			],
+			[
+				[
+					'name' => 'Item card widget',
 					'copy to' => 'another template'
 				]
 			]
@@ -636,6 +684,13 @@ class testDashboardCopyWidgets extends CWebTest {
 				[
 					'module_name' => 'Favorite graphs',
 					'widget_name' => 'Test copy Favorite graphs',
+					'action' => 'copy page'
+				]
+			],
+			[
+				[
+					'module_name' => 'Favorite maps',
+					'widget_name' => 'Test copy Favorite maps',
 					'action' => 'copy page'
 				]
 			],

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -78,7 +78,7 @@ static void	get_remote_zabbix_stats(const struct zbx_json *json, const char *ip,
 	zbx_socket_t	s;
 
 	if (SUCCEED == zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), ip, port, timeout,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL))
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL, ZBX_DNS_FAILOVER_ENABLED))
 	{
 		if (SUCCEED == zbx_tcp_send(&s, json->buffer))
 		{

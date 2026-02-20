@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,8 +30,10 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/proc"
 	_ "golang.zabbix.com/agent2/plugins/redis"
 	_ "golang.zabbix.com/agent2/plugins/smart"
+	_ "golang.zabbix.com/agent2/plugins/system/boottime"
 	_ "golang.zabbix.com/agent2/plugins/system/cpu"
 	_ "golang.zabbix.com/agent2/plugins/system/hw"
+	_ "golang.zabbix.com/agent2/plugins/system/localtime"
 	_ "golang.zabbix.com/agent2/plugins/system/sw"
 	_ "golang.zabbix.com/agent2/plugins/system/swap"
 	_ "golang.zabbix.com/agent2/plugins/system/uname"

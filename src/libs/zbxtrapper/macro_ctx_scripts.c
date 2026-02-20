@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,7 +76,7 @@ static void	resolve_user_macros(zbx_uint64_t userid, const char *m, zbx_user_nam
 	if (NULL == *user_names && SUCCEED != zbx_db_get_user_names(userid, user_names))
 		return;
 
-	if (0 == strcmp(m, MVAR_USER_USERNAME) || 0 == strcmp(m, MVAR_USER_ALIAS))
+	if (0 == strcmp(m, MVAR_USER_USERNAME))
 	{
 		*replace_to = zbx_strdup(*replace_to, (*user_names)->username);
 	}
@@ -123,11 +123,11 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 			zbx_dc_get_user_macro(um_handle, p->macro, &dc_host->hostid, 1, replace_to);
 			p->pos = p->token.loc.r;
 		}
-		else if (0 == strcmp(p->macro, MVAR_HOST_HOST) || 0 == strcmp(p->macro, MVAR_HOSTNAME))
+		else if (0 == strcmp(p->macro, MVAR_HOST_HOST))
 			*replace_to = zbx_strdup(*replace_to, dc_host->host);
 		else if (0 == strcmp(p->macro, MVAR_HOST_NAME))
 			*replace_to = zbx_strdup(*replace_to, dc_host->name);
-		else if (0 == strcmp(p->macro, MVAR_HOST_IP) || 0 == strcmp(p->macro, MVAR_IPADDRESS))
+		else if (0 == strcmp(p->macro, MVAR_HOST_IP))
 		{
 			ret = zbx_dc_get_interface_value(dc_host->hostid, 0, replace_to, ZBX_DC_REQUEST_HOST_IP);
 		}
@@ -151,8 +151,7 @@ static int	macro_host_script_resolv(zbx_macro_resolv_data_t *p, va_list args, ch
 		{
 			if (0 == strcmp(p->macro, MVAR_USER_USERNAME) || 0 == strcmp(p->macro, MVAR_USER_NAME) ||
 					0 == strcmp(p->macro, MVAR_USER_SURNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_ALIAS))
+					0 == strcmp(p->macro, MVAR_USER_FULLNAME))
 			{
 				zbx_user_names_t	**user_names = (zbx_user_names_t **)zbx_expr_rem(userid,
 						sizeof(zbx_user_names_t *), NULL, user_names_clean_rem_wrap);
@@ -194,8 +193,7 @@ static int	macro_normal_script_resolv(zbx_macro_resolv_data_t *p, va_list args, 
 			if (NULL != userid && (0 == strcmp(p->macro, MVAR_USER_USERNAME) ||
 					0 == strcmp(p->macro, MVAR_USER_NAME) ||
 					0 == strcmp(p->macro, MVAR_USER_SURNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_FULLNAME) ||
-					0 == strcmp(p->macro, MVAR_USER_ALIAS)))
+					0 == strcmp(p->macro, MVAR_USER_FULLNAME)))
 			{
 				zbx_user_names_t	**user_names = (zbx_user_names_t **)zbx_expr_rem(userid,
 						sizeof(zbx_user_names_t *), NULL, user_names_clean_rem_wrap);

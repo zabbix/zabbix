@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1207,8 +1207,7 @@ class CRole extends CApiService {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sql_parts['from']['users'] = 'users u';
-			$sql_parts['where']['u'] = 'r.roleid=u.roleid';
+			$sql_parts['join']['u'] = ['table' => 'users', 'using' => 'roleid'];
 			$sql_parts['where'][] = 'u.userid='.self::$userData['userid'];
 		}
 

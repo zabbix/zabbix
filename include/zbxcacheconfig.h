@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -232,8 +232,10 @@ typedef struct
 	zbx_uint64_t		lastlogsize;
 	zbx_uint64_t		valuemapid;
 	char			key_orig[ZBX_ITEM_KEY_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+#define ZBX_HYSTORY_SYNC_PREALOCATED_UNITS_SIZE		8
 	char			*units;
 	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
+#define ZBX_HYSTORY_SYNC_PREALOCATED_PERIOD_SIZE	8
 	char			*history_period, *trends_period;
 	int			mtime;
 	int			history_sec;
@@ -304,6 +306,7 @@ typedef struct
 	zbx_uint64_t	functionid;
 	zbx_uint64_t	triggerid;
 	zbx_uint64_t	itemid;
+#define ZBX_DC_FUNCTION_PREALOCATED_FUNC_SIZE	256
 	char		*function;
 	char		*parameter;
 	unsigned char	type;
@@ -517,6 +520,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_AUDITLOG_MODE			__UINT64_C(0x0000000000000400)
 #define ZBX_CONFIG_FLAGS_PROXY_SECRETS_PROVIDER		__UINT64_C(0x0000000000000800)
 #define ZBX_CONFIG_FLAGS_ALERT_USRGRPID			__UINT64_C(0x0000000000001000)
+#define ZBX_CONFIG_FLAGS_DB_HISTORY_COMPRESION		__UINT64_C(0x0000000000002000)
 
 typedef struct
 {
@@ -855,7 +859,7 @@ void	zbx_dc_config_history_sync_get_functions_by_functionids(zbx_dc_function_t *
 void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_info,
 		zbx_vector_dc_trigger_t *trigger_order, const zbx_uint64_t *itemids, const zbx_timespec_t *timespecs,
 		int itemids_num);
-void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
+void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, size_t num);
 void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
 int	zbx_dc_config_history_get_trends_sec(const char *trends_period, int trends_global, int hk_trends);
 
@@ -876,7 +880,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		zbx_uint64_t *revision);
 void	zbx_dc_config_get_functions_by_functionids(zbx_dc_function_t *functions,
 		zbx_uint64_t *functionids, int *errcodes, size_t num);
-void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, int *errcodes, size_t num);
+void	zbx_dc_config_clean_functions(zbx_dc_function_t *functions, size_t num);
 void	zbx_dc_config_clean_triggers(zbx_dc_trigger_t *triggers, int *errcodes, size_t num);
 
 typedef struct zbx_hc_data
@@ -897,7 +901,9 @@ typedef struct
 {
 	zbx_uint64_t	itemid;
 	unsigned char	status;
+	unsigned char	cache;
 	int		values_num;
+	zbx_timespec_t	ts;
 
 	zbx_hc_data_t	*tail;
 	zbx_hc_data_t	*head;
@@ -1010,8 +1016,8 @@ int	zbx_dc_is_autoreg_host_changed(const char *host, unsigned short port, const 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 size_t	zbx_dc_get_psk_by_identity(const unsigned char *psk_identity, unsigned char *psk_buf, unsigned int *psk_usage);
 #endif
-void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity_buf_len,
-		unsigned char *psk_buf, size_t psk_buf_len);
+void	zbx_dc_get_autoreg_tls_config(size_t psk_identity_buf_len, size_t psk_buf_len, unsigned char *tls_accept,
+		char *psk_identity_buf, char *psk_buf);
 
 #define ZBX_PROXY_PENDING_HISTORY_NO	0
 #define ZBX_PROXY_PENDING_HISTORY_YES	1
@@ -1023,8 +1029,6 @@ void	zbx_dc_get_autoregistration_psk(char *psk_identity_buf, size_t psk_identity
 #define ZBX_MACRO_VALUE_TEXT	0
 #define ZBX_MACRO_VALUE_SECRET	1
 #define ZBX_MACRO_VALUE_VAULT	2
-
-#define ZBX_MACRO_SECRET_MASK	"******"
 
 int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out);
@@ -1295,6 +1299,8 @@ void	zbx_dc_close_user_macros(zbx_dc_um_handle_t *um_handle);
 
 void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macro, const zbx_uint64_t *hostids,
 		int hostids_num, char **value);
+
+unsigned char	zbx_dc_get_user_macro_env(zbx_dc_um_handle_t *um_handle);
 
 int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
 		const zbx_uint64_t *hostids, int hostids_num, char **error);

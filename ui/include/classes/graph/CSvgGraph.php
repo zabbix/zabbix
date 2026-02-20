@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -247,8 +247,8 @@ class CSvgGraph extends CSvg {
 				'data_set' => $metric['data_set'],
 				'name' => $metric['name'],
 				'itemid' => $metric['itemid'],
+				'itemids' => $metric['itemids'],
 				'units' => $metric['units'],
-				'host' => $metric['hosts'][0],
 				'options' => ['order' => $index] + $metric['options']
 			];
 

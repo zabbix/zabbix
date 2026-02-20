@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -65,6 +65,9 @@ void	zbx_variant_clear(zbx_variant_t *value)
 		case ZBX_VARIANT_BIN:
 			zbx_free(value->data.bin);
 			break;
+		case ZBX_VARIANT_JSON:
+			zbx_free(value->data.json);
+			break;
 		case ZBX_VARIANT_ERR:
 			zbx_free(value->data.err);
 			break;
@@ -80,6 +83,8 @@ void	zbx_variant_clear(zbx_variant_t *value)
 			zbx_free(value->data.vector);
 			break;
 		case ZBX_VARIANT_NONE:
+			value->data.flags = 0;
+			break;
 		case ZBX_VARIANT_DBL:
 		case ZBX_VARIANT_UI64:
 			break;
@@ -89,6 +94,12 @@ void	zbx_variant_clear(zbx_variant_t *value)
 	}
 
 	value->type = ZBX_VARIANT_NONE;
+}
+
+void	zbx_variant_clear_ext(zbx_variant_t *value, unsigned char flags)
+{
+	zbx_variant_clear(value);
+	value->data.flags = flags;
 }
 
 /******************************************************************************
@@ -123,6 +134,7 @@ void	zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64)
 
 void	zbx_variant_set_none(zbx_variant_t *value)
 {
+	value->data.flags = 0;
 	value->type = ZBX_VARIANT_NONE;
 }
 
@@ -130,6 +142,12 @@ void	zbx_variant_set_bin(zbx_variant_t *value, void *value_bin)
 {
 	value->data.bin = value_bin;
 	value->type = ZBX_VARIANT_BIN;
+}
+
+void	zbx_variant_set_json(zbx_variant_t *value, char *value_json)
+{
+	value->data.json = value_json;
+	value->type = ZBX_VARIANT_JSON;
 }
 
 void	zbx_variant_set_error(zbx_variant_t *value, char *error)
@@ -174,6 +192,7 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			zbx_variant_set_bin(value, zbx_variant_data_bin_copy(source->data.bin));
 			break;
 		case ZBX_VARIANT_NONE:
+			value->data.flags = source->data.flags;
 			value->type = ZBX_VARIANT_NONE;
 			break;
 		case ZBX_VARIANT_ERR:
@@ -190,6 +209,12 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 
 			zbx_variant_set_vector(value, var_vector);
 			break;
+		case ZBX_VARIANT_JSON:
+			zbx_variant_set_json(value, zbx_strdup(NULL, source->data.json));
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
 	}
 }
 
@@ -278,6 +303,7 @@ static int	variant_to_str(zbx_variant_t *value)
 	switch (value->type)
 	{
 		case ZBX_VARIANT_STR:
+		case ZBX_VARIANT_JSON:
 			return SUCCEED;
 		case ZBX_VARIANT_DBL:
 			value_str = zbx_strdup(NULL, zbx_print_double(buffer, sizeof(buffer), value->data.dbl));
@@ -305,6 +331,7 @@ int	zbx_variant_convert(zbx_variant_t *value, int type)
 		case ZBX_VARIANT_DBL:
 			return variant_to_dbl(value);
 		case ZBX_VARIANT_STR:
+		case ZBX_VARIANT_JSON:
 			return variant_to_str(value);
 		case ZBX_VARIANT_NONE:
 			zbx_variant_clear(value);
@@ -384,6 +411,8 @@ const char	*zbx_variant_value_desc(const zbx_variant_t *value)
 		case ZBX_VARIANT_VECTOR:
 			zbx_snprintf(buffer, sizeof(buffer), "var vector[0:%d]", value->data.vector->values_num);
 			return buffer;
+		case ZBX_VARIANT_JSON:
+			return value->data.json;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
@@ -408,6 +437,8 @@ const char	*zbx_get_variant_type_desc(unsigned char type)
 			return "error";
 		case ZBX_VARIANT_VECTOR:
 			return "vector";
+		case ZBX_VARIANT_JSON:
+			return "json";
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return ZBX_UNKNOWN_STR;
@@ -448,7 +479,15 @@ zbx_uint64_t	zbx_variant_size(const zbx_variant_t *value)
 				size += sizeof(zbx_variant_t) * (value->data.vector->values_alloc - i);
 			}
 			break;
+		case ZBX_VARIANT_JSON:
+			size = strlen(value->data.json) + 1;
+			break;
+		case ZBX_VARIANT_DBL:
+		case ZBX_VARIANT_UI64:
+			break;
 		default:
+			zabbix_log(LOG_LEVEL_CRIT, "%s(): unexpected value->type:%hhu", __func__, value->type);
+			THIS_SHOULD_NEVER_HAPPEN;
 			break;
 	}
 
@@ -495,6 +534,14 @@ static int	variant_compare_bin(const zbx_variant_t *value1, const zbx_variant_t 
 	}
 
 	return -1;
+}
+
+static int	variant_compare_json(const zbx_variant_t *value1, const zbx_variant_t *value2)
+{
+	if (ZBX_VARIANT_JSON == value1->type)
+		return strcmp(value1->data.json, zbx_variant_value_desc(value2));
+
+	return strcmp(zbx_variant_value_desc(value1), value2->data.json);
 }
 
 /******************************************************************************
@@ -583,6 +630,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 		case ZBX_VARIANT_STR:
 			value1_dbl = atof(value1->data.str);
 			break;
+		case ZBX_VARIANT_JSON:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -599,6 +647,7 @@ static int	variant_compare_dbl(const zbx_variant_t *value1, const zbx_variant_t 
 		case ZBX_VARIANT_STR:
 			value2_dbl = atof(value2->data.str);
 			break;
+		case ZBX_VARIANT_JSON:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
@@ -670,6 +719,9 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 	if (ZBX_VARIANT_BIN == value1->type || ZBX_VARIANT_BIN == value2->type)
 		return variant_compare_bin(value1, value2);
 
+	if (ZBX_VARIANT_JSON == value1->type || ZBX_VARIANT_JSON == value2->type)
+		return variant_compare_json(value1, value2);
+
 	if (ZBX_VARIANT_VECTOR == value1->type || ZBX_VARIANT_VECTOR == value2->type)
 		return variant_compare_vector(value1, value2);
 
@@ -697,8 +749,9 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
  *               FAIL    - values are different                               *
  *                                                                            *
  * Comments: This function checks if two variants are of the same type and    *
- *           have identical content. For string, error, binary, and vector    *
- *           types, it checks if they point to the same memory location.      *
+ *           have identical content. For string, error, binary, vector and    *
+ *           JSON types, it checks if they point to the same memory location. *
+ *           It does not compare flags used in processing.                    *
  *                                                                            *
  ******************************************************************************/
 int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2)
@@ -721,6 +774,8 @@ int	zbx_variant_same(const zbx_variant_t *value1, const zbx_variant_t *value2)
 			return value1->data.bin == value2->data.bin ? SUCCEED : FAIL;
 		case ZBX_VARIANT_VECTOR:
 			return value1->data.vector == value2->data.vector ? SUCCEED : FAIL;
+		case ZBX_VARIANT_JSON:
+			return value1->data.json == value2->data.json ? SUCCEED : FAIL;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return FAIL;

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,9 +14,6 @@
 
 #include "zbxalgo.h"
 
-
-static void	swap(zbx_binary_heap_t *heap, int index_1, int index_2);
-
 static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap);
 
 static int	__binary_heap_bubble_up(zbx_binary_heap_t *heap, int index);
@@ -28,19 +25,19 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index);
 
 /* helper functions */
 
-static void	swap(zbx_binary_heap_t *heap, int index_1, int index_2)
+static void	swap_direct(zbx_binary_heap_t *heap, int index_1, int index_2)
+{
+	zbx_hashmap_set(heap->key_index, heap->elems[index_1].key, index_1);
+	zbx_hashmap_set(heap->key_index, heap->elems[index_2].key, index_2);
+}
+
+static void	swap(zbx_binary_heap_elem_t *elem_1, zbx_binary_heap_elem_t *elem_2)
 {
 	zbx_binary_heap_elem_t	tmp;
 
-	tmp = heap->elems[index_1];
-	heap->elems[index_1] = heap->elems[index_2];
-	heap->elems[index_2] = tmp;
-
-	if (HAS_DIRECT_OPTION(heap))
-	{
-		zbx_hashmap_set(heap->key_index, heap->elems[index_1].key, index_1);
-		zbx_hashmap_set(heap->key_index, heap->elems[index_2].key, index_2);
-	}
+	tmp = *elem_1;
+	*elem_1 = *elem_2;
+	*elem_2 = tmp;
 }
 
 /* private binary heap functions */
@@ -78,13 +75,21 @@ static void	__binary_heap_ensure_free_space(zbx_binary_heap_t *heap)
 
 static int	__binary_heap_bubble_up(zbx_binary_heap_t *heap, int index)
 {
+	unsigned char direct = HAS_DIRECT_OPTION(heap);
+
 	while (0 != index)
 	{
-		if (heap->compare_func(&heap->elems[(index - 1) / 2], &heap->elems[index]) <= 0)
+		int	left = (index - 1) / 2;
+
+		if (heap->compare_func(&heap->elems[left], &heap->elems[index]) <= 0)
 			break;
 
-		swap(heap, (index - 1) / 2, index);
-		index = (index - 1) / 2;
+		swap(&heap->elems[left], &heap->elems[index]);
+
+		if (direct)
+			swap_direct(heap, left, index);
+
+		index = left;
 	}
 
 	return index;
@@ -92,6 +97,8 @@ static int	__binary_heap_bubble_up(zbx_binary_heap_t *heap, int index)
 
 static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index)
 {
+	unsigned char direct = HAS_DIRECT_OPTION(heap);
+
 	while (1)
 	{
 		int left = 2 * index + 1;
@@ -104,7 +111,11 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index)
 		{
 			if (heap->compare_func(&heap->elems[index], &heap->elems[left]) > 0)
 			{
-				swap(heap, index, left);
+				swap(&heap->elems[index], &heap->elems[left]);
+
+				if (direct)
+					swap_direct(heap, index, left);
+
 				index = left;
 			}
 
@@ -115,7 +126,11 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index)
 		{
 			if (heap->compare_func(&heap->elems[index], &heap->elems[left]) > 0)
 			{
-				swap(heap, index, left);
+				swap(&heap->elems[index], &heap->elems[left]);
+
+				if (direct)
+					swap_direct(heap, index, left);
+
 				index = left;
 			}
 			else
@@ -125,7 +140,11 @@ static int	__binary_heap_bubble_down(zbx_binary_heap_t *heap, int index)
 		{
 			if (heap->compare_func(&heap->elems[index], &heap->elems[right]) > 0)
 			{
-				swap(heap, index, right);
+				swap(&heap->elems[index], &heap->elems[right]);
+
+				if (direct)
+					swap_direct(heap, index, right);
+
 				index = right;
 			}
 			else

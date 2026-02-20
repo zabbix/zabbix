@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -379,7 +379,7 @@ static void	determine_items_in_expressions(zbx_vector_dc_trigger_t *trigger_orde
 		}
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, functionids.values_num);
+	zbx_dc_config_clean_functions(functions, functionids.values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
 out:
@@ -521,6 +521,7 @@ static void	DCinventory_value_add(zbx_vector_inventory_value_ptr_t *inventory_va
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			return;
@@ -607,6 +608,11 @@ static void	dc_history_set_value(zbx_dc_history_t *hdata, unsigned char value_ty
 			hdata->value.str = value->data.str;
 			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_BIN_VALUE_LEN)] = '\0';
 			break;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_dc_history_clean_value(hdata);
+			hdata->value.str = value->data.str;
+			hdata->value.str[zbx_db_strlen_n(hdata->value.str, ZBX_HISTORY_JSON_VALUE_LEN)] = '\0';
+			break;
 		case ITEM_VALUE_TYPE_LOG:
 			if (ITEM_VALUE_TYPE_LOG != hdata->value_type)
 			{
@@ -665,6 +671,10 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 				logvalue = hdata->value.log->value;
 				logvalue[zbx_db_strlen_n(logvalue, ZBX_HISTORY_LOG_VALUE_LEN)] = '\0';
 				break;
+			case ITEM_VALUE_TYPE_JSON:
+				/* JSON values do not need to be truncated since their sizes are already checked */
+				/* before inserting them into history cache. */
+				break;
 			case ITEM_VALUE_TYPE_BIN:
 				/* in history cache binary values are stored as ITEM_VALUE_TYPE_STR */
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -693,6 +703,7 @@ static void	normalize_item_value(const zbx_history_sync_item_t *item, zbx_dc_his
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			zbx_variant_set_str(&value_var, hdata->value.str);
 			hdata->value.str = NULL;
 			break;
@@ -899,7 +910,9 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 					select_str = {.table_name = "history_str"},
 					select_log = {.table_name = "history_log"},
 					select_text = {.table_name = "history_text"},
-					select_bin = {.table_name = "history_bin"};
+					select_bin = {.table_name = "history_bin"},
+					select_json = {.table_name = "history_json"};
+
 	zbx_vector_dc_history_ptr_t	duplicates, history_index;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -928,6 +941,8 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 			select_ptr = &select_text;
 		else if (h->value_type == ITEM_VALUE_TYPE_BIN)
 			select_ptr = &select_bin;
+		else if (h->value_type == ITEM_VALUE_TYPE_JSON)
+			select_ptr = &select_json;
 		else
 			continue;
 
@@ -951,6 +966,7 @@ static void	remove_history_duplicates(zbx_vector_dc_history_ptr_t *history)
 	db_fetch_duplicates(&select_log, ITEM_VALUE_TYPE_LOG, &duplicates);
 	db_fetch_duplicates(&select_text, ITEM_VALUE_TYPE_TEXT, &duplicates);
 	db_fetch_duplicates(&select_bin, ITEM_VALUE_TYPE_BIN, &duplicates);
+	db_fetch_duplicates(&select_json, ITEM_VALUE_TYPE_JSON, &duplicates);
 
 	vc_flag_duplicates(&history_index, &duplicates);
 
@@ -1257,6 +1273,7 @@ static void	DCmodule_prepare_history(zbx_dc_history_t *history, int history_num,
 				h_log->severity = log->severity;
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -1382,7 +1399,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 	static int				module_enabled = FAIL;
 	int					i, history_num, history_float_num, history_integer_num,
 						history_string_num, history_text_num, history_log_num, txn_error,
-						compression_age, connectors_retrieved = FAIL;
+						compression_age = FAIL, connectors_retrieved = FAIL;
 	unsigned int				item_retrieve_mode;
 	time_t					sync_start;
 	zbx_vector_uint64_t			triggerids;
@@ -1440,8 +1457,6 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 				ZBX_HC_SYNC_MAX * sizeof(ZBX_HISTORY_LOG));
 	}
 
-	compression_age = zbx_hc_get_history_compression_age();
-
 	zbx_vector_connector_filter_create(&connector_filters_history);
 	zbx_vector_connector_filter_create(&connector_filters_events);
 	zbx_vector_inventory_value_ptr_create(&inventory_values);
@@ -1460,7 +1475,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 	zbx_vector_hc_item_ptr_reserve(&history_items, ZBX_HC_SYNC_MAX);
 
 	zbx_vector_dc_trigger_create(&trigger_order);
-	zbx_hashset_create(&trigger_info, 100, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_hashset_create(&trigger_info, 100, ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	zbx_vector_uint64_create(&itemids);
 
@@ -1498,6 +1513,11 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 			zbx_dc_um_handle_t	*um_handle;
 
 			stats->values_num += history_num;
+
+			if (FAIL == compression_age)
+			{
+				compression_age = zbx_hc_get_history_compression_age();
+			}
 
 			if (FAIL == connectors_retrieved)
 			{
@@ -1653,7 +1673,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 					zbx_vector_escalation_new_ptr_create(&escalations);
 
 					start_time = zbx_time();
-					zbx_db_begin();
+					zbx_db_begin_deferred();
 
 					recalculate_triggers(history, history_num, &itemids, items, errcodes,
 							&trigger_timers, events_cbs->add_event_cb, &trigger_diff,
@@ -1835,7 +1855,7 @@ void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc
 		if (0 != history_num)
 		{
 			zbx_free(trends);
-			zbx_dc_config_clean_history_sync_items(items, errcodes, (size_t)history_num);
+			zbx_dc_config_clean_history_sync_items(items, (size_t)history_num);
 
 			zbx_vector_hc_item_ptr_clear(&history_items);
 			zbx_hc_free_item_values(history, history_num);

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,13 +23,13 @@ require_once __DIR__.'/../../include/CWebTest.php';
 class testMultiselects extends CWebTest {
 
 	public function testMultiselects_SuggestExisting() {
-		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
+		$this->checkSuggest('zabbix.php?action=latest.view&filter_reset=1', 'zbx_filter',
 				'Host groups', 'z', 'multiselect-suggest'
 		);
 	}
 
 	public function testMultiselects_SuggestNoMatches() {
-		$this->checkSuggest('zabbix.php?action=problem.view&filter_reset=1', 'zbx_filter',
+		$this->checkSuggest('zabbix.php?action=latest.view&filter_reset=1', 'zbx_filter',
 				'Host groups', 'QQQ', 'multiselect-matches'
 		);
 	}
@@ -59,13 +59,13 @@ class testMultiselects extends CWebTest {
 			? [$element, ['x' => 111, 'y' => 338, 'width' => 452, 'height' => 22]]
 			: [$element];
 
-		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'table-forms'))
+		$this->assertScreenshotExcept($element->parents('class', (($query === 'host-form') ? 'form-grid' : 'cell'))
 				->one(), $covered_region, $string
 		);
 	}
 
 	public function testMultiselects_NotSuggestAlreadySelected() {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1')->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
 		$this->page->updateViewport();
 		$form = $this->query('name:zbx_filter')->asForm()->one()->waitUntilVisible();
 		$field = $form->getField('Host groups');
@@ -73,7 +73,7 @@ class testMultiselects extends CWebTest {
 		$element = $field->query('tag:input')->one();
 		$element->type('Zabbix server');
 		$this->query('class:multiselect-matches')->waitUntilVisible();
-		$this->assertScreenshotExcept($element->parents('class:table-forms')->one(), [$element]);
+		$this->assertScreenshotExcept($element->parents('class:cell')->one(), [$element]);
 	}
 
 	public function testMultiselects_SuggestInOverlay() {

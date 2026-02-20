@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -635,6 +635,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			{
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)
 						zbx_dc_get_stats(ZBX_STATS_HISTORY_BIN_COUNTER));
+			}
+			else if (0 == strcmp(tmp1, "json"))
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_JSON_COUNTER));
 			}
 			else if (0 == strcmp(tmp1, "not supported"))
 			{

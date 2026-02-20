@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -249,7 +249,7 @@ class testFormServicesServices extends CWebTest {
 
 		// Check hint-box.
 		$form->query('id:algorithm-not-applicable-warning')->one()->click();
-		$hint = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hint = $form->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent();
 		$hintbox = 'Status calculation rule and additional rules are only applicable if child services exist.';
 		$this->assertEquals($hintbox, $hint->one()->getText());
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -190,9 +190,7 @@ class CMacroValue extends CDiv {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
 			$dropdown_btn_class = ZBX_ICON_TEXT;
 
-			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value, [
-				'add_post_js' => $this->add_post_js
-			]))
+			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value))
 				->setErrorContainer($this->error_container_id)
 				->setErrorLabel($this->error_label)
 				->setMaxlength($this->maxlength)
@@ -205,9 +203,7 @@ class CMacroValue extends CDiv {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_ICON_LOCK;
 
-			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value, [
-				'add_post_js' => $this->add_post_js
-			]))
+			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value))
 				->setErrorContainer($this->error_container_id)
 				->setErrorLabel($this->error_label)
 				->setMaxlength($this->maxlength)

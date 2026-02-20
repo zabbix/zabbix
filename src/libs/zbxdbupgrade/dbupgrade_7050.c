@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,7 @@
 
 #include "zbxdbschema.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 8.0 development database patches
@@ -236,6 +237,264 @@ static int	DBpatch_7050018(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050019(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptestitem"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050020(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstepitem"
+			" where httpstepid in ("
+				"select hts.httpstepid"
+				" from hosts h,httptest ht,httpstep hts"
+				" where h.hostid=ht.hostid"
+					" and ht.httptestid=hts.httptestid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050021(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from item_tag"
+			" where itemid in ("
+				"select i.itemid from hosts h,items i"
+				" where h.hostid=i.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050022(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from items"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=items.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050023(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep_field"
+			" where httpstepid in ("
+				"select hts.httpstepid"
+				" from hosts h,httptest ht,httpstep hts"
+				" where h.hostid=ht.hostid"
+					" and ht.httptestid=hts.httptestid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050024(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httpstep"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050025(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest_field"
+			" where httptestid in ("
+				"select ht.httptestid from hosts h,httptest ht"
+				" where h.hostid=ht.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050026(void)
+{
+	/* 2 - ZBX_FLAG_DISCOVERY_PROTOTYPE */
+	/* 6 - ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED (host prototype discovered via nested LLD) */
+	if (ZBX_DB_OK > zbx_db_execute(
+			"delete from httptest"
+			" where exists ("
+				"select null from hosts h"
+				" where h.hostid=httptest.hostid and h.flags in (2,6)"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050027(void)
+{
+	/* 3 - HOST_STATUS_TEMPLATE */
+	if (ZBX_DB_OK > zbx_db_execute("delete from item_rtdata"
+			" where exists ("
+				"select null from items i,hosts h"
+				" where item_rtdata.itemid=i.itemid"
+					" and i.hostid=h.hostid and h.status=3"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050028(void)
+{
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
+}
+
+static int	DBpatch_7050029(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update trigger_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where triggerid in ("
+				"select triggerid"
+				" from trigger_discovery"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050030(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'*.massupdate',"
+					"'host.massupdate',"
+					"'hostgroup.massupdate',"
+					"'template.massupdate',"
+					"'templategroup.massupdate',"
+					"'*.replacehostinterfaces',"
+					"'hostinterface.replacehostinterfaces'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050031(void)
+{
+	const zbx_db_table_t	table =
+			{"history_json", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 0, ZBX_TYPE_JSON, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050032(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int				ret;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			(char *)NULL);
+
+	result = zbx_db_select("select w.widgetid"
+			" from widget w"
+			" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+			" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
+			" where w.type='scatterplot' or w.type='svggraph'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_hostnames", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7050033(void)
+{
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget_field", &field, NULL);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -261,5 +520,20 @@ DBPATCH_ADD(7050015, 0, 1)
 DBPATCH_ADD(7050016, 0, 1)
 DBPATCH_ADD(7050017, 0, 1)
 DBPATCH_ADD(7050018, 0, 1)
+DBPATCH_ADD(7050019, 0, 1)
+DBPATCH_ADD(7050020, 0, 1)
+DBPATCH_ADD(7050021, 0, 1)
+DBPATCH_ADD(7050022, 0, 1)
+DBPATCH_ADD(7050023, 0, 1)
+DBPATCH_ADD(7050024, 0, 1)
+DBPATCH_ADD(7050025, 0, 1)
+DBPATCH_ADD(7050026, 0, 1)
+DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
+DBPATCH_ADD(7050029, 0, 1)
+DBPATCH_ADD(7050030, 0, 1)
+DBPATCH_ADD(7050031, 0, 1)
+DBPATCH_ADD(7050032, 0, 1)
+DBPATCH_ADD(7050033, 0, 1)
 
 DBPATCH_END()

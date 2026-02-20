@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 #
-# Copyright (C) 2001-2025 Zabbix SIA
+# Copyright (C) 2001-2026 Zabbix SIA
 #
 # This program is free software: you can redistribute it and/or modify it under the terms of
 # the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,10 +42,11 @@ my %c = (
 	"t_time"	=>	"ZBX_TYPE_INT",
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_cuid"	=>	"ZBX_TYPE_CUID",
+	"t_json"	=>	"ZBX_TYPE_JSON",
 );
 
 $c{"before"} = "/*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,6 +87,7 @@ my %mysql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"json",
 );
 
 my %postgresql = (
@@ -107,6 +109,7 @@ my %postgresql = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"jsonb",
 );
 
 my %sqlite3 = (
@@ -128,6 +131,7 @@ my %sqlite3 = (
 	"t_time"	=>	"integer",
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
+	"t_json"	=>	"jsonb",
 );
 
 sub rtrim($)
@@ -656,7 +660,7 @@ EOF
 
 	my $flags = "migrate_data => true, if_not_exists => true";
 
-	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin")
+	for ("history", "history_uint", "history_log", "history_text", "history_str", "history_bin", "history_json")
 	{
 		print<<EOF
 	PERFORM create_hypertable('$_', 'clock', chunk_time_interval => 86400, $flags);
