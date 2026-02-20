@@ -48,14 +48,15 @@ type msgIfDiscovery struct {
 }
 
 type ifConfigData struct {
-	Ifname      string  `json:"name"`
-	Ifalias     string  `json:"ifalias"`
-	Ifmac       string  `json:"mac"`
-	Iftype      string  `json:"type"`
-	Ifspeed     uint64  `json:"speed"`
-	Ifduplex    string  `json:"duplex"`
-	IfAdmState  *string `json:"administrative_state"`
-	IfOperState *string `json:"operational_state"`
+	Name      string `json:"name"`
+	Alias     string `json:"ifalias"`
+	Mac       string `json:"mac"`
+	Type      string `json:"type"`
+	Speed     uint64 `json:"speed"`
+	Duplex    string `json:"duplex"`
+	AdmState  string `json:"administrative_state"`
+	OperState string `json:"operational_state"`
+	Carrier   uint64 `json:"carrier"`
 }
 
 type ifStatsIn struct {

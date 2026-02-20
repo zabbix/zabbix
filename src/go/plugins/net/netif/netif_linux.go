@@ -16,7 +16,6 @@ package netif
 
 import (
 	"encoding/json"
-	"net"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -337,6 +336,32 @@ func (p *Plugin) ifTypeGet(ifName string) string {
 	return physical
 }
 
+// ifAdminStateGet returns the administrative state of the interface.
+func (p *Plugin) ifAdminStateGet(ifName string) string {
+	const (
+		unknown = "unknown"
+		up      = "up"
+		down    = "down"
+	)
+
+	s := p.sysClassNetStrGet(ifName, "flags")
+	if s == "" {
+		return unknown
+	}
+
+	flags, err := strconv.ParseUint(s, 16, 64)
+	if err != nil {
+		/* should never happen */
+		return unknown
+	}
+
+	if (flags & unix.IFF_UP) != 0 {
+		return up
+	}
+
+	return down
+}
+
 // ifRowScan scans one line from /proc/net/dev representing network interface.
 func (p *Plugin) ifRowScan(line string) (string, []uint64, error) {
 	dev := strings.Split(line, ":")
@@ -425,41 +450,20 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 
 // returns single interface config and values.
 func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigData, *IfValuesData) {
-	var admState, operState *string
-
-	iface, err := net.InterfaceByName(ifName)
-	if err == nil {
-		adm := "down"
-		if iface.Flags&net.FlagUp != 0 {
-			adm = "up"
-		}
-
-		admState = &adm
-
-		oper := "down"
-		if iface.Flags&net.FlagRunning != 0 {
-			oper = "up"
-		}
-
-		operState = &oper
-	}
-
 	alias := p.sysClassNetStrGet(ifName, "ifalias")
 	mac := p.sysClassNetStrGet(ifName, "address")
-	speed := p.sysClassNetUintGet(ifName, "speed")
-	ifType := p.ifTypeGet(ifName)
-	carrier := p.sysClassNetUintGet(ifName, "carrier")
-	duplex := p.sysClassNetStrGet(ifName, "duplex")
+	carrier:=p.sysClassNetUintGet(ifName, "carrier")
 
 	config := ifConfigData{
-		Ifname:      ifName,
-		Ifalias:     alias,
-		Ifmac:       mac,
-		Iftype:      ifType,
-		Ifspeed:     speed,
-		Ifduplex:    duplex,
-		IfAdmState:  admState,
-		IfOperState: operState,
+		Name:      ifName,
+		Alias:     alias,
+		Mac:       mac,
+		Type:      p.ifTypeGet(ifName),
+		Speed:     p.sysClassNetUintGet(ifName, "speed"),
+		Duplex:    p.sysClassNetStrGet(ifName, "duplex"),
+		AdmState:  p.ifAdminStateGet(ifName),
+		OperState: p.sysClassNetStrGet(ifName, "operational_state"),
+		Carrier:   carrier,
 	}
 
 	values := IfValuesData{
