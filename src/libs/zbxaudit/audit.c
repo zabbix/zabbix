@@ -52,11 +52,12 @@ zbx_hashset_t	*zbx_get_audit_hashset(void)
 	return &zbx_audit;
 }
 
-static void	zbx_audit_init_details(zbx_vector_audit_entry_detail_t *details) {
+static void	zbx_audit_details_init(zbx_vector_audit_entry_detail_t *details)
+{
 	zbx_vector_audit_entry_detail_create(details);
 }
 
-static void	zbx_audit_clean_details(zbx_vector_audit_entry_detail_t *details)
+static void	zbx_audit_details_clean(zbx_vector_audit_entry_detail_t *details)
 {
 	for (int i = 0; i < details->values_num; i++)
 	{
@@ -79,14 +80,14 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 	audit_entry->audit_action = audit_action;
 	audit_entry->resource_type = resource_type;
 	zbx_new_cuid(audit_entry->audit_cuid);
-	zbx_audit_init_details(&audit_entry->details);
+	zbx_audit_details_init(&audit_entry->details);
 
 	return audit_entry;
 }
 
 void	zbx_audit_entry_clean(zbx_audit_entry_t *entry)
 {
-	zbx_audit_clean_details(&entry->details);
+	zbx_audit_details_clean(&entry->details);
 	zbx_free(entry->name);
 	zbx_free(entry->cuid);
 }
@@ -104,12 +105,12 @@ zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_tabl
 	audit_entry->audit_action = audit_action;
 	audit_entry->resource_type = resource_type;
 	zbx_new_cuid(audit_entry->audit_cuid);
-	zbx_audit_init_details(&audit_entry->details);
+	zbx_audit_details_init(&audit_entry->details);
 
 	return audit_entry;
 }
 
-static void	push_detail(zbx_vector_audit_entry_detail_t *details, const char *key, struct zbx_json *json)
+static void	detail_push(zbx_vector_audit_entry_detail_t *details, const char *key, struct zbx_json *json)
 {
 	zbx_audit_entry_detail_t	new_detail;
 
@@ -128,7 +129,7 @@ static void	details_append_str(zbx_vector_audit_entry_detail_t *details, const c
 	zbx_json_addstring(&json, NULL, val, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -142,7 +143,7 @@ static void	details_append_uint64(zbx_vector_audit_entry_detail_t *details, cons
 	zbx_json_adduint64(&json, NULL, val);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -156,7 +157,7 @@ static void	details_append_int(zbx_vector_audit_entry_detail_t *details, const c
 	zbx_json_addint64(&json, NULL, val);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -170,7 +171,7 @@ static void	details_append_double(zbx_vector_audit_entry_detail_t *details, cons
 	zbx_json_addfloat(&json, NULL, val);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -182,7 +183,7 @@ static void	details_append_no_value(zbx_vector_audit_entry_detail_t *details, co
 	zbx_json_addstring(&json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -197,7 +198,7 @@ static void	details_update_str(zbx_vector_audit_entry_detail_t *details, const c
 	zbx_json_addstring(&json, NULL, val_old, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -212,7 +213,7 @@ static void	details_update_uint64(zbx_vector_audit_entry_detail_t *details, cons
 	zbx_json_adduint64(&json, NULL, val_old);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -226,7 +227,7 @@ static void	details_update_int(zbx_vector_audit_entry_detail_t *details, const c
 	zbx_json_addint64(&json, NULL, val_old);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -241,7 +242,7 @@ static void	details_update_double(zbx_vector_audit_entry_detail_t *details, cons
 	zbx_json_addfloat(&json, NULL, val_old);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
@@ -253,15 +254,14 @@ static void	details_delete(zbx_vector_audit_entry_detail_t *details, const char 
 	zbx_json_addstring(&json, NULL, audit_op, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 
-	push_detail(details, key, &json);
+	detail_push(details, key, &json);
 	zbx_json_free(&json);
 }
 
-static void	zbx_audit_details_to_json(zbx_vector_audit_entry_detail_t *details, struct zbx_json *json) {
+static void	zbx_audit_details_to_json(zbx_vector_audit_entry_detail_t *details, struct zbx_json *json)
+{
 	for (int i = 0; i < details->values_num; i++)
-	{
 		zbx_json_addraw(json, details->values[i].key, details->values[i].value);
-	}
 }
 
 /******************************************************************************
@@ -280,10 +280,10 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 	int				ret = SUCCEED;
 	char				auditid_cuid[CUID_LEN], hostid_s[MAX_ID_LEN + 1], eventid_s[MAX_ID_LEN + 1],
 					proxyid_s[MAX_ID_LEN + 1];
+	struct zbx_json			details_json;
 	zbx_config_t			cfg;
 	zbx_db_insert_t			db_insert;
 	zbx_vector_audit_entry_detail_t	details;
-	struct zbx_json			details_json;
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
 
@@ -294,7 +294,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_new_cuid(auditid_cuid);
 
-	zbx_audit_init_details(&details);
+	zbx_audit_details_init(&details);
 
 	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script_type)
 	{
@@ -342,7 +342,7 @@ int	zbx_auditlog_global_script(unsigned char script_type, unsigned char script_e
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_json_free(&details_json);
-	zbx_audit_clean_details(&details);
+	zbx_audit_details_clean(&details);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s():%s", __func__, zbx_result_string(ret));
 
@@ -1098,7 +1098,7 @@ int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const c
 
 	zbx_new_cuid(auditid_cuid);
 
-	zbx_audit_init_details(&details);
+	zbx_audit_details_init(&details);
 
 	details_append_int(&details, AUDIT_DETAILS_ACTION_ADD, "history.processed", processed_num);
 	details_append_int(&details, AUDIT_DETAILS_ACTION_ADD, "history.failed", failed_num);
@@ -1121,7 +1121,7 @@ int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const c
 
 	zbx_db_insert_clean(&db_insert);
 	zbx_json_free(&details_json);
-	zbx_audit_clean_details(&details);
+	zbx_audit_details_clean(&details);
 out:
 	zbx_config_clean(&cfg);
 
