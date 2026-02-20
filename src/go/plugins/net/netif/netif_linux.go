@@ -349,7 +349,7 @@ func (p *Plugin) ifAdminStateGet(ifName string) string {
 		return unknown
 	}
 
-	flags, err := strconv.ParseUint(s, 16, 64)
+	flags, err := strconv.ParseUint(s, 0, 64)
 	if err != nil {
 		/* should never happen */
 		return unknown
@@ -452,7 +452,7 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigData, *IfValuesData) {
 	alias := p.sysClassNetStrGet(ifName, "ifalias")
 	mac := p.sysClassNetStrGet(ifName, "address")
-	carrier:=p.sysClassNetUintGet(ifName, "carrier")
+	carrier := p.sysClassNetUintGet(ifName, "carrier")
 
 	config := ifConfigData{
 		Name:      ifName,
@@ -462,7 +462,7 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 		Speed:     p.sysClassNetUintGet(ifName, "speed"),
 		Duplex:    p.sysClassNetStrGet(ifName, "duplex"),
 		AdmState:  p.ifAdminStateGet(ifName),
-		OperState: p.sysClassNetStrGet(ifName, "operational_state"),
+		OperState: p.sysClassNetStrGet(ifName, "operstate"),
 		Carrier:   carrier,
 	}
 
