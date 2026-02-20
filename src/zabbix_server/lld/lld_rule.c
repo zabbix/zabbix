@@ -2987,7 +2987,7 @@ static void	lld_rule_process_nested_rules(const zbx_vector_lld_item_full_ptr_t *
  *             auditlog_enabled - [IN] whether auditlog is enabled:           *
  *                                     ZBX_AUDITLOG_ENABLED or                *
  *                                     ZBX_AUDITLOG_DISABLED                  *
- *             auditlog_enabled - [IN] auditlog mode                          *
+ *             auditlog_mode    - [IN]                                        *
  *                                                                            *
  * Return value: SUCCEED - rules updated successfully                         *
  *               FAIL    - an error occurred                                  *
