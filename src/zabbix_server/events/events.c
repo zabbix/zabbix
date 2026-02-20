@@ -1808,6 +1808,14 @@ out:
 	zbx_vector_uint64_destroy(&triggerids);
 }
 
+static	int	get_trigger_diff_value(zbx_trigger_diff_t *diff)
+{
+	if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT))
+		return diff->value;
+
+	return (0 == diff->problem_count ? TRIGGER_VALUE_OK : TRIGGER_VALUE_PROBLEM);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: update trigger value, problem count fields depending on problem   *
@@ -1817,7 +1825,6 @@ out:
 static void	update_trigger_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 {
 	int			i, index;
-	unsigned char		new_value;
 	zbx_trigger_diff_t	*diff;
 
 	update_trigger_problem_count(trigger_diff);
@@ -1848,6 +1855,14 @@ static void	update_trigger_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 			continue;
 		}
 
+		if (TRIGGER_VALUE_PROBLEM == get_trigger_diff_value(diff) &&
+				event->trigger.value == TRIGGER_VALUE_PROBLEM)
+		{
+			diff->flags &= ~(zbx_uint64_t)(ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE |
+					ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE);
+			continue;
+		}
+
 		/* always update trigger last change whenever a trigger event has been created */
 		diff->lastchange = event->clock;
 		diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_LASTCHANGE;
@@ -1856,14 +1871,11 @@ static void	update_trigger_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff)
 	/* recalculate trigger value from problem_count and mark for updating if necessary */
 	for (i = 0; i < trigger_diff->values_num; i++)
 	{
+		unsigned char	new_value;
+
 		diff = trigger_diff->values[i];
 
-		if (0 == (diff->flags & ZBX_FLAGS_TRIGGER_DIFF_UPDATE_PROBLEM_COUNT))
-			continue;
-
-		new_value = (0 == diff->problem_count ? TRIGGER_VALUE_OK : TRIGGER_VALUE_PROBLEM);
-
-		if (new_value != diff->value)
+		if ((new_value = get_trigger_diff_value(diff)) != diff->value)
 		{
 			diff->value = new_value;
 			diff->flags |= ZBX_FLAGS_TRIGGER_DIFF_UPDATE_VALUE;
