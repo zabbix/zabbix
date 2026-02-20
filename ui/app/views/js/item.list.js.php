@@ -172,7 +172,16 @@
 			const filters = Object.keys(filter_values).reduce((filtered, filter_key) => {
 				if (filter_key.includes('filter_') || filter_key.startsWith('sort')) {
 					if (Array.isArray(filter_values[filter_key])) {
-						filter_values[filter_key].forEach(value => filtered.push({key: `${filter_key}[]`, value}));
+						filter_values[filter_key].forEach((value, i) => {
+							if (typeof value === 'object') {
+								Object.keys(value).forEach(key =>
+									filtered.push({key: `${filter_key}[${i}][${key}]`, value: value[key]})
+								);
+							}
+							else {
+								filtered.push({key: `${filter_key}[]`, value});
+							}
+						});
 					}
 					else if (typeof filter_values[filter_key] === 'object') {
 						Object.keys(filter_values[filter_key]).forEach(key =>
