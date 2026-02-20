@@ -200,7 +200,7 @@ char	*zbx_gen_uuid7(void)
 
 	ts_ms = (uint64_t)ts.sec * 1000 + ts.ns / 1000000;
 
-	/* ---- 48-bit Unix timestamp (big-endian) ---- */
+	/* 6 bytes Unix timestamp */
 	uuid7[0] = (ts_ms >> 40) & 0xff;
 	uuid7[1] = (ts_ms >> 32) & 0xff;
 	uuid7[2] = (ts_ms >> 24) & 0xff;
@@ -208,17 +208,17 @@ char	*zbx_gen_uuid7(void)
 	uuid7[4] = (ts_ms >> 8) & 0xff;
 	uuid7[5] = ts_ms & 0xff;
 
-	/* ---- 10 remaining random bytes ---- */
+	/* 10 remaining random bytes */
 	for (int i = 6; i < ZBX_UUID7_BYTES; i++)
 		uuid7[i] = (unsigned char)(rand() & 0xff);
 
-	/* ---- Set version (7) ---- */
+	/* version */
 	uuid7[6] = (uuid7[6] & 0x0f) | 0x70;
 
-	/* ---- Set variant (10xxxxxx) ---- */
+	/* variant */
 	uuid7[8] = (uuid7[8] & 0x3f) | 0x80;
 
-	/* ---- Convert to hex ---- */
+	/* convert to hex */
 	for (int i = 0; i < ZBX_UUID7_BYTES; i++)
 	{
 		*ptr++ = hex[(uuid7[i] >> 4) & 0xf];
