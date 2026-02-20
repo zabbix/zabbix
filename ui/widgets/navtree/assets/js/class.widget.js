@@ -504,6 +504,7 @@ class CWidgetNavTree extends CWidget {
 				this.#broadcast();
 			}
 		}
+		this.#showSearchTree();
 	}
 
 	#getDefaultSelectable() {
@@ -1059,5 +1060,31 @@ class CWidgetNavTree extends CWidget {
 				e.preventDefault();
 			}
 		};
+	}
+	
+	#showSearchTree() {
+		jQuery(`#navTreeSearch`).remove();
+		const addNear = jQuery(`.navtree`).parent();
+		const searchDom =
+			"<div id='navTreeSearch' style='padding: 10px;'>" +
+			"<label for='navTreeSearchInput'>Search in tree:</label>" +
+			"<input id='navTreeSearchInput' placeholder='branch name...' class='search'/>" +
+			"<input type='checkbox' id='navTreeSearchCheckbox' style='float: right'/>" +
+			"<label for='navTreeSearchCheckbox' style='float: right'>!</label>" +
+			"</div>";
+		addNear.before(searchDom);
+
+		$(document).on("input propertychange paste change", '#navTreeSearchInput,#navTreeSearchCheckbox', function(e) {
+			let value = jQuery(`#navTreeSearchInput`).val().toLowerCase();
+			let problemBox = jQuery(`#navTreeSearchCheckbox`).prop('checked');
+			//let problemLis = jQuery(`.problem-icon-list-item`).closest('li');
+			let $ul = jQuery(`.navtree`);
+			let $li = $ul.find('li:gt(0)');
+			$li.hide();
+			$li.filter(function() {
+				let text = $(this).text().toLowerCase();
+				return problemBox ? text.indexOf(value)>=0 && $(this).find('.problem-icon-list-item').text() !== '' : text.indexOf(value)>=0;
+			}).show();
+		});
 	}
 }
