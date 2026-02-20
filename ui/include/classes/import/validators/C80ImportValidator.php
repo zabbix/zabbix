@@ -410,14 +410,6 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::MEDIA_TYPE_WEBHOOK => CXmlConstantName::WEBHOOK
 	];
 
-	public function setDeniedMediaTypes (array $denied_media_types)	{
-		$all_media_types = array_change_key_case(array_flip($this->MEDIA_TYPE));
-		$supported_media_types = array_diff_key($all_media_types, array_flip($denied_media_types));
-		$supported_media_types = array_flip(array_change_key_case($supported_media_types, 1));
-
-		$this->MEDIA_TYPE = $supported_media_types;
-	}
-
 	private $MEDIA_PROVIDER = [
 		CXmlConstantValue::GENERIC_SMTP => CXmlConstantName::GENERIC_SMTP,
 		CXmlConstantValue::GMAIL => CXmlConstantName::GMAIL,

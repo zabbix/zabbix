@@ -64,22 +64,11 @@ class CImportValidator extends CImportValidatorGeneral {
 			unset($data['zabbix_export']['screens']);
 		}
 
-		$validator = $this->factory->getObject($version)
+		$data['zabbix_export'] = $this->factory->getObject($version)
 			->setStrict($strict)
-			->setPreview($is_preview);
-
-		if (version_compare($version, '8.0', '>=')) {
-			$validator->setDeniedMediaTypes($this->denied_media_types);
-		}
-
-		$data['zabbix_export'] = $validator->validate($data['zabbix_export'], '/zabbix_export');
+			->setPreview($is_preview)
+			->validate($data['zabbix_export'], '/zabbix_export');
 
 		return $data;
-	}
-
-	protected $denied_media_types = [];
-
-	public function setDeniedMediaTypes(array $media_types) {
-		$this->denied_media_types = $media_types;
 	}
 }
