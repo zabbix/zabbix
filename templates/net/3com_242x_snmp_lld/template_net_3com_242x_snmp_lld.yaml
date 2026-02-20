@@ -14,6 +14,7 @@ zabbix_export:
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for 3Com 242x series switches.
         Version: 2.0.0
+        Author: Majid Abdollahi
 
         This template delivers full interface‑level monitoring with advanced analytics, predictive
         modeling, anomaly detection, stability scoring, noise suppression, and SLA‑oriented KPIs.
@@ -72,6 +73,7 @@ zabbix_export:
           • Tested for Zabbix 8.x import and runtime behavior
 
         LLD Version: 18
+        Phase Completed: 1-20
 
       groups:
         - name: "Templates/Network"
