@@ -2526,6 +2526,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			goto out;
 	}
 
+	if (SUCCEED != zbx_db_update_serverid())
+		goto out;
+
 	zbx_db_save_server_status();
 
 	if (SUCCEED != zbx_db_check_instanceid())

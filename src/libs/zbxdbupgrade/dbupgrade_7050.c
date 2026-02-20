@@ -19,6 +19,7 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
+#include "zbxcrypto.h"
 
 /*
  * 8.0 development database patches
@@ -495,6 +496,23 @@ static int	DBpatch_7050033(void)
 	return DBmodify_field_type("widget_field", &field, NULL);
 }
 
+
+static int	DBpatch_7050034(void)
+{
+	int	ret = SUCCEED;
+	char	*uuid7 = zbx_gen_uuid7();
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str, value_int)"
+			" values ('serverid', 1, '%s', 0)", uuid7))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "cannot update serverid in settings table");
+		ret = FAIL;
+	}
+	zbx_free(uuid7);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -535,5 +553,6 @@ DBPATCH_ADD(7050030, 0, 1)
 DBPATCH_ADD(7050031, 0, 1)
 DBPATCH_ADD(7050032, 0, 1)
 DBPATCH_ADD(7050033, 0, 1)
+DBPATCH_ADD(7050034, 0, 1)
 
 DBPATCH_END()

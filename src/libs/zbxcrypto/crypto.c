@@ -177,3 +177,56 @@ char	*zbx_gen_uuid4(const char *seed)
 
 	return uuid;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: calculates UUID version 7 as string of 32 symbols                 *
+ *                                                                            *
+ * Return value: uuid string                                                  *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_gen_uuid7(void)
+{
+#define ZBX_UUID7_BYTES      16
+	const char	*hex = "0123456789abcdef";
+	zbx_timespec_t	ts;
+	unsigned char	uuid7[ZBX_UUID7_BYTES];
+	char		*out, *ptr;
+	uint64_t	ts_ms;
+
+	ptr = out = (char *)zbx_malloc(NULL, 2 * ZBX_UUID7_BYTES + 1);
+
+	zbx_timespec(&ts);
+
+	ts_ms = (uint64_t)ts.sec * 1000 + ts.ns / 1000000;
+
+	/* ---- 48-bit Unix timestamp (big-endian) ---- */
+	uuid7[0] = (ts_ms >> 40) & 0xff;
+	uuid7[1] = (ts_ms >> 32) & 0xff;
+	uuid7[2] = (ts_ms >> 24) & 0xff;
+	uuid7[3] = (ts_ms >> 16) & 0xff;
+	uuid7[4] = (ts_ms >> 8) & 0xff;
+	uuid7[5] = ts_ms & 0xff;
+
+	/* ---- 10 remaining random bytes ---- */
+	for (int i = 6; i < ZBX_UUID7_BYTES; i++)
+		uuid7[i] = (unsigned char)(rand() & 0xff);
+
+	/* ---- Set version (7) ---- */
+	uuid7[6] = (uuid7[6] & 0x0f) | 0x70;
+
+	/* ---- Set variant (10xxxxxx) ---- */
+	uuid7[8] = (uuid7[8] & 0x3f) | 0x80;
+
+	/* ---- Convert to hex ---- */
+	for (int i = 0; i < ZBX_UUID7_BYTES; i++)
+	{
+		*ptr++ = hex[(uuid7[i] >> 4) & 0xf];
+		*ptr++ = hex[uuid7[i] & 0xf];
+	}
+
+	*ptr = '\0';
+
+	return out;
+#undef ZBX_UUID7_BYTES
+}
