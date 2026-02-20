@@ -960,10 +960,10 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 		dbconn_errlog(db, errcode, 0, error, sql);
 		zbx_free(error);
 
-		if (CONNECTION_OK != PQstatus(db->conn))
-			db->connection_failure = 1;
-
 		ret = (SUCCEED == dbconn_is_recoverable_error(db, result) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
+
+		if (ZBX_DB_DOWN == ret)
+			db->connection_failure = 1;
 	}
 
 	if (ZBX_DB_OK == ret)
@@ -1275,6 +1275,7 @@ static zbx_db_result_t	dbconn_vselect(zbx_dbconn_t *db, const char *fmt, va_list
 		{
 			zbx_db_free_result(result);
 			result = (zbx_db_result_t)ZBX_DB_DOWN;
+			db->connection_failure = 1;
 		}
 		else
 		{
