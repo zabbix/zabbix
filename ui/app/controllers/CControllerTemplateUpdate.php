@@ -230,9 +230,13 @@ class CControllerTemplateUpdate extends CController {
 				'macros' => $macros
 			];
 
-			API::Template()->update($template);
+			$result = (bool) API::Template()->update($template);
 
-			$result = DBend(true);
+			if (!$result) {
+				throw new Exception();
+			}
+
+			DBend(true);
 		}
 		catch (Exception $e) {
 			$result = false;
