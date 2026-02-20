@@ -1,0 +1,411 @@
+zabbix_export:
+  version: '6.2'
+  date: '2023-01-02T10:36:14Z'
+  media_types:
+    -
+      name: 'Google Chat'
+      type: WEBHOOK
+      parameters:
+        -
+          name: alert_message
+          value: '{ALERT.MESSAGE}'
+        -
+          name: alert_subject
+          value: '{ALERT.SUBJECT}'
+        -
+          name: event_date
+          value: '{EVENT.DATE}'
+        -
+          name: event_id
+          value: '{EVENT.ID}'
+        -
+          name: event_nseverity
+          value: '{EVENT.NSEVERITY}'
+        -
+          name: event_opdata
+          value: '{EVENT.OPDATA}'
+        -
+          name: event_recovery_date
+          value: '{EVENT.RECOVERY.DATE}'
+        -
+          name: event_recovery_time
+          value: '{EVENT.RECOVERY.TIME}'
+        -
+          name: event_severity
+          value: '{EVENT.SEVERITY}'
+        -
+          name: event_source
+          value: '{EVENT.SOURCE}'
+        -
+          name: event_status
+          value: '{EVENT.STATUS}'
+        -
+          name: event_tags
+          value: '{EVENT.TAGS}'
+        -
+          name: event_time
+          value: '{EVENT.TIME}'
+        -
+          name: event_update_action
+          value: '{EVENT.UPDATE.ACTION}'
+        -
+          name: event_update_date
+          value: '{EVENT.UPDATE.DATE}'
+        -
+          name: event_update_message
+          value: '{EVENT.UPDATE.MESSAGE}'
+        -
+          name: event_update_status
+          value: '{EVENT.UPDATE.STATUS}'
+        -
+          name: event_update_time
+          value: '{EVENT.UPDATE.TIME}'
+        -
+          name: event_update_user
+          value: '{USER.FULLNAME}'
+        -
+          name: event_value
+          value: '{EVENT.VALUE}'
+        -
+          name: host_ip
+          value: '{HOST.IP}'
+        -
+          name: host_name
+          value: '{HOST.NAME}'
+        -
+          name: gchat_endpoint
+          value: '<PLACE WEBHOOK URL HERE>'
+        -
+          name: trigger_description
+          value: '{TRIGGER.DESCRIPTION}'
+        -
+          name: trigger_id
+          value: '{TRIGGER.ID}'
+        -
+          name: use_default_message
+          value: 'false'
+        -
+          name: zabbix_url
+          value: '{$ZABBIX.URL}'
+      script: |
+        var SEVERITY_COLORS = [
+            '#97AAB3', // Not classified.
+            '#7499FF', // Information.
+            '#FFC859', // Warning.
+            '#FFA059', // Average.
+            '#E97659', // High.
+            '#E45959', // Disaster.
+            '#009900', // Resolved.
+            '#000000'  // Default.
+        ];
+
+        try {
+            var params = JSON.parse(value);
+
+            if (!params.gchat_endpoint) {
+                throw 'Cannot get gchat_endpoint';
+            }
+            else if (!params.gchat_endpoint.startsWith('https://chat.googleapis.com/v1/spaces/')) {
+                throw 'Invalid Google Chat webhook URL: ' + params.gchat_endpoint;
+            }
+
+            params.zabbix_url = (params.zabbix_url.endsWith('/'))
+            ? params.zabbix_url.slice(0, -1) : params.zabbix_url;
+
+            if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {
+                throw 'Incorrect "event_source" parameter given: "' + params.event_source + '".\nMust be 0-3.';
+            }
+
+            // Set "use_default_message" to true for non trigger-based events.
+            if (params.event_source !== '0') {
+                params.use_default_message = 'true';
+            }
+
+            // Check {EVENT.VALUE} for trigger-based and internal events.
+            if (params.event_value !== '0' && params.event_value !== '1'
+                && (params.event_source === '0' || params.event_source === '3')) {
+                throw 'Incorrect "event_value" parameter given: "' + params.event_value + '".\nMust be 0 or 1.';
+            }
+
+            // Check {EVENT.UPDATE.STATUS} only for trigger-based events.
+            if (params.event_update_status !== '0' && params.event_update_status !== '1' && params.event_source === '0') {
+                throw 'Incorrect "event_update_status" parameter given: "' + params.event_update_status + '".\nMust be 0 or 1.';
+            }
+
+            if (params.event_value == 0) {
+                params.event_nseverity = '6';
+            }
+
+            if (!SEVERITY_COLORS[params.event_nseverity]) {
+                params.event_nseverity = '7';
+            }
+
+            var request = new HttpRequest();
+            var facts = [];
+            var body = {
+                    cards: [
+                        {
+                            sections: [
+                                {
+                                    widgets: [
+                                        {
+                                            textParagraph: {
+                                                text: '<b><font color=\"' +SEVERITY_COLORS[params.event_nseverity]+ '\">' + params.alert_subject + '</font></b>'
+                                            }
+                                        },
+                                        {
+                                            textParagraph: {
+                                                text: '<i>On ' + params.host_name + ' [' + params.host_ip + ']</i>'
+                                            }
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                };
+
+            if (params.use_default_message.toLowerCase() == 'true' && params.alert_message) {
+                body.cards[0].sections.push({
+                    widgets: [
+                        {
+                            textParagraph: {
+                                text: params.alert_message
+                            }
+                        }
+                    ]
+                });
+            } else if (params.trigger_description) {
+                body.cards[0].sections.push({
+                    widgets: [
+                        {
+                            textParagraph: {
+                                text: params.trigger_description
+                            }
+                        }
+                    ]
+                });
+            }
+
+            if (params.use_default_message.toLowerCase() !== 'true') {
+                // Problem message.
+                if (params.event_value === '1' && params.event_update_status === '0') {
+                    facts.push({
+                        keyValue: {
+                            topLabel: 'Event time',
+                            content: params.event_time + ' ' + params.event_date
+                        }
+                    });
+                }
+                // Update message.
+                else if (params.event_update_status === '1') {
+                    facts.push({
+                        textParagraph: {
+                            text: params.event_update_user + ' ' + params.event_update_action + '.'
+                        }
+                    });
+
+                    if (params.event_update_message) {
+                        facts.push({
+                            keyValue: {
+                                topLabel: 'Message',
+                                content: params.event_update_message
+                            }
+                        });
+                    }
+
+                    facts.push({
+                        keyValue: {
+                            topLabel: 'Event update time',
+                            content: params.event_update_time + ' ' + params.event_update_date
+                        }
+                    });
+                }
+                // Resolved message.
+                else {
+                    facts.push({
+                        keyValue: {
+                            topLabel: 'Revovery time',
+                            content: params.event_recovery_time + ' ' + params.event_recovery_date
+                        }
+                    });
+                }
+
+                if (params.event_severity && params.event_severity !== '{EVENT.SEVERITY}') {
+                    facts.push({
+                        keyValue: {
+                            topLabel: 'Severity',
+                            content: params.event_severity
+                        }
+                    });
+                }
+
+
+                if (params.event_opdata && params.event_opdata !== '{EVENT.OPDATA}') {
+                    facts.push({
+                        keyValue: {
+                            topLabel: 'Operational data',
+                            content: params.event_opdata
+                        }
+                    });
+                }
+
+                if (params.event_tags && params.event_tags !== '{EVENT.TAGS}') {
+                    facts.push({
+                        keyValue: {
+                            topLabel: 'Event tags',
+                            content: params.event_tags
+                        }
+                    });
+                }
+
+                body.cards[0].sections.push({widgets: facts });
+
+                if (params.zabbix_url.startsWith('http')) {
+                    body.cards[0].sections.push({
+                        widgets: [
+                            {
+                                buttons: [
+                                    {
+                                        textButton: {
+                                            text: (params.event_source === '0')
+                                                ? 'Event Info'
+                                                : 'Zabbix Home',
+                                            onClick: {
+                                                openLink: {
+                                                    url: (params.event_source === '0')
+                                                        ? params.zabbix_url + '/tr_events.php?triggerid=' +
+                                                            params.trigger_id + '&eventid=' + params.event_id
+                                                        : params.zabbix_url
+                                                }
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        ]
+                    });
+                }
+            }
+
+            request.addHeader('Content-Type: application/json');
+
+            if (typeof params.HTTPProxy === 'string' && params.HTTPProxy !== '') {
+                request.setProxy(params.HTTPProxy);
+            }
+
+            Zabbix.Log(4, '[ Google Chat Webhook ] JSON: ' + JSON.stringify(body));
+
+            var response = request.post(params.gchat_endpoint, JSON.stringify(body));
+
+            Zabbix.Log(4, '[ Google Chat Webhook ] Response: ' + response);
+
+            if (response.error) {
+                Zabbix.Log(4, '[ Google Chat Webhook ] FAILED with response: ' + response.error.message);
+                throw response;
+            }
+            else {
+                return 'OK';
+            }
+        }
+        catch (error) {
+            Zabbix.Log(3, '[ Google Chat Webhook ] ERROR: ' + error);
+            throw 'Sending failed: ' + error;
+        }
+      description: |
+        Please refer to https://developers.google.com/hangouts/chat/how-tos/webhooks
+
+        Set global macro {$ZABBIX.URL} with your Zabbix server URL.
+        Add a dedicated user with the media type "Google Chat".
+        Change the value of the variable gchat_endpoint parameter to integrate into the service.
+      message_templates:
+        -
+          event_source: TRIGGERS
+          operation_mode: PROBLEM
+          subject: 'Problem: {EVENT.NAME}'
+          message: |
+            Problem started at {EVENT.TIME} on {EVENT.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Operational data: {EVENT.OPDATA}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: RECOVERY
+          subject: 'Resolved: {EVENT.NAME}'
+          message: |
+            Problem has been resolved in {EVENT.DURATION} at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Host: {HOST.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            {TRIGGER.URL}
+        -
+          event_source: TRIGGERS
+          operation_mode: UPDATE
+          subject: 'Updated problem: {EVENT.NAME}'
+          message: |
+            {USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            {EVENT.UPDATE.MESSAGE}
+
+            Current problem status is {EVENT.STATUS}, acknowledged: {EVENT.ACK.STATUS}.
+        -
+          event_source: DISCOVERY
+          operation_mode: PROBLEM
+          subject: 'Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}'
+          message: |
+            Discovery rule: {DISCOVERY.RULE.NAME}
+
+            Device IP: {DISCOVERY.DEVICE.IPADDRESS}
+            Device DNS: {DISCOVERY.DEVICE.DNS}
+            Device status: {DISCOVERY.DEVICE.STATUS}
+            Device uptime: {DISCOVERY.DEVICE.UPTIME}
+
+            Device service name: {DISCOVERY.SERVICE.NAME}
+            Device service port: {DISCOVERY.SERVICE.PORT}
+            Device service status: {DISCOVERY.SERVICE.STATUS}
+            Device service uptime: {DISCOVERY.SERVICE.UPTIME}
+        -
+          event_source: AUTOREGISTRATION
+          operation_mode: PROBLEM
+          subject: 'Autoregistration: {HOST.HOST}'
+          message: |
+            Host name: {HOST.HOST}
+            Host IP: {HOST.IP}
+            Agent port: {HOST.PORT}
+        -
+          event_source: SERVICE
+          operation_mode: PROBLEM
+          subject: 'Service "{SERVICE.NAME}" problem: {EVENT.NAME}'
+          message: |
+            Service problem started at {EVENT.TIME} on {EVENT.DATE}
+            Service problem name: {EVENT.NAME}
+            Service: {SERVICE.NAME}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+
+            {SERVICE.ROOTCAUSE}
+        -
+          event_source: SERVICE
+          operation_mode: RECOVERY
+          subject: 'Service "{SERVICE.NAME}" resolved in {EVENT.DURATION}: {EVENT.NAME}'
+          message: |
+            Service "{SERVICE.NAME}" has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}
+            Problem name: {EVENT.NAME}
+            Problem duration: {EVENT.DURATION}
+            Severity: {EVENT.SEVERITY}
+            Original problem ID: {EVENT.ID}
+            Service description: {SERVICE.DESCRIPTION}
+        -
+          event_source: SERVICE
+          operation_mode: UPDATE
+          subject: 'Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} in {EVENT.AGE}'
+          message: |
+            Changed "{SERVICE.NAME}" service status to {EVENT.UPDATE.SEVERITY} at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.
+            Current problem age is {EVENT.AGE}.
+            Service description: {SERVICE.DESCRIPTION}
+
+            {SERVICE.ROOTCAUSE}
