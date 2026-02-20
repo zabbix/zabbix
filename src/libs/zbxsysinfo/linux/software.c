@@ -176,6 +176,7 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 	{"pkgtools",	"[ -d /var/log/packages ] && echo true",	"ls /var/log/packages",		NULL},
 	{"rpm",		"rpm --version 2> /dev/null",			"rpm -qa",			NULL},
 	{"pacman",	"pacman --version 2> /dev/null",		"pacman -Q",			NULL},
+	{"portage",     "emerge --version 2> /dev/null",                "qlist -IRCv",                  NULL},
 	{NULL}
 };
 
