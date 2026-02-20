@@ -47,6 +47,8 @@ zabbix_export:
           value: '{ALERT.SENDTO}'
         - name: subject
           value: '{ALERT.SUBJECT}'
+        - name: token
+          value: '{$EDA_WEBHOOK_TOKEN}'
         - name: trigger_description
           value: '{TRIGGER.DESCRIPTION}'
         - name: trigger_id
@@ -61,6 +63,7 @@ zabbix_export:
             setParams: function (params) {
                 var required_params = [
                         'send_to',
+                        'token',
                         'event_source',
                         'event_value',
                         'event_date',
@@ -156,28 +159,33 @@ zabbix_export:
             
                 return tags;
             },
-        
+       
             sendMessage: function () {
-                var response, request = new HttpRequest();
+                var request = new HttpRequest();
                 var url = Eda.params['send_to'] + Eda.params['endpoint'];
-                var data = JSON.stringify(Eda.params);
+
+                // Clone params and exclude sensitive fields
+                var payload = JSON.parse(JSON.stringify(Eda.params));
+                delete payload.token;
+                delete payload.send_to;
+                var data = JSON.stringify(payload);
+
                 Zabbix.log(4, '[ Event-Driven Ansible webhook ] URL: ' + url + ' data: ' + data);
-                
+
                 if (typeof Eda.HTTPProxy !== 'undefined' && Eda.HTTPProxy !== '') {
                     request.setProxy(Eda.HTTPProxy);
                 }
+                request.addHeader('Authorization: Bearer ' + Eda.params.token);
                 request.addHeader('Content-Type: application/json');
-                response = request.post(url, data);
-                
-                Zabbix.log(4, '[ Event-Driven Ansible webhook ] HTTP code: ' + request.getStatus()
-                    + ' response: ' + response);
-        
+                var response = request.post(url, data);
+                Zabbix.log(4, '[ Event-Driven Ansible webhook ] HTTP code: ' + request.getStatus() + ' response: ' + response);
+
                 if (request.getStatus() !== 200) {
                     throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
                 }
             }
         };
-        
+
         
         try {
             var params = JSON.parse(value);
