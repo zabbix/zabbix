@@ -23,9 +23,9 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/sys/unix"
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
-	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
@@ -254,18 +254,23 @@ func validateParams(params []string, minParams, maxParams int) error {
 	return nil
 }
 
+// sysClassNetPathSanitize sanitizes /sys/class/net/<interface>/ directory path
+func (p *Plugin) sysClassNetPathSanitize(ifName string) error {
+	dirPath, err := filepath.Abs(filepath.Join(p.sysClassNetDirpath, ifName))
+	if err != nil || !strings.HasPrefix(dirPath, p.sysClassNetDirpath) {
+		/* should never happen */
+		return errs.Errorf("path traversal was prevented, network interface %q, absolute dir path = %q",
+			ifName,
+			dirPath,
+		)
+	}
+
+	return nil
+}
+
 // sysClassNetStrGet reads sysfs parameters.
 func (p *Plugin) sysClassNetStrGet(ifName, filename string) string {
-	path, err := filepath.Abs(filepath.Join(p.sysClassNetDirpath, ifName, filename))
-	if err != nil || !strings.HasPrefix(path, p.sysClassNetDirpath) {
-		/* should never happen */
-		log.Errf("path traversal was prevented, network interface %q, filename = %q, absolute file path = %q",
-			ifName,
-			filename,
-			path,
-		)
-		return ""
-	}
+	path := filepath.Join(p.sysClassNetDirpath, ifName, filename)
 
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -288,6 +293,48 @@ func (p *Plugin) sysClassNetUintGet(ifName, filename string) uint64 {
 	}
 
 	return val
+}
+
+// ifTypeGet returns the network interface type for the given interface name.
+//
+// The type is determined as follows:
+//   - "loopback" if /sys/class/net/<name>/type contains the ARPHRD_LOOPBACK value
+//   - "physical" if /sys/class/net/<name>/device symlink is present and
+//     /sys/class/net/<name>/device/virtfn* symlinks are not present
+//   - "virtual" otherwise
+//
+// Presence of /sys/class/net/<name>/device/virtfn* symlinks indicates that
+// <name> is a Single Root Input/Output Virtualization (SR-IOV) virtual interface.
+func (p *Plugin) ifTypeGet(ifName string) string {
+	const (
+		loopback = "loopback"
+		virtual  = "virtual"
+		physical = "physical"
+	)
+
+	if p.sysClassNetUintGet(ifName, "type") == unix.ARPHRD_LOOPBACK {
+		return loopback
+	}
+
+	devPath := filepath.Join(p.sysClassNetDirpath, ifName, "device")
+
+	_, err := os.Lstat(devPath)
+	if err != nil {
+		return virtual
+	}
+
+	entries, err := os.ReadDir(devPath)
+	if err != nil {
+		return virtual
+	}
+
+	for _, entry := range entries {
+		if strings.HasPrefix(entry.Name(), "virtfn") {
+			return virtual
+		}
+	}
+
+	return physical
 }
 
 // ifRowScan scans one line from /proc/net/dev representing network interface.
@@ -362,6 +409,12 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 			continue
 		}
 
+		err = p.sysClassNetPathSanitize(ifName)
+		if err != nil {
+			/* should never happen */
+			return nil, errs.Wrapf(err, "failed to parse file \"%s\"", p.netDevFilepath)
+		}
+
 		conf, val := p.getInterfaceMetrics(ifName, stats)
 		result.Config = append(result.Config, *conf)
 		result.Values = append(result.Values, *val)
@@ -394,7 +447,7 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 	alias := p.sysClassNetStrGet(ifName, "ifalias")
 	mac := p.sysClassNetStrGet(ifName, "address")
 	speed := p.sysClassNetUintGet(ifName, "speed")
-	ifType := p.sysClassNetUintGet(ifName, "type")
+	ifType := p.ifTypeGet(ifName)
 	carrier := p.sysClassNetUintGet(ifName, "carrier")
 	duplex := p.sysClassNetStrGet(ifName, "duplex")
 
@@ -413,7 +466,6 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 		Ifname:    ifName,
 		Ifalias:   alias,
 		Ifmac:     mac,
-		Iftype:    ifType,
 		Ifcarrier: carrier,
 		StatsIn: ifStatsIn{
 			Bytes:      stats[0],

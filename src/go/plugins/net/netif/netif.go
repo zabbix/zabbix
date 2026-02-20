@@ -51,7 +51,7 @@ type ifConfigData struct {
 	Ifname      string  `json:"name"`
 	Ifalias     string  `json:"ifalias"`
 	Ifmac       string  `json:"mac"`
-	Iftype      uint64  `json:"type"`
+	Iftype      string  `json:"type"`
 	Ifspeed     uint64  `json:"speed"`
 	Ifduplex    string  `json:"duplex"`
 	IfAdmState  *string `json:"administrative_state"`
@@ -84,7 +84,6 @@ type IfValuesData struct {
 	Ifname    string     `json:"name"`
 	Ifalias   string     `json:"ifalias"`
 	Ifmac     string     `json:"mac"`
-	Iftype    uint64     `json:"type"`
 	Ifcarrier uint64     `json:"carrier"`
 	StatsIn   ifStatsIn  `json:"in"`
 	StatsOut  ifStatsOut `json:"out"`
