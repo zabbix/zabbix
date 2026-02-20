@@ -418,12 +418,11 @@ func PdhEnumObject(force bool) (objects []string, err error) {
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
 		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(true)
-		if isPdhErrorRetryable(retErr) == true && force == true {
-			time.Sleep(750 * time.Millisecond)
-			log.Debugf("pdhEnumObjectGet(true) attempt:%d err: 0x%08X", attempt, uint32(retErr))
-			continue
+		if force == false || isPdhErrorRetryable(retErr) == false {
+			break
 		}
-		break
+		log.Debugf("pdhEnumObjectGet(true) attempt:%d err: 0x%08X", attempt, uint32(retErr))
+		time.Sleep(750 * time.Millisecond)
 	}
 
 	if force == true {
