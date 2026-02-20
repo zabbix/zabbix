@@ -328,11 +328,11 @@ static int	ha_db_commit(zbx_ha_info_t *info)
 {
 	if (ZBX_DB_OK <= info->db_status)
 		info->db_status = zbx_dbconn_commit(info->dbconn);
+	else
+		zbx_dbconn_rollback(info->dbconn);
 
 	if (ZBX_DB_OK > info->db_status)
 	{
-		zbx_dbconn_rollback(info->dbconn);
-
 		if (ZBX_DB_FAIL == info->db_status)
 			ha_set_error(info, "database error");
 		else
