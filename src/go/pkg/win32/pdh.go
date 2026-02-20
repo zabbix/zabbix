@@ -359,6 +359,7 @@ func pdhEnumObjectHelper(objListSize uint32, refresh bool) ([]uint16, uint32, ui
 }
 
 func pdhEnumObjectGet(refresh bool) ([]uint16, uint32, uintptr) {
+	log.Debugf("pdhEnumObjectGet() refresh:%t", refresh)
 	objectBuf, objectListSizeRet, ret := pdhEnumObjectHelper(objectListSize, refresh)
 	if ret == PDH_MORE_DATA {
 		log.Debugf("PdhEnumObjectGet() insufficient buffer size: %d", objectListSize)
