@@ -1966,8 +1966,6 @@ class CItem extends CItemGeneral {
 
 		self::deleteAffectedTriggers($del_itemids);
 
-		self::clearHistoryAndTrends($del_itemids);
-
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [
@@ -2064,50 +2062,5 @@ class CItem extends CItemGeneral {
 			'source' => 'itemid',
 			'value_id' => $del_itemids
 		]);
-	}
-
-	/**
-	 * Clear the history and trends of the given items.
-	 *
-	 * @param array $del_itemids
-	 */
-	private static function clearHistoryAndTrends(array $del_itemids): void {
-		global $DB;
-
-		$table_names = ['events'];
-
-		$timescale_extension = $DB['TYPE'] === ZBX_DB_POSTGRESQL
-			&& CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB;
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
-				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0)) {
-			$table_names = array_merge($table_names, CHistoryManager::getTableName());
-		}
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
-				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 0)) {
-			array_push($table_names, 'trends', 'trends_uint');
-		}
-
-		$ins_housekeeper = [];
-
-		foreach ($del_itemids as $del_itemid) {
-			foreach ($table_names as $table_name) {
-				$ins_housekeeper[] = [
-					'tablename' => $table_name,
-					'field' => 'itemid',
-					'value' => $del_itemid
-				];
-
-				if (count($ins_housekeeper) == ZBX_DB_MAX_INSERTS) {
-					DB::insertBatch('housekeeper', $ins_housekeeper);
-					$ins_housekeeper = [];
-				}
-			}
-		}
-
-		if ($ins_housekeeper) {
-			DB::insertBatch('housekeeper', $ins_housekeeper);
-		}
 	}
 }

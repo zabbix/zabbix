@@ -1139,6 +1139,19 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 	return FAIL;
 }
 
+static int	DBget_housekeeper_object_by_name(const char *table_name)
+{
+	const zbx_db_table_housekeeper_t	*table;
+
+	for (table = zbx_dbschema_get_housekeeper_tables(); NULL != table->table_name; table++)
+	{
+		if (0 == strcmp(table_name, table->table_name))
+			return table->object_type;
+	}
+
+	return FAIL;
+}
+
 int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_name)
 {
 	char	*sql = NULL;
@@ -1215,6 +1228,47 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 					"execute procedure changelog_%s_update();",
 				table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE, table_name, table_name,
 				table_name);
+#endif
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBcreate_housekeeper_trigger(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	object_type, ret = FAIL;
+
+	if (FAIL == (object_type = DBget_housekeeper_object_by_name(table_name)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+#if HAVE_MYSQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_housekeeping before delete on %s\n"
+				"for each row\n"
+					"insert into housekeeper (object,objectid)\n"
+						"values (%d,old.%s)",
+				table_name, table_name, object_type, field_name);
+#elif HAVE_POSTGRESQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function %s_housekeeping_proc() returns trigger as $$\n"
+			"begin\n"
+				"insert into housekeeper (object,objectid) values (%d,old.%s);\n"
+				"return old;\n"
+			"end;\n"
+			"$$ language plpgsql;\n"
+			"create trigger %s_housekeeping before delete on %s\n"
+				"for each row\n"
+					"execute procedure %s_housekeeping_proc();",
+				table_name, object_type, field_name, table_name, table_name, table_name);
 #endif
 
 	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))

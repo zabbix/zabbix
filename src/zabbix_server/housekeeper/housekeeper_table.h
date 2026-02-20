@@ -12,29 +12,18 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_HOUSEKEEPER_SERVER_H
-#define ZABBIX_HOUSEKEEPER_SERVER_H
+#ifndef ZABBIX_HOUSEKEEPER_TABLE_H
+#define ZABBIX_HOUSEKEEPER_TABLE_H
 
-#include "zbxthreads.h"
+void	housekeeper_init(void);
+void	housekeeper_deinit(void);
 
-typedef struct
-{
-	struct zbx_db_version_info_t	*db_version_info;
-	int				config_timeout;
-	int				config_housekeeping_frequency;
-	int				config_max_housekeeper_delete;
-}
-zbx_thread_housekeeper_args;
+void	housekeeper_process(int config_max_hk_delete, int *deleted_history, int *deleted_events, int *deleted_problems);
 
-ZBX_THREAD_ENTRY(housekeeper_thread, args);
+int	hk_cfg_history_mode(void);
+int	hk_cfg_trends_mode(void);
+int	hk_cfg_events_mode(void);
 
-typedef struct
-{
-	int	config_timeout;
-	int	config_problemhousekeeping_frequency;
-}
-zbx_thread_server_trigger_housekeeper_args;
-
-ZBX_THREAD_ENTRY(trigger_housekeeper_thread, args);
+int	hk_delete_from_table(const char *tablename, const char *filter, int limit);
 
 #endif
