@@ -883,8 +883,8 @@ static int	zbx_dbconn_parse_and_validate_dbhost(zbx_db_config_t *config, char **
 
 		if (SUCCEED != zbx_parse_serveractive_element(start, &parsed_ip, &parsed_port, def_port))
 		{
-			*error = zbx_dsprintf(NULL, "error parsing the \"%s\" parameter: address \"%s\" is "
-					"invalid", config->dbhost, start);
+			*error = zbx_dsprintf(NULL, "error parsing the \"DBHost\" parameter: address \"%s\" is "
+					"invalid", start);
 
 			zbx_free(result);
 			zbx_free(config->dbports);
