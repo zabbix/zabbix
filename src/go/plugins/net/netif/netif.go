@@ -74,8 +74,8 @@ type ifStatsOut struct {
 	Packets    uint64 `json:"packets"`
 	Err        uint64 `json:"errors"`
 	Drop       uint64 `json:"dropped"`
-	Colls      uint64 `json:"collisions"`
 	Fifo       uint64 `json:"overruns"`
+	Colls      uint64 `json:"collisions"`
 	Carrier    uint64 `json:"carrier"`
 	Compressed uint64 `json:"compressed"`
 }
