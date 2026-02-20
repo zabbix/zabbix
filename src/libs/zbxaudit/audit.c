@@ -258,7 +258,7 @@ static void	details_delete(zbx_vector_audit_entry_detail_t *details, const char 
 	zbx_json_free(&json);
 }
 
-static void	zbx_audit_details_to_json(zbx_vector_audit_entry_detail_t *details, struct zbx_json *json)
+static void	zbx_audit_details_to_json(const zbx_vector_audit_entry_detail_t *details, struct zbx_json *json)
 {
 	for (int i = 0; i < details->values_num; i++)
 		zbx_json_addraw(json, details->values[i].key, details->values[i].value);
