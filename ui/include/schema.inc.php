@@ -5943,27 +5943,18 @@ return [
 		'fields' => [
 			'housekeeperid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
+				'type' => DB::FIELD_TYPE_UINT,
 				'length' => 20
 			],
-			'tablename' => [
+			'object' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10
 			],
-			'field' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			],
-			'value' => [
+			'objectid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'items',
-				'ref_field' => 'value'
+				'length' => 20
 			]
 		]
 	],
@@ -7606,8 +7597,8 @@ return [
 			],
 			'value_str' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
 				'default' => ''
 			],
 			'value_groupid' => [

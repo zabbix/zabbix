@@ -99,7 +99,7 @@ int	zbx_ip_cmp(int prefix_size, const struct sockaddr *ai_addr, int ai_family, c
 	int ipv6v4_mode);
 int	zbx_validate_peer_list(const char *peer_list, char **error);
 int	zbx_tcp_check_allowed_peers_info(const ZBX_SOCKADDR *peer_info, const char *peer_list);
-int	validate_cidr(const char *ip, const char *cidr, void *value);
+int	zbx_validate_cidr(const char *ip, const char *cidr, void *value);
 
 #if !defined(WITH_AGENT2_METRICS)
 typedef enum
