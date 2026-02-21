@@ -849,7 +849,7 @@ zabbix_export:
             - uuid: 550e8400e29b41d4a71644665544bb81
               name: "Interface {#IFNAME}: Speed is below 10Gbps"
               expression: "last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) < 10000000000 and last(/3Com 242x SNMP LLD Base/ifSpeed[{#IFINDEX}]) >= 1000000000"
-              priority: HIGH
+              priority: WARNING
               tags:
                 - tag: scope
                   value: performance
