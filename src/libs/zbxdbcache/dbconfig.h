@@ -244,7 +244,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
-	const char		*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	const char		*delay;
 	ZBX_DC_ITEMTYPE		itemtype;
 	ZBX_DC_ITEMVALUETYPE	itemvaluetype;
