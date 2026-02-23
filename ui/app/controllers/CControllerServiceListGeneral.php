@@ -30,14 +30,12 @@ abstract class CControllerServiceListGeneral extends CController {
 	 */
 	protected $service;
 
-	protected $inaccessible_service = false;
-
 	/**
-	 * @throws APIException
-	 *
-	 * @return bool
+	 * @var bool
 	 */
-	protected function checkPermissions(): bool {
+	protected $is_inaccessible = false;
+
+	protected function loadService(): void {
 		if ($this->hasInput('serviceid')) {
 			$db_service = API::Service()->get([
 				'output' => ['serviceid', 'name', 'status', 'readonly'],
@@ -51,11 +49,9 @@ abstract class CControllerServiceListGeneral extends CController {
 			}
 			else {
 				error(_('No permissions to referred object or it does not exist!'));
-				$this->inaccessible_service = true;
+				$this->is_inaccessible = true;
 			}
 		}
-
-		return true;
 	}
 
 	/**
@@ -83,6 +79,8 @@ abstract class CControllerServiceListGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
+		$this->loadService();
+
 		if ($this->service !== null) {
 			$this->service['tags'] = makeTags([$this->service], true, 'serviceid');
 			$this->service['parents'] = API::Service()->get([
@@ -100,7 +98,7 @@ abstract class CControllerServiceListGeneral extends CController {
 	 */
 	protected function getPath(): array {
 		if ($this->service === null) {
-			return $this->inaccessible_service ? [$this->getInput('serviceid')] : [];
+			return $this->is_inaccessible ? [$this->getInput('serviceid')] : [];
 		}
 
 		$path_serviceids = $this->getInput('path', []);

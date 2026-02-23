@@ -52,7 +52,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			return false;
 		}
 
-		return parent::checkPermissions();
+		return true;
 	}
 
 	/**
@@ -142,7 +142,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'service' => $this->service,
-			'inaccessible_service' => $this->inaccessible_service
+			'is_inaccessible' => $this->is_inaccessible
 		];
 
 		if ($this->service !== null && !$filter['filter_set']) {
@@ -155,7 +155,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		CPagerHelper::savePage('service.list.edit', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
-		if ($this->inaccessible_service) {
+		if ($this->is_inaccessible) {
 			$data['services'] = [];
 		}
 		else {
