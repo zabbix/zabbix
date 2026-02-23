@@ -336,17 +336,21 @@ class CControllerLatestViewData extends CControllerDataTable {
 					->toString();
 
 				if ($item['value_type'] == ITEM_VALUE_TYPE_BINARY) {
-					$last_value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+					$last_value = italic(_('binary value'))
+						->addClass(ZBX_STYLE_GREY)
+						->toString();
 				}
 				else {
 					$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
+						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 						->setHint(
 							(new CTrim($last_history['value'], ZBX_HINTBOX_CONTENT_LIMIT))
 								->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 								->addClass(ZBX_STYLE_HINTBOX_WRAP),
 							'', true, '', 0
-						);
+						)
+						->toString();
 				}
 
 				$change = '';

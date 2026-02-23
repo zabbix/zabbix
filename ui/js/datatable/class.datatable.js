@@ -202,8 +202,8 @@ class CDataTable {
 		[CDataTable.EVENT_SCROLL]: this.onScroll,
 		[CDataTable.EVENT_COLUMNS_SORT]: this.onColumnsSort,
 		[CDataTable.EVENT_COLUMN_RESIZE]: this.onColumnResize,
-		[CDataTable.EVENT_COLUMN_RESIZE_END]: this.onColumnResizeEnd,
 		[CDataTable.EVENT_COLUMN_RESIZE_START]: this.onColumnResizeStart,
+		[CDataTable.EVENT_COLUMN_RESIZE_END]: this.onColumnResizeEnd,
 		[CDataTable.EVENT_COLUMN_TOGGLE]: this.onColumnToggle,
 		[CDataTable.EVENT_COLUMN_DELETE]: this.onColumnDelete,
 		[CDataTable.EVENT_COLUMN_DUPLICATE]: this.onColumnDuplicate,
@@ -1066,35 +1066,6 @@ class CDataTable {
 		this.#initialized = true;
 	}
 
-	onColumnResizeStart(event) {
-		const {x, column_index, id} = event.detail;
-
-		this.#resize_click_count++;
-
-		if (this.#resize_click_count == 2) {
-			return this.dispatchEvent(CDataTable.EVENT_COLUMN_RESET, {column_index, id});
-		}
-
-		const column_config = this.getColumnConfig(column_index);
-		column_config.setResized(false);
-
-		this.#calculateColumnWidth(column_config);
-
-		this.#resizing = true;
-		this.#resize_column_index = column_index;
-		this.#resize_start_x = x;
-		this.#resize_start_width = parseFloat(this.#getWidthWithoutUnit(column_config.getWidth()));
-
-		this.#element.classList.add(CDataTable.ZBX_STYLE_RESIZING);
-
-		document.querySelector('.sidebar').style.pointerEvents = 'none';
-
-		this.#findCells(column_index).forEach(cell => cell.classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING));
-
-		window.addEventListener('mousemove', this.onResizeMouseMove);
-		window.addEventListener('mouseup', this.onResizeMouseUp);
-	}
-
 	onResizeMouseMove = event => {
 		this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE, {event});
 	}
@@ -1136,6 +1107,35 @@ class CDataTable {
 
 		this.#applyScrollableBody();
 		this.#scrollToColumn(this.#resize_column_index);
+	}
+
+	onColumnResizeStart(event) {
+		const {x, column_index, id} = event.detail;
+
+		this.#resize_click_count++;
+
+		if (this.#resize_click_count == 2) {
+			return this.dispatchEvent(CDataTable.EVENT_COLUMN_RESET, {column_index, id});
+		}
+
+		const column_config = this.getColumnConfig(column_index);
+		column_config.setResized(false);
+
+		this.#calculateColumnWidth(column_config);
+
+		this.#resizing = true;
+		this.#resize_column_index = column_index;
+		this.#resize_start_x = x;
+		this.#resize_start_width = parseFloat(this.#getWidthWithoutUnit(column_config.getWidth()));
+
+		this.#element.classList.add(CDataTable.ZBX_STYLE_RESIZING);
+
+		document.querySelector('.sidebar').style.pointerEvents = 'none';
+
+		this.#findCells(column_index).forEach(cell => cell.classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING));
+
+		window.addEventListener('mousemove', this.onResizeMouseMove);
+		window.addEventListener('mouseup', this.onResizeMouseUp);
 	}
 
 	onColumnResizeEnd() {
@@ -1195,12 +1195,16 @@ class CDataTable {
 			}
 		}
 
+		this.#context_popup_updated = true;
+
 		const header_cell = this.#findClosestHeaderCell(handle);
 		const column_index = parseInt(header_cell.getAttribute('data-col'));
-
-		this.#scrollToColumn(column_index);
-
 		const column_config = this.getColumnConfig(column_index);
+
+		if (column_config.getId() != CDataTableColumn.CUSTOMIZE_TABLE) {
+			this.#scrollToColumn(column_index);
+		}
+
 		const context_popup_handler = column_config.getContextPopupHandler();
 
 		const handler = this.#context_popup_handlers[context_popup_handler];
