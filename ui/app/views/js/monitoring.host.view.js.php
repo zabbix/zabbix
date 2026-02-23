@@ -135,7 +135,8 @@
 					new CDataTableColumn('interface', '<?= _('Interface') ?>')
 						.setFields(['interface']),
 					new CDataTableColumn('availability', '<?= _('Availability') ?>')
-						.setFields(['availability', 'active_available']),
+						.setFields(['availability', 'active_available'])
+						.setRenderer('availability'),
 					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
 						.setFields(['tags']),
 					new CDataTableColumn('status', '<?= _('Status') ?>')
@@ -213,6 +214,11 @@
 							cell_inner.appendChild(maintenance_icon);
 						}
 					}
+				})
+				.setRenderer('availability', ({column_data, cell_inner}) => {
+					const [availability] = column_data;
+
+					cell_inner.innerHTML = availability;
 				})
 				.setRenderer('status', ({column_data, cell_inner}) => {
 					const [status] = column_data;

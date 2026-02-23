@@ -287,7 +287,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setRenderer('status')
 						.setSortable(true),
 					new CDataTableColumn('availability', '<?= _('Availability'); ?>')
-						.setFields(['availability', 'active_available']),
+						.setFields(['availability', 'active_available'])
+						.setRenderer('availability'),
 					new CDataTableColumn('encryption', '<?= _('Agent encryption'); ?>')
 						.setFields(['tls_accept', 'tls_connect'])
 						.setRenderer('encryption'),
@@ -548,6 +549,11 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(description_icon);
 					}
+				})
+				.setRenderer('availability', ({column_data, cell_inner}) => {
+					const [availability] = column_data;
+
+					cell_inner.innerHTML = availability;
 				})
 				.setRenderer('proxy', ({column_data, cell_inner}) => {
 					const [monitored_by, proxyid, proxy_groupid, assigned_proxyid, proxy, proxy_group,
