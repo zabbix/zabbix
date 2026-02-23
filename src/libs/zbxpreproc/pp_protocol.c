@@ -203,7 +203,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		}
 		else if (ZBX_ISSET_JSON(result))
 		{
-			var_type = ZBX_VARIANT_JSON;
+			var_type = ZBX_VARIANT_STR;
 			zbx_serialize_prepare_str_len(data_len, result->json, value_len);
 		}
 	}
@@ -332,9 +332,6 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 		case ZBX_VARIANT_STR:
 			ptr += zbx_deserialize_str(ptr, &value->data.str, len);
 			break;
-		case ZBX_VARIANT_JSON:
-			ptr += zbx_deserialize_str(ptr, &value->data.json, len);
-			break;
 		case ZBX_VARIANT_ERR:
 			ptr += zbx_deserialize_str(ptr, &value->data.err, len);
 			break;
@@ -419,10 +416,6 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 
 		case ZBX_VARIANT_ERR:
 			fields[offset++] = PACKED_FIELD(value->data.err, 0);
-			break;
-
-		case ZBX_VARIANT_JSON:
-			fields[offset++] = PACKED_FIELD(value->data.json, 0);
 			break;
 
 		case ZBX_VARIANT_BIN:
@@ -531,9 +524,6 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 			break;
 		case ZBX_VARIANT_BIN:
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
-			break;
-		case ZBX_VARIANT_JSON:
-			offset += zbx_deserialize_str(offset, &value->data.json, value_len);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_VECTOR:

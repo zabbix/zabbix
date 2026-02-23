@@ -315,11 +315,7 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 
 			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
 
-			if (ZBX_VARIANT_JSON == result->value.type)
-			{
-				src_json_check = result->value.data.json;
-			}
-			else if (ZBX_VARIANT_STR == result->value.type)
+			if (ZBX_VARIANT_STR == result->value.type)
 			{
 				src_json_check = result->value.data.str;
 			}
