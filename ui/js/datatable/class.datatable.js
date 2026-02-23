@@ -77,6 +77,11 @@ class CDataTable {
 	static RESIZE_CLICK_COUNT_RESET_DELAY = 250;
 
 	/**
+	 * @type {number}
+	 */
+	static COLUMN_TOGGLE_INITIAL_MIN_WIDTH = 150;
+
+	/**
 	 * Flag to determine when a component is initialized, to disallow any further modifications.
 	 *
 	 * @type {boolean}
@@ -872,6 +877,10 @@ class CDataTable {
 			return;
 		}
 
+		if (column_config.getWidth() == 'auto') {
+			column_config.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
+		}
+
 		column_config.setVisible(visible);
 
 		this.updateUserConfig();
@@ -1514,6 +1523,8 @@ class CDataTable {
 
 			return !column_config.isDuplicate();
 		});
+
+		this.#sortColumns();
 	}
 
 	#resetOptions() {
@@ -1890,7 +1901,7 @@ class CDataTable {
 		);
 
 		return {
-			columns,
+			columns: columns.sort((a, b) => a.getColumnIndex() - b.getColumnIndex()),
 			filter: this.#filter,
 			options,
 			context_popup_data,
