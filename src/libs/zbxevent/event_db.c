@@ -94,16 +94,15 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 					" from hosts h"
 					" join autoreg_host a on a.host=h.host"
 					" left join proxy p on p.proxyid=a.proxyid"
-					" where case"
-						" when h.monitored_by=%d"
-							" then " ZBX_SQL_NULLCMP("p.proxy_groupid", "h.proxy_groupid")
-							" else " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid")
-						" end"
+					" where ((h.monitored_by=%d"
+						" and (" ZBX_SQL_NULLCMP("p.proxy_groupid", "h.proxy_groupid") "))"
+						" or (h.monitored_by<>%d"
+						" and " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid") "))"
 						" and h.status=%d"
-						" and h.flags&%d=0"
+						" and " ZBX_SQL_BITAND_ZERO("h.flags", "%d")
 						" and a.autoreg_hostid=" ZBX_FS_UI64,
-					HOST_MONITORED_BY_PROXY_GROUP, HOST_STATUS_MONITORED,
-					ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
+					HOST_MONITORED_BY_PROXY_GROUP, HOST_MONITORED_BY_PROXY_GROUP,
+					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);
 			break;
 		default:
 			zbx_snprintf(error, max_error_len, "Unsupported event source [%d]", event->source);
