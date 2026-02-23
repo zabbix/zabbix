@@ -55,14 +55,16 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 			return false;
 		}
 
-		return parent::checkPermissions();
+		return true;
 	}
 
 	/**
 	 * @throws Exception
 	 */
 	protected function doAction(): void {
-		if ($this->inaccessible_service) {
+		parent::doAction();
+
+		if ($this->is_inaccessible) {
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
@@ -73,8 +75,6 @@ class CControllerServiceListEditRefresh extends CControllerServiceListGeneral {
 
 			return;
 		}
-
-		parent::doAction();
 
 		$path = $this->getPath();
 

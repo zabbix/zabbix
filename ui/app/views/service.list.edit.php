@@ -134,7 +134,7 @@ $page = (new CHtmlPage())
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	);
 
-if (!$data['inaccessible_service']) {
+if (!$data['is_inaccessible']) {
 	$page
 		->addItem($filter)
 		->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
