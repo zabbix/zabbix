@@ -1194,7 +1194,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 				state = ITEM_STATE_NOTSUPPORTED;
 				dyn_error = zbx_strdup(NULL, "JSON is too large.");
 			}
-			else if (0 == zbx_json_validate_ext(json_val, &dyn_error))
+			else if (FAIL == zbx_json_validate_ext(json_val, &dyn_error))
 			{
 				state = ITEM_STATE_NOTSUPPORTED;
 			}

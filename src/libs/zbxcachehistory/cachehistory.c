@@ -2494,7 +2494,7 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 
 	char	*err = NULL;
 
-	if (0 == zbx_json_validate_ext(value->data.str, &err))
+	if (FAIL == zbx_json_validate_ext(value->data.str, &err))
 	{
 		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
 		zbx_free(err);
