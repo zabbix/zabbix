@@ -163,6 +163,7 @@ $page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'is_inaccessible' => $data['is_inaccessible'],
 		'path' => $data['path'],
 		'is_filtered' => $data['is_filtered'],
 		'mode_switch_url' => $data['view_mode_url'],
