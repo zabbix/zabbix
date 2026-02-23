@@ -631,27 +631,6 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
-static int	DBpatch_7050051(void)
-{
-	int	ret = SUCCEED;
-	char	*uuid7;
-
-	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
-		goto out;
-
-	uuid7 = zbx_gen_uuid7();
-
-	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name, type, value_str, value_int)"
-			" values ('serverid', 1, '%s', 0)", uuid7))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot update serverid in settings table");
-		ret = FAIL;
-	}
-	zbx_free(uuid7);
-out:
-	return ret;
-}
-
 #endif
 
 DBPATCH_START(7050)
@@ -709,6 +688,5 @@ DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
 DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
-DBPATCH_ADD(7050051, 0, 1)
 
 DBPATCH_END()
