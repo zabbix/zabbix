@@ -138,6 +138,7 @@ $page->show();
 (new CScriptTag('
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'is_inaccessible' => $data['is_inaccessible'],
 		'mode_switch_url' => $data['edit_mode_url'],
 		'refresh_url' => $data['refresh_url'],
 		'refresh_interval' => $data['refresh_interval']
