@@ -1033,11 +1033,11 @@ class CDataTable {
 			...event.detail
 		};
 
-		const params = this.#getDataProviderParams({force_load});
-
 		if (!reset) {
 			this.#setUserConfig(this.#tabfilter_item._index);
 		}
+
+		const params = this.#getDataProviderParams({force_load});
 
 		this.#data_provider.getData(params)
 			.then(response => {
@@ -1885,11 +1885,9 @@ class CDataTable {
 			context_popup_data = Object.assign(context_popup_data, column_config.getContextPopupData());
 		}
 
-		const options = Object.entries(this.#options).reduce((options, [id, option]) => {
-			options[id] = option.checked ? '1' : '0';
-
-			return options;
-		}, {});
+		const options = Object.fromEntries(
+			Object.entries(this.#options).map(([id, option]) => [id, option.checked ? 1 : 0])
+		);
 
 		return {
 			columns,
