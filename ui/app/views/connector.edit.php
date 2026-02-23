@@ -134,32 +134,37 @@ $form_grid = (new CFormGrid())
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
 						'label' => _('Numeric (unsigned)'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,
 						'label' => _('Numeric (float)'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR,
 						'label' => _('Character'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG,
 						'label' => _('Log'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT,
 						'label' => _('Text'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN,
 						'label' => _('Binary'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN & $data['form']['item_value_type']) != 0
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON,
+						'label' => _('JSON'),
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON & $data['form']['item_value_type']) != 0
 					]
 				])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

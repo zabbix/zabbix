@@ -28,23 +28,6 @@ function check_target(e, type) {
 	}
 }
 
-/**
- * Remove part of expression.
- *
- * @param string id		Expression temporary ID.
- * @param number type	Expression (type = 0) or recovery expression (type = 1).
- */
-function delete_expression(id, type) {
-	// If type is expression.
-	if (type == 0) {
-		jQuery('#remove_expression').val(id);
-	}
-	// Type is recovery expression.
-	else {
-		jQuery('#remove_recovery_expression').val(id);
-	}
-}
-
 function testUserSound(idx) {
 	var element = document.getElementById(idx);
 	var sound = element.options[element.selectedIndex].value;
@@ -508,12 +491,12 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 function overlayDialogue(properties, options = {}) {
 	const overlay = overlays_stack.getById(options.dialogueid) || new Overlay({...options, type: 'popup'});
 
+	addToOverlaysStack(overlay);
+
 	overlay.setProperties(properties);
 	overlay.mount();
 	overlay.recoverFocus();
 	overlay.containFocus();
-
-	addToOverlaysStack(overlay);
 
 	return overlay;
 }
@@ -974,6 +957,17 @@ function objectToFormData(object) {
 }
 
 /**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.
@@ -992,25 +986,8 @@ function convertRGBToHSL(r, g, b) {
 }
 
 /**
- * Convert HSL encoded color into RGB encoded color.
- *
- * @param {number} h  Hue component in range of 0-360.
- * @param {number} s  Saturation component in range of 0-1.
- * @param {number} l  Lightness component in range of 0-1.
- *
- * @returns [{number}, {number}, {number}]  Red, green and blue components in range 0-1.
- */
-function convertHSLToRGB(h, s, l) {
-	const a = s * Math.min(l, 1 - l);
-	const f = (n, k = (n + h / 30) % 12) => l - a * Math.max(Math.min(k - 3, 9 - k, 1), -1);
-
-	return [f(0), f(8), f(4)];
-}
-
-/**
  * Check if given value is valid color hex code.
  */
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
-

@@ -14,57 +14,95 @@
 **/
 
 
-class CControllerSlaCreate extends CControllerSlaCreateUpdate {
-
-	/**
-	 * @var array
-	 */
-	private $schedule = [];
+class CControllerSlaCreate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'name' =>				'required|string|not_empty',
-			'slo' =>				'required|string|not_empty',
-			'period' =>				'required|in '.implode(',', [ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY, ZBX_SLA_PERIOD_ANNUALLY]),
-			'timezone' =>			'required|in '.implode(',', array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))),
-			'schedule_mode' =>		'required|in '.implode(',', [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]),
-			'schedule_enabled' =>	'array',
-			'schedule_periods' =>	'array',
-			'effective_date' =>		'required|abs_date',
-			'service_tags' =>		'required|array',
-			'description' =>		'required|string',
-			'status' =>				'in '.ZBX_SLA_STATUS_ENABLED,
-			'excluded_downtimes' =>	'array'
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['sla.get', ['name' => '{name}']]
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'name' => ['db sla.name', 'required', 'not_empty'],
+			'slo' => ['float', 'required', 'not_empty', 'min' => 0, 'max' => 100, 'decimal_limit' => 4],
+			'period' => ['db sla.period', 'in' => [
+				ZBX_SLA_PERIOD_DAILY, ZBX_SLA_PERIOD_WEEKLY, ZBX_SLA_PERIOD_MONTHLY, ZBX_SLA_PERIOD_QUARTERLY,
+				ZBX_SLA_PERIOD_ANNUALLY
+			]],
+			'timezone' => ['db sla.timezone',
+				'in' => array_merge([ZBX_DEFAULT_TIMEZONE], array_keys(CTimezoneHelper::getList()))
+			],
+			'schedule_mode' => ['integer', 'in' => [CSlaHelper::SCHEDULE_MODE_24X7, CSlaHelper::SCHEDULE_MODE_CUSTOM]],
+			'schedule_periods' => [ 'objects', 'required', 'uniq' => ['day'],
+				'when' => ['schedule_mode', 'in' => [CSlaHelper::SCHEDULE_MODE_CUSTOM]],
+				'fields' => [
+					'day' => ['integer', 'required', 'in' => range(0, 6)],
+					'enabled' => ['boolean'],
+					'period' => ['string', 'not_empty',
+						'use' => [CTimeRangesValidator::class, []],
+						'when' => ['enabled', 'in' => [1]]
+					]
+				],
+				'count_values' => [
+					'field_rules' => ['enabled', 'in' => [1]],
+					'min' => 1,
+					'message' => _('At least one entry should be selected.')
+				]
+			],
+			'effective_date' => ['string', 'required', 'not_empty',
+				'use' => [CAbsoluteTimeValidator::class, ['date_only' => true, 'min' => 0, 'max' => ZBX_MAX_DATE]]
+			],
+			'service_tags' => ['objects', 'required', 'not_empty', 'uniq' => ['tag', 'value'],
+				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
+				'fields' => [
+					'value' => ['db sla_service_tag.value'],
+					'operator' => ['db sla_service_tag.operator', 'in' => [
+						ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL, ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE
+					]],
+					'tag' => [
+						['db sla_service_tag.tag', 'required'],
+						['db sla_service_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
+				]
+			],
+			'description' => ['db sla.description'],
+			'excluded_downtimes' => ['objects', 'uniq' => ['period_from', 'period_to'],
+				'messages' => ['uniq' => _('Excluded downtime periods must be unique.')],
+				'fields' => [
+					'name' => ['db sla_excluded_downtime.name'],
+					'period_from' => ['db sla_excluded_downtime.period_from', 'required', 'not_empty',
+						'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => ZBX_MAX_DATE]],
+						'when' => ['name', 'not_empty']
+					],
+					'period_to' => ['db sla_excluded_downtime.period_to', 'required', 'not_empty',
+						'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => ZBX_MAX_DATE]],
+						'when' => ['name', 'not_empty']
+					]
+				]
+			],
+			'status' => ['db sla.status', 'in' => [ZBX_SLA_STATUS_DISABLED, ZBX_SLA_STATUS_ENABLED]]
+		]];
+	}
 
-		if ($ret) {
-			if ($this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM) {
-				try {
-					$this->schedule = self::validateCustomSchedule($this->getInput('schedule_enabled', []),
-						$this->getInput('schedule_periods', [])
-					);
-				}
-				catch (InvalidArgumentException $e) {
-					info($e->getMessage());
-					$ret = false;
-				}
-			}
-		}
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot create SLA'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Cannot create SLA'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response, JSON_THROW_ON_ERROR)])
 			);
 		}
 
@@ -72,8 +110,7 @@ class CControllerSlaCreate extends CControllerSlaCreateUpdate {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA)
-			&& $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
+		return $this->checkAccess(CRoleHelper::UI_SERVICES_SLA) && $this->checkAccess(CRoleHelper::ACTIONS_MANAGE_SLA);
 	}
 
 	/**
@@ -86,25 +123,21 @@ class CControllerSlaCreate extends CControllerSlaCreateUpdate {
 			->getDateTime(true, new DateTimeZone('UTC'))
 			->getTimestamp();
 
+		$schedule = $this->getInput('schedule_mode') == CSlaHelper::SCHEDULE_MODE_CUSTOM
+			? CSlaHelper::prepareSchedulePeriods($this->getInput('schedule_periods'))
+			: [];
+
 		$sla = [
 			'effective_date' => $effective_date,
 			'status' => $this->hasInput('status') ? ZBX_SLA_STATUS_ENABLED : ZBX_SLA_STATUS_DISABLED,
-			'schedule' => $this->schedule,
-			'service_tags' => [],
+			'schedule' => $schedule,
+			'service_tags' => $this->getInput('service_tags', []),
 			'excluded_downtimes' =>	[]
 		];
 
 		$fields = ['name', 'slo', 'period', 'timezone', 'description', 'excluded_downtimes'];
 
 		$this->getInputs($sla, $fields);
-
-		foreach ($this->getInput('service_tags', []) as $service_tag) {
-			if ($service_tag['tag'] === '' && $service_tag['value'] === '') {
-				continue;
-			}
-
-			$sla['service_tags'][] = $service_tag;
-		}
 
 		$result = API::Sla()->create($sla);
 

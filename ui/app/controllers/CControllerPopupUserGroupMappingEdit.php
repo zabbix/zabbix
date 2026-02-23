@@ -24,6 +24,7 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 		$fields = [
 			'add_group' =>			'in 1',
 			'usrgrpid' =>			'array_id',
+			'existing_names' =>		'array',
 			'roleid' =>				'db users.roleid',
 			'name' =>				'required|string',
 			'idp_type' =>			'required|in '.IDP_TYPE_LDAP.','.IDP_TYPE_SAML
@@ -62,8 +63,13 @@ class CControllerPopupUserGroupMappingEdit extends CController {
 			'name' => $this->getInput('name', ''),
 			'add_group' => $this->getInput('add_group', 0),
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'idp_type' => $this->getInput('idp_type')
+			'idp_type' => $this->getInput('idp_type'),
+			'existing_names' => $this->getInput('existing_names', [])
 		];
+
+		$data['js_validation_rules'] = (new CFormValidator(
+			CControllerPopupUserGroupMappingCheck::getValidationRules($data['existing_names'])
+		))->getRules();
 
 		$data['user_groups'] = $this->hasInput('usrgrpid')
 			? API::UserGroup()->get([

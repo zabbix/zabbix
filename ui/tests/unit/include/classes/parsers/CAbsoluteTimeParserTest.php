@@ -23,235 +23,303 @@ class CAbsoluteTimeParserTest extends TestCase {
 	 */
 	public static function dataProvider() {
 		return [
+			// date only
 			[
-				'2018-04-15 12:0', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 12:0'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:59']]
+				'2025-04-15',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025-04-15'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15 12:0:0', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 12:0:0'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:00']]
+				'2025-04-5',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025-04-5'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15 0:0:0', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 0:0:0'
-				],
-				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']]
+				'2025-04-05',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025-04-05'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'texttexttext2018-04-15 0:0:0', 12,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 0:0:0'
-				],
-				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']]
+				'2025-4-5',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025-4-5'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15 12:45:34', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 12:45:34'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:45:34', '2018-04-15 12:45:34']]
+				'2025-01',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025-01'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15 12:45', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 12:45'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:59']]
+				'2025-3',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025-3'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15 12', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 12'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:00:00', '2018-04-15 12:59:59']]
+				'2025',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2025'],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15'
-				],
-				'datetime' => ['values' => ['2018-04-15 00:00:00', '2018-04-15 23:59:59']]
+				'text',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-9', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-9'
-				],
-				'datetime' => ['values' => ['2018-04-09 00:00:00', '2018-04-09 23:59:59']]
+				'2025-02-30 12:45:34',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04'
-				],
-				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
+				'2025-11-01 aaa',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-4', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-4'
-				],
-				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
+				'202',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018'
-				],
-				'datetime' => ['values' => ['2018-01-01 00:00:00', '2018-12-31 23:59:59']]
+				'20',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04 12:45:34', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '2018-04'
-				],
-				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
+				'2',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
 			],
 			[
-				'2018-04-15 12:45:34text', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '2018-04-15 12:45:34'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:45:34', '2018-04-15 12:45:34']]
+				'',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				null,
+				['date_only' => true]
+			],
+			// full datetime
+			[
+				'2018-04-15 12:0',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 12:0'],
+				['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:59']],
+				[]
 			],
 			[
-				'2018-', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '2018'
-				],
-				'datetime' => ['values' => ['2018-01-01 00:00:00', '2018-12-31 23:59:59']]
+				'2018-04-15 12:0:0',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 12:0:0'],
+				['values' => ['2018-04-15 12:00:00', '2018-04-15 12:00:00']],
+				[]
 			],
 			[
-				'2018-04-', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS_CONT,
-					'match' => '2018-04'
-				],
-				'datetime' => ['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']]
+				'2018-04-15 0:0:0',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 0:0:0'],
+				['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']],
+				[]
 			],
 			[
-				'2018-04-15 12:45', 0,
-				[
-					'rc' => CParser::PARSE_SUCCESS,
-					'match' => '2018-04-15 12:45'
-				],
-				'datetime' => ['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:59'], 'tz' => 'UTC']
+				'texttexttext2018-04-15 0:0:0',
+				12,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 0:0:0'],
+				['values' => ['2018-04-15 00:00:00', '2018-04-15 00:00:00']],
+				[]
 			],
 			[
-				'text', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04-15 12:45:34',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 12:45:34'],
+				['values' => ['2018-04-15 12:45:34', '2018-04-15 12:45:34']],
+				[]
 			],
 			[
-				'2018-02-30 12:45:34', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04-15 12:45',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 12:45'],
+				['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:59']],
+				[]
 			],
 			[
-				'2018-11-31', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04-15 12',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 12'],
+				['values' => ['2018-04-15 12:00:00', '2018-04-15 12:59:59']],
+				[]
 			],
 			[
-				'2018-11-01 23:59:61', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04-15',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15'],
+				['values' => ['2018-04-15 00:00:00', '2018-04-15 23:59:59']],
+				[]
 			],
 			[
-				'2018-11-01 23:72:00', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04-9',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-9'],
+				['values' => ['2018-04-09 00:00:00', '2018-04-09 23:59:59']],
+				[]
 			],
 			[
-				'2018-11-01 24:00:00', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04'],
+				['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']],
+				[]
 			],
 			[
-				'201', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-4',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-4'],
+				['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']],
+				[]
 			],
 			[
-				'20', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018'],
+				['values' => ['2018-01-01 00:00:00', '2018-12-31 23:59:59']],
+				[]
 			],
 			[
-				'2', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04 12:45:34',
+				0,
+				['rc' => CParser::PARSE_SUCCESS_CONT, 'match' => '2018-04'],
+				['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']],
+				[]
 			],
 			[
-				'', 0,
-				[
-					'rc' => CParser::PARSE_FAIL,
-					'match' => ''
-				],
-				'datetime' => ['values' => [null, null]]
+				'2018-04-15 12:45:34text',
+				0,
+				['rc' => CParser::PARSE_SUCCESS_CONT, 'match' => '2018-04-15 12:45:34'],
+				['values' => ['2018-04-15 12:45:34', '2018-04-15 12:45:34']],
+				[]
+			],
+			[
+				'2018-',
+				0,
+				['rc' => CParser::PARSE_SUCCESS_CONT, 'match' => '2018'],
+				['values' => ['2018-01-01 00:00:00', '2018-12-31 23:59:59']],
+				[]
+			],
+			[
+				'2018-04-',
+				0,
+				['rc' => CParser::PARSE_SUCCESS_CONT, 'match' => '2018-04'],
+				['values' => ['2018-04-01 00:00:00', '2018-04-30 23:59:59']],
+				[]
+			],
+			[
+				'2018-04-15 12:45',
+				0,
+				['rc' => CParser::PARSE_SUCCESS, 'match' => '2018-04-15 12:45'],
+				['values' => ['2018-04-15 12:45:00', '2018-04-15 12:45:59'], 'tz' => 'UTC'],
+				[]
+			],
+			[
+				'text',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'2018-02-30 12:45:34',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'2018-11-31',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'2018-11-01 23:59:61',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'2018-11-01 23:72:00',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'2018-11-01 24:00:00',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'201',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'20',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'2',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
+			],
+			[
+				'',
+				0,
+				['rc' => CParser::PARSE_FAIL, 'match' => ''],
+				['values' => [null, null]],
+				[]
 			]
 		];
 	}
 
 	/**
 	 * @dataProvider dataProvider
-	 *
-	 * @param string $source
-	 * @param int    $pos
-	 * @param array  $expected
-	 * @param array  $datetime
 	 */
-	public function testParse($source, $pos, array $expected, array $datetime) {
-		$parser = new CAbsoluteTimeParser();
+	public function testParse(string $source, int $pos, array $expected, ?array $datetime, array $options) {
+		$parser = new CAbsoluteTimeParser($options);
 
 		$this->assertSame($expected, [
 			'rc' => $parser->parse($source, $pos),
@@ -259,14 +327,16 @@ class CAbsoluteTimeParserTest extends TestCase {
 		]);
 		$this->assertSame(strlen($expected['match']), $parser->getLength());
 
-		$tz = array_key_exists('tz', $datetime) ? new DateTimeZone($datetime['tz']) : null;
-		$ts_from = $parser->getDateTime(true, $tz);
-		$ts_to = $parser->getDateTime(false, $tz);
-		$this->assertSame($datetime['values'][0], $ts_from !== null ? $ts_from->format('Y-m-d H:i:s') : null);
-		$this->assertSame($datetime['values'][1], $ts_to !== null ? $ts_to->format('Y-m-d H:i:s') : null);
-		if ($tz !== null) {
-			$this->assertSame($datetime['tz'], $ts_from->getTimeZone()->getName());
-			$this->assertSame($datetime['tz'], $ts_to->getTimeZone()->getName());
+		if ($datetime !== null) {
+			$tz = array_key_exists('tz', $datetime) ? new DateTimeZone($datetime['tz']) : null;
+			$ts_from = $parser->getDateTime(true, $tz);
+			$ts_to = $parser->getDateTime(false, $tz);
+			$this->assertSame($datetime['values'][0], $ts_from !== null ? $ts_from->format('Y-m-d H:i:s') : null);
+			$this->assertSame($datetime['values'][1], $ts_to !== null ? $ts_to->format('Y-m-d H:i:s') : null);
+			if ($tz !== null) {
+				$this->assertSame($datetime['tz'], $ts_from->getTimeZone()->getName());
+				$this->assertSame($datetime['tz'], $ts_to->getTimeZone()->getName());
+			}
 		}
 	}
 }

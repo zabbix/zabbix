@@ -40,14 +40,16 @@ class CConfigurationImport {
 	protected $options;
 
 	/**
-	 * @var array with data read from source string
+	 * @var array  Data read from the source string.
 	 */
 	protected $data;
 
 	/**
-	 * @var array  cached data from the adapter
+	 * @var array  Cached data from the adapter.
 	 */
 	protected $formattedData = [];
+
+	protected ?CMissingObjectCollector $missing_object_collector = null;
 
 	/**
 	 * Constructor.
@@ -75,7 +77,8 @@ class CConfigurationImport {
 			'maps' => ['updateExisting' => false, 'createMissing' => false],
 			'images' => ['updateExisting' => false, 'createMissing' => false],
 			'mediaTypes' => ['updateExisting' => false, 'createMissing' => false],
-			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false]
+			'valueMaps' => ['updateExisting' => false, 'createMissing' => false, 'deleteMissing' => false],
+			'dashboards' => ['updateExisting' => false, 'createMissing' => false]
 		];
 
 		$options += $default_options;
@@ -115,15 +118,24 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Collect missing referred objects using the provided collector.
+	 *
+	 * @param ?CMissingObjectCollector $missing_object_collector
+	 *
+	 * @return $this
+	 */
+	public function setMissingObjectCollector(?CMissingObjectCollector $missing_object_collector): static {
+		$this->missing_object_collector = $missing_object_collector;
+
+		return $this;
+	}
+
+	/**
 	 * Import configuration data.
 	 *
-	 * @param CImportDataAdapter $adapter an object to provide access to the imported data
-	 *
-	 * @return bool
-	 *
-	 * @throws Exception
+	 * @param CImportDataAdapter $adapter  Import data provider.
 	 */
-	public function import(CImportDataAdapter $adapter): bool {
+	public function import(CImportDataAdapter $adapter): void {
 		$this->adapter = $adapter;
 
 		// Parse all import for references to resolve them all together with less sql count.
@@ -150,10 +162,24 @@ class CConfigurationImport {
 		$this->processGraphs();
 		$this->processImages();
 		$this->processMaps();
-		$this->processTemplateDashboards();
 		$this->processMediaTypes();
+		$this->processTemplateDashboards();
 
-		return true;
+		$this->processDashboards(false);
+	}
+
+	/**
+	 * Collect missing referred objects.
+	 *
+	 * @param CImportDataAdapter $adapter  Import data provider.
+	 */
+	public function collectMissingObjects(CImportDataAdapter $adapter): void {
+		$this->adapter = $adapter;
+
+		// Parse all import for references to resolve them all together with less sql count.
+		$this->gatherReferences();
+
+		$this->processDashboards(true);
 	}
 
 	/**
@@ -190,6 +216,7 @@ class CConfigurationImport {
 		$host_prototypes_refs = [];
 		$httptests_refs = [];
 		$httpsteps_refs = [];
+		$dashboards_refs = [];
 
 		foreach ($this->getFormattedTemplateGroups() as $group) {
 			$template_groups_refs[$group['name']] = ['uuid' => $group['uuid']];
@@ -529,83 +556,14 @@ class CConfigurationImport {
 			}
 		}
 
-		foreach ($this->getFormattedTemplateDashboards() as $host => $dashboards) {
+		foreach ($this->getFormattedTemplateDashboards() as $dashboards) {
 			foreach ($dashboards as $dashboard) {
 				$template_dashboards_refs[$dashboard['uuid']]['name'] = $dashboard['name'];
 
-				if (!$dashboard['pages']) {
-					continue;
-				}
-
-				foreach ($dashboard['pages'] as $dashboard_page) {
-					if (!$dashboard_page['widgets']) {
-						continue;
-					}
-
-					foreach ($dashboard_page['widgets'] as $widget) {
-						foreach ($widget['fields'] as $field) {
-							$value = $field['value'];
-
-							switch ($field['type']) {
-								case ZBX_WIDGET_FIELD_TYPE_ITEM:
-								case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
-									$templates_refs += [$value['host'] => []];
-
-									if (!array_key_exists($value['host'], $items_refs)
-											|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
-										$items_refs[$value['host']][$value['key']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH:
-								case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
-									$templates_refs += [$value['host'] => []];
-
-									if (!array_key_exists($value['host'], $graphs_refs)
-											|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
-										$graphs_refs[$value['host']][$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_MAP:
-									if (!array_key_exists($value['name'], $maps_refs)) {
-										$maps_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_SERVICE:
-									if (!array_key_exists($value['name'], $services_refs)) {
-										$services_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_SLA:
-									if (!array_key_exists($value['name'], $slas_refs)) {
-										$slas_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_USER:
-									if (!array_key_exists($value['username'], $users_refs)) {
-										$users_refs[$value['username']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_ACTION:
-									if (!array_key_exists($value['name'], $actions_refs)) {
-										$actions_refs[$value['name']] = [];
-									}
-									break;
-
-								case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
-									if (!array_key_exists($value['name'], $media_types_refs)) {
-										$media_types_refs[$value['name']] = [];
-									}
-									break;
-							}
-						}
-					}
-				}
+				$this->gatherDashboardReferences($dashboard, true, $host_groups_refs, $hosts_refs, $templates_refs,
+					$items_refs, $graphs_refs, $maps_refs, $services_refs, $slas_refs, $users_refs, $actions_refs,
+					$media_types_refs
+				);
 			}
 		}
 
@@ -627,6 +585,15 @@ class CConfigurationImport {
 
 		foreach ($this->getFormattedImages() as $image) {
 			$images_refs[$image['name']] = [];
+		}
+
+		foreach ($this->getFormattedDashboards() as $dashboard) {
+			$dashboards_refs[$dashboard['name']] = [];
+
+			$this->gatherDashboardReferences($dashboard, false, $host_groups_refs, $hosts_refs, $templates_refs,
+				$items_refs, $graphs_refs, $maps_refs, $services_refs, $slas_refs, $users_refs, $actions_refs,
+				$media_types_refs
+			);
 		}
 
 		$this->referencer->addTemplateGroups($template_groups_refs);
@@ -655,6 +622,105 @@ class CConfigurationImport {
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
 		$this->referencer->addHttpTests($httptests_refs);
 		$this->referencer->addHttpSteps($httpsteps_refs);
+		$this->referencer->addDashboards($dashboards_refs);
+	}
+
+	private function gatherDashboardReferences(array $dashboard, bool $is_templated, array &$host_groups_refs,
+			array &$hosts_refs, array &$templates_refs, array &$items_refs, array &$graphs_refs, array &$maps_refs,
+			array &$services_refs, array &$slas_refs, array &$users_refs, array &$actions_refs,
+			array &$media_types_refs): void {
+
+		if (!array_key_exists('pages', $dashboard)) {
+			return;
+		}
+
+		foreach ($dashboard['pages'] as $dashboard_page) {
+			if (!$dashboard_page['widgets']) {
+				continue;
+			}
+
+			foreach ($dashboard_page['widgets'] as $widget) {
+				foreach ($widget['fields'] as $field) {
+					$value = $field['value'];
+
+					switch ($field['type']) {
+						case ZBX_WIDGET_FIELD_TYPE_GROUP:
+							$host_groups_refs += [$value['name'] => []];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_HOST:
+							$hosts_refs += [$value['host'] => []];
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ITEM:
+						case ZBX_WIDGET_FIELD_TYPE_ITEM_PROTOTYPE:
+							if ($is_templated) {
+								$templates_refs += [$value['host'] => []];
+							}
+							else {
+								$hosts_refs += [$value['host'] => []];
+							}
+
+							if (!array_key_exists($value['host'], $items_refs)
+									|| !array_key_exists($value['key'], $items_refs[$value['host']])) {
+								$items_refs[$value['host']][$value['key']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH:
+						case ZBX_WIDGET_FIELD_TYPE_GRAPH_PROTOTYPE:
+							if ($is_templated) {
+								$templates_refs += [$value['host'] => []];
+							}
+							else {
+								$hosts_refs += [$value['host'] => []];
+							}
+
+							if (!array_key_exists($value['host'], $graphs_refs)
+									|| !array_key_exists($value['name'], $graphs_refs[$value['host']])) {
+								$graphs_refs[$value['host']][$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MAP:
+							if (!array_key_exists($value['name'], $maps_refs)) {
+								$maps_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SERVICE:
+							if (!array_key_exists($value['name'], $services_refs)) {
+								$services_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_SLA:
+							if (!array_key_exists($value['name'], $slas_refs)) {
+								$slas_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_USER:
+							if (!array_key_exists($value['username'], $users_refs)) {
+								$users_refs[$value['username']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_ACTION:
+							if (!array_key_exists($value['name'], $actions_refs)) {
+								$actions_refs[$value['name']] = [];
+							}
+							break;
+
+						case ZBX_WIDGET_FIELD_TYPE_MEDIA_TYPE:
+							if (!array_key_exists($value['name'], $media_types_refs)) {
+								$media_types_refs[$value['name']] = [];
+							}
+							break;
+					}
+				}
+			}
+		}
 	}
 
 	/**
@@ -2279,6 +2345,30 @@ class CConfigurationImport {
 	}
 
 	/**
+	 * Import global dashboards.
+	 */
+	protected function processDashboards(bool $dry_run): void {
+		if ($this->options['dashboards']['updateExisting'] || $this->options['dashboards']['createMissing']) {
+			$dashboards = $this->getFormattedDashboards();
+
+			if ($dashboards) {
+				$dashboard_importer = new CDashboardImporter($this->options, $this->referencer,
+					$this->importedObjectContainer
+				);
+
+				$dashboard_importer->setMissingObjectCollector($this->missing_object_collector);
+
+				if ($dry_run) {
+					$dashboard_importer->collectMissingObjects($dashboards);
+				}
+				else {
+					$dashboard_importer->import($dashboards);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Deletes items from DB that are missing in import file.
 	 */
 	protected function deleteMissingItems(): void {
@@ -2881,6 +2971,19 @@ class CConfigurationImport {
 		}
 
 		return $this->formattedData['hosts'];
+	}
+
+	/**
+	 * Get formatted dashboards.
+	 *
+	 * @return array
+	 */
+	public function getFormattedDashboards(): array {
+		if (!array_key_exists('dashboards', $this->formattedData)) {
+			$this->formattedData['dashboards'] = $this->adapter->getDashboards();
+		}
+
+		return $this->formattedData['dashboards'];
 	}
 
 	/**

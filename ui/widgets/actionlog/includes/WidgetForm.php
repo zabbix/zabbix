@@ -58,7 +58,7 @@ class WidgetForm extends CWidgetForm {
 				])
 			)
 			->addField(
-				new CWidgetFieldTextBox('message', _('Search string'))
+				(new CWidgetFieldTextBox('message', _('Search string')))->setMaxLength(2048)
 			)
 			->addField(
 				(new CWidgetFieldTimePeriod('time_period', _('Time period')))

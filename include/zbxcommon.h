@@ -211,7 +211,8 @@ typedef enum
 	ITEM_VALUE_TYPE_LOG,
 	ITEM_VALUE_TYPE_UINT64,
 	ITEM_VALUE_TYPE_TEXT,
-	ITEM_VALUE_TYPE_BIN,	/* Last real value. In some places it is also used in size of array or */
+	ITEM_VALUE_TYPE_BIN,
+	ITEM_VALUE_TYPE_JSON,	/* Last real value. In some places it is also used in size of array or */
 				/* upper bound for iteration. Do not forget to update when adding new types. */
 	ITEM_VALUE_TYPE_NONE	/* Artificial value, not written into DB, used internally in server. */
 }

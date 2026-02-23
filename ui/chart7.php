@@ -123,9 +123,7 @@ $graph->setHeight(getRequest('height', 300));
 $resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 foreach ($items as $item) {
-	if ($db_items[$item['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($item['itemid'], $resolve_macros, $item['calc_fnc'], $item['color'], $item['type']);
-	}
+	$graph->addItem($item['itemid'], $resolve_macros, $item['calc_fnc'], $item['color'], $item['type']);
 }
 $graph->draw();
 

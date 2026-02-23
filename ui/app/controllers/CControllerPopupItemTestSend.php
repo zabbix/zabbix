@@ -101,7 +101,7 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'username'				=> 'string',
 			'url'					=> 'string',
 			'value'					=> 'string',
-			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
+			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]),
 			'valuemapid'			=> 'id',
 			'verify_host'			=> 'in 0,1',
 			'verify_peer'			=> 'in 0,1',

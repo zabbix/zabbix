@@ -1725,7 +1725,7 @@ class testPageProblems extends CWebTest {
 			: count($data['result'])
 		);
 
-		$dialog_selector = 'xpath://div[@class="overlay-dialogue wordbreak"]';
+		$dialog_selector = 'xpath://div[contains(@class, "hintbox-static")]';
 		if (array_key_exists('check_trigger_description', $data)) {
 			foreach ($data['check_trigger_description'] as $i => $description) {
 				$cell = $table->getRow($i)->getColumn('Problem');
