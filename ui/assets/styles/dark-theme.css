@@ -2469,6 +2469,7 @@ button {
     box-sizing: border-box;
     display: flex;
     min-height: var(--datatable-row-height);
+    min-width: 0;
     position: relative;
     text-align: left; }
     .datatable .cell:not(.cell-bg) {
