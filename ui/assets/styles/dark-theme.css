@@ -5323,6 +5323,8 @@ form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #525252; }
 
+div.dashboard-widget-itemhistory .list-table iframe {
+  vertical-align: top; }
 div.dashboard-widget-itemhistory .list-table pre {
   font-family: inherit; }
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
