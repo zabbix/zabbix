@@ -19,7 +19,6 @@
 #include "zbxdbschema.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
-#include "zbxcrypto.h"
 
 /*
  * 8.0 development database patches
