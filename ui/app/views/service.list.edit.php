@@ -134,7 +134,12 @@ $page = (new CHtmlPage())
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
 	);
 
-if (!$data['is_inaccessible']) {
+if ($data['is_inaccessible']) {
+	$page->addItem(
+		makeMessageBox(ZBX_STYLE_MSG_BAD, [], _('No permissions to referred object or it does not exist!'))
+	);
+}
+else {
 	$page
 		->addItem($filter)
 		->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
