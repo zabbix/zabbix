@@ -12,12 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "libs/zbxpreproc/pp_execute.h"
+
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
-
-#include "libs/zbxpreproc/pp_execute.h"
 
 #include "pp_mock.h"
 
@@ -100,7 +100,7 @@ void	zbx_mock_test_entry(void **state)
 				zbx_variant_t	value_res = {0};
 
 				if (result_num >= results_num) {
-					fail_msg("Not enough results from preprocessing");
+					fail_msg("Number of out.results exceeds number of results from preprocessing");
 					break;
 				}
 
@@ -110,9 +110,10 @@ void	zbx_mock_test_entry(void **state)
 
 				if (0 != zbx_variant_compare(&pp_result->value, &value_res))
 				{
-					fail_msg("preprocessing result %d differs: '%s'/'%s'", result_num,
-							zbx_variant_value_desc(&pp_result->value),
-							zbx_variant_value_desc(&value_res));
+					fail_msg("preprocessing result %d differs: expected '%s', got '%s'",
+							result_num,
+							zbx_variant_value_desc(&value_res),
+							zbx_variant_value_desc(&pp_result->value));
 				}
 
 				result_num++;

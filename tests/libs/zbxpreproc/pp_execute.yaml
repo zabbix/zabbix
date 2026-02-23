@@ -20,6 +20,7 @@ in:
   value:
     value_type: ITEM_VALUE_TYPE_NONE
     time: 2017-10-29 03:15:00 +03:00
+# When none value is passed, there should be no result.
 ---
 test case: none on JSONPath preprocessing
 in:
@@ -34,7 +35,7 @@ out:
   results:
   - variant: ZBX_VARIANT_NONE
 ---
-test case: none
+test case: none with multiplier
 in:
   item_type: ITEM_TYPE_TRAPPER
   value:

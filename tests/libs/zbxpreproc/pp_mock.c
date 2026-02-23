@@ -114,6 +114,7 @@ void	mock_pp_read_value(zbx_mock_handle_t handle, unsigned char *value_type, zbx
 {
 	if (NULL != value_type)
 		*value_type = zbx_mock_str_to_value_type(zbx_mock_get_object_member_string(handle, "value_type"));
+
 	if (ZBX_MOCK_SUCCESS != zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "time"), ts))
 		fail_msg("Invalid 'time' format");
 
@@ -149,10 +150,14 @@ void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step)
 	step->params = zbx_strdup(NULL, step_params);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler", &herror))
+	{
 		step->error_handler = str_to_preproc_error_handler(
 				zbx_mock_get_object_member_string(hop, "error_handler"));
+	}
 	else
+	{
 		step->error_handler = ZBX_PREPROC_FAIL_DEFAULT;
+	}
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hop, "error_handler_params", &herror_params))
 		error_handler_params = zbx_mock_get_object_member_string(hop, "error_handler_params");
