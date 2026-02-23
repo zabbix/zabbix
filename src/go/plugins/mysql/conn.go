@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -61,7 +61,6 @@ type connectionManagerOptions struct {
 	keepAlive      time.Duration
 	connectTimeout time.Duration
 	callTimeout    time.Duration
-	hkInterval     time.Duration
 	queryStorage   yarn.Yarn
 	logger         log.Logger
 }
@@ -123,7 +122,7 @@ func NewConnManager(options *connectionManagerOptions) *ConnManager {
 		log:            options.logger,
 	}
 
-	go connMgr.housekeeper(ctx, hkInterval)
+	go connMgr.housekeeper(ctx)
 
 	return connMgr
 }
@@ -192,8 +191,10 @@ func (c *ConnManager) closeAll() {
 }
 
 // housekeeper repeatedly checks for unused connections and closes them.
-func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
-	ticker := time.NewTicker(interval)
+func (c *ConnManager) housekeeper(ctx context.Context) {
+	const interval = 10
+
+	ticker := time.NewTicker(interval * time.Second)
 
 	for {
 		select {

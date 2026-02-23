@@ -4894,4 +4894,563 @@ in:
   params: 6m
 out:
   return: FAIL
+---
+test case: Evaluate baselinedev '1h:now/h,"d",10'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinedev
+  params: '1h:now/h,"d",10'
+  baseline_values: [1.7, 1.8, 1.9]
+  baseline_index: [0, 1, 2]
+out:
+  return: SUCCEED
+  value: 1.224745
+---
+test case: Evaluate baselinedev '1h:now/h,"d",10 with max double values'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinedev
+  params: '1h:now/h,"d",10'
+  baseline_values: [1.7976931348623157e+308, 1.7976931348623157e+308, 1.7976931348623157e+308]
+  baseline_index: [0, 1, 2]
+out:
+  return: FAIL
+---
+test case: Evaluate baselinedev '1h:now/h,"d",10 with min double values'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinedev
+  params: '1h:now/h,"d",10'
+  baseline_values: [2.2250738585072014e-308, 2.2250738585072014e-308, 2.2250738585072014e-308]
+  baseline_index: [0, 1, 2]
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate baselinedev not enough parameters
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinedev
+  params: '"d",10'
+  baseline_values: [1.7, 1.8, 1.9]
+  baseline_index: [0, 1, 2]
+out:
+  return: FAIL
+---
+test case: Evaluate baseline unknown function
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselineSomething
+  params: '1h:now/h,"d",10'
+  baseline_values: [0.0, 0.0, 0.0]
+  baseline_index: [0, 1, 2]
+out:
+  return: FAIL
+---
+test case: Evaluate baselinewma '1h:now/h,"d",10'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinewma
+  params: '1h:now/h,"d",3'
+  baseline_values: [2.0, 2.5, 3.0]
+  baseline_index: [0, 1, 2]
+out:
+  return: SUCCEED
+  value: 2.333333
+---
+test case: Evaluate baselinewma '1h:now/h,"d",10 with max double values'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinewma
+  params: '1h:now/h,"d",3'
+  baseline_values: [1.7976931348623157e+308, 1.7976931348623157e+308, 1.7976931348623157e+308]
+  baseline_index: [0, 1, 2]
+out:
+  return: SUCCEED
+  value: INF
+---
+test case: Evaluate baselinewma '1h:now/h,"d",10 with min double values'
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: baselinewma
+  params: '1h:now/h,"d",3'
+  baseline_values: [2.2250738585072014e-308, 2.2250738585072014e-308, 2.2250738585072014e-308]
+  baseline_index: [0, 1, 2]
+out:
+  return: SUCCEED
+  value: 0
+---
+test case: Evaluate trendcount
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendcount
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 5.400000
+db data:
+  trends:
+  - [5.4, 1616662800]
+---
+test case: Evaluate trendcount max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendcount
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
+db data:
+  trends:
+  - [1.7976931348623157e+308, 1616662800]
+---
+test case: Evaluate trendcount min double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendcount
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 2.2250738585072014e-308
+db data:
+  trends:
+  - [2.2250738585072014e-308, 1616662800]
+---
+test case: Evaluate trendmax
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendmax
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.900000
+db data:
+  trends:
+  - [1.9, 1616662800]
+---
+test case: Evaluate trendmax max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendmax
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
+db data:
+  trends:
+  - [1.7976931348623157e+308, 1616662800]
+---
+test case: Evaluate trendmax min double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendmax
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 2.2250738585072014e-308
+db data:
+  trends:
+  - [2.2250738585072014e-308, 1616662800]
+---
+test case: Evaluate trendmin
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendmin
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.700000
+db data:
+  trends:
+  - [1.7, 1616662800]
+---
+test case: Evaluate trendmin with max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendmin
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
+db data:
+  trends:
+  - [1.7976931348623157e+308, 1616662800]
+---
+test case: Evaluate trendmin with min double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendmin
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 0
+db data:
+  trends:
+  - [2.2250738585072014e-308, 1616662800]
+---
+test case: Evaluate trendavg
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendavg
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.800000
+db data:
+  trends:
+  - [1.8, 1616662800]
+---
+test case: Evaluate trendavg with max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendavg
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 1.7976931348623157e+308
+db data:
+  trends:
+  - [1.7976931348623157e+308, 1616662800]
+---
+test case: Evaluate trendavg with min double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendavg
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 2.2250738585072014e-308
+db data:
+  trends:
+  - [2.2250738585072014e-308, 1616662800]
+---
+test case: Evaluate trendsum
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendsum
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 16.200000
+db data:
+  trends:
+  - [5.4, 3, 1616662800]
+---
+test case: Evaluate trendsum with max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendsum
+  params: '1h:now/h'
+out:
+  return: FAIL
+db data:
+  trends:
+  - [1.7976931348623157e+308, 3, 1616662800]
+---
+test case: Evaluate trendsum with max double value
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendsum
+  params: '1h:now/h'
+out:
+  return: SUCCEED
+  value: 0
+db data:
+  trends:
+  - [2.2250738585072014e-308, 3, 1616662800]
+---
+test case: Evaluate trendstl
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendstl
+  params: '10h:now/h,2h,2h'
+out:
+  return: SUCCEED
+  value: 0.5
+db data:
+  trends:
+  - [5.4, 3]
+  trends (2):
+  - [16.2, 3]
+  trends (3):
+  - [16.2, 3]
+  trends (4):
+  - [8.2, 3]
+  trends (5):
+  - [8.2, 3]
+  trends (6):
+  - [8.2, 3]
+  trends (7):
+  - [8.2, 3]
+  trends (8):
+  - [8.2, 3]
+  trends (9):
+  - [8.2, 3]
+  trends (10):
+  - [50.0, 3]
+---
+test case: Evaluate trendstl max double values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendstl
+  params: '10h:now/h,2h,2h'
+out:
+  return: FAIL
+db data:
+  trends:
+  - [1, 3]
+  trends (2):
+  - [2, 3]
+  trends (3):
+  - [1.7976931348623157e+308, 3]
+  trends (4):
+  - [3, 3]
+  trends (5):
+  - [1.7976931348623157e+308, 3]
+  trends (6):
+  - [1.7976931348623157e+308, 3]
+  trends (7):
+  - [6, 3]
+  trends (8):
+  - [1.7976931348623157e+308, 3]
+  trends (9):
+  - [1.7976931348623157e+308, 3]
+  trends (10):
+  - [1.7976931348623157e+308, 3]
+---
+test case: Evaluate trendstl min double values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendstl
+  params: '10h:now/h,2h,2h'
+out:
+  return: SUCCEED
+  value: 0.5
+db data:
+  trends:
+  - [2.2250738585072014e-308, 3]
+  trends (2):
+  - [2.2250738585072014e-308, 3]
+  trends (3):
+  - [2.2250738585072014e-308, 3]
+  trends (4):
+  - [2.2250738585072014e-308, 3]
+  trends (5):
+  - [2.2250738585072014e-308, 3]
+  trends (6):
+  - [2.2250738585072014e-308, 3]
+  trends (7):
+  - [2.2250738585072014e-308, 3]
+  trends (8):
+  - [2.2250738585072014e-308, 3]
+  trends (9):
+  - [2.2250738585072014e-308, 3]
+  trends (10):
+  - [2.2250738585072014e-308, 3]
+---
+test case: Evaluate trendstl (mad)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendstl
+  params: '10h:now/h,2h,2h, 2.0, "mad"'
+out:
+  return: SUCCEED
+  value: 1.000000
+db data:
+  trends:
+  - [12.0, 1]
+  trends (2):
+  - [10, 2]
+  trends (3):
+  - [11.0, 3]
+  trends (4):
+  - [10.0, 4]
+  trends (5):
+  - [10.0, 5]
+  trends (6):
+  - [12.0, 6]
+  trends (7):
+  - [12.0, 7]
+  trends (8):
+  - [10.0, 8]
+  trends (9):
+  - [10.0, 9]
+  trends (10):
+  - [100.0, 10]
+---
+test case: Evaluate trendstl (mad) with max double values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendstl
+  params: '10h:now/h,2h,2h, 2.0, "mad"'
+out:
+  return: SUCCEED
+  value: 1.000000
+db data:
+  trends:
+  - [12.0, 1]
+  trends (2):
+  - [10, 2]
+  trends (3):
+  - [11.0, 3]
+  trends (4):
+  - [10.0, 4]
+  trends (5):
+  - [10.0, 5]
+  trends (6):
+  - [12.0, 6]
+  trends (7):
+  - [10.0, 7]
+  trends (8):
+  - [10.0, 8]
+  trends (9):
+  - [10.0, 9]
+  trends (10):
+  - [1.7976931348623157e+308, 10]
+---
+test case: Evaluate trendstl (mad) with min double values
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data: []
+  time: 2021-03-25 10:07:00.000000000 +00:00
+  function: trendstl
+  params: '10h:now/h,2h,2h, 2.0, "mad"'
+out:
+  return: SUCCEED
+  value: 1.000000
+db data:
+  trends:
+  - [12.0, 1]
+  trends (2):
+  - [10, 2]
+  trends (3):
+  - [11.0, 3]
+  trends (4):
+  - [10.0, 4]
+  trends (5):
+  - [10.0, 5]
+  trends (6):
+  - [12.0, 6]
+  trends (7):
+  - [10.0, 7]
+  trends (8):
+  - [10.0, 8]
+  trends (9):
+  - [10.0, 9]
+  trends (10):
+  - [2.2250738585072014e-308, 10]
 ...

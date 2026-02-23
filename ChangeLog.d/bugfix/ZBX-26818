@@ -1,1 +1,0 @@
-.......PS. [ZBX-26818] fixed crash on \"cannot get secrets for path\" error due to missing lock when using shared memory (vso)

@@ -2243,6 +2243,13 @@ msgstr "Både fälten \"tls_psk_identity\" och \"tls_psk\" måste anges när du 
 msgid "Both passwords must be equal."
 msgstr "Båda lösenorden måste vara lika."
 
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -4207,6 +4214,10 @@ msgstr "Det går inte att ange \"%1$s\" för grafprototypen \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Det går inte att ställa in \"Aggregering av datauppsättning\" när objekt av typen \"Total\" läggs till i diagrammet."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -12240,6 +12251,13 @@ msgstr "Intervall och lagring"
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ogiltig API-metod \"%2$s\" för användarrollen \"%1$s\"."
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -26834,6 +26852,11 @@ msgstr "ogiltig byte-sekvens i UTF-8"
 msgid "invalid data type"
 msgstr "ogiltig datatyp"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ogiltig fördröjning"
@@ -28233,6 +28256,11 @@ msgstr "värdet måste ligga mellan \"%1$s\" och \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "värdet måste ligga mellan \"%1$s\" och \"%2$s\" och får inte ha fler än \"%3$s\" siffror efter decimaltecknet"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "värdet måste vara tomt"
@@ -28249,6 +28277,16 @@ msgstr[1] "värdet måste vara tomt eller ett av %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "värdet måste vara större än \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
