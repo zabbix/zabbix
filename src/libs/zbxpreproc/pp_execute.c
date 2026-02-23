@@ -1054,6 +1054,7 @@ static int	pp_execute_snmp_get_to_value(zbx_variant_t *value, const char *params
  *             history_value_out - [OUT] historical (next) data               *
  *             history_ts        - [IN/OUT] last value timestamp              *
  *             config_source_ip  - [IN]                                       *
+ *             error             - [OUT] error message                        *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -1070,7 +1071,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
 			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
 
-	/* Special case: nothing to do - just clear error message. */
+	/* Special case: nothing to do */
 	if (ZBX_VARIANT_NONE == value->type)
 		goto out;
 

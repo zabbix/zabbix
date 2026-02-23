@@ -158,5 +158,6 @@ void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step)
 		error_handler_params = zbx_mock_get_object_member_string(hop, "error_handler_params");
 	else
 		error_handler_params = "";
+
 	step->error_handler_params = zbx_strdup(NULL, error_handler_params);
 }
