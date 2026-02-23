@@ -32,7 +32,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Constants for regular dashboard cases.
 	const NEW_PAGE_NAME = 'Test_page';
-	const PASTE_DASHBOARD_NAME = 'Dashboard for Paste widgets';
+	const PASTE_DASHBOARD_NAME = 'Widget pasting dashboard';
 
 	// Constants for templated dashboard cases.
 	const TEMPLATED_DASHBOARD_NAME = 'Templated dashboard with all widgets';
@@ -55,7 +55,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	/*
-	 *  Get all widgets from dashboards with name starting with "Dashboard for Copying widgets".
+	 *  Get all widgets from dashboards with name starting with "Widget copy dashboard".
 	 */
 	public static function getDashboardsData() {
 		static $data = null;
@@ -70,7 +70,7 @@ class testDashboardCopyWidgets extends CWebTest {
 					' JOIN dashboard_page dp ON w.dashboard_pageid=dp.dashboard_pageid'.
 					' WHERE dp.dashboardid IN ('.
 						'SELECT dashboardid FROM dashboard '.
-						'WHERE name LIKE \'%Dashboard for Copying widgets%\''.
+						'WHERE name LIKE \'%Widget copy dashboard%\''.
 					') ORDER BY w.widgetid DESC'
 			);
 		}
@@ -160,7 +160,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		else {
 			$dashboardid = $start_dashboardid;
 			$new_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-					zbx_dbstr('Dashboard for Paste widgets')
+					zbx_dbstr('Widget pasting dashboard')
 			);
 			$new_page_name = self::NEW_PAGE_NAME;
 			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='.
