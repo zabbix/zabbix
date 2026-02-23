@@ -97,7 +97,7 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 		$reset_curl = (new CUrl('zabbix.php'))
 			->setArgument('action', 'service.list.edit')
 			->setArgument('path', $path ?: null)
-			->setArgument('serviceid', $this->service !== null ? $this->service['serviceid'] : null);
+			->setArgument('serviceid', $this->hasInput('serviceid') ? $this->getInput('serviceid') : null);
 
 		$paging_curl = clone $reset_curl;
 
@@ -149,16 +149,13 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 			$data += $this->getSlas();
 		}
 
-		$db_serviceids = self::getServiceIds($filter, $filter['filter_set']);
+		if (!$this->is_inaccessible) {
+			$db_serviceids = self::getServiceIds($filter, $filter['filter_set']);
 
-		$page_num = $this->getInput('page', 1);
-		CPagerHelper::savePage('service.list.edit', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
+			$page_num = $this->getInput('page', 1);
+			CPagerHelper::savePage('service.list.edit', $page_num);
+			$data['paging'] = CPagerHelper::paginate($page_num, $db_serviceids, ZBX_SORT_UP, $paging_curl);
 
-		if ($this->is_inaccessible) {
-			$data['services'] = [];
-		}
-		else {
 			$data['services'] = API::Service()->get([
 				'output' => ['serviceid', 'name', 'status', 'created_at', 'readonly'],
 				'selectParents' => $filter['filter_set'] ? ['serviceid', 'name'] : null,
@@ -171,11 +168,11 @@ class CControllerServiceListEdit extends CControllerServiceListGeneral {
 				'sortorder' => ZBX_SORT_UP,
 				'preservekeys' => true
 			]);
+
+			self::extendProblemEvents($data['services']);
+
+			$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 		}
-
-		self::extendProblemEvents($data['services']);
-
-		$data['tags'] = makeTags($data['services'], true, 'serviceid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Services'));

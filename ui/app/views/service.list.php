@@ -98,7 +98,7 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	]);
 }
 
-(new CHtmlPage())
+$page = (new CHtmlPage())
 	->setTitle(_('Services'))
 	->setWebLayoutMode($web_layout_mode)
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SERVICE_LIST))
@@ -119,12 +119,22 @@ if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
 	)
 	->setNavigation(
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
-	)
-	->addItem($filter)
-	->addItem(new CPartial('service.list', array_intersect_key($data, array_flip(['can_monitor_problems', 'path',
-		'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags', 'paging'
-	]))))
-	->show();
+	);
+
+if ($data['is_inaccessible']) {
+	$page->addItem(
+		makeMessageBox(ZBX_STYLE_MSG_BAD, [], _('No permissions to referred object or it does not exist!'))
+	);
+}
+else {
+	$page
+		->addItem($filter)
+		->addItem(new CPartial('service.list', array_intersect_key($data, array_flip(['can_monitor_problems', 'path',
+			'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags', 'paging'
+		]))));
+}
+
+$page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
