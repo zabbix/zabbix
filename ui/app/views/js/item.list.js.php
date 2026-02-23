@@ -137,7 +137,6 @@
 
 			this.form.querySelectorAll('.list-table thead th a').forEach(link => {
 				link.addEventListener('click', e => {
-
 					e.preventDefault();
 
 					const search_params = new URLSearchParams(e.currentTarget.href);
@@ -146,7 +145,7 @@
 						subfilter_set: 1,
 						sort: search_params.get('sort'),
 						sortorder: search_params.get('sortorder')
-					}
+					};
 
 					location.href = zabbixUrl(filters);
 				});
