@@ -235,7 +235,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
-		 * since the widget header and the conent block without the loading appear first,
+		 * since the widget header and the content block without the loading appear first,
 		 * and only after that the loading appears.
 		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
 		 */
@@ -251,6 +251,9 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
+			COverlayDialogElement::ensureNotPresent();
+
+			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}
 
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
@@ -265,8 +268,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->assertEquals($original_form, $copied_form);
 
 		// Close overlay and save dashboard to get new widget size from DB.
-		$copied_overlay = COverlayDialogElement::find()->one();
-		$copied_overlay->close();
+		COverlayDialogElement::find()->one()->close();
 
 		if ($templated) {
 			$this->query('button:Save changes')->one()->click();

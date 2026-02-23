@@ -678,7 +678,7 @@ class testFormTags extends CWebTest {
 		$tags = $element->getValue();
 
 		// Click Clone or Full Clone button.
-		$this->query('button', $action)->one()->click();
+		$this->query('button', $action)->one()->click()->waitUntilNotVisible();
 		$this->page->waitUntilReady();
 
 		// Find form again for cloned host and click Add host.

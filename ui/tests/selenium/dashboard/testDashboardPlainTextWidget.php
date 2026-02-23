@@ -47,7 +47,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	protected static $update_widget = 'Update Plain text Widget';
 	const DEFAULT_WIDGET = 'Default Plain text Widget';
 	const DELETE_WIDGET = 'Widget for delete';
-	const DATA_WIDET = 'Widget for data check';
+	const DATA_WIDGET = 'Widget for data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -171,7 +171,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'plaintext',
-								'name' => self::DATA_WIDET,
+								'name' => self::DATA_WIDGET,
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -1119,7 +1119,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
 
-		$widget = $dashboard->getWidget(self::DATA_WIDET);
+		$widget = $dashboard->getWidget(self::DATA_WIDGET);
 		$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 
 		$default_values = [
@@ -1173,9 +1173,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 	 * @param array 				$configuration    	widget parameter(s)
 	 */
 	protected function widgetConfigurationChange($configuration, $dashboard) {
-		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
+		$form = $dashboard->getWidget(self::DATA_WIDGET)->edit();
 		$form->fill($configuration);
-		$form->submit();
+		$form->submit()->waitUntilNotVisible();
+		$dashboard->getWidget(self::DATA_WIDGET);
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 	}
