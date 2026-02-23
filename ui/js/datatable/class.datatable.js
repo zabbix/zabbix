@@ -1129,20 +1129,9 @@ class CDataTable {
 
 		column_config.setWidth(`${width}%`);
 
-		const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
-
-		const current_total_width = visible_columns
-			.map(column_config => parseFloat(this.#getWidthWithoutUnit(column_config.getWidth())))
-			.reduce((total_width, width) => total_width + width, 0);
-
-		if (current_total_width < 100) {
-			width = Math.max(min_width_percent, width + 100 - current_total_width);
-
-			column_config.setWidth(`${width}%`);
-		}
-
 		this.#applyColumnWidths();
 
+		const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
 		visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
 
 		this.#applyScrollableBody();
