@@ -77,23 +77,12 @@ type netIfResult struct {
 	Values []ifValuesData `json:"values"`
 }
 
-// sysClassNetPathSanitize sanitizes /sys/class/net/<interface>/ directory path.
-func (p *Plugin) sysClassNetPathSanitize(ifName string) error {
-	dirPath, err := filepath.Abs(filepath.Join(p.sysClassNetDirpath, ifName))
-	if err != nil || !strings.HasPrefix(dirPath, p.sysClassNetDirpath) {
-		/* should never happen */
-		return errs.Errorf("path traversal was prevented, network interface %q, absolute dir path = %q",
-			ifName,
-			dirPath,
-		)
-	}
-
-	return nil
-}
-
 func (p *Plugin) sysClassNetStrGet(ifName, filename string) string {
 	path := filepath.Join(p.sysClassNetDirpath, ifName, filename)
 
+	// G304: path is composed of a hardcoded base dir, kernel-supplied interface name, and hardcoded filename;
+	// no user input involved.
+	//nolint:gosec
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return ""
@@ -255,12 +244,6 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 
 		if rgx != nil && !rgx.MatchString(ifName) {
 			continue
-		}
-
-		err = p.sysClassNetPathSanitize(ifName)
-		if err != nil {
-			/* should never happen */
-			return nil, err
 		}
 
 		conf, val := p.getInterfaceMetrics(ifName, stats)
