@@ -318,15 +318,6 @@ zbx_db_alert;
 
 typedef struct
 {
-	zbx_uint64_t	housekeeperid;
-	char		*tablename;
-	char		*field;
-	zbx_uint64_t	value;
-}
-zbx_db_housekeeper;
-
-typedef struct
-{
 	zbx_uint64_t	httptestid;
 	char		*name;
 	char		*agent;
