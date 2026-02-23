@@ -3,6 +3,15 @@ Changes for 7.0.24rc1
 New features:
 
 Bug fixes:
+........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
+.......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
+..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
+...G...PS. [ZBX-26383] fixed inability to return not supported via user parameters (dgoloscapov, mkorotkov)
+.......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
+..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
+..F....... [ZBX-26827] fixed checkboxes "SSL verify peer" and "SSL verify host" not being selected when corresponding label is clicked in media type form (msnihach)
+..F....... [ZBX-27416] fixed message box display bug in Monitoring Problems page (gberzina)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.23
@@ -3944,6 +3953,13 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.45rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
