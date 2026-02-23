@@ -403,7 +403,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'placeholder' => 'type here to search'
 					],
 					'id:description' => [
-						'maxlength' => 2048
+						'maxlength' => 65535
 					],
 					'id:desc_size' => [
 						'maxlength' => 3

@@ -627,6 +627,9 @@ svg a {
   background-color: #333333;
   color: #ffffff; }
 
+.align-top {
+  vertical-align: top; }
+
 [data-indicator="count"][data-indicator-value]:not([data-indicator-value="0"])::after {
   content: attr(data-indicator-value);
   margin-left: .4em;
@@ -2312,7 +2315,7 @@ button {
   margin-top: 4px;
   white-space: break-spaces;
   word-break: break-word;
-  line-height: 17px;
+  line-height: 1.4em;
   color: #ad1f1f; }
 
 z-select.has-error button.focusable:active,
@@ -5249,6 +5252,8 @@ form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #9f9f9f; }
 
+div.dashboard-widget-itemhistory .list-table iframe {
+  vertical-align: top; }
 div.dashboard-widget-itemhistory .list-table pre {
   font-family: inherit; }
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
