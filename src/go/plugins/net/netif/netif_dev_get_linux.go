@@ -26,18 +26,6 @@ import (
 	"golang.zabbix.com/sdk/errs"
 )
 
-type ifConfigData struct {
-	Name      string `json:"name"`
-	Alias     string `json:"ifalias"`
-	Mac       string `json:"mac"`
-	Type      string `json:"type"`
-	Speed     uint64 `json:"speed"`
-	Duplex    string `json:"duplex"`
-	AdmState  string `json:"administrative_state"`
-	OperState string `json:"operational_state"`
-	Carrier   uint64 `json:"carrier"`
-}
-
 type ifStatsIn struct {
 	Bytes      uint64 `json:"bytes"`
 	Packets    uint64 `json:"packets"`
@@ -57,6 +45,18 @@ type ifStatsOut struct {
 	Colls      uint64 `json:"collisions"`
 	Carrier    uint64 `json:"carrier"`
 	Compressed uint64 `json:"compressed"`
+}
+
+type ifConfigData struct {
+	Name      string `json:"name"`
+	Alias     string `json:"ifalias"`
+	Mac       string `json:"mac"`
+	Type      string `json:"type"`
+	Speed     uint64 `json:"speed"`
+	Duplex    string `json:"duplex"`
+	AdmState  string `json:"administrative_state"`
+	OperState string `json:"operational_state"`
+	Carrier   uint64 `json:"carrier"`
 }
 
 type ifValuesData struct {

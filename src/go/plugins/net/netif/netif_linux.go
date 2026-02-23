@@ -40,7 +40,7 @@ func init() { //nolint:gochecknoinits // legacy implementation
 		"net.if.out", "Returns outgoing traffic statistics on network interface.",
 		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
 		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
-		"net.if.get", "Returns list of network interfaces with parameters.",
+		"net.if.get", "Returns list of network interfaces with detailed information.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
@@ -82,49 +82,49 @@ func (p *Plugin) Export(key string, params []string, _ plugin.ContextProvider) (
 	}
 }
 
-func (p *Plugin) exportDiscovery(params []string) (any, error) {
+func (p *Plugin) exportDiscovery(params []string) (string, error) {
 	if len(params) > 0 {
-		return nil, errs.New(errorParametersNotAllowed)
+		return "", errs.New(errorParametersNotAllowed)
 	}
 
 	devices, err := p.getDevDiscovery()
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	b, err := json.Marshal(devices)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to marshal devices")
+		return "", errs.Wrap(err, "failed to marshal devices")
 	}
 
 	return string(b), nil
 }
 
-func (p *Plugin) exportGet(params []string) (any, error) {
+func (p *Plugin) exportGet(params []string) (string, error) {
 	var (
 		err error
 		rgx *regexp.Regexp
 	)
 
 	if len(params) > 1 {
-		return nil, zbxerr.ErrorTooManyParameters
+		return "", zbxerr.ErrorTooManyParameters
 	}
 
 	if len(params) > 0 && params[0] != "" {
 		rgx, err = regexp.Compile(params[0])
 		if err != nil {
-			return nil, errs.Wrapf(err, "invalid regular expression %q", params[0])
+			return "", errs.Wrapf(err, "invalid regular expression %q", params[0])
 		}
 	}
 
 	devices, err := p.getIfGet(rgx)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
 	b, err := json.Marshal(devices)
 	if err != nil {
-		return nil, errs.Wrap(err, "failed to marshal devices")
+		return "", errs.Wrap(err, "failed to marshal devices")
 	}
 
 	return string(b), nil
