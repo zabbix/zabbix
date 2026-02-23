@@ -95,11 +95,11 @@ int	zbx_event_db_get_host(const zbx_db_event *event, zbx_dc_host_t *host, char *
 					" join autoreg_host a on a.host=h.host"
 					" left join proxy p on p.proxyid=a.proxyid"
 					" where ((h.monitored_by=%d"
-						" and (" ZBX_SQL_NULLCMP("p.proxy_groupid", "h.proxy_groupid") "))"
+						" and " ZBX_SQL_NULLCMP("p.proxy_groupid", "h.proxy_groupid") ")"
 						" or (h.monitored_by<>%d"
 						" and " ZBX_SQL_NULLCMP("a.proxyid", "h.proxyid") "))"
 						" and h.status=%d"
-						" and " ZBX_SQL_BITAND_ZERO("h.flags", "%d")
+						" and h.flags<>%d"
 						" and a.autoreg_hostid=" ZBX_FS_UI64,
 					HOST_MONITORED_BY_PROXY_GROUP, HOST_MONITORED_BY_PROXY_GROUP,
 					HOST_STATUS_MONITORED, ZBX_FLAG_DISCOVERY_PROTOTYPE, event->objectid);

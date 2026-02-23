@@ -59,12 +59,6 @@ typedef struct
 }
 zbx_config_dbhigh_t;
 
-#ifdef HAVE_ORACLE
-#	define ZBX_SQL_BITAND_ZERO(col, val)	"bitand(" col "," val ")=0"
-#else
-#	define ZBX_SQL_BITAND_ZERO(col, val)	col "&" val "=0"
-#endif
-
 #ifdef HAVE_SQLITE3
 	/* we have to put double % here for sprintf */
 #	define ZBX_SQL_MOD(x, y) #x "%%" #y
