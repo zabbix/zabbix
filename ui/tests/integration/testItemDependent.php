@@ -21,12 +21,9 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @required-components server, agent
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_host
- * @backup history
+ * @onAfter clearData
  */
 class testItemDependent extends CIntegrationTest {
-
-	const ITEM_FILE_NAME1 = '/tmp/test1.json';
-	const ITEM_FILE_NAME2 = '/tmp/test2.json';
 
 	private static $hostid;
 	private static $interfaceid;
@@ -133,10 +130,12 @@ class testItemDependent extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testItemDependent_checkErrorPropagation() {
+		$filename = tempnam('/tmp', 'test1');
+
 		$response = $this->call('item.create', [
 			'hostid'     => self::$hostid,
 			'name'       => 'Master item',
-			'key_'       => 'vfs.file.contents['.self::ITEM_FILE_NAME1.']',
+			'key_'       => 'vfs.file.contents['.$filename.']',
 			'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
 			'value_type' => ITEM_VALUE_TYPE_STR,
 			'delay'      => '5s',
@@ -179,36 +178,36 @@ class testItemDependent extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
 
 		// Error in master preprocessing should be propagated to dependent item
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"b":{}}');
+		$this->updateDataAndWait($master_itemid, $filename, '{"b":{}}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NOTSUPPORTED, '', 'ERROR');
 		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, '', 'ERROR');
 
 		// Dependent drops the value
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"a":{}}');
+		$this->updateDataAndWait($master_itemid, $filename, '{"a":{}}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{}', '');
 		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, '', '');
 
 		// Both items are supported and has value
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"a":{"sub":"sub_value"}}');
+		$this->updateDataAndWait($master_itemid, $filename, '{"a":{"sub":"sub_value"}}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{"sub":"sub_value"}', '');
 		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, 'sub_value', '');
 
 		// Error in master should propagate to dependent
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"b":{}}');
+		$this->updateDataAndWait($master_itemid, $filename, '{"b":{}}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NOTSUPPORTED, '{"sub":"sub_value"}', 'ERROR');
 		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, 'sub_value', 'ERROR');
 
 		// Dependent should drop the old error
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, '{"a":{}}');
+		$this->updateDataAndWait($master_itemid, $filename, '{"a":{}}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{}', '');
 		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, 'sub_value', '');
 
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME1, null);
+		$this->updateDataAndWait($master_itemid, $filename, null);
 	}
 
 	/**
@@ -218,10 +217,12 @@ class testItemDependent extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testItemDependent_checkUnsupported() {
+		$filename = tempnam('/tmp', 'test1');
+
 		$response = $this->call('item.create', [
 			'hostid'     => self::$hostid,
 			'name'       => 'Master item',
-			'key_'       => 'vfs.file.contents['.self::ITEM_FILE_NAME2.']',
+			'key_'       => 'vfs.file.contents['.$filename.']',
 			'type'       => ITEM_TYPE_ZABBIX_ACTIVE,
 			'value_type' => ITEM_VALUE_TYPE_STR,
 			'delay'      => '5s',
@@ -269,18 +270,18 @@ class testItemDependent extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
 
 		// Set both items to supported
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME2, '{"a":{"b":{}}}');
+		$this->updateDataAndWait($master_itemid, $filename, '{"a":{"b":{}}}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{"b":{}}', '');
 		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, '', true);
 
 		// Propagate error coming from master item preprocessing
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME2, '{}');
+		$this->updateDataAndWait($master_itemid, $filename, '{}');
 
 		$this->validateItems($master_itemid, ITEM_STATE_NOTSUPPORTED, '{"b":{}}', 'MASTER_PREPROC_ERROR');
 		$this->validateItems($dep_itemid, ITEM_STATE_NOTSUPPORTED, '', 'MASTER_PREPROC_ERROR');
 
-		$this->updateDataAndWait($master_itemid, self::ITEM_FILE_NAME2, null);
+		$this->updateDataAndWait($master_itemid, $filename, null);
 
 		$this->validateItems($master_itemid, ITEM_STATE_NORMAL, '{"b":{}}', '');
 		$this->validateItems($dep_itemid, ITEM_STATE_NORMAL, '', '');
