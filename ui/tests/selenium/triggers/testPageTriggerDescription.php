@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -96,7 +96,7 @@ class testPageTriggerDescription extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
 			$row->query('xpath:.//button['.CXPathHelper::fromClass('zi-alert-with-content').']')->one()->click();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->one()->waitUntilReady();
+			$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->one()->waitUntilReady();
 			$this->assertEquals($data['description'], $overlay->getText());
 
 			// Check urls in description.

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,7 +22,8 @@ class CAggHelper {
 	 * @param int|float|string $value
 	 * @param int|string       $value_type                  Value type (ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR,
 	 *                                                      ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-	 *                                                      ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY).
+	 *                                                      ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY,
+	 * 														ITEM_VALUE_TYPE_JSON).
 	 * @param int              $function                    Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN,
 	 *                                                      AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT,
 	 *                                                      AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST).
@@ -65,6 +66,7 @@ class CAggHelper {
 				case ITEM_VALUE_TYPE_STR:
 				case ITEM_VALUE_TYPE_TEXT:
 				case ITEM_VALUE_TYPE_LOG:
+				case ITEM_VALUE_TYPE_JSON:
 					$display_value = $options['trim'] && mb_strlen($value) > 20
 						? mb_substr($value, 0, 20).'...'
 						: $value;

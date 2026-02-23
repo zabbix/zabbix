@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,14 +23,15 @@ class DB {
 	const SCHEMA_ERROR = 3;
 	const INIT_ERROR = 4;
 
-	const FIELD_TYPE_INT = 0x01;
-	const FIELD_TYPE_CHAR = 0x02;
-	const FIELD_TYPE_ID = 0x04;
-	const FIELD_TYPE_FLOAT = 0x08;
-	const FIELD_TYPE_UINT = 0x10;
-	const FIELD_TYPE_BLOB = 0x20;
-	const FIELD_TYPE_TEXT = 0x40;
-	const FIELD_TYPE_CUID = 0x80;
+	const FIELD_TYPE_INT = 0x0001;
+	const FIELD_TYPE_CHAR = 0x0002;
+	const FIELD_TYPE_ID = 0x0004;
+	const FIELD_TYPE_FLOAT = 0x0008;
+	const FIELD_TYPE_UINT = 0x0010;
+	const FIELD_TYPE_BLOB = 0x0020;
+	const FIELD_TYPE_TEXT = 0x0040;
+	const FIELD_TYPE_CUID = 0x0080;
+	const FIELD_TYPE_JSON = 0x0100;
 
 	const SUPPORTED_FILTER_TYPES = self::FIELD_TYPE_INT | self::FIELD_TYPE_CHAR | self::FIELD_TYPE_ID |
 		self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID;
@@ -698,130 +699,6 @@ class DB {
 		if (!DBexecute($sql)) {
 			self::exception(self::DBEXECUTE_ERROR, _s('SQL statement execution has failed "%1$s".', $sql));
 		}
-	}
-
-	/**
-	 * Updates the values by the given PK.
-	 *
-	 * @param string $tableName
-	 * @param string $pk
-	 * @param array  $values
-	 *
-	 * @return bool
-	 */
-	public static function updateByPk($tableName, $pk, array $values) {
-		return self::update($tableName, [
-			'where' => [self::getPk($tableName) => $pk],
-			'values' => $values
-		]);
-	}
-
-	/**
-	 * Saves the given records to the database. If the record has the primary key set, it is updated, otherwise - a new
-	 * record is inserted. For new records the newly generated PK is added to the result.
-	 *
-	 * @param $tableName
-	 * @param $data
-	 *
-	 * @return array    the same records, that have been passed with the primary keys set for new records
-	 */
-	public static function save($tableName, array $data) {
-		$pk = self::getPk($tableName);
-
-		$newRecords = [];
-		foreach ($data as $key => $record) {
-			// if the pk is set - update the record
-			if (isset($record[$pk])) {
-				self::updateByPk($tableName, $record[$pk], $record);
-			}
-			// if no pk is set, create the record later
-			else {
-				$newRecords[$key] = $data[$key];
-			}
-		}
-
-		// insert the new records
-		if ($newRecords) {
-			$newIds = self::insert($tableName, $newRecords);
-			foreach ($newIds as $key => $id) {
-				$data[$key][$pk] = $id;
-			}
-		}
-
-		return $data;
-	}
-
-	/**
-	 * Replaces the records given in $oldRecords with the ones in $newRecords.
-	 *
-	 * If a record with the same primary key as a new one already exists in the old records, the record is updated
-	 * only if they are different. For new records the newly generated PK is added to the result. Old records that are
-	 * not present in the new records are deleted.
-	 *
-	 * All of the records must have the primary key defined.
-	 *
-	 * @param string $tableName
-	 * @param array  $oldRecords
-	 * @param array  $newRecords
-	 *
-	 * @return array    the new records, that have been passed with the primary keys set for newly inserted records
-	 */
-	public static function replace($tableName, array $oldRecords, array $newRecords) {
-		$pk = self::getPk($tableName);
-		$oldRecords = zbx_toHash($oldRecords, $pk);
-
-		$modifiedRecords = [];
-		foreach ($newRecords as $key => $record) {
-			// if it's a new or modified record - save it later
-			if (!isset($record[$pk]) || self::recordModified($tableName, $oldRecords[$record[$pk]], $record)) {
-				$modifiedRecords[$key] = $record;
-			}
-
-			// remove the existing records from the collection, the remaining ones will be deleted
-			if(isset($record[$pk])) {
-				unset($oldRecords[$record[$pk]]);
-			}
-		}
-
-		// save modified records
-		if ($modifiedRecords) {
-			$modifiedRecords = self::save($tableName, $modifiedRecords);
-
-			// add the new IDs to the new records
-			foreach ($modifiedRecords as $key => $record) {
-				$newRecords[$key][$pk] = $record[$pk];
-			}
-		}
-
-		// delete remaining records
-		if ($oldRecords) {
-			self::delete($tableName, [
-				$pk => array_keys($oldRecords)
-			]);
-		}
-
-		return $newRecords;
-	}
-
-	/**
-	 * Compares the fields, that are present in both records, and returns true if any of the values differ.
-	 *
-	 * @param string $tableName
-	 * @param array  $oldRecord
-	 * @param array  $newRecord
-	 *
-	 * @return bool
-	 */
-	public static function recordModified($tableName, array $oldRecord, array $newRecord) {
-		foreach ($oldRecord as $field => $value) {
-			if (self::hasField($tableName, $field)
-					&& isset($newRecord[$field])
-					&& (string) $value !== (string) $newRecord[$field]) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**

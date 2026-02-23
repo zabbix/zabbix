@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -582,7 +582,8 @@ class CElementQuery implements IWaitable {
 			'CElement'					=> [
 				// TODO: change after DEV-1630 (1) is resolved.
 				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
-				'/textarea[@name]'
+				'/textarea[@name]',
+				'/z-textarea-flexible[@name]'
 			],
 			'CListElement'				=> '/select[@name]',
 			'CDropdownElement'			=> '/z-select[@name]',

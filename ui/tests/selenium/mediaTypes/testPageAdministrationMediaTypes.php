@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -146,7 +146,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 		}
 
 		$filter->getLabel('Display actions')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$popup = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+		$popup = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
 		$popup_text = "Filter actions by the scope of media type usage:\n".
 				"All - display all actions\n".
 				"All available - display only actions where All available media types are used in action operation\n".

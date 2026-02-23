@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -338,13 +338,13 @@ class testFormAction extends CLegacyWebTest {
 			// Open Condition overlay dialog and fill first condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@class, "condition-create")]');
 			$this->zbxTestLaunchOverlayDialog('New condition');
-			$this->zbxTestInputTypeByXpath('//textarea[@id="value"]', 'TEST1');
+			$this->zbxTestInputTypeByXpath('//z-textarea-flexible[@id="value"]', 'TEST1');
 			$this->query('xpath://div[@data-dialogueid="action-condition"]//button[text()="Add"]')->one()->click()->waitUntilNotVisible();
 			$this->zbxTestAssertVisibleXpath('//*[@id="conditionTable"]//tr[@data-row_index="0"]');
 			// Open Condition overlay dialog again and fill second condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@class, "condition-create")]');
 			$this->zbxTestLaunchOverlayDialog('New condition');
-			$this->zbxTestInputTypeByXpath('//textarea[@id="value"]', 'TEST2');
+			$this->zbxTestInputTypeByXpath('//z-textarea-flexible[@id="value"]', 'TEST2');
 			$this->query('xpath://div[@data-dialogueid="action-condition"]//button[text()="Add"]')->one()->click()->waitUntilNotVisible();
 			// Wait until overlay is closed and value is added, so that Type of calculation dropdown is clickable.
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
@@ -560,10 +560,10 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->zbxTestAssertElementPresentXpath('//input[@id="value"] | //textarea[@id="value"]');
+				$this->zbxTestAssertElementPresentXpath('//input[@id="value"] | //z-textarea-flexible[@id="value"]');
 				break;
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//input[@id="value"] | //textarea[@id="value"]');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id="value"] | //z-textarea-flexible[@id="value"]');
 				break;
 		}
 
@@ -580,7 +580,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->zbxTestAssertAttribute('//textarea[@id="value"] | //input[@id="value"]', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="value"] | //input[@id="value"]', 'maxlength', 255);
 				break;
 			case 'Uptime/Downtime':
 				$this->zbxTestAssertAttribute('//input[@id="value"]', 'maxlength', 7);
@@ -1391,7 +1391,7 @@ class testFormAction extends CLegacyWebTest {
 
 		if (isset($data['operations'])) {
 			$action_form->selectTab('Operations');
-			foreach ($data['operations'] as $operation) {
+			foreach ($data['operations'] as $i => $operation) {
 				$action_form->query('xpath://table[@id="op-table"]//button[text()="Add"]')->waitUntilVisible()->one()->click();
 				COverlayDialogElement::find()->waitUntilReady()->one();
 				$operation_form = $this->query('id:popup-operation')->asForm()->one();
@@ -1423,6 +1423,9 @@ class testFormAction extends CLegacyWebTest {
 
 				$operation_form->submit();
 				$operation_form->waitUntilNotVisible();
+				// Wait until new operation row is visible.
+				$operations_table = $this->query('id:op-table')->waitUntilVisible()->asTable()->one();
+				$operations_table->query('xpath:./tbody/tr['.($i + 1).']')->waitUntilVisible();
 			}
 
 			if (array_key_exists('esc_period', $data)) {

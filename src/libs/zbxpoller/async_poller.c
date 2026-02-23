@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -540,22 +540,22 @@ static void	sock_state_cb(void *data, int s, int read, int write)
 		goto out;
 	}
 
-	struct event	*ev = event_new(poller_config->base, s, events|EV_PERSIST, ares_process_fd_cb,
+	fd_event_local.event = event_new(poller_config->base, s, events|EV_PERSIST, ares_process_fd_cb,
 			poller_config->channel);
 
-	if (NULL == ev)
+	if (NULL == fd_event_local.event)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot create new event");
 		goto out;
 	}
 
-	if (0 != event_add(ev, NULL))
+	if (0 != event_add(fd_event_local.event, NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add event");
-		event_free(ev);
+		event_free(fd_event_local.event);
 		goto out;
 	}
-	fd_event_local.event = ev;
+
 	zbx_hashset_insert(&poller_config->fd_events, &fd_event_local, sizeof(fd_event_local));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -567,7 +567,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 {
 	char			*timeout;
 #ifdef HAVE_ARES
-	struct ares_options	options;
+	struct ares_options	options = {0};
 	int			optmask, status;
 
 	status = ares_library_init(ARES_LIB_INIT_ALL);
@@ -579,6 +579,10 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	}
 
 	optmask = ARES_OPT_SOCK_STATE_CB|ARES_OPT_TIMEOUT;
+#ifdef ARES_OPT_QUERY_CACHE
+	optmask |= ARES_OPT_QUERY_CACHE;
+	options.qcache_max_ttl = SEC_PER_HOUR;
+#endif
 	options.sock_state_cb = sock_state_cb;
 	options.sock_state_cb_data = poller_config;
 	options.timeout = poller_args_in->config_comms->config_timeout;

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2376,7 +2376,7 @@ class testLowLevelDiscovery extends CWebTest {
 		// Fill LLD macros tab.
 		if (array_key_exists('LLD macros', $data)) {
 			$form->selectTab('LLD macros');
-			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'z-textarea-flexible');
 		}
 
 		// Fill Filters tab.
@@ -2484,7 +2484,7 @@ class testLowLevelDiscovery extends CWebTest {
 			// Check LLD macros.
 			if (array_key_exists('LLD macros', $data)) {
 				$form->selectTab('LLD macros');
-				$this->checkComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+				$this->checkComplexFields($data['LLD macros'], $form, 'LLD macros', 'z-textarea-flexible');
 			}
 
 			// Check LLD Filters.
@@ -2692,7 +2692,7 @@ class testLowLevelDiscovery extends CWebTest {
 		// Change LLD macros.
 		if (array_key_exists('LLD macros', $data)) {
 			$form->selectTab('LLD macros');
-			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'textarea');
+			$this->fillComplexFields($data['LLD macros'], $form, 'LLD macros', 'z-textarea-flexible');
 		}
 
 		// Change Filters.
@@ -2979,7 +2979,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * @param array        $data       given array of fields
 	 * @param CFormElement $form       LLD edit form
 	 * @param string       $label      container's label
-	 * @param string       $locator    field's locator input or textarea
+	 * @param string       $locator    field's locator input or z-textarea-flexible
 	 */
 	protected function fillComplexFields($data, $form, $label, $locator) {
 		$table = $form->getField($label);
@@ -3009,7 +3009,7 @@ class testLowLevelDiscovery extends CWebTest {
 	 * @param array        $data       given array of fields
 	 * @param CFormElement $form       LLD edit form
 	 * @param string       $label      container's label
-	 * @param string       $locator    field's locator input or textarea
+	 * @param string       $locator    field's locator input or z-textarea-flexible
 	 */
 	protected function checkComplexFields($data, $form, $label, $locator) {
 		$table = $form->getField($label);

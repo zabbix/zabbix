@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -107,9 +107,7 @@ $resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
-	if ($db_items[$gItem['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
-	}
+	$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
 }
 
 $hostName = '';

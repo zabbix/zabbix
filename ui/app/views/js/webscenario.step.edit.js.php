@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -90,7 +90,7 @@ window.webscenario_step_edit_popup = new class {
 	#updateSortOrder(table, name_field) {
 		table.querySelectorAll('.form_row').forEach((row, index) => {
 			for (const field of row.querySelectorAll(`[name^="${name_field}["]`)) {
-				field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+				field.setAttribute('name', field.getAttribute('name').replace(/\[\d+]/g, `[${index}]`));
 			}
 		});
 	}
@@ -110,8 +110,6 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'query_fields'));
-
-		this.#initTextareaFlexible($query_fields);
 	}
 
 	#initPostFields(post_fields) {
@@ -129,8 +127,6 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'post_fields'));
-
-		this.#initTextareaFlexible($post_fields);
 	}
 
 	#initVariables(variables) {
@@ -140,8 +136,6 @@ window.webscenario_step_edit_popup = new class {
 			template: '#step-variable-row-tmpl',
 			rows: variables
 		});
-
-		this.#initTextareaFlexible($variables);
 	}
 
 	#initHeaders(headers) {
@@ -159,16 +153,6 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'headers'));
-
-		this.#initTextareaFlexible($headers);
-	}
-
-	#initTextareaFlexible($table) {
-		$table
-			.on('afteradd.dynamicRows', () => {
-				jQuery('.form_row:last .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
-			})
-			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#togglePostType(e) {
@@ -319,8 +303,6 @@ window.webscenario_step_edit_popup = new class {
 			}
 
 			$post_fields.data('dynamicRows').enableSorting();
-
-			jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $post_fields).textareaFlexible();
 		}
 	}
 

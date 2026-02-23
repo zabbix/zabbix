@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,7 +22,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup profiles
  *
- * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets, MonitoringOverview
+ * @dataSource TagFilter, UserPermissions, WidgetCommunication, DynamicItemWidgets, MonitoringOverview, HostAvailabilityWidget
  */
 class testPageMonitoringHosts extends CWebTest {
 
@@ -78,11 +78,14 @@ class testPageMonitoringHosts extends CWebTest {
 				->one()->getAttribute('maxlength'));
 		}
 
-		// Check disabled links.
+		// Check empty columns because of no data.
+		$row = $table->findRow('Name', 'Available host');
 		foreach (['Graphs', 'Dashboards', 'Web'] as $disabled) {
-			$row = $table->findRow('Name', 'Available host');
-			$this->assertTrue($row->query('xpath://following::td/span[@class="disabled" and text()="'.$disabled.'"]')->exists());
+			$this->assertEquals('', $row->getColumn($disabled)->getText());
 		}
+
+		// Check that sortable headers are clickable.
+		$this->assertEquals(['Name', 'Status'], $table->getSortableHeaders()->asText());
 
 		// Check tags on the specific host.
 		$tags = $table->findRow('Name', 'Host for tags filtering - clone')->getColumn('Tags')->query('class:tag')->all();

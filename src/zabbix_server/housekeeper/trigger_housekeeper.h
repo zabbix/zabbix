@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,6 +15,7 @@
 #ifndef ZABBIX_TRIGGER_HOUSEKEEPER_H
 #define ZABBIX_TRIGGER_HOUSEKEEPER_H
 
-int	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more);
+void	zbx_housekeep_problems_events(const char *query, int config_max_hk_delete, int events_mode, int *more,
+		int *deleted_events, int *deleted_problems);
 
 #endif

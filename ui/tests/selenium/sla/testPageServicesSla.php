@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -315,7 +315,8 @@ class testPageServicesSla extends CWebTest {
 			if (array_key_exists('rows', $schedule)) {
 				// Find the corresponding row and open the Custom schedule dialog.
 				$table->findRow('Name', $schedule['name'])->query('class:zi-alert-with-content')->one()->click();
-				$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+				$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
+					->waitUntilReady()->one();
 				$schedule_table = $overlay->query('class:list-table')->asTable()->one();
 				$displayed_days = $schedule_table->getRows()->asText();
 

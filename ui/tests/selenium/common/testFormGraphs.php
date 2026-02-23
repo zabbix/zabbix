@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1052,7 +1052,7 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$dialog->waitUntilReady();
 		$form = $dialog->asForm();
 

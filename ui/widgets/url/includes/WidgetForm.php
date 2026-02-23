@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,6 +36,7 @@ class WidgetForm extends CWidgetForm {
 			->addField(
 				(new CWidgetFieldUrl('url', _('URL')))
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+					->setMaxLength(2048)
 			)
 			->addField(
 				new CWidgetFieldMultiSelectOverrideHost()

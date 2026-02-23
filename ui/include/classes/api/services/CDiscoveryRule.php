@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1318,18 +1318,6 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			'where' => ['itemid' => $del_itemids]
 		]);
 		DB::delete('items', ['itemid' => $del_itemids]);
-
-		$ins_housekeeper = [];
-
-		foreach ($del_itemids as $itemid) {
-			$ins_housekeeper[] = [
-				'tablename' => 'events',
-				'field' => 'lldruleid',
-				'value' => $itemid
-			];
-		}
-
-		DB::insertBatch('housekeeper', $ins_housekeeper);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_LLD_RULE, $db_items);
 	}

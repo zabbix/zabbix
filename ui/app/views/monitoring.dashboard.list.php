@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,8 @@
  * @var CView $this
  * @var array $data
  */
+
+$this->includeJsFile('monitoring.dashboard.list.js.php');
 
 if ($data['uncheck']) {
 	uncheckTableRows('dashboard');
@@ -42,6 +44,11 @@ $html_page = (new CHtmlPage())
 							->setArgument('new', '1')
 							->getUrl()
 					))->setEnabled($data['allowed_edit'])
+				)
+				->addItem(
+					(new CSimpleButton(_('Import')))
+						->addClass('js-import')
+						->setEnabled($data['allowed_edit'])
 				)
 				->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode]))
 			)
@@ -101,8 +108,7 @@ foreach ($data['dashboards'] as $dashboard) {
 	}
 
 	$table->addRow([
-		(new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']))
-			->setEnabled($dashboard['editable']),
+		new CCheckBox('dashboardids['.$dashboard['dashboardid'].']', $dashboard['dashboardid']),
 		new CDiv([
 			(new CLink($dashboard['name'],
 				(new CUrl('zabbix.php'))
@@ -118,6 +124,14 @@ foreach ($data['dashboards'] as $dashboard) {
 $form->addItem([
 	$table,
 	new CActionButtonList('action', 'dashboardids', [
+		'dashboard.export' => [
+			'content' => new CButtonExport('export.dashboards',
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'dashboard.list')
+					->setArgument('page', ($data['page'] == 1) ? null : $data['page'])
+					->getUrl()
+			)
+		],
 		'dashboard.delete' => [
 			'name' => _('Delete'),
 			'confirm_singular' => _('Delete selected dashboard?'),
@@ -130,4 +144,10 @@ $form->addItem([
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag('
+	view.init('.json_encode(['import_csrf_token' => CCsrfTokenHelper::get('import')]).');
+'))
+	->setOnDocumentReady()
 	->show();

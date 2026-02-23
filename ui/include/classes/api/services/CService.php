@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -397,18 +397,6 @@ class CService extends CApiService {
 		$this->validateDelete($serviceids, $db_services);
 
 		DB::delete('services', ['serviceid' => $serviceids]);
-
-		$ins_housekeeper = [];
-
-		foreach ($serviceids as $serviceid) {
-			$ins_housekeeper[] = [
-				'tablename' => 'events',
-				'field' => 'serviceid',
-				'value' => $serviceid
-			];
-		}
-
-		DB::insertBatch('housekeeper', $ins_housekeeper);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_IT_SERVICE, $db_services);
 

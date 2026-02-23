@@ -24,6 +24,7 @@
 z-select.has-error button.focusable:active,
 z-select.has-error button.focusable:hover,
 z-select.has-error button.focusable,
+z-textarea-flexible.has-error textarea,
 input[type="text"].has-error,
 input[type="password"].has-error,
 input[type="search"].has-error,
@@ -125,6 +126,7 @@ div[data-field-type="set"] {
 	.has-error {
 		& + .btn-undo,
 		&:focus + .btn-undo,
+		&:focus-within + .btn-undo,
 		& + .btn-undo:focus {
 			border-color: $error;
 		}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -78,7 +78,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		CDataHelper::call('itemprototype.create', [
 			[
 				'name' => 'Item prototype for Graph Prototype widget',
-				'key_' => 'grpah.prototype[{#ID}]',
+				'key_' => 'graph.prototype[{#ID}]',
 				'hostid' => $hosts['Host for Graph Prototype widget'],
 				'ruleid' => $discoveryruleid,
 				'type' => ITEM_TYPE_TRAPPER,

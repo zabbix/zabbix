@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -66,7 +66,8 @@ class CItem extends CItemGeneral {
 		ITEM_VALUE_TYPE_LOG => ['logtimefmt'],
 		ITEM_VALUE_TYPE_UINT64 => ['units', 'trends', 'valuemapid', 'inventory_link'],
 		ITEM_VALUE_TYPE_TEXT => ['inventory_link'],
-		ITEM_VALUE_TYPE_BINARY => []
+		ITEM_VALUE_TYPE_BINARY => [],
+		ITEM_VALUE_TYPE_JSON => []
 	];
 
 	/**
@@ -521,8 +522,9 @@ class CItem extends CItemGeneral {
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('items', 'key_')],
 			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
-									['else' => true, 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+									['else' => true, 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_JSON])]
 			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
@@ -761,8 +763,9 @@ class CItem extends CItemGeneral {
 			'type' =>			['type' => API_INT32, 'in' => implode(',', self::SUPPORTED_ITEM_TYPES)],
 			'key_' =>			['type' => API_ITEM_KEY, 'length' => DB::getFieldLength('items', 'key_')],
 			'value_type' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY])],
-									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])]
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_DEPENDENT], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])],
+									['if' => ['field' => 'type', 'in' => ITEM_TYPE_CALCULATED], 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT])],
+									['else' => true, 'type' => API_INT32, 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_JSON])]
 			]],
 			'units' =>			['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'value_type', 'in' => implode(',', [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'units')],
@@ -1963,8 +1966,6 @@ class CItem extends CItemGeneral {
 
 		self::deleteAffectedTriggers($del_itemids);
 
-		self::clearHistoryAndTrends($del_itemids);
-
 		DB::delete('item_preproc', ['itemid' => $del_itemids]);
 		DB::delete('item_tag', ['itemid' => $del_itemids]);
 		DB::update('items', [
@@ -2061,50 +2062,5 @@ class CItem extends CItemGeneral {
 			'source' => 'itemid',
 			'value_id' => $del_itemids
 		]);
-	}
-
-	/**
-	 * Clear the history and trends of the given items.
-	 *
-	 * @param array $del_itemids
-	 */
-	private static function clearHistoryAndTrends(array $del_itemids): void {
-		global $DB;
-
-		$table_names = ['events'];
-
-		$timescale_extension = $DB['TYPE'] === ZBX_DB_POSTGRESQL
-			&& CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION) === ZBX_DB_EXTENSION_TIMESCALEDB;
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_MODE) == 1
-				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 0)) {
-			$table_names = array_merge($table_names, CHistoryManager::getTableName());
-		}
-
-		if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_MODE) == 1
-				&& (!$timescale_extension || CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 0)) {
-			array_push($table_names, 'trends', 'trends_uint');
-		}
-
-		$ins_housekeeper = [];
-
-		foreach ($del_itemids as $del_itemid) {
-			foreach ($table_names as $table_name) {
-				$ins_housekeeper[] = [
-					'tablename' => $table_name,
-					'field' => 'itemid',
-					'value' => $del_itemid
-				];
-
-				if (count($ins_housekeeper) == ZBX_DB_MAX_INSERTS) {
-					DB::insertBatch('housekeeper', $ins_housekeeper);
-					$ins_housekeeper = [];
-				}
-			}
-		}
-
-		if ($ins_housekeeper) {
-			DB::insertBatch('housekeeper', $ins_housekeeper);
-		}
 	}
 }

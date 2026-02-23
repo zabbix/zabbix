@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -150,7 +150,7 @@ class testPageNetworkDiscovery extends CWebTest {
 		// Check the presence and data of the error hintboxes for a specific rows.
 		foreach ([self::CUSTOM_ERROR_RULE, self::SYMBOLS_ERROR_RULE] as $rule_name) {
 			$table->findRow('Name', $rule_name)->getColumn('Info')->query('button')->one()->click();
-			$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+			$hintbox = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent();
 
 			$this->assertEquals(self::ERROR_MESSAGES[$rule_name], $hintbox->one()->getText());
 			$hintbox->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click()->waitUntilNotPresent();

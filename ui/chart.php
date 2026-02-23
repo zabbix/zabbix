@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -128,13 +128,11 @@ if (getRequest('widget_view') === '1') {
 }
 
 foreach ($items as $item) {
-	if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($item + [
-			'color' => rgb2hex(get_next_color(1)),
-			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
-			'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
-		]);
-	}
+	$graph->addItem($item + [
+		'color' => rgb2hex(get_next_color(1)),
+		'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+	]);
 }
 
 $min_dimensions = $graph->getMinDimensions();

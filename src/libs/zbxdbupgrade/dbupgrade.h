@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -75,6 +75,8 @@ int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field);
 int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_name);
 int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_name);
 int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_name);
+
+int	DBcreate_housekeeper_trigger(const char *table_name, const char *field_name);
 
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,

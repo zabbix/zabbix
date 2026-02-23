@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -506,24 +506,21 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 	natsort($values);
 	$values = array_values($values);
 
-	$singles = array_map(function($value) {
-		return dbQuoteInt($value);
-	}, $values);
+	foreach ($values as &$value) {
+		$value = dbQuoteInt($value);
+	}
+	unset($value);
 
-	// Limit maximum number of values for using in "IN (<id1>,<id2>,...,<idN>)".
-	$single_chunks = array_chunk($singles, 950);
 	$multiple_conditions = false;
 
-	foreach ($single_chunks as $chunk) {
-		if ($condition !== '') {
-			$condition .= $not_in ? ' AND ' : ' OR ';
-			$multiple_conditions = true;
-		}
-
-		$condition .= count($chunk) == 1
-			? $field_name.($not_in ? '!=' : '=').$chunk[0]
-			: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $chunk).')';
+	if ($condition !== '') {
+		$condition .= $not_in ? ' AND ' : ' OR ';
+		$multiple_conditions = true;
 	}
+
+	$condition .= count($values) == 1
+		? $field_name.($not_in ? '!=' : '=').$values[0]
+		: $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', $values).')';
 
 	if (!$not_in && $multiple_conditions) {
 		$condition = '('.$condition.')';
@@ -548,42 +545,18 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
 /**
  * Takes an initial part of SQL query and appends a generated WHERE condition.
  *
- * @param string $fieldName		field name to be used in SQL WHERE condition
- * @param array  $values		array of string values sorted in ascending order to be included in WHERE
- * @param bool   $notIn			builds inverted condition
+ * @param string $field_name  Field name to be used in SQL WHERE condition.
+ * @param array  $values      Array of string values to be included in WHERE.
+ * @param bool   $not_in      Builds inverted condition.
  *
  * @return string
  */
 function dbConditionString(string $field_name, array $values, bool $not_in = false): string {
-	if (!$values) {
-		return '1=0';
-	}
-
-	if (count($values) == 1) {
-		return $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values));
-	}
-
-	$value_index = 0;
-	$in_conditions = [];
-	$chunk = [];
-
-	foreach ($values as $value) {
-		if ($value_index != 0 && $value_index % 950 == 0) {
-			$in_conditions[] = $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
-			$chunk = [];
-		}
-
-		$chunk[] = zbx_dbstr($value);
-		$value_index++;
-	}
-
-	if ($chunk) {
-		$in_conditions[] = count($chunk) == 1
-			? $field_name.($not_in ? '!=' : '=').$chunk[0]
-			: $field_name.($not_in ? ' NOT IN ' : ' IN ').'('.implode(',', $chunk).')';
-	}
-
-	return count($in_conditions) == 1 ? $in_conditions[0] : '('.implode($not_in ? ' AND ' : ' OR ', $in_conditions).')';
+	return match (count($values)) {
+		0 => $not_in ? '1=1' : '1=0',
+		1 => $field_name.($not_in ? '!=' : '=').zbx_dbstr(reset($values)),
+		default => $field_name.($not_in ? ' NOT' : '').' IN ('.implode(',', zbx_dbstr($values)).')'
+	};
 }
 
 /**
@@ -750,4 +723,43 @@ function zbx_dbcast_2bigint($field) {
 		default:
 			return false;
 	}
+}
+
+/**
+ * Creates DB dependent string with SQL expression that casts passed value to text.
+ *
+ * @param $field
+ *
+ * @return bool|string
+ */
+function dbCast2Text($field) {
+	global $DB;
+
+	if (!isset($DB['TYPE'])) {
+		return false;
+	}
+
+	switch ($DB['TYPE']) {
+		case ZBX_DB_POSTGRESQL:
+			return 'CAST('.$field.' AS TEXT)';
+
+		case ZBX_DB_MYSQL:
+			return 'CAST('.$field.' AS CHAR)';
+
+		default:
+			return false;
+	}
+}
+
+/**
+ * Returns a database-compatible substring expression.
+ *
+ * @param string $field   Database field or expression to extract from.
+ * @param int    $offset  Starting position (1-based; first character is 1).
+ * @param int    $length  Number of characters to return.
+ *
+ * @return string
+ */
+function dbSubstring($field, $offset, $length) {
+	return 'SUBSTRING('.dbCast2Text($field).','.dbQuoteInt($offset).','.dbQuoteInt($length).') AS '.$field;
 }

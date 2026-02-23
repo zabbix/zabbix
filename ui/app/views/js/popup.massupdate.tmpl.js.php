@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,7 +37,7 @@
 	->addItem(
 		(new CRow([
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 					->addClass('macro')
 					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 					->setAttribute('placeholder', '{$MACRO}')
@@ -47,7 +47,7 @@
 				new CMacroValue(ZBX_MACRO_TYPE_TEXT, 'macros[#{rowNum}]', '', false)
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setAdaptiveWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 					->setAttribute('placeholder', _('description'))
@@ -64,7 +64,7 @@
 	->show();
 
 (new CTemplateTag('tag-row-tmpl'))
-	->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
+	->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => '']))
 	->show();
 
 (new CTemplateTag('custom-intervals-tmpl'))
