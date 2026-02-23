@@ -78,11 +78,11 @@ The solution relies heavily on WMI queries. Read access is required for the foll
 
 ### Verification
 
-```ssh -l <user_name>@<domain_name> <claster_name>```
+```ssh -l <user_name>@<domain_name> <server_name>```
 
 or
 
-```ssh -l <loacal_user> <claster_name>```
+```ssh -l <local_user> <server_name>```
 
 ### Enable Resource Metering for VMs
 

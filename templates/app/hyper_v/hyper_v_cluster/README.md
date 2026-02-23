@@ -97,11 +97,11 @@ The solution relies heavily on WMI queries. Read access is required for the foll
 
 ### Verification
 
-```ssh -l <user_name>@<domain_name> <claster_name>```
+```ssh -l <user_name>@<domain_name> <cluster_name>```
 
 or
 
-```ssh -l <loacal_user> <claster_name>```
+```ssh -l <local_user> <cluster_name>```
 
 ### Enable Resource Metering for VMs
 
@@ -219,8 +219,8 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |CSV [{#CSV.NAME}]: Free space|<p>Free space of Hyper-V Cluster CSV {#CSV.NAME}.</p>|Dependent item|hyperv.cluster.csv.space.free[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].Free.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |CSV [{#CSV.NAME}]: Total space|<p>Total space of Hyper-V Cluster CSV {#CSV.NAME}.</p>|Dependent item|hyperv.cluster.csv.space.total[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].Total.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |CSV [{#CSV.NAME}]: Space utilization|<p>Space utilization of Hyper-V Cluster CSV {#CSV.NAME}.</p>|Dependent item|hyperv.cluster.csv.space.utilization[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].UsedPct.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|CSV [{#CSV.NAME}]: Read speed|<p>Read speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from from nodes.</p>|Dependent item|hyperv.cluster.csv.speed.read[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].ReadBps.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|CSV [{#CSV.NAME}]: Write speed|<p>Write speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from from nodes.</p>|Dependent item|hyperv.cluster.csv.speed.write[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].WriteBps.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|CSV [{#CSV.NAME}]: Read speed|<p>Read speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from nodes.</p>|Dependent item|hyperv.cluster.csv.speed.read[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].ReadBps.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|CSV [{#CSV.NAME}]: Write speed|<p>Write speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from nodes.</p>|Dependent item|hyperv.cluster.csv.speed.write[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].WriteBps.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |CSV [{#CSV.NAME}]: Path|<p>Path of Hyper-V Cluster CSV {#CSV.NAME}.</p>|Dependent item|hyperv.cluster.csv.path[{#CSV.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.Storage[?(@.Id=='{#CSV.ID}')].Path.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Trigger prototypes for CSV discovery

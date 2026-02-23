@@ -82,11 +82,11 @@ zabbix_export:
         
         ### Verification
         
-        ```ssh -l <user_name>@<domain_name> <claster_name>```
+        ```ssh -l <user_name>@<domain_name> <cluster_name>```
         
         or
         
-        ```ssh -l <loacal_user> <claster_name>```
+        ```ssh -l <local_user> <cluster_name>```
         
         ### Enable Resource Metering for VMs
         
@@ -383,7 +383,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hyperv.cluster.csv.speed.read[{#CSV.ID}]'
               units: Bbs
-              description: 'Read speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from from nodes.'
+              description: 'Read speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from nodes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -403,7 +403,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'hyperv.cluster.csv.speed.write[{#CSV.ID}]'
               units: Bbs
-              description: 'Write speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from from nodes.'
+              description: 'Write speed of Hyper-V Cluster CSV {#CSV.NAME}, aggregated from nodes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
