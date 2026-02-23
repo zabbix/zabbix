@@ -342,12 +342,11 @@ class CControllerLatestViewData extends CControllerDataTable {
 					$last_value = (new CSpan(formatHistoryValue($last_history['value'], $item, false)))
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->setHint(
-							(new CDiv(mb_substr($last_history['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+							(new CTrim($last_history['value'], ZBX_HINTBOX_CONTENT_LIMIT))
 								->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 								->addClass(ZBX_STYLE_HINTBOX_WRAP),
 							'', true, '', 0
-						)
-						->toString();
+						);
 				}
 
 				$change = '';
