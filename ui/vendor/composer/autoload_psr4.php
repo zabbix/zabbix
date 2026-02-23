@@ -8,15 +8,11 @@ $baseDir = dirname($vendorDir);
 return array(
     'Symfony\\Polyfill\\Ctype\\' => array($vendorDir . '/symfony/polyfill-ctype'),
     'Symfony\\Component\\Yaml\\' => array($vendorDir . '/symfony/yaml'),
-    'SpomkyLabs\\Pki\\' => array($vendorDir . '/spomky-labs/pki-framework/src'),
     'SCIM\\' => array($baseDir . '/include/classes/scim'),
     'RobRichards\\XMLSecLibs\\' => array($vendorDir . '/robrichards/xmlseclibs/src'),
-    'Psr\\Clock\\' => array($vendorDir . '/psr/clock/src'),
     'PragmaRX\\Google2FA\\' => array($vendorDir . '/pragmarx/google2fa/src'),
     'ParagonIE\\ConstantTime\\' => array($vendorDir . '/paragonie/constant_time_encoding/src'),
     'OneLogin\\' => array($vendorDir . '/onelogin/php-saml/src'),
-    'Jose\\Component\\' => array($vendorDir . '/web-token/jwt-library'),
     'Firebase\\JWT\\' => array($vendorDir . '/firebase/php-jwt/src'),
     'Duo\\DuoUniversal\\' => array($vendorDir . '/duosecurity/duo_universal_php/src'),
-    'Brick\\Math\\' => array($vendorDir . '/brick/math/src'),
 );

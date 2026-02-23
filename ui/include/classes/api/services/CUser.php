@@ -3066,19 +3066,10 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
-			// To test the DPoP verification implementation using one of the libraries
-			// (firebase/php-jwt or web-token/jwt-library), is necessary to uncomment
-			// the corresponding code below.
-
-			if (!CApiDpopHelper::verifyDpopSignatureUsingFirebase($signature, $db_token['client_public_key'],
+			if (!CApiDpopHelper::verifyDpopSignature($signature, $db_token['client_public_key'],
 					$auth_token, $request_api_method)) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
-
-//			if (!CApiDpopHelper::verifyDpopSignatureUsingJose($signature, $db_token['client_public_key'],
-//					$auth_token, $request_api_method)) {
-//				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-//			}
 		}
 
 		return array_diff_key($db_token, array_flip(['expires_at', 'flags', 'public_key_pem']));

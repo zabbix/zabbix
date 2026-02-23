@@ -16,7 +16,6 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         array (
             'Symfony\\Polyfill\\Ctype\\' => 23,
             'Symfony\\Component\\Yaml\\' => 23,
-            'SpomkyLabs\\Pki\\' => 15,
             'SCIM\\' => 5,
         ),
         'R' => 
@@ -25,17 +24,12 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         ),
         'P' => 
         array (
-            'Psr\\Clock\\' => 10,
             'PragmaRX\\Google2FA\\' => 19,
             'ParagonIE\\ConstantTime\\' => 23,
         ),
         'O' => 
         array (
             'OneLogin\\' => 9,
-        ),
-        'J' => 
-        array (
-            'Jose\\Component\\' => 15,
         ),
         'F' => 
         array (
@@ -44,10 +38,6 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         'D' => 
         array (
             'Duo\\DuoUniversal\\' => 17,
-        ),
-        'B' => 
-        array (
-            'Brick\\Math\\' => 11,
         ),
     );
 
@@ -60,10 +50,6 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         array (
             0 => __DIR__ . '/..' . '/symfony/yaml',
         ),
-        'SpomkyLabs\\Pki\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/spomky-labs/pki-framework/src',
-        ),
         'SCIM\\' => 
         array (
             0 => __DIR__ . '/../..' . '/include/classes/scim',
@@ -71,10 +57,6 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         'RobRichards\\XMLSecLibs\\' => 
         array (
             0 => __DIR__ . '/..' . '/robrichards/xmlseclibs/src',
-        ),
-        'Psr\\Clock\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/psr/clock/src',
         ),
         'PragmaRX\\Google2FA\\' => 
         array (
@@ -88,10 +70,6 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         array (
             0 => __DIR__ . '/..' . '/onelogin/php-saml/src',
         ),
-        'Jose\\Component\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/web-token/jwt-library',
-        ),
         'Firebase\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
@@ -99,10 +77,6 @@ class ComposerStaticInit3e832710df7ec8c92736d5724fad7cab
         'Duo\\DuoUniversal\\' => 
         array (
             0 => __DIR__ . '/..' . '/duosecurity/duo_universal_php/src',
-        ),
-        'Brick\\Math\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/brick/math/src',
         ),
     );
 

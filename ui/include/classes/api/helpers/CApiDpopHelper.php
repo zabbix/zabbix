@@ -13,11 +13,6 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-use Jose\Component\Signature\Serializer\CompactSerializer;
-use Jose\Component\KeyManagement\JWKFactory;
-use Jose\Component\Signature\Algorithm\ES256;
-use Jose\Component\Signature\JWSVerifier;
-use Jose\Component\Core\AlgorithmManager;
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -35,62 +30,7 @@ FVYsajjgjBE0FLCjNfOpwqeQUrXHxCTF4Vi/euCMvHNipe50AjfMIVJHag==
 	private const IAT_DELAY = 2;
 	private const IAT_EXP_MAX_DIFFERENCE = 60;
 
-	public static function verifyDpopSignatureUsingJose(string $signature, string $pem, string $access_token,
-			string $request_api_method): bool {
-		// signature check section
-		$serializer = new CompactSerializer();
-
-		try {
-			$jws = $serializer->unserialize($signature);
-		}
-		catch (Exception $e) {
-			return false;
-		}
-
-		$jwk = JWKFactory::createFromKey($pem);
-
-		$verifier = new JWSVerifier(new AlgorithmManager([new ES256()]));
-
-		if (!$verifier->verifyWithKey($jws, $jwk, 0)) {
-			return false;
-		}
-
-		// header check section
-		$header = $jws->getSignature(0)->getProtectedHeader();
-
-		$dpop_jwk = $jwk->toPublic()->all();
-
-		if (!self::checkKid($header, $dpop_jwk)) {
-			return false;
-		}
-
-		// payload check section
-		$payload = json_decode($jws->getPayload(), true);
-
-		if (!self::checkHtu($payload, $request_api_method)) {
-			return false;
-		}
-
-		if (!self::chechAth($payload, $access_token)) {
-			return false;
-		}
-
-		if (!self::checkIat($payload)) {
-			return false;
-		}
-
-		if (!self::checkExp($payload)) {
-			return false;
-		}
-
-		if (!self::checkJti($payload)) {
-			return false;
-		}
-
-		return true;
-	}
-
-	public static function verifyDpopSignatureUsingFirebase(string $signature, string $pem, string $access_token,
+	public static function verifyDpopSignature(string $signature, string $pem, string $access_token,
 			string $request_api_method): bool {
 		try {
 			JWT::decode($signature, new Key($pem, 'ES256'));
