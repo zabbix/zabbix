@@ -274,7 +274,7 @@
 					if (graphs > 0) {
 						const url = new URL('zabbix.php', location.href);
 						url.searchParams.set('action', 'charts.view');
-						url.searchParams.set('hostids[0]', hostid);
+						url.searchParams.set('filter_hostids[0]', hostid);
 						url.searchParams.set('filter_set', '1');
 
 						const graphs_link = document.createElement('a');
