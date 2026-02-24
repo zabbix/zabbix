@@ -2533,6 +2533,26 @@ void	zbx_vc_reset(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if value type is supported by value cache                   *
+ *                                                                            *
+ * Return value:  SUCCEED - value type is supported                           *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_is_value_type_supported(unsigned char value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
+			return FAIL;
+		default:
+			return SUCCEED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds item values to history and value cache                       *
  *                                                                            *
  * Parameters:                                                                *
@@ -2563,6 +2583,14 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		h = history->values[i];
 
 		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+
+		if (FAIL == vc_is_value_type_supported(h->value_type))
+		{
+			if (NULL != item)
+				vc_remove_item(item);
+
+			continue;
+		}
 
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
@@ -2610,26 +2638,6 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 	UNLOCK_CACHE;
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: check if value type is supported by value cache                   *
- *                                                                            *
- * Return value:  SUCCEED - value type is supported                           *
- *                FAIL    - otherwise                                         *
- *                                                                            *
- ******************************************************************************/
-static int	vc_is_value_type_supported(unsigned char value_type)
-{
-	switch (value_type)
-	{
-		case ITEM_VALUE_TYPE_BIN:
-		case ITEM_VALUE_TYPE_JSON:
-			return FAIL;
-		default:
-			return SUCCEED;
-	}
 }
 
 /******************************************************************************
@@ -2935,6 +2943,7 @@ void	zbx_vc_flush_stats(void)
 
 	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
 }
+
 
 /******************************************************************************
  *                                                                            *
