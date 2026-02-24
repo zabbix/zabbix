@@ -3340,19 +3340,19 @@ class CFormValidatorTest extends TestCase {
 			"Expected result doesn't match validator result"
 		);
 
-		$macro_name = '([A-Z0-9._]+)';
-		$quoted_param = '([ ]*"((\\\.)|[^"\\\])*"[ ]*)';
-		$unquoted_context = '([ ]*[^"} ]([^}])*)';
-		$macro_context = '(:([ ]*|'.$unquoted_context.'|'.$quoted_param.'))';
+		$macro_name = '[A-Z0-9._]+';
+		$quoted_param = '(?:[ ]*"(?:\\\.|[^"\\\])*"[ ]*)';
+		$unquoted_context = '(?:[ ]*[^"} ][^}]*)';
+		$macro_context = '(?::(?:[ ]*|'.$unquoted_context.'|'.$quoted_param.'))?';
 
 		$macro_regexps = [];
 
 		if ($macro_rules['usermacros']) {
-			$macro_regexps[] = '({\$'.$macro_name.$macro_context.'?})';
+			$macro_regexps[] = '(?:{\$'.$macro_name.$macro_context.'})';
 		}
 
 		if ($macro_rules['lldmacros']) {
-			$macro_regexps[] = '({#'.$macro_name.'})';
+			$macro_regexps[] = '(?:{#'.$macro_name.'})';
 		}
 
 		if (count($macro_regexps) == 0) {
@@ -3360,16 +3360,16 @@ class CFormValidatorTest extends TestCase {
 			return;
 		}
 
-		$macro = '('.implode('|', $macro_regexps).')';
+		$macro = '(?:'.implode('|', $macro_regexps).')';
 
 		$regex_result = false;
 
 
 		if (!preg_match('/^'.$macro.'$/', $value)) {
-			$unquoted_param = '([^"][^),]*)';
-			$single_param = '[ ]*([ ]*|'.$unquoted_param.'|'.$quoted_param.')[ ]*';
-			$params_regex = '('.$single_param.',)*'.$single_param;
-			$function_regex = '/^({'.$macro.'\.(?<func>[a-z]+)\(('.$params_regex.')\)})$/';
+			$unquoted_param = '(?:[^"][^),]*)';
+			$single_param = '(?:[ ]*|'.$unquoted_param.'|'.$quoted_param.')';
+			$params_regex = '(?:'.$single_param.',)*'.$single_param;
+			$function_regex = '/^{'.$macro.'\.[a-z]+\(('.$params_regex.')\)}$/';
 
 			if (preg_match($function_regex, $value)) {
 				$regex_result = true;
