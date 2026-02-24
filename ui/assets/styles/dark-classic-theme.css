@@ -2492,6 +2492,7 @@ button {
         align-items: center;
         flex-wrap: nowrap; }
         .datatable .cell .cell-inner .tags-wrapper .tag {
+          height: 16px;
           min-width: 16px; }
           .datatable .cell .cell-inner .tags-wrapper .tag.tag-inherited {
             min-width: 35px; }
