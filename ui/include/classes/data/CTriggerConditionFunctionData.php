@@ -2288,7 +2288,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2304,7 +2304,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2323,7 +2323,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2342,7 +2342,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2358,7 +2358,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2374,7 +2374,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2390,7 +2390,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
@@ -2428,7 +2428,7 @@ final class CTriggerConditionFunctionData {
 				'itemid' => ['db items.itemid', 'required'],
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
-					'period_shift' => ['string', 'required',
+					'period_shift' => ['string', 'required', 'not_empty',
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
