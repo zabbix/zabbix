@@ -2054,6 +2054,11 @@ class WidgetCommunication {
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
 										'name' => 'rf_rate',
 										'value' => 0
+									],
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+										'name' => 'show_hostnames',
+										'value' => SVG_GRAPH_LABELS_IN_HOSTNAMES_SHOW
 									]
 								]
 							],

@@ -232,6 +232,15 @@ class CFormValidator {
 						$result[$key] = $value;
 						break;
 
+					case 'decimal_limit':
+						if (!is_int($value)) {
+							// Value should be a number.
+							throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain a number (Path: '.$rule_path.')');
+						}
+
+						$result[$key] = $value;
+						break;
+
 					case 'length':
 						if (array_key_exists($key, $result)) {
 							throw new Exception('[RULES ERROR] Rule "'.$key.'" is specified multiple times (Path: '.$rule_path.')');
@@ -301,7 +310,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('not_empty', $result)) {
-			if (!in_array($result['type'], ['string', 'objects', 'array', 'file'])) {
+			if (!in_array($result['type'], ['string', 'objects', 'array', 'file', 'integer', 'float'])) {
 				throw new Exception('[RULES ERROR] Rule "not_empty" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 			}
 		}
@@ -338,6 +347,11 @@ class CFormValidator {
 		if ((array_key_exists('min', $result) || array_key_exists('max', $result))
 				&& !in_array($result['type'], ['integer', 'float'])) {
 			throw new Exception('[RULES ERROR] Rule "min" or "max" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
+		}
+
+		if ((array_key_exists('decimal_limit', $result))
+				&& $result['type'] != 'float') {
+			throw new Exception('[RULES ERROR] Rule "decimal_limit" is not compatible with type "'.$result['type'].'" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('length', $result) && $result['type'] !== 'string') {
@@ -1008,6 +1022,7 @@ class CFormValidator {
 	 * Integers validator.
 	 *
 	 * @param array  $rules
+	 * @param bool   $rules['not_empty']  (optional) pass if value must be filled.
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
@@ -1018,6 +1033,12 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateInt32(array $rules, &$value, ?string &$error = null): bool {
+		if (array_key_exists('not_empty', $rules) && $value === '') {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+
+			return false;
+		}
+
 		if (!self::isInt32($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid integer.'));
 
@@ -1062,6 +1083,7 @@ class CFormValidator {
 	 * @param array  $rules['in']         (optional) allowed ranges or list of allowed values.
 	 * @param int    $rules['min']        (optional) minimal allowed value length.
 	 * @param int    $rules['max']        (optional) maximum allowed value length.
+	 * @param int    $rules['decimal_limit']
 	 * @param array  $rules['messages']   (optional) Error messages to use when some check fails.
 	 * @param mixed  $value
 	 * @param string $error
@@ -1069,6 +1091,12 @@ class CFormValidator {
 	 * @return bool
 	 */
 	private static function validateFloat($rules, &$value, ?string &$error = null): bool {
+		if (array_key_exists('not_empty', $rules) && $value == '') {
+			$error = self::getMessage($rules, 'not_empty', _('This field cannot be empty.'));
+
+			return false;
+		}
+
 		if (!self::is_float($value)) {
 			$error = self::getMessage($rules, 'type', _('This value is not a valid floating-point value.'));
 
@@ -1087,16 +1115,36 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('min', $rules) && bccomp($value, $rules['min']) == -1) {
+		if (array_key_exists('min', $rules) && $value < $rules['min']) {
 			$error = self::getMessage($rules, 'min', _s('This value must be no less than "%1$s".', $rules['min']));
 
 			return false;
 		}
 
-		if (array_key_exists('max', $rules) && bccomp($value, $rules['max']) == 1) {
+		if (array_key_exists('max', $rules) && $rules['max'] < $value) {
 			$error = self::getMessage($rules, 'max', _s('This value must be no greater than "%1$s".', $rules['max']));
 
 			return false;
+		}
+
+		if (array_key_exists('decimal_limit', $rules)) {
+			preg_match('/^'.ZBX_PREG_NUMBER.'/', $value, $matches);
+
+			$decimals_before_e = array_key_exists('frac', $matches)
+				? strlen($matches['frac'])
+				: (array_key_exists('frac_only', $matches) ? strlen($matches['frac_only']) : 0);
+
+			$exponent = array_key_exists('exp', $matches) ? (int) $matches['exp'] : 0;
+
+			$decimal_count = max(0, $decimals_before_e - $exponent);
+
+			if ($decimal_count > $rules['decimal_limit']) {
+				$error = self::getMessage($rules, 'decimal_limit',
+					_s('This value cannot have more than %1$s decimal places.', $rules['decimal_limit'])
+				);
+
+				return false;
+			}
 		}
 
 		return true;
@@ -1212,7 +1260,10 @@ class CFormValidator {
 
 			// Some parsers may return empty string as error.
 			if ($error === '') {
-				$error = _('Invalid string.');
+				$error = match ($parser_class) {
+					CAbsoluteTimeParser::class => _('Invalid date.'),
+					default => _('Invalid string.')
+				};
 			}
 		}
 	}
@@ -1245,6 +1296,7 @@ class CFormValidator {
 	 * @param array  $rules
 	 * @param array  $rules['fields']
 	 * @param string $rules['fields'][<field_name>][<role_name>]
+	 * @param bool   $rules['not_empty']
 	 * @param mixed  $value
 	 * @param string $error
 	 * @param string $path

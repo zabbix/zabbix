@@ -577,14 +577,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=hostgroup.edit',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #47 Update host group via popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=4', // Zabbix servers.
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #48 Template list view.
@@ -2049,14 +2049,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit',
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #217 Edit template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=12', // Templates/Applications.
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #218 Start creating Discovery status widget.

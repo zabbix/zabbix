@@ -489,17 +489,6 @@ function validateTimeSelectorPeriod($from, $to) {
 }
 
 /**
- * Validate, if unix time in (1970.01.01 00:00:01 - 2038.01.19 00:00:00).
- *
- * @param int $time
- *
- * @return bool
- */
-function validateUnixTime($time) {
-	return (is_numeric($time) && $time > 0 && $time <= 2147464800);
-}
-
-/**
  * Validate if date and time are in correct range, e.g. month is not greater than 12 etc.
  *
  * @param int $year

@@ -16,6 +16,7 @@ package serverlistener
 
 import (
 	"encoding/json"
+	"strings"
 	"time"
 
 	"golang.zabbix.com/agent2/internal/agent"
@@ -221,7 +222,19 @@ func processJSONRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Sched
 		return
 	}
 
-	payload, err := formatJSONCheckDataPayload(*result)
+	var payload []byte
+
+	if *result == notsupported || strings.HasPrefix(*result, notsupported+"\x00") {
+		errMessage := ""
+		if len(*result) > len(notsupported)+1 {
+			errMessage = (*result)[len(notsupported)+1:]
+		}
+
+		payload, err = formatCheckErrorPayload(errMessage, true)
+	} else {
+		payload, err = formatJSONCheckDataPayload(*result)
+	}
+
 	if err != nil {
 		log.Debugf("could not format JSON response: %s", err.Error())
 

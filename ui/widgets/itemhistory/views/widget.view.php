@@ -313,7 +313,10 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 
 				case CWidgetFieldColumnsList::DISPLAY_HTML:
 					$cell->addItem(
-						new CJsScript($item_value['value'])
+						(new CIFrame(null, '100%', '0', 'no', null))
+							->setAttribute('srcdoc', $item_value['value'])
+							->setAttribute('sandbox', 'allow-same-origin')
+							->addClass('js-iframe')
 					);
 					break;
 			}

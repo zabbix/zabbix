@@ -1037,6 +1037,13 @@ class CFormValidator {
 	 * @returns {Object}
 	 */
 	#validateInt32(rules, value) {
+		if (('not_empty' in rules) && value === '') {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
+			};
+		}
+
 		if (!this.#isTypeInt32(value)) {
 			return {
 				result: CFormValidator.ERROR,
@@ -1126,11 +1133,41 @@ class CFormValidator {
 	 * @returns {Object}
 	 */
 	#validateFloat(rules, value) {
+		if (('not_empty' in rules) && value === '') {
+			return {
+				result: CFormValidator.ERROR,
+				error: this.#getMessage(rules, 'not_empty', t('This field cannot be empty.'))
+			};
+		}
+
 		if (!this.#isTypeFloat(value)) {
 			return {
 				result: CFormValidator.ERROR,
 				error: this.#getMessage(rules, 'type', t('This value is not a valid floating-point value.'))
 			};
+		}
+
+		if (('decimal_limit' in rules) && value) {
+			const match = parseFloat(value).toString().match(ZBX_PREG_NUMBER);
+
+			if (match) {
+				const frac = (match.groups.frac || '') + (match.groups.frac_only || '');
+				const exp = match.groups.exp ? parseInt(match.groups.exp) : 0;
+
+				const decimals_before_e = frac.length;
+				const decimal_count = Math.max(0, decimals_before_e - exp);
+
+				if (decimal_count > rules['decimal_limit']) {
+					return {
+						result: CFormValidator.ERROR,
+						error: this.#getMessage(rules, 'decimal_limit',
+							sprintf(
+								t('This value cannot have more than %1$s decimal places.'), rules['decimal_limit']
+							)
+						)
+					};
+				}
+			}
 		}
 
 		value = parseFloat(value);

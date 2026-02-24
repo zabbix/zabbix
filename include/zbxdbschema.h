@@ -74,8 +74,16 @@ typedef struct
 }
 zbx_db_table_changelog_t;
 
-zbx_db_table_t			*zbx_dbschema_get_tables(void);
-const zbx_db_table_changelog_t	*zbx_dbschema_get_changelog_tables(void);
-const char			*zbx_dbschema_get_schema(void);
+typedef struct
+{
+	const char	*table_name;
+	int		object_type;
+}
+zbx_db_table_housekeeper_t;
+
+zbx_db_table_t				*zbx_dbschema_get_tables(void);
+const zbx_db_table_changelog_t		*zbx_dbschema_get_changelog_tables(void);
+const zbx_db_table_housekeeper_t	*zbx_dbschema_get_housekeeper_tables(void);
+const char				*zbx_dbschema_get_schema(void);
 
 #endif
