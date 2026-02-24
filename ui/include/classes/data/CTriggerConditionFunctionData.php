@@ -272,15 +272,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -296,15 +298,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -320,15 +324,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -344,15 +350,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -368,19 +376,21 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'abscissa' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros]
-						]]
+					]]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -397,13 +407,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -421,13 +431,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1]
-								]
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -445,15 +455,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'min' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
 						['usermacros' => true, 'lldmacros' => $lld_macros]
@@ -475,15 +487,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'mask' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
@@ -504,15 +518,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -528,15 +544,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'bits' => ['string', 'required', 'not_empty']
 				]],
@@ -553,15 +571,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -577,15 +597,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'mask' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
@@ -606,15 +628,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'bits' => ['string', 'required', 'not_empty']
 				]],
@@ -631,15 +655,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'mask' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
@@ -660,15 +686,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -684,15 +712,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -708,15 +738,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -736,14 +768,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'mode' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
@@ -763,15 +795,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -787,15 +821,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'string' => ['string', 'required', 'not_empty']
 				]],
@@ -812,15 +848,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -836,15 +874,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -860,15 +900,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -883,14 +925,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'o' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
@@ -910,14 +952,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'o' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
@@ -941,15 +983,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -966,15 +1010,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -990,15 +1036,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1014,14 +1062,14 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty']],
 						['string', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'o' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
@@ -1040,9 +1088,11 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => [
-						['string', 'required', 'not_empty', 'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-						]]
+						['string', 'required', 'not_empty',
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1056,9 +1106,11 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => [
-						['string', 'required', 'not_empty', 'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-						]]
+						['string', 'required', 'not_empty',
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1074,15 +1126,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1097,14 +1151,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'time' => ['string', 'required', 'not_empty',
@@ -1127,9 +1181,11 @@ final class CTriggerConditionFunctionData {
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
 					'last' => [
-						['string', 'required', 'not_empty', 'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-						]]
+						['string', 'required', 'not_empty',
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS_BOOL],
@@ -1145,15 +1201,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'values' => ['string', 'required', 'not_empty']
 				]],
@@ -1170,15 +1228,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'start' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class,
 						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
@@ -1201,15 +1261,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'path' => ['string', 'required', 'not_empty'],
 					'replace' => ['string']
@@ -1226,14 +1288,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -1250,15 +1312,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1274,15 +1338,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1298,15 +1364,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'count' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
 						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
@@ -1325,15 +1393,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1349,15 +1419,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1373,15 +1445,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1397,15 +1471,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'v' => ['string']
 				]],
@@ -1422,15 +1498,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1446,15 +1524,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'v' => ['string']
 				]],
@@ -1471,15 +1551,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1495,15 +1577,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'chars' => ['string']
 				]],
@@ -1519,14 +1603,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -1545,13 +1629,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -1569,13 +1653,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -1593,15 +1677,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'start' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class,
 						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
@@ -1625,13 +1711,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -1649,13 +1735,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -1673,15 +1759,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'denominator' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
@@ -1699,14 +1787,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'mode' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
@@ -1725,14 +1813,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'mode' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
@@ -1747,9 +1835,11 @@ final class CTriggerConditionFunctionData {
 				'paramtype' => ['integer', 'required', 'in' => [PARAM_TYPE_TIME]],
 				'params' => ['object', 'fields' => [
 					'last' => [
-						['string', 'required', 'not_empty', 'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-						]]
+						['string', 'required', 'not_empty',
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'mode' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
 						'in' => ['', 'strict']
@@ -1768,14 +1858,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					'p' => ['string', 'required', 'not_empty', 'regex' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/',
@@ -1798,15 +1888,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'power' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
@@ -1825,15 +1917,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1848,9 +1942,11 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => [
-						['string', 'required', 'not_empty', 'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-						]]
+						['string', 'required', 'not_empty',
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1866,15 +1962,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'count' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
 						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
@@ -1893,15 +1991,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'pattern' => ['string', 'required', 'not_empty'],
 					'replace' => ['string', 'required', 'not_empty']
@@ -1919,15 +2019,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'count' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
 						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
@@ -1946,15 +2048,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'decimals' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
@@ -1973,15 +2077,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'chars' => ['string']
 				]],
@@ -1998,15 +2104,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2022,15 +2130,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2046,15 +2156,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2069,14 +2181,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -2093,15 +2205,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2116,14 +2230,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -2139,14 +2253,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -2165,13 +2279,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -2189,13 +2303,13 @@ final class CTriggerConditionFunctionData {
 							['string', 'required', 'not_empty',
 								'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 								'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-									'with_float' => false, 'min' => 1
+									'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 								]]
 							],
 							['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-								'use' => [CTimeUnitValidator::class,
-									['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-								]
+								'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+									'min' => 1, 'max' => ZBX_MAX_INT32
+								]]
 							]
 						]
 					]],
@@ -2212,14 +2326,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -2236,15 +2350,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2260,14 +2376,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					],
 					't' => ['string', 'required', 'not_empty',
@@ -2292,9 +2408,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2308,9 +2424,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					],
 					'season_unit' => ['string', 'required', 'in' => ['h', 'd', 'w', 'M', 'y']],
 					'num_seasons' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
@@ -2327,9 +2443,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					],
 					'season_unit' => ['string', 'required', 'in' => ['h', 'd', 'w', 'M', 'y']],
 					'num_seasons' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
@@ -2346,9 +2462,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2362,9 +2478,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2378,9 +2494,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2394,19 +2510,19 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					],
 					'detect_period' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					],
 					'season' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR*2, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR*2, 'max' => ZBX_MAX_INT32
+						]]
 					],
 					'deviations' => ['string', 'regex' => '/^((\d+(\.\d{0,4})?)|(\.\d{1,4}))$/',
 						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
@@ -2432,9 +2548,9 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => ['string', 'required', 'not_empty',
-						'use' => [CTimeUnitValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => SEC_PER_HOUR, 'max' => null]
-						]
+						'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+							'min' => SEC_PER_HOUR, 'max' => ZBX_MAX_INT32
+						]]
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -2450,15 +2566,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'chars' => ['string']
 				]],
@@ -2475,15 +2593,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'decimals' => ['string', 'required', 'not_empty',
 						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
@@ -2501,14 +2621,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -2524,14 +2644,14 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
-							'use' => [CNumberValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-							]
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						],
 						['string', 'required', 'not_empty', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_TIME]],
-							'use' => [CTimeUnitValidator::class,
-								['usermacros' => true, 'lldmacros' => $lld_macros, 'min' => 1, 'max' => null]
-							]
+							'use' => [CTimeUnitValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
 						]
 					]
 				]],
@@ -2548,15 +2668,17 @@ final class CTriggerConditionFunctionData {
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
 							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
 							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
 						],
-						['string', 'use' => [CNumberValidator::class,
-							['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false, 'min' => 1]
-						]]
+						['string',
+							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
+								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
+							]]
+						]
 					],
 					'path' => ['string', 'required', 'not_empty'],
 					'replace' => ['string']
