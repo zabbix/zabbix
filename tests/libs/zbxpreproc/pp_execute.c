@@ -120,6 +120,11 @@ void	zbx_mock_test_entry(void **state)
 			}
 		}
 	}
+	else
+	{
+		if (0 != results_num)
+			fail_msg("expected no result");
+	}
 
 	for (int i = 0; i < results_num; i++)
 	{
