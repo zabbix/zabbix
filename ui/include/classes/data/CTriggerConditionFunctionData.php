@@ -747,7 +747,7 @@ final class CTriggerConditionFunctionData {
 						]
 					],
 					'mode' => ['string', 'allow_macro' => ['usermacros' => true, 'lldmacros' => $lld_macros],
-						'in' => ['inc', 'dec', 'all']
+						'in' => ['', 'inc', 'dec', 'all']
 					]
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
