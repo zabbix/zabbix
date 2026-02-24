@@ -45,4 +45,6 @@ then
 	# flags for clang
 	CFLAGS+=" -Wno-uninitialized"
 
+	# other
+	CFLAGS+=" -DZBX_DEBUG"
 fi

@@ -482,5 +482,13 @@
             "parameters": ["([^a-z])", "\\\\\\1;"]
         },
         "result": "\\T;\\E;\\S;\\T;\\ ;\\0;\\1;\\2;\\3;\\4;\\5;"
+    },
+    {
+        "value": "\\/var\\/log",
+        "macrofunc": {
+            "function": "regrepl",
+            "parameters": ["^\\\\/var\\\\/log", "\\0"]
+        },
+        "result": "\\/var\\/log"
     }
 ]

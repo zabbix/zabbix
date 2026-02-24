@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -405,7 +405,6 @@ class CMfa extends CApiService {
 			API::Authentication()->update(['mfaid' => 0]);
 		}
 
-		DB::delete('mfa_totp_secret', ['mfaid' => array_keys($db_mfas)]);
 		DB::delete('mfa', ['mfaid' => array_keys($db_mfas)]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfas);
