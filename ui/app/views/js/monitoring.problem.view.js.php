@@ -541,7 +541,7 @@
 					for (const column_config of visible_columns.slice(0, column_index + 1)) {
 						const column_config_clone = column_config.clone();
 
-						if (column_config.getColumnIndex() == column_index) {
+						if (visible_columns.indexOf(column_config) == column_index) {
 							column_config_clone.setSpan(visible_columns.length - column_index);
 						}
 						else {
