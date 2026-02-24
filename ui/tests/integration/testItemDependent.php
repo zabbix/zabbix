@@ -26,11 +26,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 class testItemDependent extends CIntegrationTest {
 
 	private static $hostid;
-	private static $interfaceid;
 
-	/**
-	 * @inheritdoc
-	 */
 	public function prepareData() {
 		// Create the host
 		$response = $this->call('host.create', [
@@ -53,19 +49,14 @@ class testItemDependent extends CIntegrationTest {
 		$this->assertArrayHasKey(0, $response['result']['hostids']);
 		self::$hostid = $response['result']['hostids'][0];
 
-		// Check host interface ids
-		$response = $this->call('host.get', [
-			'output'           => ['host'],
-			'hostids'          => [self::$hostid],
-			'selectInterfaces' => ['interfaceid']
-		]);
-
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertArrayHasKey('interfaces', $response['result'][0]);
-		$this->assertArrayHasKey(0, $response['result'][0]['interfaces']);
-		self::$interfaceid = $response['result'][0]['interfaces'][0]['interfaceid'];
-
 		return true;
+	}
+
+	/**
+	 * Delete all created data after test.
+	 */
+	public static function clearData(): void {
+		CDataHelper::call('host.delete', [self::$hostid]);
 	}
 
 	/**
