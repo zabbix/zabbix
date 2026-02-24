@@ -92,6 +92,10 @@ class CConfiguration extends CApiService {
 			'createMissing' => CValueMap::ACCESS_RULES['create'],
 			'updateExisting' => CValueMap::ACCESS_RULES['update'],
 			'deleteMissing' => CValueMap::ACCESS_RULES['delete']
+		],
+		'dashboards' => [
+			'createMissing' => CDashboard::ACCESS_RULES['create'],
+			'updateExisting' => CDashboard::ACCESS_RULES['update']
 		]
 	];
 
@@ -136,7 +140,8 @@ class CConfiguration extends CApiService {
 				'mediaTypes' =>			['type' => API_IDS],
 				'template_groups' =>	['type' => API_IDS],
 				'host_groups' => 		['type' => API_IDS],
-				'templates' =>			['type' => API_IDS]
+				'templates' =>			['type' => API_IDS],
+				'dashboards' =>			['type' => API_IDS]
 			]]
 		]];
 
@@ -200,75 +205,80 @@ class CConfiguration extends CApiService {
 	 */
 	protected function validateImport(array &$params): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'format' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
-			'source' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'rules' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-				'discoveryRules' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+			'format' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'in' => implode(',', [CImportReaderFactory::YAML, CImportReaderFactory::XML, CImportReaderFactory::JSON])],
+			'source' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'returnMissingObjects' =>	['type' => API_BOOLEAN, 'default' => false],
+			'rules' =>					['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+				'discoveryRules' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'graphs' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'graphs' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'host_groups' =>		['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'host_groups' =>			['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'template_groups' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'template_groups' =>		['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'hosts' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'hosts' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'httptests' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'httptests' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'images' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'images' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'items' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'items' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'maps' =>				['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'maps' =>					['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'mediaTypes' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'mediaTypes' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateLinkage' =>	['type' => API_OBJECT, 'default' => [], 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'templateLinkage' =>		['type' => API_OBJECT, 'default' => [], 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templates' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false]
+				'templates' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'templateDashboards' =>	['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'templateDashboards' =>		['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'triggers' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'triggers' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
 				]],
-				'valueMaps' =>			['type' => API_OBJECT, 'fields' => [
-					'createMissing' =>		['type' => API_BOOLEAN, 'default' => false],
-					'updateExisting' =>		['type' => API_BOOLEAN, 'default' => false],
-					'deleteMissing' =>		['type' => API_BOOLEAN, 'default' => false]
+				'valueMaps' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false],
+					'deleteMissing' =>			['type' => API_BOOLEAN, 'default' => false]
+				]],
+				'dashboards' =>				['type' => API_OBJECT, 'fields' => [
+					'createMissing' =>			['type' => API_BOOLEAN, 'default' => false],
+					'updateExisting' =>			['type' => API_BOOLEAN, 'default' => false]
 				]]
 			]]
 		]];
@@ -323,7 +333,8 @@ class CConfiguration extends CApiService {
 							'templates' => _('No permissions to import templates.'),
 							'templateDashboards' => _('No permissions to import template dashboards.'),
 							'triggers' => _('No permissions to import triggers.'),
-							'valueMaps' => _('No permissions to import value maps.')
+							'valueMaps' => _('No permissions to import value maps.'),
+							'dashboards' => _('No permissions to import dashboards.')
 						}
 					);
 				}
@@ -334,62 +345,15 @@ class CConfiguration extends CApiService {
 	/**
 	 * @param array $params
 	 *
-	 * @return bool
+	 * @return bool|array
 	 */
-	public function import($params) {
+	public function import(array $params): bool|array {
 		$this->validateImport($params);
 
 		$import_reader = CImportReaderFactory::getReader($params['format']);
-		$data = $import_reader->read($params['source']);
+		$data_raw = $import_reader->read($params['source']);
 
-		$import_validator_factory = new CImportValidatorFactory($params['format']);
-		$import_converter_factory = new CImportConverterFactory();
-
-		$validator = new CImportValidator($import_validator_factory, $params['format']);
-
-		$data = $validator
-			->setStrict(true)
-			->validate($data, '/');
-
-		foreach ($import_converter_factory::getSequentialVersions() as $version) {
-			if ($data['zabbix_export']['version'] !== $version) {
-				continue;
-			}
-
-			$data = $import_converter_factory
-				->getObject($version)
-				->convert($data);
-
-			$data = $validator
-				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
-				->setStrict(false)
-				->validate($data, '/');
-		}
-
-		// Get schema for converters.
-		$schema = $import_validator_factory
-			->getObject(ZABBIX_EXPORT_VERSION)
-			->getSchema();
-
-		// Convert human readable import constants to values Zabbix API can work with.
-		$data = (new CConstantImportConverter($schema))->convert($data);
-
-		// Add default values in place of missed tags.
-		$data = (new CDefaultImportConverter($schema))->convert($data);
-
-		// Normalize array keys and strings.
-		$data = (new CImportDataNormalizer($schema))->normalize($data);
-
-		$adapter = new CImportDataAdapter();
-		$adapter->load($data);
-
-		$configuration_import = new CConfigurationImport(
-			$params['rules'],
-			new CImportReferencer(),
-			new CImportedObjectContainer()
-		);
-
-		return $configuration_import->import($adapter);
+		return $this->importForce($data_raw, $params, false);
 	}
 
 	/**
@@ -406,7 +370,7 @@ class CConfiguration extends CApiService {
 		$this->validateImport($params);
 
 		$import_reader = CImportReaderFactory::getReader($params['format']);
-		$data = $import_reader->read($params['source']);
+		$data_raw = $import_reader->read($params['source']);
 
 		$import_validator_factory = new CImportValidatorFactory($params['format']);
 		$import_converter_factory = new CImportConverterFactory();
@@ -416,7 +380,7 @@ class CConfiguration extends CApiService {
 		$data = $validator
 			->setStrict(true)
 			->setPreview(true)
-			->validate($data, '/');
+			->validate($data_raw, '/');
 
 		foreach ($import_converter_factory::getSequentialVersions() as $version) {
 			if ($data['zabbix_export']['version'] !== $version) {
@@ -452,15 +416,17 @@ class CConfiguration extends CApiService {
 		$imported_entities = [];
 
 		$entities = [
-			'host_groups' => 'name',
-			'template_groups' => 'name',
-			'templates' => 'template'
+			'host_groups' => ['uuid', 'name'],
+			'template_groups' => ['uuid', 'name'],
+			'templates' => ['uuid', 'template'],
+			'dashboards' => ['name']
 		];
 
-		foreach ($entities as $entity => $name_field) {
+		foreach ($entities as $entity => $search_fields) {
 			if (array_key_exists($entity, $import)) {
-				$imported_entities[$entity]['uuid'] = array_column($import[$entity], 'uuid');
-				$imported_entities[$entity][$name_field] = array_column($import[$entity], $name_field);
+				foreach ($search_fields as $search_field) {
+					$imported_entities[$entity][$search_field] = array_column($import[$entity], $search_field);
+				}
 			}
 		}
 
@@ -514,6 +480,20 @@ class CConfiguration extends CApiService {
 					$db_templates = API::Template()->get($options);
 
 					$imported_ids['templates'] = array_keys($db_templates);
+					break;
+
+				case 'dashboards':
+					$options = [
+						'output' => [],
+						'filter' => [
+							'name' => $data['name']
+						],
+						'preservekeys' => true
+					];
+
+					$db_dashboards = API::Dashboard()->get($options);
+
+					$imported_ids['dashboards'] = array_keys($db_dashboards);
 					break;
 
 				default:
@@ -574,6 +554,80 @@ class CConfiguration extends CApiService {
 
 		$importcompare = new CConfigurationImportcompare($params['rules']);
 
-		return $importcompare->importcompare($export, $import);
+		$result = $importcompare->importcompare($export, $import);
+
+		if ($params['returnMissingObjects']) {
+			$result['missingObjects'] = $this->importForce($data_raw, $params, true)['missingObjects'];
+		}
+
+		return $result;
+	}
+
+	private function importForce(array $data, array $params, bool $dry_run): bool|array {
+		$import_validator_factory = new CImportValidatorFactory($params['format']);
+		$import_converter_factory = new CImportConverterFactory();
+
+		$validator = new CImportValidator($import_validator_factory, $params['format']);
+
+		$data = $validator
+			->setStrict(true)
+			->validate($data, '/');
+
+		foreach ($import_converter_factory::getSequentialVersions() as $version) {
+			if ($data['zabbix_export']['version'] !== $version) {
+				continue;
+			}
+
+			$data = $import_converter_factory
+				->getObject($version)
+				->convert($data);
+
+			$data = $validator
+				// Must not use XML_INDEXED_ARRAY key validation for the converted data.
+				->setStrict(false)
+				->validate($data, '/');
+		}
+
+		// Get schema for converters.
+		$schema = $import_validator_factory
+			->getObject(ZABBIX_EXPORT_VERSION)
+			->getSchema();
+
+		// Convert human readable import constants to values Zabbix API can work with.
+		$data = (new CConstantImportConverter($schema))->convert($data);
+
+		// Add default values in place of missed tags.
+		$data = (new CDefaultImportConverter($schema))->convert($data);
+
+		// Normalize array keys and strings.
+		$data = (new CImportDataNormalizer($schema))->normalize($data);
+
+		$configuration_import = new CConfigurationImport(
+			$params['rules'],
+			new CImportReferencer(),
+			new CImportedObjectContainer()
+		);
+
+		$missing_object_collector = $params['returnMissingObjects']
+			? new CMissingObjectCollector()
+			: null;
+
+		$configuration_import->setMissingObjectCollector($missing_object_collector);
+
+		$adapter = new CImportDataAdapter();
+		$adapter->load($data);
+
+		if ($dry_run) {
+			$configuration_import->collectMissingObjects($adapter);
+		}
+		else {
+			$configuration_import->import($adapter);
+		}
+
+		if ($params['returnMissingObjects']) {
+			return ['missingObjects' => $missing_object_collector->getMissingObjects()];
+		}
+
+		return true;
 	}
 }

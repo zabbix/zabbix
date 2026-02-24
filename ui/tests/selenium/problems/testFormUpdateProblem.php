@@ -431,15 +431,12 @@ class testFormUpdateProblem extends CWebTest {
 			}
 		}
 
-		// Check asterisk text.
-		$this->assertTrue($form->query('xpath:.//label[@class="form-label-asterisk" and '.
-				'text()="At least one update operation or message must exist."]')->exists()
-		);
 		$dialog->close();
 	}
 
 	public function getFormData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -449,9 +446,13 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => '2020-08-01 00:00:00'
 					],
-					'error' => 'Incorrect value for field "Suppress": invalid time.'
+					'suppress_until_error' => [
+						'field' => 'id:suppress_until_problem',
+						'error' => 'Value must be greater than or equal to '
+					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -461,9 +462,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => '2040-08-01'
 					],
-					'error' => 'Incorrect value for field "Suppress": invalid time.'
+					'inline_errors' => [
+						'id:suppress_until_problem' => 'Invalid time.'
+					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -473,9 +477,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => '2040-08-01 00:00:00'
 					],
-					'error' => 'Incorrect value for field "Suppress": invalid time.'
+					'inline_errors' => [
+						'id:suppress_until_problem' => 'Invalid time.'
+					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -485,9 +492,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => '00:00:00'
 					],
-					'error' => 'Incorrect value for field "suppress_until_problem": a time is expected.'
+					'inline_errors' => [
+						'id:suppress_until_problem' => 'Invalid time.'
+					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -498,9 +508,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now+16y'
 					],
-					'error' => 'Incorrect value for field "Suppress": invalid time.'
+					'inline_errors' => [
+						'id:suppress_until_problem' => 'Invalid time.'
+					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -511,9 +524,13 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'now-1d'
 					],
-					'error' => 'Incorrect value for field "Suppress": invalid time.'
+					'suppress_until_error' => [
+						'field' => 'id:suppress_until_problem',
+						'error' => 'Value must be greater than or equal to '
+					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -523,9 +540,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => '-3d'
 					],
-					'error' => 'Incorrect value for field "suppress_until_problem": a time is expected.'
+					'inline_errors' => [
+						'id:suppress_until_problem' => 'Invalid time.'
+					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -535,9 +555,12 @@ class testFormUpdateProblem extends CWebTest {
 						'id:suppress_time_option' => 'Until',
 						'id:suppress_until_problem' => 'text'
 					],
-					'error' => 'Incorrect value for field "suppress_until_problem": a time is expected.'
+					'inline_errors' => [
+						'id:suppress_until_problem' => 'Invalid time.'
+					]
 				]
 			],
+			// #8.
 			[
 				[
 					'problems' => ['Trigger for log', 'Trigger for char', 'Trigger for float'],
@@ -565,6 +588,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'problems' => ['Trigger for float'],
@@ -584,6 +608,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'problems' => ['Trigger for text', 'Trigger for log'],
@@ -606,6 +631,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'problems' => ['Trigger for char'],
@@ -624,6 +650,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
@@ -643,6 +670,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'problems' => ['Trigger for log'],
@@ -661,6 +689,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'problems' => ['Trigger for text', 'Trigger for log'],
@@ -681,6 +710,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'problems' => ['Trigger for log', 'Trigger for char', 'Trigger for float', 'Trigger for text', 'Trigger for unsigned'],
@@ -716,6 +746,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'problems' => ['Trigger for text'],
@@ -730,6 +761,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
@@ -744,6 +776,7 @@ class testFormUpdateProblem extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'problems' => ['Trigger for char'],
@@ -787,15 +820,31 @@ class testFormUpdateProblem extends CWebTest {
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->query('id:acknowledge_form')->asForm()->one();
 		$form->fill($data['fields']);
-		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertTrue($dialog->isVisible());
-			$this->assertMessage(TEST_BAD, null, $data['error']);
+			$this->page->removeFocus();
+
+			if (CTestArrayHelper::get($data, 'suppress_until_error')) {
+				// Validate inline error for "suppress_until_problem" field.
+				$time = time();
+
+				$error_array = [];
+				for ($i = 0; $i <= 3; $i++) {
+					$error_array[$i] = $data['suppress_until_error']['error'].date('Y-m-d H:i:s', $time + $i).'.';
+				}
+
+				$error = $form->getField($data['suppress_until_error']['field'])->query('xpath:./../span[@class="error"]')
+						->waitUntilPresent()->one()->getText();
+				$this->assertTrue(in_array($error, $error_array), 'Error "'.$error.'" was not found in reference error messages array.');
+			}
+			else {
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
 			$this->assertEquals($old_hash, $this->getHash());
 			$dialog->close();
 		}
 		else {
+			$form->submit();
 			$dialog->ensureNotPresent();
 			$this->page->waitUntilReady();
 			$this->page->assertHeader('Problems');
