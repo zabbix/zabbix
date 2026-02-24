@@ -25,7 +25,6 @@
 #	include "zbxip.h"
 #	include "zbxregexp.h"
 #	include "zbxstr.h"
-#	include <linux/if_arp.h>
 #endif
 
 typedef struct
@@ -1245,6 +1244,8 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
  ******************************************************************************/
 static void	if_type_add(const char *ifname, struct zbx_json *j)
 {
+#define ARPHRD_VOID	0xFFFF
+#define ARPHRD_LOOPBACK	772
 #define JSON_KEY_TYPE	"type"
 #define VIRTFN_PFX	"virtfn"
 	FILE		*f;
@@ -1296,6 +1297,8 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 	}
 
 	zbx_json_addstring(j, JSON_KEY_TYPE, "virtual", ZBX_JSON_TYPE_STRING);
+#undef ARPHRD_VOID
+#undef ARPHRD_LOOPBACK
 #undef JSON_KEY_TYPE
 #undef VIRTFN_PFX
 }
