@@ -4270,7 +4270,7 @@ abstract class testFormPreprocessing extends CWebTest {
 			$hint->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
 
 			// Check 'Type of information' options.
-			$this->assertEquals(['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'],
+			$this->assertEquals(['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'JSON'],
 					$form->query('name:value_type_steps')->asDropdown()->one()->getOptions()->asText()
 			);
 		}

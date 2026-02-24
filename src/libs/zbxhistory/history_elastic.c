@@ -43,7 +43,6 @@ typedef enum
 }
 zbx_elastic_retries_t;
 
-
 typedef struct
 {
 	unsigned char		value_type;
@@ -87,6 +86,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			value.str = zbx_strdup(NULL, str);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -113,6 +113,7 @@ static const char	*history_value2str(const zbx_history_entry_t *h)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			return h->value.str;
 		case ITEM_VALUE_TYPE_LOG:
 			return h->value.log->value;
@@ -1539,7 +1540,6 @@ static void	history_elastic_write(void *data, unsigned char value_type,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json_idx, ZBX_IDX_JSON_ALLOCATE);
-
 	zbx_json_addobject(&json_idx, "index");
 	zbx_json_addstring(&json_idx, "_index", history_options_value_types[value_type], ZBX_JSON_TYPE_STRING);
 
@@ -1606,7 +1606,7 @@ static void	history_elastic_get_value_type_data(zbx_history_elastic_data_t *d, z
 {
 	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
 
-	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	for (unsigned char i = 0; i <= ITEM_VALUE_TYPE_JSON; i++)
 	{
 		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
 			continue;

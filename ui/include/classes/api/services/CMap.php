@@ -1993,9 +1993,10 @@ class CMap extends CMapElement {
 				);
 			}
 
-			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY) {
+			if ($db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_BINARY
+					|| $db_items[$itemid]['value_type'] == ITEM_VALUE_TYPE_JSON) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Invalid parameter "%1$s": %2$s.', $path, _('binary item is not supported'))
+					_s('Invalid parameter "%1$s": %2$s.', $path, _('unsupported data type'))
 				);
 			}
 		}

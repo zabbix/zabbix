@@ -18,7 +18,7 @@
 #include "zbxhistory.h"
 
 const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT] = {
-		"dbl", "str", "log", "uint", "text", "bin"};
+		"dbl", "str", "log", "uint", "text", "bin", "json"};
 
 ZBX_VECTOR_IMPL(history_option, zbx_history_option_t)
 

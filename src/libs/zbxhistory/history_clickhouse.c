@@ -92,8 +92,9 @@ typedef struct
 }
 zbx_clickhouse_data_t;
 
+/* history_bin is not used */
 static char	*clickhouse_history_tables[] = {"history", "history_str", "history_log", "history_uint", "history_text",
-					"unsupported"};
+					"history_bin", "history_json", "unsupported"};
 
 static void	clickhouse_conn_free(zbx_clickhouse_conn_t *conn)
 {
@@ -440,6 +441,20 @@ static void	history_clickhouse_write_uint32(zbx_uint32_t ui32, char **post_data,
 	zbx_str_memcpy_alloc(post_data, post_data_alloc, post_data_offset, (const char *)&number, sizeof(number));
 }
 
+static int	is_json_object(const char *json_str)
+{
+	if (NULL == json_str)
+		return FAIL;
+
+	while ('\0' != *json_str && 0 != isspace((unsigned char)*json_str))
+		json_str++;
+
+	if ('{' == *json_str)
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: write history data to ClickHouse                                  *
@@ -463,6 +478,14 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 	CURLcode		err;
 	int			ret = FAIL;
 
+	/* bin is not supported */
+	if (ITEM_VALUE_TYPE_BIN == value_type)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "bin item value type is not supported in ClickHouse ");
+		THIS_SHOULD_NEVER_HAPPEN;
+		return;
+	}
+
 	conn = history_clickhouse_get_conn(d, value_type);
 
 	if (NULL == conn->handle && SUCCEED != history_clickhouse_conn_init(conn, d, &error))
@@ -473,9 +496,18 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		goto out;
 	}
 
-	zbx_snprintf(url, sizeof(url), "%s?database=%s"
-		"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary", d->base_url, d->db,
-		clickhouse_history_tables[value_type]);
+	if (ITEM_VALUE_TYPE_JSON == value_type)
+	{
+		zbx_snprintf(url, sizeof(url), "%s?database=%s"
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary&input_format_binary_read_json_as_string=1",
+			d->base_url, d->db, clickhouse_history_tables[value_type]);
+	}
+	else
+	{
+		zbx_snprintf(url, sizeof(url), "%s?database=%s"
+			"&query=INSERT%%20INTO%%20%s%%20FORMAT%%20RowBinary", d->base_url, d->db,
+			clickhouse_history_tables[value_type]);
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(conn->handle, CURLOPT_URL, url)))
 	{
@@ -494,7 +526,6 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 		history_clickhouse_write_uint64(entry->itemid, &post_data, &post_data_alloc, &post_data_offset);
 		history_clickhouse_write_uint64((zbx_uint64_t)entry->ts.sec * 1000000000ULL + entry->ts.ns,
 				&post_data, &post_data_alloc, &post_data_offset);
-
 		switch (value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
@@ -505,6 +536,22 @@ static void	history_clickhouse_write(void *data, unsigned char value_type,
 			case ITEM_VALUE_TYPE_TEXT:
 				history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
 						&post_data_offset);
+				break;
+			case ITEM_VALUE_TYPE_JSON:
+				if (SUCCEED == is_json_object(entry->value.str))
+				{
+					history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
+							&post_data_offset);
+					history_clickhouse_write_text("", &post_data, &post_data_alloc,
+							&post_data_offset);
+				}
+				else
+				{
+					history_clickhouse_write_text("null", &post_data, &post_data_alloc,
+							&post_data_offset);
+					history_clickhouse_write_text(entry->value.str, &post_data, &post_data_alloc,
+							&post_data_offset);
+				}
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				history_clickhouse_write_text(entry->value.log->value, &post_data, &post_data_alloc,
@@ -1523,7 +1570,7 @@ static void	history_clickhouse_get_value_type_data(zbx_clickhouse_data_t *d, CUR
 
 	zbx_vector_history_provider_value_type_info_reserve(&info->value_types, ITEM_VALUE_TYPE_COUNT);
 
-	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_BIN; i++)
+	for (unsigned char i = 0; i < ITEM_VALUE_TYPE_JSON; i++)
 	{
 		if (FAIL == ZBX_HISTORY_CHECK_TYPE_FLAGS(d->value_type_flags, i))
 			continue;

@@ -938,7 +938,7 @@ int	zbx_history_add_values(const zbx_vector_dc_history_ptr_t *history, zbx_uint6
 	entries = (const zbx_history_entry_t **)zbx_malloc(NULL,
 			sizeof(zbx_history_entry_t *) * (size_t)history->values_num);
 
-	for (unsigned char value_type = 0; value_type <= ITEM_VALUE_TYPE_BIN; value_type++)
+	for (unsigned char value_type = 0; value_type <= ITEM_VALUE_TYPE_JSON; value_type++)
 	{
 		int	entries_num = 0;
 
@@ -1168,6 +1168,7 @@ void	zbx_history_record_clear(zbx_history_record_t *value, int value_type)
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 			zbx_free(value->value.str);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
@@ -1209,6 +1210,9 @@ void	zbx_history_value2str(char *buffer, size_t size, const zbx_history_value_t 
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 			zbx_strlcpy(buffer, value->str, size);
+			break;
+		case ITEM_VALUE_TYPE_JSON:
+			zbx_strlcpy_utf8(buffer, value->str, size);
 			break;
 		case ITEM_VALUE_TYPE_LOG:
 			zbx_strlcpy_utf8(buffer, value->log->value, size);
@@ -1255,6 +1259,7 @@ void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int va
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 			for (i = 0; i < vector->values_num; i++)
 				zbx_free(vector->values[i].value.str);
 
@@ -1354,6 +1359,7 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
 			zbx_variant_set_str(var, zbx_strdup(NULL, value->log->value));
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -1607,7 +1613,7 @@ void	zbx_history_record_copy(zbx_history_record_t *dst, const zbx_history_record
 const char	*history_value_type_desc(unsigned char value_type)
 {
 	static char	*value_types_desc[] = {"Numeric (float)", "Character", "Log", "Numeric (unsigned)", "Text",
-			"Binary"};
+			"Binary", "JSON"};
 
 	if (value_type >= ARRSIZE(value_types_desc))
 		return "Unknown";

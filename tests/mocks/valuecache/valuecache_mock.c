@@ -109,6 +109,7 @@ static void	zbx_vcmock_read_history_value(zbx_mock_handle_t hvalue, unsigned cha
 				value->dbl = atof(data);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 				break;
 			case ITEM_VALUE_TYPE_NONE:
 			default:
@@ -203,6 +204,7 @@ static void	zbx_vcmock_ds_clone_record(const zbx_history_record_t *src, unsigned
 			dst->value.log = log;
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			fail_msg("Unexpected value type: %c", value_type);
@@ -401,6 +403,7 @@ void	zbx_vcmock_check_records(const char *prefix, unsigned char value_type,
 				zbx_mock_assert_double_eq(prefix, expected->value.dbl, returned->value.dbl);
 				break;
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 			case ITEM_VALUE_TYPE_NONE:
 			default:
 				fail_msg("Unexpected value type: %c", value_type);
@@ -469,6 +472,7 @@ void	zbx_vcmock_free_dc_history(zbx_dc_history_t *h)
 		case ITEM_VALUE_TYPE_FLOAT:
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			fail_msg("Unexpected value type: %c", h->entry.value_type);

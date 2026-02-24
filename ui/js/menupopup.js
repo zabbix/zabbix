@@ -1024,7 +1024,7 @@ function getMenuPopupItem(options) {
 		const config_urls = [];
 		const config_triggers = {
 			label: t('Triggers'),
-			disabled: options.binary_value_type || options.triggers.length === 0
+			disabled: !options.is_trigger_supported || options.triggers.length === 0
 		};
 
 		if (options.isWriteable) {
@@ -1088,7 +1088,7 @@ function getMenuPopupItem(options) {
 
 		config_urls.push({
 			label: t('Create trigger'),
-			disabled: options.binary_value_type,
+			disabled: !options.is_trigger_supported,
 			clickCallback: function() {
 				ZABBIX.PopupManager.open('trigger.edit', {
 					hostid: options.hostid,
@@ -1099,25 +1099,18 @@ function getMenuPopupItem(options) {
 			}
 		});
 
-		if (options.isDiscovery) {
-			config_urls.push({
-				label: t('Create dependent item'),
-				disabled: true
-			});
-		}
-		else {
-			config_urls.push({
-				label: t('Create dependent item'),
-				clickCallback: () => {
-					ZABBIX.PopupManager.open('item.edit', {
-						context: options.context,
-						hostid: options.hostid,
-						master_itemid: options.itemid,
-						type: 18 // ITEM_TYPE_DEPENDENT
-					});
-				}
-			});
-		}
+		config_urls.push({
+			label: t('Create dependent item'),
+			disabled: options.isDiscovery,
+			clickCallback: () => {
+				ZABBIX.PopupManager.open('item.edit', {
+					context: options.context,
+					hostid: options.hostid,
+					master_itemid: options.itemid,
+					type: 18 // ITEM_TYPE_DEPENDENT
+				});
+			}
+		});
 
 		url = new Curl('host_discovery.php');
 		url.setArgument('form', 'create');
@@ -1227,7 +1220,7 @@ function getMenuPopupItemPrototype(options) {
 
 	config_urls.push({
 		label: t('Create trigger prototype'),
-		disabled: options.is_binary_value_type || options.is_discovered_prototype,
+		disabled: !options.is_trigger_supported || options.is_discovered_prototype,
 		clickCallback: () => {
 			ZABBIX.PopupManager.open('trigger.prototype.edit', {
 				parent_discoveryid: options.parent_discoveryid,

@@ -1059,6 +1059,7 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_JSON:
 			break;
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
@@ -2923,7 +2924,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d count:%d period:%d end_timestamp"
 			" '%s'", __func__, itemid, value_type, count, seconds, zbx_timespec_str(ts));
 
-	if (ITEM_VALUE_TYPE_BIN == value_type)
+	if (ITEM_VALUE_TYPE_BIN == value_type || ITEM_VALUE_TYPE_JSON == value_type)
 		return FAIL;
 
 	if (0 != count)

@@ -573,6 +573,9 @@ pre {
   font-family: var(--font-stack-mono);
   font-size: 1em; }
 
+.trimmed-content::after {
+  content: '\2026'; }
+
 a {
   color: #555555;
   text-decoration: none; }
@@ -7794,6 +7797,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .calendar-footer .btn-grey {
     float: left;
     margin-top: 0; }
+
+.hintbox-wrap {
+  display: block; }
 
 .notif.overlay-dialogue {
   width: 250px; }

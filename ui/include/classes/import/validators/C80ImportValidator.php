@@ -384,7 +384,8 @@ class C80ImportValidator extends CImportValidatorGeneral {
 		CXmlConstantValue::LOG => CXmlConstantName::LOG,
 		CXmlConstantValue::UNSIGNED => CXmlConstantName::UNSIGNED,
 		CXmlConstantValue::TEXT => CXmlConstantName::TEXT,
-		CXmlConstantValue::BINARY => CXmlConstantName::BINARY
+		CXmlConstantValue::BINARY => CXmlConstantName::BINARY,
+		CXmlConstantValue::VALUE_TYPE_JSON => CXmlConstantName::JSON
 	];
 
 	private $TRIGGER_PRIORITY = [

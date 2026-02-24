@@ -86,7 +86,8 @@ static zbx_vc_history_table_t	vc_history_tables[] = {
 	{"history_log", "timestamp,logeventid,severity,source,value", row2value_log},
 	{"history_uint", "value", row2value_ui64},
 	{"history_text", "value", row2value_str},
-	{"history_bin", "value", row2value_str}
+	{"history_bin", "value", row2value_str},
+	{"history_json", "value", row2value_str}
 };
 
 /******************************************************************************************************************
@@ -279,6 +280,17 @@ static void	sql_write_log(zbx_db_insert_t *db_insert, const zbx_history_entry_t 
 static void	sql_write_bin(zbx_db_insert_t *db_insert, const zbx_history_entry_t * const *entries, int entries_num)
 {
 	zbx_db_insert_prepare(db_insert, "history_bin", "itemid", "clock", "ns", "value", (char *)NULL);
+
+	for (int i = 0; i < entries_num; i++)
+	{
+		const zbx_history_entry_t	*h = entries[i];
+		zbx_db_insert_add_values(db_insert, h->itemid, h->ts.sec, h->ts.ns, h->value.str);
+	}
+}
+
+static void	sql_write_json(zbx_db_insert_t *db_insert, const zbx_history_entry_t * const *entries, int entries_num)
+{
+	zbx_db_insert_prepare(db_insert, "history_json", "itemid", "clock", "ns", "value", (char *)NULL);
 
 	for (int i = 0; i < entries_num; i++)
 	{
@@ -706,6 +718,10 @@ static void	history_sql_write(void *data, unsigned char value_type, const zbx_hi
 		case ITEM_VALUE_TYPE_BIN:
 			sql_write_bin(db_insert, entries, entries_num);
 			break;
+		case ITEM_VALUE_TYPE_JSON:
+			sql_write_json(db_insert, entries, entries_num);
+			break;
+		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			exit(EXIT_FAILURE);
