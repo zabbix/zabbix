@@ -145,15 +145,21 @@ class CHistory extends CApiService {
 
 		$this->tableName = CHistoryManager::getTableName($options['history']);
 
-		$this->history_source = CHistoryManager::getDataSourceType($options['history']);
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
+		}
+
+		$storage = Manager::History()->getStorageForValueType($options['history']);
+		$provider = $storage !== null ? $storage['provider'] : ZBX_HISTORY_SOURCE_SQL;
+		$this->history_source = $provider;
 
 		switch ($this->history_source) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
-				$result = $this->getFromElasticsearch($options);
+				$result = $this->getFromElasticsearch($options, $storage);
 				break;
 
 			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-				$result = $this->getFromClickhouse($options);
+				$result = $this->getFromClickhouse($options, $storage);
 				break;
 
 			default:
@@ -252,7 +258,7 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromElasticsearch($options) {
+	private function getFromElasticsearch($options, array $storage) {
 		$query = [];
 		$schema = DB::getSchema($this->tableName);
 
@@ -326,10 +332,11 @@ class CHistory extends CApiService {
 			];
 		}
 
-		$endpoints = CHistoryManager::getElasticsearchEndpoints([$options['history']]);
+		$endpoint = CElasticsearchHelper::getRequestUrl($storage);
 
-		if ($endpoints) {
-			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
+		if ($endpoint) {
+			// TBD: remove if condition
+			return CElasticsearchHelper::query('POST', $endpoint, $query);
 		}
 
 		return null;
@@ -340,15 +347,7 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromClickhouse($options) {
-		$endpoints = CHistoryManager::getClickhouseEndpoints([$options['history']]);
-
-		if (!$endpoints) {
-			return null;
-		}
-
-		$endpoint = reset($endpoints);
-
+	private function getFromClickhouse($options, array $storage) {
 		$sql_parts = [
 			'select'	=> ['history' => 'h.itemid'],
 			'from'		=> $this->tableName.' h',
@@ -362,23 +361,20 @@ class CHistory extends CApiService {
 		}
 
 		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock_ns>='.db_utc_to_datetime64($options['time_from']);
+			$sql_parts['where']['clock_from'] = 'h.clock_ns>=toDateTime64('.intval($options['time_from']).', 9)';
 		}
 
 		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock_ns<='.db_utc_to_datetime64($options['time_till']);
+			$sql_parts['where']['clock_till'] = 'h.clock_ns<=toDateTime64('.intval($options['time_till']).', 9)';
 		}
 
 		if ($options['filter'] !== null) {
-			$this->dbFilter($sql_parts['from']['history'], $options, $sql_parts);
+			// TBD: clock and ns field will fail.
+			$this->dbFilter($sql_parts['from'], $options, $sql_parts);
 		}
 
 		if ($options['search'] !== null) {
-			zbx_db_search($sql_parts['from']['history'], $options, $sql_parts);
-		}
-
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
+			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
@@ -400,9 +396,7 @@ class CHistory extends CApiService {
 			$query .= ' LIMIT '.$options['limit'];
 		}
 
-		return CClickhouseHelper::fetch($query,
-			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
-		);
+		return CClickhouseHelper::query($query, $storage);
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {

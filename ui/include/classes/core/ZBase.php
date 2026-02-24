@@ -186,6 +186,7 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initVault();
 				$this->initDB();
+				$this->initHistoryManager();
 				$this->setServerAddress();
 				$this->authenticateUser();
 
@@ -232,6 +233,7 @@ class ZBase {
 				$this->loadConfigFile();
 				$this->initVault();
 				$this->initDB();
+				$this->initHistoryManager();
 				$this->setServerAddress();
 				$this->initLocales('en_us');
 				break;
@@ -498,6 +500,36 @@ class ZBase {
 			CDataCacheHelper::clearValues(['db_user', 'db_password']);
 
 			throw new DBException($error, DB::INIT_ERROR);
+		}
+	}
+
+	/**
+	 * Initialize HistoryManager instance.
+	 */
+	protected function initHistoryManager(): void {
+		$storages = CSettingsHelper::getDbVersionStatus();
+		$instance = Manager::History();
+		$value_type_name_ttl = [];
+
+		foreach ($storages as $storage) {
+			if (!array_key_exists('provider', $storage)) {
+				if (array_key_exists('history_pk', $storage) && $storage['history_pk'] == 1) {
+					$instance->setPrimaryKeysEnabled();
+				}
+			}
+			elseif (array_key_exists('value_types', $storage)) {
+				foreach ($storage['value_types'] as $value_type) {
+					if (!array_key_exists('ttl', $value_type)) {
+						continue;
+					}
+
+					$value_type_name_ttl[$value_type['type']] = $value_type['ttl'];
+				}
+			}
+		}
+
+		if (array_key_exists('HISTORY_PROVIDERS', $this->config)) {
+			$instance->setStorageProviders($this->config['HISTORY_PROVIDERS'], $value_type_name_ttl);
 		}
 	}
 

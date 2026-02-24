@@ -181,20 +181,11 @@ class CControllerItemEdit extends CControllerItem {
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 			],
 			'user' => ['debug_mode' => $this->getDebugMode()],
-			'provider_value_types' => []
+			'value_type_ttl' => array_map(
+				fn ($v) => array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0],
+				Manager::History()->getValueTypesStorageTtls()
+			)
 		];
-
-		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
-
-		foreach ($dbversion_history_status as $provider) {
-			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])) {
-				continue;
-			}
-
-			foreach ($provider['value_types'] as $type_data) {
-				$data['provider_value_types'][] = CHistoryManager::getTypeIdByTypeName($type_data['type']);
-			}
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Item'));

@@ -106,7 +106,10 @@ class CControllerHousekeepingEdit extends CController {
 				CHousekeepingHelper::COMPRESS_OLDER
 			)),
 			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
-			'history_providers' => []
+			'value_type_ttl' => array_map(
+				fn($v) => ['value_ttl_label' => array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0]] + $v,
+				Manager::History()->getValueTypesStorageTtls()
+			)
 		];
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
@@ -132,25 +135,6 @@ class CControllerHousekeepingEdit extends CController {
 
 					break;
 				}
-			}
-		}
-
-		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
-
-		$data['hk_history_providers_enabled'] = (bool) $dbversion_history_status;
-
-		foreach ($dbversion_history_status as $provider) {
-			if (!array_key_exists('value_types', $provider) || !is_array($provider['value_types'])) {
-				continue;
-			}
-
-			foreach ($provider['value_types'] as $type_data) {
-				$type = itemValueTypeString(CHistoryManager::getTypeIdByTypeName($type_data['type']));
-				$ttl_variations = array_key_exists('ttl', $type_data)
-					? getTimeUnitFilters($type_data['ttl'])
-					: [_('Not available')];
-
-				$data['history_providers'][$provider['database']][$type] = array_pop($ttl_variations);
 			}
 		}
 

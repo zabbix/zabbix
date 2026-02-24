@@ -185,18 +185,12 @@ class CConfigFile {
 		}
 
 		if (isset($HISTORY)) {
-			if (!CHistoryManager::isHistoryDataValid($HISTORY, $error)) {
-				self::exception($error);
-			}
-
-			$this->config['HISTORY'] = $HISTORY;
+			$HISTORY_PROVIDERS = self::getHistoryLegacyFormat($HISTORY);
+			self::validateHistoryProviders('$HISTORY', $HISTORY_PROVIDERS);
 		}
 
 		if (isset($HISTORY_PROVIDERS)) {
-			if (!CHistoryManager::isHistoryProvidersDataValid($HISTORY_PROVIDERS, $error)) {
-				self::exception($error);
-			}
-
+			self::validateHistoryProviders('$HISTORY_PROVIDERS', $HISTORY_PROVIDERS);
 			$this->config['HISTORY_PROVIDERS'] = $HISTORY_PROVIDERS;
 		}
 
@@ -240,16 +234,14 @@ class CConfigFile {
 	}
 
 	public function makeGlobal() {
-		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $HISTORY_PROVIDERS,
-			$SSO, $ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $SSO, $ALLOW_HTTP_AUTH,
+			$ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
 		$ZBX_SERVER_PORT = $this->config['ZBX_SERVER_PORT'];
 		$ZBX_SERVER_NAME = $this->config['ZBX_SERVER_NAME'];
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
-		$HISTORY = $this->config['HISTORY'];
-		$HISTORY_PROVIDERS = $this->config['HISTORY_PROVIDERS'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
@@ -402,8 +394,9 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['ZBX_SERVER_PORT'] = null;
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
+		// TBD: change to array or remove both
 		$this->config['HISTORY'] = null;
-		$this->config['HISTORY_PROVIDERS'] = null;
+		$this->config['HISTORY_PROVIDERS'] = [];
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;
 		$this->config['ZBX_SERVER_TLS'] = [
@@ -414,5 +407,87 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
 		];
+	}
+
+	/**
+	 * Get history provider configuration from $HISTORY legacy variable.
+	 *
+	 * @param mixed $history  Value of $HISTORY variable.
+	 * @return array of providers configuration compatible with $HISTORY_PROVIDERS configuration.
+	 *
+	 * @throws ConfigFileException
+	 */
+	protected static function getHistoryLegacyFormat($history): array {
+		$providers = [];
+
+		if (!is_array($history) || !array_key_exists('url', $history)) {
+			self::exception(_s('Unsupported format of %1$s.', '$HISTORY'));
+		}
+
+		if (is_string($history['url']) && array_key_exists('types', $history) && is_array($history['types'])) {
+			$providers[] = [
+				'types' => $history['types'],
+				'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+				'url' => $history['url']
+			];
+		}
+		elseif (is_array($history['url']) && !array_key_exists('types', $history)) {
+			foreach ($history['url'] as $type => $url) {
+				$providers[] = [
+					'types' => [$type],
+					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+					'url' => $url
+				];
+			}
+		}
+		else {
+			self::exception(_s('Unsupported format of %1$s.', '$HISTORY'));
+		}
+
+		return $providers;
+	}
+
+	/**
+	 * Validate history storage configuration.
+	 *
+	 * @param string $variable           Configuration variable name: $HISTORY, $HISTORY_PROVIDERS
+	 * @param mixed  $storage_providers  Varaible value.
+	 *
+	 * @throws ConfigFileException
+	 */
+	protected static function validateHistoryProviders(string $variable, $storage_providers): void {
+		if (!is_array($storage_providers) || !$storage_providers) {
+			self::exception(_s('Unsupported format of %1$s.', $variable));
+		}
+
+		$invalid_providers = array_diff(array_column($storage_providers, 'provider'), [
+			ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
+		]);
+
+		if ($invalid_providers) {
+			self::exception(_s('Unsupported history storage provider %1$s.', reset($invalid_providers)));
+		}
+
+		$registered_type = [];
+
+		foreach ($storage_providers as $storage_provider) {
+			$types_provider = array_fill_keys($storage_provider['types'], $storage_provider['provider']);
+			$already_registered = array_intersect_key($types_provider, $registered_type);
+			$registered_type += $types_provider;
+
+			if ($already_registered) {
+				$provider = reset($already_registered);
+				$type = key($already_registered);
+				self::exception(_s('Duplicate value type %1$s configured for history provider %2$s.', $type, $provider));
+			}
+		}
+
+		$invalid_types = array_diff_key($registered_type, array_flip(CHistoryManager::VALUE_TYPE_NAME));
+
+		if ($invalid_types) {
+			$provider = reset($invalid_types);
+			$type = key($invalid_types);
+			self::exception(_s('Unsupported value type %1$s for history provider %2$s.', $type, $provider));
+		}
 	}
 }

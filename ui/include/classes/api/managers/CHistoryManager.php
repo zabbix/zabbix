@@ -21,12 +21,7 @@ class CHistoryManager {
 
 	private bool $primary_keys_enabled = false;
 
-	private static array $providers = [
-		ZBX_HISTORY_SOURCE_CLICKHOUSE => 'ClickHouse',
-		ZBX_HISTORY_SOURCE_ELASTIC => 'ElasticDB'
-	];
-
-	private static array $value_type_mapping = [
+	public const VALUE_TYPE_NAME = [
 		ITEM_VALUE_TYPE_FLOAT => 'dbl',
 		ITEM_VALUE_TYPE_STR => 'str',
 		ITEM_VALUE_TYPE_LOG => 'log',
@@ -36,48 +31,80 @@ class CHistoryManager {
 		ITEM_VALUE_TYPE_JSON => 'json'
 	];
 
-	private static ?array $value_type_sources = null;
+	/**
+	 * @var array $value_type_storage configurations of storage providers by item value_type
+	 * $value_type_storage[]['provider']
+	 */
+	protected $value_type_storage = [];
 
-	private static function initSources(): void {
-		if (self::$value_type_sources !== null) {
-			return;
-		}
+	/**
+	 * @var array $value_type_storage_type storage providers types by item value_type
+	 */
+	protected $value_type_storage_type = [];
 
-		global $HISTORY, $HISTORY_PROVIDERS;
+	/**
+	 * Set storage providers configuration.
+	 *
+	 * @param array $providers            Array of storage providers configuration arrays.
+	 * @param array $value_type_name_ttl  Array where key is value type name and value is that value type TTL.
+	 */
+	public function setStorageProviders(array $providers, array $value_type_name_ttl): void {
+		$supported_props = array_flip(['db', 'password', 'provider', 'url', 'username']);
 
-		self::$value_type_sources = [];
+		foreach ($providers as $provider) {
+			$provider_config = array_intersect_key($provider, $supported_props);
 
-		if ($HISTORY_PROVIDERS) {
-			foreach ($HISTORY_PROVIDERS as $provider) {
-				$provider_data = [
-					'provider' => $provider['provider'],
-					'url' => array_key_exists('url', $provider) ? rtrim($provider['url'], '/').'/' : null,
-					'db' => array_key_exists('db', $provider) ? $provider['db'] : null,
-					'username' => array_key_exists('username', $provider) ? $provider['username'] : null,
-					'password' => array_key_exists('password', $provider) ? $provider['password'] : null
-				];
+			foreach ($provider['types'] as $value_type_name) {
+				$value_type = array_search($value_type_name, static::VALUE_TYPE_NAME);
 
-				foreach ($provider['types'] as $type) {
-					self::$value_type_sources[$type] = $provider_data;
-				}
-			}
-		}
-		elseif ($HISTORY) {
-			$url = array_key_exists('url', $HISTORY) ? $HISTORY['url'] : null;
-
-			foreach ($HISTORY['types'] as $type) {
-				$target_url = $url;
-
-				if (is_array($target_url)) {
-					$target_url = array_key_exists($type, $target_url) ? $target_url[$type] : null;
+				if (array_key_exists($value_type_name, $value_type_name_ttl)) {
+					$provider_config['value_ttl'] = $value_type_name_ttl[$value_type_name];
 				}
 
-				self::$value_type_sources[$type] = [
-					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
-					'url' => $target_url !== null ? rtrim($target_url, '/').'/' : null
-				];
+				$provider_config['value_type'] = $value_type_name;
+				$this->value_type_storage[$value_type] = $provider_config;
+				$this->value_type_storage_type[$value_type] = $provider_config['provider'];
 			}
 		}
+	}
+
+	/**
+	 * Get storage for specific value type. Return null when storage is not set.
+	 *
+	 * @param int $value_type  Item value type to get storage for.
+	 */
+	public function getStorageForValueType(int $value_type): ?array {
+		return $this->value_type_storage[$value_type] ?? null;
+	}
+
+	/**
+	 * Get storage type for item value type
+	 *
+	 * @param int $value_type  Item value type to get storage type for.
+	 */
+	public function getStorageTypeForValueType(int $value_type): string {
+		return $this->value_type_storage_type[$value_type] ?? ZBX_HISTORY_SOURCE_SQL;
+	}
+
+	/**
+	 * Get value types with custom TTL values and provider.
+	 * Returns data only for custom, non database, storage defined TTL.
+	 */
+	public function getValueTypesStorageTtls(): array {
+		$value_type_ttl = [];
+
+		foreach ($this->value_type_storage as $value_type => $storage) {
+			if (!array_key_exists('value_ttl', $storage)) {
+				continue;
+			}
+
+			$value_type_ttl[$value_type] = [
+				'storage' => $storage['provider'],
+				'value_ttl' => $storage['value_ttl']
+			];
+		}
+
+		return $value_type_ttl;
 	}
 
 	/**
@@ -244,10 +271,11 @@ class CHistoryManager {
 			];
 		}
 
-		foreach (self::getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
+		foreach ($terms as $type => $itemids) {
+			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageForValueType($type));
 			$query['query']['bool']['must'] = array_merge([[
 				'terms' => [
-					'itemid' => $terms[$type]
+					'itemid' => $itemids
 				]
 			]], $filter);
 			$query['aggs']['group_by_itemid']['aggs']['group_by_docs'] = [
@@ -484,28 +512,30 @@ class CHistoryManager {
 
 		$results = [];
 
-		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $type => $endpoint) {
+		foreach ($value_type_itemids as $type => $itemids) {
+			$storage = $this->getStorageForValueType($type);
 			$period_condition = '';
 
-			$hk_history = self::getClickhouseTtlByTypeId($type);
+			$hk_history = $storage['value_ttl'] ?? null;
 
 			$effective_periods = array_filter([$period, $hk_history]);
 
 			if ($effective_periods) {
-				$period_condition = ' AND h.clock_ns>'.db_utc_to_datetime64(time() - min($effective_periods));
+				// TBD: add clickhouse function
+				$period_condition = ' AND h.clock_ns>toDateTime64('.(time() - min($effective_periods)).', 9)';
 			}
 
 			$itemids = $value_type_itemids[$type];
 
 			foreach ($itemids as $itemid) {
-				$values = CClickhouseHelper::fetch(
+				$values = CClickhouseHelper::query(
 					'SELECT '.self::getClickhouseSelectFieldsByValueType($type).
 					' FROM '.self::getTableName($type).' h'.
 					' WHERE h.itemid='.zbx_dbstr($itemid).
 						$period_condition.
 					' ORDER BY h.clock_ns DESC'.
 					' LIMIT '.$limit,
-					$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+					$storage
 				);
 
 				if ($values) {
@@ -532,7 +562,7 @@ class CHistoryManager {
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
 	public function getValueAt(array $item, $clock, $ns) {
-		switch (self::getDataSourceType($item['value_type'])) {
+		switch ($this->getStorageTypeForValueType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
@@ -599,13 +629,8 @@ class CHistoryManager {
 
 		foreach ($filters as $filter) {
 			$query['query']['bool']['must'] = $filter;
-			$endpoints = self::getElasticsearchEndpoints([$item['value_type']]);
-
-			if (count($endpoints) !== 1) {
-				break;
-			}
-
-			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
+			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageForValueType($item['value_type']));
+			$result = CElasticsearchHelper::query('POST', $endpoint, $query);
 
 			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
 				return $result[0];
@@ -764,35 +789,26 @@ class CHistoryManager {
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
 	private function getValueAtFromClickhouse(array $item, int $clock, int $ns): ?array {
-		$hk_history = self::getClickhouseTtlByTypeId($item['value_type']);
+		$storage = $this->getStorageForValueType($item['value_type']);
+		$hk_history = $storage['value_ttl'] ?? null;
 
 		if ($hk_history !== null && ($clock <= time() - $hk_history)) {
 			return null;
 		}
 
-		$endpoints = CHistoryManager::getClickhouseEndpoints([$item['value_type']]);
-
-		if (!$endpoints) {
-			return null;
-		}
-
-		$endpoint = reset($endpoints);
-
-		$values = CClickhouseHelper::fetch(
-			'SELECT '.self::getClickhouseSelectFieldsByValueType($item['value_type']).
+		$query = 'SELECT '.self::getClickhouseSelectFieldsByValueType($item['value_type']).
 			' FROM '.self::getTableName($item['value_type']).' h'.
-			' WHERE h.itemid='.zbx_dbstr($item['itemid']).
-			' AND h.clock_ns<='.db_utc_to_datetime64($clock, $ns).
+			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
+			' AND h.clock_ns<=fromUnixTimestamp64Nano('.($clock * 1000000000 + $ns).')'.
 			' ORDER BY h.clock_ns DESC'.
-			' LIMIT 1',
-			$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
-		);
+			' LIMIT 1';
+		$values = CClickhouseHelper::query($query, $storage);
 
 		if (!$values) {
 			return null;
 		}
 
-		return $values;
+		return reset($values);
 	}
 
 	/**
@@ -914,11 +930,12 @@ class CHistoryManager {
 		];
 
 		$results = [];
-		foreach (self::getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
+		foreach ($terms as $type => $itemids) {
+			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageForValueType($type));
 			$query['query']['bool']['must'] = [
 				[
 					'terms' => [
-						'itemid' => $terms[$type]
+						'itemid' => $itemids
 					]
 				],
 				[
@@ -1014,24 +1031,26 @@ class CHistoryManager {
 
 		$results = [];
 
-		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
-			$hk_history = self::getClickhouseTtlByTypeId($value_type);
+		foreach ($value_type_itemids as $value_type => $itemids) {
+			$storage = $this->getStorageForValueType($value_type);
+			$hk_history = $storage['value_ttl'] ?? null;
 
 			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
 
-			$period_condition = ' AND h.clock_ns BETWEEN '.db_utc_to_datetime64($effective_time_from).
-				' AND '.db_utc_to_datetime64($time_to);
+			// TBD: replace between with >= <=
+			$period_condition = ' AND h.clock_ns BETWEEN toDateTime64('.$effective_time_from.', 9)'.
+				' AND toDateTime64('.$time_to.', 9)';
 
-			$values = CClickhouseHelper::fetch(
+			$values = CClickhouseHelper::query(
 				'SELECT '.implode(',', $sql_select).
 				' FROM ('.
 					'SELECT '.implode(',', $sql_sub_select).
 					' FROM '.self::getTableName($value_type).' h'.
-					' WHERE '.dbConditionId('h.itemid', array_keys($value_type_itemids[$value_type])).
+					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
 					$period_condition.
 					' GROUP BY h.itemid,tick'.
 				') s',
-				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+				$storage
 			);
 
 			if ($values) {
@@ -1358,11 +1377,12 @@ class CHistoryManager {
 
 		$results = [];
 
-		foreach (self::getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
+		foreach ($terms as $type => $itemids) {
+			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageForValueType($type));
 			$query['query']['bool']['must'] = [
 				[
 					'terms' => [
-						'itemid' => $terms[$type]
+						'itemid' => $itemids
 					]
 				],
 				[
@@ -1450,24 +1470,25 @@ class CHistoryManager {
 
 		$results = [];
 
-		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
-			$hk_history = self::getClickhouseTtlByTypeId($value_type);
+		foreach ($value_type_itemids as $value_type => $itemids) {
+			$storage = $this->getStorageForValueType($value_type);
+			$hk_history = $storage['value_ttl'] ?? null;
 
 			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
 
-			$period_condition = ' AND h.clock_ns BETWEEN '.db_utc_to_datetime64($effective_time_from).
-				' AND '.db_utc_to_datetime64($time_to);
+			$period_condition = ' AND h.clock_ns BETWEEN toDateTime64('.$effective_time_from.', 9)'.
+				' AND toDateTime64('.$time_to.', 9)';
 
-			$values = CClickhouseHelper::fetch(
+			$values = CClickhouseHelper::query(
 				'SELECT '.implode(',', $sql_select).
 				' FROM ('.
 					'SELECT '.implode(',', $sql_sub_select).
 					' FROM '.self::getTableName($value_type).' h'.
-					' WHERE '.dbConditionId('h.itemid', array_keys($value_type_itemids[$value_type])).
+					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
 					$period_condition.
 					' GROUP BY '.implode(',', $group_by).
 				') s',
-				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+				$storage
 			);
 
 			if ($values) {
@@ -1664,14 +1685,15 @@ class CHistoryManager {
 
 		$result = [];
 
-		foreach (self::getElasticsearchEndpoints(array_keys($itemids_by_value_type)) as $value_type => $endpoint) {
+		foreach ($itemids_by_value_type as $value_type => $itemids) {
+			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageForValueType($value_type));
 			$query = [
 				'query' => [
 					'bool' => [
 						'must' => [
 							[
 								'terms' => [
-									'itemid' => array_keys($itemids_by_value_type[$value_type])
+									'itemid' => array_keys($itemids)
 								]
 							],
 							[
@@ -1753,24 +1775,25 @@ class CHistoryManager {
 
 		$result = [];
 
-		foreach (self::getClickhouseEndpoints(array_keys($value_type_itemids)) as $value_type => $endpoint) {
-			$hk_history = self::getClickhouseTtlByTypeId($value_type);
+		foreach ($value_type_itemids as $value_type => $itemids) {
+			$storage = $this->getStorageForValueType($value_type);
+			$hk_history = $storage['value_ttl'] ?? null;
 
 			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
+			// TBD: use clickhouse datetime64
+			$period_condition = ' AND h.clock_ns>=toDateTime64('.$effective_time_from.', 9)'.
+				($time_to !== null ? ' AND h.clock_ns<=toDateTime64('.$time_to.', 9)' : '');
 
-			$period_condition = ' AND h.clock_ns>='.db_utc_to_datetime64($effective_time_from).
-				($time_to !== null ? ' AND h.clock_ns<='.db_utc_to_datetime64($time_to) : '');
-
-			$values = CClickhouseHelper::fetch(
+			$values = CClickhouseHelper::query(
 				'SELECT s.itemid,s.value,toUnixTimestamp(s.ts) AS clock'.
 				' FROM ('.
 					'SELECT '.implode(',', $sql_select).
 					' FROM '.self::getTableName($value_type).' h'.
-					' WHERE '.dbConditionId('h.itemid', array_keys($value_type_itemids[$value_type])).
+					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
 					$period_condition.
 					' GROUP BY h.itemid'.
 				') s',
-				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
+				$storage
 			);
 
 			if ($values) {
@@ -1945,8 +1968,7 @@ class CHistoryManager {
 	 * @return bool
 	 */
 	public function deleteHistory(array $itemid_types) {
-		self::initSources();
-
+		// TBD: get item grouped by storage and do not call all storage types when deleting item from one storage
 		return $this->deleteHistoryFromSql($itemid_types) && $this->deleteHistoryFromElasticsearch($itemid_types)
 			&& $this->deleteHistoryFromClickhouse($itemid_types);
 	}
@@ -1957,31 +1979,24 @@ class CHistoryManager {
 	 * @see CHistoryManager::deleteHistory
 	 */
 	private function deleteHistoryFromElasticsearch(array $itemid_types) {
-		$value_type_endpoints = self::getElasticsearchEndpoints($itemid_types, '_delete_by_query');
+		$terms = [];
 
-		if (!$value_type_endpoints) {
-			return true;
+		foreach ($itemid_types as $itemid => $value_type) {
+			$terms[$value_type][] = $itemid;
 		}
 
-		$itemid_types = array_filter($itemid_types,
-			static fn(int $value_type) => array_key_exists($value_type, $value_type_endpoints)
-		);
+		$result = true;
 
-		$query = [
-			'query' => [
-				'terms' => [
-					'itemid' => array_keys($itemid_types)
-				]
-			]
-		];
+		foreach ($terms as $value_type => $itemids) {
+			$storage = $this->getStorageForValueType($value_type);
 
-		foreach ($value_type_endpoints as $endpoint) {
-			if (!CElasticsearchHelper::query('POST', $endpoint, $query)) {
-				return false;
+			if ($storage !== null
+					&& !CElasticsearchHelper::delete(['history' => $value_type, 'itemid' => $itemids], $storage)) {
+				$result = false;
 			}
 		}
 
-		return true;
+		return $result;
 	}
 
 	/**
@@ -2028,168 +2043,24 @@ class CHistoryManager {
 	 * @see CHistoryManager::deleteHistory
 	 */
 	private function deleteHistoryFromClickhouse(array $itemid_types): bool {
-		$value_type_endpoints = self::getClickhouseEndpoints($itemid_types);
-
-		if ($value_type_endpoints) {
-			$itemid_types = array_filter($itemid_types,
-				static fn(int $value_type) => array_key_exists($value_type, $value_type_endpoints)
-			);
+		$terms = [];
+		foreach ($itemid_types as $itemid => $value_type) {
+			$terms[$value_type][$itemid] = true;
 		}
 
-		foreach ($value_type_endpoints as $value_type => $endpoint) {
+		$result = true;
+
+		foreach ($terms as $value_type => $itemids) {
+			$storage = $this->getStorageForValueType($value_type);
 			$query = 'DELETE FROM '.self::getTableName($value_type).' h'.
-				' WHERE '.dbConditionId('h.itemid', array_keys($itemid_types));
+				' WHERE '.dbConditionId('h.itemid', array_keys($itemids));
 
-			$result = CClickhouseHelper::execute($query,
-				$endpoint['endpoint'], $endpoint['username'], $endpoint['password']
-			);
-
-			if ($result === false) {
-				return false;
+			if ($storage !== null && !CClickhouseHelper::query($query, $storage)) {
+				$result = false;
 			}
 		}
 
-		return true;
-	}
-
-	public static function getTypeNameByTypeId(int $value_type): string {
-		if (array_key_exists($value_type, self::$value_type_mapping)) {
-			return self::$value_type_mapping[$value_type];
-		}
-
-		// Fallback to float.
-		return self::$value_type_mapping[ITEM_VALUE_TYPE_FLOAT];
-	}
-
-	/**
-	 * Get type id by value type name.
-	 *
-	 * @param int $type_name  Value type name.
-	 *
-	 * @return int  Value type id.
-	 */
-	public static function getTypeIdByTypeName($type_name) {
-		$mapping = [
-			'dbl' => ITEM_VALUE_TYPE_FLOAT,
-			'str' => ITEM_VALUE_TYPE_STR,
-			'log' => ITEM_VALUE_TYPE_LOG,
-			'uint' => ITEM_VALUE_TYPE_UINT64,
-			'text' => ITEM_VALUE_TYPE_TEXT,
-			'binary' => ITEM_VALUE_TYPE_BINARY,
-			'json' => ITEM_VALUE_TYPE_JSON
-		];
-
-		if (array_key_exists($type_name, $mapping)) {
-			return $mapping[$type_name];
-		}
-
-		// Fallback to float.
-		return ITEM_VALUE_TYPE_FLOAT;
-	}
-
-	/**
-	 * Get data source (sql, elastic or clickhouse) type based on value type id.
-	 *
-	 * @param int $value_type  Value type id.
-	 *
-	 * @return string  Data source type.
-	 */
-	public static function getDataSourceType(int $value_type): string {
-		static $cache = [];
-
-		self::initSources();
-
-		if (!array_key_exists($value_type, $cache)) {
-			$value_name = self::getTypeNameByTypeId($value_type);
-
-			$cache[$value_type] = array_key_exists($value_name, self::$value_type_sources)
-				? self::$value_type_sources[$value_name]['provider']
-				: ZBX_HISTORY_SOURCE_SQL;
-		}
-
-		return $cache[$value_type];
-	}
-
-	private static function getSourceConfiguration(string $value_name): ?array {
-		static $invalid = [];
-		static $sources_data = [];
-
-		if (array_key_exists($value_name, $sources_data)) {
-			return $sources_data[$value_name];
-		}
-
-		// Additional check to limit error count produced by invalid configuration.
-		if (array_key_exists($value_name, $invalid)) {
-			return null;
-		}
-
-		$source = self::$value_type_sources[$value_name];
-
-		if ($source['url'] === null) {
-			$invalid[$value_name] = true;
-
-			error(_s(self::$providers[$source['provider']].' URL is not set for type: %1$s.', $value_name));
-
-			return null;
-		}
-
-		if ($source['provider'] == ZBX_HISTORY_SOURCE_CLICKHOUSE
-				&& ($source['db'] === null || $source['username'] === null || $source['password'] === null)) {
-			$invalid[$value_name] = true;
-
-			error(_s(self::$providers[$source['provider']].' credentials are not set for type: %1$s.', $value_name));
-
-			return null;
-		}
-
-		$sources_data[$value_name] = $source;
-
-		return $source;
-	}
-
-	/**
-	 * Get endpoints for Elasticsearch requests.
-	 *
-	 * @param array $value_types  Value type(s).
-	 *
-	 * @return array  Elasticsearch query endpoints.
-	 */
-	public static function getElasticsearchEndpoints(array $value_types, $action = '_search'): array {
-		$indices = [];
-		$endpoints = [];
-
-		foreach (array_unique($value_types) as $type) {
-			if (self::getDataSourceType($type) === ZBX_HISTORY_SOURCE_ELASTIC) {
-				$indices[$type] = self::getTypeNameByTypeId($type);
-			}
-		}
-
-		foreach ($indices as $type => $name) {
-			if (($source_configuration = self::getSourceConfiguration($name)) !== null) {
-				$endpoints[$type] = $source_configuration['url'].$name.'*/'.$action;
-			}
-		}
-
-		return $endpoints;
-	}
-
-	public static function getClickhouseEndpoints(array $value_types): array {
-		$endpoints = [];
-
-		foreach (array_unique($value_types) as $type) {
-			if (self::getDataSourceType($type) === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
-				$source_configuration = self::getSourceConfiguration(self::getTypeNameByTypeId($type));
-
-				if ($source_configuration !== null) {
-					$source_configuration['endpoint'] =
-						$source_configuration['url'].'?database='.urlencode($source_configuration['db']);
-
-					$endpoints[$type] = $source_configuration;
-				}
-			}
-		}
-
-		return $endpoints;
+		return $result;
 	}
 
 	/**
@@ -2223,113 +2094,17 @@ class CHistoryManager {
 	private function getItemsGroupedByStorage(array $items) {
 		$grouped_items = [];
 
+		$value_storage = [];
 		foreach ($items as $item) {
-			$source = self::getDataSourceType($item['value_type']);
+			if (!array_key_exists($item['value_type'], $value_storage)) {
+				$value_storage[$item['value_type']] = $this->getStorageTypeForValueType((int) $item['value_type']);
+			}
+
+			$source = $value_storage[$item['value_type']];
 			$grouped_items[$source][] = $item;
 		}
 
 		return $grouped_items;
-	}
-
-	private static function getClickhouseTtlByTypeId(int $value_type): ?int {
-		$ttl = null;
-
-		$dbversion_history_status = CSettingsHelper::getDbVersionHistoryStatus();
-
-		foreach ($dbversion_history_status as $provider) {
-			if ($provider['database'] !== self::$providers[ZBX_HISTORY_SOURCE_CLICKHOUSE]) {
-				continue;
-			}
-
-			foreach ($provider['value_types'] as $type ) {
-				if ($type['type'] == self::getTypeNameByTypeId($value_type) && array_key_exists('ttl', $type)) {
-					$ttl = (int) $type['ttl'];
-
-					break 2;
-				}
-			}
-		}
-
-		return $ttl;
-	}
-
-	public static function isHistoryProvidersDataValid($history_providers, &$error): bool {
-		if (!is_array($history_providers) || !$history_providers) {
-			$error = _s('Unsupported format of %1$s.', '$HISTORY_PROVIDERS');
-
-			return false;
-		}
-
-		$providers_value_types = [];
-
-		foreach ($history_providers as $provider) {
-			if (!is_array($provider) || !array_key_exists('types', $provider) || !is_array($provider['types'])
-					|| !$provider['types'] || !array_key_exists('provider', $provider)) {
-				$error = _s('Unsupported format of %1$s.', '$HISTORY_PROVIDERS');
-
-				return false;
-			}
-
-			if (!array_key_exists($provider['provider'], self::$providers)) {
-				$error = _s('Unsupported history storage provider %1$s.', $provider['provider']);
-
-				return false;
-			}
-
-			foreach ($provider['types'] as $type) {
-				if (!in_array($type, self::$value_type_mapping)) {
-					$error = _s('Unsupported value type %1$s for history provider %2$s.', $type, $provider['provider']);
-
-					return false;
-				}
-
-				if (array_key_exists($provider['provider'], $providers_value_types)
-						&& array_key_exists($type, $providers_value_types[$provider['provider']])) {
-					$error = _s('Duplicate value type %1$s configured for history provider %2$s.',
-						$type, $provider['provider']
-					);
-
-					return false;
-				}
-
-				$providers_value_types[$provider['provider']][$type] = true;
-			}
-		}
-
-		return true;
-	}
-
-	public static function isHistoryDataValid($history, &$error): bool {
-		if (!is_array($history) || !array_key_exists('types', $history) || !is_array($history['types'])
-				|| !$history['types']) {
-			$error = _s('Unsupported format of %1$s.', '$HISTORY');
-
-			return false;
-		}
-
-		$value_types = [];
-
-		foreach ($history['types'] as $type) {
-			if (!in_array($type, self::$value_type_mapping)) {
-				$error = _s('Unsupported value type %1$s for history provider %2$s.',
-					$type, ZBX_HISTORY_SOURCE_ELASTIC
-				);
-
-				return false;
-			}
-
-			if (array_key_exists($type, $value_types)) {
-				$error = _s('Duplicate value type %1$s configured for history provider %2$s.',
-					$type, ZBX_HISTORY_SOURCE_ELASTIC
-				);
-
-				return false;
-			}
-
-			$value_types[$type] = true;
-		}
-
-		return true;
 	}
 
 	private function getClickhouseSelectFieldsByValueType(int $value_type, string $table_alias = 'h'): string {

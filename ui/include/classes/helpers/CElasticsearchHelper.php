@@ -26,6 +26,38 @@ class CElasticsearchHelper {
 	private static $scrolls;
 
 	/**
+	 * Get Elasticsearch URL.
+	 *
+	 * @param array $storage. Array with elastic provider configuration.
+	 */
+	public static function getRequestUrl(array $storage, string $action = '_search'): string {
+		$segments = [
+			rtrim($storage['url'], '/'),
+			$storage['value_type'].'*',
+			$action
+		];
+
+		return implode('/', $segments);
+	}
+
+	/**
+	 * @param array $options['itemids']
+	 */
+	public static function delete(array $options, array $storage): bool {
+		$endpoint = self::getRequestUrl($storage);
+		$query = [
+			'query' => [
+				'terms' => [
+					'itemid' => $options['itemids']
+				]
+			]
+		];
+		$result = self::query('POST', $endpoint, $query);
+
+		return (bool) $result;
+	}
+
+	/**
 	 * Perform request to Elasticsearch.
 	 *
 	 * @param string $method      HTTP method to be used to perform request

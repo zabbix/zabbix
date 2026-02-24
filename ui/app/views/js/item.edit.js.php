@@ -43,7 +43,7 @@ window.item_edit_form = new class {
 
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
-		testable_item_types, type_with_key_select, value_type_keys, source, return_url, provider_value_types
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, value_type_ttl
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -58,7 +58,7 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
-		this.provider_value_types = provider_value_types;
+		this.value_type_ttl = source === 'item' ? value_type_ttl : {};
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -792,18 +792,13 @@ window.item_edit_form = new class {
 
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
-			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly);
+			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
+			custom_ttl = Object.keys(this.value_type_ttl).includes(this.field.value_type.value);
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
-
-		// check selected value type if external history providers are used
-		if (Array.isArray(this.provider_value_types) && !disabled) {
-			this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE,
-				!this.provider_value_types.includes(parseInt(this.field.value_type.value))
-			);
-		}
+		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !custom_ttl);
+		// TBD: set tooltip text according custom TTL value
 	}
 
 	#updateTrendsModeVisibility() {

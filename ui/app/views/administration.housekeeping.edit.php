@@ -135,7 +135,7 @@ $house_keeper_tab = (new CFormList())
 	->addRow(
 		(new CLabel([
 			_('Data storage period'),
-			$data['hk_history_providers_enabled']
+			$data['value_type_ttl']
 				? makeWarningIcon(
 					_('This setting does not affect Elasticsearch and ClickHouse storage periods.')
 				)
@@ -148,18 +148,27 @@ $house_keeper_tab = (new CFormList())
 			->setAriaRequired()
 	);
 
-if ($data['history_providers']) {
-	foreach ($data['history_providers'] as $provider => $types) {
-		$house_keeper_tab
-			->addRow((new CTag('p', true, $provider))->addClass('input-section-header'));
+foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage) {
+	$storage_value_types = array_filter($data['value_type_ttl'], fn($ttl) => $ttl['storage'] === $storage);
 
-		foreach ($types as $type => $ttl) {
-			$house_keeper_tab
-				->addRow(
-					new CLabel(_('Data storage period').' ('.$type.')'),
-					$ttl
-				);
-		}
+	if (!$storage_value_types) {
+		continue;
+	}
+
+	$house_keeper_tab->addRow(
+		(new CTag('p', true, match($storage) {
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => _s('%1$s data storage period', _('ClickHouse')),
+			ZBX_HISTORY_SOURCE_ELASTIC => _s('%1$s data storage period', _('Elasticsearch'))
+		}))->addClass('input-section-header')
+	);
+
+	foreach ($storage_value_types as $value_type => $ttl) {
+		$house_keeper_tab->addRow(
+			new CLabel(itemValueTypeString($value_type)),
+			(new CTextBox('ttl', $ttl['value_ttl_label']))
+				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+				->setEnabled(false)
+		);
 	}
 }
 

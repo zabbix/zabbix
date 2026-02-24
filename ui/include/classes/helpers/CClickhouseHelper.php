@@ -19,61 +19,52 @@
  */
 class CClickhouseHelper {
 
-	public static function fetch(string $sql, string $endpoint, string $username, string $password): false|array {
-		$response = self::request($endpoint, $username, $password, $sql.' FORMAT JSON');
-
-		return $response === false ? false : json_decode($response, true)['data'];
-	}
-
-	public static function execute(string $sql, string $endpoint, string $username, string $password): bool {
-		$response = self::request($endpoint, $username, $password, $sql);
-
-		return !($response === false);
-	}
-
-	private static function request(string $endpoint, string $username, string $password, string $sql) {
-		$time_start = microtime(true);
+	/**
+	 * Query CickHouse
+	 *
+	 * @param string $query    SQL like query to be sent.
+	 * @param array  $storage  ClickHouse storage configuration.
+	 */
+	public static function query(string $query, array $storage): ?array {
+		$url = (new CUrl($storage['url']))
+			->setArgument('database', $storage['db'])
+			->setArgument('default_format', 'JSON')
+			->getUrl();
 
 		$handle = curl_init();
 
 		curl_setopt_array($handle, [
-			CURLOPT_URL => $endpoint,
+			CURLOPT_URL => $url,
 			CURLOPT_RETURNTRANSFER => true,
 			CURLOPT_POST => true,
-			CURLOPT_HTTPHEADER => ['Content-Type: text/plain'],
-			CURLOPT_USERPWD => $username.':'.$password,
-			CURLOPT_POSTFIELDS => $sql,
+			CURLOPT_HTTPHEADER => ['Accept: application/json'],
+			CURLOPT_USERPWD => $storage['username'].':'.$storage['password'],
+			CURLOPT_POSTFIELDS => $query,
 			CURLOPT_TIMEOUT => 10
 		]);
 
+		$result = null;
+		$time_start = microtime(true);
 		$response = curl_exec($handle);
 
 		if (curl_errno($handle)) {
 			error(_('ClickHouse connection failed.'));
+		}
+		else {
+			$result = json_decode($response, true);
 
-			curl_close($handle);
+			if (curl_getinfo($handle, CURLINFO_HTTP_CODE) != 200) {
+				$error_message = is_array($result) && array_key_exists('exception', $result)
+					? $result['exception']
+					: $response;
 
-			return false;
+				error(_s('ClickHouse error: %1$s.', $error_message), true);
+			}
 		}
 
-		$http_code = curl_getinfo($handle, CURLINFO_HTTP_CODE);
+		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, 'POST', $url, $query);
+		unset($handle);
 
-		curl_close($handle);
-
-		if ($http_code != 200) {
-			$_response = json_decode($response, true);
-
-			$error_message = is_array($_response) && array_key_exists('exception', $_response)
-				? $_response['exception']
-				: $response;
-
-			error(_s('ClickHouse error: %1$s.', $error_message));
-
-			return false;
-		}
-
-		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, 'POST', $endpoint, $sql);
-
-		return $response;
+		return $result !== null ? $result['data'] : null;
 	}
 }
