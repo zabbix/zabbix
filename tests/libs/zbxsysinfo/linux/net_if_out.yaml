@@ -133,9 +133,9 @@ files:
       eno1: 1395994481 5343265    0    0    2     0          0     83760 111280259  741237    0    0    1     0       0          0
         lo: 6410206   43792    0    0    0     0          0         0  6410206   43792    0    0    0     0       0          0
 in:
-  param: 'net.if.out[enoX,overruns]'  
+  param: 'net.if.out[enoX,overruns]'
 out:
-  result: 'Cannot find information for this network interface in /proc/net/dev.'
+  result: 'Cannot find information for this network interface in "/proc/net/dev".'
   return: 'SYSINFO_RET_FAIL'
 
 ---
@@ -147,7 +147,7 @@ files:
       eno1: 1395994481 5343265    0    0    2     0          0     83760 111280259  741237    0    0    1     0       0          0
         lo: 6410206   43792    0    0    0     0          0         0  6410206   43792    0    0    0     0       0          0
 in:
-  param: 'net.if.out[eno1,XXX]'  
+  param: 'net.if.out[eno1,XXX]'
 out:
   result: 'Invalid second parameter.'
   return: 'SYSINFO_RET_FAIL'
