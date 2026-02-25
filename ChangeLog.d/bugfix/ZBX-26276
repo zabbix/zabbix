@@ -1,1 +1,0 @@
-...G...... [ZBX-26276] fixed issue with failed oracle connections causing memory leak in Zabbix agent 2 (opucka)

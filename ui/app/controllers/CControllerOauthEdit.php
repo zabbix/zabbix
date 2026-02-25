@@ -28,7 +28,7 @@ class CControllerOauthEdit extends CController {
 			'client_secret' =>		'db media_type_oauth.client_secret',
 			'authorization_url' =>	'db media_type_oauth.authorization_url',
 			'token_url' =>			'db media_type_oauth.token_url',
-			'token_status' =>		'in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
+			'tokens_status' =>		'in '.implode(',', [0, OAUTH_ACCESS_TOKEN_VALID | OAUTH_REFRESH_TOKEN_VALID]),
 			'update' =>				'in 0,1',
 			'advanced_form' =>		'in 0,1'
 		];
@@ -67,10 +67,11 @@ class CControllerOauthEdit extends CController {
 			'client_id' => '',
 			'authorization_url' => '',
 			'token_url' => '',
-			'token_status' => 0
+			'tokens_status' => 0,
+			'js_validation_rules' => (new CFormValidator(CControllerOauthCheck::getValidationRules()))->getRules()
 		];
 		$this->getInputs($data, ['update', 'advanced_form', 'mediatypeid', 'redirection_url', 'client_id',
-			'client_secret', 'authorization_url', 'token_url', 'token_status'
+			'client_secret', 'authorization_url', 'token_url', 'tokens_status'
 		]);
 
 		$data['user'] = [
