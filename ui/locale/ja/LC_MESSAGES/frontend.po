@@ -471,6 +471,10 @@ msgstr "あと少しの手順"
 msgid "A floating point value is expected."
 msgstr "浮動小数点の値で指定してください。"
 
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:89
+msgid "A message or at least one operation is required."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
 msgstr "テンプレートとは、監視対象に合わせて設計された、事前定義された構成 (収集するメトリック、アラートを生成する条件など) のセットです。"
@@ -1724,6 +1728,11 @@ msgstr "毎%3$s %2$s日 %1$s"
 msgid "At (hour:minute)"
 msgstr "開始時刻 (時:分)"
 
+#: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
+#, c-format
+msgid "At least %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "少なくとも1台のLDAPサーバーを設定してください。"
@@ -1761,6 +1770,11 @@ msgstr "少なくとも1つの曜日または日付を指定してください�
 
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
+msgstr ""
+
+#: app/controllers/CControllerSlaCreate.php:53
+#: app/controllers/CControllerSlaUpdate.php:54
+msgid "At least one entry should be selected."
 msgstr ""
 
 #: app/controllers/CControllerRegExCreate.php:54
@@ -2272,6 +2286,13 @@ msgstr "接続の暗号化用の 事前共有鍵を変更する場合は、\"tls
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "両方のパスワードが一致している必要があります。"
+
+#: app/controllers/CControllerItemCreate.php:256
+#: app/controllers/CControllerItemPrototypeCreate.php:269
+#: app/controllers/CControllerItemPrototypeUpdate.php:257
+#: app/controllers/CControllerItemUpdate.php:256
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3403,6 +3424,11 @@ msgstr "\"%4$s\"上のディスカバリルール\"%3$s\"のホストのプロ�
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "\"%4$s\"上のディスカバリルールプロトタイプ\"%3$s\"のホストプロトタイプ\"%2$s\"のためのホストグループ\"%1$s\"が見つかりません。"
+
+#: include/classes/import/importers/CDashboardImporterGeneral.php:57
+#, c-format
+msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4773,6 +4799,14 @@ msgstr "シャーシ情報。文字列値を返す。"
 #: app/views/js/discovery.check.edit.js.php:256
 msgid "Check already exists."
 msgstr "すでに存在します。"
+
+#: app/controllers/CControllerPopupImportCompare.php:121
+msgid "Check and reconfigure widgets after the import is completed."
+msgstr ""
+
+#: app/controllers/CControllerPopupImport.php:136
+msgid "Check and reconfigure widgets."
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
@@ -6307,6 +6341,10 @@ msgstr "ダッシュボードリスト"
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
 msgstr "ダッシュボードページのプロパティ"
+
+#: app/controllers/CControllerPopupImportCompare.php:216
+msgid "Dashboard pages"
+msgstr ""
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -8102,6 +8140,10 @@ msgctxt "compact table header"
 msgid "Duration"
 msgstr "継続期間"
 
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
+msgid "Duration must be no less than a minute."
+msgstr ""
+
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
 msgstr "オランダ語 (nl_NL)"
@@ -8827,6 +8869,16 @@ msgstr "除外するホストグループ"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "Excluded downtime"
 msgstr "除外するダウンタイム"
+
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
+#, c-format
+msgid "Excluded downtime must not extend beyond %1$s."
+msgstr ""
+
+#: app/controllers/CControllerSlaCreate.php:74
+#: app/controllers/CControllerSlaUpdate.php:75
+msgid "Excluded downtime periods must be unique."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -10056,6 +10108,11 @@ msgstr "16進数から10進数"
 msgid "Hidden"
 msgstr "非表示"
 
+#: widgets/scatterplot/includes/WidgetForm.php:176
+#: widgets/svggraph/includes/WidgetForm.php:268
+msgid "Hide"
+msgstr ""
+
 #: jsLoader.php:395
 msgid "Hide debug"
 msgstr "デバッグを隠す"
@@ -10512,6 +10569,11 @@ msgstr "ホストメタデータ"
 #: widgets/tophosts/views/column.edit.php:65
 msgid "Host name"
 msgstr "ホスト名"
+
+#: widgets/scatterplot/includes/WidgetForm.php:173
+#: widgets/svggraph/includes/WidgetForm.php:265
+msgid "Host names in labels"
+msgstr ""
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -12292,6 +12354,13 @@ msgstr ""
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "ユーザーの役割\"%1$s\"のためのAPIメソッド\"%2$s\"が正しくありません。"
 
+#: app/controllers/CControllerItemCreate.php:175
+#: app/controllers/CControllerItemPrototypeCreate.php:188
+#: app/controllers/CControllerItemPrototypeUpdate.php:176
+#: app/controllers/CControllerItemUpdate.php:175
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12867,6 +12936,11 @@ msgstr "イタリア語 (it_IT)"
 msgid "Item"
 msgstr "アイテム"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
+#, c-format
+msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
+msgstr ""
+
 #: items.php:667
 msgid "Item added"
 msgstr "アイテムを追加しました"
@@ -13265,6 +13339,10 @@ msgstr "LDAPグループのパターン"
 #: app/controllers/CControllerAuthenticationUpdate.php:117
 msgid "LDAP is not configured"
 msgstr "LDAPは設定されていません"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:34
+msgid "LDAP is not configured."
+msgstr ""
 
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
@@ -14411,6 +14489,13 @@ msgstr "メディア タイプ \"%1$s\" はアクション \"%2$s\" によって
 msgid "Media type added"
 msgstr "メディアタイプを追加しました"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:104
+#: app/controllers/CControllerAuthenticationUpdate.php:175
+#: app/controllers/CControllerAuthenticationUpdate.php:296
+#: app/controllers/CControllerPopupLdapCheck.php:116
+msgid "Media type and attribute is not unique."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
@@ -15181,6 +15266,12 @@ msgstr "名前"
 msgid "Name ID"
 msgstr "NameID"
 
+#: app/controllers/CControllerMfaCheck.php:30
+#: app/controllers/CControllerPopupLdapCheck.php:30
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
+msgid "Name already exists."
+msgstr ""
+
 #: app/controllers/CControllerOauthCheck.php:36
 #: app/controllers/CControllerOauthCheck.php:44
 msgid "Name and value combination is not unique."
@@ -15670,6 +15761,11 @@ msgstr "マップが追加されていません。"
 msgid "No matches found"
 msgstr "条件に一致するデータはありません"
 
+#: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "新しいモジュールは見つかりませんでした"
@@ -15728,6 +15824,10 @@ msgstr "システムへのアクセス権がありません。"
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "\"%1$s.%2$s\"を呼び出す権限がありません。"
+
+#: include/classes/api/services/CConfiguration.php:337
+msgid "No permissions to import dashboards."
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16657,6 +16757,11 @@ msgstr "インストール手順を開く"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "ログ表示"
+
+#: include/classes/validators/CSslCertificateValidator.php:28
+#: include/classes/validators/CSslPrivateKeyValidator.php:28
+msgid "OpenSSL extension is not available"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -18422,6 +18527,14 @@ msgstr "リダイレクトエンドポイント"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "リファレンスの属性"
+
+#: app/controllers/CControllerPopupImport.php:135
+msgid "References to missing objects were ignored:"
+msgstr ""
+
+#: app/controllers/CControllerPopupImportCompare.php:120
+msgid "References to missing objects will be ignored:"
+msgstr ""
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -22204,6 +22317,11 @@ msgstr[0] ""
 #, c-format
 msgid "This value cannot be one of %1$s."
 msgstr "この値は%1$sのうちのどれかにはなりません。"
+
+#: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
+#, c-format
+msgid "This value cannot have more than %1$s decimal places."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -26479,6 +26597,11 @@ msgstr "循環するアイテムの依存関係は許可されていません"
 msgid "color"
 msgstr "色"
 
+#: include/classes/validators/CTimeRangesValidator.php:33
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
+msgid "comma separated list of time periods is expected"
+msgstr ""
+
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
 msgstr "予定されている平日の期間のリストをカンマ区切りで指定してください"
@@ -27678,6 +27801,11 @@ msgstr "パターン"
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - 期間TでのパーセンタイルP"
 
+#: include/classes/validators/CTimeRangesValidator.php:56
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
+msgid "periods must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() - 円周率を返す"
@@ -27897,6 +28025,11 @@ msgstr "skewness() - 確率分布の非対称性を測定"
 #: app/controllers/CControllerPopupTriggerExpr.php:1020
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt() - 値の平方根"
+
+#: include/classes/validators/CTimeRangesValidator.php:44
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
+msgid "start time must be less than end time"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28212,6 +28345,10 @@ msgstr "不明"
 #, c-format
 msgid "unknown function \"%1$s\""
 msgstr "関数\"%1$s\"が不明です"
+
+#: include/classes/api/services/CMap.php:1999
+msgid "unsupported data type"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"

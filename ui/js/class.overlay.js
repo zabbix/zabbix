@@ -152,7 +152,7 @@ Overlay.prototype._initListeners = function() {
 				return;
 			}
 
-			// Restore centering on double click.
+			// Restore centering on a double click.
 			this._position_fix = null;
 
 			this.fixPosition();
@@ -451,6 +451,7 @@ Overlay.prototype.unmount = function() {
 	document.removeEventListener('debug.click', this._listeners.debug_click);
 
 	this._body_mutation_observer.disconnect();
+	this._body_resize_observer.disconnect();
 	this._cancelFixPositionOnAnimationFrame();
 
 	if (this._is_draggable) {
@@ -498,6 +499,7 @@ Overlay.prototype.mount = function() {
 	}
 
 	this._body_mutation_observer = new MutationObserver(() => this._fixPositionOnAnimationFrame());
+	this._body_resize_observer = new ResizeObserver(() => this._fixPositionOnAnimationFrame());
 
 	const observable_elements = [this.$dialogue.$controls[0], this.$dialogue.$head[0], this.$dialogue.$body[0],
 		this.$dialogue.$footer[0]
@@ -509,6 +511,7 @@ Overlay.prototype.mount = function() {
 			subtree: true,
 			attributeFilter: ['style', 'class', 'hidden']
 		});
+		this._body_resize_observer.observe(observable_element);
 	}
 
 	this.$dialogue.$head.$close_button[0].addEventListener('click', this._listeners.close_button_click);
