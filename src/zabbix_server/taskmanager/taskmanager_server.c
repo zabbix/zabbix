@@ -1841,9 +1841,9 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 			((((zbx_thread_args_t *)args))->args);
 
 	const char		*adapter_url = taskmanager_args_in->config_adapter_url,
-				*config_push_ca_file = taskmanager_args_in->config_push_ca_file,
-				*config_push_cert_file = taskmanager_args_in->config_push_cert_file,
-				*config_push_key_file = taskmanager_args_in->config_push_key_file;
+				*config_push_ca_file = taskmanager_args_in->config_adapter_ca_file,
+				*config_push_cert_file = taskmanager_args_in->config_adapter_cert_file,
+				*config_push_key_file = taskmanager_args_in->config_adapter_key_file;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
