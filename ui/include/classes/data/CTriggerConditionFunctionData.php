@@ -271,9 +271,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -297,9 +294,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -323,9 +317,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -349,9 +340,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -375,9 +363,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -454,9 +439,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -486,9 +468,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -517,9 +496,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -543,9 +519,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -570,9 +543,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -596,9 +566,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -627,9 +594,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -654,9 +618,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -685,9 +646,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -711,9 +669,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -737,9 +692,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -794,9 +746,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -820,9 +769,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -847,9 +793,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -873,9 +816,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -899,9 +839,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -982,9 +919,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1009,9 +943,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1035,9 +966,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1060,7 +988,11 @@ final class CTriggerConditionFunctionData {
 						'use' => [CRelativeTimeParser::class, ['usermacros' => true, 'lldmacros' => $lld_macros]]
 					],
 					'last' => [
-						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty']],
+						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
+							'messages' => [
+								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
+							]
+						],
 						['string', 'when' => ['../paramtype', 'in' => [PARAM_TYPE_COUNTS]],
 							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
 								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
@@ -1125,9 +1057,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1200,9 +1129,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1227,9 +1153,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1260,9 +1183,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1311,9 +1231,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1337,9 +1254,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1363,9 +1277,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1392,9 +1303,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1418,9 +1326,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1444,9 +1349,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1470,9 +1372,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1497,9 +1396,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1523,9 +1419,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1550,9 +1443,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1576,9 +1466,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1676,9 +1563,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1758,9 +1642,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1887,9 +1768,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1916,9 +1794,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1961,9 +1836,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -1990,9 +1862,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2018,9 +1887,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2047,9 +1913,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2076,9 +1939,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2103,9 +1963,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2129,9 +1986,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2155,9 +2009,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2204,9 +2055,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2349,9 +2197,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2565,9 +2410,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2592,9 +2434,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
@@ -2667,9 +2506,6 @@ final class CTriggerConditionFunctionData {
 					],
 					'last' => [
 						['string', 'required', 'not_empty', 'when' => ['shift', 'not_empty'],
-							'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros,
-								'with_float' => false, 'min' => 1, 'max' => ZBX_MAX_INT32
-							]],
 							'messages' => [
 								'not_empty' => _('Field "Last of" cannot be empty when "Time shift" is not empty.')
 							]
