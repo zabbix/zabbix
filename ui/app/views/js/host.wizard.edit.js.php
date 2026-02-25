@@ -248,7 +248,9 @@ window.host_wizard_edit = new class {
 
 		this.#dialogue.addEventListener('input', this.#onInputChange.bind(this));
 		this.#dialogue.addEventListener('focusout', this.#onInputBlur.bind(this));
-		this.#dialogue.addEventListener('mousedown', () => this.#form_update_locked = true);
+		this.#dialogue.addEventListener('mousedown', () => {
+			this.#form_update_locked = this.#getCurrentStep() !== this.STEP_SELECT_TEMPLATE;
+		});
 		this.#dialogue.addEventListener('mouseup', () => {
 			this.#form_update_locked = false;
 
