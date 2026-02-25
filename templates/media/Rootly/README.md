@@ -1,4 +1,4 @@
-# <img width="142" height="141" alt="image" src="https://github.com/user-attachments/assets/a5b08642-45f7-4304-a1b9-cbfab69b469a" /> Rootly webhook
+# <img width="42" height="41" alt="image" src="https://github.com/user-attachments/assets/a5b08642-45f7-4304-a1b9-cbfab69b469a" /> Rootly webhook
 
 ## Overview
 
