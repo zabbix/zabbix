@@ -116,7 +116,7 @@ class testItemDependent extends CIntegrationTest {
 	}
 
 	/**
-	 * Test if error message are propagated to dependent item correctly
+	 * Test if error message is propagated to dependent item correctly
 	 *
 	 * @required-components server, agent
 	 */
