@@ -932,7 +932,7 @@ static void	vfs_dev_get_process_entry(const char *dev_name, const zbx_regexp_t *
 	zbx_stat_t	stat_buf;
 	char		*type, *model;
 
-	if (0 != zbx_regexp_match_precompiled(dev_name, devnames_rxp))
+	if (NULL != devnames_rxp && 0 != zbx_regexp_match_precompiled(dev_name, devnames_rxp))
 		return;
 
 	if (NULL == (type = dev_type_get(dev_name, 1, &stat_buf)))
@@ -1049,13 +1049,7 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	devnames = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL == devnames || '\0' == *devnames)
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
-		return SYSINFO_RET_FAIL;
-	}
-
-	if (SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
+	if (NULL != devnames && '\0' == *devnames && SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in first parameter: %s",
 				rxp_error));
