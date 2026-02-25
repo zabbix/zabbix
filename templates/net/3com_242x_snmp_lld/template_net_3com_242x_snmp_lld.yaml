@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a716446655449999
       template: "3Com 242x SNMP LLD Base"
-      name: "3Com 242x SNMP LLD Base v2.0.4"
+      name: "3Com 242x SNMP LLD Base v2.0.5"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for 3Com 242x series switches.
-        Version: 2.0.4
+        Version: 2.0.5
         Author: Majid Abdollahi
 
         This template delivers full interface‑level monitoring with advanced analytics, predictive
@@ -710,7 +710,7 @@ zabbix_export:
                 last(/3Com 242x SNMP LLD Base/ifOperStatus[{#IFINDEX}])<>1
                 and
                 last(/3Com 242x SNMP LLD Base/ifAdminStatus[{#IFINDEX}])=1
-              priority: HIGH
+              priority: AVERAGE
 
             - uuid: 550e8400e29b41d4a716446655449921
               name: "Interface {#IFNAME} utilization >{$IF_UTIL_WARN}"
