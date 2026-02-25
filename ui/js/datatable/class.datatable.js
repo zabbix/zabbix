@@ -1013,7 +1013,14 @@ class CDataTable {
 
 		const defaults = column_config.getDefaults();
 
-		column_config.setResized(false).setWidth(defaults.getWidth());
+		column_config.setResized(false);
+
+		if (defaults.getWidth() == 'auto') {
+			column_config.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
+		}
+		else {
+			column_config.setWidth(defaults.getWidth());
+		}
 
 		this.#applyColumnWidths();
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
@@ -1113,10 +1120,10 @@ class CDataTable {
 
 		column_config.setWidth(`${width}%`);
 
-		this.#applyColumnWidths();
-
 		const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
 		visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
+
+		this.#applyColumnWidths();
 
 		this.#applyScrollableBody();
 		this.#scrollToColumn(this.#resize_column_index);
