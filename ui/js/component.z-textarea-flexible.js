@@ -267,11 +267,11 @@ class ZTextareaFlexible extends HTMLElement {
 		this.setAttribute('placeholder', placeholder);
 	}
 
-	get readonly() {
+	get readOnly() {
 		return this.#textarea.readOnly;
 	}
 
-	set readonly(readonly) {
+	set readOnly(readonly) {
 		this.toggleAttribute('readonly', readonly);
 	}
 
