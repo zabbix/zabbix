@@ -72,10 +72,10 @@ typedef struct
 	const char	*config_source_ip;
 	const char	*config_ssl_ca_location;
 	const char	*config_sms_devices;
-	const char			*config_push_ca_file;
-	const char			*config_push_cert_file;
-	const char			*config_push_key_file;
-	const char			*config_push_adapter_url;
+	const char	*config_adapter_url;
+	const char	*config_adapter_ca_file;
+	const char	*config_adapter_cert_file;
+	const char	*config_adapter_key_file;
 }
 zbx_thread_alerter_args;
 

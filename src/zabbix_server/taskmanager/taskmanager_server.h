@@ -27,9 +27,9 @@ typedef struct
 	int		config_timeout;
 	int		config_startup_time;
 	char		*config_adapter_url;
-	const char	*config_push_ca_file;
-	const char	*config_push_cert_file;
-	const char	*config_push_key_file;
+	const char	*config_adapter_ca_file;
+	const char	*config_adapter_cert_file;
+	const char	*config_adapter_key_file;
 }
 zbx_thread_taskmanager_args;
 

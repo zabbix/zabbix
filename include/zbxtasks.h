@@ -57,6 +57,10 @@
 /* the time period after which finished (done/expired) tasks are removed */
 #define ZBX_TM_CLEANUP_TASK_AGE			SEC_PER_DAY
 
+/* task device status */
+#define ZBX_TM_TASK_DEVICE_STATUS_SUCCESS	0
+#define ZBX_TM_TASK_DEVICE_STATUS_FAIL		1
+
 typedef struct
 {
 	int		command_type;

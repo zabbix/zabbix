@@ -1299,41 +1299,12 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 
 #else
 
-	zbx_db_result_t	result = NULL;
-	zbx_db_row_t	row;
-	const char	*device_id;
-	char		*payload = NULL;
+	zbx_db_result_t		result = NULL;
+	zbx_db_row_t		row;
+	const char		*uuid;
+	char			*payload = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
-
-	result = zbx_db_select(
-			"select d.device_id"
-			" from task t"
-			" join devices d"
-			" on d.deviceid = t.device_ref"
-			" where t.taskid=" ZBX_FS_UI64,
-			taskid);
-
-
-	if (NULL == (row = zbx_db_fetch(result)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed enroll task " ZBX_FS_UI64 ": no row in task_device_enroll.",
-				taskid);
-
-		zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
-		goto out;
-	}
-
-	device_id = row[0];
-
-	struct zbx_json	json;
-
-	zbx_json_init(&json, 512);
-
-	zbx_json_addobject(&json, "device_enrollment");
-	zbx_json_addstring(&json, "device_id", device_id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&json);
-
-	payload = zbx_strdup(NULL, json.buffer);
+	int			td_status = FAIL;
 
 	CURL			*curl = NULL;
 	CURLcode		err;
@@ -1342,16 +1313,52 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 	long			http_code = 0;
 	char			*error = NULL, errbuf[CURL_ERROR_SIZE];
 
+	struct	zbx_json_parse jp;
+	char	met[256];
+	char	bek[256];
+	char	enroll_url[2048];
+
+	struct zbx_json	json;
+
+	zbx_json_init(&json, 512);
+
+	result = zbx_db_select(
+			"select d.uuid"
+			" from task_device td"
+			" join device d"
+			" on d.deviceid = td.deviceid"
+			" where td.taskid=" ZBX_FS_UI64,
+			taskid);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed enroll task " ZBX_FS_UI64 ": no row in task_device_enroll.",
+				taskid);
+		goto out;
+	}
+
+	uuid = row[0];
+
+	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "method", "device_enroll", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(&json, "params");
+	zbx_json_addstring(&json, "device_id", uuid, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "id", taskid, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&json);
+	zbx_json_close(&json);
+
+	payload = zbx_strdup(NULL, json.buffer);
+
 	if (NULL == (curl = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed initialize cURL library");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb, zbx_curl_write_cb,
 			errbuf, &error))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error));
+		zabbix_log(LOG_LEVEL_INFORMATION, "Cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error));
 		goto out;
 	}
 
@@ -1369,10 +1376,16 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(curl, &error))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_https %s", curl_easy_strerror(err));
 		goto out;
+	}
 
 	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_ssl_version %s", curl_easy_strerror(err));
 		goto out;
+	}
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_push_ca_file)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_push_cert_file)) ||
@@ -1396,14 +1409,17 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 
 	if (http_code < 200 || http_code >= 300)
 	{
+		if (400 == http_code || 415 == http_code || 500 == http_code)
+		{
+			if (ZBX_DB_OK > zbx_db_execute("update task_device set info='Internal adapter error'"
+					"where taskid=" ZBX_FS_UI64, taskid))
+				zabbix_log(LOG_LEVEL_WARNING, "failed to save task info data to database");
+		}
+
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed enroll task " ZBX_FS_UI64 ": adapter returned HTTP %ld",
 				taskid, http_code);
 		goto out;
 	}
-
-	struct	zbx_json_parse jp;
-	char	met[256];
-	char	enrollment_url[256];
 
 	if (FAIL == zbx_json_open(ZBX_NULL2EMPTY_STR(body.data), &jp))
 	{
@@ -1411,31 +1427,53 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, "MET", met, sizeof(met), NULL) ||
-			FAIL == zbx_json_value_by_name(&jp, "Enrollment_URL", enrollment_url, sizeof(enrollment_url),
-			NULL))
+	if (FAIL == zbx_json_value_by_name(&jp, "met", met, sizeof(met), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp, "bek", bek, sizeof(bek), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp, "enroll_url", enroll_url, sizeof(enroll_url), NULL))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "missing MET/Enrollment_URL in adapter body: %s",
-				ZBX_NULL2EMPTY_STR(body.data));
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing met/bek/enroll_url in adapter body: %s",
+		ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "met %s, bek %s, URL %s", met, bek ,enroll_url);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "MET %s, URL %s", met, enrollment_url);
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update task_device"
+			" set mobile_enrollment_token='%s',"
+			" bridge_enrollment_key='%s',"
+			" enrollment_url='%s'"
+			" where taskid=" ZBX_FS_UI64,
+			met, bek, enroll_url, taskid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "failed to save device enroll data to database");
+		goto out;
+	}
 
-	char		*sql = NULL;
-
-	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
-	/* TODO save MET and URL to DB */
+	td_status = SUCCEED;
 
 out:
-	zbx_free(payload);
+	if (ZBX_DB_OK > zbx_db_execute("update task_device set status=%d where taskid=" ZBX_FS_UI64, td_status, taskid))
+		zabbix_log(LOG_LEVEL_WARNING, "failed to save device task status to database");
+
+	if (ZBX_DB_OK > zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE,
+			taskid))
+		zabbix_log(LOG_LEVEL_WARNING, "failed to save task status to database");
+
 	zbx_db_free_result(result);
 	zbx_json_free(&json);
+	curl_easy_cleanup(curl);
+	zbx_free(payload);
+	zbx_free(error);
 	zbx_free(body.data);
 	zbx_free(response_header.data);
-	curl_easy_cleanup(curl);
+
 #endif
+}
+
+static void	tm_process_device_offboard()
+{
+
 }
 
 /******************************************************************************
@@ -1564,8 +1602,12 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, char *adapt
 				processed_num++;
 				break;
 			case ZBX_TM_TASK_ENROLL_DEVICE:
-				tm_process_device_enroll(taskid, adapter_url, config_push_ca_file,
-						config_push_cert_file, config_push_key_file);
+				if (0 != ttl && clock + ttl < now)
+					zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64,
+						ZBX_TM_STATUS_EXPIRED, taskid);
+				else
+					tm_process_device_enroll(taskid, adapter_url, config_push_ca_file,
+							config_push_cert_file, config_push_key_file);
 				processed_num++;
 			break;
 			default:
