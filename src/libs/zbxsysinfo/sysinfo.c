@@ -15,9 +15,9 @@
 #include "zbxsysinfo.h"
 #include "sysinfo.h"
 
-#include "alias/alias.h"
 
 #if !defined(WITH_AGENT2_METRICS)
+#	include "alias/alias.h"
 #	include "zbxthreads.h"
 #endif
 
@@ -984,6 +984,7 @@ out:
 #undef ZBX_COMMAND_WITHOUT_PARAMS
 #undef ZBX_COMMAND_WITH_PARAMS
 
+#if !defined(WITH_AGENT2_METRICS)
 void	zbx_test_parameter(const char *key)
 {
 #define ZBX_KEY_COLUMN_WIDTH	45
@@ -1060,6 +1061,7 @@ void	zbx_test_parameters(void)
 
 	test_aliases();
 }
+#endif
 
 static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_parameters, char *error,
 		int max_error_len)
@@ -1153,6 +1155,7 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
 	return ret;
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 /**********************************************************************************
  *                                                                                *
  * Parameters: in_command - [IN] item key                                         *
@@ -1280,6 +1283,7 @@ notsupported:
 
 	return ret;
 }
+#endif
 
 static void	add_log_result(AGENT_RESULT *result, const char *value)
 {
