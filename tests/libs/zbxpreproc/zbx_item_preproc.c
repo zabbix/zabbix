@@ -306,11 +306,11 @@ void	zbx_mock_test_entry(void **state)
 
 				if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.type"))
 				{
-					const char	*value_type_str = zbx_mock_get_parameter_string("out.type");
-					unsigned char	value_type = zbx_mock_str_to_value_type(value_type_str);
+					const char	*out_type_str = zbx_mock_get_parameter_string("out.type");
+					unsigned char	out_type = zbx_mock_str_to_value_type(out_type_str);
 
-					if (value_type != value.type)
-						fail_msg("expected %s, but got %s", value_type_str,
+					if (out_type != value.type)
+						fail_msg("expected %s, but got %s", out_type_str,
 								zbx_variant_type_desc(&value));
 				}
 
