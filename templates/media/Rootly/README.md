@@ -11,11 +11,11 @@ Zabbix version: 7.0 and higher.
 ### Setup
 
 1. In Rootly, get your Bearer Token and URL (with the parameters).
-  - The Webhook URL is found in Rootly when adding a Webhook (Alerts > Sources > + New Source >  Generic Webhook).
+    - The Webhook URL is found in Rootly when adding a Webhook (Alerts > Sources > + New Source >  Generic Webhook).
 
   
 2. Add them as macro variables in Zabbix (Administration > Macros).
-  - Name them exactly as shown here and input their values from Step 1: `{$ROOTLY.URL}` and `{$ROOTLY_BEARER_TOKEN}`
+    - Name them exactly as shown here and input their values from Step 1: `{$ROOTLY.URL}` and `{$ROOTLY_BEARER_TOKEN}`
 
 
 
