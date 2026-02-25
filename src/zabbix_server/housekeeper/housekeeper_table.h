@@ -12,17 +12,18 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-package com.zabbix.gateway;
+#ifndef ZABBIX_HOUSEKEEPER_TABLE_H
+#define ZABBIX_HOUSEKEEPER_TABLE_H
 
-class GeneralInformation
-{
-	static final String APPLICATION_NAME = "Zabbix Java Gateway";
-	static final String REVISION_DATE = "18 February 2026";
-	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "8.0.0beta1";
+void	housekeeper_init(void);
+void	housekeeper_deinit(void);
 
-	static void printVersion()
-	{
-		System.out.println(String.format("%s v%s (revision %s) (%s)", APPLICATION_NAME, VERSION, REVISION, REVISION_DATE));
-	}
-}
+void	housekeeper_process(int config_max_hk_delete, int *deleted_history, int *deleted_events, int *deleted_problems);
+
+int	hk_cfg_history_mode(void);
+int	hk_cfg_trends_mode(void);
+int	hk_cfg_events_mode(void);
+
+int	hk_delete_from_table(const char *tablename, const char *filter, int limit);
+
+#endif
