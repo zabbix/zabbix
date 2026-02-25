@@ -896,21 +896,25 @@ class CDataTable {
 		const {items, index, index_to} = event.detail;
 
 		const [offset, start, end] = index > index_to
-			? [1, index_to, index]
-			: [-1, index, index_to];
-
-		Array.from(items).slice(start, end).forEach(item => {
-			const column_index = parseInt(item.getAttribute('data-col'));
-			const column_config = this.getColumnConfig(column_index);
-
-			column_config.setOrder(column_config.getOrder() + offset);
-		});
+			? [1, index_to + 1, index]
+			: [-1, index, index_to - 1];
 
 		const item = items.item(index_to);
 		const column_index = parseInt(item.getAttribute('data-col'));
-		const column_config = this.getColumnConfig(column_index);
+		const from = items.item(start).getAttribute('data-col');
+		const to = items.item(end).getAttribute('data-col');
 
-		column_config.setOrder(index_to + (this.#selectable ? 2 : 1));
+		const columns = this.#columns.filter(
+			column_config => ![this.#checkboxid, CDataTableColumn.CUSTOMIZE_TABLE].includes(column_config.getId())
+				&& column_config.getColumnIndex() >= from && column_config.getColumnIndex() <= to
+		);
+
+		const column_config = this.getColumnConfig(column_index);
+		column_config.setOrder(columns.at(offset < 0 ? columns.length - 1 : 0).getOrder());
+
+		for (const column_config of columns) {
+			column_config.setOrder(column_config.getOrder() + offset);
+		}
 
 		this.#sortColumns();
 
