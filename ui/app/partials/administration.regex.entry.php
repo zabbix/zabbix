@@ -38,7 +38,7 @@
 			->setAriaRequired()
 			->setErrorContainer('expressions-'.$data['index'].'-error-container')
 			->setErrorLabel(_('Expression'))
-		))->addClass('align-top')
+		))->addClass(ZBX_STYLE_ALIGN_TOP)
 	)
 	->addItem((new CSelect('expressions['.$data['index'].'][exp_delimiter]'))
 		->setValue($data['delimiter'])

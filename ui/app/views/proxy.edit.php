@@ -62,13 +62,13 @@ $interface = (new CTable())
 				->setMaxlength(DB::getFieldLength('proxy', 'address'))
 				->setErrorLabel(_('Address'))
 				->setErrorContainer('address-port-error-container')
-		))->addClass('align-top'),
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setErrorLabel(_('Port'))
 			->setErrorContainer('address-port-error-container')
 			->setAriaRequired()
-	])->addClass('align-top')
+	])->addClass(ZBX_STYLE_ALIGN_TOP)
 	->addRow(
 		(new CCol())
 			->setId('address-port-error-container')

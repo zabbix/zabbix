@@ -4575,6 +4575,7 @@ z-sparkline {
 z-textarea-flexible {
   display: inline-block; }
   z-textarea-flexible textarea {
+    display: block !important;
     width: 100%;
     height: 24px;
     overflow: hidden;
@@ -6978,9 +6979,6 @@ form.is-loading {
   @media screen and (min-width: 1600px) {
     .table-forms-separator .tags-wrapper {
       max-width: 452px; } }
-
-.align-top {
-  vertical-align: top; }
 
 .border-left {
   border-left: 1px solid #888888; }

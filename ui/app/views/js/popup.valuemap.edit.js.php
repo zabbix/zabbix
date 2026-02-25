@@ -133,7 +133,7 @@ window.valuemap_edit_popup = {
 			.on('tableupdate.dynamicRows', (e) => {
 				e.target.querySelectorAll('.form_row').forEach((row, index) => {
 					for (const field of row.querySelectorAll('[name^="mappings["]')) {
-						field.setAttribute('name', field.getAttribute('name').replace(/\[\d+]/g, `[${index}]`));
+						field.setAttribute('name', field.name.replace(/\[\d+]/g, `[${index}]`));
 					}
 				});
 			});
@@ -152,9 +152,9 @@ window.valuemap_edit_popup = {
 				select.getOptionByValue(<?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>).disabled = (default_select
 					&& select !== default_select
 				);
-				textarea.classList.toggle('visibility-hidden', (select === default_select));
-				textarea.disabled = (select === default_select);
-				textarea.setAttribute('placeholder', this.type_placeholder[select.value] || '');
+				textarea.classList.toggle('visibility-hidden', select === default_select);
+				textarea.disabled = select === default_select;
+				textarea.placeholder = this.type_placeholder[select.value] || '';
 			}
 		});
 	},

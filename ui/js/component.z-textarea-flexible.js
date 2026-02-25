@@ -53,6 +53,7 @@ class ZTextareaFlexible extends HTMLElement {
 			'autofocus',
 			'disabled',
 			'maxlength',
+			'name',
 			'placeholder',
 			'readonly',
 			'singleline',
@@ -125,6 +126,10 @@ class ZTextareaFlexible extends HTMLElement {
 				else {
 					this.#textarea.removeAttribute('maxlength');
 				}
+				break;
+
+			case 'name':
+				this.#textarea.name = value;
 				break;
 
 			case 'placeholder':
@@ -212,7 +217,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#keydownHandler = (e) => {
-		if (e.key === 'Enter' && this.#singleline) {
+		if (e.key === 'Enter' && this.#singleline && !this.#textarea.readOnly) {
 			e.preventDefault();
 			this.closest('form')?.requestSubmit();
 		}
@@ -244,6 +249,14 @@ class ZTextareaFlexible extends HTMLElement {
 
 	set maxLength(maxlength) {
 		this.setAttribute('maxlength', maxlength);
+	}
+
+	get name() {
+		return this.#textarea.name;
+	}
+
+	set name(name) {
+		this.setAttribute('name', name);
 	}
 
 	get placeholder() {

@@ -62,7 +62,7 @@
 				->addClass('macro')
 				->setAttribute('placeholder', '{#MACRO}')
 				->setAttribute('data-formulaid', '#{formulaId}')
-		))->addClass('align-top'),
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CSelect('overrides_filters[#{rowNum}][operator]'))
 			->setValue(CONDITION_OPERATOR_REGEXP)
 			->addClass('js-operator')
@@ -80,7 +80,7 @@
 					->addClass('js-value')
 					->setAttribute('placeholder', _('regular expression'))
 			))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		))->addClass('align-top'),
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CCol(
 			(new CButton('overrides_filters#{rowNum}_remove', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)

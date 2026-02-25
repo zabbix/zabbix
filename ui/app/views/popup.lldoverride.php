@@ -147,11 +147,11 @@ foreach ($options['overrides_filters'] as $i => $overrides_filter) {
 
 	$row = [
 		$formulaid,
-		(new CCol($macro))->addClass('align-top'),
+		(new CCol($macro))->addClass(ZBX_STYLE_ALIGN_TOP),
 		$operator_select,
 		(new CCol(
 			(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-		))->addClass('align-top'),
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	];
 
