@@ -24,3 +24,9 @@ Zabbix version: 7.0 and higher.
 
 
 4. Attach this to a new user called "Rootly" and assign User role permissions with this media type
+
+
+### Bonus Feature for Rootly "2 way ack" back to Zabbix
+
+If you would like your acks/resolves of alerts in Rootly that are received from the Zabbix Alert source to reflect in Zabbix itself (alert gets acknowledged/resolved in Zabbix)
+you can set this up https://github.com/francisheroux/rootly2zabbix
