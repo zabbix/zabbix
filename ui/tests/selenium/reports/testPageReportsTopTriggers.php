@@ -332,8 +332,13 @@ class testPageReportsTopTriggers extends CWebTest {
 		// Create events and problems.
 		self::$time = time();
 
-		// If creation time is closer to midnight than 1.5 minutes, creation of day-based problems needs to be moved to the next day.
-		$delta = (strtotime('Tomorrow - 1 second') - self::$time < 90) ? 1 : 0;
+		/**
+		 * If test data is created on one day, but test cases that test day-based time selectors are executed on the
+		 * next day, then these cases will fail. On Jenkins, the time between test data creation and execution of these
+		 * test cases is 45 - 55 seconds. To avoid such failures, creation of day-based problems needs to be moved to
+		 * the next day, if creation time is closer to midnight than 1 minute.
+		 */
+		$delta = (strtotime('Tomorrow') - self::$time < 60) ? 1 : 0;
 
 		$trigger_data = [
 			[
@@ -971,7 +976,6 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Severity' => 'Average',
 							'Number of problems' => '1'
 						],
-
 						[
 							'Host' => 'Host for problem tags check',
 							'Trigger' => 'Problem with two tags',
@@ -1029,8 +1033,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					],
 					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg'
-					],
-'var_dump' => true
+					]
 				]
 			],
 			// #21.
@@ -1260,9 +1263,7 @@ class testPageReportsTopTriggers extends CWebTest {
 
 		$this->page->waitUntilReady();
 		$table->waitUntilReloaded();
-if (CTestArrayHelper::get($data, 'var_dump')) {
-	var_dump(time() - self::$time);
-}
+
 		if (array_key_exists('background_colors', $data)) {
 			foreach ($data['background_colors'] as $trigger => $color) {
 				$this->assertEquals($color, $table->findRow('Trigger', $trigger)->getColumn('Severity')->getAttribute('class'));
