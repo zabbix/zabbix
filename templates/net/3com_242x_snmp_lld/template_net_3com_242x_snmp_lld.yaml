@@ -10,10 +10,10 @@ zabbix_export:
   templates:
     - uuid: 550e8400e29b41d4a716446655449999
       template: "3Com 242x SNMP LLD Base"
-      name: "3Com 242x SNMP LLD Base v2.0.0"
+      name: "3Com 242x SNMP LLD Base v2.0.4"
       description: |
         Production‑ready SNMP Low‑Level Discovery (LLD) template for 3Com 242x series switches.
-        Version: 2.0.0
+        Version: 2.0.4
         Author: Majid Abdollahi
 
         This template delivers full interface‑level monitoring with advanced analytics, predictive
@@ -710,7 +710,7 @@ zabbix_export:
                 last(/3Com 242x SNMP LLD Base/ifOperStatus[{#IFINDEX}])<>1
                 and
                 last(/3Com 242x SNMP LLD Base/ifAdminStatus[{#IFINDEX}])=1
-              priority: AVERAGE
+              priority: HIGH
 
             - uuid: 550e8400e29b41d4a716446655449921
               name: "Interface {#IFNAME} utilization >{$IF_UTIL_WARN}"
@@ -778,7 +778,7 @@ zabbix_export:
             - uuid: 550e8400e29b41d4a716446655449962
               name: "Interface {#IFNAME} SLA compliance <95%"
               expression: "last(/3Com 242x SNMP LLD Base/ifSLA[{#IFINDEX}])<95"
-              priority: HIGH
+              priority: WARNING
 
             # --- Planned v1.10 triggers ---
             - uuid: 550e8400e29b41d4a71644665544f200
@@ -879,7 +879,7 @@ zabbix_export:
             - uuid: 550e8400e29b41d4a71644665544f002
               name: "Interface {#IFNAME}: CRC/FCS errors detected (input)"
               expression: "change(/3Com 242x SNMP LLD Base/ifInErrors[{#IFINDEX}]) > 0"
-              priority: HIGH
+              priority: WARNING
               tags:
                 - tag: scope
                   value: performance
@@ -887,7 +887,7 @@ zabbix_export:
             - uuid: 550e8400e29b41d4a71644665544f001
               name: "Interface {#IFNAME}: CRC/FCS errors detected (output)"
               expression: "change(/3Com 242x SNMP LLD Base/ifOutErrors[{#IFINDEX}]) > 0"
-              priority: HIGH
+              priority: WARNING
               tags:
                 - tag: scope
                   value: performance
