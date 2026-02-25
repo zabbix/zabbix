@@ -685,6 +685,14 @@ class ZSelect extends HTMLElement {
 			window_resize: () => {
 				this._change(this._preselected_index);
 				this._collapse();
+			},
+
+			window_pointerdown: event => {
+				if (!this._expanded || this.contains(event.target)) {
+					return;
+				}
+
+				this._collapse();
 			}
 		}
 
@@ -702,6 +710,7 @@ class ZSelect extends HTMLElement {
 		this.addEventListener('focus', this._events.focus);
 
 		window.addEventListener('resize', this._events.window_resize);
+		window.addEventListener('pointerdown', this._events.window_pointerdown);
 	}
 
 	unregisterEvents() {
@@ -719,6 +728,7 @@ class ZSelect extends HTMLElement {
 		this.removeEventListener('focus', this._events.focus);
 
 		window.removeEventListener('resize', this._events.window_resize);
+		window.removeEventListener('pointerdown', this._events.window_pointerdown);
 	}
 }
 
