@@ -47,7 +47,6 @@ libzbxagentsysinfo_a_SOURCES = \
 
 # AGENT2 version of sysinfo library
 libzbxagent2sysinfo_a_CFLAGS = \
-	-DWITH_COMMON_METRICS \
 	-DWITH_AGENT2_METRICS
 
 libzbxagent2sysinfo_a_SOURCES = \

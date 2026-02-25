@@ -222,7 +222,7 @@ static int	add_metric_local(zbx_metric_t *metric, char *error, size_t max_error_
 }
 #endif /* WITH_COMMON_METRICS */
 
-#if !defined(__MINGW32__)
+#if !defined(__MINGW32__) && defined(WITH_COMMON_METRICS)
 int	zbx_add_user_parameter(const char *itemkey, char *command, char *error, size_t max_error_len)
 {
 	int		ret;
