@@ -585,7 +585,9 @@ static void	dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 		{
 			/* The size is in standard UNIX 512 byte blocks           */
 			/* and it must be multiplied by 512 to get size in bytes. */
-			size = (zbx_uint64_t)strtoul(buf, NULL, 10) * 512;
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
+			size *= 512;
 		}
 		zbx_fclose(f);
 	}
@@ -606,7 +608,8 @@ static void	dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json 
 	{
 		if (NULL != fgets(buf, sizeof(buf), f))
 		{
-			size = (unsigned int)strtol(buf, NULL, 10);
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
 		}
 		zbx_fclose(f);
 	}
@@ -627,7 +630,8 @@ static void	dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json
 	{
 		if (NULL != fgets(buf, sizeof(buf), f))
 		{
-			size = (unsigned int)strtol(buf, NULL, 10);
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
 		}
 		zbx_fclose(f);
 	}
@@ -773,22 +777,18 @@ static void	devids_init(zbx_vector_device_ptr_t *devices)
 		zbx_stat_t	stat_buf;
 		char		*real;
 
-		if (entry->d_type != DT_LNK)
+		if (0 == strcmp(entry->d_name, ".") || 0 == strcmp(entry->d_name, ".."))
 			continue;
 
 		zbx_snprintf(buf, sizeof(buf), ZBX_SYS_DISK_BYID_PFX "%s", entry->d_name);
 
 		if (NULL == (real = realpath(buf, NULL)))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get real path for symlink \"%s\": %s", buf,
-					zbx_strerror(errno));
 			continue;
-		}
 
 		if (0 != zbx_stat(real, &stat_buf) || 0 == S_ISBLK(stat_buf.st_mode))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot get major-id and minor-id for device \"%s\"", real);
-			goto next;
+			zbx_free(real);
+			continue;
 		}
 
 		device = zbx_malloc(NULL, sizeof(zbx_device_t));
@@ -799,7 +799,7 @@ static void	devids_init(zbx_vector_device_ptr_t *devices)
 		device->name = zbx_strdup(NULL, basename(real));
 
 		zbx_vector_device_ptr_append(devices, device);
-next:
+
 		zbx_free(real);
 	}
 
@@ -815,7 +815,7 @@ next:
  *                                                                            *
  * Parameters: devices  [IN]  - cache of pre-sorted devices with IDs          *
  *           : stat_buf [IN]  - needed to identify current device by          *
- *                              get major-id and minor-id                     *
+ *                              major-id and minor-id                         *
  *             model    [IN]                                                  *
  *             json     [out]                                                 *
  *                                                                            *
@@ -844,7 +844,7 @@ next:
  *                                                                            *
  ******************************************************************************/
 static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const zbx_stat_t *stat_buf,
-		const char *model,  struct zbx_json *json)
+		const char *model, struct zbx_json *json)
 {
 	int	i, j, l = -1, r = -1, match_idx = -1;
 	char	*devid = "", norm_model[MAX_STRING_LEN];
@@ -882,7 +882,8 @@ static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const 
 	{
 		char c = model[i];
 
-		if (isalnum((unsigned char)c) || c == '.' || c == ' ') {
+		if (isalnum(c) || c == '.' || c == ' ')
+		{
 			norm_model[j] = (c == ' ' ? '_' : c);
 			i++;
 			j++;
@@ -895,7 +896,7 @@ static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const 
 
 	for (i = l; i <= r; i++)
 	{
-		if (NULL != strstr(devices->values[i]->devid, model))
+		if (NULL != strstr(devices->values[i]->devid, norm_model))
 		{
 			match_idx = i;
 			break;
@@ -1030,15 +1031,13 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 
 	char			*devnames, *mode, *rxp_error = NULL;
-	int			has_vals, ret = SYSINFO_RET_OK;;
+	int			has_vals, imode, ret = SYSINFO_RET_OK;;
 	DIR			*dir;
 	zbx_stat_t		stat_buf;
 	struct dirent		*entry;
 	struct zbx_json		j, cfg, val;
 	zbx_vector_device_ptr_t devices;
 	zbx_regexp_t		*devnames_rxp = NULL;
-
-	int	imode;
 
 	if (2 < request->nparam)
 	{
@@ -1049,7 +1048,7 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	devnames = get_rparam(request, 0);
 	mode = get_rparam(request, 1);
 
-	if (NULL != devnames && '\0' == *devnames && SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
+	if (NULL != devnames && '\0' != *devnames && SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in first parameter: %s",
 				rxp_error));
@@ -1089,8 +1088,8 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	/* check if sysfs with block devices is available */
 	if (0 != zbx_stat(ZBX_SYS_BLKDEV_PFX, &stat_buf) || 0 == S_ISDIR(stat_buf.st_mode))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device information: directory "
-				ZBX_SYS_BLKDEV_PFX " is not found."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain device information: directory \""
+				ZBX_SYS_BLKDEV_PFX "\" is not found."));
 		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
@@ -1098,12 +1097,14 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir(ZBX_DEV_PFX)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL,
-				"Cannot obtain device list: failed to open " ZBX_DEV_PFX " directory."));
+				"Cannot obtain device list: failed to open \"" ZBX_DEV_PFX "\" directory."));
 		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}
 
 	devids_init(&devices);
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_init(&cfg, ZBX_JSON_STAT_BUF_LEN);
 	if (1 == has_vals)
 		zbx_json_init(&val, ZBX_JSON_STAT_BUF_LEN);
@@ -1112,7 +1113,6 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		vfs_dev_get_process_entry(entry->d_name, devnames_rxp, imode, &devices, &cfg, &val);
 	closedir(dir);
 
-	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 	zbx_json_addraw(&j, "config", cfg.buffer);
 	if (1 == has_vals)
 		zbx_json_addraw(&j, "values", val.buffer);
