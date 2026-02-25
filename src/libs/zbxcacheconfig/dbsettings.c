@@ -55,7 +55,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"custom_color",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"db_extension",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	/* dbversion_status is used only directly */
-	{"dbversion_status",		ZBX_SETTING_TYPE_STR, 		0,			""},
+	{"dbversion_status",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	{"default_inventory_mode",	ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"-1"},
 	{"default_lang",		ZBX_SETTING_TYPE_STR, 		0,			"en_US"},
 	{"default_theme",		ZBX_SETTING_TYPE_STR, 		0,			"blue-theme"},
