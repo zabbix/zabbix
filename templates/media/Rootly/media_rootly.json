@@ -1,0 +1,123 @@
+{
+    "zabbix_export": {
+        "version": "7.0",
+        "media_types": [
+            {
+                "name": "Rootly",
+                "type": "WEBHOOK",
+                "parameters": [
+                    {
+                        "name": "alert_message",
+                        "value": "{ALERT.MESSAGE}"
+                    },
+                    {
+                        "name": "eventack",
+                        "value": "{EVENT.ACK.STATUS}"
+                    },
+                    {
+                        "name": "eventdate",
+                        "value": "{EVENT.DATE}"
+                    },
+                    {
+                        "name": "eventid",
+                        "value": "{EVENT.ID}"
+                    },
+                    {
+                        "name": "eventname",
+                        "value": "{ALERT.SUBJECT}"
+                    },
+                    {
+                        "name": "eventtags",
+                        "value": "{EVENT.TAGS}"
+                    },
+                    {
+                        "name": "eventtime",
+                        "value": "{EVENT.TIME}"
+                    },
+                    {
+                        "name": "eventupdate",
+                        "value": "{EVENT.UPDATE.STATUS}"
+                    },
+                    {
+                        "name": "eventvalue",
+                        "value": "{EVENT.VALUE}"
+                    },
+                    {
+                        "name": "event_source",
+                        "value": "{EVENT.SOURCE}"
+                    },
+                    {
+                        "name": "hostip",
+                        "value": "{HOST.IP}"
+                    },
+                    {
+                        "name": "hostname",
+                        "value": "{HOST.NAME}"
+                    },
+                    {
+                        "name": "severity",
+                        "value": "{EVENT.NSEVERITY}"
+                    },
+                    {
+                        "name": "token",
+                        "value": "{$ROOTLY_BEARER_TOKEN}"
+                    },
+                    {
+                        "name": "triggerdesc",
+                        "value": "{TRIGGER.DESCRIPTION}"
+                    },
+                    {
+                        "name": "triggerid",
+                        "value": "{TRIGGER.ID}"
+                    },
+                    {
+                        "name": "triggeropdata",
+                        "value": "{EVENT.OPDATA}"
+                    },
+                    {
+                        "name": "url",
+                        "value": "{$ZABBIX.URL}"
+                    },
+                    {
+                        "name": "webhook_url",
+                        "value": "{$ROOTLY.URL}"
+                    }
+                ],
+                "script": "try {\n    var params = JSON.parse(value),\n        req = new HttpRequest(),\n        fields = {},\n        resp = '';\n\n    // Rootly severity mapping (can be customized in Rootly UI)\n    var severityMapping = [\n        'info',    // Not classified\n        'info',    // Information\n        'low',     // Warning\n        'medium',  // Average\n        'high',    // High\n        'critical' // Disaster\n    ];\n\n    if (!severityMapping[params.severity]) {\n        params.severity = '0';\n    }\n\n    if (typeof params.HTTPProxy === 'string' && params.HTTPProxy.trim() !== '') {\n        req.setProxy(params.HTTPProxy);\n    }\n\n    // Validation - check webhook_url is provided\n    if (typeof params.webhook_url !== 'string' || params.webhook_url.trim() === '') {\n        throw 'webhook_url parameter is required. Set this to your Rootly webhook URL from Alert Sources.';\n    }\n    \n    // Validation - check token is provided\n    if (typeof params.token !== 'string' || params.token.trim() === '') {\n        throw 'token parameter is required. Set this to your Rootly Bearer token from Alert Sources.';\n    }\n\n    // Validation\n    if (isNaN(parseInt(params.eventid)) || params.eventid < 1) {\n        throw 'incorrect value for variable \"eventid\". The value must be a positive number.';\n    }\n    if (params.eventname.length < 1) {\n        throw 'incorrect value for variable \"eventname\". The value must be a non-empty string.';\n    }\n    if (isNaN(parseInt(params.severity)) || (params.severity < 0 && params.severity > 5)) {\n        throw 'incorrect value for variable \"severity\". The value must be a number 0..5.';\n    }\n\n    if ([0, 1, 2, 3].indexOf(parseInt(params.event_source)) === -1) {\n        throw 'Incorrect \"event_source\" parameter given: \"' + params.event_source + '\".\\nMust be 0-3.';\n    }\n\n    // Check {EVENT.VALUE} for trigger-based and internal events\n    if (params.eventvalue !== '0' && params.eventvalue !== '1'\n        && (params.event_source === '0' || params.event_source === '3')) {\n        throw 'Incorrect \"eventvalue\" parameter given: \"' + params.eventvalue + '\".\\nMust be 0 or 1.';\n    }\n\n    if (params.event_source === '0') {\n        if (params.hostname.length < 1) {\n            throw 'incorrect value for variable \"hostname\". The value must be a non-empty string.';\n        }\n        if (isNaN(parseInt(params.triggerid)) || params.triggerid < 1) {\n            throw 'incorrect value for variable \"triggerid\". The value must be a positive number.';\n        }\n        if (params.eventack != 'Yes' && params.eventack != 'No') {\n            throw 'incorrect value for variable \"eventack\". The value must be Yes or No.';\n        }\n        if (isNaN(parseInt(params.eventupdate)) || (params.eventupdate < 0 || params.eventupdate > 1)) {\n            throw 'incorrect value for variable \"eventupdate\". The value must be 0 or 1.';\n        }\n    }\n\n    // Set headers for Rootly\n    req.addHeader('Content-Type: application/json');\n    req.addHeader('Authorization: Bearer ' + params.token);\n\n    // Build Rootly webhook payload - flat structure for easy Liquid access\n    fields.alert_id = params.eventid;\n    fields.alert_name = params.eventname;\n    fields.severity = severityMapping[params.severity];\n    fields.original_source = 'Zabbix';\n    fields.zabbix_url = params.url;\n    \n    // Determine alert state for auto-resolve functionality\n    if (params.eventvalue == 0) {\n        fields.state = 'resolved';\n    } else {\n        fields.state = 'firing';\n    }\n\n    // Add event-specific details\n    if (params.event_source === '0') {\n        fields.host = params.hostname;\n        fields.host_ip = params.hostip;\n        fields.event_date = params.eventdate;\n        fields.event_time = params.eventtime;\n        fields.trigger_id = params.triggerid;\n        fields.trigger_description = params.triggerdesc;\n        fields.trigger_opdata = params.triggeropdata;\n        fields.event_tags = params.eventtags;\n        fields.acknowledged = params.eventack;\n        \n        // Create direct event URL for easy linking in Rootly\n        fields.event_url = params.url + '/tr_events.php?triggerid=' + params.triggerid + '&eventid=' + params.eventid;\n        \n    } else if (params.event_source === '1') {\n        fields.source_type = 'Discovery';\n        fields.alert_message = params.alert_message;\n    } else {\n        fields.alert_message = params.alert_message;\n    }\n\n    Zabbix.log(4, '[Rootly Webhook] Sending request: ' + JSON.stringify(fields));\n    \n    // Send to Rootly webhook URL\n    resp = req.post(params.webhook_url, JSON.stringify(fields));\n    \n    Zabbix.log(4, '[Rootly Webhook] Receiving response: ' + resp);\n\n    // Rootly returns 200/202 for successful webhook ingestion\n    if (req.getStatus() < 200 || req.getStatus() >= 300) {\n        try {\n            resp = JSON.parse(resp);\n            if (typeof resp.error === 'string') {\n                throw resp.error;\n            }\n        } catch (parseError) {\n            throw 'HTTP request failed with status: ' + req.getStatus() + ', response: ' + resp;\n        }\n    }\n\n    return 'OK';\n}\ncatch (error) {\n    Zabbix.log(3, '[Rootly Webhook] Notification failed: ' + error);\n    throw 'Rootly notification failed: ' + error;\n}",
+                "description": "Rootly generic webhook integration",
+                "message_templates": [
+                    {
+                        "event_source": "TRIGGERS",
+                        "operation_mode": "PROBLEM",
+                        "subject": "{HOST.NAME} is {EVENT.NAME}",
+                        "message": "Problem started at {EVENT.TIME} on {EVENT.DATE}\nProblem name: {EVENT.NAME}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\nOperational data: {EVENT.OPDATA}\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}"
+                    },
+                    {
+                        "event_source": "TRIGGERS",
+                        "operation_mode": "RECOVERY",
+                        "subject": "{HOST.NAME} has been Resolved in {EVENT.DURATION}: {EVENT.NAME}",
+                        "message": "Problem has been resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}\nProblem name: {EVENT.NAME}\nProblem duration: {EVENT.DURATION}\nHost: {HOST.NAME}\nSeverity: {EVENT.SEVERITY}\nOriginal problem ID: {EVENT.ID}\n{TRIGGER.URL}"
+                    },
+                    {
+                        "event_source": "TRIGGERS",
+                        "operation_mode": "UPDATE",
+                        "subject": "Updated problem in {EVENT.AGE}: {EVENT.NAME}",
+                        "message": "{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} {EVENT.UPDATE.TIME}.\n{EVENT.UPDATE.MESSAGE}\n\nCurrent problem status is {EVENT.STATUS}, age is {EVENT.AGE}, acknowledged: {EVENT.ACK.STATUS}."
+                    },
+                    {
+                        "event_source": "DISCOVERY",
+                        "operation_mode": "PROBLEM",
+                        "subject": "Discovery: {DISCOVERY.DEVICE.STATUS} {DISCOVERY.DEVICE.IPADDRESS}",
+                        "message": "Discovery rule: {DISCOVERY.RULE.NAME}\n\nDevice IP: {DISCOVERY.DEVICE.IPADDRESS}\nDevice DNS: {DISCOVERY.DEVICE.DNS}\nDevice status: {DISCOVERY.DEVICE.STATUS}\nDevice uptime: {DISCOVERY.DEVICE.UPTIME}\n\nDevice service name: {DISCOVERY.SERVICE.NAME}\nDevice service port: {DISCOVERY.SERVICE.PORT}\nDevice service status: {DISCOVERY.SERVICE.STATUS}\nDevice service uptime: {DISCOVERY.SERVICE.UPTIME}"
+                    },
+                    {
+                        "event_source": "AUTOREGISTRATION",
+                        "operation_mode": "PROBLEM",
+                        "subject": "Autoregistration: {HOST.HOST}",
+                        "message": "Host name: {HOST.HOST}\nHost IP: {HOST.IP}\nAgent port: {HOST.PORT}"
+                    }
+                ]
+            }
+        ]
+    }
+}
