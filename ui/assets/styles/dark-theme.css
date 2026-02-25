@@ -846,6 +846,10 @@ svg a {
     transition: left 0s, top 0s; }
 .sortable.sortable-transitions-disabled .sortable-item {
   transition: left 0s, top 0s; }
+.sortable td > .drag-icon {
+  padding-top: 4px; }
+.sortable td:not(:first-child) {
+  vertical-align: top; }
 
 html,
 body {
