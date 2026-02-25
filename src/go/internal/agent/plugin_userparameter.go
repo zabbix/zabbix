@@ -74,7 +74,7 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
-							return "", errors.New("Special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %, 0x0a\" are not allowed in the parameters.")
+							return "", errors.New("special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %, 0x0a\" are not allowed in the parameters.")
 						}
 					}
 					b.WriteString(param)
