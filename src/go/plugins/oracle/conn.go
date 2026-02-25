@@ -36,6 +36,9 @@ import (
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
+// characters that can cause escape.
+const forbiddenCharsInNames = "()\"'=#"
+
 var errInvalidPrivilege = errs.New("invalid connection privilege")
 
 type OraClient interface {
@@ -217,7 +220,17 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		},
 	)
 
-	service, err := url.QueryUnescape(cd.uri.GetParam("service"))
+	var (
+		service = url.QueryEscape(cd.uri.GetParam("service"))
+		host    = cd.uri.Host()
+	)
+
+	err := checkForbiddenCharacters(service)
+	if err != nil {
+		return nil, err
+	}
+
+	err = checkForbiddenCharacters(host)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +238,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 	connectString := fmt.Sprintf(
 		`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 			`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		cd.uri.Host(),
+		host,
 		cd.uri.Port(),
 		service,
 		c.connectTimeout/time.Second,
@@ -347,4 +360,15 @@ func getConnParams(privilege string) (godror.ConnParams, error) {
 	}
 
 	return out, nil
+}
+
+func checkForbiddenCharacters(s string) error {
+	if strings.ContainsAny(s, forbiddenCharsInNames) {
+		return errs.WrapConst(
+			errs.New("invalid characters in: "+s),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
+
+	return nil
 }
