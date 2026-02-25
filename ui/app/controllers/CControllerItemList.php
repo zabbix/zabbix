@@ -799,15 +799,19 @@ class CControllerItemList extends CControllerItem {
 			if ($context === 'host') {
 				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Host()->get([
 					'output' => ['hostid', 'name'],
-					'hostids' => $filter['filter_hostids']
+					'hostids' => $filter['filter_hostids'],
+					'preservekeys' => true
 				]), ['hostid' => 'id']);
 			}
 			else {
 				$filter['ms_hosts'] = CArrayHelper::renameObjectsKeys(API::Template()->get([
 					'output' => ['hostid', 'name'],
-					'templateids' => $filter['filter_hostids']
+					'templateids' => $filter['filter_hostids'],
+					'preservekeys' => true
 				]), ['templateid' => 'id']);
 			}
+
+			$filter['filter_hostids'] = array_keys($filter['ms_hosts']);
 
 			if ($filter['ms_hosts'] && $filter['filter_valuemapids']) {
 				$filter['ms_valuemaps'] = CArrayHelper::renameObjectsKeys(API::ValueMap()->get([
