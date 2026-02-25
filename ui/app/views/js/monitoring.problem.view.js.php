@@ -533,28 +533,23 @@
 
 					row.classList.add(CDataTable.ZBX_STYLE_ROW_DISABLED);
 
-					const visible_columns = columns.filter(column_config => column_config.isVisible());
-
 					const data_cells = [];
-					const column_index = visible_columns.length > 2 ? 2 : Math.min(2, visible_columns.length - 1);
+					const visible_columns = columns.filter(column_config => column_config.isVisible());
+					const column_index = visible_columns.findIndex(column_config => column_config.getId() == 'time');
 
-					for (const column_config of visible_columns.slice(0, column_index + 1)) {
-						const column_config_clone = column_config.clone();
+					if (column_index < 0) {
+						return;
+					}
 
-						if (visible_columns.indexOf(column_config) == column_index) {
-							column_config_clone.setSpan(visible_columns.length - column_index);
-						}
-						else {
-							column_config_clone.setSpan(1);
-						}
-
+					for (let i = 0; i < visible_columns.length; i++) {
+						const column_config_clone = visible_columns[i].clone();
 						const data_cell = this.datatable.createDataCell(column_config_clone, row_index);
 
-						if (column_config.getId() == 'time') {
+						if (i == column_index) {
 							column_config_clone.setRenderer('breakpoint');
 
 							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, {
-								[column_config.getColumnIndex()]: row_data
+								[column_config_clone.getColumnIndex()]: row_data
 							});
 						}
 
