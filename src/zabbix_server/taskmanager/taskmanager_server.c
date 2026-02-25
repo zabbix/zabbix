@@ -1285,6 +1285,11 @@ static zbx_proxy_compatibility_t	tm_get_proxy_compatibility(zbx_uint64_t proxyid
 	return compatibility;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process device enrollment task                                    *
+ *                                                                            *
+ ******************************************************************************/
 static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_url, const char *config_push_ca_file,
 		const char *config_push_cert_file, const char *config_push_key_file)
 {
@@ -1301,7 +1306,7 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 
 	zbx_db_result_t		result = NULL;
 	zbx_db_row_t		row;
-	const char		*uuid;
+	const char		*uuid, *serverid;
 	char			*payload = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
 	int			td_status = FAIL;
@@ -1323,10 +1328,11 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 	zbx_json_init(&json, 512);
 
 	result = zbx_db_select(
-			"select d.uuid"
+			"select d.uuid, s.value_str"
 			" from task_device td"
-			" join device d"
-			" on d.deviceid = td.deviceid"
+			" join device d on d.deviceid = td.deviceid"
+			" left join settings s"
+			"   on s.name='serverid' and s.type=1"
 			" where td.taskid=" ZBX_FS_UI64,
 			taskid);
 
@@ -1338,13 +1344,14 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 	}
 
 	uuid = row[0];
+	serverid = row[1];
 
 	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "method", "device_enroll", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, "params");
 	zbx_json_addstring(&json, "device_id", uuid, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "id", taskid, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
+	zbx_json_addstring(&json, "id", taskid, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 
 	payload = zbx_strdup(NULL, json.buffer);
@@ -1471,9 +1478,27 @@ out:
 #endif
 }
 
-static void	tm_process_device_offboard()
+/******************************************************************************
+ *                                                                            *
+ * Purpose: process device offboard task                                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	tm_process_device_offboard(zbx_uint64_t taskid, const char *adapter_url,
+		const char *config_push_ca_file, const char *config_push_cert_file, const char *config_push_key_file)
 {
+#if !defined(HAVE_LIBCURL)
+	ZBX_UNUSED(taskid);
+	ZBX_UNUSED(adapter_url);
+	ZBX_UNUSED(config_push_ca_file);
+	ZBX_UNUSED(config_push_cert_file);
+	ZBX_UNUSED(config_push_key_file);
 
+	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+
+#else
+
+
+#endif
 }
 
 /******************************************************************************
