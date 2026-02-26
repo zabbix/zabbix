@@ -74,46 +74,38 @@ const view = new class {
 		});
 	}
 
-	#enable(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.prototype.enable');
+	#enable(target, data) {
+		const urlparams = {action: 'lldrule.prototype.enable'};
 
 		if (target !== null) {
-			this.#confirmAction(curl, parameters, target);
+			this.#confirmAction(urlparams, data, target);
 		}
 		else {
-			this.#post(curl, parameters);
+			this.#post(urlparams, data);
 		}
 	}
 
-	#disable(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.prototype.disable');
+	#disable(target, data) {
+		const urlparams = {action: 'lldrule.prototype.disable'};
 
 		if (target !== null) {
-			this.#confirmAction(curl, parameters, target);
+			this.#confirmAction(urlparams, data, target);
 		}
 		else {
-			this.#post(curl, parameters);
+			this.#post(urlparams, data);
 		}
 	}
 
-	#discoverUpdate(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.prototype.updatediscover');
-
-		this.#post(curl, parameters);
+	#discoverUpdate(target, data) {
+		this.#post({action: 'lldrule.prototype.updatediscover'}, data);
 	}
 
-	#delete(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.prototype.delete');
-
-		this.#confirmAction(curl, parameters, target);
+	#delete(target, data) {
+		this.#confirmAction({action: 'lldrule.prototype.delete'}, data, target);
 	}
 
-	#confirmAction(curl, data, target) {
-		const confirm = this.#confirm_messages[curl.getArgument('action')];
+	#confirmAction(urlparams, data, target) {
+		const confirm = this.#confirm_messages[urlparams.action];
 		const message = confirm ? confirm[data.itemids.length > 1 ? 1 : 0] : '';
 
 		if (message != '' && !window.confirm(message)) {
@@ -121,17 +113,17 @@ const view = new class {
 		}
 
 		target.classList.add('is-loading');
-		this.#post(curl, data)
+		this.#post(urlparams, data)
 			.finally(() => {
 				target.classList.remove('is-loading');
 				target.blur();
 			});
 	}
 
-	#post(curl, data) {
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('lldrule')) ?>);
+	#post(urlparams, data) {
+		urlparams[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('lldrule')) ?>;
 
-		return fetch(curl.getUrl(), {
+		return fetch(zabbixUrl(urlparams), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify(data)

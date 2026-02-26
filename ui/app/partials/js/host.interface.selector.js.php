@@ -91,8 +91,7 @@ var HostInterfaceSelector = class {
 			interface_select.hide();
 		}
 		// If any interface type allowed, enable all options.
-		else if (select_options.length &&
-				(interface_type == <?= INTERFACE_TYPE_ANY ?> || interface_type == <?= INTERFACE_TYPE_OPT ?>)) {
+		else if (select_options.length && interface_type == <?= INTERFACE_TYPE_OPT ?>) {
 			interface_select_node.disabled = false;
 			select_options.map(opt => opt.disabled = false);
 			interface_select.show();

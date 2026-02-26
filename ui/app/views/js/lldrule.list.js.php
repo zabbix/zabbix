@@ -92,47 +92,43 @@ const view = new class {
 			|| lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
 	}
 
-	#enable(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.enable');
+	#enable(target, data) {
+		const urlparams = {action: 'lldrule.enable'};
 
 		if (target !== null) {
-			this.#confirmAction(curl, parameters, target);
+			this.#confirmAction(urlparams, data, target);
 		}
 		else {
-			this.#post(curl, parameters);
+			this.#post(urlparams, data);
 		}
 	}
 
-	#disable(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.disable');
+	#disable(target, data) {
+		const urlparams = {action: 'lldrule.disable'};
 
 		if (target !== null) {
-			this.#confirmAction(curl, parameters, target);
+			this.#confirmAction(urlparams, data, target);
 		}
 		else {
-			this.#post(curl, parameters);
+			this.#post(urlparams, data);
 		}
 	}
 
-	#execute(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'item.execute');
-		parameters.discovery_rule = 1;
+	#execute(target, data) {
+		const urlparams = {
+			action: 'item.execute',
+			discovery_rule: 1
+		};
 
-		this.#confirmAction(curl, parameters, target);
+		this.#confirmAction(urlparams, data, target);
 	}
 
-	#delete(target, parameters) {
-		const curl = new Curl('zabbix.php');
-		curl.setArgument('action', 'lldrule.delete');
-
-		this.#confirmAction(curl, parameters, target);
+	#delete(target, data) {
+		this.#confirmAction({action: 'lldrule.delete'}, data, target);
 	}
 
-	#confirmAction(curl, data, target) {
-		const confirm = this.#confirm_messages[curl.getArgument('action')];
+	#confirmAction(urlparams, data, target) {
+		const confirm = this.#confirm_messages[urlparams.action];
 		const message = confirm ? confirm[data.itemids.length > 1 ? 1 : 0] : '';
 
 		if (message != '' && !window.confirm(message)) {
@@ -140,18 +136,17 @@ const view = new class {
 		}
 
 		target.classList.add('is-loading');
-		this.#post(curl, data)
+		this.#post(urlparams, data)
 			.finally(() => {
 				target.classList.remove('is-loading');
 				target.blur();
 			});
 	}
 
-	#post(curl, data) {
-		const action = curl.getArgument('action');
-		const token_name = action === 'item.execute' ? 'item' : 'lldrule';
+	#post(urlparams, data) {
+		const token_name = urlparams.action === 'item.execute' ? 'item' : 'lldrule';
 
-		return fetch(curl.getUrl(), {
+		return fetch(zabbixUrl(urlparams), {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({...this.#tokens[token_name], ...data})

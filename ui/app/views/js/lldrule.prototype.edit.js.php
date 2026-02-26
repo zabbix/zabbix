@@ -139,12 +139,13 @@ window.lldrule_prototype_edit = new class {
 
 			const fields = this.#form.getAllValues();
 
-			const curl = new Curl('zabbix.php');
-			curl.setArgument('action', 'lldrule.prototype.delete');
-			curl.setArgument('context', fields.context);
-			curl.setArgument(CSRF_TOKEN_NAME, fields[CSRF_TOKEN_NAME]);
+			const params = {
+				action: 'lldrule.prototype.delete',
+				context: fields.context,
+				[CSRF_TOKEN_NAME]: fields[CSRF_TOKEN_NAME]
+			}
 
-			this.#post(curl.getUrl(), {itemids: [fields.itemid]});
+			this.#post(zabbixUrl(params), {itemids: [fields.itemid]}, params.action);
 		}
 		else {
 			this.#overlay.unsetLoading();
@@ -170,10 +171,6 @@ window.lldrule_prototype_edit = new class {
 		fields.interfaceid = fields.interfaceid ? fields.interfaceid : null;
 		this.#overlay.unsetLoading();
 
-		const curl = new Curl('zabbix.php');
-
-		curl.setArgument('action', fields.itemid ? 'lldrule.prototype.update' : 'lldrule.prototype.create');
-
 		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
@@ -181,7 +178,9 @@ window.lldrule_prototype_edit = new class {
 					return;
 				}
 
-				this.#post(curl.getUrl(), fields);
+				const action = fields.itemid ? 'lldrule.prototype.update' : 'lldrule.prototype.create'
+
+				this.#post(zabbixUrl({action}), fields, action);
 			});
 	}
 
@@ -189,7 +188,7 @@ window.lldrule_prototype_edit = new class {
 		this.#tabs.preprocessing.test(true, true, button, -2);
 	}
 
-	#post(url, data, keep_open = false) {
+	#post(url, data, action, keep_open = false) {
 		fetch(url, {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
@@ -215,8 +214,6 @@ window.lldrule_prototype_edit = new class {
 					this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 				}
 				else {
-					const action = (new Curl(url)).getArgument('action');
-
 					overlayDialogueDestroy(this.#overlay.dialogueid);
 
 					const event_details = {action, ...response};

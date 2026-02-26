@@ -49,13 +49,8 @@ var LldRuleEditLldMacrosTab = class {
 			$textarea.on('change keydown', (e) => {
 				if (e.type === 'change' || e.which === 13) {
 					$(textarea).val($(textarea).val().toUpperCase());
-					$textarea.textareaFlexible();
 				}
 			});
-
-			$textarea
-				.addClass('initialized-field')
-				.textareaFlexible();
 		});
 	}
 };
