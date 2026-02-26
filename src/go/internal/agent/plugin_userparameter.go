@@ -78,7 +78,7 @@ func specialCharsNotAllowedMessage() string {
 		}
 	}
 
-	b.WriteString("\" are not allowed in the parameters. ")
+	b.WriteString("\" are not allowed in the parameters")
 
 	return b.String()
 }
