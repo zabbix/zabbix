@@ -56,8 +56,8 @@ $triggers_tab = (new CTabView())
 		new CPartial('configuration.tags.tab', [
 			'source' => 'trigger',
 			'tags' => $data['tags'],
+			'with_automatic' => true,
 			'show_inherited_tags' => $data['show_inherited_tags'],
-			'readonly' => $discovered_trigger,
 			'tabs_id' => 'tabs',
 			'tags_tab_id' => 'tags-tab',
 			'has_inline_validation' => true

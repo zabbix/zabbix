@@ -1,0 +1,5 @@
+cpu  831300 1214 517796 136940034 196296 0 102135 0 0 0
+ctxt 232483817
+processes 945413
+procs_running 1
+procs_blocked 0

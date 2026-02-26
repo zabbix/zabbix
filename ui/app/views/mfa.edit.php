@@ -19,11 +19,7 @@
  * @var array $data
  */
 
-$form_action = (new CUrl('zabbix.php'))
-	->setArgument('action', 'mfa.check')
-	->getUrl();
-
-$form = (new CForm('post', $form_action))
+$form = (new CForm())
 	->addItem(getMessages());
 
 if (array_key_exists('mfaid', $data)) {
@@ -117,27 +113,21 @@ $form
 				->setAsteriskMark(),
 			(new CFormField($data['add_mfa_method'] == 0 && $data['type'] == MFA_TYPE_DUO
 				? [
-					array_key_exists('client_secret', $data)
-						? (new CVar('client_secret', $data['client_secret']))->removeId()
-						: null,
 					(new CSimpleButton(_('Change client secret')))
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->setId('client-secret-btn'),
-					(new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
+					(new CPassBox('client_secret',
+						array_key_exists('client_secret', $data) ? $data['client_secret'] : '',
+						DB::getFieldLength('mfa', 'client_secret')
+					))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 						->addStyle('display: none;')
-						->setEnabled(false)
+						->setEnabled(array_key_exists('client_secret', $data))
 				]
 				: (new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			))->addClass('js-client-secret')
 		])
-		->addItem((new CScriptTag('mfa_edit.init('.json_encode([
-				'mfaid' => array_key_exists('mfaid', $data) ? $data['mfaid'] : null,
-				'change_sensitive_data' => array_intersect_key(
-					$data, array_flip(['type', 'hash_function', 'code_length'])
-				)
-			]).');'))->setOnDocumentReady())
 	);
 
 if ($data['add_mfa_method']) {
@@ -145,10 +135,9 @@ if ($data['add_mfa_method']) {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mfa_edit.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -157,10 +146,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mfa_edit.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -170,7 +158,15 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('mfa.edit.js.php')
+		$this->readJsFile('mfa.edit.js.php').
+		'mfa_edit.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'mfaid' => array_key_exists('mfaid', $data) ? $data['mfaid'] : null,
+			'change_sensitive_data' => array_intersect_key(
+				$data, array_flip(['type', 'hash_function', 'code_length'])
+			),
+			'existing_names' => $data['existing_names']
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {

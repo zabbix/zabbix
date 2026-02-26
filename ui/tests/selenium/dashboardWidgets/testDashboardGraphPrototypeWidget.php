@@ -78,7 +78,7 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		CDataHelper::call('itemprototype.create', [
 			[
 				'name' => 'Item prototype for Graph Prototype widget',
-				'key_' => 'grpah.prototype[{#ID}]',
+				'key_' => 'graph.prototype[{#ID}]',
 				'hostid' => $hosts['Host for Graph Prototype widget'],
 				'ruleid' => $discoveryruleid,
 				'type' => ITEM_TYPE_TRAPPER,

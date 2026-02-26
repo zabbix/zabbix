@@ -21,18 +21,22 @@
 
 <script type="text/javascript">
 	const view = new class {
-		init({userid}) {
-			this.userid = userid;
+		init({rules}) {
+			this.form_element = document.getElementById('user-form');
+			this.form = new CForm(this.form_element, rules);
 
-			document.getElementById('user-form').addEventListener('submit', (e) => {
-				document.querySelectorAll('#username, #name, #surname, #autologout, #refresh, #url').forEach((elem) => {
-					elem.value = elem.value.trim();
-				});
-
-				if (!this.#confirmSubmit()) {
-					e.preventDefault();
-				}
+			this.form_element.addEventListener('submit', (e) => {
+				e.preventDefault();
+				this.#submit();
 			});
+
+			document.getElementById('delete')?.addEventListener('click', () => this.#delete());
+			document.getElementById('change-password-button')?.addEventListener('click', () => {
+				document.getElementById('change_password').setAttribute('value', 1);
+				this.#displayPasswordChange(true);
+			});
+
+			this.#displayPasswordChange(document.getElementById('change_password').getAttribute('value') == 1);
 
 			const roleid_elem = document.getElementById('roleid');
 			new MutationObserver(() => {
@@ -53,7 +57,7 @@
 				const password1 = elem_password1.value;
 				const password2 = elem_password2.value;
 
-				if (this.userid !== null && password1 !== '' && password2 !== '') {
+				if (document.getElementById('userid') !== null && password1 !== '' && password2 !== '') {
 					const warning_msg = <?= json_encode(
 						_('In case of successful password change user will be logged out of all active sessions. Continue?')
 					) ?>;
@@ -120,5 +124,152 @@
 				hidden.remove();
 			}
 		}
-	}
+
+		#displayPasswordChange(visible = true) {
+			if (visible) {
+				document.getElementById('current_password')?.removeAttribute('disabled');
+				document.getElementById('password1')?.removeAttribute('disabled');
+				document.getElementById('password2')?.removeAttribute('disabled');
+
+				this.form_element.querySelectorAll('.password-change-active').forEach(elem => {
+					elem.style.display = '';
+				})
+
+				this.form_element.querySelectorAll('.password-change-inactive').forEach(elem => {
+					elem.style.display = 'none';
+				})
+			}
+			else {
+				document.getElementById('current_password')?.setAttribute('disabled', 'disabled');
+				document.getElementById('password1')?.setAttribute('disabled', 'disabled');
+				document.getElementById('password2')?.setAttribute('disabled', 'disabled');
+
+				this.form_element.querySelectorAll('.password-change-active').forEach(elem => {
+					elem.style.display = 'none';
+				})
+
+				this.form_element.querySelectorAll('.password-change-inactive').forEach(elem => {
+					elem.style.display = '';
+				})
+			}
+		}
+
+		#submit() {
+			if (!this.#confirmSubmit()) {
+				return;
+			}
+
+			this.#setLoadingStatus(['add', 'update'])
+			clearMessages();
+			const fields = this.form.getAllValues();
+
+			this.form.validateSubmit(fields)
+				.then((result) => {
+					if (!result) {
+						this.#unsetLoadingStatus();
+						return;
+					}
+
+					var curl = new Curl('zabbix.php');
+
+					const action = document.getElementById('userid') !== null
+						? 'user.update'
+						: 'user.create';
+
+					curl.setArgument('action', action);
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(fields)
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							if ('error' in response) {
+								throw {error: response.error};
+							}
+
+							if ('form_errors' in response) {
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
+
+								return;
+							}
+
+							if ('success' in response) {
+								postMessageOk(response.success.title);
+
+								if ('messages' in response.success) {
+									postMessageDetails('success', response.success.messages);
+								}
+
+								location.href = new URL(response.success.redirect, location.href).href;
+							}
+						})
+						.catch((exception) => this.#ajaxExceptionHandler(exception))
+						.finally(() => this.#unsetLoadingStatus())
+				});
+		}
+
+		#delete() {
+			if (window.confirm(<?= json_encode(_('Delete selected user?')) ?>)) {
+				this.#setLoadingStatus(['delete']);
+				const fields = this.form.getAllValues();
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'user.delete');
+				curl.setArgument('userids', [fields.userid]);
+				curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('user')) ?>);
+
+				redirect(curl.getUrl(), 'post', 'action', undefined, true);
+			}
+		}
+
+		#ajaxExceptionHandler(exception) {
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+			}
+
+			addMessage(makeMessageBox('bad', messages, title)[0]);
+		}
+
+		#setLoadingStatus(loading_ids) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
+
+			[
+				document.getElementById('add'),
+				document.getElementById('update'),
+				document.getElementById('delete')
+			].forEach(button => {
+				if (button) {
+					button.setAttribute('disabled', 'disabled');
+
+					if (loading_ids.includes(button.id)) {
+						button.classList.add('is-loading');
+					}
+				}
+			});
+		}
+
+		#unsetLoadingStatus() {
+			[
+				document.getElementById('add'),
+				document.getElementById('update'),
+				document.getElementById('delete')
+			].forEach(button => {
+				if (button) {
+					button.classList.remove('is-loading');
+					button.removeAttribute('disabled');
+				}
+			});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+		}
+	};
 </script>

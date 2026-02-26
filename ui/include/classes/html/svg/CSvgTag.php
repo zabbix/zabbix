@@ -16,8 +16,10 @@
 
 class CSvgTag extends CTag {
 
-	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
-	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
+	public const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
+	public const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
+	public const ZBX_STYLE_SCATTER_PLOT_VERTICAL_HELPER = 'scatter-plot-vertical-helper';
+	public const ZBX_STYLE_SCATTER_PLOT_HORIZONTAL_HELPER = 'scatter-plot-horizontal-helper';
 
 	/**
 	 * SVG styles array.

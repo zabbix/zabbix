@@ -18,47 +18,99 @@ class CControllerPopupLdapTestSend extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+	}
+
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'userdirectoryid' => ['db userdirectory.userdirectoryid'],
+			'host' => ['db userdirectory_ldap.host', 'required', 'not_empty'],
+			'port' => ['db userdirectory_ldap.port', 'required', 'min' => ZBX_MIN_PORT_NUMBER,
+				'max' => ZBX_MAX_PORT_NUMBER
+			],
+			'base_dn' => ['db userdirectory_ldap.base_dn', 'required', 'not_empty'],
+			'search_attribute' => ['db userdirectory_ldap.search_attribute', 'required', 'not_empty'],
+			'bind_dn' => ['db userdirectory_ldap.bind_dn'],
+			'bind_password' => ['db userdirectory_ldap.bind_password'],
+			'provision_status' => ['db userdirectory.provision_status',
+				'in' => [JIT_PROVISIONING_DISABLED, JIT_PROVISIONING_ENABLED]
+			],
+			'group_basedn' => ['db userdirectory_ldap.group_basedn',
+				'when' => [
+					['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'group_name' => ['db userdirectory_ldap.group_name',
+				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+			],
+			'group_membership' => ['db userdirectory_ldap.group_membership',
+				'when' => [
+					['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'group_member' => ['db userdirectory_ldap.group_member',
+				'when' => [
+					['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'user_ref_attr' => ['db userdirectory_ldap.user_ref_attr',
+				'when' => [
+					['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'group_filter' => ['db userdirectory_ldap.group_filter',
+				'when' => [
+					['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+				]
+			],
+			'user_username' => ['db userdirectory_ldap.user_username',
+				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+			],
+			'user_lastname' => ['db userdirectory_ldap.user_lastname',
+				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+			],
+			'provision_groups' => ['objects', 'required', 'not_empty', 'uniq' => ['name'],
+				'fields' => CControllerPopupUserGroupMappingCheck::getFieldsValidationRules(),
+				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+			],
+			'provision_media' => ['objects', 'uniq' => ['attribute', 'mediatypeid'],
+				'fields' => [
+					'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+					'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+					'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+					'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+					'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+						'use' => [CTimePeriodParser::class, ['usermacros' => true]]
+					],
+					'severity' => ['db userdirectory_media.severity', 'min' => 0,
+						'max' => (pow(2, TRIGGER_SEVERITY_COUNT) - 1)
+					],
+					'active' => ['db userdirectory_media.active', 'required',
+						'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+					]
+				],
+				'when' => ['provision_status', 'in' => [JIT_PROVISIONING_ENABLED]]
+			],
+			'start_tls' => ['db userdirectory_ldap.start_tls', 'in' => [ZBX_AUTH_START_TLS_OFF, ZBX_AUTH_START_TLS_ON]],
+			'search_filter' => ['db userdirectory_ldap.search_filter'],
+			'test_username' => ['string', 'required', 'not_empty'],
+			'test_password' => ['string', 'required', 'not_empty']
+		]];
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'userdirectoryid' =>		'db userdirectory.userdirectoryid',
-			'host' =>					'required|db userdirectory_ldap.host|not_empty',
-			'port' =>					'required|db userdirectory_ldap.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
-			'base_dn' =>				'required|db userdirectory_ldap.base_dn|not_empty',
-			'bind_dn' =>				'db userdirectory_ldap.bind_dn',
-			'bind_password' =>			'db userdirectory_ldap.bind_password',
-			'search_attribute' =>		'required|db userdirectory_ldap.search_attribute|not_empty',
-			'start_tls' =>				'in '.ZBX_AUTH_START_TLS_OFF.','.ZBX_AUTH_START_TLS_ON,
-			'search_filter' =>			'db userdirectory_ldap.search_filter',
-			'provision_status' =>		'db userdirectory.provision_status|in '.JIT_PROVISIONING_DISABLED.','.JIT_PROVISIONING_ENABLED,
-			'group_basedn' =>			'db userdirectory_ldap.group_basedn',
-			'group_name' =>				'db userdirectory_ldap.group_name',
-			'group_member' =>			'db userdirectory_ldap.group_member',
-			'group_filter' =>			'db userdirectory_ldap.group_filter',
-			'user_ref_attr' =>			'db userdirectory_ldap.user_ref_attr',
-			'group_membership' =>		'db userdirectory_ldap.group_membership',
-			'user_username' =>			'db userdirectory_ldap.user_username',
-			'user_lastname' =>			'db userdirectory_ldap.user_lastname',
-			'provision_media' =>		'array',
-			'provision_groups' =>		'array',
-			'test_username' =>			'required|string|not_empty',
-			'test_password' =>			'required|string|not_empty'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData([
-					'main_block' => json_encode([
-						'error' => [
-							'title' => _('Invalid LDAP configuration'),
-							'messages' => array_column(get_and_clear_messages(), 'message')
-						]
-					])
-				])
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Invalid LDAP configuration'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;
@@ -88,7 +140,7 @@ class CControllerPopupLdapTestSend extends CController {
 			$ldap_test_object['provision_groups'][] = [
 				'name'			=> $provision_group['name'],
 				'roleid'		=> $provision_group['roleid'],
-				'user_groups'	=> $provision_group['user_groups']
+				'user_groups'	=> zbx_toObject($provision_group['user_groups'], 'usrgrpid')
 			];
 		}
 

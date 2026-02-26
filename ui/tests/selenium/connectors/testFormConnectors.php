@@ -246,7 +246,7 @@ class testFormConnectors extends CWebTest {
 		}
 
 		foreach (['2' => true, '1' => false, '9' => true, '0' => false] as $attempts => $state) {
-			$form->getField('Attempts')->fill($attempts)->fireEvent();
+			$form->getField('Attempts')->fill($attempts)->fireEvent('input');
 			$this->assertEquals($state, $form->getField('Attempt interval')->isEnabled());
 			$form->checkValue(['Attempt interval' => '5s']);
 		}
@@ -261,85 +261,86 @@ class testFormConnectors extends CWebTest {
 
 	public static function getConnectorsData() {
 		return [
+			// #0
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => '',
 						'URL' => '{$URL}'
-
 					],
-					'error' => [
-						'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #1
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Connector without URL',
 						'URL' => ''
-
 					],
-					'error' => [
-						'Incorrect value for field "url": cannot be empty.'
+					'inline_errors' => [
+						'URL' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #2
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Connector with unacceptable URL',
 						'URL' => 'dns://zabbix.com:82/v1/history'
-
 					],
-					'error' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL' => 'Unacceptable URL.'
 					]
 				]
 			],
+			// #3
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Connector with unacceptable URL',
 						'URL' => 'message://zabbix.com:82/v1/history'
-
 					],
-					'error' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL' => 'Unacceptable URL.'
 					]
 				]
 			],
+			// #4
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Connector with unacceptable URL',
 						'URL' => '?'
-
 					],
-					'error' => [
-						'Invalid parameter "/1/url": unacceptable URL.'
+					'inline_errors' => [
+						'URL' => 'Unacceptable URL.'
 					]
 				]
 			],
+			// #5
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => '',
 						'URL' => ''
-
 					],
-					'error' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "url": cannot be empty.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'URL' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #6
 			[
 				[
 					'expected' => TEST_BAD,
@@ -348,11 +349,12 @@ class testFormConnectors extends CWebTest {
 						'URL' => 'https://zabbix.com:82/v1/history',
 						'HTTP authentication' => 'Bearer'
 					],
-					'error' => [
-						'Incorrect value for field "token": cannot be empty.'
+					'inline_errors' => [
+						'Bearer token' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #7
 			[
 				[
 					'expected' => TEST_BAD,
@@ -362,12 +364,12 @@ class testFormConnectors extends CWebTest {
 						'HTTP authentication' => 'Bearer',
 						'Bearer token' => ' '
 					],
-					'error' => [
-						'Incorrect value for field "token": cannot be empty.'
+					'inline_errors' => [
+						'Bearer token' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// 'Type of information' field validation when all related checkboxes are unchecked.
+			// #8 'Type of information' field validation when all related checkboxes are unchecked.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -381,12 +383,12 @@ class testFormConnectors extends CWebTest {
 						'Text' => false,
 						'Binary' => false
 					],
-					'error' => [
-						'Field "item_value_types" is mandatory.'
+					'inline_errors' => [
+						'Type of information' => 'At least one type of information must be selected.'
 					]
 				]
 			],
-			// Check validation for 'Concurrent sessions' field.
+			// #9 Check validation for 'Concurrent sessions' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -396,11 +398,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Concurrent sessions' => '0'
 					],
-					'error' => [
-						'Incorrect value for field "max_senders": value must be no less than "1".'
+					'inline_errors' => [
+						'Concurrent sessions' => 'This value must be no less than "1".'
 					]
 				]
 			],
+			// #10
 			[
 				[
 					'expected' => TEST_BAD,
@@ -410,11 +413,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Concurrent sessions' => ''
 					],
-					'error' => [
-						'Incorrect value "" for "max_senders" field.'
+					'inline_errors' => [
+						'Concurrent sessions' => 'This value is not a valid integer.'
 					]
 				]
 			],
+			// #11
 			[
 				[
 					'expected' => TEST_BAD,
@@ -424,11 +428,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Concurrent sessions' => '@'
 					],
-					'error' => [
-						'Incorrect value "@" for "max_senders" field.'
+					'inline_errors' => [
+						'Concurrent sessions' => 'This value is not a valid integer.'
 					]
 				]
 			],
+			// #12
 			[
 				[
 					'expected' => TEST_BAD,
@@ -438,12 +443,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Concurrent sessions' => '101'
 					],
-					'error' => [
-						'Incorrect value for field "max_senders": value must be no greater than "100".'
+					'inline_errors' => [
+						'Concurrent sessions' => 'This value must be no greater than "100".'
 					]
 				]
 			],
-			// Check validation for 'Attempts' field.
+			// #13 Check validation for 'Attempts' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -453,11 +458,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Attempts' => '0'
 					],
-					'error' => [
-						'Incorrect value for field "max_attempts": value must be no less than "1".'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no less than "1".'
 					]
 				]
 			],
+			// #14
 			[
 				[
 					'expected' => TEST_BAD,
@@ -467,11 +473,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Attempts' => ''
 					],
-					'error' => [
-						'Incorrect value "" for "max_attempts" field.'
+					'inline_errors' => [
+						'Attempts' => 'This value is not a valid integer.'
 					]
 				]
 			],
+			// #15
 			[
 				[
 					'expected' => TEST_BAD,
@@ -481,12 +488,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Attempts' => '6'
 					],
-					'error' => [
-						'Incorrect value for field "max_attempts": value must be no greater than "5".'
+					'inline_errors' => [
+						'Attempts' => 'This value must be no greater than "5".'
 					]
 				]
 			],
-			// 'Attempt interval' field validation checks.
+			// #16 'Attempt interval' field validation checks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -497,11 +504,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with empty attempt interval field',
 						'Attempt interval' => ''
 					],
-					'error' => [
-						'Incorrect value for field "attempt_interval": cannot be empty.'
+					'inline_errors' => [
+						'Attempt interval' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #17
 			[
 				[
 					'expected' => TEST_BAD,
@@ -512,11 +520,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with incorrect value for attempt interval field',
 						'Attempt interval' => ' '
 					],
-					'error' => [
-						'Incorrect value for field "attempt_interval": cannot be empty.'
+					'inline_errors' => [
+						'Attempt interval' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #18
 			[
 				[
 					'expected' => TEST_BAD,
@@ -527,11 +536,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with incorrect value for attempt interval field',
 						'Attempt interval' => '🔔'
 					],
-					'error' => [
-						'Invalid parameter "/1/attempt_interval": a time unit is expected.'
+					'inline_errors' => [
+						'Attempt interval' => 'A time unit is expected.'
 					]
 				]
 			],
+			// #19
 			[
 				[
 					'expected' => TEST_BAD,
@@ -542,11 +552,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with invalid parameter for attempt interval field',
 						'Attempt interval' => '1m'
 					],
-					'error' => [
-						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					'inline_errors' => [
+						'Attempt interval' => 'Value must be between 0 and 10s.'
 					]
 				]
 			],
+			// #20
 			[
 				[
 					'expected' => TEST_BAD,
@@ -557,11 +568,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with invalid parameter for attempt interval field',
 						'Attempt interval' => '-1s'
 					],
-					'error' => [
-						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					'inline_errors' => [
+						'Attempt interval' => 'A time unit is expected.'
 					]
 				]
 			],
+			// #21
 			[
 				[
 					'expected' => TEST_BAD,
@@ -572,11 +584,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with invalid parameter for attempt interval field',
 						'Attempt interval' => '11s'
 					],
-					'error' => [
-						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					'inline_errors' => [
+						'Attempt interval' => 'Value must be between 0 and 10s.'
 					]
 				]
 			],
+			// #22
 			[
 				[
 					'expected' => TEST_BAD,
@@ -587,12 +600,12 @@ class testFormConnectors extends CWebTest {
 						'Name' => 'Connector with invalid parameter for attempt interval field',
 						'Attempt interval' => '11111111111111111111111111111111'
 					],
-					'error' => [
-						'Invalid parameter "/1/attempt_interval": a number is too large.'
+					'inline_errors' => [
+						'Attempt interval' => 'Value must be between 0 and 10s.'
 					]
 				]
 			],
-			// 'Timeout' field validation checks.
+			// #23 'Timeout' field validation checks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -602,11 +615,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Timeout' => ''
 					],
-					'error' => [
-						'Incorrect value for field "timeout": cannot be empty.'
+					'inline_errors' => [
+						'Timeout' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #24
 			[
 				[
 					'expected' => TEST_BAD,
@@ -616,11 +630,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Timeout' => '0'
 					],
-					'error' => [
-						'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
 					]
 				]
 			],
+			// #25
 			[
 				[
 					'expected' => TEST_BAD,
@@ -630,11 +645,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Timeout' => '61s'
 					],
-					'error' => [
-						'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
 					]
 				]
 			],
+			// #26
 			[
 				[
 					'expected' => TEST_BAD,
@@ -644,11 +660,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Timeout' => '1h'
 					],
-					'error' => [
-						'Invalid parameter "/1/timeout": value must be one of 1-60.'
+					'inline_errors' => [
+						'Timeout' => 'Value must be between 1s and 60s (1m).'
 					]
 				]
 			],
+			// #27
 			[
 				[
 					'expected' => TEST_BAD,
@@ -658,12 +675,12 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Timeout' => STRING_255
 					],
-					'error' => [
-						'Invalid parameter "/1/timeout": a time unit is expected.'
+					'inline_errors' => [
+						'Timeout' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Tags validation checks.
+			// #28 Tags validation checks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -673,11 +690,12 @@ class testFormConnectors extends CWebTest {
 						'id:tags_0_tag' => '',
 						'id:tags_0_value' => 'value'
 					],
-					'error' => [
-						'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'inline_errors' => [
+						'id:tags_0_tag' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #29
 			[
 				[
 					'expected' => TEST_BAD,
@@ -687,11 +705,12 @@ class testFormConnectors extends CWebTest {
 						'id:tags_0_tag' => ' ',
 						'id:tags_0_value' => 'value'
 					],
-					'error' => [
-						'Invalid parameter "/1/tags/1/tag": cannot be empty.'
+					'inline_errors' => [
+						'id:tags_0_tag' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #30
 			[
 				[
 					'expected' => TEST_BAD,
@@ -704,11 +723,12 @@ class testFormConnectors extends CWebTest {
 						'id:tags_1_tag' => '',
 						'id:tags_1_value' => 'value'
 					],
-					'error' => [
-						'Invalid parameter "/1/tags/2/tag": cannot be empty.'
+					'inline_errors' => [
+						'id:tags_1_tag' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #31
 			[
 				[
 					'expected' => TEST_BAD,
@@ -721,12 +741,12 @@ class testFormConnectors extends CWebTest {
 						'id:tags_1_tag' => 'tag',
 						'id:tags_1_value' => 'value'
 					],
-					'error' => [
-						'Invalid parameter "/1/tags/2": value (tag, operator, value)=(tag, 0, value) already exists.'
+					'inline_errors' => [
+						'id:tags_1_tag' => 'Tag filter name, operator and value combination is not unique.'
 					]
 				]
 			],
-			// Custom 'Max records per message' validation check.
+			// #32 Custom 'Max records per message' validation check.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -737,12 +757,12 @@ class testFormConnectors extends CWebTest {
 						'Max records per message' => 'Custom',
 						'id:max_records' => '2147483648'
 					],
-					'error' => [
-						'Incorrect value "2147483648" for "max_records" field.'
+					'inline_errors' => [
+						'id:max_records' => 'This value is not a valid integer.'
 					]
 				]
 			],
-			// Checks with multiple errors.
+			// #33 Checks with multiple errors.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -753,12 +773,13 @@ class testFormConnectors extends CWebTest {
 						'Concurrent sessions' => '0',
 						'Attempts' => '0'
 					],
-					'error' => [
-						'Incorrect value for field "max_senders": value must be no less than "1".',
-						'Incorrect value for field "max_attempts": value must be no less than "1".'
+					'inline_errors' => [
+						'Concurrent sessions' => 'This value must be no less than "1".',
+						'Attempts' => 'This value must be no less than "1".'
 					]
 				]
 			],
+			// #34
 			[
 				[
 					'expected' => TEST_BAD,
@@ -771,15 +792,16 @@ class testFormConnectors extends CWebTest {
 						'Concurrent sessions' => '0',
 						'Attempts' => '6'
 					],
-					'error' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "url": cannot be empty.',
-						'Incorrect value "2147483648" for "max_records" field.',
-						'Incorrect value for field "max_senders": value must be no less than "1".',
-						'Incorrect value for field "max_attempts": value must be no greater than "5".'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'URL' => 'This field cannot be empty.',
+						'id:max_records' => 'This value is not a valid integer.',
+						'Concurrent sessions' => 'This value must be no less than "1".',
+						'Attempts' => 'This value must be no greater than "5".'
 					]
 				]
 			],
+			// #35
 			[
 				[
 					'expected' => TEST_BAD,
@@ -790,12 +812,13 @@ class testFormConnectors extends CWebTest {
 						'HTTP authentication' => 'Bearer',
 						'Timeout' => ''
 					],
-					'error' => [
-						'Incorrect value for field "token": cannot be empty.',
-						'Incorrect value for field "timeout": cannot be empty.'
+					'inline_errors' => [
+						'Bearer token' => 'This field cannot be empty.',
+						'Timeout' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// #36
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -805,6 +828,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #37
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -820,6 +844,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #38
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -835,6 +860,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #39
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -850,6 +876,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #40
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -869,6 +896,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #41
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -900,6 +928,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #42
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -925,6 +954,7 @@ class testFormConnectors extends CWebTest {
 					'trim' => true
 				]
 			],
+			// #43
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -946,6 +976,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #44
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -967,6 +998,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #45
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -978,6 +1010,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #46
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -989,6 +1022,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #47
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1001,6 +1035,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #48
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1013,6 +1048,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #49
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1025,6 +1061,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #50
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1037,6 +1074,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #51
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1050,6 +1088,7 @@ class testFormConnectors extends CWebTest {
 					'trim' => true
 				]
 			],
+			// #52
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1067,6 +1106,7 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// #53
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1145,7 +1185,7 @@ class testFormConnectors extends CWebTest {
 		$form->submit();
 
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update connector' : 'Cannot create connector'), $data['error']);
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::CONNECTOR_SQL));
 			$dialog->close();
 		}
@@ -1276,8 +1316,8 @@ class testFormConnectors extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'Name' => self::DELETE_CONNECTOR,
-					'error' => [
-						'Connector "'.self::DELETE_CONNECTOR.'" already exists.'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			]
@@ -1314,8 +1354,7 @@ class testFormConnectors extends CWebTest {
 		}
 		else {
 			$form->submit();
-			$this->assertMessage(TEST_BAD, 'Cannot create connector', $data['error']);
-			CMessageElement::find()->one()->close();
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM connector WHERE name='.zbx_dbstr($data['Name'])));
 		}
 
@@ -1392,16 +1431,14 @@ class testFormConnectors extends CWebTest {
 		foreach ($data as $scheme) {
 			$form->fill(['URL' => $scheme]);
 			$form->submit();
-			$message = CMessageElement::find()->one();
 
 			if ($expected === TEST_GOOD) {
 				$this->assertMessage(TEST_GOOD, 'Connector updated');
-				$message->close();
+				CMessageElement::find()->one()->close();
 				$this->query('link', self::DEFAULT_CONNECTOR)->one()->click();
 			}
 			else {
-				$this->assertMessage(TEST_BAD, 'Cannot update connector', 'Invalid parameter "/1/url": unacceptable URL.');
-				$message->close();
+				$this->assertInlineError($form, ['URL' => 'Unacceptable URL.']);
 			}
 		}
 

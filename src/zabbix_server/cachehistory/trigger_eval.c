@@ -302,6 +302,14 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 			continue;
 		}
 
+		if (ITEM_VALUE_TYPE_JSON == item->value_type)
+		{
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
+					func->parameter, "json-type items are not supported in functions");
+			continue;
+		}
+
 		/* do not evaluate if the item is disabled or belongs to a disabled host */
 
 		if (ITEM_STATUS_ACTIVE != item->status)
@@ -687,7 +695,7 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 
 	if (0 != items_num)
 	{
-		zbx_dc_config_clean_history_sync_items(items, items_err, (size_t)items_num);
+		zbx_dc_config_clean_history_sync_items(items, (size_t)items_num);
 		zbx_free(items);
 		zbx_free(items_err);
 	}

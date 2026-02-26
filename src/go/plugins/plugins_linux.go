@@ -30,6 +30,7 @@ import (
 	_ "golang.zabbix.com/agent2/plugins/proc"
 	_ "golang.zabbix.com/agent2/plugins/redis"
 	_ "golang.zabbix.com/agent2/plugins/smart"
+	_ "golang.zabbix.com/agent2/plugins/system/boottime"
 	_ "golang.zabbix.com/agent2/plugins/system/cpu"
 	_ "golang.zabbix.com/agent2/plugins/system/hw"
 	_ "golang.zabbix.com/agent2/plugins/system/localtime"

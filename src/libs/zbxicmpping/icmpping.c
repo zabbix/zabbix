@@ -1061,8 +1061,7 @@ static int	hosts_ping(zbx_fping_host_t *hosts, int hosts_count, int requests_cou
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())
 	{
-		if (SUCCEED != zbx_get_address_family(config_icmpping->get_source_ip(), &family, error,
-				(int)max_error_len))
+		if (SUCCEED != zbx_get_ip_family(config_icmpping->get_source_ip(), &family, error, (int)max_error_len))
 			goto out;
 
 		if (family == PF_INET)

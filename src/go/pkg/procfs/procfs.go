@@ -1,6 +1,3 @@
-//go:build linux
-// +build linux
-
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -20,7 +17,6 @@ package procfs
 import (
 	"bytes"
 	"errors"
-	"fmt"
 	"strconv"
 	"strings"
 	"syscall"
@@ -32,28 +28,6 @@ const (
 	gB = mB * 1024
 	tB = gB * 1024
 )
-
-// GetMemory reads /proc/meminfo file and returns and returns the value in bytes for the
-// specific memory type. Returns an error if the value was not found, or if there is an issue
-// with reading the file or parsing the value.
-func GetMemory(memType string) (mem uint64, err error) {
-	meminfo, err := ReadAll("/proc/meminfo")
-	if err != nil {
-		return mem, fmt.Errorf("cannot read meminfo file: %s", err.Error())
-	}
-
-	var found bool
-	mem, found, err = ByteFromProcFileData(meminfo, memType)
-	if err != nil {
-		return mem, fmt.Errorf("cannot get the memory amount for %s: %s", memType, err.Error())
-	}
-
-	if !found {
-		return mem, fmt.Errorf("cannot get the memory amount for %s", memType)
-	}
-
-	return
-}
 
 // ReadAll reads all data from a file. Returns an error if there is an issue with reading the file or
 // writing the output.

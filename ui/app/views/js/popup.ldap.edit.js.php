@@ -21,16 +21,16 @@
 
 window.ldap_edit_popup = new class {
 
-	constructor() {
-		this.overlay = null;
-		this.dialogue = null;
-		this.form = null;
-	}
+	#overlay;
+	#dialogue;
+	#form_element;
+	#form;
 
-	init({provision_groups, provision_media}) {
-		this.overlay = overlays_stack.getById('ldap_edit');
-		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+	init({rules, provision_groups, provision_media}) {
+		this.#overlay = overlays_stack.getById('ldap_edit');
+		this.#dialogue = this.#overlay.$dialogue[0];
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 		this.allow_jit_chbox = document.getElementById('provision_status');
 		this.provision_groups_table = document.getElementById('ldap-user-groups-table');
 
@@ -42,6 +42,8 @@ window.ldap_edit_popup = new class {
 		this._renderProvisionMedia(provision_media);
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
+
+		this.#form.discoverAllFields();
 	}
 
 	_addEventListeners() {
@@ -83,10 +85,16 @@ window.ldap_edit_popup = new class {
 			document.getElementById('bind-password-btn').addEventListener('click', this.showPasswordField);
 			document.getElementById('host').addEventListener('change', this.showPasswordFieldWithWarning.bind(this));
 		}
+
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
+		this.#overlay.$dialogue.$footer[0].querySelector('.js-test')
+			.addEventListener('click', () => this.#openTestPopup());
 	}
 
 	toggleAllowJitProvisioning(checked) {
-		for (const element of this.form.querySelectorAll('.allow-jit-provisioning')) {
+		for (const element of this.#form_element.querySelectorAll('.allow-jit-provisioning')) {
 			element.classList.toggle('<?= ZBX_STYLE_DISPLAY_NONE ?>', !checked);
 		}
 
@@ -134,100 +142,72 @@ window.ldap_edit_popup = new class {
 		}
 	}
 
-	openTestPopup() {
-		let fields = {...{provision_status: <?= JIT_PROVISIONING_DISABLED ?>}, ...getFormFields(this.form)};
-		fields = this.preprocessFormFields(fields);
-
-		const test_overlay = PopUp('popup.ldap.test.edit', fields,
-			{dialogueid: 'ldap_test_edit', dialogue_class: 'modal-popup-medium'}
-		);
-		test_overlay.xhr.then(() => this.overlay.unsetLoading());
-	}
-
-	submit() {
-		this.removePopupMessages();
-		this.overlay.setLoading();
-
-		const fields = this.preprocessFormFields(getFormFields(this.form));
-		const curl = new Curl(this.form.getAttribute('action'));
-
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				overlayDialogueDestroy(this.overlay.dialogueid);
-
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
-			})
-			.catch((exception) => {
-				let title;
-				let messages = [];
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					title = <?= json_encode(_('Unexpected server error.')) ?>;
-				}
-
-				const message_box = makeMessageBox('bad', messages, title, true, true)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
-	}
-
-	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
-			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
-				el.parentNode.removeChild(el);
-			}
-		}
-	}
-
-	preprocessFormFields(fields) {
-		this.trimFields(fields);
-
-		if (fields.provision_status != <?= JIT_PROVISIONING_ENABLED ?>) {
-			delete fields.group_basedn;
-			delete fields.group_name;
-			delete fields.group_member;
-			delete fields.group_filter;
-			delete fields.group_membership;
-			delete fields.user_username;
-			delete fields.user_lastname;
-			delete fields.provision_groups;
-			delete fields.provision_media;
-		}
-
-		if (fields.userdirectoryid == null) {
-			delete fields.userdirectoryid;
-		}
-
-		return fields;
-	}
-
-	trimFields(fields) {
-		const fields_to_trim = ['name', 'host', 'base_dn', 'bind_dn', 'search_attribute', 'search_filter',
-			'description', 'group_basedn', 'group_name', 'group_member', 'group_filter', 'group_membership',
-			'user_username', 'user_lastname'
+	#openTestPopup() {
+		const test_fields = ['host', 'port', 'base_dn', 'search_attribute', 'provision_status',
+			'provision_groups', 'provision_media'
 		];
 
-		for (const field of fields_to_trim) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
+		test_fields.forEach(fieldname => {
+			this.#form.findFieldByName(fieldname).setChanged();
+		});
+
+		this.#form.validateFieldsForAction(test_fields).then((result) => {
+			if (!result) {
+				this.#overlay.unsetLoading();
+				return;
 			}
-		}
+
+			const fields = this.#form.getAllValues();
+
+			const test_overlay = PopUp('popup.ldap.test.edit', fields,
+				{dialogueid: 'ldap_test_edit', dialogue_class: 'modal-popup-medium'}
+			);
+			test_overlay.xhr.then(() => this.#overlay.unsetLoading());
+		});
+	}
+
+	#submit() {
+		this.#removePopupMessages();
+		this.#overlay.setLoading();
+		const fields = this.#form.getAllValues();
+
+		this.#form.validateSubmit(fields).then(result => {
+			if (!result) {
+				this.#overlay.unsetLoading();
+
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', 'popup.ldap.check');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+
+					if ('form_errors' in response) {
+						this.#form.setErrors(response.form_errors, true, true);
+						this.#form.renderErrors();
+
+						return;
+					}
+
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.finally(() => {
+					this.#overlay.unsetLoading();
+				});
+		});
 	}
 
 	editProvisionGroup(row = null) {
@@ -241,7 +221,8 @@ window.ldap_edit_popup = new class {
 
 			popup_params = {
 				add_group: 1,
-				name: ''
+				name: '',
+				existing_names: this.#getExistingNames('provision_groups')
 			};
 		}
 		else {
@@ -250,7 +231,7 @@ window.ldap_edit_popup = new class {
 			popup_params.name = row.querySelector(`[name="provision_groups[${row_index}][name]"`).value;
 
 			const user_groups = row.querySelectorAll(
-				`[name="provision_groups[${row_index}][user_groups][][usrgrpid]"`
+				`[name="provision_groups[${row_index}][user_groups][]"`
 			);
 			if (user_groups.length) {
 				popup_params.usrgrpid = [...user_groups].map(usrgrp => usrgrp.value);
@@ -263,6 +244,7 @@ window.ldap_edit_popup = new class {
 		}
 
 		popup_params.idp_type = <?= IDP_TYPE_LDAP ?>;
+		popup_params.existing_names = this.#getExistingNames('provision_groups', row_index);
 
 		const overlay = PopUp('popup.usergroupmapping.edit', popup_params,
 			{dialogueid: 'user_group_edit', dialogue_class: 'modal-popup-medium'}
@@ -310,7 +292,7 @@ window.ldap_edit_popup = new class {
 			const mapping = {...e.detail, ...{row_index: row_index}};
 
 			if (row === null) {
-				this.dialogue
+				this.#dialogue
 					.querySelector('#ldap-media-type-mapping-table tbody')
 					.appendChild(this._renderProvisionMediaRow(mapping));
 			}
@@ -321,10 +303,10 @@ window.ldap_edit_popup = new class {
 	}
 
 	_renderProvisionGroups(groups) {
-		for (const key in groups) {
+		for (const [key, group] of Object.entries(groups)) {
 			this.provision_groups_table
 				.querySelector('tbody')
-				.appendChild(this._renderProvisionGroupRow({...groups[key], ...{row_index: key}}));
+				.appendChild(this._renderProvisionGroupRow({...group, ...{row_index: key}}));
 		}
 	}
 
@@ -336,18 +318,21 @@ window.ldap_edit_popup = new class {
 		};
 
 		const template = document.createElement('template');
-		const template_row = new Template(this._templateProvisionGroupRow());
+		const template_row = new Template(document.getElementById('ldap-user-groups-row-tmpl').innerHTML);
 		template.innerHTML = template_row.evaluate({...group, ...attributes}).trim();
 		const row = template.content.firstChild;
 
 		if ('user_groups' in group) {
+			const div = row.querySelector(`#provision-groups-${group.row_index}-user-groups`);
+
 			for (const user of Object.values(group.user_groups)) {
 				const input = document.createElement('input');
-				input.name = 'provision_groups[' + group.row_index + '][user_groups][][usrgrpid]';
+				input.name = 'provision_groups[' + group.row_index + '][user_groups][]';
 				input.value = user.usrgrpid;
 				input.type = 'hidden';
+				input.setAttribute('data-field-type', 'hidden');
 
-				row.appendChild(input);
+				div.appendChild(input);
 			}
 		}
 
@@ -356,6 +341,7 @@ window.ldap_edit_popup = new class {
 			input.name = 'provision_groups[' + group.row_index + '][roleid]';
 			input.value = group.roleid;
 			input.type = 'hidden';
+			input.setAttribute('data-field-type', 'hidden');
 
 			row.appendChild(input);
 		}
@@ -363,58 +349,64 @@ window.ldap_edit_popup = new class {
 		return row;
 	}
 
-	_templateProvisionGroupRow() {
-		return `
-			<tr data-row_index="#{row_index}">
-				<td>
-					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-					<input type="hidden" name="provision_groups[#{row_index}][name]" value="#{name}">
-				</td>
-				<td class="wordbreak">#{user_group_names}</td>
-				<td class="wordbreak">#{role_name}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>
-		`;
-	}
-
 	_renderProvisionMedia(provision_media) {
-		for (const key in provision_media) {
+		for (const [key, media] of Object.entries(provision_media)) {
 			document
 				.querySelector('#ldap-media-type-mapping-table tbody')
-				.appendChild(this._renderProvisionMediaRow({...provision_media[key], ...{row_index: key}}));
+				.appendChild(this._renderProvisionMediaRow({...media, ...{row_index: key}}));
 		}
 	}
 
 	_renderProvisionMediaRow(provision_media) {
-		const template_ldap_media_mapping_row = new Template(`
-			<tr data-row_index="#{row_index}">
-				<td>
-					<a href="javascript:void(0);" class="wordwrap js-edit">#{name}</a>
-					<input type="hidden" name="provision_media[#{row_index}][userdirectory_mediaid]" value="#{userdirectory_mediaid}">
-					<input type="hidden" name="provision_media[#{row_index}][name]" value="#{name}">
-					<input type="hidden" name="provision_media[#{row_index}][mediatype_name]" value="#{mediatype_name}">
-					<input type="hidden" name="provision_media[#{row_index}][mediatypeid]" value="#{mediatypeid}">
-					<input type="hidden" name="provision_media[#{row_index}][attribute]" value="#{attribute}">
-					<input type="hidden" name="provision_media[#{row_index}][period]" value="#{period}">
-					<input type="hidden" name="provision_media[#{row_index}][severity]" value="#{severity}">
-					<input type="hidden" name="provision_media[#{row_index}][active]" value="#{active}">
-				</td>
-				<td class="wordbreak">#{mediatype_name}</td>
-				<td class="wordbreak">#{attribute}</td>
-				<td>
-					<button type="button" class="<?= ZBX_STYLE_BTN_LINK ?> js-remove"><?= _('Remove') ?></button>
-				</td>
-			</tr>`);
+		const template_ldap_media_mapping_row = new Template(
+			document.getElementById('ldap-media-type-mapping-tmpl').outerHTML
+		);
 
-		const template = document.createElement('template');
-		template.innerHTML = template_ldap_media_mapping_row.evaluate(provision_media).trim();
+		const template = template_ldap_media_mapping_row.evaluateToElement(provision_media);
 
 		if (provision_media.userdirectory_mediaid === undefined) {
-			template.content.firstChild.querySelector('[name$="[userdirectory_mediaid]"]').remove();
+			template.content.querySelector('[name$="[userdirectory_mediaid]"]').remove();
 		}
 
-		return template.content.firstChild;
+		return template.content;
 	}
-}();
+
+	#getExistingNames(fieldname, exclude_row_index = null) {
+		const fields = this.#form.getAllValues();
+		const result = [];
+
+		if (fieldname in fields && typeof fields[fieldname] === 'object') {
+			Object.entries(fields[fieldname]).forEach(([key, row]) => {
+				if (key !== exclude_row_index) {
+					result.push(row.name);
+				}
+			});
+		}
+
+		return result;
+	}
+
+	#removePopupMessages() {
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
+	}
+};

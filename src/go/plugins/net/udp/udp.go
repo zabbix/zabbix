@@ -16,7 +16,6 @@ package udp
 
 import (
 	"bytes"
-	"errors"
 	"math"
 	"net"
 	"strconv"
@@ -25,6 +24,11 @@ import (
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
+)
+
+const (
+	udpListenIPv4FileLocation = "/proc/net/udp"
+	udpListenIPv6FileLocation = "/proc/net/udp6"
 )
 
 const (
@@ -48,25 +52,76 @@ const (
 	ntpScale            = 4294967296.0
 )
 
-var impl Plugin
-
-// Plugin -
+// Plugin udp plugin implementation.
 type Plugin struct {
 	plugin.Base
+
+	udpListen4Path string
+	udp6ListenPath string
 }
 
+//nolint:gochecknoinits // this is used solely for plugin registration.
 func init() {
+	impl := Plugin{}
+
 	err := plugin.RegisterMetrics(
 		&impl, "UDP",
 		"net.udp.service", "Checks if service is running and responding to UDP requests.",
 		"net.udp.service.perf", "Checks performance of UDP service.",
 		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.",
+		"net.udp.listen", "Checks if this UDP port is in LISTEN state.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
+	impl.udpListen4Path = udpListenIPv4FileLocation
+	impl.udp6ListenPath = udpListenIPv6FileLocation
 	impl.SetHandleTimeout(true)
+}
+
+// Export function that implements plugin.Exporter interface.
+//
+//nolint:gocyclo,cyclop // this is an Export function that delegates its calls further.
+func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
+	switch key {
+	case "net.udp.service", "net.udp.service.perf":
+		if len(params) > 3 {
+			return nil, errs.New(errorTooManyParams)
+		}
+
+		if len(params) < 1 || (len(params) == 1 && params[0] == "") {
+			return nil, errs.New(errorInvalidFirstParam)
+		}
+
+		if params[0] != "ntp" {
+			return nil, errs.New(errorInvalidFirstParam)
+		}
+
+		if len(params) == 3 && params[2] != "" {
+			_, err := strconv.ParseUint(params[2], 10, 16)
+			if err != nil {
+				return nil, errs.New(errorInvalidThirdParam)
+			}
+		}
+
+		switch key {
+		case "net.udp.service":
+			return p.exportNetService(params, ctx.Timeout()), nil
+		case "net.udp.service.perf":
+			return p.exportNetServicePerf(params, ctx.Timeout()), nil
+		}
+
+	case "net.udp.socket.count":
+		return p.exportNetUDPSocketCount(params)
+	case "net.udp.listen":
+		return p.exportNetUDPListen(params)
+	default:
+		return nil, errs.New(errorUnsupportedMetric)
+	}
+
+	/* SHOULD_NEVER_HAPPEN */
+	return nil, errs.New(errorUnsupportedMetric)
 }
 
 func (p *Plugin) createRequest(req []byte) {
@@ -209,41 +264,4 @@ func (p *Plugin) exportNetServicePerf(params []string, timeout int) float64 {
 		return elapsedTime
 	}
 	return 0.0
-}
-
-// Export -
-func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-	switch key {
-	case "net.udp.service", "net.udp.service.perf":
-		if len(params) > 3 {
-			err = errors.New(errorTooManyParams)
-			return
-		}
-		if len(params) < 1 || (len(params) == 1 && len(params[0]) == 0) {
-			err = errors.New(errorInvalidFirstParam)
-			return
-		}
-		if params[0] != "ntp" {
-			err = errors.New(errorInvalidFirstParam)
-			return
-		}
-
-		if len(params) == 3 && len(params[2]) != 0 {
-			if _, err = strconv.ParseUint(params[2], 10, 16); err != nil {
-				err = errors.New(errorInvalidThirdParam)
-				return
-			}
-		}
-
-		if key == "net.udp.service" {
-			return p.exportNetService(params, ctx.Timeout()), nil
-		} else if key == "net.udp.service.perf" {
-			return p.exportNetServicePerf(params, ctx.Timeout()), nil
-		}
-	case "net.udp.socket.count":
-		return p.exportNetUdpSocketCount(params)
-	}
-
-	/* SHOULD_NEVER_HAPPEN */
-	return nil, errors.New(errorUnsupportedMetric)
 }

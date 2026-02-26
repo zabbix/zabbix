@@ -212,7 +212,7 @@
 					url.searchParams.set('action', 'lldrule.list');
 					url.searchParams.set('context', this.context);
 
-					new_href = list_url.getUrl();
+					new_href = url.href;
 				}
 			}
 

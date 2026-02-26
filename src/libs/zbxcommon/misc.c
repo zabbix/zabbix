@@ -245,7 +245,8 @@ void	zbx_print_version(const char *title_message)
  *                                                                            *
  * Purpose: check if string is a valid internet hostname                      *
  *                                                                            *
- * Parameters: hostname - [IN] hostname string to be checked                  *
+ * Parameters: hostname -     [IN] hostname string to be checked              *
+ *             hostname_len - [IN] length of the hostname string              *
  *                                                                            *
  * Return value: SUCCEED - could be a valid hostname,                         *
  *               FAIL - definitely not a valid hostname                       *
@@ -256,7 +257,7 @@ void	zbx_print_version(const char *title_message)
  *         - underscores ('_') allowed in domain name, but not in hostname.   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_validate_hostname(const char *hostname)
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len)
 {
 	int		component;	/* periods ('.') are only allowed when they serve to delimit components */
 	int		len = ZBX_MAX_DNSNAME_LEN;
@@ -267,7 +268,7 @@ int	zbx_validate_hostname(const char *hostname)
 		return FAIL;
 
 	/* check only up to the first 'len' characters, the 1st character is already successfully checked */
-	for (p = hostname + 1, component = 1; '\0' != *p; p++)
+	for (p = hostname + 1, component = 1; p < hostname + hostname_len; p++)
 	{
 		if (0 == --len)				/* hostname too long */
 			return FAIL;
@@ -282,6 +283,27 @@ int	zbx_validate_hostname(const char *hostname)
 	}
 
 	return SUCCEED;
+}
+
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if string is a valid internet hostname                      *
+ *                                                                            *
+ * Parameters: hostname - [IN] hostname string to be checked                  *
+ *                                                                            *
+ * Return value: SUCCEED - could be a valid hostname,                         *
+ *               FAIL - definitely not a valid hostname                       *
+ * Comments:                                                                  *
+ *     Validation is not strict. Restrictions not checked:                    *
+ *         - individual label (component) length 1-63,                        *
+ *         - hyphens ('-') allowed only as interior characters in labels,     *
+ *         - underscores ('_') allowed in domain name, but not in hostname.   *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_validate_hostname(const char *hostname)
+{
+	return zbx_validate_hostname_len(hostname, strlen(hostname));
 }
 
 /******************************************************************************

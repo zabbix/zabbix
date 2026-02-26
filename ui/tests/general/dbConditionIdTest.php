@@ -14,13 +14,11 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/func.inc.php';
-require_once dirname(__FILE__).'/../include/CTest.php';
-require_once dirname(__FILE__).'/../../include/db.inc.php';
+require_once __DIR__.'/../include/CTest.php';
 
 class dbConditionIdTest extends CTest {
 
-	public static function provider() {
+	public static function provider(): array {
 		return [
 			[
 				['field', [0]],
@@ -52,8 +50,8 @@ class dbConditionIdTest extends CTest {
 	/**
 	 * @dataProvider provider
 	 */
-	public function test($params, $expected) {
-		$result = call_user_func_array('dbConditionId', $params);
+	public function test(array $params, string $expected): void {
+		$result = dbConditionId(...$params);
 
 		$this->assertSame($expected, $result);
 	}

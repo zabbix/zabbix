@@ -1230,6 +1230,7 @@ static void	var_vector_append_history_record(zbx_vector_history_record_t *values
 		case ITEM_VALUE_TYPE_NONE:
 			return;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
 			return;

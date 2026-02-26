@@ -15,7 +15,6 @@
 #include "pp_queue.h"
 #include "pp_task.h"
 #include "zbxalgo.h"
-#include "zbxpreprocbase.h"
 
 #define PP_TASK_QUEUE_INIT_NONE		0x00
 #define PP_TASK_QUEUE_INIT_LOCK		0x01

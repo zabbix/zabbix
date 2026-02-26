@@ -251,7 +251,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "idp_entityid": cannot be empty.'
+					'error' => ['IdP entity ID' => 'This field cannot be empty.']
 				]
 			],
 			// #1 Missing SSO service URL.
@@ -263,7 +263,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "sso_url": cannot be empty.'
+					'error' => ['SSO service URL' => 'This field cannot be empty.']
 				]
 			],
 			// #2 Missing Username attribute.
@@ -275,7 +275,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'IdP entity ID' => 'IdP',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Incorrect value for field "username_attribute": cannot be empty.'
+					'error' => ['Username attribute' => 'This field cannot be empty.']
 				]
 			],
 			// #3 Missing SP entity ID.
@@ -287,7 +287,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'IdP entity ID' => 'IdP',
 						'Username attribute' => 'UA'
 					],
-					'error' => 'Incorrect value for field "sp_entityid": cannot be empty.'
+					'error' => ['SP entity ID' => 'This field cannot be empty.']
 				]
 			],
 			// #4 Missing Group name attribute.
@@ -302,7 +302,10 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP entity ID' => 'SP entity',
 						'Configure JIT provisioning' => true
 					],
-					'error' => 'Incorrect value for field "saml_group_name": cannot be empty.'
+					'error' => [
+						'Group name attribute' => 'This field cannot be empty.',
+						'xpath:.//div[@data-field-name="saml_provision_groups"]' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #5 Missing Group name attribute.
@@ -318,7 +321,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Configure JIT provisioning' => true,
 						'Group name attribute' => 'group name attribute'
 					],
-					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+					'error' => ['xpath:.//div[@data-field-name="saml_provision_groups"]' => 'This field cannot be empty.']
 				]
 			],
 			// #6 Group mapping dialog form validation.
@@ -334,13 +337,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Group name attribute' => 'group name attribute'
 					],
 					'User group mapping' => [[]],
-					'mapping_error' => 'Invalid user group mapping configuration.',
-					'mapping_error_details' => [
-						'Field "roleid" is mandatory.',
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "user_groups" is mandatory.'
-					],
-					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+					'mapping_error' => true,
+					'error' => [
+						'SAML group pattern' => 'This field cannot be empty.',
+						'User groups' => 'This field cannot be empty.',
+						'User role' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #7 Media mapping dialog form validation.
@@ -355,13 +357,12 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Configure JIT provisioning' => true,
 						'Group name attribute' => 'group name attribute'
 					],
-					'User group mapping' => [[]],
-					'mapping_error' => 'Invalid media type mapping configuration.',
-					'mapping_error_details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "attribute": cannot be empty.'
-					],
-					'error' => 'Invalid parameter "/1/provision_groups": cannot be empty.'
+					'Media type mapping' => [[]],
+					'mapping_error' => true,
+					'error' => [
+						'Name' => 'This field cannot be empty.',
+						'Attribute' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #8 Missing IdP certificate.
@@ -375,7 +376,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'Username attribute' => 'UA',
 						'SP entity ID' => 'SP'
 					],
-					'error' => 'Invalid parameter "/1/idp_certificate": cannot be empty.'
+					'error' => ['IdP certificate' => 'This field cannot be empty.']
 				]
 			],
 			// #9 IdP certificate encoding validation.
@@ -390,7 +391,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP entity ID' => 'SP',
 						'IdP certificate' => STRING_32
 					],
-					'error' => 'Invalid parameter "/1/idp_certificate": a PEM-encoded certificate is expected.'
+					'error' => ['IdP certificate' => 'A PEM-encoded certificate is expected.']
 				]
 			],
 			// #10 IdP certificate max length validation.
@@ -405,7 +406,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'SP entity ID' => 'SP',
 						'IdP certificate' => STRING_6000.STRING_6000
 					],
-					'error' => 'Invalid parameter "/1/idp_certificate": value is too long.'
+					'error' => ['IdP certificate' => 'This value is too long.']
 				]
 			],
 			// #11 Missing SP private key.
@@ -424,7 +425,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'id:sign_messages' => true
 
 					],
-					'error' => 'Invalid parameter "/1/sp_private_key": cannot be empty.'
+					'error' => ['SP private key' => 'This field cannot be empty.']
 				]
 			],
 			// #12 SP private key encoding validation.
@@ -443,7 +444,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						// Sign.
 						'id:sign_assertions' => true
 					],
-					'error' => 'Invalid parameter "/1/sp_private_key": a PEM-encoded private key is expected.'
+					'error' => ['SP private key' => 'A PEM-encoded private key is expected.']
 				]
 			],
 			// #13 SP private key max length validation.
@@ -462,7 +463,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						// Sign.
 						'id:sign_authn_requests' => true
 					],
-					'error' => 'Invalid parameter "/1/sp_private_key": value is too long.'
+					'error' => ['SP private key' => 'This value is too long.']
 				]
 			],
 			// #14 Missing SP certificate.
@@ -481,7 +482,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'id:encrypt_nameid' => true
 
 					],
-					'error' => 'Invalid parameter "/1/sp_certificate": cannot be empty.'
+					'error' => ['SP certificate' => 'This field cannot be empty.']
 				]
 			],
 			// #15 SP certificate encoding validation.
@@ -500,7 +501,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						// Encrypt.
 						'id:encrypt_assertions' => true
 					],
-					'error' => 'Invalid parameter "/1/sp_certificate": a PEM-encoded certificate is expected.'
+					'error' => ['SP certificate' => 'A PEM-encoded certificate is expected.']
 				]
 			],
 			// #16 SP certificate max length validation.
@@ -520,7 +521,7 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 						'id:sign_logout_requests' => true,
 						'id:sign_logout_responses' => true
 					],
-					'error' => 'Invalid parameter "/1/sp_certificate": value is too long.'
+					'error' => ['SP certificate' => 'This value is too long.']
 				]
 			]
 		];
@@ -908,7 +909,14 @@ class testUsersAuthenticationSaml extends testFormAuthentication {
 
 		// Check SAML settings update messages and, in case of successful update, check that field values were saved.
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update authentication', $data['error']);
+			if (array_key_exists('mapping_error', $data)) {
+				$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+				$error_form = $dialog->asForm();
+			}
+			else {
+				$error_form = $this->query('id:authentication-form')->asForm()->one();
+			}
+			$this->assertInlineError($error_form, $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM settings'));
 		}
 		else {

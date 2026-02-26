@@ -21,6 +21,10 @@
 
 #include "test_get_value_telnet.h"
 
+#if defined(HAVE_SSH2)
+#	include <libssh2.h>
+#endif
+
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_dc_item_t	item;
@@ -29,6 +33,16 @@ void	zbx_mock_test_entry(void **state)
 	char 		*error = NULL;
 
 	ZBX_UNUSED(state);
+#if defined(HAVE_SSH2)
+	/* check https://lists.haxx.se/pipermail/libssh2-devel/2025-February/000135.html */
+	if (SUCCEED == zbx_mock_parameter_exists("in.skip_for_libssh2_and_below"))
+	{
+		size_t	skip_for_libssh2_below = zbx_mock_get_parameter_uint64("in.skip_for_libssh2_and_below");
+
+		if (LIBSSH2_VERSION_NUM >= skip_for_libssh2_below)
+			skip();
+	}
+#endif
 	test_type =  zbx_mock_get_parameter_string("in.type");
 	expected_code = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 

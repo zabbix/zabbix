@@ -1732,13 +1732,13 @@ class testFormHost extends CWebTest {
 		];
 
 		$form = $this->openForm($this->link, self::HOST_UPDATE_VISIBLE_NAME);
-		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
 		// Set name for field "Default".
 		$names = ['1' => 'default'];
 		$interfaces_form = $form->getFieldContainer('Interfaces')->asHostInterfaceElement(['names' => $names]);
 
 		$interfaces_form->fill(CTestArrayHelper::get($data, 'interfaces', []));
+		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 		$this->page->removeFocus();
 
 		if (!array_key_exists('inline_errors', $data) || CTestArrayHelper::get($data, 'submit_form')) {
@@ -2324,18 +2324,19 @@ class testFormHost extends CWebTest {
 
 					$expected_tags = [
 						[
-							'tag' => 'action',
-							'value' => 'update'
+							'Name' => 'action',
+							'Value' => 'update'
 						],
 						[
-							'tag' => 'tag without value',
-							'value' => ''
+							'Name' => 'tag without value',
+							'Value' => ''
 						],
 						[
-							'tag' => 'test',
-							'value' => 'update'
+							'Name' => 'test',
+							'Value' => 'update'
 						]
 					];
+
 					$tags_table->checkValue($expected_tags);
 
 					$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeadersText());
