@@ -47,7 +47,7 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
-//nolint:ST1005 disable capitalized error check, to be consistent with Zabbix agent
+// nolint:ST1005 // disable capitalized error check, to be consistent with Zabbix agent
 var errGetPwnamRFailed = errors.New("No such file or directory")
 
 // Plugin -
@@ -825,6 +825,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 		if errors.As(err, &u) {
 			return 0, nil
 		}
+
 		return nil, fmt.Errorf("Cannot obtain user information: %w", err)
 	}
 
