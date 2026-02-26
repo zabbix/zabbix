@@ -47,6 +47,7 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
+//nolint:ST1005 disable capitalized error check, to be consistent with Zabbix agent
 var errGetPwnamRFailed = errors.New("No such file or directory")
 
 // Plugin -
@@ -632,9 +633,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 					return 0, nil
 				}
 
-				if err != nil {
-					return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
-				}
+				return nil, fmt.Errorf("Cannot obtain user information: %w", err)
 			}
 		}
 		fallthrough
@@ -826,7 +825,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 		if errors.As(err, &u) {
 			return 0, nil
 		}
-		return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
+		return nil, fmt.Errorf("Cannot obtain user information: %w", err)
 	}
 
 	procs, err := getProcesses(flags)
@@ -877,9 +876,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					return "[]", nil
 				}
 
-				if err != nil {
-					return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
-				}
+				return nil, fmt.Errorf("Cannot obtain user information: %w", err)
 			}
 		}
 		fallthrough
@@ -902,7 +899,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
+		return nil, fmt.Errorf("Cannot obtain user information: %w", err)
 	}
 
 	if mode != "thread" {
