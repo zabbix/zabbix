@@ -47,8 +47,8 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
-// disable capitalized error check linter, to be consistent with Zabbix agent
-var errGetPwnamRFailed = errors.New("No such file or directory") //nolint:ST1005
+// disable capitalized error check linter, to be consistent with Zabbix agent.
+var errGetPwnamRFailed = errors.New("No such file or directory") //nolint:staticcheck
 
 // Plugin -
 type Plugin struct {
