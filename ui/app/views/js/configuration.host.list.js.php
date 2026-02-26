@@ -248,51 +248,51 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
 				.setColumns([
-					new CDataTableColumn('name', '<?= _('Name'); ?>')
+					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status', 'discoveryData',
 							'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
 							'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false),
-					new CDataTableColumn('items', '<?= _('Items'); ?>')
+					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['hostid', 'items'])
 						.setRenderer('items'),
-					new CDataTableColumn('triggers', '<?= _('Triggers'); ?>')
+					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['hostid', 'triggers'])
 						.setRenderer('triggers'),
-					new CDataTableColumn('graphs', '<?= _('Graphs'); ?>')
+					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
 						.setRenderer('graphs'),
-					new CDataTableColumn('discovery', '<?= _('Discovery'); ?>')
+					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['hostid', 'discoveryRules'])
 						.setRenderer('discovery'),
-					new CDataTableColumn('web', '<?= _('Web'); ?>')
+					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
 						.setRenderer('web'),
-					new CDataTableColumn('interface', '<?= _('Interface'); ?>')
+					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
 						.setFields(['interface']),
-					new CDataTableColumn('proxy', '<?= _('Proxy'); ?>')
+					new CDataTableColumn('proxy', <?= json_encode(_('Proxy')); ?>)
 						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
 							'proxy_group', 'assigned_proxy'])
 						.setRenderer('proxy')
 						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>)
 						.setTogglable(<?= !$show_monitored_by ? 'true' : 'false'; ?>),
-					new CDataTableColumn('templates', '<?= _('Templates'); ?>')
+					new CDataTableColumn('templates', <?= json_encode(_('Templates')); ?>)
 						.setFields(['templates', 'parentTemplates'])
 						.setRenderer('templates'),
-					new CDataTableColumn('status', '<?= _('Status'); ?>')
+					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['hostid', 'status', 'disabled_by_lld', 'disable_source', 'flags',
 							'maintenance_status', 'discoveryData'])
 						.setRenderer('status')
 						.setSortable(true),
-					new CDataTableColumn('availability', '<?= _('Availability'); ?>')
+					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
 						.setFields(['availability', 'active_available'])
 						.setRenderer('availability'),
-					new CDataTableColumn('encryption', '<?= _('Agent encryption'); ?>')
+					new CDataTableColumn('encryption', <?= json_encode(_('Agent encryption')); ?>)
 						.setFields(['tls_accept', 'tls_connect'])
 						.setRenderer('encryption'),
-					new CDataTableColumn('info', '<?= _('Info'); ?>')
+					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info_icons'])
 						.setRenderer('info'),
 					new CDataTableColumnTags('tags', '<?= _('Tags');?>'),
@@ -334,7 +334,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						else {
 							const discovery_rule = document.createElement('span');
 							discovery_rule.classList.add(ZBX_STYLE_ORANGE);
-							discovery_rule.innerText = '<?= _('Inaccessible discovery rule'); ?>';
+							discovery_rule.innerText = <?= json_encode(_('Inaccessible discovery rule')); ?>;
 
 							cell_inner.appendChild(discovery_rule);
 						}
@@ -356,8 +356,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
 							let hint = `${maintenance.name} [${maintenance.type
-								? '<?= _('Maintenance without data collection'); ?>'
-								: '<?= _('Maintenance with data collection'); ?>'}]`;
+								? <?= json_encode(_('Maintenance without data collection')); ?>
+								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + maintenance.description;
@@ -379,7 +379,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
 							maintenance_icon.setAttribute('type', 'button');
 							maintenance_icon.setAttribute('role', 'button');
-							maintenance_icon.setAttribute('data-hintbox-contents', '<?= _('Inaccessible maintenance'); ?>');
+							maintenance_icon.setAttribute('data-hintbox-contents', <?= json_encode(_('Inaccessible maintenance')); ?>);
 							maintenance_icon.setAttribute('data-hintbox', '1');
 
 							cell_inner.appendChild(maintenance_icon);
@@ -397,7 +397,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Items'); ?>';
+					item_link.innerText = <?= json_encode(_('Items')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -420,7 +420,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Triggers'); ?>';
+					item_link.innerText = <?= json_encode(_('Triggers')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -443,7 +443,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Graphs'); ?>';
+					item_link.innerText = <?= json_encode(_('Graphs')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -465,7 +465,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Discovery'); ?>';
+					item_link.innerText = <?= json_encode(_('Discovery')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -487,7 +487,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Web'); ?>';
+					item_link.innerText = <?= json_encode(_('Web')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -506,7 +506,9 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					const status_link = document.createElement('a');
 					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 					status_link.setAttribute('href', 'javascript:void(0);');
-					status_link.innerText = t(is_monitored ? 'Enabled' : 'Disabled');
+					status_link.innerText = is_monitored
+						? <?= json_encode(_('Enabled')); ?>
+						: <?= json_encode(_('Disabled')); ?>;
 					status_link.addEventListener('click', event => {
 						event.preventDefault();
 
@@ -543,7 +545,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, 'hintbox-wrap');
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
-						description_icon.setAttribute('data-hintbox-contents', t('Disabled automatically by an LLD rule.'));
+						description_icon.setAttribute('data-hintbox-contents',
+							<?= json_encode(_('Disabled automatically by an LLD rule.')); ?>);
 						description_icon.setAttribute('data-hintbox', '1');
 
 						cell_inner.innerHTML += ' ';
@@ -706,7 +709,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 						const none = document.createElement('span');
 						none.classList.add(ZBX_STYLE_STATUS_GREEN);
-						none.innerText = t('None');
+						none.innerText = <?= json_encode(_('None')); ?>;
 
 						const encryption = document.createElement('div');
 						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
@@ -720,13 +723,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 						// Incoming encryption.
 						if (tls_connect == HOST_ENCRYPTION_NONE) {
-							in_encryption.innerText = t('None');
+							in_encryption.innerText = <?= json_encode(_('None')); ?>;
 						}
 						else if (tls_connect == HOST_ENCRYPTION_PSK) {
-							in_encryption.innerText = t('PSK');
+							in_encryption.innerText = <?= json_encode(_('PSK')); ?>;
 						}
 						else {
-							in_encryption.innerText = t('CERT');
+							in_encryption.innerText = <?= json_encode(_('CERT')); ?>;
 						}
 
 						in_encryption.classList.add('in');
@@ -735,7 +738,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						out_encryption.classList.add('out');
 
 						const none = document.createElement('span');
-						none.innerText = t('None');
+						none.innerText = <?= json_encode(_('None')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 							none.classList.add(ZBX_STYLE_STATUS_GREEN);
@@ -747,7 +750,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						out_encryption.appendChild(none);
 
 						const psk = document.createElement('span');
-						psk.innerText = t('PSK');
+						psk.innerText = <?= json_encode(_('PSK')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 							psk.classList.add(ZBX_STYLE_STATUS_GREEN);
@@ -759,7 +762,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						out_encryption.appendChild(psk);
 
 						const cert = document.createElement('span');
-						cert.innerText = t('CERT');
+						cert.innerText = <?= json_encode(_('CERT')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
 							cert.classList.add(ZBX_STYLE_STATUS_GREEN);

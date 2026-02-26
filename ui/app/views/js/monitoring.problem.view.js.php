@@ -81,7 +81,7 @@
 
 			this.datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
-					new CDataTableColumn('time', '<?= _('Time'); ?>')
+					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
 						.setContextPopupData({
 							show_timeline: '1'
 						})
@@ -91,23 +91,23 @@
 						.setSortField('clock')
 						.setSortable(true)
 						.setWidth('max-content'),
-					new CDataTableColumn('severity', '<?= _('Severity'); ?>')
+					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
 						.setFields(['severity'])
 						.setRenderer('severity')
 						.setSortable(true)
 						.setWidth('max-content'),
-					new CDataTableColumn('recovery', '<?= _('Recovery time'); ?>')
+					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
 						.setFields(['recovery']),
-					new CDataTableColumn('status', '<?= _('Status'); ?>')
+					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['status']),
-					new CDataTableColumn('info', '<?= _('Info'); ?>')
+					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info']),
-					new CDataTableColumn('host', '<?= _('Host'); ?>')
+					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host'])
 						.setRenderer('host')
 						.setSortable(true)
 						.setWidth('max-content'),
-					new CDataTableColumn('problem', '<?= _('Problem'); ?>')
+					new CDataTableColumn('problem', <?= json_encode(_('Problem')); ?>)
 						.setContextPopupData({
 							show_opdata: '0',
 							details: '0',
@@ -119,21 +119,21 @@
 						.setSortable(true)
 						.setTogglable(false)
 						.setWidth('max-content'),
-					new CDataTableColumn('duration', '<?= _('Duration'); ?>')
+					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration']),
-					new CDataTableColumn('update', '<?= _('Update'); ?>')
+					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
 						.setFields(['can_be_closed', 'eventid'])
 						.setRenderer('update')
 						.setWidth('max-content'),
-					new CDataTableColumn('actions', '<?= _('Actions'); ?>')
+					new CDataTableColumn('actions', <?= json_encode(_('Actions')); ?>)
 						.setFields(['actions']),
-					new CDataTableColumn('opdata', '<?= _('Operational data'); ?>')
+					new CDataTableColumn('opdata', <?= json_encode(_('Operational data')); ?>)
 						.setFields(['opdata'])
 						.setVisible(false),
-					new CDataTableColumnTags('tags', '<?= _('Tags'); ?>'),
-					new CDataTableColumnTagValue('tagvalue', '<?= _('Tag value'); ?>')
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
 				])
-				.setOption('compact_view', t('Compact view'), {
+				.setOption('compact_view', <?= json_encode(_('Compact view')); ?>, {
 					onRender: option => {
 						this.datatable.getElement().classList.toggle('compact-view', option.checked);
 					},
@@ -144,7 +144,7 @@
 						this.datatable.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
 				})
-				.setOption('highlight_row', t('Highlight whole row'), {
+				.setOption('highlight_row', <?= json_encode(_('Highlight whole row')); ?>, {
 					onRender: option => {
 						this.datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
@@ -215,7 +215,7 @@
 								show_symptoms_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_CHEVRON_DOWN,
 									ZBX_STYLE_COLLAPSED);
 								show_symptoms_button.setAttribute('type', 'button');
-								show_symptoms_button.setAttribute('title', t('Expand'));
+								show_symptoms_button.setAttribute('title', <?= json_encode(_('Expand')); ?>);
 								show_symptoms_button.setAttribute('data-eventid', eventid);
 								show_symptoms_button.setAttribute('data-action', 'show_symptoms');
 
@@ -231,7 +231,7 @@
 								const symptom_icon = document.createElement('span');
 								symptom_icon.classList.add('icon', 'zi-arrow-top-right',
 									nested ? 'symptoms-right' : 'symptoms-left');
-								symptom_icon.setAttribute('title', t('Symptom'));
+								symptom_icon.setAttribute('title', <?= json_encode(_('Symptom')); ?>);
 
 								symptoms.append(symptom_icon);
 							}
@@ -362,13 +362,13 @@
 								maintenance_description = host.maintenance.description;
 							}
 							else {
-								maintenance_name = t('Inaccessible maintenance');
+								maintenance_name = <?= json_encode(_('Inaccessible maintenance')); ?>;
 								maintenance_description = '';
 							}
 
 							let hint = `${maintenance_name} [${maintenance_type
-								? t('Maintenance without data collection')
-								: t('Maintenance with data collection')}]`;
+								? <?= json_encode(_('Maintenance without data collection')); ?>
+								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance_description) {
 								hint += `\n${maintenance_description}`;
@@ -428,7 +428,7 @@
 						update_link = document.createElement('span');
 					}
 
-					update_link.innerText = t('Update');
+					update_link.innerText = <?= json_encode(_('Update')); ?>;
 
 					cell_inner.appendChild(update_link);
 				})

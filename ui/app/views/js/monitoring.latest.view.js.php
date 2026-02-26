@@ -172,11 +172,11 @@
 
 			this.datatable = new CDataTable(document.getElementById('latest'), data_provider)
 				.setColumns([
-					new CDataTableColumn('host', '<?= _('Host') ?>')
+					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('host')
 						.setSortable(true),
-					new CDataTableColumn('name', '<?= _('Name') ?>')
+					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setContextPopupData({
 							show_item_key: filter.show_item_key == 1
 						})
@@ -185,26 +185,26 @@
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false),
-					new CDataTableColumn('interval', '<?= _('Interval'); ?>')
+					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
 						.setVisible(false),
-					new CDataTableColumn('history', '<?= _('History'); ?>')
+					new CDataTableColumn('history', <?= json_encode(_('History')); ?>)
 						.setFields(['history'])
 						.setVisible(false),
-					new CDataTableColumn('trends', '<?= _('Trends'); ?>')
+					new CDataTableColumn('trends', <?= json_encode(_('Trends')); ?>)
 						.setFields(['trends'])
 						.setVisible(false),
-					new CDataTableColumn('type', '<?= _('Type'); ?>')
+					new CDataTableColumn('type', <?= json_encode(_('Type')); ?>)
 						.setFields(['type', 'state'])
 						.setRenderer('type')
 						.setVisible(false),
-					new CDataTableColumn('last_check', '<?= _('Last check') ?>')
+					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
 						.setFields(['last_check']),
-					new CDataTableColumn('last_value', '<?= _('Last value') ?>')
+					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
 						.setFields(['last_value']),
-					new CDataTableColumn('change', '<?= _('Change') ?>')
+					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change']),
-					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setRenderer('tags'),
 					new CDataTableColumn('actions', '')
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
@@ -212,7 +212,7 @@
 						.setResizable(false)
 						.setShowInCustomizeTable(false)
 						.setWidth('max-content'),
-					new CDataTableColumn('info', '<?= _('Info') ?>')
+					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
 						.setResizable(false)
 						.setWidth('max-content')
@@ -246,8 +246,8 @@
 					if (maintenance && host.status == HOST_STATUS_MONITORED) {
 						if (host.maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let hint = `${maintenance.name} [${maintenance.type
-								? '<?= _('Maintenance without data collection'); ?>'
-								: '<?= _('Maintenance with data collection'); ?>'}]`;
+								? <?= json_encode(_('Maintenance without data collection')); ?>
+								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + maintenance.description;
@@ -269,7 +269,7 @@
 								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
 							maintenance_icon.setAttribute('type', 'button');
 							maintenance_icon.setAttribute('role', 'button');
-							maintenance_icon.setAttribute('data-hintbox-contents', '<?= _('Inaccessible maintenance'); ?>');
+							maintenance_icon.setAttribute('data-hintbox-contents', <?= json_encode(_('Inaccessible maintenance')); ?>);
 							maintenance_icon.setAttribute('data-hintbox', '1');
 
 							cell_inner.appendChild(maintenance_icon);
@@ -353,13 +353,13 @@
 						const search_params = objectToSearchParams({action: 'showgraph', itemids: [itemid]});
 
 						data_link.setAttribute('href', `history.php?${search_params}`);
-						data_link.innerText = '<?= _('Graph'); ?>';
+						data_link.innerText = <?= json_encode(_('Graph')); ?>;
 					}
 					else {
 						const search_params = objectToSearchParams({action: 'showvalues', 'itemids[]': itemid});
 
 						data_link.setAttribute('href', `history.php?${search_params}`);
-						data_link.innerText = '<?= _('History'); ?>';
+						data_link.innerText = <?= json_encode(_('History')); ?>;
 					}
 
 					cell_inner.appendChild(data_link);

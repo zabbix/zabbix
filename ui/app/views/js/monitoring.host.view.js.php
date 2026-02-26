@@ -185,8 +185,8 @@
 					if (maintenance && status == HOST_STATUS_MONITORED) {
 						if (maintenance.status == HOST_MAINTENANCE_STATUS_ON) {
 							let hint = `${maintenance.name} [${maintenance.type
-								? '<?= _('Maintenance without data collection'); ?>'
-								: '<?= _('Maintenance with data collection'); ?>'}]`;
+								? <?= json_encode(_('Maintenance without data collection')); ?>
+								: <?= json_encode(_('Maintenance with data collection')); ?>}]`;
 
 							if (maintenance.description != '') {
 								hint += "\n" + maintenance.description;
@@ -208,7 +208,7 @@
 								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
 							maintenance_icon.setAttribute('type', 'button');
 							maintenance_icon.setAttribute('role', 'button');
-							maintenance_icon.setAttribute('data-hintbox-contents', '<?= _('Inaccessible maintenance'); ?>');
+							maintenance_icon.setAttribute('data-hintbox-contents', <?= json_encode(_('Inaccessible maintenance')); ?>);
 							maintenance_icon.setAttribute('data-hintbox', '1');
 
 							cell_inner.appendChild(maintenance_icon);
@@ -227,11 +227,11 @@
 
 					if (status == HOST_STATUS_MONITORED) {
 						indicator.classList.add(ZBX_STYLE_GREEN);
-						indicator.innerText = '<?= _('Enabled'); ?>';
+						indicator.innerText = <?= json_encode(_('Enabled')); ?>;
 					}
 					else {
 						indicator.classList.add(ZBX_STYLE_RED);
-						indicator.innerText = '<?= _('Disabled'); ?>';
+						indicator.innerText = <?= json_encode(_('Disabled')); ?>;
 					}
 
 					cell_inner.appendChild(indicator);
@@ -248,14 +248,14 @@
 
 						const latest_data_link = document.createElement('a');
 						latest_data_link.setAttribute('href', url.toString());
-						latest_data_link.innerText = '<?= _('Latest data'); ?>';
+						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
 
 						cell_inner.appendChild(latest_data_link);
 					}
 					else {
 						const latest_data_link = document.createElement('span');
 						latest_data_link.classList.add(ZBX_STYLE_DISABLED);
-						latest_data_link.innerText = '<?= _('Latest data'); ?>';
+						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
 
 						cell_inner.appendChild(latest_data_link);
 					}
@@ -279,7 +279,7 @@
 
 						const graphs_link = document.createElement('a');
 						graphs_link.setAttribute('href', url.toString());
-						graphs_link.innerText = '<?= _('Graphs'); ?>';
+						graphs_link.innerText = <?= json_encode(_('Graphs')); ?>;
 
 						cell_inner.appendChild(graphs_link);
 
@@ -300,7 +300,7 @@
 
 						const dashboards_link = document.createElement('a');
 						dashboards_link.setAttribute('href', url.toString());
-						dashboards_link.innerText = '<?= _('Dashboards'); ?>';
+						dashboards_link.innerText = <?= json_encode(_('Dashboards')); ?>;
 
 						cell_inner.appendChild(dashboards_link);
 
@@ -322,7 +322,7 @@
 
 						const web_link = document.createElement('a');
 						web_link.setAttribute('href', url.toString());
-						web_link.innerText = '<?= _('Web'); ?>';
+						web_link.innerText = <?= json_encode(_('Web')); ?>;
 
 						cell_inner.appendChild(web_link);
 

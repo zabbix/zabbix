@@ -99,43 +99,43 @@
 
 			this.datatable = new CDataTable(document.getElementById('templates'), data_provider)
 				.setColumns([
-					new CDataTableColumn('name', '<?= _('Name') ?>')
+					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['templateid', 'name'])
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false),
-					new CDataTableColumn('hosts', '<?= _('Hosts') ?>')
+					new CDataTableColumn('hosts', <?= json_encode(_('Hosts')); ?>)
 						.setFields(['templateid', 'hosts'])
 						.setRenderer('hosts'),
-					new CDataTableColumn('items', '<?= _('Items') ?>')
+					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['templateid', 'items'])
 						.setRenderer('items'),
-					new CDataTableColumn('triggers', '<?= _('Triggers') ?>')
+					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['templateid', 'triggers'])
 						.setRenderer('triggers'),
-					new CDataTableColumn('graphs', '<?= _('Graphs') ?>')
+					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['templateid', 'graphs'])
 						.setRenderer('graphs'),
-					new CDataTableColumn('dashboards', '<?= _('Dashboards') ?>')
+					new CDataTableColumn('dashboards', <?= json_encode(_('Dashboards')); ?>)
 						.setFields(['templateid', 'dashboards'])
 						.setRenderer('dashboards'),
-					new CDataTableColumn('discovery', '<?= _('Discovery') ?>')
+					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['templateid', 'discovery'])
 						.setRenderer('discovery'),
-					new CDataTableColumn('web', '<?= _('Web') ?>')
+					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['templateid', 'web'])
 						.setRenderer('web'),
-					new CDataTableColumn('vendor', '<?= _('Vendor') ?>')
+					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
 						.setFields(['vendor_name']),
-					new CDataTableColumn('version', '<?= _('Version') ?>')
+					new CDataTableColumn('version', <?= json_encode(_('Version')); ?>)
 						.setFields(['vendor_version']),
-					new CDataTableColumn('linked_templates', '<?= _('Linked templates') ?>')
+					new CDataTableColumn('linked_templates', <?= json_encode(_('Linked templates')); ?>)
 						.setFields(['parentTemplates'])
 						.setRenderer('linked_templates'),
-					new CDataTableColumn('linked_to_templates', '<?= _('Linked to templates') ?>')
+					new CDataTableColumn('linked_to_templates', <?= json_encode(_('Linked to templates')); ?>)
 						.setFields(['templates'])
 						.setRenderer('linked_to_templates'),
-					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setFields(['tags'])
 				])
 				.setPage(page)
@@ -185,12 +185,12 @@
 
 						const item_link = document.createElement('a');
 						item_link.setAttribute('href', url.toString());
-						item_link.innerText = '<?= _('Hosts'); ?>';
+						item_link.innerText = <?= json_encode(_('Hosts')); ?>;
 
 						cell_inner.appendChild(item_link);
 					}
 					else {
-						cell_inner.innerHTML += '<?= _('Hosts'); ?>';
+						cell_inner.innerHTML += <?= json_encode(_('Hosts')); ?>;
 					}
 
 					if (items > 0) {
@@ -212,7 +212,7 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Items'); ?>';
+					item_link.innerText = <?= json_encode(_('Items')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -235,7 +235,7 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Triggers'); ?>';
+					item_link.innerText = <?= json_encode(_('Triggers')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -258,7 +258,7 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Graphs'); ?>';
+					item_link.innerText = <?= json_encode(_('Graphs')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -280,7 +280,7 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Dashboards'); ?>';
+					item_link.innerText = <?= json_encode(_('Dashboards')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -302,7 +302,7 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Discovery'); ?>';
+					item_link.innerText = <?= json_encode(_('Discovery')); ?>;
 
 					cell_inner.appendChild(item_link);
 
@@ -324,7 +324,7 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = '<?= _('Web'); ?>';
+					item_link.innerText = <?= json_encode(_('Web')); ?>;
 
 					cell_inner.appendChild(item_link);
 
