@@ -162,20 +162,40 @@ class PostgresqlDbBackend extends DbBackend {
 	/**
 	 * Create connection to database server.
 	 *
-	 * @param string $host         Host name.
-	 * @param string $port         Port.
-	 * @param string $user         User name.
-	 * @param string $password     Password.
-	 * @param string $dbname       Database name.
-	 * @param string $schema       DB schema.
+	 * @param string $hosts_ports   Comma-separated host names and ports.
+	 * @param string $default_port  Default port.
+	 * @param string $user          User name.
+	 * @param string $password      Password.
+	 * @param string $dbname        Database name.
+	 * @param string $schema        DB schema.
 	 *
-	 * @param
-	 * @return resource|null
+	 * @return PgSql\Connection|null
 	 */
-	public function connect($host, $port, $user, $password, $dbname, $schema) {
+	public function connect($hosts_ports, $default_port, $user, $password, $dbname, $schema) {
 		$this->user = $user;
 		$this->dbname = $dbname;
 		$this->schema = ($schema) ? $schema : 'public';
+
+		$endpoints = self::parseEndpoints($hosts_ports);
+
+		// Build host and port lists for libpq.
+		$hosts = [];
+		$ports = [];
+
+		foreach ($endpoints as $endpoint) {
+			/*
+			 * Keep host exactly as returned. Preserves whitespace and brackets for IPv6. Connection can fail if
+			 * whitespaces are used after host name.
+			 */
+			$hosts[] = $endpoint['host'];
+
+			// Use endpoint port when present. If empty string, use $default_port.
+			$ports[] = trim($endpoint['port']) === '' ? $default_port : $endpoint['port'];
+		}
+
+		$host = implode(',', $hosts);
+		$port = implode(',', $ports);
+
 		$params = compact(['host', 'port', 'user', 'password', 'dbname']);
 
 		if ($this->tls_encryption && (bool) $this->tls_ca_file) {
@@ -193,10 +213,16 @@ class PostgresqlDbBackend extends DbBackend {
 			$conn_string .= ((bool) $param) ? $key.'=\''.pg_connect_escape($param).'\' ' : '';
 		}
 
-		$resource = @pg_connect($conn_string);
+		if (count($endpoints) > 1) {
+			$conn_string .= 'target_session_attrs=read-write';
+			$conn_string .= ' connect_timeout=3';
+		}
+
+		$resource = $this->doPgConnect($conn_string);
 
 		if (!$resource) {
 			$this->setError('Error connecting to database.');
+
 			return null;
 		}
 
@@ -260,5 +286,111 @@ class PostgresqlDbBackend extends DbBackend {
 		$result = DBfetch(DBselect(implode(' UNION ', $chunk_queries)));
 
 		return (bool) $result;
+	}
+
+	/**
+	 * Create connection to database server.
+	 *
+	 * @param string $conn_string  Connection string.
+	 *
+	 * @return PgSql\Connection|false
+	 */
+	protected function doPgConnect(string $conn_string) {
+		return @pg_connect($conn_string);
+	}
+
+	/**
+	 * Parse input string containing comma-separated host and port pairs. Host and port are separated by colon. Host can
+	 * be an IPv6 address enclosed in square brackets.
+	 *
+	 * @param string $input  Input string containing comma-separated host and port pairs.
+	 *
+	 * @return array
+	 */
+	public static function parseEndpoints(string $input): array {
+		// Split by comma, trimming whitespace around commas.
+		$tokens = preg_split('/\s*,\s*/u', $input);
+
+		return array_map(static function(string $token): array {
+			// Remove outer whitespace from the token (but keep internal spaces).
+			$token = trim($token);
+
+			// Empty token (e.g. ,, or token of only spaces).
+			if ($token === '') {
+				return [
+					'host' => '',
+					'port' => ''
+				];
+			}
+
+			// Bracketed IPv6 starting with '[' and having a closing ']'.
+			if (strpos($token, '[') === 0) {
+				$closing = strpos($token, ']');
+
+				if ($closing !== false) {
+					// Look for colon after the closing bracket.
+					$colon_pos = strpos($token, ':', $closing + 1);
+
+					if ($colon_pos !== false) {
+						/*
+						 * Host includes everything up to (but not including) the colon, so it keeps any spaces
+						 * between ']' and ':'.
+						 */
+						$host = substr($token, 0, $colon_pos);
+						// Preserves spaces after ':'.
+						$port = substr($token, $colon_pos + 1);
+
+						return [
+							'host' => $host,
+							'port' => $port
+						];
+					}
+
+					// Bracketed but no port.
+					return [
+						'host' => $token,
+						'port' => ''
+					];
+				}
+
+				// Starts with '[' but missing ']'. Treat as host and preserve as-is.
+				return [
+					'host' => $token,
+					'port' => ''
+				];
+			}
+
+			$colon_count = substr_count($token, ':');
+
+			// No colon. Only host, no port.
+			if ($colon_count == 0) {
+				return [
+					'host' => $token,
+					'port' => ''
+				];
+			}
+
+			// Multiple colons (unbracketed). Treat as unbracketed IPv6, keep whole token as host.
+			if ($colon_count >= 2) {
+				return [
+					'host' => $token,
+					'port' => ''
+				];
+			}
+
+			// Exactly one colon. Split at the first colon, preserve spaces on each side.
+			$colon_pos = strpos($token, ':');
+
+			// May contain trailing spaces.
+			$host = substr($token, 0, $colon_pos);
+
+			// May contain leading spaces.
+			$port = substr($token, $colon_pos + 1);
+
+			return [
+				'host' => $host,
+				'port' => $port
+			];
+		}, $tokens);
 	}
 }

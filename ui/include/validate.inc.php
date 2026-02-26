@@ -565,3 +565,28 @@ function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $optio
 
 	return true;
 }
+
+/**
+ * Validate PostgreSQL database ports. Parse the input string and then validate ports for each endpoint.
+ *
+ * @param string $input  Input string containing one or more endpoints with optional ports.
+ *
+ * @return string|null   Return the first invalid port or null if all ports are valid or not specified.
+ */
+function validatePostgresqlDbPorts(string $input): ?string {
+	$endpoints = PostgresqlDbBackend::parseEndpoints($input);
+
+	if ($endpoints) {
+		$port_parser = new CPortParser();
+
+		foreach ($endpoints as $endpoint) {
+			$port = trim($endpoint['port']);
+
+			if ($port !== '' && $port_parser->parse($port) != CParser::PARSE_SUCCESS) {
+				return $port;
+			}
+		}
+	}
+
+	return null;
+}

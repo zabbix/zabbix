@@ -599,7 +599,14 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_certificate', 0))->removeId(),
 				(new CVar('verify_host', 0))->removeId()
 			])
-			->addRow(new CLabel(_('Database type'), 'label-type'),
+			->addRow(new CLabel([
+					_('Database type'),
+					makeHelpIcon([
+						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
+						BR(),
+						_('If no port is specified, the "Database port" value is used.')
+					])
+				], 'label-type'),
 				(new CSelect('type'))
 					->setId('type')
 					->setFocusableElementId('label-type')
