@@ -19,8 +19,6 @@
  * @var array    $data
  */
 
-$data += ['provider_value_types' => []];
-
 $item = $data['item'];
 $readonly = $item['templated'] || $item['discovered'];
 $parent_lld_link = null;
@@ -742,7 +740,7 @@ $formgrid->addItem([
 $hint = null;
 if ($data['source'] === 'item'
 		&& ($data['host']['status'] == HOST_STATUS_MONITORED || $data['host']['status'] == HOST_STATUS_NOT_MONITORED)
-		&& ($data['provider_value_types'] || $data['config']['hk_history_global'])) {
+		&& ($data['value_type_ttl'] || $data['config']['hk_history_global'])) {
 	$link = _x('global housekeeping settings', 'item_form');
 
 	if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN) {

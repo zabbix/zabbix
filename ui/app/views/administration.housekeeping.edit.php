@@ -149,7 +149,7 @@ $house_keeper_tab = (new CFormList())
 	);
 
 foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage) {
-	$storage_value_types = array_filter($data['value_type_ttl'], fn($ttl) => $ttl['storage'] === $storage);
+	$storage_value_types = array_filter($data['value_type_ttl'], fn($ttl) => $ttl['provider'] === $storage);
 
 	if (!$storage_value_types) {
 		continue;
@@ -165,9 +165,7 @@ foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage
 	foreach ($storage_value_types as $value_type => $ttl) {
 		$house_keeper_tab->addRow(
 			new CLabel(itemValueTypeString($value_type)),
-			(new CTextBox('ttl', $ttl['value_ttl_label']))
-				->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-				->setEnabled(false)
+			$ttl['value_ttl_label'] === null ? _('Not available') : $ttl['value_ttl_label']
 		);
 	}
 }

@@ -394,8 +394,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['ZBX_SERVER_PORT'] = null;
 		$this->config['ZBX_SERVER_NAME'] = '';
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
-		// TBD: change to array or remove both
-		$this->config['HISTORY'] = null;
 		$this->config['HISTORY_PROVIDERS'] = [];
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;

@@ -94,14 +94,13 @@ class CHistoryManager {
 		$value_type_ttl = [];
 
 		foreach ($this->value_type_storage as $value_type => $storage) {
+			$value_type_ttl[$value_type] = ['provider' => $storage['provider']];
+
 			if (!array_key_exists('value_ttl', $storage)) {
 				continue;
 			}
 
-			$value_type_ttl[$value_type] = [
-				'storage' => $storage['provider'],
-				'value_ttl' => $storage['value_ttl']
-			];
+			$value_type_ttl[$value_type]['value_ttl'] = $storage['value_ttl'];
 		}
 
 		return $value_type_ttl;
@@ -796,10 +795,12 @@ class CHistoryManager {
 			return null;
 		}
 
+		$table = self::getTableName($item['value_type']).' h';
+
 		$query = 'SELECT '.self::getClickhouseSelectFieldsByValueType($item['value_type']).
-			' FROM '.self::getTableName($item['value_type']).' h'.
+			' FROM '.$table.
 			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-			' AND h.clock_ns<=fromUnixTimestamp64Nano('.($clock * 1000000000 + $ns).')'.
+				' AND h.clock_ns<=fromUnixTimestamp64Nano('.($clock * 1000000000 + $ns).')'.
 			' ORDER BY h.clock_ns DESC'.
 			' LIMIT 1';
 		$values = CClickhouseHelper::query($query, $storage);
@@ -1047,7 +1048,7 @@ class CHistoryManager {
 					'SELECT '.implode(',', $sql_sub_select).
 					' FROM '.self::getTableName($value_type).' h'.
 					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
-					$period_condition.
+						$period_condition.
 					' GROUP BY h.itemid,tick'.
 				') s',
 				$storage
@@ -1476,6 +1477,7 @@ class CHistoryManager {
 
 			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
 
+			// TBD: make as part of query
 			$period_condition = ' AND h.clock_ns BETWEEN toDateTime64('.$effective_time_from.', 9)'.
 				' AND toDateTime64('.$time_to.', 9)';
 
@@ -1780,9 +1782,8 @@ class CHistoryManager {
 			$hk_history = $storage['value_ttl'] ?? null;
 
 			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
-			// TBD: use clickhouse datetime64
-			$period_condition = ' AND h.clock_ns>=toDateTime64('.$effective_time_from.', 9)'.
-				($time_to !== null ? ' AND h.clock_ns<=toDateTime64('.$time_to.', 9)' : '');
+			// TBD: make as part of query
+			$period_condition = $time_to !== null ? ' AND h.clock_ns<=toDateTime64('.$time_to.', 9)' : '';
 
 			$values = CClickhouseHelper::query(
 				'SELECT s.itemid,s.value,toUnixTimestamp(s.ts) AS clock'.
@@ -1790,7 +1791,8 @@ class CHistoryManager {
 					'SELECT '.implode(',', $sql_select).
 					' FROM '.self::getTableName($value_type).' h'.
 					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
-					$period_condition.
+						' AND h.clock_ns>=toDateTime64('.$effective_time_from.', 9)'.
+						$period_condition.
 					' GROUP BY h.itemid'.
 				') s',
 				$storage
@@ -2051,9 +2053,9 @@ class CHistoryManager {
 		$result = true;
 
 		foreach ($terms as $value_type => $itemids) {
+			$table = self::getTableName($value_type);
+			$query = 'DELETE FROM '.$table.' WHERE '.dbConditionId('itemid', array_keys($itemids));
 			$storage = $this->getStorageForValueType($value_type);
-			$query = 'DELETE FROM '.self::getTableName($value_type).' h'.
-				' WHERE '.dbConditionId('h.itemid', array_keys($itemids));
 
 			if ($storage !== null && !CClickhouseHelper::query($query, $storage)) {
 				$result = false;

@@ -58,7 +58,7 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
-		this.value_type_ttl = source === 'item' ? value_type_ttl : {};
+		this.value_type_ttl = source === 'item' ? value_type_ttl : [];
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -793,12 +793,11 @@ window.item_edit_form = new class {
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
 			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
-			custom_ttl = Object.keys(this.value_type_ttl).includes(this.field.value_type.value);
+			custom_ttl = this.value_type_ttl.includes(parseInt(this.field.value_type.value, 10));
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);
 		this.label.history_hint?.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled || !custom_ttl);
-		// TBD: set tooltip text according custom TTL value
 	}
 
 	#updateTrendsModeVisibility() {

@@ -80,11 +80,6 @@ final class CSettingsSchema {
 			'default' => '',
 			'length' => 32
 		],
-		'dbversion_history_status' => [
-			'column' => 'value_str',
-			'default' => '',
-			'length' => 65
-		],
 		'dbversion_status' => [
 			'column' => 'value_str',
 			'default' => '',

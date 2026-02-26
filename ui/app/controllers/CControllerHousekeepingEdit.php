@@ -107,7 +107,11 @@ class CControllerHousekeepingEdit extends CController {
 			)),
 			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
 			'value_type_ttl' => array_map(
-				fn($v) => ['value_ttl_label' => array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0]] + $v,
+				fn($v) => $v + [
+					'value_ttl_label' => array_key_exists('value_ttl', $v)
+						? array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0]
+						: null
+					],
 				Manager::History()->getValueTypesStorageTtls()
 			)
 		];

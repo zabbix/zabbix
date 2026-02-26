@@ -182,7 +182,9 @@ class CControllerItemEdit extends CControllerItem {
 			],
 			'user' => ['debug_mode' => $this->getDebugMode()],
 			'value_type_ttl' => array_map(
-				fn ($v) => array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0],
+				fn ($v) => array_key_exists('value_ttl', $v)
+					? array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0]
+					: null,
 				Manager::History()->getValueTypesStorageTtls()
 			)
 		];
