@@ -153,7 +153,12 @@
 			);
 
 			if (!$curr_control.data('is-activated')) {
-				$('.btn-undo', $container).show();
+				const btn_undo = $('.btn-undo', $container)[0];
+
+				if (btn_undo) {
+					btn_undo.style.display = 'flex';
+				}
+
 				$curr_control.data('is-activated', true);
 			}
 
