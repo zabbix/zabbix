@@ -21,27 +21,31 @@
 
 window.mediatype_message_popup = new class {
 
-	init({message_templates}) {
+	init({rules, message_templates}) {
 		this.overlay = overlays_stack.getById('mediatype-message-form');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 		this.message_templates = Object.fromEntries(
 			message_templates.map((obj, index) => [index, { ...obj }])
 		);
 
-		this.#initActions();
+		this.#initEvents();
 	}
 
-	#initActions() {
-		this.form.querySelector('#message_type').onchange = (e) => {
+	#initEvents() {
+		this.form_element.querySelector('#message_type').onchange = (e) => {
 			const message_template = this.#getDefaultMessageTemplate(e.target.value);
 
-			if (this.form.querySelector('#subject') !== null) {
-				this.form.querySelector('#subject').value = message_template.subject;
+			if (this.form_element.querySelector('#subject') !== null) {
+				this.form_element.querySelector('#subject').value = message_template.subject;
 			}
 
-			this.form.querySelector('#message').value = message_template.message;
+			this.form_element.querySelector('#message').value = message_template.message;
 		};
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
 	}
 
 	/**
@@ -53,8 +57,8 @@ window.mediatype_message_popup = new class {
 	 */
 	#getDefaultMessageTemplate(message_type) {
 		const message_templates = this.message_templates;
-		const media_type = this.form.querySelector('#type').value;
-		const message_format = this.form.querySelector('#message_format').value;
+		const media_type = this.form_element.querySelector('#type').value;
+		const message_format = this.form_element.querySelector('#message_format').value;
 
 		if (media_type == <?= MEDIA_TYPE_SMS ?>) {
 			return {
@@ -75,12 +79,22 @@ window.mediatype_message_popup = new class {
 		};
 	}
 
-	submit() {
-		const curl = new Curl('zabbix.php');
-		const fields = getFormFields(this.form);
+	#submit() {
+		this.overlay.setLoading();
+		const fields = this.form.getAllValues();
 
-		curl.setArgument('action', 'mediatype.message.check');
-		this.#post(curl.getUrl(), fields);
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+					return;
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'mediatype.message.check');
+
+				this.#post(curl.getUrl(), fields);
+			});
 	}
 
 	/**
@@ -101,11 +115,17 @@ window.mediatype_message_popup = new class {
 					throw {error: response.error};
 				}
 
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+					return;
+				}
+
 				overlayDialogueDestroy(this.overlay.dialogueid);
 				this.dialogue.dispatchEvent(new CustomEvent('message.submit', {detail: response}));
 			})
 			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
+				for (const element of this.form_element.parentNode.children) {
 					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
 						element.parentNode.removeChild(element);
 					}
@@ -123,7 +143,7 @@ window.mediatype_message_popup = new class {
 
 				const message_box = makeMessageBox('bad', messages, title)[0];
 
-				this.form.parentNode.insertBefore(message_box, this.form);
+				this.form_element.parentNode.insertBefore(message_box, this.form_element);
 			})
 			.finally(() => this.overlay.unsetLoading());
 	}
