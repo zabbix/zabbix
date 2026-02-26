@@ -175,7 +175,10 @@ window.host_wizard_edit = new class {
 				fields: {
 					id: {
 						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/,
-						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>
+						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>,
+						messages: {
+							regex: <?= json_encode(_('Incorrect characters used for host name.')) ?>
+						}
 					}
 				}
 			},
@@ -2106,7 +2109,9 @@ window.host_wizard_edit = new class {
 				}
 
 				if (rule.regex && !rule.regex.test(value)) {
-					return <?= json_encode(_('This value does not match pattern.')) ?>;
+					return rule.messages && rule.messages.regex
+						? rule.messages.regex
+						: <?= json_encode(_('This value does not match pattern.')) ?>;
 				}
 			}
 
