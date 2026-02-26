@@ -47,7 +47,7 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
-var errGetPwnamRFailed = errors.New("getpwnam_r failed")
+var errGetPwnamRFailed = errors.New("No such file or directory")
 
 // Plugin -
 type Plugin struct {
@@ -289,7 +289,7 @@ func getUIDByName(userName string) (*uid, error) {
 	)
 
 	if errCode != 0 {
-		return nil, fmt.Errorf("%w getpwnam_r failed with code %d", errGetPwnamRFailed, int(errCode))
+		return nil, fmt.Errorf("[%d] %w", errCode, errGetPwnamRFailed)
 	}
 
 	if passwdC == nil {
@@ -632,7 +632,9 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 					return 0, nil
 				}
 
-				return nil, err
+				if err != nil {
+					return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
+				}
 			}
 		}
 		fallthrough
@@ -824,7 +826,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 		if errors.As(err, &u) {
 			return 0, nil
 		}
-		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
+		return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
 	}
 
 	procs, err := getProcesses(flags)
@@ -875,7 +877,9 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					return "[]", nil
 				}
 
-				return nil, err
+				if err != nil {
+					return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
+				}
 			}
 		}
 		fallthrough
@@ -898,7 +902,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
 	if err != nil {
-		return nil, fmt.Errorf("Failed to prepare query: %s", err.Error())
+		return nil, fmt.Errorf("Cannot obtain user information: %s", err.Error())
 	}
 
 	if mode != "thread" {
