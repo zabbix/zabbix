@@ -1251,6 +1251,7 @@ class testFormGraphs extends CWebTest {
 		$dialog->query('button:Delete')->waitUntilClickable()->one()->click();
 		$this->assertEquals('Delete graph'.$this->getGraphSuffix().'?', $this->page->getAlertText());
 		$this->page->acceptAlert();
+		$this->page->assertTitle('Configuration of graph prototypes');
 		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' deleted');
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
