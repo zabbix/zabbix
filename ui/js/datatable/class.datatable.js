@@ -864,8 +864,9 @@ class CDataTable {
 
 			const selector = `.${CDataTable.ZBX_STYLE_BODY}`;
 			const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
+			const thead_selector = `.${CDataTable.ZBX_STYLE_ROW} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
 
-			chkbxRange.init({selector, row_selector});
+			chkbxRange.init({selector, row_selector, thead_selector});
 		});
 	}
 

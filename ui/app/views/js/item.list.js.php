@@ -256,7 +256,6 @@
 
 						url.searchParams.set('action', 'item.list');
 						url.searchParams.set('context', this.context);
-						url.searchParams.set('filter_set', 1);
 
 						event.setRedirectUrl(url.href);
 					}
@@ -289,7 +288,6 @@
 
 					list_url.setArgument('action', 'item.list');
 					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
 					new_href = list_url.getUrl();
 				}
 			}

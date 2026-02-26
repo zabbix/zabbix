@@ -15,8 +15,7 @@
 
 
 class CLineGraphDraw extends CGraphDraw {
-	const GRAPH_WIDTH_MIN = 20;
-	const GRAPH_HEIGHT_MIN = 20;
+
 	const LEGEND_OFFSET_Y = 90;
 
 	private $cell_height_min;

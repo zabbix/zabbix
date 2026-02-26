@@ -28,14 +28,20 @@ use API,
 
 class WidgetView extends CControllerDashboardWidgetView {
 
+	private const GRAPH_WIDTH_MIN = 1;
+	private const GRAPH_WIDTH_MAX = 8000;
+
+	private const GRAPH_HEIGHT_MIN = 1;
+	private const GRAPH_HEIGHT_MAX = 4500;
+
 	protected function init(): void {
 		parent::init();
 
 		$this->addValidationRules([
 			'edit_mode' => 'in 0,1',
 			'dashboardid' => 'db dashboard.dashboardid',
-			'contents_width' => 'int32',
-			'contents_height' => 'int32',
+			'contents_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
+			'contents_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'has_custom_time_period' => 'in 1'
 		]);
 	}
