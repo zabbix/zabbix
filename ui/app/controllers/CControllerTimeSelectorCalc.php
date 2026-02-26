@@ -69,7 +69,6 @@ class CControllerTimeSelectorCalc extends CController {
 
 	protected function doAction() {
 		$range_time_parser = new CRangeTimeParser();
-		$time = time();
 
 		$time_period = [
 			'from' => $this->getInput('from'),
@@ -80,7 +79,7 @@ class CControllerTimeSelectorCalc extends CController {
 
 		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
 			if ($range_time_parser->parse($time_period[$field]) == CParser::PARSE_SUCCESS) {
-				$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from', null, $time)->getTimestamp();
+				$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
 			}
 			else {
 				$has_fields_errors = true;
@@ -91,7 +90,7 @@ class CControllerTimeSelectorCalc extends CController {
 		if (!$has_fields_errors) {
 			switch ($this->getInput('method')) {
 				case 'zoomout':
-					CTimePeriodHelper::zoomOut($time_period, $time);
+					CTimePeriodHelper::zoomOut($time_period);
 					break;
 
 				case 'rangeoffset':
@@ -104,7 +103,7 @@ class CControllerTimeSelectorCalc extends CController {
 			$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;
 
 			$min_period = CTimePeriodHelper::getMinPeriod();
-			$max_period = CTimePeriodHelper::getMaxPeriod($time);
+			$max_period = CTimePeriodHelper::getMaxPeriod();
 
 			$has_fields_errors = $period < $min_period || $period > $max_period + 1;
 		}

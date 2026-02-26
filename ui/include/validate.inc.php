@@ -477,7 +477,7 @@ function validateTimeSelectorPeriod($from, $to) {
 	foreach (['from' => $from, 'to' => $to] as $field => $value) {
 		$range_time_parser->parse($value);
 		$ts[$field] = $range_time_parser
-			->getDateTime($field === 'from',null, $ts['now'])
+			->getDateTime($field === 'from')
 			->getTimestamp();
 	}
 

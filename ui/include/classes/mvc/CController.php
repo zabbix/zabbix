@@ -280,11 +280,9 @@ abstract class CController {
 			return true;
 		}
 
-		$time = time();
-
 		try {
 			$min_period = CTimePeriodHelper::getMinPeriod();
-			$max_period = CTimePeriodHelper::getMaxPeriod($time);
+			$max_period = CTimePeriodHelper::getMaxPeriod();
 		}
 		catch (Exception $x) {
 			throw new CAccessDeniedException();
@@ -299,8 +297,7 @@ abstract class CController {
 
 		foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
 			$range_time_parser->parse($time_period[$field]);
-			$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from', null, $time)
-				->getTimestamp();
+			$time_period[$field_ts] = $range_time_parser->getDateTime($field === 'from')->getTimestamp();
 		}
 
 		$period = $time_period['to_ts'] - $time_period['from_ts'] + 1;

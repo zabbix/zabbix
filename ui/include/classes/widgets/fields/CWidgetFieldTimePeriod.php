@@ -66,7 +66,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 	public function validate(bool $strict = false): array {
 		$validation_rules = $this->getValidationRules($strict);
-		$time = time();
 
 		$value = $this->getValue();
 		$default = $this->getDefault();
@@ -142,7 +141,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 				}
 
 				if ($relative_time_parser->parse($field_value) === CParser::PARSE_SUCCESS) {
-					$datetime = $relative_time_parser->getDateTime($field === 'from', $this->timezone, $time);
+					$datetime = $relative_time_parser->getDateTime($field === 'from', $this->timezone);
 					$has_errors = false;
 
 					if ($this->is_date_only) {
@@ -182,7 +181,7 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 				$max_period = $this->max_period !== 0
 					? $this->max_period
-					: ($this->is_date_only ? null : CTimePeriodHelper::getMaxPeriod($time, $this->timezone));
+					: ($this->is_date_only ? null : CTimePeriodHelper::getMaxPeriod($this->timezone));
 
 				$period = $value['to_ts'] - $value['from_ts'] + 1;
 
