@@ -16,10 +16,10 @@ package agent
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
+	"unicode"
 
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
 	"golang.zabbix.com/sdk/errs"
@@ -74,7 +74,11 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
-							return "", errors.New("special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %, 0x0a\" are not allowed in the parameters.")
+							if !unicode.IsPrint(rune(param[j])) {
+								return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
+							}
+
+							return "", fmt.Errorf("Special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %%, 0x0a\" are not allowed in the parameters.")
 						}
 					}
 					b.WriteString(param)
