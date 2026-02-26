@@ -105,53 +105,7 @@ abstract class CControllerItemPrototype extends CController {
 			return false;
 		}
 
-		$ret = true;
-		$type = $this->getInput('type', -1);
-		$fields = array_fill_keys(['name', 'key'], '');
-		$this->getInputs($fields, array_keys($fields));
-
-		foreach ($fields as $field => $value) {
-			if ($value === '') {
-				$ret = false;
-				error(_s('Incorrect value for field "%1$s": %2$s.', $field, _('cannot be empty')));
-			}
-		}
-
-		if (isItemExampleKey($type, $this->getInput('key', ''))) {
-			$ret = false;
-		}
-
-		$delay_flex = $this->getInput('delay_flex', []);
-
-		if ($delay_flex && !isValidCustomIntervals($delay_flex, true)) {
-			$ret = false;
-		}
-
-		$simple_interval_parser = new CSimpleIntervalParser([
-			'usermacros' => true,
-			'lldmacros' => true
-		]);
-
-		if (!in_array($type, [ITEM_TYPE_TRAPPER, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_DEPENDENT])
-				&& !($type == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($this->getInput('key', ''), 'mqtt.get', 8) == 0)
-				&& $simple_interval_parser->parse($this->getInput('delay', '')) != CParser::PARSE_SUCCESS) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'delay', _('a time unit is expected')));
-			$ret = false;
-		}
-
-		$timeout_types = [ITEM_TYPE_ZABBIX, ITEM_TYPE_SIMPLE, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
-			ITEM_TYPE_DB_MONITOR, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_SNMP, ITEM_TYPE_HTTPAGENT,
-			ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER
-		];
-
-		if (in_array($type, $timeout_types)
-				&& $this->getInput('custom_timeout', -1) == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED
-				&& $simple_interval_parser->parse($this->getInput('timeout', '')) != CParser::PARSE_SUCCESS) {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'timeout', _('a time unit is expected')));
-			$ret = false;
-		}
-
-		return $ret && $this->validateReferredObjects();
+		return true;
 	}
 
 	protected function validateInputPreprocessing(array $steps): bool {
