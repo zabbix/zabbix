@@ -1080,11 +1080,11 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			zbx_variant_type_desc(value), (void *)cache);
 
 	/* Special case: nothing to do */
-	if (ZBX_VARIANT_NONE == value->type && NULL == cache)
-		goto out;
-
-	if (ZBX_VARIANT_NONE == value->type && NULL != cache && ZBX_VARIANT_NONE == cache->value.type)
-		goto out;
+	if (ZBX_VARIANT_NONE == value->type)
+	{
+		if (NULL == cache || ZBX_VARIANT_NONE == cache->value.type)
+			goto out;
+	}
 
 	params = step->params;
 	if (NULL != um_handle)
