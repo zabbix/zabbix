@@ -29,20 +29,6 @@ import (
 
 const notAllowedCharacters = "\\'\"`*?[]{}~$!&;()<>|#@%\n"
 
-type notAllowedCharError struct {
-	b byte
-}
-
-type specialCharsNotAllowedError struct{}
-
-func (e notAllowedCharError) Error() string {
-	return fmt.Sprintf("character 0x%02x is not allowed", e.b)
-}
-
-func (specialCharsNotAllowedError) Error() string {
-	return specialCharsNotAllowedMessage()
-}
-
 type parameterInfo struct {
 	cmd      string
 	flexible bool
@@ -60,27 +46,21 @@ type UserParameterPlugin struct {
 var userParameter UserParameterPlugin
 
 func specialCharsNotAllowedMessage() string {
-	var b strings.Builder
-
-	b.WriteString("special characters \"")
+	parts := make([]string, 0, len(notAllowedCharacters))
 
 	for i := range len(notAllowedCharacters) {
-		if i > 0 {
-			b.WriteString(", ")
-		}
-
 		c := notAllowedCharacters[i]
 
-		if unicode.IsPrint(rune(c)) {
-			b.WriteByte(c)
-		} else {
-			b.WriteString(fmt.Sprintf("0x%02x", c))
+		if !unicode.IsPrint(rune(c)) {
+			parts = append(parts, fmt.Sprintf("0x%02x", c))
+
+			continue
 		}
+
+		parts = append(parts, string(c))
 	}
 
-	b.WriteString("\" are not allowed in the parameters")
-
-	return b.String()
+	return strings.Join(parts, ", ")
 }
 
 func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
@@ -112,11 +92,10 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
-							if !unicode.IsPrint(rune(param[j])) {
-								return "", notAllowedCharError{b: param[j]}
-							}
-
-							return "", specialCharsNotAllowedError{}
+							return "", errs.New(fmt.Sprintf(
+								"Special characters \"%s\" are not allowed in the "+
+									"parameters.",
+								specialCharsNotAllowedMessage()))
 						}
 					}
 					b.WriteString(param)

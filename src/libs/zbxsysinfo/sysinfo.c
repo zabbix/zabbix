@@ -1089,7 +1089,7 @@ static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_pa
 				zbx_snprintf_alloc(&buf, &buf_alloc, &buf_offset, "0x%02x", (unsigned int)(*c));
 		}
 
-		zbx_snprintf(error, max_error_len, "special characters \"%s\" are not allowed in the parameters", buf);
+		zbx_snprintf(error, max_error_len, "Special characters \"%s\" are not allowed in the parameters.", buf);
 
 		zbx_free(buf);
 
