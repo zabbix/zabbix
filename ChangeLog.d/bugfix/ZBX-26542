@@ -1,1 +1,1 @@
-..F....... [ZBX-26542] added time param into method for calculation of the absolute time from both ends of the relative range (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
