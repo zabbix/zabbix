@@ -633,7 +633,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 					return 0, nil
 				}
 
-				return nil, fmt.Errorf("Cannot obtain user information: %w", err)
+				return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
 			}
 		}
 		fallthrough
@@ -826,7 +826,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 			return 0, nil
 		}
 
-		return nil, fmt.Errorf("Cannot obtain user information: %w", err)
+		return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
 	}
 
 	procs, err := getProcesses(flags)
@@ -877,7 +877,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					return "[]", nil
 				}
 
-				return nil, fmt.Errorf("Cannot obtain user information: %w", err)
+				return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
 			}
 		}
 		fallthrough
@@ -900,7 +900,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain user information: %w", err)
+		return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
 	}
 
 	if mode != "thread" {
