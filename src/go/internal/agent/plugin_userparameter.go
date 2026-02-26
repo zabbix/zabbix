@@ -16,7 +16,6 @@ package agent
 
 import (
 	"bytes"
-	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -30,12 +29,18 @@ import (
 
 const notAllowedCharacters = "\\'\"`*?[]{}~$!&;()<>|#@%\n"
 
-type errNotAllowedChar struct {
+type notAllowedCharError struct {
 	b byte
 }
 
-func (e errNotAllowedChar) Error() string {
-	return fmt.Sprintf("Character 0x%02x is not allowed", e.b)
+type specialCharsNotAllowedError struct{}
+
+func (e notAllowedCharError) Error() string {
+	return fmt.Sprintf("character 0x%02x is not allowed", e.b)
+}
+
+func (specialCharsNotAllowedError) Error() string {
+	return specialCharsNotAllowedMessage()
 }
 
 type parameterInfo struct {
@@ -53,6 +58,30 @@ type UserParameterPlugin struct {
 }
 
 var userParameter UserParameterPlugin
+
+func specialCharsNotAllowedMessage() string {
+	var b strings.Builder
+
+	b.WriteString("special characters \"")
+
+	for i := range len(notAllowedCharacters) {
+		if i > 0 {
+			b.WriteString(", ")
+		}
+
+		c := notAllowedCharacters[i]
+
+		if unicode.IsPrint(rune(c)) {
+			b.WriteByte(c)
+		} else {
+			b.WriteString(fmt.Sprintf("0x%02x", c))
+		}
+	}
+
+	b.WriteString("\" are not allowed in the parameters. ")
+
+	return b.String()
+}
 
 func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 	var b bytes.Buffer
@@ -84,10 +113,10 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
 							if !unicode.IsPrint(rune(param[j])) {
-								return "", errNotAllowedChar{b: param[j]}
+								return "", notAllowedCharError{b: param[j]}
 							}
 
-							return "", errors.New("special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %%, 0x0a\" are not allowed in the parameters.")
+							return "", specialCharsNotAllowedError{}
 						}
 					}
 					b.WriteString(param)
