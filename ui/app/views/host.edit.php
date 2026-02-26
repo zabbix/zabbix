@@ -540,7 +540,8 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 					->setAttribute('placeholder', _('description'))
 			))
 				->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
-				->setColSpan(7)
+				->setColSpan(2),
+			(new CCol())->setColSpan(5)
 		]))->addClass('form_row')
 	)
 	->addItem(

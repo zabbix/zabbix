@@ -232,7 +232,9 @@ else {
 				]))
 					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT)
 					->addClass(CControllerHostMacrosList::MACRO_TEXTAREA_PARENT)
-					->setColSpan(count($row))
+					->setColSpan(2),
+				(new CCol())
+					->setColSpan(count($row) - 2)
 				]))->addClass('form_row')
 			)
 			->addRow((new CCol())
