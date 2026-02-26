@@ -16,6 +16,7 @@ package agent
 
 import (
 	"bytes"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -28,6 +29,14 @@ import (
 )
 
 const notAllowedCharacters = "\\'\"`*?[]{}~$!&;()<>|#@%\n"
+
+type errNotAllowedChar struct {
+	b byte
+}
+
+func (e errNotAllowedChar) Error() string {
+	return fmt.Sprintf("Character 0x%02x is not allowed", e.b)
+}
 
 type parameterInfo struct {
 	cmd      string
@@ -75,10 +84,10 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
 							if !unicode.IsPrint(rune(param[j])) {
-								return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
+								return "", errNotAllowedChar{b: param[j]}
 							}
 
-							return "", fmt.Errorf("Special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %%, 0x0a\" are not allowed in the parameters.")
+							return "", errors.New("special characters \"\\, ', \", `, *, ?, [, ], {, }, ~, $, !, &, ;, (, ), <, >, |, #, @, %%, 0x0a\" are not allowed in the parameters.")
 						}
 					}
 					b.WriteString(param)
