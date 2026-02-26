@@ -108,7 +108,7 @@ class CLocalApiClient extends CApiClient {
 			unset($params['nopermissions']);
 
 			// if no transaction has been started yet - start one
-			if ($DB['TRANSACTIONS'] == 0) {
+			if ($DB['TRANSACTIONS'] == 0 && !($api === 'device' && $method === 'init')) {
 				DBstart();
 				$newTransaction = true;
 			}
