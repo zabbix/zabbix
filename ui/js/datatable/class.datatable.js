@@ -899,15 +899,20 @@ class CDataTable {
 			? [1, index_to + 1, index]
 			: [-1, index, index_to - 1];
 
-		const item = items.item(index_to);
-		const column_index = parseInt(item.getAttribute('data-col'));
-		const from = items.item(start).getAttribute('data-col');
-		const to = items.item(end).getAttribute('data-col');
+		let from = parseInt(items.item(start).getAttribute('data-col'));
+		let to = parseInt(items.item(end).getAttribute('data-col'));
+
+		if (from > to) {
+			[from, to] = [to, from];
+		}
 
 		const columns = this.#columns.filter(
 			column_config => ![this.#checkboxid, CDataTableColumn.CUSTOMIZE_TABLE].includes(column_config.getId())
 				&& column_config.getColumnIndex() >= from && column_config.getColumnIndex() <= to
 		);
+
+		const item = items.item(index_to);
+		const column_index = parseInt(item.getAttribute('data-col'));
 
 		const column_config = this.getColumnConfig(column_index);
 		column_config.setOrder(columns.at(offset < 0 ? columns.length - 1 : 0).getOrder());
