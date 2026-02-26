@@ -16,10 +16,13 @@
 #include "logfiles.h"
 
 #include "zbxalgo.h"
+
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 #include "zbxhash.h"
 #include "zbxnum.h"
 #include "zbxjson.h"
 #include "zbxcrypto.h"
+#endif
 
 /* tags for agent persistent storage files */
 #define ZBX_PERSIST_TAG_FILENAME		"filename"
