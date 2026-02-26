@@ -3643,6 +3643,7 @@ svg {
 
 	.btn-undo {
 		display: none;
+		align-items: start;
 		height: auto;
 		color: $icon-color;
 		background-color: $form-bg-color;
@@ -3650,6 +3651,7 @@ svg {
 		border-color: $form-border-color;
 
 		&::before {
+			margin-top: 2px;
 			font-size: $icon-medium-size;
 		}
 

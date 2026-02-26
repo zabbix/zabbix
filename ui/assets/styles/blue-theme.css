@@ -8785,12 +8785,14 @@ svg {
     display: none; }
   .macro-input-group .btn-undo {
     display: none;
+    align-items: start;
     height: auto;
     color: #768d99;
     background-color: #ffffff;
     border-width: 1px 0;
     border-color: #acbbc2; }
     .macro-input-group .btn-undo::before {
+      margin-top: 2px;
       font-size: 16px; }
     .macro-input-group .btn-undo:focus, .macro-input-group .btn-undo:hover {
       color: #ffffff;
