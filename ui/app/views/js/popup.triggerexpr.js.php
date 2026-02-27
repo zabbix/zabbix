@@ -116,6 +116,27 @@ window.trigger_edit_expression_popup = new class {
 		}
 	}
 
+	#setVisibleOptions(zselect, options, reset_value) {
+		const mapped_options = options.map(option => {
+			return {label: option, value: option};
+		});
+
+		let current_value = zselect.getAttribute('value');
+
+		if (!options.includes(current_value)) {
+			if (reset_value) {
+				current_value = options[0];
+			}
+			else {
+				mapped_options.push({label: current_value, value: current_value});
+			}
+		}
+
+		zselect.clearOptions();
+		zselect.addOptions(mapped_options);
+		zselect.setAttribute('value', current_value);
+	}
+
 	#functionSelectChanged(value, reset_paramtype = true) {
 		const [function_type, function_name] = value.split('_');
 		document.getElementById('function').value = function_name;
@@ -163,6 +184,11 @@ window.trigger_edit_expression_popup = new class {
 					this.#setVisibleParamtypes(discovered_field.closest('z-select'), field_config.options,
 						reset_paramtype
 					)
+				}
+				else if (field_name === 'operator') {
+					this.#setVisibleOptions(discovered_field.closest('z-select'), field_config.options,
+						reset_paramtype
+					);
 				}
 				else if (field_config.placeholder) {
 					discovered_field.setAttribute('placeholder', field_config.placeholder);
