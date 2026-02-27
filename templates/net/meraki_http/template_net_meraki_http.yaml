@@ -788,14 +788,14 @@ zabbix_export:
             - uuid: 00583ac9e9824f7db12a1685421f0be9
               expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)=3'
               name: 'Meraki: Status is alerting'
-              priority: AVERAGE
+              priority: WARNING
               tags:
                 - tag: scope
                   value: availability
             - uuid: 00583ac9e9824f7db22a1685421f0be9
               expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)=0'
               name: 'Meraki: Status is offline'
-              priority: WARNING
+              priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
