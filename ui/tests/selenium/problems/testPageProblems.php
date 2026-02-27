@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,7 @@ require_once __DIR__.'/../behaviors/CTagBehavior.php';
  *
  * @onBefore prepareProblemsData
  *
- * @dataSource UserPermissions, WidgetCommunication
+ * @dataSource UserPermissions, WidgetCommunication, MonitoringOverview
  */
 class testPageProblems extends CWebTest {
 
@@ -151,6 +151,11 @@ class testPageProblems extends CWebTest {
 				'expression' => 'last(/Host for Problems Page/trap1)<>"" and last(/Host for Problems Page/trapSQL)<>""',
 				'priority' => TRIGGER_SEVERITY_AVERAGE,
 				'opdata' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭'
+			],
+			[
+				'description' => 'Multiple   spaces   in problem name',
+				'expression' => 'last(/Host for Problems Page/trap)=150',
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]
 		]);
 
@@ -184,7 +189,8 @@ class testPageProblems extends CWebTest {
 			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, $clock);
 		}
 		CDBHelper::setTriggerProblem(['Symbols in Item metric', 'Filled opdata with macros', 'XSS code in Item metric',
-				'SQL Injection Item metric', 'Trigger for String problem', 'Two trigger expressions'
+				'SQL Injection Item metric', 'Trigger for String problem', 'Two trigger expressions',
+				'Multiple   spaces   in problem name'
 		]);
 
 		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
@@ -532,7 +538,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '4_Host_to_check_Monitoring_Overview',
 							'Problem' => '4_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle DB'
 						]
 					]
 				]
@@ -551,7 +557,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '3_Host_to_check_Monitoring_Overview',
 							'Problem' => '3_trigger_Average',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: Oracle'
 						]
 					],
 					'check_trigger_description' => [
@@ -603,7 +609,7 @@ class testPageProblems extends CWebTest {
 							'Host' => '1_Host_to_check_Monitoring_Overview',
 							'Problem' => '2_trigger_Information',
 							'Update' => 'Update',
-							'Tags' => ''
+							'Tags' => 'DataBase: PostgreSQL'
 						]
 					],
 					'check_trigger_description' => [
@@ -921,6 +927,7 @@ class testPageProblems extends CWebTest {
 						]
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1381,6 +1388,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1418,6 +1426,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1446,6 +1455,7 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 day'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1471,6 +1481,7 @@ class testPageProblems extends CWebTest {
 						'Show timeline' => false
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
 						['Problem' => 'Trigger for tag permissions MySQL'],
 						['Problem' => '1_trigger_Not_classified']
@@ -1562,6 +1573,7 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1586,6 +1598,7 @@ class testPageProblems extends CWebTest {
 						'id:to' => 'now'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1610,6 +1623,7 @@ class testPageProblems extends CWebTest {
 						'link' => 'Last 1 year'
 					],
 					'result' => [
+						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
 						['Problem' => 'Trigger for String problem'],
 						['Problem' => 'SQL Injection Item metric'],
@@ -1620,6 +1634,28 @@ class testPageProblems extends CWebTest {
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for Age problem 1 day'],
 						['Problem' => 'Trigger for Age problem 1 month']
+					]
+				]
+			],
+			// #48 Multiple spaces between words in "Problem" field name.
+			[
+				[
+					'fields' => [
+						'Problem' => '   spaces   '
+					],
+					'result' => [
+						['Problem' => 'Multiple spaces in problem name']
+					]
+				]
+			],
+			// #48 Multiple spaces in "Problem" field name.
+			[
+				[
+					'fields' => [
+						'Problem' => '   '
+					],
+					'result' => [
+						['Problem' => 'Multiple spaces in problem name']
 					]
 				]
 			]
@@ -1986,6 +2022,10 @@ class testPageProblems extends CWebTest {
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
 		if (array_key_exists('screen_name', $data)) {
+			// Remove time from table column - column width varies depending on time text, causing unstable screenshots.
+			CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+					[$table->findRow('Problem', $problem_name)->getColumn('Time')]
+			);
 			$this->assertScreenshot($opdata_column, $data['screen_name']);
 		}
 

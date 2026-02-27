@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,6 +42,9 @@ const (
 	// tnsValue - the plugin will interpret connString as the value of TNS name.
 	tnsValue
 )
+
+// characters that can cause escape.
+const forbiddenCharsInNames = "()\"'=#"
 
 var (
 	_ OraClient = (*OraConn)(nil)
@@ -137,6 +140,11 @@ func (conn *OraConn) WhoAmI() string {
 	return conn.username
 }
 
+// GetCallTimeout returns callTimeout.
+func (conn *OraConn) GetCallTimeout() time.Duration {
+	return conn.callTimeout
+}
+
 // normalizeSpaces function replaces all whitespace from a username with one whitespace, if any, and
 // trims a username.
 func normalizeSpaces(s string) string {
@@ -215,21 +223,31 @@ func getTNSType(host string, onlyHostname, resolveTNS bool) TNSNameType {
 }
 
 func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout time.Duration) (string, error) {
-	service, err := url.QueryUnescape(cd.Uri.GetParam("service"))
-	if err != nil {
-		return "", err //nolint:wrapcheck
-	}
-
 	var connectString string
 
 	switch tnsType {
 	case tnsKey, tnsValue:
 		connectString = cd.Uri.Host()
 	case tnsNone:
+		var (
+			service = url.QueryEscape(cd.Uri.GetParam("service"))
+			host    = cd.Uri.Host()
+		)
+
+		err := checkForbiddenCharacters(service)
+		if err != nil {
+			return "", err
+		}
+
+		err = checkForbiddenCharacters(host)
+		if err != nil {
+			return "", err
+		}
+
 		connectString = fmt.Sprintf(
 			`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 				`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-			cd.Uri.Host(),
+			host,
 			cd.Uri.Port(),
 			service,
 			connectTimeout/time.Second,
@@ -239,4 +257,15 @@ func prepareConnectString(tnsType TNSNameType, cd *ConnDetails, connectTimeout t
 	}
 
 	return connectString, nil
+}
+
+func checkForbiddenCharacters(s string) error {
+	if strings.ContainsAny(s, forbiddenCharsInNames) {
+		return errs.WrapConst(
+			errs.New("invalid characters in: "+s),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
+
+	return nil
 }

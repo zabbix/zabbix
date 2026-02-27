@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -254,7 +254,6 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:time_period_to' => 'now',
 					'History data' => 'Auto'
 				];
-
 				foreach ($default_values_advanced as $field => $value) {
 					$this->assertEquals($value, $form->getField($field)->getValue());
 				}
@@ -364,8 +363,8 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:thresholds_0_threshold' => [
 						'maxlength' => 255
 					],
-					'xpath:.//input[@id="thresholds_0_color"]/..' => [
-						'color' => 'FF465C'
+					'id:thresholds_0_color' => [
+						'value' => 'FF465C'
 					],
 					'id:time_period_from' => [
 						'maxlength' => 255,
@@ -385,12 +384,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				];
 				foreach ($inputs as $field => $attributes) {
 					foreach ($attributes as $attribute => $value) {
-						if ($attribute === 'color') {
-							$this->assertEquals($value, $form->query($field)->asColorPicker()->one()->getValue());
-						}
-						else {
-							$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
-						}
+						$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 					}
 				}
 
@@ -412,6 +406,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						$form->fill([$config => $state]);
 
 						foreach ($elements as $element) {
+							$element = str_replace('/..', '', $element);
 							$this->assertTrue($form->getField($element)->isEnabled($state));
 						}
 					}

@@ -11,7 +11,7 @@ Template `Kubernetes cluster state by HTTP` - collects metrics by HTTP agent fro
 Don't forget to change macros {$KUBE.API.URL} and {$KUBE.API.TOKEN}.
 Also, see the Macros section for a list of macros used to set trigger values.
 
-*NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
+**Note:** Some metrics may not be collected depending on your Kubernetes version and configuration.
 
 ## Requirements
 
@@ -46,7 +46,7 @@ Get the generated service account token using the command:
 Then set it to the macro `{$KUBE.API.TOKEN}`.
 Set `{$KUBE.STATE.ENDPOINT.NAME}` with Kube state metrics endpoint name. See `kubectl -n monitoring get ep`. Default: `zabbix-kube-state-metrics`.
 
-*NOTE.* If you wish to monitor Controller Manager and Scheduler components, you might need to set the `--binding-address` option for them to the address where Zabbix proxy can reach them.
+**Note:** If you wish to monitor Controller Manager and Scheduler components, you might need to set the `--binding-address` option for them to the address where Zabbix proxy can reach them.
 For example, for clusters created with `kubeadm` it can be set in the following manifest files (changes will be applied immediately):
 
 - /etc/kubernetes/manifests/kube-controller-manager.yaml
@@ -54,7 +54,7 @@ For example, for clusters created with `kubeadm` it can be set in the following 
 
 Depending on your Kubernetes distribution, you might need to adjust `{$KUBE.CONTROL_PLANE.TAINT}` macro (for example, set it to `node-role.kubernetes.io/master` for OpenShift).
 
-*NOTE.* Some metrics may not be collected depending on your Kubernetes version and configuration.
+**Note:** Some metrics may not be collected depending on your Kubernetes version and configuration.
 
 Also, see the Macros section for a list of macros used to set trigger values.
 
@@ -73,7 +73,7 @@ Set up macros to filter node metrics by nodename:
 - {$KUBE.LLD.FILTER.NODE.MATCHES}
 - {$KUBE.LLD.FILTER.NODE.NOT_MATCHES}
 
-**Note**: If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
+**Note:** If you have a large cluster, it is highly recommended to set a filter for discoverable namespaces.
 
 You can use the `{$KUBE.KUBELET.FILTER.LABELS}` and `{$KUBE.KUBELET.FILTER.ANNOTATIONS}` macros for advanced filtering of kubelets by node labels and annotations.
 
@@ -106,7 +106,7 @@ You can also set up evaluation periods for replica mismatch triggers (Deployment
 
 `{$KUBE.REPLICA.MISMATCH.EVAL_PERIOD:regex:".*:default:.*"} = 15m`
 
-**Note** that different context macros with regular expressions matching the same string can be applied in an undefined order, and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/7.0/manual/config/macros/user_macros_context) for details.
+**Note:** that different context macros with regular expressions matching the same string can be applied in an undefined order, and simple context macros (without regular expressions) have higher priority. Read the **Important notes** section in [`Zabbix documentation`](https://www.zabbix.com/documentation/7.0/manual/config/macros/user_macros_context) for details.
 
 ### Macros used
 

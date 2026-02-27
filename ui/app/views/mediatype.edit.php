@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -107,13 +107,13 @@ $mediatype_form_grid = (new CFormGrid())
 		))->setId('smtp-security-field')
 	])
 	->addItem([
-		(new CLabel(_('SSL verify peer')))->setId('verify-peer-label'),
+		(new CLabel(_('SSL verify peer'), 'smtp_verify_peer'))->setId('verify-peer-label'),
 		(new CFormField(
 			(new CCheckBox('smtp_verify_peer'))->setChecked($data['smtp_verify_peer'])
 		))->setId('verify-peer-field')
 	])
 	->addItem([
-		(new CLabel(_('SSL verify host')))->setId('verify-host-label'),
+		(new CLabel(_('SSL verify host'), 'smtp_verify_host'))->setId('verify-host-label'),
 		(new CFormField(
 			(new CCheckBox('smtp_verify_host'))->setChecked($data['smtp_verify_host'])
 		))->setId('verify-host-field')

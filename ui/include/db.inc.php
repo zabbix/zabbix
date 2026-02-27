@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -713,7 +713,7 @@ function dbConditionInt($field_name, array $values, $not_in = false, $zero_inclu
 
 	// Process individual values.
 
-	$single_chunks = array_chunk($singles, $MAX_NUM_IN);
+	$single_chunks = $DB['TYPE'] === ZBX_DB_ORACLE ? array_chunk($singles, $MAX_NUM_IN) : [$singles];
 
 	foreach ($single_chunks as $chunk) {
 		if ($condition !== '') {
@@ -759,9 +759,11 @@ function dbConditionId($fieldName, array $values, $notIn = false) {
  * @return string
  */
 function dbConditionString($fieldName, array $values, $notIn = false) {
+	global $DB;
+
 	switch (count($values)) {
 		case 0:
-			return '1=0';
+			return $notIn ? '1=1' : '1=0';
 		case 1:
 			return $notIn
 				? $fieldName.'!='.zbx_dbstr(reset($values))
@@ -770,7 +772,7 @@ function dbConditionString($fieldName, array $values, $notIn = false) {
 
 	$in = $notIn ? ' NOT IN ' : ' IN ';
 	$concat = $notIn ? ' AND ' : ' OR ';
-	$items = array_chunk($values, 950);
+	$items = $DB['TYPE'] === ZBX_DB_ORACLE ? array_chunk($values, 950) : [$values];
 
 	$condition = '';
 	foreach ($items as $values) {

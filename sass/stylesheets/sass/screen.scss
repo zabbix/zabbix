@@ -1063,12 +1063,6 @@ select {
 	}
 }
 
-div {
-	.overlay-dialogue.wordbreak {
-		white-space: normal;
-	}
-}
-
 .form-fields-inline {
 	label {
 		margin: 0 8px 0 3px;
@@ -1801,10 +1795,6 @@ div {
 	border: 1px solid $overlay-border-color;
 	border-bottom-color: darken($overlay-border-color, 1%);
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-
-	.wordbreak {
-		white-space: normal;
-	}
 
 	.overlay-dialogue-header {
 		margin: -8px -10px 6px -10px;
@@ -2569,6 +2559,13 @@ div {
 	.tag {
 		margin-top: 1px;
 		margin-bottom: 1px;
+	}
+
+	&.form-field {
+		.tag {
+			margin-top: 4px;
+			margin-bottom: 4px;
+		}
 	}
 }
 

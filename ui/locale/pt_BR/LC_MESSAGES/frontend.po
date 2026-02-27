@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-07-07 13:55+0000\n"
+"PO-Revision-Date: 2025-11-19 05:10+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -3825,6 +3825,10 @@ msgstr "Não é possível definir \"%1$s\" para o protótipo de gráfico \"%2$s\
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Não é possível definir \"Agregação de conjunto de dados\" quando o item com tipo \"Total\" é adicionado ao gráfico."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -24978,7 +24982,7 @@ msgstr "h"
 
 #: include/translateDefines.inc.php:37
 msgid "h:i A"
-msgstr "h:i A"
+msgstr "h:i"
 
 #: include/translateDefines.inc.php:36
 msgid "h:i:s A"

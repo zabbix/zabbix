@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -76,6 +76,14 @@ class testPageAlertsScripts extends CWebTest {
 				'command' => '/sbin/zabbix_server --runtime-control config_cache_reload',
 				'groupid' => '4',
 				'description' => 'This command reload cache.'
+			],
+			[
+				'name' => 'Multiple   spaces   in script name',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => '1-2-3-4 spaces',
+				'groupid' => '4',
+				'description' => 'Multiple spaces in script name'
 			]
 		]);
 		$scriptids = CDataHelper::getIds('name');
@@ -131,6 +139,18 @@ class testPageAlertsScripts extends CWebTest {
 						'Commands' => 'sudo /usr/bin/nmap -O {HOST.CONN}',
 						'User group' => 'Zabbix administrators',
 						'Host group' => 'All',
+						'Host access' => 'Read'
+					],
+					[
+						'Name' => 'Multiple spaces in script name',
+						'Scope' => 'Action operation',
+						'Count' => '',
+						'Used in actions' => '',
+						'Type' => 'Script',
+						'Execute on' => 'Server (proxy)',
+						'Commands' => '1-2-3-4 spaces',
+						'User group' => 'All',
+						'Host group' => 'Zabbix servers',
 						'Host access' => 'Read'
 					],
 					[
@@ -287,7 +307,7 @@ class testPageAlertsScripts extends CWebTest {
 
 	public function getFilterData() {
 		return [
-			// Name with special symbols.
+			// #0. Name with special symbols.
 			[
 				[
 					'filter' => [
@@ -298,7 +318,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Exact match for field Name.
+			// #1. Exact match for field Name.
 			[
 				[
 					'filter' => [
@@ -309,7 +329,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Partial match for field Name.
+			// #2. Partial match for field Name.
 			[
 				[
 					'filter' => [
@@ -320,7 +340,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Space in search field Name.
+			// #3. Space in search field Name.
 			[
 				[
 					'filter' => [
@@ -330,13 +350,36 @@ class testPageAlertsScripts extends CWebTest {
 						self::$custom_script,
 						'Detect operating system',
 						self::$script_scope_event,
+						'Multiple spaces in script name',
 						self::HOST_GROUP_SCRIPT,
 						self::$script_for_filter,
 						'Selenium script'
 					]
 				]
 			],
-			// Partial name match with space between.
+			// #4. Multiple spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'expected' => [
+						'Multiple spaces in script name'
+					]
+				]
+			],
+			// #5. Empty spaces in search field Name.
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => [
+						'Multiple spaces in script name'
+					]
+				]
+			],
+			// #6. Partial name match with space between.
 			[
 				[
 					'filter' => [
@@ -348,7 +391,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Partial name match with spaces on the sides.
+			// #7. Partial name match with spaces on the sides.
 			[
 				[
 					'filter' => [
@@ -359,7 +402,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search should not be case sensitive.
+			// #8. Search should not be case sensitive.
 			[
 				[
 					'filter' => [
@@ -370,7 +413,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Wrong name in filter field "Name".
+			// #9. Wrong name in filter field "Name".
 			[
 				[
 					'filter' => [
@@ -378,7 +421,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Action operation.
+			// #10. Search by Action operation.
 			[
 				[
 					'filter' => [
@@ -386,13 +429,14 @@ class testPageAlertsScripts extends CWebTest {
 					],
 					'expected' => [
 						self::$custom_script,
+						'Multiple spaces in script name',
 						'Reboot',
 						self::HOST_GROUP_SCRIPT,
 						'Selenium script'
 					]
 				]
 			],
-			// Search by Action operation and Name.
+			// #11. Search by Action operation and Name.
 			[
 				[
 					'filter' => [
@@ -404,7 +448,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual host action.
+			// #12. Search by Manual host action.
 			[
 				[
 					'filter' => [
@@ -417,7 +461,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual host action and Partial name match.
+			// #13. Search by Manual host action and Partial name match.
 			[
 				[
 					'filter' => [
@@ -430,7 +474,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual event action.
+			// #14. Search by Manual event action.
 			[
 				[
 					'filter' => [
@@ -442,7 +486,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search by Manual event action and Partial name match.
+			// #15. Search by Manual event action and Partial name match.
 			[
 				[
 					'filter' => [
@@ -454,7 +498,7 @@ class testPageAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// Search Any scripts.
+			// #16. Search Any scripts.
 			[
 				[
 					'filter' => [
@@ -464,6 +508,7 @@ class testPageAlertsScripts extends CWebTest {
 						self::$custom_script,
 						'Detect operating system',
 						self::$script_scope_event,
+						'Multiple spaces in script name',
 						'Ping',
 						'Reboot',
 						self::HOST_GROUP_SCRIPT,
@@ -509,6 +554,7 @@ class testPageAlertsScripts extends CWebTest {
 						self::HOST_GROUP_SCRIPT,
 						'Reboot',
 						'Ping',
+						'Multiple spaces in script name',
 						self::$script_scope_event,
 						'Detect operating system',
 						self::$custom_script
@@ -523,6 +569,7 @@ class testPageAlertsScripts extends CWebTest {
 						'/sbin/shutdown -r',
 						'/sbin/zabbix_server --runtime-control config_cache_reload',
 						'/usr/bin/traceroute {HOST.CONN}',
+						'1-2-3-4 spaces',
 						'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
 						// TODO: fix order after fix ZBX-22329
 						'',
