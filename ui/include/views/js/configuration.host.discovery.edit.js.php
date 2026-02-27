@@ -164,7 +164,7 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			}).trigger('change');
 
 			$('#lld_macro_paths')
-				.dynamicRows({template: '#lld_macro_path-row', allow_empty: true});
+				.dynamicRows({template: '#lld_macro_path-row-tmpl', allow_empty: true});
 
 			let button = document.querySelector(`[name="${this.form_name}"] .js-execute-item`);
 
