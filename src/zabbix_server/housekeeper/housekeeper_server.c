@@ -620,9 +620,9 @@ static void 	hk_update_dbversion_status(void)
  * Parameters: now - [IN] current timestamp                                   *
  *                                                                            *
  ******************************************************************************/
-static int	housekeeping_history_and_trends(int now)
+static zbx_int64_t	housekeeping_history_and_trends(int now)
 {
-	int			deleted = 0;
+	zbx_int64_t		deleted = 0;
 	zbx_hk_history_rule_t	*rule;
 #if defined(HAVE_POSTGRESQL)
 	int			ignore_history = 0, ignore_trends = 0;
@@ -708,7 +708,7 @@ skip:
 		hk_history_delete_queue_clear(rule);
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, deleted);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():" ZBX_FS_I64, __func__, deleted);
 
 	return deleted;
 }
@@ -1314,13 +1314,14 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old history and trends]",
 				get_process_type_string(process_type));
 		sec = zbx_time();
-		int	d_history_and_trends = housekeeping_history_and_trends(now);
+		zbx_int64_t	d_history_and_trends = housekeeping_history_and_trends(now);
 
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
-		int	d_problems = housekeeping_problems(now, housekeeper_args_in->config_max_housekeeper_delete);
+		zbx_int64_t	d_problems = housekeeping_problems(now,
+				housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-		int	d_events = housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
+		zbx_int64_t	d_events = housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 		int	d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_max_housekeeper_delete);
@@ -1344,10 +1345,11 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 
 		char	msg[1024] = {0};
 
-		zbx_snprintf(msg, sizeof(msg), "%s [deleted %d hist/trends, %d events, %d problems,"
-				" %d sessions, %d alarms, %d audit, %d autoreg_host, %d records in " ZBX_FS_DBL
-				" sec, %s]", get_process_type_string(process_type), d_history_and_trends, d_events,
-				d_problems, d_sessions, d_services, d_audit, d_autoreg_host, records, sec, sleeptext);
+		zbx_snprintf(msg, sizeof(msg), "%s [deleted " ZBX_FS_I64 " hist/trends, " ZBX_FS_I64 " events, "
+				ZBX_FS_I64 " problems, %d sessions, %d alarms, %d audit, %d autoreg_host,"
+				" %d records in " ZBX_FS_DBL " sec, %s]", get_process_type_string(process_type),
+				d_history_and_trends, d_events, d_problems, d_sessions, d_services, d_audit,
+				d_autoreg_host, records, sec, sleeptext);
 
 		zabbix_log(LOG_LEVEL_WARNING, "%s", msg);
 

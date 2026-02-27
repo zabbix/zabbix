@@ -17,17 +17,20 @@
  * Automatic checkbox range selection
  */
 var chkbxRange = {
-	startbox:			null,	// start checkbox obj
-	chkboxes:			{},		// ckbx list
-	prefix:				null,	// prefix for session storage variable name
-	pageGoName:			null,	// which checkboxes should be counted by Go button and saved to session storage
-	sessionStorageName:	null,
-	event_handlers:     null,
+	startbox:					null,	// start checkbox obj
+	chkboxes:					{},		// ckbx list
+	prefix:						null,	// prefix for session storage variable name
+	pageGoName:					null,	// which checkboxes should be counted by Go button and saved to session storage
+	selected_ids_storage_name:	null,
+	search_params_storage_name: null,
+	event_handlers: 			null,
 
 	init: function() {
 		var path = new Curl();
 		var filename = basename(path.getPath(), '.php');
-		this.sessionStorageName = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+
+		this.selected_ids_storage_name = 'cb_' + filename + (this.prefix ? '_' + this.prefix : '');
+		this.search_params_storage_name = 'sp_' + filename + (this.prefix ? '_' + this.prefix : '');
 		// Erase old checkboxes.
 		this.chkboxes = {};
 		this.startbox = null;
@@ -35,30 +38,20 @@ var chkbxRange = {
 		this.resetOtherPage();
 
 		// initialize checkboxes
-		var chkboxes = jQuery('.list-table tbody input[type=checkbox]:not(:disabled)');
-		if (chkboxes.length > 0) {
-			for (var i = 0; i < chkboxes.length; i++) {
-				this.implement(chkboxes[i]);
-			}
-		}
+		const checkboxes = Array.from(
+			document.querySelectorAll('.list-table tbody input[type="checkbox"]:not(:disabled)')
+		);
+
+		checkboxes.forEach(checkbox => this.implement(checkbox));
 
 		// load selected checkboxes from session storage or cache
 		if (this.pageGoName != null) {
-			const selected_ids = this.getSelectedIds();
+			const object_ids = new Set(Object.keys(this.getSelectedIds()));
 
-			// check if checkboxes should be selected from session storage
-			if (!jQuery.isEmptyObject(selected_ids)) {
-				var objectIds = Object.keys(selected_ids);
-			}
-			// no checkboxes selected, check browser cache if checkboxes are still checked and update state
-			else {
-				var checkedFromCache = jQuery('main .list-table tbody input[type=checkbox]:checked:not(:disabled)');
-				var objectIds = jQuery.map(checkedFromCache, jQuery.proxy(function(checkbox) {
-					return this.getObjectIdFromName(checkbox.name);
-				}, this));
-			}
+			checkboxes.filter(checkbox => checkbox.checked)
+				.forEach(checkbox => object_ids.add(this.getObjectIdFromName(checkbox.name)));
 
-			this.checkObjects(this.pageGoName, objectIds, true);
+			this.checkObjects(this.pageGoName, [...object_ids], true);
 			this.update(this.pageGoName);
 		}
 
@@ -97,7 +90,7 @@ var chkbxRange = {
 	},
 
 	getSelectedIds() {
-		const session_selected_ids = sessionStorage.getItem(this.sessionStorageName);
+		const session_selected_ids = sessionStorage.getItem(this.selected_ids_storage_name);
 
 		return session_selected_ids === null ? {} : JSON.parse(session_selected_ids);
 	},
@@ -157,7 +150,7 @@ var chkbxRange = {
 	/**
 	 * Returns the checkboxes in an object group.
 	 *
-	 * @param string object
+	 * @param {string} object
 	 *
 	 * @returns {Array}
 	 */
@@ -170,34 +163,112 @@ var chkbxRange = {
 	 *
 	 * Checks all of the checkboxes that belong to these objects and highlights the table row.
 	 *
-	 * @param {string}   object
-	 * @param {Array}    objectIds     array of objects IDs as integers
-	 * @param {boolean}  checked
+	 * @param {string}		object
+	 * @param {string[]}	object_ids	array of objects IDs.
+	 * @param {boolean}		checked
 	 */
-	checkObjects: function(object, objectIds, checked) {
+	checkObjects: function(object, object_ids, checked) {
+		const checkboxes = {};
+		this.getObjectCheckboxes(object).forEach(checkbox => {
+			const object_id = this.getObjectIdFromName(checkbox.name);
+
+			checkboxes[object_id] = checkbox;
+		});
+
 		const selected_ids = this.getSelectedIds();
 
-		jQuery.each(this.getObjectCheckboxes(object), jQuery.proxy(function(i, checkbox) {
-			var objectId = this.getObjectIdFromName(checkbox.name);
-
-			if (objectIds.indexOf(objectId) > -1) {
+		Object.entries(checkboxes).forEach(([object_id, checkbox]) => {
+			if (object_ids.includes(object_id)) {
 				checkbox.checked = checked;
 
-				jQuery(checkbox).closest('tr').toggleClass('row-selected', checked);
-				// Remove class attribute if it's empty.
-				jQuery(checkbox).closest('tr').filter('*[class=""]').removeAttr('class');
+				const row = checkbox.closest('tr');
 
 				if (checked) {
-					const actions = document.getElementById(object + '_' + objectId).getAttribute('data-actions');
-					selected_ids[objectId] = (actions === null) ? '' : actions;
+					row.classList.add('row-selected');
+
+					const actions = document.getElementById(object + '_' + object_id).getAttribute('data-actions');
+					selected_ids[object_id] = (actions === null) ? '' : actions;
 				}
 				else {
-					delete selected_ids[objectId];
+					row.classList.remove('row-selected');
+
+					// Remove class attribute if it's empty.
+					if (row.className.trim().length === 0) {
+						row.removeAttribute('class');
+					}
+
+					delete selected_ids[object_id];
 				}
 			}
-		}, this));
+		});
 
-		this.saveSessionStorage(object, selected_ids);
+		const search_params = this.getSearchParams();
+
+		this.handleBackForwardNavigation(search_params, checkboxes, object_ids, selected_ids);
+
+		this.saveSearchParams(object, search_params);
+		this.saveSelectedIds(object, selected_ids);
+	},
+
+	/**
+	 * Handle back/forward navigation by resetting the state of selected checkboxes.
+	 *
+	 * @param {URLSearchParams}						search_params	current search params.
+	 * @param {Record<string, HTMLInputElement>}	checkboxes		map of object IDs and checkbox elements.
+	 * @param {string[]}   							object_ids		array of objects IDs.
+	 * @param {string[]} 							selected_ids	currently selected object IDs.
+	 */
+	handleBackForwardNavigation: function(search_params, checkboxes, object_ids, selected_ids) {
+		if (!PerformanceObserver.supportedEntryTypes.includes('navigation')) {
+			return;
+		}
+
+		const entries = performance.getEntriesByType('navigation').filter(entry => entry.type === 'back_forward');
+		if (entries.length === 0) {
+			return;
+		}
+
+		if (this.hasSearchParamChanged(this.getPreviousSearchParams(), search_params, 'page')) {
+			return;
+		}
+
+		for (const object_id of object_ids) {
+			if (checkboxes[object_id] === undefined) {
+				delete selected_ids[object_id];
+			}
+		}
+	},
+
+	/**
+	 * Get the current page's URL search parameters.
+	 *
+	 * @returns {URLSearchParams}
+	 */
+	getSearchParams: function() {
+		return new URLSearchParams(window.location.search);
+	},
+
+	/**
+	 * Retrieve the previously saved search parameters from SessionStorage.
+	 *
+	 * @returns {URLSearchParams}
+	 */
+	getPreviousSearchParams: function() {
+		const search_params = JSON.parse(sessionStorage.getItem(this.search_params_storage_name)) || {};
+
+		return new URLSearchParams(search_params);
+	},
+
+	/**
+	 * Check if a specific search parameter has changed between two URLSearchParams objects.
+	 *
+	 * @param {URLSearchParams}	first_params	first search parameters to compare.
+	 * @param {URLSearchParams}	second_params	second search parameters to compare.
+	 * @param {string}			param			name of the search parameter to check.
+	 * @returns {boolean}
+	 */
+	hasSearchParamChanged: function (first_params, second_params, param) {
+		return first_params.get(param) !== second_params.get(param);
 	},
 
 	/**
@@ -206,7 +277,7 @@ var chkbxRange = {
 	 * @param {string} object
 	 * @param {object} startCheckbox
 	 * @param {object} endCheckbox
-	 * @param {bool} checked
+	 * @param {boolean} checked
 	 */
 	checkObjectRange: function(object, startCheckbox, endCheckbox, checked) {
 		var checkboxes = this.getObjectCheckboxes(object);
@@ -343,24 +414,43 @@ var chkbxRange = {
 	},
 
 	/**
+	 * Save the state of the search params belonging to the given object group in SessionStorage.
+	 *
+	 * @param {string}			object
+	 * @param {URLSearchParams}	search_params
+	 */
+	saveSearchParams: function(object, search_params) {
+		if (search_params.size > 0) {
+			if (this.pageGoName == object) {
+				const entries = Object.fromEntries(search_params.entries());
+
+				sessionStorage.setItem(this.search_params_storage_name, JSON.stringify(entries));
+			}
+		} else {
+			sessionStorage.removeItem(this.search_params_storage_name);
+		}
+	},
+
+	/**
 	 * Save the state of the checkboxes belonging to the given object group in SessionStorage.
 	 *
 	 * @param {string} object
 	 * @param {Object} selected_ids  key/value pairs of selected ids.
 	 */
-	saveSessionStorage: function(object, selected_ids) {
+	saveSelectedIds: function(object, selected_ids) {
 		if (Object.keys(selected_ids).length > 0) {
 			if (this.pageGoName == object) {
-				sessionStorage.setItem(this.sessionStorageName, JSON.stringify(selected_ids));
+				sessionStorage.setItem(this.selected_ids_storage_name, JSON.stringify(selected_ids));
 			}
 		}
 		else {
-			sessionStorage.removeItem(this.sessionStorageName);
+			sessionStorage.removeItem(this.selected_ids_storage_name);
 		}
 	},
 
 	clearSelectedOnFilterChange: function() {
-		sessionStorage.removeItem(this.sessionStorageName);
+		sessionStorage.removeItem(this.search_params_storage_name);
+		sessionStorage.removeItem(this.selected_ids_storage_name);
 	},
 
 	/**
@@ -372,7 +462,7 @@ var chkbxRange = {
 		for (var i = 0; i < sessionStorage.length; i++) {
 			key_ = sessionStorage.key(i);
 
-			if (key_.substring(0, 3) === 'cb_' && key_ != this.sessionStorageName) {
+			if (key_.substring(0, 3) === 'cb_' && key_ != this.selected_ids_storage_name) {
 				sessionStorage.removeItem(key_);
 			}
 		}
