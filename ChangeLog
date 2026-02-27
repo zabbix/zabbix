@@ -1,8 +1,10 @@
 Changes for 6.0.45rc1
 
 New features:
+A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
