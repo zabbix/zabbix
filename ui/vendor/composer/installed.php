@@ -3,7 +3,7 @@
         'name' => 'zabbix/ui',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '1d691d7a541745b79bf1f9fe626a83b2a149fe9c',
+        'reference' => 'e1ae41eabc85b1f95e71e2450f5129d489731e25',
         'type' => 'library',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -103,7 +103,7 @@
         'zabbix/ui' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '1d691d7a541745b79bf1f9fe626a83b2a149fe9c',
+            'reference' => 'e1ae41eabc85b1f95e71e2450f5129d489731e25',
             'type' => 'library',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),
