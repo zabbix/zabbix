@@ -114,16 +114,14 @@
 		var graph = graph || e.data.graph,
 			data = graph.data('options'),
 			hbox = graph.data('hintbox'),
-			content = hbox ? hbox.find('> div') : null;
+			content = hbox ? hbox.find('.svg-graph-hintbox') : null;
 
 		// Destroy old hintbox to make new one with close button.
 		destroyHintbox(graph);
 
 		if (content) {
 			// Should be put inside hintBoxItem to use functionality of hintBox.
-			graph.hintBoxItem = hintBox.createBox(e, graph, content, '', true, 'top: 0; left: 0',
-				graph.closest('.dashboard-grid-widget-container'), false
-			);
+			graph[0].hintBoxItem = hintBox.createBox(e, graph[0], content[0], '', true, false);
 
 			if (graph.data('simpleTriggersHintbox')) {
 				data.isTriggerHintBoxFrozen = true;
@@ -134,7 +132,7 @@
 
 			graph.data('widget')._pauseUpdating();
 
-			graph.hintBoxItem.on('onDeleteHint.hintBox', function(e) {
+			graph[0].hintBoxItem.on('onDeleteHint.hintBox', function(e) {
 				graph.data('widget')._resumeUpdating();
 
 				data.isTriggerHintBoxFrozen = false;
@@ -143,15 +141,15 @@
 				destroyHintbox(graph);
 			});
 
-			repositionHintBox(e, graph);
+			hintBox.positionElement(e, graph[0], graph[0].hintBoxItem);
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': graph.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': graph.hintBoxItem});
+			Overlay.prototype.recoverFocus.call({'$dialogue': graph[0].hintBoxItem});
+			Overlay.prototype.containFocus.call({'$dialogue': graph[0].hintBoxItem});
 
 			graph
 				.off('mouseup', hintboxSilentMode)
 				.on('mouseup', {graph: graph}, hintboxSilentMode);
-			graph.data('hintbox', graph.hintBoxItem);
+			graph.data('hintbox', graph[0].hintBoxItem);
 		}
 	}
 
@@ -502,25 +500,6 @@
 		}
 	}
 
-	// Position hintbox near current mouse position.
-	function repositionHintBox(e, graph) {
-		// Use closest positioned ancestor for offset calculation.
-		var offset = graph.closest('.dashboard-grid-widget-container').offsetParent().offset(),
-			hbox = jQuery(graph.hintBoxItem),
-			page_bottom = jQuery(window.top).scrollTop() + jQuery(window.top).height(),
-			mouse_distance = 15,
-			l = (document.body.clientWidth >= e.clientX + hbox.outerWidth() + mouse_distance)
-				? e.clientX + mouse_distance - offset.left
-				: e.clientX - mouse_distance - hbox.outerWidth() - offset.left,
-			t = e.pageY - offset.top,
-			t = page_bottom >= t + offset.top + hbox.outerHeight() + mouse_distance
-				? t + mouse_distance
-				: t - mouse_distance - hbox.outerHeight(),
-			t = (t + offset.top < 0) ? -offset.top : t;
-
-		hbox.css({'left': l, 'top': t});
-	}
-
 	// Show problem or value hintbox.
 	function showHintbox(e, graph) {
 		var graph = graph || e.data.graph,
@@ -673,9 +652,7 @@
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container'), false
-				);
+				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
@@ -683,11 +660,11 @@
 				graph.data('hintbox', hbox);
 			}
 			else {
-				hbox.find('> div').replaceWith(html);
+				hbox.find('.svg-graph-hintbox').replaceWith(html);
 			}
 
-			graph.hintBoxItem = hbox;
-			repositionHintBox(e, graph);
+			graph[0].hintBoxItem = hbox;
+			hintBox.positionElement(e, graph[0], graph[0].hintBoxItem);
 		}
 
 		if (html === null && (in_values_area || in_problem_area)) {
@@ -862,21 +839,19 @@
 
 		if (html !== null) {
 			if (hbox === null) {
-				hbox = hintBox.createBox(e, graph, html, '', false, false,
-					graph.closest('.dashboard-grid-widget-container'), false
-				);
+				hbox = hintBox.createBox(e, graph[0], html[0], '', false, false, '.wrapper', false);
 
 				graph
 					.off('mouseup', makeHintboxStatic)
 					.on('mouseup', {graph: graph}, makeHintboxStatic);
-				graph.data('hintbox', hbox);
+				graph.data('hintbox', html);
 			}
 			else {
-				hbox.find('> div').replaceWith(html);
+				hbox.find('.svg-graph-hintbox').replaceWith(html);
 			}
 
-			graph.hintBoxItem = hbox;
-			repositionHintBox(e, graph);
+			graph[0].hintBoxItem = hbox;
+			hintBox.positionElement(e, graph[0], graph[0].hintBoxItem);
 		}
 		else {
 			destroyHintbox(graph);

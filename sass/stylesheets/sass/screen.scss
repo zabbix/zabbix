@@ -1938,6 +1938,37 @@ select {
 		}
 	}
 
+	&.hintbox {
+		display: flex;
+		flex-direction: column;
+		box-sizing: border-box;
+		overflow: hidden;
+		padding-top: 20px;
+
+		&.hintbox-position-fixed {
+			position: fixed;
+		}
+
+		&:not(.hintbox-static) {
+			pointer-events: none;
+		}
+
+		&.hintbox-static {
+			padding-top: 0;
+
+			.hintbox-header {
+				height: 20px;
+			}
+		}
+
+		.hintbox-container {
+			overflow: auto;
+			padding-bottom: 1px; // for table correct size
+
+			@extend %webkit-scrollbar;
+		}
+	}
+
 	.hintbox-raw-data {
 		white-space: pre-wrap;
 	}
