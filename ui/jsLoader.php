@@ -80,7 +80,6 @@ $available_js = [
 	'multiselect.js' => '',
 	'chkbxrange.js' => '',
 	'layout.mode.js' => '',
-	'textareaflexible.js' => '',
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
@@ -95,6 +94,7 @@ $available_js = [
 	'component.z-color-picker.js' => '',
 	'component.z-select.js' => '',
 	'component.z-sparkline.js' => '',
+	'component.z-textarea-flexible.js' => '',
 	'component.z-vertical.js' => '',
 	'class.event-hub.js' => '',
 	'class.event-hub.event.js' => '',
@@ -176,7 +176,8 @@ $available_js = [
 	'class.field.set.js' => 'fields/',
 	'class.field.textarea.js' => 'fields/',
 	'class.field.textbox.js' => 'fields/',
-	'class.field.zselect.js' => 'fields/'
+	'class.field.zselect.js' => 'fields/',
+	'class.field.ztextarea-flexible.js' => 'fields/'
 ];
 
 $translate_strings = [
@@ -422,6 +423,8 @@ $translate_strings = [
 		'This value is not a valid floating-point value.' => _('This value is not a valid floating-point value.'),
 		'This value is not a valid string.' => _('This value is not a valid string.'),
 		'This field cannot be empty.' => _('This field cannot be empty.'),
+		'This value cannot have more than %1$s decimal places.' =>
+			_('This value cannot have more than %1$s decimal places.'),
 		'This value is too long.' => _('This value is too long.'),
 		'This value cannot be one of %1$s.' => _('This value cannot be one of %1$s.'),
 		'This value cannot be %1$s.' => _('This value cannot be %1$s.'),
@@ -501,6 +504,7 @@ $translate_strings = [
 		'Discovery rule' => _('Discovery rule'),
 		'Do you wish to replace the conditional expression?' => _('Do you wish to replace the conditional expression?'),
 		'Execute now' => _('Execute now'),
+		'Export' => _('Export'),
 		'Item' => _('Item'),
 		'Items' => _('Items'),
 		'Item prototype' => _('Item prototype'),
@@ -512,6 +516,7 @@ $translate_strings = [
 		'Host' => _('Host'),
 		'Host Wizard' => _('Host Wizard'),
 		'Inventory' => _('Inventory'),
+		'JSON' => _('JSON'),
 		'Latest data' => _('Latest data'),
 		'Links' => _('Links'),
 		'Mark as cause' => _('Mark as cause'),
@@ -533,7 +538,9 @@ $translate_strings = [
 		'Values' => _('Values'),
 		'View' => _('View'),
 		'View related reports' => _('View related reports'),
-		'Web' => _('Web')
+		'Web' => _('Web'),
+		'XML' => _('XML'),
+		'YAML' => _('YAML')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
@@ -546,7 +553,6 @@ $translate_strings = [
 		'Item type does not use interface' => _('Item type does not use interface')
 	],
 	'class.csvggraph.js' => [
-		'S_DISPLAYING_FOUND' => _('Displaying %1$s of %2$s found'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'Unexpected server error.' => _('Unexpected server error.')
 	],
@@ -603,6 +609,7 @@ if (empty($_GET['files'])) {
 		'component.z-color-picker.js',
 		'component.z-select.js',
 		'component.z-sparkline.js',
+		'component.z-textarea-flexible.js',
 		'component.z-vertical.js',
 		'class.event-hub.js',
 		'class.event-hub.event.js',
@@ -626,6 +633,7 @@ if (empty($_GET['files'])) {
 		'class.field.textarea.js',
 		'class.field.textbox.js',
 		'class.field.zselect.js',
+		'class.field.ztextarea-flexible.js',
 		'class.form.js',
 		'class.form.validator.js',
 		'class.menu.js',
@@ -654,7 +662,6 @@ if (empty($_GET['files'])) {
 		'class.expandable.subfilter.js',
 		'hostinterfacemanager.js',
 		'hostmacrosmanager.js',
-		'textareaflexible.js',
 		'class.popup-manager.js',
 		'class.popup-manager.event.js',
 		'items.js',
