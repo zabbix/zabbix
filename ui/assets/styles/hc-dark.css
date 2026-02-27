@@ -828,10 +828,6 @@ svg a {
     opacity: 0.6;
     z-index: 1;
     transition: left 0s, top 0s; }
-.sortable td > .drag-icon {
-  padding-top: 4px; }
-.sortable td:not(:first-child) {
-  vertical-align: top; }
 
 html,
 body {
@@ -4580,7 +4576,7 @@ z-sparkline {
     left: 0; }
 
 z-textarea-flexible {
-  display: inline-block; }
+  display: inline-grid; }
   z-textarea-flexible textarea {
     display: block !important;
     width: 100%;
