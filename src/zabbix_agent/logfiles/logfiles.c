@@ -1991,7 +1991,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 	size_t				szbyte;
 	zbx_offset_t			offset;
 	const int			is_count_item = (0 != (ZBX_METRIC_FLAG_LOG_COUNT & flags)) ? 1 : 0;
-#if !defined(_WINDOWS) && !defined(__MINGW32__)
+#if !defined(_WINDOWS) && !defined(__MINGW32__) && !defined(WITH_AGENT2_METRICS)
 	int				prep_vec_idx = -1;	/* index in 'prep_vec' vector */
 #endif
 	zbx_uint64_t			processed_size;

@@ -916,6 +916,7 @@ void	zbx_free_agent_request(AGENT_REQUEST *request)
 	free_request_params(request);
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 /******************************************************************************
  *                                                                            *
  * Purpose: adds new parameter                                                *
@@ -934,6 +935,7 @@ static void	add_request_param(AGENT_REQUEST *request, char *pvalue, zbx_request_
 			request->nparam * sizeof(zbx_request_parameter_type_t));
 	request->types[request->nparam - 1] = type;
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -1061,7 +1063,6 @@ void	zbx_test_parameters(void)
 
 	test_aliases();
 }
-#endif
 
 static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_parameters, char *error,
 		int max_error_len)
@@ -1155,7 +1156,6 @@ static int	replace_param(const char *cmd, const AGENT_REQUEST *request, int conf
 	return ret;
 }
 
-#if !defined(WITH_AGENT2_METRICS)
 /**********************************************************************************
  *                                                                                *
  * Parameters: in_command - [IN] item key                                         *
@@ -1283,7 +1283,7 @@ notsupported:
 
 	return ret;
 }
-#endif
+#endif /* not WITH_AGENT2_METRICS */
 
 static void	add_log_result(AGENT_RESULT *result, const char *value)
 {
