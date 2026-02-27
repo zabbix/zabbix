@@ -998,11 +998,61 @@ class testDashboardPlainTextWidget extends CWebTest {
 						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
 								'time' => strtotime('-16 hours')],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
+					]
+				]
+			],
+			// #5 Test case for 'Show text as HTML' screenshot check with Left (default) layout.
+			// Left layout has fixed columns (Timestamp/Name/Value), so the screenshot is stable
+			// across databases unlike Top layout where item column order is non-deterministic.
+			[
+				[
+					'fields' => [
+						'Show text as HTML' => true
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<b>Bold text</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<a href="#">Link text</a>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-3 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<span style="color:red;">Red text</span>'
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => 'Bold text'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => 'Link text'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-3 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => 'Red text'
+						]
+					],
+					'item_data' => [
+						['itemid' => '42227', 'values' => '<b>Bold text</b>', 'time' => strtotime('-1 hour')],
+						['itemid' => '42227', 'values' => '<a href="#">Link text</a>', 'time' => strtotime('-2 hours')],
+						['itemid' => '42227', 'values' => '<span style="color:red;">Red text</span>',
+								'time' => strtotime('-3 hours')]
 					],
 					'screenshot' => true
 				]
 			],
-			// #5 Test case for 'Dynamic items' check.
+			// #6 Test case for 'Dynamic items' check.
 			[
 				[
 					'host_select' => [
