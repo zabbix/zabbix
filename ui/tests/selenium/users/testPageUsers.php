@@ -59,6 +59,10 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
 		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
+
+		// Reset filter.
+		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
+		$this->page->waitUntilReady();
 	}
 
 	/**
@@ -79,10 +83,8 @@ class testPageUsers extends CLegacyWebTest {
 
 		$this->page->login()->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
-		$this->zbxTestTextPresent($alias);
 
-		$this->zbxTestClickLinkText($alias);
+		$this->query('link', $alias)->waitUntilClickable()->one()->click();
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User updated');
 		$this->zbxTestCheckHeader('Users');
