@@ -19,7 +19,7 @@ if (!function_exists('str_increment')) {
 	 * Function is available since PHP 8.3. Whilst PHP 8.5 runtime would emit deprecation warning when
 	 * decrementing non-numeric string.
 	 *
-	 * Replace references to this function once minimum runtime version is raised. Currently PHP 8.2 is lower boundary.
+	 * Replace references to this function once minimum runtime version is raised. Currently PHP 8.0 is lower boundary.
 	 *
 	 * Caution, this is not a complete polyfill - only A-z characters are incremented.
 	 */
