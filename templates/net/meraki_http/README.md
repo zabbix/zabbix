@@ -336,7 +336,8 @@ Set filters with macros if you want to override default filter parameters.
 |Meraki: There are errors in 'Get device data' metric||`length(last(/Cisco Meraki device by HTTP/meraki.get.device.errors))>0`|Warning||
 |Meraki: There are errors in 'Get inventory data' metric||`length(last(/Cisco Meraki device by HTTP/meraki.get.inventory.errors))>0`|Warning||
 |Meraki: There are errors in 'Get status' metric||`length(last(/Cisco Meraki device by HTTP/meraki.device.get.status.errors))>0`|Warning||
-|Meraki: Status is not online||`last(/Cisco Meraki device by HTTP/meraki.device.status)<>1`|Warning||
+|Meraki: Status is offline||`last(/Cisco Meraki device by HTTP/meraki.device.status)=0`|Warning||
+|Meraki: Status is alerting||`last(/Cisco Meraki device by HTTP/meraki.device.status)=3`|Average||
 
 ### LLD rule Uplinks loss and quality discovery
 
