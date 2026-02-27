@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,6 +86,7 @@ class CFieldSet extends CField {
 
 				for (const existing_field of Object.values(this.#fields)) {
 					if (existing_field.isSameField(discovered_field)) {
+						existing_field.updateState();
 						fields_rediscovered.push(existing_field.getName());
 						field_instance = existing_field;
 						break;
@@ -127,7 +128,7 @@ class CFieldSet extends CField {
 		let result = {};
 
 		for (const field of Object.values(this.#fields)) {
-			if (field._field.hasAttribute('data-skip-from-submit')) {
+			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
 
@@ -155,6 +156,10 @@ class CFieldSet extends CField {
 
 	getValueTrimmed() {
 		return this.getInnerValue(true);
+	}
+
+	updateState() {
+		this.#discoverAllFields();
 	}
 
 	hasErrors() {

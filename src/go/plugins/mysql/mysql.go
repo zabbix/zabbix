@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,7 +30,6 @@ import (
 const (
 	sqlExt     = ".sql"
 	pluginName = "Mysql"
-	hkInterval = 10
 )
 
 // Plugin inherits plugin.Base and store plugin-specific data.
@@ -98,7 +97,6 @@ func (p *Plugin) Start() {
 		keepAlive:      time.Duration(p.options.KeepAlive) * time.Second,
 		connectTimeout: time.Duration(p.options.Timeout) * time.Second,
 		callTimeout:    time.Duration(p.options.CallTimeout) * time.Second,
-		hkInterval:     hkInterval * time.Second,
 		queryStorage:   p.setCustomQuery(),
 		logger:         p.Logger,
 	}

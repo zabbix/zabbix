@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,6 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+
+use Facebook\WebDriver\Exception\ElementClickInterceptedException;
+use Facebook\WebDriver\Exception\NoSuchElementException;
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../../../include/items.inc.php';
@@ -529,14 +532,13 @@ class testFormItem extends CLegacyWebTest {
 				case INTERFACE_TYPE_SNMP :
 				case INTERFACE_TYPE_JMX :
 				case INTERFACE_TYPE_IPMI :
-				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_OPT :
 					$this->assertTrue($form->query('id:js-item-interface-label')->one()->isDisplayed());
 					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
+							($interfaceType === INTERFACE_TYPE_OPT ? '' : ' AND type='.$interfaceType)
 					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
@@ -1111,7 +1113,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-delay-test',
 					'delay' => 86401,
 					'inline_errors' => [
-						'Update interval' => 'Value must be one of 0-86400.'
+						'Update interval' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -1499,7 +1501,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-history-test',
 					'history' => 3599,
 					'inline_errors' => [
-						'id:history' => 'Value must be one of 3600-788400000.'
+						'id:history' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1511,7 +1513,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-history-test',
 					'history' => 788400001,
 					'inline_errors' => [
-						'id:history' => 'Value must be one of 3600-788400000.'
+						'id:history' => 'Value must be between 3600s (1h) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1559,7 +1561,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 788400001,
 					'inline_errors' => [
-						'id:trends' => 'Value must be one of 86400-788400000.'
+						'id:trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -1571,7 +1573,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-trends-test',
 					'trends' => 86399,
 					'inline_errors' => [
-						'id:trends' => 'Value must be one of 86400-788400000.'
+						'id:trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
@@ -2102,8 +2104,16 @@ class testFormItem extends CLegacyWebTest {
 					$this->zbxTestInputType('delay_flex_'.$itemCount.'_delay', $period['flexDelay']);
 				}
 				$itemCount ++;
-				$form->query("xpath://div[@id='js-item-flex-intervals-field']//button[@class='btn-link element-table-add']")
-						->one()->click();
+
+				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
+				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
+				try {
+					$add->click();
+					$this->query('id', 'delay_flex_'.$itemCount.'_delay')->one();
+				}
+				catch (NoSuchElementException | ElementClickInterceptedException $e) {
+					$add->click();
+				}
 
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_delay');
 				$this->zbxTestAssertVisibleId('delay_flex_'.$itemCount.'_period');
@@ -2262,6 +2272,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2300,6 +2311,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();

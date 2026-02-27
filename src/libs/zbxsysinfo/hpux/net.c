@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,6 +23,12 @@
 #include <sys/dlpi.h>
 #include <sys/dlpi_ext.h>
 #include <sys/mib.h>
+
+#if defined(__ia64) && HPUX_VERSION < 1131
+#	define _NET_NETMP_INCLUDED 1
+#	include <net/if.h>
+#	include <net/if6.h>
+#endif
 
 static char	buf_ctl[1024];
 

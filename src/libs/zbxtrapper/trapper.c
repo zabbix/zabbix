@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -367,9 +367,10 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 }
 
 /* queue item comparison function used to sort queue by nextcheck */
-static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_t **d2)
+static int	queue_compare_by_nextcheck_asc(const void *a1, const void *a2)
 {
-	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
+	const zbx_queue_item_t	*i1 = *(const zbx_queue_item_t * const *)a1;
+	const zbx_queue_item_t	*i2 = *(const zbx_queue_item_t * const *)a2;
 
 	return i1->nextcheck - i2->nextcheck;
 }
@@ -504,7 +505,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
@@ -1215,7 +1216,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 	zbx_rtrim(s, " \r\n");
 
+#ifdef ZBX_DEBUG
 	zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 
 	if ('{' == *s)	/* JSON protocol */
 	{
@@ -1233,6 +1236,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		if (SUCCEED != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_REQUEST, value, sizeof(value), NULL))
 			return FAIL;
 
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got request '%s'", value);
+#endif
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 		{
 			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
@@ -1250,10 +1256,16 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 
 		if (0 == strcmp(value, ZBX_PROTO_VALUE_AGENT_DATA))
 		{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
@@ -1263,6 +1275,9 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS))
 		{
+#ifndef ZBX_DEBUG
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
+#endif
 			ret = send_list_of_active_checks_json(sock, &jp, events_cbs, config_comms->config_timeout,
 					autoreg_update_host_cb);
 		}
@@ -1323,6 +1338,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 	}
 	else if (0 == strncmp(s, "ZBX_GET_ACTIVE_CHECKS", 21))	/* request for list of active checks */
 	{
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for list of active checks");
 		ret = send_list_of_active_checks(sock, s, events_cbs, config_comms->config_timeout,
 				autoreg_update_host_cb);
 	}
@@ -1336,6 +1352,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		zbx_host_key_t		hk = {host, key};
 		zbx_history_recv_item_t	item;
 		int			errcode;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "trapper received request for history data");
 
 		if (SUCCEED == zbx_vps_monitor_capped())
 		{
