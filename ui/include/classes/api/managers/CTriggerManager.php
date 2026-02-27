@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -59,18 +59,6 @@ class CTriggerManager {
 			'where' => ['triggerid' => $del_triggerids]
 		]);
 		DB::delete('triggers', ['triggerid' => $del_triggerids]);
-
-		$ins_housekeeper = [];
-
-		foreach ($del_triggerids as $del_triggerid) {
-			$ins_housekeeper[] = [
-				'tablename' => 'events',
-				'field' => 'triggerid',
-				'value' => $del_triggerid
-			];
-		}
-
-		DB::insertBatch('housekeeper', $ins_housekeeper);
 	}
 
 	/**

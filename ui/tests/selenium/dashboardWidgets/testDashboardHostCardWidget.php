@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1308,9 +1308,9 @@ class testDashboardHostCardWidget extends testWidgets {
 			$icon = $host_selector->query('class:zi-wrench-alt-small')->one();
 			$this->assertTrue($icon->isVisible());
 			$icon->waitUntilClickable()->click();
-			$dialog_text =  $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->getText();
+			$dialog_text =  $this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->getText();
 			$this->assertEquals($data['Maintenance']['Name']."\n".$data['Maintenance']['Description'], $dialog_text);
-			$this->query('xpath://div[@class="overlay-dialogue wordbreak"]/button[@title="Close"]')->one()->click();
+			$this->query('xpath://div[contains(@class, "hintbox-static")]//button[@title="Close"]')->one()->click();
 		}
 
 		if (array_key_exists('Severity', $data)) {
@@ -1330,7 +1330,7 @@ class testDashboardHostCardWidget extends testWidgets {
 
 			foreach ($availabilities as $availability) {
 				$availability->click();
-				$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+				$dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
 						->waitUntilPresent()->one();
 				$this->assertTrue($dialog->isVisible());
 				$dialog->close();
@@ -1526,20 +1526,21 @@ class testDashboardHostCardWidget extends testWidgets {
 			[
 				[
 					'class'  => 'monitoring-item',
-					'link'   => 'Graphs',
-					'header' => 'Graphs',
-					'title'  => 'Custom graphs',
-					'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={hostid}&filter_show=1&filter_set=1'
-				]
-			],
-			// #5.
-			[
-				[
-					'class'  => 'monitoring-item',
 					'link'   => 'Web',
 					'header' => 'Web monitoring',
 					'title'  => 'Web monitoring',
 					'url' => 'zabbix.php?action=web.view&filter_hostids%5B0%5D={hostid}&filter_set=1'
+				]
+			],
+			// TODO: Unstable test on Jenkins, if Graphs test case is before Web monitoring.
+			// #5.
+			[
+				[
+					'class'  => 'monitoring-item',
+					'link'   => 'Graphs',
+					'header' => 'Graphs',
+					'title'  => 'Custom graphs',
+					'url' => 'zabbix.php?action=charts.view&filter_hostids%5B0%5D={hostid}&filter_show=1&filter_set=1'
 				]
 			]
 		];
@@ -1584,11 +1585,6 @@ class testDashboardHostCardWidget extends testWidgets {
 		$data['url'] = str_replace('{hostid}', self::$hostid, $data['url']);
 		$this->assertEquals(PHPUNIT_URL.$data['url'], $this->page->getCurrentUrl());
 		$this->page->assertTitle($data['title']);
-
-		// Unstable test on Jenkins, graphs page opens slow and loose session before next test.
-		if (CTestArrayHelper::get($data, 'link') === 'Graphs') {
-			$this->page->open('browserwarning.php');
-		}
 	}
 
 	public static function getCancelData() {

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,7 @@
 
 #include "zbxdbschema.h"
 #include "zbxdb.h"
+#include "zbxnum.h"
 
 /*
  * 8.0 development database patches
@@ -391,6 +392,244 @@ static int	DBpatch_7050027(void)
 
 	return SUCCEED;
 }
+
+static int	DBpatch_7050028(void)
+{
+	const zbx_db_field_t	field = {"automatic", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_tag", &field);
+}
+
+static int	DBpatch_7050029(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute(
+			"update trigger_tag"
+			" set automatic=1"	/* ZBX_TAG_AUTOMATIC */
+			" where triggerid in ("
+				"select triggerid"
+				" from trigger_discovery"
+			")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050030(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from role_rule"
+			" where name like 'api.method.%%'"
+				" and value_str in ("
+					"'*.massupdate',"
+					"'host.massupdate',"
+					"'hostgroup.massupdate',"
+					"'template.massupdate',"
+					"'templategroup.massupdate',"
+					"'*.replacehostinterfaces',"
+					"'hostinterface.replacehostinterfaces'"
+				")"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050031(void)
+{
+	const zbx_db_table_t	table =
+			{"history_json", "itemid,clock,ns", 0,
+				{
+					{"itemid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"clock", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"ns", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"value", NULL, NULL, NULL, 0, ZBX_TYPE_JSON, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050032(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int				ret;
+	zbx_db_insert_t	db_insert;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_insert_prepare(&db_insert, "widget_field", "widget_fieldid", "widgetid", "type", "name", "value_int",
+			(char *)NULL);
+
+	result = zbx_db_select("select w.widgetid"
+			" from widget w"
+			" join dashboard_page dp on w.dashboard_pageid=dp.dashboard_pageid"
+			" join dashboard d on dp.dashboardid=d.dashboardid and d.templateid is null"
+			" where w.type='scatterplot' or w.type='svggraph'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	widgetid;
+
+		ZBX_STR2UINT64(widgetid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), widgetid, 0, "show_hostnames", 1);
+	}
+	zbx_db_free_result(result);
+
+	zbx_db_insert_autoincrement(&db_insert, "widget_fieldid");
+	ret = zbx_db_insert_execute(&db_insert);
+	zbx_db_insert_clean(&db_insert);
+
+	return ret;
+}
+
+static int	DBpatch_7050033(void)
+{
+	const zbx_db_field_t	field = {"value_str", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0};
+
+	return DBmodify_field_type("widget_field", &field, NULL);
+}
+
+static int	DBpatch_7050034(void)
+{
+	return DBrename_table("housekeeper", "housekeeper_old");
+}
+
+static int	DBpatch_7050035(void)
+{
+	const zbx_db_table_t	table =
+			{"housekeeper", "housekeeperid", 0,
+				{
+					{"housekeeperid", NULL, NULL, NULL, 0, ZBX_TYPE_SERIAL, ZBX_NOTNULL, 0},
+					{"object", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"objectid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050036(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* 0 - ZBX_HK_OBJECT_ITEM */
+	/* 1 - ZBX_HK_OBJECT_TRIGGER */
+	/* 2 - ZBX_HK_OBJECT_SERVICE */
+	if (ZBX_DB_OK > zbx_db_execute("insert into housekeeper(object,objectid)"
+			"select distinct"
+			" case"
+				" when tablename in ('history','history_str','history_log','history_uint',"
+					"'history_text','history_bin','history_json','trends','trends_uint') then 0"
+				" when tablename = 'events' and field = 'triggerid' then 1"
+				" when tablename = 'events' and field = 'itemid' then 0"
+				" when tablename = 'events' and field = 'lldruleid' then 0"
+				" when tablename = 'events' and field = 'serviceid' then 2"
+			" end as object,"
+			" value as objectid"
+			" from housekeeper_old"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050037(void)
+{
+	return DBdrop_table("housekeeper_old");
+}
+
+static int	DBpatch_7050038(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("housekeeper", "housekeeper_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("housekeeper", "housekeeper_pkey1", "housekeeper_pkey",
+			"housekeeperid", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_7050039(void)
+{
+	return DBcreate_housekeeper_trigger("items", "itemid");
+}
+
+static int	DBpatch_7050040(void)
+{
+	return DBcreate_housekeeper_trigger("triggers", "triggerid");
+}
+
+static int	DBpatch_7050041(void)
+{
+	return DBcreate_housekeeper_trigger("services", "serviceid");
+}
+
+static int	DBpatch_7050042(void)
+{
+	return DBcreate_housekeeper_trigger("dhosts", "dhostid");
+}
+
+static int	DBpatch_7050043(void)
+{
+	return DBcreate_housekeeper_trigger("dservices", "dserviceid");
+}
+
+static int	DBpatch_7050044(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("delete from ids where table_name='housekeeper'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050045(void)
+{
+	return DBdrop_foreign_key("dhosts", 1);
+}
+
+static int	DBpatch_7050046(void)
+{
+	const zbx_db_field_t	field = {"druleid", NULL, "drules", "druleid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dhosts", 1, &field);
+}
+
+static int	DBpatch_7050047(void)
+{
+	return DBdrop_foreign_key("dservices", 1);
+}
+
+static int	DBpatch_7050048(void)
+{
+	const zbx_db_field_t	field = {"dhostid", NULL, "dhosts", "dhostid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dservices", 1, &field);
+}
+
+static int	DBpatch_7050049(void)
+{
+	return DBdrop_foreign_key("dservices", 2);
+}
+
+static int	DBpatch_7050050(void)
+{
+	const zbx_db_field_t	field = {"dcheckid", NULL, "dchecks", "dcheckid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("dservices", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -425,5 +664,28 @@ DBPATCH_ADD(7050024, 0, 1)
 DBPATCH_ADD(7050025, 0, 1)
 DBPATCH_ADD(7050026, 0, 1)
 DBPATCH_ADD(7050027, 0, 1)
+DBPATCH_ADD(7050028, 0, 1)
+DBPATCH_ADD(7050029, 0, 1)
+DBPATCH_ADD(7050030, 0, 1)
+DBPATCH_ADD(7050031, 0, 1)
+DBPATCH_ADD(7050032, 0, 1)
+DBPATCH_ADD(7050033, 0, 1)
+DBPATCH_ADD(7050034, 0, 1)
+DBPATCH_ADD(7050035, 0, 1)
+DBPATCH_ADD(7050036, 0, 1)
+DBPATCH_ADD(7050037, 0, 1)
+DBPATCH_ADD(7050038, 0, 1)
+DBPATCH_ADD(7050039, 0, 1)
+DBPATCH_ADD(7050040, 0, 1)
+DBPATCH_ADD(7050041, 0, 1)
+DBPATCH_ADD(7050042, 0, 1)
+DBPATCH_ADD(7050043, 0, 1)
+DBPATCH_ADD(7050044, 0, 1)
+DBPATCH_ADD(7050045, 0, 1)
+DBPATCH_ADD(7050046, 0, 1)
+DBPATCH_ADD(7050047, 0, 1)
+DBPATCH_ADD(7050048, 0, 1)
+DBPATCH_ADD(7050049, 0, 1)
+DBPATCH_ADD(7050050, 0, 1)
 
 DBPATCH_END()

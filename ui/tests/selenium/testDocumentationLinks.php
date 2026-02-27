@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -577,14 +577,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=hostgroup.edit',
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #47 Update host group via popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=4', // Zabbix servers.
-					'doc_link' => '/en/manual/config/hosts/host#creating-a-host-group'
+					'doc_link' => '/en/manual/config/hosts/host_groups#configuration'
 				]
 			],
 			// #48 Template list view.
@@ -2049,14 +2049,14 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit',
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #217 Edit template group popup.
 			[
 				[
 					'url' => 'zabbix.php?action=popup&popup=templategroup.edit&groupid=12', // Templates/Applications.
-					'doc_link' => '/en/manual/config/templates/template#creating-a-template-group'
+					'doc_link' => '/en/manual/config/templates/template_groups#configuration'
 				]
 			],
 			// #218 Start creating Discovery status widget.
@@ -2747,7 +2747,7 @@ class testDocumentationLinks extends CWebTest {
 			[
 				[
 					'element' => [
-						'xpath://div[contains(@style, "top: 257px")]',
+						'xpath://div[contains(@style, "top: 258px")]',
 						'xpath://div[contains(@style, "top: 82px")]'
 					],
 					'doc_link' => '/en/manual/config/visualization/maps/map#adding-shapes'

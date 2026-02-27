@@ -54,6 +54,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxcommshigh}.c{..\..\..\src\libs\zbxcommshigh}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxresolver}.c{..\..\..\src\libs\zbxresolver}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\libs\zbxcomms}.c{..\..\..\src\libs\zbxcomms}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 

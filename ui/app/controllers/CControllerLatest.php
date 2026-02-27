@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -182,8 +182,10 @@ abstract class CControllerLatest extends CController {
 		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
+		// Extra byte to trim values that exceeds length limit.
+		$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
 		$history = Manager::History()->getLastValues($items, 2,
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)), $length
 		);
 
 		$hosts_on_page = array_intersect_key($prepared_data['hosts'],

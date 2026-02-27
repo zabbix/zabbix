@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,7 +44,7 @@ class CWidgetElement extends CElement {
 	public function getTimeInterval() {
 		$this->getHeader()->hoverMouse();
 		$this->query('xpath:.//li[@class="widget-info-button"]/button')->waitUntilPresent()->one()->click(true);
-		$hintbox = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible();
+		$hintbox = $this->query('xpath://div[contains(@class, "overlay-dialogue hintbox wordbreak")]')->one()->waitUntilVisible();
 		$hint_text = $hintbox->getText();
 
 		return $hint_text;

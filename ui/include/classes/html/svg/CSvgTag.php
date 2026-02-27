@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,8 +16,10 @@
 
 class CSvgTag extends CTag {
 
-	const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
-	const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
+	public const ZBX_STYLE_GRAPH_HIGHLIGHTED_VALUE = 'svg-point-highlight';
+	public const ZBX_STYLE_GRAPH_HELPER = 'svg-helper';
+	public const ZBX_STYLE_SCATTER_PLOT_VERTICAL_HELPER = 'scatter-plot-vertical-helper';
+	public const ZBX_STYLE_SCATTER_PLOT_HORIZONTAL_HELPER = 'scatter-plot-horizontal-helper';
 
 	/**
 	 * SVG styles array.

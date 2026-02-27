@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -99,8 +99,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'time_from' => $this->fields_values['time_period']['from_ts'],
 				'time_to' => $this->fields_values['time_period']['to_ts']
 			],
-			'grouped_thresholds' => $this->prepareGroupedThresholds($this->fields_values['thresholds']),
-			'interpolation' => (bool) $this->fields_values['interpolation'],
+			'show_hostnames' => $this->isTemplateDashboard()
+				? SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE
+				: $this->fields_values['show_hostnames'],
 			'axes' => [
 				'show_x_axis' => $this->fields_values['x_axis'] == SVG_GRAPH_AXIS_ON,
 				'x_axis_min' => $x_axis_min,
@@ -122,6 +123,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'legend_lines_mode' => $this->fields_values['legend_lines_mode'],
 				'show_aggregation' => $this->fields_values['legend_aggregation'] == WidgetForm::LEGEND_AGGREGATION_ON
 			],
+			'grouped_thresholds' => $this->prepareGroupedThresholds($this->fields_values['thresholds']),
+			'interpolation' => (bool) $this->fields_values['interpolation'],
 			'templateid' => $this->getInput('templateid', ''),
 			'override_hostid' => $this->fields_values['override_hostid']
 				? $this->fields_values['override_hostid'][0]
@@ -135,8 +138,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if (!$preview) {
 			$svg_options['data'] = zbx_array_merge($svg_options['data'], [
-				'time_period' => $this->fields_values['time_period'],
-				'hint_max_rows' => ZBX_WIDGET_ROWS
+				'time_period' => $this->fields_values['time_period']
 			]);
 		}
 

@@ -373,6 +373,10 @@ msgstr "(0 - использовать умолчание действия)"
 msgid "(Only super admins can create groups)"
 msgstr "(Только супер администраторы могут создавать группы)"
 
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr ""
+
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
@@ -500,6 +504,10 @@ msgstr "Ещё несколько шагов"
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
 msgstr "Ожидается значение с плавающей точкой."
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:89
+msgid "A message or at least one operation is required."
+msgstr ""
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
@@ -1770,6 +1778,11 @@ msgstr "В %1$s на %2$s каждый %3$s"
 msgid "At (hour:minute)"
 msgstr "В (час:минута)"
 
+#: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
+#, c-format
+msgid "At least %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Должен быть указан хотя бы один сервер LDAP."
@@ -1807,6 +1820,11 @@ msgstr "Должен быть указан хотя бы один день не�
 
 #: app/controllers/CControllerAutoregUpdate.php:30
 msgid "At least one encryption level must be selected."
+msgstr ""
+
+#: app/controllers/CControllerSlaCreate.php:53
+#: app/controllers/CControllerSlaUpdate.php:54
+msgid "At least one entry should be selected."
 msgstr ""
 
 #: app/controllers/CControllerRegExCreate.php:54
@@ -1860,6 +1878,11 @@ msgstr "Должен быть включкен как минимум один п
 #: app/controllers/CControllerMaintenanceCreate.php:40
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
+msgstr ""
+
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
 msgstr ""
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
@@ -2313,6 +2336,13 @@ msgstr "При изменении PSK для шифрования соедине
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Оба пароля должны совпадать."
+
+#: app/controllers/CControllerItemCreate.php:256
+#: app/controllers/CControllerItemPrototypeCreate.php:269
+#: app/controllers/CControllerItemPrototypeUpdate.php:257
+#: app/controllers/CControllerItemUpdate.php:256
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3578,6 +3608,11 @@ msgstr "Не удалось найти группу узлов сети \"%1$s\"
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "Не удалось найти группу узлов сети \"%1$s\", используемую прототипом узлов сети \"%2$s\" в прототипе правил обнаружения\"%3$s\" на \"%4$s\"."
+
+#: include/classes/import/importers/CDashboardImporterGeneral.php:57
+#, c-format
+msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4976,6 +5011,14 @@ msgstr "Информация о шасси. Возвращает строку"
 #: app/views/js/discovery.check.edit.js.php:256
 msgid "Check already exists."
 msgstr "Проверка уже существует."
+
+#: app/controllers/CControllerPopupImportCompare.php:121
+msgid "Check and reconfigure widgets after the import is completed."
+msgstr ""
+
+#: app/controllers/CControllerPopupImport.php:136
+msgid "Check and reconfigure widgets."
+msgstr ""
 
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
@@ -6524,6 +6567,10 @@ msgstr "Список панелей"
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
 msgstr "Свойства страницы панели"
+
+#: app/controllers/CControllerPopupImportCompare.php:216
+msgid "Dashboard pages"
+msgstr ""
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -8331,6 +8378,10 @@ msgctxt "compact table header"
 msgid "Duration"
 msgstr "Длительность"
 
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
+msgid "Duration must be no less than a minute."
+msgstr ""
+
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
 msgstr "Голландский (nl_NL)"
@@ -9064,6 +9115,16 @@ msgstr "Исключить группы узлов сети"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "Excluded downtime"
 msgstr "Исключение времени простоя"
+
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
+#, c-format
+msgid "Excluded downtime must not extend beyond %1$s."
+msgstr ""
+
+#: app/controllers/CControllerSlaCreate.php:74
+#: app/controllers/CControllerSlaUpdate.php:75
+msgid "Excluded downtime periods must be unique."
+msgstr ""
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -10299,6 +10360,11 @@ msgstr "Шестнадцатеричное в десятичное"
 msgid "Hidden"
 msgstr "Скрыта"
 
+#: widgets/scatterplot/includes/WidgetForm.php:176
+#: widgets/svggraph/includes/WidgetForm.php:268
+msgid "Hide"
+msgstr ""
+
 #: jsLoader.php:395
 msgid "Hide debug"
 msgstr "Скрыть отладку"
@@ -10765,6 +10831,11 @@ msgstr "Метаданные узлов сети"
 #: widgets/tophosts/views/column.edit.php:65
 msgid "Host name"
 msgstr "Имя узла сети"
+
+#: widgets/scatterplot/includes/WidgetForm.php:173
+#: widgets/svggraph/includes/WidgetForm.php:265
+msgid "Host names in labels"
+msgstr ""
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -12555,6 +12626,13 @@ msgstr ""
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ошибочный API метод \"%2$s\" для роли пользователей \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:175
+#: app/controllers/CControllerItemPrototypeCreate.php:188
+#: app/controllers/CControllerItemPrototypeUpdate.php:176
+#: app/controllers/CControllerItemUpdate.php:175
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -13130,6 +13208,11 @@ msgstr "Итальянский (it_IT)"
 msgid "Item"
 msgstr "Элемент данных"
 
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
+#, c-format
+msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
+msgstr ""
+
 #: items.php:667
 msgid "Item added"
 msgstr "Элемент данных добавлен"
@@ -13542,6 +13625,10 @@ msgstr "Шаблон группы LDAP"
 #: app/controllers/CControllerAuthenticationUpdate.php:117
 msgid "LDAP is not configured"
 msgstr "LDAP не настроен"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:34
+msgid "LDAP is not configured."
+msgstr ""
 
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
@@ -14704,6 +14791,13 @@ msgstr "Тип \"способ оповещения\" \"%1$s\" используе
 msgid "Media type added"
 msgstr "Способ оповещений добавлен"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:104
+#: app/controllers/CControllerAuthenticationUpdate.php:175
+#: app/controllers/CControllerAuthenticationUpdate.php:296
+#: app/controllers/CControllerPopupLdapCheck.php:116
+msgid "Media type and attribute is not unique."
+msgstr ""
+
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
 msgid_plural "Media types deleted"
@@ -15490,6 +15584,22 @@ msgstr "Имя "
 msgid "Name ID"
 msgstr "ID имени"
 
+#: app/controllers/CControllerMfaCheck.php:30
+#: app/controllers/CControllerPopupLdapCheck.php:30
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
+msgid "Name already exists."
+msgstr ""
+
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr ""
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr ""
+
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "Имя поля формы не должно превышать 255 символов."
@@ -15971,6 +16081,11 @@ msgstr "Карты сети не добавлены."
 msgid "No matches found"
 msgstr "Совпадения не найдены"
 
+#: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr ""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "Новые модули не обнаружены"
@@ -16029,6 +16144,10 @@ msgstr "Нет прав доступа в систему."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Нет прав доступа на вызов \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:337
+msgid "No permissions to import dashboards."
+msgstr ""
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16960,6 +17079,11 @@ msgstr "Открыть инструкции по инсталляции"
 #: app/views/mediatype.test.edit.php:101 app/views/popup.scriptexec.php:41
 msgid "Open log"
 msgstr "Открыть журнал"
+
+#: include/classes/validators/CSslCertificateValidator.php:28
+#: include/classes/validators/CSslPrivateKeyValidator.php:28
+msgid "OpenSSL extension is not available"
+msgstr ""
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -18729,6 +18853,14 @@ msgstr "Конечная точка перенаправления"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Атрибут ссылки"
+
+#: app/controllers/CControllerPopupImport.php:135
+msgid "References to missing objects were ignored:"
+msgstr ""
+
+#: app/controllers/CControllerPopupImportCompare.php:120
+msgid "References to missing objects will be ignored:"
+msgstr ""
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -21784,6 +21916,11 @@ msgstr "Приоритет отображения тегов"
 msgid "Tag filter"
 msgstr "Фильтр тегов"
 
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr ""
+
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
 msgstr "Теги для совпадения"
@@ -22538,6 +22675,11 @@ msgstr[2] "Это значение не может быть одним из %1$s
 #, c-format
 msgid "This value cannot be one of %1$s."
 msgstr "Это значение не может быть одним из %1$s."
+
+#: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
+#, c-format
+msgid "This value cannot have more than %1$s decimal places."
+msgstr ""
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -26849,6 +26991,11 @@ msgstr "закольцованная зависимость элементов �
 msgid "color"
 msgstr "цвет"
 
+#: include/classes/validators/CTimeRangesValidator.php:33
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
+msgid "comma separated list of time periods is expected"
+msgstr ""
+
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
 msgstr "для запланированных дней недели ожидается список периодов времени, разделенных запятой"
@@ -27350,6 +27497,11 @@ msgstr "ошибочная последовательность байт в UTF-
 #: include/validate.inc.php:191
 msgid "invalid data type"
 msgstr "ошибочный тип данных"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28043,6 +28195,11 @@ msgstr "шаблоны"
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentile() - Процентиль P за период Т"
 
+#: include/classes/validators/CTimeRangesValidator.php:56
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
+msgid "periods must be unique"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() - Возвращает Пи константу"
@@ -28262,6 +28419,11 @@ msgstr "skewness() - Измерение асимметрии распредел�
 #: app/controllers/CControllerPopupTriggerExpr.php:1020
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt() - Квадратный корень значения"
+
+#: include/classes/validators/CTimeRangesValidator.php:44
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
+msgid "start time must be less than end time"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28578,6 +28740,10 @@ msgstr "неизвестно"
 msgid "unknown function \"%1$s\""
 msgstr "неизвестная функция \"%1$s\""
 
+#: include/classes/api/services/CMap.php:1999
+msgid "unsupported data type"
+msgstr ""
+
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
 msgstr "неподдерживаемый суффикс времени"
@@ -28751,6 +28917,11 @@ msgstr "значение должно быть между \"%1$s\" и \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "значение должно быть между \"%1$s\" и \"%2$s\", и иметь не более \"%3$s\" цифр после десятичной точки"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "значение должно быть пустым"
@@ -28768,6 +28939,16 @@ msgstr[2] "значение должно быть пустым или одним
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "значение должно быть больше \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

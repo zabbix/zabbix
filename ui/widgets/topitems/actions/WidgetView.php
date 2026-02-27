@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -343,7 +343,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($items_by_source['history']) {
-				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
+				// Extra byte to trim values that exceeds length limit.
+				$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s,
+					$length
+				);
 				$result += array_column(array_column($values, 0), 'value', 'itemid');
 			}
 
@@ -494,7 +498,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		foreach ($db_items as $itemid => $db_item) {
 			$value_type_group = match ((int) $db_item['value_type']) {
 				ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT => 'numeric',
-				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG => 'text',
+				ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_JSON => 'text',
 				ITEM_VALUE_TYPE_BINARY => 'binary'
 			};
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -328,11 +328,11 @@ static int	ha_db_commit(zbx_ha_info_t *info)
 {
 	if (ZBX_DB_OK <= info->db_status)
 		info->db_status = zbx_dbconn_commit(info->dbconn);
+	else
+		zbx_dbconn_rollback(info->dbconn);
 
 	if (ZBX_DB_OK > info->db_status)
 	{
-		zbx_dbconn_rollback(info->dbconn);
-
 		if (ZBX_DB_FAIL == info->db_status)
 			ha_set_error(info, "database error");
 		else

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -261,6 +261,7 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 		case ITEM_VALUE_TYPE_LOG:
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			if (array_key_exists('highlights', $column)) {
 				foreach ($column['highlights'] as $highlight) {
 					if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
@@ -273,14 +274,18 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 
 			$cell = new CCol();
 
-			$formatted_value = zbx_nl2br($item_value['value']);
+			$formatted_value = $column['item_value_type'] == ITEM_VALUE_TYPE_JSON
+				? (new CTrim($item_value['value'], (64 * ZBX_KIBIBYTE))) : $item_value['value'];
+
+			$hintbox_value = $column['item_value_type'] == ITEM_VALUE_TYPE_JSON
+				? (new CTrim($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT)) : (new CDiv($item_value['value']));
 
 			switch ($column['display']) {
 				case CWidgetFieldColumnsList::DISPLAY_AS_IS:
 					$cell
 						->addItem(
 							(new CPre($formatted_value))->setHint(
-								(new CDiv($formatted_value))
+								$hintbox_value
 									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
@@ -298,7 +303,7 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 					$cell
 						->addItem(
 							(new CSpan($single_line_value))->setHint(
-								(new CDiv($formatted_value))
+								$hintbox_value
 									->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 									->addClass(ZBX_STYLE_HINTBOX_WRAP)
 							)
@@ -308,7 +313,10 @@ function makeValueCell(array $column, array $item_value, bool $text_wordbreak = 
 
 				case CWidgetFieldColumnsList::DISPLAY_HTML:
 					$cell->addItem(
-						new CJsScript($item_value['value'])
+						(new CIFrame(null, '100%', '0', 'no', null))
+							->setAttribute('srcdoc', $item_value['value'])
+							->setAttribute('sandbox', 'allow-same-origin')
+							->addClass('js-iframe')
 					);
 					break;
 			}

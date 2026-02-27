@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,6 +28,7 @@ class CControllerExport extends CController {
 			'mediatypeids' =>	'not_empty|array_db media_type.mediatypeid',
 			'maps' =>			'not_empty|array_db sysmaps.sysmapid',
 			'templates' =>		'not_empty|array_db hosts.hostid',
+			'dashboardids' =>	'not_empty|array_db dashboard.dashboardid',
 			'format' =>			'in '.implode(',', [CExportWriterFactory::YAML, CExportWriterFactory::XML, CExportWriterFactory::JSON])
 		];
 
@@ -58,6 +59,9 @@ class CControllerExport extends CController {
 			case 'export.sysmaps':
 				return $this->checkAccess(CRoleHelper::UI_MONITORING_MAPS);
 
+			case 'export.dashboards':
+				return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD);
+
 			default:
 				return false;
 		}
@@ -86,6 +90,10 @@ class CControllerExport extends CController {
 
 			case 'export.templates':
 				$params['options']['templates'] = $this->getInput('templates', []);
+				break;
+
+			case 'export.dashboards':
+				$params['options']['dashboards'] = $this->getInput('dashboardids', []);
 				break;
 
 			default:

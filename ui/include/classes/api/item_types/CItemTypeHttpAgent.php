@@ -1,6 +1,6 @@
 <?php declare(strict_types = 1);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,10 +27,6 @@ class CItemTypeHttpAgent extends CItemType {
 		'follow_redirects', 'retrieve_mode', 'output_format', 'http_proxy', 'interfaceid', 'authtype', 'username',
 		'password', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'timeout',
 		'delay', 'allow_traps', 'trapper_hosts'
-	];
-
-	const POSTS_JSON_MACROS_N = ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.PORT}', '{HOST.HOST}', '{HOST.NAME}',
-		'{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'
 	];
 
 	/**

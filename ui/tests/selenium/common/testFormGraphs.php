@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -419,8 +419,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Too large width and height'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => 65536,
-						'Height' => 65536
+						'Width' => 8001,
+						'Height' => 4501
 					],
 					'items' => [
 						[
@@ -435,8 +435,8 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'details' => [
-						'Incorrect value for field "width": value must be no greater than "65535".',
-						'Incorrect value for field "height": value must be no greater than "65535".'
+						'Incorrect value for field "width": value must be no greater than "8000".',
+						'Incorrect value for field "height": value must be no greater than "4500".'
 					]
 				]
 			],
@@ -446,8 +446,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Too low width and height'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => -65536,
-						'Height' => -65536
+						'Width' => -8001,
+						'Height' => -4501
 					],
 					'items' => [
 						[
@@ -1052,7 +1052,7 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$dialog->waitUntilReady();
 		$form = $dialog->asForm();
 

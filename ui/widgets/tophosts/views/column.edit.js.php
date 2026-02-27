@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -186,6 +186,7 @@ window.tophosts_column_edit_form = new class {
 			case <?= ITEM_VALUE_TYPE_STR ?>:
 			case <?= ITEM_VALUE_TYPE_LOG ?>:
 			case <?= ITEM_VALUE_TYPE_TEXT ?>:
+			case <?= ITEM_VALUE_TYPE_JSON ?>:
 				display_value_as = <?= CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT ?>;
 				break;
 			case <?= ITEM_VALUE_TYPE_BINARY ?>:

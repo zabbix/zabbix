@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -125,7 +125,9 @@ class testFormTagsDiscoveredHost extends testFormTags {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->clone_name).' AND flags=4');
 		$all_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE hostid='.$hostid.' ORDER BY tag, value');
 		$inherited_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE automatic=1 AND hostid='.
-				$hostid.' ORDER BY tag, value');
+				$hostid.' ORDER BY tag, value'
+		);
+
 		$this->page->login()->open($this->link);
 		$this->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();

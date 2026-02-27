@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1047,12 +1047,8 @@
 			})
 			.trigger('change');
 
-		jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
 		jQuery('.tags-table', this.$form)
-			.dynamicRows({template: '#lldoverride-tag-row', allow_empty: true})
-			.on('click', 'button.element-table-add', function() {
-				jQuery('.tags-table .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', this.$form).textareaFlexible();
-			});
+			.dynamicRows({template: '#lldoverride-tag-row', allow_empty: true});
 
 		// Override actions available per override object.
 		var available_actions = {
@@ -1124,13 +1120,13 @@
 		var url = new Curl(this.$form.attr('action'));
 		url.setArgument('validate', 1);
 
-		this.$form.trimValues(['input[type="text"]', 'textarea']);
+		this.$form.trimValues(['input[type="text"]', 'textarea', 'z-textarea-flexible']);
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		overlay.setLoading();
 		overlay.xhr = jQuery.ajax({
 			url: url.getUrl(),
-			data: this.$form.serialize(),
+			data: new URLSearchParams(new FormData(this.$form[0])).toString(),
 			dataType: 'json',
 			type: 'post'
 		})

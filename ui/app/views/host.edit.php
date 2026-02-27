@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -447,7 +447,7 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CCol([
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -464,7 +464,7 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 					->setErrorLabel(_('Value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -490,7 +490,7 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 	->addItem(
 		(new CRow([
 			(new CCol([
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -529,7 +529,7 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 	->addItem(
 		(new CRow([
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

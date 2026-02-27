@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -153,7 +153,6 @@ window.template_edit_popup = new class {
 				const $tags_table = jQuery(this.tags_table);
 
 				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
-				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});

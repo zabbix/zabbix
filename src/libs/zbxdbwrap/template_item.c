@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -243,10 +243,9 @@ static void	get_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *t
 		switch (interface_type = zbx_get_interface_type_by_item_type(item->type))
 		{
 			case INTERFACE_TYPE_UNKNOWN:
-			case INTERFACE_TYPE_OPT:
 				item->interfaceid = 0;
 				break;
-			case INTERFACE_TYPE_ANY:
+			case INTERFACE_TYPE_OPT:
 				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
 				{
 					if (0 != interfaceids[zbx_get_interface_type_priority(i) - 1])
