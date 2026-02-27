@@ -88,7 +88,7 @@ Refer to the vendor documentation.
 |----|-----------|----|-----------------------|
 |Total power|<p>MIB: HUAWEI-ENTITY-EXTENT-MIB</p><p>Object: hwDevicePowerInfoTotalPower</p><p></p><p>Indicates the total available power of the device.</p>|SNMP agent|huawei.ar600.device.power.total<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `^0$`</p><p>⛔️Custom on fail: Set error to: `The device does not support power information retrieval via SNMP.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Used power|<p>MIB: HUAWEI-ENTITY-EXTENT-MIB</p><p>Object: hwDevicePowerInfoUsedPower</p><p></p><p>Indicates the current power consumption of the device.</p>|SNMP agent|huawei.ar600.device.power.used<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `^0$`</p><p>⛔️Custom on fail: Set error to: `The device does not support power information retrieval via SNMP.`</p></li></ul>|
-|Huawei AR600 Series: SNMP walk EtherLike-MIB interfaces|<p>Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.</p>|SNMP agent|net.if.duplex.walk|
+|Huawei AR600 Series: SNMP walk EtherLike-MIB interfaces|<p>Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.</p>|SNMP agent|huawei.ar600.net.if.duplex.walk|
 |Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>Time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |Uptime (hardware)|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of time since this host was last initialized. Note that this is different from sysUpTime in the SNMPv2-MIB [RFC1907] because sysUpTime is the uptime of the network management portion of the system.</p>|SNMP agent|system.hw.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Custom multiplier: `0.01`</p></li></ul>|
 |System location|<p>MIB: SNMPv2-MIB</p><p>Physical location of the node (e.g., `equipment room`, `3rd floor`). If not provided, the value is a zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
@@ -100,10 +100,10 @@ Refer to the vendor documentation.
 |ICMP ping|<p>The host accessibility by ICMP ping.</p><p></p><p>0 - ICMP ping fails;</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
 |ICMP loss|<p>The percentage of lost packets.</p>|Simple check|icmppingloss|
 |ICMP response time|<p>The ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
-|Huawei AR600 Series: SNMP walk network interfaces|<p>Discovering interfaces from IF-MIB.</p>|SNMP agent|net.if.walk|
-|NQA walk||SNMP agent|huawei.ar600.nqa.walk<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li></ul>|
+|Huawei AR600 Series: SNMP walk network interfaces|<p>Discovering interfaces from IF-MIB.</p>|SNMP agent|huawei.ar600.net.if.walk|
+|NQA walk|<p>Collects raw Network Quality Analysis (NQA) statistics from the device using</p><p>Huawei NQA MIB. This item performs an SNMP walk of RTT, packet loss, and jitter metrics.</p><p></p><p>The output is used as a master item for NQA low-level discovery and dependent</p><p>items, allowing per-test monitoring of latency, jitter, and packet loss.</p>|SNMP agent|huawei.ar600.nqa.walk<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li></ul>|
 |CoS walk|<p>Raw SNMP walk of CBQoS-related tables (ifIndex, ifName, cbqosMatched, cbqosEnqueued, cbqosDiscarded).</p><p>Used as the master item for CBQoS LLD and dependent items that extract per-interface / per-queue metrics.</p>|SNMP agent|huawei.ar600.cos.walk<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|MPU walk||SNMP agent|mpu.walk<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li></ul>|
+|MPU walk|<p>Collects physical entity information for MPU (Main Processing Unit) components</p><p>using ENTITY-MIB. This item performs an SNMP walk of entPhysicalDescr and entPhysicalName.</p><p></p><p>The collected data is used as a master item for MPU low-level discovery (LLD),</p><p>enabling identification and monitoring of hardware processing units present</p><p>in the device.</p>|SNMP agent|huawei.ar600.mpu.walk<p>**Preprocessing**</p><ul><li><p>SNMP walk to JSON</p></li></ul>|
 
 ### Triggers
 
@@ -168,17 +168,17 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|NQA discovery||Dependent item|huawei.ar600.nqa.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|NQA discovery|<p>Discovers NQA tests based on data collected by the NQA walk item.</p><p></p><p>Discovered NQA entities are filtered using user-defined macros and used to</p><p>create per-test monitoring items and triggers.</p>|Dependent item|huawei.ar600.nqa.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for NQA discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT avg||SNMP agent|huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}]|
-|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT min||SNMP agent|huawei.ar600.nqa.rtt.min[{#NQA.ADMIN},{#NQA.TEST}]|
-|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT max||SNMP agent|huawei.ar600.nqa.rtt.max[{#NQA.ADMIN},{#NQA.TEST}]|
-|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss||SNMP agent|huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}]|
-|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter avg||SNMP agent|huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}]|
+|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT avg|<p>Average round-trip time (RTT) measured by the NQA test.</p><p></p><p>Represents the mean latency between the source and destination over the</p><p>evaluation interval.</p>|SNMP agent|huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}]|
+|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT min|<p>Minimum round-trip time (RTT) observed during the NQA test interval.</p><p></p><p>Useful for identifying baseline latency under optimal conditions.</p>|SNMP agent|huawei.ar600.nqa.rtt.min[{#NQA.ADMIN},{#NQA.TEST}]|
+|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT max|<p>Maximum round-trip time (RTT) observed during the NQA test interval.</p><p></p><p>Indicates latency spikes that may affect application performance.</p>|SNMP agent|huawei.ar600.nqa.rtt.max[{#NQA.ADMIN},{#NQA.TEST}]|
+|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss|<p>Packet loss ratio reported by the NQA test.</p><p></p><p>Represents the percentage of packets lost during transmission between</p><p>the source and destination.</p>|SNMP agent|huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}]|
+|NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter avg|<p>Average jitter measured by the NQA test.</p><p></p><p>Jitter represents variation in packet delay and is critical for real-time</p><p>applications such as voice and video.</p>|SNMP agent|huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}]|
 
 ### Trigger prototypes for NQA discovery
 
@@ -192,15 +192,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CoS queue discovery||Dependent item|huawei.ar600.cos.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CoS queue discovery|<p>Discovers Class of Service (CoS) queues on network interfaces.</p><p></p><p>Discovered queues are filtered using user-defined macros and used to create</p><p>dependent items for traffic statistics.</p>|Dependent item|huawei.ar600.cos.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for CoS queue discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#IFNAME} {#DIRECTION} queue {#QUEUE}: Discarded bytes rate||Dependent item|huawei.ar600.cbqos.discarded.rate[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.snmpIndex=="{#SNMPINDEX}")].cbqosDiscarded.first()`</p></li><li>Change per second</li></ul>|
-|{#IFNAME} {#DIRECTION} queue {#QUEUE}: Enqueued bytes rate||Dependent item|huawei.ar600.cbqos.enqueued.rate[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.snmpIndex=="{#SNMPINDEX}")].cbqosEnqueued.first()`</p></li><li>Change per second</li></ul>|
-|{#IFNAME} {#DIRECTION} queue {#QUEUE}: Matched bytes rate||Dependent item|huawei.ar600.cbqos.matched.rate[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.snmpIndex=="{#SNMPINDEX}")].cbqosMatched.first()`</p></li></ul>|
+|{#IFNAME} {#DIRECTION} queue {#QUEUE}: Discarded bytes rate|<p>Rate of bytes discarded by the CoS queue.</p><p></p><p>Calculated from cumulative SNMP counters and converted to bytes per second.</p><p>High values may indicate congestion or insufficient queue capacity.</p>|Dependent item|huawei.ar600.cbqos.discarded.rate[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.snmpIndex=="{#SNMPINDEX}")].cbqosDiscarded.first()`</p></li><li>Change per second</li></ul>|
+|{#IFNAME} {#DIRECTION} queue {#QUEUE}: Enqueued bytes rate|<p>Rate of bytes enqueued into the CoS queue.</p><p></p><p>Represents traffic accepted by the queue and scheduled for transmission.</p>|Dependent item|huawei.ar600.cbqos.enqueued.rate[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.snmpIndex=="{#SNMPINDEX}")].cbqosEnqueued.first()`</p></li><li>Change per second</li></ul>|
+|{#IFNAME} {#DIRECTION} queue {#QUEUE}: Matched bytes rate|<p>Rate of bytes matched to this CoS queue based on classification rules.</p><p></p><p>Reflects traffic classified into the queue before scheduling or dropping</p><p>decisions are applied.</p>|Dependent item|huawei.ar600.cbqos.matched.rate[{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.snmpIndex=="{#SNMPINDEX}")].cbqosMatched.first()`</p></li></ul>|
 
 ### Trigger prototypes for CoS queue discovery
 
@@ -212,7 +212,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|MPU Discovery||Dependent item|mpu.discovery|
+|MPU Discovery|<p>Discovers MPU (Main Processing Unit) components using data collected from the</p><p>MPU walk item.</p><p></p><p>Physical entity name and description are used to identify processing modules</p><p>relevant for monitoring.</p><p></p><p>Discovered entities can be used for further hardware health and performance</p><p>monitoring.</p>|Dependent item|huawei.ar600.mpu.discovery|
 
 ### Item prototypes for MPU Discovery
 

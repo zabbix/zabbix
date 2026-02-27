@@ -148,6 +148,54 @@ zabbix_export:
           tags:
             - tag: component
               value: power
+        - uuid: 29a3d94d4ee1417e92395384b1cd3227
+          name: 'MPU walk'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.47.1.1.1.1.2,1.3.6.1.2.1.47.1.1.1.1.7]'
+          key: huawei.ar600.mpu.walk
+          history: '0'
+          value_type: TEXT
+          description: |
+            Collects physical entity information for MPU (Main Processing Unit) components
+            using ENTITY-MIB. This item performs an SNMP walk of entPhysicalDescr and entPhysicalName.
+            
+            The collected data is used as a master item for MPU low-level discovery (LLD),
+            enabling identification and monitoring of hardware processing units present
+            in the device.
+          preprocessing:
+            - type: SNMP_WALK_TO_JSON
+              parameters:
+                - entPhysicalDescr
+                - 1.3.6.1.2.1.47.1.1.1.1.2
+                - '0'
+                - entPhysicalName
+                - 1.3.6.1.2.1.47.1.1.1.1.7
+                - '0'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 98f6ee6bd5504d639ab3af7c2b44c7e1
+          name: 'Huawei AR600 Series: SNMP walk EtherLike-MIB interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.10.7.2.1.19,1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2]'
+          key: huawei.ar600.net.if.duplex.walk
+          history: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 2bb552be2f2f49abb1901be66a5ef785
+          name: 'Huawei AR600 Series: SNMP walk network interfaces'
+          type: SNMP_AGENT
+          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.10,1.3.6.1.2.1.2.2.1.16,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.2.2.1.5]'
+          key: huawei.ar600.net.if.walk
+          history: '0'
+          value_type: TEXT
+          description: 'Discovering interfaces from IF-MIB.'
+          tags:
+            - tag: component
+              value: raw
         - uuid: 29a3d94d4ee1417e92395384a1cd3229
           name: 'NQA walk'
           type: SNMP_AGENT
@@ -155,6 +203,12 @@ zabbix_export:
           key: huawei.ar600.nqa.walk
           history: '0'
           value_type: TEXT
+          description: |
+            Collects raw Network Quality Analysis (NQA) statistics from the device using
+            Huawei NQA MIB. This item performs an SNMP walk of RTT, packet loss, and jitter metrics.
+            
+            The output is used as a master item for NQA low-level discovery and dependent
+            items, allowing per-test monitoring of latency, jitter, and packet loss.
           preprocessing:
             - type: SNMP_WALK_TO_JSON
               parameters:
@@ -257,47 +311,6 @@ zabbix_export:
                   value: availability
                 - tag: scope
                   value: performance
-        - uuid: 29a3d94d4ee1417e92395384b1cd3227
-          name: 'MPU walk'
-          type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.2.1.47.1.1.1.1.2,1.3.6.1.2.1.47.1.1.1.1.7]'
-          key: mpu.walk
-          history: '0'
-          value_type: TEXT
-          preprocessing:
-            - type: SNMP_WALK_TO_JSON
-              parameters:
-                - entPhysicalDescr
-                - 1.3.6.1.2.1.47.1.1.1.1.2
-                - '0'
-                - entPhysicalName
-                - 1.3.6.1.2.1.47.1.1.1.1.7
-                - '0'
-          tags:
-            - tag: component
-              value: raw
-        - uuid: 98f6ee6bd5504d639ab3af7c2b44c7e1
-          name: 'Huawei AR600 Series: SNMP walk EtherLike-MIB interfaces'
-          type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.2.1.10.7.2.1.19,1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2]'
-          key: net.if.duplex.walk
-          history: '0'
-          value_type: TEXT
-          description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.'
-          tags:
-            - tag: component
-              value: raw
-        - uuid: 2bb552be2f2f49abb1901be66a5ef785
-          name: 'Huawei AR600 Series: SNMP walk network interfaces'
-          type: SNMP_AGENT
-          snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.10,1.3.6.1.2.1.2.2.1.16,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.2.2.1.5]'
-          key: net.if.walk
-          history: '0'
-          value_type: TEXT
-          description: 'Discovering interfaces from IF-MIB.'
-          tags:
-            - tag: component
-              value: raw
         - uuid: 62da59c7aae54df7976f327119fe7cd1
           name: 'System contact details'
           type: SNMP_AGENT
@@ -495,12 +508,22 @@ zabbix_export:
               - macro: '{#QUEUE}'
                 value: '{$HUAWEI.AR600.COS.QUEUE.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
+          description: |
+            Discovers Class of Service (CoS) queues on network interfaces.
+            
+            Discovered queues are filtered using user-defined macros and used to create
+            dependent items for traffic statistics.
           item_prototypes:
             - uuid: efec46a3d440401cb089d7153a697825
               name: '{#IFNAME} {#DIRECTION} queue {#QUEUE}: Discarded bytes rate'
               type: DEPENDENT
               key: 'huawei.ar600.cbqos.discarded.rate[{#SNMPINDEX}]'
               units: bps
+              description: |
+                Rate of bytes discarded by the CoS queue.
+                
+                Calculated from cumulative SNMP counters and converted to bytes per second.
+                High values may indicate congestion or insufficient queue capacity.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -534,6 +557,10 @@ zabbix_export:
               type: DEPENDENT
               key: 'huawei.ar600.cbqos.enqueued.rate[{#SNMPINDEX}]'
               units: bps
+              description: |
+                Rate of bytes enqueued into the CoS queue.
+                
+                Represents traffic accepted by the queue and scheduled for transmission.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -555,6 +582,11 @@ zabbix_export:
               type: DEPENDENT
               key: 'huawei.ar600.cbqos.matched.rate[{#SNMPINDEX}]'
               units: bps
+              description: |
+                Rate of bytes matched to this CoS queue based on classification rules.
+                
+                Reflects traffic classified into the queue before scheduling or dropping
+                decisions are applied.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -673,192 +705,23 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: bc8e9d1a262b4b2697f98cef822a6e00
-          name: 'NQA discovery'
-          type: DEPENDENT
-          key: huawei.ar600.nqa.discovery
-          filter:
-            evaltype: AND
-            conditions:
-              - macro: '{#NQA.ADMIN}'
-                value: '{$HUAWEI.AR600.NQA.ADMIN.MATCHES}'
-              - macro: '{#NQA.ADMIN}'
-                value: '{$HUAWEI.AR600.NQA.ADMIN.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-              - macro: '{#NQA.TEST}'
-                value: '{$HUAWEI.AR600.NQA.TEST.MATCHES}'
-              - macro: '{#NQA.TEST}'
-                value: '{$HUAWEI.AR600.NQA.TEST.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-          item_prototypes:
-            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1d
-              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter avg'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.50.{#LATEST_INDEX}]'
-              key: 'huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
-              tags:
-                - tag: admin
-                  value: '{#NQA.ADMIN}'
-                - tag: component
-                  value: nqa
-                - tag: test
-                  value: '{#NQA.TEST}'
-              trigger_prototypes:
-                - uuid: d1e2f3a4b5c6478899a0b1c2d3e4f5a7
-                  expression: 'avg(/Huawei AR600 by SNMP/huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}],5m) > {$HUAWEI.AR600.JITTER.CRIT}'
-                  name: 'Huawei AR600: NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter too high'
-                  opdata: 'Current value: {ITEM.LASTVALUE} ms, threshold: {$HUAWEI.AR600.JITTER.CRIT} ms'
-                  priority: AVERAGE
-                  description: 'NQA jitter exceeds critical threshold.'
-                  tags:
-                    - tag: scope
-                      value: performance
-            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c1b1b
-              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.47.{#LATEST_INDEX}]'
-              key: 'huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: '%'
-              tags:
-                - tag: admin
-                  value: '{#NQA.ADMIN}'
-                - tag: component
-                  value: nqa
-                - tag: test
-                  value: '{#NQA.TEST}'
-              trigger_prototypes:
-                - uuid: d1e2f3a4b5c6478899a0b1c2d3e4f5a8
-                  expression: 'avg(/Huawei AR600 by SNMP/huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}],5m) > {$HUAWEI.AR600.PACKET.LOSS.CRIT}'
-                  name: 'Huawei AR600: NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss detected'
-                  opdata: 'Current value: {ITEM.LASTVALUE} %, threshold: {$HUAWEI.AR600.PACKET.LOSS.CRIT} %'
-                  priority: AVERAGE
-                  description: 'Packet loss exceeds critical threshold.'
-                  tags:
-                    - tag: scope
-                      value: performance
-            - uuid: f4d3c2b1a09e4f5d8c7b6a5e4d3c2b1a
-              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT avg'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.46.{#LATEST_INDEX}]'
-              key: 'huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
-              tags:
-                - tag: admin
-                  value: '{#NQA.ADMIN}'
-                - tag: component
-                  value: nqa
-                - tag: test
-                  value: '{#NQA.TEST}'
-              trigger_prototypes:
-                - uuid: d1e2f3a4b5c6478899a0b1c2d3e4f5b7
-                  expression: 'avg(/Huawei AR600 by SNMP/huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}],5m) > {$HUAWEI.AR600.RTT.AVG.CRIT}'
-                  name: 'Huawei AR600: NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT average too high'
-                  opdata: 'Current value: {ITEM.LASTVALUE} ms, threshold: {$HUAWEI.AR600.RTT.AVG.CRIT} ms'
-                  priority: AVERAGE
-                  description: 'Average RTT exceeds critical threshold.'
-                  tags:
-                    - tag: scope
-                      value: performance
-            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1c
-              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT max'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.9.{#LATEST_INDEX}]'
-              key: 'huawei.ar600.nqa.rtt.max[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
-              tags:
-                - tag: admin
-                  value: '{#NQA.ADMIN}'
-                - tag: component
-                  value: nqa
-                - tag: test
-                  value: '{#NQA.TEST}'
-            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1b
-              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT min'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.8.{#LATEST_INDEX}]'
-              key: 'huawei.ar600.nqa.rtt.min[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
-              tags:
-                - tag: admin
-                  value: '{#NQA.ADMIN}'
-                - tag: component
-                  value: nqa
-                - tag: test
-                  value: '{#NQA.TEST}'
-          master_item:
-            key: huawei.ar600.nqa.walk
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  var data = JSON.parse(value),
-                  	grouped = {},
-                  	result = [],
-                  	i, row, parts,
-                  	adminLen, testLen,
-                  	adminStart, testStart, probePos,
-                  	admin, test, probe,
-                  	key;
-                  
-                  	if (!Array.isArray(data)) {
-                  		throw 'Input is not an array';
-                  	}
-                  
-                  function decodeAscii(parts, start, length) {
-                  	if (start + length > parts.length) {
-                  		throw 'Invalid length for ASCII decoding';
-                  	}
-                  	var chars = [],
-                  		j;
-                  	for (j = 0; j < length; j++) {
-                  		chars.push(String.fromCharCode(+parts[start + j]));
-                  	}
-                  	return chars.join('');
-                  }
-                  
-                  for (i = 0; i < data.length; i++) {
-                  	row = data[i];
-                  	parts = row['{#SNMPINDEX}'].split('.');
-                  	adminLen = +parts[0];
-                  	adminStart = 1;
-                  	admin = decodeAscii(parts, adminStart, adminLen);
-                  	testLen = +parts[adminStart + adminLen];
-                  	testStart = adminStart + adminLen + 1;
-                  	test = decodeAscii(parts, testStart, testLen);
-                  	probePos = testStart + testLen;
-                  	probe = +parts[probePos];
-                  	key = admin + '|' + test;
-                  	if (!grouped[key] || probe > grouped[key].probe) {
-                  		grouped[key] = {
-                  			admin: admin,
-                  			test: test,
-                  			probe: probe,
-                  			index: row['{#SNMPINDEX}']
-                  		};
-                  	}
-                  }
-                  
-                  for (key in grouped) {
-                  	result.push({
-                  		"{#NQA.ADMIN}": grouped[key].admin,
-                  		"{#NQA.TEST}": grouped[key].test,
-                  		"{#LATEST_INDEX}": grouped[key].index.replace(/\.\d+$/, '.0')
-                  	});
-                  }
-                  
-                  return JSON.stringify(result);
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1h
         - uuid: a2e3937ea93d4e799a5cf3fe75bc7e48
           name: 'MPU Discovery'
           type: DEPENDENT
-          key: mpu.discovery
+          key: huawei.ar600.mpu.discovery
           filter:
             conditions:
               - macro: '{#ENT_NAME}'
                 value: 'SRU.*'
+          description: |
+            Discovers MPU (Main Processing Unit) components using data collected from the
+            MPU walk item.
+            
+            Physical entity name and description are used to identify processing modules
+            relevant for monitoring.
+            
+            Discovered entities can be used for further hardware health and performance
+            monitoring.
           item_prototypes:
             - uuid: 29549c71091a44108377a90eb9afff23
               name: '{#ENT_NAME}: Temperature'
@@ -1035,12 +898,218 @@ zabbix_export:
                     - tag: scope
                       value: performance
           master_item:
-            key: mpu.walk
+            key: huawei.ar600.mpu.walk
           lld_macro_paths:
             - lld_macro: '{#ENT_DESCR}'
               path: $.entPhysicalDescr
             - lld_macro: '{#ENT_NAME}'
               path: $.entPhysicalName
+        - uuid: bc8e9d1a262b4b2697f98cef822a6e00
+          name: 'NQA discovery'
+          type: DEPENDENT
+          key: huawei.ar600.nqa.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#NQA.ADMIN}'
+                value: '{$HUAWEI.AR600.NQA.ADMIN.MATCHES}'
+              - macro: '{#NQA.ADMIN}'
+                value: '{$HUAWEI.AR600.NQA.ADMIN.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#NQA.TEST}'
+                value: '{$HUAWEI.AR600.NQA.TEST.MATCHES}'
+              - macro: '{#NQA.TEST}'
+                value: '{$HUAWEI.AR600.NQA.TEST.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: |
+            Discovers NQA tests based on data collected by the NQA walk item.
+            
+            Discovered NQA entities are filtered using user-defined macros and used to
+            create per-test monitoring items and triggers.
+          item_prototypes:
+            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1d
+              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter avg'
+              type: SNMP_AGENT
+              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.50.{#LATEST_INDEX}]'
+              key: 'huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}]'
+              units: ms
+              description: |
+                Average jitter measured by the NQA test.
+                
+                Jitter represents variation in packet delay and is critical for real-time
+                applications such as voice and video.
+              tags:
+                - tag: admin
+                  value: '{#NQA.ADMIN}'
+                - tag: component
+                  value: nqa
+                - tag: test
+                  value: '{#NQA.TEST}'
+              trigger_prototypes:
+                - uuid: d1e2f3a4b5c6478899a0b1c2d3e4f5a7
+                  expression: 'avg(/Huawei AR600 by SNMP/huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}],5m) > {$HUAWEI.AR600.JITTER.CRIT}'
+                  name: 'Huawei AR600: NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter too high'
+                  opdata: 'Current value: {ITEM.LASTVALUE} ms, threshold: {$HUAWEI.AR600.JITTER.CRIT} ms'
+                  priority: AVERAGE
+                  description: 'NQA jitter exceeds critical threshold.'
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c1b1b
+              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss'
+              type: SNMP_AGENT
+              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.47.{#LATEST_INDEX}]'
+              key: 'huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}]'
+              units: '%'
+              description: |
+                Packet loss ratio reported by the NQA test.
+                
+                Represents the percentage of packets lost during transmission between
+                the source and destination.
+              tags:
+                - tag: admin
+                  value: '{#NQA.ADMIN}'
+                - tag: component
+                  value: nqa
+                - tag: test
+                  value: '{#NQA.TEST}'
+              trigger_prototypes:
+                - uuid: d1e2f3a4b5c6478899a0b1c2d3e4f5a8
+                  expression: 'avg(/Huawei AR600 by SNMP/huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}],5m) > {$HUAWEI.AR600.PACKET.LOSS.CRIT}'
+                  name: 'Huawei AR600: NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss detected'
+                  opdata: 'Current value: {ITEM.LASTVALUE} %, threshold: {$HUAWEI.AR600.PACKET.LOSS.CRIT} %'
+                  priority: AVERAGE
+                  description: 'Packet loss exceeds critical threshold.'
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: f4d3c2b1a09e4f5d8c7b6a5e4d3c2b1a
+              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT avg'
+              type: SNMP_AGENT
+              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.46.{#LATEST_INDEX}]'
+              key: 'huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}]'
+              units: ms
+              description: |
+                Average round-trip time (RTT) measured by the NQA test.
+                
+                Represents the mean latency between the source and destination over the
+                evaluation interval.
+              tags:
+                - tag: admin
+                  value: '{#NQA.ADMIN}'
+                - tag: component
+                  value: nqa
+                - tag: test
+                  value: '{#NQA.TEST}'
+              trigger_prototypes:
+                - uuid: d1e2f3a4b5c6478899a0b1c2d3e4f5b7
+                  expression: 'avg(/Huawei AR600 by SNMP/huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}],5m) > {$HUAWEI.AR600.RTT.AVG.CRIT}'
+                  name: 'Huawei AR600: NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT average too high'
+                  opdata: 'Current value: {ITEM.LASTVALUE} ms, threshold: {$HUAWEI.AR600.RTT.AVG.CRIT} ms'
+                  priority: AVERAGE
+                  description: 'Average RTT exceeds critical threshold.'
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1c
+              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT max'
+              type: SNMP_AGENT
+              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.9.{#LATEST_INDEX}]'
+              key: 'huawei.ar600.nqa.rtt.max[{#NQA.ADMIN},{#NQA.TEST}]'
+              units: ms
+              description: |
+                Maximum round-trip time (RTT) observed during the NQA test interval.
+                
+                Indicates latency spikes that may affect application performance.
+              tags:
+                - tag: admin
+                  value: '{#NQA.ADMIN}'
+                - tag: component
+                  value: nqa
+                - tag: test
+                  value: '{#NQA.TEST}'
+            - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1b
+              name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT min'
+              type: SNMP_AGENT
+              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.8.{#LATEST_INDEX}]'
+              key: 'huawei.ar600.nqa.rtt.min[{#NQA.ADMIN},{#NQA.TEST}]'
+              units: ms
+              description: |
+                Minimum round-trip time (RTT) observed during the NQA test interval.
+                
+                Useful for identifying baseline latency under optimal conditions.
+              tags:
+                - tag: admin
+                  value: '{#NQA.ADMIN}'
+                - tag: component
+                  value: nqa
+                - tag: test
+                  value: '{#NQA.TEST}'
+          master_item:
+            key: huawei.ar600.nqa.walk
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var data = JSON.parse(value),
+                  	grouped = {},
+                  	result = [],
+                  	i, row, parts,
+                  	adminLen, testLen,
+                  	adminStart, testStart, probePos,
+                  	admin, test, probe,
+                  	key;
+                  
+                  	if (!Array.isArray(data)) {
+                  		throw 'Input is not an array';
+                  	}
+                  
+                  function decodeAscii(parts, start, length) {
+                  	if (start + length > parts.length) {
+                  		throw 'Invalid length for ASCII decoding';
+                  	}
+                  	var chars = [],
+                  		j;
+                  	for (j = 0; j < length; j++) {
+                  		chars.push(String.fromCharCode(+parts[start + j]));
+                  	}
+                  	return chars.join('');
+                  }
+                  
+                  for (i = 0; i < data.length; i++) {
+                  	row = data[i];
+                  	parts = row['{#SNMPINDEX}'].split('.');
+                  	adminLen = +parts[0];
+                  	adminStart = 1;
+                  	admin = decodeAscii(parts, adminStart, adminLen);
+                  	testLen = +parts[adminStart + adminLen];
+                  	testStart = adminStart + adminLen + 1;
+                  	test = decodeAscii(parts, testStart, testLen);
+                  	probePos = testStart + testLen;
+                  	probe = +parts[probePos];
+                  	key = admin + '|' + test;
+                  	if (!grouped[key] || probe > grouped[key].probe) {
+                  		grouped[key] = {
+                  			admin: admin,
+                  			test: test,
+                  			probe: probe,
+                  			index: row['{#SNMPINDEX}']
+                  		};
+                  	}
+                  }
+                  
+                  for (key in grouped) {
+                  	result.push({
+                  		"{#NQA.ADMIN}": grouped[key].admin,
+                  		"{#NQA.TEST}": grouped[key].test,
+                  		"{#LATEST_INDEX}": grouped[key].index.replace(/\.\d+$/, '.0')
+                  	});
+                  }
+                  
+                  return JSON.stringify(result);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
         - uuid: 4d142a571991482da0560cb2faa8f673
           name: 'Network interfaces discovery'
           type: DEPENDENT
@@ -1101,7 +1170,7 @@ zabbix_export:
                   parameters:
                     - 3m
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1126,7 +1195,7 @@ zabbix_export:
                   parameters:
                     - 3m
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1152,7 +1221,7 @@ zabbix_export:
                   parameters:
                     - '8'
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1181,7 +1250,7 @@ zabbix_export:
                   parameters:
                     - 3m
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1206,7 +1275,7 @@ zabbix_export:
                   parameters:
                     - 3m
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1232,7 +1301,7 @@ zabbix_export:
                   parameters:
                     - '8'
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1263,7 +1332,7 @@ zabbix_export:
                   parameters:
                     - 5m
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1293,7 +1362,7 @@ zabbix_export:
                     - '1.3.6.1.2.1.2.2.1.8.{#SNMPINDEX}'
                     - '0'
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1341,7 +1410,7 @@ zabbix_export:
                   parameters:
                     - 1d
               master_item:
-                key: net.if.walk
+                key: huawei.ar600.net.if.walk
               tags:
                 - tag: component
                   value: network
@@ -1423,7 +1492,7 @@ zabbix_export:
                 - tag: scope
                   value: performance
           master_item:
-            key: net.if.walk
+            key: huawei.ar600.net.if.walk
           preprocessing:
             - type: SNMP_WALK_TO_JSON
               parameters:
@@ -1482,7 +1551,7 @@ zabbix_export:
                     - '1.3.6.1.2.1.10.7.2.1.19.{#SNMPINDEX}'
                     - '0'
               master_item:
-                key: net.if.duplex.walk
+                key: huawei.ar600.net.if.duplex.walk
               tags:
                 - tag: component
                   value: network
@@ -1501,7 +1570,7 @@ zabbix_export:
                     - tag: scope
                       value: performance
           master_item:
-            key: net.if.duplex.walk
+            key: huawei.ar600.net.if.duplex.walk
           preprocessing:
             - type: SNMP_WALK_TO_JSON
               parameters:
