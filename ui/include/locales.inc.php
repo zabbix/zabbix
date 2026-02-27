@@ -86,11 +86,11 @@ function getSupportUrl(string $language): string {
 /**
  * Get integrations URL for specified language.
  *
- * @param string|null $language  ISO639-1 code or null for English integrations URL.
+ * @param string $language  ISO639-1 code.
  *
- * @return string
+ * @return string  Fallback to English integrations URL.
  */
-function getIntegrationsUrl(?string $language = null): string {
+function getIntegrationsUrl(string $language): string {
 	$urls = [
 		'cs' => 'https://www.zabbix.com/cz/integrations',
 		'fr' => 'https://www.zabbix.com/fr/integrations',
@@ -100,13 +100,7 @@ function getIntegrationsUrl(?string $language = null): string {
 		'zh' => 'https://www.zabbix.com/cn/integrations'
 	];
 
-	$fallback_url = 'https://www.zabbix.com/integrations';
-
-	if ($language === null || !array_key_exists($language, $urls)) {
-		return $fallback_url;
-	}
-
-	return $urls[$language];
+	return array_key_exists($language, $urls) ? $urls[$language] : 'https://www.zabbix.com/integrations';
 }
 
 /**
