@@ -47,7 +47,5 @@ if (!function_exists('str_increment')) {
 		}
 
 		throw new ValueError('String argument cannot not be empty.');
-
-		return '';
 	}
 }
