@@ -2085,7 +2085,12 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					if ('\0' != *encoding)
 						value = convert_to_utf8(buf, (size_t)BUF_SIZE, encoding);
 					else
+					{
+#ifndef PCRE2_MATCH_INVALID_UTF
+						zbx_replace_invalid_utf8(buf);
+#endif
 						value = buf;
+					}
 
 					zabbix_log(LOG_LEVEL_WARNING, "Logfile contains a large record: \"%.64s\""
 							" (showing only the first 64 characters). Only the first 256 kB"
@@ -2218,7 +2223,12 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 					if ('\0' != *encoding)
 						value = convert_to_utf8(p_start, (size_t)(p_nl - p_start), encoding);
 					else
+					{
+#ifndef PCRE2_MATCH_INVALID_UTF
+						zbx_replace_invalid_utf8(p_start);
+#endif
 						value = p_start;
+					}
 
 					processed_size = (size_t)offset + (size_t)(p_next - buf);
 					send_err = FAIL;
