@@ -603,7 +603,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 			}
 			// Check page header after successful login.
 			else {
-				$this->assertEquals($check['target'], $this->query('tag:h1')->one()->getText());
+				$this->assertEquals($check['target'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 			}
 
 			// Check user data in DB after login.

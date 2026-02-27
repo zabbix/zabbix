@@ -763,7 +763,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$form = $this->openWidgetAndFill($dashboard, 'Problems', $data['fields']);
 
 		if (array_key_exists('Tags', $data)) {

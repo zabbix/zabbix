@@ -21,7 +21,6 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
-|teams_endpoint|\<PLACE WEBHOOK URL HERE\>|MS Teams workflow-webhook URL.|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 
 ### Internal parameters
@@ -41,6 +40,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 |alert_subject|\{ALERT\.SUBJECT\}|'Default subject' value from action configuration.|
 |event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
 |trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
+|teams_endpoint|\{ALERT\.SENDTO\}|MS Teams workflow-webhook URL.|
 
 > Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
@@ -108,15 +108,12 @@ Note: If you want to remove the footer message "USERNAME used a Workflow to send
 2. **Import the media type**:
     - In the `Alerts` → `Media types` section, import the [media_msteams_workflow.yaml](media_msteams_workflow.yaml) file.
 
-3. **Configure the MS Teams Workflow media type**:
-    - Open the newly added **MS Teams Workflow** media type and replace the placeholder `<PLACE WEBHOOK URL HERE>` with the **incoming webhook URL** created during step 7 of the MS Teams workflow setup.
-
-4. **Create a Zabbix user and add media**:
+3. **Create a Zabbix user and add media**:
     - In the `Users` → `Users` section, click the `Create user` button in the top-right corner. In the `User` tab, fill in all the required fields (marked with red asterisks).
-    - In the `Media` tab, add a new media type and select **MS Teams Workflow** from the drop-down list. Although the `Send to` field is not used in MS Teams Workflow media, it cannot be empty. To comply with frontend requirements, fill in the field with any symbol.
+    - In the `Media` tab, add a new media type and select **MS Teams Workflow** from the drop-down list. In the `Send to` field place the **incoming webhook URL** created during step 7 of the MS Teams workflow setup.
     - Make sure the user has access to all the hosts for which you would like problem notifications to be sent to MS Teams. You can do so by selecting the appropriate user role in the `Permissions` tab.
 
-5. **You can now start receiving alerts!**
+4. **You can now start receiving alerts!**
 
 **Note**: The MS Teams Workflow webhook supports [Markdown format for Adaptive Cards](https://learn.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format?tabs=adaptive-md%2Cdesktop%2Cconnector-html) syntax in the alert message and subject. If you want to make use of it, go to `Alerts` → `Media types`, find the "MS Teams Workflow" media type, click on it, and in the `Message templates` tab, choose the desired message template and edit it using Markdown syntax.
 

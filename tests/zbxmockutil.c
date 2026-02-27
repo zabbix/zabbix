@@ -54,6 +54,21 @@ const char	*zbx_mock_get_optional_parameter_string(const char *path)
 	return parameter;
 }
 
+const char	*zbx_mock_get_optional_object_member_string(zbx_mock_handle_t object, const char *name)
+{
+	zbx_mock_error_t	err;
+	zbx_mock_handle_t	handle;
+	const char		*member;
+
+	if (ZBX_MOCK_SUCCESS != (err = zbx_mock_object_member(object, name, &handle)) ||
+			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &member)))
+	{
+		return NULL;
+	}
+
+	return member;
+}
+
 const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const char *name)
 {
 	zbx_mock_error_t	err;

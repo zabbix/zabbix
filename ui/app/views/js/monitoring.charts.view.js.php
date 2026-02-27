@@ -22,16 +22,15 @@
 		_data: null,
 		_resize_observer: null,
 		_container: null,
-		_filter_tags: new Map(),
-		_filter_tagnames: new Set(),
+		_init_filter_values: null,
 
 		init({filter_form_name, data, timeline}) {
 			this._filter_form = document.querySelector(`[name="${filter_form_name}"]`);
 			this._container = document.querySelector('main');
 			this._data = data;
 
-			this.initSubfilter();
 			this.initCharts();
+			this.initEvents();
 
 			timeControl.addObject('charts_view', timeline, {
 				id: 'timeline_1',
@@ -42,24 +41,41 @@
 			});
 
 			timeControl.processObjects();
+			this._init_filter_values = this.getInitFilterValues();
 		},
 
-		initSubfilter() {
-			for (const element of this._filter_form.querySelectorAll('.js-subfilter-unset')) {
-				this.setSubfilter(element.dataset.tag, element.dataset.value || null);
-			}
-
+		initEvents() {
 			this._filter_form.addEventListener('click', (e) => {
-				const link = e.target;
+				const target = e.target;
 
-				if (link.classList.contains('js-subfilter-set')) {
-					this.setSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
-					this.submitSubfilter();
+				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
+					const url = this.getPageUrl();
+					const subfilter = target.closest('.subfilter');
+
+					if (subfilter.matches('.subfilter-enabled')) {
+						url.searchParams.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
+					}
+					else {
+						url.searchParams.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
+					}
+
+					this.loadPageWithFilters(url, {subfilter_set: 1});
 				}
-				else if (link.classList.contains('js-subfilter-unset')) {
-					this.unsetSubfilter(link.getAttribute('data-tag'), link.getAttribute('data-value'));
-					this.submitSubfilter();
-				}
+			});
+
+			this._filter_form.addEventListener('submit', e => {
+				e.preventDefault();
+				const search_params = new URLSearchParams(new FormData(e.target));
+				const url = new URL('', window.location.origin + window.location.pathname);
+				url.searchParams.set('filter_set', '1');
+
+				search_params.forEach((filter_value, filter_key) => {
+					if (!filter_key.startsWith('subfilter_')) {
+						url.searchParams.append(filter_key, filter_value);
+					}
+				});
+
+				this.loadPageWithFilters(url, {filter_set: 1}, false);
 			});
 		},
 
@@ -85,66 +101,75 @@
 			});
 		},
 
+		getInitFilterValues() {
+			const filters = Object.keys(this._data.config).reduce((filtered, filter_key) => {
+				if (filter_key.includes('filter_')) {
+					if (Array.isArray(this._data.config[filter_key])) {
+						this._data.config[filter_key].forEach(value => filtered.push({key: `${filter_key}[]`, value}));
+					}
+					else if (typeof this._data.config[filter_key] === 'object') {
+						Object.keys(this._data.config[filter_key]).forEach(key =>
+							this._data.config[filter_key][key].forEach(value =>
+								filtered.push({key: `${filter_key}[${key}][]`, value})
+							)
+						)
+					}
+					else {
+						filtered.push({key: filter_key, value: this._data.config[filter_key]});
+					}
+				}
+
+				return filtered;
+			}, []);
+
+			filters.push({key: 'from', value: this._data.timeline.from});
+			filters.push({key: 'to', value: this._data.timeline.to});
+
+			return filters;
+		},
+
+		getPageUrl() {
+			const url = new URL('', window.location.origin + window.location.pathname);
+
+			url.searchParams.set('action', 'charts.view');
+			this._init_filter_values.forEach(filter => url.searchParams.append(filter.key, filter.value));
+
+			return url;
+		},
+
+		loadPageWithFilters(url, overwriteFilters = {}) {
+			const clear_keys = ['filter_set', 'filter_rst', 'page', 'subfilter_set'];
+
+			clear_keys.forEach(key => url.searchParams.delete(key));
+
+			Object.keys(overwriteFilters).forEach(
+				filter_key => url.searchParams.set(filter_key, overwriteFilters[filter_key])
+			);
+
+			window.location.href = url.href;
+		},
+
 		replacePaging(paging) {
 			document.querySelector('.<?= ZBX_STYLE_TABLE_PAGING ?>').outerHTML = paging;
+
+			document.querySelectorAll('.<?= ZBX_STYLE_TABLE_PAGING ?> .paging-btn-container a').forEach(link => {
+				link.addEventListener('click', e => {
+					e.preventDefault();
+
+					const search_params = new URLSearchParams(e.currentTarget.href);
+
+					this.loadPageWithFilters(this.getPageUrl(), {
+						subfilter_set: 1,
+						page: search_params.get('page') ?? 1
+					});
+				});
+			});
 		},
 
 		replaceSubfilter(subfilter) {
 			if (document.getElementById('subfilter') !== null) {
 				document.getElementById('subfilter').outerHTML = subfilter;
 			}
-		},
-
-		setSubfilter(tag, value) {
-			if (value !== null) {
-				const tag_values = this._filter_tags.has(tag) ? this._filter_tags.get(tag) : [];
-
-				tag_values.push(value);
-				this._filter_tags.set(tag, tag_values);
-			}
-			else {
-				this._filter_tagnames.add(tag);
-			}
-		},
-
-		unsetSubfilter(tag, value) {
-			if (value !== null) {
-				const values = this._filter_tags.get(tag);
-
-				this._filter_tags.set(tag, values.filter((tag_value) => value !== tag_value));
-			}
-			else {
-				this._filter_tagnames.delete(tag);
-			}
-		},
-
-		filterAddVar(name, value) {
-			const input = document.createElement('input');
-
-			input.type = 'hidden';
-			input.name = name;
-			input.value = value;
-
-			this._filter_form.appendChild(input);
-		},
-
-		submitSubfilter() {
-			this.filterAddVar('subfilter_set', '1');
-
-			for (const element of this._filter_form.querySelectorAll('[name^="subfilter_tag"]')) {
-				element.remove();
-			}
-
-			this._filter_tags.forEach((values, tag) => {
-				for (let value of values) {
-					this.filterAddVar(`subfilter_tags[${encodeURIComponent(tag)}][]`, value);
-				}
-			});
-			this._filter_tagnames.forEach(tag => {
-				this.filterAddVar(`subfilter_tagnames[]`, tag);
-			});
-
-			this._filter_form.submit();
 		}
 	};
 </script>
