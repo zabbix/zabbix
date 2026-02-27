@@ -416,7 +416,6 @@
 
 					list_url.setArgument('action', 'item.list');
 					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
 					new_href = list_url.getUrl();
 				}
 			}

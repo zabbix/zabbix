@@ -114,9 +114,11 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		if ($confirmation) {
 			$this->zbxTestAcceptAlert();
 		}
-			$this->zbxTestCheckHeader('Macros');
-			$this->zbxTestTextPresent('Macros');
-			$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
+
+		$this->page->waitUntilReady();
+		$this->zbxTestCheckHeader('Macros');
+		$this->zbxTestTextPresent('Macros');
+		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
 	}
 
 	private function calculateHash($conditions = null) {
