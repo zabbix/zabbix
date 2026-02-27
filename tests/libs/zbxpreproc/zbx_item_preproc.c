@@ -304,6 +304,16 @@ void	zbx_mock_test_entry(void **state)
 						fail_msg("expected empty value, but got %s", zbx_variant_value_desc(&value));
 				}
 
+				if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.type"))
+				{
+					const char	*value_type_str = zbx_mock_get_parameter_string("out.type");
+					unsigned char	value_type = zbx_mock_str_to_value_type(value_type_str);
+
+					if (value_type != value.type)
+						fail_msg("expected %s, but got %s", value_type_str,
+								zbx_variant_type_desc(&value));
+				}
+
 				if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("out.history"))
 				{
 					if (ZBX_VARIANT_NONE == history_value_out.type)

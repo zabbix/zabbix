@@ -1075,11 +1075,15 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 	int	ret = SUCCEED, user_macros = 0;
 	char	*params = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
-			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' type:%s cache:%p", __func__,
+			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value),
+			zbx_variant_type_desc(value), (void *)cache);
 
 	/* Special case: nothing to do */
-	if (ZBX_VARIANT_NONE == value->type)
+	if (ZBX_VARIANT_NONE == value->type && NULL == cache)
+		goto out;
+
+	if (ZBX_VARIANT_NONE == value->type && NULL != cache && ZBX_VARIANT_NONE == cache->value.type)
 		goto out;
 
 	params = step->params;
@@ -1189,8 +1193,8 @@ out:
 	if (params != step->params)
 		zbx_free(params);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s", __func__, zbx_result_string(ret),
-			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s type:%s", __func__, zbx_result_string(ret),
+			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), zbx_variant_type_desc(value));
 
 	return ret;
 }
