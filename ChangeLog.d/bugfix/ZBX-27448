@@ -1,1 +1,0 @@
-A......... [ZBX-27448] fixed inability to delete host, user or template groups when accordingly hosts, users or templates belonging to them were previously deleted in parallel requests (jfreibergs, vmaksimovs)

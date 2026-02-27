@@ -1,8 +1,17 @@
 Changes for 7.0.24rc1
 
 New features:
+.........T [ZBXNEXT-10405] improved Device status mapping and add trigger for Meraki template (kflorowski)
+A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
+A......... [ZBX-27448] fixed inability to delete host, user or template groups when accordingly hosts, users or templates belonging to them were previously deleted in parallel requests (jfreibergs, vmaksimovs)
+.........T [ZBX-27075] improved Teams Workflow webhook to use ALERT.SENDTO macro (kflorowski)
+..F....... [ZBX-27380] fixed redirect link when deleting host or template from item or item prototype list (gberzina)
+.......PS. [ZBX-27516] fixed snmp cache housekeeping not to interrupt scheduling (vso)
+...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
+..F....... [ZBX-27348] fixed showing some selected value by default for Map navigation tree widget if a listener does not exist (wczerneha)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
 ...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
 .......PS. [ZBX-27279] fixed 'daylight saving time' error for scheduled reports (MVekslers)
@@ -3958,8 +3967,10 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.45rc1
 
 New features:
+A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.44
