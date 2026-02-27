@@ -715,6 +715,7 @@ const hintBox = {
 			*/
 			css.width = Math.ceil(parseFloat(hint_computed_style.width));
 
+			// Event coordinates relative to host.
 			let client_x, client_y;
 
 			if (e.clientX !== undefined) {
