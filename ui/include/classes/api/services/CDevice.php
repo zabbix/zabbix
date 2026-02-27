@@ -37,9 +37,12 @@ class CDevice extends CApiService {
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
-	private const TASK_DEVICE_CHECK_DELAY = 1000;
+	private const TASK_DEVICE_CHECK_DELAY = 1000000; // 1 sec.
 	private const TASK_DEVICE_CHECK_TTL = 30;
 	private const TASK_DEVICE_STATUS_ERROR = -1;
+
+	public const DEVICE_KEY_SCOPE_IDENTITY = 0;
+	public const DEVICE_KEY_SCOPE_ENCRYPTION = 1;
 
 	private const SERVER_ID = 'server_id'; // CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID)
 
@@ -87,7 +90,8 @@ class CDevice extends CApiService {
 	}
 
 	/**
-	 * @param array $user
+	 * @param array  $user
+	 * @param string $user['userid']
 	 *
 	 * @return array
 	 */
@@ -133,6 +137,53 @@ class CDevice extends CApiService {
 			'device_id' => $uuid,
 			'server_id' => self::SERVER_ID // todo - get server_id by method
 		];
+	}
+
+	/**
+	 * @param array  $options
+	 * @param string $options['enrollment_token']
+	 * @param string $options['mobile_identity_key']
+	 * @param string $options['mobile_encryption_key']
+	 * @param string $options['push_token']
+	 * @param string $options['device_name']
+	 *
+	 * @return array
+	 */
+	public function onboard(array $options): array {
+		$this->validateOnboard($options, $db_device);
+
+		// Store MIK, MEK.
+		$fields = [
+			['deviceid' => $db_device['deviceid'], 'scope' => self::DEVICE_KEY_SCOPE_IDENTITY,
+				'key' => $options['mobile_identity_key']
+			],
+			['deviceid' => $db_device['deviceid'], 'scope' => self::DEVICE_KEY_SCOPE_ENCRYPTION,
+				'key' => $options['mobile_encryption_key']
+			]
+		];
+		DB::insertBatch('device_key', $fields, false);
+
+		// Generate API token
+		$tokens_data = CToken::createForce([[
+			'name' => $options['device_name'],
+			'userid' => $db_device['userid'],
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'auth_type' => CUser::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_DPOP],
+			'expires_at' => 0
+		]], $db_device['userid'], false);
+
+		$db_tokens = CToken::generateForce($tokens_data['tokenids'], $db_device['userid'], false);
+
+		$db_token = reset($db_tokens);
+
+		DB::update('device', [
+			'values' => ['name' => $options['device_name'], 'tokenid' =>$db_token['tokenid'],
+				'push_token' => $options['push_token'], 'status' => self::DEVICE_STATUS_ENABLED
+			],
+			'where' => ['deviceid' => $db_device['deviceid']]
+		]);
+
+		return ['token' => $db_token['token']];
 	}
 
 	private function validateInit(array $user, ?array &$db_user): void {
@@ -184,7 +235,7 @@ class CDevice extends CApiService {
 
 			$fields = [
 				'deviceid' => $deviceid,
-				'enrollment_token' => $enrollment_token,
+				'enrollment_token' => hash('sha512', $enrollment_token),
 				'enrollment_token_expiration' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
 			];
 
@@ -217,5 +268,43 @@ class CDevice extends CApiService {
 		}
 
 		return $taskid;
+	}
+
+	private function validateOnboard(array $options, ?array &$db_device): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+			'enrollment_token' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'mobile_identity_key' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'mobile_encryption_key' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'push_token' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'device_name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_enrollment_tokens = DB::select('enrollment_token', [
+			'output' => ['deviceid', 'enrollment_token_expiration'],
+			'filter' => ['enrollment_token' => hash('sha512', $options['enrollment_token'])]
+		]);
+
+		if (!$db_enrollment_tokens) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$db_enrollment_token = reset($db_enrollment_tokens);
+
+		DB::delete('enrollment_token', ['deviceid' => $db_enrollment_token['deviceid']]);
+
+		if ($db_enrollment_token['enrollment_token_expiration'] < time()) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$db_devices = DB::select('device', [
+			'output' => ['deviceid', 'userid'],
+			'where' => ['deviceid' => $db_enrollment_token['deviceid']]
+		]);
+
+		$db_device = reset($db_devices);
 	}
 }

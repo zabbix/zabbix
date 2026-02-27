@@ -236,7 +236,8 @@ class CLocalApiClient extends CApiClient {
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
+			|| ($api === 'apiinfo' && $method === 'version')
+			|| ($api === 'device' && $method === 'onboard'));
 	}
 
 	/**

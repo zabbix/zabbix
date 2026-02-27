@@ -3042,7 +3042,7 @@ class CUser extends CApiService {
 	private static function tokenAuthentication(string $auth_token, int $time, ?string $signature,
 			?string $request_api_method): array {
 		$db_tokens = DB::select('token', [
-			'output' => ['userid', 'auth_type', 'client_public_key', 'expires_at', 'tokenid'],
+			'output' => ['userid', 'auth_type', 'expires_at', 'tokenid'],
 			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
 		]);
 
