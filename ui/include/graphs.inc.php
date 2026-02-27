@@ -456,10 +456,10 @@ function get_next_color($palettetype = 0) {
 /**
  * Draws a text on an image. Supports TrueType fonts.
  *
- * @param int		$color		a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
- * @param string	$string
+ * @param int $color  a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
  */
-function imageText(GdImage $image, int $fontsize, int $angle, int|float $x, int|float $y, int $color, string $string) {
+function imageText(GdImage $image, int $fontsize, int $angle, int|float $x, int|float $y, int $color,
+		string $string): void {
 	$x = (int) $x;
 	$y = (int) $y;
 	$string = strtr($string, ['&' => '&#38;']);
