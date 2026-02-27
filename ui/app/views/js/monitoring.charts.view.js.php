@@ -57,7 +57,7 @@
 					const update_filter = (current_filter, key_parts, i, value, remove) => {
 						const key_name = key_parts[i][0];
 
-						if (i === key_parts.length - 1) {
+						if (i == key_parts.length - 1) {
 							if (remove) {
 								current_filter.forEach((value, idx) => {
 									if (value == target.getAttribute('data-value')) {
@@ -85,7 +85,7 @@
 								current_filter[key_name] = Object.assign({}, current_filter[key_name]);
 							}
 
-							if (Object.values(current_filter[key_name]).length === 0) {
+							if (Object.values(current_filter[key_name]).length == 0) {
 								delete current_filter[key_name];
 							}
 						}
