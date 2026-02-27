@@ -946,7 +946,7 @@ static const char	*history_clickhouse_parse_log_value(const struct zbx_json_pars
 static const char 	*history_clickhouse_parse_numeric_value(const struct zbx_json_parse *jp, const char *p,
 		unsigned char value_type, zbx_history_record_t *record)
 {
-	char	buf[MAX_ID_LEN + 1];
+	char	buf[ZBX_MAX_DOUBLE_LEN + 1];
 
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
 	{
