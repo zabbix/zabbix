@@ -303,7 +303,7 @@ class CControllerItemCreate extends CControllerItem {
 						'string', 'required',
 						'use' => [CTimePeriodParser::class, ['usermacros' => true]],
 						'messages' => ['use' => _('Invalid period.')],
-						'when' => [['type', 'in' => [ITEM_DELAY_FLEXIBLE]]]
+						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 					]
 				]
 			]],
