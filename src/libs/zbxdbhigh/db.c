@@ -12,9 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbx_trigger_constants.h"
 #include "zbxdbhigh.h"
 
 #include "zbxcrypto.h"
+#include "zbxdbwrap.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbx_host_constants.h"
@@ -30,10 +32,12 @@
 #endif
 
 ZBX_PTR_VECTOR_IMPL(db_event, zbx_db_event *)
+ZBX_VECTOR_IMPL(db_event_recovery, zbx_db_event_recovery_t)
 ZBX_PTR_VECTOR_IMPL(events_ptr, zbx_event_t *)
 ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 ZBX_PTR_VECTOR_IMPL(item_diff_ptr, zbx_item_diff_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_diff_ptr, zbx_trigger_diff_t *)
+ZBX_VECTOR_IMPL(db_event_suppress, zbx_db_event_suppress_t)
 
 void	zbx_item_diff_free(zbx_item_diff_t *item_diff)
 {
@@ -746,4 +750,38 @@ int	zbx_db_update_software_update_checkid(void)
 	zbx_db_free_result(result);
 
 	return ret;
+}
+
+zbx_db_event	*zbx_create_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+	int clock, int ns, int value)
+{
+	zbx_db_event	*event;
+
+	event = zbx_malloc(NULL, sizeof(zbx_db_event));
+	memset(event, 0, sizeof(zbx_db_event));
+
+	event->source = source;
+	event->object = object;
+	event->objectid = objectid;
+	event->clock = clock;
+	event->ns = ns;
+	event->value = value;
+	event->acknowledged = EVENT_NOT_ACKNOWLEDGED;
+	event->flags = ZBX_FLAGS_DB_EVENT_CREATE;
+	event->severity = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+	event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
+
+	return event;
+}
+
+zbx_vector_db_event_suppress_t	*zbx_create_event_suppress(int size)
+{
+	zbx_vector_db_event_suppress_t	*suppress;
+
+	suppress = (zbx_vector_db_event_suppress_t *)zbx_malloc(NULL, sizeof(zbx_vector_db_event_suppress_t));
+	zbx_vector_db_event_suppress_create(suppress);
+	if (0 != size)
+		zbx_vector_db_event_suppress_reserve(suppress, (size_t)size);
+
+	return suppress;
 }

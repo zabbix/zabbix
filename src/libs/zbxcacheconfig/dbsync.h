@@ -132,6 +132,9 @@ struct zbx_dbsync
 	/* the preprocessed columns  */
 	zbx_vector_ptr_t		columns;
 
+	/* database connection */
+	zbx_dbconn_t			*db;
+
 	/* statistics */
 	const char	*from;
 	zbx_uint64_t	add_num;
@@ -190,14 +193,14 @@ zbx_dbsync_env_t;
 
 void	zbx_dbsync_env_init(zbx_dc_config_t *cache);
 void	zbx_dbsync_env_destroy(void);
-int	zbx_dbsync_env_prepare(unsigned char mode);
+int	zbx_dbsync_env_prepare(zbx_dbconn_t *db, unsigned char mode);
 void	zbx_dbsync_env_flush_changelog(void);
-void	zbx_dbsync_env_clear(void);
+void	zbx_dbsync_env_clear(zbx_dbconn_t *db);
 int	zbx_dbsync_env_changelog_num(void);
 int	zbx_dbsync_env_changelog_dbsyncs_new_records(void);
 
-void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode);
-void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned char mode);
+void	zbx_dbsync_init(zbx_dbsync_t *sync, const char *name, unsigned char mode, zbx_dbconn_t *db);
+void	zbx_dbsync_init_changelog(zbx_dbsync_t *sync, const char *name, unsigned char mode, zbx_dbconn_t *db);
 void	zbx_dbsync_clear(zbx_dbsync_t *sync);
 int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync);
 int	zbx_dbsync_next(zbx_dbsync_t *sync, zbx_uint64_t *rowid, char ***row, unsigned char *tag);

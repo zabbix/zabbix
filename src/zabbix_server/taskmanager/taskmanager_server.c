@@ -19,13 +19,13 @@
 #include "../actions/actions.h"
 #include "../audit/audit_server.h"
 
+#include "zbxcep_client.h"
 #include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
-#include "zbxexport.h"
 #include "zbxdiag.h"
 #include "zbxservice.h"
 #include "zbxjson.h"
@@ -42,15 +42,8 @@
 #include "zbxdbhigh.h"
 #include "zbxipcservice.h"
 #include "zbxstr.h"
-#include "zbxserialize.h"
 #include "zbxsupervisor_client.h"
 #include "postinit.h"
-
-zbx_export_file_t		*problems_export = NULL;
-static zbx_export_file_t	*get_problems_export(void)
-{
-	return problems_export;
-}
 
 /******************************************************************************
  *                                                                            *
@@ -60,15 +53,14 @@ static zbx_export_file_t	*get_problems_export(void)
  *             triggerid         - [IN] source trigger id                     *
  *             eventid           - [IN] problem eventid to close              *
  *             userid            - [IN] user that requested to close problem  *
- *             rtc                 [IN] RTC socket                            *
  *                                                                            *
  ******************************************************************************/
 static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t triggerid, zbx_uint64_t eventid,
-		zbx_uint64_t userid, zbx_ipc_async_socket_t *rtc)
+		zbx_uint64_t userid)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, eventid);
 
-	zbx_close_problem(triggerid, eventid, userid, rtc);
+	zbx_close_problem(triggerid, eventid, userid);
 
 	zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64, ZBX_TM_STATUS_DONE, taskid);
 
@@ -80,13 +72,12 @@ static void	tm_execute_task_close_problem(zbx_uint64_t taskid, zbx_uint64_t trig
  * Purpose: tries to close problem by event acknowledgment action             *
  *                                                                            *
  * Parameters: taskid - [IN]                                                  *
- *             rtc    - [IN] RTC socket                                       *
  *                                                                            *
  * Return value: SUCCEED - task was executed and removed                      *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	tm_try_task_close_problem(zbx_uint64_t taskid, zbx_ipc_async_socket_t *rtc)
+static int	tm_try_task_close_problem(zbx_uint64_t taskid)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
@@ -131,7 +122,7 @@ static int	tm_try_task_close_problem(zbx_uint64_t taskid, zbx_ipc_async_socket_t
 			{
 				ZBX_STR2UINT64(userid, row[0]);
 				ZBX_STR2UINT64(eventid, row[1]);
-				tm_execute_task_close_problem(taskid, triggerid, eventid, userid, rtc);
+				tm_execute_task_close_problem(taskid, triggerid, eventid, userid);
 
 				zbx_dc_config_unlock_triggers(&locked_triggerids);
 
@@ -529,11 +520,11 @@ fail:
  * Purpose: notifies service manager about problem severity changes           *
  *                                                                            *
  ******************************************************************************/
-static void	notify_service_manager(const zbx_vector_ack_task_ptr_t *ack_tasks)
+static void	notify_cep(const zbx_vector_ack_task_ptr_t *ack_tasks)
 {
-	zbx_vector_event_severity_ptr_t	event_severities;
+	zbx_vector_event_severity_t	event_severities;
 
-	zbx_vector_event_severity_ptr_create(&event_severities);
+	zbx_vector_event_severity_create(&event_severities);
 
 	for (int i = 0; i < ack_tasks->values_num; i++)
 	{
@@ -541,27 +532,19 @@ static void	notify_service_manager(const zbx_vector_ack_task_ptr_t *ack_tasks)
 
 		if (ack_task->old_severity != ack_task->new_severity)
 		{
-			zbx_event_severity_t	*es;
+			zbx_event_severity_t	es_local = {
+				.eventid = ack_task->eventid,
+				.severity = ack_task->new_severity
+			};
 
-			es = (zbx_event_severity_t *)zbx_malloc(NULL, sizeof(zbx_event_severity_t));
-			es->eventid = ack_task->eventid;
-			es->severity = ack_task->new_severity;
-			zbx_vector_event_severity_ptr_append(&event_severities, es);
+			zbx_vector_event_severity_append(&event_severities, es_local);
 		}
 	}
 
 	if (0 != event_severities.values_num)
-	{
-		unsigned char	*data;
-		zbx_uint32_t	size;
+		zbx_cep_send_event_severities(event_severities.values, event_severities.values_num);
 
-		size = zbx_service_serialize_event_severities(&data, &event_severities);
-		zbx_service_send(ZBX_IPC_SERVICE_EVENT_SEVERITIES, data, size, NULL);
-		zbx_free(data);
-	}
-
-	zbx_vector_event_severity_ptr_clear_ext(&event_severities, zbx_event_severity_free);
-	zbx_vector_event_severity_ptr_destroy(&event_severities);
+	zbx_vector_event_severity_destroy(&event_severities);
 }
 
 /******************************************************************************
@@ -631,7 +614,7 @@ static int	tm_process_acknowledgments(zbx_vector_uint64_t *ack_taskids)
 		zbx_vector_ack_task_ptr_sort(&ack_tasks, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 		processed_num = process_actions_by_acknowledgments(&ack_tasks);
 
-		notify_service_manager(&ack_tasks);
+		notify_cep(&ack_tasks);
 	}
 
 	sql_offset = 0;
@@ -1007,24 +990,14 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 #define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 static void	tm_service_manager_send_suppression_action(zbx_uint64_t eventid, zbx_uint64_t action)
 {
-	unsigned char	*data = NULL, *ptr;
-	zbx_uint64_t	maintenanceid = 0;
-	zbx_uint32_t	data_len = 2 * sizeof(zbx_uint64_t) + sizeof(int);
-	int		events_num = 1;
-
-	ptr = data = (unsigned char *)zbx_malloc(NULL, (size_t)data_len);
-	ptr += zbx_serialize_value(ptr, events_num);
-	ptr += zbx_serialize_value(ptr, eventid);
-	(void)zbx_serialize_value(ptr, maintenanceid);
+	zbx_event_maintenance_t	event = {.eventid = eventid};
 
 	if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS)
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, data_len);
+		zbx_cep_send_event_maintenance_off(&event, 1);
 	else if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS)
-		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, data_len);
+		zbx_cep_send_event_maintenance_on(&event, 1);
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
-
-	zbx_free(data);
 }
 
 static void	tm_process_temp_suppression(const char *data)
@@ -1322,7 +1295,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now)
 		{
 			case ZBX_TM_TASK_CLOSE_PROBLEM:
 				/* close problem tasks will never have 'in progress' status */
-				if (SUCCEED == tm_try_task_close_problem(taskid, rtc))
+				if (SUCCEED == tm_try_task_close_problem(taskid))
 					processed_num++;
 				break;
 			case ZBX_TM_TASK_REMOTE_COMMAND:
@@ -1653,9 +1626,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		problems_export = zbx_problems_export_init(get_problems_export, "task-manager", process_num);
-
 	double	sec1 = zbx_time();
 
 	sleeptime = ZBX_TM_PROCESS_PERIOD - (time_t)sec1 % ZBX_TM_PROCESS_PERIOD;
@@ -1706,9 +1676,6 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 		zbx_setproctitle("%s [processed %d task(s) in " ZBX_FS_DBL " sec, idle %d sec]",
 				get_process_type_string(process_type), tasks_num, sec2 - sec1, sleeptime);
 	}
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();

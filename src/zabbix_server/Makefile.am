@@ -5,6 +5,7 @@ SUBDIRS = \
 	autoreg \
 	actions \
 	cachehistory \
+	cep \
 	dbconfig \
 	diag \
 	discovery \
@@ -78,6 +79,8 @@ zabbix_server_LDADD = \
 	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
 	pgmanager/libzbxpgmanager.a \
+	cep/libzbxcep.a \
+	$(top_builddir)/src/libs/zbxcep_client/libzbxcep_client.a \
 	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \

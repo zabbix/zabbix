@@ -101,6 +101,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
+#include "zbxcep.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
@@ -242,7 +243,6 @@ static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
 static sigset_t	orig_mask;
 
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
-ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, trends_export, NULL)
 ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_SERVER)
@@ -297,6 +297,8 @@ int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	1, /* ZBX_PROCESS_TYPE_BROWSERPOLLER */
 	1, /* ZBX_PROCESS_TYPE_HA_MANAGER */
 	1, /* ZBX_PROCESS_TYPE_SUPERVISOR */
+	1, /* ZBX_PROCESS_TYPE_CEP_MANAGER */
+	10, /* ZBX_PROCESS_TYPE_CEP_WORKER */
 };
 
 static int	get_config_forks(unsigned char process_type)
@@ -409,10 +411,7 @@ static int	server_has_started = 0;
 static	const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= zbx_add_event,
 	.process_events_cb		= zbx_process_events,
-	.clean_events_cb		= zbx_clean_events,
-	.reset_event_recovery_cb	= zbx_reset_event_recovery,
-	.export_events_cb		= zbx_export_events,
-	.events_update_itservices_cb	= zbx_events_update_itservices
+	.clean_events_cb		= zbx_clean_events
 };
 
 typedef struct
@@ -645,6 +644,11 @@ static int	get_process_info_by_thread(int local_server_num, unsigned char *local
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_PG_MANAGER;
 		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_PG_MANAGER];
+	}
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_CEP_MANAGER]))
+	{
+		*local_process_type = ZBX_PROCESS_TYPE_CEP_MANAGER;
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_CEP_MANAGER];
 	}
 	else
 		return FAIL;
@@ -1300,9 +1304,6 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 
 	zbx_setproctitle_deinit();
 
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_export_deinit(problems_export);
-
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		zbx_export_deinit(history_export);
 
@@ -1840,6 +1841,12 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_tls = zbx_config_tls,
 		};
 
+	zbx_thread_cep_manager_args_t	cep_manager_args =
+		{
+			.workers_num = config_forks[ZBX_PROCESS_TYPE_CEP_WORKER],
+			.config_timeout = zbx_config_timeout,
+		};
+
 	thread_args.info.program_type = zbx_program_type;
 
 	/* prepare supervisor unit definitions */
@@ -1852,6 +1859,16 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_CONFSYNCER] = (zbx_supervisor_unit_def_t){
 			.entry = zbx_dbconfig_thread,
 			.args = &dbconfig_args
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_CEP_MANAGER] = (zbx_supervisor_unit_def_t){
+		.entry = zbx_cep_manager_thread,
+		.args = &cep_manager_args
+	};
+
+	supervisor_args.unit_defs[ZBX_PROCESS_TYPE_SERVICEMAN] = (zbx_supervisor_unit_def_t){
+		.entry = zbx_service_manager_thread,
+		.args = &service_manager_args
 	};
 
 	zbx_vector_proc_info_t	*processes = &runlevels[runlevel].processes;
@@ -1875,11 +1892,6 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SUPERVISOR;
 				thread_args.args = &supervisor_args;
 				zbx_thread_start(zbx_supervisor_thread, &thread_args, &zbx_threads[i]);
-				break;
-			case ZBX_PROCESS_TYPE_SERVICEMAN:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_WORKER;
-				thread_args.args = &service_manager_args;
-				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_POLLER:
 				poller_args.poller_type = ZBX_POLLER_TYPE_NORMAL;
@@ -2634,9 +2646,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		problems_export = zbx_problems_export_init(get_problems_export, "main-process", 0);
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_HISTORY))
 		history_export = zbx_history_export_init(get_history_export, "main-process", 0);

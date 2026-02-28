@@ -83,7 +83,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 	switch (state)
 	{
 		case ZBX_TRIGGER_CACHE_EVAL_CTX:
-			if ('\0' == *trigger->expression)
+			if (NULL == trigger->expression || '\0' == *trigger->expression)
 				return NULL;
 
 			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx, trigger->expression,
@@ -94,7 +94,7 @@ static zbx_trigger_cache_t	*db_trigger_get_cache(const zbx_db_trigger *trigger, 
 			}
 			break;
 		case ZBX_TRIGGER_CACHE_EVAL_CTX_R:
-			if ('\0' == *trigger->recovery_expression)
+			if (NULL == trigger->recovery_expression || '\0' == *trigger->recovery_expression)
 				return NULL;
 
 			if (FAIL == zbx_eval_parse_expression(&cache->eval_ctx_r, trigger->recovery_expression,
@@ -912,6 +912,9 @@ void	zbx_db_trigger_clean(zbx_db_trigger *trigger)
 	zbx_free(trigger->url_name);
 	zbx_free(trigger->opdata);
 	zbx_free(trigger->event_name);
+	zbx_free(trigger->correlation_tag);
+
+	zbx_vector_uint64_destroy(&trigger->dep_triggerids);
 
 	if (NULL != trigger->cache)
 		trigger_cache_free((zbx_trigger_cache_t *)trigger->cache);

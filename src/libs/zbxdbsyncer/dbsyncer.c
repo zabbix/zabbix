@@ -33,12 +33,6 @@
 
 static sigset_t			orig_mask;
 
-static zbx_export_file_t	*problems_export = NULL;
-static zbx_export_file_t	*get_problems_export(void)
-{
-	return problems_export;
-}
-
 static zbx_export_file_t	*history_export = NULL;
 static zbx_export_file_t	*get_history_export(void)
 {
@@ -149,9 +143,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		trends_export = zbx_trends_export_init(get_trends_export, "history-syncer", process_num);
 
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		problems_export = zbx_problems_export_init(get_problems_export, "history-syncer", process_num);
-
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbsyncer_args->config_timeout, &rtc);
 
 	for (;;)
@@ -175,7 +166,7 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 		zbx_block_signals(&orig_mask);
 
 		zbx_prof_start(__func__, ZBX_PROF_PROCESSING);
-		zbx_sync_history_cache(dbsyncer_args->events_cbs, &rtc, dbsyncer_args->config_history_storage_pipelines,
+		zbx_sync_history_cache(dbsyncer_args->events_cbs, dbsyncer_args->config_history_storage_pipelines,
 				&sync_stats);
 		zbx_prof_end();
 
@@ -291,9 +282,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_TRENDS))
 		zbx_export_deinit(trends_export);
-
-	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		zbx_export_deinit(problems_export);
 
 	zbx_ipc_async_socket_close(&rtc);
 

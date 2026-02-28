@@ -16,10 +16,9 @@
 #define ZABBIX_CACHEHISTORY_PROXY_H
 
 #include "zbxdbhigh.h"
-#include "zbxipcservice.h"
 #include "zbxcachehistory.h"
 
-void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
 
 #endif

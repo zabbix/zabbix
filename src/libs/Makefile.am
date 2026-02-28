@@ -9,6 +9,7 @@ DIST_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxbincommon \
+	zbxcep_client \
 	zbxconnector \
 	zbxcommon \
 	zbxcomms \
@@ -109,6 +110,7 @@ SERVER_SUBDIRS = \
 	zbxdb \
 	zbxdiscovery \
 	zbxdiscoverer \
+	zbxcep_client \
 	zbxcacheconfig \
 	zbxcachehistory \
 	zbxcachevalue \

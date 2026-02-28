@@ -38,9 +38,16 @@ zbx_supervisor_runstate_t;
 
 typedef struct
 {
+	zbx_dbconn_pool_t	*dbpool;
+}
+zbx_supervisor_unit_shared_t;
+
+typedef struct
+{
 	zbx_thread_args_t			args;
 	zbx_log_component_t			*logger;
 	_Atomic zbx_supervisor_runstate_t	*runstate;
+	zbx_supervisor_unit_shared_t		*shared;
 }
 zbx_supervisor_unit_args_t;
 

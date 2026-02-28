@@ -349,6 +349,7 @@ zbx_uint64_t	zbx_db_insert_get_lastid(zbx_db_insert_t *self);
 void	zbx_db_insert_clean(zbx_db_insert_t *db_insert);
 void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size);
 int	zbx_db_insert_get_row_count(zbx_db_insert_t *self);
+int	zbx_db_insert_is_prepared(zbx_db_insert_t *self);
 
 void	zbx_dbconn_extract_version_info(zbx_dbconn_t *db, struct zbx_db_version_info_t *version_info);
 
@@ -471,9 +472,6 @@ zbx_db_row_t	zbx_db_large_query_fetch(zbx_db_large_query_t *query);
 void	zbx_db_large_query_clear(zbx_db_large_query_t *query);
 void	zbx_dbconn_large_query_append_sql(zbx_db_large_query_t *query, const char *sql);
 
-/* connection pool */
-typedef struct zbx_dbconn_pool zbx_dbconn_pool_t;
-
 typedef struct
 {
 	int	max_open;
@@ -576,6 +574,8 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
+
+zbx_dbconn_t	*zbx_db_dbconn(void);
 
 /* connection pool settings */
 #define ZBX_SETTINGS_DBPOOL			"dbpool_"

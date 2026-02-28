@@ -146,26 +146,36 @@ zbx_db_dhost;
 
 typedef struct
 {
-	zbx_uint64_t	triggerid;
-	char		*description;
-	char		*expression;
-	char		*recovery_expression;
-	char		*url;
-	char		*url_name;
-	char		*comments;
-	char		*correlation_tag;
-	char		*opdata;
-	char		*event_name;
-	unsigned char	value;
-	unsigned char	priority;
-	unsigned char	type;
-	unsigned char	recovery_mode;
-	unsigned char	correlation_mode;
+	zbx_uint64_t		triggerid;
+	char			*description;
+	char			*expression;
+	char			*recovery_expression;
+	char			*url;
+	char			*url_name;
+	char			*comments;
+	char			*correlation_tag;
+	char			*opdata;
+	char			*event_name;
+	unsigned char		value;
+	unsigned char		priority;
+	unsigned char		type;
+	unsigned char		recovery_mode;
+	unsigned char		correlation_mode;
+	zbx_vector_uint64_t	dep_triggerids;
 
 	/* temporary trigger cache for related data */
-	void		*cache;
+	void			*cache;
 }
 zbx_db_trigger;
+
+typedef struct
+{
+	zbx_uint64_t	maintenanceid;
+	int		until;
+}
+zbx_db_event_suppress_t;
+
+ZBX_VECTOR_DECL(db_event_suppress, zbx_db_event_suppress_t)
 
 typedef struct
 {
@@ -182,7 +192,7 @@ typedef struct
 	int			severity;
 	unsigned char		suppressed;
 
-	zbx_vector_uint64_t	*maintenanceids;
+	zbx_vector_db_event_suppress_t	*suppress;
 
 	zbx_vector_tags_ptr_t	tags;
 
@@ -196,9 +206,18 @@ typedef struct
 #define ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS	0x0020
 	zbx_uint64_t		flags;
 }
-zbx_db_event;
 
+zbx_db_event;
 ZBX_PTR_VECTOR_DECL(db_event, zbx_db_event *)
+
+typedef struct
+{
+	zbx_db_event		*event;
+	zbx_vector_uint64_t	p_eventids;
+}
+zbx_db_event_recovery_t;
+
+ZBX_VECTOR_DECL(db_event_recovery, zbx_db_event_recovery_t)
 
 /* data structures used to create new and recover existing escalations */
 typedef struct
@@ -478,30 +497,19 @@ zbx_connector_filter_t;
 ZBX_PTR_VECTOR_DECL(connector_filter, zbx_connector_filter_t)
 
 /* events callbacks */
-typedef zbx_db_event	*(*zbx_add_event_func_t)(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_tags_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
+typedef void	(*zbx_add_event_func_t)(zbx_db_event *event);
 
 typedef int	(*zbx_process_events_func_t)(zbx_vector_trigger_diff_ptr_t *trigger_diff,
 		zbx_vector_uint64_t *triggerids_lock, zbx_vector_escalation_new_ptr_t *escalations);
 typedef void	(*zbx_clean_events_func_t)(void);
-typedef void	(*zbx_reset_event_recovery_func_t)(void);
-typedef void	(*zbx_export_events_func_t)(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
-		unsigned char **data, size_t *data_alloc, size_t *data_offset);
-typedef void	(*zbx_events_update_itservices_func_t)(void);
 
 typedef struct
 {
 	zbx_add_event_func_t			add_event_cb;
 	zbx_process_events_func_t		process_events_cb;
 	zbx_clean_events_func_t			clean_events_cb;
-	zbx_reset_event_recovery_func_t		reset_event_recovery_cb;
-	zbx_export_events_func_t		export_events_cb;
-	zbx_events_update_itservices_func_t	events_update_itservices_cb;
-} zbx_events_funcs_t;
+}
+zbx_events_funcs_t;
 
 /* events callbacks end */
 
@@ -869,5 +877,28 @@ const zbx_sync_row_t	*zbx_sync_rowset_search_by_id(const zbx_sync_rowset_t *rows
 zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_uint64_t parent_rowid);
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
+
+zbx_db_event	*zbx_create_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
+	int clock, int ns, int value);
+zbx_vector_db_event_suppress_t	*zbx_create_event_suppress(int size);
+
+typedef struct
+{
+	zbx_uint64_t		eventid;
+	int			source;
+	zbx_vector_tag_t	tags;
+}
+zbx_event_tags_t;
+
+ZBX_VECTOR_DECL(event_tags, zbx_event_tags_t)
+ZBX_PTR_VECTOR_DECL(event_tags_ptr, zbx_event_tags_t *)
+
+void	zbx_db_write_tags(zbx_dbconn_t *db, const zbx_vector_event_tags_ptr_t *etags, const char *table,
+		const char *field, const char *tag_table, const char *tag_key, zbx_vector_uint64_t *eventids);
+void	zbx_db_validate_tags(zbx_dbconn_t *db, zbx_vector_event_tags_ptr_t *event_tags);
+
+
+void	zbx_event_tags_clear(zbx_event_tags_t *event_tags);
+int	zbx_event_tags_compare(const void *d1, const void *d2);
 
 #endif

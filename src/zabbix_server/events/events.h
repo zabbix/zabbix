@@ -16,28 +16,27 @@
 #define ZABBIX_EVENTS_H
 
 #include "zbxdbhigh.h"
-#include "zbxtime.h"
+#include "zbxexport.h"
 #include "zbxalgo.h"
-#include "zbxipcservice.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
 
 void	zbx_initialize_events(void);
 void	zbx_uninitialize_events(void);
-zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
-		const zbx_timespec_t *timespec, int value, const char *trigger_description,
-		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
-		unsigned char trigger_type, const zbx_vector_tags_ptr_t *trigger_tags,
-		unsigned char trigger_correlation_mode, const char *trigger_correlation_tag,
-		unsigned char trigger_value, const char *trigger_opdata, const char *event_name, const char *error);
+void	zbx_add_event(zbx_db_event *event);
 
-int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid,
-		zbx_ipc_async_socket_t *rtc);
+int	zbx_close_problem(zbx_uint64_t triggerid, zbx_uint64_t eventid, zbx_uint64_t userid);
 
 int	zbx_process_events(zbx_vector_trigger_diff_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock,
 		zbx_vector_escalation_new_ptr_t *escalations);
 void	zbx_clean_events(void);
-void	zbx_reset_event_recovery(void);
-void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t *connector_filters,
-		unsigned char **data, size_t *data_alloc, size_t *data_offset);
-void	zbx_events_update_itservices(void);
+void	zbx_export_events(zbx_dbconn_t *db, const zbx_vector_db_event_t *problems,
+		const zbx_vector_db_event_recovery_t *recovery, zbx_export_file_t *problem_export,
+		zbx_vector_connector_filter_t *connector_filters, unsigned char **data, size_t *data_alloc,
+		size_t *data_offset);
+
+zbx_db_event	*zbx_create_trigger_event(const zbx_dc_trigger_t *dc_trigger, int clock, int ns, int value);
+zbx_db_event	*zbx_create_internal_event(unsigned char object, zbx_uint64_t objectid, int clock, int ns,
+	int value, const char *error, zbx_dc_trigger_t *dc_trigger);
 
 #endif

@@ -221,7 +221,7 @@ int	zbx_dbsync_compare_settings(zbx_dbsync_t *sync)
 	zbx_db_add_str_condition_alloc(&sql, &sql_alloc, &sql_offset, "name", (const char * const*)names.values,
 			names.values_num);
 
-	if (NULL == (result = zbx_db_select(sql)))
+	if (NULL == (result = zbx_dbconn_select(sync->db, sql)))
 	{
 		goto ret;
 	}

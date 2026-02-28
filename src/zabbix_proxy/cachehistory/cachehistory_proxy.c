@@ -368,11 +368,10 @@ static void	proxy_prepare_history(zbx_dc_history_t *history, int history_num, zb
 	zbx_vector_uint64_destroy(&itemids);
 }
 
-void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+void	zbx_sync_history_cache_proxy(const zbx_events_funcs_t *events_cbs,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
 	ZBX_UNUSED(events_cbs);
-	ZBX_UNUSED(rtc);
 
 	int				history_num, txn_rc = ZBX_DB_OK;
 	time_t				sync_start;

@@ -73,6 +73,8 @@ void	*zbx_dbconfig_thread(void *args)
 	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)unit_args->args.args;
 	char				*process_title;
 	sigjmp_buf			jmp_ret;
+	zbx_dbconn_pool_t		*dbpool = unit_args->shared->dbpool;
+	zbx_dbconn_t			*db;
 
 	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
 	zbx_set_log_component(process_title, unit_args->logger);
@@ -83,6 +85,8 @@ void	*zbx_dbconfig_thread(void *args)
 
 	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
+	zbx_dc_config_local_init();
+
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
@@ -90,15 +94,16 @@ void	*zbx_dbconfig_thread(void *args)
 
 	zbx_supervisor_update_activity("%s [connecting to the database]", process_title);
 
-	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
-
 	sec = zbx_time();
 	zbx_supervisor_update_activity("%s [syncing configuration]", process_title);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "starting initial configuration cache synchronization");
 
-	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
+	db = zbx_dbconn_pool_acquire_connection(dbpool);
+	zbx_dc_sync_configuration(db, ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);
+	zbx_dbconn_pool_release_connection(dbpool, db);
+
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
 			dbconfig_args_in->config_ssl_key_location);
@@ -182,9 +187,12 @@ void	*zbx_dbconfig_thread(void *args)
 			zbx_vector_uint64_create(&deleted_itemids);
 			zbx_vector_uint64_create(&hostids);
 
-			revision = zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES,
+			db = zbx_dbconn_pool_acquire_connection(dbpool);
+			revision = zbx_dc_sync_configuration(db, ZBX_DBSYNC_UPDATE, ZBX_SYNCED_NEW_CONFIG_YES,
 					&deleted_itemids, dbconfig_args_in->config_vault,
 					dbconfig_args_in->proxyconfig_frequency);
+			zbx_dbconn_pool_release_connection(dbpool, db);
+
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
@@ -226,7 +234,8 @@ stop:
 	zbx_history_cache_destroy_local_cache();
 
 	zbx_ipc_async_socket_close(&rtc);
-	zbx_db_close();
+
+	zbx_dc_config_local_destroy();
 
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 

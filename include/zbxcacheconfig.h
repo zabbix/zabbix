@@ -22,7 +22,6 @@
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
-#include "zbxtagfilter.h"
 #include "zbxpgservice.h"
 #include "zbxalgo.h"
 #include "zbxtypes_ext.h"
@@ -355,6 +354,7 @@ typedef struct _DC_TRIGGER
 
 	zbx_vector_tags_ptr_t	tags;
 	zbx_vector_uint64_t	itemids;
+	zbx_vector_uint64_t	dep_triggerids;
 
 	zbx_eval_context_t	*eval_ctx;
 	zbx_eval_context_t	*eval_ctx_r;
@@ -577,20 +577,18 @@ typedef struct
 	zbx_uint64_t			corr_conditionid;
 	int				type;
 	zbx_corr_condition_data_t	data;
+	zbx_atomic_uint32_t		refcount;
 }
 zbx_corr_condition_t;
 
 ZBX_PTR_VECTOR_DECL(corr_condition_ptr, zbx_corr_condition_t *)
 
-typedef struct
-{
-	unsigned char	type;
-}
-zbx_corr_operation_t;
+#define ZBX_CORR_OPERATION_CLOSE_OLD	0
+#define ZBX_CORR_OPERATION_CLOSE_NEW	1
 
-ZBX_PTR_VECTOR_DECL(corr_operation_ptr, zbx_corr_operation_t *)
-
-void	zbx_corr_operation_free(zbx_corr_operation_t *corr_operation);
+#define CORRELATION_OP_NONE		0
+#define CORRELATION_OP_CLOSE_NEW	0x01
+#define CORRELATION_OP_CLOSE_OLD	0x02
 
 typedef struct
 {
@@ -598,9 +596,11 @@ typedef struct
 	char				*name;
 	char				*formula;
 	unsigned char			evaltype;
+	unsigned char			operations;	/* bitmask of CORRELATION_OP_ defines */
+
+	zbx_atomic_uint32_t		refcount;
 
 	zbx_vector_corr_condition_ptr_t	conditions;
-	zbx_vector_corr_operation_ptr_t	operations;
 }
 zbx_correlation_t;
 
@@ -801,7 +801,7 @@ zbx_synced_new_config_t;
 typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
 typedef struct zbx_um_cache zbx_um_cache_t;
 
-zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
@@ -973,7 +973,7 @@ void	zbx_dc_requeue_unreachable_items(zbx_uint64_t *itemids, size_t itemids_num)
 
 int	zbx_dc_config_check_trigger_dependencies(zbx_uint64_t triggerid);
 
-void	zbx_dc_config_triggers_apply_changes(zbx_vector_trigger_diff_ptr_t *trigger_diff);
+void	zbx_dc_config_triggers_apply_changes(zbx_trigger_diff_t **trigger_diffs, int diffs_num);
 void	zbx_dc_config_items_apply_changes(const zbx_vector_item_diff_ptr_t *item_diff);
 
 void	zbx_dc_config_update_inventory_values(const zbx_vector_inventory_value_ptr_t *inventory_values);
@@ -1100,11 +1100,6 @@ void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceid
 
 void	zbx_set_availability_diff_ts(int ts);
 
-void	zbx_dc_correlation_rules_init(zbx_correlation_rules_t *rules);
-void	zbx_dc_correlation_rules_clean(zbx_correlation_rules_t *rules);
-void	zbx_dc_correlation_rules_free(zbx_correlation_rules_t *rules);
-void	zbx_dc_correlation_rules_get(zbx_correlation_rules_t *rules);
-
 void	zbx_dc_get_nested_hostgroupids(zbx_uint64_t *groupids, int groupids_num, zbx_vector_uint64_t *nested_groupids);
 void	zbx_dc_get_hostids_by_group_name(const char *name, zbx_vector_uint64_t *hostids);
 
@@ -1147,8 +1142,6 @@ zbx_trigger_dep_t;
 ZBX_PTR_VECTOR_DECL(trigger_dep_ptr, zbx_trigger_dep_t *)
 
 int	zbx_trigger_dep_compare_func(const void *d1, const void *d2);
-
-void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_trigger_dep_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
 
@@ -1594,9 +1587,6 @@ void	zbx_dc_set_proxy_lastonline(int lastonline);
 zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid);
 zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
 
-void	zbx_dc_set_itservices_num(int num);
-int	zbx_dc_get_itservices_num(void);
-
 int	zbx_dc_sync_lock(void);
 void	zbx_dc_sync_unlock(void);
 
@@ -1618,4 +1608,24 @@ int	zbx_snmp_oid_subst_cb(const char *data, int level, int num, int quoted, char
 zbx_uint64_t	zbx_dc_get_cache_size(void);
 
 zbx_uint64_t	zbx_dc_config_get_config_revision(void);
+
+void	zbx_dc_get_trigger_deps(zbx_vector_dc_trigger_t *triggers);
+
+/* local configuration cache initialization, must be called by configuration syncers */
+void	zbx_dc_config_local_init(void);
+void	zbx_dc_config_local_destroy(void);
+
+/* local configuration cache API - must be used only by thread based components hosted by supervisor */
+
+void	zbx_dc_local_set_itservices_num(int num);
+int	zbx_dc_local_get_itservices_num(void);
+
+
+typedef struct zbx_correlation_cache_handle *	zbx_correlation_cache_handle_t;
+
+zbx_correlation_cache_handle_t	zbx_correlation_cache_open(void);
+void	zbx_correlation_cache_close(zbx_correlation_cache_handle_t handle);
+
+zbx_vector_correlation_ptr_t	*zbx_correlation_cache_get_correlations(zbx_correlation_cache_handle_t handle);
+
 #endif

@@ -162,7 +162,7 @@ void	zbx_hc_free_item_values(zbx_dc_history_t *history, int history_num);
 void	zbx_db_mass_update_items(const zbx_vector_item_diff_ptr_t *item_diff,
 		const zbx_vector_inventory_value_ptr_t *inventory_values);
 void	zbx_log_sync_history_cache_progress(void);
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
 void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		AGENT_RESULT *result, const zbx_timespec_t *ts, unsigned char state, const char *error);
@@ -180,7 +180,7 @@ double	zbx_hc_mem_pused(void);
 double	zbx_hc_mem_pused_lock(void);
 void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
-typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);
 
 int	zbx_init_database_cache(zbx_get_program_type_f get_program_type,

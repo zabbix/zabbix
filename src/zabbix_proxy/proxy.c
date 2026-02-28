@@ -353,10 +353,7 @@ static int		config_proxy_memory_buffer_age	= 0;
 static const zbx_events_funcs_t	events_cbs = {
 	.add_event_cb			= NULL,
 	.process_events_cb		= NULL,
-	.clean_events_cb		= NULL,
-	.reset_event_recovery_cb	= NULL,
-	.export_events_cb		= NULL,
-	.events_update_itservices_cb	= NULL
+	.clean_events_cb		= NULL
 };
 
 typedef struct

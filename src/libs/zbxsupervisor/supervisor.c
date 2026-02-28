@@ -33,7 +33,7 @@
 #include "zbxresolver.h"
 
 #ifdef HAVE_NETSNMP
-#include "zbxsnmp.h"
+#	include "zbxsnmp.h"
 #endif
 
 #ifdef HAVE_LIBXML2
@@ -202,7 +202,7 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			break;
 
 		case ZBX_PROCESS_TYPE_TASKMANAGER:
-			*runlevel = ZBX_RUNLEVEL_TASKMANAGER;
+			*runlevel = ZBX_RUNLEVEL_POSTSYNC;
 			break;
 
 		case ZBX_PROCESS_TYPE_IPMIMANAGER:
@@ -242,7 +242,8 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 			break;
 
 		case ZBX_PROCESS_TYPE_SERVICEMAN:
-			*runlevel = ZBX_RUNLEVEL_CACHESYNC;
+			*owner = PROCESS_OWNER_SUPERVISOR;
+			*runlevel = ZBX_RUNLEVEL_POSTSYNC;
 			break;
 
 		case ZBX_PROCESS_TYPE_TRIGGERHOUSEKEEPER:
@@ -288,6 +289,16 @@ static void	zbx_supervisor_get_process_info(int process_type, zbx_proc_owner_t *
 
 		case ZBX_PROCESS_TYPE_SUPERVISOR:
 			*runlevel = ZBX_RUNLEVEL_SUPERVISOR;
+			break;
+
+		case ZBX_PROCESS_TYPE_CEP_MANAGER:
+			*owner = PROCESS_OWNER_SUPERVISOR;
+			*runlevel = ZBX_RUNLEVEL_CACHESYNC;
+			break;
+
+		case ZBX_PROCESS_TYPE_CEP_WORKER:
+			*owner = PROCESS_OWNER_UNKNOWN;
+			*runlevel = ZBX_RUNLEVEL_UNKNOWN;
 			break;
 
 		default:
@@ -669,7 +680,7 @@ static zbx_supervisor_unit_t	*supervisor_get_unit(zbx_supervisor_t *sv, unsigned
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_entry)(void *),
-		const zbx_thread_args_t *args)
+		const zbx_thread_args_t *args, zbx_supervisor_unit_shared_t *shared)
 {
 	int				err;
 	pthread_attr_t			attr;
@@ -678,6 +689,7 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 	unit_args = (zbx_supervisor_unit_args_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_unit_args_t));
 	unit_args->args = *args;
 	unit_args->logger = &unit->logger;
+	unit_args->shared = shared;
 	unit_args->runstate = &unit->runstate;
 	unit->runstate = UNIT_RUNNING;
 
@@ -699,7 +711,7 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
  *                                                                            *
  ******************************************************************************/
 static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_supervisor_args_t *args,
-		int runlevel_last)
+		zbx_supervisor_unit_shared_t *shared, int runlevel_last)
 {
 	zbx_thread_args_t	thread_args;
 
@@ -731,7 +743,7 @@ static void	supervisor_start_units(zbx_supervisor_t *sv, const zbx_thread_superv
 			thread_args.info.server_num = info->index;
 			thread_args.args = args->unit_defs[info->type].args;
 
-			supervisor_unit_start(unit, args->unit_defs[info->type].entry, &thread_args);
+			supervisor_unit_start(unit, args->unit_defs[info->type].entry, &thread_args, shared);
 		}
 	}
 }
@@ -927,6 +939,26 @@ static void	supervisor_handle_log(double time_now)
 	}
 }
 
+static int	supervisor_init_shared(zbx_supervisor_unit_shared_t *shared, char **error)
+{
+	char	*errmsg = NULL;
+
+	if (NULL == (shared->dbpool = zbx_dbconn_pool_create(&errmsg)))
+	{
+		*error = zbx_dsprintf(NULL, "cannot create database connection pool: %s", errmsg);
+		zbx_free(errmsg);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static void	supervisor_clear_shared(zbx_supervisor_unit_shared_t *shared)
+{
+	if (NULL != shared->dbpool)
+		zbx_dbconn_pool_free(shared->dbpool);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: set run state for all units                                       *
@@ -967,7 +999,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 	zbx_timespec_t			sleeptime = {1, 0};
 	zbx_supervisor_t		sv;
 	int				runlevel_last = 0;
-	zbx_dbconn_pool_t		*dbpool;
+	zbx_supervisor_unit_shared_t	shared = {0};
 
 	zbx_setproctitle("%s #%d starting", get_process_type_string(process_type), process_num);
 
@@ -978,9 +1010,9 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 	zbx_supervisor_worklog_init();
 
-	if (NULL == (dbpool = zbx_dbconn_pool_create(&error)))
+	if (SUCCEED != supervisor_init_shared(&shared, &error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot create database connection pool: %s", error);
+		zabbix_log(LOG_LEVEL_CRIT, "%s", error);
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
@@ -1066,7 +1098,7 @@ ZBX_THREAD_ENTRY(zbx_supervisor_thread, args)
 
 		if (runlevel_last != sv.runlevel)
 		{
-			supervisor_start_units(&sv, local_args, runlevel_last);
+			supervisor_start_units(&sv, local_args, &shared, runlevel_last);
 			runlevel_last = sv.runlevel;
 		}
 
@@ -1091,7 +1123,7 @@ out:
 	zbx_ipc_service_close(&service);
 	zbx_proc_startup_free(runlevels);
 
-	zbx_dbconn_pool_free(dbpool);
+	supervisor_clear_shared(&shared);
 
 	supervisor_clear_libraries(get_program_type_string(info->program_type));
 	zbx_supervisor_worklog_clear();

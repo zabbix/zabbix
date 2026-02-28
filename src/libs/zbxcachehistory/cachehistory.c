@@ -1968,7 +1968,7 @@ static void	sync_history_cache_full(const zbx_events_funcs_t *events_cbs, int co
 
 		do
 		{
-			sync_history_cache_cb(events_cbs, NULL, config_history_storage_pipelines, &stats);
+			sync_history_cache_cb(events_cbs, config_history_storage_pipelines, &stats);
 
 			zabbix_log(LOG_LEVEL_WARNING, "syncing history data... " ZBX_FS_DBL "%%",
 					(double)stats.values_num / (cache->history_num + stats.values_num) * 100);
@@ -2098,12 +2098,12 @@ static void	zbx_log_sync_trends_cache_progress(void)
  *                                            ZBX_SYNC_MORE - more data to sync        *
  *                                                                                     *
  ***************************************************************************************/
-void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
+void	zbx_sync_history_cache(const zbx_events_funcs_t *events_cbs,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() history_num:%d", __func__, cache->history_num);
 
-	sync_history_cache_cb(events_cbs, rtc, config_history_storage_pipelines, stats);
+	sync_history_cache_cb(events_cbs, config_history_storage_pipelines, stats);
 }
 
 /******************************************************************************

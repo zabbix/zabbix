@@ -2,14 +2,15 @@ include ../Makefile.include
 
 if SERVER
 SERVER_tests = \
-	queue \
+	zbx_channel \
 	zbx_list \
 	zbx_int128 \
 	zbx_mode_code \
 	zbx_binary_heap \
 	zbx_binary_heap_direct \
 	zbx_compare_tags_natural \
-	zbx_vector
+	zbx_vector \
+	zbx_channel
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -26,18 +27,18 @@ ALGO_LIBS = \
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
-queue_SOURCES = \
-	queue.c \
+zbx_channel_SOURCES = \
+	zbx_channel.c \
 	$(COMMON_SRC_FILES)
 
-queue_LDADD = \
+zbx_channel_LDADD = \
 	$(ALGO_LIBS)
 
-queue_LDADD += @SERVER_LIBS@
+zbx_channel_LDADD += @SERVER_LIBS@
 
-queue_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+zbx_channel_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
 
-queue_CFLAGS = $(COMMON_COMPILER_FLAGS)
+zbx_channel_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 #zbx_list
 
@@ -147,5 +148,19 @@ zbx_vector_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vector_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+#zbx_channel
+
+zbx_channel_SOURCES = \
+	zbx_channel.c \
+	$(COMMON_SRC_FILES)
+
+zbx_channel_LDADD = \
+	$(ALGO_LIBS)
+
+zbx_channel_LDADD += @SERVER_LIBS@
+
+zbx_channel_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
+
+zbx_channel_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

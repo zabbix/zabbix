@@ -345,7 +345,7 @@ static void	decode_and_escape_binary_value_for_sql(zbx_dbconn_t *db, char **sql_
 	if (0 == binary_data_len)
 		goto out;
 #if defined (HAVE_MYSQL)
-		escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
+	escaped_binary = (char*)zbx_malloc(NULL, 2 * binary_data_len);
 #endif
 	dbconn_escape_bin(db, binary_data, &escaped_binary, binary_data_len);
 
@@ -639,4 +639,23 @@ void	zbx_db_insert_set_batch_size(zbx_db_insert_t *self, int batch_size)
 int	zbx_db_insert_get_row_count(zbx_db_insert_t *self)
 {
 	return self->rows.values_num;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Function: zbx_db_insert_is_prepared                                        *
+ *                                                                            *
+ * Purpose: check if database insert structure is prepared                    *
+ *                                                                            *
+ * Parameters: self - [IN] pointer to the database insert structure           *
+ *                                                                            *
+ * Return value: SUCCEED - insert structure is prepared                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: Works only if db_insert is initialized with {0}.                 *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_insert_is_prepared(zbx_db_insert_t *self)
+{
+	return NULL != self->db ? SUCCEED : FAIL;
 }

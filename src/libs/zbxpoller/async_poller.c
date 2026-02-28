@@ -511,7 +511,7 @@ static void	ares_process_fd_cb(evutil_socket_t fd, short events, void *arg)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() event '%s' fd:%d", __func__, zbx_get_event_string(events), fd);
 
-	ares_process_fd((zbx_channel_t *)arg, (events & EV_READ) ? fd : ARES_SOCKET_BAD,
+	ares_process_fd((zbx_ares_channel_t *)arg, (events & EV_READ) ? fd : ARES_SOCKET_BAD,
 			(events & EV_WRITE) ? fd : ARES_SOCKET_BAD);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

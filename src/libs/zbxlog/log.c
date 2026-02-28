@@ -279,7 +279,7 @@ int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *sy
 	int		type = log_file_cfg->log_type;
 
 	log_type = type;
-	zbx_set_log_level(level);
+	(void)zbx_set_log_level(level);
 	config_log_file_size = log_file_cfg->log_file_size;
 
 	if (ZBX_LOG_TYPE_SYSTEM == type)
@@ -838,9 +838,13 @@ int	zbx_get_log_level_impl(void)
 	return *plog_level;
 }
 
-void	zbx_set_log_level(int level)
+int	zbx_set_log_level(int level)
 {
+	int	old_log_level = *plog_level;
+
 	*plog_level = level;
+
+	return old_log_level;
 }
 
 const char	*zbx_get_log_component_name(void)
@@ -993,6 +997,28 @@ void	zbx_change_component_log_level(zbx_log_component_t *component, int directio
 			log_component(LOG_LEVEL_INFORMATION, component->name, "log level has been increased to %s",
 					zabbix_get_log_level_ref_string(component->level));
 		}
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: change log level of the specified component without logging       *
+ *                                                                            *
+ * Comments: This function is used to change log level for inactive worker    *
+ *           threads.                                                         *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_change_component_log_level_silent(zbx_log_component_t *component, int direction)
+{
+	if (0 > direction)
+	{
+		if (LOG_LEVEL_EMPTY != component->level)
+			component->level += direction;
+	}
+	else
+	{
+		if (LOG_LEVEL_TRACE != component->level)
+			component->level += direction;
 	}
 }
 #endif

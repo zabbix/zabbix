@@ -14,6 +14,8 @@ COMMON_SRC_FILES = \
 COMMON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/zabbix_server/service/libservice_server.a \
+	$(top_srcdir)/src/zabbix_server/cep/libzbxcep.a \
+	$(top_builddir)/src/libs/zbxcep_client/libzbxcep_client.a \
 	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_builddir)/src/libs/zbxpgservice/libzbxpgservice.a \
@@ -91,7 +93,7 @@ SERVICE_WRAP_FUNCS = \
 	-Wl,--wrap=zbx_rtc_subscribe \
 	-Wl,--wrap=zbx_rtc_notify_finished_sync \
 	-Wl,--wrap=zbx_dc_set_itservices_num
-	
+
 # service_get_rootcause_eventids
 
 service_get_rootcause_eventids_SOURCES = \

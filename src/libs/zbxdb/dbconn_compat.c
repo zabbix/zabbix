@@ -799,3 +799,24 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 {
 	zbx_dbconn_large_query_append_sql(query, sql);
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get database connection object                                    *
+ *                                                                            *
+ * Return value: pointer to database connection object                        *
+ *                                                                            *
+ * Comments: This function must be used only by standalone processes/threads, *
+ *           not from multiple threads within one process.                    *
+ *                                                                            *
+ ******************************************************************************/
+zbx_dbconn_t	*zbx_db_dbconn(void)
+{
+	if (NULL == dbconn)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		exit(EXIT_FAILURE);
+	}
+
+	return dbconn;
+}

@@ -932,6 +932,9 @@ void	zbx_dc_config_history_sync_get_connector_filters(zbx_vector_connector_filte
 		}
 		else
 		{
+			if (NULL == connector_filters_events)
+				continue;
+
 			connector_filter_dest = connector_filters_events;
 			connector_filter.item_value_type = 0;
 		}

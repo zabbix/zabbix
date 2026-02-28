@@ -379,7 +379,7 @@ static void	discovery_update_dhost(const zbx_db_dhost *dhost)
 static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_dservice *dservice,
 		int service_status, const char *value, int now, zbx_add_event_func_t add_event_cb)
 {
-	zbx_timespec_t	ts = {.sec = now, .ns = 0};
+	zbx_db_event	*event;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -391,9 +391,9 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 
 			if (NULL != add_event_cb)
 			{
-				add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
-						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
-						NULL, NULL, NULL);
+				event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE,
+						dservice->dserviceid, now, 0, DOBJECT_STATUS_DISCOVER);
+				add_event_cb(event);
 			}
 
 			if (DOBJECT_STATUS_DOWN == dhost->status)
@@ -408,9 +408,9 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 
 				if (NULL != add_event_cb)
 				{
-					add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-							DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL,
-							0, NULL, 0, NULL, NULL, NULL);
+					event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST,
+							dhost->dhostid, now, 0, DOBJECT_STATUS_DISCOVER);
+					add_event_cb(event);
 				}
 			}
 		}
@@ -427,9 +427,9 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 
 			if (NULL != add_event_cb)
 			{
-				add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts,
-						DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL,
-						NULL, NULL);
+				event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE,
+						dservice->dserviceid, now, 0, DOBJECT_STATUS_LOST);
+				add_event_cb(event);
 			}
 
 			/* service went DOWN, no need to update host status here as other services may be UP */
@@ -438,8 +438,9 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 
 	if (NULL != add_event_cb)
 	{
-		add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, &ts, service_status,
-				NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+		event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DSERVICE, dservice->dserviceid, now, 0,
+				service_status);
+		add_event_cb(event);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -453,7 +454,7 @@ static void	discovery_update_service_status(zbx_db_dhost *dhost, const zbx_db_ds
 static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int now,
 		zbx_add_event_func_t add_event_cb)
 {
-	zbx_timespec_t	ts = {.sec = now, .ns = 0};
+	zbx_db_event	*event;
 
 	/* update host status */
 	if (DOBJECT_STATUS_UP == status)
@@ -468,9 +469,9 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
 
 			if (NULL != add_event_cb)
 			{
-				add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-						DOBJECT_STATUS_DISCOVER, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0,
-						NULL, NULL, NULL);
+				event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid,
+						now, 0, DOBJECT_STATUS_DISCOVER);
+				add_event_cb(event);
 			}
 		}
 	}
@@ -486,17 +487,17 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
 
 			if (NULL != add_event_cb)
 			{
-				add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts,
-						DOBJECT_STATUS_LOST, NULL, NULL, NULL, 0, 0, NULL, 0, NULL, 0, NULL,
-						NULL, NULL);
+				event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid,
+						now, 0, DOBJECT_STATUS_LOST);
+				add_event_cb(event);
 			}
 		}
 	}
 
 	if (NULL != add_event_cb)
 	{
-		add_event_cb(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, &ts, status, NULL, NULL, NULL,
-				0, 0, NULL, 0, NULL, 0, NULL, NULL, NULL);
+		event = zbx_create_event(EVENT_SOURCE_DISCOVERY, EVENT_OBJECT_DHOST, dhost->dhostid, now, status, 0);
+		add_event_cb(event);
 	}
 }
 

@@ -612,7 +612,7 @@ static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t obj
 	alertpoolid <<= 16;
 	alertpoolid |= object & 0xffff;
 	alertpoolid <<= 32;
-	alertpoolid |= ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+	alertpoolid |= (zbx_uint32_t)ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
 
 	return alertpoolid;
 }

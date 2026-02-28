@@ -630,6 +630,77 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
+static int	DBpatch_7050051(void)
+{
+	const zbx_db_table_t	table =
+			{"trigger_rtdata", "triggerid", 0,
+				{
+					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"lastchange", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050052(void)
+{
+	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("trigger_rtdata", 1, &field);
+}
+
+static int	DBpatch_7050053(void)
+{
+	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
+	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
+	if (ZBX_DB_OK > zbx_db_execute(
+		"insert into trigger_rtdata (triggerid,value,lastchange,state,error)"
+			"select t.triggerid,t.value,t.lastchange,t.state,t.error"
+			" from triggers t"
+			" where t.flags in (0,4)"
+				" and exists ("
+					" select null"
+					" from functions f"
+						" join items i on f.itemid=i.itemid"
+						" join hosts h on i.hostid=h.hostid"
+					" where f.triggerid = t.triggerid"
+						" and h.status<>3"
+				")"
+		))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050054(void)
+{
+	return DBdrop_field("triggers", "value");
+}
+
+static int	DBpatch_7050055(void)
+{
+	return DBdrop_field("triggers", "state");
+}
+
+static int	DBpatch_7050056(void)
+{
+	return DBdrop_field("triggers", "lastchange");
+}
+
+static int	DBpatch_7050057(void)
+{
+	return DBdrop_field("triggers", "error");
+}
+
+
 #endif
 
 DBPATCH_START(7050)
@@ -687,5 +758,12 @@ DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
 DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
+DBPATCH_ADD(7050051, 0, 1)
+DBPATCH_ADD(7050052, 0, 1)
+DBPATCH_ADD(7050053, 0, 1)
+DBPATCH_ADD(7050054, 0, 1)
+DBPATCH_ADD(7050055, 0, 1)
+DBPATCH_ADD(7050056, 0, 1)
+DBPATCH_ADD(7050057, 0, 1)
 
 DBPATCH_END()

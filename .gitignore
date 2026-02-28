@@ -141,6 +141,7 @@ tests/libs/zbxalgo/queue
 tests/libs/zbxalgo/zbx_algo_common
 tests/libs/zbxalgo/zbx_binary_heap_direct
 tests/libs/zbxalgo/zbx_binary_heap
+tests/libs/zbxalgo/zbx_channel
 tests/libs/zbxalgo/zbx_compare_tags_natural
 tests/libs/zbxalgo/zbx_list
 tests/libs/zbxalgo/zbx_mode_code

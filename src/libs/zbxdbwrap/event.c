@@ -14,6 +14,7 @@
 
 #include "zbxdbwrap.h"
 
+#include "zbx_trigger_constants.h"
 #include "zbxnum.h"
 #include "zbxalgo.h"
 #include "zbxdb.h"
@@ -73,7 +74,7 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_
 		event->name = zbx_strdup(NULL, row[8]);
 		event->severity = atoi(row[9]);
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_FALSE;
-		event->maintenanceids = NULL;
+		event->suppress = NULL;
 
 		event->trigger.triggerid = 0;
 
@@ -201,7 +202,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_
 					event->trigger.opdata = zbx_strdup(NULL, row[10]);
 					event->trigger.event_name = ('\0' != *row[11] ? zbx_strdup(NULL, row[11]) :
 							NULL);
+					zbx_vector_uint64_create(&event->trigger.dep_triggerids);
 					event->trigger.cache = NULL;
+					event->trigger.correlation_mode = ZBX_TRIGGER_CORRELATION_NONE;
+					event->trigger.correlation_tag = NULL;
 				}
 			}
 		}
@@ -232,6 +236,12 @@ void	zbx_db_free_event(zbx_db_event *event)
 
 	if (0 != event->trigger.triggerid)
 		zbx_db_trigger_clean(&event->trigger);
+
+	if (NULL != event->suppress)
+	{
+		zbx_vector_db_event_suppress_destroy(event->suppress);
+		zbx_free(event->suppress);
+	}
 
 	zbx_free(event->name);
 	zbx_free(event);
@@ -415,6 +425,7 @@ void	zbx_db_get_event_data_triggers(zbx_db_event *event)
 		ZBX_STR2UCHAR(event->trigger.value, row[8]);
 		event->trigger.opdata = zbx_strdup(NULL, row[9]);
 		event->trigger.event_name = ('\0' != *row[10] ? zbx_strdup(NULL, row[10]) : NULL);
+		zbx_vector_uint64_create(&event->trigger.dep_triggerids);
 		event->trigger.cache = NULL;
 
 		event->flags |= ZBX_FLAGS_DB_EVENT_RETRIEVED_TRIGGERS;
@@ -515,15 +526,16 @@ zbx_uint64_t	zbx_get_objectid_by_eventid(zbx_uint64_t eventid)
  * Purpose: add suppressing maintenanceid to event                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_db_event_add_maintenanceid(zbx_db_event *event, zbx_uint64_t maintenanceid)
+void	zbx_db_event_add_maintenanceid(zbx_db_event *event, zbx_uint64_t maintenanceid, int until)
 {
-	if (NULL == event->maintenanceids)
+	if (NULL == event->suppress)
 	{
-		event->maintenanceids = (zbx_vector_uint64_t *)zbx_malloc(NULL, sizeof(zbx_vector_uint64_t));
-		zbx_vector_uint64_create(event->maintenanceids);
-
+		event->suppress = zbx_create_event_suppress(1);
 		event->suppressed = ZBX_PROBLEM_SUPPRESSED_TRUE;
 	}
-	zbx_vector_uint64_append(event->maintenanceids, maintenanceid);
+
+	zbx_db_event_suppress_t	suppress_local = {.maintenanceid = maintenanceid, .until = until};
+
+	zbx_vector_db_event_suppress_append(event->suppress, suppress_local);
 }
 

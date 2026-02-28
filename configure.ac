@@ -2182,6 +2182,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxconnector/Makefile
 	src/libs/zbxcommon/Makefile
 	src/libs/zbxbincommon/Makefile
+	src/libs/zbxcep_client/Makefile
 	src/libs/zbxcomms/Makefile
 	src/libs/zbxcommshigh/Makefile
 	src/libs/zbxcompress/Makefile
@@ -2309,6 +2310,7 @@ AC_CONFIG_FILES([
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
 	src/zabbix_server/cachehistory/Makefile
+    src/zabbix_server/cep/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile

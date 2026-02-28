@@ -16,6 +16,7 @@
 
 #include "history_compress.h"
 
+#include "version.h"
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
@@ -1196,6 +1197,18 @@ static int	get_housekeeping_period(double time_slept)
 		return (int)time_slept;
 }
 
+static int	housekeeping_delete_internal_events(int config_max_hk_delete)
+{
+	int	deleted = 0, rc;
+
+	rc = hk_delete_from_table("events", "source=" ZBX_STR(EVENT_SOURCE_INTERNAL), config_max_hk_delete);
+
+	if (ZBX_DB_OK <= rc)
+		deleted = rc;
+
+	return deleted;
+}
+
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
 {
 	zbx_thread_housekeeper_args	*housekeeper_args_in = (zbx_thread_housekeeper_args *)
@@ -1314,14 +1327,22 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		zbx_setproctitle("%s [removing old history and trends]",
 				get_process_type_string(process_type));
 		sec = zbx_time();
-		zbx_int64_t	d_history_and_trends = housekeeping_history_and_trends(now);
+
+		zbx_int64_t	d_events = 0, d_history_and_trends = housekeeping_history_and_trends(now);
+
+		if (0 == zbx_dc_get_internal_action_count())
+		{
+			zbx_setproctitle("%s [removing internal events]", get_process_type_string(process_type));
+			d_events += housekeeping_delete_internal_events(
+					housekeeper_args_in->config_max_housekeeper_delete);
+		}
 
 		zbx_setproctitle("%s [removing old problems]", get_process_type_string(process_type));
 		zbx_int64_t	d_problems = housekeeping_problems(now,
 				housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old events]", get_process_type_string(process_type));
-		zbx_int64_t	d_events = housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
+		d_events += housekeeping_events(now, housekeeper_args_in->config_max_housekeeper_delete);
 
 		zbx_setproctitle("%s [removing old sessions]", get_process_type_string(process_type));
 		int	d_sessions = housekeeping_sessions(now, housekeeper_args_in->config_max_housekeeper_delete);

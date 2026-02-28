@@ -133,7 +133,8 @@ static void	get_object_ids(const zbx_vector_db_event_t *esc_events, zbx_vector_u
 
 /******************************************************************************
  *                                                                            *
- * Parameters: esc_events - [IN]     events to check                          *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN]     events to check                          *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -141,7 +142,8 @@ static void	get_object_ids(const zbx_vector_db_event_t *esc_events, zbx_vector_u
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_host_group_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_host_group_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -176,7 +178,7 @@ static int	check_host_group_condition(const zbx_vector_db_event_t *esc_events, z
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " and");
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values, groupids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_dbconn_select(db, "%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -262,7 +264,8 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
  * Purpose: There can be multiple levels of templates, that need                *
  *          resolving in order to compare to condition.                         *
  *                                                                              *
- * Parameters: object          - [IN] type of object that generated event       *
+ * Parameters: db              - [IN] database connection                       *
+ *             object          - [IN] type of object that generated event       *
  *             esc_events      - [IN] events being checked                      *
  *             objectids       - [IN] Object ids of the esc_events              *
  *                                    (contents can be changed by processing.   *
@@ -284,7 +287,7 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
  *                                    query condition.                          *
  *                                                                              *
  ********************************************************************************/
-static void	check_object_hierarchy(int object, const zbx_vector_db_event_t *esc_events,
+static void	check_object_hierarchy(zbx_dbconn_t *db, int object, const zbx_vector_db_event_t *esc_events,
 		zbx_vector_uint64_t *objectids, zbx_vector_uint64_pair_t *objectids_pair, zbx_condition_t *condition,
 		zbx_uint64_t condition_value, const char *sql_str, const char *sql_field)
 {
@@ -318,7 +321,7 @@ static void	check_object_hierarchy(int object, const zbx_vector_db_event_t *esc_
 
 		zbx_vector_uint64_clear(&objectids_tmp);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -395,7 +398,8 @@ static void	check_object_hierarchy(int object, const zbx_vector_db_event_t *esc_
 
 /******************************************************************************
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -403,7 +407,8 @@ static void	check_object_hierarchy(int object, const zbx_vector_db_event_t *esc_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_host_template_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char				*sql = NULL;
 	size_t				sql_alloc = 0;
@@ -427,7 +432,7 @@ static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events
 
 	trigger_parents_sql_alloc(&sql, &sql_alloc, &objectids);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_dbconn_select(db, "%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -441,7 +446,7 @@ static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events
 	}
 	zbx_db_free_result(result);
 
-	check_object_hierarchy(EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition,
+	check_object_hierarchy(db, EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition,
 			condition_value,
 			"select distinct t.triggerid,t.templateid,i.hostid"
 				" from items i,functions f,triggers t"
@@ -459,7 +464,8 @@ static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events
 
 /******************************************************************************
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -467,7 +473,8 @@ static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_host_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_host_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	const char		*operation;
@@ -503,7 +510,7 @@ static int	check_host_condition(const zbx_vector_db_event_t *esc_events, zbx_con
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "f.triggerid", objectids.values,
 			objectids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_dbconn_select(db, "%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -522,7 +529,8 @@ static int	check_host_condition(const zbx_vector_db_event_t *esc_events, zbx_con
 
 /******************************************************************************
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -530,7 +538,8 @@ static int	check_host_condition(const zbx_vector_db_event_t *esc_events, zbx_con
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_id_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_trigger_id_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	zbx_uint64_t			condition_value;
 	zbx_vector_uint64_t		objectids;
@@ -563,7 +572,7 @@ static int	check_trigger_id_condition(const zbx_vector_db_event_t *esc_events, z
 		zbx_vector_uint64_uniq(&objectids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		objectids_to_pair(&objectids, &objectids_pair);
 
-		check_object_hierarchy(EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition,
+		check_object_hierarchy(db, EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition,
 				condition_value,
 				"select triggerid,templateid,templateid"
 					" from triggers"
@@ -735,7 +744,8 @@ static int	check_suppressed_condition(const zbx_vector_db_event_t *esc_events, z
 	return SUCCEED;
 }
 
-static int	check_acknowledged_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_acknowledged_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	zbx_vector_uint64_t	eventids;
 	char			*sql = NULL;
@@ -765,7 +775,7 @@ static int	check_acknowledged_condition(const zbx_vector_db_event_t *esc_events,
 
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "eventid", eventids.values, eventids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_dbconn_select(db, "%s", sql);
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_uint64_t	eventid;
@@ -862,14 +872,16 @@ static void	check_condition_event_tag_value(const zbx_vector_db_event_t *esc_eve
  *                                                                            *
  * Purpose: checks if event matches single condition                          *
  *                                                                            *
- * Parameters: esc_event - [IN] trigger events to check                       *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_event - [IN] trigger events to check                       *
  *                              (event->source == EVENT_SOURCE_TRIGGERS)      *
  *             condition - [IN] condition for matching                        *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  ******************************************************************************/
-static void	check_trigger_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static void	check_trigger_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	int	ret;
 
@@ -878,16 +890,16 @@ static void	check_trigger_condition(const zbx_vector_db_event_t *esc_events, zbx
 	switch (condition->conditiontype)
 	{
 		case ZBX_CONDITION_TYPE_HOST_GROUP:
-			ret = check_host_group_condition(esc_events, condition);
+			ret = check_host_group_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_HOST_TEMPLATE:
-			ret = check_host_template_condition(esc_events, condition);
+			ret = check_host_template_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_HOST:
-			ret = check_host_condition(esc_events, condition);
+			ret = check_host_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_TRIGGER:
-			ret = check_trigger_id_condition(esc_events, condition);
+			ret = check_trigger_id_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_NAME:
 			ret = check_event_name_condition(esc_events, condition);
@@ -902,7 +914,7 @@ static void	check_trigger_condition(const zbx_vector_db_event_t *esc_events, zbx
 			ret = check_suppressed_condition(esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_ACKNOWLEDGED:
-			ret = check_acknowledged_condition(esc_events, condition);
+			ret = check_acknowledged_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			check_condition_event_tag(esc_events, condition);
@@ -956,7 +968,8 @@ static void	get_object_ids_discovery(const zbx_vector_db_event_t *esc_events, zb
  *                                                                            *
  * Purpose: checks discovery rule condition                                   *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -964,7 +977,8 @@ static void	get_object_ids_discovery(const zbx_vector_db_event_t *esc_events, zb
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_drule_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_drule_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	const char		*operation_and, *operation_where;
@@ -1031,7 +1045,7 @@ static int	check_drule_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 					objectids[i].values, objectids[i].values_num);
 		}
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1054,7 +1068,8 @@ static int	check_drule_condition(const zbx_vector_db_event_t *esc_events, zbx_co
  *                                                                            *
  * Purpose: checks discovery check condition                                  *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1062,7 +1077,8 @@ static int	check_drule_condition(const zbx_vector_db_event_t *esc_events, zbx_co
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dcheck_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_dcheck_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	const char		*operation_where;
@@ -1107,7 +1123,7 @@ static int	check_dcheck_condition(const zbx_vector_db_event_t *esc_events, zbx_c
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid", objectids.values,
 				objectids.values_num);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1159,7 +1175,8 @@ static int	check_dobject_condition(const zbx_vector_db_event_t *esc_events, zbx_
  *                                                                            *
  * Purpose: checks proxy condition for discovery event                        *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1167,7 +1184,8 @@ static int	check_dobject_condition(const zbx_vector_db_event_t *esc_events, zbx_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_proxy_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	const char		*operation_and;
@@ -1230,7 +1248,7 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 					objectids[i].values, objectids[i].values_num);
 		}
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1253,7 +1271,8 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
  *                                                                            *
  * Purpose: checks discovery value condition                                  *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1261,7 +1280,8 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dvalue_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_dvalue_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1304,7 +1324,7 @@ static int	check_dvalue_condition(const zbx_vector_db_event_t *esc_events, zbx_c
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid", objectids.values,
 				objectids.values_num);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1353,7 +1373,8 @@ static int	check_dvalue_condition(const zbx_vector_db_event_t *esc_events, zbx_c
  *                                                                            *
  * Purpose: checks host ip condition for discovery event                      *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1361,7 +1382,8 @@ static int	check_dvalue_condition(const zbx_vector_db_event_t *esc_events, zbx_c
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_dhost_ip_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0;
@@ -1406,7 +1428,7 @@ static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx
 					objectids[i].values, objectids[i].values_num);
 		}
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1439,7 +1461,8 @@ static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx
  *                                                                            *
  * Purpose: checks service type condition for discovery event                 *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1447,7 +1470,8 @@ static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dservice_type_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_dservice_type_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1483,7 +1507,7 @@ static int	check_dservice_type_condition(const zbx_vector_db_event_t *esc_events
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "ds.dserviceid", objectids.values,
 				objectids.values_num);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1556,7 +1580,8 @@ static int	check_dstatus_condition(const zbx_vector_db_event_t *esc_events, zbx_
  *                                                                            *
  * Purpose: checks uptime condition for discovery                             *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1564,7 +1589,8 @@ static int	check_dstatus_condition(const zbx_vector_db_event_t *esc_events, zbx_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_duptime_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_duptime_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0;
@@ -1611,7 +1637,7 @@ static int	check_duptime_condition(const zbx_vector_db_event_t *esc_events, zbx_
 					objectids[i].values, objectids[i].values_num);
 		}
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1649,7 +1675,8 @@ static int	check_duptime_condition(const zbx_vector_db_event_t *esc_events, zbx_
  *                                                                            *
  * Purpose: checks service port condition for discovery                       *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1657,7 +1684,8 @@ static int	check_duptime_condition(const zbx_vector_db_event_t *esc_events, zbx_
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_dservice_port_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_dservice_port_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1690,7 +1718,7 @@ static int	check_dservice_port_condition(const zbx_vector_db_event_t *esc_events
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "dserviceid", objectids.values,
 				objectids.values_num);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -1722,14 +1750,16 @@ static int	check_dservice_port_condition(const zbx_vector_db_event_t *esc_events
  *                                                                            *
  * Purpose: checks if events match single condition                           *
  *                                                                            *
- * Parameters: event     - [IN] discovery events to check                     *
+ * Parameters: db         - [IN] database connection                          *
+ *             event     - [IN] discovery events to check                     *
  *                              (event->source == EVENT_SOURCE_DISCOVERY)     *
  *             condition - [IN] condition for matching                        *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  ******************************************************************************/
-static void	check_discovery_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static void	check_discovery_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	int	ret;
 
@@ -1738,34 +1768,34 @@ static void	check_discovery_condition(const zbx_vector_db_event_t *esc_events, z
 	switch (condition->conditiontype)
 	{
 		case ZBX_CONDITION_TYPE_DRULE:
-			ret = check_drule_condition(esc_events, condition);
+			ret = check_drule_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DCHECK:
-			ret = check_dcheck_condition(esc_events, condition);
+			ret = check_dcheck_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DOBJECT:
 			ret = check_dobject_condition(esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_PROXY:
-			ret = check_proxy_condition(esc_events, condition);
+			ret = check_proxy_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DVALUE:
-			ret = check_dvalue_condition(esc_events, condition);
+			ret = check_dvalue_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DHOST_IP:
-			ret = check_dhost_ip_condition(esc_events, condition);
+			ret = check_dhost_ip_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DSERVICE_TYPE:
-			ret = check_dservice_type_condition(esc_events, condition);
+			ret = check_dservice_type_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DSTATUS:
 			ret = check_dstatus_condition(esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DUPTIME:
-			ret = check_duptime_condition(esc_events, condition);
+			ret = check_duptime_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_DSERVICE_PORT:
-			ret = check_dservice_port_condition(esc_events, condition);
+			ret = check_dservice_port_condition(db, esc_events, condition);
 			break;
 		default:
 			ret = FAIL;
@@ -1786,7 +1816,8 @@ static void	check_discovery_condition(const zbx_vector_db_event_t *esc_events, z
  *                                                                            *
  * Purpose: checks metadata or host condition for auto registration           *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1794,7 +1825,8 @@ static void	check_discovery_condition(const zbx_vector_db_event_t *esc_events, z
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_hostname_metadata_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_hostname_metadata_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1832,7 +1864,7 @@ static int	check_hostname_metadata_condition(const zbx_vector_db_event_t *esc_ev
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid", objectids.values,
 			objectids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_dbconn_select(db, "%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1872,7 +1904,8 @@ static int	check_hostname_metadata_condition(const zbx_vector_db_event_t *esc_ev
  *                                                                            *
  * Purpose: checks proxy condition for auto registration                      *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -1880,7 +1913,8 @@ static int	check_hostname_metadata_condition(const zbx_vector_db_event_t *esc_ev
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_areg_proxy_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
@@ -1907,7 +1941,7 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "autoreg_hostid",
 			objectids.values, objectids.values_num);
 
-	result = zbx_db_select("%s", sql);
+	result = zbx_dbconn_select(db, "%s", sql);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
@@ -1941,12 +1975,14 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
  *                                                                                *
  * Purpose: checks if events match single condition                               *
  *                                                                                *
- * Parameters: esc_events - [IN] autoregistration events to check                 *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] autoregistration events to check                 *
  *                               (event->source == EVENT_SOURCE_AUTOREGISTRATION) *
  *             condition  - [IN] condition for matching                           *
  *                                                                                *
  **********************************************************************************/
-static void	check_autoregistration_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static void	check_autoregistration_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	int		ret;
 
@@ -1956,10 +1992,10 @@ static void	check_autoregistration_condition(const zbx_vector_db_event_t *esc_ev
 	{
 		case ZBX_CONDITION_TYPE_HOST_NAME:
 		case ZBX_CONDITION_TYPE_HOST_METADATA:
-			ret = check_hostname_metadata_condition(esc_events, condition);
+			ret = check_hostname_metadata_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_PROXY:
-			ret = check_areg_proxy_condition(esc_events, condition);
+			ret = check_areg_proxy_condition(db, esc_events, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported condition type [%d] for condition id [" ZBX_FS_UI64 "]",
@@ -2096,7 +2132,8 @@ static void	get_object_ids_internal(const zbx_vector_db_event_t *esc_events, zbx
  *                                                                            *
  * Purpose: checks host group condition for internal events                   *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -2104,7 +2141,8 @@ static void	get_object_ids_internal(const zbx_vector_db_event_t *esc_events, zbx
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_group_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_intern_host_group_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	size_t			sql_alloc = 0;
@@ -2166,7 +2204,7 @@ static int	check_intern_host_group_condition(const zbx_vector_db_event_t *esc_ev
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hg.groupid", groupids.values,
 				groupids.values_num);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -2234,7 +2272,8 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
  *                                                                            *
  * Purpose: checks host template condition for internal events                *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] condition for matching, outputs          *
  *                                   event ids that match condition           *
  *                                                                            *
@@ -2242,7 +2281,7 @@ static void	item_parents_sql_alloc(char **sql, size_t *sql_alloc, zbx_vector_uin
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc_events,
+static int	check_intern_host_template_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
 		zbx_condition_t *condition)
 {
 	char				*sql = NULL;
@@ -2283,7 +2322,7 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 		else	/* EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE */
 			item_parents_sql_alloc(&sql, &sql_alloc, objectids_ptr);
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -2300,7 +2339,7 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 		}
 		zbx_db_free_result(result);
 
-		check_object_hierarchy(objects[i], esc_events, objectids_ptr, objectids_pair_ptr, condition,
+		check_object_hierarchy(db, objects[i], esc_events, objectids_ptr, objectids_pair_ptr, condition,
 				condition_value, 0 == i ?
 					"select distinct t.triggerid,t.templateid,i.hostid"
 						" from items i,functions f,triggers t"
@@ -2329,7 +2368,8 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
  *                                                                            *
  * Purpose: checks host condition for internal events                         *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
@@ -2337,7 +2377,8 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_intern_host_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static int	check_intern_host_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	char			*sql = NULL;
 	const char		*operation, *operation_item;
@@ -2404,7 +2445,7 @@ static int	check_intern_host_condition(const zbx_vector_db_event_t *esc_events, 
 					objectids[i].values, objectids[i].values_num);
 		}
 
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
@@ -2428,13 +2469,15 @@ static int	check_intern_host_condition(const zbx_vector_db_event_t *esc_events, 
  *                                                                            *
  * Purpose: checks if internal event matches single condition                 *
  *                                                                            *
- * Parameters: esc_events - [IN]                                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN]                                              *
  *             condition  - [IN] condition for matching                       *
  *                                                                            *
  * Return value: SUCCEED - matches, FAIL - otherwise                          *
  *                                                                            *
  ******************************************************************************/
-static void	check_internal_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
+static void	check_internal_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events,
+		zbx_condition_t *condition)
 {
 	int	ret;
 
@@ -2446,13 +2489,13 @@ static void	check_internal_condition(const zbx_vector_db_event_t *esc_events, zb
 			ret = check_intern_event_type_condition(esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_HOST_GROUP:
-			ret = check_intern_host_group_condition(esc_events, condition);
+			ret = check_intern_host_group_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_HOST_TEMPLATE:
-			ret = check_intern_host_template_condition(esc_events, condition);
+			ret = check_intern_host_template_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_HOST:
-			ret = check_intern_host_condition(esc_events, condition);
+			ret = check_intern_host_condition(db, esc_events, condition);
 			break;
 		case ZBX_CONDITION_TYPE_EVENT_TAG:
 			check_condition_event_tag(esc_events, condition);
@@ -2481,13 +2524,15 @@ static void	check_internal_condition(const zbx_vector_db_event_t *esc_events, zb
  *                                                                            *
  * Purpose: checks if multiple events matches single condition                *
  *                                                                            *
- * Parameters: esc_events - [IN] events to check                              *
+ * Parameters: db         - [IN] database connection                          *
+ *             esc_events - [IN] events to check                              *
  *             source     - [IN] specific event source that needs checking    *
  *             condition  - [IN/OUT] Condition for matching, outputs          *
  *                                   event ids that match condition.          *
  *                                                                            *
  ******************************************************************************/
-static void	check_events_condition(const zbx_vector_db_event_t *esc_events, int source, zbx_condition_t *condition)
+static void	check_events_condition(zbx_dbconn_t *db, const zbx_vector_db_event_t *esc_events, int source,
+			zbx_condition_t *condition)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64 " conditionid:" ZBX_FS_UI64 " cond.value:'%s'"
 			" cond.value2:'%s'", __func__, condition->actionid, condition->conditionid,
@@ -2496,16 +2541,16 @@ static void	check_events_condition(const zbx_vector_db_event_t *esc_events, int 
 	switch (source)
 	{
 		case EVENT_SOURCE_TRIGGERS:
-			check_trigger_condition(esc_events, condition);
+			check_trigger_condition(db, esc_events, condition);
 			break;
 		case EVENT_SOURCE_DISCOVERY:
-			check_discovery_condition(esc_events, condition);
+			check_discovery_condition(db, esc_events, condition);
 			break;
 		case EVENT_SOURCE_AUTOREGISTRATION:
-			check_autoregistration_condition(esc_events, condition);
+			check_autoregistration_condition(db, esc_events, condition);
 			break;
 		case EVENT_SOURCE_INTERNAL:
-			check_internal_condition(esc_events, condition);
+			check_internal_condition(db, esc_events, condition);
 			break;
 		default:
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event source [%d] for condition id [" ZBX_FS_UI64 "]",
@@ -2539,7 +2584,7 @@ int	check_action_condition(zbx_db_event *event, zbx_condition_t *condition)
 
 	zbx_vector_db_event_append(&esc_events, event);
 
-	check_events_condition(&esc_events, event->source, condition);
+	check_events_condition(zbx_db_dbconn(), &esc_events, event->source, condition);
 
 	ret = 0 != condition->eventids.values_num ? SUCCEED : FAIL;
 
@@ -2903,9 +2948,6 @@ static int	is_escalation_event(const zbx_db_event *event)
 	if (0 != (event->flags & ZBX_FLAGS_DB_EVENT_NO_ACTION))
 		return FAIL;
 
-	if (0 == (event->flags & ZBX_FLAGS_DB_EVENT_CREATE))
-		return FAIL;
-
 	return SUCCEED;
 }
 
@@ -3096,13 +3138,14 @@ static void	prepare_actions_conditions_eval(zbx_vector_action_eval_ptr_t *action
  *                                                                            *
  * Purpose: processes all actions of each event in list                       *
  *                                                                            *
- * Parameters: events          - [IN] events to apply actions for             *
+ * Parameters: db              - [IN] database connection                     *
+ *             events          - [IN] events to apply actions for             *
  *             closed_events   - [IN] Vector of closed event data -           *
  *                                    (PROBLEM eventid, OK eventid) pairs.    *
  *             escalations     - [IN/OUT]                                     *
  *                                                                            *
  ******************************************************************************/
-void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events,
+void	process_actions(zbx_dbconn_t *db, zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events,
 		zbx_vector_escalation_new_ptr_t *escalations)
 {
 	zbx_vector_action_eval_ptr_t	actions;
@@ -3148,7 +3191,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 		zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
 
 		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
-			check_events_condition(&esc_events[i], i, condition);
+			check_events_condition(db, &esc_events[i], i, condition);
 	}
 
 	zbx_dc_close_user_macros(um_handle);
@@ -3202,7 +3245,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	zbx_vector_action_eval_ptr_destroy(&actions);
 
 	/* 3. Find recovered escalations and store escalationids in 'rec_escalation' by OK eventids. */
-	if (0 != closed_events->values_num)
+	if (NULL != closed_events && 0 != closed_events->values_num)
 	{
 		char			*sql = NULL;
 		size_t			sql_alloc = 0, sql_offset = 0;
@@ -3228,7 +3271,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "es.eventid", eventids.values,
 				eventids.values_num);
-		result = zbx_db_select("%s", sql);
+		result = zbx_dbconn_select(db, "%s", sql);
 
 		zbx_vector_uint64_pair_reserve(&rec_escalations, eventids.values_num);
 
@@ -3281,10 +3324,10 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	if (0 != new_escalations->values_num)
 	{
 		zbx_db_insert_t	db_insert;
-		zbx_uint64_t	escalationid = zbx_db_get_maxid_num("escalations", new_escalations->values_num);
+		zbx_uint64_t	escalationid = zbx_dbconn_get_maxid_num(db, "escalations", new_escalations->values_num);
 
-		zbx_db_insert_prepare(&db_insert, "escalations", "escalationid", "actionid", "status", "triggerid",
-					"itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
+		zbx_dbconn_prepare_insert(db, &db_insert, "escalations", "escalationid", "actionid", "status",
+				"triggerid", "itemid", "eventid", "r_eventid", "acknowledgeid", (char *)NULL);
 
 		for (int j = 0; j < new_escalations->values_num; j++)
 		{
@@ -3340,10 +3383,10 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 					" where escalationid=" ZBX_FS_UI64 ";\n",
 					rec_escalations.values[j].second, rec_escalations.values[j].first);
 
-			zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+			zbx_dbconn_execute_overflowed_sql(db, &sql, &sql_alloc, &sql_offset, NULL);
 		}
 
-		(void)zbx_db_flush_overflowed_sql(sql, sql_offset);
+		(void)zbx_dbconn_flush_overflowed_sql(db, sql, sql_offset);
 
 		zbx_free(sql);
 	}
@@ -3446,7 +3489,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_task
 		zbx_hashset_iter_reset(&uniq_conditions[i], &iter);
 
 		while (NULL != (condition = (zbx_condition_t *)zbx_hashset_iter_next(&iter)))
-			check_events_condition(&esc_events[i], i, condition);
+			check_events_condition(zbx_db_dbconn(), &esc_events[i], i, condition);
 	}
 
 	zbx_dc_close_user_macros(um_handle);

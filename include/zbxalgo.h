@@ -373,6 +373,7 @@ ZBX_VECTOR_DECL(uint64_pair, zbx_uint64_pair_t)
 ZBX_VECTOR_DECL(dbl, double)
 
 ZBX_PTR_VECTOR_DECL(tags_ptr, zbx_tag_t*)
+ZBX_VECTOR_DECL(tag, zbx_tag_t)
 
 #define	ZBX_VECTOR_ARRAY_GROWTH_FACTOR	3/2
 
@@ -800,4 +801,33 @@ int	zbx_list_iterator_equal(const zbx_list_iterator_t *iterator1, const zbx_list
 int	zbx_list_iterator_isset(const zbx_list_iterator_t *iterator);
 void	zbx_list_iterator_update(zbx_list_iterator_t *iterator);
 void	*zbx_list_iterator_remove_next(zbx_list_iterator_t *iterator);
+
+/* thread-safe channel for fixed-size message passing between threads */
+typedef struct
+{
+	unsigned char	*msgs;
+	int		msg_num;
+	int		msg_size;
+	int		capacity;
+	int		head;		/* read position */
+	int		tail;		/* write position */
+	pthread_mutex_t	lock;
+	pthread_cond_t	wait_cond;
+}
+zbx_channel_t;
+
+void	zbx_chan_init(zbx_channel_t *chan, int msg_size, int initial_capacity);
+void	zbx_chan_destroy(zbx_channel_t *chan);
+void	zbx_chan_send(zbx_channel_t *chan, const void *msg);
+void	zbx_chan_send_batch(zbx_channel_t *chan, const void *msg, int msg_num);
+int	zbx_chan_recv_batch(zbx_channel_t *chan, void *msgs, int msg_num);
+int	zbx_chan_recv_timeout(zbx_channel_t *chan, void *message, int timeout_ms);
+int	zbx_chan_msg_num(zbx_channel_t *chan);
+int	zbx_chan_capacity(zbx_channel_t *chan);
+void	zbx_chan_compact(zbx_channel_t *chan, int min_capacity);
+
+int	zbx_tag_compare(const void *a1, const void *a2);
+void	zbx_tag_clear(zbx_tag_t *tag);
+
 #endif /* ZABBIX_ZBXALGO_H */
+

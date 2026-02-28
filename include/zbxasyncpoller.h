@@ -24,9 +24,9 @@
 #include <event2/event.h>
 #ifdef HAVE_ARES
 #include <ares.h>
-typedef struct ares_channeldata zbx_channel_t;
+typedef struct ares_channeldata zbx_ares_channel_t;
 #else
-typedef void zbx_channel_t;
+typedef void zbx_ares_channel_t;
 #endif
 #include "zbxalgo.h"
 
@@ -67,13 +67,13 @@ typedef int (*zbx_async_task_process_task_cb_t)(short event, void *data, int *fd
 typedef void (*zbx_async_task_process_result_cb_t)(void *data);
 
 zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event);
-void			zbx_async_poller_add_task(struct event_base *ev, zbx_channel_t *channel,
+void			zbx_async_poller_add_task(struct event_base *ev, zbx_ares_channel_t *channel,
 			struct evdns_base *dnsbase, const char *addr, void *data, int timeout,
 			zbx_async_task_process_task_cb_t async_task_process_task_cb,
 			zbx_async_task_process_result_cb_t async_task_process_result_cb);
 const char		*zbx_resolv_conf_errstr(int error);
 const char		*zbx_get_event_string(short event);
 const char		*zbx_task_state_to_str(zbx_async_task_state_t task_state);
-void			zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase, zbx_channel_t *channel);
+void			zbx_async_dns_update_host_addresses(struct evdns_base *dnsbase, zbx_ares_channel_t *channel);
 #endif
 #endif

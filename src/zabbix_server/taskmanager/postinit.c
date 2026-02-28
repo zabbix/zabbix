@@ -395,6 +395,7 @@ static int	update_event_names(void)
 		trigger.recovery_expression = zbx_strdup(NULL, row[7]);
 		ZBX_STR2UCHAR(trigger.recovery_mode, row[8]);
 		ZBX_STR2UCHAR(trigger.value, row[9]);
+		zbx_vector_uint64_create(&trigger.dep_triggerids);
 
 		int	historical;
 
