@@ -180,6 +180,7 @@ PROXY_SUBDIRS = \
 	zbxautoreg \
 	zbxavailability \
 	zbxbincommon \
+	zbxcep_client \
 	zbxconnector \
 	zbxcompress \
 	zbxdb \

@@ -2953,7 +2953,7 @@ static void	process_event_updates(zbx_service_manager_t *service_manager, zbx_ce
 	{
 		zbx_cep_event_t	*event = events[i];
 
-		zabbix_log(LOG_LEVEL_ERR, "[WDN] eventid:%lu, action:%d", (NULL != event ? event->eventid : 0),
+		zabbix_log(LOG_LEVEL_TRACE, "eventid:" ZBX_FS_UI64 " action:%d", (NULL != event ? event->eventid : 0),
 				updates[i].op);
 
 		switch (updates[i].op)

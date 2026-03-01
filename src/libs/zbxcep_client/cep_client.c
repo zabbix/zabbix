@@ -883,4 +883,127 @@ void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve the number of CEP worker processes                       *
+ *                                                                            *
+ * Parameters: workers_num - [OUT] pointer to store the number of workers     *
+ *             error       - [OUT] pointer to store an error message if any   *
+ *                                                                            *
+ * Return value: SUCCEED if the operation completed successfully,             *
+ *               FAIL otherwise                                               *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_get_workers_num(int *workers_num, char **error)
+{
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_GET_WORKERS_NUM, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send request to CEP service");
+		return FAIL;
+	}
 
+	zbx_ipc_message_t	response = {0};
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		*error = zbx_strdup(NULL, "cannot read CEP service response");
+		return FAIL;
+	}
+
+	(void)zbx_deserialize_value(response.data, workers_num);
+	zbx_ipc_message_clean(&response);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: deserialize worker usage statistics                               *
+ *                                                                            *
+ * Parameters: usage - [OUT] worker usage statistics                          *
+ *             count - [OUT]                                                  *
+ *             data  - [IN] input data                                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	preprocessor_deserialize_usage_stats(const unsigned char *data, zbx_vector_dbl_t *usage, int *count)
+{
+	const unsigned char	*offset = data;
+	int			usage_num;
+
+	offset += zbx_deserialize_value(offset, &usage_num);
+	zbx_vector_dbl_reserve(usage, (size_t)usage_num);
+
+	for (int i = 0; i < usage_num; i++)
+	{
+		double	busy;
+
+		offset += zbx_deserialize_value(offset, &busy);
+		zbx_vector_dbl_append(usage, busy);
+	}
+
+	(void)zbx_deserialize_value(offset, count);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: serialize CEP usage statistics                                    *
+ *                                                                            *
+ * Parameters: data  - [OUT] pointer to the allocated serialized data buffer  *
+ *             usage - [IN]  vector containing usage values                   *
+ *             count - [IN]  number of usage entries                          *
+ *                                                                            *
+ * Return value: size of the serialized data buffer in bytes                  *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint32_t	zbx_cep_serialize_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count)
+{
+	unsigned char	*ptr;
+	zbx_uint32_t	data_len;
+
+	data_len = (zbx_uint32_t)((unsigned int)usage->values_num * sizeof(double) + sizeof(int) + sizeof(int));
+
+	ptr = *data = (unsigned char *)zbx_malloc(NULL, data_len);
+
+	ptr += zbx_serialize_value(ptr, usage->values_num);
+
+	for (int i = 0; i < usage->values_num; i++)
+		ptr += zbx_serialize_value(ptr, usage->values[i]);
+
+	(void)zbx_serialize_value(ptr, count);
+
+	return data_len;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: retrieve CEP worker usage statistics                              *
+ *                                                                            *
+ * Parameters: usage - [OUT] vector to store usage statistics                 *
+ *             count - [OUT] number of usage entries                          *
+ *             error - [OUT] error message in case of failure                 *
+ *                                                                            *
+ * Return value: SUCCEED - operation completed successfully                   *
+ *               FAIL    - failed to communicate with CEP service             *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_cep_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error)
+{
+	if (FAIL == zbx_ipc_socket_write(cep_client_socket(), ZBX_CEP_GET_USAGE_STATS, NULL, 0))
+	{
+		*error = zbx_strdup(NULL, "cannot send request to CEP service");
+		return FAIL;
+	}
+
+	zbx_ipc_message_t	response = {0};
+
+	if (FAIL == zbx_ipc_socket_read(cep_client_socket(), &response))
+	{
+		*error = zbx_strdup(NULL, "cannot read CEP service response");
+		return FAIL;
+	}
+
+	preprocessor_deserialize_usage_stats(response.data, usage, count);
+	zbx_ipc_message_clean(&response);
+
+	return SUCCEED;
+}

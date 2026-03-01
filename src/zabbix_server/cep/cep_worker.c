@@ -606,10 +606,9 @@ static void	cep_worker_process_internal_event(zbx_cep_task_event_t *task)
  ******************************************************************************/
 static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task_event_t *task)
 {
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] process event (%d/%d/%lu) %s -> %d @ %d.%d ...",
-		task->db_event->source, task->db_event->object,
-		task->db_event->objectid, task->db_event->name, task->db_event->value,
-		task->db_event->clock, task->db_event->ns);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
+			__func__, task->db_event->source, task->db_event->object, task->db_event->objectid,
+			task->db_event->name, task->db_event->value, task->db_event->clock, task->db_event->ns);
 
 	/* check if event must be created */
 	if (EVENT_SOURCE_TRIGGERS == task->db_event->source && EVENT_OBJECT_TRIGGER == task->db_event->object)
@@ -625,6 +624,8 @@ static void	cep_worker_process_task_event(zbx_cep_worker_t *worker, zbx_cep_task
 		THIS_SHOULD_NEVER_HAPPEN_MSG("Unsupported event source:%d and object:%d", task->db_event->source,
 				task->db_event->object);
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -641,12 +642,11 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 	zbx_uint64_t			r_eventid;
 	zbx_vector_cep_event_handle_t	handles;
 
-	zbx_vector_cep_event_handle_create(&handles);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() source:%d object:%d objectid:" ZBX_FS_UI64 " name:%s value:%d ts:%d.%09d",
+			__func__, db_event->source, db_event->object, db_event->objectid, db_event->name,
+			db_event->value, db_event->clock, db_event->ns);
 
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] process close event (%d/%d/%lu) %s -> %d @ %d.%d ...",
-		task->parent.db_event->source, task->parent.db_event->object,
-		task->parent.db_event->objectid, task->parent.db_event->name, task->parent.db_event->value,
-		task->parent.db_event->clock, task->parent.db_event->ns);
+	zbx_vector_cep_event_handle_create(&handles);
 
 	cep_cache_acquire(&cep);
 	r_eventid = cep_close_trigger_event_by_eventid(cep, db_event->objectid, task->eventid, &handles);
@@ -656,6 +656,8 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
 		cep_worker_resolve_trigger_events(db_event, r_eventid, &handles, &task->parent);
 
 	zbx_vector_cep_event_handle_destroy(&handles);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() r_eventid:" ZBX_FS_UI64, __func__, r_eventid);
 }
 
 /******************************************************************************

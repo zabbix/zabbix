@@ -28,6 +28,7 @@
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxrtc.h"
+#include "zbxserialize.h"
 
 #define ZBX_CEP_WORKERS_MAX	100
 
@@ -118,7 +119,7 @@ static void	cep_manager_stop_workers(zbx_cep_manager_t *manager, int workers_num
 			return;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "stopping %d eevnt processors", workers_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "stopping %d event processor(s)", workers_num);
 
 	for (int i = manager->workers_num - 1; i >= manager->workers_num - workers_num; i--)
 		cep_worker_stop(&manager->workers[i]);
@@ -126,6 +127,8 @@ static void	cep_manager_stop_workers(zbx_cep_manager_t *manager, int workers_num
 	manager->workers_diff = workers_num;
 	manager->workers_num -= workers_num;
 	manager->pool_state = CEP_POOL_SHRINKING;
+
+	cep_queue_notify_all(manager->queue);
 }
 
 /******************************************************************************
@@ -140,7 +143,6 @@ static void	cep_manager_stop_workers(zbx_cep_manager_t *manager, int workers_num
  ******************************************************************************/
 static int	cep_manager_scale_workers(zbx_cep_manager_t *manager)
 {
-// set to 30
 /* number of 10s ticks below 50% usage when start shrinking worker pool */
 #define CEP_LOW_LOAD_SHRINK	30
 #define CEP_LOW_LOAD_USAGE	50.0
@@ -189,7 +191,8 @@ static int	cep_manager_scale_workers(zbx_cep_manager_t *manager)
 		}
 	}
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() usage:%.1f", __func__, usage);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() usage:%.1f low_load_ticks:%d", __func__, usage,
+			manager->low_load_ticks);
 
 	return ret;
 
@@ -527,6 +530,48 @@ static void	cep_manager_flush_commmits(zbx_cep_manager_t *manager)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: send the number of CEP workers to the client                      *
+ *                                                                            *
+ * Parameters: manager - [IN] CEP manager instance containing worker count    *
+ *             client  - [IN] IPC client to send the response to              *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_get_workers_num(zbx_cep_manager_t *manager, zbx_ipc_client_t *client)
+{
+	unsigned char	data[sizeof(int)];
+
+	(void)zbx_serialize_value(data, manager->workers_num);
+
+	zbx_ipc_client_send(client, ZBX_CEP_GET_WORKERS_NUM, data, (zbx_uint32_t)sizeof(data));
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send serialized CEP worker usage statistics to the client         *
+ *                                                                            *
+ * Parameters: manager - [IN] CEP manager instance holding usage data         *
+ *             client  - [IN] IPC client to send the statistics to            *
+ *                                                                            *
+ ******************************************************************************/
+static void	cep_manager_get_usage_stats(zbx_cep_manager_t *manager, zbx_ipc_client_t *client)
+{
+	unsigned char		*data;
+	zbx_uint32_t		data_len;
+	zbx_vector_dbl_t	usage;
+
+	zbx_vector_dbl_create(&usage);
+	(void)zbx_timekeeper_get_usage(manager->timekeeper, &usage);
+
+	data_len = zbx_cep_serialize_usage_stats(&data, &usage, manager->workers_num);
+
+	zbx_ipc_client_send(client, ZBX_CEP_GET_USAGE_STATS, data, data_len);
+
+	zbx_free(data);
+	zbx_vector_dbl_destroy(&usage);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: CEP manager main thread function                                  *
  *                                                                            *
  * Parameters: args - [IN] thread arguments                                   *
@@ -647,8 +692,13 @@ void	*zbx_cep_manager_thread(void *args)
 				case ZBX_CEP_UPDATE_SEVERITIES:
 				case ZBX_CEP_ADD_EVENT_TAGS:
 				case ZBX_CEP_DELETE_EVENTS:
-					zabbix_log(LOG_LEVEL_ERR, "[WDN] add remote task: %u", message->code);
 					cep_manager_add_remote_task(manager, &client, &message, NULL, 0);
+					break;
+				case ZBX_CEP_GET_WORKERS_NUM:
+					cep_manager_get_workers_num(manager, client);
+					break;
+				case ZBX_CEP_GET_USAGE_STATS:
+					cep_manager_get_usage_stats(manager, client);
 					break;
 				case ZBX_RTC_SHUTDOWN:
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");

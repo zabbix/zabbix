@@ -125,8 +125,6 @@ void	zbx_cep_event_release(zbx_cep_event_t *event)
 	if (1 != atomic_fetch_sub(&event->refcount, 1))
 		return;
 
-	zabbix_log(LOG_LEVEL_ERR, "[WDN] free event %lu", event->eventid);
-
 	cep_event_clear(event);
 	zbx_free(event);
 }
