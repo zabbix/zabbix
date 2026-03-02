@@ -32,11 +32,11 @@ class CControllerGraphPrototypeUpdate extends CControllerGraphUpdateGeneral {
 			'hostid' => ['db hosts.hostid', 'required'],
 			'parent_discoveryid' => ['db items.itemid', 'required'],
 			'name' => ['string', 'required', 'not_empty'],
-			'width' => ['db graphs.width', 'required', 'min' => CGraphGeneralHelper::GRAPH_WIDTH_MIN,
-				'max' => CGraphGeneralHelper::GRAPH_WIDTH_MAX
+			'width' => ['db graphs.width', 'required', 'min' => CGraphDraw::GRAPH_WIDTH_MIN,
+				'max' => CGraphDraw::GRAPH_WIDTH_MAX
 			],
-			'height' => ['db graphs.height', 'required', 'min' => CGraphGeneralHelper::GRAPH_HEIGHT_MIN,
-				'max' => CGraphGeneralHelper::GRAPH_HEIGHT_MAX
+			'height' => ['db graphs.height', 'required', 'min' => CGraphDraw::GRAPH_HEIGHT_MIN,
+				'max' => CGraphDraw::GRAPH_HEIGHT_MAX
 			],
 			'graphtype' => ['db graphs.graphtype', 'required',
 				'in' => [GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED]
