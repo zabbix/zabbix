@@ -2385,7 +2385,7 @@ button {
     background-color: #ffffff;
     border-top-left-radius: 2px;
     border-top-right-radius: 2px;
-    display: grid; }
+    display: contents; }
     .datatable .datatable-rows .datatable-row {
       display: contents; }
       .datatable .datatable-rows .datatable-row .no-data-message {
@@ -2404,32 +2404,41 @@ button {
         border-bottom-color: rgba(31, 44, 51, 0.1); }
       .datatable .datatable-rows .datatable-row:not(.datatable-row-disabled):hover .cell.cell-data:not(.cell-bg) {
         background-color: #e8f5ff; }
+  .datatable .datatable-headers {
+    display: grid;
+    overflow: hidden;
+    position: sticky;
+    top: 0;
+    z-index: 10; }
+  .datatable .datatable-rows {
+    display: grid;
+    overflow: hidden; }
+    .datatable .datatable-rows.datatable-rows-scrollable {
+      overflow-x: auto; }
+      .datatable .datatable-rows.datatable-rows-scrollable::-webkit-scrollbar {
+        background: #ffffff;
+        height: 10px;
+        width: 10px; }
+      .datatable .datatable-rows.datatable-rows-scrollable::-webkit-scrollbar-track {
+        background: #ffffff; }
+      .datatable .datatable-rows.datatable-rows-scrollable::-webkit-scrollbar-thumb {
+        background-color: var(--datatable-scrollbar-thumb-bg-color);
+        background-clip: content-box;
+        border: 2px solid transparent;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color .3s ease; }
+        .datatable .datatable-rows.datatable-rows-scrollable::-webkit-scrollbar-thumb:hover {
+          background-color: var(--datatable-scrollbar-thumb-hover-bg-color); }
+      .datatable .datatable-rows.datatable-rows-scrollable + .datatable-footer {
+        border-top: 1px solid #dfe4e7; }
   .datatable .datatable-body {
     align-items: center;
     background-color: #ffffff;
     border-radius: 2px;
-    display: grid;
-    overflow-y: hidden;
     width: 100%; }
     .datatable .datatable-body.no-data-message {
       padding: 100px 0; }
-    .datatable .datatable-body.datatable-body-scrollable + .datatable-footer {
-      border-top: 1px solid #dfe4e7; }
-    .datatable .datatable-body::-webkit-scrollbar {
-      background: #ffffff;
-      height: 10px;
-      width: 10px; }
-    .datatable .datatable-body::-webkit-scrollbar-track {
-      background: #ffffff; }
-    .datatable .datatable-body::-webkit-scrollbar-thumb {
-      background-color: var(--datatable-scrollbar-thumb-bg-color);
-      background-clip: content-box;
-      border: 2px solid transparent;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: background-color .3s ease; }
-      .datatable .datatable-body::-webkit-scrollbar-thumb:hover {
-        background-color: var(--datatable-scrollbar-thumb-hover-bg-color); }
     .datatable .datatable-body.datatable-body-loading:after {
       background-color: var(--datatable-overlay-color);
       content: '';
@@ -2442,11 +2451,14 @@ button {
   .datatable .datatable-footer {
     align-items: center;
     background-color: #ffffff;
+    bottom: 0;
     color: #768d99;
     display: grid;
     height: var(--datatable-row-height);
     grid-template-columns: 1fr auto 1fr;
-    padding: 0 10px; }
+    padding: 0 10px;
+    position: sticky;
+    z-index: 10; }
     .datatable .datatable-footer *:first-child {
       justify-self: start; }
     .datatable .datatable-footer *:last-child {
@@ -2493,7 +2505,7 @@ button {
         flex-wrap: nowrap; }
         .datatable .cell .cell-inner .tags-wrapper .tag {
           height: 16px;
-          min-width: 16px; }
+          min-width: 24px; }
           .datatable .cell .cell-inner .tags-wrapper .tag.tag-inherited {
             min-width: 35px; }
         .datatable .cell .cell-inner .tags-wrapper .btn-icon {
@@ -2568,27 +2580,20 @@ button {
             flex-shrink: 0;
             pointer-events: none; }
       .datatable .cell.cell-header .cell-header-resizer {
+        border-right: 3px solid transparent;
         cursor: col-resize;
         height: var(--datatable-row-height);
         position: absolute;
-        right: -4px;
+        right: 0;
         top: -1px;
         user-select: none;
-        width: 7px;
+        width: 10px;
         z-index: 20;
         -moz-user-select: none;
         -ms-user-select: none;
         -webkit-user-select: none; }
-        .datatable .cell.cell-header .cell-header-resizer:after {
-          background-color: transparent;
-          content: '';
-          height: inherit;
-          position: absolute;
-          left: 2px;
-          top: 0;
-          width: 3px; }
-        .datatable .cell.cell-header .cell-header-resizer:hover:after {
-          background-color: #0275bb; }
+        .datatable .cell.cell-header .cell-header-resizer:hover {
+          border-right-color: #0275bb; }
       .datatable .cell.cell-header:last-child {
         border-top-right-radius: 2px; }
         .datatable .cell.cell-header:last-child .header-link {
@@ -2715,10 +2720,8 @@ button {
     -ms-user-select: none;
     -webkit-user-select: none;
     pointer-events: none; }
-    .datatable.datatable-resizing .cell-resizing {
-      z-index: 4; }
-      .datatable.datatable-resizing .cell-resizing .cell-header-resizer:after {
-        background-color: #0275bb; }
+    .datatable.datatable-resizing .cell-resizing .cell-header-resizer {
+      border-right-color: #0275bb; }
   .datatable.compact-view .cell.cell-data {
     height: var(--datatable-compact-row-height);
     min-height: initial;

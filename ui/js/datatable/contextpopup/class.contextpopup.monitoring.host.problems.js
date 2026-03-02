@@ -15,7 +15,7 @@
 
 class CDataTableContextPopupMonitoringHostProblems extends CDataTableContextPopup {
 	getFields() {
-		const show_suppressed = this.getPopup().querySelector('[name="show_suppressed"]');
+		const show_suppressed = this.getElement().querySelector('[name="show_suppressed"]');
 
 		return {show_suppressed};
 	}

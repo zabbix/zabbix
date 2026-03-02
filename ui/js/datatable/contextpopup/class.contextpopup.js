@@ -56,7 +56,7 @@ class CDataTableContextPopup {
 	/**
 	 * @type {HTMLElement|null}
 	 */
-	#popup;
+	#element;
 
 	/**
 	 * @type {HTMLElement|null}
@@ -97,7 +97,7 @@ class CDataTableContextPopup {
 		this.#column_name = column_config.getName();
 		this.#header_cell = header_cell;
 		this.#handle = handle;
-		this.#popup = document.createElement('div');
+		this.#element = document.createElement('div');
 
 		this.#bindEvents();
 
@@ -135,8 +135,8 @@ class CDataTableContextPopup {
 	/**
 	 * @returns {HTMLElement|null}
 	 */
-	getPopup() {
-		return this.#popup;
+	getElement() {
+		return this.#element;
 	}
 
 	/**
@@ -210,17 +210,17 @@ class CDataTableContextPopup {
 	onOpen() {
 		const context_links = [];
 
-		this.#popup.classList.add(CDataTableContextPopup.ZBX_STYLE_CONTEXT);
-		this.#popup.setAttribute('role', 'dialog');
-		this.#popup.setAttribute('tabindex', '-1');
+		this.#element.classList.add(CDataTableContextPopup.ZBX_STYLE_CONTEXT);
+		this.#element.setAttribute('role', 'dialog');
+		this.#element.setAttribute('tabindex', '-1');
 
 		this.#template = this.getTemplate();
 
 		if (this.#template instanceof HTMLTemplateElement) {
-			this.#popup.innerHTML = this.#template.innerHTML;
+			this.#element.innerHTML = this.#template.innerHTML;
 		}
 		else if (this.#template instanceof HTMLElement) {
-			Array.from(this.#template.children).forEach(child => this.#popup.appendChild(child));
+			Array.from(this.#template.children).forEach(child => this.#element.appendChild(child));
 		}
 
 		const column_index = this.#column_config.getColumnIndex();
@@ -257,7 +257,7 @@ class CDataTableContextPopup {
 			form_field.classList.add(ZBX_STYLE_FORM_FIELD);
 			form_field.appendChild(form_input);
 
-			this.#popup.prepend(form_label, form_field);
+			this.#element.prepend(form_label, form_field);
 
 			if (this.#column_config.isDuplicate()) {
 				const delete_link = this.#addContextLink(t('Delete column'), event => {
@@ -278,13 +278,13 @@ class CDataTableContextPopup {
 				popup_links.appendChild(context_link);
 			}
 
-			this.#popup.appendChild(popup_links);
+			this.#element.appendChild(popup_links);
 		}
 
 		document.addEventListener('click', this.onClickOutside);
 		document.addEventListener('keydown', this.onKeyDown);
 
-		this.#popup.addEventListener('input', () => {
+		this.#element.addEventListener('input', () => {
 			const context_popup_data = this.getValidatedData(this.getFieldData());
 
 			this.dispatchEvent(CDataTableContextPopup.EVENT_UPDATE, {column_index, context_popup_data});
@@ -309,7 +309,7 @@ class CDataTableContextPopup {
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('click', this.onClickOutside);
 
-		this.#popup.remove();
+		this.#element.remove();
 	}
 
 	onUpdate() {}
@@ -329,7 +329,7 @@ class CDataTableContextPopup {
 	 * @param {function} callback
 	 */
 	on(event, callback) {
-		this.#popup.addEventListener(event, callback.bind(this));
+		this.#element.addEventListener(event, callback.bind(this));
 	}
 
 	/**
@@ -339,7 +339,7 @@ class CDataTableContextPopup {
 	 * @returns {boolean}
 	 */
 	dispatchEvent(type, detail = {}, options = {}) {
-		return this.#popup.dispatchEvent(new CustomEvent(type, {...options, detail}));
+		return this.#element.dispatchEvent(new CustomEvent(type, {...options, detail}));
 	}
 
 	/**
@@ -349,15 +349,15 @@ class CDataTableContextPopup {
 		const wrapper = document.querySelector('.wrapper');
 		const element_rect = this.getDataTable().getElement().getBoundingClientRect();
 		const handle_rect = this.#handle.getBoundingClientRect();
-		const popup_rect = this.#popup.getBoundingClientRect();
+		const popup_rect = this.#element.getBoundingClientRect();
 
-		this.#popup.style.maxHeight = `${wrapper.scrollHeight - popup_rect.top}px`; // FIXME: -141?
+		this.#element.style.maxHeight = `${wrapper.scrollHeight - popup_rect.top}px`;
 
 		if (handle_rect.left + popup_rect.width > window.innerWidth) {
-			this.#popup.style.right = `${element_rect.right - handle_rect.right - 1}px`;
+			this.#element.style.right = `${element_rect.right - handle_rect.right - 1}px`;
 		}
 		else {
-			this.#popup.style.left = `${handle_rect.left - element_rect.left - 1}px`;
+			this.#element.style.left = `${handle_rect.left - element_rect.left - 1}px`;
 		}
 	}
 
@@ -367,9 +367,9 @@ class CDataTableContextPopup {
 	 * @param {PointerEvent} event
 	 */
 	onClickOutside = event => {
-		const elements = [this.#handle, this.#popup];
+		const elements = [this.#handle, this.#element];
 
-		if (event.target == this.#popup) {
+		if (event.target == this.#element) {
 			return;
 		}
 

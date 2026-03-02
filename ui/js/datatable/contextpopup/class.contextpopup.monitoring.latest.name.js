@@ -15,7 +15,7 @@
 
 class CDataTableContextPopupMonitoringLatestName extends CDataTableContextPopup {
 	getFields() {
-		const show_item_key = this.getPopup().querySelector('[name="show_item_key"]');
+		const show_item_key = this.getElement().querySelector('[name="show_item_key"]');
 
 		return {show_item_key};
 	}

@@ -106,7 +106,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 	onInit() {
 		super.onInit();
 
-		this.getPopup().classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_TABLE);
+		this.getElement().classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_TABLE);
 	}
 
 	onOpen() {

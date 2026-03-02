@@ -36,8 +36,9 @@ class CDataTable {
 	static ZBX_STYLE_CONTAINER = 'datatable';
 	static ZBX_STYLE_RESIZING = 'datatable-resizing';
 	static ZBX_STYLE_BODY = 'datatable-body';
-	static ZBX_STYLE_BODY_SCROLLABLE = 'datatable-body-scrollable';
+	static ZBX_STYLE_HEADERS = 'datatable-headers';
 	static ZBX_STYLE_ROWS = 'datatable-rows';
+	static ZBX_STYLE_ROWS_SCROLLABLE = 'datatable-rows-scrollable';
 	static ZBX_STYLE_ROW = 'datatable-row';
 	static ZBX_STYLE_ROW_DISABLED = 'datatable-row-disabled';
 	static ZBX_STYLE_FOOTER = 'datatable-footer';
@@ -192,6 +193,8 @@ class CDataTable {
 	#user_configs = [];
 
 	#element = null;
+
+	#headers = null;
 
 	#body = null;
 
@@ -567,13 +570,16 @@ class CDataTable {
 
 		this.#initColumns();
 
+		this.#headers = document.createElement('div');
+		this.#headers.classList.add(CDataTable.ZBX_STYLE_HEADERS);
+
 		this.#rows = document.createElement('div');
 		this.#rows.classList.add(CDataTable.ZBX_STYLE_ROWS);
+		this.#rows.addEventListener('scroll', () => this.dispatchEvent(CDataTable.EVENT_SCROLL));
 
 		this.#body = document.createElement('div');
 		this.#body.classList.add(CDataTable.ZBX_STYLE_BODY, ZBX_STYLE_NO_DATA_MESSAGE);
-		this.#body.appendChild(this.#rows);
-		this.#body.addEventListener('scroll', () => this.dispatchEvent(CDataTable.EVENT_SCROLL));
+		this.#body.append(this.#headers, this.#rows);
 
 		this.#footer = document.createElement('div');
 		this.#footer.classList.add(CDataTable.ZBX_STYLE_FOOTER);
@@ -640,6 +646,10 @@ class CDataTable {
 
 	getElement() {
 		return this.#element;
+	}
+
+	getHeaders() {
+		return this.#headers;
 	}
 
 	getDataProvider() {
@@ -787,7 +797,9 @@ class CDataTable {
 			return;
 		}
 
+		this.#headers.innerHTML = '';
 		this.#rows.innerHTML = '';
+
 		this.#footer.removeAttribute('style');
 
 		this.#recalculateColumnSpans();
@@ -855,7 +867,12 @@ class CDataTable {
 		}
 
 		this.#applyColumnWidths();
-		this.#applyScrollableBody();
+
+		const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
+		visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
+
+		this.#applyColumnWidths();
+		this.#applyScrollableRows();
 
 		this.#pager.update(response);
 
@@ -1129,7 +1146,7 @@ class CDataTable {
 
 		this.#applyColumnWidths();
 
-		this.#applyScrollableBody();
+		this.#applyScrollableRows();
 		this.#scrollToColumn(this.#resize_column_index);
 	}
 
@@ -1156,7 +1173,8 @@ class CDataTable {
 
 		document.querySelector('.sidebar').style.pointerEvents = 'none';
 
-		this.#findCells(column_index).forEach(cell => cell.classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING));
+		[...this.#findHeaderCells(column_index), ...this.#findDataCells(column_index)]
+			.forEach(cell => cell.classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING));
 
 		window.addEventListener('mousemove', this.onResizeMouseMove);
 		window.addEventListener('mouseup', this.onResizeMouseUp);
@@ -1176,7 +1194,8 @@ class CDataTable {
 
 		const column_index = column_config.getColumnIndex();
 
-		this.#findCells(column_index).forEach(cell => cell.classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING));
+		[...this.#findHeaderCells(column_index), ...this.#findDataCells(column_index)]
+			.forEach(cell => cell.classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING));
 
 		this.#resizing = false;
 		this.#resize_column_index = -1;
@@ -1260,11 +1279,11 @@ class CDataTable {
 
 		this.#context_popup.getHandle().classList.add(CDataTable.ZBX_STYLE_LINK_CONTEXT_OPENED);
 
-		this.#element.appendChild(this.#context_popup.getPopup());
+		this.#element.appendChild(this.#context_popup.getElement());
 
 		requestAnimationFrame(() => {
 			this.#context_popup.position();
-			this.#context_popup.getPopup().focus();
+			this.#context_popup.getElement().focus();
 		});
 	}
 
@@ -1316,6 +1335,8 @@ class CDataTable {
 		}
 
 		this.#context_popup?.dispatchEvent(CDataTableContextPopup.EVENT_CLOSE);
+
+		this.#headers.scrollLeft = this.#rows.scrollLeft;
 	}
 
 	on(event, callback, options = undefined) {
@@ -1761,13 +1782,13 @@ class CDataTable {
 		});
 	}
 
-	#applyScrollableBody() {
-		const body_rect = this.#body.getBoundingClientRect();
-		const body_width = Math.round(body_rect.width);
-		const body_height = Math.round(body_rect.height);
-		const action = this.#body.scrollWidth > body_width || this.#body.scrollHeight > body_height ? 'add' : 'remove';
+	#applyScrollableRows() {
+		const rows_rect = this.#rows.getBoundingClientRect();
+		const rows_width = Math.round(rows_rect.width);
+		const rows_height = Math.round(rows_rect.height);
+		const action = this.#rows.scrollWidth > rows_width || this.#rows.scrollHeight > rows_height ? 'add' : 'remove';
 
-		this.#body.classList[action](CDataTable.ZBX_STYLE_BODY_SCROLLABLE);
+		this.#rows.classList[action](CDataTable.ZBX_STYLE_ROWS_SCROLLABLE);
 	}
 
 	#sortColumns() {
@@ -1793,22 +1814,38 @@ class CDataTable {
 		}
 
 		const {right} = header_cell.getBoundingClientRect();
-		const width = this.#body.getBoundingClientRect().width;
+		const width = this.#rows.getBoundingClientRect().width;
 
 		if (right > width) {
-			const left = this.#body.scrollLeft + right - width;
+			const left = this.#rows.scrollLeft + right - width;
 
-			this.#body.scrollTo({left});
+			this.#headers.scrollTo({left});
+			this.#rows.scrollTo({left});
 		}
 	}
 
 	#calculateColumnWidth(column_config) {
-		if (column_config.isResized() || (column_config.getWidth() && !column_config.isResizable())) {
+		if (column_config.isResized() || (column_config.getWidth() != 'max-content' && !column_config.isResizable())) {
 			return;
 		}
 
+		let offset = 0;
+		// Width 'max-content' may cause text overflow, hence we need to add 1px
+		if (column_config.getWidth() == 'max-content') {
+			offset++;
+		}
+
 		const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
-		const width = parseFloat(this.#convertPixelsToPercent(header_cell.getBoundingClientRect().width));
+		const header_width = parseFloat(this.#convertPixelsToPercent(header_cell.getBoundingClientRect().width + offset));
+
+		let data_width = 0;
+
+		const data_cell = this.#findDataCell(column_config.getColumnIndex());
+		if (data_cell) {
+			data_width = parseFloat(this.#convertPixelsToPercent(data_cell.getBoundingClientRect().width + offset));
+		}
+
+		const width = Math.max(header_width, data_width);
 
 		column_config.setResized(true).setWidth(`${width}%`);
 	}
@@ -1820,11 +1857,10 @@ class CDataTable {
 			column_widths = visible_columns.map(column_config => column_config.getWidth());
 		}
 
-		this.#rows.style.gridTemplateColumns = column_widths.join(' ');
+		this.#headers.style.gridTemplateColumns = this.#rows.style.gridTemplateColumns = column_widths.join(' ');
 	}
 
 	#renderHeaderCells() {
-		const row = this.#createRow(0);
 		const columns = this.#columns.filter(column_config => column_config.isVisible());
 
 		for (const column_config of columns) {
@@ -1840,16 +1876,14 @@ class CDataTable {
 			}
 
 			if (cell) {
-				cell?.replaceWith(header_cell);
+				cell.replaceWith(header_cell);
 			}
 			else {
-				this.#bindColumnResizeEvent(header_cell);
-
-				row.appendChild(header_cell);
+				this.#headers.appendChild(header_cell);
 			}
-		}
 
-		this.#rows.appendChild(row);
+			this.#bindColumnResizeEvent(header_cell);
+		}
 	}
 
 	#renderDataCells(response) {
@@ -1881,7 +1915,7 @@ class CDataTable {
 			const row = this.#rows.querySelector(`.${CDataTable.ZBX_STYLE_ROW}[data-row="${row_index}"]`);
 			const data_cell = this.createDataCell(column_config, row_index);
 
-			const cell = this.#body
+			const cell = this.#rows
 				.querySelector(`.${CDataTable.ZBX_STYLE_CELL}[data-row="${row_index}"][data-col="${column_index}"]`)
 			if (cell) {
 				const attributes = cell.attributes;
@@ -1931,6 +1965,8 @@ class CDataTable {
 	#bindEvents() {
 		Object.entries(this.#events).forEach(([name, callback]) => this.on(name, callback));
 
+		document.querySelector('.wrapper').addEventListener('scroll', () => this.#context_popup?.position());
+
 		if (this.#tabfilter_item._parent) {
 			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, event => {
 				const {item} = event.detail;
@@ -1979,6 +2015,10 @@ class CDataTable {
 		return this.#findHeaderCells(column_index).item(0);
 	}
 
+	#findDataCell(column_index) {
+		return this.#findDataCells(column_index).item(0);
+	}
+
 	#findClosestHeaderCell(element) {
 		return element.closest(`.${CDataTable.ZBX_STYLE_CELL_HEADER}`);
 	}
@@ -1992,11 +2032,31 @@ class CDataTable {
 			selector += `[data-row="${row_index.toString()}"]`;
 		}
 
-		return this.#body.querySelectorAll(selector);
+		return this.#rows.querySelectorAll(selector);
 	}
 
-	#findHeaderCells(column_index = null, row_index = null) {
-		return this.#findCells(column_index, row_index, `.${CDataTable.ZBX_STYLE_CELL_HEADER}`);
+	#findHeaderCells(column_index = null) {
+		let selector = `.${CDataTable.ZBX_STYLE_CELL_HEADER}`;
+
+		if (column_index) {
+			selector += `[data-col="${column_index.toString()}"]`;
+		}
+
+		return this.#headers.querySelectorAll(selector);
+	}
+
+	#findDataCells(column_index = null, row_index = null) {
+		let selector = `.${CDataTable.ZBX_STYLE_CELL_DATA}`;
+
+		if (column_index) {
+			selector += `[data-col="${column_index.toString()}"]`;
+		}
+
+		if (row_index) {
+			selector += `[data-row="${row_index.toString()}"]`;
+		}
+
+		return this.#rows.querySelectorAll(selector);
 	}
 
 	#convertPixelsToPercent(pixels) {

@@ -17,9 +17,9 @@ class CDataTableContextPopupTags extends CDataTableContextPopup {
 	static  = null;
 
 	getFields() {
-		const number_of_tags = Array.from(this.getPopup().querySelectorAll('[name="number_of_tags"]'));
-		const tag_name_display = Array.from(this.getPopup().querySelectorAll('[name="tag_name_display"]'));
-		const tag_display_priority = this.getPopup().querySelector('[name="tag_display_priority"]');
+		const number_of_tags = Array.from(this.getElement().querySelectorAll('[name="number_of_tags"]'));
+		const tag_name_display = Array.from(this.getElement().querySelectorAll('[name="tag_name_display"]'));
+		const tag_display_priority = this.getElement().querySelector('[name="tag_display_priority"]');
 
 		return {number_of_tags, tag_name_display, tag_display_priority};
 	}

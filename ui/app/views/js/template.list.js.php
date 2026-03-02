@@ -106,35 +106,46 @@
 						.setTogglable(false),
 					new CDataTableColumn('hosts', <?= json_encode(_('Hosts')); ?>)
 						.setFields(['templateid', 'hosts'])
-						.setRenderer('hosts'),
+						.setRenderer('hosts')
+						.setWidth('max-content'),
 					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['templateid', 'items'])
-						.setRenderer('items'),
+						.setRenderer('items')
+						.setWidth('max-content'),
 					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['templateid', 'triggers'])
-						.setRenderer('triggers'),
+						.setRenderer('triggers')
+						.setWidth('max-content'),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['templateid', 'graphs'])
-						.setRenderer('graphs'),
+						.setRenderer('graphs')
+						.setWidth('max-content'),
 					new CDataTableColumn('dashboards', <?= json_encode(_('Dashboards')); ?>)
 						.setFields(['templateid', 'dashboards'])
-						.setRenderer('dashboards'),
+						.setRenderer('dashboards')
+						.setWidth('max-content'),
 					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['templateid', 'discovery'])
-						.setRenderer('discovery'),
+						.setRenderer('discovery')
+						.setWidth('max-content'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['templateid', 'web'])
-						.setRenderer('web'),
+						.setRenderer('web')
+						.setWidth('max-content'),
 					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
-						.setFields(['vendor_name']),
+						.setFields(['vendor_name'])
+						.setWidth('max-content'),
 					new CDataTableColumn('version', <?= json_encode(_('Version')); ?>)
-						.setFields(['vendor_version']),
+						.setFields(['vendor_version'])
+						.setWidth('max-content'),
 					new CDataTableColumn('linked_templates', <?= json_encode(_('Linked templates')); ?>)
 						.setFields(['parentTemplates'])
-						.setRenderer('linked_templates'),
+						.setRenderer('linked_templates')
+						.setWidth('max-content'),
 					new CDataTableColumn('linked_to_templates', <?= json_encode(_('Linked to templates')); ?>)
 						.setFields(['templates'])
-						.setRenderer('linked_to_templates'),
+						.setRenderer('linked_to_templates')
+						.setWidth('max-content'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setFields(['tags'])
 				])

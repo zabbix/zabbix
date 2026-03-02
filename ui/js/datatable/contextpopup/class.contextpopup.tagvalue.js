@@ -16,7 +16,7 @@
 class CDataTableContextPopupTagValue extends CDataTableContextPopup {
 
 	getFields() {
-		const tag_name = this.getPopup().querySelector('[name="tag_name"]');
+		const tag_name = this.getElement().querySelector('[name="tag_name"]');
 
 		return {tag_name};
 	}

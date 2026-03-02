@@ -15,7 +15,7 @@
 
 class CDataTableContextPopupMonitoringProblemsTime extends CDataTableContextPopup {
 	getFields() {
-		const show_timeline = this.getPopup().querySelector('[name="show_timeline"]');
+		const show_timeline = this.getElement().querySelector('[name="show_timeline"]');
 
 		return {show_timeline};
 	}

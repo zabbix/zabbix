@@ -15,9 +15,9 @@
 
 class CDataTableContextPopupMonitoringProblemsProblem extends CDataTableContextPopup {
 	getFields() {
-		const show_opdata = this.getPopup().querySelector('[name="show_opdata"]');
-		const details = this.getPopup().querySelector('[name="details"]');
-		const show_suppressed = this.getPopup().querySelector('[name="show_suppressed"]');
+		const show_opdata = this.getElement().querySelector('[name="show_opdata"]');
+		const details = this.getElement().querySelector('[name="details"]');
+		const show_suppressed = this.getElement().querySelector('[name="show_suppressed"]');
 
 		return {show_opdata, details, show_suppressed};
 	}

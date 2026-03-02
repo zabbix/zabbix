@@ -184,7 +184,8 @@
 						.setFields(['itemid', 'description_expanded', 'name', 'key_expanded'])
 						.setRenderer('name')
 						.setSortable(true)
-						.setTogglable(false),
+						.setTogglable(false)
+						.setWidth('max-content'),
 					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
 						.setVisible(false),
@@ -199,11 +200,14 @@
 						.setRenderer('type')
 						.setVisible(false),
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
-						.setFields(['last_check']),
+						.setFields(['last_check'])
+						.setWidth('max-content'),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value']),
+						.setFields(['last_value'])
+						.setWidth('auto'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
-						.setFields(['change']),
+						.setFields(['change'])
+						.setWidth('max-content'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setRenderer('tags'),
 					new CDataTableColumn('actions', '')
