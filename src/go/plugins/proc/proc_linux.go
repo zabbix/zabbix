@@ -47,8 +47,7 @@ const (
 	maxHistory          = 60*15 + 1
 )
 
-// disable capitalized error check linter, to be consistent with Zabbix agent.
-var errGetPwnamRFailed = errors.New("No such file or directory") //nolint:staticcheck
+var errGetPwnamRFailed = errors.New("No such file or directory")
 
 // Plugin -
 type Plugin struct {
@@ -290,7 +289,7 @@ func getUIDByName(userName string) (*uid, error) {
 	)
 
 	if errCode != 0 {
-		return nil, fmt.Errorf("[%d] %w", errCode, errGetPwnamRFailed)
+		return nil, errs.Errorf("[%d] %v", errCode, errGetPwnamRFailed)
 	}
 
 	if passwdC == nil {
@@ -633,7 +632,7 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 					return 0, nil
 				}
 
-				return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
+				return nil, errs.Errorf("Cannot obtain user information: %v", err)
 			}
 		}
 		fallthrough
@@ -826,7 +825,7 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 			return 0, nil
 		}
 
-		return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
+		return nil, errs.Errorf("Cannot obtain user information: %v", err)
 	}
 
 	procs, err := getProcesses(flags)
@@ -877,7 +876,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 					return "[]", nil
 				}
 
-				return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
+				return nil, errs.Errorf("Cannot obtain user information: %v", err)
 			}
 		}
 		fallthrough
@@ -900,7 +899,7 @@ func (p *PluginExport) exportProcGet(params []string) (interface{}, error) {
 
 	query, _, err := p.prepareQuery(&procQuery{name, userName, cmdline, ""})
 	if err != nil {
-		return nil, fmt.Errorf("Cannot obtain user information: %w", err) //nolint:staticcheck
+		return nil, errs.Errorf("Cannot obtain user information: %v", err)
 	}
 
 	if mode != "thread" {
