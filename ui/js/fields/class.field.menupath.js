@@ -14,16 +14,19 @@
 
 
 class CFieldMenuPath extends CFieldTextBox {
-	getValueTrimmed() {
-		const value = super.getValueTrimmed();
 
-		return this.#splitPath(value)
+	getValueTrimmed() {
+		if (!this._allow_trim) {
+			return super.getValue();
+		}
+
+		return this.#splitPath(super.getValueTrimmed())
 			.map(path_item => path_item.trim())
 			.join('/');
 	}
 
 	#splitPath(path) {
-		const path_items = [];
+		let path_items = [];
 		let path_item = '';
 		let escaped = false;
 
@@ -50,6 +53,14 @@ class CFieldMenuPath extends CFieldTextBox {
 		}
 
 		path_items.push(path_item);
+
+		if (path_items[0] === '' && path_items[1] !== '') {
+			path_items = path_items.slice(1);
+		}
+
+		if (path_items[path_items.length - 1] === '' && path_items[path_items.length - 2] !== '') {
+			path_items = path_items.slice(0, -1);
+		}
 
 		return path_items;
 	}
