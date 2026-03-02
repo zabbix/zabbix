@@ -59,10 +59,17 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'field' => ['db role_rule.value_serviceid'],
 				'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
 			],
-			'service_read_tag_value' => ['string'],
+			'service_read_tag_value' => ['string',
+				'when' => ['service_read_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+			],
 			'service_read_tag_tag' => [
-				['string'],
-				['string', 'required', 'not_empty', 'when' => ['service_read_tag_value', 'not_empty']]
+				['string', 'when' => ['service_read_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
+				['string', 'required', 'not_empty',
+					'when' => [
+						['service_read_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
+						['service_read_tag_value', 'not_empty']
+					]
+				]
 			],
 			'service_write_access' => ['integer',
 				'in' => [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL,
@@ -73,10 +80,17 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'field' => ['db role_rule.value_serviceid'],
 				'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
 			],
-			'service_write_tag_value' => ['string'],
+			'service_write_tag_value' => ['string',
+				'when' => ['service_write_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+			],
 			'service_write_tag_tag' => [
-				['string'],
-				['string', 'required', 'not_empty', 'when' => ['service_write_tag_value', 'not_empty']]
+				['string', 'when' => ['service_write_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
+				['string', 'required', 'not_empty',
+					'when' => [
+						['service_write_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
+						['service_write_tag_value', 'not_empty']
+					]
+				]
 			],
 			'form_refresh' => ['integer']
 		]];
