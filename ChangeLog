@@ -1,10 +1,13 @@
 Changes for 7.4.8rc1
 
 New features:
+.D...J.... [ZBXNEXT-10126] updated man page and help message for zabbix_js (rtrizna)
 .........T [ZBXNEXT-10405] improved Device status mapping and add trigger for Meraki template (kflorowski)
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
+..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
 A......... [ZBX-27448] fixed inability to delete host, user or template groups when accordingly hosts, users or templates belonging to them were previously deleted in parallel requests (jfreibergs, vmaksimovs)
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ..F....... [ZBX-27225] fixed incorrect coloring of disabled host links in the Proxies list (Ivo)
@@ -1294,10 +1297,13 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.24rc1
 
 New features:
+.D...J.... [ZBXNEXT-10126] updated man page and help message for zabbix_js (rtrizna)
 .........T [ZBXNEXT-10405] improved Device status mapping and add trigger for Meraki template (kflorowski)
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+.......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
+..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
 ...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 A......... [ZBX-27448] fixed inability to delete host, user or template groups when accordingly hosts, users or templates belonging to them were previously deleted in parallel requests (jfreibergs, vmaksimovs)
 .........T [ZBX-27075] improved Teams Workflow webhook to use ALERT.SENDTO macro (kflorowski)
@@ -5263,6 +5269,7 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+...G...... [ZBX-25805] fixed regexp runtime error when processing log* items with unspecified encoding by sanitizing invalid UTF-8 (vsmelovs)
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 
 --------------------------------------------------------------------------------
