@@ -104,7 +104,7 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 
 		this.form.discoverAllFields();
-		this.initial_form_fields = this.#getFormFields();
+		this.initial_form_fields = this.form.getAllValues();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
@@ -358,7 +358,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.#getFormFields())
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.form.getAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -379,7 +379,7 @@ window.item_edit_form = new class {
 	}
 
 	create() {
-		const fields = this.#getFormFields();
+		const fields = this.form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.create);
@@ -395,7 +395,7 @@ window.item_edit_form = new class {
 	}
 
 	update() {
-		const fields = this.#getFormFields();
+		const fields = this.form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.update);
@@ -518,43 +518,6 @@ window.item_edit_form = new class {
 		});
 	}
 
-	#getFormFields() {
-		const values = this.form.getAllValues();
-
-		delete values.show_inherited_tags;
-
-		if (values.delay === undefined) {
-			values.delay = '';
-		}
-
-		if (values.preprocessing) {
-			for (let index in values.preprocessing) {
-				const step = values.preprocessing[index];
-
-				if (step.error_handler_params === null) {
-					step.error_handler_params = '';
-				}
-
-				if (step.on_fail === null) {
-					delete step.error_handler;
-					delete step.error_handler_params;
-				}
-			}
-		}
-
-		const tags = [];
-		for (let key in values.tags) {
-			let {tag, value} = values.tags[key];
-
-			if (tag === '' && value === '') {
-				continue;
-			}
-			tags.push({tag, value});
-		}
-
-		return {...values, ...{tags}};
-	}
-
 	#post(url, data, keep_open = false) {
 		if (this.form_element[CSRF_TOKEN_NAME]) {
 			data[CSRF_TOKEN_NAME] = this.form_element[CSRF_TOKEN_NAME].value;
@@ -649,7 +612,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateTagsList(show_inherited_tags) {
-		const fields = this.#getFormFields();
+		const fields = this.form.getAllValues();
 		const data = {
 			tags: fields.tags,
 			show_inherited_tags,
