@@ -253,7 +253,7 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
 {
 	int	pending_num;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", task->type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", __func__, task->type);
 
 	pthread_mutex_lock(&queue->lock);
 
@@ -391,7 +391,7 @@ static void	cep_queue_push_next_event_task_nl(zbx_cep_queue_t *queue, zbx_cep_ta
  ******************************************************************************/
 void	cep_queue_push_finished_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
 {
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", task->type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", __func__, task->type);
 
 	zbx_queue_ptr_push(&queue->finished, task);
 	queue->pending_num--;

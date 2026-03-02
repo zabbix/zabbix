@@ -23,6 +23,7 @@ static zbx_dc_config_local_t	*config_local = NULL;
 void	zbx_dc_config_local_init(void)
 {
 	config_local = (zbx_dc_config_local_t *)zbx_malloc(NULL, sizeof(zbx_dc_config_local_t));
+	config_local->itservices_num = 0;
 
 	zbx_hashset_create(&config_local->item_tag_links, 0, ZBX_DEFAULT_ID_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC);

@@ -460,9 +460,6 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_pt
 
 	zbx_vector_trigger_diff_ptr_create(&trigger_diffs);
 
-	/* WDN: remove */
-	zabbix_increase_log_level();
-
 	for (int ret = ZBX_DB_DOWN; ret == ZBX_DB_DOWN;)
 	{
 		db = zbx_dbconn_pool_acquire_connection(dbpool);
@@ -477,9 +474,6 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_pt
 		ret = zbx_dbconn_commit(db);
 		zbx_dbconn_pool_release_connection(dbpool, db);
 	}
-
-	/* WDN: remove */
-	zabbix_decrease_log_level();
 
 	zbx_dc_config_triggers_apply_changes(trigger_diffs.values, trigger_diffs.values_num);
 	zbx_vector_trigger_diff_ptr_clear_ext(&trigger_diffs, zbx_trigger_diff_free);
@@ -661,9 +655,6 @@ void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t 
 	zbx_vector_event_tags_ptr_create(&db_tags);
 	zbx_vector_event_tags_ptr_create(&event_tags);
 
-	/* WDN: remove */
-	zabbix_increase_log_level();
-
 	for (int i = 0; i < tasks->values_num; i++)
 	{
 		zbx_cep_task_add_tags_t	*t = (zbx_cep_task_add_tags_t *)tasks->values[i];
@@ -717,9 +708,6 @@ void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t 
 	zbx_vector_uint64_destroy(&eventids);
 	zbx_vector_event_tags_ptr_destroy(&event_tags);
 	zbx_vector_event_tags_ptr_destroy(&db_tags);
-
-	/* WDN: remove */
-	zabbix_decrease_log_level();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
