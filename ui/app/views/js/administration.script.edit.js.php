@@ -21,7 +21,7 @@
 
 window.script_edit_popup = new class {
 
-	init({rules, script}) {
+	init({rules, clone_rules, script}) {
 		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -36,7 +36,7 @@ window.script_edit_popup = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initView(script);
-		this.#initActions(rules);
+		this.#initActions(rules, clone_rules);
 	}
 
 	#initView(script) {
@@ -51,7 +51,7 @@ window.script_edit_popup = new class {
 		this.overlay.recoverFocus();
 	}
 
-	#initActions(rules) {
+	#initActions(rules, clone_rules) {
 		this.form_element.querySelectorAll('#scope, #type, #authtype, #hgstype-select, #manualinput,' +
 				' #manualinput_validator_type ,#enable_confirmation, #confirmation').forEach(
 			node => node.addEventListener('change', (e) => {
@@ -106,6 +106,12 @@ window.script_edit_popup = new class {
 		this.form_element.querySelector('.js-parameter-add').addEventListener('click', () => {
 			this.#addParameter({name: '', value: ''});
 		});
+
+		const dialogue_footer = this.overlay.$dialogue.$footer[0];
+
+		dialogue_footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		dialogue_footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone(clone_rules));
+		dialogue_footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 
 		this.form_element.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
@@ -304,22 +310,43 @@ window.script_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons, rules}) {
+	#clone(clone_rules) {
+		this.#clearMessages();
 		this.scriptid = null;
 
-		this.form.reload(rules);
+		this.form.reload(clone_rules);
 
 		for (const input of this.form_element.querySelectorAll('input[name=scope]')) {
 			input.disabled = false;
 		}
 
-		this.overlay.setProperties({title, buttons});
+		this.overlay.setProperties({
+			title: <?= json_encode(_('New script')) ?>,
+			buttons: [
+				{
+					title: <?= json_encode(_('Add')) ?>,
+					class: 'js-submit',
+					keepOpen: true,
+					isSubmit: true
+				},
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					class: <?= json_encode(ZBX_STYLE_BTN_ALT) ?>,
+					cancel: true,
+					action: ''
+				}
+			]
+		});
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
 	}
 
-	delete() {
+	#delete() {
 		this.#clearMessages();
 		const curl = new Curl('zabbix.php');
 
@@ -333,7 +360,7 @@ window.script_edit_popup = new class {
 		});
 	}
 
-	submit() {
+	#submit() {
 		this.#clearMessages();
 		const fields = this.form.getAllValues();
 		const curl = new Curl('zabbix.php');
@@ -371,33 +398,19 @@ window.script_edit_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				if ('form_errors' in response) {
 					this.form.setErrors(response.form_errors, true, true);
 					this.form.renderErrors();
-				}
-				else if ('error' in response) {
-					throw {error: response.error};
 				}
 				else {
 					success_callback(response);
 				}
 			})
-			.catch((exception) => {
-				let title;
-				let messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
 
@@ -408,4 +421,18 @@ window.script_edit_popup = new class {
 			}
 		}
 	}
-}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		this.form_element.parentNode.insertBefore(makeMessageBox('bad', messages, title)[0], this.form_element);
+	}
+};

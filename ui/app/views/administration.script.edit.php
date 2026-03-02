@@ -423,9 +423,9 @@ if ($data['form']['scriptid'] === null) {
 	$buttons = [
 		[
 			'title' => _('Add'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'script_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -433,42 +433,21 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'script_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT, 'js-clone',
+			'class' => ZBX_STYLE_BTN_ALT.' js-clone',
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'script_edit_popup.clone('.json_encode([
-				'title' => _('New script'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'script_edit_popup.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => ZBX_STYLE_BTN_ALT,
-						'cancel' => true,
-						'action' => ''
-					]
-				],
-				'rules' => $data['js_clone_validation_rules']
-			]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete script?'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => ZBX_STYLE_BTN_ALT.' js-delete',
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'script_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -476,12 +455,6 @@ else {
 $form
 	->addItem($form_grid)
 	->addItem($row_template)
-	->addItem(
-		(new CScriptTag('script_edit_popup.init('.json_encode([
-			'script' => $data['form'],
-			'rules' => $data['js_validation_rules']
-		]).');'))->setOnDocumentReady()
-	)
 	->addStyle('display: none;');
 
 $output = [
@@ -489,7 +462,12 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_SCRIPT_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('administration.script.edit.js.php'),
+	'script_inline' => getPagePostJs().$this->readJsFile('administration.script.edit.js.php').
+		'script_edit_popup.init('.json_encode([
+			'script' => $data['form'],
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules']
+		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];
 
