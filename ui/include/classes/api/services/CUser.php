@@ -66,11 +66,6 @@ class CUser extends CApiService {
 	public const PROVISION_STATUS_YES = 1;
 	public const PROVISION_STATUS_NO = 0;
 
-	public const TOKEN_AUTH_TYPES = [
-		ZBX_API_HEADER_AUTHENTICATE_BEARER => 0,
-		ZBX_API_HEADER_AUTHENTICATE_DPOP => 1
-	];
-
 	/**
 	 * Acceptable execution time of user verification process in seconds and nanoseconds.
 	 *
@@ -3042,7 +3037,7 @@ class CUser extends CApiService {
 	private static function tokenAuthentication(string $auth_token, int $time, ?string $signature,
 			?string $request_api_method): array {
 		$db_tokens = DB::select('token', [
-			'output' => ['userid', 'auth_type', 'expires_at', 'tokenid'],
+			'output' => ['tokenid', 'userid', 'auth_type', 'expires_at'],
 			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
 		]);
 
@@ -3054,20 +3049,36 @@ class CUser extends CApiService {
 		$db_token = $db_tokens[0];
 
 		// mock data to choice DPoP auth type
-		$db_token['auth_type'] = self::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_DPOP];
-		$db_token['client_public_key'] = CApiDpopHelper::PUBLIC_KEY_PEM;
+		$db_token['auth_type'] = ZBX_API_HEADER_AUTHENTICATE_DPOP;
 
 		if ($db_token['expires_at'] != 0 && $db_token['expires_at'] < $time) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		if ($db_token['auth_type'] == self::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_DPOP]) {
+		if ($db_token['auth_type'] == ZBX_API_HEADER_AUTHENTICATE_DPOP) {
 			if ($signature === null || $request_api_method === null) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
-			if (!CApiDpopHelper::verifyDpopSignature($signature, $db_token['client_public_key'],
-					$auth_token, $request_api_method)) {
+			$db_device_keys = DBfetch(DBselect(
+				'SELECT dk.key'.
+				' FROM device_key dk'.
+				' JOIN device d ON d.deviceid=dk.deviceid'.
+				' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
+					' AND '.dbConditionInt('dk.scope', [CDevice::DEVICE_KEY_SCOPE_IDENTITY]).
+					' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
+				1
+			));
+
+			if (!$db_device_keys) {
+				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			}
+
+			// mock client public key
+			$db_device_keys['key'] = CApiDpopHelper::PUBLIC_KEY_PEM;
+
+			if (!CApiDpopHelper::verifyDpopSignature($signature, $db_device_keys['key'], $auth_token,
+					$request_api_method)) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 		}

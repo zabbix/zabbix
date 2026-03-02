@@ -74,9 +74,7 @@ class CToken extends CApiService {
 		$sql_parts = [
 			'select' => [],
 			'from'   => $this->tableName().' '.$this->tableAlias(),
-			'where'  => [dbConditionInt($this->tableAlias().'.auth_type',
-				[CUser::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_BEARER]]
-			)], // skipped DPoP tokens
+			'where'  => [dbConditionInt($this->tableAlias().'.auth_type', [ZBX_API_HEADER_AUTHENTICATE_BEARER])], // skipped DPoP tokens
 			'group'  => [],
 			'order'  => []
 		];

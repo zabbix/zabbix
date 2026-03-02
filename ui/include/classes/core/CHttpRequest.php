@@ -125,14 +125,14 @@ class CHttpRequest {
 		if (is_string($authorization)) {
 			$auth_type = explode(' ', $authorization)[0];
 
-			if ($auth_type === ZBX_API_HEADER_AUTHENTICATE_BEARER) {
+			if ($auth_type === CJsonRpc::HEADER_AUTHENTICATE_BEARER) {
 				$auth_data['type'] = ZBX_API_HEADER_AUTHENTICATE_BEARER;
-				$auth_data['auth'] = substr($authorization, 7);
+				$auth_data['auth'] = substr($authorization, strlen($auth_type) + 1);
 			}
-			elseif ($auth_type === ZBX_API_HEADER_AUTHENTICATE_DPOP) {
+			elseif ($auth_type === CJsonRpc::HEADER_AUTHENTICATE_DPOP) {
 				$auth_data['type'] = ZBX_API_HEADER_AUTHENTICATE_DPOP;
-				$auth_data['auth'] = substr($authorization, 5);
-				$auth_data['sign'] = (string) $this->header('DPOP');
+				$auth_data['auth'] = substr($authorization, strlen($auth_type) + 1);
+				$auth_data['sign'] = (string) $this->header(CJsonRpc::HEADER_AUTHENTICATE_DPOP);
 			}
 		}
 

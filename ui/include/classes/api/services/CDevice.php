@@ -22,7 +22,7 @@ class CDevice extends CApiService {
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'init' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'onboard' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'onboard' => []
 	];
 
 	protected $tableName = 'device';
@@ -43,6 +43,8 @@ class CDevice extends CApiService {
 
 	public const DEVICE_KEY_SCOPE_IDENTITY = 0;
 	public const DEVICE_KEY_SCOPE_ENCRYPTION = 1;
+
+	public const DEVICE_KEY_ACTIVE = 0;
 
 	private const SERVER_ID = 'server_id'; // CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID)
 
@@ -168,7 +170,7 @@ class CDevice extends CApiService {
 			'name' => $options['device_name'],
 			'userid' => $db_device['userid'],
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
-			'auth_type' => CUser::TOKEN_AUTH_TYPES[ZBX_API_HEADER_AUTHENTICATE_DPOP],
+			'auth_type' => ZBX_API_HEADER_AUTHENTICATE_DPOP,
 			'expires_at' => 0
 		]], $db_device['userid'], false);
 

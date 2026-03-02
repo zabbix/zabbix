@@ -18,7 +18,9 @@ class CJsonRpc {
 
 	const VERSION = '2.0';
 
-	public const AUTH_TYPE_HEADER = 2;
+	public const HEADER_AUTHENTICATE_BEARER = 'Bearer';
+	public const HEADER_AUTHENTICATE_DPOP = 'DPoP';
+
 	public const AUTH_TYPE_COOKIE = 3;
 
 	/**
