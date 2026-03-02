@@ -246,12 +246,14 @@ func Test_prepareConnectString(t *testing.T) {
 			"+tnsServiceDecodeOk",
 			args{
 				tnsNone,
-				newConnDetHostname(t, "localhost", "XE%23"),
+				// service name can only be [a...z] [A...Z] [0...9] _ with first alphanumeric.
+				// QueryEscape removes the hashtag in the result.
+				newConnDetHostname(t, "localhost", "XE#"),
 				1,
 			},
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
-					`(CONNECT_DATA=(SERVICE_NAME="XE#"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
+					`(CONNECT_DATA=(SERVICE_NAME="XE"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
 				false,
 				false,
 			},
@@ -271,16 +273,17 @@ func Test_prepareConnectString(t *testing.T) {
 			},
 		},
 		{
-			"-tnsServiceDecodeFail",
+			"+tnsServiceDecodeQueryEscapes",
 			args{
 				tnsNone,
 				newConnDetHostname(t, "localhost", "XE%ZZ"),
 				1, //any
 			},
 			want{
-				"",
+				"(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))" +
+					"(CONNECT_DATA=(SERVICE_NAME=\"XE%25ZZ\"))" +
+					"(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))", false,
 				false,
-				true,
 			},
 		},
 		{
