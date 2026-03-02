@@ -124,7 +124,12 @@
 			this.filter_form.addEventListener('submit', e => {
 				e.preventDefault();
 
-				const filters = {...getFormFields(e.target), filter_set: 1};
+				const filters = {
+					...getFormFields(e.target),
+					filter_set: 1,
+					sort: this._init_filter_values.sort,
+					sortorder: this._init_filter_values.sortorder
+				};
 
 				Object.keys(filters).forEach(key => {
 					if (key.startsWith('subfilter_')) {
