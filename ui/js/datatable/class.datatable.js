@@ -838,19 +838,19 @@ class CDataTable {
 		const sticky_columns = this.#columns.filter(column_config => column_config.isSticky());
 		if (sticky_columns.length > 0) {
 			// First column
-			const {column_index} = sticky_columns.at(0);
+			const first_column_config = sticky_columns.at(0);
 
-			const header_cell = this.#findHeaderCell(column_index);
+			const header_cell = this.#findHeaderCell(first_column_config.getColumnIndex());
 			header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-			header_cell.style.left = '0px';
+			header_cell.style.left = '0';
 
 			if (sticky_columns.length > 1) {
 				// Last column
-				const {column_index} = sticky_columns.reverse().at(0);
+				const last_column_config = sticky_columns.at(sticky_columns.length - 1);
 
-				const header_cell = this.#findHeaderCell(column_index);
+				const header_cell = this.#findHeaderCell(last_column_config.getColumnIndex());
 				header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-				header_cell.style.right = '0px';
+				header_cell.style.right = '0';
 			}
 		}
 
@@ -1995,8 +1995,8 @@ class CDataTable {
 		return this.#body.querySelectorAll(selector);
 	}
 
-	#findHeaderCells(column_index) {
-		return this.#findCells(column_index, 0, `.${CDataTable.ZBX_STYLE_CELL_HEADER}`);
+	#findHeaderCells(column_index = null, row_index = null) {
+		return this.#findCells(column_index, row_index, `.${CDataTable.ZBX_STYLE_CELL_HEADER}`);
 	}
 
 	#convertPixelsToPercent(pixels) {
