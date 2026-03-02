@@ -1275,6 +1275,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilReloaded();
 			$this->page->waitUntilReady();
 		}
 		else {
@@ -1287,8 +1288,8 @@ class testFormTags extends CWebTest {
 		foreach ($tags_table->getRows() as $row) {
 			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
-			$current_tag['tag'] = $row->getColumn('Name')->getText();
-			$current_tag['value'] = $row->getColumn('Value')->getText();
+			$current_tag['tag'] = $row->getColumn('Name')->query('tag:z-textarea-flexible')->one()->getValue();
+			$current_tag['value'] = $row->getColumn('Value')->query('tag:z-textarea-flexible')->one()->getValue();
 
 			if (in_array($current_tag, $unique_template_tags)) {
 				$this->assertEquals($this->template, $parent_template);
