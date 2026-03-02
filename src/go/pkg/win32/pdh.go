@@ -46,8 +46,9 @@ const (
 	PDH_FMT_NOCAP100 = 0x00008000
 
 	// Retryable errors
-	PDH_CSTATUS_NO_MACHINE = 0xC0000BB8
-	PDH_PLG_CONFIG_RETRY   = 0xC0000BCB
+	PDH_CSTATUS_NO_MACHINE = 0x800007D0
+	PDH_CSTATUS_NO_OBJECT  = 0xC0000BB8
+	PDH_LOG_TYPE_NOT_FOUND = 0xC0000BCB
 	PDH_INVALID_HANDLE     = 0xC0000BBC
 
 	PDH_MAX_COUNTER_NAME = 1024
@@ -56,11 +57,6 @@ const (
 
 	objectListSizeInit = 16384
 )
-
-type perflibState struct {
-	LastCounter uint32
-	Version     uint32
-}
 
 var (
 	NegDenomErr = newPdhError(PDH_CALC_NEGATIVE_DENOMINATOR)
@@ -81,7 +77,7 @@ var (
 	pdhEnumObjects              = hPdh.mustGetProcAddress("PdhEnumObjectsW")
 
 	objectListSize uint32 = objectListSizeInit
-	pflState       perflibState
+	pflModtime     time.Time
 
 	// mutex to prevent concurrent calls of Windows API PDH functions when one of the following is already being executed
 	// pdhEnumObjectItems(), pdhEnumObjects() and pdhCollectQueryData()
@@ -397,36 +393,31 @@ func PdhEnumObject(force bool) (objects []string, err error) {
 		objectBuf         []uint16
 		objectListSizeRet uint32
 		retErr            uintptr
+		refresh           bool = true
 	)
 	pdhMu.Lock()
 	defer pdhMu.Unlock()
 
-	pflStateNew, pflErr := readPerflibState()
+	pflModtimeNew, pflErr := getPerflibModtime()
 	if pflErr != nil {
-		log.Debugf("readPerflibState() error: %s", pflErr.Error())
-		pflStateNew = &perflibState{
-			LastCounter: 0,
-			Version:     0,
-		}
-	} else {
-		log.Debugf("perfLib Version: %d, LastCounter: %d", pflStateNew.Version, pflStateNew.LastCounter)
+		log.Debugf("getPerflibModtime() error: %s", pflErr.Error())
 	}
 
-	if pflState.Version != 0 && pflState.LastCounter != 0 && pflState == *pflStateNew {
-		log.Debugf("PdhEnumObject() skipped. plState has not changed")
-		return objects, nil
+	if pflModtime.IsZero() == false && pflModtime.Equal(pflModtimeNew) {
+		log.Debugf("pdhEnumObjectGet(false) Perflib Modtime has not changed")
+		refresh = false
 	}
 
 	for attempt := 1; attempt <= maxAttempts; attempt++ {
-		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(true)
-		if force == false || isPdhErrorRetryable(retErr) == false {
+		objectBuf, objectListSizeRet, retErr = pdhEnumObjectGet(refresh)
+		if force == false || refresh == false || isPdhErrorRetryable(retErr) == false {
 			break
 		}
 		log.Debugf("pdhEnumObjectGet(true) attempt:%d err: 0x%08X", attempt, uint32(retErr))
 		time.Sleep(750 * time.Millisecond)
 	}
 
-	if force == true {
+	if force == true || refresh == false {
 		if syscall.Errno(retErr) != windows.ERROR_SUCCESS {
 			return nil, newPdhError(retErr)
 		}
@@ -446,7 +437,7 @@ func PdhEnumObject(force bool) (objects []string, err error) {
 	}
 
 	if pflErr == nil {
-		pflState = *pflStateNew
+		pflModtime = pflModtimeNew
 	}
 
 	var singleName []uint16
@@ -502,35 +493,33 @@ func newPdhError(ret uintptr) (err error) {
 	return fmt.Errorf("%s (error code: 0x%08X)", windows.UTF16ToString(buf), uint32(ret))
 }
 
-func readPerflibState() (*perflibState, error) {
+func getPerflibModtime() (time.Time, error) {
 	plPath := "SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Perflib"
 	rootKey, err := registry.OpenKey(registry.LOCAL_MACHINE, plPath, registry.READ)
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
 	defer rootKey.Close()
 
-	version, _, err := rootKey.GetIntegerValue("Version")
+	stats, err := rootKey.Stat()
 	if err != nil {
-		return nil, err
+		return time.Time{}, err
 	}
-
-	lastCounter, _, err := rootKey.GetIntegerValue("Last Counter")
-	if err != nil {
-		return nil, err
+	mt := stats.ModTime()
+	if mt.IsZero() {
+		return time.Time{}, errors.New("empty value")
 	}
+	log.Debugf("getPerflibModtime() ModTime=%s", stats.ModTime().String())
 
-	return &perflibState{
-		LastCounter: uint32(lastCounter),
-		Version:     uint32(version),
-	}, nil
+	return mt, nil
 }
 
 func isPdhErrorRetryable(code uintptr) bool {
 	switch code {
 	case PDH_CSTATUS_NO_MACHINE,
+		PDH_CSTATUS_NO_OBJECT,
 		PDH_CSTATUS_INVALID_DATA,
-		PDH_PLG_CONFIG_RETRY,
+		PDH_LOG_TYPE_NOT_FOUND,
 		PDH_INVALID_HANDLE:
 		return true
 	}
