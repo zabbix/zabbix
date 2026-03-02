@@ -36,7 +36,7 @@ abstract class CControllerItemPrototype extends CController {
 			'name'					=> 'db items.name',
 			'type'					=> 'in '.implode(',', array_keys(item_type2str())),
 			'key'					=> 'db items.key_',
-			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY]),
+			'value_type'			=> 'in '.implode(',', [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON]),
 			'url'					=> 'db items.url',
 			'query_fields'			=> 'array',
 			'parameters'			=> 'array',

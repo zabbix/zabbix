@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -14,11 +14,19 @@
 **/
 
 
-class CMarkdown extends CDiv {
+class CTrim extends CSpan {
 
-	public function __construct($items = null) {
-		parent::__construct();
+	public function __construct(string $string, int $limit) {
+		$is_trimmed = mb_strlen($string) > $limit;
 
-		$this->addClass(ZBX_STYLE_MARKDOWN);
+		if ($is_trimmed) {
+			$string = mb_substr($string, 0, $limit);
+		}
+
+		parent::__construct($string);
+
+		if ($is_trimmed) {
+			$this->addClass(ZBX_STYLE_TRIMMED_CONTENT);
+		}
 	}
 }

@@ -35,7 +35,8 @@
 #define		ZBX_IDX_JSON_ALLOCATE		256
 #define		ZBX_JSON_ALLOCATE		2048
 
-const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
+/* bin is not used for elastic, but is needed for mapping consistency */
+const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -76,7 +77,7 @@ typedef struct
 }
 zbx_curlpage_t;
 
-static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_BIN + 1];
+static zbx_curlpage_t	page_w[ITEM_VALUE_TYPE_JSON + 1];
 
 static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
 {
@@ -102,6 +103,7 @@ static zbx_history_value_t	history_str2value(char *str, unsigned char value_type
 			break;
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			value.str = zbx_strdup(NULL, str);
 			break;
 		case ITEM_VALUE_TYPE_FLOAT:
@@ -128,6 +130,7 @@ static const char	*history_value2str(const zbx_dc_history_t *h)
 	{
 		case ITEM_VALUE_TYPE_STR:
 		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_JSON:
 			return h->value.str;
 		case ITEM_VALUE_TYPE_LOG:
 			return h->value.log->value;
@@ -1030,13 +1033,14 @@ static int	elastic_add_values(zbx_history_iface_t *hist, const zbx_vector_dc_his
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_json_init(&json_idx, ZBX_IDX_JSON_ALLOCATE);
-
 	zbx_json_addobject(&json_idx, "index");
+
 	zbx_json_addstring(&json_idx, "_index", value_type_str[hist->value_type], ZBX_JSON_TYPE_STRING);
 
 	if (1 == config_history_storage_pipelines)
 	{
 		zbx_snprintf(pipeline, sizeof(pipeline), "%s-pipeline", value_type_str[hist->value_type]);
+
 		zbx_json_addstring(&json_idx, "pipeline", pipeline, ZBX_JSON_TYPE_STRING);
 	}
 

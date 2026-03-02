@@ -245,7 +245,7 @@ $form_grid->addItem(
 	(new CFormField(
 		(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
 	))
-		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-type', 'array')
 		->setAttribute('data-field-name', 'modules')
 );
 

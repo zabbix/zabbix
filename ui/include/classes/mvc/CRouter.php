@@ -41,6 +41,7 @@ class CRouter {
 	private array $routes = [
 		// action									controller															layout					view
 		'acknowledge.edit'							=> [CControllerAcknowledgeEdit::class,								'layout.json',			'acknowledge.edit'],
+		'acknowledge.rank.change'					=> [CControllerAcknowledgeRankChange::class,						'layout.json',			null],
 		'action.create'								=> [CControllerActionCreate::class,									'layout.json',			null],
 		'action.delete'								=> [CControllerActionDelete::class,									'layout.json',			null],
 		'action.disable'							=> [CControllerActionDisable::class,								'layout.json',			null],
@@ -56,7 +57,7 @@ class CRouter {
 		'audit.settings.update'						=> [CControllerAuditSettingsUpdate::class,							null,					null],
 		'auditlog.list'								=> [CControllerAuditLogList::class,									'layout.htmlpage',		'reports.auditlog.list'],
 		'authentication.edit'						=> [CControllerAuthenticationEdit::class,							'layout.htmlpage',		'administration.authentication.edit'],
-		'authentication.update'						=> [CControllerAuthenticationUpdate::class,							null,					null],
+		'authentication.update'						=> [CControllerAuthenticationUpdate::class, 						'layout.json',			null],
 		'autoreg.edit'								=> [CControllerAutoregEdit::class,									'layout.htmlpage',		'administration.autoreg.edit'],
 		'autoreg.update'							=> [CControllerAutoregUpdate::class,								'layout.json',			null],
 		'availabilityreport.list'					=> [CControllerAvailabilityReportList::class,						'layout.htmlpage',		'reports.availabilityreport.list'],
@@ -109,6 +110,7 @@ class CRouter {
 		'export.mediatypes'							=> [CControllerExport::class,										'layout.export',		null],
 		'export.sysmaps'							=> [CControllerExport::class,										'layout.export',		null],
 		'export.templates'							=> [CControllerExport::class,										'layout.export',		null],
+		'export.dashboards'							=> [CControllerExport::class,										'layout.export',		null],
 		'favorite.create'							=> [CControllerFavoriteCreate::class,								'layout.javascript',	null],
 		'favorite.delete'							=> [CControllerFavoriteDelete::class,								'layout.javascript',	null],
 		'geomaps.edit'								=> [CControllerGeomapsEdit::class,									'layout.htmlpage',		'administration.geomaps.edit'],

@@ -205,6 +205,10 @@
 						? ''
 						: 'none';
 				});
+
+			if (service_write_access) {
+				this.form.findFieldByName('service_write_tag_tag').setChanged();
+			}
 		}
 
 		updateServicesReadAccessFields() {
@@ -217,6 +221,10 @@
 						? ''
 						: 'none';
 				});
+
+			if (service_read_access) {
+				this.form.findFieldByName('service_read_tag_tag').setChanged();
+			}
 		}
 
 		updateApiAccessFieldsGroup(is_apiaccess_checked) {
