@@ -847,10 +847,10 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 	$fields2 = zbx_objectValues($secondary, $field);
 
 	$first = array_diff($fields1, $fields2);
-	$first = zbx_toHash($first);
+	$first = zbx_toHash($first, '');
 
 	$second = array_diff($fields2, $fields1);
-	$second = zbx_toHash($second);
+	$second = zbx_toHash($second, '');
 
 	$result = [
 		'first' => [],
@@ -1078,15 +1078,12 @@ function createParentToChildRelation(&$chain, $link, $parentField, $childField) 
 }
 
 // object or array of objects to hash
-function zbx_toHash($value, $field = null) {
+function zbx_toHash(mixed $value, string $field): ?array {
 	if (is_null($value)) {
 		return $value;
 	}
-	$result = [];
 
-	if ($field === null) {
-		$field = '';
-	}
+	$result = [];
 
 	if (!is_array($value)) {
 		$result = [$value => $value];
