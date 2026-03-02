@@ -233,11 +233,11 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 #ifdef HAVE_NETSNMP
 	if (0 != poller_config->clear_cache)
 	{
-		if (0 != poller_config->processing)
-			goto exit;
-
 		if (ZBX_SNMP_POLLER_CLEAR_CACHE == poller_config->clear_cache)
 		{
+			if (0 != poller_config->processing)
+				goto exit;
+
 			zbx_unset_snmp_bulkwalk_options();
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options(zbx_progname);

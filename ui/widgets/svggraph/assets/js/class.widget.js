@@ -17,17 +17,33 @@ class CWidgetSvgGraph extends CWidget {
 
 	static DATASET_TYPE_SINGLE_ITEM = 0;
 
+	/**
+	 * @type {CSvgGraph|null}
+	 */
+	#graph = null;
+
+	/**
+	 *
+	 * @type {SVGSVGElement|null}
+	 */
+	#svg = null;
+
+	#selected_itemid = null;
+	#selected_itemids = null;
+	#selected_ds = null;
+
+	#is_default_selected_itemid = true;
+
 	onInitialize() {
 		this._has_contents = false;
-		this._svg_options = {};
 	}
 
 	onActivate() {
-		this._activateGraph();
+		this.#activateGraph();
 	}
 
 	onDeactivate() {
-		this._deactivateGraph();
+		this.#deactivateGraph();
 	}
 
 	onResize() {
@@ -105,12 +121,16 @@ class CWidgetSvgGraph extends CWidget {
 		if (response.svg_options !== undefined) {
 			this._has_contents = true;
 
-			this._initGraph({
+			if (this.#is_default_selected_itemid && response.svg_options.first_metric_to_broadcast !== null) {
+				const {itemids, ds} = response.svg_options.first_metric_to_broadcast;
+				this.updateItemBroadcast(itemids, ds, true);
+			}
+
+			this.#initGraph({
 				sbox: false,
 				show_problems: true,
 				show_simple_triggers: true,
-				hint_max_rows: 20,
-				hintbox_type: GRAPH_HINTBOX_TYPE_SVG_GRAPH,
+				graph_type: GRAPH_TYPE_SVG_GRAPH,
 				min_period: 60,
 				...response.svg_options.data
 			});
@@ -122,30 +142,82 @@ class CWidgetSvgGraph extends CWidget {
 
 	onClearContents() {
 		if (this._has_contents) {
-			this._deactivateGraph();
+			this.#deactivateGraph();
 
 			this._has_contents = false;
 		}
 	}
 
-	_initGraph(options) {
-		this._svg_options = options;
-		this._svg = this._body.querySelector('svg');
-		jQuery(this._svg).svggraph(this);
+	updateItemBroadcast(itemids, ds, is_default_selected_itemid = false) {
+		this.#selected_itemid = itemids[0];
+		this.#selected_itemids = itemids;
+		this.#selected_ds = ds;
 
-		this._activateGraph();
+		this.#is_default_selected_itemid = is_default_selected_itemid;
+
+		this.broadcast({
+			[CWidgetsData.DATA_TYPE_ITEM_ID]: [this.#selected_itemid],
+			[CWidgetsData.DATA_TYPE_ITEM_IDS]: this.#selected_itemids
+		});
 	}
 
-	_activateGraph() {
-		if (this._has_contents) {
-			jQuery(this._svg).svggraph('activate');
-		}
+	getItemBroadcast() {
+		return {itemid: this.#selected_itemid, itemids: this.#selected_itemids, ds: this.#selected_ds}
 	}
 
-	_deactivateGraph() {
-		if (this._has_contents) {
-			jQuery(this._svg).svggraph('deactivate');
-		}
+	updateTimeSelector(data) {
+		this._schedulePreloader();
+
+		const curl = new Curl('zabbix.php');
+
+		curl.setArgument('action', 'timeselector.calc');
+
+		fetch(curl.getUrl(), {
+			method: 'POST',
+			headers: {'Content-Type': 'application/json'},
+			body: JSON.stringify(data)
+		})
+			.then(response => response.json())
+			.then(time_period => {
+				if ('error' in time_period) {
+					throw {error: time_period.error};
+				}
+
+				if ('has_fields_errors' in time_period) {
+					throw new Error();
+				}
+
+				return time_period;
+			})
+			.then(time_period => {
+				if (time_period === null) {
+					return;
+				}
+
+				this._startUpdating();
+				this.feedback({time_period});
+				this.broadcast({
+					[CWidgetsData.DATA_TYPE_TIME_PERIOD]: time_period
+				});
+			})
+			.catch((exception) => {
+				let title;
+				let messages = [];
+
+				if (typeof exception === 'object' && 'error' in exception) {
+					title = exception.error.title;
+					messages = exception.error.messages;
+				} else {
+					title = t('Unexpected server error.');
+				}
+
+				this._updateMessages(messages, title);
+
+				return null;
+			})
+			.finally(() => {
+				this._hidePreloader();
+			});
 	}
 
 	getActionsContextMenu({can_copy_widget, can_paste_widget}) {
@@ -178,7 +250,7 @@ class CWidgetSvgGraph extends CWidget {
 			label: t('Download image'),
 			disabled: !this._has_contents,
 			clickCallback: () => {
-				downloadSvgImage(this._svg, 'image.png', '.svg-graph-legend');
+				downloadSvgImage(this.#svg, 'image.png', '.svg-graph-legend');
 			}
 		});
 
@@ -187,5 +259,24 @@ class CWidgetSvgGraph extends CWidget {
 
 	hasPadding() {
 		return true;
+	}
+
+	#initGraph(options) {
+		this.#svg = this._body.querySelector('svg');
+		this.#graph = new CSvgGraph(this.#svg, this, options);
+
+		this.#activateGraph();
+	}
+
+	#activateGraph() {
+		if (this._has_contents && this.#graph !== null) {
+			this.#graph.activate();
+		}
+	}
+
+	#deactivateGraph() {
+		if (this._has_contents && this.#graph !== null) {
+			this.#graph.deactivate();
+		}
 	}
 }

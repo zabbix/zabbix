@@ -47,17 +47,34 @@ else {
 
 	$output = [
 		'header' => $data['title'],
-		'script_inline' => trim($this->readJsFile('popup.import.compare.js.php')),
+		'script_inline' => implode('', [
+			$this->readJsFile('popup.import.compare.js.php'),
+			'popup_import_compare.init('.json_encode([
+				'no_changes' => !$data['diff']
+			]).');'
+		]),
 		'body' => !$data['diff']
 			? (new CTableInfo())
 				->setNoDataMessage(_('No changes.'))
 				->toString()
-			: (new CForm())
-				->addClass('import-compare')
-				->addItem(drawToc($data['diff_toc']))
-				->addItem(drawDiff($data['diff']))
+			: (new CObject())
 				->addItem(
-					(new CScriptTag('popup_import_compare.init();'))->setOnDocumentReady()
+					array_key_exists('missing_objects', $data) && $data['missing_objects']
+						? makeMessageBox(ZBX_STYLE_MSG_WARNING,
+							[[
+								'message' => CImportHelper::missingObjectsToString($data['missing_objects'])."\n".
+									$data['missing_objects_warning_foot_note']
+							]],
+							$data['missing_objects_warning_title'],
+							false
+						)
+						: null
+				)
+				->addItem(
+					(new CForm())
+						->addClass('import-compare')
+						->addItem(drawToc($data['diff_toc']))
+						->addItem(drawDiff($data['diff']))
 				)
 				->toString(),
 		'buttons' => $buttons,
@@ -127,7 +144,9 @@ function drawEntity(array $entity): CTag {
 		(new CDiv())
 			->addClass(ZBX_STYLE_TOC_ROW)
 			->addItem(
-				(new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))->addClass(ZBX_STYLE_TOC_ITEM)
+				(new CLink($entity['name'], '#importcompare_toc_'.$entity['id']))
+					->addClass(ZBX_STYLE_TOC_ITEM)
+					->setHint($entity['name'], '', false)
 			)
 	);
 }

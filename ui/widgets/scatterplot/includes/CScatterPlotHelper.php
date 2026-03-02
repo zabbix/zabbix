@@ -43,6 +43,7 @@ class CScatterPlotHelper {
 	 *                        int     $options['data_source']         Data source of graph.
 	 *                        array   $options['time_period']         Graph time period used.
 	 *                        bool    $options['fix_time_period']     Whether to keep time period fixed.
+	 *                        bool    $options['show_hostnames']      Show or hide host names in item labels.
 	 *                        array   $options['axes']                Options for graph X and Y axis.
 	 *                        array   $options['grouped_thresholds']  Thresholds used by graph to modify the color
 	 *                                                                based on the value of the metric.
@@ -59,12 +60,22 @@ class CScatterPlotHelper {
 	public static function get(array $options, int $width, int $height): array {
 		$metrics = [];
 		$errors = [];
+		$show_hostnames = $options['show_hostnames'] != SVG_GRAPH_LABELS_IN_HOSTNAMES_HIDE;
 
 		// Find which metrics will be shown in graph and calculate time periods and display options.
-		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
-		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
+		self::getMetricsPattern($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid'],
+			$show_hostnames
+		);
+		self::getMetricsItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid'],
+			$show_hostnames
+		);
+
+		if ($options['show_hostnames'] == SVG_GRAPH_LABELS_IN_HOSTNAMES_AUTO) {
+			$show_hostnames = self::hasMetricsMultipleHosts($metrics);
+		}
+
 		self::sortByDataset($metrics);
-		self::setMetricNames($metrics, $options['legend']);
+		self::setMetricNames($metrics, $options['legend'], $show_hostnames);
 		self::applyUnits($metrics, $options['axes']);
 		// Apply time periods for each $metric, based on graph/dashboard time as well as metric level time shifts.
 		self::getTimePeriods($metrics, $options['time_period']);
@@ -88,9 +99,21 @@ class CScatterPlotHelper {
 		// Add mouse following helper line.
 		$scatter_plot->addHelper();
 
+		$first_metric_to_broadcast = null;
+
+		if ($metrics) {
+			$metric = reset($metrics);
+
+			$first_metric_to_broadcast = [
+				'itemid' => array_keys($metric['x_axis_items_name'])[0],
+				'ds' => $metric['data_set']
+			];
+		}
+
 		return [
 			'svg' => $scatter_plot,
 			'legend' => $legend ?? '',
+			'first_metric_to_broadcast' => $first_metric_to_broadcast,
 			'data' => [
 				'dims' => [
 					'x' => $scatter_plot->getCanvasX(),
@@ -108,7 +131,7 @@ class CScatterPlotHelper {
 	}
 
 	private static function getMetricsPattern(array &$metrics, array $data_sets, string $templateid,
-		string $override_hostid): void {
+			string $override_hostid, bool $show_hostnames): void {
 		$max_metrics = [
 			'x_axis_items' => SVG_GRAPH_MAX_NUMBER_OF_METRICS,
 			'y_axis_items' => SVG_GRAPH_MAX_NUMBER_OF_METRICS
@@ -145,7 +168,7 @@ class CScatterPlotHelper {
 			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
 				$options = [
 					'output' => ['itemid', 'hostid', 'history', 'trends', 'units', 'value_type'],
-					'selectHosts' => ['name'],
+					'selectHosts' => $show_hostnames ? ['name'] : null,
 					'webitems' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -247,7 +270,7 @@ class CScatterPlotHelper {
 	}
 
 	private static function getMetricsItems(array &$metrics, array $data_sets, string $templateid,
-			string $override_hostid): void {
+			string $override_hostid, bool $show_hostnames): void {
 		$max_metrics = [
 			'x_axis_itemids' => SVG_GRAPH_MAX_NUMBER_OF_METRICS,
 			'y_axis_itemids' => SVG_GRAPH_MAX_NUMBER_OF_METRICS
@@ -328,7 +351,7 @@ class CScatterPlotHelper {
 					'output' => ['itemid', 'hostid', $resolve_macros ? 'name_resolved' : 'name', 'history', 'trends',
 						'units', 'value_type'
 					],
-					'selectHosts' => ['name'],
+					'selectHosts' => $show_hostnames ? ['name'] : null,
 					'webitems' => true,
 					'filter' => [
 						'value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]
@@ -377,6 +400,26 @@ class CScatterPlotHelper {
 				];
 			}
 		}
+	}
+
+	private static function hasMetricsMultipleHosts(array $metrics): bool {
+		$unique_hosts = [];
+
+		foreach ($metrics as $metric) {
+			foreach (['x_axis_items', 'y_axis_items'] as $key) {
+				foreach ($metric[$key] as $item) {
+					if (!array_key_exists($item['hostid'], $unique_hosts)) {
+						$unique_hosts[$item['hostid']] = true;
+
+						if (count($unique_hosts) > 1) {
+							return true;
+						}
+					}
+				}
+			}
+		}
+
+		return false;
 	}
 
 	private static function sortByDataset(array &$metrics): void {
@@ -557,35 +600,22 @@ class CScatterPlotHelper {
 	/**
 	 * Set metric names from X axis and Y axis items and aggregation function used.
 	 */
-	private static function setMetricNames(array &$metrics, array $legend_options): void {
+	private static function setMetricNames(array &$metrics, array $legend_options, bool $show_hostnames): void {
 		foreach ($metrics as &$metric) {
-			$aggregation_name = $legend_options['show_aggregation']
-				? CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']).'('
+			$metric['aggregation_name'] = $legend_options['show_aggregation']
+				? CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function'])
 				: '';
 
 			foreach (['x_axis_items', 'y_axis_items'] as $axis) {
-				$name = $aggregation_name;
-
-				$count = 0;
+				$names = [];
 
 				foreach ($metric[$axis] as $item) {
-					if ($count > 0) {
-						$name .= ', ';
-					}
-
-					$name .= $item['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
-
-					$count++;
+					$names[$item['itemid']] = $show_hostnames
+						? $item['hosts'][0]['name'].NAME_DELIMITER.$item['name']
+						: $item['name'];
 				}
 
-				if ($legend_options['show_aggregation']) {
-					$name .= ')';
-				}
-				elseif ($count > 1) {
-					$name = '('.$name.')';
-				}
-
-				$metric[$axis.'_name'] = $name;
+				$metric[$axis.'_name'] = $names;
 			}
 		}
 		unset($metric);
@@ -709,6 +739,8 @@ class CScatterPlotHelper {
 			ksort($metric_points, SORT_NUMERIC);
 
 			$metric['points'] = $metric_points;
+
+			unset($metric['x_axis_items'], $metric['y_axis_items']);
 		}
 		unset($metric);
 	}
@@ -812,8 +844,34 @@ class CScatterPlotHelper {
 		$items = [];
 
 		foreach ($metrics as $metric) {
+			$names = [];
+
+			foreach (['x_axis_items_name', 'y_axis_items_name'] as $axis) {
+				$names[$axis] = '';
+
+				$count = 0;
+
+				foreach ($metric[$axis] as $item_name) {
+					if ($count > 0) {
+						$names[$axis] .= ', ';
+					}
+
+					$names[$axis] .= $item_name;
+
+					$count++;
+				}
+
+				if ($legend_options['show_aggregation']) {
+					$names[$axis] = $metric['aggregation_name'].'('.$names[$axis].')';
+				}
+				elseif ($count > 1) {
+					$names[$axis] = '('.$names[$axis].')';
+				}
+			}
+
 			$item = [
-				'name' => $metric['x_axis_items_name'].', '.$metric['y_axis_items_name'],
+				'aggregation_name' => $metric['aggregation_name'],
+				'name' => $names['x_axis_items_name'].', '.$names['y_axis_items_name'],
 				'color' => $metric['options']['color'],
 				'marker' => $metric['options']['marker']
 			];

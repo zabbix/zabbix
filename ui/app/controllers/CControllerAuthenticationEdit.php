@@ -112,13 +112,14 @@ class CControllerAuthenticationEdit extends CController {
 		$openssl_status = (new CFrontendSetup())->checkPhpOpenSsl();
 
 		$data = [
-			'action_submit' => 'authentication.update',
 			'action_passw_change' => 'authentication.edit',
 			'is_http_auth_allowed' => $ALLOW_HTTP_AUTH,
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'saml_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),
-			'form_refresh' => $this->getInput('form_refresh', 0)
+			'form_refresh' => $this->getInput('form_refresh', 0),
+			'js_validation_rules' => (new CFormValidator(CControllerAuthenticationUpdate::getValidationRules()))
+				->getRules()
 		];
 
 		$auth_params = [

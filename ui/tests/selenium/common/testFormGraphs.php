@@ -419,8 +419,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Too large width and height'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => 65536,
-						'Height' => 65536
+						'Width' => 8001,
+						'Height' => 4501
 					],
 					'items' => [
 						[
@@ -435,8 +435,8 @@ class testFormGraphs extends CWebTest {
 						]
 					],
 					'details' => [
-						'Incorrect value for field "width": value must be no greater than "65535".',
-						'Incorrect value for field "height": value must be no greater than "65535".'
+						'Incorrect value for field "width": value must be no greater than "8000".',
+						'Incorrect value for field "height": value must be no greater than "4500".'
 					]
 				]
 			],
@@ -446,8 +446,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Too low width and height'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => -65536,
-						'Height' => -65536
+						'Width' => -8001,
+						'Height' => -4501
 					],
 					'items' => [
 						[

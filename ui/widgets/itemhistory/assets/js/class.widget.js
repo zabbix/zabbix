@@ -89,6 +89,32 @@ class CWidgetItemHistory extends CWidget {
 			return;
 		}
 
+		for (const iframe of this.#values_table.querySelectorAll('.js-iframe')) {
+			iframe.addEventListener('load', () => {
+				const iframe_content_body = iframe.contentDocument.body;
+				const computed_style = getComputedStyle(iframe);
+
+				iframe_content_body.style.margin = '0';
+				iframe_content_body.style.font = computed_style.font;
+				iframe_content_body.style.color = computed_style.color;
+
+				const resizeIframe = () => {
+					const content_scroll_width = iframe_content_body.scrollWidth;
+
+					if (content_scroll_width > iframe_content_body.clientWidth) {
+						iframe.style.minWidth =	`${content_scroll_width}px`;
+					}
+
+					iframe.style.height = `${iframe_content_body.scrollHeight}px`;
+				};
+
+				const resize_observer = new ResizeObserver(resizeIframe);
+				resize_observer.observe(iframe_content_body);
+
+				resizeIframe();
+			});
+		}
+
 		const items_data = new Map();
 		this.#values_table.querySelectorAll('.has-broadcast-data').forEach(element => {
 			const itemid = element.dataset.itemid;
@@ -394,19 +420,6 @@ class CWidgetItemHistory extends CWidget {
 				container.innerHTML = '';
 				container.append(content);
 
-				e.target.resize_observer = new ResizeObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.contentBoxSize) {
-							const overlay = content.closest('.dashboard-widget-itemhistory-hintbox-image');
-							const size = entry.contentBoxSize[0];
-
-							overlay.style.width = `${size.inlineSize}px`;
-							overlay.style.height = `${size.blockSize}px`;
-						}
-					})
-				});
-				e.target.resize_observer.observe(content);
-
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
 
@@ -421,14 +434,6 @@ class CWidgetItemHistory extends CWidget {
 					});
 				}
 			});
-
-			button.addEventListener('onHideHint.hintBox', e => {
-				if (e.target.resize_observer !== undefined) {
-					e.target.resize_observer.disconnect();
-
-					delete e.target.resize_observer;
-				}
-			})
 		}
 		else {
 			if (curl !== null) {

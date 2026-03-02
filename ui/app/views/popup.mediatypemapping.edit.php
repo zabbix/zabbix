@@ -19,11 +19,7 @@
  * @var array $data
  */
 
-$form_action = (new CUrl('zabbix.php'))
-	->setArgument('action', 'popup.mediatypemapping.check')
-	->getUrl();
-
-$form = (new CForm('post', $form_action))
+$form = (new CForm())
 	->setId('media-type-mapping-edit-form')
 	->setName('media-type-mapping-edit-form');
 
@@ -91,15 +87,11 @@ $form
 					new CFormField(
 						(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
 							->setChecked($data['active'] == MEDIA_STATUS_ACTIVE)
+							->setUncheckedValue(MEDIA_STATUS_DISABLED)
 					)
 				]
 			]))->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP))
 		])
-	)
-	->addItem(
-		(new CScriptTag('
-			media_type_mapping_edit_popup.init();
-		'))->setOnDocumentReady()
 	);
 
 if ($data['add_media_type_mapping']) {
@@ -107,10 +99,9 @@ if ($data['add_media_type_mapping']) {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'media_type_mapping_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -119,17 +110,20 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'media_type_mapping_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
 
 $output = [
 	'header' => $title,
-	'script_inline' => $this->readJsFile('popup.mediatypemapping.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.mediatypemapping.edit.js.php').
+		'media_type_mapping_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules']
+		]).');',
 	'body' => $form->toString(),
 	'buttons' => $buttons
 ];

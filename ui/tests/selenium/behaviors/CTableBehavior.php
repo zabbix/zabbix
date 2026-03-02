@@ -124,12 +124,14 @@ class CTableBehavior extends CBehavior {
 
 		foreach ($data as $data_row) {
 			$found = false;
+			$current = null;
 
 			foreach ($table->index() as $table_row) {
 				$match = true;
 
 				foreach ($data_row as $key => $value) {
 					if (!isset($table_row[$key]) || $table_row[$key] != $data_row[$key]) {
+						$current = json_encode($table_row);
 						$match = false;
 						break;
 					}
@@ -144,7 +146,7 @@ class CTableBehavior extends CBehavior {
 			if (!$found) {
 				throw new \Exception('Row ('.implode(', ', array_map(function ($value) {
 					return '"'.$value.'"';
-				}, $data_row)).') was not found in table.');
+				}, $data_row)).') was not found in table. Table row is: '.$current);
 			}
 		}
 	}

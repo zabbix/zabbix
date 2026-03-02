@@ -532,14 +532,13 @@ class testFormItem extends CLegacyWebTest {
 				case INTERFACE_TYPE_SNMP :
 				case INTERFACE_TYPE_JMX :
 				case INTERFACE_TYPE_IPMI :
-				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_OPT :
 					$this->assertTrue($form->query('id:js-item-interface-label')->one()->isDisplayed());
 					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
+							($interfaceType === INTERFACE_TYPE_OPT ? '' : ' AND type='.$interfaceType)
 					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
@@ -2110,7 +2109,6 @@ class testFormItem extends CLegacyWebTest {
 				$itemCount ++;
 
 				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
-				$add->click();
 				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
 				try {
 					$add->click();
@@ -2301,10 +2299,14 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestClickLinkTextWait($this->item);
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
-		$form->getLabel('History')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak']", 'Overridden by global housekeeping settings (99d)');
-		$form->getLabel('Trends')->query("xpath:span[@class='js-hint']/button")->one()->click();
-		$this->zbxTestAssertElementText("//div[@class='overlay-dialogue wordbreak'][2]", 'Overridden by global housekeeping settings (455d)');
+		$form->getLabel('History')->query('xpath:span[@class="js-hint"]/button')->one()->click();
+		$this->zbxTestAssertElementText('//div[contains(@class, "hintbox-static")]',
+				'Overridden by global housekeeping settings (99d)'
+		);
+		$form->getLabel('Trends')->query('xpath:span[@class="js-hint"]/button')->one()->click();
+		$this->zbxTestAssertElementText('//div[contains(@class, "hintbox-static")][2]',
+				'Overridden by global housekeeping settings (455d)'
+		);
 		$dialog->close();
 
 		$this->zbxTestOpen('zabbix.php?action=housekeeping.edit');
