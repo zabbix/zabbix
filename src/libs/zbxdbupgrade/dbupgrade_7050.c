@@ -636,6 +636,7 @@ static int	DBpatch_7050051(void)
 			{"trigger_rtdata", "triggerid", 0,
 				{
 					{"triggerid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"value", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"state", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"lastchange", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
@@ -649,13 +650,18 @@ static int	DBpatch_7050051(void)
 
 static int	DBpatch_7050052(void)
 {
+	return DBcreate_index("trigger_rtdata", "trigger_rtdata_1", "value,lastchange", 0);
+}
+
+static int	DBpatch_7050053(void)
+{
 	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("trigger_rtdata", 1, &field);
 }
 
-static int	DBpatch_7050053(void)
+static int	DBpatch_7050054(void)
 {
 	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
 	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
@@ -680,26 +686,25 @@ static int	DBpatch_7050053(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050054(void)
+static int	DBpatch_7050055(void)
 {
 	return DBdrop_field("triggers", "value");
 }
 
-static int	DBpatch_7050055(void)
+static int	DBpatch_7050056(void)
 {
 	return DBdrop_field("triggers", "state");
 }
 
-static int	DBpatch_7050056(void)
+static int	DBpatch_7050057(void)
 {
 	return DBdrop_field("triggers", "lastchange");
 }
 
-static int	DBpatch_7050057(void)
+static int	DBpatch_7050058(void)
 {
 	return DBdrop_field("triggers", "error");
 }
-
 
 #endif
 
@@ -765,5 +770,6 @@ DBPATCH_ADD(7050054, 0, 1)
 DBPATCH_ADD(7050055, 0, 1)
 DBPATCH_ADD(7050056, 0, 1)
 DBPATCH_ADD(7050057, 0, 1)
+DBPATCH_ADD(7050058, 0, 1)
 
 DBPATCH_END()
