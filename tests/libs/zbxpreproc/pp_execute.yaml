@@ -1,0 +1,50 @@
+---
+test case: string(10) * 10
+in:
+  item_type: ITEM_TYPE_TRAPPER
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: 10
+  steps:
+  - type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+out:
+  results:
+  - data: 100
+    variant: ZBX_VARIANT_UI64
+---
+test case: none
+in:
+  item_type: ITEM_TYPE_TRAPPER
+  value:
+    value_type: ITEM_VALUE_TYPE_NONE
+    time: 2017-10-29 03:15:00 +03:00
+# When none value is passed, there should be no result.
+---
+test case: none on JSONPath preprocessing
+in:
+  item_type: ITEM_TYPE_TRAPPER
+  value:
+    value_type: ITEM_VALUE_TYPE_NONE
+    time: 2017-10-29 03:15:00 +03:00
+  steps:
+  - type: ZBX_PREPROC_JSONPATH
+    params: 10
+out:
+  results:
+  - variant: ZBX_VARIANT_NONE
+---
+test case: none with multiplier
+in:
+  item_type: ITEM_TYPE_TRAPPER
+  value:
+    value_type: ITEM_VALUE_TYPE_NONE
+    time: 2017-10-29 03:15:00 +03:00
+  steps:
+  - type: ZBX_PREPROC_MULTIPLIER
+    params: 10
+out:
+  results:
+  - variant: ZBX_VARIANT_NONE
+...
