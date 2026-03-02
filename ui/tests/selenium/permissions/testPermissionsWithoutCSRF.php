@@ -605,7 +605,10 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM role',
 					'link' => 'zabbix.php?action=userrole.edit',
-					'return_button' => true
+					'return_button' => true,
+					'fields' => [
+						'id:name' => 'User role name'
+					]
 				]
 			],
 			// #55 User API token create.
