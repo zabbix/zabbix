@@ -243,13 +243,18 @@ class CControllerPopupTriggerExprEdit extends CController {
 					}
 				}
 
-				foreach ($outer_parameters as $parameter) {
-					if (array_key_exists($param_index, $key_map)) {
-						$params[$key_map[$param_index]] = str_starts_with($parameter['match'], '"')
-							? CHistFunctionParser::unquoteParam($parameter['match'])
-							: $parameter['match'];
+				if ($function === 'in' && array_key_exists($param_index, $key_map)) {
+					$params[$key_map[$param_index]] = implode(',', array_column($outer_parameters, 'match'));
+				}
+				else {
+					foreach ($outer_parameters as $parameter) {
+						if (array_key_exists($param_index, $key_map)) {
+							$params[$key_map[$param_index]] = str_starts_with($parameter['match'], '"')
+								? CHistFunctionParser::unquoteParam($parameter['match'])
+								: $parameter['match'];
 
-						$param_index++;
+							$param_index++;
+						}
 					}
 				}
 			}
