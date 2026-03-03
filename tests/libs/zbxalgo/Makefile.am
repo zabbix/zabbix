@@ -27,20 +27,7 @@ ALGO_LIBS = \
 
 COMMON_COMPILER_FLAGS = -I@top_srcdir@/tests $(CMOCKA_CFLAGS) $(YAML_CFLAGS)
 
-zbx_channel_SOURCES = \
-	zbx_channel.c \
-	$(COMMON_SRC_FILES)
-
-zbx_channel_LDADD = \
-	$(ALGO_LIBS)
-
-zbx_channel_LDADD += @SERVER_LIBS@
-
-zbx_channel_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS)
-
-zbx_channel_CFLAGS = $(COMMON_COMPILER_FLAGS)
-
-#zbx_list
+# zbx_list
 
 zbx_list_SOURCES = \
 	zbx_list.c \
@@ -56,7 +43,7 @@ zbx_list_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_list_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_int128
+# zbx_int128
 
 zbx_int128_SOURCES = \
 	zbx_int128.c \
@@ -71,7 +58,7 @@ zbx_int128_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_int128_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_mode_code
+# zbx_mode_code
 
 zbx_mode_code_SOURCES = \
 	zbx_mode_code.c \
@@ -86,7 +73,7 @@ zbx_mode_code_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_mode_code_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_binary_heap
+# zbx_binary_heap
 
 zbx_binary_heap_SOURCES = \
 	zbx_binary_heap.c \
@@ -102,7 +89,7 @@ zbx_binary_heap_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_binary_heap_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_binary_heap_direct
+# zbx_binary_heap_direct
 
 zbx_binary_heap_direct_SOURCES = \
 	zbx_binary_heap_direct.c \
@@ -118,7 +105,7 @@ zbx_binary_heap_direct_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_binary_heap_direct_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_compare_tags_natural
+# zbx_compare_tags_natural
 
 zbx_compare_tags_natural_SOURCES = \
 	zbx_compare_tags_natural.c \
@@ -133,7 +120,7 @@ zbx_compare_tags_natural_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_compare_tags_natural_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_vector
+# zbx_vector
 
 zbx_vector_SOURCES = \
 	zbx_vector.c \
@@ -148,7 +135,7 @@ zbx_vector_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_vector_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
-#zbx_channel
+# zbx_channel
 
 zbx_channel_SOURCES = \
 	zbx_channel.c \
