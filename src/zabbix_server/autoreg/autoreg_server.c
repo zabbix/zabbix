@@ -18,7 +18,6 @@
 #include "zbx_trigger_constants.h"
 #include "zbxdb.h"
 #include "zbxnum.h"
-#include "zbxtime.h"
 #include "zbxautoreg.h"
 #include "zbxalgo.h"
 #include "zbxstr.h"

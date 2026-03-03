@@ -27,7 +27,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxtasks.h"
 #include "zbxdiag.h"
-#include "zbxservice.h"
 #include "zbxjson.h"
 #include "zbxrtc.h"
 #include "audit/zbxaudit.h"

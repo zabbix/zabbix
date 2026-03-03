@@ -13,8 +13,8 @@
 **/
 
 #include "cep_correlation.h"
-
 #include "cep_task.h"
+
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcalc.h"
@@ -22,6 +22,10 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxexpr.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxstr.h"
 #include "../events/events.h"
 
 typedef enum

@@ -17,6 +17,7 @@
 
 #include "dbconfig_correlation.h"
 #include "zbxalgo.h"
+#include "zbxtypes_ext.h"
 
 typedef struct
 {

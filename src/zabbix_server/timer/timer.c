@@ -27,8 +27,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_host_constants.h"
-#include "zbxservice.h"
-#include "zbxserialize.h"
 
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
 typedef struct

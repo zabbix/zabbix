@@ -14,19 +14,22 @@
 
 #include "cep_db.h"
 #include "cep_task.h"
+#include "zbxcep.h"
+
 #include "zbx_trigger_constants.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-#include "zbxlog.h"
 #include "zbxescalations.h"
 #include "zbxconnector.h"
 #include "zbxexport.h"
+#include "zbxtypes.h"
+#include "zbxstr.h"
+#include "zbxdbhigh.h"
 #include "../actions/actions.h"
 #include "../events/events.h"
-#include <stdint.h>
 
 typedef struct
 {

@@ -17,10 +17,19 @@
 #include "dbconfig_local.h"
 #include "dbsync.h"
 #include "zbxcacheconfig.h"
+
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
-#include "zbxlog.h"
 #include "zbxtypes_ext.h"
+#include "zbxdb.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
+#include "zbxnum.h"
+#include "zbxnum.h"
+#include "zbxnum.h"
+
 
 static void	correlation_cache_handle_release(zbx_correlation_cache_handle_t handle);
 

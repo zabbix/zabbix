@@ -16,6 +16,9 @@
 #define ZABBIX_DBCONFIG_CEP_H
 
 #include "dbconfig.h"
+#include "zbxcacheconfig.h"
+#include "zbxtypes_ext.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

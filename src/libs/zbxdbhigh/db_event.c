@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 #include "zbxdbhigh.h"
+#include "zbxdb.h"
 #include "zbxalgo.h"
-#include "zbxlog.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 ZBX_VECTOR_IMPL(event_tags, zbx_event_tags_t);
 ZBX_PTR_VECTOR_IMPL(event_tags_ptr, zbx_event_tags_t *)

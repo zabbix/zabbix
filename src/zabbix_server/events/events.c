@@ -31,6 +31,7 @@
 #include "zbxtagfilter.h"
 #include "zbx_expression_constants.h"
 #include "zbxcep_client.h"
+#include "zbxtime.h"
 
 /* event recovery data */
 typedef struct

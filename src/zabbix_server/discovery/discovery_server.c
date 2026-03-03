@@ -14,7 +14,6 @@
 
 #include "discovery_server.h"
 
-#include "zbxtime.h"
 #include "zbxnum.h"
 #include "zbxdb.h"
 #include "zbxstr.h"

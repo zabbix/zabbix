@@ -13,12 +13,13 @@
 **/
 
 #include "cep_manager.h"
-#include "zbxcep.h"
+#include "cep.h"
 #include "cep_task.h"
 #include "cep_worker.h"
 #include "cep_queue.h"
 #include "cep_api.h"
 #include "zbxcep_client.h"
+#include "zbxcep.h"
 
 #include "zbxcommon.h"
 #include "zbxipcservice.h"
@@ -29,6 +30,11 @@
 #include "zbxnix.h"
 #include "zbxrtc.h"
 #include "zbxserialize.h"
+#include "zbxalgo.h"
+#include "zbxprof.h"
+#include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
+#include "zbxtime.h"
 
 #define ZBX_CEP_WORKERS_MAX	100
 

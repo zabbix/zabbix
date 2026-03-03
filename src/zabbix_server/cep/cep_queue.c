@@ -15,9 +15,11 @@
 #include "cep_queue.h"
 #include "cep_task.h"
 #include "cep.h"
+#include "zbxcep.h"
 
 #include "zbxalgo.h"
 #include "zbxcommon.h"
+#include "zbxdbhigh.h"
 
 typedef struct
 {

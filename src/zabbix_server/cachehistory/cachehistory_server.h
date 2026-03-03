@@ -16,7 +16,6 @@
 #define ZABBIX_CACHEHISTORY_SERVER_H
 
 #include "zbxdbhigh.h"
-#include "zbxipcservice.h"
 #include "zbxcacheconfig.h"
 #include "zbxcachehistory.h"
 #include "zbxalgo.h"
