@@ -2644,7 +2644,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 	char					*sql = NULL;
 	size_t					sql_alloc = 8 * ZBX_KIBIBYTE, sql_offset = 0;
 	zbx_db_insert_t				db_insert, db_insert_tdiscovery, db_insert_tfunctions,
-						db_insert_tdepends, db_insert_ttags;
+						db_insert_tdepends, db_insert_ttags, db_insert_rt;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2758,12 +2758,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 		triggerid = zbx_db_get_maxid_num("triggers", new_triggers);
 
 		zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "expression", "priority",
-				"status", "comments", "url", "url_name", "type", "value", "state", "flags",
-				"recovery_mode", "recovery_expression", "correlation_mode", "correlation_tag",
+				"status", "comments", "url", "url_name", "type", "flags", "recovery_mode",
+				"recovery_expression", "correlation_mode", "correlation_tag",
 				"manual_close", "opdata", "event_name", "discover", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerid", "parent_triggerid",
 				"lastcheck", (char *)NULL);
+
+		zbx_db_insert_prepare(&db_insert_rt, "trigger_rtdata", "triggerid", "value", "state", (char *)NULL);
 	}
 
 	if (0 != new_tags)
@@ -2859,12 +2861,14 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 			zbx_db_insert_add_values(&db_insert, triggerid, trigger->description, trigger->expression,
 					(int)trigger->priority, (int)trigger->status,
 					trigger->comments, trigger->url, trigger->url_name,
-					(int)trigger_prototype->type, (int)TRIGGER_VALUE_OK, (int)TRIGGER_STATE_NORMAL,
-					(int)(ZBX_FLAG_DISCOVERY_CREATED | dflags),
+					(int)trigger_prototype->type, (int)(ZBX_FLAG_DISCOVERY_CREATED | dflags),
 					(int)trigger_prototype->recovery_mode,
 					trigger->recovery_expression, (int)trigger_prototype->correlation_mode,
 					trigger->correlation_tag, (int)trigger_prototype->manual_close,
 					trigger->opdata, trigger->event_name, trigger->discover);
+
+			zbx_db_insert_add_values(&db_insert_rt, triggerid, (int)TRIGGER_VALUE_OK,
+					(int)TRIGGER_STATE_NORMAL);
 
 			zbx_audit_trigger_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD,triggerid,
 					trigger->description, dflags);
@@ -3221,6 +3225,10 @@ cleanup:
 		if (ret == SUCCEED)
 			zbx_db_insert_execute(&db_insert);
 		zbx_db_insert_clean(&db_insert);
+
+		if (ret == SUCCEED)
+			zbx_db_insert_execute(&db_insert_rt);
+		zbx_db_insert_clean(&db_insert_rt);
 
 		if (ret == SUCCEED)
 			zbx_db_insert_execute(&db_insert_tdiscovery);
