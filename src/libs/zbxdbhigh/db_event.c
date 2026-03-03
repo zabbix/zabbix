@@ -18,7 +18,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 
-ZBX_VECTOR_IMPL(event_tags, zbx_event_tags_t);
+ZBX_VECTOR_IMPL(event_tags, zbx_event_tags_t)
 ZBX_PTR_VECTOR_IMPL(event_tags_ptr, zbx_event_tags_t *)
 
 void	zbx_db_write_tags(zbx_dbconn_t *db, const zbx_vector_event_tags_ptr_t *etags, const char *table,
