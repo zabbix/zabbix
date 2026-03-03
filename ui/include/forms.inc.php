@@ -662,7 +662,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
 						->addClass(
-							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_VISIBILITY_HIDDEN : null
+							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_DISPLAY_NONE : null
 						)
 				];
 				break;

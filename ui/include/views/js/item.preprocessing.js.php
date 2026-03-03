@@ -372,7 +372,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
 		->removeId()
 		->setAttribute('placeholder', _('pattern'))
-		->addClass(ZBX_STYLE_VISIBILITY_HIDDEN)
+		->addClass(ZBX_STYLE_DISPLAY_NONE)
 ]))->show();
 
 (new CTemplateTag('preprocessing-steps-parameters-snmp-get-value-tmpl',
@@ -804,7 +804,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			})
 			.on('change', '.js-preproc-param-error-matching', function() {
 				$(this).next('z-textarea-flexible')
-					.toggleClass('<?= ZBX_STYLE_VISIBILITY_HIDDEN ?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
+					.toggleClass('<?= ZBX_STYLE_DISPLAY_NONE ?>', this.value == <?= ZBX_PREPROC_MATCH_ERROR_ANY ?>);
 			})
 			.on('click', '.js-group-json-action-delete', function() {
 				const table = this.closest('.group-json-mapping');
