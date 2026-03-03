@@ -342,7 +342,7 @@ echo (new CView('general.warning', [
 	'header' => _('You are not logged in'),
 	'messages' => array_column(get_and_clear_messages(), 'message'),
 	'buttons' => [
-		$sso_authorized && !CWebUser::isLoggedIn()
+		$sso_authorized && (!CWebUser::isLoggedIn() || CWebUser::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED)
 			? (new CButton('force_authn', _('Switch SSO user')))
 					->setAttribute('data-url',
 						(new CUrl('index_sso.php'))
