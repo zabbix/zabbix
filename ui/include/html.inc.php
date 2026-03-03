@@ -861,7 +861,7 @@ function getUserSettingsSubmenu(): array {
 	$user_settings_items = [];
 
 	$menu_items = APP::Component()->get('menu.user')
-		->find('User settings')
+		->find(_('User settings'))
 		->getSubMenu()
 		->getMenuItems();
 
@@ -885,9 +885,9 @@ function getAdministrationGeneralSubmenu(): array {
 	$general_items = [];
 
 	$menu_items = APP::Component()->get('menu.main')
-		->find('Administration')
+		->find(_('Administration'))
 		->getSubMenu()
-		->find('General')
+		->find(_('General'))
 		->getSubMenu()
 		->getMenuItems();
 
@@ -911,9 +911,9 @@ function getAdministrationQueueSubmenu(): array {
 	$queue_items = [];
 
 	$menu_items = APP::Component()->get('menu.main')
-		->find('Administration')
+		->find(_('Administration'))
 		->getSubMenu()
-		->find('Queue')
+		->find(_('Queue'))
 		->getSubMenu()
 		->getMenuItems();
 
@@ -937,9 +937,9 @@ function getAlertsActionsSubmenu(): array {
 	$actions_items = [];
 
 	$menu_items = APP::Component()->get('menu.main')
-		->find('Alerts')
+		->find(_('Alerts'))
 		->getSubMenu()
-		->find('Actions')
+		->find(_('Actions'))
 		->getSubMenu()
 		->getMenuItems();
 
