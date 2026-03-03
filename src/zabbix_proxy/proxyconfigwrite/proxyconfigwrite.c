@@ -2432,7 +2432,7 @@ int	zbx_proxyconfig_process(zbx_dbconn_pool_t *dbpool, const char *addr, struct 
 	zbx_dbconn_t	*db;
 
 	if (NULL != dbpool)
-		zbx_dbconn_pool_acquire_connection(dbpool);
+		db = zbx_dbconn_pool_acquire_connection(dbpool);
 	else
 		db = zbx_db_dbconn();
 

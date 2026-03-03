@@ -440,7 +440,6 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		zbx_supervisor_update_activity("%s [loading configuration]", process_title);
 
-		db = zbx_dbconn_pool_acquire_connection(dbpool);
 		process_configuration_sync(dbpool, &data_size, &synced, info, proxyconfig_args_in);
 
 		proxyconfig_update_vault_macros(proxyconfig_args_in);
@@ -453,11 +452,12 @@ void	*zbx_proxyconfig_thread(void *args)
 
 		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
 		{
+			db = zbx_dbconn_pool_acquire_connection(dbpool);
 			proxyconfig_remove_unused_templates(db);
+			zbx_dbconn_pool_release_connection(dbpool, db);
+
 			last_template_cleanup_sec = sec;
 		}
-
-		zbx_dbconn_pool_release_connection(dbpool, db);
 
 		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;
 	}
