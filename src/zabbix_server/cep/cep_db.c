@@ -27,7 +27,6 @@
 #include "zbxexport.h"
 #include "zbxtypes.h"
 #include "zbxstr.h"
-#include "zbxdbhigh.h"
 #include "../actions/actions.h"
 #include "../events/events.h"
 

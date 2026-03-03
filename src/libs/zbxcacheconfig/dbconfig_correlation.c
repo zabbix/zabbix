@@ -25,11 +25,6 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
-#include "zbxnum.h"
-#include "zbxnum.h"
-#include "zbxnum.h"
-#include "zbxnum.h"
-
 
 static void	correlation_cache_handle_release(zbx_correlation_cache_handle_t handle);
 

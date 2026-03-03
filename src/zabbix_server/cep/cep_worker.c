@@ -34,6 +34,7 @@
 #include "zbxregexp.h"
 #include "zbxsupervisor_client.h"
 #include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
 
 /******************************************************************************
  *                                                                            *

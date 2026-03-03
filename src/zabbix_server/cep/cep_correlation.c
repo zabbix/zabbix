@@ -25,7 +25,7 @@
 #include "zbxexpr.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
-#include "zbxstr.h"
+#include "zbxvariant.h"
 #include "../events/events.h"
 
 typedef enum
