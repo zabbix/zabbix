@@ -184,8 +184,7 @@
 						.setFields(['itemid', 'description_expanded', 'name', 'key_expanded'])
 						.setRenderer('name')
 						.setSortable(true)
-						.setTogglable(false)
-						.setWidth('max-content'),
+						.setTogglable(false),
 					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
 						.setVisible(false),
@@ -203,22 +202,18 @@
 						.setFields(['last_check'])
 						.setWidth('max-content'),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value'])
-						.setWidth('auto'),
+						.setFields(['last_value']),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
-						.setFields(['change'])
-						.setWidth('max-content'),
+						.setFields(['change']),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
 						.setRenderer('tags'),
 					new CDataTableColumn('actions', '')
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
 						.setRenderer('actions')
-						.setResizable(false)
 						.setShowInCustomizeTable(false)
 						.setWidth('max-content'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
-						.setResizable(false)
 						.setWidth('max-content')
 				])
 				.setPage(page)

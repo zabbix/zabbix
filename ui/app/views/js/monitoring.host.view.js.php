@@ -159,7 +159,7 @@
 						.setRenderer('dashboards'),
 					new CDataTableColumn('web', '<?= _('Web') ?>')
 						.setFields(['hostid', 'httpTests'])
-						.setRenderer('web'),
+						.setRenderer('web')
 				])
 				.setPage(page)
 				.setFilter(filter)

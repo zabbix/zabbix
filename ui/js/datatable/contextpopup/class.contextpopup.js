@@ -53,6 +53,8 @@ class CDataTableContextPopup {
 	 */
 	#handle;
 
+	#offset_top = 0;
+
 	/**
 	 * @type {HTMLElement|null}
 	 */
@@ -97,6 +99,7 @@ class CDataTableContextPopup {
 		this.#column_name = column_config.getName();
 		this.#header_cell = header_cell;
 		this.#handle = handle;
+		this.#offset_top = this.#datatable.getElement().getBoundingClientRect().top;
 		this.#element = document.createElement('div');
 
 		this.#bindEvents();
@@ -350,6 +353,7 @@ class CDataTableContextPopup {
 		const element_rect = this.getDataTable().getElement().getBoundingClientRect();
 		const handle_rect = this.#handle.getBoundingClientRect();
 		const popup_rect = this.#element.getBoundingClientRect();
+		const offset_top = wrapper.scrollTop + this.#datatable.getElement().getBoundingClientRect().top;
 
 		this.#element.style.maxHeight = `${wrapper.scrollHeight - popup_rect.top}px`;
 
@@ -358,6 +362,12 @@ class CDataTableContextPopup {
 		}
 		else {
 			this.#element.style.left = `${handle_rect.left - element_rect.left - 1}px`;
+		}
+
+		if (this.#datatable.isStickyHeaders()) {
+			const top = handle_rect.height + (handle_rect.top == 0 ? wrapper.scrollTop - offset_top : 0) + 2;
+
+			this.#element.style.top = `${top}px`;
 		}
 	}
 

@@ -257,24 +257,19 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setTogglable(false),
 					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['hostid', 'items'])
-						.setRenderer('items')
-						.setWidth('max-content'),
+						.setRenderer('items'),
 					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['hostid', 'triggers'])
-						.setRenderer('triggers')
-						.setWidth('max-content'),
+						.setRenderer('triggers'),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
-						.setRenderer('graphs')
-						.setWidth('max-content'),
+						.setRenderer('graphs'),
 					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['hostid', 'discoveryRules'])
-						.setRenderer('discovery')
-						.setWidth('max-content'),
+						.setRenderer('discovery'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
-						.setRenderer('web')
-						.setWidth('max-content'),
+						.setRenderer('web'),
 					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
 						.setFields(['interface']),
 					new CDataTableColumn('proxy', <?= json_encode(_('Proxy')); ?>)

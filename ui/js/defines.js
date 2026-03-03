@@ -26,6 +26,7 @@ const ZBX_PROPERTY_BOTH = 0x03;
 
 const ZBX_STYLE_LOADING = 'is-loading';
 
+const ZBX_STYLE_HIDDEN = 'hidden';
 const ZBX_STYLE_DISPLAY_NONE = 'display-none';
 
 const ZBX_STYLE_NO_DATA = 'no-data';

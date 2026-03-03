@@ -89,13 +89,11 @@
 						.setFields(['clock', 'eventid', 'objectid'])
 						.setRenderer('time')
 						.setSortField('clock')
-						.setSortable(true)
-						.setWidth('max-content'),
+						.setSortable(true),
 					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
 						.setFields(['severity'])
 						.setRenderer('severity')
-						.setSortable(true)
-						.setWidth('max-content'),
+						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
 						.setFields(['recovery']),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
@@ -105,8 +103,7 @@
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host'])
 						.setRenderer('host')
-						.setSortable(true)
-						.setWidth('max-content'),
+						.setSortable(true),
 					new CDataTableColumn('problem', <?= json_encode(_('Problem')); ?>)
 						.setContextPopupData({
 							show_opdata: '0',
@@ -117,14 +114,12 @@
 						.setFields(['description'])
 						.setSortField('name')
 						.setSortable(true)
-						.setTogglable(false)
-						.setWidth('max-content'),
+						.setTogglable(false),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration']),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
 						.setFields(['can_be_closed', 'eventid'])
-						.setRenderer('update')
-						.setWidth('max-content'),
+						.setRenderer('update'),
 					new CDataTableColumn('actions', <?= json_encode(_('Actions')); ?>)
 						.setFields(['actions']),
 					new CDataTableColumn('opdata', <?= json_encode(_('Operational data')); ?>)

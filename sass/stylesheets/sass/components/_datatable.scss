@@ -1,62 +1,6 @@
 :root {
-	--datatable-overlay-color: #{rgba(#fff, .4)};
 	--datatable-row-height: 32px;
 	--datatable-compact-row-height: calc(var(--datatable-row-height) - 10px);
-	--datatable-scrollbar-thumb-bg-color: #c2c2c2;
-	--datatable-scrollbar-thumb-hover-bg-color: #{darken(#c2c2c2, .05)};
-}
-
-[theme="dark-theme"] {
-	--datatable-overlay-color: #{rgba(#383838, .4)};
-	--datatable-scrollbar-thumb-bg-color: #4a4a4a;
-	--datatable-scrollbar-thumb-hover-bg-color: #515151;
-}
-
-.datatable-context-popup-link {
-	align-items: center;
-	background-color: transparent;
-	border: 1px solid transparent;
-	border-radius: 0;
-	box-sizing: border-box;
-	color: #768d99;
-	display: flex;
-	flex-shrink: 0;
-	height: calc(var(--datatable-row-height) - 1px);
-	justify-content: center;
-	padding: 0;
-	text-align: center;
-	user-select: none;
-	width: var(--datatable-row-height);
-	-moz-user-select: none;
-	-webkit-touch-callout: none;
-	-webkit-user-drag: none;
-	-webkit-user-select: none;
-
-	.zi-context {
-		margin-top: -2px;
-		pointer-events: none;
-
-		&:before {
-			font-size: 12px;
-		}
-	}
-
-	.zi-filters {
-		pointer-events: none;
-
-		&:before {
-			font-size: 14px;
-		}
-	}
-
-	&:hover,
-	&:focus,
-	&.datatable-context-popup-link-opened {
-		background-color: $ui-hover-bg-color;
-		border-color: #0275b8;
-		box-shadow: none;
-		color: #768d99;
-	}
 }
 
 .datatable {
@@ -69,9 +13,6 @@
 
 	.datatable-customize {
 		user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		-webkit-user-select: none;
 
 		.datatable-customize-header {
 			color: $font-color;
@@ -93,7 +34,7 @@
 				height: 25px;
 
 				.checkbox-radio {
-					left: -99999px;
+					display: none;
 				}
 
 				.datatable-customize-list-item-label {
@@ -224,9 +165,12 @@
 	.datatable-headers {
 		display: grid;
 		overflow: hidden;
-		position: sticky;
-		top: 0;
-		z-index: 10;
+
+		&.datatable-headers-sticky {
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
 	}
 
 	.datatable-rows {
@@ -235,6 +179,10 @@
 
 		&.datatable-rows-scrollable {
 			overflow-x: auto;
+
+			.no-data-message {
+				border-bottom: 1px solid $ui-border-color;
+			}
 
 			&::-webkit-scrollbar {
 				background: $ui-bg-color;
@@ -247,7 +195,7 @@
 			}
 
 			&::-webkit-scrollbar-thumb {
-				background-color: var(--datatable-scrollbar-thumb-bg-color);
+				background-color: $datatable-scrollbar-thumb-bg-color;
 				background-clip: content-box;
 				border: 2px solid transparent;
 				border-radius: 5px;
@@ -255,7 +203,7 @@
 				transition: background-color .3s ease;
 
 				&:hover {
-					background-color: var(--datatable-scrollbar-thumb-hover-bg-color);
+					background-color: $datatable-scrollbar-thumb-hover-bg-color;
 				}
 			}
 
@@ -277,7 +225,7 @@
 
 		&.datatable-body-loading {
 			&:after {
-				background-color: var(--datatable-overlay-color);
+				background-color: $datatable-overlay-color;
 				content: '';
 				position: absolute;
 				top: 2px;
@@ -292,32 +240,28 @@
 	.datatable-footer {
 		align-items: center;
 		background-color: $ui-bg-color;
-		bottom: 0;
-		color: #768d99;
+		color: $font-alt-color;
 		display: grid;
 		height: var(--datatable-row-height);
 		grid-template-columns: 1fr auto 1fr;
-		padding: 0 10px;
-		position: sticky;
-		z-index: 10;
+		padding: 0 8px;
 
-		*:first-child {
-			justify-self: start;
-		}
-
-		*:last-child {
-			justify-self: end;
-		}
-
-		#selected_count {
-			justify-self: start;
+		&.datatable-footer-sticky {
+			bottom: 0;
+			position: sticky;
+			z-index: 10;
 		}
 
 		&.table-paging {
 			border: none;
 			border-top: 1px solid $ui-border-color;
 
+			#selected_count {
+				justify-self: start;
+			}
+
 			.table-stats {
+				justify-self: end;
 				position: static;
 			}
 		}
@@ -428,9 +372,6 @@
 			top: 0;
 			user-select: none;
 			z-index: 1;
-			-moz-user-select: none;
-			-ms-user-select: none;
-			-webkit-user-select: none;
 
 			&:focus {
 				outline: none;
@@ -438,7 +379,7 @@
 
 			.cell-inner {
 				flex-grow: 1;
-				padding: 0 10px;
+				padding: 0 8px;
 				text-overflow: ellipsis;
 				white-space: nowrap;
 			}
@@ -451,7 +392,7 @@
 				padding: 0;
 
 				.cell-inner {
-					padding: 0 10px;
+					padding: 0 8px;
 				}
 
 				.header-link {
@@ -461,7 +402,7 @@
 					display: flex;
 					gap: 3px;
 					height: calc(var(--datatable-row-height) - 1px);
-					padding: 0 10px;
+					padding: 0 8px;
 					text-decoration: none;
 					width: 100%;
 
@@ -478,16 +419,59 @@
 					}
 
 					.arrow-up {
-						border-bottom-color: #768d99;
+						border-bottom-color: $font-alt-color;
 						flex-shrink: 0;
 						pointer-events: none;
 					}
 
 					.arrow-down {
-						border-top-color: #768d99;
+						border-top-color: $font-alt-color;
 						flex-shrink: 0;
 						pointer-events: none;
 					}
+				}
+			}
+
+			.datatable-context-popup-link {
+				align-items: center;
+				background-color: transparent;
+				border: 1px solid transparent;
+				border-radius: 0;
+				box-sizing: border-box;
+				color: $font-alt-color;
+				display: flex;
+				flex-shrink: 0;
+				height: calc(var(--datatable-row-height) - 1px);
+				justify-content: center;
+				padding: 0;
+				text-align: center;
+				user-select: none;
+				width: var(--datatable-row-height);
+
+				.zi-context {
+					margin-top: -2px;
+					pointer-events: none;
+
+					&:before {
+						font-size: 12px;
+					}
+				}
+
+				.zi-filters {
+					pointer-events: none;
+
+					&:before {
+						font-size: 14px;
+					}
+				}
+
+				&:hover,
+				&:focus,
+				&.datatable-context-popup-link-opened {
+					background-color: $ui-hover-bg-color;
+					border-color: $btn-alt-color;
+					box-shadow: none;
+					color: $font-alt-color;
 				}
 			}
 
@@ -501,12 +485,9 @@
 				user-select: none;
 				width: 10px;
 				z-index: 20;
-				-moz-user-select: none;
-				-ms-user-select: none;
-				-webkit-user-select: none;
 
 				&:hover {
-					border-right-color: #0275bb;
+					border-right-color: $datatable-resizer-border-color;
 				}
 			}
 
@@ -536,7 +517,7 @@
 
 		&.cell-data {
 			align-items: flex-start;
-			padding: 0 10px;
+			padding: 0 8px;
 
 			a {
 				transition: color .2s ease-out;
@@ -660,19 +641,19 @@
 			}
 
 			&.warning-bg {
-				border-bottom-color: $alt-yellow;
+				border-bottom-color: var(--severity-color-warning-bg);
 			}
 
 			&.average-bg {
-				border-bottom-color: $alt-orange;
+				border-bottom-color: var(--severity-color-average-bg);
 			}
 
 			&.high-bg {
-				border-bottom-color: $alt-dark-orange;
+				border-bottom-color: var(--severity-color-high-bg);
 			}
 
 			&.disaster-bg {
-				border-bottom-color: $alt-red;
+				border-bottom-color: var(--severity-color-disaster-bg);
 			}
 
 			&:first-child {
@@ -682,7 +663,7 @@
 
 		&.cell-checkbox {
 			justify-content: flex-start;
-			padding: 0 10px;
+			padding: 0 8px;
 
 			.cell-inner {
 				text-overflow: initial;
@@ -720,14 +701,11 @@
 
 	&.datatable-resizing {
 		user-select: none;
-		-moz-user-select: none;
-		-ms-user-select: none;
-		-webkit-user-select: none;
 		pointer-events: none;
 
 		.cell-resizing {
 			.cell-header-resizer {
-				border-right-color: #0275bb;
+				border-right-color: $datatable-resizer-border-color;
 			}
 		}
 	}
@@ -737,7 +715,7 @@
 			&.cell-data {
 				height: var(--datatable-compact-row-height);
 				min-height: initial;
-				padding: 2px 10px;
+				padding: 2px 8px;
 
 				.cell-inner {
 					padding: 0;
@@ -767,16 +745,16 @@
 						&.cell-data {
 							a {
 								&.link-action {
-									color: #1f2c33;
+									color: $font-color;
 								}
 
 								&:hover {
-									color: #0275b8;
+									color: $btn-alt-color;
 								}
 							}
 
 							.btn-icon {
-								background-color: #fff;
+								background-color: $ui-bg-color;
 							}
 						}
 					}
@@ -785,10 +763,10 @@
 						&:not(:hover) {
 							.cell {
 								&.cell-data {
-									color: #1f2c33;
+									color: $font-color;
 
 									a {
-										color: #1f2c33;
+										color: $font-color;
 									}
 								}
 							}
@@ -798,7 +776,7 @@
 							.cell {
 								&.cell-data {
 									a:not(.link-action) {
-										color: #0275b8;
+										color: $btn-alt-color;
 									}
 
 									&:not(.cell-bg) {
@@ -809,29 +787,8 @@
 							}
 						}
 					}
-
-					&:not(:hover) {
-						.cell {
-							&.cell-data {
-								.tags-wrapper {
-									.tag {
-										color: #ffffff;
-										background-color: rgba(31, 44, 51, .5);
-									}
-								}
-							}
-						}
-					}
 				}
 			}
-		}
-	}
-}
-
-@media (prefers-reduced-motion: reduce) {
-	.datatable {
-		.datatable-body {
-			scroll-behavior: auto;
 		}
 	}
 }
