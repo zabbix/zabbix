@@ -2875,10 +2875,9 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_lld_trigger_p
 
 			zbx_audit_trigger_update_json_add_data(ZBX_AUDIT_LLD_CONTEXT, triggerid, 0,
 					(int)trigger_prototype->recovery_mode, trigger->status, trigger_prototype->type,
-					TRIGGER_VALUE_OK, TRIGGER_STATE_NORMAL, trigger->priority, trigger->comments,
-					trigger->url, trigger->url_name, dflags, trigger_prototype->correlation_mode,
-					trigger->correlation_tag, trigger_prototype->manual_close, trigger->opdata, 0,
-					trigger->event_name);
+					trigger->priority, trigger->comments, trigger->url, trigger->url_name, dflags,
+					trigger_prototype->correlation_mode, trigger->correlation_tag,
+					trigger_prototype->manual_close, trigger->opdata, 0, trigger->event_name);
 
 			zbx_audit_trigger_update_json_add_expr(ZBX_AUDIT_LLD_CONTEXT, triggerid, dflags,
 					trigger->expression);
