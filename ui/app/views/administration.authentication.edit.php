@@ -24,12 +24,23 @@ $this->includeJsFile('administration.authentication.edit.js.php');
 $form = (new CForm())
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('authentication')))->removeId())
-	->addVar('action', $data['action_submit'])
-	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
-	->addVar('mfa_removed_mfaids', $data['mfa_removed_mfaids'])
 	->setId('authentication-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->disablePasswordAutofill();
+
+$form->addItem((new CDiv())
+	->setId('mfa_removed_mfaids')
+	->setAttribute('data-field-type', 'array')
+	->setAttribute('data-field-name', 'mfa_removed_mfaids')
+	->addStyle('display: none;')
+);
+
+$form->addItem((new CDiv())
+	->setId('ldap_removed_userdirectoryids')
+	->setAttribute('data-field-type', 'array')
+	->setAttribute('data-field-name', 'ldap_removed_userdirectoryids')
+	->addStyle('display: none;')
+);
 
 // Authentication general fields.
 $auth_tab = (new CFormGrid())
@@ -103,17 +114,17 @@ $auth_tab = (new CFormGrid())
 		]),
 		new CFormField(
 			(new CList([
-				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_CASE))
+				(new CCheckBox('passwd_check_rules[0]', PASSWD_CHECK_CASE))
 					->setLabel(_('an uppercase and a lowercase Latin letter'))
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_CASE) == PASSWD_CHECK_CASE)
 					->setUncheckedValue(0x00)
 					->setId('passwd_check_rules_case'),
-				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_DIGITS))
+				(new CCheckBox('passwd_check_rules[1]', PASSWD_CHECK_DIGITS))
 					->setLabel(_('a digit'))
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_DIGITS) == PASSWD_CHECK_DIGITS)
 					->setUncheckedValue(0x00)
 					->setId('passwd_check_rules_digits'),
-				(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SPECIAL))
+				(new CCheckBox('passwd_check_rules[2]', PASSWD_CHECK_SPECIAL))
 					->setLabel(_('a special character'))
 					->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SPECIAL) == PASSWD_CHECK_SPECIAL)
 					->setUncheckedValue(0x00)
@@ -133,7 +144,7 @@ $auth_tab = (new CFormGrid())
 			])
 		], 'passwd_check_rules_simple'),
 		new CFormField(
-			(new CCheckBox('passwd_check_rules[]', PASSWD_CHECK_SIMPLE))
+			(new CCheckBox('passwd_check_rules[3]', PASSWD_CHECK_SIMPLE))
 				->setChecked(($data['passwd_check_rules'] & PASSWD_CHECK_SIMPLE) == PASSWD_CHECK_SIMPLE)
 				->setUncheckedValue(0x00)
 				->setId('passwd_check_rules_simple')
@@ -189,6 +200,8 @@ $ldap_tab = (new CFormGrid())
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'ldap_servers')
 		)
 	])
 	->addItem([
@@ -325,11 +338,15 @@ if ($data['saml_certs_editable']) {
 					->addClass($data['show_idp_certificate_input'] ? 'saml-enabled' : '')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 					->setEnabled($data['show_idp_certificate_input'])
+					->setErrorContainer('idp-certificate-error-container')
 					->setAriaRequired(),
 				(new CButton('idp_certificate_file', _('Choose file')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->addClass('js-saml-cert-file-button')
-					->addClass('saml-enabled')
+					->addClass('saml-enabled'),
+				(new CDiv())
+					->setId('idp-certificate-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
 			]))
 				->addClass('js-saml-cert-input')
 				->addStyle($data['show_idp_certificate_input'] ? '' : 'display: none')
@@ -350,11 +367,15 @@ if ($data['saml_certs_editable']) {
 					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 					->addClass($data['show_sp_private_key_input'] ? 'saml-enabled' : '')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setErrorContainer('sp-private-key-error-container')
 					->setEnabled($data['show_sp_private_key_input']),
 				(new CButton('sp_private_key_file', _('Choose file')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->addClass('js-saml-cert-file-button')
-					->addClass('saml-enabled')
+					->addClass('saml-enabled'),
+				(new CDiv())
+					->setId('sp-private-key-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
 			]))
 				->addClass('js-saml-cert-input')
 				->addStyle($data['show_sp_private_key_input'] ? '' : 'display: none')
@@ -375,11 +396,15 @@ if ($data['saml_certs_editable']) {
 					->addClass(ZBX_STYLE_FORM_INPUT_MARGIN)
 					->addClass($data['show_sp_certificate_input'] ? 'saml-enabled' : '')
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setErrorContainer('sp-certificate-error-container')
 					->setEnabled($data['show_sp_certificate_input']),
 				(new CButton('sp_certificate_file', _('Choose file')))
 					->addClass(ZBX_STYLE_BTN_GREY)
 					->addClass('js-saml-cert-file-button')
-					->addClass('saml-enabled')
+					->addClass('saml-enabled'),
+				(new CDiv())
+					->setId('sp-certificate-error-container')
+					->addClass(ZBX_STYLE_ERROR_CONTAINER)
 			]))
 				->addClass('js-saml-cert-input')
 				->addStyle($data['show_sp_certificate_input'] ? '' : 'display: none')
@@ -535,6 +560,8 @@ $saml_tab->addItem([
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'saml_provision_groups')
 		))
 			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
 			->addClass('saml-provision-status')
@@ -575,6 +602,8 @@ $saml_tab->addItem([
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'saml_provision_media')
 		))
 			->addClass($saml_provisioning ? null : ZBX_STYLE_DISPLAY_NONE)
 			->addClass('saml-provision-status')
@@ -631,6 +660,8 @@ $mfa_tab = (new CFormGrid())
 			))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 				->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'mfa_methods')
 		)
 	]);
 
@@ -712,30 +743,56 @@ $templates['saml_provisioning_group_row'] = (string) (new CRow([
 		(new CLink('#{name}', 'javascript:void(0);'))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addClass('js-edit'),
-		(new CVar('saml_provision_groups[#{row_index}][name]', '#{name}'))->removeId()
+		(new CVar('saml_provision_groups[#{row_index}][name]', '#{name}'))->removeId(),
+		(new CDiv())
+			->setAttribute('data-field-type', 'array')
+			->setAttribute('data-field-name', 'saml_provision_groups[#{row_index}][user_groups]')
+			->setId('saml-provision-groups-#{row_index}-user-groups')
 	],
 	(new CCol('#{user_group_names}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CCol('#{role_name}'))->addClass(ZBX_STYLE_WORDBREAK),
 	(new CButtonLink(_('Remove')))->addClass('js-remove')
 ]))->setAttribute('data-row_index', '#{row_index}');
 // SAML provisioning medias row template.
-$templates['saml_provisioning_media_row'] = (string) (new CRow([
-	[
-		(new CLink('#{name}', 'javascript:void(0);'))
-			->addClass(ZBX_STYLE_WORDWRAP)
-			->addClass('js-edit'),
-		(new CVar('saml_provision_media[#{row_index}][userdirectory_mediaid]', '#{userdirectory_mediaid}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][name]', '#{name}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][period]', '#{period}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][severity]', '#{severity}'))->removeId(),
-		(new CVar('saml_provision_media[#{row_index}][active]', '#{active}'))->removeId()
-	],
-	(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
-	(new CButtonLink(_('Remove')))->addClass('js-remove')
-]))->setAttribute('data-row_index', '#{row_index}');
+$templates['saml_provisioning_media_row'] = (string) (new CTemplateTag('', [
+	(new CRow([
+		[
+			(new CLink('#{name}', 'javascript:void(0);'))
+				->addClass(ZBX_STYLE_WORDWRAP)
+				->addClass('js-edit'),
+			(new CVar('saml_provision_media[#{row_index}][userdirectory_mediaid]', '#{userdirectory_mediaid}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][name]', '#{name}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][mediatypeid]', '#{mediatypeid}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][attribute]', '#{attribute}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][period]', '#{period}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][severity]', '#{severity}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId(),
+			(new CVar('saml_provision_media[#{row_index}][active]', '#{active}'))
+				->setAttribute('data-error-container', 'saml-provision-media-#{row_index}-error-container')
+				->removeId()
+		],
+		(new CCol('#{mediatype_name}'))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CCol('#{attribute}'))->addClass(ZBX_STYLE_WORDBREAK),
+		(new CButtonLink(_('Remove')))->addClass('js-remove')
+	]))->setAttribute('data-row_index', '#{row_index}'),
+	(new CRow())
+		->addClass('error-container-row')
+		->addItem((new CCol())
+			->setId('saml-provision-media-#{row_index}-error-container')
+			->setColSpan(4)
+		)
+]));
 // LDAP servers list row.
 $templates['ldap_servers_row'] = (string) (new CRow([
 	[
@@ -751,13 +808,17 @@ $templates['ldap_servers_row'] = (string) (new CRow([
 		(new CVar('ldap_servers[#{row_index}][search_filter]', '#{search_filter}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][start_tls]', '#{start_tls}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][bind_dn]', '#{bind_dn}'))->removeId(),
-		(new CVar('ldap_servers[#{row_index}][bind_password]', '#{bind_password}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][bind_password]', '#{bind_password}'))
+			->setAttribute('data-notrim', '')
+			->removeId(),
 		(new CVar('ldap_servers[#{row_index}][description]', '#{description}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][provision_status]', '#{provision_status}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][group_basedn]', '#{group_basedn}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][group_name]', '#{group_name}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][group_member]', '#{group_member}'))->removeId(),
-		(new CVar('ldap_servers[#{row_index}][user_ref_attr]', '#{user_ref_attr}'))->removeId(),
+		(new CVar('ldap_servers[#{row_index}][user_ref_attr]', '#{user_ref_attr}'))
+			->setAttribute('data-notrim', '')
+			->removeId(),
 		(new CVar('ldap_servers[#{row_index}][group_filter]', '#{group_filter}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][group_membership]', '#{group_membership}'))->removeId(),
 		(new CVar('ldap_servers[#{row_index}][user_username]', '#{user_username}'))->removeId(),
@@ -801,6 +862,7 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 
 (new CScriptTag(
 	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
 		'ldap_servers' => $data['ldap_servers'],
 		'ldap_default_row_index' => $data['ldap_default_row_index'],
 		'db_authentication_type' => $data['db_authentication_type'],
@@ -813,8 +875,6 @@ $templates['mfa_methods_row'] = (string) (new CRow([
 		'saml_idp_certificate_exists' => $data['saml_certs_editable'] && $data['idp_certificate_hash'] !== '',
 		'saml_sp_certificate_exists' => $data['saml_certs_editable'] && $data['sp_certificate_hash'] !== '',
 		'saml_sp_private_key_exists' => $data['saml_certs_editable'] && $data['sp_private_key_hash'] !== '',
-		'saml_certificate_max_filesize' => CApiInputValidator::SSL_CERTIFICATE_MAX_LENGTH,
-		'saml_private_key_max_filesize' => CApiInputValidator::SSL_PRIVATE_KEY_MAX_LENGTH,
 		'saml_filesize_error_message' => _('File is too big, max upload size is %1$s bytes.'),
 		'saml_certs_editable' => $data['saml_certs_editable']
 	]).');'

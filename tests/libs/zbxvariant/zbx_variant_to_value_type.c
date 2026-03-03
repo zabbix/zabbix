@@ -35,10 +35,19 @@ void	zbx_mock_test_entry(void **state)
 	value_type = zbx_mock_str_to_value_type(zbx_mock_get_parameter_string("in.value_type"));
 	ret = zbx_variant_to_value_type(&value, value_type, &error);
 
-	zbx_mock_assert_str_eq("zbx_variant_to_value_type() return", zbx_mock_get_parameter_string("out.return"),
-			error);
 	zbx_mock_assert_int_eq("Return value", zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.ret")),
 			ret);
+
+	if (SUCCEED == ret)
+	{
+		zbx_mock_assert_str_eq("zbx_variant_to_value_type() return",
+				zbx_mock_get_parameter_string("out.return"), zbx_variant_value_desc(&value));
+	}
+	else
+	{
+		zbx_mock_assert_str_eq("zbx_variant_to_value_type() return",
+				zbx_mock_get_parameter_string("out.return"), error);
+	}
 	zbx_variant_clear(&value);
 	zbx_free(error);
 }
