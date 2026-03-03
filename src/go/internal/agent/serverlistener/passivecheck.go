@@ -90,7 +90,7 @@ func parsePassiveCheckJSONRequest(rawRequest []byte) (string, time.Duration, err
 		return "", 0, errs.Errorf("unknown request type %q", request.Request)
 	}
 
-	timeout, err := scheduler.ParseItemTimeoutAny(request.Data[0].Timeout)
+	timeout, err := scheduler.ParseAndValidateItemTimeout(request.Data[0].Timeout)
 	if err != nil {
 		return "", 0, errs.Wrap(err, "failed to parse passive check timeout")
 	}

@@ -15,8 +15,6 @@
 package scheduler
 
 import (
-	"errors"
-	"fmt"
 	"hash/fnv"
 	"sync/atomic"
 	"time"
@@ -26,6 +24,7 @@ import (
 	"golang.zabbix.com/agent2/internal/agent/resultcache"
 	"golang.zabbix.com/agent2/pkg/glexpr"
 	"golang.zabbix.com/agent2/pkg/zbxlib"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -99,10 +98,15 @@ func (c *client) Output() plugin.ResultWriter {
 
 // addRequest requests client to start monitoring/update item described by request 'r' using plugin 'p' (*pluginAgent)
 // with output writer 'sink'
-func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin.ResultWriter, now time.Time,
-	firstActiveChecksRefreshed bool) (err error) {
+func (c *client) addRequest(p *pluginAgent, r *Request, sink plugin.ResultWriter, now time.Time,
+	firstActiveChecksRefreshed bool) error {
 	var info *pluginInfo
 	var ok bool
+
+	timeout, err := ParseAndValidateItemTimeout(r.Timeout)
+	if err != nil {
+		return errs.Wrap(err, "item timeout parse failed")
+	}
 
 	log.Debugf("[%d] adding new request for key: '%s'", c.id, r.Key)
 
@@ -123,7 +127,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 				taskBase: taskBase{plugin: p, active: true, recurring: true},
 				seed:     uint64(h.Sum32())}
 			if err = task.reschedule(now); err != nil {
-				return
+				return errs.Wrap(err, "reschedule failed")
 			}
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created collector task for plugin %s with collecting interval %d", c.id, p.name(),
@@ -135,10 +139,6 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 	if _, ok := p.impl.(plugin.Exporter); ok {
 		var tacc exporterTaskAccessor
 
-		if r.Timeout == 0 {
-			r.Timeout = agent.Options.Timeout
-		}
-
 		if c.id > agent.MaxBuiltinClientID {
 			var task *exporterTask
 			var scheduling bool
@@ -149,7 +149,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 			if tacc, ok = c.exporters[r.Itemid]; ok {
 				task = tacc.task()
 				if task.updated.Equal(now) {
-					return errors.New("duplicate itemid found")
+					return errs.New("duplicate itemid found")
 				}
 				if task.plugin != p {
 					// decativate current exporter task and create new one if the item key has been changed
@@ -172,7 +172,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 				if !scheduling && !firstActiveChecksRefreshed && p.forceActiveChecksOnStart {
 					task.scheduled = time.Unix(now.Unix(), priorityExporterTaskNs)
 				} else if err = task.reschedule(now); err != nil {
-					return
+					return errs.Wrap(err, "reschedule failed")
 				}
 				c.exporters[r.Itemid] = task
 				tasks = append(tasks, task)
@@ -188,7 +188,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 				if task.item.delay != r.Delay {
 					task.item.delay = r.Delay
 					if err = task.reschedule(now); err != nil {
-						return
+						return errs.Wrap(err, "reschedule failed")
 					}
 					p.tasks.Update(task)
 					log.Debugf("[%d] updated exporter task for plugin '%s' itemid:%d key '%s'",
@@ -208,14 +208,14 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 				output:   sink,
 			}
 			if err = task.reschedule(now); err != nil {
-				return
+				return errs.Wrap(err, "reschedule failed")
 			}
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created direct exporter task for plugin '%s' itemid:%d key '%s'",
 				c.id, p.name(), task.item.itemid, task.item.key)
 		}
 	} else if c.id <= agent.MaxBuiltinClientID {
-		return fmt.Errorf(`The "%s" key is not supported in test or single passive check mode`, r.Key)
+		return errs.Errorf(`The "%s" key is not supported in test or single passive check mode`, r.Key)
 	}
 
 	// handle runner interface for inactive plugins
@@ -225,7 +225,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 				taskBase: taskBase{plugin: p, active: true},
 			}
 			if err = task.reschedule(now); err != nil {
-				return
+				return errs.Wrap(err, "reschedule failed")
 			}
 			tasks = append(tasks, task)
 			log.Debugf("[%d] created starter task for plugin %s", c.id, p.name())
@@ -241,7 +241,7 @@ func (c *client) addRequest(p *pluginAgent, r *Request, timeout int, sink plugin
 				client:   c,
 			}
 			if err = info.watcher.reschedule(now); err != nil {
-				return
+				return errs.Wrap(err, "reschedule failed")
 			}
 			tasks = append(tasks, info.watcher)
 
