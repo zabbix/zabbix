@@ -2194,19 +2194,12 @@ button {
 .dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
-.dashboard-list .status-green {
-  background-color: #2f9f5e;
-  border-color: #2f9f5e; }
-.dashboard-list .status-yellow {
-  background-color: #e79e0b;
-  border-color: #e79e0b; }
-
-.overlay-dialogue.modal-widget-configuration {
+.overlay-dialogue.modal.modal-widget-configuration {
   --modal-width: auto;
   --modal-max-width: calc(100vw - 20px);
   --modal-min-width: 650px;
   box-sizing: border-box; }
-  .overlay-dialogue.modal-widget-configuration .overlay-dialogue-body {
+  .overlay-dialogue.modal.modal-widget-configuration .overlay-dialogue-body {
     overflow-x: auto; }
 
 .dashboard-widget-form {
@@ -2704,9 +2697,9 @@ div[data-field-type="set"].has-error {
 .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-axis,
 .list-table.has-highlighted-rows .problem-nested:not([class*='flh-']):not(.row-selected) .timeline-td {
   border-bottom-style: none; }
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)):not(.green.link:not(:hover):not(:focus)),
 .list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) td,
-.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)),
+.list-table.compact-view [class*='flh-']:not(.row-selected):not(:hover) sup, .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) a:not(.green):not(.green.btn-icon:not([disabled])):not(.green.btn-link:not([disabled])):not(.green.link-action:not(:hover):not(:focus)):not(.green.link-alt:not(:hover):not(:focus)):not(.green.link:not(:hover):not(:focus)),
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) td,
 .list-table.has-highlighted-rows [class*='flh-']:not(.row-selected):not(:hover) sup {
   color: #000000; }
@@ -4523,19 +4516,21 @@ z-select {
       background-color: #383838;
       border-color: #4f4f4f;
       box-shadow: none; }
-    .z-select .focusable.color-negative, .z-select .focusable.color-negative.link-action:not(:hover):not(:focus), .z-select .focusable.color-negative.link-alt:not(:hover):not(:focus),
+    .z-select .focusable.color-negative, .z-select .focusable.color-negative.link-action:not(:hover):not(:focus), .z-select .focusable.color-negative.link-alt:not(:hover):not(:focus), .z-select .focusable.color-negative.link:not(:hover):not(:focus),
     z-select .focusable.color-negative,
     z-select .focusable.color-negative.btn-icon:not([disabled]),
     z-select .focusable.color-negative.btn-link:not([disabled]),
     z-select .focusable.color-negative.link-action:not(:hover):not(:focus),
-    z-select .focusable.color-negative.link-alt:not(:hover):not(:focus) {
+    z-select .focusable.color-negative.link-alt:not(:hover):not(:focus),
+    z-select .focusable.color-negative.link:not(:hover):not(:focus) {
       color: #e45959; }
-      .z-select .focusable.color-negative::after, .z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after,
+      .z-select .focusable.color-negative::after, .z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after, .z-select .focusable.color-negative.link:not(:focus):not(:hover)::after,
       z-select .focusable.color-negative::after,
       z-select .focusable.color-negative.btn-icon:not([disabled])::after,
       z-select .focusable.color-negative.btn-link:not([disabled])::after,
       z-select .focusable.color-negative.link-action:not(:focus):not(:hover)::after,
-      z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after {
+      z-select .focusable.color-negative.link-alt:not(:focus):not(:hover)::after,
+      z-select .focusable.color-negative.link:not(:focus):not(:hover)::after {
         color: #f2f2f2; }
   .z-select .list,
   z-select .list {
@@ -4566,12 +4561,13 @@ z-select {
       .z-select .list li.hover,
       z-select .list li.hover {
         background-color: #454545; }
-      .z-select .list li.color-negative, .z-select .list li.color-negative.link-action:not(:hover):not(:focus), .z-select .list li.color-negative.link-alt:not(:hover):not(:focus),
+      .z-select .list li.color-negative, .z-select .list li.color-negative.link-action:not(:hover):not(:focus), .z-select .list li.color-negative.link-alt:not(:hover):not(:focus), .z-select .list li.color-negative.link:not(:hover):not(:focus),
       z-select .list li.color-negative,
       z-select .list li.color-negative.btn-icon:not([disabled]),
       z-select .list li.color-negative.btn-link:not([disabled]),
       z-select .list li.color-negative.link-action:not(:hover):not(:focus),
-      z-select .list li.color-negative.link-alt:not(:hover):not(:focus) {
+      z-select .list li.color-negative.link-alt:not(:hover):not(:focus),
+      z-select .list li.color-negative.link:not(:hover):not(:focus) {
         color: #e45959; }
       .z-select .list li[disabled],
       z-select .list li[disabled] {
@@ -5252,6 +5248,8 @@ form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
 form.dashboard-widget-itemhistory #list_columns .inaccessible {
   color: #525252; }
 
+div.dashboard-widget-itemhistory .list-table iframe {
+  vertical-align: top; }
 div.dashboard-widget-itemhistory .list-table pre {
   font-family: inherit; }
 div.dashboard-widget-itemhistory .list-table.show-thumbnail tbody td {
@@ -5534,7 +5532,7 @@ div.dashboard-widget-navtree .treeview {
 form.dashboard-widget-piechart {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-piechart .pie-chart-widget-config-tabs > .tabs-nav {
@@ -5671,7 +5669,7 @@ div.dashboard-widget-problemsbysv .list-table tr[data-hostgroupid] {
 form.dashboard-widget-svggraph {
   max-width: 1330px;
   min-width: 1120px;
-  width: 100vw; }
+  width: min(100vw - 42px, calc(var(--modal-max-width) - 22px)); }
   form.dashboard-widget-svggraph .graph-widget-config-tabs {
     grid-column: 1 / -1; }
   form.dashboard-widget-svggraph .graph-widget-config-tabs > .tabs-nav {
@@ -6844,9 +6842,6 @@ select {
     color: #f2f2f2 !important;
     pointer-events: none; }
 
-div .overlay-dialogue.wordbreak {
-  white-space: normal; }
-
 .form-fields-inline label {
   margin: 0 8px 0 3px; }
 
@@ -7316,8 +7311,6 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #383838;
   border-bottom-color: #353535;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
-  .overlay-dialogue .wordbreak {
-    white-space: normal; }
   .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
     padding: 8px 10px;
@@ -7788,6 +7781,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   .tags-wrapper .tag {
     margin-top: 1px;
     margin-bottom: 1px; }
+  .tags-wrapper.form-field .tag {
+    margin-top: 4px;
+    margin-bottom: 4px; }
 
 .tag {
   display: inline-block;
@@ -8836,64 +8832,64 @@ z-select.z-select-host-interface li[disabled] .description:not(:empty) {
   .audit-details-wrapper .audit-show-details-btn-wrapper {
     margin: 0 5px 0 5px; }
 
-.color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus) {
+.color-accent, .color-accent.btn-icon:not([disabled]), .color-accent.btn-link:not([disabled]), .color-accent.link-action:not(:hover):not(:focus), .color-accent.link-alt:not(:hover):not(:focus), .color-accent.link:not(:hover):not(:focus) {
   color: #f24f1d; }
-  .color-accent.btn-link:not([disabled]), .btn-link.color-accent.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-accent.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-accent.btn-link:not([disabled]), .btn-link.color-accent.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-accent.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-accent.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #f24f1d; }
 
-.color-icon, .color-icon.btn-icon:not([disabled]), .color-icon.btn-link:not([disabled]), .color-icon.link-action:not(:hover):not(:focus), .color-icon.link-alt:not(:hover):not(:focus) {
+.color-icon, .color-icon.btn-icon:not([disabled]), .color-icon.btn-link:not([disabled]), .color-icon.link-action:not(:hover):not(:focus), .color-icon.link-alt:not(:hover):not(:focus), .color-icon.link:not(:hover):not(:focus) {
   color: #69808d; }
-  .color-icon.btn-link:not([disabled]), .btn-link.color-icon.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-icon.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-icon.btn-link:not([disabled]), .btn-link.color-icon.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-icon.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-icon.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #69808d; }
 
-.color-negative, .color-negative.btn-icon:not([disabled]), .color-negative.btn-link:not([disabled]), .color-negative.link-action:not(:hover):not(:focus), .color-negative.link-alt:not(:hover):not(:focus) {
+.color-negative, .color-negative.btn-icon:not([disabled]), .color-negative.btn-link:not([disabled]), .color-negative.link-action:not(:hover):not(:focus), .color-negative.link-alt:not(:hover):not(:focus), .color-negative.link:not(:hover):not(:focus) {
   color: #e45959; }
-  .color-negative.btn-link:not([disabled]), .btn-link.color-negative.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-negative.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-negative.btn-link:not([disabled]), .btn-link.color-negative.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-negative.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-negative.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #e45959; }
 
-.color-warning, .color-warning.btn-icon:not([disabled]), .color-warning.btn-link:not([disabled]), .color-warning.link-action:not(:hover):not(:focus), .color-warning.link-alt:not(:hover):not(:focus) {
+.color-warning, .color-warning.btn-icon:not([disabled]), .color-warning.btn-link:not([disabled]), .color-warning.link-action:not(:hover):not(:focus), .color-warning.link-alt:not(:hover):not(:focus), .color-warning.link:not(:hover):not(:focus) {
   color: #e99003; }
-  .color-warning.btn-link:not([disabled]), .btn-link.color-warning.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-warning.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-warning.btn-link:not([disabled]), .btn-link.color-warning.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-warning.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-warning.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #e99003; }
 
-.color-positive, .color-positive.btn-icon:not([disabled]), .color-positive.btn-link:not([disabled]), .color-positive.link-action:not(:hover):not(:focus), .color-positive.link-alt:not(:hover):not(:focus) {
+.color-positive, .color-positive.btn-icon:not([disabled]), .color-positive.btn-link:not([disabled]), .color-positive.link-action:not(:hover):not(:focus), .color-positive.link-alt:not(:hover):not(:focus), .color-positive.link:not(:hover):not(:focus) {
   color: #59db8f; }
-  .color-positive.btn-link:not([disabled]), .btn-link.color-positive.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-positive.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .color-positive.btn-link:not([disabled]), .btn-link.color-positive.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.color-positive.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.color-positive.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #59db8f; }
 
-.blue, .blue.btn-icon:not([disabled]), .blue.btn-link:not([disabled]), .blue.link-action:not(:hover):not(:focus), .blue.link-alt:not(:hover):not(:focus) {
+.blue, .blue.btn-icon:not([disabled]), .blue.btn-link:not([disabled]), .blue.link-action:not(:hover):not(:focus), .blue.link-alt:not(:hover):not(:focus), .blue.link:not(:hover):not(:focus) {
   color: #429ae3; }
-  .blue.btn-link:not([disabled]), .btn-link.blue.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.blue.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .blue.btn-link:not([disabled]), .btn-link.blue.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.blue.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.blue.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #429ae3; }
 
-.green, .green.btn-icon:not([disabled]), .green.btn-link:not([disabled]), .green.link-action:not(:hover):not(:focus), .green.link-alt:not(:hover):not(:focus) {
+.green, .green.btn-icon:not([disabled]), .green.btn-link:not([disabled]), .green.link-action:not(:hover):not(:focus), .green.link-alt:not(:hover):not(:focus), .green.link:not(:hover):not(:focus) {
   color: #59db8f; }
-  .green.btn-link:not([disabled]), .btn-link.green.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.green.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .green.btn-link:not([disabled]), .btn-link.green.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.green.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.green.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #59db8f; }
 
-.grey, .grey.btn-icon:not([disabled]), .grey.btn-link:not([disabled]), .grey.link-action:not(:hover):not(:focus), .grey.link-alt:not(:hover):not(:focus) {
+.grey, .grey.btn-icon:not([disabled]), .grey.btn-link:not([disabled]), .grey.link-action:not(:hover):not(:focus), .grey.link-alt:not(:hover):not(:focus), .grey.link:not(:hover):not(:focus) {
   color: #737373; }
-  .grey.btn-link:not([disabled]), .btn-link.grey.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.grey.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .grey.btn-link:not([disabled]), .btn-link.grey.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.grey.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.grey.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #737373; }
 
-.orange, .orange.btn-icon:not([disabled]), .orange.btn-link:not([disabled]), .orange.link-action:not(:hover):not(:focus), .orange.link-alt:not(:hover):not(:focus) {
+.orange, .orange.btn-icon:not([disabled]), .orange.btn-link:not([disabled]), .orange.link-action:not(:hover):not(:focus), .orange.link-alt:not(:hover):not(:focus), .orange.link:not(:hover):not(:focus) {
   color: #f24f1d; }
-  .orange.btn-link:not([disabled]), .btn-link.orange.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.orange.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .orange.btn-link:not([disabled]), .btn-link.orange.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.orange.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.orange.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #f24f1d; }
 
-.red, .red.btn-icon:not([disabled]), .red.btn-link:not([disabled]), .red.link-action:not(:hover):not(:focus), .red.link-alt:not(:hover):not(:focus) {
+.red, .red.btn-icon:not([disabled]), .red.btn-link:not([disabled]), .red.link-action:not(:hover):not(:focus), .red.link-alt:not(:hover):not(:focus), .red.link:not(:hover):not(:focus) {
   color: #e45959; }
-  .red.btn-link:not([disabled]), .btn-link.red.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.red.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .red.btn-link:not([disabled]), .btn-link.red.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.red.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.red.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #e45959; }
 
-.teal, .teal.btn-icon:not([disabled]), .teal.btn-link:not([disabled]), .teal.link-action:not(:hover):not(:focus), .teal.link-alt:not(:hover):not(:focus) {
+.teal, .teal.btn-icon:not([disabled]), .teal.btn-link:not([disabled]), .teal.link-action:not(:hover):not(:focus), .teal.link-alt:not(:hover):not(:focus), .teal.link:not(:hover):not(:focus) {
   color: #0f998b; }
-  .teal.btn-link:not([disabled]), .btn-link.teal.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.teal.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .teal.btn-link:not([disabled]), .btn-link.teal.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.teal.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.teal.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #0f998b; }
 
-.yellow, .yellow.btn-icon:not([disabled]), .yellow.btn-link:not([disabled]), .yellow.link-action:not(:hover):not(:focus), .yellow.link-alt:not(:hover):not(:focus) {
+.yellow, .yellow.btn-icon:not([disabled]), .yellow.btn-link:not([disabled]), .yellow.link-action:not(:hover):not(:focus), .yellow.link-alt:not(:hover):not(:focus), .yellow.link:not(:hover):not(:focus) {
   color: #e99003; }
-  .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus) {
+  .yellow.btn-link:not([disabled]), .btn-link.yellow.link-action:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link-alt:not([disabled]):not(:hover):not(:focus), .btn-link.yellow.link:not([disabled]):not(:hover):not(:focus) {
     border-color: #e99003; }
 
 .sidebar.is-compact:not(.is-opened) .form-search .search-icon {

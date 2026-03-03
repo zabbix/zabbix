@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -444,6 +444,7 @@ class CHostGroup extends CApiService {
 		DB::delete('sysmaps_elements', ['elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP, 'elementid' => $groupids]);
 
 		$this->unlinkHosts($db_groups);
+		self::deleteUnusedHgSets($groupids);
 
 		DB::delete('hstgrp', ['groupid' => $groupids]);
 
@@ -461,6 +462,22 @@ class CHostGroup extends CApiService {
 		}
 
 		$this->massUpdate($data);
+	}
+
+	/**
+	 * Deletes host group sets that have no hosts linked to them.
+	 * This may happen during parallel deletion of hosts which have the same host group set.
+	 */
+	private static function deleteUnusedHgSets(array $groupids): void {
+		DBexecute(
+			'DELETE FROM hgset'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM hgset_group hg'.
+				' WHERE hgset.hgsetid=hg.hgsetid'.
+					' AND '.dbConditionId('hg.groupid', $groupids).
+			')'
+		);
 	}
 
 	/**

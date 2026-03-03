@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -334,6 +334,16 @@ window.host_wizard_edit = new class {
 						this.#gotoStep(Math.min(this.#current_step + 1, this.#steps_queue.length - 1));
 					}
 					else {
+						if (this.#data.host_new !== null) {
+							const return_url = new URL('zabbix.php', location.href);
+
+							return_url.searchParams.set('action', 'latest.view');
+							return_url.searchParams.set('hostids[]', this.#data.host_new.id);
+							return_url.searchParams.set('filter_set', '1');
+
+							ZABBIX.PopupManager.setReturnUrl(return_url.href);
+						}
+
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
 						this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {

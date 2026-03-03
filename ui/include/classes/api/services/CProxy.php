@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -420,7 +420,6 @@ class CProxy extends CApiService {
 		$this->validateDelete($proxyids, $db_proxies);
 
 		DB::delete('host_proxy', ['proxyid' => $proxyids]);
-		DB::delete('proxy_rtdata', ['proxyid' => $proxyids]);
 		DB::delete('proxy', ['proxyid' => $proxyids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_PROXY, $db_proxies);

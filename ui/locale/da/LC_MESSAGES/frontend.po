@@ -298,6 +298,24 @@ msgstr "%1$s.php klassen skal udvide %2$s for modul placeret i %3$s."
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -2222,6 +2240,13 @@ msgstr "Både \"tls_psk_identity\" og \"tls_psk\" felter skal angives ved ændri
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Begge kodeord skal være ens."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -4187,6 +4212,10 @@ msgstr "Kan ikke sætte \"%1$s\" for graf prototype \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Kan ikke indstille \"Datasætaggregation\", når datapunktet med typen \"Total\" føjes til diagrammet."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -12220,6 +12249,13 @@ msgstr ""
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ugyldig API-metode \"%2$s\" for brugerrollen \"%1$s\"."
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -26814,6 +26850,11 @@ msgstr "ugyldig bytesekvens i UTF-8"
 msgid "invalid data type"
 msgstr "ugyldig datatype"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ugyldig forsinkelse"
@@ -28213,6 +28254,11 @@ msgstr "værdien skal være mellem \"%1$s\" og \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "værdien skal være tom"
@@ -28229,6 +28275,16 @@ msgstr[1] "værdien skal være tom eller en af følgende %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "værdien skal være større end \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

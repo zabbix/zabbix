@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -133,7 +133,10 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 				'messages' => ['uniq' => _('Tag name and value combination is not unique.')],
 				'fields' => [
 					'value' => ['db host_tag.value'],
-					'tag' => ['db host_tag.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					'tag' => [
+						['db tag_filter.tag'],
+						['db tag_filter.tag', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+					]
 				]
 			],
 			'templates' => ['array', 'field' => ['db hosts.hostid']],
@@ -209,40 +212,7 @@ class CControllerHostUpdate extends CControllerHostUpdateGeneral {
 					'inherited_type' => ['integer']
 				]
 			],
-			'valuemaps' => ['objects', 'fields' => [
-				'valuemapid' => ['db valuemap.valuemapid'],
-				'name' => ['db valuemap.name', 'not_empty', 'required'],
-				'mappings' => ['objects', 'not_empty', 'uniq' => [['type', 'value']],
-					'messages' => ['uniq' => _('Mapping type and value combination is not unique.')],
-					'fields' => [
-						'type' => ['db valuemap_mapping.type', 'required', 'in' => [VALUEMAP_MAPPING_TYPE_EQUAL,
-							VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
-							VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP, VALUEMAP_MAPPING_TYPE_DEFAULT
-						]],
-						'value' => [
-							['db valuemap_mapping.value', 'required', 'when' => ['type', 'in' => [
-								VALUEMAP_MAPPING_TYPE_EQUAL
-							]]],
-							['db valuemap_mapping.value', 'required', 'not_empty', 'when' => ['type', 'in' => [
-								VALUEMAP_MAPPING_TYPE_GREATER_EQUAL, VALUEMAP_MAPPING_TYPE_LESS_EQUAL,
-								VALUEMAP_MAPPING_TYPE_IN_RANGE, VALUEMAP_MAPPING_TYPE_REGEXP
-							]]],
-							['float', 'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_GREATER_EQUAL,
-								VALUEMAP_MAPPING_TYPE_LESS_EQUAL
-							]]],
-							['string',
-								'use' => [CRangesParser::class, ['with_minus' => true, 'with_float' => true, 'with_suffix' => true]],
-								'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_IN_RANGE]],
-								'messages' => ['use' => _('Invalid range.')]
-							],
-							['string', 'use' => [CRegexValidator::class, []],
-								'when' => ['type', 'in' => [VALUEMAP_MAPPING_TYPE_REGEXP]]
-							]
-						],
-						'newvalue' => ['db valuemap_mapping.newvalue', 'required', 'not_empty']
-					]
-				]
-			]],
+			'valuemaps' => ['objects', 'fields' => CControllerValueMapCheck::getFieldsValidationRules()],
 			'clone' => ['integer', 'in' => [1]]
 		]];
 	}

@@ -7,4 +7,5 @@ libzbxpoller_proxy_a_SOURCES = \
 	poller_proxy.h
 
 libzbxpoller_proxy_a_CFLAGS = \
-	$(TLS_CFLAGS)
+	$(TLS_CFLAGS) \
+	$(LIBEVENT_CFLAGS)

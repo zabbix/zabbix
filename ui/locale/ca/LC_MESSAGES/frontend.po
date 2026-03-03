@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-19 10:32+0000\n"
+"PO-Revision-Date: 2025-11-06 22:04+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -298,6 +298,24 @@ msgstr "La classe %1$s.php ha d'estendre %2$s per al mòdul situat a %3$s."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "(%1$s: %2$s)"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr "%1$s: %2$s."
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr "%1$s: l'arxiu no és llegible."
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr "%1$s: ruta no vàlida o arxiu no trobat."
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -2223,6 +2241,13 @@ msgstr "Tant els camps \"tls_psk_identity\" com \"tls_psk\" s'han d'especificar 
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Ambdues paraules de pas han d'ésser iguals."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -4188,6 +4213,10 @@ msgstr "No es pot pas establir \"%1$s\" per al prototip de gràfic \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "No es pot pas establir \"Afegit del conjunt de dades\" quan s'afegeix un element de tipus \"Total\" al gràfic."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr "No es pot definir el joc de caràcters."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -12221,6 +12250,13 @@ msgstr "Interval i emmagatzematge"
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "El mètode \"%2$s\" de l'api no és pas vàlid per a la funció d'usuari \"%1$s\"."
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -26815,6 +26851,11 @@ msgstr "seqüència d'octets no vàlida en UTF-8"
 msgid "invalid data type"
 msgstr "tipus de dades no vàlid"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "endarreriment no vàlid"
@@ -28214,6 +28255,11 @@ msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\" dígits després del punt decimal"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "el valor ha d'ésser buit"
@@ -28230,6 +28276,16 @@ msgstr[1] "els valors han d'ésser buits o un d'entre %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "el valor ha d'ésser més gran de \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

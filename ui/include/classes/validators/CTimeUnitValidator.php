@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@ class CTimeUnitValidator extends CValidator {
 	protected int $min = 0;
 	protected bool $usermacros = false;
 	protected bool $lldmacros = false;
+	protected bool $with_year = false;
 
 	public function __construct(array $options = []) {
 		if (array_key_exists('min', $options)) {
@@ -28,6 +29,10 @@ class CTimeUnitValidator extends CValidator {
 
 		if (array_key_exists('max', $options)) {
 			$this->max = (int) $options['max'];
+		}
+
+		if (array_key_exists('with_year', $options)) {
+			$this->with_year = (bool) $options['with_year'];
 		}
 
 		if (array_key_exists('lldmacros', $options)) {
@@ -39,9 +44,18 @@ class CTimeUnitValidator extends CValidator {
 		}
 	}
 
+	/**
+	 * Checks if the given string is:
+	 * - either macro or time unit text with CSimpleIntervalParser
+	 * - if value is not a macro, then also validates if value is between provided min and max range
+	 *
+	 * @param string $value
+	 *
+	 * @return bool
+	 */
 	public function validate($value) {
 		$interval_parser = new CSimpleIntervalParser(['usermacros' => $this->usermacros,
-			'lldmacros' => $this->lldmacros
+			'lldmacros' => $this->lldmacros, 'with_year' => $this->with_year
 		]);
 		$result = $interval_parser->parse($value);
 
@@ -55,10 +69,19 @@ class CTimeUnitValidator extends CValidator {
 			return true;
 		}
 
-		$seconds = timeUnitToSeconds($value, false);
+		$seconds = timeUnitToSeconds($value, $this->with_year);
+		$convert_options = ['with_year' => $this->with_year];
 
 		if ($seconds > $this->max || $seconds < $this->min) {
-			$this->setError(_s('value must be one of %1$s', $this->min.'-'.$this->max));
+			$min_text = $this->min >= 60
+				? $this->min._x('s', 'second short').' ('.convertUnitsS($this->min, $convert_options) .')'
+				: convertUnitsS($this->min, $convert_options);
+
+			$max_text = $this->max >= 60
+				? $this->max._x('s', 'second short').' ('.convertUnitsS($this->max, $convert_options).')'
+				: convertUnitsS($this->max, $convert_options);
+
+			$this->setError(_s('value must be between %1$s and %2$s', $min_text, $max_text));
 
 			return false;
 		}

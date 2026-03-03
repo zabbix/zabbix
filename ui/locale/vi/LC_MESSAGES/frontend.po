@@ -285,6 +285,24 @@ msgstr "Class %1$s.php phải mở rộng module %2$s nằm tại vị trí %3$s
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
 
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
+
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
 msgid "%1$sth percentile: %2$s"
@@ -2200,6 +2218,13 @@ msgstr ""
 msgid "Both passwords must be equal."
 msgstr "Cả hai mật khẩu phải bằng nhau."
 
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -4093,6 +4118,10 @@ msgstr "Không thể đặt \"%1$s\" cho kiểu đồ thị \"%2$s\"."
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
 msgstr "Không thể cài đặt \"Data set aggregation\" khi đã có sẵn một item với kiểu là \"Total\" được thêm vào biểu đồ."
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
+msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -12082,6 +12111,13 @@ msgstr ""
 #: include/classes/api/services/CRole.php:731
 #, c-format
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
 msgstr ""
 
 #: include/classes/api/services/CHostInterface.php:824
@@ -26624,6 +26660,11 @@ msgstr "chuỗi byte không hợp lệ trong UTF-8"
 msgid "invalid data type"
 msgstr ""
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "Thời gian trễ không hợp lệ"
@@ -28022,6 +28063,11 @@ msgstr ""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr ""
@@ -28036,6 +28082,16 @@ msgstr[0] ""
 #: widgets/gauge/includes/WidgetForm.php:133
 #, c-format
 msgid "value must be greater than \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
 msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342

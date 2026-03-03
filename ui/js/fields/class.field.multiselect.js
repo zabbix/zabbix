@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -82,20 +82,26 @@ class CFieldMultiselect extends CField {
 				[this.getName()]: return_id ? null : []
 			};
 
-		if ($(this._field).multiSelect('getOption', 'disabled') === false) {
-			$(this._field).multiSelect('getData').forEach((value) => {
-				const field_name = value.isNew ? this.getName() + '_new' : this.getName();
-
-				if (!return_id) {
-					values[field_name].push(value.id);
-				}
-				else if (values[field_name] === null) {
-					values[field_name] = value.id;
-				}
-			});
+		if (this.isDisabled()) {
+			return null;
 		}
 
+		$(this._field).multiSelect('getData').forEach((value) => {
+			const field_name = value.isNew ? this.getName() + '_new' : this.getName();
+
+			if (!return_id) {
+				values[field_name].push(value.id);
+			}
+			else if (values[field_name] === null) {
+				values[field_name] = value.id;
+			}
+		});
+
 		return values;
+	}
+
+	isDisabled () {
+		return $(this._field).multiSelect('getOption', 'disabled') === true;
 	}
 
 	_appendErrorHint(error_hint) {

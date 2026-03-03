@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-09-18 16:00+0000\n"
-"Last-Translator: Justin <info@jstorfinger.de>\n"
+"PO-Revision-Date: 2025-11-11 15:35+0000\n"
+"Last-Translator: Udo <zabbix@inet-hamburg.de>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
@@ -299,6 +299,24 @@ msgstr "php-Klasse %1$s muss das Modul %2$s unter %3$s erweitern."
 #, c-format
 msgid "%1$s: %2$s"
 msgstr "%1$s: %2$s"
+
+#: include/classes/server/CZabbixServer.php:740
+#: include/classes/setup/CSetupWizard.php:1459
+#, c-format
+msgid "%1$s: %2$s."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:746
+#: include/classes/setup/CSetupWizard.php:1465
+#, c-format
+msgid "%1$s: file is not readable."
+msgstr ""
+
+#: include/classes/server/CZabbixServer.php:743
+#: include/classes/setup/CSetupWizard.php:1462
+#, c-format
+msgid "%1$s: invalid path or file not found."
+msgstr ""
 
 #: include/classes/graph/CSvgGraph.php:1418
 #, c-format
@@ -2227,6 +2245,13 @@ msgstr "Zum Ändern der TLS-PSK Verschlüsselung Einstellung, müssen beide Wert
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Beide Passwörter müssen gleich sein."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -4198,6 +4223,10 @@ msgstr "Kann \"%1$s\"\" für Diagramm-Prototypen \"%2$s\" nicht setzen."
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
+msgstr ""
+
+#: include/classes/db/MysqlDbBackend.php:197
+msgid "Cannot set charset."
 msgstr ""
 
 #: include/classes/api/services/CItemGeneral.php:2478
@@ -6553,7 +6582,7 @@ msgstr "Tag"
 
 #: include/func.inc.php:2565
 msgid "Day before yesterday"
-msgstr "Vorvorgestern"
+msgstr "Vorgestern"
 
 #: app/views/maintenance.timeperiod.edit.php:138
 #: app/views/maintenance.timeperiod.edit.php:168
@@ -12253,6 +12282,13 @@ msgstr ""
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Ungültige API-Methode \"%2$s\" für Benutzerrolle \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr ""
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -17681,7 +17717,7 @@ msgstr "Vorangehende Woche"
 #: app/partials/scheduledreport.formgrid.html.php:89
 #: app/partials/scheduledreport.table.html.php:60 include/func.inc.php:2569
 msgid "Previous year"
-msgstr "Vorangehedes Jahr"
+msgstr "Vorangehendes Jahr"
 
 #: include/hosts.inc.php:399
 msgid "Primary POC cell"
@@ -26870,6 +26906,11 @@ msgstr "ungültigen Byte-Sequenz in UTF-8"
 msgid "invalid data type"
 msgstr "ungültiger Datentyp"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr ""
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "ungültige Verzögerung"
@@ -28270,6 +28311,11 @@ msgstr "Wert muss zwischen \"%1$s\" und \"%2$s\" liegen"
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr ""
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr ""
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "Wert muss leer sein"
@@ -28285,6 +28331,16 @@ msgstr[1] "Wert muss leer oder %1$s sein"
 #: widgets/gauge/includes/WidgetForm.php:133
 #, c-format
 msgid "value must be greater than \"%1$s\""
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr ""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
 msgstr ""
 
 #: app/controllers/CControllerPopupItemTest.php:1342

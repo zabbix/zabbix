@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -225,6 +225,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Status' => 'Disabled'
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						'Local network',
 						'Discovery rule to check delete',
 						'Discovery rule for successful deleting',
@@ -244,6 +245,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => ''
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						'Local network',
 						'External network',
 						self::SYMBOLS_ERROR_RULE,
@@ -269,6 +271,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'RULE'
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
@@ -291,6 +294,7 @@ class testPageNetworkDiscovery extends CWebTest {
 						'Name' => 'Disco'
 					],
 					'expected' => [
+						'Multiple spaces in discovery rule name',
 						self::SYMBOLS_ERROR_RULE,
 						'Discovery rule to check delete',
 						'Discovery rule for update',
@@ -310,9 +314,17 @@ class testPageNetworkDiscovery extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => '    '
+						'Name' => '   spaces   '
 					],
-					'expected' => []
+					'expected' => ['Multiple spaces in discovery rule name']
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'expected' => ['Multiple spaces in discovery rule name']
 				]
 			],
 			[

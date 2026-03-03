@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -821,7 +821,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 			$this->assertEquals('New_macro_value', $value_field->getValue());
 		}
 
-		// Press revert button amd save the changes and make sure that changes were reverted.
+		// Press revert button and save the changes and make sure that changes were reverted.
 		$value_field->getRevertButton()->click();
 		$this->query('button:Update')->one()->click();
 		// Check that no macro value changes took place.
@@ -922,6 +922,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$setting_form = $this->query('name:otherForm')->asForm()->one();
 		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
 		$setting_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Try to create macros with Vault type different from settings.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,20 +17,21 @@ package mysql
 import (
 	"context"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-func versionHandler(ctx context.Context, conn MyClient, params map[string]string, _ ...string) (interface{}, error) {
+func versionHandler(ctx context.Context, conn MyClient, _ map[string]string, _ ...string) (any, error) {
 	var res string
 
 	row, err := conn.QueryRow(ctx, `SELECT version()`)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	err = row.Scan(&res)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 	}
 
 	return res, nil

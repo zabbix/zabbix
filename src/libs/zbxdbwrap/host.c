@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1115,15 +1115,15 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 		sql_offset = 0;
 
+		/* check if items from template require interfaces and */
+		/* are interfaces of required types configured for host */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type in (%d,%d,%d,%d,%d)"
 					" and",
-				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED_LLD);
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP);
+
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -1134,21 +1134,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			type = (unsigned char)atoi(trow[0]);
 			type = zbx_get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY == type)
-			{
-				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
-				{
-					if (0 != interfaceids[i])
-						break;
-				}
-
-				if (INTERFACE_TYPE_COUNT == i)
-				{
-					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
-					ret = FAIL;
-				}
-			}
-			else if (0 == interfaceids[type - 1])
+			if ((INTERFACE_TYPE_AGENT == type || INTERFACE_TYPE_SNMP == type ||
+					INTERFACE_TYPE_IPMI == type || INTERFACE_TYPE_JMX == type) &&
+					0 == interfaceids[type - 1])
 			{
 				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 						zbx_interface_type_string((zbx_interface_type_t)type));
@@ -4126,7 +4114,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 				zbx_audit_host_update_json_add_hostmacro(audit_context_mode,
 						host_prototype->hostid, ZBX_AUDIT_RESOURCE_HOST_PROTOTYPE,
 						new_hostmacroid, hostmacro->macro, (ZBX_MACRO_VALUE_SECRET ==
-						(int)hostmacro->type) ? ZBX_MACRO_SECRET_MASK : hostmacro->value,
+						(int)hostmacro->type) ? ZBX_SECRET_MASK : hostmacro->value,
 						hostmacro->description, (int)hostmacro->type,
 						(int)hostmacro->automatic);
 				new_hostmacroid++;
@@ -4154,9 +4142,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type_orig) ||
 							(0 == (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_TYPE) &&
 							ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type)) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value_orig,
+							ZBX_SECRET_MASK : hostmacro->value_orig,
 							(ZBX_MACRO_VALUE_SECRET == (int)hostmacro->type) ?
-							ZBX_MACRO_SECRET_MASK : hostmacro->value);
+							ZBX_SECRET_MASK : hostmacro->value);
 				}
 
 				if (0 != (hostmacro->flags & ZBX_FLAG_HPMACRO_UPDATE_DESCRIPTION))
@@ -5443,8 +5431,8 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 			zbx_free(str_esc);									\
 														\
 			zbx_audit_httptest_update_json_update_##field(audit_context_mode, httptest->httptestid, \
-					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_MACRO_SECRET_MASK),	\
-					(0 == strcmp("", httptest->field) ? "" : ZBX_MACRO_SECRET_MASK));	\
+					(0 == strcmp("", httptest->field##_orig) ? "" :ZBX_SECRET_MASK),	\
+					(0 == strcmp("", httptest->field) ? "" : ZBX_SECRET_MASK));	\
 		}
 
 #define PREPARE_UPDATE_HTTPTEST_INT(FLAG, field)								\

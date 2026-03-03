@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -936,6 +936,17 @@ function objectToSearchParams(object) {
 	};
 
 	return combine(object);
+}
+
+/**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
 }
 
 /**
