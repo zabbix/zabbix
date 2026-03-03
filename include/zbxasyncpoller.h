@@ -16,18 +16,14 @@
 #define ZABBIX_ASYNCPOLLER_H
 
 #include "zbxcommon.h"
+#include "zbxresolver.h"
 
 #define ZBX_RES_CONF_FILE "/etc/resolv.conf"
 
 #ifdef HAVE_LIBEVENT
 #include <event2/dns.h>
 #include <event2/event.h>
-#ifdef HAVE_ARES
-#include <ares.h>
-typedef struct ares_channeldata zbx_ares_channel_t;
-#else
-typedef void zbx_ares_channel_t;
-#endif
+
 #include "zbxalgo.h"
 
 typedef enum
