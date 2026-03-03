@@ -95,14 +95,15 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
+		$this->zbxTestLogin('zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
-			$this->assertFalse($this->query('button:Clear history and trends')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Execute now')->exists());
+			$this->assertFalse($this->query('button:Clear history and trends')->exists());
 		}
 		else {
 			$this->zbxTestClickButtonText('Execute now');
