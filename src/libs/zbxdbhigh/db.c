@@ -913,7 +913,7 @@ zbx_uint64_t	zbx_db_get_maxid_num(const char *tablename, int num)
 			0 == strcmp(tablename, "proxy_dhistory") ||
 			0 == strcmp(tablename, "proxy_autoreg_host") ||
 			0 == strcmp(tablename, "host_proxy"))
-		return zbx_cb_nextid(tablename, num);
+		return zbx_cb_nextid(tablename, num); /* zbx_dc_get_nextid() */
 
 	return DBget_nextid(tablename, num);
 }
