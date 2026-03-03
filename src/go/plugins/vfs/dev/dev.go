@@ -77,6 +77,7 @@ func init() {
 		"vfs.dev.read", "Disk read statistics.",
 		"vfs.dev.write", "Disk write statistics.",
 		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.",
+		"vfs.dev.get", "List of block devices and their statistics as structured JSON. Used for low-level discovery.",
 	)
 	if err != nil {
 		panic(errs.Wrap(err, "failed to register metrics"))
@@ -135,6 +136,8 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		mode = ioModeWrite
 	case "vfs.dev.discovery":
 		return p.getDiscovery()
+	case "vfs.dev.get":
+		return p.vfsDevGet(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}

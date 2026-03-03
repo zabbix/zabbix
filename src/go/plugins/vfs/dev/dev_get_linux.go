@@ -1,0 +1,655 @@
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+package vfsdev
+
+import (
+	"encoding/json"
+	"fmt"
+	"os"
+	"path"
+	"path/filepath"
+	"regexp"
+	"sort"
+	"strconv"
+	"strings"
+	"syscall"
+
+	"golang.org/x/sys/unix"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/zbxerr"
+)
+
+const (
+	modeDisks vfsDevGetMode = iota
+	modeDiskStats
+	modeDevices
+	modeDeviceStats
+)
+
+type vfsDevGetMode int
+
+type vfsDevice struct {
+	major uint32
+	minor uint32
+	devid string
+	name  string
+}
+
+type vfsDevDisksCfg struct {
+	Name            string `json:"name"`
+	Type            string `json:"type"`
+	Devid           string `json:"devid"`
+	Path            string `json:"path"`
+	Model           string `json:"model"`
+	Serial          string `json:"serial"`
+	WWN             string `json:"wwn"`
+	SizeBytes       uint64 `json:"size_bytes"`
+	LogicalBlkSize  uint64 `json:"logical_block_size"`
+	PhysicalBlkSize uint64 `json:"physical_block_size"`
+}
+
+type vfsDevDisks struct {
+	Cfg []vfsDevDisksCfg `json:"config"`
+}
+
+type vfsStats struct {
+	ReadsCompleted  uint64 `json:"reads_completed"`
+	WritesCompleted uint64 `json:"writes_completed"`
+	BytesRead       uint64 `json:"bytes_read"`
+	BytesWritten    uint64 `json:"bytes_written"`
+	IOTimeMs        uint64 `json:"io_time_ms"`
+}
+
+type vfsDevDiskStatsCfg struct {
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Devid     string `json:"devid"`
+	SizeBytes uint64 `json:"size_bytes"`
+}
+
+type vfsDevDiskStatsVal struct {
+	Name  string   `json:"name"`
+	Stats vfsStats `json:"stats"`
+}
+
+type vfsDevDiskStats struct {
+	Cfg []vfsDevDiskStatsCfg `json:"config"`
+	Val []vfsDevDiskStatsVal `json:"values"`
+}
+
+type vfsPartitions map[string]uint64
+
+type vfsDevicesCfg struct {
+	Name       string        `json:"name"`
+	Type       string        `json:"type"`
+	Model      string        `json:"model"`
+	Devid      string        `json:"devid"`
+	Partitions vfsPartitions `json:"partitions"`
+}
+
+type vfsDevices struct {
+	Cfg []vfsDevicesCfg `json:"config"`
+}
+
+type vfsDeviceStatsCfg struct {
+	Name      string `json:"name"`
+	Type      string `json:"type"`
+	Devid     string `json:"devid"`
+	SizeBytes uint64 `json:"size_bytes"`
+}
+
+type vfsDeviceStatsVal struct {
+	Name  string   `json:"name"`
+	Stats vfsStats `json:"stats"`
+}
+
+type vfsDeviceStats struct {
+	Cfg []vfsDeviceStatsCfg `json:"config"`
+	Val []vfsDeviceStatsVal `json:"values"`
+}
+
+func (p *Plugin) vfsDevGet(params []string) (string, error) {
+	var (
+		devNamesRgx    *regexp.Regexp
+		imode          vfsDevGetMode
+		out            any
+		devNames, mode string
+	)
+
+	switch len(params) {
+	case 2:
+		mode = params[1]
+
+		switch mode {
+		case "disks", "":
+			imode = modeDisks
+		case "disk_stats":
+			imode = modeDiskStats
+		case "devices":
+			imode = modeDevices
+		case "device_stats":
+			imode = modeDeviceStats
+
+		default:
+			return "", errs.Wrapf(zbxerr.ErrorInvalidParams, "invalid second parameter '%s'", mode)
+		}
+
+		fallthrough
+	case 1:
+		devNames = params[0]
+
+		if devNames != "" {
+			var err error
+
+			devNamesRgx, err = regexp.Compile(devNames)
+			if err != nil {
+				return "", errs.Wrapf(
+					err,
+					"invalid regular expression in first parameter: %q",
+					devNames,
+				)
+			}
+		}
+	case 0:
+	default:
+		return "", zbxerr.ErrorTooManyParameters
+	}
+
+	sysfs, err := isSysfsAvailable()
+	if err != nil {
+		return "", err
+	}
+
+	devs, rdevs, err := p.getDevRecords(sysfs)
+	if err != nil {
+		return "", err
+	}
+
+	switch imode {
+	case modeDisks:
+		out = vfsDevGetDisks(devs, rdevs, devNamesRgx)
+	case modeDiskStats:
+		out = vfsDevGetDiskStats(devs, rdevs, devNamesRgx)
+	case modeDevices:
+		out = vfsDevGetDevices(devs, rdevs, devNamesRgx)
+	case modeDeviceStats:
+		out = vfsDevGetDeviceStats(devs, rdevs, devNamesRgx)
+	}
+
+	b, err := json.Marshal(out)
+	if err != nil {
+		return "", errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
+}
+
+func sysfsStrGet(rdev uint64, relPath string) string {
+	filepath := path.Join(
+		sysBlkdevLocation,
+		fmt.Sprintf("%d:%d", unix.Major(rdev), unix.Minor(rdev)),
+		relPath,
+	)
+
+	data, err := os.ReadFile(filepath)
+	if err != nil {
+		return ""
+	}
+
+	return strings.TrimSpace(string(data))
+}
+
+func sysfsUintGet(rdev uint64, relPath string) uint64 {
+	s := sysfsStrGet(rdev, relPath)
+	if s == "" {
+		return 0
+	}
+
+	val, err := strconv.ParseUint(s, 10, 64)
+	if err != nil {
+		return 0
+	}
+
+	return val
+}
+
+func devidsInit() []vfsDevice {
+	var (
+		devices []vfsDevice
+		stat    syscall.Stat_t
+	)
+
+	entries, err := os.ReadDir(devDiskByID)
+	if err != nil {
+		return devices
+	}
+
+	for _, entry := range entries {
+		devName := entry.Name()
+
+		if devName == "." || devName == ".." {
+			continue
+		}
+
+		symlinkPath := path.Join(devDiskByID, devName)
+
+		real, err := filepath.EvalSymlinks(symlinkPath)
+		if err != nil {
+			continue
+		}
+
+		if err := syscall.Stat(real, &stat); err != nil {
+			continue
+		}
+
+		if stat.Mode&syscall.S_IFMT != syscall.S_IFBLK {
+			continue
+		}
+
+		devices = append(devices, vfsDevice{
+			major: unix.Major(stat.Rdev),
+			minor: unix.Minor(stat.Rdev),
+			devid: devName,
+			name:  filepath.Base(real),
+		})
+	}
+
+	sort.Slice(devices, func(i, j int) bool {
+		return deviceCompare(devices[i], devices[j]) < 0
+	})
+
+	return devices
+}
+
+func isAlnum(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
+
+func devPathGet(name string) string {
+	return path.Join(devLocation, name)
+}
+
+func devModelGet(rdev uint64) string {
+	return sysfsStrGet(rdev, path.Join("device", "model"))
+}
+
+func devSerialGet(rdev uint64) string {
+	return sysfsStrGet(rdev, path.Join("device", "serial"))
+}
+
+func devWWNGet(rdev uint64) string {
+	return sysfsStrGet(rdev, path.Join("device", "wwid"))
+}
+
+func sysfsSizeGet(rdev uint64) uint64 {
+	return sysfsUintGet(rdev, "size") * 512
+}
+
+func sysfsLogicalBlksizeGet(rdev uint64) uint64 {
+	return sysfsUintGet(rdev, path.Join("queue", "logical_block_size"))
+}
+
+func sysfsPhysicalBlksizeGet(rdev uint64) uint64 {
+	return sysfsUintGet(rdev, path.Join("queue", "physical_block_size"))
+}
+
+// sysfsDevStatsGet gets a device ID in the format used by /dev/disk/by-id/.
+//
+// When more than one device ID is present for a particular device, the ID
+// containing the device model is preferred as it is human-readable.
+//
+// Algorithm for resolving device IDs:
+//
+//  1. Read all symlink names in /dev/disk/by-id/. Treat them as device IDs
+//     and resolve the <major-ID> and <minor-ID> for each.
+//
+//  2. Sort devices by <major-ID> and <minor-ID>.
+//     Sort IDs of the same device in lexicographical order.
+//
+//  3. If there is only one device ID for the symlink, use it.
+//
+//  4. Otherwise, try to find the device ID that contains the device model:
+//     4.1. Read the model from
+//     /sys/dev/block/<major-ID>:<minor-ID>/device/model
+//     4.2. Take the longest left-anchored prefix of the model consisting only
+//     of alphanumeric characters, digits, dots, and spaces.
+//     Replace spaces with underscores.
+//     4.3. Choose the device ID that contains the resulting model string.
+//
+//  5. If no match is found, use the first symlink for the device.
+func sysfsDevStatsGet(rdev uint64) vfsStats {
+	var stats vfsStats
+
+	line := sysfsStrGet(rdev, "stat")
+	if line == "" {
+		return stats
+	}
+	tokens := strings.Fields(line)
+
+	for idx, tok := range tokens {
+		if idx > 10 {
+			break
+		}
+
+		switch idx {
+		case 0:
+			val, err := strconv.ParseUint(tok, 10, 64)
+			if err != nil {
+				break
+			}
+			stats.ReadsCompleted = val
+		case 2:
+			/* units: sectors, must be multiplied by 512 to convert to bytes */
+			val, err := strconv.ParseUint(tok, 10, 64)
+			if err != nil {
+				break
+			}
+			stats.BytesRead = val * 512
+		case 4:
+			val, err := strconv.ParseUint(tok, 10, 64)
+			if err != nil {
+				break
+			}
+			stats.WritesCompleted = val
+		case 6:
+			/* units: sectors, must be multiplied by 512 to convert to bytes */
+			val, err := strconv.ParseUint(tok, 10, 64)
+			if err != nil {
+				break
+			}
+			stats.BytesWritten = val * 512
+		case 10:
+			val, err := strconv.ParseUint(tok, 10, 64)
+			if err != nil {
+				break
+			}
+			stats.IOTimeMs = val
+		}
+	}
+
+	return stats
+}
+
+func sysfsDiskPartitionsGet(rdev uint64) vfsPartitions {
+	partitions := make(vfsPartitions)
+	major := unix.Major(rdev)
+	minor := unix.Minor(rdev)
+
+	diskPath := path.Join(sysBlkdevLocation, fmt.Sprintf("%d:%d", major, minor))
+
+	entries, err := os.ReadDir(diskPath)
+	if err != nil {
+		return partitions
+	}
+
+	for _, entry := range entries {
+		partitionPath := path.Join(diskPath, entry.Name())
+
+		/* partition directories should contain a text file named "partition" */
+		stat, err := os.Stat(path.Join(partitionPath, "partition"))
+		if err != nil || !stat.Mode().IsRegular() {
+			continue
+		}
+
+		val, err := os.ReadFile(path.Join(partitionPath, "size"))
+		if err != nil {
+			continue
+		}
+
+		size, err := strconv.ParseUint(strings.TrimSpace(string(val)), 10, 64)
+		if err != nil {
+			continue
+		}
+
+		// The size is in standard UNIX 512 byte blocks
+		// and it must be multiplied by 512 to get size in bytes.
+		partitions[entry.Name()] = size * 512
+	}
+
+	return partitions
+}
+
+func vfsDevGetDisks(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDevDisks {
+	devIds := devidsInit()
+
+	out := vfsDevDisks{
+		Cfg: make([]vfsDevDisksCfg, 0),
+	}
+
+	for _, dev := range devs {
+		if !isDisk(dev.Type) {
+			continue
+		}
+
+		if reg != nil && !reg.MatchString(dev.Name) {
+			continue
+		}
+
+		rdev := rdevs[dev.Name]
+		model := devModelGet(rdev)
+		cfg := vfsDevDisksCfg{
+			Name:            dev.Name,
+			Type:            dev.Type,
+			Devid:           devIdGet(devIds, rdev, model),
+			Path:            devPathGet(dev.Name),
+			Model:           model,
+			Serial:          devSerialGet(rdev),
+			WWN:             devWWNGet(rdev),
+			SizeBytes:       sysfsSizeGet(rdev),
+			LogicalBlkSize:  sysfsLogicalBlksizeGet(rdev),
+			PhysicalBlkSize: sysfsPhysicalBlksizeGet(rdev),
+		}
+		out.Cfg = append(out.Cfg, cfg)
+	}
+
+	return out
+}
+
+func vfsDevGetDiskStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDevDiskStats {
+	devIds := devidsInit()
+
+	out := vfsDevDiskStats{
+		Cfg: make([]vfsDevDiskStatsCfg, 0),
+		Val: make([]vfsDevDiskStatsVal, 0),
+	}
+
+	for _, dev := range devs {
+		if !isDisk(dev.Type) {
+			continue
+		}
+
+		if reg != nil && !reg.MatchString(dev.Name) {
+			continue
+		}
+
+		rdev := rdevs[dev.Name]
+		model := devModelGet(rdev)
+		cfg := vfsDevDiskStatsCfg{
+			Name:      dev.Name,
+			Type:      dev.Type,
+			Devid:     devIdGet(devIds, rdev, model),
+			SizeBytes: sysfsSizeGet(rdev),
+		}
+		out.Cfg = append(out.Cfg, cfg)
+
+		val := vfsDevDiskStatsVal{
+			Name:  dev.Name,
+			Stats: sysfsDevStatsGet(rdev),
+		}
+		out.Val = append(out.Val, val)
+	}
+
+	return out
+}
+
+func vfsDevGetDevices(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDevices {
+	devIds := devidsInit()
+
+	out := vfsDevices{
+		Cfg: make([]vfsDevicesCfg, 0),
+	}
+
+	for _, dev := range devs {
+		if !isDisk(dev.Type) {
+			continue
+		}
+
+		if reg != nil && !reg.MatchString(dev.Name) {
+			continue
+		}
+
+		rdev := rdevs[dev.Name]
+		model := devModelGet(rdev)
+		cfg := vfsDevicesCfg{
+			Name:       dev.Name,
+			Type:       dev.Type,
+			Model:      model,
+			Devid:      devIdGet(devIds, rdev, model),
+			Partitions: sysfsDiskPartitionsGet(rdev),
+		}
+		out.Cfg = append(out.Cfg, cfg)
+	}
+
+	return out
+}
+
+func vfsDevGetDeviceStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDeviceStats {
+	devIds := devidsInit()
+
+	out := vfsDeviceStats{
+		Cfg: make([]vfsDeviceStatsCfg, 0),
+		Val: make([]vfsDeviceStatsVal, 0),
+	}
+
+	for _, dev := range devs {
+		if !isDisk(dev.Type) && !isPartition(dev.Type) {
+			continue
+		}
+
+		if reg != nil && !reg.MatchString(dev.Name) {
+			continue
+		}
+
+		rdev := rdevs[dev.Name]
+		model := devModelGet(rdev)
+		cfg := vfsDeviceStatsCfg{
+			Name:      dev.Name,
+			Type:      dev.Type,
+			Devid:     devIdGet(devIds, rdev, model),
+			SizeBytes: sysfsSizeGet(rdev),
+		}
+		out.Cfg = append(out.Cfg, cfg)
+
+		val := vfsDeviceStatsVal{
+			Name:  dev.Name,
+			Stats: sysfsDevStatsGet(rdev),
+		}
+		out.Val = append(out.Val, val)
+	}
+
+	return out
+}
+
+func isDisk(devType string) bool {
+	if devType == "disk" || devType == "rom" {
+		return true
+	}
+
+	return false
+}
+
+func isPartition(devType string) bool {
+	if devType == "partition" {
+		return true
+	}
+
+	return false
+}
+
+func deviceCompare(a, b vfsDevice) int {
+	if a.major < b.major {
+		return -1
+	}
+	if a.major > b.major {
+		return 1
+	}
+	if a.minor < b.minor {
+		return -1
+	}
+	if a.minor > b.minor {
+		return 1
+	}
+
+	return strings.Compare(a.devid, b.devid)
+}
+
+func devIdGet(devices []vfsDevice, rdev uint64, model string) string {
+	var normModel []byte
+
+	if len(devices) == 0 {
+		return ""
+	}
+
+	statMajor := unix.Major(rdev)
+	statMinor := unix.Minor(rdev)
+
+	l, r := -1, -1
+	for i, d := range devices {
+		if statMajor == d.major && statMinor == d.minor {
+			if l == -1 {
+				l = i
+			}
+			r = i
+		} else if l != -1 {
+			break
+		}
+	}
+
+	if l == -1 {
+		return ""
+	}
+
+	if l == r || len(model) == 0 {
+		return devices[l].devid
+	}
+
+	for i := 0; i < len(model); i++ {
+		c := model[i]
+		if isAlnum(c) || c == '.' || c == ' ' {
+			if c == ' ' {
+				normModel = append(normModel, '_')
+			} else {
+				normModel = append(normModel, c)
+			}
+		} else {
+			break
+		}
+	}
+	normModelStr := string(normModel)
+
+	matchIdx := -1
+	for i := l; i <= r; i++ {
+		if strings.Contains(devices[i].devid, normModelStr) {
+			matchIdx = i
+			break
+		}
+	}
+
+	if matchIdx != -1 {
+		return devices[matchIdx].devid
+	}
+
+	return devices[l].devid
+}

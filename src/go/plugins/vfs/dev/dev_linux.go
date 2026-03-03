@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"strconv"
@@ -29,11 +28,13 @@ import (
 	"time"
 
 	"golang.org/x/sys/unix"
+	"golang.zabbix.com/sdk/errs"
 )
 
 const (
 	devLocation       = "/dev/"
 	sysBlkdevLocation = "/sys/dev/block/"
+	devDiskByID       = "/dev/disk/by-id/"
 	devtypePrefix     = "DEVTYPE="
 	diskstatLocation  = "/proc/diskstats"
 	devTypeRom        = 5
@@ -45,68 +46,92 @@ type devRecord struct {
 	Type string `json:"{#DEVTYPE}"`
 }
 
-func (p *Plugin) getDiscovery() (out string, err error) {
-	var entries []os.FileInfo
-	if entries, err = ioutil.ReadDir(devLocation); err != nil {
-		return
-	}
-
-	var sysfs bool
-	if stat, tmperr := os.Stat(sysBlkdevLocation); tmperr == nil {
-		sysfs = stat.IsDir()
+func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
+	entries, err := os.ReadDir(devLocation)
+	if err != nil {
+		return nil, nil, errs.Wrapf(err, "cannot read directory \"%s\"", devLocation)
 	}
 
 	devs := make([]*devRecord, 0)
+	rdevs := make(map[string]uint64)
 	for _, entry := range entries {
+		var rdev uint64
 		bypass := 0
 		devname := devLocation + entry.Name()
-		if stat, tmperr := os.Stat(devname); tmperr == nil {
-			if stat.Mode()&os.ModeType == os.ModeDevice {
-				dev := &devRecord{Name: entry.Name()}
-				if sysfs {
-					//nolint:unconvert
-					rdev := uint64(stat.Sys().(*syscall.Stat_t).Rdev)
-					dirname := fmt.Sprintf("%s%d:%d/", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
 
-					if lstat, tmperr := os.Lstat(devname); tmperr == nil {
-						filename := dirname + "/device/type"
-						if file, tmperr := os.Open(filename); tmperr == nil {
-							var devtype int
+		stat, err := os.Stat(devname)
+		if err != nil {
+			continue
+		}
 
-							if _, tmperr = fmt.Fscanf(file, "%d\n", &devtype); tmperr == nil {
-								if devtype == devTypeRom {
-									dev.Type = devTypeRomString
-									if lstat.Mode()&os.ModeSymlink != 0 {
-										bypass = 1
-									}
+		if stat.Mode()&os.ModeType == os.ModeDevice {
+			dev := &devRecord{Name: entry.Name()}
+			if sysfs {
+				//nolint:unconvert
+				rdev = uint64(stat.Sys().(*syscall.Stat_t).Rdev)
+				dirname := fmt.Sprintf(
+					"%s%d:%d/",
+					sysBlkdevLocation,
+					unix.Major(rdev),
+					unix.Minor(rdev),
+				)
+
+				lstat, err := os.Lstat(devname)
+				if err == nil {
+					filename := dirname + "/device/type"
+					file, err := os.Open(filename)
+					if err == nil {
+						var devtype int
+
+						_, err = fmt.Fscanf(file, "%d\n", &devtype)
+						if err == nil {
+							if devtype == devTypeRom {
+								dev.Type = devTypeRomString
+								if lstat.Mode()&os.ModeSymlink != 0 {
+									bypass = 1
 								}
 							}
-							file.Close()
 						}
+						file.Close()
 					}
+				}
 
-					if dev.Type == "" {
-						filename := dirname + "uevent"
-						if file, tmperr := os.Open(filename); tmperr == nil {
-							scanner := bufio.NewScanner(file)
-							for scanner.Scan() {
-								if strings.HasPrefix(scanner.Text(), devtypePrefix) {
-									dev.Type = scanner.Text()[len(devtypePrefix):]
-								}
+				if dev.Type == "" {
+					filename := dirname + "uevent"
+					file, err := os.Open(filename)
+					if err == nil {
+						scanner := bufio.NewScanner(file)
+						for scanner.Scan() {
+							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
+								dev.Type = scanner.Text()[len(devtypePrefix):]
 							}
-							file.Close()
 						}
+						file.Close()
 					}
 				}
-				if bypass == 0 {
-					devs = append(devs, dev)
-				}
+			}
+			if bypass == 0 {
+				devs = append(devs, dev)
+				rdevs[entry.Name()] = rdev
 			}
 		}
 	}
+
+	return devs, rdevs, nil
+}
+
+func (p *Plugin) getDiscovery() (out string, err error) {
+	sysfs, _ := isSysfsAvailable()
+
+	devs, _, err := p.getDevRecords(sysfs)
+	if err != nil {
+		return "", err
+	}
+
 	var b []byte
-	if b, err = json.Marshal(&devs); err != nil {
-		return
+	b, err = json.Marshal(&devs)
+	if err != nil {
+		return "", errs.Wrap(err, "failed to marshal devices")
 	}
 	return string(b), nil
 }
@@ -285,4 +310,22 @@ func (p *Plugin) collectDeviceStats(devices map[string]*devUnit) (err error) {
 		}
 	}
 	return
+}
+
+func isSysfsAvailable() (bool, error) {
+	var found bool
+
+	stat, err := os.Stat(sysBlkdevLocation)
+	if err == nil {
+		found = stat.IsDir()
+	}
+
+	if !found {
+		return false, fmt.Errorf(
+			"cannot obtain device information, directory \"%s\" is not found",
+			sysBlkdevLocation,
+		)
+	}
+
+	return true, nil
 }
