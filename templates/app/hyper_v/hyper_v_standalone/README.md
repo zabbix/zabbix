@@ -28,30 +28,30 @@ This template has been tested on:
 
 ## Setup
 
-### Prerequisites & Least Privilege Scope (Information security)
+### Prerequisites & least privilege scope
 
-Solution requires a service account with sufficient privileges to query virtualization subsystems. The exact implementation of these privileges (e.g., via Local Administrators group, Delegated Permissions, or JEA) is at the discretion of the infrastructure administrator, provided the following functional requirements are met.
+The solution requires a service account with sufficient privileges to query virtualization subsystems. The exact implementation of these privileges (e.g., via Local Administrators group, Delegated Permissions, or JEA) is at the discretion of the infrastructure administrator, provided the following functional requirements are met.
 
-#### Connectivity & Execution
+#### Connectivity & execution
 
-*   **SSH Access:** The account must be able to establish an SSH session.
+*   **SSH access:** The account must be able to establish an SSH session.
     
-*   **PowerShell Execution:** The account requires permission to execute PowerShell commands (non-interactive mode).
+*   **PowerShell execution:** The account requires permission to execute PowerShell commands (non-interactive mode).
     
 
-#### WMI & CIM Namespaces (Read Access)
+#### WMI & CIM namespaces (read access)
 
 The solution relies heavily on WMI queries. Read access is required for the following namespaces:
 
-*   root\\cimv2 (Operating System, Processor, Physical Memory, Logical Disk).
+*   `root\\cimv2` (Operating System, Processor, Physical Memory, Logical Disk).
     
-*   root\\virtualization\\v2 (Hyper-V VM states, Resource Metering, Configuration).
+*   `root\\virtualization\\v2` (Hyper-V VM states, Resource Metering, Configuration).
         
-### SSH Setup
+### SSH setup
 
-1.  **Create a Service Account**: Create a user (e.g., zabbix\_mon) in the domain or locally on all nodes.
+1.  **Create a Service Account**: Create a user (e.g., `zabbix\_mon`) in the domain or locally on all nodes.
     
-2.  **Install SSH service**:
+2.  **Install the SSH service**:
     
 
     ```powershell
@@ -71,7 +71,7 @@ The solution relies heavily on WMI queries. Read access is required for the foll
     Get-VM -Name * | Enable-VMResourceMetering
     ```
         
-3.  **Zabbix Configuration**:
+3.  **Zabbix configuration**:
     
     *   Ensure timeout is set to at least **30 seconds** (script takes ~15s).
         
@@ -86,11 +86,11 @@ or
 
 ### Enable Resource Metering for VMs
 
-To ensure accurate collection of CPU, Disk I/O, and Network traffic metrics, Resource Metering must be enabled on all Virtual Machines. By default, Hyper-V creates new VMs with this feature disabled.
+To ensure accurate collection of CPU, Disk I/O, and Network Traffic metrics, Resource Metering must be enabled on all Virtual Machines. By default, Hyper-V creates new VMs with this feature disabled.
 
-Recommended Approach: Create a Scheduled Task on each Hyper-V Node to automatically enable metering for new VMs.
+Recommended approach: create a Scheduled Task on each Hyper-V Node to automatically enable metering for new VMs.
 
-PowerShell Deployment Command (Run as Admin): This command creates a daily task named HyperV-AutoEnableMetering that runs under the SYSTEM account.
+PowerShell Deployment Command (Run as Admin): this command creates a daily task named `HyperV-AutoEnableMetering` that runs under the `SYSTEM` account.
 
 ```powershell
 $Action = New-ScheduledTaskAction -Execute "powershell.exe" `
@@ -113,11 +113,11 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 |{$HYPERV.SSH.PASSWORD}|<p>SSH password.</p>|`password`|
 |{$HYPERV.SSH.ADDRESS}|<p>SSH address.</p>|`127.0.0.1`|
 |{$HYPERV.SSH.PORT}|<p>SSH port.</p>|`22`|
-|{$HYPERV.TRIGGER.VM.STATUS.NORMAL}|<p>Normal state for Hyper-V Virtual machine status trigger. Support context `{#VM.NAME}`</p>|`2`|
-|{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION}|<p>Threshold for Hyper-V Virtual Machine memory utilization trigger. Support context `{#VM.NAME}`</p>|`85`|
-|{$HYPERV.FILTER.LLD.VM.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. Only VMs with names matching this regex will be monitored. Default is '.*' (matches all VMs).</p>|`.*`|
+|{$HYPERV.TRIGGER.VM.STATUS.NORMAL}|<p>Normal state for Hyper-V Virtual Machine status trigger. Supports context `{#VM.NAME}`.</p>|`2`|
+|{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION}|<p>Threshold for Hyper-V Virtual Machine memory utilization trigger. Supports context `{#VM.NAME}`.</p>|`85`|
+|{$HYPERV.FILTER.LLD.VM.NAME.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. Only VMs with names matching this regex will be monitored.</p>|`.*`|
 |{$HYPERV.FILTER.LLD.VM.NAME.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machines based on their names. VMs with names matching this regex will be excluded from monitoring.</p>|`CHANGE_IF_NEEDED`|
-|{$HYPERV.FILTER.LLD.VM.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machine Status. Only VMs with statuses matching this regex will be monitored. Default is '.*'. See value mappings for possible status values.</p>|`.*`|
+|{$HYPERV.FILTER.LLD.VM.STATUS.MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machine Status. Only VMs with statuses matching this regex will be monitored. See value mappings for possible status values.</p>|`.*`|
 |{$HYPERV.FILTER.LLD.VM.STATUS.NOT_MATCHES}|<p>Regular expression to filter Hyper-V Virtual Machine Status. VMs with statuses matching this regex will be excluded from monitoring. See value mappings for possible status values.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
@@ -138,30 +138,30 @@ Register-ScheduledTask -Action $Action -Trigger $Trigger `
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|VM discovery|<p>Discover Hyper-V Virtual machines.</p>|Dependent item|hyperv.vm.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM discovery|<p>Discovery of Hyper-V Virtual Machines.</p>|Dependent item|hyperv.vm.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for VM discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|VM [{#VM.NAME}]: Status|<p>Status of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.status[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].State.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|VM [{#VM.NAME}]: Uptime|<p>Uptime of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.uptime[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].Uptime.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|VM [{#VM.NAME}]: CPU utilization|<p>CPU utilization of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.cpu.utilization[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].CPU.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1000000`</p></li></ul>|
-|VM [{#VM.NAME}]: Used memory|<p>Used memory of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.memory.used[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].UsedMem.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|VM [{#VM.NAME}]: Total memory|<p>Total memory of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.memory.total[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].TotalMem.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|VM [{#VM.NAME}]: Memory utilization|<p>Memory utilization of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.memory.utilization[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|VM [{#VM.NAME}]: Network in (bits per second)|<p>Network incoming traffic of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.net.in[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].NetIn.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
-|VM [{#VM.NAME}]: Network out (bits per second)|<p>Network outgoing traffic of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.net.out[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].NetOut.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
-|VM [{#VM.NAME}]: Disk read (bytes per second)|<p>Disk read speed of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.disk.read[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].DiskRead.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li>Change per second</li></ul>|
-|VM [{#VM.NAME}]: Disk write (bytes per second)|<p>Disk write speed of Hyper-V Virtual machine {#VM.NAME}.</p>|Dependent item|hyperv.vm.disk.write[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].DiskWrite.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li>Change per second</li></ul>|
+|VM [{#VM.NAME}]: Status|<p>Status of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.status[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].State.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM [{#VM.NAME}]: Uptime|<p>Uptime of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.uptime[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].Uptime.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VM [{#VM.NAME}]: CPU utilization|<p>CPU utilization of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.cpu.utilization[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].CPU.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1000000`</p></li></ul>|
+|VM [{#VM.NAME}]: Used memory|<p>Used memory of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.memory.used[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].UsedMem.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|VM [{#VM.NAME}]: Total memory|<p>Total memory of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.memory.total[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].TotalMem.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|VM [{#VM.NAME}]: Memory utilization|<p>Memory utilization of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.memory.utilization[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|VM [{#VM.NAME}]: Network in (bits per second)|<p>Network incoming traffic of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.net.in[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].NetIn.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
+|VM [{#VM.NAME}]: Network out (bits per second)|<p>Network outgoing traffic of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.net.out[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].NetOut.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Custom multiplier: `8`</p></li><li>Change per second</li></ul>|
+|VM [{#VM.NAME}]: Disk read (bytes per second)|<p>Disk read speed of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.disk.read[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].DiskRead.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li>Change per second</li></ul>|
+|VM [{#VM.NAME}]: Disk write (bytes per second)|<p>Disk write speed of Hyper-V Virtual Machine `{#VM.NAME}`.</p>|Dependent item|hyperv.vm.disk.write[{#VM.ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Data.VMs[?(@.Id=='{#VM.ID}')].DiskWrite.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1048576`</p></li><li>Change per second</li></ul>|
 
 ### Trigger prototypes for VM discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Hyper-V Standalone: Virtual machine [{#VM.NAME}] {ITEM.VALUE}|<p>Trigger fires when the Hyper-V Virtual Machine {#VM.NAME} is not normal status.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.status[{#VM.ID}])<>{$HYPERV.TRIGGER.VM.STATUS.NORMAL:"{#VM.NAME}"}`|Average||
-|Hyper-V Standalone: Virtual machine [{#VM.NAME}] has rebooted|<p>Trigger fires when the uptime of Hyper-V Virtual machine {#VM.NAME} is less than 15 minutes, which may indicate that the VM has recently rebooted.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.uptime[{#VM.ID}])<900 and last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.uptime[{#VM.ID}])<>0`|Info||
-|Hyper-V Standalone: Virtual machine [{#VM.NAME}]: High memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Virtual machine {#VM.NAME} exceeds {$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}%.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`|Warning||
+|Hyper-V Standalone: Virtual machine [{#VM.NAME}] {ITEM.VALUE}|<p>Trigger fires when Hyper-V Virtual Machine `{#VM.NAME}` is not in normal status.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.status[{#VM.ID}])<>{$HYPERV.TRIGGER.VM.STATUS.NORMAL:"{#VM.NAME}"}`|Average||
+|Hyper-V Standalone: Virtual machine [{#VM.NAME}] has rebooted|<p>Trigger fires when the uptime of Hyper-V Virtual Machine `{#VM.NAME}` is less than 15 minutes, which may indicate that the VM has recently rebooted.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.uptime[{#VM.ID}])<900 and last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.uptime[{#VM.ID}])<>0`|Info||
+|Hyper-V Standalone: Virtual machine [{#VM.NAME}]: High memory utilization|<p>Trigger fires when the memory utilization on Hyper-V Virtual Machine `{#VM.NAME}` exceeds `{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`%.</p>|`last(/Microsoft Hyper-V Standalone by SSH/hyperv.vm.memory.utilization[{#VM.ID}])>{$HYPERV.TRIGGER.VM.MEMORY.UTILIZATION:"{#VM.NAME}"}`|Warning||
 
 ## Feedback
 
