@@ -62,6 +62,7 @@ require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
+require_once dirname(__FILE__).'/testItemDependent.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -119,6 +120,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
+		$suite->addTestSuite('testItemDependent');
 		return $suite;
 	}
 }

@@ -1,5 +1,19 @@
 xmlseclibs.php
 |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+08, Dec 2025, 3.1.4
+Security:
+- fix canonicalization bypass error (d0ge)
+
+20, Nov 2024, 3.1.3
+Bug Fixes:
+- remove loadKey check due to BC issues
+
+20, Nov 2024, 3.1.2
+Improvements:
+- Add tab to list of whitespace values to remove from cert. refs #252
+- loadKey should check return value for openssl_get_privatekey (sammarshallou)
+- Switch to GitHub actions (SharkMachine)
+
 05, Sep 2020, 3.1.1
 Features:
 - Support OAEP (iggyvolz)
