@@ -24,6 +24,7 @@
 #include "zbxtime.h"
 #include "zbxcomms.h"
 #include "zbx_discoverer_constants.h"
+#include "zbxip.h"
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
