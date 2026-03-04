@@ -91,6 +91,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
