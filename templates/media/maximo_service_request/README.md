@@ -60,7 +60,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 ## Zabbix configuration
 
 1. Import the media type:
-- In the *Alerts* > *Media types* section, import the [`media_maximo_service_request.yaml`](media_maximo_service_request.yaml) file.
+- In the *Alerts* > *Media types* section, import the `media_maximo_service_request.yaml` file.
 
 2. Open the imported **IBM Maximo Service Request** media type and set the following webhook parameters:
 - `api_endpoint` - the address of IBM Maximo Service Request endpoint
