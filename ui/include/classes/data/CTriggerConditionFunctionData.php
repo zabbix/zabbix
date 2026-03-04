@@ -373,9 +373,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'abscissa' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros]
-					]]
+					'abscissa' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -449,12 +447,8 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'min' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros]
-					]],
-					'max' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros]
-					]]
+					'min' => ['string', 'required', 'not_empty'],
+					'max' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS_BOOL],
 				'value' => ['string', 'required', 'not_empty']
@@ -478,11 +472,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'mask' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-							'with_float' => false, 'min' => 0, 'max' => ZBX_MAX_UINT64
-						]]
-					]
+					'mask' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -576,11 +566,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'mask' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-							'with_float' => false, 'min' => 0, 'max' => ZBX_MAX_UINT64
-						]]
-					]
+					'mask' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -628,11 +614,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'mask' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true, 'lldmacros' => $lld_macros,
-							'with_float' => false, 'min' => 0, 'max' => ZBX_MAX_UINT64
-						]]
-					]
+					'mask' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1163,12 +1145,8 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'start' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]],
-					'length' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]],
+					'start' => ['string', 'required', 'not_empty'],
+					'length' => ['string', 'required', 'not_empty'],
 					'replace' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
@@ -1287,9 +1265,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'count' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]]
+					'count' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1573,12 +1549,8 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'start' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]],
-					'length' => ['string', 'required', 'not_empty', 'use' => [CNumberParser::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]]
+					'start' => ['string', 'required', 'not_empty'],
+					'length' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1652,9 +1624,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'denominator' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
-					]
+					'denominator' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1778,9 +1748,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'power' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
-					]
+					'power' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1846,9 +1814,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'count' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]]
+					'count' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1897,9 +1863,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'count' => ['string', 'required', 'not_empty', 'use' => [CNumberValidator::class,
-						['usermacros' => true, 'lldmacros' => $lld_macros, 'with_float' => false]
-					]]
+					'count' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -1923,9 +1887,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'decimals' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
-					]
+					'decimals' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
@@ -2444,9 +2406,7 @@ final class CTriggerConditionFunctionData {
 							]]
 						]
 					],
-					'decimals' => ['string', 'required', 'not_empty',
-						'use' => [CNumberValidator::class, ['usermacros' => true,'lldmacros' => $lld_macros]]
-					]
+					'decimals' => ['string', 'required', 'not_empty']
 				]],
 				'operator' => ['string', 'required', 'in' => self::OPERATORS],
 				'value' => ['string', 'required', 'not_empty']
