@@ -92,10 +92,10 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
-							return "", errs.New(fmt.Sprintf(
+							return "", errs.Errorf(
 								"Special characters \"%s\" are not allowed in the "+
 									"parameters.",
-								specialCharsNotAllowedMessage()))
+								specialCharsNotAllowedMessage())
 						}
 					}
 					b.WriteString(param)
