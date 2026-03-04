@@ -137,7 +137,10 @@ func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, err
 }
 
 func (p *Plugin) getDiscovery() (out string, err error) {
-	sysfs, _ := isSysfsAvailable()
+	sysfs, err := isSysfsAvailable()
+	if err != nil {
+		return "", err
+	}
 
 	devs, _, err := p.getDevRecords(sysfs)
 	if err != nil {
