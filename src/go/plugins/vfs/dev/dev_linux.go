@@ -29,6 +29,7 @@ import (
 
 	"golang.org/x/sys/unix"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (
@@ -70,7 +71,14 @@ func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, err
 			dev := &devRecord{Name: entry.Name()}
 			if sysfs {
 				//nolint:unconvert
-				rdev = uint64(stat.Sys().(*syscall.Stat_t).Rdev)
+				sysInfo, ok := stat.Sys().(*syscall.Stat_t)
+				if !ok {
+					// should never happen
+					log.Errf("cannot get device major and minor for \"%s\"", devname)
+					continue
+				}
+				rdev = uint64(sysInfo.Rdev)
+
 				dirname := fmt.Sprintf(
 					"%s%d:%d/",
 					sysBlkdevLocation,
@@ -94,7 +102,10 @@ func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, err
 								}
 							}
 						}
-						file.Close()
+						err = file.Close()
+						if err != nil {
+							log.Errf("cannot close file \"%s\"", filename)
+						}
 					}
 				}
 
@@ -108,7 +119,10 @@ func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, err
 								dev.Type = scanner.Text()[len(devtypePrefix):]
 							}
 						}
-						file.Close()
+						err = file.Close()
+						if err != nil {
+							log.Errf("cannot close file \"%s\"", filename)
+						}
 					}
 				}
 			}
