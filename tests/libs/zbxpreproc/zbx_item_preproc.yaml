@@ -4981,4 +4981,18 @@ out:
   out:
     return: SUCCEED
     value: "AAA"
+---
+test case: JSONPath on ITEM_VALUE_TYPE_BIN
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_BIN
+    time: 2017-10-29 03:15:00 +03:00
+    data: '{"binary":""}'
+  step:
+    type: ZBX_PREPROC_JSONPATH
+    params: '$.binary'
+out:
+  value: ""
+  type: ITEM_VALUE_TYPE_STR
+  return: SUCCEED
 ...

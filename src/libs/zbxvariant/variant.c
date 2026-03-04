@@ -692,7 +692,7 @@ int	zbx_variant_compare(const zbx_variant_t *value1, const zbx_variant_t *value2
 		return variant_compare_vector(value1, value2);
 
 	if (ZBX_VARIANT_UI64 == value1->type && ZBX_VARIANT_UI64 == value2->type)
-		return  variant_compare_ui64(value1, value2);
+		return variant_compare_ui64(value1, value2);
 
 	if ((ZBX_VARIANT_STR != value1->type || SUCCEED == zbx_is_double(value1->data.str, NULL)) &&
 			(ZBX_VARIANT_STR != value2->type || SUCCEED == zbx_is_double(value2->data.str, NULL)))
