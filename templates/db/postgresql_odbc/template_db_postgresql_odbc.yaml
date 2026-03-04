@@ -224,7 +224,7 @@ zabbix_export:
         - uuid: e5df321a28e043b292abdc5061ffb480
           name: 'Health: Get data'
           type: ODBC
-          key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+          key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -425,7 +425,7 @@ zabbix_export:
         - uuid: e1f5776255024fc49507a4ed15e7fc16
           name: 'LRQ: Get data'
           type: ODBC
-          key: 'db.odbc.select[pgsql.longest.running.querry,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+          key: 'db.odbc.select[pgsql.longest.running.query.data.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           history: '0'
           value_type: TEXT
           params: |
@@ -894,7 +894,7 @@ zabbix_export:
         - uuid: 4bfb0c1697f043d9acf640b84cc8d945
           name: 'Build: Get data'
           type: ODBC
-          key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+          key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           delay: 15m
           history: '0'
           value_type: CHAR
@@ -956,6 +956,8 @@ zabbix_export:
               value: database
             - tag: component
               value: application
+            - tag: component
+              value: raw
         - uuid: 0b76450dd17d47a1829f51960dcb1374
           name: 'Build: Version (numeric)'
           type: ODBC
@@ -1705,7 +1707,7 @@ zabbix_export:
               parameters:
                 - $.active_connections
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1719,7 +1721,7 @@ zabbix_export:
               parameters:
                 - $.autovacuum.active
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1744,7 +1746,7 @@ zabbix_export:
               parameters:
                 - $.autovacuum.idle
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1773,7 +1775,7 @@ zabbix_export:
               parameters:
                 - $.cache_hit_ratio
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: buffer
@@ -1826,7 +1828,7 @@ zabbix_export:
               parameters:
                 - $.deadlocks
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1844,7 +1846,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1900,7 +1902,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1914,7 +1916,7 @@ zabbix_export:
               parameters:
                 - $.total_connections
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1928,7 +1930,7 @@ zabbix_export:
               parameters:
                 - $.waiting_locks
           master_item:
-            key: 'db.odbc.select[pgsql.health.snapshot,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.health.snapshot.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: health
@@ -1944,7 +1946,7 @@ zabbix_export:
               parameters:
                 - $.duration
           master_item:
-            key: 'db.odbc.select[pgsql.longest.running.querry,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.longest.running.query.data.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: LRQ
@@ -1980,7 +1982,7 @@ zabbix_export:
               parameters:
                 - $.pid
           master_item:
-            key: 'db.odbc.select[pgsql.longest.running.querry,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.longest.running.query.data.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: LRQ
@@ -1998,7 +2000,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2018,7 +2020,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2038,7 +2040,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2058,7 +2060,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2089,7 +2091,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2109,7 +2111,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2178,7 +2180,7 @@ zabbix_export:
               parameters:
                 - 1d
           master_item:
-            key: 'db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+            key: 'db.odbc.select[pgsql.version.get,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
           tags:
             - tag: component
               value: application
@@ -2379,7 +2381,7 @@ zabbix_export:
                     - $.blks_hit
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: cache
@@ -2398,7 +2400,7 @@ zabbix_export:
                     - $.blks_read
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -2420,7 +2422,7 @@ zabbix_export:
                     - '0.001'
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -2442,7 +2444,7 @@ zabbix_export:
                     - '0.001'
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -2461,7 +2463,7 @@ zabbix_export:
                     - $.conflicts
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2492,7 +2494,7 @@ zabbix_export:
                     - $.deadlocks
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: deadlocks
@@ -2509,9 +2511,9 @@ zabbix_export:
                     - tag: scope
                       value: performance
             - uuid: 4e977e75b4044928a75dcdd713be1169
-              name: 'DB [{#DBNAME}]: Get dbstat'
+              name: 'DB [{#DBNAME}]: Get data'
               type: DEPENDENT
-              key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+              key: 'pgsql.dbstat.get["{#DBNAME}"]'
               history: '0'
               value_type: TEXT
               description: 'Get dbstat metrics for database "{#DBNAME}".'
@@ -2537,7 +2539,7 @@ zabbix_export:
                   parameters:
                     - $.numbackends
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: backends
@@ -2555,7 +2557,7 @@ zabbix_export:
                     - $.temp_bytes
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -2573,7 +2575,7 @@ zabbix_export:
                     - $.temp_files
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: storage
@@ -2592,7 +2594,7 @@ zabbix_export:
                     - $.tup_deleted
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2611,7 +2613,7 @@ zabbix_export:
                     - $.tup_fetched
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2630,7 +2632,7 @@ zabbix_export:
                     - $.tup_inserted
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2649,7 +2651,7 @@ zabbix_export:
                     - $.tup_returned
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2668,7 +2670,7 @@ zabbix_export:
                     - $.tup_updated
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2687,7 +2689,7 @@ zabbix_export:
                     - $.xact_commit
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: transactions
@@ -2706,7 +2708,7 @@ zabbix_export:
                     - $.xact_rollback
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'pgsql.dbstat.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.dbstat.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: transactions
@@ -2722,7 +2724,7 @@ zabbix_export:
                   parameters:
                     - $.accessexclusive
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2738,7 +2740,7 @@ zabbix_export:
                   parameters:
                     - $.accessshare
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2754,16 +2756,16 @@ zabbix_export:
                   parameters:
                     - $.exclusive
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 350ebc4e054c4290a92293ba625c40dd
-              name: 'DB [{#DBNAME}]: Get locks'
+              name: 'DB [{#DBNAME}]: Get data'
               type: DEPENDENT
-              key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+              key: 'pgsql.locks.get["{#DBNAME}"]'
               history: '0'
               value_type: TEXT
               description: 'Get locks metrics for database "{#DBNAME}".'
@@ -2789,7 +2791,7 @@ zabbix_export:
                   parameters:
                     - $.rowexclusive
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2806,7 +2808,7 @@ zabbix_export:
                     - $.rowshare
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2822,7 +2824,7 @@ zabbix_export:
                   parameters:
                     - $.sharerowexclusive
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2838,7 +2840,7 @@ zabbix_export:
                   parameters:
                     - $.shareupdateexclusive
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2854,7 +2856,7 @@ zabbix_export:
                   parameters:
                     - $.share
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
@@ -2870,16 +2872,16 @@ zabbix_export:
                   parameters:
                     - $.total
               master_item:
-                key: 'pgsql.locks.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.locks.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: locks
                 - tag: database
                   value: '{#DBNAME}'
             - uuid: 16fd0bd835fd4db7b5ebb635780d9fe6
-              name: 'DB [{#DBNAME}]: Get queries'
+              name: 'DB [{#DBNAME}]: Get data'
               type: DEPENDENT
-              key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+              key: 'pgsql.queries.get["{#DBNAME}"]'
               history: '0'
               value_type: TEXT
               description: 'Get queries metrics for database "{#DBNAME}".'
@@ -2905,7 +2907,7 @@ zabbix_export:
                   parameters:
                     - $.mro_slow_count
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2922,7 +2924,7 @@ zabbix_export:
                   parameters:
                     - $.mro_time_max
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2939,7 +2941,7 @@ zabbix_export:
                   parameters:
                     - $.mro_time_sum
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2955,7 +2957,7 @@ zabbix_export:
                   parameters:
                     - $.query_slow_count
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2982,7 +2984,7 @@ zabbix_export:
                   parameters:
                     - $.query_time_max
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -2999,7 +3001,7 @@ zabbix_export:
                   parameters:
                     - $.query_time_sum
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -3015,7 +3017,7 @@ zabbix_export:
                   parameters:
                     - $.tx_slow_count
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -3032,7 +3034,7 @@ zabbix_export:
                   parameters:
                     - $.tx_time_max
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -3049,7 +3051,7 @@ zabbix_export:
                   parameters:
                     - $.tx_time_sum
               master_item:
-                key: 'pgsql.queries.get_metrics["{#DBNAME}"]'
+                key: 'pgsql.queries.get["{#DBNAME}"]'
               tags:
                 - tag: component
                   value: queries
@@ -3275,9 +3277,9 @@ zabbix_export:
           description: 'Discovers replication lag metrics.'
           item_prototypes:
             - uuid: 9e7797789d2c47efb9af2c86f8c6a93e
-              name: 'Application [{#APPLICATION_NAME}]: Get replication'
+              name: 'Application [{#APPLICATION_NAME}]: Get data'
               type: DEPENDENT
-              key: 'pgsql.replication.get_metrics["{#APPLICATION_NAME}"]'
+              key: 'pgsql.replication.get["{#APPLICATION_NAME}"]'
               history: '0'
               value_type: TEXT
               description: 'Collect metrics from the "pg_stat_replication" about the application "{#APPLICATION_NAME}" that is connected to this WAL sender, which contains information about the WAL sender process, showing statistics about replication to that sender''s connected standby server.'
@@ -3305,7 +3307,7 @@ zabbix_export:
                   parameters:
                     - $.flush_lag
               master_item:
-                key: 'pgsql.replication.get_metrics["{#APPLICATION_NAME}"]'
+                key: 'pgsql.replication.get["{#APPLICATION_NAME}"]'
               tags:
                 - tag: application
                   value: '{#APPLICATION_NAME}'
@@ -3323,7 +3325,7 @@ zabbix_export:
                   parameters:
                     - $.replay_lag
               master_item:
-                key: 'pgsql.replication.get_metrics["{#APPLICATION_NAME}"]'
+                key: 'pgsql.replication.get["{#APPLICATION_NAME}"]'
               tags:
                 - tag: application
                   value: '{#APPLICATION_NAME}'
@@ -3341,7 +3343,7 @@ zabbix_export:
                   parameters:
                     - $.write_lag
               master_item:
-                key: 'pgsql.replication.get_metrics["{#APPLICATION_NAME}"]'
+                key: 'pgsql.replication.get["{#APPLICATION_NAME}"]'
               tags:
                 - tag: application
                   value: '{#APPLICATION_NAME}'
@@ -3842,7 +3844,7 @@ zabbix_export:
             - uuid: cecad6427f454bcbae8483537ed85bc8
               name: 'I/O: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.stat.io.version.above.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.stat.io.version.above.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -3891,7 +3893,7 @@ zabbix_export:
                       if (reads + hits === 0) return 0;
                       return (hits * 100) / (reads + hits);
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.above.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.above.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: cache
@@ -3943,7 +3945,7 @@ zabbix_export:
                   parameters:
                     - $.read_bytes
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.above.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.above.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: io
@@ -3966,7 +3968,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.above.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.above.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: io
@@ -3981,7 +3983,7 @@ zabbix_export:
                   parameters:
                     - $.wal_write_bytes
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.above.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.above.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: wal
@@ -3996,7 +3998,7 @@ zabbix_export:
                   parameters:
                     - $.write_bytes
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.above.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.above.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: io
@@ -4022,7 +4024,7 @@ zabbix_export:
             - uuid: e9d8b7c6a5f64d1eaf5b1c7e3b5d2a4f
               name: 'I/O: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.stat.io.version.below.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.stat.io.version.below.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -4047,7 +4049,7 @@ zabbix_export:
                   parameters:
                     - $.reads
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.below.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.below.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: io
@@ -4062,7 +4064,7 @@ zabbix_export:
                   parameters:
                     - $.writes
               master_item:
-                key: 'db.odbc.select[pgsql.stat.io.version.below.18{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.io.version.below.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: io
@@ -4132,7 +4134,7 @@ zabbix_export:
             - uuid: a95a0c68cc644d9695fef2a97a393a71
               name: 'Replication slots: Get slots'
               type: ODBC
-              key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -4193,7 +4195,7 @@ zabbix_export:
                   parameters:
                     - $.slots_active
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4207,7 +4209,7 @@ zabbix_export:
                   parameters:
                     - $.slots_inactive
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4221,7 +4223,7 @@ zabbix_export:
                   parameters:
                     - $.inactive_retaining_slots
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4262,7 +4264,7 @@ zabbix_export:
                   parameters:
                     - $.max_safe_wal_size
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4278,7 +4280,7 @@ zabbix_export:
                   parameters:
                     - $.slots_total
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4293,7 +4295,7 @@ zabbix_export:
                   parameters:
                     - $.worst_slot_lag_bytes
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.above.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4321,7 +4323,7 @@ zabbix_export:
             - uuid: ecb1eb567e664bcf8330520e5d202c81
               name: 'Replication slots: Get slots'
               type: ODBC
-              key: 'db.odbc.select[pgsql.replication.slots.below.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.replication.slots.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -4371,7 +4373,7 @@ zabbix_export:
                   parameters:
                     - $.slots_active
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.below.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4385,7 +4387,7 @@ zabbix_export:
                   parameters:
                     - $.slots_inactive
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.below.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4399,7 +4401,7 @@ zabbix_export:
                   parameters:
                     - $.slots_total
               master_item:
-                key: 'db.odbc.select[pgsql.replication.slots.below.15{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.replication.slots.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: replication
@@ -4423,7 +4425,7 @@ zabbix_export:
             - uuid: cd6e9bfc3cfb4ae891fef2a563b83c90
               name: 'SLRU: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.stat.slru{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.stat.slru.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -4465,7 +4467,7 @@ zabbix_export:
                       	 return sum + currentValue;
                       });
               master_item:
-                key: 'db.odbc.select[pgsql.stat.slru{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.slru.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: slru
@@ -4488,7 +4490,7 @@ zabbix_export:
                       });
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'db.odbc.select[pgsql.stat.slru{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.slru.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: slru
@@ -4509,7 +4511,7 @@ zabbix_export:
                       	 return sum + currentValue;
                       });
               master_item:
-                key: 'db.odbc.select[pgsql.stat.slru{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.slru.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: slru
@@ -4538,7 +4540,7 @@ zabbix_export:
                       }
                       return 100 * hits / (hits + reads);
               master_item:
-                key: 'db.odbc.select[pgsql.stat.slru{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.stat.slru.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: slru
@@ -4602,7 +4604,7 @@ zabbix_export:
             - uuid: 7b7773c3f17049a398515150918ee816
               name: 'Subscription stats [{#SUBNAME}]: Get data'
               type: DEPENDENT
-              key: 'gsql.subscription.data.preprocessing[{#SUBNAME}]'
+              key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
               history: '0'
               value_type: TEXT
               description: 'Preprocessed data for each subscription object array.'
@@ -4616,6 +4618,8 @@ zabbix_export:
               master_item:
                 key: 'db.odbc.select[pgsql.subscription.inventory{,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
+                - tag: component
+                  value: raw
                 - tag: component
                   value: subscription
                 - tag: subid
@@ -4636,7 +4640,7 @@ zabbix_export:
                   parameters:
                     - $.apply_error_count
               master_item:
-                key: 'gsql.subscription.data.preprocessing[{#SUBNAME}]'
+                key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
               tags:
                 - tag: component
                   value: subscription
@@ -4700,7 +4704,7 @@ zabbix_export:
                   parameters:
                     - $.stats_reset
               master_item:
-                key: 'gsql.subscription.data.preprocessing[{#SUBNAME}]'
+                key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
               tags:
                 - tag: component
                   value: subscription
@@ -4722,7 +4726,7 @@ zabbix_export:
                   parameters:
                     - $.sync_error_count
               master_item:
-                key: 'gsql.subscription.data.preprocessing[{#SUBNAME}]'
+                key: 'gsql.subscription.data.preprocessing.get[{#SUBNAME}]'
               tags:
                 - tag: component
                   value: subscription
@@ -4829,7 +4833,7 @@ zabbix_export:
             - uuid: 656a9806785c4679ae1c6eb3a0d07828
               name: 'Tablespace [{#TABLESPACE.NAME}]: Get data'
               type: DEPENDENT
-              key: 'pgsql.tablespace.inventory.preprocessing.data[{#TABLESPACE.NAME}]'
+              key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               history: '0'
               value_type: TEXT
               preprocessing:
@@ -4839,6 +4843,8 @@ zabbix_export:
               master_item:
                 key: 'db.odbc.select[pgsql.tablespace.inventory{,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
+                - tag: component
+                  value: raw
                 - tag: oid
                   value: '{#TABLESPACE.OID}'
                 - tag: tablespace
@@ -4859,7 +4865,7 @@ zabbix_export:
                   parameters:
                     - 7d
               master_item:
-                key: 'pgsql.tablespace.inventory.preprocessing.data[{#TABLESPACE.NAME}]'
+                key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               tags:
                 - tag: oid
                   value: '{#TABLESPACE.OID}'
@@ -4879,7 +4885,7 @@ zabbix_export:
                   parameters:
                     - 7d
               master_item:
-                key: 'pgsql.tablespace.inventory.preprocessing.data[{#TABLESPACE.NAME}]'
+                key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               tags:
                 - tag: oid
                   value: '{#TABLESPACE.OID}'
@@ -4899,7 +4905,7 @@ zabbix_export:
                   parameters:
                     - 7d
               master_item:
-                key: 'pgsql.tablespace.inventory.preprocessing.data[{#TABLESPACE.NAME}]'
+                key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               tags:
                 - tag: oid
                   value: '{#TABLESPACE.OID}'
@@ -4916,7 +4922,7 @@ zabbix_export:
                   parameters:
                     - $.size_bytes
               master_item:
-                key: 'pgsql.tablespace.inventory.preprocessing.data[{#TABLESPACE.NAME}]'
+                key: 'pgsql.tablespace.inventory.preprocessing.data.get[{#TABLESPACE.NAME}]'
               tags:
                 - tag: oid
                   value: '{#TABLESPACE.OID}'
@@ -4986,7 +4992,7 @@ zabbix_export:
             - uuid: 9aa6e88e063a4beba6f373be04ea4f4a
               name: 'WAL statistics: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.wal.stats.above.14{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.wal.stats.above.14.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5139,7 +5145,7 @@ zabbix_export:
                   parameters:
                     - $.wal_buffers_full
               master_item:
-                key: 'db.odbc.select[pgsql.wal.stats.above.14{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.wal.stats.above.14.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: wal
@@ -5154,7 +5160,7 @@ zabbix_export:
                   parameters:
                     - $.wal_bytes
               master_item:
-                key: 'db.odbc.select[pgsql.wal.stats.above.14{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.wal.stats.above.14.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: wal
@@ -5170,7 +5176,7 @@ zabbix_export:
                   parameters:
                     - $.wal_fpi
               master_item:
-                key: 'db.odbc.select[pgsql.wal.stats.above.14{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.wal.stats.above.14.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: wal
@@ -5184,7 +5190,7 @@ zabbix_export:
                   parameters:
                     - $.wal_records
               master_item:
-                key: 'db.odbc.select[pgsql.wal.stats.above.14{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.wal.stats.above.14.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: wal
@@ -5205,7 +5211,7 @@ zabbix_export:
                   parameters:
                     - 7d
               master_item:
-                key: 'db.odbc.select[pgsql.wal.stats.above.14{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.wal.stats.above.14.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: wal
@@ -5231,7 +5237,7 @@ zabbix_export:
             - uuid: d6bca0d81a3b4dfd8e6d10970f475c53
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5335,13 +5341,16 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collects top queries from "pg_stat_statements".
+                Collects top queries from `pg_stat_statements`.
                 Caution!!!
                 Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
+              tags:
+                - tag: component
+                  value: raw
             - uuid: 58ed40d4f4744e49b49c98968b85477c
               name: 'Workload: Average execution'
               type: DEPENDENT
@@ -5360,7 +5369,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5382,7 +5391,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5391,7 +5400,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.workload.pgss.version.above.15[{#SINGLETON}]'
               value_type: CHAR
-              description: 'Version of "pg_stat_statements".'
+              description: 'Version of `pg_stat_statements`.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5400,7 +5409,7 @@ zabbix_export:
                   parameters:
                     - $.pgss_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5418,7 +5427,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_deleted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5436,7 +5445,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_inserted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5454,7 +5463,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_updated
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5473,7 +5482,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_blks_written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5491,7 +5500,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5515,7 +5524,7 @@ zabbix_export:
             - uuid: 998648ce373d4513a9aa06ec82f967be
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.below.13[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.below.13.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5536,7 +5545,7 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collects top queries from "pg_stat_statements".
+                Collects top queries from `pg_stat_statements`.
                 Caution!!!
                 Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
               preprocessing:
@@ -5560,7 +5569,7 @@ zabbix_export:
                   parameters:
                     - $.pgss_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.13[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.13.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5586,7 +5595,7 @@ zabbix_export:
             - uuid: 74e6eca6a47d468dac09cb49670ad868
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.below.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5662,13 +5671,16 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collects top queries from "pg_stat_statements".
+                Collects top queries from `pg_stat_statements`.
                 Caution!!!
                 Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
+              tags:
+                - tag: component
+                  value: raw
             - uuid: 5e35fb01b3e24449b9aff1f96d5ad2a7
               name: 'Workload: Average execution'
               type: DEPENDENT
@@ -5687,7 +5699,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5709,7 +5721,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5718,7 +5730,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.workload.pgss.version.below.15[{#SINGLETON}]'
               value_type: CHAR
-              description: 'Version of "pg_stat_statements".'
+              description: 'Version of `pg_stat_statements`.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5727,7 +5739,7 @@ zabbix_export:
                   parameters:
                     - $.pgss_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5746,7 +5758,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_blks_written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5764,7 +5776,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5790,7 +5802,7 @@ zabbix_export:
             - uuid: cd04a234781a40a083ce9f5cb20104a0
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5907,13 +5919,16 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collects top queries from "pg_stat_statements".
+                Collects top queries from `pg_stat_statements`.
                 Caution!!!
                 Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
+              tags:
+                - tag: component
+                  value: raw
             - uuid: 1a6c8b9ba5a24ebbbed90f7754ff4276
               name: 'Workload: Average execution'
               type: DEPENDENT
@@ -5932,7 +5947,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5954,7 +5969,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5972,7 +5987,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.distinct_statements
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5994,7 +6009,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6012,7 +6027,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.max
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6030,7 +6045,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.extension_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6048,7 +6063,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.deleted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6066,7 +6081,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.inserted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6084,7 +6099,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.updated
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6103,7 +6118,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.read
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6137,7 +6152,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6155,7 +6170,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6177,7 +6192,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6198,7 +6213,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6216,7 +6231,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6234,7 +6249,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track_nested
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6258,7 +6273,7 @@ zabbix_export:
             - uuid: 24d6dc268d6244a9bfcd83e1e121e3d6
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -6315,13 +6330,16 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collects top queries from "pg_stat_statements".
+                Collects top queries from `pg_stat_statements`.
                 Caution!!!
                 Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
                     - '-1'
+              tags:
+                - tag: component
+                  value: raw
             - uuid: 5c806912fcf4466bbac864a509736cee
               name: 'Workload: Average execution'
               type: DEPENDENT
@@ -6340,7 +6358,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6362,7 +6380,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6380,7 +6398,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.distinct_statements
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6402,7 +6420,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6420,7 +6438,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.max
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6442,7 +6460,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6464,7 +6482,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6486,7 +6504,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6504,7 +6522,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.extension_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6522,7 +6540,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.deleted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6540,7 +6558,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.inserted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6558,7 +6576,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.updated
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6577,7 +6595,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.read
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6611,7 +6629,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6629,7 +6647,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6651,7 +6669,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6672,7 +6690,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6690,7 +6708,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6708,7 +6726,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track_nested
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
