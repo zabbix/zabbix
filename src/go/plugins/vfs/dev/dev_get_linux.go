@@ -32,7 +32,8 @@ import (
 )
 
 const (
-	modeDisks vfsDevGetMode = iota
+	modeNone vfsDevGetMode = iota
+	modeDisks
 	modeDiskStats
 	modeDevices
 	modeDeviceStats
@@ -119,51 +120,81 @@ type vfsDeviceStats struct {
 	Val []vfsDeviceStatsVal `json:"values"`
 }
 
-func (p *Plugin) vfsDevGet(params []string) (string, error) {
+func vfsDevGetParseModeParam(mode string) (vfsDevGetMode, error) {
+
+	switch mode {
+	case "disks", "":
+		return modeDisks, nil
+	case "disk_stats":
+		return modeDiskStats, nil
+	case "devices":
+		return modeDevices, nil
+	case "device_stats":
+		return modeDeviceStats, nil
+
+	default:
+		return modeNone, errs.Wrapf(zbxerr.ErrorInvalidParams, "invalid second parameter '%s'", mode)
+	}
+}
+
+func vfsDevGetPrepareRegexParam(devNames string) (*regexp.Regexp, error) {
 	var (
-		devNamesRgx    *regexp.Regexp
-		imode          vfsDevGetMode
-		out            any
-		devNames, mode string
+		rgx *regexp.Regexp
+		err error
 	)
 
+	if devNames != "" {
+		rgx, err = regexp.Compile(devNames)
+		if err != nil {
+			return nil, errs.Wrapf(
+				err,
+				"invalid regular expression in first parameter: %q",
+				devNames,
+			)
+		}
+	}
+
+	return rgx, nil
+}
+
+func vfsDevGetParamsValidate(params []string) (vfsDevGetMode, *regexp.Regexp, error) {
+	var (
+		mode        vfsDevGetMode
+		devNamesRgx *regexp.Regexp
+		err         error
+	)
 	switch len(params) {
 	case 2:
-		mode = params[1]
-
-		switch mode {
-		case "disks", "":
-			imode = modeDisks
-		case "disk_stats":
-			imode = modeDiskStats
-		case "devices":
-			imode = modeDevices
-		case "device_stats":
-			imode = modeDeviceStats
-
-		default:
-			return "", errs.Wrapf(zbxerr.ErrorInvalidParams, "invalid second parameter '%s'", mode)
+		mode, err = vfsDevGetParseModeParam(params[1])
+		if err != nil {
+			return modeNone, nil, err
 		}
 
 		fallthrough
 	case 1:
-		devNames = params[0]
-
-		if devNames != "" {
-			var err error
-
-			devNamesRgx, err = regexp.Compile(devNames)
-			if err != nil {
-				return "", errs.Wrapf(
-					err,
-					"invalid regular expression in first parameter: %q",
-					devNames,
-				)
-			}
+		devNamesRgx, err = vfsDevGetPrepareRegexParam(params[0])
+		if err != nil {
+			return modeNone, nil, err
 		}
 	case 0:
 	default:
-		return "", zbxerr.ErrorTooManyParameters
+		return modeNone, nil, zbxerr.ErrorTooManyParameters
+	}
+
+	return mode, devNamesRgx, nil
+}
+
+func (p *Plugin) vfsDevGet(params []string) (string, error) {
+	var (
+		mode        vfsDevGetMode
+		devNamesRgx *regexp.Regexp
+		out         any
+		err         error
+	)
+
+	mode, devNamesRgx, err = vfsDevGetParamsValidate(params)
+	if err != nil {
+		return "", err
 	}
 
 	sysfs, err := isSysfsAvailable()
@@ -176,7 +207,7 @@ func (p *Plugin) vfsDevGet(params []string) (string, error) {
 		return "", err
 	}
 
-	switch imode {
+	switch mode {
 	case modeDisks:
 		out = vfsDevGetDisks(devs, rdevs, devNamesRgx)
 	case modeDiskStats:
@@ -619,7 +650,7 @@ func devIdGet(devices []vfsDevice, rdev uint64, model string) string {
 		return ""
 	}
 
-	if l == r || len(model) == 0 {
+	if l == r || model == "" {
 		return devices[l].devid
 	}
 

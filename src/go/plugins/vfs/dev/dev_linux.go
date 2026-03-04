@@ -341,11 +341,6 @@ func isSysfsAvailable() (bool, error) {
 	}
 
 	if !found {
-		// return false, fmt.Errorf(
-		// 	"cannot obtain device information, directory \"%s\" is not found",
-		// 	sysBlkdevLocation,
-		// )
-
 		return false, errs.Wrapf(errCannotObtainDevInfo, "directory \"%s\" is not found", sysBlkdevLocation)
 	}
 
