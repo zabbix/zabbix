@@ -19,6 +19,74 @@
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check is string is valid hostname name used for services          *
+ *                                                                            *
+ * Parameters: host - [IN]                                                    *
+ *                                                                            *
+ * Return value: SUCCEED - input is hostname address                          *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_dns(const char *host)
+{
+#define STATE_DASH	1
+#define STATE_SEPARATOR	2
+	const char	*p = host;
+	int		state = 0;
+	int		len = 1;
+
+	/* DNS name should start with [0-9A-Za-z] */
+	if ('\0' == *p || 0 == isalnum(*p++))
+		return FAIL;
+
+	while ('\0' != *p)
+	{
+		if (0 != isalnum(*p))
+		{
+			state = 0;
+			len++;
+		}
+		else if ('-' == *p)
+		{
+			/* Labels should not start with dash. */
+			if (STATE_SEPARATOR == state)
+				return FAIL;
+			state = STATE_DASH;
+			len++;
+		}
+		else if ('.' == *p)
+		{
+			/* Dashes are not allowed before separator. */
+			if (STATE_DASH == state)
+				return FAIL;
+			/* Empty labels are not allowed. */
+			if (0 == len)
+				return FAIL;
+			state = STATE_SEPARATOR;
+			len = 0;
+		}
+		else
+		{
+			return FAIL;
+		}
+
+		/* Label should not exceed 63 characters */
+		if (63 < len)
+			return FAIL;
+		p++;
+	}
+
+	/* Total length should not exceed 253 characters. */
+	if (253 < p - host)
+		return FAIL;
+
+	return 0 == state ? SUCCEED : FAIL;
+#undef STATE_DASH
+#undef STATE_SEPARATOR
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks if string is IPv4 address                                  *
  *                                                                            *
  * Parameters: ip - [IN]                                                      *
@@ -31,8 +99,6 @@ int	zbx_is_ip4(const char *ip)
 {
 	const char	*p = ip;
 	int		digits = 0, dots = 0, res = FAIL, octet = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
 
 	while ('\0' != *p)
 	{
@@ -61,7 +127,7 @@ int	zbx_is_ip4(const char *ip)
 	if (3 == dots && 1 <= digits && 3 >= digits && 255 >= octet)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
 
 	return res;
 }
@@ -80,8 +146,6 @@ int	zbx_is_ip6(const char *ip)
 {
 	const char	*p = ip, *last_colon;
 	int		xdigits = 0, only_xdigits = 0, colons = 0, dbl_colons = 0, res;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() ip:'%s'", __func__, ip);
 
 	while ('\0' != *p)
 	{
@@ -123,7 +187,7 @@ int	zbx_is_ip6(const char *ip)
 	else
 		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
 
 	return res;
 }

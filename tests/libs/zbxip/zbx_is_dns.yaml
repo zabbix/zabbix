@@ -1,0 +1,103 @@
+---
+test case: "1. Empty string"
+in:
+  string: ""
+out:
+  return: FAIL
+---
+test case: "2. Starts with dash"
+in:
+  string: "-"
+out:
+  return: FAIL
+---
+test case: "3. Dash before separator"
+in:
+  string: "a-.a"
+out:
+  return: FAIL
+---
+test case: "4. Dash after separator"
+in:
+  string: "a.-a"
+out:
+  return: FAIL
+---
+test case: "5. Too long label"
+in:
+  string: "0123456789012345678901234567890123456789012345678901234567890123456789"
+out:
+  return: FAIL
+---
+test case: "6. Label is 63 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789-123456789-123"
+out:
+  return: SUCCEED
+---
+test case: "7. Label is 64 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789-123456789-1234"
+out:
+  return: FAIL
+---
+test case: "8. Hostname is 253 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123"
+out:
+  return: SUCCEED
+---
+test case: "9. Hostname is 254 character long"
+in:
+  string: "123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.123456789-123456789-123456789-123456789-123456789.1234"
+out:
+  return: FAIL
+---
+test case: "10. Unicode character"
+in:
+  string: "tēst.zabbix.com"
+out:
+  return: FAIL
+---
+test case: "11. Leading dot"
+in:
+  string: ".example.com"
+out:
+  return: FAIL
+---
+test case: "12. Underscore"
+in:
+  string: "example_com.com"
+out:
+  return: FAIL
+---
+test case: "13. Space"
+in:
+  string: "ex ample.com"
+out:
+  return: FAIL
+---
+test case: "14. Ends with dash"
+in:
+  string: "example.com-"
+out:
+  return: FAIL
+---
+test case: "15. Empty label"
+in:
+  string: "example.."
+out:
+  return: FAIL
+---
+test case: "16. Minimal label"
+in:
+  string: "a.com"
+out:
+  return: SUCCEED
+---
+test case: "17. Punny code"
+in:
+  string: "xn--bcher-kva.com"
+out:
+  return: SUCCEED
+...
