@@ -303,10 +303,6 @@ func devidsInit() []vfsDevice {
 	return devices
 }
 
-func isAlnum(c byte) bool {
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
-}
-
 func devPathGet(name string) string {
 	return path.Join(devLocation, name)
 }
@@ -601,6 +597,57 @@ func deviceCompare(a, b vfsDevice) int {
 	return strings.Compare(a.devid, b.devid)
 }
 
+func findDeviceRange(devices []vfsDevice, rdev uint64) (int, int) {
+	major, minor := unix.Major(rdev), unix.Minor(rdev)
+
+	l, r := -1, -1
+	for i, d := range devices {
+		if major == d.major && minor == d.minor {
+			if l == -1 {
+				l = i
+			}
+			r = i
+		} else if l != -1 {
+			break
+		}
+	}
+
+	return l, r
+}
+
+func isAlnum(c byte) bool {
+	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || (c >= '0' && c <= '9')
+}
+
+func normalizeModel(model string) string {
+	var normModel []byte
+
+	for i := 0; i < len(model); i++ {
+		c := model[i]
+		if isAlnum(c) || c == '.' || c == ' ' {
+			if c == ' ' {
+				normModel = append(normModel, '_')
+			} else {
+				normModel = append(normModel, c)
+			}
+		} else {
+			break
+		}
+	}
+	return string(normModel)
+}
+
+func findDeviceByModel(devices []vfsDevice, l, r int, model string) int {
+	normModel := normalizeModel(model)
+
+	for i := l; i <= r; i++ {
+		if strings.Contains(devices[i].devid, normModel) {
+			return i
+		}
+	}
+	return -1
+}
+
 // devIdGet gets a device ID in the format used by /dev/disk/by-id/.
 //
 // When more than one device ID is present for a particular device, the ID
@@ -626,26 +673,11 @@ func deviceCompare(a, b vfsDevice) int {
 //
 //  5. If no match is found, use the first symlink for the device.
 func devIdGet(devices []vfsDevice, rdev uint64, model string) string {
-	var normModel []byte
-
 	if len(devices) == 0 {
 		return ""
 	}
 
-	statMajor := unix.Major(rdev)
-	statMinor := unix.Minor(rdev)
-
-	l, r := -1, -1
-	for i, d := range devices {
-		if statMajor == d.major && statMinor == d.minor {
-			if l == -1 {
-				l = i
-			}
-			r = i
-		} else if l != -1 {
-			break
-		}
-	}
+	l, r := findDeviceRange(devices, rdev)
 
 	if l == -1 {
 		return ""
@@ -655,27 +687,7 @@ func devIdGet(devices []vfsDevice, rdev uint64, model string) string {
 		return devices[l].devid
 	}
 
-	for i := 0; i < len(model); i++ {
-		c := model[i]
-		if isAlnum(c) || c == '.' || c == ' ' {
-			if c == ' ' {
-				normModel = append(normModel, '_')
-			} else {
-				normModel = append(normModel, c)
-			}
-		} else {
-			break
-		}
-	}
-	normModelStr := string(normModel)
-
-	matchIdx := -1
-	for i := l; i <= r; i++ {
-		if strings.Contains(devices[i].devid, normModelStr) {
-			matchIdx = i
-			break
-		}
-	}
+	matchIdx := findDeviceByModel(devices, l, r, model)
 
 	if matchIdx != -1 {
 		return devices[matchIdx].devid
