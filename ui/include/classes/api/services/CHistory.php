@@ -143,7 +143,7 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
-		$this->tableName = CHistoryManager::getTableName($options['history']);
+		$this->tableName = Manager::History()->getTableName($options['history']);
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
 			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
@@ -224,6 +224,14 @@ class CHistory extends CApiService {
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
+
+		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
+				&& $options['maxValueSize'] !== null && !$options['countOutput']
+				&& $this->outputIsRequested('value', $options['output'])) {
+			$value_index = array_search($this->fieldId('value', $this->tableAlias()), $sql_parts['select']);
+			$sql_parts['select'][$value_index] = dbSubstring('value', 1, $options['maxValueSize']);
+		}
+
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
@@ -238,19 +246,6 @@ class CHistory extends CApiService {
 		}
 
 		return $result;
-	}
-
-	protected function applyQueryOutputOptions(string $table_name, string $table_alias, array $options, array $sql_parts) {
-		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
-
-		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
-				&& $options['maxValueSize'] !== null && !$options['countOutput']
-				&& $this->outputIsRequested('value', $options['output'])) {
-			$value_index = array_search($this->fieldId('value', $table_alias), $sql_parts['select']);
-			$sql_parts['select'][$value_index] = dbSubstring('value', 1, $options['maxValueSize']);
-		}
-
-		return $sql_parts;
 	}
 
 	/**
@@ -349,7 +344,7 @@ class CHistory extends CApiService {
 	 */
 	private function getFromClickhouse($options, array $storage) {
 		$sql_parts = [
-			'select'	=> ['history' => 'h.itemid'],
+			'select'	=> [],
 			'from'		=> $this->tableName.' h',
 			'where'		=> [],
 			'group'		=> [],
@@ -361,11 +356,11 @@ class CHistory extends CApiService {
 		}
 
 		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock_ns>=toDateTime64('.intval($options['time_from']).', 9)';
+			$sql_parts['where']['clock_from'] = 'h.clock_ns>=toDateTime64('.$options['time_from'].',9)';
 		}
 
 		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock_ns<=toDateTime64('.intval($options['time_till']).', 9)';
+			$sql_parts['where']['clock_till'] = 'h.clock_ns<=toDateTime64('.$options['time_till'].',9)';
 		}
 
 		if ($options['filter'] !== null) {
@@ -376,17 +371,10 @@ class CHistory extends CApiService {
 			zbx_db_search($sql_parts['from'], $options, $sql_parts);
 		}
 
-		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
-
-		foreach ($sql_parts['select'] as &$field) {
-			$field = match ($field) {
-				'h.clock' => 'toUnixTimestamp(h.clock_ns) AS clock',
-				'h.ns' => 'toUnixTimestamp64Nano(h.clock_ns) % 1000000000 AS ns',
-				default => $field
-			};
-		}
-		unset($field);
+		$table = $this->tableName();
+		$alias = $this->tableAlias();
+		$sql_parts = $this->applyQueryOutputOptionsClickhouse($table, $alias, $options, $sql_parts);
+		$sql_parts = $this->applyQuerySortOptions($table, $alias, $options, $sql_parts);
 
 		$query = self::createSelectQueryFromParts($sql_parts);
 
@@ -433,6 +421,34 @@ class CHistory extends CApiService {
 		return $this->dbFilter($table, $options, $sql_parts);
 	}
 
+	/**
+	 * Apply ClickHouse specific output changes to $sql_parts.
+	 *
+	 * @param string $table
+	 * @param string $alias
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 *
+	 * @return array modified $sql_parts.
+	 */
+	private function applyQueryOutputOptionsClickhouse(string $table, string $alias, array $options,
+			array $sql_parts): array {
+		$output = array_diff($options['output'], ['clock', 'ns']);
+		// TODO: test countOutput, groupBy and group $options
+		$sql_parts = $this->applyQueryOutputOptions($table, $alias, ['output' => $output] + $options, $sql_parts);
+
+		if (in_array('clock', $options['output'])) {
+			$sql_parts['select'][] = 'toUnixTimestamp('.$this->fieldId('clock_ns', $alias).') AS clock';
+		}
+
+		if (in_array('ns', $options['output'])) {
+			$sql_parts['select'][] = 'toUnixTimestamp64Nano('.$this->fieldId('clock_ns', $alias).')%1000000000 AS ns';
+		}
+
+		return $sql_parts;
+	}
+
+	// TODO: order by ns will work incorrectly.
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
 		if ($this->history_source === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
 			$sortfield = match ($sortfield) {
@@ -455,7 +471,7 @@ class CHistory extends CApiService {
 	public function clear(array $itemids): array {
 		self::validateClear($itemids, $db_items);
 
-		Manager::History()->deleteHistory(array_column($db_items, 'value_type', 'itemid'));
+		Manager::History()->deleteHistory($db_items);
 
 		self::addAuditLog(CAudit::ACTION_HISTORY_CLEAR, CAudit::RESOURCE_ITEM, $db_items);
 

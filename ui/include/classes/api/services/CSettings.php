@@ -107,8 +107,7 @@ class CSettings extends CApiService {
 	 */
 	public static function getPrivate(): array {
 		$parameters = CApiSettingsHelper::getParameters([
-			'session_key', 'dbversion_status', 'server_status', 'software_update_checkid',
-			'software_update_check_data'
+			'session_key', 'dbversion_status', 'server_status', 'software_update_checkid', 'software_update_check_data'
 		]);
 
 		$parameters['dbversion_status'] = json_decode($parameters['dbversion_status'], true) ?: [];

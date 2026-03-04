@@ -46,7 +46,7 @@ class CHistoryManager {
 	 * Set storage providers configuration.
 	 *
 	 * @param array $providers            Array of storage providers configuration arrays.
-	 * @param array $value_type_name_ttl  Array where key is value type name and value is that value type TTL.
+	 * @param array $value_type_name_ttl  Array where key is value type name and value is that value type TTL in seconds.
 	 */
 	public function setStorageProviders(array $providers, array $value_type_name_ttl): void {
 		$supported_props = array_flip(['db', 'password', 'provider', 'url', 'username']);
@@ -141,9 +141,9 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			$results += $this->getLastValuesFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE], 1,
-				$period, $length
-			);
+			$length = 1;
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
+			$results += CClickhouseHelper::getLastValues($items, 1, $period, $length);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -181,7 +181,7 @@ class CHistoryManager {
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
 				'SELECT DISTINCT itemid'.
-				' FROM '.self::getTableName($type).
+				' FROM '.$this->getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
 					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
@@ -213,9 +213,8 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			$results += $this->getLastValuesFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE], $limit,
-				$period, $length
-			);
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
+			$results += CClickhouseHelper::getLastValues($items, $limit, $period, $length);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -352,14 +351,14 @@ class CHistoryManager {
 		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
 		foreach ($items as $item) {
-			$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
+			$select_fields = DB::getSchema($this->getTableName($item['value_type']))['fields'];
 			$select_fields = array_diff(array_keys($select_fields), ['value']);
 			$db_values = DBselect(
 				'SELECT h.'.implode(',h.', $select_fields).','.
 					($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? $value_expression
 						: 'h.value').
-				' FROM '.self::getTableName($item['value_type']).' h'.
+				' FROM '.$this->getTableName($item['value_type']).' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 					$period_condition.
 				' ORDER BY h.clock DESC,h.ns DESC',
@@ -398,7 +397,7 @@ class CHistoryManager {
 
 				$clock_max = DBfetch(DBselect(
 					'SELECT MAX(h.clock)'.
-					' FROM '.self::getTableName($item['value_type']).' h'.
+					' FROM '.$this->getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
@@ -408,14 +407,14 @@ class CHistoryManager {
 					continue;
 				}
 
-				$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
+				$select_fields = DB::getSchema($this->getTableName($item['value_type']))['fields'];
 				$select_fields = array_diff(array_keys($select_fields), ['value']);
 				$db_values = DBfetchArray(DBselect(
 					'SELECT h.'.implode(',h.', $select_fields).','.
 						($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 							? $value_expression
 							: 'h.value').
-					' FROM '.self::getTableName($item['value_type']).' h'.
+					' FROM '.$this->getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						' AND h.clock='.zbx_dbstr($clock_max).
 					' ORDER BY h.ns DESC',
@@ -429,7 +428,7 @@ class CHistoryManager {
 		}
 		else {
 			foreach ($items as $item) {
-				$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
+				$select_fields = DB::getSchema($this->getTableName($item['value_type']))['fields'];
 				$select_fields = array_diff(array_keys($select_fields), ['value']);
 				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
@@ -437,7 +436,7 @@ class CHistoryManager {
 						($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 							? $value_expression
 							: 'h.value').
-					' FROM '.self::getTableName($item['value_type']).' h'.
+					' FROM '.$this->getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '').
 					' ORDER BY h.clock DESC',
@@ -466,7 +465,7 @@ class CHistoryManager {
 							($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 								? $value_expression
 								: 'h.value').
-						' FROM '.self::getTableName($item['value_type']).' h'.
+						' FROM '.$this->getTableName($item['value_type']).' h'.
 						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 							' AND h.clock='.$clock.
 						' ORDER BY h.ns DESC',
@@ -498,55 +497,6 @@ class CHistoryManager {
 	}
 
 	/**
-	 * ClickHouse specific implementation of getLastValues.
-	 *
-	 * @see CHistoryManager::getLastValues
-	 */
-	private function getLastValuesFromClickhouse(array $items, int $limit, ?int $period): array {
-		$value_type_itemids = [];
-
-		foreach ($items as $item) {
-			$value_type_itemids[$item['value_type']][] = $item['itemid'];
-		}
-
-		$results = [];
-
-		foreach ($value_type_itemids as $type => $itemids) {
-			$storage = $this->getStorageForValueType($type);
-			$period_condition = '';
-
-			$hk_history = $storage['value_ttl'] ?? null;
-
-			$effective_periods = array_filter([$period, $hk_history]);
-
-			if ($effective_periods) {
-				// TBD: add clickhouse function
-				$period_condition = ' AND h.clock_ns>toDateTime64('.(time() - min($effective_periods)).', 9)';
-			}
-
-			$itemids = $value_type_itemids[$type];
-
-			foreach ($itemids as $itemid) {
-				$values = CClickhouseHelper::query(
-					'SELECT '.self::getClickhouseSelectFieldsByValueType($type).
-					' FROM '.self::getTableName($type).' h'.
-					' WHERE h.itemid='.zbx_dbstr($itemid).
-						$period_condition.
-					' ORDER BY h.clock_ns DESC'.
-					' LIMIT '.$limit,
-					$storage
-				);
-
-				if ($values) {
-					$results[$itemid] = $values;
-				}
-			}
-		}
-
-		return $results;
-	}
-
-	/**
 	 * Returns the history data of the item at the given time. If no data exists at the given time, the function will
 	 * return the previous data.
 	 *
@@ -566,7 +516,7 @@ class CHistoryManager {
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
 			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-				return $this->getValueAtFromClickhouse($item, $clock, $ns);
+				return CClickhouseHelper::getValueAt($item, $clock, $ns);
 
 			default:
 				return $this->primary_keys_enabled
@@ -658,7 +608,7 @@ class CHistoryManager {
 			return null;
 		}
 
-		$history_table = self::getTableName($item['value_type']);
+		$history_table = $this->getTableName($item['value_type']);
 
 		$sql = 'SELECT *'.
 			' FROM '.$history_table.
@@ -705,7 +655,7 @@ class CHistoryManager {
 		}
 
 		$result = null;
-		$table = self::getTableName($item['value_type']);
+		$table = $this->getTableName($item['value_type']);
 
 		$sql = 'SELECT *'.
 				' FROM '.$table.
@@ -777,42 +727,6 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Implementation that uses existence of primary key in history tables.
-	 * @see CHistoryManager->getValueAtFromClickhouse()
-	 *
-	 * @param string $item['itemid']
-	 * @param int    $item['value_type']
-	 * @param int    $clock
-	 * @param int    $ns
-	 *
-	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
-	 */
-	private function getValueAtFromClickhouse(array $item, int $clock, int $ns): ?array {
-		$storage = $this->getStorageForValueType($item['value_type']);
-		$hk_history = $storage['value_ttl'] ?? null;
-
-		if ($hk_history !== null && ($clock <= time() - $hk_history)) {
-			return null;
-		}
-
-		$table = self::getTableName($item['value_type']).' h';
-
-		$query = 'SELECT '.self::getClickhouseSelectFieldsByValueType($item['value_type']).
-			' FROM '.$table.
-			' WHERE '.dbConditionId('h.itemid', [$item['itemid']]).
-				' AND h.clock_ns<=fromUnixTimestamp64Nano('.($clock * 1000000000 + $ns).')'.
-			' ORDER BY h.clock_ns DESC'.
-			' LIMIT 1';
-		$values = CClickhouseHelper::query($query, $storage);
-
-		if (!$values) {
-			return null;
-		}
-
-		return reset($values);
-	}
-
-	/**
 	 * Get value aggregation by interval within the specified time period.
 	 *
 	 * The $item parameter must have the value_type, itemid and source properties set.
@@ -838,9 +752,8 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			$results += $this->getAggregationByIntervalFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE],
-				$time_from, $time_to, $function, $interval
-			);
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
+			$results += CClickhouseHelper::getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -982,88 +895,6 @@ class CHistoryManager {
 				if (array_key_exists($item['key'], $results)) {
 					$results[$item['key']]['source'] = 'history';
 				}
-			}
-		}
-
-		return $results;
-	}
-
-	/**
-	 * ClickHouse specific implementation of getAggregationByInterval.
-	 *
-	 * @see CHistoryManager::getAggregationByInterval
-	 */
-	private function getAggregationByIntervalFromClickhouse(array $items, int $time_from, int $time_to,
-			int $function, int $interval): array {
-		$value_type_itemids = [];
-
-		foreach ($items as $item) {
-			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
-		}
-
-		$sql_select = ['s.itemid', 's.value', 'toUnixTimestamp(s.tick) AS tick', 'toUnixTimestamp(s.ts) AS clock',
-			'toUnixTimestamp64Nano(s.ts) % 1000000000 AS ns'
-		];
-		$sql_sub_select = ['h.itemid', 'toStartOfInterval(h.clock_ns, toIntervalSecond('.$interval.')) AS tick'];
-
-		switch ($function) {
-			case AGGREGATE_MIN:
-				$sql_sub_select[] = 'min(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_MAX:
-				$sql_sub_select[] = 'max(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_AVG:
-				$sql_sub_select[] = 'avg(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_COUNT:
-				$sql_sub_select[] = 'count() AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_SUM:
-				$sql_sub_select[] = 'sum(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_FIRST:
-				$sql_sub_select[] = 'argMin(h.value, h.clock_ns) AS value,min(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_LAST:
-				$sql_sub_select[] = 'argMax(h.value, h.clock_ns) AS value,max(h.clock_ns) AS ts';
-				break;
-		}
-
-		$results = [];
-
-		foreach ($value_type_itemids as $value_type => $itemids) {
-			$storage = $this->getStorageForValueType($value_type);
-			$hk_history = $storage['value_ttl'] ?? null;
-
-			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
-
-			// TBD: replace between with >= <=
-			$period_condition = ' AND h.clock_ns BETWEEN toDateTime64('.$effective_time_from.', 9)'.
-				' AND toDateTime64('.$time_to.', 9)';
-
-			$values = CClickhouseHelper::query(
-				'SELECT '.implode(',', $sql_select).
-				' FROM ('.
-					'SELECT '.implode(',', $sql_sub_select).
-					' FROM '.self::getTableName($value_type).' h'.
-					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
-						$period_condition.
-					' GROUP BY h.itemid,tick'.
-				') s',
-				$storage
-			);
-
-			if ($values) {
-				foreach ($values as $value) {
-					$results[$value['itemid']]['data'][] = $value;
-				}
-			}
-		}
-
-		foreach ($items as $item) {
-			if (array_key_exists($item['itemid'], $results)) {
-				$results[$item['itemid']]['source'] = 'history';
 			}
 		}
 
@@ -1261,9 +1092,8 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			$results += $this->getGraphAggregationByWidthFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE],
-				$time_from, $time_to, $width
-			);
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
+			$results += CClickhouseHelper::getGraphAggregationByWidth($items, $time_from, $time_to, $width);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -1441,75 +1271,6 @@ class CHistoryManager {
 	}
 
 	/**
-	 * ClickHouse specific implementation of getGraphAggregationByWidth.
-	 *
-	 * @see CHistoryManager::getGraphAggregationByWidth
-	 */
-	private function getGraphAggregationByWidthFromClickhouse(array $items, int $time_from, int $time_to,
-			?int $width): array {
-		$value_type_itemids = [];
-
-		foreach ($items as $item) {
-			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
-		}
-
-		$sql_select = ['s.itemid', 's.count', 's.avg', 's.min', 's.max', 'toUnixTimestamp(s.ts) AS clock'];
-
-		$sql_sub_select = ['h.itemid', 'count() AS count', 'avg(h.value) AS avg', 'min(h.value) AS min',
-			'max(h.value) AS max', 'max(h.clock_ns) as ts'
-		];
-
-		$group_by = ['h.itemid'];
-
-		if ($width !== null) {
-			$sql_sub_select[] =
-				'round('.$width.'*(toUnixTimestamp(h.clock_ns)-'.$time_from.')/('.$time_to.'-'.$time_from.')) AS i';
-
-			$sql_select[] = 'i';
-			$group_by[] = 'i';
-		}
-
-		$results = [];
-
-		foreach ($value_type_itemids as $value_type => $itemids) {
-			$storage = $this->getStorageForValueType($value_type);
-			$hk_history = $storage['value_ttl'] ?? null;
-
-			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
-
-			// TBD: make as part of query
-			$period_condition = ' AND h.clock_ns BETWEEN toDateTime64('.$effective_time_from.', 9)'.
-				' AND toDateTime64('.$time_to.', 9)';
-
-			$values = CClickhouseHelper::query(
-				'SELECT '.implode(',', $sql_select).
-				' FROM ('.
-					'SELECT '.implode(',', $sql_sub_select).
-					' FROM '.self::getTableName($value_type).' h'.
-					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
-					$period_condition.
-					' GROUP BY '.implode(',', $group_by).
-				') s',
-				$storage
-			);
-
-			if ($values) {
-				foreach ($values as $value) {
-					$results[$value['itemid']]['data'][] = $value;
-				}
-			}
-		}
-
-		foreach ($items as $item) {
-			if (array_key_exists($item['itemid'], $results)) {
-				$results[$item['itemid']]['source'] = 'history';
-			}
-		}
-
-		return $results;
-	}
-
-	/**
 	 * SQL specific implementation of getGraphAggregationByWidth.
 	 *
 	 * @see CHistoryManager::getGraphAggregationByWidth
@@ -1615,9 +1376,8 @@ class CHistoryManager {
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			$results += $this->getAggregatedValuesFromClickhouse($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE],
-				$function, $time_from, $time_to
-			);
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
+			$results += CClickhouseHelper::getAggregatedValues($items, $function, $time_from, $time_to);
 		}
 
 		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
@@ -1737,78 +1497,6 @@ class CHistoryManager {
 	}
 
 	/**
-	 * ClickHouse specific implementation of getAggregatedValues.
-	 *
-	 * @see CHistoryManager::getAggregatedValues
-	 */
-	private function getAggregatedValuesFromClickhouse(array $items, int $function, int $time_from,
-			?int $time_to): array {
-		$value_type_itemids = [];
-
-		foreach ($items as $item) {
-			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
-		}
-
-		$sql_select = ['h.itemid'];
-
-		switch ($function) {
-			case AGGREGATE_MIN:
-				$sql_select[] = 'min(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_MAX:
-				$sql_select[] = 'max(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_AVG:
-				$sql_select[] = 'avg(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_COUNT:
-				$sql_select[] = 'count() AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_SUM:
-				$sql_select[] = 'sum(h.value) AS value,max(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_FIRST:
-				$sql_select[] = 'argMin(h.value, h.clock_ns) AS value,min(h.clock_ns) AS ts';
-				break;
-			case AGGREGATE_LAST:
-				$sql_select[] = 'argMax(h.value, h.clock_ns) AS value,max(h.clock_ns) AS ts';
-				break;
-		}
-
-		$result = [];
-
-		foreach ($value_type_itemids as $value_type => $itemids) {
-			$storage = $this->getStorageForValueType($value_type);
-			$hk_history = $storage['value_ttl'] ?? null;
-
-			$effective_time_from = $hk_history === null ? $time_from : max($time_from, time() - $hk_history);
-			// TBD: make as part of query
-			$period_condition = $time_to !== null ? ' AND h.clock_ns<=toDateTime64('.$time_to.', 9)' : '';
-
-			$values = CClickhouseHelper::query(
-				'SELECT s.itemid,s.value,toUnixTimestamp(s.ts) AS clock'.
-				' FROM ('.
-					'SELECT '.implode(',', $sql_select).
-					' FROM '.self::getTableName($value_type).' h'.
-					' WHERE '.dbConditionId('h.itemid', array_keys($itemids)).
-						' AND h.clock_ns>=toDateTime64('.$effective_time_from.', 9)'.
-						$period_condition.
-					' GROUP BY h.itemid'.
-				') s',
-				$storage
-			);
-
-			if ($values) {
-				foreach ($values as $value) {
-					$result[$value['itemid']] = $value;
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
 	 * SQL specific implementation of getAggregatedValues.
 	 *
 	 * @see CHistoryManager::getAggregatedValues
@@ -1865,7 +1553,7 @@ class CHistoryManager {
 							break;
 					}
 
-					$sql_from = self::getTableName($value_type);
+					$sql_from = $this->getTableName($value_type);
 				}
 				else {
 					switch ($function) {
@@ -1963,16 +1651,32 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Clear item history and trends by provided item IDs. History is deleted from both SQL and Elasticsearch.
+	 * Clear item history and trends by provided item IDs. History is deleted from all storages.
 	 *
-	 * @param array $itemid_types  Key - itemid, value - value_type.
+	 * @param array $items  Items to delete, each item must contain 'itemid', 'value_type'.
 	 *
 	 * @return bool
 	 */
-	public function deleteHistory(array $itemid_types) {
-		// TBD: get item grouped by storage and do not call all storage types when deleting item from one storage
-		return $this->deleteHistoryFromSql($itemid_types) && $this->deleteHistoryFromElasticsearch($itemid_types)
-			&& $this->deleteHistoryFromClickhouse($itemid_types);
+	public function deleteHistory(array $items) {
+		$grouped_items = $this->getItemsGroupedByStorage($items);
+		$result = true;
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC]);
+			$result = $this->deleteHistoryFromElasticsearch($items);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
+			$result = CClickhouseHelper::delete($items);
+		}
+
+		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
+			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_SQL]);
+			$result = $this->deleteHistoryFromSql($items);
+		}
+
+		return $result;
 	}
 
 	/**
@@ -1980,20 +1684,14 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromElasticsearch(array $itemid_types) {
-		$terms = [];
-
-		foreach ($itemid_types as $itemid => $value_type) {
-			$terms[$value_type][] = $itemid;
-		}
-
+	private function deleteHistoryFromElasticsearch(array $value_type_itemids) {
 		$result = true;
 
-		foreach ($terms as $value_type => $itemids) {
+		foreach ($value_type_itemids as $value_type => $itemids) {
 			$storage = $this->getStorageForValueType($value_type);
+			$query = ['history' => $value_type, 'itemid' => array_keys($itemids)];
 
-			if ($storage !== null
-					&& !CElasticsearchHelper::delete(['history' => $value_type, 'itemid' => $itemids], $storage)) {
+			if (!CElasticsearchHelper::delete($query, $storage)) {
 				$result = false;
 			}
 		}
@@ -2006,32 +1704,36 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromSql(array $itemid_types) {
+	private function deleteHistoryFromSql(array $value_type_itemids) {
 		global $DB;
 
-		$item_tables = array_map([self::class, 'getTableName'], array_unique($itemid_types));
-		$table_names = array_flip(self::getTableName());
-
-		if (in_array(ITEM_VALUE_TYPE_UINT64, $itemid_types)) {
-			$item_tables[] = 'trends_uint';
-			$table_names['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
+		$table_value_type = [];
+		foreach (array_keys($value_type_itemids) as $value_type) {
+			$table_value_type[$this->getTableName($value_type)] = $value_type;
 		}
 
-		if (in_array(ITEM_VALUE_TYPE_FLOAT, $itemid_types)) {
-			$item_tables[] = 'trends';
-			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
+		if (in_array(ITEM_VALUE_TYPE_UINT64, $table_value_type)) {
+			$table_value_type['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
 		}
 
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed($item_tables)) {
+		if (in_array(ITEM_VALUE_TYPE_FLOAT, $table_value_type)) {
+			$table_value_type['trends'] = ITEM_VALUE_TYPE_FLOAT;
+		}
+
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed(array_keys($table_value_type))) {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;
 		}
 
-		foreach ($item_tables as $table_name) {
-			$itemids = array_keys(array_intersect($itemid_types, [(string) $table_names[$table_name]]));
+		foreach ($table_value_type as $table => $value_type) {
+			if (!array_key_exists($value_type, $value_type_itemids)) {
+				continue;
+			}
 
-			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
+			$itemids = array_keys($value_type_itemids[$value_type]);
+
+			if (!DBexecute('DELETE FROM '.$table.' WHERE '.dbConditionInt('itemid', $itemids))) {
 				return false;
 			}
 		}
@@ -2040,39 +1742,13 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Clickhouse specific implementation of deleteHistory.
-	 *
-	 * @see CHistoryManager::deleteHistory
-	 */
-	private function deleteHistoryFromClickhouse(array $itemid_types): bool {
-		$terms = [];
-		foreach ($itemid_types as $itemid => $value_type) {
-			$terms[$value_type][$itemid] = true;
-		}
-
-		$result = true;
-
-		foreach ($terms as $value_type => $itemids) {
-			$table = self::getTableName($value_type);
-			$query = 'DELETE FROM '.$table.' WHERE '.dbConditionId('itemid', array_keys($itemids));
-			$storage = $this->getStorageForValueType($value_type);
-
-			if ($storage !== null && !CClickhouseHelper::query($query, $storage)) {
-				$result = false;
-			}
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Return the name of the table where the data for the given value type is stored.
 	 *
 	 * @param int $value_type  Value type.
 	 *
-	 * @return string|array  Table name | all tables.
+	 * @return string  Table name.
 	 */
-	public static function getTableName($value_type = null) {
+	public function getTableName($value_type): string {
 		$tables = [
 			ITEM_VALUE_TYPE_LOG => 'history_log',
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
@@ -2083,7 +1759,18 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_JSON => 'history_json'
 		];
 
-		return ($value_type === null) ? $tables : $tables[$value_type];
+		return $tables[$value_type];
+	}
+
+	/**
+	 * Get database columns list available for specific value type.
+	 *
+	 * @param int $value_type
+	 */
+	public function getOutputFields($value_type): array {
+		$table = $this->getTableName($value_type);
+
+		return array_keys(DB::getSchema($table)['fields']);
 	}
 
 	/**
@@ -2093,7 +1780,7 @@ class CHistoryManager {
 	 *
 	 * @return array  An array with storage type as a keys and item arrays as a values.
 	 */
-	private function getItemsGroupedByStorage(array $items) {
+	private function getItemsGroupedByStorage(array $items): array {
 		$grouped_items = [];
 
 		$value_storage = [];
@@ -2109,18 +1796,20 @@ class CHistoryManager {
 		return $grouped_items;
 	}
 
-	private function getClickhouseSelectFieldsByValueType(int $value_type, string $table_alias = 'h'): string {
-		$fields = array_diff(array_keys(DB::getSchema(self::getTableName($value_type))['fields']), ['clock', 'ns']);
+	/**
+	 * Return items grouped by value type.
+	 *
+	 * @param array $items
+	 * @param int   $items[itemid]
+	 * @param int   $items[value_type]
+	 */
+	private function getItemsGroupedByValueType(array $items): array {
+		$value_type_itemids = [];
 
-		foreach ($fields as &$field) {
-			$field = $table_alias.'.'.$field;
+		foreach ($items as $item) {
+			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
 		}
-		unset($field);
 
-		$sql_select = array_merge($fields, ['toUnixTimestamp('.$table_alias.'.clock_ns) AS clock',
-			'toUnixTimestamp64Nano('.$table_alias.'.clock_ns) % 1000000000 AS ns'
-		]);
-
-		return implode(',', $sql_select);
+		return $value_type_itemids;
 	}
 }

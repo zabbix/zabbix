@@ -218,7 +218,7 @@ $form
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
 			'return_url' => $return_url,
-			'value_type_ttl' => array_keys($data['value_type_ttl'])
+			'value_type_ttl' => array_keys(array_filter($data['value_type_ttl'], fn($ttl) => $ttl !== null))
 		]).');'))->setOnDocumentReady()
 	);
 $output = [
