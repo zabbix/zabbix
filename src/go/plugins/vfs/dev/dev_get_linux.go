@@ -335,30 +335,7 @@ func sysfsPhysicalBlksizeGet(rdev uint64) uint64 {
 	return sysfsUintGet(rdev, path.Join("queue", "physical_block_size"))
 }
 
-// sysfsDevStatsGet gets a device ID in the format used by /dev/disk/by-id/.
-//
-// When more than one device ID is present for a particular device, the ID
-// containing the device model is preferred as it is human-readable.
-//
-// Algorithm for resolving device IDs:
-//
-//  1. Read all symlink names in /dev/disk/by-id/. Treat them as device IDs
-//     and resolve the <major-ID> and <minor-ID> for each.
-//
-//  2. Sort devices by <major-ID> and <minor-ID>.
-//     Sort IDs of the same device in lexicographical order.
-//
-//  3. If there is only one device ID for the symlink, use it.
-//
-//  4. Otherwise, try to find the device ID that contains the device model:
-//     4.1. Read the model from
-//     /sys/dev/block/<major-ID>:<minor-ID>/device/model
-//     4.2. Take the longest left-anchored prefix of the model consisting only
-//     of alphanumeric characters, digits, dots, and spaces.
-//     Replace spaces with underscores.
-//     4.3. Choose the device ID that contains the resulting model string.
-//
-//  5. If no match is found, use the first symlink for the device.
+//nolint:gocyclo // large switch over independent token indices, not genuinely complex
 func sysfsDevStatsGet(rdev uint64) vfsStats {
 	var stats vfsStats
 
@@ -624,6 +601,30 @@ func deviceCompare(a, b vfsDevice) int {
 	return strings.Compare(a.devid, b.devid)
 }
 
+// devIdGet gets a device ID in the format used by /dev/disk/by-id/.
+//
+// When more than one device ID is present for a particular device, the ID
+// containing the device model is preferred as it is human-readable.
+//
+// Algorithm for resolving device IDs:
+//
+//  1. Read all symlink names in /dev/disk/by-id/. Treat them as device IDs
+//     and resolve the <major-ID> and <minor-ID> for each.
+//
+//  2. Sort devices by <major-ID> and <minor-ID>.
+//     Sort IDs of the same device in lexicographical order.
+//
+//  3. If there is only one device ID for the symlink, use it.
+//
+//  4. Otherwise, try to find the device ID that contains the device model:
+//     4.1. Read the model from
+//     /sys/dev/block/<major-ID>:<minor-ID>/device/model
+//     4.2. Take the longest left-anchored prefix of the model consisting only
+//     of alphanumeric characters, digits, dots, and spaces.
+//     Replace spaces with underscores.
+//     4.3. Choose the device ID that contains the resulting model string.
+//
+//  5. If no match is found, use the first symlink for the device.
 func devIdGet(devices []vfsDevice, rdev uint64, model string) string {
 	var normModel []byte
 
