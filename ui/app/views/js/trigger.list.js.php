@@ -217,7 +217,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('trigger');
+						uncheckTableRows(`trigger_${this.checkbox_hash}`, [], true);
 					}
 
 					location.href = location.href;
