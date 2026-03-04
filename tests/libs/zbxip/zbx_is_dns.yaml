@@ -100,4 +100,10 @@ in:
   string: "xn--bcher-kva.com"
 out:
   return: SUCCEED
+---
+test case: "17. Localhost"
+in:
+  string: "localhost"
+out:
+  return: SUCCEED
 ...

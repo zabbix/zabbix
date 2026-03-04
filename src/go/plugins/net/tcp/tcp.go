@@ -482,6 +482,59 @@ func (p *Plugin) exportNetServicePerf(params []string, timeout int) float64 {
 	return 0.0
 }
 
+func isDNS(host string) bool {
+	n := len(host)
+	if n == 0 || n > 253 {
+		return false
+	}
+
+	// first character must be alphanumeric
+	c := host[0]
+	if (c < '0' || c > '9') && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') {
+		return false
+	}
+
+	labelLen := 0
+	prevDash := false
+
+	for i := 1; i < n; i++ {
+		c = host[i]
+
+		switch {
+		case (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'):
+			labelLen++
+			prevDash = false
+		case c == '-':
+			// label must not start with dash
+			if labelLen == 0 {
+				return false
+			}
+			labelLen++
+			prevDash = true
+		case c == '.':
+			// empty label or label ending with dash
+			if labelLen == 0 || prevDash {
+				return false
+			}
+			labelLen = 0
+			prevDash = false
+		default:
+			return false
+		}
+
+		if labelLen > 63 {
+			return false
+		}
+	}
+
+	// last label must not be empty or end with dash
+	if labelLen == 0 || prevDash {
+		return false
+	}
+
+	return true
+}
+
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
@@ -509,6 +562,13 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		default:
 			err = errors.New(errorInvalidFirstParam)
 			return
+		}
+
+		if len(params) >= 2 && len(params[1]) != 0 {
+			if nil == net.ParseIP(params[1]) && !isDNS(params[1]) {
+				err = errors.New(errorInvalidSecondParam)
+				return
+			}
 		}
 
 		if len(params) == 3 && len(params[2]) != 0 {
