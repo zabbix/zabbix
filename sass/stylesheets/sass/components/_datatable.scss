@@ -4,8 +4,8 @@
 }
 
 .datatable {
-	border: 1px solid $ui-border-color;
 	position: relative;
+	border: 1px solid $ui-border-color;
 
 	.hidden {
 		display: none !important;
@@ -15,9 +15,9 @@
 		user-select: none;
 
 		.datatable-customize-header {
-			color: $font-color;
-			font-weight: 600;
 			margin-bottom: 10px;
+			font-weight: 600;
+			color: $font-color;
 		}
 
 		.datatable-customize-list {
@@ -27,9 +27,9 @@
 			margin-bottom: 10px;
 
 			.datatable-customize-list-item {
-				align-items: center;
 				display: flex;
 				flex-direction: row;
+				align-items: center;
 				gap: 5px;
 				height: 25px;
 
@@ -49,33 +49,33 @@
 	}
 
 	.datatable-context {
-		border: 1px solid $ui-border-color;
-		box-sizing: border-box;
-		box-shadow: 0 4px 20px 0 $action-shadow-color;
-		background-color: $ui-bg-color;
-		display: flex;
-		flex-direction: column;
-		gap: 5px;
-		min-height: 40px;
-		min-width: 220px;
-		max-height: 90vh;
-		max-width: 220px;
-		outline: none;
-		overflow-y: auto;
-		padding: 10px;
 		position: absolute;
 		top: calc(var(--datatable-row-height) + 1px);
-		user-select: none;
-		width: 220px;
 		z-index: 200;
+		box-sizing: border-box;
+		display: flex;
+		gap: 5px;
+		flex-direction: column;
+		width: 220px;
+		min-height: 40px;
+		max-height: 90vh;
+		padding: 10px;
+		overflow-y: auto;
+		background-color: $ui-bg-color;
+		border: 1px solid $ui-border-color;
+		box-shadow: 0 4px 20px 0 $action-shadow-color;
+		outline: none;
+		user-select: none;
 
 		&:focus {
 			outline: none;
 		}
 
-		.radio-list-control {
-			label {
-				transition: none;
+		@if $ui-transitions {
+			.radio-list-control {
+				label {
+					transition: none;
+				}
 			}
 		}
 
@@ -86,10 +86,10 @@
 		}
 
 		.form-label {
-			cursor: pointer;
 			display: inline-block;
 			height: 18px;
 			line-height: 18px;
+			cursor: pointer;
 		}
 
 		.form-field {
@@ -104,19 +104,19 @@
 	}
 
 	.datatable-rows {
+		display: contents;
 		background-color: $ui-bg-color;
 		border-top-left-radius: 2px;
 		border-top-right-radius: 2px;
-		display: contents;
 
 		.datatable-row {
 			display: contents;
 
 			.no-data-message {
-				background-color: $ui-bg-color;
-				border-top: none;
 				box-sizing: border-box;
 				padding: 100px 0;
+				background-color: $ui-bg-color;
+				border-top: none;
 			}
 
 			&.nested {
@@ -185,9 +185,9 @@
 			}
 
 			&::-webkit-scrollbar {
-				background: $ui-bg-color;
-				height: 10px;
 				width: 10px;
+				height: 10px;
+				background: $ui-bg-color;
 			}
 
 			&::-webkit-scrollbar-track {
@@ -195,12 +195,15 @@
 			}
 
 			&::-webkit-scrollbar-thumb {
+				cursor: pointer;
 				background-color: $datatable-scrollbar-thumb-bg-color;
 				background-clip: content-box;
 				border: 2px solid transparent;
 				border-radius: 5px;
-				cursor: pointer;
-				transition: background-color .3s ease;
+
+				@if $ui-transitions {
+					transition: background-color $ui-transition-duration ease;
+				}
 
 				&:hover {
 					background-color: $datatable-scrollbar-thumb-hover-bg-color;
@@ -215,9 +218,9 @@
 
 	.datatable-body {
 		align-items: center;
+		width: 100%;
 		background-color: $ui-bg-color;
 		border-radius: 2px;
-		width: 100%;
 
 		&.no-data-message {
 			padding: 100px 0;
@@ -225,7 +228,6 @@
 
 		&.datatable-body-loading {
 			&:after {
-				background-color: $datatable-overlay-color;
 				content: '';
 				position: absolute;
 				top: 2px;
@@ -233,58 +235,59 @@
 				left: 0;
 				bottom: 0;
 				width: 100%;
+				background-color: $datatable-overlay-color;
 			}
 		}
 	}
 
 	.datatable-footer {
-		align-items: center;
-		background-color: $ui-bg-color;
-		color: $font-alt-color;
 		display: grid;
-		height: var(--datatable-row-height);
 		grid-template-columns: 1fr auto 1fr;
+		align-items: center;
+		height: var(--datatable-row-height);
 		padding: 0 8px;
+		color: $font-alt-color;
+		background-color: $ui-bg-color;
 
 		&.datatable-footer-sticky {
-			bottom: 0;
 			position: sticky;
+			bottom: 0;
 			z-index: 10;
 		}
 
 		&.table-paging {
-			border: none;
-			border-top: 1px solid $ui-border-color;
+			border: solid $ui-border-color;
+			border-width: 1px 0 0;
 
 			#selected_count {
 				justify-self: start;
 			}
 
 			.table-stats {
-				justify-self: end;
 				position: static;
+				justify-self: end;
 			}
 		}
 	}
 
 	.cell {
-		align-items: center;
-		border-bottom: 1px solid $ui-border-color;
 		box-sizing: border-box;
-		display: flex;
-		min-height: var(--datatable-row-height);
-		min-width: 0;
 		position: relative;
+		display: flex;
+		align-items: center;
+		min-width: 0;
+		min-height: var(--datatable-row-height);
 		text-align: left;
+		border-bottom: 1px solid $ui-border-color;
 
 		&:not(.cell-bg) {
 			color: $font-color;
 		}
 
 		.cell-inner {
+			width: 100%;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			width: 100%;
 			white-space: nowrap;
 
 			.btn-icon {
@@ -303,8 +306,8 @@
 				width: 100%;
 
 				.link-action {
-					height: 16px;
 					min-width: 1ch;
+					height: 16px;
 				}
 
 				.rel-container {
@@ -322,8 +325,8 @@
 				flex-wrap: nowrap;
 
 				.tag {
-					height: 16px;
 					min-width: 24px;
+					height: 16px;
 
 					&.tag-inherited {
 						min-width: 35px;
@@ -353,8 +356,8 @@
 				}
 
 				span {
-					overflow: inherit;
 					min-width: 24px;
+					overflow: inherit;
 					text-overflow: inherit;
 					white-space: inherit;
 				}
@@ -362,16 +365,16 @@
 		}
 
 		&.cell-header {
-			background-color: $ui-bg-color;
-			box-sizing: border-box;
-			color: $font-alt-color;
-			display: flex;
-			height: var(--datatable-row-height);
-			justify-content: space-between;
 			position: sticky;
 			top: 0;
-			user-select: none;
 			z-index: 1;
+			box-sizing: border-box;
+			display: flex;
+			justify-content: space-between;
+			height: var(--datatable-row-height);
+			color: $font-alt-color;
+			background-color: $ui-bg-color;
+			user-select: none;
 
 			&:focus {
 				outline: none;
@@ -396,21 +399,21 @@
 				}
 
 				.header-link {
-					align-items: center;
-					border: none;
-					box-sizing: border-box;
 					display: flex;
+					align-items: center;
 					gap: 3px;
+					width: 100%;
 					height: calc(var(--datatable-row-height) - 1px);
 					padding: 0 8px;
+					border: none;
+					box-sizing: border-box;
 					text-decoration: none;
-					width: 100%;
 
 					.name {
 						overflow: hidden;
-						pointer-events: none;
 						text-overflow: ellipsis;
 						white-space: nowrap;
+						pointer-events: none;
 					}
 
 					&:hover,
@@ -419,34 +422,34 @@
 					}
 
 					.arrow-up {
-						border-bottom-color: $font-alt-color;
 						flex-shrink: 0;
+						border-bottom-color: $font-alt-color;
 						pointer-events: none;
 					}
 
 					.arrow-down {
-						border-top-color: $font-alt-color;
 						flex-shrink: 0;
+						border-top-color: $font-alt-color;
 						pointer-events: none;
 					}
 				}
 			}
 
 			.datatable-context-popup-link {
+				box-sizing: border-box;
+				display: flex;
+				flex-shrink: 0;
+				justify-content: center;
 				align-items: center;
+				text-align: center;
+				width: var(--datatable-row-height);
+				height: calc(var(--datatable-row-height) - 1px);
+				padding: 0;
+				color: $font-alt-color;
 				background-color: transparent;
 				border: 1px solid transparent;
 				border-radius: 0;
-				box-sizing: border-box;
-				color: $font-alt-color;
-				display: flex;
-				flex-shrink: 0;
-				height: calc(var(--datatable-row-height) - 1px);
-				justify-content: center;
-				padding: 0;
-				text-align: center;
 				user-select: none;
-				width: var(--datatable-row-height);
 
 				.zi-context {
 					margin-top: -2px;
@@ -468,23 +471,23 @@
 				&:hover,
 				&:focus,
 				&.datatable-context-popup-link-opened {
-					background-color: $ui-hover-bg-color;
-					border-color: $btn-alt-color;
-					box-shadow: none;
 					color: $font-alt-color;
+					border-color: $btn-alt-color;
+					background-color: $ui-hover-bg-color;
+					box-shadow: none;
 				}
 			}
 
 			.cell-header-resizer {
-				border-right: 3px solid transparent;
 				cursor: col-resize;
-				height: var(--datatable-row-height);
 				position: absolute;
-				right: 0;
 				top: -1px;
-				user-select: none;
-				width: 10px;
+				right: 0;
 				z-index: 20;
+				width: 10px;
+				height: var(--datatable-row-height);
+				border-right: 3px solid transparent;
+				user-select: none;
 
 				&:hover {
 					border-right-color: $datatable-resizer-border-color;
@@ -519,16 +522,18 @@
 			align-items: flex-start;
 			padding: 0 8px;
 
-			a {
-				transition: color .2s ease-out;
+			@if $ui-transitions {
+				a {
+					transition: color $ui-transition-duration ease-out;
+				}
 			}
 
 			.cell-inner {
-				display: block;          /* Standard flow for inline/block children */
-				min-height: 32px;        /* Ensures the 32px floor */
+				box-sizing: border-box;
+				display: block;
 				padding: 6px 0;
-				box-sizing: border-box;  /* Includes padding in the 32px min-height */
-				line-height: 20px;       /* The "base" height of a single line of text */
+				min-height: 32px;
+				line-height: 20px;
 
 				& + .timeline-axis {
 					margin-left: 5px;
@@ -556,17 +561,17 @@
 			}
 
 			.btn-icon {
-				height: 18px;
 				min-width: 18px;
+				height: 18px;
 			}
 
 			.symptoms {
-				align-items: center;
 				display: flex;
+				justify-content: flex-start;
+				align-items: center;
 				flex-shrink: 0;
 				gap: 3px;
 				height: var(--datatable-row-height);
-				justify-content: flex-start;
 
 				.symptoms-left {
 					max-width: 3ch;
@@ -595,9 +600,9 @@
 			.timeline-th,
 			.timeline-td {
 				position: relative;
-				padding: 0;
 				width: 6px;
 				height: 100%;
+				padding: 0;
 			}
 
 			.timeline-axis {
@@ -666,8 +671,8 @@
 			padding: 0 8px;
 
 			.cell-inner {
-				text-overflow: initial;
 				width: 23px;
+				text-overflow: initial;
 			}
 
 			.checkbox-radio {
@@ -713,9 +718,9 @@
 	&.compact-view {
 		.cell {
 			&.cell-data {
+				padding: 2px 8px;
 				height: var(--datatable-compact-row-height);
 				min-height: initial;
-				padding: 2px 8px;
 
 				.cell-inner {
 					padding: 0;
@@ -730,8 +735,8 @@
 				}
 
 				.table-stats {
-					padding: 0;
 					right: 0;
+					padding: 0;
 				}
 			}
 		}
