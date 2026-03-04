@@ -25,6 +25,8 @@ Zabbix version: 7.0 and higher.
 
 4. Attach this to a new user called "**Rootly**" and assign **User role permissions** with this media type
 
+5. Send a test alert to **Rootly** from Zabbix to make sure its working (**Zabbix > Media Type > on the Rootly row, there will be an `Action` column with a "Test" button on it**)
+
 
 ### Bonus Feature for Rootly "2 way ack" back to Zabbix
 
