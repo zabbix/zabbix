@@ -155,12 +155,20 @@ class CDevice extends CApiService {
 		$this->validateOnboard($options, $db_device);
 
 		// Store MIK, MEK.
+		$device_keyid = DB::reserveIds('device_key', 2);
+
 		$fields = [
-			['deviceid' => $db_device['deviceid'], 'scope' => self::DEVICE_KEY_SCOPE_IDENTITY,
-				'key' => $options['mobile_identity_key']
+			[
+				'device_keyid' => $device_keyid,
+				'deviceid' => $db_device['deviceid'],
+				'scope' => self::DEVICE_KEY_SCOPE_IDENTITY,
+				'key_' => json_encode($options['mobile_identity_key'])
 			],
-			['deviceid' => $db_device['deviceid'], 'scope' => self::DEVICE_KEY_SCOPE_ENCRYPTION,
-				'key' => $options['mobile_encryption_key']
+			[
+				'device_keyid' => bcadd($device_keyid, 1, 0),
+				'deviceid' => $db_device['deviceid'],
+				'scope' => self::DEVICE_KEY_SCOPE_ENCRYPTION,
+				'key_' => json_encode($options['mobile_encryption_key'])
 			]
 		];
 		DB::insertBatch('device_key', $fields, false);
@@ -273,12 +281,20 @@ class CDevice extends CApiService {
 	}
 
 	private function validateOnboard(array $options, ?array &$db_device): void {
+		$api_input_jwk_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'kid' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'x' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+			'y' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
+		]];
+
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'enrollment_token' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'mobile_identity_key' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'mobile_encryption_key' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'push_token' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'device_name' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+			'enrollment_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'mobile_identity_key' => $api_input_jwk_rules,
+			'mobile_encryption_key' => $api_input_jwk_rules,
+			'push_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'device_name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
@@ -302,9 +318,18 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
+		if (CApiDpopHelper::checkThumbprint($options['mobile_identity_key'], $options['mobile_identity_key']['kid'])) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		if (CApiDpopHelper::checkThumbprint($options['mobile_encryption_key'],
+				$options['mobile_encryption_key']['kid'])) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
 		$db_devices = DB::select('device', [
 			'output' => ['deviceid', 'userid'],
-			'where' => ['deviceid' => $db_enrollment_token['deviceid']]
+			'filter' => ['deviceid' => $db_enrollment_token['deviceid']]
 		]);
 
 		$db_device = reset($db_devices);

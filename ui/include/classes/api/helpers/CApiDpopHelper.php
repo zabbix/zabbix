@@ -15,25 +15,24 @@
 
 
 use Firebase\JWT\JWT;
-use Firebase\JWT\Key;
+use Firebase\JWT\JWK;
 
 /**
  * Helper class containing methods for DPoP signature verification.
  */
 class CApiDpopHelper {
 
-	public const PUBLIC_KEY_PEM = '-----BEGIN PUBLIC KEY-----
-MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE03irsjT9U8UHjfQWxRKmO7hRODMW
-FVYsajjgjBE0FLCjNfOpwqeQUrXHxCTF4Vi/euCMvHNipe50AjfMIVJHag==
------END PUBLIC KEY-----';
-
 	private const IAT_DELAY = 2;
 	private const IAT_EXP_MAX_DIFFERENCE = 60;
 
-	public static function verifyDpopSignature(string $signature, string $pem, string $access_token,
+	public static function verifyDpopSignature(string $signature, string $encoded_jwk, string $access_token,
 			string $request_api_method): bool {
+		$jwk = json_decode($encoded_jwk);
+
+		$key = JWK::parseKey($jwk, 'ES256');
+
 		try {
-			JWT::decode($signature, new Key($pem, 'ES256'));
+			JWT::decode($signature, $key);
 		}
 		catch (Exception $e) {
 			return false;
@@ -48,9 +47,7 @@ FVYsajjgjBE0FLCjNfOpwqeQUrXHxCTF4Vi/euCMvHNipe50AjfMIVJHag==
 			return false;
 		}
 
-		$dpop_jwk = self::getDpopJwkFromPem($pem);
-
-		if (!self::checkKid($header, $dpop_jwk)) {
+		if (!self::checkKid($header, $jwk)) {
 			return false;
 		}
 
@@ -81,11 +78,7 @@ FVYsajjgjBE0FLCjNfOpwqeQUrXHxCTF4Vi/euCMvHNipe50AjfMIVJHag==
 	}
 
 	private static function checkKid(array $header, array $dpop_jwk): bool {
-		$expected_jwk_hash = JWT::urlsafeB64Encode(
-			hash('sha256', json_encode($dpop_jwk, JSON_UNESCAPED_SLASHES), true)
-		);
-
-		return array_key_exists('kid', $header) && hash_equals($expected_jwk_hash, $header['kid']);
+		return array_key_exists('kid', $header) && self::checkThumbprint($dpop_jwk, $header['kid']);
 	}
 
 	private static function checkHtu(array $payload, string $request_api_method): bool {
@@ -150,10 +143,21 @@ FVYsajjgjBE0FLCjNfOpwqeQUrXHxCTF4Vi/euCMvHNipe50AjfMIVJHag==
 		$details = openssl_pkey_get_details($public_key);
 
 		return [
-			'kty' => 'EC',
 			'crv' => 'P-256',
+			'kty' => 'EC',
 			'x' => JWT::urlsafeB64Encode($details['ec']['x']),
 			'y' => JWT::urlsafeB64Encode($details['ec']['y'])
 		];
+	}
+
+	public static function checkThumbprint(array $jwk, string $kid): bool {
+		$canonical_jwk = array_intersect_key($jwk, array_flip(['crv', 'kty', 'x', 'y']));
+		ksort($canonical_jwk);
+
+		$expected_jwk_hash = JWT::urlsafeB64Encode(
+			hash('sha256', json_encode($canonical_jwk, JSON_UNESCAPED_SLASHES), true)
+		);
+
+		return hash_equals($expected_jwk_hash, $kid);
 	}
 }

@@ -10339,7 +10339,7 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
-			'key' => [
+			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 511,

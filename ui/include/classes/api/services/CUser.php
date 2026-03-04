@@ -3013,6 +3013,13 @@ class CUser extends CApiService {
 				'where' => ['tokenid' => $db_token['tokenid']]
 			]);
 
+			if ($db_token['auth_type'] == ZBX_API_HEADER_AUTHENTICATE_DPOP) {
+				DB::update('device', [
+					'values' => ['last_access_time' => $time],
+					'where' => ['tokenid' => $db_token['tokenid']]
+				]);
+			}
+
 			self::$userData = $db_user + ['token' => $session['token']];
 
 		}
@@ -3046,10 +3053,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$db_token = $db_tokens[0];
-
-		// mock data to choice DPoP auth type
-		$db_token['auth_type'] = ZBX_API_HEADER_AUTHENTICATE_DPOP;
+		$db_token = reset($db_tokens);
 
 		if ($db_token['expires_at'] != 0 && $db_token['expires_at'] < $time) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
@@ -3060,8 +3064,8 @@ class CUser extends CApiService {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
-			$db_device_keys = DBfetch(DBselect(
-				'SELECT dk.key'.
+			$db_device_key = DBfetch(DBselect(
+				'SELECT dk.key_'.
 				' FROM device_key dk'.
 				' JOIN device d ON d.deviceid=dk.deviceid'.
 				' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
@@ -3070,20 +3074,17 @@ class CUser extends CApiService {
 				1
 			));
 
-			if (!$db_device_keys) {
+			if (!$db_device_key) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
-			// mock client public key
-			$db_device_keys['key'] = CApiDpopHelper::PUBLIC_KEY_PEM;
-
-			if (!CApiDpopHelper::verifyDpopSignature($signature, $db_device_keys['key'], $auth_token,
+			if (!CApiDpopHelper::verifyDpopSignature($signature, $db_device_key['key_'], $auth_token,
 					$request_api_method)) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 		}
 
-		return array_diff_key($db_token, array_flip(['expires_at', 'flags', 'public_key_pem']));
+		return array_diff_key($db_token, array_flip(['expires_at', 'flags']));
 	}
 
 	/**
