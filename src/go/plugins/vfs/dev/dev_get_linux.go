@@ -49,8 +49,8 @@ type vfsDevice struct {
 
 type vfsDevDisksCfg struct {
 	Name            string `json:"name"`
-	Type            string `json:"type"`
 	Devid           string `json:"devid"`
+	Type            string `json:"type"`
 	Path            string `json:"path"`
 	Model           string `json:"model"`
 	Serial          string `json:"serial"`
@@ -74,8 +74,8 @@ type vfsStats struct {
 
 type vfsDevDiskStatsCfg struct {
 	Name      string `json:"name"`
-	Type      string `json:"type"`
 	Devid     string `json:"devid"`
+	Type      string `json:"type"`
 	SizeBytes uint64 `json:"size_bytes"`
 }
 
@@ -93,9 +93,8 @@ type vfsPartitions map[string]uint64
 
 type vfsDevicesCfg struct {
 	Name       string        `json:"name"`
-	Type       string        `json:"type"`
-	Model      string        `json:"model"`
 	Devid      string        `json:"devid"`
+	Type       string        `json:"type"`
 	Partitions vfsPartitions `json:"partitions"`
 }
 
@@ -105,8 +104,8 @@ type vfsDevices struct {
 
 type vfsDeviceStatsCfg struct {
 	Name      string `json:"name"`
-	Type      string `json:"type"`
 	Devid     string `json:"devid"`
+	Type      string `json:"type"`
 	SizeBytes uint64 `json:"size_bytes"`
 }
 
@@ -441,8 +440,8 @@ func vfsDevGetDisks(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Rege
 		model := devModelGet(rdev)
 		cfg := vfsDevDisksCfg{
 			Name:            dev.Name,
-			Type:            dev.Type,
 			Devid:           devIdGet(devIds, rdev, model),
+			Type:            dev.Type,
 			Path:            devPathGet(dev.Name),
 			Model:           model,
 			Serial:          devSerialGet(rdev),
@@ -478,8 +477,8 @@ func vfsDevGetDiskStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.
 		model := devModelGet(rdev)
 		cfg := vfsDevDiskStatsCfg{
 			Name:      dev.Name,
-			Type:      dev.Type,
 			Devid:     devIdGet(devIds, rdev, model),
+			Type:      dev.Type,
 			SizeBytes: sysfsSizeGet(rdev),
 		}
 		out.Cfg = append(out.Cfg, cfg)
@@ -514,9 +513,8 @@ func vfsDevGetDevices(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Re
 		model := devModelGet(rdev)
 		cfg := vfsDevicesCfg{
 			Name:       dev.Name,
-			Type:       dev.Type,
-			Model:      model,
 			Devid:      devIdGet(devIds, rdev, model),
+			Type:       dev.Type,
 			Partitions: sysfsDiskPartitionsGet(rdev),
 		}
 		out.Cfg = append(out.Cfg, cfg)
@@ -546,8 +544,8 @@ func vfsDevGetDeviceStats(devs []*devRecord, rdevs map[string]uint64, reg *regex
 		model := devModelGet(rdev)
 		cfg := vfsDeviceStatsCfg{
 			Name:      dev.Name,
-			Type:      dev.Type,
 			Devid:     devIdGet(devIds, rdev, model),
+			Type:      dev.Type,
 			SizeBytes: sysfsSizeGet(rdev),
 		}
 		out.Cfg = append(out.Cfg, cfg)
