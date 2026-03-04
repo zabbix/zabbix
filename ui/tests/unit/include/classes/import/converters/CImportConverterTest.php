@@ -14,8 +14,6 @@
 **/
 
 
-require_once __DIR__.'/../../../../../../include/runtime.support.inc.php';
-
 use PHPUnit\Framework\TestCase;
 
 abstract class CImportConverterTest extends TestCase {
