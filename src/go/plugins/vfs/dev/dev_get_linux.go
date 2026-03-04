@@ -335,7 +335,7 @@ func sysfsPhysicalBlksizeGet(rdev uint64) uint64 {
 	return sysfsUintGet(rdev, path.Join("queue", "physical_block_size"))
 }
 
-//nolint:gocyclo // large switch over independent token indices, not genuinely complex
+//nolint:gocognit // large switch over independent token indices, not genuinely complex
 func sysfsDevStatsGet(rdev uint64) vfsStats {
 	var stats vfsStats
 
