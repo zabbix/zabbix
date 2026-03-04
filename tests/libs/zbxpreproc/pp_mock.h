@@ -12,21 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_HOUSEKEEPER_TABLE_H
-#define ZABBIX_HOUSEKEEPER_TABLE_H
+#ifndef ZABBIX_ZBXPREPROC_PP_MOCK_H
+#define ZABBIX_ZBXPREPROC_PP_MOCK_H
 
-#include "zbxtypes.h"
+#include "zbxtime.h"
 
-void	housekeeper_init(void);
-void	housekeeper_deinit(void);
+int	str_to_preproc_type(const char *str);
 
-void	housekeeper_process(int config_max_hk_delete, zbx_int64_t *deleted_history, zbx_int64_t *deleted_events,
-		zbx_int64_t *deleted_problems);
-
-int	hk_cfg_history_mode(void);
-int	hk_cfg_trends_mode(void);
-int	hk_cfg_events_mode(void);
-
-int	hk_delete_from_table(const char *tablename, const char *filter, int limit);
+void	mock_pp_read_variant(zbx_mock_handle_t handle, zbx_variant_t *value);
+void	mock_pp_read_value(zbx_mock_handle_t handle, unsigned char *value_type, zbx_variant_t *value,
+		zbx_timespec_t *ts);
+void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step);
 
 #endif
