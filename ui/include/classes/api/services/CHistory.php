@@ -369,8 +369,7 @@ class CHistory extends CApiService {
 		}
 
 		if ($options['filter'] !== null) {
-			// TBD: clock and ns field will fail.
-			$this->dbFilter($sql_parts['from'], $options, $sql_parts);
+			$this->dbFilterClickhouse($sql_parts['from'], $options, $sql_parts);
 		}
 
 		if ($options['search'] !== null) {
@@ -397,6 +396,41 @@ class CHistory extends CApiService {
 		}
 
 		return CClickhouseHelper::query($query, $storage);
+	}
+
+	/**
+	 * Add ClickHouse specific filter condition to $sql_parts.
+	 * Modifies original $sql_parts array.
+	 *
+	 * @param string $table
+	 * @param array  $options
+	 * @param array  $sql_parts
+	 */
+	private function dbFilterClickhouse(string $table, array $options, array &$sql_parts) {
+		$clock_fields = array_intersect_key($options['filter'], array_flip(['clock', 'ns']));
+
+		if (!$clock_fields) {
+			return $this->dbFilter($table, $options, $sql_parts);
+		}
+
+		$sql_parts['where']['filter'] = '';
+		$options['filter'] = array_diff_key($options['filter'], $clock_fields);
+
+		if (array_key_exists('clock', $clock_fields)) {
+			$sql_parts['where']['filter'] = dbConditionInt('toUnixTimestamp(h.clock_ns)',
+				$clock_fields['clock']
+			);
+		}
+
+		if (array_key_exists('ns', $clock_fields)) {
+			$operation = ($options['searchByAny'] === null || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
+			$sql_parts['where']['filter'] .= $sql_parts['where']['filter'] !== '' ? $operation : '';
+			$sql_parts['where']['filter'] .= dbConditionInt('toUnixTimestamp64Nano(h.clock_ns)%1000000000',
+				$clock_fields['ns']
+			);
+		}
+
+		return $this->dbFilter($table, $options, $sql_parts);
 	}
 
 	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
