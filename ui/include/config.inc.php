@@ -14,7 +14,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/runtime.support.inc.php';
 require_once dirname(__FILE__).'/classes/core/APP.php';
 
 try {
