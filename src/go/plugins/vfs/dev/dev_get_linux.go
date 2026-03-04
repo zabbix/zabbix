@@ -233,6 +233,7 @@ func sysfsStrGet(rdev uint64, relPath string) string {
 		relPath,
 	)
 
+	//nolint:gosec // path is constructed from controlled, trusted components
 	data, err := os.ReadFile(filepath)
 	if err != nil {
 		return ""
@@ -401,11 +402,13 @@ func sysfsDiskPartitionsGet(rdev uint64) vfsPartitions {
 		partitionPath := path.Join(diskPath, entry.Name())
 
 		/* partition directories should contain a text file named "partition" */
+		//nolint:gosec // path is constructed from controlled, trusted components
 		stat, err := os.Stat(path.Join(partitionPath, "partition"))
 		if err != nil || !stat.Mode().IsRegular() {
 			continue
 		}
 
+		//nolint:gosec // path is constructed from controlled, trusted components
 		val, err := os.ReadFile(path.Join(partitionPath, "size"))
 		if err != nil {
 			continue
