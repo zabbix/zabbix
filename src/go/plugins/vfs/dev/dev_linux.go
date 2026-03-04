@@ -49,6 +49,7 @@ type devRecord struct {
 	Type string `json:"{#DEVTYPE}"`
 }
 
+//nolint:gocognit // this is a legacy function with some minor changes
 func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
 	entries, err := os.ReadDir(devLocation)
 	if err != nil {
