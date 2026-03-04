@@ -8,6 +8,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
 ..F....... [ZBX-27225] fixed incorrect coloring of disabled host links in the Proxies list (Ivo)
 .......PS. [ZBX-27067] fixed script macros expanding by Zabbix proxy during autoregistration (vsmelovs)
 .......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
@@ -211,6 +212,7 @@ New features:
 A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
 .......PS. [ZBX-27067] fixed script macros expanding via Zabbix proxy during autoregistration (vsmelovs)
 .......PS. [ZBX-27406] fixed dependent item error message clearing in preprocessing (askolmeisters)
 ..F....... [ZBX-25930] fixed incorrect filter being applied when switching subfilters in multiple tabs in Data collection->Hosts->Items, Monitoring->Hosts->Graphs (gberzina)
