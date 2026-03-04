@@ -41,6 +41,8 @@ const (
 	devTypeRomString  = "rom"
 )
 
+var errCannotObtainDevInfo = errs.New("cannot obtain device information")
+
 type devRecord struct {
 	Name string `json:"{#DEVNAME}"`
 	Type string `json:"{#DEVTYPE}"`
@@ -321,10 +323,12 @@ func isSysfsAvailable() (bool, error) {
 	}
 
 	if !found {
-		return false, fmt.Errorf(
-			"cannot obtain device information, directory \"%s\" is not found",
-			sysBlkdevLocation,
-		)
+		// return false, fmt.Errorf(
+		// 	"cannot obtain device information, directory \"%s\" is not found",
+		// 	sysBlkdevLocation,
+		// )
+
+		return false, errs.Wrapf(errCannotObtainDevInfo, "directory \"%s\" is not found", sysBlkdevLocation)
 	}
 
 	return true, nil
