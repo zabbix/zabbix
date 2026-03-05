@@ -4286,5 +4286,9 @@ z-select {
 		&.link-alt:not(:hover):not(:focus) {
 			@extend .#{$class};
 		}
+
+		&.link:not(:hover):not(:focus) {
+			@extend .#{$class};
+		}
 	}
 }
