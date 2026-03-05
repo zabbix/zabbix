@@ -20,9 +20,7 @@ class CFieldMenuPath extends CFieldTextBox {
 			return super.getValue();
 		}
 
-		return this.#splitPath(super.getValueTrimmed())
-			.map(path_item => path_item.trim())
-			.join('/');
+		return this.#splitPath(super.getValueTrimmed()).join('/');
 	}
 
 	#splitPath(path) {
@@ -53,6 +51,10 @@ class CFieldMenuPath extends CFieldTextBox {
 		}
 
 		path_items.push(path_item);
+
+		if (this._allow_trim) {
+			path_items = path_items.map(item => item.trim());
+		}
 
 		if (path_items[0] === '' && path_items[1] !== '') {
 			path_items = path_items.slice(1);
