@@ -1047,18 +1047,8 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return SYSINFO_RET_FAIL;
 	}
 
-	devnames = get_rparam(request, 0);
-	mode = get_rparam(request, 1);
-
-	if (NULL != devnames && '\0' != *devnames && SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
-	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in first parameter: %s",
-				rxp_error));
-
-		zbx_free(rxp_error);
-		ret = SYSINFO_RET_FAIL;
-		goto clean;
-	}
+	mode = get_rparam(request, 0);
+	devnames = get_rparam(request, 1);
 
 	if (NULL == mode || '\0' == *mode || 0 == strcmp(mode, "disks"))	/* default parameter */
 	{
@@ -1082,7 +1072,17 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 	else
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
+		ret = SYSINFO_RET_FAIL;
+		goto clean;
+	}
+
+	if (NULL != devnames && '\0' != *devnames && SUCCEED != zbx_regexp_compile(devnames, &devnames_rxp, &rxp_error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in second parameter: %s",
+				rxp_error));
+
+		zbx_free(rxp_error);
 		ret = SYSINFO_RET_FAIL;
 		goto clean;
 	}

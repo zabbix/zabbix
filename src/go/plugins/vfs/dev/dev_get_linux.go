@@ -132,7 +132,7 @@ func vfsDevGetParseModeParam(mode string) (vfsDevGetMode, error) {
 		return modeDeviceStats, nil
 
 	default:
-		return modeNone, errs.Wrapf(zbxerr.ErrorInvalidParams, "invalid second parameter '%s'", mode)
+		return modeNone, errs.Wrapf(zbxerr.ErrorInvalidParams, "invalid first parameter '%s'", mode)
 	}
 }
 
@@ -147,7 +147,7 @@ func vfsDevGetPrepareRegexParam(devNames string) (*regexp.Regexp, error) {
 		if err != nil {
 			return nil, errs.Wrapf(
 				err,
-				"invalid regular expression in first parameter: %q",
+				"invalid regular expression in second parameter: %q",
 				devNames,
 			)
 		}
@@ -165,14 +165,14 @@ func vfsDevGetParamsValidate(params []string) (vfsDevGetMode, *regexp.Regexp, er
 
 	switch len(params) {
 	case 2:
-		mode, err = vfsDevGetParseModeParam(params[1])
+		devNamesRgx, err = vfsDevGetPrepareRegexParam(params[1])
 		if err != nil {
 			return modeNone, nil, err
 		}
 
 		fallthrough
 	case 1:
-		devNamesRgx, err = vfsDevGetPrepareRegexParam(params[0])
+		mode, err = vfsDevGetParseModeParam(params[0])
 		if err != nil {
 			return modeNone, nil, err
 		}
