@@ -18,6 +18,8 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxregexp.h"
+#include "zbxalgo.h"
+#include "zbxnum.h"
 
 #include "../common/stats.h"
 #include "../common/diskdevices.h"
