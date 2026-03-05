@@ -374,12 +374,17 @@
 
 					const {type, title, messages} = event.detail;
 
-					if (type == 'clear') {
+					if (type == CMessageHelper.TYPE_CLEAR) {
 						clearMessages();
 					}
 					else {
 						addMessage(makeMessageBox(type, messages, title));
 					}
+				})
+				.on(CPager.EVENT_STATE_CHANGE, event => {
+					const {page} = event.detail;
+
+					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_INIT, () => this.refreshCounters())
 				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
@@ -464,7 +469,6 @@
 					}
 				})
 				.catch(error => {
-					CMessageHelper.clear(this.datatable.getElement());
 					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
 				});
 		},
@@ -530,8 +534,6 @@
 			})
 				.then((response) => response.json())
 				.then((response) => {
-					CMessageHelper.clear(this.datatable.getElement());
-
 					/*
 					 * Using postMessageError or postMessageOk would mean that those messages are stored in session
 					 * messages and that would mean to reload the page and show them. Also postMessageError would be
@@ -552,7 +554,6 @@
 				.catch(() => {
 					const title = <?= json_encode(_('Unexpected server error.')) ?>;
 
-					CMessageHelper.clear(this.datatable.getElement());
 					CMessageHelper.error(this.datatable.getElement(), [], title);
 				})
 				.finally(() => {

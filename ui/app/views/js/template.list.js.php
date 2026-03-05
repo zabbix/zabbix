@@ -144,18 +144,6 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
-				.on(CMessageHelper.EVENT_MESSAGE, event => {
-					event.stopPropagation();
-
-					const {type, title, messages} = event.detail;
-
-					if (type == 'clear') {
-						clearMessages();
-					}
-					else {
-						addMessage(makeMessageBox(type, messages, title));
-					}
-				})
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [templateid, name] = column_data;
 
@@ -411,6 +399,23 @@
 					if (templates.length > max_in_table) {
 						cell_inner.innerHTML += ' &hellip;';
 					}
+				})
+				.on(CMessageHelper.EVENT_MESSAGE, event => {
+					event.stopPropagation();
+
+					const {type, title, messages} = event.detail;
+
+					if (type == CMessageHelper.TYPE_CLEAR) {
+						clearMessages();
+					}
+					else {
+						addMessage(makeMessageBox(type, messages, title));
+					}
+				})
+				.on(CPager.EVENT_STATE_CHANGE, event => {
+					const {page} = event.detail;
+
+					new CState().setParams({page});
 				})
 				.init(user_configs);
 		}

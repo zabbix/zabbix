@@ -518,8 +518,6 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						const callback = response => {
 							this.datatable.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
 
-							CMessageHelper.clear(this.datatable.getElement());
-
 							if (response.error) {
 								const title = response.error.title ?? '';
 								CMessageHelper.error(this.datatable.getElement(), response.error.messages, title);
@@ -787,12 +785,17 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const {type, title, messages} = event.detail;
 
-					if (type == 'clear') {
+					if (type == CMessageHelper.TYPE_CLEAR) {
 						clearMessages();
 					}
 					else {
 						addMessage(makeMessageBox(type, messages, title));
 					}
+				})
+				.on(CPager.EVENT_STATE_CHANGE, event => {
+					const {page} = event.detail;
+
+					new CState().setParams({page});
 				})
 				.init(user_configs);
 		},

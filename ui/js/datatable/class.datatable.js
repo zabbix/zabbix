@@ -608,15 +608,19 @@ class CDataTable {
 		this.#footer.appendChild(selected_count);
 
 		this.#pager = new CPager(this.#footer);
-		this.#pager.on(CPager.EVENT_SELECT, event => {
-			const {page} = event.detail;
+		this.#pager
+			.on(CPager.EVENT_SELECT, event => {
+				const {page} = event.detail;
 
-			this.#element.classList.add(ZBX_STYLE_LOADING);
+				this.#element.classList.add(ZBX_STYLE_LOADING);
 
-			this.#page = page;
+				this.#page = page;
 
-			this.dispatchEvent(CDataTable.EVENT_INIT);
-		});
+				this.dispatchEvent(CDataTable.EVENT_INIT);
+			})
+			.on(CPager.EVENT_STATE_CHANGE, event => {
+				this.dispatchEvent(CPager.EVENT_STATE_CHANGE, event.detail);
+			});
 
 		this.#element.classList.add(CDataTable.ZBX_STYLE_CONTAINER);
 		this.#element.append(this.#body, this.#footer);
@@ -1120,7 +1124,6 @@ class CDataTable {
 		this.#data_provider.getData(params)
 			.then(response => {
 				if ('error' in response && response.error) {
-					CMessageHelper.clear(this.#element);
 					CMessageHelper.error(this.#element, [response.error], t('Unexpected server error.'));
 				}
 
@@ -1133,7 +1136,6 @@ class CDataTable {
 			})
 			.catch(error => {
 				if (error.name != 'AbortError') {
-					CMessageHelper.clear(this.#element);
 					CMessageHelper.error(this.#element, [error.message], error.name);
 				}
 
@@ -1252,7 +1254,7 @@ class CDataTable {
 	onDataSort(event, sort_field, sort_order) {
 		event.preventDefault();
 
-		history.pushState(null, '', event.target.href);
+		new CState(event.target.href).push();
 
 		this.#sort_field = sort_field;
 		this.#sort_order = sort_order;
@@ -1397,7 +1399,6 @@ class CDataTable {
 		this.#data_provider.getData(params)
 			.then(response => {
 				if ('error' in response && response.error) {
-					CMessageHelper.clear(this.#element);
 					CMessageHelper.error(this.#element, [response.error], t('Unexpected server error.'));
 
 					return;

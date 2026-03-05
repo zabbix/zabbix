@@ -16,6 +16,7 @@
 class CPager {
 
 	static EVENT_SELECT = 'select';
+	static EVENT_STATE_CHANGE = 'state:change';
 
 	static RANGE = 11;
 
@@ -23,11 +24,6 @@ class CPager {
 	 * @type {HTMLElement}
 	 */
 	#element;
-
-	/**
-	 * @type {URL}
-	 */
-	#url;
 
 	/**
 	 * @type {number}
@@ -46,15 +42,13 @@ class CPager {
 	constructor(element) {
 		this.#element = element;
 
-		this.#url = new URL(location.href);
-		this.#page = this.#url.searchParams.get('page') || 1;
+		this.#page = new CState().getParams().get('page') || 1;
 
 		this.#state_abort_controller?.abort();
 		this.#state_abort_controller = new AbortController();
 
 		window.addEventListener('popstate', event => {
-			const url = new URL('', event.target.location.href);
-			const page = url.searchParams.get('page') || 1;
+			const page = new CState(event.target.location.href).getParams().get('page') || 1;
 
 			this.dispatchEvent(CPager.EVENT_SELECT, {page});
 		}, { signal: this.#state_abort_controller.signal });
@@ -75,12 +69,19 @@ class CPager {
 	onSelect(event) {
 		const {page} = event.detail;
 
-		this.#pushState(page);
+		this.#page = page;
+
+		this.dispatchEvent(CPager.EVENT_STATE_CHANGE, {page});
 	}
 
 	update({page, rows_per_page, num_rows, limit_exceeded}) {
+		this.#element.querySelector(`.${ZBX_STYLE_PAGING_BTN_CONTAINER}`)?.remove();
+		this.#element.querySelector(`.${ZBX_STYLE_TABLE_STATS}`)?.remove();
+
 		if (this.#page != page) {
-			this.#pushState(page);
+			this.#page = page;
+
+			this.dispatchEvent(CPager.EVENT_STATE_CHANGE, {page});
 		}
 
 		const num_pages = Math.max(1, Math.round(Math.ceil(num_rows / rows_per_page)));
@@ -90,10 +91,7 @@ class CPager {
 		const start = (page - 1) * rows_per_page;
 		const end = Math.min(num_rows, start + rows_per_page);
 
-		let nav = this.#element.querySelector(`.${ZBX_STYLE_PAGING_BTN_CONTAINER}`);
-		nav?.remove();
-
-		nav = document.createElement('nav');
+		const nav = document.createElement('nav');
 		nav.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
 		nav.setAttribute('role', 'navigation');
 		nav.setAttribute('aria-label', 'Pager');
@@ -167,10 +165,7 @@ class CPager {
 			}
 		}
 
-		let stats = this.#element.querySelector(`.${ZBX_STYLE_TABLE_STATS}`);
-		stats?.remove();
-
-		stats = document.createElement('div');
+		const stats = document.createElement('div');
 		stats.classList.add(ZBX_STYLE_TABLE_STATS);
 
 		if (num_pages == 1) {
@@ -191,17 +186,23 @@ class CPager {
 	/**
 	 * @param {string}   event
 	 * @param {function} callback
+	 * @returns {CPager}
 	 */
 	on(event, callback) {
 		this.#element.addEventListener(event, callback.bind(this));
+
+		return this;
 	}
 
 	/**
 	 * @param {string}   event
 	 * @param {function} callback
+	 * @returns {CPager}
 	 */
 	off(event, callback) {
 		this.#element.addEventListener(event, callback.bind(this));
+
+		return this;
 	}
 
 	/**
@@ -218,16 +219,5 @@ class CPager {
 	 */
 	#bindEvents() {
 		Object.entries(this.#events).forEach(([name, callback]) => this.on(name, callback));
-	}
-
-	/**
-	 * @param {number} page
-	 */
-	#pushState(page) {
-		this.#page = page;
-
-		this.#url.searchParams.set('page', page.toString());
-
-		history.pushState(null, '', this.#url);
 	}
 }

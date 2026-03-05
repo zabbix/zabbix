@@ -339,12 +339,17 @@
 
 					const {type, title, messages} = event.detail;
 
-					if (type == 'clear') {
+					if (type == CMessageHelper.TYPE_CLEAR) {
 						clearMessages();
 					}
 					else {
 						addMessage(makeMessageBox(type, messages, title));
 					}
+				})
+				.on(CPager.EVENT_STATE_CHANGE, event => {
+					const {page} = event.detail;
+
+					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => this.refreshCounters())
 				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
@@ -409,7 +414,6 @@
 					}
 				})
 				.catch(error => {
-					CMessageHelper.clear(this.datatable.getElement());
 					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
 				});
 		},

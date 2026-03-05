@@ -562,12 +562,17 @@
 
 					const {type, title, messages} = event.detail;
 
-					if (type == 'clear') {
+					if (type == CMessageHelper.TYPE_CLEAR) {
 						clearMessages();
 					}
 					else {
 						addMessage(makeMessageBox(type, messages, title));
 					}
+				})
+				.on(CPager.EVENT_STATE_CHANGE, event => {
+					const {page} = event.detail;
+
+					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
 					this.refreshCounters();
@@ -675,8 +680,6 @@
 				callback: ({data, event}) => {
 					event.preventDefault();
 
-					CMessageHelper.clear(this.datatable.getElement());
-
 					if ('success' in data.submit) {
 						CMessageHelper.success(this.datatable.getElement(), data.submit.success.messages,
 							data.submit.success.title);
@@ -780,7 +783,6 @@
 					}
 				})
 				.catch(error => {
-					CMessageHelper.clear(this.datatable.getElement());
 					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
 				});
 		},
@@ -797,7 +799,6 @@
 
 		onDataDone(response) {
 			if ('messages' in response) {
-				CMessageHelper.clear(this.datatable.getElement());
 				CMessageHelper.success(this.datatable.getElement(), [], response.messages, {show_close_box: true});
 			}
 
