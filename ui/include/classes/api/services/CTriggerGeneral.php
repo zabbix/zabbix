@@ -2981,10 +2981,10 @@ abstract class CTriggerGeneral extends CApiService {
 			 * in template links. And vice versa, if at least one of the trigger templates was not found in template
 			 * links, then the trigger is not inherited further.
 			 */
-			$templateid_up = (string) key($trigger_hosts[$triggerid_up]['templateids']);
+			$templateid_up = key($trigger_hosts[$triggerid_up]['templateids']);
 
 			foreach ($triggerids as $triggerid => $foo) {
-				$templateid = (string) key($trigger_hosts[$triggerid]['templateids']);
+				$templateid = key($trigger_hosts[$triggerid]['templateids']);
 
 				if (!array_key_exists($templateid, $template_links)) {
 					continue;
@@ -3217,7 +3217,7 @@ abstract class CTriggerGeneral extends CApiService {
 
 					if (array_key_exists($child_triggerid, $tpl_child_dependencies)) {
 						foreach ($tpl_child_dependencies[$child_triggerid] as $child_triggerid_up => $hostids_up) {
-							$hostid_up = (string) key($hostids_up);
+							$hostid_up = key($hostids_up);
 							$triggerdepid = reset($hostids_up);
 
 							if (in_array($child_triggerid_up, $upd_child_triggerids_up)
