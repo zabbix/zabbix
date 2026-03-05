@@ -309,6 +309,10 @@ func (t *exporterTask) Delay() string {
 	return t.item.delay
 }
 
+func (t *exporterTask) LegacyTimeout() bool {
+	return t.item.legacyTimeout
+}
+
 // directExporterTask provides access to plugin Exporter interaface.
 // It's used for non-recurring exporter requests - single passive checks
 // and internal requests to obtain HostnameItem, HostMetadataItem,
@@ -426,6 +430,10 @@ func (t *directExporterTask) Timeout() int {
 
 func (t *directExporterTask) Delay() string {
 	return t.item.delay
+}
+
+func (t *directExporterTask) LegacyTimeout() bool {
+	return t.item.legacyTimeout
 }
 
 // starterTask provides access to plugin Exporter interaface Start() method.
