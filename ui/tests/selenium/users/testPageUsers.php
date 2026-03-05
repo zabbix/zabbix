@@ -864,7 +864,7 @@ class testPageUsers extends CWebTest {
 	}
 
 	/**
-	 * Check that reseting TOTP secret for a user removes his secret from mfa_totp_secret and does not impact other secrets.
+	 * Check that resetting TOTP secret for a user removes his secret from mfa_totp_secret and does not impact other secrets.
 	 *
 	 * @onBefore prepareResetTOTPData
 	 */

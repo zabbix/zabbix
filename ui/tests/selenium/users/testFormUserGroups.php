@@ -301,7 +301,7 @@ class testFormUserGroups extends CWebTest {
 					.zbx_dbstr($data['fields']['Group name'])
 			));
 
-			// Check that the previusly entered values are saved.
+			// Check that the previously entered values are saved.
 			$this->query('link', $data['fields']['Group name'])->one()->click();
 			$form->invalidate();
 			$form->checkValue($data['fields']);
