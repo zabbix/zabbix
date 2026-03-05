@@ -89,6 +89,7 @@ final class CItemData {
 			'system.uptime',
 			'system.users.num',
 			'vfs.dev.discovery',
+			'vfs.dev.get[<mode>,<regex>]',
 			'vfs.dev.read[<device>,<type>,<mode>]',
 			'vfs.dev.write[<device>,<type>,<mode>]',
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
@@ -195,6 +196,7 @@ final class CItemData {
 			'system.uptime',
 			'system.users.num',
 			'vfs.dev.discovery',
+			'vfs.dev.get[<mode>,<regex>]',
 			'vfs.dev.read[<device>,<type>,<mode>]',
 			'vfs.dev.write[<device>,<type>,<mode>]',
 			'vfs.dir.count[dir,<regex_incl>,<regex_excl>,<types_incl>,<types_excl>,<max_depth>,<min_size>,<max_size>,<min_age>,<max_age>,<regex_excl_dir>]',
@@ -1706,6 +1708,14 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.dev.discovery',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.dev.discovery'
+				]
+			],
+			'vfs.dev.get[<mode>,<regex>]' => [
+				'description' => _('List of block devices with detailed information. Returns JSON'),
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#vfs.dev.get',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#vfs.dev.get'
 				]
 			],
 			'vfs.dev.read[<device>,<type>,<mode>]' => [
