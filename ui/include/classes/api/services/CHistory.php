@@ -342,7 +342,7 @@ class CHistory extends CApiService {
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromClickhouse($options, array $storage) {
+	private function getFromClickhouse($options, array $storage): array {
 		$sql_parts = [
 			'select'	=> [],
 			'from'		=> $this->tableName.' h',
@@ -383,7 +383,9 @@ class CHistory extends CApiService {
 			$query .= ' LIMIT '.$options['limit'];
 		}
 
-		return CClickhouseHelper::query($query, $storage);
+		$result = CClickhouseHelper::query($query, $storage);
+
+		return $result ?: [];
 	}
 
 	/**

@@ -28,42 +28,43 @@ class CClickhouseHelper {
 	public static function query(string $query, array $storage): ?array {
 		$url = (new CUrl($storage['url']))
 			->setArgument('database', $storage['db'])
-			->setArgument('default_format', 'JSON')
 			->getUrl();
-
-		$handle = curl_init();
-
-		curl_setopt_array($handle, [
-			CURLOPT_URL => $url,
-			CURLOPT_RETURNTRANSFER => true,
-			CURLOPT_POST => true,
-			CURLOPT_HTTPHEADER => ['Accept: application/json'],
-			CURLOPT_USERPWD => $storage['username'].':'.$storage['password'],
-			CURLOPT_POSTFIELDS => $query,
-			CURLOPT_TIMEOUT => 10
-		]);
-
+		$options = [
+			'http' => [
+				'header'  => implode("\r\n", [
+					'Content-Type: text/plain',
+					'Authorization: Basic '.base64_encode($storage['username'].':f'.$storage['password']),
+					'X-ClickHouse-Format: JSON'
+				]),
+				'method'  => 'POST',
+				'ignore_errors' => true,
+				'content' => $query
+			]
+		];
 		$result = null;
 		$time_start = microtime(true);
-		$response = curl_exec($handle);
 
-		if (curl_errno($handle)) {
-			error(_('ClickHouse connection failed.'));
-		}
-		else {
-			$result = json_decode($response, true);
+		try {
+			$result_raw = file_get_contents($url, false, stream_context_create($options));
+			sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
+			$result = json_decode($result_raw, true);
 
-			if (curl_getinfo($handle, CURLINFO_HTTP_CODE) != 200) {
+			if ($http_code != 200) {
 				$error_message = is_array($result) && array_key_exists('exception', $result)
 					? $result['exception']
-					: $response;
+					: $result_raw;
 
-				error(_s('ClickHouse error: %1$s.', $error_message), true);
+				throw new Exception(_s('ClickHouse error: %1$s.', $error_message));
 			}
+		} catch (Throwable $error) {
+			$result = null;
+
+			error($error->getMessage(), true);
 		}
 
-		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, 'POST', $url, $query);
-		unset($handle);
+		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, $options['http']['method'], $url,
+			$query
+		);
 
 		return $result !== null ? $result['data'] : null;
 	}
