@@ -562,12 +562,8 @@
 
 					const {type, title, messages} = event.detail;
 
-					if (type == CMessageHelper.TYPE_CLEAR) {
-						clearMessages();
-					}
-					else {
-						addMessage(makeMessageBox(type, messages, title));
-					}
+					clearMessages();
+					addMessage(makeMessageBox(type, messages, title));
 				})
 				.on(CPager.EVENT_STATE_CHANGE, event => {
 					const {page} = event.detail;

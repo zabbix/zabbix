@@ -785,12 +785,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const {type, title, messages} = event.detail;
 
-					if (type == CMessageHelper.TYPE_CLEAR) {
-						clearMessages();
-					}
-					else {
-						addMessage(makeMessageBox(type, messages, title));
-					}
+					clearMessages();
+					addMessage(makeMessageBox(type, messages, title));
 				})
 				.on(CPager.EVENT_STATE_CHANGE, event => {
 					const {page} = event.detail;
