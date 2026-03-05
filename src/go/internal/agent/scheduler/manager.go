@@ -52,6 +52,10 @@ const (
 	maxItemTimeout = 600 // seconds
 )
 
+var (
+	_ Scheduler = (*Manager)(nil)
+)
+
 // ErrUnsupportedTimeout is thrown if timeout value cannot be parsed or exceeds limit (> maxTimeout or 0).
 var ErrUnsupportedTimeout = errs.New("unsupported timeout value")
 
@@ -62,6 +66,9 @@ type Request struct {
 	LastLogsize *uint64 `json:"lastlogsize"`
 	Mtime       *int    `json:"mtime"`
 	Timeout     any     `json:"timeout"`
+
+	// Server doesn't send this value. It's used to mark plaintext passive checks requests.
+	LegacyTimeout bool
 }
 
 // Manager implements Scheduler interface and manages plugin interface usage.
@@ -125,6 +132,7 @@ type Scheduler interface {
 	PerformTask(
 		key string,
 		timeout time.Duration,
+		legacyTimeout bool,
 		clientID uint64,
 	) (result *string, err error)
 	Query(command string) (status string)
@@ -758,6 +766,7 @@ func (r resultWriter) PersistSlotsAvailable() int {
 func (m *Manager) PerformTask(
 	key string,
 	timeout time.Duration,
+	legacyTimeout bool,
 	clientID uint64,
 ) (*string, error) {
 	var lastLogsize uint64
@@ -772,10 +781,11 @@ func (m *Manager) PerformTask(
 		nil,
 		[]*Request{
 			{
-				Key:         key,
-				LastLogsize: &lastLogsize,
-				Mtime:       &mtime,
-				Timeout:     int(timeout.Seconds()),
+				Key:           key,
+				LastLogsize:   &lastLogsize,
+				Mtime:         &mtime,
+				Timeout:       int(timeout.Seconds()),
+				LegacyTimeout: legacyTimeout,
 			},
 		},
 		time.Now(),

@@ -15,6 +15,7 @@
 package systemrun
 
 import (
+	"context"
 	"log"
 	"testing"
 
@@ -36,7 +37,12 @@ type mockLogger struct {
 }
 
 type contextMock struct {
+	context.Context
 	clientID uint64
+}
+
+func (contextMock) LegacyTimeout() bool {
+	return false
 }
 
 // Infof empty mock function.

@@ -15,10 +15,13 @@
 package zbxtest
 
 import (
+	"context"
+
 	"golang.zabbix.com/sdk/plugin"
 )
 
 type MockEmptyCtx struct {
+	context.Context
 }
 
 func (ctx MockEmptyCtx) ClientID() uint64 {
@@ -49,4 +52,8 @@ func (ctx MockEmptyCtx) Timeout() int {
 
 func (ctx MockEmptyCtx) Delay() string {
 	return ""
+}
+
+func (MockEmptyCtx) LegacyTimeout() bool {
+	return false
 }

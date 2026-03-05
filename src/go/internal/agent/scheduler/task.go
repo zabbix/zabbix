@@ -15,6 +15,7 @@
 package scheduler
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"reflect"
@@ -40,6 +41,13 @@ const (
 	priorityStopperTaskNs
 )
 
+var (
+	_ plugin.ContextProvider = (*exporterTask)(nil)
+	_ plugin.ContextProvider = (*directExporterTask)(nil)
+	_ plugin.ContextProvider = (*watcherTask)(nil)
+	_ plugin.ContextProvider = (*commandTask)(nil)
+)
+
 // exporterTaskAccessor is used by clients to track item exporter tasks .
 type exporterTaskAccessor interface {
 	task() *exporterTask
@@ -47,11 +55,20 @@ type exporterTaskAccessor interface {
 
 // taskBase implements common task properties and functionality
 type taskBase struct {
+	context.Context
 	plugin    *pluginAgent
 	scheduled time.Time
 	index     int
 	active    bool
 	recurring bool
+}
+
+func (*taskBase) Deadline() (time.Time, bool) {
+	return time.Time{}, false
+}
+
+func (ctx *taskBase) LegacyTimeout() bool {
+	return false
 }
 
 func (t *taskBase) getPlugin() *pluginAgent {
@@ -172,12 +189,14 @@ func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.Con
 		timeout = maxItemTimeout
 	}
 
+	exportStartedCtx := plugin.StartTimeout(ctx, time.Now())
+
 	var ret any
 	var err error
 	tc := make(chan bool)
 
 	go func() {
-		ret, err = exporter.Export(key, params, ctx)
+		ret, err = exporter.Export(key, params, exportStartedCtx)
 		tc <- true
 	}()
 
@@ -598,7 +617,9 @@ func (t *commandTask) perform(s Scheduler) {
 
 		var cr *resultcache.CommandResult
 
-		if ret, err := e.Export("system.run", t.params, t); err == nil {
+		exportStartedCtx := plugin.StartTimeout(t, time.Now())
+
+		if ret, err := e.Export("system.run", t.params, exportStartedCtx); err == nil {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,

@@ -182,7 +182,7 @@ func formatJSONParsingError(errText string) ([]byte, error) {
 }
 
 func processPlainTextRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Scheduler, key string) {
-	result, err := sched.PerformTask(key, time.Minute, agent.PassiveChecksClientID)
+	result, err := sched.PerformTask(key, time.Minute, true, agent.PassiveChecksClientID)
 	if err != nil {
 		sendTaskErrorResponse(conn, err.Error(), false)
 
@@ -209,7 +209,7 @@ func processJSONRequest(conn zbxcomms.ConnectionInterface, sched scheduler.Sched
 		return
 	}
 
-	result, err := sched.PerformTask(key, timeout, agent.PassiveChecksClientID)
+	result, err := sched.PerformTask(key, timeout, false, agent.PassiveChecksClientID)
 	if err != nil {
 		sendTaskErrorResponse(conn, err.Error(), true)
 
