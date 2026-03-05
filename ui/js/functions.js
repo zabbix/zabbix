@@ -939,6 +939,17 @@ function objectToSearchParams(object) {
 }
 
 /**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.
