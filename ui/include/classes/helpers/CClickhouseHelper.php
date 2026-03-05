@@ -33,7 +33,7 @@ class CClickhouseHelper {
 			'http' => [
 				'header'  => implode("\r\n", [
 					'Content-Type: text/plain',
-					'Authorization: Basic '.base64_encode($storage['username'].':f'.$storage['password']),
+					'Authorization: Basic '.base64_encode($storage['username'].':'.$storage['password']),
 					'X-ClickHouse-Format: JSON'
 				]),
 				'method'  => 'POST',
