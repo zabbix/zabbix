@@ -77,7 +77,8 @@ function getMessageSettings() {
 		$messages['triggers.severities'] = $defSeverities;
 	}
 	else {
-		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
+		$messages['triggers.severities'] = array_fill_keys(json_decode($messages['triggers.severities'], true), 1)
+			?? [];
 	}
 
 	return $messages;
@@ -88,9 +89,10 @@ function updateMessageSettings($messages) {
 		$messages['enabled'] = 0;
 	}
 	if (isset($messages['triggers.severities'])) {
-		$messages['triggers.severities'] = serialize(array_filter($messages['triggers.severities'], function($v) {
+		$selected = array_filter($messages['triggers.severities'], function($v) {
 			return $v == 1;
-		}));
+		});
+		$messages['triggers.severities'] = json_encode(array_keys($selected));
 	}
 
 	$dbProfiles = DBselect(
