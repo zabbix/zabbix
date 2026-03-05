@@ -644,7 +644,7 @@ window.operation_popup = new class {
 			for (const field of message_fields) {
 				const field_element = document.getElementById(field);
 
-				default_msg.value = is_checked ? 1 : 0;
+				default_msg.value = is_checked ? 0 : 1;
 				field_element.style.display = is_checked ? '' : 'none';
 				field_element.disabled = !is_checked;
 			}
