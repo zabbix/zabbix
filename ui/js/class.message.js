@@ -15,10 +15,10 @@
 
 class CMessageHelper {
 
-	static TYPE_SUCCESS = 'good';
-	static TYPE_ERROR = 'bad';
 	static TYPE_INFO = 'info';
+	static TYPE_SUCCESS = 'good';
 	static TYPE_WARNING = 'warning';
+	static TYPE_ERROR = 'bad';
 
 	static EVENT_MESSAGE = 'message';
 
@@ -31,7 +31,8 @@ class CMessageHelper {
 	 */
 	static success(element, messages, title = null, {show_close_box = true, show_details = null} = {}) {
 		CMessageHelper.dispatchEvent(element, CMessageHelper.EVENT_MESSAGE,
-			{type: CMessageHelper.TYPE_SUCCESS, messages, title, show_close_box, show_details});
+			{type: CMessageHelper.TYPE_SUCCESS, messages, title, show_close_box, show_details}
+		);
 	}
 
 	/**
@@ -43,7 +44,8 @@ class CMessageHelper {
 	 */
 	static error(element, messages, title = null, {show_close_box = true, show_details = null} = {}) {
 		CMessageHelper.dispatchEvent(element, CMessageHelper.EVENT_MESSAGE,
-			{type: CMessageHelper.TYPE_ERROR, messages, title, show_close_box, show_details});
+			{type: CMessageHelper.TYPE_ERROR, messages, title, show_close_box, show_details}
+		);
 	}
 
 	/**
@@ -55,7 +57,8 @@ class CMessageHelper {
 	 */
 	static info(element, messages, title = null, {show_close_box = true, show_details = null} = {}) {
 		CMessageHelper.dispatchEvent(element, CMessageHelper.EVENT_MESSAGE,
-			{type: CMessageHelper.TYPE_INFO, messages, title, show_close_box, show_details});
+			{type: CMessageHelper.TYPE_INFO, messages, title, show_close_box, show_details}
+		);
 	}
 
 	/**
@@ -67,7 +70,8 @@ class CMessageHelper {
 	 */
 	static warning(element, messages, title = null, {show_close_box = true, show_details = null} = {}) {
 		CMessageHelper.dispatchEvent(element, CMessageHelper.EVENT_MESSAGE,
-			{type: CMessageHelper.TYPE_WARNING, messages, title, show_close_box, show_details});
+			{type: CMessageHelper.TYPE_WARNING, messages, title, show_close_box, show_details}
+		);
 	}
 
 	/**
