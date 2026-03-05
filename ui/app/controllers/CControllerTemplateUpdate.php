@@ -184,7 +184,7 @@ class CControllerTemplateUpdate extends CController {
 				throw new Exception();
 			}
 
-			DBend(true);
+			$result = DBend(true);
 		}
 		catch (Exception $e) {
 			$result = false;
