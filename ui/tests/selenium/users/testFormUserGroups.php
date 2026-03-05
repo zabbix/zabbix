@@ -14,255 +14,309 @@
 **/
 
 
-require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 /**
  * @backup usrgrp
  *
  * @dataSource LoginUsers
+ *
+ * @onBefore prepareMfaHostgroupData
  */
-class testFormUserGroups extends CLegacyWebTest {
-	private $userGroup = 'Selenium user group';
-
-	public function testFormUserGroups_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
-		$this->zbxTestClickButtonText('Create user group');
-		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestCheckHeader('User groups');
-
-		$this->zbxTestTextPresent(['Group name', 'Users', 'Frontend access', 'Enabled', 'Debug mode']);
-		$this->zbxTestAssertAttribute('//input[@id="name"]', 'maxlength', '64');
-
-		$this->zbxTestDropdownHasOptions('gui_access', ['System default', 'Internal', 'LDAP', 'Disabled']);
-		$this->zbxTestDropdownAssertSelected('gui_access', 'System default');
-		$this->zbxTestCheckboxSelected('users_status');
-	}
-
-	public static function create() {
-		return [
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => '',
-					'error_msg' => 'Cannot add user group',
-					'error' => 'Incorrect value for field "name": cannot be empty.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Zabbix administrators',
-					'error_msg' => 'Cannot add user group',
-					'error' => 'User group "Zabbix administrators" already exists.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Selenium test add admin in disabled group',
-					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin',
-					'enabled' => false,
-					'error_msg' => 'Cannot add user group',
-					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_BAD,
-					'name' => 'Selenium test add admin in group with disabled GUI access',
-					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin',
-					'frontend_access' => 'Disabled',
-					'error_msg' => 'Cannot add user group',
-					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Selenium test create user group'
-				]
-			],
-			[
-				[
-					'expected' => TEST_GOOD,
-					'name' => 'Selenium test create user group with different properties',
-					'user_group' => 'Guests',
-					'user' => 'test-user',
-					'frontend_access' => 'Disabled',
-					'enabled' => false,
-					'debug_mode' => true
-				]
-			]
-		];
-	}
+class testFormUserGroups extends CWebTest {
 
 	/**
-	 * @dataProvider create
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
 	 */
-	public function testFormUserGroups_Create($data) {
-		$this->zbxTestLogin('zabbix.php?action=usergroup.edit');
-		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestCheckHeader('User groups');
-
-		$this->zbxTestInputTypeOverwrite('name', $data['name']);
-		if (array_key_exists('user_group', $data)) {
-			$this->zbxTestClickButtonMultiselect('userids_');
-			$this->zbxTestLaunchOverlayDialog('Users');
-			$this->zbxTestClickLinkTextWait($data['user']);
-		}
-
-		if (array_key_exists('frontend_access', $data)) {
-			$this->zbxTestDropdownSelect('gui_access', $data['frontend_access']);
-		}
-
-		if (array_key_exists('enabled', $data)) {
-			$this->zbxTestCheckboxSelect('users_status', $data['enabled']);
-		}
-
-		if (array_key_exists('debug_mode', $data)) {
-			$this->zbxTestCheckboxSelect('debug_mode', $data['debug_mode']);
-		}
-
-		$this->zbxTestClickXpath("//button[@id='cancel']/../button[@id='add']");
-		$this->page->waitUntilReady();
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group added');
-				$this->zbxTestCheckTitle('Configuration of user groups');
-				$this->zbxTestCheckHeader('User groups');
-				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot add user group']);
-				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(1, CDBHelper::getCount($sql));
-
-				if (array_key_exists('user_group', $data)) {
-					$groupid = DBfetch(DBselect($sql));
-					$users = "SELECT id FROM users_groups WHERE usrgrpid=".$groupid['usrgrpid'];
-					$this->assertEquals(1, CDBHelper::getCount($users));
-				}
-				break;
-
-			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-				$this->zbxTestTextPresent($data['error']);
-				break;
-		}
+	public function getBehaviors() {
+		return [CMessageBehavior::class];
 	}
 
-	public static function update() {
+	protected static $user_group = 'Selenium user group';
+
+	/**
+	 * Create test data for "Multi-factor authentication" field in user group form.
+	 */
+	public function prepareMfaHostgroupData() {
+		CDataHelper::call('mfa.create', [
+			[
+				'type' => MFA_TYPE_TOTP,
+				'name' => 'User groups TOTP',
+				'hash_function' => TOTP_HASH_SHA1,
+				'code_length' => '6'
+			],
+			[
+				'type' => MFA_TYPE_DUO,
+				'name' => 'User groups DUO',
+				'api_hostname' => 'API hostname 1',
+				'clientid' => 'client_id_123',
+				'client_secret' => 'secret'
+			]
+		]);
+
+		CDataHelper::call('authentication.update', ['mfa_status' => MFA_ENABLED]);
+	}
+
+	public function testFormUserGroups_CheckLayout() {
+		$this->page->login()->open('zabbix.php?action=usergroup.list');
+		$this->query('button:Create user group')->waitUntilClickable()->one()->click();
+
+		$this->page->assertHeader('User groups');
+		$this->page->assertTitle('Configuration of user groups');
+		$form = $this->query('id:user-group-form')->asForm()->one();
+		$this->assertEquals(['User group', 'Template permissions', 'Host permissions', 'Problem tag filter'], $form->getTabs());
+		$this->assertEquals('User group', $form->getSelectedTab());
+
+		$this->assertEquals(['Group name', 'Users', 'Frontend access', 'LDAP Server', 'Multi-factor authentication',
+				'Enabled', 'Debug mode'], $form->getLabels(CElementFilter::VISIBLE)->asText()
+		);
+		$this->assertEquals(['Group name'], $form->getRequiredLabels());
+
+		$default_values = [
+			'Group name' => '',
+			'Users' => '',
+			'Frontend access' => 'System default',
+			'LDAP Server' => 'Default',
+			'Multi-factor authentication' => 'Default',
+			'Enabled' => true,
+			'Debug mode' => false
+		];
+		$form->checkValue($default_values);
+
+		$this->assertEquals(64, $form->getField('Group name')->getAttribute('maxlength'));
+
+		$dropdowns = [
+			'Frontend access' => ['System default', 'Internal', 'LDAP', 'Disabled'],
+			'LDAP Server' => ['Default'],
+			'Multi-factor authentication' => ['User groups DUO', 'User groups TOTP','Disabled', 'Default']
+		];
+
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
+		}
+
+		foreach ([MFA_ENABLED, MFA_DISABLED] as $mfa_status) {
+			if ($mfa_status) {
+				// Check that warning icon is not visible if MFA is enabled.
+				$this->assertFalse($form->query('id:mfa-warning')->one()->isDisplayed(), 'Warning icon should not be visible.');
+			}
+			else {
+				// Disable MFA and reload the page.
+				CDataHelper::call('authentication.update', ['mfa_status' => $mfa_status]);
+				$this->page->refresh()->waitUntilReady();
+				$form->invalidate();
+
+				// Check that, when MFA is disabled, the default value on MFA field is "Disabled".
+				$mfa_field = $form->getField('Multi-factor authentication');
+				$this->assertEquals('Disabled', $mfa_field->getValue());
+
+				// Change the value of the MFA field, and the appeared warning icon and its hint.
+				$mfa_field->fill('Default');
+				$warning_icon = $form->query('id:mfa-warning')->waitUntilVisible()->one();
+				$warning_icon->click();
+				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
+				$this->assertEquals('Multi-factor authentication is disabled system-wide.', $hint->getText());
+				$hint->close();
+			}
+		}
+
+		// Check the default layout in other tabs.
+		$tabs = [
+			'Template permissions' => ['Template groups', 'Permissions', ''],
+			'Host permissions' => ['Host groups', 'Permissions', ''],
+			'Problem tag filter' => ['Host groups', 'Tags', 'Actions']
+		];
+
+		foreach ($tabs as $tab => $table_headers) {
+			$form->selectTab($tab);
+			$this->assertEquals(['Permissions'], array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
+
+			// Each of the three tabs have "Permissions" field, so this field ir retrieved using the exact label element.
+			$table = $form->getFieldByLabelElement($form->getLabel('Permissions'))->asTable();
+			$this->assertEquals($table_headers, $table->getHeadersText());
+			$this->assertEquals(['Add'], $table->query('tag:button')->all()->filter(CElementFilter::CLICKABLE)->asText());
+		}
+
+		// Check the action buttons below the form.
+		$this->assertEquals(['Add', 'Cancel'], $this->query('class:tfoot-buttons')->one()->query('tag:button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+	}
+
+	public static function getCommonData() {
 		return [
+			// #0 Empty space in name.
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => ' ',
-					'error_msg' => 'Cannot update user group',
+					'fields' => [
+						'Group name' => ' '
+					],
 					'error' => 'Invalid parameter "/1/name": cannot be empty.'
 				]
 			],
+			// #1 Already existing user.
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Zabbix administrators',
-					'error_msg' => 'Cannot update user group',
+					'fields' => [
+						'Group name' => 'Zabbix administrators'
+					],
+					'duplicate' => true,
 					'error' => 'User group "Zabbix administrators" already exists.'
 				]
 			],
+			// #2 Adding the current user to a disabled group.
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Selenium test group update, admin in disabled group',
-					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin',
-					'enabled' => false,
-					'error_msg' => 'Cannot update user group',
+					'fields' => [
+						'Group name' => 'Selenium test add admin in disabled group',
+						'Users' => 'Admin',
+						'Enabled' => false
+					],
 					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
+			// #3 Adding the current user to a group without GUI access.
 			[
 				[
 					'expected' => TEST_BAD,
-					'name' => 'Selenium group update, admin in group with disabled GUI access',
-					'user_group' => 'Zabbix administrators',
-					'user' => 'Admin',
-					'frontend_access' => 'Disabled',
-					'error_msg' => 'Cannot update user group',
+					'fields' => [
+						'Group name' => 'Selenium test add admin in group with disabled GUI access',
+						'Users' => 'Admin',
+						'Frontend access' => 'Disabled'
+					],
 					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 				]
 			],
+			// #4 Group with trailing and leading spaces in name.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'name' => 'Selenium test update user group with different properties',
-					'user_group' => 'Guests',
-					'user' => 'test-user',
-					'frontend_access' => 'Disabled',
-					'enabled' => false,
-					'debug_mode' => true
+					'fields' => [
+						'Group name' => '   User group with trailing and leading spaces   '
+					],
+					'trim_name' => true
+				]
+			],
+			// #5 Group with XSS in name.
+			[
+				[
+					'fields' => [
+						'Group name' => '<body onload=alert(\'User group\')>;'
+					]
+				]
+			],
+			// #6 Group with all parameters from "User group" tab listed.
+			[
+				[
+					'fields' => [
+						'Group name' => 'User group %#$@^%$&%^🙈😂😱*&^(*_))}{|" with symbols',
+						'Users' => 'test-user',
+						'Frontend access' => 'LDAP',
+						'Enabled' => false,
+						'Debug mode' => true,
+						'Multi-factor authentication' => 'User groups TOTP'
+					]
+				]
+			]
+		];
+	}
+
+	public static function getCreateData() {
+		return [
+			// Empty name.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Group name' => ''
+					],
+					'error' => 'Incorrect value for field "name": cannot be empty.'
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider update
+	 * @dataProvider getCommonData
+	 * @dataProvider getCreateData
+	 */
+	public function testFormUserGroups_Create($data) {
+		$this->executeAction($data);
+	}
+
+	/**
+	 * @dataProvider getCommonData
 	 */
 	public function testFormUserGroups_Update($data) {
-		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
-		$this->zbxTestClickLinkTextWait($this->userGroup);
-		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestCheckHeader('User groups');
+		$this->executeAction($data, true);
+	}
 
-		$this->zbxTestInputTypeOverwrite('name', $data['name']);
-		if (array_key_exists('user_group', $data)) {
-			$this->zbxTestClickButtonMultiselect('userids_');
-			$this->zbxTestLaunchOverlayDialog('Users');
-			$this->zbxTestClickLinkTextWait($data['user']);
+	/**
+	 * Check User group creation or update.
+	 *
+	 * @param array     $data     data provider
+	 * @param boolean   $update   flag that determines whether the tested scenario is an update scenario
+	 */
+	protected function executeAction($data, $update = false) {
+		// Add word "update" to update cases to ensure uniqueness. Only for cases where name validation is not checked.
+		if ($update && !in_array($data['fields']['Group name'], [' ', 'Zabbix administrators'])) {
+			$data['fields']['Group name'] =  str_replace('group', 'group update', $data['fields']['Group name']);
 		}
 
-		if (array_key_exists('frontend_access', $data)) {
-			$this->zbxTestDropdownSelect('gui_access', $data['frontend_access']);
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM usrgrp');
 		}
 
-		if (array_key_exists('enabled', $data)) {
-			$this->zbxTestCheckboxSelect('users_status', $data['enabled']);
+		$this->page->login()->open('zabbix.php?action=usergroup.list')->waitUntilReady();
+
+		$button_selector = ($update) ? 'link:'.self::$user_group : 'button:Create user group';
+		$this->query($button_selector)->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$form = $this->query('id:user-group-form')->waitUntilVisible()->asForm()->one();
+		$form->fill($data['fields']);
+		$form->submit();
+		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$message = ($update) ? 'User group updated' : 'User group added';
+			$this->assertMessage(TEST_GOOD, $message);
+
+			// Only the user group name field is trimmed, since it is the only input element in the form.
+			if (CTestArrayHelper::get($data, 'trim_name')) {
+				$data['fields']['Group name'] = trim($data['fields']['Group name']);
+			}
+
+			// Once success message is there the name of the  group to be updated in next cases needs to be saved.
+			if ($update) {
+				self::$user_group = $data['fields']['Group name'];
+			}
+
+			$this->assertEquals(1, CDBHelper::getCount('SELECT usrgrpid FROM usrgrp WHERE name='
+					.zbx_dbstr($data['fields']['Group name'])
+			));
+
+			// Check that the previusly entered values are saved.
+			$this->query('link', $data['fields']['Group name'])->one()->click();
+			$form->invalidate();
+			$form->checkValue($data['fields']);
 		}
-
-		if (array_key_exists('debug_mode', $data)) {
-			$this->zbxTestCheckboxSelect('debug_mode', $data['debug_mode']);
-		}
-
-		$this->zbxTestClickButton('usergroup.update');
-
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestCheckTitle('Configuration of user groups');
-				$this->zbxTestCheckHeader('User groups');
-				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot update user group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
-				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(1, CDBHelper::getCount($sql));
-
-				if (array_key_exists('user_group', $data)) {
-					$groupid = DBfetch(DBselect($sql));
-					$users = "SELECT id FROM users_groups WHERE usrgrpid=".$groupid['usrgrpid'];
-					$this->assertEquals(1, CDBHelper::getCount($users));
-				}
-				break;
-
-			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', $data['error_msg']);
-				$this->zbxTestTextPresent($data['error']);
-				break;
+		else {
+			$message = ($update) ? 'Cannot update user group' : 'Cannot add user group';
+			$this->assertMessage(TEST_BAD, $message, $data['error']);
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM usrgrp'));
 		}
 	}
 
-	public static function delete() {
+	public static function getDeleteData() {
 		return [
 			[
 				[
-					'expected' => TEST_GOOD,
 					'name' => 'Disabled'
 				]
 			],
@@ -289,40 +343,39 @@ class testFormUserGroups extends CLegacyWebTest {
 			],
 			[
 				[
-					'expected' => TEST_GOOD,
-					'name' => 'Selenium test update user group with different properties'
+					'name' => 'User group %#$@^%$&%^🙈😂😱*&^(*_))}{|" with symbols'
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider delete
+	 * @dataProvider getDeleteData
 	 */
 	public function testFormUserGroups_Delete($data) {
-		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
-		$this->zbxTestClickLinkTextWait($data['name']);
-		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->zbxTestCheckHeader('User groups');
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			$old_hash = CDBHelper::getHash('SELECT * FROM usrgrp');
+		}
 
-		$this->zbxTestClickXpath("//button[@id='cancel']/../button[@id='delete']");
-		$this->zbxTestAcceptAlert();
+		$this->page->login()->open('zabbix.php?action=usergroup.list')->waitUntilReady();
 
-		switch ($data['expected']) {
-			case TEST_GOOD:
-				$this->zbxTestCheckTitle('Configuration of user groups');
-				$this->zbxTestCheckHeader('User groups');
-				$this->zbxTestTextNotPresent(['Page received incorrect data', 'Cannot delete user group']);
-				$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group deleted');
-				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(0, CDBHelper::getCount($sql));
-				break;
-			case TEST_BAD:
-				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Cannot delete user group');
-				$this->zbxTestTextPresent($data['error']);
-				$sql = "SELECT usrgrpid FROM usrgrp WHERE name='".$data['name']."'";
-				$this->assertEquals(1, CDBHelper::getCount($sql));
-				break;
+		// Locate row first, as the user group name may coincides with group actions for other groups ('Internal', 'Disabled').
+		$this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name'])->query('link', $data['name'])
+				->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$this->query('button:Delete')->waitUntilClickable()->one()->click();
+		$this->assertEquals('Delete selected group?', $this->page->getAlertText());
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+
+		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+			$this->assertMessage(TEST_GOOD, 'User group deleted');
+			$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM usrgrp WHERE name='.zbx_dbstr($data['name'])));
+		}
+		else {
+			$this->assertMessage(TEST_BAD, 'Cannot delete user group', $data['error']);
+			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM usrgrp'));
 		}
 	}
 }
