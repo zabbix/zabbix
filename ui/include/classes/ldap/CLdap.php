@@ -158,7 +158,7 @@ class CLdap {
 
 		// Set protocol version and dependent options.
 		if ($this->cnf['version']) {
-			if (!$this->setOption(LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
+			if (!@ldap_set_option($this->ds, LDAP_OPT_PROTOCOL_VERSION, $this->cnf['version'])) {
 				$this->error = static::ERR_OPT_PROTOCOL_FAILED;
 			}
 			elseif ($this->cnf['version'] == 3) {
@@ -166,13 +166,14 @@ class CLdap {
 					$this->error = static::ERR_OPT_TLS_FAILED;
 				}
 
-				if (!$this->cnf['referrals'] && !$this->setOption(LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
+				if (!$this->cnf['referrals']
+						&& !@ldap_set_option($this->ds, LDAP_OPT_REFERRALS, $this->cnf['referrals'])) {
 					$this->error = static::ERR_OPT_REFERRALS_FAILED;
 				}
 			}
 		}
 
-		if (isset($this->cnf['deref']) && !$this->setOption(LDAP_OPT_DEREF, $this->cnf['deref'])) {
+		if (isset($this->cnf['deref']) && !@ldap_set_option($this->ds, LDAP_OPT_DEREF, $this->cnf['deref'])) {
 			$this->error = static::ERR_OPT_DEREF_FAILED;
 		}
 
@@ -549,14 +550,5 @@ class CLdap {
 		}
 
 		return $results;
-	}
-
-	protected function setOption(int $option, mixed $value): bool {
-		try {
-			return ldap_set_option($this->ds, $option, $value);
-		}
-		catch (ValueError) {
-			return false;
-		}
 	}
 }
