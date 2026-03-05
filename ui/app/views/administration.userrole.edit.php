@@ -86,7 +86,7 @@ $form_grid->addItem(
 
 foreach ($data['labels']['sections'] as $section_key => $section_label) {
 	if (count($data['labels']['rules'][$section_key]) === 1) {
-		$first_rule_key = (string) array_key_first($data['labels']['rules'][$section_key]);
+		$first_rule_key = array_key_first($data['labels']['rules'][$section_key]);
 		$form_grid->addItem([
 			new CLabel($section_label, $first_rule_key),
 			new CFormField(
