@@ -274,7 +274,18 @@
 			);
 		},
 
+		isUserInteracting() {
+			return document
+				.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
+		},
+
 		refresh() {
+			if (this.isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			this.setLoading();
 
 			const params = this.refresh_url.getArgumentsObject();
