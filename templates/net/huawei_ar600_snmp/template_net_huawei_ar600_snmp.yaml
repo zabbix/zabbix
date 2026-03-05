@@ -185,7 +185,7 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: 2bb552be2f2f49abb1901be66a5ef785
+        - uuid: 2bb552be2f2f48abb1901be66a5ef785
           name: 'Huawei AR600 Series: SNMP walk network interfaces'
           type: SNMP_AGENT
           snmp_oid: 'walk[1.3.6.1.2.1.2.2.1.8,1.3.6.1.2.1.2.2.1.7,1.3.6.1.2.1.31.1.1.1.18,1.3.6.1.2.1.31.1.1.1.1,1.3.6.1.2.1.2.2.1.2,1.3.6.1.2.1.2.2.1.3,1.3.6.1.2.1.2.2.1.10,1.3.6.1.2.1.2.2.1.16,1.3.6.1.2.1.2.2.1.14,1.3.6.1.2.1.2.2.1.20,1.3.6.1.2.1.2.2.1.19,1.3.6.1.2.1.2.2.1.13,1.3.6.1.2.1.2.2.1.5]'
@@ -1110,7 +1110,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 4d142a571991482da0560cb2faa8f673
+        - uuid: 4d142a571991482da0460cb2faa8f673
           name: 'Network interfaces discovery'
           type: DEPENDENT
           key: net.if.discovery
@@ -1149,7 +1149,7 @@ zabbix_export:
                 operator: NOT_MATCHES_REGEX
           description: 'Discovering interfaces from IF-MIB.'
           item_prototypes:
-            - uuid: 018d93910eef44388fcd1eb1de63262b
+            - uuid: 018d93910eef43388fcd1eb1de53162b
               name: 'Interface [{#IFNAME}]: Inbound packets discarded'
               type: DEPENDENT
               key: 'net.if.in.discards[ifInDiscards.{#SNMPINDEX}]'
@@ -1178,7 +1178,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: f97ed0e4b7b3473a988f27a60e5d79ef
+            - uuid: f97ed0e4b7b3473a988f27a60e5d79ee
               name: 'Interface [{#IFNAME}]: Inbound packets with errors'
               type: DEPENDENT
               key: 'net.if.in.errors[ifInErrors.{#SNMPINDEX}]'
@@ -1203,7 +1203,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 3a971825c99e476aa2c18b1a792ec19d
+            - uuid: 3a971825c99e476aa2c18b1a792ec19e
               name: 'Interface [{#IFNAME}]: Bits received'
               type: DEPENDENT
               key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
@@ -1229,7 +1229,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 2395b3a694474b9894e64f759dbe805e
+            - uuid: 2395b3a694474b9894e64f459dbe805e
               name: 'Interface [{#IFNAME}]: Outbound packets discarded'
               type: DEPENDENT
               key: 'net.if.out.discards[ifOutDiscards.{#SNMPINDEX}]'
@@ -1258,7 +1258,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: f6872ed88b464c37800738fd5e492896
+            - uuid: f6872ed88b464c37800738fd5e492895
               name: 'Interface [{#IFNAME}]: Outbound packets with errors'
               type: DEPENDENT
               key: 'net.if.out.errors[ifOutErrors.{#SNMPINDEX}]'
@@ -1283,7 +1283,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 2a7b5b7e48444c8c8cf38f89a1a1091e
+            - uuid: 2a7b5b7e48444c8c8cf38f89a1a1091d
               name: 'Interface [{#IFNAME}]: Bits sent'
               type: DEPENDENT
               key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
@@ -1309,7 +1309,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: b93b4164db1c4c838ecfd5c2b261acfb
+            - uuid: b93b4164db1c4c838ecfd5c2b261acfc
               name: 'Interface [{#IFNAME}]: Speed'
               type: DEPENDENT
               key: 'net.if.speed[ifSpeed.{#SNMPINDEX}]'
@@ -1340,7 +1340,7 @@ zabbix_export:
                   value: '{#IFALIAS}'
                 - tag: interface
                   value: '{#IFNAME}'
-            - uuid: 43d9d7883a1b4f6dbe4e118ef12d731e
+            - uuid: 43d9d7883a1b4f6dbe4e118ef12d731d
               name: 'Interface [{#IFNAME}]: Operational status'
               type: DEPENDENT
               key: 'net.if.status[ifOperStatus.{#SNMPINDEX}]'
@@ -1371,7 +1371,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
-                - uuid: 94097ac2b53748aea45fed2f3014c1b6
+                - uuid: 94097ac2b53748aea45fed1f3014c1b6
                   expression: '{$IFCONTROL:"{#IFNAME}"}=1 and last(/Huawei AR600 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2 and (last(/Huawei AR600 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#1)<>last(/Huawei AR600 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}],#2))'
                   recovery_mode: RECOVERY_EXPRESSION
                   recovery_expression: 'last(/Huawei AR600 by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2 or {$IFCONTROL:"{#IFNAME}"}=0'
@@ -1389,7 +1389,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: availability
-            - uuid: 9470d6a01c4e4ea2a007582ac1c0ce64
+            - uuid: 9470d6a01c4e4ea2a007582ac1c0ce63
               name: 'Interface [{#IFNAME}]: Interface type'
               type: DEPENDENT
               key: 'net.if.type[ifType.{#SNMPINDEX}]'
@@ -1419,7 +1419,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
           trigger_prototypes:
-            - uuid: 13c523ffdf154e6fb1ab7628e3a2010a
+            - uuid: 13c523ffdf144e6fb1ab7628e3a2010a
               expression: |
                 change(/Huawei AR600 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/Huawei AR600 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
                 and (
@@ -1448,7 +1448,7 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
-            - uuid: 7594011ba1964285abd0f232ffeb22e3
+            - uuid: 7594011ba1964285abd0f232ffeb22e2
               expression: |
                 (avg(/Huawei AR600 by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Huawei AR600 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
                 avg(/Huawei AR600 by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Huawei AR600 by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
@@ -1470,7 +1470,7 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: performance
-            - uuid: 2eb4baaf86a2405b9a1a232241eee72b
+            - uuid: 2eb4baaf86a2405b9a1a232241eee72c
               expression: |
                 min(/Huawei AR600 by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
                 or min(/Huawei AR600 by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$IF.ERRORS.WARN:"{#IFNAME}"}
@@ -1518,7 +1518,7 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
-        - uuid: 2a04f08ae9504f9dadb73550700960b1
+        - uuid: 5c3a1b2e3f4a4b6c8d9e0f1a2b3c4d5e
           name: 'EtherLike-MIB Discovery'
           type: DEPENDENT
           key: net.if.duplex.discovery
@@ -1533,7 +1533,7 @@ zabbix_export:
                 operator: EXISTS
           description: 'Discovering interfaces from IF-MIB and EtherLike-MIB. Interfaces with `up(1)` Operational Status are discovered.'
           item_prototypes:
-            - uuid: 6bb6b8b98190429ca7564944885f5bdd
+            - uuid: e6ae9fc7d4454d389d066450af3a3056
               name: 'Interface {#IFNAME}({#IFALIAS}): Duplex status'
               type: DEPENDENT
               key: 'net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}]'
@@ -1560,7 +1560,7 @@ zabbix_export:
                 - tag: interface
                   value: '{#IFNAME}'
               trigger_prototypes:
-                - uuid: e6ae9fc7d4454d389d066450af3a3066
+                - uuid: e6ae9fc7d4454d389d076450af3a3066
                   expression: 'last(/Huawei AR600 by SNMP/net.if.duplex[dot3StatsDuplexStatus.{#SNMPINDEX}])=2'
                   name: 'Huawei AR600: Interface {#IFNAME}({#IFALIAS}): In half-duplex mode'
                   priority: WARNING
