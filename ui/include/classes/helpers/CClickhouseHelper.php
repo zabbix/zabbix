@@ -132,7 +132,7 @@ class CClickhouseHelper {
 				($value_type_fields ? ','.implode(',', $value_type_fields) : '').
 			' FROM '.$table.
 			' WHERE '.dbConditionId('itemid', [$item['itemid']]).
-				' AND clock_ns<=fromUnixTimestamp64Nano('.($clock * 1000000000 + $ns).')'.
+				' AND clock_ns<=fromUnixTimestamp64Nano('.$clock.'*1000000000+'.$ns.')'.
 			' ORDER BY clock_ns DESC'.
 			' LIMIT 1',
 			$storage

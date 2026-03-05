@@ -1666,12 +1666,12 @@ class CHistoryManager {
 			$result = $this->deleteHistoryFromElasticsearch($items);
 		}
 
-		if (array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
+		if ($result && array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
 			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]);
 			$result = CClickhouseHelper::delete($items);
 		}
 
-		if (array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
+		if ($result && array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
 			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_SQL]);
 			$result = $this->deleteHistoryFromSql($items);
 		}
