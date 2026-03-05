@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,6 +43,15 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 				'Bergen' => null
 			]
 		];
+
+	/**
+	 * Attach MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return ['class' => CMessageBehavior::class];
+	}
 
 	public function prepareZoomData() {
 		// Create hostgroup for hosts with items triggers.
@@ -283,6 +292,7 @@ class testDashboardGeomapWidgetScreenshots extends CWebTest {
 		$form = $this->query('id:geomaps-form')->asForm()->one();
 		$form->fill($data);
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$zoom_dashboardid);
 		$this->page->waitUntilReady();

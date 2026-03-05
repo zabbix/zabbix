@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -221,6 +221,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 					'show_lines' => $this->fields_values['show_lines'],
 					'show_tags' => $this->fields_values['show_tags'],
 					'show_timeline' => $this->fields_values['show_timeline'],
+					'highlight_row' => $this->fields_values['highlight_row'],
 					'tags' => $this->fields_values['tags'],
 					'tag_name_format' => $this->fields_values['tag_name_format'],
 					'tag_priority' => $this->fields_values['tag_priority'],

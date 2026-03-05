@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -31,10 +31,15 @@ use Facebook\WebDriver\WebDriverBy;
 class testFormItem extends CLegacyWebTest {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	/**
@@ -1001,8 +1006,10 @@ class testFormItem extends CLegacyWebTest {
 		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
+		$table = $this->getTable();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReloaded();
 		// Find Items link in host row and click it.
 		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
 				->getColumn('Items')->query('link:Items')->one()->click();
@@ -2225,6 +2232,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2241,6 +2249,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestInputType('hk_trends', '455d');
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2262,6 +2271,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
 		$this->zbxTestClickWait('update');
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
@@ -2275,8 +2285,8 @@ class testFormItem extends CLegacyWebTest {
 	private function filterEntriesAndOpenItems() {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $this->host]);
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
-				->getColumn('Items')->query('link:Items')->one()->click();
+		$table->waitUntilReloaded()->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
 	}
 }

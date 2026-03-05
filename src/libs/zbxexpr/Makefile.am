@@ -5,6 +5,7 @@ noinst_LIBRARIES = libzbxexpr.a
 libzbxexpr_a_SOURCES = \
 	host.c \
 	macro.c \
+	macrofunc.c \
 	function.c \
 	expr.c \
 	interval.c \

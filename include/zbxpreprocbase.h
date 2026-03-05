@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -56,6 +56,7 @@ void			zbx_pp_history_cache_release(zbx_pp_history_cache_t *history_cache);
 zbx_pp_history_t	*zbx_pp_history_cache_history_acquire(zbx_pp_history_cache_t *history_cache);
 void			zbx_pp_history_cache_history_set_and_release(zbx_pp_history_cache_t *history_cache,
 				zbx_pp_history_t *history_in, zbx_pp_history_t *history_out);
+zbx_uint64_t		zbx_pp_history_cache_history_size(zbx_pp_history_cache_t *history_cache);
 
 typedef enum
 {
@@ -100,6 +101,8 @@ typedef struct
 
 	zbx_uint64_t		values_num;
 	zbx_uint64_t		values_sz;
+	zbx_uint64_t		time_ms;
+	zbx_uint64_t		total_ms;
 }
 zbx_pp_item_preproc_t;
 
@@ -119,6 +122,7 @@ typedef struct
 }
 zbx_pp_item_t;
 
+void	zbx_pp_item_clear_wrapper(void *data);
 void	zbx_pp_item_clear(zbx_pp_item_t *item);
 
 #endif

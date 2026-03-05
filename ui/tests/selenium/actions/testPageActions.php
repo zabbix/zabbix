@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -185,7 +185,8 @@ class testPageActions extends CLegacyWebTest {
 		$this->calculateHash($action['actionid']);
 		$this->zbxTestLogin('zabbix.php?action=action.list&eventsource='.$action['eventsource']);
 		$this->zbxTestClickLinkText($action['name']);
-		$this->zbxTestClickButtonText('Update');
+		$this->query('button:Update')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of actions');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Action updated');
 		$this->zbxTestTextPresent($action['name']);

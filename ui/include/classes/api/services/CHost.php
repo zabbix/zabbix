@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -490,18 +490,9 @@ class CHost extends CHostGeneral {
 
 		// tags
 		if ($options['tags'] !== null && $options['tags']) {
-			if ($options['inheritedTags']) {
-				$sqlParts['left_join'][] = ['alias' => 'ht2', 'table' => 'hosts_templates', 'using' => 'hostid'];
-				$sqlParts['left_table'] = ['alias' => $this->tableAlias, 'table' => $this->tableName];
-				$sqlParts['where'][] = CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'],
-					$options['evaltype']
-				);
-			}
-			else {
-				$sqlParts['where'][] = CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h',
-					'host_tag', 'hostid'
-				);
-			}
+			$sqlParts['where'][] = $options['inheritedTags']
+				? CApiTagHelper::addInheritedHostTagsWhereCondition($options['tags'], $options['evaltype'], 'h')
+				: CApiTagHelper::addWhereCondition($options['tags'], $options['evaltype'], 'h', 'host_tag', 'hostid');
 		}
 
 		// limit

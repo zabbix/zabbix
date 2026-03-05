@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2191,7 +2191,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 		$this->zbxTestContentControlButtonClickTextWait('Create item prototype');
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$dialog_footer = $dialog->getFooter();
 
 		if (isset($data['type'])) {
 			$type = $data['type'];
@@ -2210,7 +2209,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementValue('name', $data['name']);
 		}
-		$name = $this->zbxTestGetValue("//input[@id='name']");
 
 		if (isset($data['key'])) {
 			$this->zbxTestInputTypeOverwrite('key', $data['key']);
@@ -2219,7 +2217,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 			}
 			$this->zbxTestAssertElementValue('key', $data['key']);
 		}
-		$key = $this->zbxTestGetValue("//input[@id='key']");
 
 		if (isset($data['username'])) {
 			$this->zbxTestInputType('username', $data['username']);
@@ -2451,9 +2448,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 	 */
 	private function filterEntriesAndOpenDiscovery($name) {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
+		$table = $this->query('xpath:(//table[@class="list-table"])[1]')->asTable()->one();
 		$form->fill(['Name' => $name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-				->getColumn('Discovery')->query('link:Discovery')->one()->click();
+		$table->waitUntilReloaded();
+		$table->findRow('Name', $name)->getColumn('Discovery')->query('link:Discovery')->one()->click();
 	}
 }

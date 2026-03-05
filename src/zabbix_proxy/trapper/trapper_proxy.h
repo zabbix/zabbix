@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@
 #include "zbxtime.h"
 #include "zbxvault.h"
 #include "zbxjson.h"
+#include "zbxipcservice.h"
 
 int	init_proxy_history_lock(unsigned char program_type, char **error);
 
@@ -29,6 +30,6 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
 		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
-		zbx_get_config_forks_f get_config_forks);
+		zbx_get_config_forks_f get_config_forks, zbx_ipc_async_socket_t *rtc);
 
 #endif

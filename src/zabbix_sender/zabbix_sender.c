@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -280,8 +280,6 @@ static const char	*help_message[] = {
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
 
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
 /* COMMAND LINE OPTIONS */
 
 /* long options */
@@ -539,10 +537,10 @@ static int	check_response(char *response, const char *server, unsigned short por
 	unsigned char		redirect_reset;
 	zbx_uint64_t		redirect_revision;
 
-	ret = zbx_json_open(response, &jp);
+	if (FAIL == zbx_json_open(response, &jp))
+		return FAIL;
 
-	if (SUCCEED == ret)
-		ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL);
+	ret = zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_RESPONSE, value, sizeof(value), NULL);
 
 	if (SUCCEED == ret && 0 != strcmp(value, ZBX_PROTO_VALUE_SUCCESS))
 		ret = FAIL;
@@ -856,8 +854,6 @@ static void	zbx_load_config(const char *config_file_in)
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{"TLSCipherPSK",		&cfg_tls_cipher_psk,			ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
-		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		ZBX_CFG_TYPE_INT,
-				ZBX_CONF_PARM_OPT,	0,			INT_MAX},
 		{0}
 	};
 

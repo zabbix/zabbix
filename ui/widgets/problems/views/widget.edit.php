@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -81,6 +81,9 @@ $form
 	)
 	->addField(
 		new CWidgetFieldCheckBoxView($data['fields']['show_timeline'])
+	)
+	->addField(
+		(new CWidgetFieldCheckBoxView($data['fields']['highlight_row']))->addRowClass(ZBX_STYLE_FILTER_HIGHLIGHT_ROW_CB)
 	)
 	->addField(
 		new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])

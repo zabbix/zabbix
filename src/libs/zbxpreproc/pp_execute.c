@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1054,6 +1054,7 @@ static int	pp_execute_snmp_get_to_value(zbx_variant_t *value, const char *params
  *             history_value_out - [OUT] historical (next) data               *
  *             history_ts        - [IN/OUT] last value timestamp              *
  *             config_source_ip  - [IN]                                       *
+ *             error             - [OUT] error message                        *
  *                                                                            *
  * Result value: SUCCEED - the preprocessing step was executed successfully.  *
  *               FAIL    - otherwise. The error message is stored in value.   *
@@ -1064,14 +1065,21 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 		const zbx_pp_step_t *step, const zbx_variant_t *history_value_in, zbx_variant_t *history_value_out,
 		zbx_timespec_t *history_ts, const char *config_source_ip, char **error)
 {
-	int	ret, user_macros = 0;
+	int	ret = SUCCEED, user_macros = 0;
 	char	*params = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' cache:%p", __func__,
-			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), (void *)cache);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step:%d params:'%s' value:'%.*s' type:%s cache:%p", __func__,
+			step->type, step->params, PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value),
+			zbx_variant_type_desc(value), (void *)cache);
 
-	params = zbx_strdup(NULL, step->params);
+	/* Special case: nothing to do */
+	if (ZBX_VARIANT_NONE == value->type)
+	{
+		if (NULL == cache || ZBX_VARIANT_NONE == cache->value.type)
+			goto out;
+	}
 
+	params = step->params;
 	if (NULL != um_handle)
 	{
 		if (NULL != strstr(params, "{$"))
@@ -1079,6 +1087,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE :
 					ZBX_MACRO_ENV_NONSECURE;
 
+			params = zbx_strdup(NULL, step->params);
 			zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1, env);
 			user_macros = 1;
 		}
@@ -1176,10 +1185,11 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 			ret = FAIL;
 		}
 out:
-	zbx_free(params);
+	if (params != step->params)
+		zbx_free(params);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s", __func__, zbx_result_string(ret),
-			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value));
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%s value:%.*s type:%s", __func__, zbx_result_string(ret),
+			PP_VALUE_LOG_LIMIT, zbx_variant_value_desc(value), zbx_variant_type_desc(value));
 
 	return ret;
 }

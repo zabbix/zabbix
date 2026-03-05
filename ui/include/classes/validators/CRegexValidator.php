@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -13,22 +13,22 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-class CRegexValidator extends CValidator
-{
+
+class CRegexValidator extends CValidator {
 
 	/**
 	 * Error message if the is not a string.
 	 *
 	 * @var string
 	 */
-	public $messageInvalid;
+	public $messageInvalid = '';
 
 	/**
 	 * Error message if the value is invalid
 	 *
 	 * @var string
 	 */
-	public $messageRegex;
+	public $messageRegex = '';
 
 	/**
 	 * Check if regular expression is valid
@@ -43,28 +43,18 @@ class CRegexValidator extends CValidator
 			return false;
 		}
 
-		// escape '/' since Zabbix server treats them as literal characters.
-		$value = str_replace('/', '\/', $value);
-
-		// validate through preg_match
-		$error = false;
+		$error = '';
 
 		set_error_handler(function ($errno, $errstr) use (&$error) {
-			if ($errstr != '') {
-				$error = $errstr;
-			}
+			$error = $errstr;
 		});
 
-		preg_match('/'.$value.'/', '');
+		preg_match('/'.CRegexHelper::handleSlashEscaping($value).'/', '');
 
 		restore_error_handler();
 
-		if ($error) {
-			$this->error(
-				$this->messageRegex,
-				$value,
-				str_replace('preg_match(): ', '', $error)
-			);
+		if ($error !== '') {
+			$this->error($this->messageRegex, $value, str_replace('preg_match(): ', '', $error));
 			return false;
 		}
 

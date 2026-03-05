@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -181,7 +181,7 @@ static const char	*mock_token_type2str(zbx_uint32_t type)
 		ZBX_MOCK_TOKEN_CASE(NOP)
 	}
 
-	fail_msg("unknown token type: %d", type);
+	fail_msg("unknown token type: %" PRIu32, type);
 	return NULL;
 
 #undef ZBX_MOCK_TOKEN_CASE
@@ -269,7 +269,8 @@ void	mock_compare_stack(const zbx_eval_context_t *ctx, const char *path)
 		if (expected_opt != token->opt)
 		{
 			mock_dump_stack(ctx);
-			fail_msg("expected token optional data %d while got %d", expected_opt, token->opt);
+			fail_msg("expected token optional data %" PRIu32 " while got %" PRIu32, expected_opt,
+					token->opt);
 		}
 
 		len = token->loc.r - token->loc.l + 1;

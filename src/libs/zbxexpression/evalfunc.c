@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -29,6 +29,7 @@
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxeval.h"
+#include "zbxtime.h"
 
 #define ZBX_VALUEMAP_TYPE_MATCH			0
 #define ZBX_VALUEMAP_TYPE_GREATER_OR_EQUAL	1
@@ -320,7 +321,7 @@ static void	add_value_suffix(char *value, size_t max_len, const char *units, uns
 			if (0 == strcmp(units, "unixtime"))
 			{
 				time = (time_t)atol(value);
-				local_time = localtime(&time);
+				local_time = zbx_localtime(&time, NULL);
 				strftime(value, max_len, "%Y.%m.%d %H:%M:%S", local_time);
 				break;
 			}
@@ -909,28 +910,39 @@ out:
 	return ret;
 }
 
-int	zbx_history_record_float_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+int	history_record_float_compare(const void *a1, const void *a2)
 {
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
+
 	ZBX_RETURN_IF_NOT_EQUAL(d1->value.dbl, d2->value.dbl);
 
 	return 0;
 }
 
-static int	history_record_uint64_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+static int	history_record_uint64_compare(const void *a1, const void *a2)
 {
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
+
 	ZBX_RETURN_IF_NOT_EQUAL(d1->value.ui64, d2->value.ui64);
 
 	return 0;
 }
 
-static int	history_record_str_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+static int	history_record_str_compare(const void *a1, const void *a2)
 {
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
+
 	return strcmp(d1->value.str, d2->value.str);
 }
 
-static int	history_record_log_compare(const zbx_history_record_t *d1, const zbx_history_record_t *d2)
+static int	history_record_log_compare(const void *a1, const void *a2)
 {
-	int	value_match;
+	int				value_match;
+	const zbx_history_record_t	*d1 = (const zbx_history_record_t *)a1;
+	const zbx_history_record_t	*d2 = (const zbx_history_record_t *)a2;
 
 	if (0 != (value_match = strcmp(d1->value.log->value, d2->value.log->value)))
 		return value_match;
@@ -1144,28 +1156,20 @@ static int	evaluate_COUNT(zbx_variant_t *value, const zbx_dc_evaluate_item_t *it
 		switch (item->value_type)
 		{
 			case ITEM_VALUE_TYPE_UINT64:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)history_record_uint64_compare);
-				zbx_vector_history_record_uniq(&values,
-						(zbx_compare_func_t)history_record_uint64_compare);
+				zbx_vector_history_record_sort(&values, history_record_uint64_compare);
+				zbx_vector_history_record_uniq(&values, history_record_uint64_compare);
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)zbx_history_record_float_compare);
-				zbx_vector_history_record_uniq(&values,
-						(zbx_compare_func_t)zbx_history_record_float_compare);
+				zbx_vector_history_record_sort(&values, history_record_float_compare);
+				zbx_vector_history_record_uniq(&values, history_record_float_compare);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)history_record_log_compare);
-				zbx_vector_history_record_log_uniq(&values,
-						(zbx_compare_func_t)history_record_log_compare);
+				zbx_vector_history_record_sort(&values, history_record_log_compare);
+				zbx_vector_history_record_log_uniq(&values, history_record_log_compare);
 				break;
 			default:
-				zbx_vector_history_record_sort(&values,
-						(zbx_compare_func_t)history_record_str_compare);
-				zbx_vector_history_record_str_uniq(&values,
-						(zbx_compare_func_t)history_record_str_compare);
+				zbx_vector_history_record_sort(&values, history_record_str_compare);
+				zbx_vector_history_record_str_uniq(&values, history_record_str_compare);
 		}
 	}
 
@@ -1629,9 +1633,9 @@ static int	evaluate_PERCENTILE(zbx_variant_t  *value, const zbx_dc_evaluate_item
 		int	index;
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type)
-			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)zbx_history_record_float_compare);
+			zbx_vector_history_record_sort(&values, history_record_float_compare);
 		else
-			zbx_vector_history_record_sort(&values, (zbx_compare_func_t)history_record_uint64_compare);
+			zbx_vector_history_record_sort(&values, history_record_uint64_compare);
 
 		if (0 == percentage)
 			index = 1;

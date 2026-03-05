@@ -33,8 +33,9 @@ This template has been tested on:
 |{$HPE.SYNERGY.API.USERNAME}|<p>Specify user name for API.</p>|`zabbix`|
 |{$HPE.SYNERGY.DATA.TIMEOUT}|<p>Response timeout for API.</p>|`15s`|
 |{$HPE.SYNERGY.API.SCHEME}|<p>The API scheme (http/https).</p>|`https`|
-|{$HPE.SYNERGY.API.HOST}|<p>The hostname or IP address of the API host.</p>|`<SET API HOST>`|
+|{$HPE.SYNERGY.API.HOST}|<p>The hostname or IP address of the API host.</p>||
 |{$HPE.SYNERGY.API.PORT}|<p>The API port.</p>|`443`|
+|{$HPE.SYNERGY.API.LOGIN_DOMAIN}|<p>User domain.</p>|`LOCAL`|
 
 ### Items
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -121,7 +121,7 @@ const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char *
  * Comments: allocates memory                                                 *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid)
+char	*zbx_get_macro_from_func(const char *str, const zbx_token_func_macro_t *fm, int *N_functionid)
 {
 	const char	*ptr_l = str + fm->macro.l, *ptr_r;
 	char		*ptr = NULL;
@@ -480,3 +480,33 @@ char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, cha
 
 	return buffer;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: check if string is a valid user macro                             *
+ *                                                                            *
+ * Parameters: str - [IN] string to check                                     *
+ *                                                                            *
+ * Return value: SUCCEED - string is a valid user macro                       *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_is_user_macro(const char *str)
+{
+	int	macro_r, context_l, context_r, len = strlen(str);
+
+	if (3 > len)
+		return FAIL;
+
+	if ('{' != str[0] || '$' != str[1])
+		return FAIL;
+
+	if (SUCCEED != zbx_user_macro_parse(str, &macro_r, &context_l, &context_r, NULL))
+		return FAIL;
+
+	if (macro_r != len - 1)
+		return FAIL;
+
+	return SUCCEED;
+}
+

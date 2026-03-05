@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,13 +55,15 @@ foreach ($data['hosts'] as $hostid => $host) {
 		}
 	}
 
-	$problems_link = new CLink('',
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'problem.view')
-			->setArgument('severities', $data['filter']['severities'])
-			->setArgument('hostids', [$host['hostid']])
-			->setArgument('filter_set', '1')
-	);
+	$problems = $data['allowed_ui_problems']
+		? new CLink('',
+			(new CUrl('zabbix.php'))
+				->setArgument('action', 'problem.view')
+				->setArgument('severities', $data['filter']['severities'])
+				->setArgument('hostids', [$host['hostid']])
+				->setArgument('filter_set', '1')
+		)
+		: (new CDiv())->addClass(ZBX_STYLE_DISABLED);
 
 	$total_problem_count = 0;
 
@@ -71,20 +73,19 @@ foreach ($data['hosts'] as $hostid => $host) {
 				|| (!$data['filter']['severities'] && $count > 0)) {
 			$total_problem_count += $count;
 
-			$problems_link->addItem((new CSpan($count))
+			$problems->addItem((new CSpan($count))
 				->addClass(ZBX_STYLE_PROBLEM_ICON_LIST_ITEM)
 				->addClass(CSeverityHelper::getStatusStyle($severity))
 				->setAttribute('title', CSeverityHelper::getName($severity))
 			);
 		}
-
 	}
 
 	if ($total_problem_count == 0) {
-		$problems_link->addItem(_('Problems'));
+		$problems->addItem(_('Problems'));
 	}
 	else {
-		$problems_link->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
+		$problems->addClass(ZBX_STYLE_PROBLEM_ICON_LINK);
 	}
 
 	$maintenance_icon = '';
@@ -107,7 +108,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 		[$host_name, $maintenance_icon],
 		(new CCol(getHostInterface($interface)))->addClass(ZBX_STYLE_NOWRAP),
 		getHostAvailabilityTable($host['interfaces']),
-		$host['tags'],
+		(new CDiv($host['tags']))->addClass(ZBX_STYLE_TAGS_WRAPPER),
 		$host['status'] == HOST_STATUS_MONITORED
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_RED),
@@ -122,7 +123,7 @@ foreach ($data['hosts'] as $hostid => $host) {
 				: (new CSpan(_('Latest data')))->addClass(ZBX_STYLE_DISABLED),
 				CViewHelper::showNum($host['items_count'])
 		],
-		$problems_link,
+		$problems,
 		$host['graphs']
 			? [
 				new CLink(_('Graphs'),

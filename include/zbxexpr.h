@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -36,6 +36,8 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
+int	zbx_is_user_macro(const char *str);
+
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
 char	*zbx_function_param_unquote_dyn_ext(const char *param, size_t len, int *quoted, int esc_bs);
@@ -280,7 +282,7 @@ typedef int (*zbx_macro_resolv_func_t)(zbx_macro_resolv_data_t *p, va_list args,
 
 int		zbx_is_indexed_macro(const char *str, const zbx_token_t *token);
 const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char **macros, int *N_functionid);
-char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
+char		*zbx_get_macro_from_func(const char *str, const zbx_token_func_macro_t *fm, int *N_functionid);
 const char	**zbx_get_indexable_macros(void);
 
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
@@ -288,4 +290,5 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 void	zbx_url_encode(const char *source, char **result);
 int	zbx_url_decode(const char *source, char **result);
 
+int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
 #endif /* ZABBIX_EXPR_H */

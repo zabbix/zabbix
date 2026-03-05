@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -286,7 +286,7 @@ typedef struct
 	zbx_uint64_t		valuemapid;
 	const char		*key;
 	const char		*port;
-	const char		*error;
+	char			error_hash[ZBX_SHA512_BINARY_LENGTH];
 	const char		*delay;
 	const char		*delay_ex;
 	const char		*history_period;
@@ -433,6 +433,7 @@ typedef struct
 	int		flags;
 	int		timestamp;
 	unsigned short	listen_port;
+	unsigned int	connection_type;
 }
 ZBX_DC_AUTOREG_HOST;
 
@@ -562,6 +563,7 @@ typedef struct
 	/* item statistics per interface */
 	int		items_num;
 	int		version;
+	zbx_uint64_t	revision;
 }
 ZBX_DC_INTERFACE;
 
@@ -1049,6 +1051,7 @@ typedef struct
 	ZBX_DC_STATUS		*status;
 	zbx_hashset_t		strpool;
 	zbx_um_cache_t		*um_cache;
+	zbx_hashset_t		um_hosts;
 	char			autoreg_psk_identity[HOST_TLS_PSK_IDENTITY_LEN_MAX];	/* autoregistration PSK */
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
@@ -1131,16 +1134,16 @@ void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src
 void		DCget_trigger(zbx_dc_trigger_t *dst_trigger, const ZBX_DC_TRIGGER *src_trigger, unsigned int flags);
 int		DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface, int flags, int now,
 			char **error);
+unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *src_item);
 
 #define ZBX_TRIGGER_TIMER_NONE			0x0000
 #define ZBX_TRIGGER_TIMER_TRIGGER		0x0001
 #define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
-
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
-		unsigned char program_type);
+		double *um_cache_dup_sec, zbx_int64_t *um_cache_dup_size, unsigned char program_type);
 
 void	dc_host_deregister_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
 void	dc_host_register_proxy(ZBX_DC_HOST *host, zbx_uint64_t proxyid, zbx_uint64_t revision);
