@@ -313,6 +313,7 @@ window.script_edit_popup = new class {
 	#clone(clone_rules) {
 		this.#clearMessages();
 		this.scriptid = null;
+		document.getElementById('scriptid').remove();
 
 		this.form.reload(clone_rules);
 
