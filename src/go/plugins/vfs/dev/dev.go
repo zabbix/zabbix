@@ -135,9 +135,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case "vfs.dev.write":
 		mode = ioModeWrite
 	case "vfs.dev.discovery":
-		return p.getDiscovery()
+		return getDiscovery()
 	case "vfs.dev.get":
-		return p.vfsDevGet(params)
+		return vfsDevGet(params)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}

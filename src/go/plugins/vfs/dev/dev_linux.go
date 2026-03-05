@@ -49,113 +49,6 @@ type devRecord struct {
 	Type string `json:"{#DEVTYPE}"`
 }
 
-//nolint:gocyclo,gocognit // this is a legacy function with some minor changes
-func (p *Plugin) getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
-	entries, err := os.ReadDir(devLocation)
-	if err != nil {
-		return nil, nil, errs.Wrapf(err, "cannot read directory \"%s\"", devLocation)
-	}
-
-	devs := make([]*devRecord, 0)
-	rdevs := make(map[string]uint64)
-	for _, entry := range entries {
-		var rdev uint64
-		bypass := 0
-		devname := devLocation + entry.Name()
-
-		stat, err := os.Stat(devname)
-		if err != nil {
-			continue
-		}
-
-		if stat.Mode()&os.ModeType == os.ModeDevice {
-			dev := &devRecord{Name: entry.Name()}
-			if sysfs {
-				//nolint:unconvert
-				sysInfo, ok := stat.Sys().(*syscall.Stat_t)
-				if !ok {
-					// should never happen
-					log.Errf("cannot get device major and minor for \"%s\"", devname)
-					continue
-				}
-				rdev = uint64(sysInfo.Rdev)
-
-				dirname := fmt.Sprintf(
-					"%s%d:%d/",
-					sysBlkdevLocation,
-					unix.Major(rdev),
-					unix.Minor(rdev),
-				)
-
-				lstat, err := os.Lstat(devname)
-				if err == nil {
-					filename := dirname + "/device/type"
-					file, err := os.Open(filename)
-					if err == nil {
-						var devtype int
-
-						_, err = fmt.Fscanf(file, "%d\n", &devtype)
-						if err == nil {
-							if devtype == devTypeRom {
-								dev.Type = devTypeRomString
-								if lstat.Mode()&os.ModeSymlink != 0 {
-									bypass = 1
-								}
-							}
-						}
-						err = file.Close()
-						if err != nil {
-							log.Errf("cannot close file \"%s\"", filename)
-						}
-					}
-				}
-
-				if dev.Type == "" {
-					filename := dirname + "uevent"
-					file, err := os.Open(filename)
-					if err == nil {
-						scanner := bufio.NewScanner(file)
-						for scanner.Scan() {
-							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
-								dev.Type = scanner.Text()[len(devtypePrefix):]
-							}
-						}
-						err = file.Close()
-						if err != nil {
-							log.Errf("cannot close file \"%s\"", filename)
-						}
-					}
-				}
-			}
-			if bypass == 0 {
-				devs = append(devs, dev)
-				rdevs[entry.Name()] = rdev
-			}
-		}
-	}
-
-	return devs, rdevs, nil
-}
-
-func (p *Plugin) getDiscovery() (out string, err error) {
-	sysfs, err := isSysfsAvailable()
-	if err != nil {
-		return "", err
-	}
-
-	devs, _, err := p.getDevRecords(sysfs)
-	if err != nil {
-		return "", err
-	}
-
-	var b []byte
-	b, err = json.Marshal(&devs)
-	if err != nil {
-		return "", errs.Wrap(err, "failed to marshal devices")
-	}
-	return string(b), nil
-}
-
 func (p *Plugin) getDeviceName(name string) (devName string, err error) {
 	if name == "" {
 		return "", nil
@@ -345,4 +238,128 @@ func isSysfsAvailable() (bool, error) {
 	}
 
 	return true, nil
+}
+
+//nolint:gocyclo,gocognit,cyclop // legacy code, suppressed until refactored
+func getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
+	entries, err := os.ReadDir(devLocation)
+	if err != nil {
+		return nil, nil, errs.Wrapf(err, "cannot read directory \"%s\"", devLocation)
+	}
+
+	devs := make([]*devRecord, 0)
+	rdevs := make(map[string]uint64)
+
+	for _, entry := range entries {
+		var rdev uint64
+
+		bypass := 0
+		devname := devLocation + entry.Name()
+
+		stat, err := os.Stat(devname)
+
+		if err != nil {
+			continue
+		}
+
+		//nolint:nestif // legacy code, suppressed until refactored
+		if stat.Mode()&os.ModeType == os.ModeDevice {
+			dev := &devRecord{Name: entry.Name()}
+
+			if sysfs {
+				sysInfo, ok := stat.Sys().(*syscall.Stat_t)
+
+				if !ok {
+					// should never happen
+					log.Errf("cannot get device major and minor for \"%s\"", devname)
+
+					continue
+				}
+
+				rdev = sysInfo.Rdev
+
+				dirname := fmt.Sprintf(
+					"%s%d:%d/",
+					sysBlkdevLocation,
+					unix.Major(rdev),
+					unix.Minor(rdev),
+				)
+
+				lstat, err := os.Lstat(devname)
+				if err == nil {
+					filename := dirname + "/device/type"
+					//nolint:gosec // path is constructed from controlled, trusted components
+					file, err := os.Open(filename)
+					if err == nil {
+						var devtype int
+
+						_, err = fmt.Fscanf(file, "%d\n", &devtype)
+						if err == nil {
+							//nolint:revive // legacy code, suppressed until refactored
+							if devtype == devTypeRom {
+								dev.Type = devTypeRomString
+
+								if lstat.Mode()&os.ModeSymlink != 0 {
+									bypass = 1
+								}
+							}
+						}
+
+						err = file.Close()
+						if err != nil {
+							log.Errf("cannot close file \"%s\"", filename)
+						}
+					}
+				}
+
+				if dev.Type == "" {
+					filename := dirname + "uevent"
+					//nolint:gosec // path is constructed from controlled, trusted components
+					file, err := os.Open(filename)
+					if err == nil {
+						scanner := bufio.NewScanner(file)
+						for scanner.Scan() {
+							//nolint:revive // legacy code, suppressed until refactored
+							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
+								dev.Type = scanner.Text()[len(devtypePrefix):]
+							}
+						}
+
+						err = file.Close()
+						if err != nil {
+							log.Errf("cannot close file \"%s\"", filename)
+						}
+					}
+				}
+			}
+
+			if bypass == 0 {
+				devs = append(devs, dev)
+				rdevs[entry.Name()] = rdev
+			}
+		}
+	}
+
+	return devs, rdevs, nil
+}
+
+func getDiscovery() (string, error) {
+	sysfs, err := isSysfsAvailable()
+	if err != nil {
+		return "", err
+	}
+
+	devs, _, err := getDevRecords(sysfs)
+	if err != nil {
+		return "", err
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(&devs)
+	if err != nil {
+		return "", errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
 }

@@ -121,7 +121,6 @@ type vfsDeviceStats struct {
 }
 
 func vfsDevGetParseModeParam(mode string) (vfsDevGetMode, error) {
-
 	switch mode {
 	case "disks", "":
 		return modeDisks, nil
@@ -163,6 +162,7 @@ func vfsDevGetParamsValidate(params []string) (vfsDevGetMode, *regexp.Regexp, er
 		devNamesRgx *regexp.Regexp
 		err         error
 	)
+
 	switch len(params) {
 	case 2:
 		mode, err = vfsDevGetParseModeParam(params[1])
@@ -184,7 +184,7 @@ func vfsDevGetParamsValidate(params []string) (vfsDevGetMode, *regexp.Regexp, er
 	return mode, devNamesRgx, nil
 }
 
-func (p *Plugin) vfsDevGet(params []string) (string, error) {
+func vfsDevGet(params []string) (string, error) {
 	var (
 		mode        vfsDevGetMode
 		devNamesRgx *regexp.Regexp
@@ -202,7 +202,7 @@ func (p *Plugin) vfsDevGet(params []string) (string, error) {
 		return "", err
 	}
 
-	devs, rdevs, err := p.getDevRecords(sysfs)
+	devs, rdevs, err := getDevRecords(sysfs)
 	if err != nil {
 		return "", err
 	}
@@ -227,14 +227,14 @@ func (p *Plugin) vfsDevGet(params []string) (string, error) {
 }
 
 func sysfsStrGet(rdev uint64, relPath string) string {
-	filepath := path.Join(
+	fp := path.Join(
 		sysBlkdevLocation,
 		fmt.Sprintf("%d:%d", unix.Major(rdev), unix.Minor(rdev)),
 		relPath,
 	)
 
 	//nolint:gosec // path is constructed from controlled, trusted components
-	data, err := os.ReadFile(filepath)
+	data, err := os.ReadFile(fp)
 	if err != nil {
 		return ""
 	}
@@ -257,17 +257,16 @@ func sysfsUintGet(rdev uint64, relPath string) uint64 {
 }
 
 func devidsInit() []vfsDevice {
-	var (
-		devices []vfsDevice
-		stat    syscall.Stat_t
-	)
-
 	entries, err := os.ReadDir(devDiskByID)
 	if err != nil {
-		return devices
+		return nil
 	}
 
+	devices := make([]vfsDevice, 0, len(entries))
+
 	for _, entry := range entries {
+		var stat syscall.Stat_t
+
 		devName := entry.Name()
 
 		if devName == "." || devName == ".." {
@@ -276,12 +275,12 @@ func devidsInit() []vfsDevice {
 
 		symlinkPath := path.Join(devDiskByID, devName)
 
-		real, err := filepath.EvalSymlinks(symlinkPath)
+		fp, err := filepath.EvalSymlinks(symlinkPath)
 		if err != nil {
 			continue
 		}
 
-		if err := syscall.Stat(real, &stat); err != nil {
+		if err := syscall.Stat(fp, &stat); err != nil {
 			continue
 		}
 
@@ -293,7 +292,7 @@ func devidsInit() []vfsDevice {
 			major: unix.Major(stat.Rdev),
 			minor: unix.Minor(stat.Rdev),
 			devid: devName,
-			name:  filepath.Base(real),
+			name:  filepath.Base(fp),
 		})
 	}
 
@@ -340,6 +339,7 @@ func sysfsDevStatsGet(rdev uint64) vfsStats {
 	if line == "" {
 		return stats
 	}
+
 	tokens := strings.Fields(line)
 
 	for idx, tok := range tokens {
@@ -353,6 +353,7 @@ func sysfsDevStatsGet(rdev uint64) vfsStats {
 			if err != nil {
 				break
 			}
+
 			stats.ReadsCompleted = val
 		case 2:
 			/* units: sectors, must be multiplied by 512 to convert to bytes */
@@ -360,12 +361,14 @@ func sysfsDevStatsGet(rdev uint64) vfsStats {
 			if err != nil {
 				break
 			}
+
 			stats.BytesRead = val * 512
 		case 4:
 			val, err := strconv.ParseUint(tok, 10, 64)
 			if err != nil {
 				break
 			}
+
 			stats.WritesCompleted = val
 		case 6:
 			/* units: sectors, must be multiplied by 512 to convert to bytes */
@@ -373,12 +376,14 @@ func sysfsDevStatsGet(rdev uint64) vfsStats {
 			if err != nil {
 				break
 			}
+
 			stats.BytesWritten = val * 512
 		case 10:
 			val, err := strconv.ParseUint(tok, 10, 64)
 			if err != nil {
 				break
 			}
+
 			stats.IOTimeMs = val
 		}
 	}
@@ -402,7 +407,6 @@ func sysfsDiskPartitionsGet(rdev uint64) vfsPartitions {
 		partitionPath := path.Join(diskPath, entry.Name())
 
 		/* partition directories should contain a text file named "partition" */
-		//nolint:gosec // path is constructed from controlled, trusted components
 		stat, err := os.Stat(path.Join(partitionPath, "partition"))
 		if err != nil || !stat.Mode().IsRegular() {
 			continue
@@ -428,7 +432,7 @@ func sysfsDiskPartitionsGet(rdev uint64) vfsPartitions {
 }
 
 func vfsDevGetDisks(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDevDisks {
-	devIds := devidsInit()
+	devIDs := devidsInit()
 
 	out := vfsDevDisks{
 		Cfg: make([]vfsDevDisksCfg, 0),
@@ -447,7 +451,7 @@ func vfsDevGetDisks(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Rege
 		model := devModelGet(rdev)
 		cfg := vfsDevDisksCfg{
 			Name:            dev.Name,
-			Devid:           devIdGet(devIds, rdev, model),
+			Devid:           devIDGet(devIDs, rdev, model),
 			Type:            dev.Type,
 			Path:            devPathGet(dev.Name),
 			Model:           model,
@@ -464,7 +468,7 @@ func vfsDevGetDisks(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Rege
 }
 
 func vfsDevGetDiskStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDevDiskStats {
-	devIds := devidsInit()
+	devIDs := devidsInit()
 
 	out := vfsDevDiskStats{
 		Cfg: make([]vfsDevDiskStatsCfg, 0),
@@ -484,7 +488,7 @@ func vfsDevGetDiskStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.
 		model := devModelGet(rdev)
 		cfg := vfsDevDiskStatsCfg{
 			Name:      dev.Name,
-			Devid:     devIdGet(devIds, rdev, model),
+			Devid:     devIDGet(devIDs, rdev, model),
 			Type:      dev.Type,
 			SizeBytes: sysfsSizeGet(rdev),
 		}
@@ -501,7 +505,7 @@ func vfsDevGetDiskStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.
 }
 
 func vfsDevGetDevices(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDevices {
-	devIds := devidsInit()
+	devIDs := devidsInit()
 
 	out := vfsDevices{
 		Cfg: make([]vfsDevicesCfg, 0),
@@ -520,7 +524,7 @@ func vfsDevGetDevices(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Re
 		model := devModelGet(rdev)
 		cfg := vfsDevicesCfg{
 			Name:       dev.Name,
-			Devid:      devIdGet(devIds, rdev, model),
+			Devid:      devIDGet(devIDs, rdev, model),
 			Type:       dev.Type,
 			Partitions: sysfsDiskPartitionsGet(rdev),
 		}
@@ -531,7 +535,7 @@ func vfsDevGetDevices(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Re
 }
 
 func vfsDevGetDeviceStats(devs []*devRecord, rdevs map[string]uint64, reg *regexp.Regexp) vfsDeviceStats {
-	devIds := devidsInit()
+	devIDs := devidsInit()
 
 	out := vfsDeviceStats{
 		Cfg: make([]vfsDeviceStatsCfg, 0),
@@ -551,7 +555,7 @@ func vfsDevGetDeviceStats(devs []*devRecord, rdevs map[string]uint64, reg *regex
 		model := devModelGet(rdev)
 		cfg := vfsDeviceStatsCfg{
 			Name:      dev.Name,
-			Devid:     devIdGet(devIds, rdev, model),
+			Devid:     devIDGet(devIDs, rdev, model),
 			Type:      dev.Type,
 			SizeBytes: sysfsSizeGet(rdev),
 		}
@@ -568,31 +572,26 @@ func vfsDevGetDeviceStats(devs []*devRecord, rdevs map[string]uint64, reg *regex
 }
 
 func isDisk(devType string) bool {
-	if devType == "disk" || devType == "rom" {
-		return true
-	}
-
-	return false
+	return devType == "disk" || devType == "rom"
 }
 
 func isPartition(devType string) bool {
-	if devType == "partition" {
-		return true
-	}
-
-	return false
+	return devType == "partition"
 }
 
 func deviceCompare(a, b vfsDevice) int {
 	if a.major < b.major {
 		return -1
 	}
+
 	if a.major > b.major {
 		return 1
 	}
+
 	if a.minor < b.minor {
 		return -1
 	}
+
 	if a.minor > b.minor {
 		return 1
 	}
@@ -604,11 +603,13 @@ func findDeviceRange(devices []vfsDevice, rdev uint64) (int, int) {
 	major, minor := unix.Major(rdev), unix.Minor(rdev)
 
 	l, r := -1, -1
+
 	for i, d := range devices {
 		if major == d.major && minor == d.minor {
 			if l == -1 {
 				l = i
 			}
+
 			r = i
 		} else if l != -1 {
 			break
@@ -625,18 +626,20 @@ func isAlnum(c byte) bool {
 func normalizeModel(model string) string {
 	var normModel []byte
 
-	for i := 0; i < len(model); i++ {
+	for i := range model {
 		c := model[i]
-		if isAlnum(c) || c == '.' || c == ' ' {
-			if c == ' ' {
-				normModel = append(normModel, '_')
-			} else {
-				normModel = append(normModel, c)
-			}
-		} else {
+
+		if !isAlnum(c) && c != '.' && c != ' ' {
 			break
 		}
+
+		if c == ' ' {
+			normModel = append(normModel, '_')
+		} else {
+			normModel = append(normModel, c)
+		}
 	}
+
 	return string(normModel)
 }
 
@@ -648,10 +651,11 @@ func findDeviceByModel(devices []vfsDevice, l, r int, model string) int {
 			return i
 		}
 	}
+
 	return -1
 }
 
-// devIdGet gets a device ID in the format used by /dev/disk/by-id/.
+// devIDGet gets a device ID in the format used by /dev/disk/by-id/.
 //
 // When more than one device ID is present for a particular device, the ID
 // containing the device model is preferred as it is human-readable.
@@ -675,7 +679,7 @@ func findDeviceByModel(devices []vfsDevice, l, r int, model string) int {
 //     4.3. Choose the device ID that contains the resulting model string.
 //
 //  5. If no match is found, use the first symlink for the device.
-func devIdGet(devices []vfsDevice, rdev uint64, model string) string {
+func devIDGet(devices []vfsDevice, rdev uint64, model string) string {
 	if len(devices) == 0 {
 		return ""
 	}
