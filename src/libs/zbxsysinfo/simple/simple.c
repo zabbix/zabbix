@@ -28,7 +28,6 @@
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
-#	include "zbxip.h"
 #endif
 
 #ifdef HAVE_LDAP
