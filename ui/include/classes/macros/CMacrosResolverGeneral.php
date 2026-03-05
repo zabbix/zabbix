@@ -2454,7 +2454,7 @@ class CMacrosResolverGeneral {
 					$host = $trigger_hosts_by_f_num[$triggerid][$reference];
 
 					// Replace {HOST.HOST<1-9>} macro with real host name.
-					$macro = (string) preg_replace($pattern, '/'.$host.'/', $_macro, 1);
+					$macro = preg_replace($pattern, '/'.$host.'/', $_macro, 1);
 
 					if (!array_key_exists($macro, $expr_macros)) {
 						$expr_macros[$macro] = ['host' => $host] + $data;
@@ -2481,7 +2481,7 @@ class CMacrosResolverGeneral {
 				foreach ($_macros as $_macro => $data) {
 					// Replace {HOST.HOST} macro with real host name.
 					$pattern = $data['host'] === '' ? '#//#' : '#/\{HOST\.HOST\}/#';
-					$macro = (string) preg_replace($pattern, '/'.$db_hosts[$hostid]['host'].'/', $_macro, 1);
+					$macro = preg_replace($pattern, '/'.$db_hosts[$hostid]['host'].'/', $_macro, 1);
 
 					if (!array_key_exists($macro, $expr_macros)) {
 						$expr_macros[$macro] = ['host' => $db_hosts[$hostid]['host']] + $data;
