@@ -439,7 +439,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -826,6 +826,8 @@ zabbix_export:
                   		return 1
                   	case 'dormant':
                   		return 2
+                  	case 'alerting':
+                  		return 3
                   	default:
                   		return 10
                   }
@@ -835,10 +837,17 @@ zabbix_export:
             - tag: component
               value: health
           triggers:
-            - uuid: 00583ac9e9824f7db22a1685421f0be9
-              expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)<>1'
-              name: 'Meraki: Status is not online'
+            - uuid: 00583ac9e9824f7db12a1685421f0be9
+              expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)=3'
+              name: 'Meraki: Status is alerting'
               priority: WARNING
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: 00583ac9e9824f7db22a1685421f0be9
+              expression: 'last(/Cisco Meraki device by HTTP/meraki.device.status)=0'
+              name: 'Meraki: Status is offline'
+              priority: AVERAGE
               tags:
                 - tag: scope
                   value: availability
@@ -1417,6 +1426,8 @@ zabbix_export:
               newvalue: online
             - value: '2'
               newvalue: dormant
+            - value: '3'
+              newvalue: alerting
             - value: '10'
               newvalue: unknown
     - uuid: 39e2f742d0b24ea489b7f61d27a5df1c
