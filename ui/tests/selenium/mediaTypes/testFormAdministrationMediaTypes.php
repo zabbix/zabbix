@@ -1905,13 +1905,13 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 	/**
 	 * Check scenarios when warning tooltip does or doesn't appear.
-	 * Possible values:
+	 * Possible values for tokens_status parameter:
 	 * 		0 - (default) Both tokens contain invalid value;
 	 * 		1 - Access token contain valid value;
 	 * 		2 - Refresh token contain valid value;
 	 * 		3 - Both tokens contain valid value.
 	 */
-	public function testFormAdministrationMediaTypes_TokenStatus() {
+	public function testFormAdministrationMediaTypes_WarningTooltip() {
 		$this->page->login()->open(self::URL)->waitUntilReady();
 
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
@@ -1919,17 +1919,33 @@ class testFormAdministrationMediaTypes extends CWebTest {
 				DBexecute('UPDATE media_type_oauth SET tokens_status='.$tokens_status.' WHERE mediatypeid='.
 						self::$mediatypeids[$name]
 				);
-				$this->query('link', $name)->waitUntilClickable()->one()->click();
-				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 
-				if ($tokens_status === 0 || $tokens_status === 1) {
-					$this->checkHint($form, 'zi-i-negative', 'Refresh token is invalid or outdated.');
-				}
-				else {
-					$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)->isValid());
-				}
+				// '2147483647' - the last possible unix timestamp.
+				foreach (['2147483647', time()] as $access_token_updated) {
+					DBexecute('UPDATE media_type_oauth SET access_token_updated ='.$access_token_updated.' WHERE mediatypeid='.
+							self::$mediatypeids[$name]
+					);
+					$this->query('link', $name)->waitUntilClickable()->one()->click();
+					$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 
-				COverlayDialogElement::find()->one()->close();
+					// In case when refresh token is invalid and access token has "unexpected update time" there will be two warning hints.
+					$warning = ($tokens_status === 0 || $tokens_status === 1)
+						? ($access_token_updated === '2147483647'
+							? "Refresh token is invalid or outdated.\nUnexpected access token update time."
+							: 'Refresh token is invalid or outdated.')
+						: ($access_token_updated === '2147483647'
+							? 'Unexpected access token update time.'
+							: null);
+
+					if ($warning !== null) {
+						$this->checkHint($form, 'zi-i-negative', $warning);
+					}
+					else {
+						$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)->isValid());
+					}
+
+					COverlayDialogElement::find()->one()->close();
+				}
 			}
 		}
 	}
