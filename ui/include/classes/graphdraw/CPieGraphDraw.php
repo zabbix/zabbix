@@ -18,9 +18,6 @@ class CPieGraphDraw extends CGraphDraw {
 
 	const DEFAULT_HEADER_PADDING_TOP = 30;
 
-	const GRAPH_WIDTH_MIN = 20;
-	const GRAPH_HEIGHT_MIN = 20;
-
 	private $background;
 	private $sum;
 	private $exploderad;
