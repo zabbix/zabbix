@@ -439,13 +439,13 @@ else {
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT.' js-clone',
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
-			'class' => ZBX_STYLE_BTN_ALT.' js-delete',
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false
 		]
