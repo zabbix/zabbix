@@ -42,6 +42,10 @@ const (
 	errorUnsupportedMetric  = "Unsupported metric."
 )
 
+var (
+	ErrorInvalidSecondParam = errors.New(errorInvalidSecondParam)
+)
+
 const (
 	tcpExpectFail   = -1
 	tcpExpectOk     = 0
@@ -482,6 +486,12 @@ func (p *Plugin) exportNetServicePerf(params []string, timeout int) float64 {
 	return 0.0
 }
 
+func isAlnum(c byte) bool {
+	return (c >= '0' && c <= '9') ||
+		(c >= 'a' && c <= 'z') ||
+		(c >= 'A' && c <= 'Z')
+}
+
 func isDNS(host string) bool {
 	n := len(host)
 	if n == 0 || n > 253 {
@@ -490,7 +500,7 @@ func isDNS(host string) bool {
 
 	// first character must be alphanumeric
 	c := host[0]
-	if (c < '0' || c > '9') && (c < 'a' || c > 'z') && (c < 'A' || c > 'Z') {
+	if !isAlnum(c) {
 		return false
 	}
 
@@ -501,7 +511,7 @@ func isDNS(host string) bool {
 		c = host[i]
 
 		switch {
-		case (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'):
+		case isAlnum(c):
 			labelLen++
 			prevDash = false
 		case c == '-':
@@ -509,6 +519,7 @@ func isDNS(host string) bool {
 			if labelLen == 0 {
 				return false
 			}
+
 			labelLen++
 			prevDash = true
 		case c == '.':
@@ -516,6 +527,7 @@ func isDNS(host string) bool {
 			if labelLen == 0 || prevDash {
 				return false
 			}
+
 			labelLen = 0
 			prevDash = false
 		default:
@@ -564,10 +576,9 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 			return
 		}
 
-		if len(params) >= 2 && len(params[1]) != 0 {
-			if nil == net.ParseIP(params[1]) && !isDNS(params[1]) {
-				err = errors.New(errorInvalidSecondParam)
-				return
+		if len(params) >= 2 && params[1] != "" {
+			if net.ParseIP(params[1]) == nil && !isDNS(params[1]) {
+				return nil, ErrorInvalidSecondParam
 			}
 		}
 
