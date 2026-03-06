@@ -718,12 +718,13 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 				break;
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
-				if ((HOST_MONITORED_BY_SERVER != item->host.monitored_by ||
-						(ZBX_ITEM_REQUIRES_PREPROCESSING_YES != item->preprocessing)) &&
+				if ((HOST_MONITORED_BY_PROXY == item->host.monitored_by ||
+						HOST_MONITORED_BY_PROXY_GROUP == item->host.monitored_by ||
+						ZBX_ITEM_REQUIRES_PREPROCESSING_NO == item->preprocessing) &&
 						SUCCEED == zbx_set_agent_result_type(&result,
 								item->value_type, value->value))
 				{
-						break;
+					break;
 				}
 				ZBX_FALLTHROUGH;
 			default:
