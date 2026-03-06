@@ -24,19 +24,21 @@ window.script_edit_popup = new class {
 	init({rules, clone_rules, script}) {
 		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.script = script;
 		this.scriptid = script.scriptid;
 		this.saved_scope_value = script.scope;
 		this.saved_menu_path_value = '';
+		this.clone_rules = clone_rules;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'script.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initView(script);
-		this.#initActions(rules, clone_rules);
+		this.#initActions(rules);
 	}
 
 	#initView(script) {
@@ -51,7 +53,7 @@ window.script_edit_popup = new class {
 		this.overlay.recoverFocus();
 	}
 
-	#initActions(rules, clone_rules) {
+	#initActions(rules) {
 		this.form_element.querySelectorAll('#scope, #type, #authtype, #hgstype-select, #manualinput,' +
 				' #manualinput_validator_type ,#enable_confirmation, #confirmation').forEach(
 			node => node.addEventListener('change', (e) => {
@@ -107,11 +109,9 @@ window.script_edit_popup = new class {
 			this.#addParameter({name: '', value: ''});
 		});
 
-		const dialogue_footer = this.overlay.$dialogue.$footer[0];
-
-		dialogue_footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
-		dialogue_footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone(clone_rules));
-		dialogue_footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
+		this.footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
 
 		this.form_element.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
@@ -310,12 +310,12 @@ window.script_edit_popup = new class {
 		});
 	}
 
-	#clone(clone_rules) {
+	#clone() {
 		this.#clearMessages();
 		this.scriptid = null;
 		document.getElementById('scriptid').remove();
 
-		this.form.reload(clone_rules);
+		this.form.reload(this.clone_rules);
 
 		for (const input of this.form_element.querySelectorAll('input[name=scope]')) {
 			input.disabled = false;
@@ -339,8 +339,7 @@ window.script_edit_popup = new class {
 			]
 		});
 
-		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
-			.addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-submit') .addEventListener('click', () => this.#submit());
 
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
@@ -434,6 +433,8 @@ window.script_edit_popup = new class {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		this.form_element.parentNode.insertBefore(makeMessageBox('bad', messages, title)[0], this.form_element);
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 };
