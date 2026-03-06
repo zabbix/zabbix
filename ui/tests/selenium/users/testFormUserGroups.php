@@ -117,7 +117,8 @@ class testFormUserGroups extends CWebTest {
 				$mfa_field->fill('Default');
 				$warning_icon = $form->query('id:mfa-warning')->waitUntilVisible()->one();
 				$warning_icon->click();
-				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
+				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()
+						->waitUntilReady()->one();
 				$this->assertEquals('Multi-factor authentication is disabled system-wide.', $hint->getText());
 				$hint->close();
 			}
@@ -125,9 +126,9 @@ class testFormUserGroups extends CWebTest {
 
 		// Check the default layout in other tabs.
 		$tabs = [
-			'Template permissions' => ['Template groups', 'Permissions', ''],
-			'Host permissions' => ['Host groups', 'Permissions', ''],
-			'Problem tag filter' => ['Host groups', 'Tags', 'Actions']
+			'Template permissions' => ['Template groups', 'Permissions', 'Action'],
+			'Host permissions' => ['Host groups', 'Permissions', 'Action'],
+			'Problem tag filter' => ['Host groups', 'Tags', 'Action']
 		];
 
 		foreach ($tabs as $tab => $table_headers) {
