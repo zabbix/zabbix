@@ -617,6 +617,7 @@ class CDataTable {
 				this.#page = page;
 
 				this.dispatchEvent(CDataTable.EVENT_INIT);
+				this.dispatchEvent(CPager.EVENT_SELECT, event.detail);
 			})
 			.on(CPager.EVENT_STATE_CHANGE, event => {
 				this.dispatchEvent(CPager.EVENT_STATE_CHANGE, event.detail);
