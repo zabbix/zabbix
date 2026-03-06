@@ -1267,7 +1267,6 @@ class testFormTags extends CWebTest {
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
 			foreach (['Value', ''] as $column) {
-				$row->getColumn($column)->highlight();
 				$this->assertFalse($row->getColumn($column)->children()->one()->isEnabled());
 			}
 

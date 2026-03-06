@@ -317,10 +317,7 @@ class testFormGraphs extends CWebTest {
 			}
 
 			if (array_key_exists('value', $attribute)) {
-				$locator = ($attribute['value'] === '')
-					? $form->query($field)->one()
-					: $form->getField($field);
-				$this->assertEquals($attribute['value'], $locator->getValue());
+				$this->assertEquals($attribute['value'], $form->getField($field)->getValue());
 			}
 
 			if (array_key_exists('maxlength', $attribute)) {

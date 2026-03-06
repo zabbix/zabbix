@@ -659,9 +659,6 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Delete the events so they don't appear in the next test case.
-	 *
-	 * TODO: test fails on Jenkins with error "Failed to write session data".
-	 * Adding DB::delete in onAfter instead of at the end of the test might help.
 	 */
 	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);

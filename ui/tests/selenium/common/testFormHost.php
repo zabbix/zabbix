@@ -2187,7 +2187,7 @@ class testFormHost extends CWebTest {
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_dns', 'value' => '',
 								'maxlength' => 255, 'enabled' => false],
-						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip_1', 'value' => '1', 'enabled' => false], // value 1 = IP.
+						['name' => 'id:interfaces_'.$discovered_interface_id.'_useip', 'value' => 'IP', 'enabled' => false],
 						['name' => 'id:interfaces_'.$discovered_interface_id.'_port', 'value' => 10050,
 								'maxlength' => 64, 'enabled' => false],
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
@@ -2197,15 +2197,12 @@ class testFormHost extends CWebTest {
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
-				foreach ($host_fields as $field) {
-						$locator = (str_starts_with($field['name'], 'id:'))
-							? $form->query($field['name'])->one()
-							: $form->getField($field['name']);
-						$this->assertTrue($locator->isEnabled($field['enabled']));
-						$this->assertEquals($field['value'], $locator->getValue());
+					foreach ($host_fields as $field) {
+						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
+						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
 
 						if (CTestArrayHelper::get($field, 'maxlength')) {
-							$this->assertEquals($field['maxlength'], $locator->getAttribute('maxlength'));
+							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
 						}
 					}
 

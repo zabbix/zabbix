@@ -252,8 +252,7 @@ class testDashboardPieChartWidget extends testWidgets {
 		}
 
 		foreach (['id:ds_0_hosts_' => 'host patterns', 'id:ds_0_items_' => 'item patterns'] as $selector => $placeholder) {
-			$field = $form->query($selector);
-			$this->assertEquals($placeholder, $field->query('tag:input')->one()->getAttribute('placeholder'));
+			$this->assertFieldAttributes($form, $selector, ['placeholder' => $placeholder], true);
 		}
 
 		$this->assertFieldAttributes($form, 'Data set label', ['placeholder' => 'Data set #1', 'maxlength' => 255]);

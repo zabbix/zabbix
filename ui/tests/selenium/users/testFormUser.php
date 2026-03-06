@@ -367,12 +367,12 @@ class testFormUser extends CWebTest {
 			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
-			$this->assertTrue($form->query('id:roleid')->one()->isEnabled());
+			$this->assertTrue($form->getField('Role')->isEnabled());
 			$this->assertTrue($form->isRequired('Role'));
 		}
 
 		if ($data['role'] === '') {
-			$this->assertTrue($form->query('id:roleid_ms')->one()->isAttributePresent(['placeholder' => 'type here to search']));
+			$this->assertTrue($form->getField('id:roleid_ms')->isAttributePresent(['placeholder' => 'type here to search']));
 		}
 	}
 

@@ -1925,7 +1925,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						],
 						[
 							'skip_mandatory_check' => true,
-							'field_locator' => 'xpath://label[@for="acknowledged_by_me"]',
+							'field_locator' => 'id:acknowledged_by_me',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -2256,13 +2256,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 							: (array_key_exists('field', $no_access_field)
 								? $no_access_field['field']
 								: $no_access_field['field_locator']);
-
-						if ($field_locator === 'xpath://label[@for="acknowledged_by_me"]') {
-							$this->assertFalse($widget_form->getField('id:acknowledged_by_me')->isEnabled());
-						}
-						else {
-							$this->assertFalse($widget_form->getField($field_locator)->isEnabled());
-						}
+						$this->assertFalse($widget_form->getField($field_locator)->isEnabled());
 					}
 				}
 				// Reference values are filled in to defined form fields to access the hidden/disabled fields.
@@ -2333,7 +2327,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 		foreach ($fields as $field_details) {
 			// Field locator is used for stand-alone fields that cannot be located via label.
 			$field = (array_key_exists('field_locator', $field_details))
-				? $widget_form->query($field_details['field_locator'])->one()
+				? $widget_form->query($field_details['field_locator'])->one()->detect()
 				: $widget_form->getField($field_details['field']);
 
 			$this->assertTrue($field->isVisible());
