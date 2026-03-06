@@ -955,7 +955,7 @@ class CDataTable {
 			? [1, index_to, index]
 			: [-1, index, index_to];
 
-		const indices = [...items].slice(start, end).map(item => parseInt(item.getAttribute('data-col')));
+		const indices = [...items].slice(start, end + 1).map(item => parseInt(item.getAttribute('data-col')));
 		const lowest = Math.min(...indices);
 		const highest = Math.max(...indices);
 		const item = items.item(index_to);
