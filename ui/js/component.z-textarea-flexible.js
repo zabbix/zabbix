@@ -26,6 +26,9 @@ class ZTextareaFlexible extends HTMLElement {
 	 */
 	#internals;
 
+	/** @type {string} */
+	#name;
+
 	/** @type {HTMLTextAreaElement} */
 	#textarea;
 
@@ -129,7 +132,7 @@ class ZTextareaFlexible extends HTMLElement {
 				break;
 
 			case 'name':
-				this.#textarea.name = value;
+				this.#name = value;
 				break;
 
 			case 'placeholder':
@@ -252,7 +255,7 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	get name() {
-		return this.#textarea.name;
+		return this.#name;
 	}
 
 	set name(name) {
