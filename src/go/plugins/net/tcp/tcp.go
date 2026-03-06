@@ -504,7 +504,7 @@ func isDNS(host string) bool {
 		return false
 	}
 
-	labelLen := 0
+	labelLen := 1
 	prevDash := false
 
 	for i := 1; i < n; i++ {
