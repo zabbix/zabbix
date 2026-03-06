@@ -7412,6 +7412,13 @@ static void	dc_trigger_update_cache(zbx_vector_uint64_t *triggerids, zbx_uint64_
 		while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 		{
 			for (int i = 0; i < host->items.values_num; i++)
+				dc_item_reset_trigger_functional(host->items.values[i]);
+		}
+
+		zbx_hashset_iter_reset(&config->hosts, &iter);
+		while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+		{
+			for (int i = 0; i < host->items.values_num; i++)
 				dc_item_update_trigger_functional(host->items.values[i], host->status);
 		}
 	}
