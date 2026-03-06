@@ -1098,4 +1098,32 @@ class CIntegrationTest extends CAPITest {
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, $args, '> /dev/null 2>&1');
 	}
+
+	/**
+	 *
+	 * @param string $name        name of the item (with component)
+	 * @param int     $state      expected state (ITEM_STATE_SUPPORTED, ITEM_STATE_NOTSUPPORTED)
+	 *
+	 * @return string
+	 */
+	protected function checkItemState(string $name, int $state) {
+		$wait_iterations = 5;
+		$wait_iteration_delay = 1;
+
+		for ($r = 0; $r < $wait_iterations; $r++) {
+			$item = $this->call('item.get', [
+				'output' => ['state', 'lastvalue'],
+				'itemids' => self::$itemids[$name]
+			])['result'][0];
+
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
+				break;
+			}
+
+			sleep($wait_iteration_delay);
+		}
+
+		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
+	}
+
 }
