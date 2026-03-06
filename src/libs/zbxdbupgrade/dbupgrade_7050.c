@@ -634,15 +634,15 @@ static int	DBpatch_7050051(void)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	char		    *sql = NULL;
-	size_t		    sql_alloc = 0, sql_offset = 0;
-	int		        ret = SUCCEED;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = SUCCEED;
 
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
 	result = zbx_db_select("select profileid,value_str from profiles"
-			" where idx='web.messages' and source='trigger.severities'");
+			" where idx='web.messages' and source='triggers.severities'");
 
 	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
 	{
@@ -657,8 +657,8 @@ static int	DBpatch_7050051(void)
 			continue;
 
 		p += 2;
-
 		count = 0;
+
 		while ('0' <= *p && *p <= '9')
 			count = count * 10 + (*p++ - '0');
 
@@ -666,9 +666,7 @@ static int	DBpatch_7050051(void)
 			continue;
 
 		p += 2;
-
 		zbx_json_initarray(&json, 64);
-
 		valid = 1;
 
 		for (i = 0; i < count; i++)
@@ -683,8 +681,8 @@ static int	DBpatch_7050051(void)
 			}
 
 			p += 2;
-
 			key = 0;
+
 			while ('0' <= *p && *p <= '9')
 				key = key * 10 + (*p++ - '0');
 
@@ -715,7 +713,6 @@ static int	DBpatch_7050051(void)
 			}
 
 			p++;
-
 			zbx_json_addint64(&json, NULL, (zbx_int64_t)key);
 		}
 
