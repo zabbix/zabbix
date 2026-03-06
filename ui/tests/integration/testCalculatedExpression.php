@@ -233,7 +233,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// last 5 are dbl max values that are outside the zabbix supported range
 		$this->sendNotSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
-		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_NOTSUPPORTED, self::$itemIds);
+		$this->checkItemState(self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY, ITEM_STATE_NOTSUPPORTED, self::$itemIds);
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history);
 
@@ -241,7 +241,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// last 5 are dbl max values that are maximum possible supported in zabbix
 		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
-		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED, self::$itemIds);
+		$this->checkItemState(self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED, self::$itemIds);
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
@@ -293,7 +293,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// unsupported - 2 max and 2 min
 		$this->sendUnsupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
-		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_UNSUPPORTED, self::$itemIds);
+		$this->checkItemState(self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY, ITEM_STATE_UNSUPPORTED, self::$itemIds);
 
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history);
@@ -302,7 +302,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// supported - 2 max and 2 min
 		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
-		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED, self::$itemIds);
+		$this->checkItemState(self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED, self::$itemIds);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -356,7 +356,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// unsupported
 		$this->sendUnsupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
-		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_UNSUPPORTED, self::$itemIds);
+		$this->checkItemState(self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY, ITEM_STATE_UNSUPPORTED, self::$itemIds);
 
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history);
@@ -366,7 +366,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// supported
 		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
-		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED, self::$itemIds);
+		$this->checkItemState(self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED, self::$itemIds);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
