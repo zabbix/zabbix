@@ -15,13 +15,13 @@
 package handlers
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
 	"path"
 
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/plugin"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
@@ -32,9 +32,9 @@ type errorMessage struct {
 	Message string `json:"message"`
 }
 
-func queryDockerAPI(client *http.Client, query string) ([]byte, error) {
+func queryDockerAPI(ctx plugin.ContextProvider, client *http.Client, query string) ([]byte, error) {
 	req, err := http.NewRequestWithContext(
-		context.Background(),
+		ctx,
 		http.MethodGet,
 		"http://"+path.Join(dockerVersion, query),
 		http.NoBody,
