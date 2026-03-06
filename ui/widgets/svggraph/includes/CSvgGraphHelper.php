@@ -758,7 +758,6 @@ class CSvgGraphHelper {
 								'max' => $point['max']
 							];
 						}
-						ksort($metric['points'], SORT_NUMERIC);
 
 						unset($metric['history'], $metric['trends']);
 					}
