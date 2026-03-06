@@ -18,21 +18,35 @@ import (
 	"fmt"
 
 	"golang.zabbix.com/sdk/conf"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
+type Session struct {
+	URI      string `conf:"name=Uri,optional"`
+	Password string `conf:"optional"`
+	User     string `conf:"optional"`
+
+	// Session processing involves marshaling the Session struct into JSON and
+	// then marshaling that JSON into a map[string]string (why anyone would
+	// commit such a horrific act is beyond me).
+	// Since JSON can contain ints and ints can't be unmarshaled into strings,
+	// here we tell the marshaler to do the conversion during initial marshaling.
+	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
+}
+
 type PluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyTimeout int `conf:"name=Timeout,optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]conf.Session `conf:"optional"`
+	Sessions map[string]Session `conf:"optional"`
 
 	// Default stores default connection parameter values from configuration file
-	Default conf.Session `conf:"optional"`
+	Default Session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
@@ -42,8 +56,20 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyTimeout != 0 {
+		log.Debugf("[%s] Config value 'Plugins.Memcached.Timeout' is deprecated. Use 'Plugins.Memcached.Default.ConnectionTimeout' instead.", pluginName)
+
+		if p.options.Default.ConnectionTimeout == 0 {
+			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout
+		}
+	}
+
+	if p.options.Default.ConnectionTimeout == 0 {
+		p.options.Default.ConnectionTimeout = global.Timeout
+	}
+
+	if p.options.LegacyTimeout == 0 {
+		p.options.LegacyTimeout = global.Timeout
 	}
 }
 

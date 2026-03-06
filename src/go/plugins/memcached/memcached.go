@@ -16,6 +16,7 @@ package memcached
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"golang.zabbix.com/sdk/metric"
@@ -60,12 +61,17 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, err
 	}
 
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		connectionTimeout = p.options.Default.ConnectionTimeout // shouldn't happen anyway
+	}
+
 	handleMetric := getHandlerFunc(key)
 	if handleMetric == nil {
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	result, err = handleMetric(p.connMgr.GetConnection(*uri), params)
+	result, err = handleMetric(p.connMgr.GetConnection(*uri, connectionTimeout), params)
 	if err != nil {
 		p.Errf(err.Error())
 	}
@@ -77,7 +83,6 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 func (p *Plugin) Start() {
 	p.connMgr = NewConnManager(
 		time.Duration(p.options.KeepAlive)*time.Second,
-		time.Duration(p.options.Timeout)*time.Second,
 		hkInterval*time.Second,
 	)
 }

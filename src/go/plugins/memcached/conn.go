@@ -90,18 +90,16 @@ type ConnManager struct {
 	connMutex   sync.Mutex
 	connections map[uri.URI]*MCConn
 	keepAlive   time.Duration
-	timeout     time.Duration
 	Destroy     context.CancelFunc
 }
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
-func NewConnManager(keepAlive, timeout, hkInterval time.Duration) *ConnManager {
+func NewConnManager(keepAlive, hkInterval time.Duration) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{
 		connections: make(map[uri.URI]*MCConn),
 		keepAlive:   keepAlive,
-		timeout:     timeout,
 		Destroy:     cancel, // Destroy stops originated goroutines and close connections.
 	}
 
@@ -152,7 +150,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 }
 
 // create creates a new connection with given credentials.
-func (c *ConnManager) create(uri uri.URI) *MCConn {
+func (c *ConnManager) create(uri uri.URI, connectionTimeout int) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -170,7 +168,7 @@ func (c *ConnManager) create(uri uri.URI) *MCConn {
 			Retries:            2,
 			RetryDelay:         200 * time.Millisecond,
 			Failover:           true,
-			ConnectionTimeout:  c.timeout,
+			ConnectionTimeout:  time.Duration(connectionTimeout) * time.Second,
 			DownRetryDelay:     60 * time.Second,
 			PoolSize:           poolSize,
 			TcpKeepAlive:       true,
@@ -190,7 +188,7 @@ func (c *ConnManager) create(uri uri.URI) *MCConn {
 }
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
-func (c *ConnManager) get(uri uri.URI) *MCConn {
+func (c *ConnManager) get(uri uri.URI, connectionTimeout int) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
 
@@ -203,14 +201,14 @@ func (c *ConnManager) get(uri uri.URI) *MCConn {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(uri uri.URI) (conn *MCConn) {
+func (c *ConnManager) GetConnection(uri uri.URI, connectionTimeout int) (conn *MCConn) {
 	c.Lock()
 	defer c.Unlock()
 
-	conn = c.get(uri)
+	conn = c.get(uri, connectionTimeout)
 
 	if conn == nil {
-		conn = c.create(uri)
+		conn = c.create(uri, connectionTimeout)
 	}
 
 	return
