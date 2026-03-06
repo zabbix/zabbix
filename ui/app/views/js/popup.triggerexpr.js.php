@@ -333,10 +333,8 @@ window.trigger_edit_expression_popup = new class {
 						this.overlay.$dialogue[0]
 							.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 					})
-					.catch(this.#ajaxExceptionHandler)
-					.finally(() => {
-						this.overlay.unsetLoading();
-					});
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.overlay.unsetLoading());
 			});
 	}
 
@@ -397,8 +395,6 @@ window.trigger_edit_expression_popup = new class {
 	}
 
 	#ajaxExceptionHandler(exception) {
-		const form = window.trigger_edit_expression_popup.form_element;
-
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -411,6 +407,6 @@ window.trigger_edit_expression_popup = new class {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		form.parentNode.insertBefore(message_box, form);
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 }
