@@ -717,7 +717,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	}
 
 	protected function checkItemState($itemid, $state) {
-		$wait_iterations = 20;
+		$wait_iterations = 4;
 		$wait_iteration_delay = 1;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {
@@ -733,9 +733,9 @@ class testCalculatedExpression extends CIntegrationTest {
 			sleep($wait_iteration_delay);
 		}
 
-		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
+		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, itemid: '. $itemid);
 		if ($state == ITEM_STATE_NORMAL) {
-			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, item name: '. $name);
+			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, itemid: '. $itemid);
 		}
 	}
 
