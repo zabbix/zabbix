@@ -235,7 +235,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->sendNotSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 		$this->checkItemState($itemid, ITEM_STATE_NOTSUPPORTED);
 		$history = $this->historyGet($trapId);
-		$this->assertEmpty($history, json_encode($history));
+		$this->assertEmpty($history['result'], json_encode($history));
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
 
@@ -296,7 +296,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->checkItemState($itemid, ITEM_STATE_UNSUPPORTED);
 
 		$history = $this->historyGet($trapId);
-		$this->assertEmpty($history, json_encode($history));
+		$this->assertEmpty($history['result'], json_encode($history));
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
 
@@ -359,7 +359,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->checkItemState($itemid, ITEM_STATE_UNSUPPORTED);
 
 		$history = $this->historyGet($trapId);
-		$this->assertEmpty($history, json_encode($history));
+		$this->assertEmpty($history['result'], json_encode($history));
 
 		// ZBX_DBL_MAX is for unsupported, even if we sent mins
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
@@ -421,7 +421,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->sendUnsupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 
 		$history = $this->historyGet($trapId);
-		$this->assertEmpty($history, json_encode($history));
+		$this->assertEmpty($history['result'], json_encode($history));
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
 
