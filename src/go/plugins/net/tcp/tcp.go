@@ -28,6 +28,7 @@ import (
 
 	"github.com/go-ldap/ldap"
 	"golang.zabbix.com/agent2/pkg/web"
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
@@ -40,11 +41,6 @@ const (
 	errorInvalidFifthParam  = "Invalid fifth parameter."
 	errorTooManyParams      = "Too many parameters."
 	errorUnsupportedMetric  = "Unsupported metric."
-)
-
-var (
-	// ErrInvalidSecondParam - invalid second parameter
-	ErrInvalidSecondParam = errors.New(errorInvalidSecondParam)
 )
 
 const (
@@ -493,6 +489,7 @@ func isAlnum(c byte) bool {
 		(c >= 'A' && c <= 'Z')
 }
 
+//nolint:gocyclo // high complexity due to DNS validation, splitting not practical
 func isDNS(host string) bool {
 	n := len(host)
 	if n == 0 || n > 253 {
@@ -579,7 +576,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		if len(params) >= 2 && params[1] != "" {
 			if net.ParseIP(params[1]) == nil && !isDNS(params[1]) {
-				return nil, ErrInvalidSecondParam
+				return nil, errs.New(errorInvalidSecondParam)
 			}
 		}
 
