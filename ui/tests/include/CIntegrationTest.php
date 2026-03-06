@@ -1102,12 +1102,14 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 *
 	 * @param string $name        name of the item (with component)
-	 * @param int     $state      expected state (ITEM_STATE_SUPPORTED, ITEM_STATE_NOTSUPPORTED)
+	 * @param int    $state       expected state (ITEM_STATE_SUPPORTED, ITEM_STATE_NOTSUPPORTED)
+	 * @param array  $itemids
+	 * @param string $lastvalue
 	 *
 	 * @return string
 	 */
-	protected function checkItemState(string $name, int $state, array $itemids) {
-		$wait_iterations = 5;
+	protected function checkItemState(string $name, int $state, array $itemids, ?string $lastvalue = null) {
+		$wait_iterations = 20;
 		$wait_iteration_delay = 1;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {
@@ -1116,7 +1118,7 @@ class CIntegrationTest extends CAPITest {
 				'itemids' => $itemids[$name]
 			])['result'][0];
 
-			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED || $lastvalue === $item['lastvalue'])) {
 				break;
 			}
 
@@ -1124,6 +1126,9 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
+		if ($state == ITEM_STATE_NORMAL) {
+			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, item name: '.$name);
+		}
 	}
 
 }

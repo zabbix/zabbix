@@ -207,8 +207,8 @@ class testUserParametersReload extends CIntegrationTest {
 		$this->executeUserParamReload($config);
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'singleParam.01');
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, self::$itemids, 'singleParam.01');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED, self::$itemids);
 		}
 
 		// Test multiple user parameters: usrprm01 and usrprm02
@@ -235,8 +235,8 @@ class testUserParametersReload extends CIntegrationTest {
 		$this->executeUserParamReload($config);
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'multipleParams.01');
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, 'multipleParams.02');
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, self::$itemids, 'multipleParams.01');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, self::$itemids, 'multipleParams.02');
 			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm.conf'));
 		}
 
@@ -245,8 +245,8 @@ class testUserParametersReload extends CIntegrationTest {
 		$this->executeUserParamReload();
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED, self::$itemids);
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED, self::$itemids);
 		}
 
 		$config = [
@@ -261,8 +261,8 @@ class testUserParametersReload extends CIntegrationTest {
 		$this->executeUserParamReload($config);
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'A, echo B, echo C');
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, self::$itemids, 'A, echo B, echo C');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED, self::$itemids);
 		}
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
@@ -280,9 +280,9 @@ class testUserParametersReload extends CIntegrationTest {
 		$this->executeUserParamReload($config);
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'A, echo B, echo C');
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, self::$itemids, 'A, echo B, echo C');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED, self::$itemids);
+			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED, self::$itemids);
 		}
 	}
 
@@ -320,14 +320,14 @@ class testUserParametersReload extends CIntegrationTest {
 	 */
 	public function testUserParametersWithVariablesReload() {
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, 'usr.prm.var.1');
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, 'usr.prm.var.2');
-			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NORMAL, 'usr.prm.var.3');
-			$this->checkItemState($component.':'.self::ITEM_NAME_04, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_05, ITEM_STATE_NOTSUPPORTED);
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NORMAL, self::$itemids, 'usr.prm.var.1');
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NORMAL, self::$itemids, 'usr.prm.var.2');
+			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NORMAL, self::$itemids, 'usr.prm.var.3');
+			$this->checkItemState($component.':'.self::ITEM_NAME_04, ITEM_STATE_NOTSUPPORTED, self::$itemids);
+			$this->checkItemState($component.':'.self::ITEM_NAME_05, ITEM_STATE_NOTSUPPORTED, self::$itemids);
 			// Make sure that environment variables were unset by Zabbix agent processes
 			// so that they are not available to their child processes.
-			$this->checkItemState($component.':'.self::ITEM_NAME_ENV_TEST, ITEM_STATE_NORMAL, 'UsrParamEnv1= UsrParamEnv2=');
+			$this->checkItemState($component.':'.self::ITEM_NAME_ENV_TEST, ITEM_STATE_NORMAL, self::$itemids, 'UsrParamEnv1= UsrParamEnv2=');
 			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm_with_vars.conf'));
 		}
 
@@ -351,11 +351,11 @@ class testUserParametersReload extends CIntegrationTest {
 		$this->executeUserParamReload($config);
 
 		foreach ([self::COMPONENT_AGENT, self::COMPONENT_AGENT2] as $component) {
-			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED);
-			$this->checkItemState($component.':'.self::ITEM_NAME_04, ITEM_STATE_NORMAL, 'usr.prm.var.4');
-			$this->checkItemState($component.':'.self::ITEM_NAME_05, ITEM_STATE_NORMAL, 'usr.prm.var.5');
+			$this->checkItemState($component.':'.self::ITEM_NAME_01, ITEM_STATE_NOTSUPPORTED, self::$itemids);
+			$this->checkItemState($component.':'.self::ITEM_NAME_02, ITEM_STATE_NOTSUPPORTED, self::$itemids);
+			$this->checkItemState($component.':'.self::ITEM_NAME_03, ITEM_STATE_NOTSUPPORTED, self::$itemids);
+			$this->checkItemState($component.':'.self::ITEM_NAME_04, ITEM_STATE_NORMAL, self::$itemids, 'usr.prm.var.4');
+			$this->checkItemState($component.':'.self::ITEM_NAME_05, ITEM_STATE_NORMAL, self::$itemids, 'usr.prm.var.5');
 			$this->assertTrue(@unlink(PHPUNIT_CONFIG_DIR.'/'.$component.'_usrprm_with_vars.conf'));
 		}
 	}
@@ -376,36 +376,6 @@ class testUserParametersReload extends CIntegrationTest {
 			}
 			self::prepareComponentConfiguration($component, $config);
 			self::reloadUserParameters($component);
-		}
-	}
-
-	/**
-	 * Check item state.
-	 *
-	 * @param string $name
-	 * @param int    $state
-	 * @param string $lastvalue
-	 */
-	public function checkItemState(string $name, int $state, ?string $lastvalue = null) {
-		$wait_iterations = 20;
-		$wait_iteration_delay = 1;
-
-		for ($r = 0; $r < $wait_iterations; $r++) {
-			$item = $this->call('item.get', [
-				'output' => ['state', 'lastvalue'],
-				'itemids' => self::$itemids[$name]
-			])['result'][0];
-
-			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED || $lastvalue === $item['lastvalue'])) {
-				break;
-			}
-
-			sleep($wait_iteration_delay);
-		}
-
-		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
-		if ($state == ITEM_STATE_NORMAL) {
-			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, item name: '.$name);
 		}
 	}
 }
