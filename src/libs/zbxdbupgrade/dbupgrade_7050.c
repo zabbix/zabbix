@@ -630,6 +630,121 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
+static int	DBpatch_7050051(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		    *sql = NULL;
+	size_t		    sql_alloc = 0, sql_offset = 0;
+	int		        ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select profileid,value_str from profiles"
+			" where idx='web.messages' and source='trigger.severities'");
+
+	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
+	{
+		zbx_uint64_t	profileid;
+		const char	*p = row[1];
+		int		count, i, valid;
+		struct zbx_json	json;
+		char		*value_str_esc;
+
+		/* Validate and parse PHP serialized array header: a:N:{ */
+		if ('a' != *p || ':' != *(p + 1))
+			continue;
+
+		p += 2;
+
+		count = 0;
+		while ('0' <= *p && *p <= '9')
+			count = count * 10 + (*p++ - '0');
+
+		if (count > 6 || ':' != *p || '{' != *(p + 1))
+			continue;
+
+		p += 2;
+
+		zbx_json_initarray(&json, 64);
+
+		valid = 1;
+
+		for (i = 0; i < count; i++)
+		{
+			int	key;
+
+			/* Parse key: i:N; */
+			if ('i' != *p || ':' != *(p + 1))
+			{
+				valid = 0;
+				break;
+			}
+
+			p += 2;
+
+			key = 0;
+			while ('0' <= *p && *p <= '9')
+				key = key * 10 + (*p++ - '0');
+
+			if (';' != *p)
+			{
+				valid = 0;
+				break;
+			}
+
+			p++;
+
+			/* Parse value: i:N; — value is validated but not stored */
+			if ('i' != *p || ':' != *(p + 1))
+			{
+				valid = 0;
+				break;
+			}
+
+			p += 2;
+
+			while ('0' <= *p && *p <= '9')
+				p++;
+
+			if (';' != *p)
+			{
+				valid = 0;
+				break;
+			}
+
+			p++;
+
+			zbx_json_addint64(&json, NULL, (zbx_int64_t)key);
+		}
+
+		if (1 == valid && '}' == *p)
+		{
+			ZBX_DBROW2UINT64(profileid, row[0]);
+
+			value_str_esc = zbx_db_dyn_escape_string(json.buffer);
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update profiles set value_str='%s' where profileid=" ZBX_FS_UI64 ";\n",
+					value_str_esc, profileid);
+			zbx_free(value_str_esc);
+
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_json_free(&json);
+	}
+
+	zbx_db_free_result(result);
+
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		ret = FAIL;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -687,5 +802,6 @@ DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
 DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
+DBPATCH_ADD(7050051, 0, 1)
 
 DBPATCH_END()
