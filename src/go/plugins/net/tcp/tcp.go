@@ -43,6 +43,7 @@ const (
 )
 
 var (
+	// Exported error for comparison
 	ErrorInvalidSecondParam = errors.New(errorInvalidSecondParam)
 )
 
