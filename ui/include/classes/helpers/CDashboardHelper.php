@@ -691,11 +691,7 @@ class CDashboardHelper {
 
 		$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
 
-		if ($widget_last_type === null) {
-			return null;
-		}
-
-		if (!array_key_exists($widget_last_type, $known_widgets)) {
+		if ($widget_last_type === null || !array_key_exists($widget_last_type, $known_widgets)) {
 			$current_types = [];
 			$deprecated_types = [];
 
