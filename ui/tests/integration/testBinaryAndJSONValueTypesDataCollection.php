@@ -518,7 +518,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		// Dependent
-		$this->checkItemState('agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL, self::$itemids);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_TEXT,
@@ -529,7 +529,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 		$this->assertEquals($response['result'][0]['value'], self::error_message);
 
-		$this->checkItemState('agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
+		$this->checkItemState('agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL, self::$itemids);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_UINT64,
@@ -543,7 +543,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		// Invalid JSON
 
 		$this->sendSenderValue('agent', 'JSON_TRAPPER', self::$invalid_json);
-		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+		$this->checkItemState('agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED, self::$itemids);
 
 		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
 		$this->sendSenderValue('agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image);
@@ -606,7 +606,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
 		// Dependent
-		$this->checkItemState('proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
+		$this->checkItemState('proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL, self::$itemids);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:TEXT_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_TEXT,
@@ -617,7 +617,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 		$this->assertEquals($response['result'][0]['value'], self::error_message);
 
-		$this->checkItemState('proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL);
+		$this->checkItemState('proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC', ITEM_STATE_NORMAL, self::$itemids);
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'itemids'	=>	self::$itemids['proxy_agent:UINT64_VALUE_TYPE_DEP_FROM_TRAPPER_WITH_PREPROC'],
 			'history'	=>	ITEM_VALUE_TYPE_UINT64,
@@ -630,7 +630,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		// Invalid JSON
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER', self::$invalid_json, self::COMPONENT_PROXY);
-		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED);
+		$this->checkItemState('proxy_agent:JSON_TRAPPER', ITEM_STATE_NOTSUPPORTED, self::$itemids);
 
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
 		$this->sendSenderValue('proxy_agent', 'JSON_TRAPPER_PREPROC_THROTTLING', self::$json_with_image, self::COMPONENT_PROXY);
@@ -743,14 +743,14 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 
 		$this->assertEquals(self::$json_image_normalized, $json_result);
 
-		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:BINARY_IMAGE_EMPTY', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:BINARY_IMAGE_INVALID', ITEM_STATE_NOTSUPPORTED);
+		$this->checkItemState('agent:BINARY_IMAGE', ITEM_STATE_NORMAL, self::$itemids);
+		$this->checkItemState('agent:BINARY_IMAGE_EMPTY', ITEM_STATE_NORMAL, self::$itemids);
+		$this->checkItemState('agent:BINARY_IMAGE_INVALID', ITEM_STATE_NOTSUPPORTED, self::$itemids);
 
-		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:STR_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL);
-		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_INVALID', ITEM_STATE_NOTSUPPORTED);
+		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP', ITEM_STATE_NORMAL, self::$itemids);
+		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL, self::$itemids);
+		$this->checkItemState('agent:STR_VALUE_TYPE_DEP_WITH_PREPROC', ITEM_STATE_NORMAL, self::$itemids);
+		$this->checkItemState('agent:JSON_VALUE_TYPE_DEP_INVALID', ITEM_STATE_NOTSUPPORTED, self::$itemids);
 	}
 
 	/**

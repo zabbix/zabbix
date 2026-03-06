@@ -1106,14 +1106,14 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return string
 	 */
-	protected function checkItemState(string $name, int $state) {
+	protected function checkItemState(string $name, int $state, array $itemids) {
 		$wait_iterations = 5;
 		$wait_iteration_delay = 1;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {
 			$item = $this->call('item.get', [
 				'output' => ['state', 'lastvalue'],
-				'itemids' => self::$itemids[$name]
+				'itemids' => $itemids[$name]
 			])['result'][0];
 
 			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
