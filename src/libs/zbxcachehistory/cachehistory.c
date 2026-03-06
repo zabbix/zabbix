@@ -2992,7 +2992,9 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		if (NULL == ((*data)->value.str = hc_mem_value_str_dup(&item_value->value.value_str)))
 			return FAIL;
 
+		(*data)->sz_value = item_value->value.value_str.len;
 		(*data)->value_type = item_value->value_type;
+
 		cache->stats.notsupported_counter++;
 
 		return SUCCEED;
@@ -3003,6 +3005,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 		if (NULL == ((*data)->value.str = hc_mem_value_str_dup(&item_value->value.value_str)))
 			return FAIL;
 
+		(*data)->sz_value = item_value->value.value_str.len;
 		(*data)->value_type = ITEM_VALUE_TYPE_TEXT;
 
 		cache->stats.history_text_counter++;
@@ -3030,6 +3033,7 @@ static int	hc_clone_history_data(zbx_hc_data_t **data, const dc_item_value_t *it
 				{
 					return FAIL;
 				}
+				(*data)->sz_value = item_value->value.value_str.len;
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				if (SUCCEED != hc_clone_history_log_data(&(*data)->value.log, item_value))
@@ -3258,7 +3262,8 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 
 	if (ITEM_STATE_NOTSUPPORTED == data->state)
 	{
-		history->value.err = zbx_strdup(NULL, data->value.str);
+		history->value.err = zbx_malloc(NULL, data->sz_value);
+		memcpy(history->value.err, data->value.str, data->sz_value);
 		history->flags |= ZBX_DC_FLAG_UNDEF;
 		return;
 	}
@@ -3279,7 +3284,8 @@ static void	hc_copy_history_data(zbx_dc_history_t *history, zbx_uint64_t itemid,
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
 			case ITEM_VALUE_TYPE_JSON:
-				history->value.str = zbx_strdup(NULL, data->value.str);
+				history->value.str = zbx_malloc(NULL, data->sz_value);
+				memcpy(history->value.str, data->value.str, data->sz_value);
 				break;
 			case ITEM_VALUE_TYPE_LOG:
 				history->value.log = (zbx_log_value_t *)zbx_malloc(NULL, sizeof(zbx_log_value_t));

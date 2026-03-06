@@ -888,6 +888,7 @@ typedef struct zbx_hc_data
 	zbx_history_value_t	value;
 	zbx_uint64_t		lastlogsize;
 	zbx_timespec_t		ts;
+	unsigned int		sz_value;
 	int			mtime;
 	unsigned char		value_type;
 	unsigned char		flags;

@@ -645,6 +645,9 @@ static void	process_item_value(const zbx_history_recv_item_t *item, AGENT_RESULT
  ******************************************************************************/
 static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_value_t *value, int *h_num)
 {
+	AGENT_RESULT	result;
+	zbx_log_t	*log;
+
 	if (ITEM_STATUS_ACTIVE != item->status)
 		return FAIL;
 
@@ -673,19 +676,17 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 
 		item->state = ITEM_STATE_NOTSUPPORTED;
 		process_item_value(item, NULL, &value->ts, h_num, value->value);
+
+		return SUCCEED;
 	}
-	else
+
+	zbx_init_agent_result(&result);
+
+	if (NULL != value->value)
 	{
-		AGENT_RESULT	result;
-
-		zbx_init_agent_result(&result);
-
-		if (NULL != value->value)
+		switch (item->value_type)
 		{
-			if (ITEM_VALUE_TYPE_LOG == item->value_type)
-			{
-				zbx_log_t	*log;
-
+			case ITEM_VALUE_TYPE_LOG:
 				log = (zbx_log_t *)zbx_malloc(NULL, sizeof(zbx_log_t));
 				log->value = zbx_strdup(NULL, value->value);
 				zbx_replace_invalid_utf8(log->value);
@@ -710,26 +711,34 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 					log->source = NULL;
 
 				SET_LOG_RESULT(&result, log);
-			}
-			else if (ITEM_VALUE_TYPE_JSON == item->value_type)
-			{
+				break;
+			case ITEM_VALUE_TYPE_JSON:
 				if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_JSON, value->value))
 					return FAIL;
-			}
-			else if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value))
-			{
-				return FAIL;
-			}
+				break;
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				if ((HOST_MONITORED_BY_SERVER != item->host.monitored_by ||
+						(ZBX_ITEM_REQUIRES_PREPROCESSING_YES != item->preprocessing)) &&
+						SUCCEED == zbx_set_agent_result_type(&result,
+								item->value_type, value->value))
+				{
+						break;
+				}
+				ZBX_FALLTHROUGH;
+			default:
+				if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value))
+					return FAIL;
 		}
-
-		if (0 != value->meta)
-			zbx_set_agent_result_meta(&result, value->lastlogsize, value->mtime);
-
-		item->state = ITEM_STATE_NORMAL;
-		process_item_value(item, &result, &value->ts, h_num, NULL);
-
-		zbx_free_agent_result(&result);
 	}
+
+	if (0 != value->meta)
+		zbx_set_agent_result_meta(&result, value->lastlogsize, value->mtime);
+
+	item->state = ITEM_STATE_NORMAL;
+	process_item_value(item, &result, &value->ts, h_num, NULL);
+
+	zbx_free_agent_result(&result);
 
 	return SUCCEED;
 }
