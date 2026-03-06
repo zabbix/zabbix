@@ -51,9 +51,10 @@ class CFieldMenuPath extends CFieldTextBox {
 		}
 
 		path_items.push(path_item);
+		path_items = path_items.map(item => item.trim());
 
-		if (this._allow_trim) {
-			path_items = path_items.map(item => item.trim());
+		if (path_items.length == 2 && path_items.join('') === '') {
+			return [''];
 		}
 
 		if (path_items[0] === '' && path_items[1] !== '') {
