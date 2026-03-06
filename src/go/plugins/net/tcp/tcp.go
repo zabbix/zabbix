@@ -43,8 +43,8 @@ const (
 )
 
 var (
-	// Exported error for comparison
-	ErrorInvalidSecondParam = errors.New(errorInvalidSecondParam)
+	// ErrInvalidSecondParam - invalid second parameter
+	ErrInvalidSecondParam = errors.New(errorInvalidSecondParam)
 )
 
 const (
@@ -579,7 +579,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		if len(params) >= 2 && params[1] != "" {
 			if net.ParseIP(params[1]) == nil && !isDNS(params[1]) {
-				return nil, ErrorInvalidSecondParam
+				return nil, ErrInvalidSecondParam
 			}
 		}
 
