@@ -339,7 +339,7 @@ window.script_edit_popup = new class {
 			]
 		});
 
-		this.footer.querySelector('.js-submit') .addEventListener('click', () => this.#submit());
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
