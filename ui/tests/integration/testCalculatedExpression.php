@@ -723,7 +723,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		for ($r = 0; $r < $wait_iterations; $r++) {
 			$item = $this->call('item.get', [
 				'output' => ['state', 'lastvalue'],
-				'itemids' => $itemid
+				'itemids' => [$itemid]
 			])['result'][0];
 
 			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
