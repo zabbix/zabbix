@@ -347,17 +347,22 @@ window.script_edit_popup = new class {
 	}
 
 	#delete() {
-		this.#clearMessages();
-		const curl = new Curl('zabbix.php');
+		if (window.confirm(<?= json_encode(_('Delete script?')) ?>)) {
+			this.#clearMessages();
+			const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'script.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('script')) ?>);
+			curl.setArgument('action', 'script.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('script')) ?>);
 
-		this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
 	#submit() {
