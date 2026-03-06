@@ -489,7 +489,7 @@ func isAlnum(c byte) bool {
 		(c >= 'A' && c <= 'Z')
 }
 
-//nolint:gocyclo
+//nolint:cyclop,gocyclo // high complexity due to DNS validation, splitting not practical
 func isDNS(host string) bool {
 	n := len(host)
 	if n == 0 || n > 253 {
