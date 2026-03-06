@@ -106,6 +106,8 @@ class CDevice extends CApiService {
 		// todo - AuditLog $enrollment_token
 
 		return [
+			'enrollment_token' => $enrollment_token,
+			'uuid' => $uuid,
 			'taskid' => $taskid
 		];
 	}
