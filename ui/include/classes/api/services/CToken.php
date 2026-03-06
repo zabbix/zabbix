@@ -487,7 +487,7 @@ class CToken extends CApiService {
 		$upd_tokens = [];
 
 		foreach ($tokenids as $tokenid) {
-			$new_token = bin2hex(random_bytes(32));
+			$new_token = CApiTokenHelper::generateToken();
 
 			$token = [
 				'tokenid' => $tokenid,

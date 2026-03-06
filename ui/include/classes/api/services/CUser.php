@@ -3013,13 +3013,6 @@ class CUser extends CApiService {
 				'where' => ['tokenid' => $db_token['tokenid']]
 			]);
 
-			if ($db_token['auth_type'] == ZBX_API_HEADER_AUTHENTICATE_DPOP) {
-				DB::update('device', [
-					'values' => ['last_access_time' => $time],
-					'where' => ['tokenid' => $db_token['tokenid']]
-				]);
-			}
-
 			self::$userData = $db_user + ['token' => $session['token']];
 
 		}
@@ -3069,7 +3062,7 @@ class CUser extends CApiService {
 				' FROM device_key dk'.
 				' JOIN device d ON d.deviceid=dk.deviceid'.
 				' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
-					' AND '.dbConditionInt('dk.scope', [CDevice::DEVICE_KEY_SCOPE_IDENTITY]).
+					' AND '.dbConditionInt('dk.scope', [CDevice::MOBILE_IDENTITY_KEY]).
 					' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
 				1
 			));

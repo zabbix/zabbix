@@ -25,11 +25,13 @@ class CApiDpopHelper {
 	private const IAT_DELAY = 2;
 	private const IAT_EXP_MAX_DIFFERENCE = 60;
 
+	private const SIGNATURE_ALGORITHM = 'ES256';
+
 	public static function verifyDpopSignature(string $signature, string $encoded_jwk, string $access_token,
 			string $request_api_method): bool {
-		$jwk = json_decode($encoded_jwk);
+		$jwk = json_decode($encoded_jwk, true);
 
-		$key = JWK::parseKey($jwk, 'ES256');
+		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
 
 		try {
 			JWT::decode($signature, $key);
@@ -78,7 +80,7 @@ class CApiDpopHelper {
 	}
 
 	private static function checkKid(array $header, array $dpop_jwk): bool {
-		return array_key_exists('kid', $header) && self::checkThumbprint($dpop_jwk, $header['kid']);
+		return array_key_exists('kid', $header) && hash_equals($dpop_jwk['kid'], $header['kid']);
 	}
 
 	private static function checkHtu(array $payload, string $request_api_method): bool {
@@ -138,26 +140,38 @@ class CApiDpopHelper {
 		);
 	}
 
-	private static function getDpopJwkFromPem(string $pem): array {
-		$public_key = openssl_pkey_get_public($pem);
-		$details = openssl_pkey_get_details($public_key);
+	// todo - double check if its not needed
 
-		return [
-			'crv' => 'P-256',
-			'kty' => 'EC',
-			'x' => JWT::urlsafeB64Encode($details['ec']['x']),
-			'y' => JWT::urlsafeB64Encode($details['ec']['y'])
-		];
-	}
+//	private static function getDpopJwkFromPem(string $pem): array {
+//		$public_key = openssl_pkey_get_public($pem);
+//		$details = openssl_pkey_get_details($public_key);
+//
+//		return [
+//			'crv' => 'P-256',
+//			'kty' => 'EC',
+//			'x' => JWT::urlsafeB64Encode($details['ec']['x']),
+//			'y' => JWT::urlsafeB64Encode($details['ec']['y'])
+//		];
+//	}
 
-	public static function checkThumbprint(array $jwk, string $kid): bool {
-		$canonical_jwk = array_intersect_key($jwk, array_flip(['crv', 'kty', 'x', 'y']));
-		ksort($canonical_jwk);
+//	public static function checkThumbprint(array $jwk, string $kid): bool {
+//		$canonical_jwk = array_intersect_key($jwk, array_flip(['crv', 'kty', 'x', 'y']));
+//		ksort($canonical_jwk);
+//
+//		$expected_jwk_hash = JWT::urlsafeB64Encode(
+//			hash('sha256', json_encode($canonical_jwk, JSON_UNESCAPED_SLASHES), true)
+//		);
+//
+//		return hash_equals($expected_jwk_hash, $kid);
+//	}
 
-		$expected_jwk_hash = JWT::urlsafeB64Encode(
-			hash('sha256', json_encode($canonical_jwk, JSON_UNESCAPED_SLASHES), true)
-		);
+	public static function checkJwkIntegrity(array $jwk): bool {
+		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
 
-		return hash_equals($expected_jwk_hash, $kid);
+		if (openssl_pkey_get_public($key->getKeyMaterial()) === false) {
+			return false;
+		}
+
+		return true;
 	}
 }

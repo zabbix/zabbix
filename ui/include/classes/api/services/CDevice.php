@@ -37,16 +37,12 @@ class CDevice extends CApiService {
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
-	private const TASK_DEVICE_CHECK_DELAY = 1000000; // 1 sec.
 	private const TASK_DEVICE_CHECK_TTL = 30;
-	private const TASK_DEVICE_STATUS_ERROR = -1;
 
-	public const DEVICE_KEY_SCOPE_IDENTITY = 0;
-	public const DEVICE_KEY_SCOPE_ENCRYPTION = 1;
+	public const MOBILE_IDENTITY_KEY = 0;
+	public const MOBILE_ENCRYPTION_KEY = 1;
 
 	public const DEVICE_KEY_ACTIVE = 0;
-
-	private const SERVER_ID = 'server_id'; // CSettingsHelper::getPrivate(CSettingsHelper::SERVER_ID)
 
 	/**
 	 * @param array $options
@@ -93,89 +89,41 @@ class CDevice extends CApiService {
 
 	/**
 	 * @param array  $user
-	 * @param string $user['userid']
 	 *
 	 * @return array
 	 */
 	public function init(array $user): array {
 		$this->validateInit($user, $db_user);
 
-		$enrollment_token = bin2hex(random_bytes(32));
+		$enrollment_token = CApiTokenHelper::generateToken();
 		$uuid = generateUuidV7();
 		$time_start = time();
 
-		$taskid = self::makeTaskDeviceData($db_user, $enrollment_token, $uuid, $time_start);
+		$deviceid = self::createDevice($db_user, $enrollment_token, $uuid, $time_start);
 
-		// checking for task result
-		do {
-			usleep(self::TASK_DEVICE_CHECK_DELAY);
+		$taskid = self::createTask($deviceid, $time_start);
 
-			$result = DBfetch(DBselect(
-				'SELECT t.status,td.mobile_enrollment_token,td.bridge_enrollment_key,td.enrollment_url,'.
-					'td.status AS subtask_status,td.info'.
-				' FROM task t'.
-				' JOIN task_device td ON td.taskid=t.taskid'.
-				' WHERE '.dbConditionId('t.taskid', [$taskid]),
-				1
-			));
-
-			$is_init_process_expired = time() > $time_start + self::TASK_DEVICE_CHECK_TTL;
-		}
-		while ($result['status'] <= ZBX_TM_STATUS_INPROGRESS && !$is_init_process_expired);
-
-		if ($result['subtask_status'] == self::TASK_DEVICE_STATUS_ERROR || $is_init_process_expired) {
-			self::exception(ZBX_API_ERROR_NO_ENTITY,
-				self::$userData['type'] == USER_TYPE_SUPER_ADMIN && $result['info'] !== ''
-					? $result['info']
-					: _('No permissions to referred object or it does not exist!') // todo - what message?
-			);
-		}
+		// todo - AuditLog $enrollment_token
 
 		return [
-			'enrollment_token' => $enrollment_token,
-			'mobile_enrollment_token' => $result['mobile_enrollment_token'],
-			'bridge_enrollment_key' => $result['bridge_enrollment_key'],
-			'enrollment_url' => $result['enrollment_url'],
-			'device_id' => $uuid,
-			'server_id' => self::SERVER_ID // todo - get server_id by method
+			'taskid' => $taskid
 		];
 	}
 
 	/**
 	 * @param array  $options
-	 * @param string $options['enrollment_token']
-	 * @param string $options['mobile_identity_key']
-	 * @param string $options['mobile_encryption_key']
-	 * @param string $options['push_token']
-	 * @param string $options['device_name']
 	 *
 	 * @return array
 	 */
 	public function onboard(array $options): array {
 		$this->validateOnboard($options, $db_device);
 
-		// Store MIK, MEK.
-		$device_keyid = DB::reserveIds('device_key', 2);
+		self::createDeviceKeys($db_device['deviceid'], $options['mobile_identity_key'],
+			$options['mobile_encryption_key']
+		);
 
-		$fields = [
-			[
-				'device_keyid' => $device_keyid,
-				'deviceid' => $db_device['deviceid'],
-				'scope' => self::DEVICE_KEY_SCOPE_IDENTITY,
-				'key_' => json_encode($options['mobile_identity_key'])
-			],
-			[
-				'device_keyid' => bcadd($device_keyid, 1, 0),
-				'deviceid' => $db_device['deviceid'],
-				'scope' => self::DEVICE_KEY_SCOPE_ENCRYPTION,
-				'key_' => json_encode($options['mobile_encryption_key'])
-			]
-		];
-		DB::insertBatch('device_key', $fields, false);
-
-		// Generate API token
 		$tokens_data = CToken::createForce([[
-			'name' => $options['device_name'],
+			'name' => $db_device['uuid'],
 			'userid' => $db_device['userid'],
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'auth_type' => ZBX_API_HEADER_AUTHENTICATE_DPOP,
@@ -192,6 +140,8 @@ class CDevice extends CApiService {
 			],
 			'where' => ['deviceid' => $db_device['deviceid']]
 		]);
+
+		// todo - auditlog
 
 		return ['token' => $db_token['token']];
 	}
@@ -224,114 +174,150 @@ class CDevice extends CApiService {
 			$db_user = $db_users[$user['userid']];
 		}
 		else {
-			$db_user = self::$userData;
+			$db_user = ['userid' => self::$userData['userid']];
 		}
-	}
-
-	private static function makeTaskDeviceData(array $db_user, string $enrollment_token, string $uuid,
-			int $time_start): string {
-		$fields = [
-			'userid' => $db_user['userid'],
-			'uuid' => $uuid,
-			'status' => self::DEVICE_STATUS_NEW
-		];
-
-		try {
-			DBstart();
-
-			$deviceids = DB::insertBatch('device', [$fields]);
-
-			$deviceid = array_shift($deviceids);
-
-			$fields = [
-				'deviceid' => $deviceid,
-				'enrollment_token' => hash('sha512', $enrollment_token),
-				'enrollment_token_expiration' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
-			];
-
-			DB::insertBatch('enrollment_token', [$fields], false);
-
-			$fields = [
-				'type' =>ZBX_TM_TASK_ENROLL_DEVICE,
-				'status' => ZBX_TM_STATUS_NEW,
-				'clock' => $time_start,
-				'ttl' => self::TASK_DEVICE_CHECK_TTL
-			];
-
-			$taskids = DB::insertBatch('task', [$fields]);
-
-			$taskid = array_shift($taskids);
-
-			$fields = [
-				'taskid' => $taskid,
-				'deviceid' => $deviceid
-			];
-
-			DB::insertBatch('task_device', [$fields], false);
-
-			DBend(true);
-		}
-		catch (Exception $e) {
-			DBend(false);
-
-			self::exception(ZBX_API_ERROR_INTERNAL, _('Internal error.'));
-		}
-
-		return $taskid;
 	}
 
 	private function validateOnboard(array $options, ?array &$db_device): void {
-		$api_input_jwk_rules = ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-			'kid' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-			'x' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-			'y' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY]
-		]];
-
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'enrollment_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'mobile_identity_key' => $api_input_jwk_rules,
-			'mobile_encryption_key' => $api_input_jwk_rules,
-			'push_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'device_name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED]
+			'enrollment_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'mobile_identity_key' => self::getJwkValidationRules(),
+			'mobile_encryption_key' => self::getJwkValidationRules(),
+			'push_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_enrollment_tokens = DB::select('enrollment_token', [
-			'output' => ['deviceid', 'enrollment_token_expiration'],
-			'filter' => ['enrollment_token' => hash('sha512', $options['enrollment_token'])]
-		]);
-
-		if (!$db_enrollment_tokens) {
+		if (!CApiDpopHelper::checkJwkIntegrity($options['mobile_identity_key']) ||
+				!CApiDpopHelper::checkJwkIntegrity($options['mobile_encryption_key'])) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$db_enrollment_token = reset($db_enrollment_tokens);
+		$db_enrollment_token = DBfetch(DBselect(
+			'SELECT et.deviceid'.
+			' FROM enrollment_token et'.
+			' WHERE '.dbConditionString('et.enrollment_token', [hash('sha512', $options['enrollment_token'])]).
+			' AND enrollment_token_expiration>'.time(),
+			1
+		));
+
+		if (!$db_enrollment_token) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
 
 		DB::delete('enrollment_token', ['deviceid' => $db_enrollment_token['deviceid']]);
 
-		if ($db_enrollment_token['enrollment_token_expiration'] < time()) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		if (CApiDpopHelper::checkThumbprint($options['mobile_identity_key'], $options['mobile_identity_key']['kid'])) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		if (CApiDpopHelper::checkThumbprint($options['mobile_encryption_key'],
-				$options['mobile_encryption_key']['kid'])) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
 		$db_devices = DB::select('device', [
-			'output' => ['deviceid', 'userid'],
+			'output' => ['deviceid', 'uuid', 'userid'],
 			'filter' => ['deviceid' => $db_enrollment_token['deviceid']]
 		]);
 
 		$db_device = reset($db_devices);
+	}
+
+	private static function getJwkValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
+			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => ['P-256']],
+			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => ['EC']],
+			'kid' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'x' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 32],
+			'y' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 32]
+		]];
+	}
+
+	private static function createDevice(array $db_user, string $enrollment_token, string $uuid,
+			int $time_start): string {
+		$ins_device = [
+			'userid' => $db_user['userid'],
+			'uuid' => $uuid,
+			'status' => self::DEVICE_STATUS_NEW
+		];
+
+		$deviceids = DB::insertBatch('device', [$ins_device]);
+
+		$deviceid = array_shift($deviceids);
+
+		$ins_enrollment_token = [
+			'deviceid' => $deviceid,
+			'enrollment_token' => hash('sha512', $enrollment_token),
+			'enrollment_token_expiration' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
+		];
+
+		DB::insertBatch('enrollment_token', [$ins_enrollment_token], false);
+
+		return $deviceid;
+	}
+
+	private static function createTask(string $deviceid, int $time_start): string {
+		$ins_task = [
+			'type' =>ZBX_TM_TASK_ENROLL_DEVICE,
+			'status' => ZBX_TM_STATUS_NEW,
+			'clock' => $time_start,
+			'ttl' => self::TASK_DEVICE_CHECK_TTL
+		];
+
+		$taskids = DB::insertBatch('task', [$ins_task]);
+
+		$taskid = array_shift($taskids);
+
+		$ins_task_device = [
+			'taskid' => $taskid,
+			'deviceid' => $deviceid
+		];
+
+		DB::insertBatch('task_device', [$ins_task_device], false);
+
+		return $taskid;
+	}
+
+//	private static function getTaskDeviceResult(string $taskid, int $time_start): array {
+//		do {
+//			sleep(self::TASK_DEVICE_CHECK_DELAY);
+//
+//			$task_result = DBfetch(DBselect(
+//				'SELECT t.status,td.mobile_enrollment_token,td.bridge_enrollment_key,td.enrollment_url,'.
+//					'td.status AS task_device_status,td.info'.
+//				' FROM task t'.
+//				' JOIN task_device td ON td.taskid=t.taskid'.
+//				' WHERE '.dbConditionId('t.taskid', [$taskid]),
+//				1
+//			));
+//
+//			$is_init_process_expired = time() > $time_start + self::TASK_DEVICE_CHECK_TTL;
+//		}
+//		while ($task_result['status'] <= ZBX_TM_STATUS_INPROGRESS && !$is_init_process_expired);
+//
+//		if ($is_init_process_expired) {
+//			$task_result['task_device_status'] = self::TASK_DEVICE_STATUS_FAILED;
+//		}
+//
+//		return $task_result;
+//	}
+
+	private static function createDeviceKeys(string $deviceid, array $mobile_identity_key,
+			array $mobile_encryption_key): void {
+		$device_keyid = DB::reserveIds('device_key', 2);
+
+		$fields = [
+			[
+				'device_keyid' => $device_keyid,
+				'deviceid' => $deviceid,
+				'scope' => self::MOBILE_IDENTITY_KEY,
+				'kid' => $mobile_identity_key['kid'],
+				'key_' => json_encode($mobile_identity_key)
+			],
+			[
+				'device_keyid' => bcadd($device_keyid, 1, 0),
+				'deviceid' => $deviceid,
+				'scope' => self::MOBILE_ENCRYPTION_KEY,
+				'kid' => $mobile_encryption_key['kid'],
+				'key_' => json_encode($mobile_encryption_key)
+			]
+		];
+
+		DB::insertBatch('device_key', $fields, false);
 	}
 }
