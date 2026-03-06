@@ -20,7 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup usrgrp
  *
- * @dataSource LoginUsers
+ * @dataSource LoginUsers, ScheduledReports
  *
  * @onBefore prepareMfaHostgroupData
  */
