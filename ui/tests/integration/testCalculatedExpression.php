@@ -36,10 +36,11 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	/* According to our 'Upgrading to numeric values of extended range' docs supported limits are */
 	/* -1.79E+308 and 1.79E+308, NOT -1.7976931348623157e308 and 1.7976931348623157e308.          */
-	// const DBL_MAX = '1.79e308';
-	// const DBL_MIN = '-1.79e308';
 	const DBL_MAX = '1.7976931348623157e308';
 	const DBL_MIN = '-1.7976931348623157e308';
+
+	const ZBX_DBL_MAX = '1.79e308';
+	const ZBX_DBL_MIN = '-1.79e308';
 
 	/**
 	 * Component configuration provider.
@@ -130,7 +131,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		}
 	}
 
-	private function sendExtremeValues($sendMax, $sendMin, $itemkey)
+	private function sendNotSupportedExtremeValues($sendMax, $sendMin, $itemkey)
 	{
 		for ($i = 1; $i <= $sendMax; $i++) {
 			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX);
@@ -138,6 +139,17 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		for ($i = 1; $i <= $sendMin; $i++) {
 			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN);
+		}
+	}
+
+	private function sendSupportedExtremeValues($sendMax, $sendMin, $itemkey)
+	{
+		for ($i = 1; $i <= $sendMax; $i++) {
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::ZBX_DBL_MAX);
+		}
+
+		for ($i = 1; $i <= $sendMin; $i++) {
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::ZBX_DBL_MIN);
 		}
 	}
 
@@ -218,23 +230,33 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator); // last 5 are max values
-		$history = $this->historyGet($trapId);
 
+		// last 5 are dbl max values that are outside the zabbix supported range
+		$this->sendNotSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_NOTSUPPORTED);
+		$history = $this->historyGet($trapId);
+		$this->assertEmpty($history);
+
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
+		// last 5 are dbl max values that are maximum possible supported in zabbix
+		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED);
+		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MaxOfLast4()
@@ -268,22 +290,36 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // 2 max and 2 min
+
+		// unsupported - 2 max and 2 min
+		$this->sendUnsupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_UNSUPPORTED);
+
+		$history = $this->historyGet($trapId);
+		$this->assertEmpty($history);
+
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
+		// supported - 2 max and 2 min
+		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				(float)self::DBL_MIN,
-				(float)self::DBL_MIN,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX
+				(float)self::ZBX_DBL_MIN,
+				(float)self::ZBX_DBL_MIN,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
+
 	}
 
 	public function testCalculatedExpression_MinOfLast3()
@@ -317,23 +353,36 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
+
+		// unsupported
+		$this->sendUnsupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
+		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_UNSUPPORTED);
+
+		$history = $this->historyGet($trapId);
+		$this->assertEmpty($history);
+
+		// ZBX_DBL_MAX is for unsupported, even if we sent mins
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
+		// supported
+		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
+		$this->checkItemState(self::TRAPPER_ITEM_KEY, ITEM_STATE_SUPPORTED);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				(float)self::DBL_MIN,
-				(float)self::DBL_MIN,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX
+				(float)self::ZBX_DBL_MIN,
+				(float)self::ZBX_DBL_MIN,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::DBL_MIN, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::ZBX_DBL_MIN, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_LastValue()
@@ -367,21 +416,33 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+
+		// max unsupported
+		$this->sendUnsupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+
+		$history = $this->historyGet($trapId);
+		$this->assertEmpty($history);
+
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
+		// max supported
+
+		$this->sendSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX,
-				(float)self::DBL_MAX
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX,
+				(float)self::ZBX_DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
