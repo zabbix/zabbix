@@ -144,6 +144,57 @@ class testFormUserGroups extends CWebTest {
 		$this->assertEquals(['Add', 'Cancel'], $this->query('class:tfoot-buttons')->one()->query('tag:button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
+
+		// Check that Frontend access, MFA and Enabled fields are read only for Zabbix Administrators.
+		$form->query('button:Cancel')->one()->click();
+		$this->page->waitUntilReady();
+		$this->query('link:Zabbix administrators')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+
+		$form->invalidate();
+		$admin_fields = [
+			'Group name' => [
+				'value' => 'Zabbix administrators'
+			],
+			'Users' => [
+				'value' => ['Admin (Zabbix Administrator)', 'admin-zabbix', 'admin user for testFormScheduledReport',
+					'filter-create', 'filter-delete', 'filter-update', 'http-auth-admin', 'user-recipient of the report',
+					'user-zabbix'
+				]
+			],
+			'Frontend access' => [
+				'value' => 'System default',
+				'class' => 'text-field green'
+			],
+			'Multi-factor authentication' => [
+				'value' => 'Disabled',
+				'class' => 'text-field green'
+			],
+			'Enabled' => [
+				'value' => 'Enabled',
+				'class' => 'text-field green'
+			],
+			'Debug mode' => [
+				'value' => false
+			]
+		];
+
+		foreach ($admin_fields as $field_name => $parameters) {
+			$field = $form->getField($field_name);
+
+			if (array_key_exists('class', $parameters)) {
+				// Check that read-only fields are represented as text, and check their text.
+				$this->assertEquals($parameters['value'], $field->getText());
+				$this->assertTrue($field->query('xpath:./span[@class='.CXPathHelper::escapeQuotes($parameters['class']).']')
+						->one(false)->isValid()
+				);
+			}
+			else {
+				// Check value of the interactible fields and make sure they are enabled.
+				$this->assertEquals($parameters['value'], $field->getValue());
+				$this->assertTrue($field->isEnabled());
+			}
+		}
 	}
 
 	public static function getCommonData() {
