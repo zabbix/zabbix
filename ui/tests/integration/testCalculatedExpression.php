@@ -726,7 +726,7 @@ class testCalculatedExpression extends CIntegrationTest {
 				'itemids' => $itemid
 			])['result'][0];
 
-			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED) {
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED)) {
 				break;
 			}
 
