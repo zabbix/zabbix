@@ -21,24 +21,24 @@
 
 <script>
 	const view = {
+		layout_mode: null,
 		refresh_interval: null,
 		refresh_interval_id: null,
 		filter_defaults: {},
 		filter: null,
 		active_filter: null,
-		layout_mode: null,
 		checkbox_object: null,
 		datatable: null,
 		_refresh_message_box: null,
 		_popup_message_box: null,
 
 		init({
+			layout_mode,
 			refresh_interval,
 			filter_defaults,
 			filter_options,
 			checkbox_object,
 			filter_set,
-			layout_mode,
 			filter,
 			page,
 			sort_field,
@@ -46,11 +46,11 @@
 			storage_idx,
 			user_configs
 		}) {
+			this.layout_mode = layout_mode;
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 			this.checkbox_object = checkbox_object;
 			this.filter_set = filter_set;
-			this.layout_mode = layout_mode;
 
 			this.initTabFilter(filter_options);
 			this.initExpandableSubfilter();
@@ -64,14 +64,11 @@
 		},
 
 		initTabFilter(filter_options) {
+			/** @type {HTMLElement} */
 			const filter = document.getElementById('monitoring_latest_filter');
 
 			this.filter = new CTabFilter(filter, filter_options);
 			this.active_filter = this.filter._active_item;
-
-			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
-				filter.style.display = 'none';
-			}
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
@@ -382,7 +379,9 @@
 
 					new CState().setParams({page});
 				})
-				.on(CDataTable.EVENT_INIT, () => this.refreshCounters())
+				.on(CDataTable.EVENT_RENDER, () => {
+					this.refreshCounters(this.datatable.getDataProvider().getLastResponse());
+				})
 				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
 				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
 				.init(user_configs);
@@ -445,28 +444,14 @@
 				});
 		},
 
-		refreshCounters() {
-			// Filter is not present in Kiosk mode.
-			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+		refreshCounters(response) {
+			if (this.layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
-			const url = new URL('zabbix.php', location.href);
-			url.searchParams.set('action', 'latest.view.refresh');
-
-			fetch(url.toString(), {
-				method: 'POST',
-				body: objectToSearchParams({filter_counters: 1})
-			})
-				.then(response => response.json())
-				.then(response => {
-					if ('filter_counters' in response) {
-						this.filter.updateCounters(response.filter_counters);
-					}
-				})
-				.catch(error => {
-					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
-				});
+			if ('filter_counters' in response) {
+				this.filter.updateCounters(response.filter_counters);
+			}
 		},
 
 		doRefresh(subfilter = null) {
@@ -499,6 +484,8 @@
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
 			}
+
+			this.refreshCounters(response);
 
 			this.initExpandableSubfilter();
 		},

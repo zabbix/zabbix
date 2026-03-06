@@ -45,7 +45,6 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_counters' =>		'in 1',
 			'filter_set' =>				'in 1',
 			'filter_reset' =>			'in 1',
-			'counter_index' =>			'ge 0',
 			'subfilter_hostids' =>		'array',
 			'subfilter_tagnames' =>		'array',
 			'subfilter_tags' =>			'array',

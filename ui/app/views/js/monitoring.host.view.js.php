@@ -21,6 +21,7 @@
 ?>
 <script>
 	const view = {
+		layout_mode: null,
 		refresh_interval: null,
 		refresh_interval_id: null,
 		filter_defaults: {},
@@ -32,6 +33,7 @@
 		_popup_message_box: null,
 
 		init({
+			layout_mode,
 			filter_defaults,
 			filter_options,
 			refresh_interval,
@@ -43,6 +45,7 @@
 			storage_idx,
 			user_configs
 		}) {
+			this.layout_mode = layout_mode;
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 			this.applied_filter_groupids = applied_filter_groupids;
@@ -58,11 +61,10 @@
 		},
 
 		initTabFilter(filter_options) {
-			if (!filter_options) {
-				return;
-			}
+			/** @type {HTMLElement} */
+			const filter = document.getElementById('monitoring_hosts_filter');
 
-			this.filter = new CTabFilter($('#monitoring_hosts_filter')[0], filter_options);
+			this.filter = new CTabFilter(filter, filter_options);
 			this.active_filter = this.filter._active_item;
 
 			this.filter.on(TABFILTER_EVENT_URLSET, () => {
@@ -347,7 +349,9 @@
 
 					new CState().setParams({page});
 				})
-				.on(CDataTable.EVENT_RENDER, () => this.refreshCounters())
+				.on(CDataTable.EVENT_RENDER, () => {
+					this.refreshCounters(this.datatable.getDataProvider().getLastResponse());
+				})
 				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
 				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
 				.init(user_configs);
@@ -390,28 +394,14 @@
 				});
 		},
 
-		refreshCounters() {
-			// Filter is not present in Kiosk mode.
-			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+		refreshCounters(response) {
+			if (this.layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
-			const url = new URL('zabbix.php', location.href);
-			url.searchParams.set('action', 'host.view.refresh');
-
-			fetch(url.toString(), {
-				method: 'POST',
-				body: objectToSearchParams({filter_counters: 1})
-			})
-				.then(response => response.json())
-				.then(response => {
-					if ('filter_counters' in response) {
-						this.filter.updateCounters(response.filter_counters);
-					}
-				})
-				.catch(error => {
-					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
-				});
+			if ('filter_counters' in response) {
+				this.filter.updateCounters(response.filter_counters);
+			}
 		},
 
 		onDataDone(response) {
@@ -420,6 +410,8 @@
 			if ('groupids' in response) {
 				this.applied_filter_groupids = response.groupids;
 			}
+
+			this.refreshCounters(response);
 
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);

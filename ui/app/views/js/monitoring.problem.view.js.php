@@ -20,6 +20,7 @@
 ?>
 <script>
 	const view = {
+		layout_mode: null,
 		refresh_interval: null,
 		refresh_interval_id: null,
 		filter_defaults: null,
@@ -30,6 +31,7 @@
 		datatable: null,
 
 		init({
+			layout_mode,
 			filter_options,
 			refresh_interval,
 			filter_defaults,
@@ -41,6 +43,7 @@
 			user_configs,
 			severities
 		}) {
+			this.layout_mode = layout_mode;
 			this.refresh_interval = refresh_interval;
 			this.filter_defaults = filter_defaults;
 
@@ -570,8 +573,11 @@
 
 					new CState().setParams({page});
 				})
+				.on(CDataTable.EVENT_INIT, () => {
+					requestAnimationFrame(() => this.initExpandables());
+				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.refreshCounters();
+					this.refreshCounters(this.datatable.getDataProvider().getLastResponse());
 
 					requestAnimationFrame(() => this.initExpandables());
 				})
@@ -584,12 +590,12 @@
 		 * @param {{ timeselector: object }} filter_options
 		 */
 		initFilter(filter_options) {
-			if (!filter_options) {
-				return;
-			}
+			/** @type {HTMLElement} */
+			const filter = document.getElementById('monitoring_problem_filter');
 
-			this.filter = new CTabFilter($('#monitoring_problem_filter')[0], filter_options);
+			this.filter = new CTabFilter(filter, filter_options);
 			this.active_filter = this.filter._active_item;
+
 			this.global_timerange = {
 				from: filter_options.timeselector.from,
 				to: filter_options.timeselector.to
@@ -684,7 +690,7 @@
 					chkbxRange.checkObjectAll('eventids', false);
 					chkbxRange.update('eventids');
 
-					this.refreshCounters();
+					this.refresh();
 				}
 			});
 		},
@@ -760,27 +766,14 @@
 				});
 		},
 
-		refreshCounters() {
-			if (!this.filter) {
+		refreshCounters(response) {
+			if (this.layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
-			const url = new URL('zabbix.php', location.href);
-			url.searchParams.set('action', 'problem.view.refresh');
-
-			fetch(url.toString(), {
-				method: 'POST',
-				body: objectToSearchParams({filter_counters: 1})
-			})
-				.then(response => response.json())
-				.then(response => {
-					if ('filter_counters' in response) {
-						this.filter.updateCounters(response.filter_counters);
-					}
-				})
-				.catch(error => {
-					CMessageHelper.error(this.datatable.getElement(), [error.message], error.name);
-				});
+			if ('filter_counters' in response) {
+				this.filter.updateCounters(response.filter_counters);
+			}
 		},
 
 		scheduleRefresh() {
@@ -797,6 +790,8 @@
 			if ('messages' in response) {
 				CMessageHelper.success(this.datatable.getElement(), [], response.messages, {show_close_box: true});
 			}
+
+			this.refreshCounters(response);
 
 			('debug' in response) && this.refreshDebug(response.debug);
 		}

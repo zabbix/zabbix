@@ -43,114 +43,17 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$page = $this->getInput('page', 1);
 		$filter = CControllerLatest::sanitizeFilter($filter);
 
-		// Select groups for later selection of hosts and items.
-		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
+		$data = $this->prepareData($filter, $sort_field, $sort_order);
 
-		// Select hosts for a subsequent selection of items.
-		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
-			'groupids' => $groupids,
-			'hostids' => $filter['hostids'] ?: null,
-			'preservekeys' => true
-		]);
+		$data['items'] = CMacrosResolverHelper::resolveItemKeys($data['items']);
+		$data['items'] = CMacrosResolverHelper::resolveItemDescriptions($data['items']);
+		$data['items'] = CMacrosResolverHelper::resolveTimeUnitMacros($data['items'], ['delay', 'history', 'trends']);
 
-		$search_limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-		$select_items_cnt = 0;
-		$select_items = [];
-
-		if ($filter['tags']) {
-			$filter['tags'] = array_filter($filter['tags'], function (array $tag) {
-				return !($tag['tag'] === '' && $tag['value'] === '');
-			});
-		}
-
-		foreach ($hosts as $hostid => $host) {
-			if ($select_items_cnt > $search_limit) {
-				unset($hosts[$hostid]);
-				continue;
-			}
-
-			$select_items += API::Item()->get([
-				'output' => ['itemid', 'hostid', 'value_type'],
-				'hostids' => [$hostid],
-				'webitems' => true,
-				'evaltype' => $filter['evaltype'],
-				'tags' => $filter['tags'] ?: null,
-				'inheritedTags' => true,
-				'filter' => [
-					'status' => [ITEM_STATUS_ACTIVE],
-					'state' => $filter['state'] == -1 ? null : $filter['state']
-				],
-				'search' => $filter['name'] === '' ? null : ['name_resolved' => $filter['name']],
-				'preservekeys' => true
-			]);
-
-			$select_items_cnt = count($select_items);
-		}
-
-		if ($select_items) {
-			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
-				'output' => ['itemid', 'type', 'hostid', 'name_resolved', 'key_', 'delay', 'history', 'trends',
-					'status', 'value_type', 'units', 'description', 'state', 'error'
-				],
-				'selectTags' => ['tag', 'value'],
-				'selectInheritedTags' => ['tag', 'value'],
-				'selectValueMap' => ['mappings'],
-				'itemids' => array_keys($select_items),
-				'webitems' => true,
-				'preservekeys' => true
-			]), ['name_resolved' => 'name']);
-
-			CTagHelper::mergeOwnAndInheritedTags($items);
-
-			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
-			$items_rw = $items;
-
-			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
-			if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
-				&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
-				$items_rw = API::Item()->get([
-					'output' => [],
-					'itemids' => array_keys($items),
-					'editable' => true,
-					'preservekeys' => true
-				]);
-			}
-
-			if ($sort_field === 'host') {
-				$items = array_map(function ($item) use ($hosts) {
-					return $item + [
-						'host_name' => $hosts[$item['hostid']]['name']
-					];
-				}, $items);
-
-				CArrayHelper::sort($items, [[
-					'field' => 'host_name',
-					'order' => $sort_order
-				]]);
-			}
-			else {
-				CArrayHelper::sort($items, [[
-					'field' => 'name',
-					'order' => $sort_order
-				]]);
-			}
-		}
-		else {
-			$hosts = [];
-			$items = [];
-			$items_rw = [];
-		}
-
-		$items = CMacrosResolverHelper::resolveItemKeys($items);
-		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
-		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
-
-		$history = Manager::History()->getLastValues($items, 2,
+		$history = Manager::History()->getLastValues($data['items'], 2,
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
 		);
 
-		$hosts_on_page = array_intersect_key($hosts, array_column($items, 'hostid', 'hostid'));
+		$hosts_on_page = array_intersect_key($data['hosts'], array_column($data['items'], 'hostid', 'hostid'));
 
 		$maintenanceids = [];
 
@@ -170,122 +73,17 @@ class CControllerLatestViewData extends CControllerDataTable {
 			]);
 		}
 
-		$prepared_data = [
-			'hosts' => $hosts,
-			'items' => $items,
-			'items_rw' => $items_rw
-		];
-
-		if (CControllerLatest::isSubfilterSet($filter)) {
-			// Select groups for subsequent selection of hosts and items.
-			$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
-
-			// Select hosts for subsequent selection of items.
-			$hosts = API::Host()->get([
-				'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
-				'groupids' => $groupids,
-				'hostids' => $filter['hostids'] ?: null,
-				'preservekeys' => true
-			]);
-
-			$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
-			$select_items_cnt = 0;
-			$select_items = [];
-
-			foreach ($hosts as $hostid => $host) {
-				if ($select_items_cnt > $search_limit) {
-					unset($hosts[$hostid]);
-					continue;
-				}
-
-				$select_items += API::Item()->get([
-					'output' => ['itemid', 'hostid', 'value_type'],
-					'hostids' => [$hostid],
-					'webitems' => true,
-					'evaltype' => $filter['evaltype'],
-					'tags' => $filter['tags'] ?: null,
-					'inheritedTags' => true,
-					'filter' => [
-						'status' => [ITEM_STATUS_ACTIVE],
-						'state' => $filter['state'] == -1 ? null : $filter['state']
-					],
-					'search' => $filter['name'] === '' ? null : ['name_resolved' => $filter['name']],
-					'preservekeys' => true
-				]);
-
-				$select_items_cnt = count($select_items);
-			}
-
-			if ($select_items) {
-				$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
-					'output' => ['itemid', 'type', 'hostid', 'name_resolved', 'key_', 'delay', 'history', 'trends',
-						'status', 'value_type', 'units', 'description', 'state', 'error'
-					],
-					'selectTags' => ['tag', 'value'],
-					'selectInheritedTags' => ['tag', 'value'],
-					'selectValueMap' => ['mappings'],
-					'itemids' => array_keys($select_items),
-					'webitems' => true,
-					'preservekeys' => true
-				]), ['name_resolved' => 'name']);
-
-				CTagHelper::mergeOwnAndInheritedTags($items);
-
-				// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
-				$items_rw = $items;
-
-				// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
-				if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
-					&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
-					$items_rw = API::Item()->get([
-						'output' => [],
-						'itemids' => array_keys($items),
-						'editable' => true,
-						'preservekeys' => true
-					]);
-				}
-
-				if ($sort_field === 'host') {
-					$items = array_map(function ($item) use ($hosts) {
-						return $item + [
-								'host_name' => $hosts[$item['hostid']]['name']
-							];
-					}, $items);
-
-					CArrayHelper::sort($items, [[
-						'field' => 'host_name',
-						'order' => $sort_order
-					]]);
-				}
-				else {
-					CArrayHelper::sort($items, [[
-						'field' => 'name',
-						'order' => $sort_order
-					]]);
-				}
-			}
-			else {
-				$hosts = [];
-				$items = [];
-				$items_rw = [];
-			}
-
-			$prepared_data['hosts'] = $hosts;
-			$prepared_data['items'] = $items;
-			$prepared_data['items_rw'] = $items_rw;
-		}
-
 		$subfilters_fields = CControllerLatest::getSubfilterFields($filter);
-		$subfilters = CControllerLatest::getSubfilters($subfilters_fields, $prepared_data);
-		$prepared_data['items'] = CControllerLatest::applySubfilters($prepared_data['items']);
+		$subfilters = CControllerLatest::getSubfilters($subfilters_fields, $data);
+		$data['items'] = CControllerLatest::applySubfilters($data['items']);
 
-		$this->paging = $this->paginate($prepared_data['items'], $page, $sort_order);
+		$this->paging = $this->paginate($data['items'], $page, $sort_order);
 
 		if ($filter['state'] != -1) {
 			$subfilters['state'] = [];
 		}
 
-		order_result($prepared_data['items'], $sort_field, $sort_order);
+		order_result($data['items'], $sort_field, $sort_order);
 
 		$simple_interval_parser = new CSimpleIntervalParser();
 		$update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
@@ -297,7 +95,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			'hk_history_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)
 		];
 
-		foreach ($prepared_data['items'] as &$item) {
+		foreach ($data['items'] as &$item) {
 			$host = $hosts_on_page[$item['hostid']];
 
 			$data_actions = [];
@@ -308,7 +106,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 			if (in_array($item['type'], checkNowAllowedTypes()) && $item['status'] == ITEM_STATUS_ACTIVE
 					&& $host['status'] == HOST_STATUS_MONITORED
-					&& array_key_exists($item['itemid'], $prepared_data['items_rw'])) {
+					&& array_key_exists($item['itemid'], $data['items_rw'])) {
 				$data_actions['execute'] = true;
 			}
 
@@ -450,13 +248,149 @@ class CControllerLatestViewData extends CControllerDataTable {
 		unset($item);
 
 		return [
+			'filter_counters' => $this->getFilterCounters(),
 			'fields' => $fields,
 			'columns' => $columns,
-			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $prepared_data['items'])),
+			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $data['items'])),
 			'subfilter' => (new CPartial('monitoring.latest.subfilter', [
 				'subfilters' => $subfilters,
 				'subfilters_expanded' => array_flip($filter['subfilters_expanded'] ?? [])
 			]))->getOutput()
+		];
+	}
+
+	private function getFilterCounters(): array {
+		$filter_counters = [];
+
+		if (CViewHelper::loadLayoutMode() == ZBX_LAYOUT_KIOSKMODE) {
+			return $filter_counters;
+		}
+
+		$profile = (new CTabFilterProfile(CControllerLatest::FILTER_IDX, CControllerLatest::FILTER_FIELDS_DEFAULT))
+			->read();
+
+		$filters = $profile->getTabsWithDefaults();
+
+		foreach ($filters as $index => $tabfilter) {
+			$filter_counters[$index] = 0;
+
+			$tabfilter = CControllerLatest::sanitizeFilter($tabfilter);
+			$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($tabfilter);
+			$subfilter_set = CControllerLatest::isSubfilterSet($tabfilter);
+
+			if (!$tabfilter['filter_show_counter'] || (!$mandatory_filter_set && !$subfilter_set)) {
+				continue;
+			}
+
+			$prepared_data = $this->prepareData($tabfilter, $tabfilter['sort'], $tabfilter['sortorder']);
+			$subfilters_fields = CControllerLatest::getSubfilterFields($tabfilter);
+
+			CControllerLatest::getSubfilters($subfilters_fields, $prepared_data);
+
+			$filter_counters[$index] = count(CControllerLatest::applySubfilters($prepared_data['items']));
+		}
+
+		return $filter_counters;
+	}
+
+	private function prepareData(array $filter, string $sort_field, string $sort_order): array {
+		// Select groups for subsequent selection of hosts and items.
+		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
+
+		// Select hosts for subsequent selection of items.
+		$hosts = API::Host()->get([
+			'output' => ['hostid', 'name', 'status', 'maintenanceid', 'maintenance_status', 'maintenance_type'],
+			'groupids' => $groupids,
+			'hostids' => $filter['hostids'] ?: null,
+			'preservekeys' => true
+		]);
+
+		$search_limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
+		$select_items_cnt = 0;
+		$select_items = [];
+
+		foreach ($hosts as $hostid => $host) {
+			if ($select_items_cnt > $search_limit) {
+				unset($hosts[$hostid]);
+				continue;
+			}
+
+			$select_items += API::Item()->get([
+				'output' => ['itemid', 'hostid', 'value_type'],
+				'hostids' => [$hostid],
+				'webitems' => true,
+				'evaltype' => $filter['evaltype'],
+				'tags' => $filter['tags'] ?: null,
+				'inheritedTags' => true,
+				'filter' => [
+					'status' => [ITEM_STATUS_ACTIVE],
+					'state' => $filter['state'] == -1 ? null : $filter['state']
+				],
+				'search' => $filter['name'] === '' ? null : ['name_resolved' => $filter['name']],
+				'preservekeys' => true
+			]);
+
+			$select_items_cnt = count($select_items);
+		}
+
+		if ($select_items) {
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'type', 'hostid', 'name_resolved', 'key_', 'delay', 'history', 'trends',
+					'status', 'value_type', 'units', 'description', 'state', 'error'
+				],
+				'selectTags' => ['tag', 'value'],
+				'selectInheritedTags' => ['tag', 'value'],
+				'selectValueMap' => ['mappings'],
+				'itemids' => array_keys($select_items),
+				'webitems' => true,
+				'preservekeys' => true
+			]), ['name_resolved' => 'name']);
+
+			CTagHelper::mergeOwnAndInheritedTags($items);
+
+			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
+			$items_rw = $items;
+
+			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
+			if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
+				&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
+				$items_rw = API::Item()->get([
+					'output' => [],
+					'itemids' => array_keys($items),
+					'editable' => true,
+					'preservekeys' => true
+				]);
+			}
+
+			if ($sort_field === 'host') {
+				$items = array_map(function ($item) use ($hosts) {
+					return $item + [
+							'host_name' => $hosts[$item['hostid']]['name']
+						];
+				}, $items);
+
+				CArrayHelper::sort($items, [[
+					'field' => 'host_name',
+					'order' => $sort_order
+				]]);
+			}
+			else {
+				CArrayHelper::sort($items, [[
+					'field' => 'name',
+					'order' => $sort_order
+				]]);
+			}
+		}
+		else {
+			$hosts = [];
+			$items = [];
+			$items_rw = [];
+		}
+
+		return [
+			'hosts' => $hosts,
+			'items' => $items,
+			'items_rw' => $items_rw
 		];
 	}
 }

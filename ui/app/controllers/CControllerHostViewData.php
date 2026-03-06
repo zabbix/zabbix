@@ -273,10 +273,78 @@ class CControllerHostViewData extends CControllerDataTable {
 		unset($host);
 
 		return [
+			'filter_counters' => $this->getFilterCounters(),
 			'fields' => $fields,
 			'columns' => $columns,
 			'rows' => array_values(array_map(static fn (array $host) => [[], $host], $hosts)),
 			'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 		];
+	}
+
+	private function getFilterCounters(): array {
+		$filter_counters = [];
+
+		if (CViewHelper::loadLayoutMode() == ZBX_LAYOUT_KIOSKMODE) {
+			return $filter_counters;
+		}
+
+		$profile = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))->read();
+
+		$filters = $profile->getTabsWithDefaults();
+
+		foreach ($filters as $index => $tabfilter) {
+			$tabfilter = CControllerHost::sanitizeFilter($tabfilter);
+
+			$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+		}
+
+		return $filter_counters;
+	}
+
+	/**
+	 * Get host list results count for passed filter.
+	 *
+	 * @param array  $filter                        Filter options.
+	 *        string $filter['name']                Filter hosts by name.
+	 *        array  $filter['groupids']            Filter hosts by host groups.
+	 *        string $filter['ip']                  Filter hosts by IP.
+	 *        string $filter['dns']	                Filter hosts by DNS.
+	 *        string $filter['port']                Filter hosts by port.
+	 *        string $filter['status']              Filter hosts by status.
+	 *        string $filter['evaltype']            Filter hosts by tags.
+	 *        string $filter['tags']                Filter hosts by tag names and values.
+	 *        string $filter['severities']          Filter problems on hosts by severities.
+	 *        string $filter['show_suppressed']     Filter suppressed problems.
+	 *        int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 *
+	 * @return int
+	 */
+	private function getCount(array $filter): int {
+		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
+
+		return (int) API::Host()->get([
+			'countOutput' => true,
+			'evaltype' => $filter['evaltype'],
+			'tags' => $filter['tags'] ?: null,
+			'inheritedTags' => true,
+			'groupids' => $groupids,
+			'severities' => $filter['severities'] ? $filter['severities'] : null,
+			'withProblemsSuppressed' => $filter['severities']
+				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				: null,
+			'search' => [
+				'name' => ($filter['name'] === '') ? null : $filter['name'],
+				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
+				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+			],
+			'filter' => [
+				'status' => ($filter['status'] == -1) ? null : $filter['status'],
+				'port' => ($filter['port'] === '') ? null : $filter['port'],
+				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+					? null
+					: HOST_MAINTENANCE_STATUS_OFF
+			],
+			'limit' => (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
+		]);
 	}
 }

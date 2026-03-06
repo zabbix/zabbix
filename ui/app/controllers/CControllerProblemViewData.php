@@ -32,6 +32,7 @@ class CControllerProblemViewData extends CControllerDataTable
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
 
 		return [
+			'filter_counters' => $this->getFilterCounters(),
 			'fields' => $data['fields'],
 			'columns' => $data['columns'],
 			'page' => $data['page'],
@@ -40,6 +41,45 @@ class CControllerProblemViewData extends CControllerDataTable
 			'show_two_columns' => $data['show_two_columns'],
 			'rows' => $rows
 		];
+	}
+
+	private function getFilterCounters(): array {
+		$filter_counters = [];
+
+		if (CViewHelper::loadLayoutMode() == ZBX_LAYOUT_KIOSKMODE) {
+			return $filter_counters;
+		}
+
+		$profile = (new CTabFilterProfile(CControllerProblem::FILTER_IDX, CControllerProblem::FILTER_FIELDS_DEFAULT))
+			->read();
+
+		$filters = $profile->getTabsWithDefaults();
+
+		foreach ($filters as $index => $tabfilter) {
+			$tabfilter = CControllerProblem::sanitizeFilter($tabfilter);
+
+			if (!$tabfilter['filter_custom_time']) {
+				$tabfilter = ['from' => $profile->from, 'to' => $profile->to] + $tabfilter;
+			} else {
+				$tabfilter['show'] = TRIGGERS_OPTION_ALL;
+			}
+
+			$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+		}
+
+		return $filter_counters;
+	}
+
+	private function getCount(array $filter): int {
+		$range_time_parser = new CRangeTimeParser();
+		$range_time_parser->parse($filter['from']);
+		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
+		$range_time_parser->parse($filter['to']);
+		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
+
+		$data = CScreenProblem::getData($filter, [], CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
+
+		return count($data['problems']);
 	}
 
 	private static function addProblemRows(array &$rows, array &$data, array $problems, array $filter,

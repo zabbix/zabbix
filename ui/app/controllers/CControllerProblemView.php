@@ -50,8 +50,7 @@ class CControllerProblemView extends CControllerProblem {
 			'filter_show_counter' =>	'in 1,0',
 			'filter_counters' =>		'in 1',
 			'filter_set' =>				'in 1',
-			'filter_reset' =>			'in 1',
-			'counter_index' =>			'ge 0'
+			'filter_reset' =>			'in 1'
 		];
 
 		$ret = $this->validateInput($fields) && $this->validateTimeSelectorPeriod() && $this->validateInventory()

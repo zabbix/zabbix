@@ -39,11 +39,14 @@ $html_page = (new CHtmlPage())
 			->setAttribute('aria-label', _('Content controls'))
 	);
 
-
 $filter = (new CTabFilter())
 	->setId('monitoring_latest_filter')
 	->setOptions($data['tabfilter_options'])
 	->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+
+if ($web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
+	$filter->setAttribute('hidden', '');
+}
 
 if ($data['mandatory_filter_set'] && $data['items'] || $data['subfilter_set']) {
 	$filter->addSubfilter(new CPartial('monitoring.latest.subfilter',
@@ -80,11 +83,29 @@ $button_list = [
 $html_page
 	->addItem($filter)
 	->addItem(
-		new CPartial('monitoring.latest.view.html', array_intersect_key($data,
-			array_flip(['filter', 'sort_field', 'sort_order', 'view_curl', 'paging', 'hosts', 'items', 'history',
-				'config', 'tags', 'maintenances', 'items_rw', 'mandatory_filter_set', 'subfilter_set'
+		(new CForm('GET', 'history.php'))
+			->setName('items')
+			->addItem(new CVar('action', HISTORY_BATCH_GRAPH))
+			->addItem([
+				(new CDiv())->setId('latest'),
+				(new CActionButtonList('graphtype', 'itemids', [
+					GRAPH_TYPE_STACKED => [
+						'name' => _('Display stacked graph'),
+						'attributes' => ['data-required' => 'graph', 'data-required-count' => 2]
+					],
+					GRAPH_TYPE_NORMAL => [
+						'name' => _('Display graph'),
+						'attributes' => ['data-required' => 'graph']
+					],
+					'item.execute' => [
+						'content' => (new CSimpleButton(_('Execute now')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->addClass('js-massexecute-item')
+							->addClass('js-no-chkbxrange')
+							->setAttribute('data-required', 'execute')
+					]
+				], 'latest'))->setAddSelectedCountElement(false)
 			])
-		))
 	)
 	->show();
 
@@ -130,12 +151,12 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'layout_mode' => $web_layout_mode,
 		'filter_options' => $data['filter_options'],
 		'refresh_interval' => $data['refresh_interval'],
 		'filter_defaults' => $data['filter_defaults'],
 		'checkbox_object' => 'itemids',
 		'filter_set' => $data['mandatory_filter_set'] || $data['subfilter_set'],
-		'layout_mode' => $web_layout_mode,
 		'filter' => $data['filter'],
 		'page' => $data['tabfilter_options']['page'],
 		'sort_field' => $data['sort_field'],

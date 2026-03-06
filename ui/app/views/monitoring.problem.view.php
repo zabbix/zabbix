@@ -46,30 +46,56 @@ $html_page = (new CHtmlPage())
 		))->setAttribute('aria-label', _('Content controls'))
 	);
 
-if ($web_layout_mode == ZBX_LAYOUT_NORMAL) {
-	$filter = (new CTabFilter())
-		->setId('monitoring_problem_filter')
-		->setOptions($data['tabfilter_options'])
-		->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
+$filter = (new CTabFilter())
+	->setId('monitoring_problem_filter')
+	->setOptions($data['tabfilter_options'])
+	->addTemplate(new CPartial($data['filter_view'], $data['filter_defaults']));
 
-	foreach ($data['filter_tabs'] as $tab) {
-		$tab['tab_view'] = $data['filter_view'];
-		$filter->addTemplatedTab($tab['filter_name'], $tab);
-	}
+if ($web_layout_mode == ZBX_LAYOUT_KIOSKMODE) {
+	$filter->setAttribute('hidden', '');
+}
 
-	// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
-	$data['filter_options'] = $filter->options;
-	$html_page->addItem($filter);
+foreach ($data['filter_tabs'] as $tab) {
+	$tab['tab_view'] = $data['filter_view'];
+	$filter->addTemplatedTab($tab['filter_name'], $tab);
 }
-else {
-	$data['filter_options'] = null;
-}
+
+// Set javascript options for tab filter initialization in monitoring.problem.view.js.php file.
+$data['filter_options'] = $filter->options;
 
 $this->includeJsFile('monitoring.problem.view.js.php', $data);
+
+$allowed = [
+	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
+	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
+	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),
+	'close' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CLOSE_PROBLEMS),
+	'suppress_problems' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
+	'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
+];
+
+$mass_update_enabled = $allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
+	|| $allowed['close'] || $allowed['suppress_problems'] || $allowed['rank_change'];
+
 $html_page
-	->addItem(new CPartial('monitoring.problem.view.html', array_intersect_key($data,
-		array_flip(['page', 'action', 'sort', 'sortorder', 'filter', 'tabfilter_idx'])
-	)))
+	->addItem($filter)
+	->addItem(
+		(new CForm('post', 'zabbix.php'))
+			->setId('problem_form')
+			->setName('problem')
+			->addItem([
+				(new CDiv())->setId('problems'),
+				(new CActionButtonList('action', 'eventids', [
+					'acknowledge.edit' => [
+						'content' => (new CSimpleButton(_('Mass update')))
+							->addClass(ZBX_STYLE_BTN_ALT)
+							->addClass('js-massupdate-problem')
+							->addClass('js-no-chkbxrange')
+							->setEnabled($mass_update_enabled)
+					]
+				], 'problem'))->setAddSelectedCountElement(false)
+			])
+	)
 	->show();
 
 (new CTemplateTag('time'))
@@ -145,6 +171,7 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
+		'layout_mode' => $web_layout_mode,
 		'filter_options' => $data['filter_options'],
 		'refresh_interval' => $data['refresh_interval'],
 		'filter_defaults' => $data['filter_defaults'],

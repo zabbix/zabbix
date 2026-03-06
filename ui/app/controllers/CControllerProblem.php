@@ -46,25 +46,6 @@ abstract class CControllerProblem extends CController {
 	];
 
 	/**
-	 * Get count of resulting rows for specified filter.
-	 *
-	 * @param array $filter Filter fields values.
-	 *
-	 * @return int
-	 */
-	protected function getCount(array $filter): int {
-		$range_time_parser = new CRangeTimeParser();
-		$range_time_parser->parse($filter['from']);
-		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
-		$range_time_parser->parse($filter['to']);
-		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
-
-		$data = CScreenProblem::getData($filter, [], CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
-
-		return count($data['problems']);
-	}
-
-	/**
 	 * Get additional data required for render filter as HTML.
 	 *
 	 * @param array $filter  Filter fields values.
@@ -207,7 +188,7 @@ abstract class CControllerProblem extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function sanitizeFilter(array &$filter): array {
+	public static function sanitizeFilter(array &$filter): array {
 		if ($filter['hostids']) {
 			$hosts = API::Host()->get([
 				'output' => [],

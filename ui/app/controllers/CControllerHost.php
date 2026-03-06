@@ -326,7 +326,7 @@ abstract class CControllerHost extends CController {
 	 *
 	 * @return array
 	 */
-	protected static function sanitizeFilter(array $filter): array {
+	public static function sanitizeFilter(array $filter): array {
 		if ($filter['groupids']) {
 			$groups = API::HostGroup()->get([
 				'output' => [],
