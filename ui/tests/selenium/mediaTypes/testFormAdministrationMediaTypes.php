@@ -1916,19 +1916,26 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		foreach (['Generic SMTP OAuth', 'Gmail OAuth', 'Gmail relay OAuth', 'Office365 OAuth'] as $name) {
 			foreach ([0, 1, 2, 3] as $tokens_status) {
-				DBexecute('UPDATE media_type_oauth SET tokens_status='.$tokens_status.' WHERE mediatypeid='.
-						self::$mediatypeids[$name]
-				);
+				// Change the status of the corresponding mediatype token.
+				CDataHelper::call('mediatype.update', [
+					'mediatypeid' => self::$mediatypeids[$name],
+					'access_token' => 'test',
+					'refresh_token' => 'test',
+					'access_expires_in' => 3599,
+					'tokens_status' => $tokens_status
+				]);
 
-				// '2147483647' - the last possible unix timestamp.
+				// Check warning presence based on time access token was updated. '2147483647' - maximal valid unix time.
 				foreach (['2147483647', time()] as $access_token_updated) {
-					DBexecute('UPDATE media_type_oauth SET access_token_updated ='.$access_token_updated.' WHERE mediatypeid='.
-							self::$mediatypeids[$name]
-					);
-					$this->query('link', $name)->waitUntilClickable()->one()->click();
-					$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+					CDataHelper::call('mediatype.update', [
+						'mediatypeid' => self::$mediatypeids[$name],
+						'access_token_updated' => $access_token_updated
+					]);
 
-					// In case when refresh token is invalid and access token has "unexpected update time" there will be two warning hints.
+					$this->query('link', $name)->waitUntilClickable()->one()->click();
+					$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+
+					// There will be two warning hints when refresh token is invalid and access token has "unexpected update time" .
 					$warning = ($tokens_status === 0 || $tokens_status === 1)
 						? ($access_token_updated === '2147483647'
 							? "Refresh token is invalid or outdated.\nUnexpected access token update time."
@@ -1941,7 +1948,9 @@ class testFormAdministrationMediaTypes extends CWebTest {
 						$this->checkHint($form, 'zi-i-negative', $warning);
 					}
 					else {
-						$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)->isValid());
+						$this->assertFalse($form->query('xpath://button[contains(@class, "zi-i-negative")]')->one(false)
+								->isValid()
+						);
 					}
 
 					COverlayDialogElement::find()->one()->close();
