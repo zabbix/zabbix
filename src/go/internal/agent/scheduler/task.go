@@ -42,6 +42,7 @@ const (
 )
 
 var (
+	_ context.Context        = (*taskBase)(nil)
 	_ plugin.ContextProvider = (*exporterTask)(nil)
 	_ plugin.ContextProvider = (*directExporterTask)(nil)
 	_ plugin.ContextProvider = (*watcherTask)(nil)
@@ -55,12 +56,23 @@ type exporterTaskAccessor interface {
 
 // taskBase implements common task properties and functionality
 type taskBase struct {
-	context.Context
 	plugin    *pluginAgent
 	scheduled time.Time
 	index     int
 	active    bool
 	recurring bool
+}
+
+func (*taskBase) Done() <-chan struct{} {
+	return nil
+}
+
+func (*taskBase) Err() error {
+	return nil
+}
+
+func (*taskBase) Value(key any) any {
+	return nil
 }
 
 func (*taskBase) Deadline() (time.Time, bool) {
