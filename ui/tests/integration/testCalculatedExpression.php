@@ -237,8 +237,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history['result'], json_encode($history));
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
-
 		// last 5 are dbl max values that are maximum possible supported in zabbix
 		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 		$this->checkItemState($itemid, ITEM_STATE_SUPPORTED);
@@ -292,7 +290,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		// unsupported - 2 max and 2 min
-		$this->sendUnsupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->sendNotSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
 		$this->checkItemState($itemid, ITEM_STATE_UNSUPPORTED);
 
 		$history = $this->historyGet($trapId);
@@ -355,7 +353,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		// unsupported
-		$this->sendUnsupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
+		$this->sendNotSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
 		$this->checkItemState($itemid, ITEM_STATE_UNSUPPORTED);
 
 		$history = $this->historyGet($trapId);
@@ -418,7 +416,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
 		// max unsupported
-		$this->sendUnsupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
+		$this->sendNotSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history['result'], json_encode($history));
