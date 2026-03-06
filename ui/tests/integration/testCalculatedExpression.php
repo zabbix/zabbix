@@ -715,4 +715,28 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		CDataHelper::call('host.delete', [self::$hostid]);
 	}
+
+	protected function checkItemState($itemid) {
+		$wait_iterations = 20;
+		$wait_iteration_delay = 1;
+
+		for ($r = 0; $r < $wait_iterations; $r++) {
+			$item = $this->call('item.get', [
+				'output' => ['state', 'lastvalue'],
+				'itemids' => $itemid
+			])['result'][0];
+
+			if ($item['state'] == $state && ($state == ITEM_STATE_NOTSUPPORTED) {
+				break;
+			}
+
+			sleep($wait_iteration_delay);
+		}
+
+		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, item name: '.$name);
+		if ($state == ITEM_STATE_NORMAL) {
+			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, item name: '. $name);
+		}
+	}
+
 }
