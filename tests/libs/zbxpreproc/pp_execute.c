@@ -25,10 +25,9 @@ static zbx_pp_item_preproc_t	*read_pp_item_preproc(void)
 {
 	zbx_pp_item_preproc_t	*preproc;
 
-	int	item_type = zbx_mock_str_to_item_type(zbx_mock_get_parameter_string("in.item_type"));
 	int	value_type = zbx_mock_str_to_value_type(zbx_mock_get_parameter_string("in.value.value_type"));
 
-	preproc = zbx_pp_item_preproc_create(0, item_type, value_type, 0);
+	preproc = zbx_pp_item_preproc_create(0, (unsigned char)value_type, 0);
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter_exists("in.steps"))
 	{

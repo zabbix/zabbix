@@ -25,7 +25,6 @@ ZBX_PTR_VECTOR_IMPL(pp_step_ptr, zbx_pp_step_t *)
  * Purpose: create item preprocessing data                                    *
  *                                                                            *
  * Parameters: hostid     - [IN] item host id                                 *
- *             type       - [IN] item type                                    *
  *             value_type - [IN] item value type                              *
  *             flags      - [IN] item flags                                   *
  *                                                                            *
