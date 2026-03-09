@@ -494,14 +494,14 @@ class CControllerPopupImportCompare extends CController {
 						'id' => $this->id_counter
 					];
 
-					$add_sequence_id = null;
+					$entity_counter_id = null;
 					$new_rows = $this->objectToRows($before, $after, $depth + 1, $this->id_counter);
 
 					if ($new_rows) {
 						$rows = array_merge($rows, $new_rows);
 					}
 					else {
-						$add_sequence_id = $this->id_counter;
+						$entity_counter_id = $this->id_counter;
 					}
 
 					$this->id_counter++;
@@ -509,15 +509,15 @@ class CControllerPopupImportCompare extends CController {
 					// Process any sub-entities.
 					if ($entity) {
 						$rows = array_merge($rows, $this->blocksToDiff($entity, $depth + 2,
-							[...$outer_names, [$entity_type, $name]], $change_type, $add_sequence_id
+							[...$outer_names, [$entity_type, $name]], $change_type, $entity_counter_id
 						));
 					}
-					else if ($add_sequence_id) {
+					elseif ($entity_counter_id) {
 						$rows[] = [
 							'value' => $this->convertToYaml([]),
 							'depth' => $depth + 2,
 							'change_type' => $change_types[$change_type],
-							'id' => $add_sequence_id,
+							'id' => $entity_counter_id,
 							'sequence_start' => true
 						];
 					}
