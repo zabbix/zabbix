@@ -25,7 +25,11 @@
 		attribution: null,
 		max_zoom: null,
 		tile_providers: {},
-		defaults: {},
+		defaults: {
+			geomaps_tile_url: '',
+			geomaps_attribution: '',
+			geomaps_max_zoom: ''
+		},
 
 		init({rules, tile_providers}) {
 			this.form_element = document.getElementById('geomaps-form');
@@ -33,17 +37,28 @@
 			this.tile_url = document.getElementById('geomaps_tile_url');
 			this.attribution = document.getElementById('geomaps_attribution');
 			this.max_zoom = document.getElementById('geomaps_max_zoom');
+			this.tile_providers = Object.assign(tile_providers, { other: this.defaults });
 
-			this.tile_providers = tile_providers;
-			this.defaults = {
-				geomaps_tile_url: '',
-				geomaps_max_zoom: ''
-			};
+			const tile_provider = document.querySelector('[name="geomaps_tile_provider"]');
+			tile_provider.addEventListener('change', this.events.tileProviderChange);
 
-			document.querySelector('[name="geomaps_tile_provider"]')
-				.addEventListener('change', this.events.tileProviderChange);
+			if (!tile_provider.value) {
+				const values = this.form.getAllValues();
 
-			document.getElementById('geomaps-form').addEventListener('submit', (e) => {
+				for (let key of Object.keys(view.defaults)) {
+					view.tile_providers.other[key] = values[key] || '';
+				}
+			}
+
+			this.form_element.addEventListener('input', event => {
+				if (tile_provider.value) {
+					return;
+				}
+
+				view.tile_providers.other[event.target.name] = event.target.value;
+			});
+
+			this.form_element.addEventListener('submit', (e) => {
 				e.preventDefault();
 
 				const fields = this.form.getAllValues(),
@@ -84,10 +99,10 @@
 					attribution_label.classList.remove('<?= ZBX_STYLE_DISPLAY_NONE ?>');
 				}
 
-				const data = view.tile_providers[e.target.value] || view.defaults;
+				const data = view.tile_providers[e.target.value || 'other'] || view.defaults;
 				view.tile_url.value = data.geomaps_tile_url;
 				view.max_zoom.value = data.geomaps_max_zoom;
-				view.attribution.value = '';
+				view.attribution.value = data.geomaps_attribution || '';
 
 				view.form.validateChanges(['geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution']);
 			}
