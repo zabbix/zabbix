@@ -2467,6 +2467,19 @@ define('ZBX_NODE_STATUS_STOPPED',		1);
 define('ZBX_NODE_STATUS_UNAVAILABLE',	2);
 define('ZBX_NODE_STATUS_ACTIVE',		3);
 
+define('ZBX_CEP_WINDOW_NONE',			0);
+define('ZBX_CEP_WINDOW_SIMPLE',			1);
+define('ZBX_CEP_WINDOW_CAUSE_SYMPTOM',	2);
+define('ZBX_CEP_WINDOW_TAG_MATCH',		3);
+define('ZBX_CEP_WINDOW_PATTERN_MATCH',	4);
+
+define('ZBX_CEP_STATUS_ENABLED',	0);
+define('ZBX_CEP_STATUS_DISABLED',	1);
+
+define('ZBX_CEP_EXECUTION_CONTINUE',	0);
+define('ZBX_CEP_EXECUTION_STOP',		1);
+
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;

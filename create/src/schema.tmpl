@@ -408,7 +408,7 @@ FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|userdirectoryid|t_id		|NULL	|NULL		|0			|2|userdirectory	|	|RESTRICT
 FIELD		|mfa_status	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|mfaid		|t_id	|	|NULL	|0 |3|mfa	|	|RESTRICT
+FIELD		|mfaid		|t_id	|	|NULL	|0	|3|mfa	|	|RESTRICT
 UNIQUE		|1		|name
 INDEX		|2		|userdirectoryid
 INDEX		|3		|mfaid
@@ -2263,7 +2263,7 @@ FIELD		|mfaid			|t_id			|	|NOT NULL	|0	|1|mfa	|mfaid
 FIELD		|userid			|t_id			|	|NOT NULL	|0	|2|users|userid
 FIELD		|totp_secret	|t_varchar(32)	|''	|NULL		|0
 FIELD		|status			|t_integer		|'0'|NOT NULL	|0
-FIELD		|used_codes		|t_varchar(32)	|'' |NOT NULL	|0
+FIELD		|used_codes		|t_varchar(32)	|''	|NOT NULL	|0
 INDEX		|1			|mfaid
 INDEX		|2			|userid
 
@@ -2301,3 +2301,72 @@ FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
 ROW		|1		|7050058	|7050058
+
+TABLE|cep_rule|cep_ruleid|ZBX_DATA
+FIELD	|cep_ruleid	|t_id	|	|NOT NULL |0
+FIELD	|name	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD	|description	|t_text	|''	|NOT NULL	|0
+FIELD	|window	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|evaltype	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|formula	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD	|status	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|stop	|t_integer	|'0'	|NOT NULL	|0
+FIELD	|sortorder	|t_integer	|'0'	|NOT NULL	|0
+
+TABLE|cep_condition|cep_conditionid|ZBX_DATA
+FIELD|cep_conditionid|t_id||NOT NULL|0
+FIELD|cep_ruleid|t_id||NOT NULL|0|1|cep_rule
+FIELD|type|t_integer|'0'|NOT NULL|0
+FIELD|operator|t_integer|'0'|NOT NULL|0
+FIELD|value1_str|t_varchar(255)|''|NOT NULL|0
+FIELD|value2_str|t_varchar(255)|''|NOT NULL|0
+FIELD|value_int|t_integer|'0'|NOT NULL|0
+INDEX|1|cep_ruleid
+
+TABLE|cep_window|cep_windowid|ZBX_DATA
+FIELD|cep_windowid		|t_id||NOT NULL|0
+FIELD|cep_ruleid|t_id||NOT NULL|0|1|cep_rule
+FIELD|duration|t_integer|'0'|NOT NULL|0
+FIELD|capacity|t_integer|'0'|NOT NULL|0
+FIELD|symptom_num_tag|t_varchar(255)|''|NOT NULL|0
+FIELD|param|t_varchar(255)|''|NOT NULL|0
+FIELD|group_by|t_integer|'0'|NOT NULL|0
+INDEX|1|cep_ruleid
+
+TABLE|cep_match_condition|cep_match_conditionid|ZBX_DATA
+FIELD|cep_match_conditionid|t_id||NOT NULL|0
+FIELD|cep_windowid|t_id||NOT NULL|0|1|cep_window
+FIELD|name|t_varchar(255)|''|NOT NULL|0
+FIELD|value|t_varchar(255)|''|NOT NULL|0
+INDEX|1|cep_windowid
+
+TABLE|cep_group|cep_groupid|ZBX_DATA
+FIELD|cep_groupid|t_id||NOT NULL|0
+FIELD|cep_ruleid|t_id||NOT NULL|0|1|cep_rule
+FIELD|groupid|t_id||NULL|0|2|hstgrp
+FIELD|hostid|t_id||NULL|0|3|hosts
+FIELD|value|t_varchar(255)|''|NOT NULL|0
+INDEX|1|cep_ruleid
+
+TABLE|cep_group_event|cep_groupid,eventid|ZBX_DATA
+FIELD|cep_groupid		|t_id||NOT NULL|0|1|cep_group
+FIELD|eventid|t_id||NULL|0|2|events
+
+TABLE|cep_operation|cep_operationid|ZBX_DATA
+FIELD|cep_operationid|t_id||NOT NULL|0
+FIELD|cep_ruleid|t_id||NOT NULL|0|1|cep_rule
+FIELD|type|t_integer|'0'|NOT NULL|0
+FIELD|condition|t_integer|'0'|NOT NULL|0
+FIELD|evaltype|t_integer|'0'|NOT NULL|0
+FIELD|value1_str|t_varchar(255)|''|NOT NULL|0
+FIELD|value2_str|t_varchar(255)|''|NOT NULL|0
+FIELD|value_int|t_integer|'0'|NOT NULL|0
+FIELD|sortorder|t_integer|'0'|NOT NULL|0
+INDEX|1|cep_ruleid
+
+TABLE|cep_operation_target|cep_operation_targetid|ZBX_DATA
+FIELD|cep_operation_targetid|t_id||NOT NULL|0
+FIELD|cep_operationid		|t_id||NOT NULL|0|1|cep_operation
+FIELD|tag|t_varchar(255)|''|NOT NULL|0
+FIELD|value|t_varchar(255)|''|NOT NULL|0
+INDEX|1|cep_operationid

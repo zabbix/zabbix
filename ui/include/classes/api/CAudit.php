@@ -87,6 +87,7 @@ class CAudit {
 	public const RESOURCE_MFA = 54;
 	public const RESOURCE_PROXY_GROUP = 55;
 	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
+	public const RESOURCE_CEP_RULE = 57;
 
 	/**
 	 * Audit details actions.
