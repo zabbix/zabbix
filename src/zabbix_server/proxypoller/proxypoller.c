@@ -741,7 +741,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
 				proxy_poller_args_in->proxydata_frequency, &vault_ret);
 
-		if (SUCCEED != vault_ret)
+		if (SUCCEED != vault_ret && NULL != proxy_poller_args_in->config_vault->token)
 		{
 			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 					(unsigned char*)proxy_poller_args_in->config_vault->token,

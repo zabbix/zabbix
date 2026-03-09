@@ -355,7 +355,7 @@ int	trapper_process_request_proxy(const char *request, zbx_socket_t *sock, const
 					config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
 					config_comms->config_ssl_key_location, config_comms->server, &vault_ret);
 
-			if (SUCCEED != vault_ret)
+			if (SUCCEED != vault_ret && NULL != config_vault->token)
 				zbx_ipc_async_socket_send(rtc, ZBX_RTC_VAULT_RELOGIN,
 					(unsigned char*)config_vault->token, strlen(config_vault->token) + 1);
 

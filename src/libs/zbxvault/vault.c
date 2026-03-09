@@ -248,7 +248,7 @@ int	zbx_vault_approle_from_env_get(zbx_config_vault_t *config_vault, char **erro
 
 	if (NULL != (ptr = getenv("VAULT_APPSECRET")))
 	{
-		if (NULL != config_vault->app_role_id)
+		if (NULL != config_vault->app_secret_id)
 		{
 			*error = zbx_dsprintf(*error, "both \"VaultAppSecretID\" configuration parameter"
 					" and \"VAULT_APPSECRET\" environment variable are defined");
@@ -256,7 +256,7 @@ int	zbx_vault_approle_from_env_get(zbx_config_vault_t *config_vault, char **erro
 			return FAIL;
 		}
 
-		config_vault->app_role_id = zbx_strdup(NULL, ptr);
+		config_vault->app_secret_id = zbx_strdup(NULL, ptr);
 		unsetenv("VAULT_APPSECRET");
 	}
 

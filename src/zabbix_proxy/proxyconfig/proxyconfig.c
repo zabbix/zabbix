@@ -363,7 +363,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 				proxyconfig_update_vault_macros(proxyconfig_args_in, &vault_ret);
 
-				if (SUCCEED != vault_ret)
+				if (SUCCEED != vault_ret && NULL != proxyconfig_args_in->config_vault->token)
 				{
 					zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 						(unsigned char*)proxyconfig_args_in->config_vault->token,
@@ -409,7 +409,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 			last_template_cleanup_sec = sec;
 		}
 
-		if (SUCCEED != vault_ret)
+		if (SUCCEED != vault_ret && NULL != proxyconfig_args_in->config_vault->token)
 		{
 			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 				(unsigned char*)proxyconfig_args_in->config_vault->token,

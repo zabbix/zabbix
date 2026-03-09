@@ -2071,7 +2071,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 		if (NULL != message)
 		{
-			if (ZBX_RTC_VAULT_RELOGIN == message->code &&
+			if (ZBX_RTC_VAULT_RELOGIN == message->code && NULL != zbx_config_vault.token &&
 					0 == strcmp(zbx_config_vault.token, (char *)message->data))
 			{
 				zbx_free(zbx_config_vault.token);

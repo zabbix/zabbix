@@ -148,7 +148,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 					dbconfig_args_in->config_ssl_cert_location,
 					dbconfig_args_in->config_ssl_key_location, &vault_ret);
 
-			if (SUCCEED != vault_ret)
+			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 						(unsigned char*)dbconfig_args_in->config_vault->token,
 						strlen(dbconfig_args_in->config_vault->token) + 1);
@@ -177,7 +177,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 					dbconfig_args_in->config_ssl_cert_location,
 					dbconfig_args_in->config_ssl_key_location, &vault_ret);
 
-			if (SUCCEED != vault_ret)
+			if (SUCCEED != vault_ret && NULL != dbconfig_args_in->config_vault->token)
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
 					(unsigned char*)dbconfig_args_in->config_vault->token,
 					strlen(dbconfig_args_in->config_vault->token) + 1);
