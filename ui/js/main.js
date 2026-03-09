@@ -300,9 +300,7 @@ const hintBox = {
 				hintBox.hideHint($target[0], false);
 			}
 
-			if ($target[0].dataset.hintboxContents) {
-				hintBox.showHintStart(e, $target, delay);
-			}
+			hintBox.showHintStart(e, $target, delay);
 		};
 
 		const cancelHintboxGeneration = () => {
