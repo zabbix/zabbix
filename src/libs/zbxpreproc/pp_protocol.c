@@ -1168,9 +1168,22 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 			{
 				json_val = result->log->value;
 			}
-			else if (ZBX_ISSET_DBL(result) || ZBX_ISSET_UI64(result))
+			else if (ZBX_ISSET_UI64(result))
 			{
-				/* double and uint are valid JSON and do not require limit checks */
+				/* uint64 value is a valid JSON and do not require limit checks */
+				zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
+				goto out;
+			}
+			else if (ZBX_ISSET_DBL(result))
+			{
+				/* double value is a valid JSON and do not require limit checks,  */
+				/* except when being NaN value                                    */
+				if (FAIL == zbx_validate_value_dbl(result->dbl))
+				{
+					state = ITEM_STATE_NOTSUPPORTED;
+					error = zbx_strdup(NULL, "NaN is not a valid JSON");
+				}
+
 				zbx_dc_add_history(itemid, item_value_type, item_flags, result, ts, state, error);
 				goto out;
 			}
