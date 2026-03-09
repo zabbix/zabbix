@@ -121,7 +121,7 @@ typedef struct zbx_audit_entry_detail
 }
 zbx_audit_entry_detail_t;
 
-ZBX_VECTOR_DECL(audit_entry_detail, zbx_audit_entry_detail_t);
+ZBX_VECTOR_DECL(audit_entry_detail, zbx_audit_entry_detail_t)
 
 typedef struct zbx_audit_entry
 {

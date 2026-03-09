@@ -29,7 +29,7 @@
 #define AUDIT_USERNAME		"System"
 #define AUDIT_IP		""
 
-ZBX_VECTOR_IMPL(audit_entry_detail, zbx_audit_entry_detail_t);
+ZBX_VECTOR_IMPL(audit_entry_detail, zbx_audit_entry_detail_t)
 
 static zbx_hashset_t	zbx_audit;
 

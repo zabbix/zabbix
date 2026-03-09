@@ -15,7 +15,6 @@
 #include "lld.h"
 
 #include "zbxregexp.h"
-#include "audit/zbxaudit.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
