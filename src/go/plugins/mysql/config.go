@@ -19,29 +19,29 @@ import (
 
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
 // Session is a general structure for storing sessions' configuration.
 type Session struct {
-	URI         string `conf:"name=Uri,optional"`
-	Password    string `conf:"optional"`
-	User        string `conf:"optional"`
-	TLSConnect  string `conf:"name=TLSConnect,optional"`
-	TLSCAFile   string `conf:"name=TLSCAFile,optional"`
-	TLSCertFile string `conf:"name=TLSCertFile,optional"`
-	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
+	URI               string `conf:"name=Uri,optional"`
+	Password          string `conf:"optional"`
+	User              string `conf:"optional"`
+	TLSConnect        string `conf:"name=TLSConnect,optional"`
+	TLSCAFile         string `conf:"name=TLSCAFile,optional"`
+	TLSCertFile       string `conf:"name=TLSCertFile,optional"`
+	TLSKeyFile        string `conf:"name=TLSKeyFile,optional"`
+	ConnectionTimeout int    `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
 }
 
 // PluginOptions option from config file.
 type PluginOptions struct {
-	// Timeout is the maximum time in seconds for waiting when a connection has to be established.
-	// Default value equals to the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyConnectionTimeout int `conf:"name=Timeout,optional,range=1:30"`
 
-	// CallTimeout is the maximum time in seconds for waiting when a request has to be done.
-	// Default value equals to the global agent timeout.
-	CallTimeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyItemTimeout int `conf:"name=CallTimeout,optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
@@ -68,12 +68,28 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 
 	p.options.setCustomQueriesPathDefault()
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyConnectionTimeout != 0 {
+		log.Debugf("[%s] Config value 'Plugins.Mysql.Timeout' is deprecated. Use 'Plugins.Mysql.Default.ConnectionTimeout' instead.", pluginName)
+
+		if p.options.Default.ConnectionTimeout == 0 {
+			p.options.Default.ConnectionTimeout = p.options.LegacyConnectionTimeout
+		}
 	}
 
-	if p.options.CallTimeout == 0 {
-		p.options.CallTimeout = global.Timeout
+	if p.options.LegacyItemTimeout != 0 {
+		log.Debugf("[%s] Config value 'Plugins.Mysql.CallTimeout' is deprecated.", pluginName)
+	}
+
+	if p.options.Default.ConnectionTimeout == 0 {
+		p.options.Default.ConnectionTimeout = global.Timeout
+	}
+
+	if p.options.LegacyConnectionTimeout == 0 {
+		p.options.LegacyConnectionTimeout = global.Timeout
+	}
+
+	if p.options.LegacyItemTimeout == 0 {
+		p.options.LegacyItemTimeout = global.Timeout
 	}
 }
 
