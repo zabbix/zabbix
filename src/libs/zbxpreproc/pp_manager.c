@@ -1435,6 +1435,8 @@ void	*zbx_pp_manager_thread(void *args)
 			break;
 	}
 
+	zbx_prof_destroy();
+
 	zbx_dc_flush_history();
 	zbx_history_cache_destroy_local_cache();
 

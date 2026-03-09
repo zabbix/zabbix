@@ -19,6 +19,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxnix.h"
 #include "zbxpgservice.h"
+#include "zbxprof.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
@@ -397,6 +398,8 @@ static void	*pg_service_entry(void *data)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 	}
+
+	zbx_prof_destroy();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 

@@ -51,6 +51,17 @@ static void	zbx_prof_init(void)
 	}
 }
 
+void	zbx_prof_destroy(void)
+{
+	if (0 != zbx_prof_initialized)
+	{
+		zbx_prof_disable();
+
+		zbx_vector_func_profiles_destroy(&zbx_func_profiles);
+		zbx_prof_initialized = 0;
+	}
+}
+
 static int	compare_func_profile(const void *d1, const void *d2)
 {
 	const zbx_func_profile_t	*func_profile1 = *((const zbx_func_profile_t * const *)d1);

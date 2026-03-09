@@ -19,6 +19,7 @@
 
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
+#include "zbxprof.h"
 #include "zbxregexp.h"
 #include "zbxthreads.h"
 #include "zbxnix.h"
@@ -170,6 +171,8 @@ static void	*pp_worker_entry(void *args)
 		if (1 < queue->pending_num)
 			pp_task_queue_notify(queue);
 	}
+
+	zbx_prof_destroy();
 
 	pp_task_queue_deregister_worker(queue);
 	pp_task_queue_unlock(queue);
