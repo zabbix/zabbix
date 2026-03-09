@@ -17,6 +17,7 @@ package oracle
 import (
 	"context"
 	"errors"
+	"strconv"
 	"strings"
 	"time"
 
@@ -46,7 +47,7 @@ type Plugin struct {
 // Export implements the Exporter interface.
 //
 //nolint:gocyclo,cyclop // Complex code that currently has no unit tests and hence is not safe for refactoring.
-func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.ContextProvider) (any, error) {
+func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (any, error) {
 	if key == keyCustomQuery && !p.options.CustomQueriesEnabled {
 		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
 	}
@@ -75,7 +76,12 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
-	conn, err := p.connMgr.GetConnection(*connDetails)
+	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
+	if err != nil {
+		connectionTimeout = p.options.Default.ConnectionTimeout // shouldn't happen anyway
+	}
+
+	conn, err := p.connMgr.GetConnection(*connDetails, connectionTimeout)
 	if err != nil {
 		p.Errf("%s failed: %v\n", key, err.Error())
 
@@ -88,14 +94,6 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		return nil, errs.Wrap(err, "get connection failed")
 	}
 
-	timeout := conn.GetCallTimeout()
-	if timeout < time.Second*time.Duration(pluginCtx.Timeout()) {
-		timeout = time.Second * time.Duration(pluginCtx.Timeout())
-	}
-
-	ctx, cancel := conn.GetContextWithTimeout(timeout)
-	defer cancel()
-
 	result, err := handleMetric(ctx, conn, params, extraParams...)
 
 	if err != nil {
@@ -104,9 +102,9 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 		ctxErr := ctx.Err()
 		if ctxErr != nil && errors.Is(ctxErr, context.DeadlineExceeded) {
 			p.Errf(
-				"failed to handle metric %q: query execution timeout %s exceeded: %s",
+				"failed to handle metric %q: query execution timeout %d exceeded: %s",
 				key,
-				timeout.String(),
+				ctx.Timeout(),
 				err.Error(),
 			)
 
@@ -131,8 +129,6 @@ func (p *Plugin) Export(key string, rawParams []string, pluginCtx plugin.Context
 func (p *Plugin) Start() {
 	opt := &dbconn.Options{
 		KeepAlive:            time.Duration(p.options.KeepAlive) * time.Second,
-		ConnectTimeout:       time.Duration(p.options.ConnectTimeout) * time.Second,
-		CallTimeout:          time.Duration(p.options.CallTimeout) * time.Second,
 		CustomQueriesEnabled: p.options.CustomQueriesEnabled,
 		CustomQueriesPath:    p.options.CustomQueriesPath,
 		ResolveTNS:           p.options.ResolveTNS,

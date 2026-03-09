@@ -61,8 +61,6 @@ var (
 // Options contains parameters for ConnManager.
 type Options struct {
 	KeepAlive            time.Duration
-	ConnectTimeout       time.Duration
-	CallTimeout          time.Duration
 	CustomQueriesEnabled bool
 	CustomQueriesPath    string
 	ResolveTNS           bool
@@ -141,7 +139,7 @@ func NewConnManager(logr log.Logger, opt *Options) *ConnManager {
 }
 
 // GetConnection returns an existing connection or creates a new one.
-func (c *ConnManager) GetConnection(cd ConnDetails) (*OraConn, error) { //nolint:gocritic
+func (c *ConnManager) GetConnection(cd ConnDetails, connectionTimeout int) (*OraConn, error) { //nolint:gocritic
 	conn := c.getConn(cd)
 	if conn != nil {
 		conn.updateLastAccessTime(time.Now())
@@ -149,22 +147,12 @@ func (c *ConnManager) GetConnection(cd ConnDetails) (*OraConn, error) { //nolint
 		return conn, nil
 	}
 
-	conn, err := c.createConn(&cd)
+	conn, err := c.createConn(&cd, connectionTimeout)
 	if err != nil {
 		return nil, err
 	}
 
 	return c.setConn(cd, conn)
-}
-
-// GetContextWithTimeout function returns context with specified timeout.
-func (conn *OraConn) GetContextWithTimeout(timeout time.Duration) (context.Context, context.CancelFunc) {
-	return context.WithTimeout(conn.ctx, timeout)
-}
-
-// GetContextWithCallTimeout function returns context with timeout = conn.callTimeout.
-func (conn *OraConn) GetContextWithCallTimeout() (context.Context, context.CancelFunc) {
-	return context.WithTimeout(conn.ctx, conn.callTimeout)
 }
 
 // closeUnused closes each connection that has not been accessed at least within the KeepAlive interval.
@@ -213,7 +201,7 @@ func (c *ConnManager) housekeeper(ctx context.Context) {
 }
 
 // createConn creates a new connection for given credentials in cd.
-func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
+func (c *ConnManager) createConn(cd *ConnDetails, connectionTimeout int) (*OraConn, error) {
 	ctx := godror.ContextWithTraceTag(
 		context.Background(),
 		godror.TraceTag{
@@ -222,7 +210,7 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 		},
 	)
 
-	connector, err := createDBConnector(cd, c.Opt.ConnectTimeout, c.Opt.ResolveTNS)
+	connector, err := createDBConnector(cd, connectionTimeout, c.Opt.ResolveTNS)
 	if err != nil {
 		return nil, err
 	}
@@ -249,10 +237,8 @@ func (c *ConnManager) createConn(cd *ConnDetails) (*OraConn, error) {
 
 	return &OraConn{
 		Client:         client,
-		callTimeout:    c.Opt.CallTimeout,
 		version:        serverVersion,
 		lastAccessTime: time.Now(),
-		ctx:            ctx,
 		queryStorage:   &c.QueryStorage,
 		username:       cd.Uri.User(),
 	}, nil
