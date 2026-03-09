@@ -2256,14 +2256,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 	zbx_locks_enable();
 #endif
 
-	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
-			&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
-			config_ssl_cert_location, config_ssl_key_location, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
 
 	/* re-initialize database before re-starting HA manager */
 	if (SUCCEED != zbx_db_init(&error))
@@ -2729,18 +2721,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_ssl_ca_location, config_ssl_cert_location,
 								config_ssl_key_location, &zbx_config_vault.token);
 
-					}
-
-					if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault,
-							&zbx_db_config->dbuser, &zbx_db_config->dbpassword,
-							zbx_config_source_ip, config_ssl_ca_location,
-							config_ssl_cert_location, config_ssl_key_location, &error))
-					{
-						zabbix_log(LOG_LEVEL_CRIT,
-							"cannot initialize database credentials from vault: %s", error);
-						zbx_set_exiting_with_fail();
-						ha_status = ZBX_NODE_STATUS_ERROR;
-						continue;
 					}
 
 					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay,
