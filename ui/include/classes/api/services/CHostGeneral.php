@@ -479,8 +479,6 @@ abstract class CHostGeneral extends CHostBase {
 		), 'hgsetid');
 
 		if ($del_hgsetids) {
-			DB::delete('permission', ['hgsetid' => $del_hgsetids]);
-			DB::delete('hgset_group', ['hgsetid' => $del_hgsetids]);
 			DB::delete('hgset', ['hgsetid' => $del_hgsetids]);
 		}
 	}

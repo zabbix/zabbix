@@ -45,6 +45,24 @@ type UserParameterPlugin struct {
 
 var userParameter UserParameterPlugin
 
+func specialCharsNotAllowedMessage() string {
+	parts := make([]string, 0, len(notAllowedCharacters))
+
+	for i := range len(notAllowedCharacters) {
+		c := notAllowedCharacters[i]
+
+		if !unicode.IsPrint(rune(c)) {
+			parts = append(parts, fmt.Sprintf("0x%02x", c))
+
+			continue
+		}
+
+		parts = append(parts, string(c))
+	}
+
+	return strings.Join(parts, ", ")
+}
+
 func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 	var b bytes.Buffer
 
@@ -74,11 +92,10 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 					param := params[s[i]-'0'-1]
 					if p.unsafeUserParameters == 0 {
 						if j := strings.IndexAny(param, notAllowedCharacters); j != -1 {
-							if unicode.IsPrint(rune(param[j])) {
-								return "", fmt.Errorf("Character \"%c\" is not allowed", param[j])
-							}
-
-							return "", fmt.Errorf("Character 0x%02x is not allowed", param[j])
+							return "", errs.Errorf(
+								"Special characters \"%s\" are not allowed in the "+
+									"parameters.",
+								specialCharsNotAllowedMessage())
 						}
 					}
 					b.WriteString(param)
