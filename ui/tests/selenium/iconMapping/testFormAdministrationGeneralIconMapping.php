@@ -883,6 +883,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	/**
 	 * Test cancel cloning of icon mapping.
+	 *
+	 * TODO: Remove @ignoreBrowserErrors after the console.error for "Failed to fetch" is resolved in ZBX-27065
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCloning() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
@@ -893,12 +896,9 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 2') as $iconmap) {
 			$new_name = $iconmap['name'].' (cloned)';
 			$this->query('link', $iconmap['name'])->waitUntilClickable()->one()->click();
-			// TODO: remove redundant page->waitUntilReady after ZBX-27065 is fixed.
-			$this->page->waitUntilReady();
 			$form = $this->query('id:iconmap')->waitUntilVisible()->asForm()->one();
 			$form->fill(['Name' => $new_name]);
 			$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
-			$this->page->waitUntilReady();
 			$form->waitUntilReloaded();
 			$form->checkValue(['Name' => $new_name]);
 			$form->query('button:Cancel')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
