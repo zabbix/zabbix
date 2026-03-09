@@ -3,7 +3,7 @@
 
 ## Overview
 
-This guide describes how to integrate your Zabbix installation with IBM Maximo Service Request using the API and Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
+This guide describes how to integrate your Zabbix installation with IBM Maximo Service Request using its API and the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
 ### Supported features:
 * Service request creation
@@ -25,9 +25,9 @@ The configurable parameters are intended to be changed according to the webhook 
 
 |Name|Value|Description|
 |----|-----|-----------|
-|api_endpoint|\<PLACE YOUR API ENDPOINT\>|IBM Maximo API endpoint.|
-|api_key|\<PLACE YOUR API KEY\>|API key that will be used to access IBM Maximo.|
-|reported_priority||Use custom reported priority here instead of event severity.|
+|api_endpoint|\<ENTER YOUR API ENDPOINT\>|IBM Maximo API endpoint.|
+|api_key|\<ENTER YOUR API KEY\>|API key that will be used to access IBM Maximo.|
+|reported_priority||Use a custom reported priority here instead of event severity.|
 |use_oslc_format|true|`true` to use OSLC API, `false` to use REST API.|
 
 ### Internal parameters
@@ -44,18 +44,18 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 |event_update_severity|\{EVENT\.UPDATE\.SEVERITY\}|Name of the event update severity.|
 |event_update_status|\{EVENT\.UPDATE\.STATUS\}|Numeric value of the problem update status. Possible values: 0 - Webhook was called because of problem/recovery event, 1 - Update operation.|
 |event_name|\{EVENT\.NAME\}|Name of the problem event that triggered an action.|
-|class_structure_id|\{ALERT\.SENDTO\}|A numeric ID of the classification to create Service Request under.|
+|class_structure_id|\{ALERT\.SENDTO\}|A numeric ID of the under which the Service Request will be created.|
 |asset_number|\{INVENTORY\.ASSET\.TAG\}|Inventory asset tag.|
 
 > Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
 ## Service setup
 
-1\. Create a API key in Administration Work Center under the Integration tab in your Maximo.
+1\. In IBM Maximo, create an API key in *Administration Work Center* under the *Integration* tab.
 
-2\. Grant permissions to MXAPISR data set in Security Groups / Object Structures.
+2\. Grant permissions to the MXAPISR data set in *Security Groups* / *Object Structures*.
 
-3\. Endpoint configuration lives in the Integration > External Systems and Enterprise Services applications.
+3\. Configure the endpoint in *Integration* > *External Systems* and *Enterprise Services*.
 
 ## Zabbix configuration
 
@@ -63,18 +63,18 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 - In the *Alerts* > *Media types* section, import the `media_maximo_service_request.yaml` file.
 
 2. Open the imported **IBM Maximo Service Request** media type and set the following webhook parameters:
-- `api_endpoint` - the address of IBM Maximo Service Request endpoint
-- `api_key` - the key to access API
-- `reported_priority` - optional. Reported priority to create service request with. Leave empty to use event severity from Zabbix.
-- `use_oslc_format` - optional, boolean. `true` to use OSLC API, `false` to use REST API. Default value - `yes`.
+- `api_endpoint` - the address of the IBM Maximo Service Request endpoint.
+- `api_key` - the key to access the API.
+- `reported_priority` - optional. Reported priority to create the Service Request with. Leave empty to use the event severity from Zabbix.
+- `use_oslc_format` - optional, boolean. `true` to use OSLC API, `false` to use REST API. Default value - `true`.
 
 3. Click the *Enabled* checkbox to enable the media type and click the *Update* button to save the webhook settings.
 
 4. Create a Zabbix user and add media:
   - To create a new user, go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
-  - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to **IBM Maximo Service Request**.
-  - In the *Media* tab, click *Add* and select **IBM Maximo Service Request** from the *Type* drop-down list.
-  - In the *Send to* field, specify the `classstructureid` - classification ID to create service request under.
+  - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to IBM Maximo Service Request.
+  - In the *Media* tab, click *Add* and select *IBM Maximo Service Request* from the *Type* drop-down list.
+  - In the *Send to* field, specify the `classstructureid` - the classification ID under which to create the Service Request.
 
 5. Done! You can now start using this media type in actions and send notifications.
 
