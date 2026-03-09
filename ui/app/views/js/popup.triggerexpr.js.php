@@ -79,11 +79,11 @@ window.trigger_edit_expression_popup = new class {
 		zselect.clearOptions();
 
 		if (change_function && !current_function_added) {
-			zselect.setAttribute('value', '3_last');
+			zselect.value = '3_last';
 			this.#functionSelectChanged('3_last', true);
 		}
 		else {
-			zselect.setAttribute('value', current_value);
+			zselect.value = current_value;
 		}
 
 		zselect.addOptions(Object.values(option_groups));
@@ -100,7 +100,7 @@ window.trigger_edit_expression_popup = new class {
 
 		if (reset_value || !mapped_options[current_value]) {
 			current_value = options[0];
-			zselect.setAttribute('value', options[0]);
+			zselect.value = options[0];
 		}
 
 		const paramtype = zselect.parentNode.querySelector('.paramtype');
@@ -134,7 +134,7 @@ window.trigger_edit_expression_popup = new class {
 
 		zselect.clearOptions();
 		zselect.addOptions(mapped_options);
-		zselect.setAttribute('value', current_value);
+		zselect.value = current_value;
 	}
 
 	#functionSelectChanged(value, reset_paramtype = true) {
@@ -191,7 +191,7 @@ window.trigger_edit_expression_popup = new class {
 					);
 				}
 				else if (field_config.placeholder) {
-					discovered_field.setAttribute('placeholder', field_config.placeholder);
+					discovered_field.placeholder = field_config.placeholder;
 				}
 
 				if (field_config.label) {
@@ -206,18 +206,18 @@ window.trigger_edit_expression_popup = new class {
 					}
 				}
 
-				discovered_field.removeAttribute('disabled', 'disabled');
+				discovered_field.disabled = false;
 				discovered_field.closest('li').style.display = '';
 			}
 			else {
-				discovered_field.setAttribute('disabled', 'disabled');
+				discovered_field.disabled = true;
 				discovered_field.closest('li').style.display = 'none';
 			}
 		}
 
 		if (document.getElementById('itemid').value === '') {
-			document.getElementById('itemid').setAttribute('disabled', 'disabled');
-			document.getElementById('item_value_type').setAttribute('disabled', 'disabled');
+			document.getElementById('itemid').disabled = true;
+			document.getElementById('item_value_type').disabled = true;
 		}
 
 		if (name in this.functions) {
@@ -285,9 +285,9 @@ window.trigger_edit_expression_popup = new class {
 			if (item_field.value !== orig_value) {
 				this.#promiseGetItemType(document.getElementById('itemid').value, mode)
 					.then((type) => {
-						document.getElementById('item_value_type').setAttribute('value', type);
-						document.getElementById('itemid').removeAttribute('disabled');
-						document.getElementById('item_value_type').removeAttribute('disabled');
+						document.getElementById('item_value_type').value = type;
+						document.getElementById('itemid').disabled = false;
+						document.getElementById('item_value_type').disabled = false;
 						this.form.validateChanges(['itemid', 'item_value_type']);
 						this.#setFilterFunctions(type);
 					});
