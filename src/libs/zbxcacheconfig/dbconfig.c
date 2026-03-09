@@ -7372,7 +7372,7 @@ static void	dc_item_update_trigger_functional(ZBX_DC_ITEM *item, unsigned char h
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reset trigger functional state to funcational                     *
+ * Purpose: reset trigger functional state to functional                      *
  *                                                                            *
  * Parameters: item        - [IN] item whose triggers are updated             *
  *                                                                            *
