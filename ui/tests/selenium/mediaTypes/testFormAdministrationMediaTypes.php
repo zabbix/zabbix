@@ -1935,7 +1935,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$this->query('link', $name)->waitUntilClickable()->one()->click();
 					$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
-					// There will be two warning hints when refresh token is invalid and access token has "unexpected update time" .
+					// There will be two warning hints when refresh token is invalid and access token has "unexpected update time".
 					$warning = ($tokens_status === 0 || $tokens_status === 1)
 						? ($access_token_updated === '2147483647'
 							? "Refresh token is invalid or outdated.\nUnexpected access token update time."
