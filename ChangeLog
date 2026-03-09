@@ -88,6 +88,7 @@ A......... [ZBX-27060] fixed scope of information available via user.get (jfreib
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
