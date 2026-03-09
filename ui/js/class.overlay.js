@@ -317,23 +317,60 @@ Overlay.prototype._cancelFixPositionOnAnimationFrame = function() {
 	}
 };
 
+
+Overlay.prototype.FOCUSABLE_SELECTORS = ['button:not([disabled])', 'input:not([type="hidden"]):not([disabled])',
+	'select:not([disabled])', 'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"]):not([disabled])'
+];
+
 /**
- * Determines element to place focus on and focuses it if found.
+ * Find the primary focusable element of the dialogue.
+ *
+ * @returns {Element|null}
  */
-Overlay.prototype.recoverFocus = function() {
-	if (this.$btn_focus) {
-		this.$btn_focus[0].focus({preventScroll: true});
-		return;
+Overlay.prototype.getFocusableElement = function() {
+	if (this.$btn_focus !== null && !this.$btn_focus[0].disabled) {
+		return this.$btn_focus[0];
 	}
 
-	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue)[0]?.focus({preventScroll: true});
+	const autofocus_element = this.$dialogue[0].querySelector('[autofocus]');
+
+	if (autofocus_element !== null && !autofocus_element.disabled && isVisible(autofocus_element)) {
+		return autofocus_element;
 	}
-	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0]?.focus({preventScroll: true});
+
+	const focusable_selector = Overlay.prototype.FOCUSABLE_SELECTORS.join(', ');
+
+	const parents = [this.$dialogue.$body, this.$dialogue.$footer, this.$dialogue.$head,
+		this.$dialogue.$controls
+	];
+
+	for (const $parent of parents) {
+		if ($parent.length === 0 || !isVisible($parent[0])) {
+			continue;
+		}
+
+		for (const element of $parent[0].querySelectorAll(focusable_selector)) {
+			if (isVisible(element)) {
+				return element;
+			}
+		}
 	}
-	else {
-		jQuery(':focusable:first', this.$dialogue)[0]?.focus({preventScroll: true});
+
+	return null;
+};
+
+/**
+ * Focus and select the primary focusable element of the dialogue.
+ */
+Overlay.prototype.recoverFocus = function() {
+	const element = this.getFocusableElement();
+
+	if (element !== null) {
+		element.focus({preventScroll: true});
+
+		if (element instanceof HTMLInputElement && ['text', 'password'].includes(element.type)) {
+			element.select();
+		}
 	}
 };
 
