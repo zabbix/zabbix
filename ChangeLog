@@ -26,7 +26,7 @@ A......... [ZBX-27448] fixed inability to delete host, user or template groups w
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ........S. [ZBX-27407] fixed Zabbix HA manager process crashing on failed commits with Galera cluster (mkorotkov)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
-...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64) (Andris)
 
 --------------------------------------------------------------------------------
 Changes for 8.0.0alpha2
@@ -237,7 +237,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ........S. [ZBX-27407] fixed Zabbix HA manager process crashing on failed commits with Galera cluster (mkorotkov)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
-...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64) (Andris)
 ..F....... [ZBX-27419] fixed dialogue not resizing properly when hiding/expanding error message details (gklavins)
 ..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype (gberzina, vmurzins)
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
@@ -1537,7 +1537,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27348] fixed showing some selected value by default for Map navigation tree widget if listener does not exist (wczerneha)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
-...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64) (Andris)
 .......PS. [ZBX-27279] fixed "daylight saving time" error for scheduled reports (MVekslers)
 ...G...PS. [ZBX-26383] fixed inability to return "not supported" via user parameters (dgoloscapov, mkorotkov)
 .......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
