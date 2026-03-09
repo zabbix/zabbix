@@ -180,14 +180,14 @@ function rowsToDivs(array $rows): array {
 			}
 
 			$padding = array_key_exists('sequence_start', $row)
-				? str_repeat(' ', $row['depth'] * 2 - 3) . '- '
+				? str_repeat(' ', $row['depth'] * 2 - 3).'- '
 				: str_repeat(' ', $row['depth'] * 2 - 1);
 
-			$text = $first_characters[$row['change_type']] . $padding . $line . "\n";
+			$text = $first_characters[$row['change_type']].$padding.$line."\n";
 			$div = (new CDiv($text));
 
 			if (array_key_exists('id', $row) && $index === 0) {
-				$div->setAttribute('id', 'importcompare_toc_' . $row['id']);
+				$div->setAttribute('id', 'importcompare_toc_'.$row['id']);
 			}
 
 			if (array_key_exists($row['change_type'], $classes)) {
