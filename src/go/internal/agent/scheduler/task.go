@@ -174,6 +174,7 @@ func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.Con
 
 	var ret any
 	var err error
+
 	tc := make(chan bool, 1)
 
 	go func() {
