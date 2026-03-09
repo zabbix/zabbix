@@ -3,6 +3,7 @@ Changes for 7.4.8rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-27563] improved trigger related post-processing after configuration cache sync (wiper)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.8rc1
@@ -1309,6 +1310,8 @@ Changes for 7.0.24rc2
 New features:
 
 Bug fixes:
+........S. [ZBX-27563] improved trigger related post-processing after configuration cache sync (wiper)
+..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.24rc1
