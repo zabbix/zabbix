@@ -74,7 +74,7 @@ class CToken extends CApiService {
 		$sql_parts = [
 			'select' => [],
 			'from'   => $this->tableName().' '.$this->tableAlias(),
-			'where'  => [dbConditionInt($this->tableAlias().'.auth_type', [ZBX_API_HEADER_AUTHENTICATE_BEARER])], // skipped DPoP tokens
+			'where'  => [],
 			'group'  => [],
 			'order'  => []
 		];
@@ -157,6 +157,14 @@ class CToken extends CApiService {
 		}
 
 		return $this->unsetExtraFields($db_tokens, ['tokenid'], $options['output']);
+	}
+
+	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
+
+		$sql_parts['where'][] = dbConditionInt($table_alias.'.auth_type', [ZBX_API_HEADER_AUTHENTICATE_BEARER]);
+
+		return $sql_parts;
 	}
 
 	/**
