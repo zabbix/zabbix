@@ -60,6 +60,20 @@ window.update_problem_popup = new class {
 	}
 
 	#update() {
+		const unacknowledge_checkbox = this.form_element
+			.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
+
+		if (unacknowledge_checkbox) {
+			unacknowledge_checkbox.disabled = this.form_element.querySelector('[name="acknowledge_problem"]').checked;
+		}
+
+		const acknowledge_checkbox = this.form_element
+			.querySelector('.js-operation-checkbox[name="acknowledge_problem"]');
+
+		if (acknowledge_checkbox) {
+			acknowledge_checkbox.disabled = this.form_element.querySelector('[name="unacknowledge_problem"]').checked
+		}
+
 		const suppress_checked = document.getElementById('suppress_problem').checked;
 		const unsuppress_checked = document.getElementById('unsuppress_problem').checked;
 		const close_problem_checked = document.getElementById('close_problem').checked;
