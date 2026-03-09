@@ -25,7 +25,7 @@ zabbix_export:
         - name: event_value
           value: '{EVENT.VALUE}'
         - name: teams_endpoint
-          value: '<PLACE WEBHOOK URL HERE>'
+          value: '{ALERT.SENDTO}'
         - name: trigger_id
           value: '{TRIGGER.ID}'
         - name: zabbix_url
@@ -543,7 +543,7 @@ zabbix_export:
         To set up a webhook, please follow these steps:
         
         - Create a workflow in MS Teams. You can use the "Post a message in a channel when a webhook request is received" template for it.
-        - Copy the endpoint URL and place it in the teams_endpoint parameter.
+        - Copy the endpoint URL and place it in the teams_endpoint parameter or place it in the "Send to" field while adding media type to user.
         - Set up the global macro {$ZABBIX.URL}, which will contain the URL to the Zabbix frontend.
         - Create a Zabbix user and add the MS Teams Workflow media to it.
         

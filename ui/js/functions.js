@@ -491,12 +491,12 @@ function overlayDialogueDestroy(dialogueid, close_by = Overlay.prototype.CLOSE_B
 function overlayDialogue(properties, options = {}) {
 	const overlay = overlays_stack.getById(options.dialogueid) || new Overlay({...options, type: 'popup'});
 
+	addToOverlaysStack(overlay);
+
 	overlay.setProperties(properties);
 	overlay.mount();
 	overlay.recoverFocus();
 	overlay.containFocus();
-
-	addToOverlaysStack(overlay);
 
 	return overlay;
 }
@@ -957,6 +957,17 @@ function objectToFormData(object) {
 }
 
 /**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.
@@ -980,4 +991,3 @@ function convertRGBToHSL(r, g, b) {
 function isColorHex(value) {
 	return /^#([0-9A-F]{6})$/i.test(value);
 }
-

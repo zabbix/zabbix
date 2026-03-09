@@ -494,7 +494,7 @@ class testScripts extends CAPITest {
 		}
 		catch (Exception $e) {
 			CDataHelper::call('host.delete', self::$data['hostids']);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -553,8 +553,8 @@ class testScripts extends CAPITest {
 		}
 		catch (Exception $e) {
 			CDataHelper::call('host.delete', self::$data['hostids']);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -579,8 +579,8 @@ class testScripts extends CAPITest {
 		catch (Exception $e) {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -605,8 +605,8 @@ class testScripts extends CAPITest {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -696,8 +696,8 @@ class testScripts extends CAPITest {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -727,8 +727,8 @@ class testScripts extends CAPITest {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -775,8 +775,8 @@ class testScripts extends CAPITest {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -1314,8 +1314,8 @@ class testScripts extends CAPITest {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -1382,8 +1382,8 @@ class testScripts extends CAPITest {
 			CDataHelper::call('host.delete', self::$data['hostids']);
 			DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 			DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-			DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-			DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+			DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+			DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 			CDataHelper::call('hostgroup.delete', self::$data['groupids']);
 
 			$this->assertTrue(false, $e->getMessage());
@@ -12772,8 +12772,8 @@ class testScripts extends CAPITest {
 		 */
 		DB::delete('event_symptom', ['eventid' => array_values(self::$data['eventids'])]);
 		DB::delete('events', ['eventid' => array_values(self::$data['eventids'])]);
-		DB::delete('housekeeper', ['field' => 'triggerid', 'value' => array_values(self::$data['triggerids'])]);
-		DB::delete('housekeeper', ['field' => 'itemid', 'value' => array_values(self::$data['itemids'])]);
+		DB::delete('housekeeper', ['object' => 1, 'objectid' => array_values(self::$data['triggerids'])]);
+		DB::delete('housekeeper', ['object' => 0, 'objectid' => array_values(self::$data['itemids'])]);
 
 		// Delete hosts groups.
 		CDataHelper::call('hostgroup.delete', self::$data['groupids']);
