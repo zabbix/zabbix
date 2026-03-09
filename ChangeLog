@@ -204,6 +204,7 @@ A.F....... [ZBXNEXT-9816] added ability to convert to JSON for discovery rule wi
 Bug fixes:
 ..F....... [ZBX-26665] fixed widget configuration form layout on narrow screens (averza)
 .......PS. [ZBX-25752] reduced memory allocations in preprocessing manager (wiper)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.8rc2
@@ -560,6 +561,7 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.1
@@ -1831,6 +1833,7 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.17
@@ -5577,6 +5580,7 @@ A......... [ZBX-27060] fixed scope of information available via user.get (jfreib
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
