@@ -872,7 +872,7 @@ function showHideVisible(obj) {
 }
 
 /**
- * Check if element is visible.
+ * Check if an element is visible.
  *
  * @param {Element} element
  *
