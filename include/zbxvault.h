@@ -44,7 +44,7 @@ int	zbx_vault_db_credentials_get(zbx_config_vault_t *config_vault, char **dbuser
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **error);
 
-int	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *config_source_ip,
+void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **token);
 
