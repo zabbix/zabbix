@@ -9523,7 +9523,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 {
 	const ZBX_DC_LOGITEM		*logitem;
 	const ZBX_DC_SNMPINTERFACE	*snmp;
-	const ZBX_DC_TRAPITEM		*trapitem;
 	const ZBX_DC_INTERFACE		*dc_interface;
 	int				i;
 
@@ -9618,16 +9617,6 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->snmpv3_privpassphrase = NULL;
 			dst_item->snmpv3_contextname = NULL;
 			break;
-		case ITEM_TYPE_TRAPPER:
-			if (NULL != (trapitem = src_item->itemtype.trapitem))
-			{
-				zbx_strscpy(dst_item->trapper_hosts, trapitem->trapper_hosts);
-			}
-			else
-			{
-				*dst_item->trapper_hosts = '\0';
-			}
-			break;
 		case ITEM_TYPE_IPMI:
 			zbx_strscpy(dst_item->ipmi_sensor, src_item->itemtype.ipmiitem->ipmi_sensor);
 			break;
@@ -9654,27 +9643,18 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_HTTPAGENT:
-			zbx_strscpy(dst_item->url_orig, src_item->itemtype.httpitem->url);
-			zbx_strscpy(dst_item->query_fields_orig, src_item->itemtype.httpitem->query_fields);
-			zbx_strscpy(dst_item->status_codes_orig, src_item->itemtype.httpitem->status_codes);
 			dst_item->follow_redirects = src_item->itemtype.httpitem->follow_redirects;
 			dst_item->post_type = src_item->itemtype.httpitem->post_type;
-			zbx_strscpy(dst_item->http_proxy_orig, src_item->itemtype.httpitem->http_proxy);
 			dst_item->headers = zbx_strdup(NULL, src_item->itemtype.httpitem->headers);
 			dst_item->retrieve_mode = src_item->itemtype.httpitem->retrieve_mode;
 			dst_item->request_method = src_item->itemtype.httpitem->request_method;
 			dst_item->output_format = src_item->itemtype.httpitem->output_format;
-			zbx_strscpy(dst_item->ssl_cert_file_orig, src_item->itemtype.httpitem->ssl_cert_file);
-			zbx_strscpy(dst_item->ssl_key_file_orig, src_item->itemtype.httpitem->ssl_key_file);
-			zbx_strscpy(dst_item->ssl_key_password_orig, src_item->itemtype.httpitem->ssl_key_password);
 			dst_item->verify_peer = src_item->itemtype.httpitem->verify_peer;
 			dst_item->verify_host = src_item->itemtype.httpitem->verify_host;
 			dst_item->authtype = src_item->itemtype.httpitem->authtype;
 			zbx_strscpy(dst_item->username_orig, src_item->itemtype.httpitem->username);
 			zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
 			dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
-			dst_item->allow_traps = src_item->itemtype.httpitem->allow_traps;
-			zbx_strscpy(dst_item->trapper_hosts, src_item->itemtype.httpitem->trapper_hosts);
 
 			dst_item->timeout = 0;
 			dst_item->url = NULL;
@@ -9759,6 +9739,159 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 		default:
 			/* nothing to do */;
 	}
+}
+
+static void	DCget_agent_item(zbx_dc_agent_item_t *dst_item, const ZBX_DC_ITEM *src_item)
+{
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+}
+
+static void	DCget_snmp_item(zbx_dc_snmp_item_t *dst_item, const ZBX_DC_ITEM *src_item, const ZBX_DC_HOST *src_host)
+{
+	const ZBX_DC_SNMPINTERFACE	*snmp;
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->hostid = src_host->hostid;
+	zbx_strscpy(dst_item->host_host, src_host->host);
+	zbx_strscpy(dst_item->host_name, src_host->name);
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+
+	snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp,
+			&src_item->interfaceid);
+
+	if (NULL != snmp)
+	{
+		zbx_strscpy(dst_item->snmp_community_orig, snmp->community);
+		zbx_strscpy(dst_item->snmp_oid_orig, src_item->itemtype.snmpitem->snmp_oid);
+		zbx_strscpy(dst_item->snmpv3_securityname_orig, snmp->securityname);
+		dst_item->snmpv3_securitylevel = snmp->securitylevel;
+		zbx_strscpy(dst_item->snmpv3_authpassphrase_orig, snmp->authpassphrase);
+		zbx_strscpy(dst_item->snmpv3_privpassphrase_orig, snmp->privpassphrase);
+		dst_item->snmpv3_authprotocol = snmp->authprotocol;
+		dst_item->snmpv3_privprotocol = snmp->privprotocol;
+		zbx_strscpy(dst_item->snmpv3_contextname_orig, snmp->contextname);
+		dst_item->snmp_version = snmp->version;
+		dst_item->snmp_max_repetitions = snmp->max_repetitions;
+	}
+	else
+	{
+		*dst_item->snmp_community_orig = '\0';
+		*dst_item->snmp_oid_orig = '\0';
+		*dst_item->snmpv3_securityname_orig = '\0';
+		dst_item->snmpv3_securitylevel = ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV;
+		*dst_item->snmpv3_authpassphrase_orig = '\0';
+		*dst_item->snmpv3_privpassphrase_orig = '\0';
+		dst_item->snmpv3_authprotocol = 0;
+		dst_item->snmpv3_privprotocol = 0;
+		*dst_item->snmpv3_contextname_orig = '\0';
+		dst_item->snmp_version = ZBX_IF_SNMP_VERSION_2;
+		dst_item->snmp_max_repetitions = 0;
+		dst_item->timeout = 0;
+	}
+
+	dst_item->snmp_community = NULL;
+	dst_item->snmp_oid = NULL;
+	dst_item->snmpv3_securityname = NULL;
+	dst_item->snmpv3_authpassphrase = NULL;
+	dst_item->snmpv3_privpassphrase = NULL;
+	dst_item->snmpv3_contextname = NULL;
+}
+
+static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC_ITEM *src_item,
+		const ZBX_DC_HOST *src_host)
+{
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->hostid = src_host->hostid;
+	zbx_strscpy(dst_item->host_host, src_host->host);
+	zbx_strscpy(dst_item->host_name, src_host->name);
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+
+	zbx_strscpy(dst_item->url_orig, src_item->itemtype.httpitem->url);
+	zbx_strscpy(dst_item->query_fields_orig, src_item->itemtype.httpitem->query_fields);
+	zbx_strscpy(dst_item->status_codes_orig, src_item->itemtype.httpitem->status_codes);
+	dst_item->follow_redirects = src_item->itemtype.httpitem->follow_redirects;
+	dst_item->post_type = src_item->itemtype.httpitem->post_type;
+	zbx_strscpy(dst_item->http_proxy_orig, src_item->itemtype.httpitem->http_proxy);
+	dst_item->headers = zbx_strdup(NULL, src_item->itemtype.httpitem->headers);
+	dst_item->retrieve_mode = src_item->itemtype.httpitem->retrieve_mode;
+	dst_item->request_method = src_item->itemtype.httpitem->request_method;
+	dst_item->output_format = src_item->itemtype.httpitem->output_format;
+	zbx_strscpy(dst_item->ssl_cert_file_orig, src_item->itemtype.httpitem->ssl_cert_file);
+	zbx_strscpy(dst_item->ssl_key_file_orig, src_item->itemtype.httpitem->ssl_key_file);
+	zbx_strscpy(dst_item->ssl_key_password_orig, src_item->itemtype.httpitem->ssl_key_password);
+	dst_item->verify_peer = src_item->itemtype.httpitem->verify_peer;
+	dst_item->verify_host = src_item->itemtype.httpitem->verify_host;
+	dst_item->authtype = src_item->itemtype.httpitem->authtype;
+	zbx_strscpy(dst_item->username_orig, src_item->itemtype.httpitem->username);
+	zbx_strscpy(dst_item->password_orig, src_item->itemtype.httpitem->password);
+	dst_item->posts = zbx_strdup(NULL, src_item->itemtype.httpitem->posts);
+
+	dst_item->timeout = 0;
+	dst_item->url = NULL;
+	dst_item->query_fields = NULL;
+	dst_item->status_codes = NULL;
+	dst_item->http_proxy = NULL;
+	dst_item->ssl_cert_file = NULL;
+	dst_item->ssl_key_file = NULL;
+	dst_item->ssl_key_password = NULL;
+	dst_item->username = NULL;
+	dst_item->password = NULL;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
@@ -11504,16 +11637,32 @@ static void	dc_requeue_item_at(ZBX_DC_ITEM *dc_item, ZBX_DC_HOST *dc_host, time_
  *                                                                            *
  ******************************************************************************/
 int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout, int processing,
-		int config_max_concurrent_checks, zbx_dc_item_t **items)
+		int config_max_concurrent_checks, zbx_dc_poller_item_t *items)
 {
 	int			now, num = 0, max_items, items_alloc = 0;
 	zbx_binary_heap_t	*queue;
+	size_t			item_size;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() poller_type:%d", __func__, (int)poller_type);
 
 	now = time(NULL);
 
 	queue = &config->queues[poller_type];
+
+	switch (poller_type)
+	{
+		case ZBX_POLLER_TYPE_AGENT:
+			item_size = sizeof(zbx_dc_agent_item_t);
+			break;
+		case ZBX_POLLER_TYPE_SNMP:
+			item_size = sizeof(zbx_dc_snmp_item_t);
+			break;
+		case ZBX_POLLER_TYPE_HTTPAGENT:
+			item_size = sizeof(zbx_dc_httpagent_item_t);
+			break;
+		default:
+			item_size = sizeof(zbx_dc_item_t);
+	}
 
 	switch (poller_type)
 	{
@@ -11530,7 +11679,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 				goto out;
 
 			items_alloc = max_items;
-			*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * items_alloc);
+			items->any = zbx_malloc(NULL, item_size * items_alloc);
 			break;
 		default:
 			max_items = 1;
@@ -11634,13 +11783,29 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			}
 
 			if (1 < max_items && 0 == items_alloc)
-				*items = zbx_malloc(NULL, sizeof(zbx_dc_item_t) * max_items);
+				items->dc_items = zbx_malloc(NULL, item_size * max_items);
 		}
 
 		dc_item_prev = dc_item;
 		dc_item->location = ZBX_LOC_POLLER;
-		DCget_host(&(*items)[num].host, dc_host);
-		DCget_item(&(*items)[num], dc_item);
+
+		switch (poller_type)
+		{
+			case ZBX_POLLER_TYPE_AGENT:
+				DCget_host(&items->agent_items[num].host, dc_host);
+				DCget_agent_item(&items->agent_items[num], dc_item);
+				break;
+			case ZBX_POLLER_TYPE_SNMP:
+				DCget_snmp_item(&items->snmp_items[num], dc_item, dc_host);
+				break;
+			case ZBX_POLLER_TYPE_HTTPAGENT:
+				DCget_httpagent_item(&items->httpagent_items[num], dc_item, dc_host);
+				break;
+			default:
+				DCget_host(&items->dc_items[num].host, dc_host);
+				DCget_item(&items->dc_items[num], dc_item);
+		}
+
 		num++;
 	}
 
