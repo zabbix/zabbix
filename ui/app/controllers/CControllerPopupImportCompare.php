@@ -463,7 +463,7 @@ class CControllerPopupImportCompare extends CController {
 
 			if ($sequence_id) {
 				$rows[] = [
-					'value' => $entity_type . ':',
+					'value' => $entity_type.':',
 					'depth' => $depth,
 					'change_type' => $change_types[$outer_change_type],
 					'id' => $sequence_id,
@@ -474,7 +474,7 @@ class CControllerPopupImportCompare extends CController {
 			}
 			else {
 				$rows[] = [
-					'value' => $entity_type . ':',
+					'value' => $entity_type.':',
 					'depth' => $depth,
 					'change_type' => $change_types[$outer_change_type]
 				];
