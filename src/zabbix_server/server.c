@@ -2255,6 +2255,16 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
+
+	if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault, &zbx_db_config->dbuser,
+			&zbx_db_config->dbpassword, zbx_config_source_ip, config_ssl_ca_location,
+			config_ssl_cert_location, config_ssl_key_location, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize database credentials from vault: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	/* re-initialize database before re-starting HA manager */
 	if (SUCCEED != zbx_db_init(&error))
 	{
@@ -2472,6 +2482,13 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	if (SUCCEED != zbx_vault_approle_from_env_get(&zbx_config_vault, &error))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault approle: %s", error);
+		zbx_free(error);
+		exit(EXIT_FAILURE);
+	}
+
 	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
@@ -2644,6 +2661,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_ipc_client_t	*client;
 		zbx_ipc_message_t	*message;
 		int			rtc_state;
+		char			*token;
 
 		rtc_state = zbx_ipc_service_recv(&rtc.service, &rtc_timeout, &client, &message);
 
@@ -2658,22 +2676,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		}
 		else
 		{
-			if (ZBX_RTC_VAULT_RELOGIN == message->code)
+			if (ZBX_RTC_VAULT_RELOGIN == message->code && NULL != zbx_config_vault.token &&
+					0 == strcmp(zbx_config_vault.token, (char *)message->data))
 			{
-				char *token = (char *)message->data;
-
-				if (SUCCEED == zbx_vault_relogin(&zbx_config_vault,zbx_config_source_ip,
-					config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-					&token, &error))
-				{
-					zbx_ipc_client_send(client, ZBX_RTC_VAULT_NEW_TOKEN, (unsigned char *)token,
-							strlen(token) + 1);
-				}
-				else if (NULL != error)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "vault relogin error: %s", error);
-					zbx_free(error);
-				}
+				zbx_free(zbx_config_vault.token);
 			}
 			else if (ZBX_NODE_STATUS_ACTIVE == ha_status || ZBX_RTC_LOG_LEVEL_DECREASE == message->code ||
 					ZBX_RTC_LOG_LEVEL_INCREASE == message->code)
@@ -2715,7 +2721,29 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			switch (ha_status)
 			{
 				case ZBX_NODE_STATUS_ACTIVE:
-					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay, &rtc, &exit_args))
+					if (NULL != zbx_config_vault.app_role_id)
+					{
+						zbx_free(zbx_config_vault.token);
+						zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip,
+								config_ssl_ca_location, config_ssl_cert_location,
+								config_ssl_key_location, &zbx_config_vault.token);
+
+					}
+
+					if (SUCCEED != zbx_vault_db_credentials_get(&zbx_config_vault,
+							&zbx_db_config->dbuser, &zbx_db_config->dbpassword,
+							zbx_config_source_ip, config_ssl_ca_location,
+							config_ssl_cert_location, config_ssl_key_location, &error))
+					{
+						zabbix_log(LOG_LEVEL_CRIT,
+							"cannot initialize database credentials from vault: %s", error);
+						zbx_set_exiting_with_fail();
+						ha_status = ZBX_NODE_STATUS_ERROR;
+						continue;
+					}
+
+					if (SUCCEED != server_startup(&listen_sock, &ha_status, &ha_failover_delay,
+							&rtc, &exit_args))
 					{
 						zbx_set_exiting_with_fail();
 						ha_status = ZBX_NODE_STATUS_ERROR;
@@ -2775,8 +2803,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			break;
 		}
 
+		token = zbx_config_vault.token;
+
 		zbx_vault_renew_token(&zbx_config_vault, zbx_config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location);
+				config_ssl_cert_location, config_ssl_key_location, &zbx_config_vault.token);
+
+		if (token != zbx_config_vault.token)
+		{
+			zbx_ipc_client_send(client, ZBX_RTC_VAULT_NEW_TOKEN,
+				(unsigned char *)zbx_config_vault.token, strlen(zbx_config_vault.token) + 1);
+		}
 
 		__zbx_update_env(zbx_time());
 	}

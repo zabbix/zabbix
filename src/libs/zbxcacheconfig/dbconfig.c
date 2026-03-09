@@ -1881,7 +1881,7 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **relog_token)
+		const char *config_ssl_key_location, int *vault_ret)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1913,7 +1913,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		}
 		else if (FAIL == zbx_vault_get_kvs(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
 				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
-				relog_token, &error))
+				vault_ret, &error))
 		{
 			if (NULL == dc_kvs_path->last_error || 0 != strcmp(dc_kvs_path->last_error, error))
 			{
@@ -1992,10 +1992,13 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		zbx_kvs_clear(&kvs);
 	}
 
+//out:
 	zbx_vector_ptr_pair_destroy(&diff);
 	zbx_kvs_destroy(&kvs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+//	return ret;
 }
 
 #define EXPAND_INTERFACE_MACROS		1

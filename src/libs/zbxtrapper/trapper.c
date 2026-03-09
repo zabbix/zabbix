@@ -1517,7 +1517,10 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
 			{
 				if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
-					zbx_vault_update_token((char *)rtc_data);
+				{
+					zbx_free(trapper_args_in->config_vault->token);
+					trapper_args_in->config_vault->token = (char *)rtc_data;
+				}
 				else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				{
 					zbx_tcp_unaccept(&s);

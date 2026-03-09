@@ -258,7 +258,7 @@ out:
  ******************************************************************************/
 static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vault_t *config_vault,
 		int config_trapper_timeout, const char *config_source_ip, const char *config_ssl_ca_location,
-		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **relog_token)
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, int *vault_ret)
 {
 	char				*error = NULL, *buffer = NULL;
 	int				ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, loglevel;
@@ -267,7 +267,6 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	struct zbx_json_parse		jp;
 	size_t				buffer_size, reserved = 0;
 	zbx_proxyconfig_status_t	status = ZBX_PROXYCONFIG_STATUS_DATA;
-
 
 	zbx_json_init(&j, 512 * ZBX_KIBIBYTE);
 	zbx_json_addstring(&j, ZBX_PROTO_TAG_REQUEST, ZBX_PROTO_VALUE_PROXY_CONFIG, ZBX_JSON_TYPE_STRING);
@@ -295,7 +294,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	zbx_json_clean(&j);
 
 	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, relog_token,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, vault_ret,
 			&error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
@@ -556,7 +555,7 @@ out:
 static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency,
-		int proxydata_frequency, char **relog_token)
+		int proxydata_frequency, int *vault_ret)
 {
 	zbx_dc_proxy_t		proxy, proxy_old;
 	int			num, i;
@@ -612,7 +611,7 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 			{
 				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault,
 						config_trapper_timeout, config_source_ip, config_ssl_ca_location,
-						config_ssl_cert_location, config_ssl_key_location, relog_token)))
+						config_ssl_cert_location, config_ssl_key_location, vault_ret)))
 				{
 					goto error;
 				}
@@ -722,7 +721,7 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		char		*relog_token = NULL;
+		int		vault_ret = SUCCEED;
 
 		sec = zbx_time();
 		zbx_update_env(get_process_type_string(process_type), sec);
@@ -740,12 +739,13 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 				proxy_poller_args_in->config_ssl_cert_location,
 				proxy_poller_args_in->config_ssl_key_location,
 				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
-				proxy_poller_args_in->proxydata_frequency, &relog_token);
+				proxy_poller_args_in->proxydata_frequency, &vault_ret);
 
-		if (NULL != relog_token)
+		if (SUCCEED != vault_ret)
 		{
 			zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-				(unsigned char*)relog_token, strlen(relog_token) + 1);
+					(unsigned char*)proxy_poller_args_in->config_vault->token,
+					strlen(proxy_poller_args_in->config_vault->token) + 1);
 		}
 
 		total_sec += zbx_time() - sec;
@@ -777,7 +777,10 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 		if (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
-				zbx_vault_update_token((char*)rtc_data);
+			{
+				zbx_free(proxy_poller_args_in->config_vault->token);
+				proxy_poller_args_in->config_vault->token = (char *)rtc_data;
+			}
 			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
 				break;
 		}

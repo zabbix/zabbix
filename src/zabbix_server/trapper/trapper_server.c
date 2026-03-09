@@ -264,7 +264,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
-		char	*relog_token = NULL;
+		int	vault_ret = SUCCEED;
 
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
@@ -272,12 +272,12 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
 				config_comms->config_trapper_timeout, config_comms->config_source_ip,
 				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
-				config_comms->config_ssl_key_location, &relog_token);
+				config_comms->config_ssl_key_location, &vault_ret);
 
-		if (NULL != relog_token)
+		if (SUCCEED != vault_ret)
 		{
 			zbx_ipc_async_socket_send(rtc, ZBX_RTC_VAULT_RELOGIN,
-					(unsigned char*)relog_token, strlen(relog_token) + 1);
+					(unsigned char*)config_vault->token, strlen(config_vault->token) + 1);
 		}
 
 		return SUCCEED;

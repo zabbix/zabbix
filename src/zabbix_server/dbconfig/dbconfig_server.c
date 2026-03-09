@@ -84,15 +84,16 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
-		char		*relog_token = NULL;
-
+		int		vault_ret = SUCCEED;
 		sleeptime = nextcheck - (int)time(NULL);
 
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
 			if (ZBX_RTC_VAULT_NEW_TOKEN == rtc_cmd)
-				zbx_vault_update_token((char*)rtc_data);
-
+			{
+				zbx_free(dbconfig_args_in->config_vault->token);
+				dbconfig_args_in->config_vault->token = (char*)rtc_data;
+			}
 			else if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
 			{
 				if (0 == cache_reload)
@@ -145,13 +146,12 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location, &relog_token);
+					dbconfig_args_in->config_ssl_key_location, &vault_ret);
 
-			if (NULL != relog_token)
-			{
+			if (SUCCEED != vault_ret)
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-					(unsigned char*)relog_token, strlen(relog_token) + 1);
-			}
+						(unsigned char*)dbconfig_args_in->config_vault->token,
+						strlen(dbconfig_args_in->config_vault->token) + 1);
 
 			zbx_dc_config_get_hostids_by_revision(revision, &hostids);
 			zbx_dbconfig_worker_send_ids(&hostids);
@@ -175,13 +175,13 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 					dbconfig_args_in->config_ssl_ca_location,
 					dbconfig_args_in->config_ssl_cert_location,
-					dbconfig_args_in->config_ssl_key_location, &relog_token);
+					dbconfig_args_in->config_ssl_key_location, &vault_ret);
 
-			if (NULL != relog_token)
-			{
+			if (SUCCEED != vault_ret)
 				zbx_ipc_async_socket_send(&rtc, ZBX_RTC_VAULT_RELOGIN,
-					(unsigned char*)relog_token, strlen(relog_token) + 1);
-			}
+					(unsigned char*)dbconfig_args_in->config_vault->token,
+					strlen(dbconfig_args_in->config_vault->token) + 1);
+
 			secrets_reload = 0;
 			zabbix_log(LOG_LEVEL_WARNING, "finished forced reloading of the secrets");
 		}
