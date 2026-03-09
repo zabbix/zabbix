@@ -423,12 +423,6 @@ int	zbx_is_item_processed_by_server(unsigned char type, const char *key)
 				arg1 = get_rparam(&request, 0);
 				arg2 = get_rparam(&request, 1);
 
-				if (0 == strcmp(arg1, "vps"))
-				{
-					ret = SUCCEED;
-					goto clean;
-				}
-
 				if (2 == request.nparam)
 				{
 					if ((0 == strcmp(arg1, "proxy") && 0 == strcmp(arg2, "discovery")) ||
