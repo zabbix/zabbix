@@ -17,14 +17,15 @@ package redis
 import (
 	"golang.zabbix.com/sdk/conf"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 	"golang.zabbix.com/sdk/plugin"
 )
 
 var _ plugin.Configurator = (*Plugin)(nil)
 
 type pluginOptions struct {
-	// Timeout is the maximum time for waiting when a request has to be done. Default value equals the global timeout.
-	Timeout int `conf:"optional,range=1:30"`
+	// Deprecated old timeout value kept for compatibility.
+	LegacyTimeout int `conf:"name=Timeout,optional,range=1:30"`
 
 	// KeepAlive is a time to wait before unused connections will be closed.
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
@@ -44,8 +45,20 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 		p.Errf("cannot unmarshal configuration options: %s", err)
 	}
 
-	if p.options.Timeout == 0 {
-		p.options.Timeout = global.Timeout
+	if p.options.LegacyTimeout != 0 {
+		log.Debugf("[%s] Config value 'Plugins.Redis.Timeout' is deprecated. Use 'Plugins.Redis.Default.ConnectionTimeout' instead.", pluginName)
+
+		if p.options.Default.ConnectionTimeout == 0 {
+			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout
+		}
+	}
+
+	if p.options.Default.ConnectionTimeout == 0 {
+		p.options.Default.ConnectionTimeout = global.Timeout
+	}
+
+	if p.options.LegacyTimeout == 0 {
+		p.options.LegacyTimeout = global.Timeout
 	}
 }
 

@@ -31,6 +31,8 @@ type session struct {
 	TLSCAFile   string `conf:"name=TLSCAFile,optional"`
 	TLSCertFile string `conf:"name=TLSCertFile,optional"`
 	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
+
+	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
 }
 
 func (s *session) getFieldValues() map[comms.ConfigSetting]string {
