@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,43 +17,44 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package docker
+package handlers
 
 import (
 	"encoding/json"
+	"net/http"
 
+	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/zbxerr"
 )
 
-type containerDiscovery struct {
-	ID   string `json:"{#ID}"`
-	Name string `json:"{#NAME}"`
-}
-
+//nolint:tagliatelle // our non-standard naming conventions.
 type imageDiscovery struct {
 	ID   string `json:"{#ID}"`
 	Name string `json:"{#NAME}"`
 }
 
-func (p *Plugin) getContainersDiscovery(data []Container) (result []byte, err error) {
-	containers := make([]containerDiscovery, 0)
+func keyImagesDiscoveryHandler(client *http.Client, query string, _ ...string) (string, error) {
+	var data []image
 
-	for _, container := range data {
-		if len(container.Names) == 0 {
-			continue
-		}
-
-		containers = append(containers, containerDiscovery{ID: container.ID, Name: container.Names[0]})
+	body, err := queryDockerAPI(client, query)
+	if err != nil {
+		return "", err
 	}
 
-	if result, err = json.Marshal(&containers); err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	err = json.Unmarshal(body, &data)
+	if err != nil {
+		return "", errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
-	return
+	result, err := getImagesDiscovery(data)
+	if err != nil {
+		return "", err
+	}
+
+	return string(result), nil
 }
 
-func (p *Plugin) getImagesDiscovery(data []Image) (result []byte, err error) {
+func getImagesDiscovery(data []image) ([]byte, error) {
 	images := make([]imageDiscovery, 0)
 
 	for _, image := range data {
@@ -64,9 +65,10 @@ func (p *Plugin) getImagesDiscovery(data []Image) (result []byte, err error) {
 		images = append(images, imageDiscovery{ID: image.ID, Name: image.RepoTags[0]})
 	}
 
-	if result, err = json.Marshal(&images); err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+	result, err := json.Marshal(&images)
+	if err != nil {
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
-	return
+	return result, nil
 }

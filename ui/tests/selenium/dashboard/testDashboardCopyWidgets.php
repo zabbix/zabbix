@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class testDashboardCopyWidgets extends CWebTest {
 
 	// Constants for regular dashboard cases.
 	const NEW_PAGE_NAME = 'Test_page';
-	const PASTE_DASHBOARD_NAME = 'Dashboard for Paste widgets';
+	const PASTE_DASHBOARD_NAME = 'Widget pasting dashboard';
 
 	// Constants for templated dashboard cases.
 	const TEMPLATED_DASHBOARD_NAME = 'Templated dashboard with all widgets';
@@ -55,7 +55,7 @@ class testDashboardCopyWidgets extends CWebTest {
 	}
 
 	/*
-	 *  Get all widgets from dashboards with name starting with "Dashboard for Copying widgets".
+	 *  Get all widgets from dashboards with name starting with "Widget copy dashboard".
 	 */
 	public static function getDashboardsData() {
 		static $data = null;
@@ -70,7 +70,7 @@ class testDashboardCopyWidgets extends CWebTest {
 					' JOIN dashboard_page dp ON w.dashboard_pageid=dp.dashboard_pageid'.
 					' WHERE dp.dashboardid IN ('.
 						'SELECT dashboardid FROM dashboard '.
-						'WHERE name LIKE \'%Dashboard for Copying widgets%\''.
+						'WHERE name LIKE \'%Widget copy dashboard%\''.
 					') ORDER BY w.widgetid DESC'
 			);
 		}
@@ -160,7 +160,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		else {
 			$dashboardid = $start_dashboardid;
 			$new_dashboardid = CDBHelper::getValue('SELECT dashboardid FROM dashboard WHERE name ='.
-					zbx_dbstr('Dashboard for Paste widgets')
+					zbx_dbstr('Widget pasting dashboard')
 			);
 			$new_page_name = self::NEW_PAGE_NAME;
 			$new_pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid ='.
@@ -235,7 +235,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		}
 
 		/* At the moment this is the only option how to wait for the loading spinner to disappear after pasting the widget,
-		 * since the widget header and the conent block without the loading appear first,
+		 * since the widget header and the content block without the loading appear first,
 		 * and only after that the loading appears.
 		 * TODO: after ZBX-26280 remove sleep and change to ->asWidget()->waitUntilReady()->one();
 		 */
@@ -251,6 +251,9 @@ class testDashboardCopyWidgets extends CWebTest {
 			$copied_widget_form = $copied_widget->edit();
 			$copied_widget_form->fill(['Filter' => 'Test copy Map navigation tree']);
 			$copied_widget_form->submit();
+			COverlayDialogElement::ensureNotPresent();
+
+			$copied_widget = $dashboard->waitUntilReady()->getWidget($widget_name);
 		}
 
 		$this->assertEquals($widget_name, $copied_widget->getHeaderText());
@@ -265,8 +268,7 @@ class testDashboardCopyWidgets extends CWebTest {
 		$this->assertEquals($original_form, $copied_form);
 
 		// Close overlay and save dashboard to get new widget size from DB.
-		$copied_overlay = COverlayDialogElement::find()->one();
-		$copied_overlay->close();
+		COverlayDialogElement::find()->one()->close();
 
 		if ($templated) {
 			$this->query('button:Save changes')->one()->click();

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 	protected static $update_widget = 'Update Plain text Widget';
 	const DEFAULT_WIDGET = 'Default Plain text Widget';
 	const DELETE_WIDGET = 'Widget for delete';
-	const DATA_WIDET = 'Widget for data check';
+	const DATA_WIDGET = 'Widget for data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -171,7 +171,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						'widgets' => [
 							[
 								'type' => 'plaintext',
-								'name' => self::DATA_WIDET,
+								'name' => self::DATA_WIDGET,
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -833,7 +833,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 
 	public static function getTableData() {
 		return [
-			// Simple test case with one item and one data entry.
+			// #0 Simple test case with one item and one data entry.
 			[
 				[
 					'initial_data' => [
@@ -848,7 +848,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Simple test case with one item and several data entries.
+			// #1 Simple test case with one item and several data entries.
 			[
 				[
 					'initial_data' => [
@@ -875,7 +875,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case with two items and several data entries.
+			// #2 Test case with two items and several data entries.
 			[
 				[
 					'initial_data' => [
@@ -914,7 +914,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case with limited lines to show.
+			// #3 Test case with limited lines to show.
 			[
 				[
 					'fields' => [
@@ -945,7 +945,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case for 'Items location' and 'Show text as HTML' options check.
+			// #4 Test case for 'Items location' and 'Show text as HTML' options check.
 			[
 				[
 					'fields' => [
@@ -985,7 +985,7 @@ class testDashboardPlainTextWidget extends CWebTest {
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-16 hours')),
-							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'TEST'
+							'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running' => 'test'
 						],
 						[
 							'Timestamp' =>  date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -1001,7 +1001,58 @@ class testDashboardPlainTextWidget extends CWebTest {
 					]
 				]
 			],
-			// Test case for 'Dynamic items' check.
+			// #5 Test case for 'Show text as HTML' screenshot check with Left (default) layout.
+			// Left layout has fixed columns (Timestamp/Name/Value), so the screenshot is stable
+			// across databases unlike Top layout where item column order is non-deterministic.
+			[
+				[
+					'fields' => [
+						'Show text as HTML' => true
+					],
+					'initial_data' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<b>Bold text</b>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<a href="#">Link text</a>'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-3 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => '<span style="color:red;">Red text</span>'
+						]
+					],
+					'result' => [
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-1 hour')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => 'Bold text'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-2 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => 'Link text'
+						],
+						[
+							'Timestamp' => date('Y-m-d H:i:s', strtotime('-3 hours')),
+							'Name' => 'ЗАББИКС Сервер: Linux: Host name of Zabbix agent running',
+							'Value' => 'Red text'
+						]
+					],
+					'item_data' => [
+						['itemid' => '42227', 'values' => '<b>Bold text</b>', 'time' => strtotime('-1 hour')],
+						['itemid' => '42227', 'values' => '<a href="#">Link text</a>', 'time' => strtotime('-2 hours')],
+						['itemid' => '42227', 'values' => '<span style="color:red;">Red text</span>',
+								'time' => strtotime('-3 hours')]
+					],
+					'screenshot' => true
+				]
+			],
+			// #6 Test case for 'Dynamic items' check.
 			[
 				[
 					'host_select' => [
@@ -1059,11 +1110,57 @@ class testDashboardPlainTextWidget extends CWebTest {
 	}
 
 	/**
+	 * Get widget table data, including handling of HTML content in iframes.
+	 *
+	 * @param CWidgetElement $widget    widget element
+	 *
+	 * @return array
+	 */
+	protected function getWidgetTableData($widget) {
+		$widget->waitUntilReady();
+
+		// Return empty array if no data is present in the widget.
+		if ($widget->query('class:nothing-to-show')->one(false)->isVisible()) {
+			return [];
+		}
+
+		$table = $widget->getContent()->asTable()->waitUntilPresent();
+
+		$headers = $table->getHeadersText();
+		$data = [];
+
+		foreach ($table->getRows() as $row) {
+			$raw_row = [];
+
+			foreach ($headers as $i => $name) {
+				$column = $row->getColumn($i);
+				$iframe = $column->query('class:js-iframe')->one(false);
+
+				if ($iframe->isValid()) {
+					/**
+					 * The content is stored as encoded HTML inside the iframe's 'srcdoc' attribute.
+					 * 1. getAttribute: Retrieves the raw encoded string.
+					 * 2. htmlspecialchars_decode: Converts entities (like &lt;) back to tags (<).
+					 * 3. strip_tags: Removes the tags to leave only the visible plain text.
+					 */
+					$raw_row[$name] = strip_tags(htmlspecialchars_decode($iframe->getAttribute('srcdoc')));
+				}
+				else {
+					$raw_row[$name] = $column->getText();
+				}
+			}
+			// Clear empty array elements.
+			$data[] = array_filter($raw_row);
+		}
+		return $data;
+	}
+
+	/**
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
 	 */
-	public function  testDashboardPlainTextWidget_TableData($data) {
+	public function testDashboardPlainTextWidget_TableData($data) {
 		foreach ($data['item_data'] as $params) {
 			CDataHelper::addItemData($params['itemid'], $params['values'], $params['time']);
 		}
@@ -1071,16 +1168,30 @@ class testDashboardPlainTextWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
-		$this->assertTableData($data['initial_data']);
+
+		$widget = $dashboard->getWidget(self::DATA_WIDGET);
+		$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 
 		$default_values = [
 			'Show lines' => '25',
 			'Show text as HTML' => false,
 			'Items location' => 'Left'
 		];
+
 		if (array_key_exists('fields', $data)) {
 			$this->widgetConfigurationChange($data['fields'], $dashboard);
-			$this->assertTableData($data['result']);
+			$this->assertEquals(CTestArrayHelper::get($data, 'result', $data['initial_data']),
+					$this->getWidgetTableData($widget)
+			);
+
+			if (CTestArrayHelper::get($data, 'screenshot')) {
+				// Remove timestamp due to unstable screenshot which depends on column width.
+				CElementQuery::getDriver()->executeScript("arguments[0].forEach(el => el.textContent = '');",
+						[$widget->query('xpath:.//tbody/tr/*[1]')->all()->asArray()]
+				);
+				$this->assertScreenshot($widget, 'HTML encode check');
+			}
+
 			$this->widgetConfigurationChange($default_values, $dashboard);
 		}
 
@@ -1088,16 +1199,20 @@ class testDashboardPlainTextWidget extends CWebTest {
 			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 			$multiselect_field->fill($data['host_select']['without_data']);
 			$dashboard->waitUntilReady();
-			$this->assertTableData();
+			$this->assertEquals([], $this->getWidgetTableData($widget));
+
+			// Check "No data found." widget text.
+			$this->assertEquals('No data found.', $widget->getContent()->query('class:nothing-to-show')->one()->getText());
+
 			$multiselect_field->fill($data['host_select']['with_data']);
 			$dashboard->waitUntilReady();
-			$this->assertTableData($data['result']);
+			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
 			$multiselect_field->clear();
 			$dashboard->waitUntilReady();
 		}
 
 		if (array_key_exists('result', $data)) {
-			$this->assertTableData($data['initial_data']);
+			$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 		}
 	}
 
@@ -1108,9 +1223,10 @@ class testDashboardPlainTextWidget extends CWebTest {
 	 * @param array 				$configuration    	widget parameter(s)
 	 */
 	protected function widgetConfigurationChange($configuration, $dashboard) {
-		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
+		$form = $dashboard->getWidget(self::DATA_WIDGET)->edit();
 		$form->fill($configuration);
-		$form->submit();
+		$form->submit()->waitUntilNotVisible();
+		$dashboard->getWidget(self::DATA_WIDGET);
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 	}

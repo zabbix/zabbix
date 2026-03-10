@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,6 +59,10 @@ class testPageUsers extends CLegacyWebTest {
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][contains(text(),'Displaying')]");
 		$this->zbxTestAssertElementText("//span[@id='selected_count']", '0 selected');
+
+		// Reset filter.
+		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
+		$this->page->waitUntilReady();
 	}
 
 	/**
@@ -77,12 +81,10 @@ class testPageUsers extends CLegacyWebTest {
 		$sqlHashMedia = 'select * from media where userid='.$userid.' order by mediaid';
 		$oldHashMedia = CDBHelper::getHash($sqlHashMedia);
 
-		$this->zbxTestLogin('zabbix.php?action=user.list');
+		$this->page->login()->open('zabbix.php?action=user.list')->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of users');
-		$this->zbxTestDropdownSelectWait('filter_usrgrpid', 'All');
-		$this->zbxTestTextPresent($alias);
 
-		$this->zbxTestClickLinkText($alias);
+		$this->query('link', $alias)->waitUntilClickable()->one()->click();
 		$this->zbxTestClickWait('update');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User updated');
 		$this->zbxTestCheckHeader('Users');

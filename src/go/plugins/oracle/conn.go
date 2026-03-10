@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,9 @@ import (
 	"golang.zabbix.com/sdk/uri"
 	"golang.zabbix.com/sdk/zbxerr"
 )
+
+// characters that can cause escape.
+const forbiddenCharsInNames = "()\"'=#"
 
 var errInvalidPrivilege = errs.New("invalid connection privilege")
 
@@ -217,7 +220,17 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 		},
 	)
 
-	service, err := url.QueryUnescape(cd.uri.GetParam("service"))
+	var (
+		service = url.QueryEscape(cd.uri.GetParam("service"))
+		host    = cd.uri.Host()
+	)
+
+	err := checkForbiddenCharacters(service)
+	if err != nil {
+		return nil, err
+	}
+
+	err = checkForbiddenCharacters(host)
 	if err != nil {
 		return nil, err
 	}
@@ -225,7 +238,7 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 	connectString := fmt.Sprintf(
 		`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=%s)(PORT=%s))`+
 			`(CONNECT_DATA=(SERVICE_NAME="%s"))(CONNECT_TIMEOUT=%d)(RETRY_COUNT=0))`,
-		cd.uri.Host(),
+		host,
 		cd.uri.Port(),
 		service,
 		c.connectTimeout/time.Second,
@@ -252,6 +265,11 @@ func (c *ConnManager) create(cd connDetails) (*OraConn, error) {
 
 	serverVersion, err := godror.ServerVersion(ctx, client)
 	if err != nil {
+		clientCloseErr := client.Close()
+		if clientCloseErr != nil {
+			log.Debugf("[%s] Error closing connection: %s", pluginName, clientCloseErr.Error())
+		}
+
 		return nil, err
 	}
 
@@ -342,4 +360,15 @@ func getConnParams(privilege string) (godror.ConnParams, error) {
 	}
 
 	return out, nil
+}
+
+func checkForbiddenCharacters(s string) error {
+	if strings.ContainsAny(s, forbiddenCharsInNames) {
+		return errs.WrapConst(
+			errs.New("invalid characters in: "+s),
+			zbxerr.ErrorInvalidParams,
+		)
+	}
+
+	return nil
 }

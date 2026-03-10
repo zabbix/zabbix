@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -645,12 +645,13 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 
 		// Check saved dashboard.
 		$dialog->ensureNotPresent();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Assert Problems widget's table.
 		$dashboard->getWidget($data['fields']['Name']);
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table->waitUntilReloaded();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
