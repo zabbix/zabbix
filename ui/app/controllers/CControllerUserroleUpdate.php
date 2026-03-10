@@ -63,13 +63,13 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 				'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
 			],
 			'service_read_tag_value' => ['string',
-				'when' => ['service_read_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+				'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
 			],
 			'service_read_tag_tag' => [
-				['string', 'when' => ['service_read_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
+				['string', 'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
 				['string', 'required', 'not_empty',
 					'when' => [
-						['service_read_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
+						['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
 						['service_read_tag_value', 'not_empty']
 					]
 				]
@@ -84,13 +84,13 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 				'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
 			],
 			'service_write_tag_value' => ['string',
-				'when' => ['service_write_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+				'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
 			],
 			'service_write_tag_tag' => [
-				['string', 'when' => ['service_write_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
+				['string', 'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
 				['string', 'required', 'not_empty',
 					'when' => [
-						['service_write_list', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
+						['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
 						['service_write_tag_value', 'not_empty']
 					]
 				]
