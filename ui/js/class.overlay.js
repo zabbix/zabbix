@@ -317,15 +317,10 @@ Overlay.prototype._cancelFixPositionOnAnimationFrame = function() {
 	}
 };
 
-
-Overlay.prototype.FOCUSABLE_SELECTORS = ['button:not([disabled])', 'input:not([type="hidden"]):not([disabled])',
-	'select:not([disabled])', 'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"]):not([disabled])'
-];
-
 /**
  * Find the primary focusable element of the dialogue.
  *
- * @returns {Element|null}
+ * @returns {HTMLElement|null}
  */
 Overlay.prototype.getFocusableElement = function() {
 	if (this.$btn_focus !== null && !this.$btn_focus[0].disabled) {
@@ -338,21 +333,17 @@ Overlay.prototype.getFocusableElement = function() {
 		return autofocus_element;
 	}
 
-	const focusable_selector = Overlay.prototype.FOCUSABLE_SELECTORS.join(', ');
-
-	const parents = [this.$dialogue.$body, this.$dialogue.$footer, this.$dialogue.$head,
-		this.$dialogue.$controls
-	];
+	const parents = [this.$dialogue.$body, this.$dialogue.$footer, this.$dialogue.$head, this.$dialogue.$controls];
 
 	for (const $parent of parents) {
 		if ($parent.length === 0 || !isVisible($parent[0])) {
 			continue;
 		}
 
-		for (const element of $parent[0].querySelectorAll(focusable_selector)) {
-			if (isVisible(element)) {
-				return element;
-			}
+		const focusable_element = Focuser.getFocusableElement($parent[0]);
+
+		if (focusable_element !== null) {
+			return focusable_element;
 		}
 	}
 
@@ -360,58 +351,17 @@ Overlay.prototype.getFocusableElement = function() {
 };
 
 /**
- * Focus and select the primary focusable element of the dialogue.
+ * Focus and preselect the primary focusable element of the dialogue, mimicking the autofocus behavior.
  */
 Overlay.prototype.recoverFocus = function() {
-	const element = this.getFocusableElement();
-
-	if (element !== null) {
-		element.focus({preventScroll: true});
-
-		if (element instanceof HTMLInputElement && ['text', 'password'].includes(element.type)) {
-			element.select();
-		}
-	}
+	Focuser.focus(this.getFocusableElement());
 };
 
 /**
- * Binds keyboard events to contain focus within dialogue window.
+ * Prevent the focus from running away from the dialogue window.
  */
 Overlay.prototype.containFocus = function() {
-	var focusable = jQuery(':focusable', this.$dialogue);
-
-	focusable.off('keydown.containFocus');
-
-	if (focusable.length > 1) {
-		var first_focusable = focusable.filter(':first:not([disabled])'),
-			last_focusable = focusable.filter(':last:not([disabled])');
-
-		first_focusable
-			.on('keydown.containFocus', function(e) {
-				// TAB and SHIFT
-				if (e.which == 9 && e.shiftKey) {
-					last_focusable[0].focus();
-					return false;
-				}
-			});
-
-		last_focusable
-			.on('keydown.containFocus', function(e) {
-				// TAB and not SHIFT
-				if (e.which == 9 && !e.shiftKey) {
-					first_focusable[0].focus();
-					return false;
-				}
-			});
-	}
-	else {
-		focusable
-			.on('keydown.containFocus', function(e) {
-				if (e.which == 9) {
-					return false;
-				}
-			});
-	}
+	Focuser.containFocus(this.$dialogue[0]);
 };
 
 /**
