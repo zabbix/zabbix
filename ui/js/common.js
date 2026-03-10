@@ -558,6 +558,120 @@ function reloadPopup(form, action) {
 }
 
 /**
+ * A singleton class instance for maintaining a focus within a specified container.
+ */
+const Focuser = new class {
+
+	#FOCUSABLE_SELECTORS = ['button:not([disabled])', 'input:not([type="hidden"]):not([disabled])',
+		'select:not([disabled])', 'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"]):not([disabled])',
+		'[href]:not([tabindex="-1"])'
+	];
+
+	/**
+	 * @type {Map<HTMLElement, AbortController>}
+	 */
+	#contain_abort_controllers = new Map();
+
+	/**
+	 * Get the first focusable, enabled, and visible element within the container.
+	 *
+	 * @param {HTMLElement|null} container
+	 *
+	 * @returns {HTMLElement|null}
+	 */
+	getFocusableElement(container) {
+		if (!(container instanceof HTMLElement)) {
+			return null;
+		}
+
+		for (const element of container.querySelectorAll(this.#FOCUSABLE_SELECTORS.join(', '))) {
+			if (isVisible(element)) {
+				return element;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Focus and preselect the element, mimicking the autofocus behavior.
+	 *
+	 * @param {HTMLElement|null} element
+	 */
+	focus(element) {
+		if (!(element instanceof HTMLElement)) {
+			return null;
+		}
+
+		element.focus({preventScroll: true});
+
+		if (element instanceof HTMLInputElement && ['text', 'password'].includes(element.type)) {
+			element.select();
+		}
+	}
+
+	/**
+	 * Focus and preselect the first focusable element of the container, mimicking the autofocus behavior.
+	 *
+	 * @param {HTMLElement|null} container
+	 */
+	recoverFocus(container) {
+		this.focus(this.getFocusableElement(container));
+	}
+
+	/**
+	 * Prevent the focus from running away from the specified container.
+	 *
+	 * @param {HTMLElement} container
+	 */
+	containFocus(container) {
+		if (!(container instanceof HTMLElement)) {
+			return null;
+		}
+
+		if (this.#contain_abort_controllers.has(container)) {
+			this.#contain_abort_controllers.get(container).abort();
+			this.#contain_abort_controllers.delete(container);
+		}
+
+		const focusable_elements = [
+			...container.querySelectorAll(this.#FOCUSABLE_SELECTORS.join(', '))
+		].filter(element => isVisible(element));
+
+		if (focusable_elements.length === 0) {
+			return;
+		}
+
+		const abort_controller = new AbortController();
+
+		this.#contain_abort_controllers.set(container, abort_controller);
+
+		if (focusable_elements.length > 1) {
+			focusable_elements[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab' && e.shiftKey) {
+					e.preventDefault();
+					focusable_elements.at(-1).focus();
+				}
+			}, {signal: abort_controller.signal});
+
+			focusable_elements.at(-1).addEventListener('keydown', e => {
+				if (e.key === 'Tab' && !e.shiftKey) {
+					e.preventDefault();
+					focusable_elements[0].focus();
+				}
+			}, {signal: abort_controller.signal});
+		}
+		else {
+			focusable_elements[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab') {
+					e.preventDefault();
+				}
+			}, {signal: abort_controller.signal});
+		}
+	}
+};
+
+/**
  * Pass value to add.popup trigger.
  *
  * @param {string} object			refers to destination object
