@@ -1116,15 +1116,15 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 		sql_offset = 0;
 
+		/* check if items from template require interfaces and */
+		/* are interfaces of required types configured for host */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type in (%d,%d,%d,%d,%d)"
 					" and",
-				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED_LLD);
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP);
+
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -1135,21 +1135,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			type = (unsigned char)atoi(trow[0]);
 			type = zbx_get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY == type)
-			{
-				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
-				{
-					if (0 != interfaceids[i])
-						break;
-				}
-
-				if (INTERFACE_TYPE_COUNT == i)
-				{
-					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
-					ret = FAIL;
-				}
-			}
-			else if (0 == interfaceids[type - 1])
+			if ((INTERFACE_TYPE_AGENT == type || INTERFACE_TYPE_SNMP == type ||
+					INTERFACE_TYPE_IPMI == type || INTERFACE_TYPE_JMX == type) &&
+					0 == interfaceids[type - 1])
 			{
 				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 						zbx_interface_type_string((zbx_interface_type_t)type));
@@ -1189,46 +1177,6 @@ static void	DBupdate_action_conditions(int conditiontype, const zbx_vector_uint6
 
 /******************************************************************************
  *                                                                            *
- * Purpose:  adds table and field with specific id to housekeeper list        *
- *                                                                            *
- * Parameters: ids       - [IN] identifiers for data removal                  *
- *             field     - [IN] field name from table                         *
- *             tables_hk - [IN] table name to delete information from         *
- *             count     - [IN] number of tables in tables array              *
- *                                                                            *
- * Comments: !!! Don't forget to sync the code with PHP !!!                   *
- *                                                                            *
- ******************************************************************************/
-static void	DBadd_to_housekeeper(const zbx_vector_uint64_t *ids, const char *field, const char * const *tables_hk,
-		int count)
-{
-	int		i, j;
-	zbx_uint64_t	housekeeperid;
-	zbx_db_insert_t	db_insert;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, ids->values_num);
-
-	if (0 == ids->values_num)
-		goto out;
-
-	housekeeperid = zbx_db_get_maxid_num("housekeeper", count * ids->values_num);
-
-	zbx_db_insert_prepare(&db_insert, "housekeeper", "housekeeperid", "tablename", "field", "value", (char *)NULL);
-
-	for (i = 0; i < ids->values_num; i++)
-	{
-		for (j = 0; j < count; j++)
-			zbx_db_insert_add_values(&db_insert, housekeeperid++, tables_hk[j], field, ids->values[i]);
-	}
-
-	zbx_db_insert_execute(&db_insert);
-	zbx_db_insert_clean(&db_insert);
-out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: deletes trigger from database                                     *
  *                                                                            *
  * Parameters:                                                                *
@@ -1239,7 +1187,6 @@ out:
 void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_mode)
 {
 	zbx_vector_uint64_t	selementids;
-	const char		*event_tables[] = {"events"};
 	zbx_vector_uint64_t	linkids;
 
 	if (0 == triggerids->values_num)
@@ -1272,9 +1219,6 @@ void	zbx_db_delete_triggers(zbx_vector_uint64_t *triggerids, int audit_context_m
 					" and",
 				"selementid", &selementids);
 	}
-
-	/* add housekeeper task to delete problems associated with trigger, this allows old events to be deleted */
-	DBadd_to_housekeeper(triggerids, "triggerid", event_tables, ARRSIZE(event_tables));
 
 	DBupdate_trigger_map_links(&linkids);
 
@@ -1669,10 +1613,7 @@ static void	db_get_item_prototypes(const zbx_vector_uint64_t *itemids, zbx_vecto
 void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 {
 	zbx_vector_uint64_t	profileids;
-	const char		*event_tables[] = {"events"};
 	const char		*profile_idx = "web.favorite.graphids";
-	int			history_mode, trends_mode;
-	zbx_vector_str_t	hk_history;
 	zbx_vector_uint64_t	itemids_linked, linked_llruleids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() values_num:%d", __func__, itemids->values_num);
@@ -1714,35 +1655,6 @@ void	zbx_db_delete_items(zbx_vector_uint64_t *itemids, int audit_context_mode)
 
 	DBdelete_graphs_by_itemids(itemids, audit_context_mode);
 	DBdelete_triggers_by_itemids(itemids, audit_context_mode);
-
-	zbx_config_get_hk_mode(&history_mode, &trends_mode);
-
-	zbx_vector_str_create(&hk_history);
-
-	if (ZBX_HK_MODE_REGULAR == history_mode)
-	{
-		zbx_vector_str_append(&hk_history, "history");
-		zbx_vector_str_append(&hk_history, "history_str");
-		zbx_vector_str_append(&hk_history, "history_uint");
-		zbx_vector_str_append(&hk_history, "history_log");
-		zbx_vector_str_append(&hk_history, "history_text");
-		zbx_vector_str_append(&hk_history, "history_bin");
-	}
-
-	if (ZBX_HK_MODE_REGULAR == trends_mode)
-	{
-		zbx_vector_str_append(&hk_history, "trends");
-		zbx_vector_str_append(&hk_history, "trends_uint");
-	}
-
-	if (0 != hk_history.values_num)
-		DBadd_to_housekeeper(itemids, "itemid", (const char * const *)hk_history.values, hk_history.values_num);
-
-	zbx_vector_str_destroy(&hk_history);
-
-	/* add housekeeper task to delete problems associated with item, this allows old events to be deleted */
-	DBadd_to_housekeeper(itemids, "itemid", event_tables, ARRSIZE(event_tables));
-	DBadd_to_housekeeper(itemids, "lldruleid", event_tables, ARRSIZE(event_tables));
 
 	/* delete from profiles */
 	DBget_profiles_by_source_idxs_values(&profileids, "itemid", &profile_idx, 1, itemids);

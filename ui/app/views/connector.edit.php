@@ -24,6 +24,7 @@ $form = (new CForm('post'))
 	->setId('connector-form')
 	->setName('connector_form')
 	->addItem(getMessages())
+	->addVar('connectorid', $data['connectorid'])
 	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
@@ -43,7 +44,7 @@ $form_grid = (new CFormGrid())
 		new CLabel(_('Protocol')),
 		new CFormField([
 			_('Zabbix Streaming Protocol v1.0'),
-			new CInput('hidden', 'protocol', $data['form']['protocol'])
+			new CVar( 'protocol', $data['form']['protocol'])
 		])
 	])
 	->addItem([
@@ -78,19 +79,24 @@ $form_grid = (new CFormGrid())
 				->setId('tags')
 				->addClass('table-tags')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
+				->addClass(ZBX_STYLE_TABLE_FORMS)
+				->setAttribute('data-field-type', 'set')
+				->setAttribute('data-field-name', 'tags')
 				->setFooter(
 					new CCol(
 						(new CButtonLink(_('Add')))->addClass('element-table-add')
 					)
 				),
-			(new CTemplateTag('tag-row-tmpl'))->addItem(
+			(new CTemplateTag('tag-row-tmpl', [
 				(new CRow([
 					(new CTextBox('tags[#{rowNum}][tag]', '#{tag}', false,
 						DB::getFieldLength('connector_tag', 'tag')
 					))
+						->setErrorContainer('tags-#{rowNum}-error-container')
 						->setAttribute('placeholder', _('tag'))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CSelect('tags[#{rowNum}][operator]'))
+						->setErrorContainer('tags-#{rowNum}-error-container')
 						->addClass('js-tag-operator')
 						->setValue(CONDITION_OPERATOR_EQUAL)
 						->addOptions(CSelect::createOptionsFromArray([
@@ -104,12 +110,16 @@ $form_grid = (new CFormGrid())
 					(new CTextBox('tags[#{rowNum}][value]', '#{value}', false,
 						DB::getFieldLength('connector_tag', 'value')
 					))
+						->setErrorContainer('tags-#{rowNum}-error-container')
 						->addClass('js-tag-value')
 						->setAttribute('placeholder', _('value'))
 						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
-				]))->addClass('form_row')
-			)
+				]))->addClass('form_row'),
+				(new CRow())
+					->addClass('error-container-row')
+					->addItem((new CCol())->setId('tags-#{rowNum}-error-container')->setColSpan(4))
+			]))
 		])
 	)
 	->addItem([
@@ -118,36 +128,43 @@ $form_grid = (new CFormGrid())
 			->addClass('js-field-item-value-types'),
 		(new CFormField(
 			(new CCheckBoxList('item_value_types'))
+				->setAttribute('data-field-name', 'item_value_types')
+				->setAttribute('data-field-type', 'array')
 				->setOptions([
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64,
 						'label' => _('Numeric (unsigned)'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_UINT64 & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT,
 						'label' => _('Numeric (float)'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_FLOAT & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR,
 						'label' => _('Character'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_STR & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG,
 						'label' => _('Log'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_LOG & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT,
 						'label' => _('Text'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_TEXT & $data['form']['item_value_type']) != 0
 					],
 					[
 						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN,
 						'label' => _('Binary'),
-						'checked' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN & $data['form']['item_value_type']
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_BIN & $data['form']['item_value_type']) != 0
+					],
+					[
+						'value' => ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON,
+						'label' => _('JSON'),
+						'checked' => (ZBX_CONNECTOR_ITEM_VALUE_TYPE_JSON & $data['form']['item_value_type']) != 0
 					]
 				])
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -184,6 +201,7 @@ $form_grid = (new CFormGrid())
 		(new CFormField(
 			(new CTextBox('password', $data['form']['password'], false, DB::getFieldLength('connector', 'password')))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setAttribute('data-notrim', '')
 				->disableAutocomplete()
 		))->addClass('js-field-password')
 	])
@@ -264,6 +282,7 @@ $form_grid = (new CFormGrid())
 				new CFormField(
 					(new CCheckBox('verify_peer', ZBX_HTTP_VERIFY_PEER_ON))
 						->setChecked($data['form']['verify_peer'] == ZBX_HTTP_VERIFY_PEER_ON)
+						->setUncheckedValue(ZBX_HTTP_VERIFY_PEER_OFF)
 				)
 			])
 			->addItem([
@@ -271,6 +290,7 @@ $form_grid = (new CFormGrid())
 				new CFormField(
 					(new CCheckBox('verify_host', ZBX_HTTP_VERIFY_HOST_ON))
 						->setChecked($data['form']['verify_host'] == ZBX_HTTP_VERIFY_HOST_ON)
+						->setUncheckedValue(ZBX_HTTP_VERIFY_HOST_OFF)
 				)
 			])
 			->addItem([
@@ -313,61 +333,32 @@ $form_grid = (new CFormGrid())
 		new CFormField(
 			(new CCheckBox('status', ZBX_CONNECTOR_STATUS_ENABLED))
 				->setChecked($data['form']['status'] == ZBX_CONNECTOR_STATUS_ENABLED)
+				->setUncheckedValue(ZBX_CONNECTOR_STATUS_DISABLED)
 		)
 	]);
 
-$form
-	->addItem($form_grid)
-	->addItem(
-		(new CScriptTag('
-			connector_edit_popup.init('.json_encode([
-				'connectorid' => $data['connectorid'],
-				'tags' => $data['form']['tags']
-			]).');
-		'))->setOnDocumentReady()
-	);
+$form->addItem($form_grid);
 
 if ($data['connectorid'] !== null) {
 	$title = _('Connector');
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'connector_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Clone'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'connector_edit_popup.clone('.json_encode([
-				'title' => _('New connector'),
-				'buttons' => [
-					[
-						'title' => _('Add'),
-						'class' => 'js-add',
-						'keepOpen' => true,
-						'isSubmit' => true,
-						'action' => 'connector_edit_popup.submit();'
-					],
-					[
-						'title' => _('Cancel'),
-						'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-cancel']),
-						'cancel' => true,
-						'action' => ''
-					]
-				]
-			]).');'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete selected connector?'),
 			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'connector_edit_popup.delete();'
+			'isSubmit' => false
 		]
 	];
 }
@@ -376,10 +367,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'connector_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -390,7 +380,12 @@ $output = [
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
-		$this->readJsFile('connector.edit.js.php'),
+		$this->readJsFile('connector.edit.js.php').
+		'connector_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'tags' => $data['form']['tags']
+		]).');',
 	'dialogue_class' => 'modal-popup-static'
 ];
 

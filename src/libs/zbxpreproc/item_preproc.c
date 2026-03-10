@@ -883,11 +883,10 @@ int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *par
 
 	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(value->data.str, &jp))
+	if (FAIL == zbx_json_open(value_str.data.str, &jp))
 		goto out;
 
 	if (FAIL == (ret = zbx_jsonpath_query(&jp, params, error)))

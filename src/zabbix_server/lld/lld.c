@@ -108,8 +108,16 @@ static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, 
 	else
 	{
 		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+		zbx_macro_resolv_item_t macro_resolv_item = {
+			.um_handle = um_handle,
+			.hostid = item->host.hostid,
+			.host_host = item->host.host,
+			.host_name = item->host.name,
+			.itemid = item->itemid,
+			.interface = &item->interface,
+		};
 
-		zbx_substitute_macros(&condition->regexp, NULL, 0, zbx_macro_field_params_resolv, um_handle, item);
+		zbx_substitute_macros(&condition->regexp, NULL, 0, zbx_macro_field_params_resolv, macro_resolv_item);
 
 		zbx_dc_close_user_macros(um_handle);
 	}

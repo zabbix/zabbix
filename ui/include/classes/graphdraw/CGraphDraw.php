@@ -16,6 +16,12 @@
 
 abstract class CGraphDraw {
 
+	const GRAPH_WIDTH_MIN = 20;
+	const GRAPH_WIDTH_MAX = 8000;
+
+	const GRAPH_HEIGHT_MIN = 20;
+	const GRAPH_HEIGHT_MAX = 4500;
+
 	protected $stime;
 	protected $fullSizeX;
 	protected $fullSizeY;
