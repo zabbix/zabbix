@@ -1173,7 +1173,7 @@ function getEventsSuppressions(array $events): array {
 		}
 
 		$suppressions[$event['eventid']] = [
-			'suppress_until' => array_values($event_suppressions),
+			'suppress_until' => $event_suppressions,
 			'count' => count($event_suppressions)
 		];
 	}
@@ -1216,7 +1216,7 @@ function getEventsMessages(array $events): array {
 		}
 
 		$messages[$event['eventid']] = [
-			'messages' => array_values($event_messages),
+			'messages' => $event_messages,
 			'count' => count($event_messages)
 		];
 	}
@@ -1265,7 +1265,7 @@ function getEventsSeverityChanges(array $events, array $triggers): array {
 		}
 
 		$severities[$event['eventid']] = [
-			'severities' => array_values($event_severities),
+			'severities' => $event_severities,
 			'count' => count($event_severities),
 			'original_severity' => $triggers[$event['objectid']]['priority'],
 			'current_severity' => $event['severity']
