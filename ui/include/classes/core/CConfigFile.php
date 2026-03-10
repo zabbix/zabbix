@@ -60,6 +60,36 @@ class CConfigFile {
 		include($this->configFile);
 		ob_end_clean();
 
+		if (isset($DB['VAULT']) && $DB['VAULT'] == CVaultHashiCorp::NAME) {
+			if (!array_key_exists('VAULT_URL', $DB)) {
+				self::exception('Configuration parameter VAULT_URL is missing.');
+			}
+			elseif (!array_key_exists('VAULT_DB_PATH', $DB)) {
+				self::exception('Configuration parameter VAULT_DB_PATH is missing.');
+			}
+			elseif (!array_key_exists('VAULT_TOKEN', $DB) || $DB['VAULT_TOKEN'] === '') {
+				if (!array_key_exists('VAULT_APP_ROLE_ID', $DB) && !array_key_exists('VAULT_APP_SECRET_ID', $DB)) {
+					self::exception('Configuration parameter VAULT_TOKEN is missing.');
+				}
+				elseif (!array_key_exists('VAULT_APP_ROLE_ID', $DB)) {
+					self::exception('Configuration parameter VAULT_APP_ROLE_ID is missing.');
+				}
+				elseif (!array_key_exists('VAULT_APP_SECRET_ID', $DB)) {
+					self::exception('Configuration parameter VAULT_APP_SECRET_ID is missing.');
+				}
+			}
+
+			$vault = new CVaultHashiCorp($DB['VAULT_URL'], $DB['VAULT_PREFIX'] ?? '', $DB['VAULT_DB_PATH'],
+				$DB['VAULT_TOKEN'] ?? '', $DB['VAULT_APP_ROLE_ID'] ?? '', $DB['VAULT_APP_SECRET_ID'] ?? ''
+			);
+
+			if (!$vault->validateParameters()) {
+				$errors = $vault->getErrors();
+
+				self::exception(reset($errors));
+			}
+		}
+
 		if (!isset($DB['TYPE'])) {
 			self::exception('DB type is not set.');
 		}
