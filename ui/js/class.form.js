@@ -26,8 +26,9 @@ class CForm {
 		'text-box': CFieldTextBox,
 		'textarea': CFieldTextarea,
 		'z-select': CFieldZSelect,
-		'file': CFieldFile,
-		'z-color-picker': CFieldZColorPicker
+		'z-color-picker': CFieldZColorPicker,
+		'z-textarea-flexible': CFieldZTextareaFlexible,
+		'file': CFieldFile
 	};
 	#form = null;
 	#rules = null;

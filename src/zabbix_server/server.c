@@ -688,7 +688,7 @@ static void	zbx_set_defaults(void)
 		config_ssl_key_location = zbx_strdup(config_ssl_key_location, DEFAULT_SSL_KEY_LOCATION);
 
 	if (NULL == config_history_storage_opts)
-		config_history_storage_opts = zbx_strdup(config_history_storage_opts, "uint,dbl,str,log,text");
+		config_history_storage_opts = zbx_strdup(config_history_storage_opts, "uint,dbl,str,log,text,json");
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -2589,6 +2589,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_vps_monitor_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);

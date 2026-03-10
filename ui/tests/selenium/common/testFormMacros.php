@@ -810,8 +810,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check that host macro is editable.
 				foreach ($data['macros'] as $data_macro) {
-					$this->assertTrue($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
-							']')->waitUntilPresent()->one()->isEnabled()
+					$this->assertTrue($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->waitUntilPresent()->one()->isEnabled()
 					);
 
 					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
@@ -852,8 +852,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check enabled/disabled fields.
 				foreach ($data['macros'] as $data_macro) {
-					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).']')
-							->waitUntilPresent()->one()->isEnabled()
+					$this->assertFalse($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->waitUntilPresent()->one()->isEnabled()
 					);
 
 					$this->assertTrue($this->getValueField($data_macro['macro'])->isEnabled());
@@ -862,7 +862,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 					$this->assertTrue($this->query('id:macros_'.$this->getMacroIndex($data_macro['macro']).
 							'_description')->one()->isEnabled()
 					);
-					$this->assertTrue($this->query('xpath://textarea[text()='.
+					$this->assertTrue($this->query('xpath://z-textarea-flexible[@value='.
 							CXPathHelper::escapeQuotes($data_macro['macro']).']/../..//button[text()="Remove"]')->exists()
 					);
 				}
@@ -879,7 +879,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				foreach ($data['macros'] as $data_macro) {
 					// Find necessary row by macro name and click Change button.
-					$this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
+					$this->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($data_macro['macro']).
 							']/../..//button[text()="Change"]')->waitUntilPresent()->one()->click();
 
 					// Fill macro value by new value.
@@ -1185,18 +1185,19 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 				// Check enabled/disabled fields and values.
 				foreach ($data['macros'] as $data_macro) {
-					$this->assertTrue($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
-							']/../..//button[text()="Change"]')->exists()
+					$this->assertTrue($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']/../..//button[text()="Change"]')->exists()
 					);
 
 					// Check macro field disabled.
-					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).']')
-							->waitUntilPresent()->one()->isEnabled()
+					$this->assertFalse($this->query('xpath://z-textarea-flexible[@value='.
+							CXPathHelper::escapeQuotes($data_macro['macro']).']')->waitUntilPresent()->one()->isEnabled()
 					);
 
 					// Check macro value and disabled field.
-					$this->assertFalse($this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($data_macro['macro']).
-							']/../..//div[contains(@class, "macro-value")]/textarea')->waitUntilPresent()->one()->isEnabled()
+					$this->assertFalse($this->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($data_macro['macro']).
+							']/../..//div[contains(@class, "macro-value")]/z-textarea-flexible')->waitUntilPresent()
+							->one()->isEnabled()
 					);
 					$this->assertEquals($data_macro['value'], $this->getValueField($data_macro['macro'])->getValue());
 
@@ -1373,10 +1374,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
 			$row = $rows->get($i);
-			$macro['macro'] = $row->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $row->query('xpath:./td[1]/z-textarea-flexible')->one()->getValue();
 			$macro_value = $this->getValueField($macro['macro']);
 			$macro['value'] = $macro_value->getValue();
-			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
+			$macro['description'] = $rows->get($i + 1)->query('tag:z-textarea-flexible')->one()->getValue();
 			$macro['type'] = ($macro_value->getInputType() === CInputGroupElement::TYPE_SECRET) ?
 					ZBX_MACRO_TYPE_SECRET : ZBX_MACRO_TYPE_TEXT;
 			$macros_frontend[] = $macro;
@@ -1443,8 +1444,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$revert_button = $value_field->getRevertButton();
 
 			if ($data['type'] === CInputGroupElement::TYPE_TEXT) {
-				$this->assertTrue($value_field->query('xpath:./textarea')->one()->isAttributePresent('readonly'));
-				$this->assertEquals(2048, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
+				$this->assertTrue($value_field->query('xpath:./z-textarea-flexible')->one()->isAttributePresent('readonly'));
+				$this->assertEquals(2048, $value_field->query('xpath:./z-textarea-flexible')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 			}
@@ -1468,11 +1469,10 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 			$change_button = $value_field->getNewValueButton();
 			$revert_button = $value_field->getRevertButton();
-			$textarea_xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]';
 
 			if ($data['type'] === CInputGroupElement::TYPE_SECRET) {
-				$this->assertFalse($value_field->query($textarea_xpath)->exists());
-				$this->assertEquals(2048, $value_field->query('xpath:.//input')->one()->getAttribute('maxlength'));
+				$this->assertFalse($value_field->query('tag:z-textarea-flexible')->exists());
+				$this->assertEquals(2048, $value_field->query('tag:input')->one()->getAttribute('maxlength'));
 
 				$this->assertTrue($change_button->isValid());
 				$this->assertFalse($revert_button->isClickable());
@@ -1491,8 +1491,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {
-				$this->assertTrue($value_field->query($textarea_xpath)->exists());
-				$this->assertEquals(2048, $value_field->query('xpath:./textarea')->one()->getAttribute('maxlength'));
+				$this->assertTrue($value_field->query('tag:z-textarea-flexible')->exists());
+				$this->assertEquals(2048, $value_field->query('tag:z-textarea-flexible')->one()->getAttribute('maxlength'));
 				$this->assertFalse($change_button->isValid());
 				$this->assertFalse($revert_button->isValid());
 
@@ -1870,7 +1870,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 * @return int
 	 */
 	private function getMacroIndex($macro) {
-		$index = explode('_', $this->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).']')
+		$index = explode('_', $this->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($macro).']')
 				->one()->getAttribute('id'), 3
 		);
 
@@ -2403,7 +2403,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		$result = [];
 		foreach (['macro', 'value', 'description'] as $field) {
-			$result[] = $this->query('xpath://textarea[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')->one()->getText();
+			$result[] = $this->query('xpath://z-textarea-flexible[@id="macros_'.$data['fields']['index'].'_'.$field.'"]')
+					->one()->getValue();
 		}
 
 		$data = CTestArrayHelper::get($data, 'expected_macros', $data);

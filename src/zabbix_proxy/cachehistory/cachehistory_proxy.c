@@ -81,6 +81,7 @@ static void	dc_add_proxy_history(zbx_pb_history_data_t *handle, const zbx_dc_his
 				break;
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				pvalue = h->value.str;
 				break;
 			default:
@@ -211,6 +212,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 	int			i;
 	zbx_pb_history_data_t	*handle;
 	time_t			now;
+	int 			written_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -225,6 +227,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 		if (ITEM_STATE_NOTSUPPORTED == h->state)
 		{
 			dc_add_proxy_history_notsupported(handle, h, now);
+			written_num++;
 			continue;
 		}
 
@@ -240,6 +243,7 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 			case ITEM_VALUE_TYPE_UINT64:
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_JSON:
 				if (0 != (h->flags & ZBX_DC_FLAG_META))
 					dc_add_proxy_history_meta(handle, h, now);
 				else
@@ -253,9 +257,12 @@ static void	DBmass_proxy_add_history(zbx_dc_history_t *history, int history_num)
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
 
+		written_num++;
 	}
 
 	zbx_pb_history_close(handle);
+
+	zbx_vps_monitor_add_written((zbx_uint64_t)written_num);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
