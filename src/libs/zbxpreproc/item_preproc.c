@@ -888,7 +888,7 @@ int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *par
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(value->data.str, &jp))
+	if (FAIL == zbx_json_open(value_str.data.str, &jp))
 		goto out;
 
 	if (FAIL == (ret = zbx_jsonpath_query(&jp, params, error)))

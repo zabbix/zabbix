@@ -73,6 +73,7 @@ out:
 ---
 test case: (SSH) Has empty additional option key
 in:
+  skip_for_libssh2_and_below: 68353
   type: ZBX_TEST_GET_VALUE_SSH
   item:
     interface: ""
@@ -82,6 +83,7 @@ out:
 ---
 test case: (SSH) Has only additional option key
 in:
+  skip_for_libssh2_and_below: 68353
   type: ZBX_TEST_GET_VALUE_SSH
   item:
     interface: ""
@@ -100,6 +102,7 @@ out:
 ---
 test case: (SSH) Has unsupported additional option KexAlgorithms value
 in:
+  skip_for_libssh2_and_below: 68353
   type: ZBX_TEST_GET_VALUE_SSH
   item:
     interface: ""
