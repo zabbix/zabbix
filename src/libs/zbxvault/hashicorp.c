@@ -267,11 +267,6 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 		if (200 != response_code && 204 != response_code)
 		{
-			if (403 == response_code && NULL != app_role_id)
-			{
-				zbx_free(*token);
-			}
-
 			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
 			goto out;
 		}
@@ -318,11 +313,6 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 		if (200 != response_code && 204 != response_code)
 		{
-			if (403 == response_code && NULL != app_role_id)
-			{
-				next_renew = 0;
-			}
-
 			error = zbx_dsprintf(NULL, "unsuccessful response code \"%ld\"", response_code);
 			goto out;
 		}

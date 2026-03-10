@@ -1989,13 +1989,10 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		zbx_kvs_clear(&kvs);
 	}
 
-//out:
 	zbx_vector_ptr_pair_destroy(&diff);
 	zbx_kvs_destroy(&kvs);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
-//	return ret;
 }
 
 #define EXPAND_INTERFACE_MACROS		1
