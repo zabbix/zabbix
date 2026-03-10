@@ -2070,8 +2070,8 @@ class testDashboardGraphWidget extends testWidgets {
 	/**
 	 * Fill graph widget form with provided data.
 	 *
-	 * @param array $data		data provider with fields values
-	 * @param array $form		CFormElement
+	 * @param array 		$data		data provider with fields values
+	 * @param CFormElement 	$form		widget configuration form element
 	 */
 	protected function fillForm($data, $form) {
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
@@ -2771,27 +2771,22 @@ class testDashboardGraphWidget extends testWidgets {
 		$form->selectTab('Problems');
 
 		$fields = ['Selected items only', 'Severity', 'Problem', 'Problem tags', 'Problem hosts'];
-		$this->assertEnabledFields($fields, false);
-
 		$tag_elements = [
-			'id:evaltype_0',												// Tag type.
-			'id:tags_0_tag',												// Tag name.
-			'id:tags_0_operator',											// Tag operator.
-			'id:tags_0_value',												// Tag value
-			'id:tags_0_remove',												// Tag remove button.
-			'xpath:.//table[@id="tags_table_tags"]//button[@id="tags_add"]'	// Tag add button.
+			'id:tags_0_tag',		// Tag name.
+			'id:tags_0_operator',	// Tag operator.
+			'id:tags_0_value'		// Tag value.
 		];
-		foreach ($tag_elements as $tag_fields) {
-			$this->assertFalse($form->query($tag_fields)->one()->isEnabled());
-		}
+		$this->assertEnabledFields(array_merge($fields, $tag_elements), false);
+		$this->assertEquals(0, $form->query('id:tags_table_tags')->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 
-		// Set "Show problems" and check that fields are enabled now.
+		// Set "Show problems" and check that fields and buttons are enabled now.
 		$form->fill(['Show problems' => true]);
-		$this->assertEnabledFields($fields, true);
-
-		foreach ($tag_elements as $tag_fields) {
-			$this->assertTrue($form->query($tag_fields)->one()->isEnabled());
-		}
+		$this->assertEnabledFields(array_merge($fields, $tag_elements), true);
+		$this->assertEquals(2, $form->query('id:tags_table_tags')->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 
 		COverlayDialogElement::find()->one()->close();
 	}
