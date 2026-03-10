@@ -820,18 +820,23 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
+		$this->page->login()->open('zabbix.php?action=iconmap.list');
 
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 2') as $iconmap) {
-			$this->zbxTestClickLinkText($iconmap['name']);
-			$this->zbxTestInputTypeOverwrite('iconmap_name', $iconmap['name'].' (cloned)');
-			$this->zbxTestClickWait('clone');
-			$this->zbxTestClick('cancel');
+			$new_name = $iconmap['name'].' (cloned)';
+			$this->query('link', $iconmap['name'])->waitUntilClickable()->one()->click();
+			$form = $this->query('id:iconmap')->waitUntilVisible()->asForm()->one();
+			$form->fill(['Name' => $new_name]);
+			$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
+			$form->waitUntilReloaded();
+			$form->checkValue(['Name' => $new_name]);
+			$form->query('button:Cancel')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
 
 			// Check the results in frontend.
-			$this->zbxTestCheckTitle('Configuration of icon mapping');
-			$this->zbxTestCheckHeader('Icon mapping');
-			$this->zbxTestTextNotPresent($iconmap['name'].' (cloned)');
+			$this->page->assertTitle('Configuration of icon mapping');
+			$this->page->assertHeader('Icon mapping');
+			$this->assertFalse($this->query('link', $new_name)->exists(),
+					'Icon mapping "'.$new_name.'" should not be visible on page.');
 		}
 
 		// Check the results in DB

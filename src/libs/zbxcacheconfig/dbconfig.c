@@ -72,6 +72,7 @@ ZBX_PTR_VECTOR_IMPL(trigger_dep_ptr, zbx_trigger_dep_t *)
 ZBX_PTR_VECTOR_IMPL(trigger_timer_ptr, zbx_trigger_timer_t *)
 
 ZBX_VECTOR_IMPL(dc_item_tag, zbx_dc_item_tag_t)
+ZBX_PTR_VECTOR_IMPL(trigger_ptr, ZBX_DC_TRIGGER *)
 
 typedef struct
 {
@@ -302,13 +303,15 @@ zbx_uint64_t	dbconfig_used_size(void)
 }
 
 static void	dc_maintenance_precache_nested_groups(void);
-static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude);
 
 static void	dc_reschedule_items(const zbx_hashset_t *activated_hosts);
 static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts);
 
 static int	dc_host_update_revision(ZBX_DC_HOST *host, zbx_uint64_t revision);
 static int	dc_item_update_revision(ZBX_DC_ITEM *item, zbx_uint64_t revision);
+
+static void	dc_item_remove_trigger(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger);
+static void	dc_trigger_remove_itemid(ZBX_DC_TRIGGER *trigger, zbx_uint64_t itemid);
 
 typedef struct
 {
@@ -3924,6 +3927,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 					__config_shmem_realloc_func, __config_shmem_free_func);
 			trigger->topoindex = 1;
 			trigger->itemids = NULL;
+			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
 		}
 		else
 		{
@@ -3974,7 +3978,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 						if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
 								itemid)))
 						{
-							dc_item_reset_triggers(item, trigger);
+							dc_item_remove_trigger(item, trigger);
 						}
 					}
 				}
@@ -4512,7 +4516,21 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now, int 
 	}
 }
 
-static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision)
+static void	dc_function_remove_item_trigger_link(ZBX_DC_FUNCTION *function)
+{
+	ZBX_DC_TRIGGER	*trigger;
+	ZBX_DC_ITEM	*item;
+
+	if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
+	{
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
+			dc_item_remove_trigger(item, trigger);
+
+		dc_trigger_remove_itemid(trigger, function->itemid);
+	}
+}
+
+static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vector_uint64_t *triggerids)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -4559,14 +4577,19 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			if (function->itemid != itemid)
 			{
-				ZBX_DC_ITEM	*item_last;
+				dc_function_remove_item_trigger_link(function);
 
-				if (NULL != (item_last = zbx_hashset_search(&config->items, &function->itemid)))
-					dc_item_reset_triggers(item_last, NULL);
+				if (NULL != triggerids)
+					zbx_vector_uint64_append(triggerids, function->triggerid);
 			}
 		}
 		else
+		{
 			function->timer_revision = 0;
+
+			if (NULL != triggerids)
+				zbx_vector_uint64_append(triggerids, triggerid);
+		}
 
 		function->triggerid = triggerid;
 		function->itemid = itemid;
@@ -4575,8 +4598,6 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		function->type = zbx_get_function_type(function->function);
 		function->revision = revision;
-
-		dc_item_reset_triggers(item, NULL);
 	}
 
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
@@ -4584,8 +4605,10 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions, &rowid)))
 			continue;
 
-		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
-			dc_item_reset_triggers(item, NULL);
+		dc_function_remove_item_trigger_link(function);
+
+		if (NULL != triggerids)
+			zbx_vector_uint64_append(triggerids, function->triggerid);
 
 		dc_strpool_release(function->function);
 		dc_strpool_release(function->parameter);
@@ -6805,234 +6828,395 @@ static void	dc_trigger_update_topology(void)
 	DCconfig_sort_triggers_topologically();
 }
 
-static int	zbx_default_ptr_pair_ptr_compare_func(const void *d1, const void *d2)
+static void	dc_item_remove_trigger(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger)
 {
-	const zbx_ptr_pair_t	*p1 = (const zbx_ptr_pair_t *)d1;
-	const zbx_ptr_pair_t	*p2 = (const zbx_ptr_pair_t *)d2;
+	if (NULL != item->triggers)
+	{
+		for (ZBX_DC_TRIGGER **triggers = item->triggers; NULL != *triggers; triggers++)
+		{
+			if (trigger == triggers[0])
+			{
+				while (NULL != (triggers[0] = triggers[1]))
+					triggers++;
 
-	ZBX_RETURN_IF_NOT_EQUAL(p1->first, p2->first);
-	ZBX_RETURN_IF_NOT_EQUAL(p1->second, p2->second);
+				break;
+			}
+		}
 
-	return 0;
+		if (NULL == item->triggers[0])
+		{
+			config->items.mem_free_func(item->triggers);
+			item->triggers = NULL;
+		}
+	}
 }
 
-static int	zbx_default_ptr_pair_ptr_second_compare_func(const void *d1, const void *d2)
+static void	dc_trigger_remove_itemid(ZBX_DC_TRIGGER *trigger, zbx_uint64_t itemid)
 {
-	const zbx_ptr_pair_t	*p1 = (const zbx_ptr_pair_t *)d1;
-	const zbx_ptr_pair_t	*p2 = (const zbx_ptr_pair_t *)d2;
+	if (NULL != trigger->itemids)
+	{
+		for (zbx_uint64_t *itemids = trigger->itemids; 0 != *itemids; itemids++)
+		{
+			if (itemid == itemids[0])
+			{
+				while (0 != (itemids[0] = itemids[1]))
+					itemids++;
 
-	ZBX_RETURN_IF_NOT_EQUAL(p1->second, p2->second);
-	ZBX_RETURN_IF_NOT_EQUAL(p1->first, p2->first);
+				break;
+			}
+		}
 
-	return 0;
+		if (0 == trigger->itemids[0])
+		{
+			config->triggers.mem_free_func(trigger->itemids);
+			trigger->itemids = NULL;
+		}
+	}
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add new itemids into trigger itemids array                        *
+ * Purpose: add item IDs to a trigger's item list                             *
  *                                                                            *
- * Comments: If trigger is already linked to an item and a new function       *
- *           linking the trigger to that item is being added, then the item   *
- *           triggers will be reset causing itemid to be removed from trigger.*
- *           Because of that itemids always can be simply appended to the     *
- *           existing list without checking for duplicates.                   *
+ * Parameters: trigger - [IN/OUT] trigger to update                           *
+ *             itemids - [IN]     sorted vector of item IDs                   *
+ *                                                                            *
+ * Comments: Duplicate ids are not added.                                     *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, const zbx_vector_uint64_t *itemids)
+static void	dc_trigger_add_itemids(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64_t *itemids)
 {
-	zbx_uint64_t	*itemid;
-	int		i;
+	int	alloc_num = 0;
 
 	if (NULL != trigger->itemids)
 	{
-		int	itemids_num = 0;
+		for (zbx_uint64_t *itemid = trigger->itemids; 0 != *itemid; itemid++)
+		{
+			int	i;
 
-		for (itemid = trigger->itemids; 0 != *itemid; itemid++)
-			itemids_num++;
+			if (FAIL != (i = zbx_vector_uint64_bsearch(itemids, *itemid, ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+				zbx_vector_uint64_remove(itemids, i);
 
-		trigger->itemids = (zbx_uint64_t *)__config_shmem_realloc_func(trigger->itemids,
-				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + itemids_num + 1));
-	}
-	else
-	{
-		trigger->itemids = (zbx_uint64_t *)__config_shmem_malloc_func(trigger->itemids,
-				sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + 1));
-		trigger->itemids[0] = 0;
+			alloc_num++;
+		}
 	}
 
-	for (itemid = trigger->itemids; 0 != *itemid; itemid++)
-		;
+	if (0 == itemids->values_num)
+		return;
 
-	for (i = 0; i < itemids->values_num; i++)
-		*itemid++ = itemids->values[i];
+	trigger->itemids = (zbx_uint64_t *)config->triggers.mem_realloc_func(trigger->itemids,
+			sizeof(zbx_uint64_t) * (size_t)(itemids->values_num + alloc_num + 1));
 
-	*itemid = 0;
+	memcpy(trigger->itemids + alloc_num, itemids->values, sizeof(zbx_uint64_t) * itemids->values_num);
+	trigger->itemids[itemids->values_num + alloc_num] = 0;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: reset item trigger links and remove corresponding itemids from    *
- *          affected triggers                                                 *
+ * Purpose: add triggers to an item's trigger list                            *
  *                                                                            *
- * Parameters: item            - the item to reset                            *
- *             trigger_exclude - the trigger to exclude                       *
+ * Parameters: item     - [IN/OUT] item to update                             *
+ *             triggers - [IN]     sorted vector of trigger pointers          *
+ *                                                                            *
+ * Comments: Duplicate trigger pointers are not added.                        *
  *                                                                            *
  ******************************************************************************/
-static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_exclude)
+static void	dc_item_add_triggers(ZBX_DC_ITEM *item, zbx_vector_trigger_ptr_t *triggers)
 {
-	ZBX_DC_TRIGGER	**trigger;
+	int	alloc_num = 0;
 
-	item->update_triggers = 1;
-
-	if (NULL == item->triggers)
-		return;
-
-	for (trigger = item->triggers; NULL != *trigger; trigger++)
+	if (NULL != item->triggers)
 	{
-		zbx_uint64_t	*itemid;
-
-		if (*trigger == trigger_exclude)
-			continue;
-
-		if (NULL != (*trigger)->itemids)
+		for (ZBX_DC_TRIGGER **ptrigger = item->triggers; NULL != *ptrigger; ptrigger++)
 		{
-			for (itemid = (*trigger)->itemids; 0 != *itemid; itemid++)
-			{
-				if (item->itemid == *itemid)
-				{
-					while (0 != (*itemid = itemid[1]))
-						itemid++;
+			int	i;
 
-					break;
-				}
+			if (FAIL != (i = zbx_vector_trigger_ptr_bsearch(triggers, *ptrigger,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
+			{
+				zbx_vector_trigger_ptr_remove(triggers, i);
 			}
+
+			alloc_num++;
 		}
 	}
 
-	config->items.mem_free_func(item->triggers);
-	item->triggers = NULL;
+	if (0 == triggers->values_num)
+		return;
+
+	item->triggers = (ZBX_DC_TRIGGER **)config->items.mem_realloc_func(item->triggers,
+				sizeof(ZBX_DC_TRIGGER *) * (size_t)(triggers->values_num + alloc_num + 1));
+
+	memcpy(item->triggers + alloc_num, triggers->values, sizeof(ZBX_DC_TRIGGER *) * triggers->values_num);
+	item->triggers[triggers->values_num + alloc_num] = NULL;
+}
+
+typedef struct
+{
+	zbx_uint64_t			itemid;
+	zbx_vector_trigger_ptr_t	triggers;
+}
+zbx_item_triggers_t;
+
+static void	item_triggers_clear(void *a)
+{
+	zbx_item_triggers_t	*it = (zbx_item_triggers_t *)a;
+
+	zbx_vector_trigger_ptr_destroy(&it->triggers);
+}
+
+static void	item_triggers_add(zbx_hashset_t *item_triggers, zbx_uint64_t itemid, ZBX_DC_TRIGGER *trigger)
+{
+	zbx_item_triggers_t	*it, it_local = {.itemid = itemid};
+
+	it = (zbx_item_triggers_t *)zbx_hashset_insert(item_triggers, &it_local, sizeof(it_local));
+
+	if (NULL == it->triggers.values)
+	{
+		zbx_vector_trigger_ptr_create(&it->triggers);
+		zbx_vector_trigger_ptr_reserve(&it->triggers, 3);
+	}
+
+	zbx_vector_trigger_ptr_append(&it->triggers, trigger);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add item associations for a trigger and cache pending             *
+ *          item triggers updates                                             *
+ *                                                                            *
+ * Parameters: trigger       - [IN] trigger to update                         *
+ *             itemids       - [IN] temporary vector of item IDs              *
+ *             functionids   - [IN] temporary vector of function IDs          *
+ *             item_triggers - [IN/OUT] hashset of item triggers links        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_trigger_add_item_links(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64_t *itemids,
+		zbx_vector_uint64_t *functionids, zbx_hashset_t *item_triggers)
+{
+	ZBX_DC_FUNCTION	*function;
+
+	if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		return;
+
+	zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin, functionids);
+
+	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == trigger->recovery_mode)
+	{
+		zbx_get_serialized_expression_functionids(trigger->recovery_expression,
+				trigger->recovery_expression_bin, functionids);
+	}
+
+	for (int j = 0; j < functionids->values_num; j++)
+	{
+		if (NULL == (function = (ZBX_DC_FUNCTION *)zbx_hashset_search(&config->functions,
+				&functionids->values[j])))
+		{
+			continue;
+		}
+
+		zbx_vector_uint64_append(itemids, function->itemid);
+	}
+
+	zbx_vector_uint64_sort(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_vector_uint64_uniq(itemids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	dc_trigger_add_itemids(trigger, itemids);
+
+	for (int j = 0; j < itemids->values_num; j++)
+		item_triggers_add(item_triggers, itemids->values[j], trigger);
+
+	zbx_vector_uint64_clear(itemids);
+	zbx_vector_uint64_clear(functionids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update associations between items and triggers                    *
+ *                                                                            *
+ * Parameters: triggerids - [IN]  list of trigger IDs to process              *
+ *             hostids    - [OUT] set of host IDs affected by the update      *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_update_item_trigger_links(zbx_vector_uint64_t *triggerids, zbx_hashset_t *hostids)
+{
+	zbx_hashset_t		item_triggers;
+	zbx_hashset_iter_t	iter;
+	zbx_vector_uint64_t	itemids, functionids;
+	zbx_item_triggers_t	*it;
+	int			triggers_num = (NULL == triggerids ? config->items.num_data : triggerids->values_num);
+
+	zbx_hashset_create_ext(&item_triggers, (size_t)triggers_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, item_triggers_clear, ZBX_DEFAULT_MEM_MALLOC_FUNC,
+			ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
+
+	zbx_vector_uint64_create(&itemids);
+	zbx_vector_uint64_create(&functionids);
+
+	if (NULL != triggerids)
+	{
+		zbx_vector_uint64_sort(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(triggerids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+		for (int i = 0; i < triggerids->values_num; i++)
+		{
+			ZBX_DC_TRIGGER	*trigger;
+
+			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+					&triggerids->values[i])))
+			{
+				continue;
+			}
+
+			dc_trigger_add_item_links(trigger, &itemids, &functionids, &item_triggers);
+		}
+	}
+	else
+	{
+		ZBX_DC_TRIGGER	*trigger;
+
+		zbx_hashset_iter_reset(&config->triggers, &iter);
+		while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
+		{
+			dc_trigger_add_item_links(trigger, &itemids, &functionids, &item_triggers);
+		}
+	}
+
+	zbx_hashset_iter_reset(&item_triggers, &iter);
+	while (NULL != (it = (zbx_item_triggers_t *)zbx_hashset_iter_next(&iter)))
+	{
+		ZBX_DC_ITEM	*item;
+
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &it->itemid)))
+			continue;
+
+		zbx_vector_trigger_ptr_sort(&it->triggers, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		zbx_vector_trigger_ptr_uniq(&it->triggers, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+
+		dc_item_add_triggers(item, &it->triggers);
+
+		/* for initial sync all hosts will be updated, no need to prepare update list */
+		if (NULL != triggerids)
+			zbx_hashset_insert(hostids, &item->hostid, sizeof(item->hostid));
+	}
+
+	zbx_hashset_destroy(&item_triggers);
+	zbx_vector_uint64_destroy(&functionids);
+	zbx_vector_uint64_destroy(&itemids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update trigger functional state based on item and host status     *
+ *                                                                            *
+ * Parameters: item        - [IN] item whose triggers are updated             *
+ *             host_status - [IN] current status of the host                  *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_item_update_trigger_functional(ZBX_DC_ITEM *item, unsigned char host_status)
+{
+	if (NULL == item->triggers)
+		return;
+
+	if (HOST_STATUS_MONITORED != host_status || ITEM_STATUS_ACTIVE != item->status)
+	{
+		for (ZBX_DC_TRIGGER **ptrigger = item->triggers; NULL != *ptrigger; ptrigger++)
+			(*ptrigger)->functional = TRIGGER_FUNCTIONAL_FALSE;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: reset trigger functional state to functional                      *
+ *                                                                            *
+ * Parameters: item        - [IN] item whose triggers are updated             *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_item_reset_trigger_functional(ZBX_DC_ITEM *item)
+{
+	if (NULL == item->triggers)
+		return;
+
+	for (ZBX_DC_TRIGGER **ptrigger = item->triggers; NULL != *ptrigger; ptrigger++)
+		(*ptrigger)->functional = TRIGGER_FUNCTIONAL_TRUE;
+}
+
+static void	dc_host_reset_trigger_functional(ZBX_DC_HOST *host)
+{
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM_REF		*ref;
+
+	zbx_hashset_iter_reset(&host->items, &iter);
+	while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
+		dc_item_reset_trigger_functional(ref->item);
+}
+
+static void	dc_host_update_trigger_functional(ZBX_DC_HOST *host)
+{
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_ITEM_REF		*ref;
+
+	zbx_hashset_iter_reset(&host->items, &iter);
+	while (NULL != (ref = (ZBX_DC_ITEM_REF *)zbx_hashset_iter_next(&iter)))
+		dc_item_update_trigger_functional(ref->item, host->status);
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: updates trigger related cache data;                               *
- *              1) time triggers assigned to timer processes                  *
- *              2) trigger functionality (if it uses contain disabled         *
+ *              1) trigger functionality (if it uses contain disabled         *
  *                 items/hosts)                                               *
- *              3) list of triggers each item is used by                      *
+ *              2) list of triggers each item is used by                      *
  *                                                                            *
  ******************************************************************************/
-static void	dc_trigger_update_cache(int *itemtrigs_num)
+static void	dc_trigger_update_cache(zbx_vector_uint64_t *triggerids, zbx_uint64_t new_revision, int *itemtrigs_num)
 {
-	zbx_hashset_iter_t	iter;
-	ZBX_DC_TRIGGER		*trigger;
-	ZBX_DC_FUNCTION		*function;
-	ZBX_DC_ITEM		*item;
-	int			i, j, k;
-	zbx_ptr_pair_t		itemtrig;
-	zbx_vector_ptr_pair_t	itemtrigs;
-	ZBX_DC_HOST		*host;
+	zbx_hashset_iter_t		iter;
+	ZBX_DC_HOST			*host;
+	zbx_hashset_t			hostids;
+	int				triggerids_num = (NULL == triggerids ? 0 : triggerids->values_num);
 
-	zbx_hashset_iter_reset(&config->triggers, &iter);
-	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
-		trigger->functional = TRIGGER_FUNCTIONAL_TRUE;
+	zbx_hashset_create(&hostids, (size_t)triggerids_num, ZBX_DEFAULT_UINT64_HASH_FUNC,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	zbx_vector_ptr_pair_create(&itemtrigs);
-	zbx_hashset_iter_reset(&config->functions, &iter);
-	while (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_iter_next(&iter)))
+	dc_update_item_trigger_links(triggerids, &hostids);
+
+	if (NULL == triggerids)
 	{
-		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)) ||
-				NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
-				&function->triggerid)))
+		zbx_hashset_iter_reset(&config->hosts, &iter);
+		while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+			dc_host_reset_trigger_functional(host);
+
+		zbx_hashset_iter_reset(&config->hosts, &iter);
+		while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+			dc_host_update_trigger_functional(host);
+	}
+	else
+	{
+		zbx_vector_dc_host_ptr_t	hosts;
+
+		zbx_vector_dc_host_ptr_create(&hosts);
+		zbx_vector_dc_host_ptr_reserve(&hosts, (size_t)triggerids_num);
+
+		zbx_hashset_iter_reset(&config->hosts, &iter);
+		while (NULL != (host = (ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
 		{
-			continue;
+			if (host->revision < new_revision && NULL == zbx_hashset_search(&hostids, &host->hostid))
+				continue;
+
+			zbx_vector_dc_host_ptr_append(&hosts, host);
+			dc_host_reset_trigger_functional(host);
 		}
 
-		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-		{
-			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
-			continue;
-		}
+		for (int j = 0; j < hosts.values_num; j++)
+			dc_host_update_trigger_functional(hosts.values[j]);
 
-		/* cache item - trigger link */
-		if (0 != item->update_triggers)
-		{
-			itemtrig.first = item;
-			itemtrig.second = trigger;
-			zbx_vector_ptr_pair_append(&itemtrigs, itemtrig);
-		}
-
-		/* disable functionality for triggers with expression containing */
-		/* disabled or not monitored items                               */
-
-		if (TRIGGER_FUNCTIONAL_FALSE == trigger->functional)
-			continue;
-
-		if (ITEM_STATUS_DISABLED == item->status ||
-				(NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &item->hostid)) ||
-						HOST_STATUS_NOT_MONITORED == host->status))
-		{
-			trigger->functional = TRIGGER_FUNCTIONAL_FALSE;
-		}
+		zbx_vector_dc_host_ptr_destroy(&hosts);
 	}
 
-	if (0 != itemtrigs.values_num)
-	{
-		zbx_vector_uint64_t	itemids;
+	zbx_hashset_destroy(&hostids);
 
-		zbx_vector_ptr_pair_sort(&itemtrigs, zbx_default_ptr_pair_ptr_compare_func);
-		zbx_vector_ptr_pair_uniq(&itemtrigs, zbx_default_ptr_pair_ptr_compare_func);
-
-		/* update links from items to triggers */
-		for (i = 0; i < itemtrigs.values_num; i++)
-		{
-			for (j = i + 1; j < itemtrigs.values_num; j++)
-			{
-				if (itemtrigs.values[i].first != itemtrigs.values[j].first)
-					break;
-			}
-
-			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
-			item->update_triggers = 0;
-			item->triggers = (ZBX_DC_TRIGGER **)config->items.mem_realloc_func(item->triggers,
-					(size_t)(j - i + 1) * sizeof(ZBX_DC_TRIGGER *));
-
-			for (k = i; k < j; k++)
-				item->triggers[k - i] = (ZBX_DC_TRIGGER *)itemtrigs.values[k].second;
-
-			item->triggers[j - i] = NULL;
-
-			i = j - 1;
-		}
-
-		/* update reverse links from trigger to items */
-
-		zbx_vector_uint64_create(&itemids);
-		zbx_vector_ptr_pair_sort(&itemtrigs, zbx_default_ptr_pair_ptr_second_compare_func);
-
-		trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[0].second;
-		for (i = 0; i < itemtrigs.values_num; i++)
-		{
-			if (trigger != itemtrigs.values[i].second)
-			{
-				dc_trigger_add_itemids(trigger, &itemids);
-				trigger = (ZBX_DC_TRIGGER *)itemtrigs.values[i].second;
-				zbx_vector_uint64_clear(&itemids);
-			}
-
-			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
-			zbx_vector_uint64_append(&itemids, item->itemid);
-		}
-
-		if (0 != itemids.values_num)
-			dc_trigger_add_itemids(trigger, &itemids);
-
-		zbx_vector_uint64_destroy(&itemids);
-	}
-
-	*itemtrigs_num = itemtrigs.values_num;
-
-	zbx_vector_ptr_pair_destroy(&itemtrigs);
+	*itemtrigs_num = (NULL == triggerids ? config->triggers.num_data : triggerids->values_num);
 }
 
 /******************************************************************************
@@ -7665,7 +7849,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
 	zbx_hashset_t			trend_queue;
-	zbx_vector_uint64_t		active_avail_diff;
+	zbx_vector_uint64_t		active_avail_diff, triggerids, *ptriggerids = NULL;
 	zbx_hashset_t			activated_hosts;
 	zbx_uint64_t			new_revision = config->revision.config + 1;
 	int				connectors_num = 0;
@@ -7690,6 +7874,9 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	{
 		zbx_vector_dc_item_ptr_create(&new_items);
 		pnew_items = &new_items;
+
+		zbx_vector_uint64_create(&triggerids);
+		ptriggerids = &triggerids;
 	}
 
 	if (ZBX_DBSYNC_INIT != changelog_sync_mode && 0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
@@ -7720,7 +7907,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_dbsync_init(&hmacro_sync, "hostmacro", mode);
 	zbx_dbsync_init(&if_sync, "interface", mode);
 	zbx_dbsync_init_changelog(&items_sync, "items", changelog_sync_mode);
-	zbx_dbsync_init(&item_discovery_sync, "item_discovery", mode);
+	zbx_dbsync_init_changelog(&item_discovery_sync, "item_discovery", changelog_sync_mode);
 	zbx_dbsync_init_changelog(&triggers_sync, "triggers", changelog_sync_mode);
 	zbx_dbsync_init(&tdep_sync, "trigger_depends", mode);
 	zbx_dbsync_init_changelog(&func_sync, "functions", changelog_sync_mode);
@@ -7951,7 +8138,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* relies on items, must be after DCsync_items() */
 	DCsync_items_param(&itemscrp_sync, new_revision);
 
-	DCsync_functions(&func_sync, new_revision);
+	DCsync_functions(&func_sync, new_revision, ptriggerids);
 
 	FINISH_SYNC;
 
@@ -8079,7 +8266,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		sec = zbx_time();
 		used_size = dbconfig_used_size();
 
-		dc_trigger_update_cache(&itemtrigs_num);
+		dc_trigger_update_cache(ptriggerids, new_revision, &itemtrigs_num);
 
 		update_sec = zbx_time() - sec;
 		update_size = dbconfig_used_size() - used_size;
@@ -8353,6 +8540,9 @@ clean:
 
 	if (NULL != pnew_items)
 		zbx_vector_dc_item_ptr_destroy(pnew_items);
+
+	if (NULL != ptriggerids)
+		zbx_vector_uint64_destroy(ptriggerids);
 
 	zbx_dbsync_env_clear();
 
