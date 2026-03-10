@@ -1504,27 +1504,6 @@ function getSingleEventActions(array $event, array $r_events, array $alerts): ar
 }
 
 /**
- * Get data required to create history list in problem update page.
- *
- * @param array  $event                               Array with event objects with acknowledges.
- *        array  $event['acknowledges']               Array with manual updates to problem.
- *        string $event['acknowledges'][]['clock']    Time when severity was changed.
- *        string $event['acknowledges'][]['userid']   Responsible user's userid.
- */
-function getEventUpdates(array $event): array {
-	$userids = [];
-
-	foreach ($event['acknowledges'] as $ack) {
-		$userids[$ack['userid']] = true;
-	}
-
-	return [
-		'data' => array_values($event['acknowledges']),
-		'userids' => $userids
-	];
-}
-
-/**
  * Make icons (suppressions, messages, severity changes, actions) for actions column.
  *
  * @param string $eventid                  ID for event, for which icons are created.
