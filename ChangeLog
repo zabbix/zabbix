@@ -1,7 +1,5 @@
 Changes for 7.4.8rc2
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-27583] fixed interface selection when linking templates (askolmeisters)
 ........S. [ZBX-27563] improved trigger-related postprocessing after configuration cache sync (wiper)
