@@ -105,6 +105,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 	ZBX_UNUSED(vault_url);
 	ZBX_UNUSED(prefix);
 	ZBX_UNUSED(token);
+	ZBX_UNUSED(approle);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
 	ZBX_UNUSED(path);

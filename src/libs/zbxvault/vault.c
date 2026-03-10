@@ -26,7 +26,7 @@ typedef	int (*zbx_vault_get_kvs_cb_t)(const char *vault_url, const char *prefix,
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs,
 		int *vault_ret, char **error);
 
-typedef	int (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *app_role_id, const char *app_secret_id,
+typedef	void (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *app_role_id, const char *app_secret_id,
 		const char *ssl_cert_file, const char *ssl_key_file, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, long timeout, char **token);
