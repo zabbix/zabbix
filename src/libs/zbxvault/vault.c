@@ -17,7 +17,6 @@
 #include "cyberark.h"
 
 #include "zbxkvs.h"
-#include "zbxstr.h"
 #include "zbxjson.h"
 
 typedef	int (*zbx_vault_get_kvs_cb_t)(const char *vault_url, const char *prefix, const char *token, const char *approle,
