@@ -444,13 +444,37 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	}
 
+	private function createForecastCalculatedItemWithFormula($formula, $keySuffix)
+	{
+		$params = [
+			'formula'   => $formula,
+			'data_type' => ITEM_VALUE_TYPE_FLOAT,
+			'delay'     => '1s'
+		];
+
+		$response = $this->call('item.create', [
+			'name'       => self::CALCULATED_ITEM_KEY . '.' . $keySuffix,
+			'key_'       => self::CALCULATED_ITEM_KEY . '.' . $keySuffix,
+			'type'       => ITEM_TYPE_CALCULATED,
+			'hostid'     => self::$hostid,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'params'     => $params
+		]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+
+		return $response['result']['itemids'][0];
+	}
+
+
 
 	public function testCalculatedExpression_Forecast_Overflow()
 	{
 		$trapId = $this->createTrap();
 
 		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3)';
-		$itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow');
+		$itemid = $this->createForecastCalculatedItemWithFormula($formula, 'forecast_overflow');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
