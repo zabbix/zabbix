@@ -1,1 +1,0 @@
-.......PS. [ZBX-27590] reverted the custom on fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
