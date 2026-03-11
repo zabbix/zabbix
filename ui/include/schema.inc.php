@@ -10248,7 +10248,7 @@ return [
 			'jti' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64
+				'length' => 36
 			],
 			'expires_at' => [
 				'null' => false,
@@ -10303,12 +10303,6 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
-			],
-			'last_access_time' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
-				'default' => '0'
 			]
 		]
 	],
@@ -10363,33 +10357,36 @@ return [
 				'ref_table' => 'task',
 				'ref_field' => 'taskid'
 			],
-			'deviceid' => [
+			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'device',
-				'ref_field' => 'deviceid'
+				'length' => 20
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 128
 			],
 			'mobile_enrollment_token' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => ''
 			],
 			'bridge_enrollment_key' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
 			],
 			'enrollment_url' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
 				'default' => ''
 			],
 			'status' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
