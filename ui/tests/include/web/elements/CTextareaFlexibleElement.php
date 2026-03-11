@@ -14,32 +14,39 @@
 **/
 
 
-//require_once 'vendor/autoload.php';
 require_once __DIR__.'/../CElement.php';
 
 /**
- * TextareaFlexible element.
+ * Textarea flexible element.
  */
 class CTextareaFlexibleElement extends CElement {
 	/**
-	 * Get value of InputGroup element.
+	 * Clear the value of textarea flexible element.
 	 *
 	 * @return $this
 	 */
 	public function clear() {
-		$driver = CElementQuery::getDriver();
-		$driver->executeScript('arguments[0].value="";', [$this]);
+		CElementQuery::getDriver()->executeScript('arguments[0].value="";', [$this]);
 
 		return $this;
 	}
 
-//	/**
-//	 * Get value of InputGroup element.
-//	 *
-//	 * @return $this
-//	 */
-//	public function fill($text) {
-//		CElement::fill($text);
-//	}
+	/**
+	 * Overwrite value in textarea flexible element.
+	 *
+	 * @param $text    text to be written into the field
+	 *
+	 * @return $this
+	 */
+	public function overwrite($text) {
+		if ($text === null) {
+			$text = '';
+		}
+
+		$this->selectValue();
+		CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($text).';', [$this]);
+
+		return $this;
+	}
 }
 

@@ -953,7 +953,7 @@ class testFormHost extends CWebTest {
 		$this->page->login()->open($this->link)->waitUntilReady();
 
 		$this->query('button:Create host')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 

@@ -562,7 +562,6 @@ class CPage {
 	 */
 	public function removeFocus() {
 		try {
-//			$this->query('tag:body')->one()->click();
 			$this->driver->executeScript('for (var i = 0; i < 5; i++) if (document.activeElement.tagName !== "BODY")'.
 					' document.activeElement.blur(); else break;');
 		}
