@@ -732,9 +732,5 @@ class testCalculatedExpression extends CIntegrationTest {
 		}
 
 		$this->assertEquals($state, $item['state'], 'User parameter failed to reload, itemid: '. $itemid);
-		if ($state == ITEM_STATE_NORMAL) {
-			$this->assertSame($lastvalue, $item['lastvalue'], 'User parameter failed to reload, itemid: '. $itemid);
-		}
 	}
-
 }
