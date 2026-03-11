@@ -470,7 +470,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertSame(
 			[
 				-((float)self::ZBX_DBL_MAX),
-				0,
+				0.0,
 				((float)self::ZBX_DBL_MAX),
 			],
 			array_map('floatval', $values)
