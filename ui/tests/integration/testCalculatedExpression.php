@@ -388,7 +388,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		$trapId = $this->createTrap();
 
-		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3)';
+		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#1)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
@@ -455,10 +455,10 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 2000));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 1000));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, (float)self::ZBX_DBL_MAX);
 
-		$this->sendSenderValue(self::HOST_NAME, $itemkey, ((float)self::ZBX_DBL_MAX - 2000));
-		$this->sendSenderValue(self::HOST_NAME, $itemkey, ((float)self::ZBX_DBL_MAX - 1000));
-		$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::ZBX_DBL_MAX);
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
