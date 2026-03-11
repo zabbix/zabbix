@@ -123,6 +123,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -135,6 +136,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -147,7 +149,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #1 Empty name field.
+			// #3 Empty name field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -160,6 +162,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -172,6 +175,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -184,7 +188,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #2 Empty space in name field.
+			// #6 Empty space in name field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -197,6 +201,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -209,6 +214,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -221,7 +227,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #3 All UI elements unchecked.
+			// #9 All UI elements unchecked.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -239,6 +245,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -258,6 +265,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -279,7 +287,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #4 Remove everything.
+			// #12 Remove everything.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -309,6 +317,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -343,6 +352,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -379,7 +389,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #5 Read-write service tag name not specified.
+			// #15 Read-write service tag name not specified.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -398,7 +408,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #6 Read-only service tag name not specified.
+			// #16 Read-only service tag name not specified.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -417,7 +427,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// #7 Special symbols in the name.
+			// #17 Special symbols in the name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -428,6 +438,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -438,6 +449,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -448,7 +460,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #8 A lot of spaces in the name.
+			// #20 A lot of spaces in the name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -459,6 +471,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -469,6 +482,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -479,7 +493,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #9 Trailing, leading space in name.
+			// #23 Trailing, leading space in name.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -491,7 +505,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #10 All UI elements unchecked except one.
+			// #24 All UI elements unchecked except one.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -507,6 +521,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -524,6 +539,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -543,7 +559,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #11 Remove all Access to actions.
+			// #27 Remove all Access to actions.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -564,6 +580,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			//#28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -587,6 +604,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -609,7 +627,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #12 API methods deny list.
+			// #30 API methods deny list.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -625,6 +643,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #31.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -640,6 +659,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #32.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -655,7 +675,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #13 API methods allow list.
+			// #33 API methods allow list.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -672,6 +692,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #34.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -688,6 +709,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #35.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -704,6 +726,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
+			// #36.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -719,7 +742,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #14 Access to services set to None.
+			// #37 Access to services set to None.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -732,7 +755,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #15 Access to services set to All in both cases.
+			// #38 Access to services set to All in both cases.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -745,7 +768,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #16 Access to services set to Service list.
+			// #39 Access to services set to Service list.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -772,7 +795,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #17 Access to services set to Service list.
+			// #40 Access to services set to Service list.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -789,7 +812,7 @@ class testFormUserRoles extends CWebTest {
 					'message_header' => 'User role created'
 				]
 			],
-			// #18 Access to services set to Service list but the list is empty.
+			// #41 Access to services set to Service list but the list is empty.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -863,7 +886,7 @@ class testFormUserRoles extends CWebTest {
 
 	public static function getApiListData() {
 		return [
-			// User role.
+			// #0 User role.
 			[
 				[
 					'fields' => [
@@ -888,7 +911,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// Admin role.
+			// #1 Admin role.
 			[
 				[
 					'fields' => [
@@ -931,7 +954,7 @@ class testFormUserRoles extends CWebTest {
 					]
 				]
 			],
-			// Super Admin role.
+			// #2 Super Admin role.
 			[
 				[
 					'fields' => [
