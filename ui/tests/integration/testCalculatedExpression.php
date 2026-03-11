@@ -239,7 +239,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// last 5 are dbl max values that are maximum possible supported in zabbix
 		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
-		$this->checkItemState($itemid, ITEM_STATE_SUPPORTED);
+		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
@@ -300,7 +300,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// supported - 2 max and 2 min
 		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
-		$this->checkItemState($itemid, ITEM_STATE_SUPPORTED);
+		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -364,7 +364,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		// supported
 		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
-		$this->checkItemState($itemid, ITEM_STATE_SUPPORTED);
+		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
