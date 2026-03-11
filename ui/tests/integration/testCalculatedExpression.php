@@ -444,6 +444,37 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	}
 
+
+	public function testCalculatedExpression_Forecast_Overflow()
+	{
+		$trapId = $this->createTrap();
+
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3)';
+		$itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow');
+		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+
+		$this->sendSenderValue(self::HOST_NAME, $itemkey, ((float)self::ZBX_DBL_MAX - 2000));
+		$this->sendSenderValue(self::HOST_NAME, $itemkey, ((float)self::ZBX_DBL_MAX - 1000));
+		$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::ZBX_DBL_MAX);
+		$history = $this->historyGet($trapId);
+		$values = $this->extractHistoryValues($history);
+
+		$this->assertSame(
+			[
+				((float)self::ZBX_DBL_MAX - 2000),
+				((float)self::ZBX_DBL_MAX - 1000),
+				((float)self::ZBX_DBL_MAX)
+			],
+			array_map('floatval', $values)
+		);
+
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+	}
+
+
 	public function testCalculatedExpression_ArithmeticAndScaling()
 	{
 		$trapId = $this->createTrap();
