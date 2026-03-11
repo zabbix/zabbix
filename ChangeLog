@@ -9,6 +9,8 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+.......PS. [ZBX-27590] reverted the custom on fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
 ........S. [ZBX-27563] improved trigger-related postprocessing after configuration cache sync (wiper)
 ...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
 ..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
@@ -213,6 +215,8 @@ Changes for 7.4.8rc3
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27590] reverted the custom on fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.8rc2
@@ -1526,6 +1530,8 @@ Changes for 7.0.24rc3
 New features:
 
 Bug fixes:
+.......PS. [ZBX-27590] reverted the custom on fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.24rc2
