@@ -16,7 +16,6 @@
 
 #include "zbxstr.h"
 #include "zbxnum.h"
-#include "zbxalgo.h"
 
 ZBX_VECTOR_IMPL(var, zbx_variant_t)
 
@@ -89,7 +88,6 @@ void	zbx_variant_clear(zbx_variant_t *value)
 	}
 
 	value->type = ZBX_VARIANT_NONE;
-	value->flags = 0;
 }
 
 /******************************************************************************
@@ -192,8 +190,6 @@ void	zbx_variant_copy(zbx_variant_t *value, const zbx_variant_t *source)
 			zbx_variant_set_vector(value, var_vector);
 			break;
 	}
-
-	value->flags = source->flags;
 }
 
 static int	variant_to_dbl(zbx_variant_t *value)
