@@ -208,6 +208,13 @@ Bug fixes:
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
+Changes for 7.4.8rc3
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.4.8rc2
 
 Bug fixes:
