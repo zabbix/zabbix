@@ -219,12 +219,12 @@ function addTextFormatting(CDiv $div, array $text_data): CDiv {
 }
 
 /**
- * @param string $hex  Took background color as hex string.
+ * @param string $color  Takes background color as hex string.
  *
  * @return string
  */
-function getLabelColor(string $hex): string {
-	$rgb = hex2rgb($hex);
+function getLabelColor(string $color): string {
+	$rgb = hex2rgb($color);
 	$brightness = ($rgb[0] * 299 + $rgb[1] * 587 + $rgb[2] * 114) / 1000;
 
 	return $brightness > 128 ? 'var(--item-value-label-contrast-color)' : 'var(--item-value-label-color)';
