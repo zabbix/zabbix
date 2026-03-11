@@ -388,7 +388,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		$trapId = $this->createTrap();
 
-		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3,1h)';
+		$formula = 'last(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
@@ -449,7 +449,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		$trapId = $this->createTrap();
 
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3)';
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3,1h)';
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
