@@ -46,6 +46,10 @@ svg:focus,
 svg *:focus {
   outline: none; }
 
+:root {
+  --item-value-label-color: var(--theme-item-value-label-color, #f2f2f2);
+  --item-value-label-contrast-color: var(--theme-item-value-label-contrast-color, #1f2c33); }
+
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1728543869077") format("woff2"), url("../fonts/zabbix-icons.woff?t=1728543869077") format("woff"), url("../fonts/zabbix-icons.ttf?t=1728543869077") format("truetype"), url("../fonts/zabbix-icons.svg?t=1728543869077#zabbix-icons") format("svg"); }
