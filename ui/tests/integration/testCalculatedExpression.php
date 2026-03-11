@@ -444,20 +444,51 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	}
 
-
-	public function testCalculatedExpression_Forecast_Overflow()
+	public function testCalculatedExpression_TimeleftOverflow()
 	{
 		$trapId = $this->createTrap();
 
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3,1h)';
-		$itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+		$formula = 'timeleft(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3, -1)';
+		$timeleft_itemid = $this->createCalculatedItemWithFormula($formula, 'timeleft_overflow');
+
+		self::$itemIds = array_merge(self::$itemIds, [$timeleft_itemid]);
+
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3, 1h)';
+		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow');
+		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 2000));
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 1000));
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, (float)self::ZBX_DBL_MAX);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, -((float)self::ZBX_DBL_MAX));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX));
+
+		$history = $this->historyGet($trapId);
+		$values = $this->extractHistoryValues($history);
+
+		$this->assertSame(
+			[
+				-((float)self::ZBX_DBL_MAX),
+				0,
+				((float)self::ZBX_DBL_MAX)
+			],
+			array_map('floatval', $values)
+		);
+
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($forecast_itemid));
+	}
+
+	public function testCalculatedExpression_ForecastOverflow()
+	{
+		$trapId = $this->createTrap();
+
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 2);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
@@ -465,8 +496,8 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertSame(
 			[
 				0,
-				((float)self::ZBX_DBL_MAX / 3),
-				((float)self::ZBX_DBL_MAX - 1)
+				1,
+				2
 			],
 			array_map('floatval', $values)
 		);
@@ -589,10 +620,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:12 flags:uint64", true, 120);
+			" value:14 flags:uint64", true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:12 flags:uint64", true, 120);
-		$this->assertEquals('12', $this->getItemLastValue($calcItemId));
+			" value:14 flags:uint64", true, 120);
+		$this->assertEquals('14', $this->getItemLastValue($calcItemId));
 	}
 
 	public function testCalculatedExpression_HistogramQuantile()
