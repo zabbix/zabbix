@@ -113,7 +113,12 @@ class ZTextareaFlexible extends HTMLElement {
 	#applyAttribute(name, value) {
 		switch (name) {
 			case 'autofocus':
-				this.#textarea.autofocus = value !== null;
+				if (value !== null) {
+					this.#textarea.setAttribute('autofocus', 'autofocus');
+				}
+				else {
+					this.#textarea.removeAttribute('autofocus');
+				}
 				break;
 
 			case 'disabled':
