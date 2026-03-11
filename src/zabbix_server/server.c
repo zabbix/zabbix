@@ -2255,8 +2255,6 @@ static void	server_teardown(zbx_rtc_t *rtc, zbx_socket_t *listen_sock)
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
 	zbx_locks_enable();
 #endif
-
-
 	/* re-initialize database before re-starting HA manager */
 	if (SUCCEED != zbx_db_init(&error))
 	{
@@ -2796,7 +2794,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			zbx_set_exiting_with_fail();
 			break;
 		}
-
 
 		__zbx_update_env(zbx_time());
 	}

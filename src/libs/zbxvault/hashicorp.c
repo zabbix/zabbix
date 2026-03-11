@@ -125,6 +125,22 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 	int			ret = FAIL;
 	long			response_code;
 
+	if (NULL == token)
+	{
+		if (NULL == approle)
+		{
+			*error = zbx_dsprintf(*error, "at least one configuration parameter "
+				"(\"VaultToken\" or \"VaultAppRoleID\")"
+				" or corresponding environment variable \"VAULT_TOKEN\" or \"VAULT_TOKEN\" required");
+		}
+		else
+		{
+			*error = zbx_dsprintf(*error, "token not available");
+		}
+
+		return FAIL;
+	}
+
 	if (NULL == prefix || '\0' == *prefix)
 	{
 		zbx_strsplit_first(path, '/', &left, &right);
@@ -144,6 +160,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 		url = zbx_dsprintf(NULL, "%s%s%s", vault_url, prefix, path);
 
 	zbx_snprintf(header, sizeof(header), "X-Vault-Token: %s", token);
+
 	if (SUCCEED != zbx_http_req(url, header, timeout, ssl_cert_file, ssl_key_file, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &out, NULL,
 			&response_code, error))
@@ -235,13 +252,16 @@ void	zbx_vault_renew_token_hashicorp(const char *vault_url, const char *app_role
 
 	if (NULL == *token)
 	{
-		char	*errmsg;
+		char	*errmsg = NULL;
+
+		if (NULL == app_role_id)
+			return;
 
 		if (SUCCEED != zbx_vault_app_role_login_hashicorp(vault_url, app_role_id, app_secret_id, ssl_cert_file,
 					ssl_key_file, config_source_ip, config_ssl_ca_location,
 					config_ssl_cert_location, config_ssl_key_location, timeout, &errmsg, token))
 		{
-			error = zbx_dsprintf(error, "unable approle login: %s", errmsg);
+			error = zbx_dsprintf(NULL, "unable approle login: %s", errmsg);
 			zbx_free(errmsg);
 
 			goto out;

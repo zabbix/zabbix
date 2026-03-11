@@ -26,12 +26,10 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 		const char *config_ssl_key_location, const char *path, long timeout, zbx_kvs_t *kvs,
 		int *vault_ret, char **error)
 {
-	ZBX_UNUSED(vault_ret);
-	ZBX_UNUSED(approle);
-	ZBX_UNUSED(token);
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(vault_url);
 	ZBX_UNUSED(prefix);
+	ZBX_UNUSED(token);
 	ZBX_UNUSED(ssl_cert_file);
 	ZBX_UNUSED(ssl_key_file);
 	ZBX_UNUSED(config_source_ip);
@@ -49,6 +47,10 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 	struct zbx_json_parse	jp, jp_data;
 	int			ret = FAIL;
 	long			response_code;
+
+	ZBX_UNUSED(token);
+	ZBX_UNUSED(vault_ret);
+	ZBX_UNUSED(approle);
 
 	if (NULL == prefix || '\0' == *prefix)
 		prefix = "/AIMWebService/api/Accounts?";

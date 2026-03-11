@@ -17,6 +17,7 @@
 #include "cyberark.h"
 
 #include "zbxkvs.h"
+#include "zbxstr.h"
 #include "zbxjson.h"
 
 typedef	int (*zbx_vault_get_kvs_cb_t)(const char *vault_url, const char *prefix, const char *token, const char *approle,
@@ -32,7 +33,6 @@ typedef	void (*zbx_vault_renew_token_cb_t)(const char *vault_url, const char *ap
 
 static zbx_vault_get_kvs_cb_t		zbx_vault_get_kvs_cb;
 static zbx_vault_renew_token_cb_t	zbx_vault_renew_token_cb;
-
 static const char			*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
 
 int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
@@ -47,11 +47,12 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 	if (NULL == config_vault->name || '\0' == *(config_vault->name) || 0 == strcmp(config_vault->name,
 			ZBX_HASHICORP_NAME))
 	{
-		if (NULL == config_vault->token && NULL == config_vault->app_role_id)
+		if (NULL == config_vault->token && NULL == config_vault->app_role_id &&
+			0 == zbx_strcmp_null(config_vault->name, ZBX_HASHICORP_NAME))
 		{
-			*error = zbx_dsprintf(*error, "\"Vault\" value \"%s\" requires \"VaultToken\""
-					" or \"VaultAppRoleID\"configuration"
-					" parameter or \"VAULT_TOKEN\" environment variable", config_vault->name);
+			*error = zbx_dsprintf(*error, "at least one configuration parameter "
+				"(\"VaultToken\" or \"VaultAppRoleID\")"
+				" or corresponding environment variable is required");
 			return FAIL;
 		}
 
