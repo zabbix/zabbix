@@ -1432,7 +1432,8 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 
 	if (FAIL == zbx_json_brackets_by_name(&jp, "result", &jp_result))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "missing 'result' in adapter body: %s", ZBX_NULL2EMPTY_STR(body.data));
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing 'result' in adapter body: %s",
+				ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
