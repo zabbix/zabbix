@@ -296,7 +296,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history['result'], json_encode($history));
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals(0, $this->getItemLastValue($itemid));
 
 		// supported - 2 max and 2 min
 		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
@@ -361,8 +361,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$history = $this->historyGet($trapId);
 		$this->assertEmpty($history['result'], json_encode($history));
 
-		// ZBX_DBL_MAX is for unsupported, even if we sent mins
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals(0, $this->getItemLastValue($itemid));
 
 		// supported
 		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
