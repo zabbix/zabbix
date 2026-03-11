@@ -459,6 +459,26 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, -((float)self::ZBX_DBL_MAX));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX));
+
+		$history = $this->historyGet($trapId);
+		$values = $this->extractHistoryValues($history);
+
+		$this->assertSame(
+			[
+				-((float)self::ZBX_DBL_MAX),
+				0,
+				((float)self::ZBX_DBL_MAX),
+			],
+			array_map('floatval', $values)
+		);
+
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
+
+
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 1));
@@ -475,7 +495,6 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($forecast_itemid));
 	}
 
