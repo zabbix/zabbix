@@ -444,7 +444,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	}
 
-	public function testCalculatedExpression_TimeleftOverflow()
+	public function testCalculatedExpression_TimeleftForecastOverflow()
 	{
 		$trapId = $this->createTrap();
 
@@ -469,7 +469,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertSame(
 			[
 				-((float)self::ZBX_DBL_MAX),
-				0,
+				0.0,
 				((float)self::ZBX_DBL_MAX)
 			],
 			array_map('floatval', $values)
@@ -478,33 +478,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($forecast_itemid));
 	}
-
-	public function testCalculatedExpression_ForecastOverflow()
-	{
-		$trapId = $this->createTrap();
-
-
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 2);
-
-		$history = $this->historyGet($trapId);
-		$values = $this->extractHistoryValues($history);
-
-		$this->assertSame(
-			[
-				0,
-				1,
-				2
-			],
-			array_map('floatval', $values)
-		);
-
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
-	}
-
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
 	{
