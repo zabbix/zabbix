@@ -593,6 +593,7 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		$form->submit();
 
 		$dialog->ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Host prototype updated');
 		$this->page->waitUntilReady();
 
 		// Open host prototype inherited from template on host and check inherited macros.

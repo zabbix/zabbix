@@ -476,6 +476,7 @@ class testUserRolesPermissions extends CWebTest {
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
+			$dialog->close();
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 
 			// Check that problem actions works after they were turned on.
@@ -503,6 +504,7 @@ class testUserRolesPermissions extends CWebTest {
 					}
 
 					$dialog->query('button:Update')->one()->click();
+					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
 					$status = $row->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $status);

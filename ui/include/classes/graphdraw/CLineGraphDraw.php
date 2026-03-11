@@ -15,8 +15,7 @@
 
 
 class CLineGraphDraw extends CGraphDraw {
-	const GRAPH_WIDTH_MIN = 20;
-	const GRAPH_HEIGHT_MIN = 20;
+
 	const LEGEND_OFFSET_Y = 90;
 
 	private $cell_height_min;
@@ -451,6 +450,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			if ($item['throttling_type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE
 					&& ($throttling_delay = timeUnitToSeconds($item['throttling_delay'])) === null) {
+				continue;
+			}
+
+			if (!array_key_exists($item['itemid'], $results)) {
 				continue;
 			}
 
