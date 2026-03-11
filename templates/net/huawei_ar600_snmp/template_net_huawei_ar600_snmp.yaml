@@ -216,6 +216,98 @@ zabbix_export:
                 - jitter
                 - 1.3.6.1.4.1.2011.5.25.111.4.3.1.50
                 - '0'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var HuaweiNqaParser = {
+                  
+                  	decodeAscii: function(parts, start, length) {
+                  		var chars = [],
+                  			j;
+                  
+                  		for (j = 0; j < length; j++) {
+                  			chars.push(String.fromCharCode(+parts[start + j]));
+                  		}
+                  
+                  		return chars.join('');
+                  	},
+                  
+                  	parse: function(data) {
+                  		var grouped = {},
+                  			i,
+                  			row,
+                  			parts,
+                  			admin_len,
+                  			admin_start,
+                  			admin,
+                  			test_len,
+                  			test_start,
+                  			test,
+                  			probe_pos,
+                  			probe,
+                  			key;
+                  
+                  		for (i = 0; i < data.length; i++) {
+                  			row = data[i];
+                  
+                  			if (typeof row['{#SNMPINDEX}'] === 'undefined') {
+                  				continue;
+                  			}
+                  
+                  			parts = row['{#SNMPINDEX}'].split('.');
+                  
+                  			admin_len = +parts[0];
+                  			admin_start = 1;
+                  
+                  			admin = this.decodeAscii(parts, admin_start, admin_len);
+                  
+                  			test_len = +parts[admin_start + admin_len];
+                  			test_start = admin_start + admin_len + 1;
+                  
+                  			test = this.decodeAscii(parts, test_start, test_len);
+                  
+                  			probe_pos = test_start + test_len;
+                  			probe = +parts[probe_pos];
+                  
+                  			key = admin + '|' + test;
+                  
+                  			if (typeof grouped[key] === 'undefined' || probe > grouped[key].probe) {
+                  				grouped[key] = {
+                  					admin: admin,
+                  					test: test,
+                  					probe: probe,
+                  					rttAvg: Number(row.rttAvg),
+                  					rttMax: Number(row.rttMax),
+                  					rttMin: Number(row.rttMin),
+                  					packetLoss: Number(row.packetLoss),
+                  					jitter: Number(row.jitter)
+                  				};
+                  			}
+                  		}
+                  
+                  		return grouped;
+                  	}
+                  };
+                  
+                  try {
+                  	var data = JSON.parse(value),
+                  		result;
+                  
+                  	if (typeof data !== 'object') {
+                  		throw 'Input data is not a valid JSON object.';
+                  	}
+                  
+                  	result = HuaweiNqaParser.parse(data);
+                  
+                  	return JSON.stringify(result);
+                  }
+                  catch (error) {
+                  	error += (String(error).endsWith('.')) ? '' : '.';
+                  
+                  	Zabbix.log(3, '[ Huawei NQA ] ERROR: ' + error);
+                  
+                  	return JSON.stringify({error: error});
+                  }
           tags:
             - tag: component
               value: raw
@@ -908,14 +1000,19 @@ zabbix_export:
           item_prototypes:
             - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1d
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter avg'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.50.{#LATEST_INDEX}]'
+              type: DEPENDENT
               key: 'huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}]'
               units: ms
               description: |
                 Average jitter measured by the NQA test.
                 
                 Jitter represents variation in packet delay and is critical for real-time applications such as voice and video.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["{#NQA.ADMIN}|{#NQA.TEST}"].jitter'
+              master_item:
+                key: huawei.ar600.nqa.walk
               tags:
                 - tag: admin
                   value: '{#NQA.ADMIN}'
@@ -935,14 +1032,19 @@ zabbix_export:
                       value: performance
             - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c1b1b
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Packet loss'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.47.{#LATEST_INDEX}]'
+              type: DEPENDENT
               key: 'huawei.ar600.nqa.packetloss[{#NQA.ADMIN},{#NQA.TEST}]'
               units: '%'
               description: |
                 Packet loss ratio reported by the NQA test.
                 
                 Represents the percentage of packets lost during transmission between the source and destination.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["{#NQA.ADMIN}|{#NQA.TEST}"].packetLoss'
+              master_item:
+                key: huawei.ar600.nqa.walk
               tags:
                 - tag: admin
                   value: '{#NQA.ADMIN}'
@@ -962,14 +1064,19 @@ zabbix_export:
                       value: performance
             - uuid: f4d3c2b1a09e4f5d8c7b6a5e4d3c2b1a
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT avg'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.46.{#LATEST_INDEX}]'
+              type: DEPENDENT
               key: 'huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}]'
               units: ms
               description: |
                 Average round-trip time (RTT) measured by the NQA test.
                 
                 Represents the mean latency between the source and destination over the evaluation interval.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["{#NQA.ADMIN}|{#NQA.TEST}"].rttAvg'
+              master_item:
+                key: huawei.ar600.nqa.walk
               tags:
                 - tag: admin
                   value: '{#NQA.ADMIN}'
@@ -989,14 +1096,19 @@ zabbix_export:
                       value: performance
             - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1c
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT max'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.9.{#LATEST_INDEX}]'
+              type: DEPENDENT
               key: 'huawei.ar600.nqa.rtt.max[{#NQA.ADMIN},{#NQA.TEST}]'
               units: ms
               description: |
                 Maximum round-trip time (RTT) observed during the NQA test interval.
                 
                 Indicates latency spikes that may affect application performance.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["{#NQA.ADMIN}|{#NQA.TEST}"].rttAvg'
+              master_item:
+                key: huawei.ar600.nqa.walk
               tags:
                 - tag: admin
                   value: '{#NQA.ADMIN}'
@@ -1006,14 +1118,19 @@ zabbix_export:
                   value: '{#NQA.TEST}'
             - uuid: f2d3c2b1a09e4f5d8c7b6a5e4d3c2b1b
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT min'
-              type: SNMP_AGENT
-              snmp_oid: 'get[1.3.6.1.4.1.2011.5.25.111.4.3.1.8.{#LATEST_INDEX}]'
+              type: DEPENDENT
               key: 'huawei.ar600.nqa.rtt.min[{#NQA.ADMIN},{#NQA.TEST}]'
               units: ms
               description: |
                 Minimum round-trip time (RTT) observed during the NQA test interval.
                 
                 Useful for identifying baseline latency under optimal conditions.
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$["{#NQA.ADMIN}|{#NQA.TEST}"].rttMin'
+              master_item:
+                key: huawei.ar600.nqa.walk
               tags:
                 - tag: admin
                   value: '{#NQA.ADMIN}'
@@ -1027,62 +1144,46 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  var data = JSON.parse(value),
-                  	grouped = {},
-                  	result = [],
-                  	i, row, parts,
-                  	adminLen, testLen,
-                  	adminStart, testStart, probePos,
-                  	admin, test, probe,
-                  	key;
+                  var HuaweiNqaDiscovery = {
                   
-                  	if (!Array.isArray(data)) {
-                  		throw 'Input is not an array';
+                  	buildDiscovery: function(data) {
+                  		var result = [],
+                  			id;
+                  
+                  		for (id in data) {
+                  			if (typeof data[id] !== 'object') {
+                  				continue;
+                  			}
+                  
+                  			result.push({
+                  				'{#NQA.ADMIN}': data[id].admin,
+                  				'{#NQA.TEST}': data[id].test
+                  			});
+                  		}
+                  
+                  		return result;
+                  	}
+                  };
+                  
+                  try {
+                  	var data = JSON.parse(value),
+                  		result;
+                  
+                  	if (typeof data !== 'object') {
+                  		throw 'Input data is not a valid JSON object.';
                   	}
                   
-                  function decodeAscii(parts, start, length) {
-                  	if (start + length > parts.length) {
-                  		throw 'Invalid length for ASCII decoding';
-                  	}
-                  	var chars = [],
-                  		j;
-                  	for (j = 0; j < length; j++) {
-                  		chars.push(String.fromCharCode(+parts[start + j]));
-                  	}
-                  	return chars.join('');
+                  	result = HuaweiNqaDiscovery.buildDiscovery(data);
+                  
+                  	return JSON.stringify(result);
                   }
+                  catch (error) {
+                  	error += (String(error).endsWith('.')) ? '' : '.';
                   
-                  for (i = 0; i < data.length; i++) {
-                  	row = data[i];
-                  	parts = row['{#SNMPINDEX}'].split('.');
-                  	adminLen = +parts[0];
-                  	adminStart = 1;
-                  	admin = decodeAscii(parts, adminStart, adminLen);
-                  	testLen = +parts[adminStart + adminLen];
-                  	testStart = adminStart + adminLen + 1;
-                  	test = decodeAscii(parts, testStart, testLen);
-                  	probePos = testStart + testLen;
-                  	probe = +parts[probePos];
-                  	key = admin + '|' + test;
-                  	if (!grouped[key] || probe > grouped[key].probe) {
-                  		grouped[key] = {
-                  			admin: admin,
-                  			test: test,
-                  			probe: probe,
-                  			index: row['{#SNMPINDEX}']
-                  		};
-                  	}
+                  	Zabbix.log(3, '[ Huawei NQA Discovery ] ERROR: ' + error);
+                  
+                  	return JSON.stringify({error: error});
                   }
-                  
-                  for (key in grouped) {
-                  	result.push({
-                  		"{#NQA.ADMIN}": grouped[key].admin,
-                  		"{#NQA.TEST}": grouped[key].test,
-                  		"{#LATEST_INDEX}": grouped[key].index.replace(/\.\d+$/, '.0')
-                  	});
-                  }
-                  
-                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
