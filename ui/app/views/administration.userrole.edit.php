@@ -189,7 +189,7 @@ $form_grid
 			]),
 			(new CDiv())
 				->setId('service-write-tag-tag-error-container')
-				->addClass(ZBX_STYLE_ERROR_CONTAINER),
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 		]))
 			->addClass('js-service-write-access')
 			->addStyle('display: none;')
@@ -235,7 +235,7 @@ $form_grid
 			]),
 			(new CDiv())
 				->setId('service-read-tag-tag-error-container')
-				->addClass(ZBX_STYLE_ERROR_CONTAINER),
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 		]))
 			->addClass('js-service-read-access')
 			->addStyle('display: none;')
