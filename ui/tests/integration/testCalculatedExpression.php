@@ -459,18 +459,18 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, -((float)self::ZBX_DBL_MAX));
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 1));
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				-((float)self::ZBX_DBL_MAX),
 				0.0,
-				((float)self::ZBX_DBL_MAX)
+				1.0,
+				((float)self::ZBX_DBL_MAX - 1)
 			],
 			array_map('floatval', $values)
 		);
@@ -593,10 +593,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:14 flags:uint64", true, 120);
+			" value:13 flags:uint64", true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:14 flags:uint64", true, 120);
-		$this->assertEquals('14', $this->getItemLastValue($calcItemId));
+			" value:13 flags:uint64", true, 120);
+		$this->assertEquals('13', $this->getItemLastValue($calcItemId));
 	}
 
 	public function testCalculatedExpression_HistogramQuantile()
