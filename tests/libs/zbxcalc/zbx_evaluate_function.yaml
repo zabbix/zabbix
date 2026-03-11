@@ -1523,7 +1523,26 @@ in:
   params: '5m,1.7e+30'
 out:
   return: SUCCEED
-  value: 1.7976931348623158e+308
+  value: 1.79e+308
+---
+test case: Evaluate timeleft(#3,wait infinite)
+in:
+  history:
+  - itemid: 1
+    value type: ITEM_VALUE_TYPE_FLOAT
+    data:
+    - value: -1.79+e308
+      ts: 2017-01-10 10:01:00.000000000 +00:00
+    - value: 0.0
+      ts: 2017-01-10 10:02:00.000000000 +00:00
+    - value: 1.79+e308
+      ts: 2017-01-10 10:03:00.000000000 +00:00
+  time: 2017-01-10 10:05:00.000000000 +00:00
+  function: timeleft
+  params: '#3,-1'
+out:
+  return: SUCCEED
+  value: 1.79e+308
 ---
 test case: Evaluate timeleft(5m,65)
 in:
@@ -4497,6 +4516,23 @@ out:
     out:
       return: SUCCEED
       value: 3.671013
+---
+    test case: Evaluate forecast inf (#2,1s)
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_FLOAT
+        data:
+        - value: 1.79e+307
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 1.79e+308
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+      time: 2017-01-10 10:04:00.000000000 +00:00
+      function: forecast
+      params: '#2,1s,'
+    out:
+      return: SUCCEED
+      value: -1
 ---
 test case: Evaluate timeleft(5m,65,power)
 in:
