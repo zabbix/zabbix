@@ -610,10 +610,10 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_PUSH:
 				alerter_process_push(&alerter_socket, &message,
-						alerter_args_in->config_push_adapter_url,
-						alerter_args_in->config_push_ca_file,
-						alerter_args_in->config_push_cert_file,
-						alerter_args_in->config_push_key_file);
+						alerter_args_in->config_adapter_url,
+						alerter_args_in->config_adapter_ca_file,
+						alerter_args_in->config_adapter_cert_file,
+						alerter_args_in->config_adapter_key_file);
 				break;
 		}
 

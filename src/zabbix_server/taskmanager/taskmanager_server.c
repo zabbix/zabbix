@@ -1319,7 +1319,7 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 	long			http_code = 0;
 	char			*error = NULL, errbuf[CURL_ERROR_SIZE];
 
-	struct	zbx_json_parse jp;
+	struct	zbx_json_parse jp, jp_result;
 	char	met[256];
 	char	bek[256];
 	char	enroll_url[2048];
@@ -1430,18 +1430,18 @@ static void	tm_process_device_enroll(zbx_uint64_t taskid, const char *adapter_ur
 		goto out;
 	}
 
-	if (FAIL == zbx_json_open(ZBX_NULL2EMPTY_STR(body.data), &jp))
+	if (FAIL == zbx_json_brackets_by_name(&jp, "result", &jp_result))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "invalid JSON from adapter: %s", ZBX_NULL2EMPTY_STR(body.data));
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing 'result' in adapter body: %s", ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp, "met", met, sizeof(met), NULL) ||
-			FAIL == zbx_json_value_by_name(&jp, "bek", bek, sizeof(bek), NULL) ||
-			FAIL == zbx_json_value_by_name(&jp, "enroll_url", enroll_url, sizeof(enroll_url), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp_result, "met", met, sizeof(met), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp_result, "bek", bek, sizeof(bek), NULL) ||
+			FAIL == zbx_json_value_by_name(&jp_result, "enroll_url", enroll_url, sizeof(enroll_url), NULL))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "missing met/bek/enroll_url in adapter body: %s",
-		ZBX_NULL2EMPTY_STR(body.data));
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing met/bek/enroll_url in adapter result: %s",
+				ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
 
@@ -1502,7 +1502,7 @@ static void	tm_process_device_offboard(zbx_uint64_t taskid, const char *adapter_
 
 	zbx_db_result_t		result = NULL;
 	zbx_db_row_t		row;
-	const char		*uuid;
+	const char		*uuid, *serverid;
 	char			*payload = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
 	int			td_status = FAIL;
@@ -1519,10 +1519,11 @@ static void	tm_process_device_offboard(zbx_uint64_t taskid, const char *adapter_
 	zbx_json_init(&json, 512);
 
 	result = zbx_db_select(
-			"select d.uuid"
+			"select d.uuid, s.value_str"
 			" from task_device td"
-			" join device d"
-			" on d.deviceid = td.deviceid"
+			" join device d on d.deviceid = td.deviceid"
+			" left join settings s"
+			" on s.name='serverid' and s.type=1"
 			" where td.taskid=" ZBX_FS_UI64,
 			taskid);
 
@@ -1534,11 +1535,13 @@ static void	tm_process_device_offboard(zbx_uint64_t taskid, const char *adapter_
 	}
 
 	uuid = row[0];
+	serverid = row[1];
 
 	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "method", "device_offboard", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "method", "device_enroll", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, "params");
 	zbx_json_addstring(&json, "device_id", uuid, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
 	zbx_json_addstring(&json, "id", taskid, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
@@ -1757,7 +1760,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, char *adapt
 				tm_process_data_result(taskid);
 				processed_num++;
 				break;
-			case ZBX_TM_TASK_ENROLL_DEVICE:
+			case ZBX_TM_TASK_INIT_DEVICE:
 				if (0 != ttl && clock + ttl < now)
 					zbx_db_execute("update task set status=%d where taskid=" ZBX_FS_UI64,
 						ZBX_TM_STATUS_EXPIRED, taskid);
