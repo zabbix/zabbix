@@ -107,7 +107,7 @@ zabbix_export:
             ) AS result
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collect archive status metrics.'
+          description: 'Collects archive status metrics.'
           tags:
             - tag: component
               value: raw
@@ -135,7 +135,7 @@ zabbix_export:
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
           description: |
-            Collect all metrics from pg_stat_activity:
+            Collects all metrics from `pg_stat_activity`:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW
           tags:
             - tag: component
@@ -177,7 +177,7 @@ zabbix_export:
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
           description: |
-            Collect all metrics from pg_stat_database per database:
+            Collects all metrics from `pg_stat_database` per database:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
           tags:
             - tag: component
@@ -216,7 +216,7 @@ zabbix_export:
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
           description: |
-            Collect all metrics from pg_stat_database as sums for all databases:
+            Collects all metrics from `pg_stat_database` as sums for all databases:
             https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW
           tags:
             - tag: component
@@ -312,7 +312,7 @@ zabbix_export:
               ) AS health;
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collects raw PG health metrics.'
+          description: 'Collects raw PostgreSQL health metrics.'
           tags:
             - tag: component
               value: health
@@ -417,7 +417,7 @@ zabbix_export:
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
           description: |
-            Collect all metrics from pg_locks per database:
+            Collects all metrics from `pg_locks` per database:
             https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES
           tags:
             - tag: component
@@ -482,7 +482,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Oldest Active XID >= {$PG.XID_ACTIVE.AVG} for 15m'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Oldest active XID >= {$PG.XID_ACTIVE.AVG}. Check for long-running transactions.'
+              description: 'Oldest active XID >= `{$PG.XID_ACTIVE.AVG}`. Check for long-running transactions.'
               dependencies:
                 - name: 'PostgreSQL: Oldest active XID high'
                   expression: 'min(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"],15m) >= {$PG.XID_ACTIVE.HIGH}'
@@ -495,7 +495,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Oldest Active XID >= {$PG.XID_ACTIVE.HIGH} for 15m'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Oldest active XID >= {$PG.XID_ACTIVE.HIGH}. Investigate immediately.'
+              description: 'Oldest active XID >= `{$PG.XID_ACTIVE.HIGH}`. Investigate immediately.'
               tags:
                 - tag: scope
                   value: performance
@@ -505,7 +505,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Oldest Active XID >= {$PG.XID_ACTIVE.WARN} for 15m'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Oldest active XID >= {$PG.XID_ACTIVE.WARN}. Monitor long transactions.'
+              description: 'Oldest active XID >= `{$PG.XID_ACTIVE.WARN}`. Monitor long transactions.'
               dependencies:
                 - name: 'PostgreSQL: Oldest active XID average'
                   expression: 'min(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"],15m) >= {$PG.XID_ACTIVE.AVG}'
@@ -519,7 +519,7 @@ zabbix_export:
           params: 'SELECT 1'
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.'
+          description: 'Used to test a connection to see if it is alive. Set to `0` if the query is unsuccessful.'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -585,7 +585,7 @@ zabbix_export:
             FROM T
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collect all metrics by query execution time.'
+          description: 'Collects all metrics by query execution time.'
           tags:
             - tag: component
               value: raw
@@ -623,7 +623,7 @@ zabbix_export:
                 ) AS sub;
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collects raw relation size information from primary core database.'
+          description: 'Collects raw relation size information from the primary core database.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -689,7 +689,7 @@ zabbix_export:
               ) t;
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collect metrics from the `pg_stat_replication``, which contains information about the WAL sender process, showing statistics about replication to that sender''s connected standby server.'
+          description: 'Collects metrics from `pg_stat_replication`, which contains information about the WAL sender process, showing statistics about replication to that sender''s connected standby server.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -752,8 +752,8 @@ zabbix_export:
           password: '{$PG.PASSWORD}'
           description: |
             Replication role:
-            1 — Standby mode 
-            0 — Master mode
+            1 - Standby mode
+            0 - Master mode
           valuemap:
             name: 'PostgreSQL recovery role'
           tags:
@@ -778,9 +778,9 @@ zabbix_export:
           password: '{$PG.PASSWORD}'
           description: |
             Shows replication streaming state:
-            0 = Standby offline
-            1 = Standby streaming
-            2 = Master node
+            0 - Standby offline
+            1 - Standby streaming
+            2 - Master node
           valuemap:
             name: 'PostgreSQL replication status'
           tags:
@@ -821,9 +821,8 @@ zabbix_export:
           password: '{$PG.PASSWORD}'
           description: |
             Shows `apply errors`, `sync errors`, and `last reset time` for each subscription.
-            Caution!!!
-            Logical replication subscription metrics supported for PG 15-18.
-            Designed for subscriber databases with existing subscriptions. Unsupported or missing values will be discarded.
+            IMPORTANT!
+            Logical replication subscription metrics are supported for PostgreSQL 15–18 and are designed for subscriber databases with existing subscriptions. Unsupported or missing values will be discarded.
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -1004,7 +1003,7 @@ zabbix_export:
               ) T
           username: '{$PG.USER}'
           password: '{$PG.PASSWORD}'
-          description: 'Collect write-ahead log (WAL) metrics.'
+          description: 'Collects write-ahead log (WAL) metrics.'
           tags:
             - tag: component
               value: raw
@@ -1142,7 +1141,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle connections >= {$PG.IDLE.AVG} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Number of idle connections >= {$PG.IDLE.AVG}.'
+              description: 'Number of idle connections >= `{$PG.IDLE.AVG}`.'
               dependencies:
                 - name: 'PostgreSQL: Idle high'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.idle,5m) >= {$PG.IDLE.HIGH}'
@@ -1155,7 +1154,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle connections >= {$PG.IDLE.HIGH} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Number of idle connections >= {$PG.IDLE.HIGH}.'
+              description: 'Number of idle connections >= `{$PG.IDLE.HIGH}`.'
               tags:
                 - tag: scope
                   value: performance
@@ -1165,7 +1164,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle connections >= {$PG.IDLE.WARN} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Number of idle connections >= {$PG.IDLE.WARN}.'
+              description: 'Number of idle connections >= `{$PG.IDLE.WARN}`.'
               dependencies:
                 - name: 'PostgreSQL: Idle average'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.idle,5m) >= {$PG.IDLE.AVG}'
@@ -1193,7 +1192,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle in transaction >= {$PG.IDLE.TRANSACTION.AVG} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Number of idle in transaction connections >= {$PG.IDLE.TRANSACTION.AVG}.'
+              description: 'Number of idle in transaction connections >= `{$PG.IDLE.TRANSACTION.AVG}`.'
               dependencies:
                 - name: 'PostgreSQL: Idle in transaction high'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.idle_in_transaction,5m) >= {$PG.IDLE.TRANSACTION.HIGH}'
@@ -1206,7 +1205,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle in transaction >= {$PG.IDLE.TRANSACTION.HIGH} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Number of idle in transaction connections >= {$PG.IDLE.TRANSACTION.HIGH}.'
+              description: 'Number of idle in transaction connections >= `{$PG.IDLE.TRANSACTION.HIGH}`.'
               tags:
                 - tag: scope
                   value: performance
@@ -1216,7 +1215,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle in transaction >= {$PG.IDLE.TRANSACTION.WARN} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Number of idle in transaction connections >= {$PG.IDLE.TRANSACTION.WARN}.'
+              description: 'Number of idle in transaction connections >= `{$PG.IDLE.TRANSACTION.WARN}`.'
               dependencies:
                 - name: 'PostgreSQL: Idle in transaction average'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.idle_in_transaction,5m) >= {$PG.IDLE.TRANSACTION.AVG}'
@@ -1244,7 +1243,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle in transaction (aborted) >= {$PG.IDLE.TRANSACTION.ABORTED.AVG} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Number of idle in transaction (aborted) connections >= {$PG.IDLE.TRANSACTION.ABORTED.AVG}.'
+              description: 'Number of idle in transaction (aborted) connections >= `{$PG.IDLE.TRANSACTION.ABORTED.AVG}`.'
               dependencies:
                 - name: 'PostgreSQL: Idle in transaction (aborted) high'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.idle_in_transaction_aborted,5m) >= {$PG.IDLE.TRANSACTION.ABORTED.HIGH}'
@@ -1257,7 +1256,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle in transaction (aborted) >= {$PG.IDLE.TRANSACTION.ABORTED.HIGH} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Number of idle in transaction (aborted) connections >= {$PG.IDLE.TRANSACTION.ABORTED.HIGH}.'
+              description: 'Number of idle in transaction (aborted) connections >= `{$PG.IDLE.TRANSACTION.ABORTED.HIGH}`.'
               tags:
                 - tag: scope
                   value: performance
@@ -1267,7 +1266,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Idle in transaction (aborted) >= {$PG.IDLE.TRANSACTION.ABORTED.WARN} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Number of idle in transaction (aborted) connections >= {$PG.IDLE.TRANSACTION.ABORTED.WARN}.'
+              description: 'Number of idle in transaction (aborted) connections >= `{$PG.IDLE.TRANSACTION.ABORTED.WARN}`.'
               dependencies:
                 - name: 'PostgreSQL: Idle in transaction (aborted) average'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.idle_in_transaction_aborted,5m) >= {$PG.IDLE.TRANSACTION.ABORTED.AVG}'
@@ -1309,7 +1308,7 @@ zabbix_export:
           type: DEPENDENT
           key: pgsql.connections.sum.total_pct
           units: '%'
-          description: 'Total number of connections, in percentage.'
+          description: 'Total number of connections, in percent.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1326,7 +1325,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Connections >= {$PG.CONNECTION.COUNT.AVG}% for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Total connections >= {$PG.CONNECTION.COUNT.AVG}%.'
+              description: 'Total connections >= `{$PG.CONNECTION.COUNT.AVG}`%.'
               dependencies:
                 - name: 'PostgreSQL: Connection usage high'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) >= {$PG.CONNECTION.COUNT.HIGH}'
@@ -1339,7 +1338,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Connections >= {$PG.CONNECTION.COUNT.HIGH}% for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Total connections >= {$PG.CONNECTION.COUNT.HIGH}%.'
+              description: 'Total connections >= `{$PG.CONNECTION.COUNT.HIGH}`%.'
               tags:
                 - tag: scope
                   value: performance
@@ -1349,7 +1348,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Connections >= {$PG.CONNECTION.COUNT.WARN}% for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Total connections >= {$PG.CONNECTION.COUNT.WARN}%.'
+              description: 'Total connections >= `{$PG.CONNECTION.COUNT.WARN}`%.'
               dependencies:
                 - name: 'PostgreSQL: Connection usage average'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) >= {$PG.CONNECTION.COUNT.AVG}'
@@ -1379,7 +1378,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Waiting connections >= {$PG.WAITING.AVG} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Number of connections waiting >= {$PG.WAITING.AVG}.'
+              description: 'Number of connections waiting >= `{$PG.WAITING.AVG}`.'
               dependencies:
                 - name: 'PostgreSQL: Waiting connections high'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.waiting,5m) >= {$PG.WAITING.HIGH}'
@@ -1392,7 +1391,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Waiting connections >= {$PG.WAITING.HIGH} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Number of connections waiting >= {$PG.WAITING.HIGH}.'
+              description: 'Number of connections waiting >= `{$PG.WAITING.HIGH}`.'
               tags:
                 - tag: scope
                   value: performance
@@ -1402,7 +1401,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Waiting connections >= {$PG.WAITING.WARN} for 5m'
               opdata: 'Current count: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Number of connections waiting >= {$PG.WAITING.WARN}.'
+              description: 'Number of connections waiting >= `{$PG.WAITING.WARN}`.'
               dependencies:
                 - name: 'PostgreSQL: Waiting connections average'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.connections.sum.waiting,5m) >= {$PG.WAITING.AVG}'
@@ -1415,7 +1414,7 @@ zabbix_export:
           key: pgsql.dbstat.sum.blks_hit.rate
           value_type: FLOAT
           units: '!read/s'
-          description: 'Number of times per second disk blocks were found already in the buffer cache.'
+          description: 'Number of times per second disk blocks were found in the buffer cache.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1487,7 +1486,7 @@ zabbix_export:
           key: pgsql.dbstat.sum.conflicts.rate
           value_type: FLOAT
           units: '!conflicts/s'
-          description: 'Number of queries canceled per second due to conflicts with recovery (conflicts occur only on standby servers; see pg_stat_database_conflicts for details).'
+          description: 'Number of queries canceled per second due to conflicts with recovery (conflicts occur only on standby servers; see `pg_stat_database_conflicts` for details).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1732,7 +1731,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Autovacuum active workers >= {$PG.AUTOVAC.ACTIVE.WORKERS.WARN} for 5m'
               opdata: 'Current active workers: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Number of active autovacuum workers exceeded the ({$PG.AUTOVAC.ACTIVE.WORKERS.WARN}) threshold for the last 5 minutes.'
+              description: 'Number of active autovacuum workers has exceeded the `{$PG.AUTOVAC.ACTIVE.WORKERS.WARN}` threshold for the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -1757,7 +1756,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Autovacuum idle workers >= {$PG.AUTOVAC.IDLE.WORKERS.WARN} for 5m'
               opdata: 'Current idle workers: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Number of idle autovacuum workers exceeded the ({$PG.AUTOVAC.IDLE.WORKERS.WARN}) threshold for the last 5 minutes.'
+              description: 'Number of idle autovacuum workers has exceeded the `{$PG.AUTOVAC.IDLE.WORKERS.WARN}` threshold for the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -1788,7 +1787,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Buffer hit ratio <= {$PG.HEALTH.CACHE.WARN}% for 5m'
               opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Buffer hit ratio <= {$PG.HEALTH.CACHE.WARN}%. Slightly below optimal. Monitor I/O and queries.'
+              description: 'Buffer hit ratio <= `{$PG.HEALTH.CACHE.WARN}`%. Slightly below optimal. Monitor I/O and queries.'
               dependencies:
                 - name: 'PostgreSQL: Health: Buffer hit average'
                   expression: 'max(/PostgreSQL by ODBC/pgsql.health.cache.hit.ratio,5m) <= {$PG.HEALTH.CACHE.AVG}'
@@ -1801,7 +1800,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Buffer hit ratio <= {$PG.HEALTH.CACHE.AVG}% for 5m'
               opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Buffer hit ratio <= {$PG.HEALTH.CACHE.AVG}%. Low cache efficiency, potential I/O pressure. Investigate frequently used queries.'
+              description: 'Buffer hit ratio <= `{$PG.HEALTH.CACHE.AVG}`%. Low cache efficiency, potential I/O pressure. Investigate frequently used queries.'
               dependencies:
                 - name: 'PostgreSQL: Health: Buffer hit high'
                   expression: 'max(/PostgreSQL by ODBC/pgsql.health.cache.hit.ratio,5m) <= {$PG.HEALTH.CACHE.HIGH}'
@@ -1814,7 +1813,7 @@ zabbix_export:
               event_name: 'PostgreSQL: Buffer hit ratio <= {$PG.HEALTH.CACHE.HIGH}% for 5m'
               opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Buffer hit ratio <= {$PG.HEALTH.CACHE.HIGH}%. Very low cache efficiency. High I/O load expected. Investigate hot queries and disk usage immediately.'
+              description: 'Buffer hit ratio <= `{$PG.HEALTH.CACHE.HIGH}`%. Very low cache efficiency. High I/O load expected. Investigate hot queries and disk usage immediately.'
               tags:
                 - tag: scope
                   value: performance
@@ -1857,7 +1856,7 @@ zabbix_export:
               event_name: 'PostgreSQL: XID age >= {$PG.XID_MAX.AVG}'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Oldest XID age >= {$PG.XID_MAX.AVG}. Ensure autovacuum is running properly; investigate long-running transactions.'
+              description: 'Oldest XID age >= `{$PG.XID_MAX.AVG}`. Ensure autovacuum is running properly; investigate long-running transactions.'
               dependencies:
                 - name: 'PostgreSQL: XID age high'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.health.max.xid.age,5m) >= {$PG.XID_MAX.HIGH}'
@@ -1870,7 +1869,7 @@ zabbix_export:
               event_name: 'PostgreSQL: XID age >= {$PG.XID_MAX.HIGH}'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Oldest XID age >= {$PG.XID_MAX.HIGH}. Immediate action required! Check autovacuum, terminate long-running transactions to prevent wraparound risk.'
+              description: 'Oldest XID age >= `{$PG.XID_MAX.HIGH}`. Immediate action required! Check autovacuum, terminate long-running transactions to prevent wraparound risk.'
               tags:
                 - tag: scope
                   value: performance
@@ -1880,7 +1879,7 @@ zabbix_export:
               event_name: 'PostgreSQL: XID age >= {$PG.XID_MAX.WARN}'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Oldest XID age >= {$PG.XID_MAX.WARN}. Check autovacuum activity and monitor long-running transactions.'
+              description: 'Oldest XID age >= `{$PG.XID_MAX.WARN}`. Check autovacuum activity and monitor long-running transactions.'
               dependencies:
                 - name: 'PostgreSQL: XID age average'
                   expression: 'min(/PostgreSQL by ODBC/pgsql.health.max.xid.age,5m) >= {$PG.XID_MAX.AVG}'
@@ -1893,7 +1892,7 @@ zabbix_export:
           key: pgsql.health.max.xid.percent
           value_type: FLOAT
           units: '%'
-          description: 'Max XID age as "%" of wraparound.'
+          description: 'Max XID age as % of wraparound.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1940,7 +1939,7 @@ zabbix_export:
           key: pgsql.longest.running.query.duration
           value_type: FLOAT
           units: s
-          description: 'Duration of the currently LRQ (Longest Running Query).'
+          description: 'Duration of the current LRQ (Longest Running Query).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1956,7 +1955,7 @@ zabbix_export:
               name: 'PostgreSQL: LRQ duration average'
               opdata: 'Running time: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'Query running longer than {$PG.LRQ.TIME.AVG} seconds; check pg_stat_activity, optimize or index if needed, and cancel if blocking critical operations.'
+              description: 'Query running longer than `{$PG.LRQ.TIME.AVG}` seconds; check `pg_stat_activity`, optimize or index if needed, and cancel if blocking critical operations.'
               dependencies:
                 - name: 'PostgreSQL: LRQ duration high'
                   expression: 'last(/PostgreSQL by ODBC/pgsql.longest.running.query.duration) >= {$PG.LRQ.TIME.HIGH}'
@@ -1968,7 +1967,7 @@ zabbix_export:
               name: 'PostgreSQL: LRQ duration high'
               opdata: 'Running time: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Query running longer than {$PG.LRQ.TIME.HIGH} seconds; check pg_stat_activity, optimize or index if needed, and cancel if blocking critical operations.'
+              description: 'Query running longer than `{$PG.LRQ.TIME.HIGH}` seconds; check `pg_stat_activity`, optimize or index if needed, and cancel if blocking critical operations.'
               tags:
                 - tag: scope
                   value: performance
@@ -1976,7 +1975,7 @@ zabbix_export:
           name: 'LRQ: PID'
           type: DEPENDENT
           key: pgsql.longest.running.query.pid
-          description: 'PID of the currently LRQ (Longest Running Query).'
+          description: 'PID of the current LRQ (Longest Running Query).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2047,11 +2046,11 @@ zabbix_export:
             - tag: component
               value: version
         - uuid: e7e4e8cc216442aaa51817facc836257
-          name: 'Build: PG version'
+          name: 'Build: Version'
           type: DEPENDENT
           key: pgsql.version.major.minor
           value_type: CHAR
-          description: 'PostgreSQL version(major.minor).'
+          description: 'PostgreSQL version (major.minor).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2123,7 +2122,7 @@ zabbix_export:
           key: pgsql.version.validator
           history: '0'
           value_type: CHAR
-          description: 'Validates PG version and sets version macros for LLDs.'
+          description: 'Validates the PostgreSQL version and sets version macros for LLDs.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -2260,7 +2259,6 @@ zabbix_export:
               WHERE
                 NOT datistemplate
                 AND datallowconn
-                AND datname != 'postgres'
             )
             SELECT '{"data":'|| regexp_replace(coalesce(json_agg(T), '[]'::json)::text, E'[\\n\\r\\s]+', '', 'g') || '}'
             FROM T
@@ -2292,7 +2290,7 @@ zabbix_export:
                   WHERE datname = '{#DBNAME}'
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
-              description: 'Age of the database in transactions (XID distance from datfrozenxid).'
+              description: 'Age of the database in transactions (XID distance from `datfrozenxid`).'
               tags:
                 - tag: component
                   value: application
@@ -2338,7 +2336,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: DB [{#DBNAME}]: Size >= `avg` state for 5m'
                   opdata: '{#DBNAME} current size: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Database "{#DBNAME}" size >= {$PG.DATABASE.SIZE.AVG} bytes.'
+                  description: 'Database `{#DBNAME}` size >= `{$PG.DATABASE.SIZE.AVG}` bytes.'
                   dependencies:
                     - name: 'PostgreSQL: DB [{#DBNAME}]: Size high'
                       expression: 'min(/PostgreSQL by ODBC/db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"],5m) >= {$PG.DATABASE.SIZE.HIGH:"{#DBNAME}"}'
@@ -2351,7 +2349,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: DB [{#DBNAME}]: Size >= `high` state for 5m'
                   opdata: '{#DBNAME} current size: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Database "{#DBNAME}" size >= {$PG.DATABASE.SIZE.HIGH} bytes.'
+                  description: 'Database `{#DBNAME}` size >= `{$PG.DATABASE.SIZE.HIGH}` bytes.'
                   tags:
                     - tag: scope
                       value: capacity
@@ -2361,7 +2359,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: DB [{#DBNAME}]: Size >= `warn` state for 5m'
                   opdata: '{#DBNAME} current size: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Database "{#DBNAME}" size >= {$PG.DATABASE.SIZE.WARN} bytes.'
+                  description: 'Database `{#DBNAME}` size >= `{$PG.DATABASE.SIZE.WARN}` bytes.'
                   dependencies:
                     - name: 'PostgreSQL: DB [{#DBNAME}]: Size average'
                       expression: 'min(/PostgreSQL by ODBC/db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING.ODBC}"],5m) >= {$PG.DATABASE.SIZE.AVG:"{#DBNAME}"}'
@@ -2374,7 +2372,7 @@ zabbix_export:
               key: 'pgsql.dbstat.blks_hit.rate["{#DBNAME}"]'
               value_type: FLOAT
               units: '!hits/s'
-              description: 'Total number of times per second disk blocks were found already in the buffer cache, so that a read was not necessary.'
+              description: 'Total number of times per second disk blocks were found in the buffer cache, making a read unnecessary.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2471,7 +2469,7 @@ zabbix_export:
                   value: '{#DBNAME}'
               trigger_prototypes:
                 - uuid: 8dc225c8a2824e5cb62b0ce4dd11dc1e
-                  expression: 'min(/PostgreSQL by ODBC/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) >= {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL by ODBC/pgsql.dbstat.conflicts.rate["{#DBNAME}"],5m) > {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"}'
                   name: 'PostgreSQL: DB [{#DBNAME}]: Too many recovery conflicts'
                   event_name: 'PostgreSQL: DB [{#DBNAME}]: Too many recovery conflicts (over {$PG.CONFLICTS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: AVERAGE
@@ -2502,11 +2500,11 @@ zabbix_export:
                   value: '{#DBNAME}'
               trigger_prototypes:
                 - uuid: 7e9c3fad615448deafbd21abdac7936d
-                  expression: 'min(/PostgreSQL by ODBC/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) >= {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
+                  expression: 'min(/PostgreSQL by ODBC/pgsql.dbstat.deadlocks.rate["{#DBNAME}"],5m) > {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}'
                   name: 'PostgreSQL: DB [{#DBNAME}]: Deadlock occurred'
                   event_name: 'PostgreSQL: DB [{#DBNAME}]: Deadlock occurred (over {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: HIGH
-                  description: 'Number of deadlocks detected per second exceeds {$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"} for 5m.'
+                  description: 'Number of deadlocks detected per second has exceeded `{$PG.DEADLOCKS.MAX.WARN:"{#DBNAME}"}` for 5m.'
                   tags:
                     - tag: scope
                       value: performance
@@ -2516,7 +2514,7 @@ zabbix_export:
               key: 'pgsql.dbstat.get["{#DBNAME}"]'
               history: '0'
               value_type: TEXT
-              description: 'Get dbstat metrics for database "{#DBNAME}".'
+              description: 'Get `dbstat` metrics for database `{#DBNAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2718,7 +2716,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of accessexclusive locks'
               type: DEPENDENT
               key: 'pgsql.locks.accessexclusive["{#DBNAME}"]'
-              description: 'Number of accessexclusive locks for this database.'
+              description: 'Number of `accessexclusive` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2734,7 +2732,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of accessshare locks'
               type: DEPENDENT
               key: 'pgsql.locks.accessshare["{#DBNAME}"]'
-              description: 'Number of accessshare locks for this database.'
+              description: 'Number of `accessshare` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2750,7 +2748,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of exclusive locks'
               type: DEPENDENT
               key: 'pgsql.locks.exclusive["{#DBNAME}"]'
-              description: 'Number of exclusive locks for this database.'
+              description: 'Number of `exclusive` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2768,7 +2766,7 @@ zabbix_export:
               key: 'pgsql.locks.get["{#DBNAME}"]'
               history: '0'
               value_type: TEXT
-              description: 'Get locks metrics for database "{#DBNAME}".'
+              description: 'Get locks metrics for database `{#DBNAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2785,7 +2783,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of rowexclusive locks'
               type: DEPENDENT
               key: 'pgsql.locks.rowexclusive["{#DBNAME}"]'
-              description: 'Number of rowexclusive locks for this database.'
+              description: 'Number of `rowexclusive` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2801,7 +2799,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of rowshare locks'
               type: DEPENDENT
               key: 'pgsql.locks.rowshare["{#DBNAME}"]'
-              description: 'Number of rowshare locks for this database.'
+              description: 'Number of `rowshare` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2818,7 +2816,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of sharerowexclusive locks'
               type: DEPENDENT
               key: 'pgsql.locks.sharerowexclusive["{#DBNAME}"]'
-              description: 'Number of total sharerowexclusive for this database.'
+              description: 'Number of total `sharerowexclusive` for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2834,7 +2832,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of shareupdateexclusive locks'
               type: DEPENDENT
               key: 'pgsql.locks.shareupdateexclusive["{#DBNAME}"]'
-              description: 'Number of shareupdateexclusive locks for this database.'
+              description: 'Number of `shareupdateexclusive` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2850,7 +2848,7 @@ zabbix_export:
               name: 'DB [{#DBNAME}]: Num of share locks'
               type: DEPENDENT
               key: 'pgsql.locks.share["{#DBNAME}"]'
-              description: 'Number of share locks for this database.'
+              description: 'Number of `share` locks for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2884,7 +2882,7 @@ zabbix_export:
               key: 'pgsql.queries.get["{#DBNAME}"]'
               history: '0'
               value_type: TEXT
-              description: 'Get queries metrics for database "{#DBNAME}".'
+              description: 'Get query metrics for database `{#DBNAME}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2935,7 +2933,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.mro.time_sum["{#DBNAME}"]'
               units: s
-              description: 'Sum maintenance query time for this database.'
+              description: 'Sum of maintenance query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2969,7 +2967,7 @@ zabbix_export:
                   name: 'PostgreSQL: DB [{#DBNAME}]: Too many slow queries'
                   event_name: 'PostgreSQL: DB [{#DBNAME}]: Too many slow queries (over {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"} in 5m)'
                   priority: WARNING
-                  description: 'The number of detected slow queries exceeds the limit of {$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}.'
+                  description: 'The number of detected slow queries has exceeded the limit of `{$PG.SLOW_QUERIES.MAX.WARN:"{#DBNAME}"}`.'
                   tags:
                     - tag: scope
                       value: performance
@@ -2995,7 +2993,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.query.time_sum["{#DBNAME}"]'
               units: s
-              description: 'Sum query time for this database.'
+              description: 'Sum of query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3045,7 +3043,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.queries.tx.time_sum["{#DBNAME}"]'
               units: s
-              description: 'Sum transaction query time for this database.'
+              description: 'Sum of transaction query time for this database.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3282,7 +3280,7 @@ zabbix_export:
               key: 'pgsql.replication.get["{#APPLICATION_NAME}"]'
               history: '0'
               value_type: TEXT
-              description: 'Collect metrics from the "pg_stat_replication" about the application "{#APPLICATION_NAME}" that is connected to this WAL sender, which contains information about the WAL sender process, showing statistics about replication to that sender''s connected standby server.'
+              description: 'Collects metrics from `pg_stat_replication` about the application `{#APPLICATION_NAME}` that is connected to this WAL sender, which contains information about the WAL sender process, showing statistics about replication to that sender''s connected standby server.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3301,7 +3299,7 @@ zabbix_export:
               key: 'pgsql.replication.process.flush_lag["{#APPLICATION_NAME}"]'
               value_type: FLOAT
               units: s
-              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written and flushed it (but not yet applied it). This can be used to gauge the delay that synchronous_commit level on incurred while committing if this server was configured as a synchronous standby.'
+              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written and flushed it (but not yet applied it). This can be used to gauge the delay that `synchronous_commit` level incurred while committing if this server was configured as a synchronous standby.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3319,7 +3317,7 @@ zabbix_export:
               key: 'pgsql.replication.process.replay_lag["{#APPLICATION_NAME}"]'
               value_type: FLOAT
               units: s
-              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written, flushed and applied it. This can be used to gauge the delay that synchronous_commit level remote_apply incurred while committing if this server was configured as a synchronous standby.'
+              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written, flushed, and applied it. This can be used to gauge the delay that `synchronous_commit` level `remote_apply` incurred while committing if this server was configured as a synchronous standby.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3337,7 +3335,7 @@ zabbix_export:
               key: 'pgsql.replication.process.write_lag["{#APPLICATION_NAME}"]'
               value_type: FLOAT
               units: s
-              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written it (but not yet flushed it or applied it). This can be used to gauge the delay that synchronous_commit level remote_write incurred while committing if this server was configured as a synchronous standby.'
+              description: 'Time elapsed between flushing recent WAL locally and receiving notification that this standby server has written it (but not yet flushed it or applied it). This can be used to gauge the delay that `synchronous_commit` level `remote_write` incurred while committing if this server was configured as a synchronous standby.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -3372,7 +3370,7 @@ zabbix_export:
               parameters:
                 - 3h
         - uuid: fee729c8c626409ba1849e0f6d99392c
-          name: 'Bgwriter metrics discovery (above PG 17)'
+          name: 'Bgwriter metrics discovery (v17+)'
           type: DEPENDENT
           key: pgsql.bgwriter.above_17.discovery
           filter:
@@ -3380,7 +3378,7 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V17}'
                 value: 'false'
-          description: 'Discovers "bgwriter" metrics for PostgreSQL version 17 and above.'
+          description: 'Discovers `bgwriter` metrics in PostgreSQL 17 and above.'
           item_prototypes:
             - uuid: 46c4d56f21b24f4face87858445e7b5e
               name: 'Get bgwriter'
@@ -3585,7 +3583,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: fcbd89dc14aa4bd99446016d453f850d
-          name: 'Bgwriter metrics discovery (below PG 17)'
+          name: 'Bgwriter metrics discovery (v<=17)'
           type: DEPENDENT
           key: pgsql.bgwriter.below_17.discovery
           filter:
@@ -3593,7 +3591,7 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V17}'
                 value: 'true'
-          description: 'Discovers "bgwriter" metrics for PostgreSQL below version 17.'
+          description: 'Discovers `bgwriter` metrics in PostgreSQL 17 and below.'
           item_prototypes:
             - uuid: 777e615655634c8bae2e13cef153314b
               name: 'Get bgwriter'
@@ -3831,7 +3829,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: c10ee16518b74163b984cf1cc9967865
-          name: 'I/O metrics discovery (above PG 18)'
+          name: 'I/O metrics discovery (v18+)'
           type: DEPENDENT
           key: pgsql.io.discovery.version.above.18
           filter:
@@ -3839,7 +3837,7 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V18}'
                 value: 'false'
-          description: 'I/O stats for PG 18 and above.'
+          description: 'Discovers `I/O` metrics in PostgreSQL 18 and above.'
           item_prototypes:
             - uuid: cecad6427f454bcbae8483537ed85bc8
               name: 'I/O: Get data'
@@ -3872,7 +3870,7 @@ zabbix_export:
                   pg_stat_io;
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
-              description: 'Aggregated pg_stat_io metrics for PG above 18 version.'
+              description: 'Aggregated `pg_stat_io metrics` for PostgreSQL 18 and above.'
               tags:
                 - tag: component
                   value: raw
@@ -3904,7 +3902,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: I/O buffer hit ratio <= {$PG.IO.CACHE.AVG}% for 5m'
                   opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'I/O buffer hit ratio <= {$PG.IO.CACHE.AVG}%. Moderate cache efficiency drop. Investigate queries and disk latency.'
+                  description: 'I/O buffer hit ratio <= `{$PG.IO.CACHE.AVG}`%. Moderate cache efficiency drop. Investigate queries and disk latency.'
                   dependencies:
                     - name: 'PostgreSQL: I/O:Buffer hit high'
                       expression: 'max(/PostgreSQL by ODBC/pgsql.io.hit.ratio.version.above.18[{#SINGLETON}],5m) <= {$PG.IO.CACHE.HIGH}'
@@ -3917,7 +3915,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: I/O buffer hit ratio <= {$PG.IO.CACHE.HIGH}% for 5m'
                   opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'I/O buffer hit ratio <= {$PG.IO.CACHE.HIGH}%. Critical cache inefficiency. High disk I/O expected. Investigate storage performance immediately.'
+                  description: 'I/O buffer hit ratio <= `{$PG.IO.CACHE.HIGH}`%. Critical cache inefficiency. High disk I/O expected. Investigate storage performance immediately.'
                   tags:
                     - tag: scope
                       value: performance
@@ -3927,7 +3925,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: I/O buffer hit ratio <= {$PG.IO.CACHE.WARN}% for 5m'
                   opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'I/O buffer hit ratio <= {$PG.IO.CACHE.WARN}%. Slightly below optimal. Monitor memory and disk activity.'
+                  description: 'I/O buffer hit ratio <= `{$PG.IO.CACHE.WARN}`%. Slightly below optimal. Monitor memory and disk activity.'
                   dependencies:
                     - name: 'PostgreSQL: I/O:Buffer hit average'
                       expression: 'max(/PostgreSQL by ODBC/pgsql.io.hit.ratio.version.above.18[{#SINGLETON}],5m) <= {$PG.IO.CACHE.AVG}'
@@ -3956,10 +3954,10 @@ zabbix_export:
               value_type: FLOAT
               units: s
               description: |
-                Total time spent on IO operations (read + write).
-                Caution!!!
-                Requires `track_io_timing` = on in p`ostgresql.conf` or via `ALTER SYSTEM`.
-                Otherwise, this metric will always be 0.
+                Total time spent on I/O operations (read + write).
+                IMPORTANT!
+                Requires `track_io_timing = on` in `postgresql.conf` or via `ALTER SYSTEM`.
+                Otherwise, this metric will always be `0`.
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -4009,7 +4007,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: a7c52e8f0f3d4e7cb12a9f7b1d64b9e3
-          name: 'I/O metrics discovery (PG 16-17)'
+          name: 'I/O metrics discovery (v16–17)'
           type: DEPENDENT
           key: pgsql.io.discovery.version.below.18
           filter:
@@ -4019,7 +4017,7 @@ zabbix_export:
                 value: 'false'
               - macro: '{#BELOW_V18}'
                 value: 'true'
-          description: 'I/O stats for PG 16-17.'
+          description: 'Discovers `I/O` metrics in PostgreSQL 16 and 17.'
           item_prototypes:
             - uuid: e9d8b7c6a5f64d1eaf5b1c7e3b5d2a4f
               name: 'I/O: Get data'
@@ -4034,7 +4032,7 @@ zabbix_export:
                   pg_stat_io;
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
-              description: 'Aggregated pg_stat_io metrics for PG 16 version.'
+              description: 'Aggregated `pg_stat_io` metrics for PostgreSQL 16-17.'
               tags:
                 - tag: component
                   value: raw
@@ -4086,7 +4084,7 @@ zabbix_export:
               - macro: '{#SCHEMA.NAME}'
                 value: '{$PG.LLD.FILTER.SCHEMA.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'Discovers all PG schemas in the primary core database.'
+          description: 'Discovers all PostgreSQL schemas in the primary core database.'
           item_prototypes:
             - uuid: 6491a8e759cf494ea15446822b5fcf87
               name: 'Relation [{#SCHEMA.NAME}]: Size'
@@ -4121,7 +4119,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: d9c2e7a1b4f54c3eb2a1f8d123456789
-          name: 'Replication slots metrics discovery (above PG 15)'
+          name: 'Replication slots metrics discovery (v15+)'
           type: DEPENDENT
           key: pgsql.replication.slots.above.15.discovery
           filter:
@@ -4129,7 +4127,7 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V15}'
                 value: 'false'
-          description: 'LLD for replication slots for above PG 15.'
+          description: 'Discovers `replication slots` metrics in PostgreSQL 15 and above.'
           item_prototypes:
             - uuid: a95a0c68cc644d9695fef2a97a393a71
               name: 'Replication slots: Get slots'
@@ -4173,11 +4171,9 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collect raw replication slot information from `pg_replication_slots`,
-                including activity state, WAL retention, and slot type.
-                Caution!!!
-                Ensure logical replication is enabled: set `wal_level=logical`,
-                `max_replication_slots` >= 1, `max_wal_senders` >= 1 in `postgresql.conf`.
+                Collects raw replication slot information from `pg_replication_slots`, including activity state, WAL retention, and slot type.
+                IMPORTANT!
+                Ensure logical replication is enabled: set `wal_level=logical`, `max_replication_slots` >= 1, `max_wal_senders` >= 1 in `postgresql.conf`.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -4236,7 +4232,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Slots retaining WAL >= {$PG.REPLICATION.SLOTS.RETAINING.AVG} for 5m'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Slots retaining WAL >= {$PG.REPLICATION.SLOTS.RETAINING.AVG}. Some inactive slots are retaining WAL; monitor to prevent disk growth.'
+                  description: 'Slots retaining WAL >= `{$PG.REPLICATION.SLOTS.RETAINING.AVG}`. Some inactive slots are retaining WAL; monitor to prevent disk growth.'
                   dependencies:
                     - name: 'PostgreSQL: Replication slots: Retaining WAL high'
                       expression: 'min(/PostgreSQL by ODBC/pgsql.replication.slots.inactive.retaining.above.15[{#SINGLETON}],5m) >= {$PG.REPLICATION.SLOTS.RETAINING.HIGH}'
@@ -4249,7 +4245,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Slots retaining WAL >= {$PG.REPLICATION.SLOTS.RETAINING.HIGH} for 5m'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Slots retaining WAL >= {$PG.REPLICATION.SLOTS.RETAINING.HIGH}. Inactive slots retaining WAL may cause significant disk usage. Investigate and clean up unnecessary slots immediately.'
+                  description: 'Slots retaining WAL >= `{$PG.REPLICATION.SLOTS.RETAINING.HIGH}`. Inactive slots retaining WAL may cause significant disk usage. Investigate and clean up unnecessary slots immediately.'
                   tags:
                     - tag: scope
                       value: performance
@@ -4308,7 +4304,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 7c315d5963254d6d9fa2790b2bf010e1
-          name: 'Replication slots metrics discovery (PG 12-14)'
+          name: 'Replication slots metrics discovery (v12–14)'
           type: DEPENDENT
           key: pgsql.replication.slots.below_15.discovery
           filter:
@@ -4318,7 +4314,7 @@ zabbix_export:
                 value: 'false'
               - macro: '{#BELOW_V15}'
                 value: 'true'
-          description: 'LLD for replication slots for PG 12-14.'
+          description: 'Discovers `replication slots` metrics in PostgreSQL 12 to 14.'
           item_prototypes:
             - uuid: ecb1eb567e664bcf8330520e5d202c81
               name: 'Replication slots: Get slots'
@@ -4351,11 +4347,9 @@ zabbix_export:
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
               description: |
-                Collect raw replication slot information from `pg_replication_slots`,
-                including activity state, WAL retention, and slot type.
-                Caution!!!
-                Ensure logical replication is enabled: set `wal_level=logical`,
-                `max_replication_slots` >= 1, `max_wal_senders` >= 1 in `postgresql.conf`.
+                Collects raw replication slot information from `pg_replication_slots`, including activity state, WAL retention, and slot type.
+                IMPORTANT!
+                Ensure logical replication is enabled: set `wal_level=logical`, `max_replication_slots` >= 1, `max_wal_senders` >= 1 in `postgresql.conf`.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -4412,7 +4406,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: bdebb7e9e22f4c40a933cb6a5986142d
-          name: 'SLRU metrics discovery (above PG 13)'
+          name: 'SLRU metrics discovery (v13+)'
           type: DEPENDENT
           key: pgsql.slru.above_13.discovery
           filter:
@@ -4420,7 +4414,7 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V13}'
                 value: 'false'
-          description: 'SLRU statistics for PG 13 and above.'
+          description: 'Discovers `SLRU` metrics in PostgreSQL 13 and above.'
           item_prototypes:
             - uuid: cd6e9bfc3cfb4ae891fef2a563b83c90
               name: 'SLRU: Get data'
@@ -4446,7 +4440,7 @@ zabbix_export:
                   pg_stat_slru;
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
-              description: 'Collect SLRU (Simple Least Recently Used) cache statistics from pg_stat_slru.'
+              description: 'Collects SLRU (Simple Least Recently Used) cache statistics from `pg_stat_slru`.'
               tags:
                 - tag: component
                   value: raw
@@ -4551,7 +4545,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: SLRU buffer hit ratio <= {$PG.SLRU.CACHE.AVG}% for 5m'
                   opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'SLRU buffer hit ratio <= {$PG.SLRU.CACHE.AVG}%. Moderate cache efficiency drop. Investigate I/O patterns and autovacuum activity.'
+                  description: 'SLRU buffer hit ratio <= `{$PG.SLRU.CACHE.AVG}`%. Moderate cache efficiency drop. Investigate I/O patterns and autovacuum activity.'
                   dependencies:
                     - name: 'PostgreSQL: SLRU: Buffer hit high'
                       expression: 'max(/PostgreSQL by ODBC/pgsql.slru.hit.ratio[{#SINGLETON}],5m) <= {$PG.SLRU.CACHE.HIGH}'
@@ -4564,7 +4558,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: SLRU buffer hit ratio <= {$PG.SLRU.CACHE.HIGH}% for 5m'
                   opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'SLRU buffer hit ratio <= {$PG.SLRU.CACHE.HIGH}%. Critical cache inefficiency. High I/O load expected. Investigate disk usage and hot transactions immediately.'
+                  description: 'SLRU buffer hit ratio <= `{$PG.SLRU.CACHE.HIGH}`%. Critical cache inefficiency. High I/O load expected. Investigate disk usage and hot transactions immediately.'
                   tags:
                     - tag: scope
                       value: performance
@@ -4574,7 +4568,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: SLRU buffer hit ratio <= {$PG.SLRU.CACHE.WARN}% for 5m'
                   opdata: 'Current hit ratio: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'SLRU buffer hit ratio <= {$PG.SLRU.CACHE.WARN}%. Slightly below optimal. Monitor I/O and queries.'
+                  description: 'SLRU buffer hit ratio <= `{$PG.SLRU.CACHE.WARN}`%. Slightly below optimal. Monitor I/O and queries.'
                   dependencies:
                     - name: 'PostgreSQL: SLRU: Buffer hit average'
                       expression: 'max(/PostgreSQL by ODBC/pgsql.slru.hit.ratio[{#SINGLETON}],5m) <= {$PG.SLRU.CACHE.AVG}'
@@ -4655,7 +4649,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Apply errors >= {$PG.SUBSCRIPTION.APPLY.ERROR.AVG}'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Apply subscription errors >= {$PG.SUBSCRIPTION.APPLY.ERROR.AVG}. Investigate subscription apply issues or replication delays.'
+                  description: 'Apply subscription errors >= `{$PG.SUBSCRIPTION.APPLY.ERROR.AVG}`. Investigate subscription apply issues or replication delays.'
                   dependencies:
                     - name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Apply errors high'
                       expression: 'min(/PostgreSQL by ODBC/pgsql.subscription.apply.error[{#SUBNAME}],5m) >= {$PG.SUBSCRIPTION.APPLY.ERROR.HIGH}'
@@ -4668,7 +4662,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Apply errors >= {$PG.SUBSCRIPTION.APPLY.ERROR.HIGH}'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Apply subscription errors >= {$PG.SUBSCRIPTION.APPLY.ERROR.HIGH}. Check subscription apply processes and replication lag.'
+                  description: 'Apply subscription errors >= `{$PG.SUBSCRIPTION.APPLY.ERROR.HIGH}`. Check subscription apply processes and replication lag.'
                   tags:
                     - tag: scope
                       value: performance
@@ -4695,7 +4689,7 @@ zabbix_export:
               units: unixtime
               description: |
                 Unix timestamp of the last reset of subscription statistics.
-                Value `never` indicates that statistics have never been reset.
+                The value `never` indicates that statistics have never been reset.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -4741,7 +4735,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Sync errors >= {$PG.SUBSCRIPTION.SYNC.ERROR.AVG}'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Sync subscription errors >= {$PG.SUBSCRIPTION.SYNC.ERROR.AVG}. Investigate subscription sync issues or replication delays.'
+                  description: 'Sync subscription errors >= `{$PG.SUBSCRIPTION.SYNC.ERROR.AVG}`. Investigate subscription sync issues or replication delays.'
                   dependencies:
                     - name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Sync errors high'
                       expression: 'min(/PostgreSQL by ODBC/pgsql.subscription.sync.error[{#SUBNAME}],5m) >= {$PG.SUBSCRIPTION.SYNC.ERROR.HIGH}'
@@ -4754,7 +4748,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Sync errors >= {$PG.SUBSCRIPTION.SYNC.ERROR.HIGH}'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Sync subscription errors >= {$PG.SUBSCRIPTION.SYNC.ERROR.HIGH}. Check subscription sync processes and replication lag.'
+                  description: 'Sync subscription errors >= `{$PG.SUBSCRIPTION.SYNC.ERROR.HIGH}`. Check subscription sync processes and replication lag.'
                   tags:
                     - tag: scope
                       value: performance
@@ -4764,7 +4758,7 @@ zabbix_export:
               key: 'pgsql.subscription.total.error.count[{#SUBNAME}]'
               units: '!errors'
               params: 'last(//pgsql.subscription.apply.error[{#SUBNAME}]) + last(//pgsql.subscription.sync.error[{#SUBNAME}])'
-              description: 'Total number of errors for this logical replication subscription `apply` and `sync`.'
+              description: 'Total number of errors for this logical replication subscription, from both`apply` and `sync`.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -4783,7 +4777,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Total errors >= {$PG.SUBSCRIPTION.TOTAL.ERROR.AVG}'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Total subscription errors (sync + apply) >= {$PG.SUBSCRIPTION.TOTAL.ERROR.AVG}. Investigate replication issues or subscription problems.'
+                  description: 'Total subscription errors (sync + apply) >= `{$PG.SUBSCRIPTION.TOTAL.ERROR.AVG}`. Investigate replication issues or subscription problems.'
                   dependencies:
                     - name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Total errors high'
                       expression: 'min(/PostgreSQL by ODBC/pgsql.subscription.total.error.count[{#SUBNAME}],5m) >= {$PG.SUBSCRIPTION.TOTAL.ERROR.HIGH}'
@@ -4796,7 +4790,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Subscription stats [{#SUBNAME}]: Total errors >= {$PG.SUBSCRIPTION.TOTAL.ERROR.HIGH}'
                   opdata: 'Current count: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Total subscription errors (sync + apply) >= {$PG.SUBSCRIPTION.TOTAL.ERROR.HIGH}. Check subscription health, replication lag, or sync/apply errors.'
+                  description: 'Total subscription errors (sync + apply) >= `{$PG.SUBSCRIPTION.TOTAL.ERROR.HIGH}`. Check subscription health, replication lag, or sync/apply errors.'
                   tags:
                     - tag: scope
                       value: performance
@@ -4853,7 +4847,7 @@ zabbix_export:
               name: 'Tablespace [{#TABLESPACE.NAME}]: Default'
               type: DEPENDENT
               key: 'pgsql.tablespace.is_default[{#TABLESPACE.NAME}]'
-              description: 'Indicates whether the tablespace "{#TABLESPACE.NAME}" is a default system tablespace.'
+              description: 'Indicates whether the tablespace `{#TABLESPACE.NAME}` is a default system tablespace.'
               valuemap:
                 name: 'Tablespace default status'
               preprocessing:
@@ -4876,7 +4870,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.tablespace.location[{#TABLESPACE.NAME}]'
               value_type: CHAR
-              description: 'Filesystem path for the tablespace "{#TABLESPACE.NAME}". Empty string indicates default PostgreSQL data directory.'
+              description: 'Filesystem path for the tablespace `{#TABLESPACE.NAME}`. An empty string indicates the default PostgreSQL data directory.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -4896,7 +4890,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.tablespace.owner[{#TABLESPACE.NAME}]'
               value_type: CHAR
-              description: 'Owner of the tablespace "{#TABLESPACE.NAME}" (the PostgreSQL role that created it).'
+              description: 'Owner of the tablespace `{#TABLESPACE.NAME}` (the PostgreSQL role that created it).'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -4916,7 +4910,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.tablespace.size[{#TABLESPACE.NAME}]'
               units: B
-              description: 'Size of the tablespace "{#TABLESPACE.NAME}" in bytes.'
+              description: 'Size of the tablespace `{#TABLESPACE.NAME}` in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -4935,7 +4929,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size >= `avg` state for 5m'
                   opdata: '{#TABLESPACE.NAME} current size: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
-                  description: 'Tablespace "{#TABLESPACE.NAME}" size >= {$PG.TABLESPACE.SIZE.AVG} bytes.'
+                  description: 'Tablespace `{#TABLESPACE.NAME}` size >= `{$PG.TABLESPACE.SIZE.AVG}` bytes.'
                   dependencies:
                     - name: 'PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size high'
                       expression: 'min(/PostgreSQL by ODBC/pgsql.tablespace.size[{#TABLESPACE.NAME}],5m) >= {$PG.TABLESPACE.SIZE.HIGH:"{#TABLESPACE.NAME}"}'
@@ -4948,7 +4942,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size >= `high` state for 5m'
                   opdata: '{#TABLESPACE.NAME} current size: {ITEM.LASTVALUE1}'
                   priority: HIGH
-                  description: 'Tablespace "{#TABLESPACE.NAME}" size >= {$PG.TABLESPACE.SIZE.HIGH} bytes.'
+                  description: 'Tablespace `{#TABLESPACE.NAME}` size >= `{$PG.TABLESPACE.SIZE.HIGH}` bytes.'
                   tags:
                     - tag: scope
                       value: capacity
@@ -4958,7 +4952,7 @@ zabbix_export:
                   event_name: 'PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size >= `warn` state for 5m'
                   opdata: '{#TABLESPACE.NAME} current size: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Tablespace "{#TABLESPACE.NAME}" size >= {$PG.TABLESPACE.SIZE.WARN} bytes.'
+                  description: 'Tablespace `{#TABLESPACE.NAME}` size >= `{$PG.TABLESPACE.SIZE.WARN}` bytes.'
                   dependencies:
                     - name: 'PostgreSQL: Tablespace [{#TABLESPACE.NAME}]: Size average'
                       expression: 'min(/PostgreSQL by ODBC/pgsql.tablespace.size[{#TABLESPACE.NAME}],5m) >= {$PG.TABLESPACE.SIZE.AVG:"{#TABLESPACE.NAME}"}'
@@ -4979,7 +4973,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: bc51f0b5bf024f2d98b729f9c19e5fb3
-          name: 'WAL statistics metrics discovery (above PG 14)'
+          name: 'WAL statistics metrics discovery (v14+)'
           type: DEPENDENT
           key: pgsql.wal.stats.above.14.discovery
           filter:
@@ -4987,7 +4981,7 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V14}'
                 value: 'false'
-          description: 'WAL statistics for PG 14 and above.'
+          description: 'Discovers `WAL statistics` metrics in PostgreSQL 14 and above.'
           item_prototypes:
             - uuid: 9aa6e88e063a4beba6f373be04ea4f4a
               name: 'WAL statistics: Get data'
@@ -5125,7 +5119,7 @@ zabbix_export:
                   ) AS result;
               username: '{$PG.USER}'
               password: '{$PG.PASSWORD}'
-              description: 'Collect WAL activity metrics from pg_stat_wal.'
+              description: 'Collects WAL activity metrics from `pg_stat_wal`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -5222,7 +5216,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: ebdb07934baa43279acd5384cde7f146
-          name: 'Workload metrics discovery (PG 15-16)'
+          name: 'Workload metrics discovery (v15–16)'
           type: DEPENDENT
           key: pgsql.workload.stats.above.15.discovery
           filter:
@@ -5232,12 +5226,12 @@ zabbix_export:
                 value: 'false'
               - macro: '{#BELOW_V17}'
                 value: 'true'
-          description: 'Top query statistics for PG 15-16.'
+          description: 'Discovers `query` metrics in PostgreSQL 15 and 16.'
           item_prototypes:
             - uuid: d6bca0d81a3b4dfd8e6d10970f475c53
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5342,8 +5336,8 @@ zabbix_export:
               password: '{$PG.PASSWORD}'
               description: |
                 Collects top queries from `pg_stat_statements`.
-                Caution!!!
-                Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
+                IMPORTANT!
+                Ensure `pg_stat_statements` is installed, add it to `shared_preload_libraries`, turn on `compute_query_id`, and set `pg_stat_statements.track` to `all`, so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5369,7 +5363,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5391,7 +5385,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5409,7 +5403,7 @@ zabbix_export:
                   parameters:
                     - $.pgss_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5427,7 +5421,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_deleted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5445,7 +5439,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_inserted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5463,7 +5457,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_updated
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5482,7 +5476,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_blks_written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5500,7 +5494,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.above.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5511,7 +5505,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 2d931e53e6684a30bcb7944dee72cb04
-          name: 'Workload metrics discovery (PG 12)'
+          name: 'Workload metrics discovery (v12)'
           type: DEPENDENT
           key: pgsql.workload.stats.below.13.discovery
           filter:
@@ -5519,12 +5513,12 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V13}'
                 value: 'true'
-          description: 'Top query statistics for PG 12.'
+          description: 'Discovers `query` metrics in PostgreSQL 12.'
           item_prototypes:
             - uuid: 998648ce373d4513a9aa06ec82f967be
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.below.13.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.below.13.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5546,8 +5540,8 @@ zabbix_export:
               password: '{$PG.PASSWORD}'
               description: |
                 Collects top queries from `pg_stat_statements`.
-                Caution!!!
-                Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
+                IMPORTANT!
+                Ensure `pg_stat_statements` is installed, add it to `shared_preload_libraries`, turn on `compute_query_id`, and set `pg_stat_statements.track` to `all`, so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5560,7 +5554,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.workload.pgss.version.below.13[{#SINGLETON}]'
               value_type: CHAR
-              description: 'Version of "pg_stat_statements".'
+              description: 'Version of `pg_stat_statements`.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5569,7 +5563,7 @@ zabbix_export:
                   parameters:
                     - $.pgss_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.13.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.13.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5580,7 +5574,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 0cf27d0d1a3e4bff947b7c9a480e93bf
-          name: 'Workload metrics discovery (PG 13-14)'
+          name: 'Workload metrics discovery (v13–14)'
           type: DEPENDENT
           key: pgsql.workload.stats.below.15.discovery
           filter:
@@ -5590,12 +5584,12 @@ zabbix_export:
                 value: 'false'
               - macro: '{#BELOW_V15}'
                 value: 'true'
-          description: 'Top query statistics for PG 13-14.'
+          description: 'Discovers `query` metrics in PostgreSQL 13 and 14.'
           item_prototypes:
             - uuid: 74e6eca6a47d468dac09cb49670ad868
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5672,8 +5666,8 @@ zabbix_export:
               password: '{$PG.PASSWORD}'
               description: |
                 Collects top queries from `pg_stat_statements`.
-                Caution!!!
-                Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
+                IMPORTANT!
+                Ensure `pg_stat_statements` is installed, add it to `shared_preload_libraries`, turn on `compute_query_id`, and set `pg_stat_statements.track` to `all`, so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5699,7 +5693,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5721,7 +5715,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5739,7 +5733,7 @@ zabbix_export:
                   parameters:
                     - $.pgss_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5758,7 +5752,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_blks_written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5776,7 +5770,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.below.15.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5787,7 +5781,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 6243b0c9e9ba4685947709ea12b1a5c8
-          name: 'Workload metrics discovery (PG 17)'
+          name: 'Workload metrics discovery (v17)'
           type: DEPENDENT
           key: pgsql.workload.stats.version.17.discovery
           filter:
@@ -5797,12 +5791,12 @@ zabbix_export:
                 value: 'false'
               - macro: '{#BELOW_V18}'
                 value: 'true'
-          description: 'Top query statistics for PG 17 version.'
+          description: 'Discovers `query` metrics in PostgreSQL 17.'
           item_prototypes:
             - uuid: cd04a234781a40a083ce9f5cb20104a0
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -5920,8 +5914,8 @@ zabbix_export:
               password: '{$PG.PASSWORD}'
               description: |
                 Collects top queries from `pg_stat_statements`.
-                Caution!!!
-                Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
+                IMPORTANT!
+                Ensure `pg_stat_statements` is installed, add it to `shared_preload_libraries`, turn on `compute_query_id`, and set `pg_stat_statements.track` to `all`, so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -5947,7 +5941,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5969,7 +5963,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5987,7 +5981,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.distinct_statements
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -5997,7 +5991,7 @@ zabbix_export:
               key: 'pgsql.workload.max.exec.time.version.17[{#SINGLETON}]'
               value_type: FLOAT
               units: s
-              description: 'Slowest query execution time in from `pg_stat_statements`.'
+              description: 'Slowest query execution time from `pg_stat_statements`.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -6009,7 +6003,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6027,7 +6021,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.max
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6036,7 +6030,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'pgsql.workload.pgss.version.17[{#SINGLETON}]'
               value_type: CHAR
-              description: 'Version of "pg_stat_statements".'
+              description: 'Version of `pg_stat_statements`.'
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -6045,7 +6039,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.extension_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6063,7 +6057,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.deleted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6081,7 +6075,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.inserted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6099,7 +6093,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.updated
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6118,7 +6112,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.read
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6152,7 +6146,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6170,7 +6164,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6192,7 +6186,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6213,7 +6207,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6231,7 +6225,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6249,7 +6243,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track_nested
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.17.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6260,7 +6254,7 @@ zabbix_export:
               parameters:
                 - 1h
         - uuid: 1c1a68ff76b848ea972395bf2341d9cc
-          name: 'Workload metrics discovery (above PG 18)'
+          name: 'Workload metrics discovery (v18+)'
           type: DEPENDENT
           key: pgsql.workload.stats.version.18.discovery
           filter:
@@ -6268,12 +6262,12 @@ zabbix_export:
             conditions:
               - macro: '{#BELOW_V18}'
                 value: 'false'
-          description: 'Top query statistics for PG 18 and above.'
+          description: 'Discovers `query` metrics in PostgreSQL 18 and above.'
           item_prototypes:
             - uuid: 24d6dc268d6244a9bfcd83e1e121e3d6
               name: 'Workload: Get data'
               type: ODBC
-              key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+              key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               history: '0'
               value_type: TEXT
               params: |
@@ -6331,8 +6325,8 @@ zabbix_export:
               password: '{$PG.PASSWORD}'
               description: |
                 Collects top queries from `pg_stat_statements`.
-                Caution!!!
-                Ensure `pg_stat_statements` installed, add it to shared_preload_libraries, turn on compute_query_id, and set `pg_stat_statements`.track to all so all queries are tracked.
+                IMPORTANT!
+                Ensure `pg_stat_statements` is installed, add it to `shared_preload_libraries`, turn on `compute_query_id`, and set `pg_stat_statements.track` to `all`, so all queries are tracked.
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
                   parameters:
@@ -6358,7 +6352,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6380,7 +6374,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6398,7 +6392,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.distinct_statements
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6420,7 +6414,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6438,7 +6432,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.max
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6460,7 +6454,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6482,7 +6476,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6504,7 +6498,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6522,7 +6516,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.extension_version
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6540,7 +6534,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.deleted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6558,7 +6552,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.inserted
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6576,7 +6570,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.rows_affected.updated
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6595,7 +6589,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.read
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6629,7 +6623,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.temp_io_blocks.written
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6647,7 +6641,7 @@ zabbix_export:
                   parameters:
                     - $.metrics.total_calls
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6669,7 +6663,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6690,7 +6684,7 @@ zabbix_export:
                   parameters:
                     - '0.001'
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6708,7 +6702,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6726,7 +6720,7 @@ zabbix_export:
                   parameters:
                     - $.pg_stat_statements.configuration.track_nested
               master_item:
-                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get[{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
+                key: 'db.odbc.select[pgsql.workload.snapshot.version.18.get{#SINGLETON},,"Database={$PG.DATABASE};{$PG.CONNSTRING.ODBC}"]'
               tags:
                 - tag: component
                   value: queries
@@ -6812,21 +6806,21 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PG.CONNSTRING.ODBC}'
           value: Servername=localhost;Port=5432;Driver=/usr/lib64/psqlodbcw.so
-          description: 'Connection string for the PostgreSQL instance.'
+          description: 'Connection string for PostgreSQL instance.'
           config:
             type: TEXT
             priority: '53'
             label: 'PostgreSQL connection string'
-            description: 'Connection string for the PostgreSQL instance.'
+            description: 'Connection string for PostgreSQL instance.'
             required: 'YES'
         - macro: '{$PG.DATABASE}'
           value: postgres
-          description: 'Default PostgreSQL database for the connection.'
+          description: 'Default PostgreSQL database for connection.'
           config:
             type: TEXT
             priority: '56'
-            label: 'Default PostgreSQL database for the connection'
-            description: 'Default PostgreSQL database.'
+            label: 'Default PostgreSQL database'
+            description: 'Default PostgreSQL database for connection.'
             required: 'YES'
         - macro: '{$PG.DATABASE.SIZE.AVG}'
           value: '10000000000'
@@ -7177,13 +7171,13 @@ zabbix_export:
             required: 'YES'
         - macro: '{$PG.QUERY_EXECUTION_TIME.MAX.WARN}'
           value: '30'
-          description: 'Execution time limit for count of slow queries.'
+          description: 'Execution time limit for slow query count.'
           config:
             type: TEXT
             priority: '39'
             section_name: 'Thresholds: Performance'
             label: 'Slow queries execution time threshold'
-            description: 'Execution time threshold for queries to be considered slow. No less than 0.'
+            description: 'Execution time limit for slow query count. No less than 0.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PG.REPLICATION.SLOTS.RETAINING.AVG}'
@@ -7208,13 +7202,13 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PG.SLOW_QUERIES.MAX.WARN}'
           value: '5'
-          description: 'Slow queries count threshold for a trigger.'
+          description: 'Slow query count threshold for trigger expression.'
           config:
             type: TEXT
             priority: '40'
             section_name: 'Thresholds: Performance'
             label: 'Slow queries count threshold'
-            description: 'Slow queries count threshold for a trigger. No less than 0.'
+            description: 'Slow query count threshold for trigger expression. No less than 0.'
             required: 'YES'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PG.SLRU.CACHE.AVG}'
@@ -7516,7 +7510,7 @@ zabbix_export:
                       name: value_v_pos
                       value: '2'
                 - type: item
-                  name: 'PG version'
+                  name: 'PostgreSQL version'
                   'y': '2'
                   width: '7'
                   hide_header: 'YES'
@@ -7724,7 +7718,7 @@ zabbix_export:
                       name: secondary_label_decimal_places
                       value: '0'
                 - type: item
-                  name: 'PG wordsize'
+                  name: 'PostgreSQL wordsize'
                   x: '7'
                   'y': '2'
                   width: '7'
@@ -7823,7 +7817,7 @@ zabbix_export:
                       value: E45959
                     - type: STRING
                       name: thresholds.0.threshold
-                      value: '3600'
+                      value: '0'
                     - type: STRING
                       name: thresholds.1.color
                       value: FFA059
@@ -7852,7 +7846,7 @@ zabbix_export:
                       name: value_v_pos
                       value: '2'
                 - type: item
-                  name: 'PG platform'
+                  name: 'PostgreSQL platform'
                   x: '14'
                   'y': '2'
                   width: '15'
