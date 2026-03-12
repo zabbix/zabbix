@@ -510,7 +510,10 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$trapId = $this->createTrap();
 
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 1h)';
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his4);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his5);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his6);
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 1m)';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
 		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
