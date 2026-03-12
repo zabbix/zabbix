@@ -1,7 +1,7 @@
 Changes for 7.0.24rc3
 
 Bug fixes:
-.......PS. [ZBX-27590] reverted the custom on fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+.......PS. [ZBX-27590] reverted the custom-on-fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
 ..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
 
 --------------------------------------------------------------------------------
