@@ -44,7 +44,9 @@ class CTextareaFlexibleElement extends CElement {
 		}
 
 		$this->selectValue();
-		CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($text).';', [$this]);
+		CElementQuery::getDriver()->executeScript('arguments[0].value = '.json_encode($text).
+				',arguments[0].dispatchEvent(new Event("change")),arguments[0].dispatchEvent(new Event("keyup"));', [$this]
+		);
 
 		return $this;
 	}

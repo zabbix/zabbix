@@ -37,21 +37,21 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'parameter_1',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]|'.
-						'.//z-select[contains(@name, "params_0")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_params_0")]|.//input[contains(@id, "_params_0")]|'.
+						'.//div[contains(@id, "_params_0")]|.//z-select[contains(@name, "params_0")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_2',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "params_1")]|'.
-						'.//input[contains(@name, "params_1")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_params_1")]|.//input[contains(@id, "_params_1")]|'.
+						'.//z-select[contains(@name, "params_1")]|.//z-textarea-flexible[contains(@name, "params_1")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_3',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_2")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_params_2")]|.//input[contains(@id, "_params_2")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],

@@ -520,10 +520,12 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$this->zbxTestInputTypeWait('host', $data['name']);
 
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestInputType('name', $data['visible_name']);
+			$form->fill(['Visible name' => $data['visible_name']]);
+//			$this->zbxTestInputType('name', $data['visible_name']);
 		}
 
 		if (array_key_exists('checkbox', $data)) {
@@ -925,7 +927,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestInputType('name', $data['visible_name']);
+			$dialog->query('id:name')->one()->fill($data['visible_name']);
 		}
 		// Change status.
 		if (array_key_exists('checkbox', $data)) {
