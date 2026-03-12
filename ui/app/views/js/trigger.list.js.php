@@ -105,7 +105,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
-				callback: () => uncheckTableRows('trigger')
+				callback: () => uncheckTableRows(`trigger_${this.checkbox_hash}`)
 			});
 		}
 
@@ -208,7 +208,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('trigger', response.keepids ?? []);
+						uncheckTableRows(`trigger_${this.checkbox_hash}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
