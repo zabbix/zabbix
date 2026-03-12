@@ -508,12 +508,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertEquals(-1, $this->getItemLastValue($timeleft_itemid));
 
-		// timescale with compression does not supoprt history clear
-		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
-			$trapId = $this->createTrap();
-		} else {
-			CDataHelper::call('history.clear', $trapId);
-		}
+		$trapId = $this->createTrap();
 
 		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 1h)';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
@@ -642,10 +637,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:13 flags:uint64", true, 120);
+			" value:14 flags:uint64", true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:13 flags:uint64", true, 120);
-		$this->assertEquals('13', $this->getItemLastValue($calcItemId));
+			" value:14 flags:uint64", true, 120);
+		$this->assertEquals('14', $this->getItemLastValue($calcItemId));
 	}
 
 	public function testCalculatedExpression_HistogramQuantile()
