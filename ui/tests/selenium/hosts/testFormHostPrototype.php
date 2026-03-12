@@ -525,7 +525,6 @@ class testFormHostPrototype extends CLegacyWebTest {
 
 		if (array_key_exists('visible_name', $data)) {
 			$form->fill(['Visible name' => $data['visible_name']]);
-//			$this->zbxTestInputType('name', $data['visible_name']);
 		}
 
 		if (array_key_exists('checkbox', $data)) {
