@@ -515,7 +515,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED" .
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED");
 
 		$res = $this->historyGet($forecast_itemid);
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $res['result'][0]['value']);
