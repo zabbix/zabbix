@@ -27,12 +27,23 @@ window.update_problem_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.problem_suppressible = !document.getElementById('suppress_problem').disabled;
 		this.problem_unsuppressible = !document.getElementById('unsuppress_problem').disabled;
+		this.ack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="acknowledge_problem"]');
+		this.unack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'problem.view');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initEvents();
+	}
+
+	#syncAcknowledgeCheckboxes() {
+		if (!this.ack_checkbox  || !this.unack_checkbox) {
+			return;
+		}
+
+		this.unack_checkbox.disabled = this.ack_checkbox.checked;
+		this.ack_checkbox.disabled = this.unack_checkbox.checked;
 	}
 
 	#initEvents () {
@@ -60,20 +71,6 @@ window.update_problem_popup = new class {
 	}
 
 	#update() {
-		const unacknowledge_checkbox = this.form_element
-			.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
-
-		if (unacknowledge_checkbox) {
-			unacknowledge_checkbox.disabled = this.form_element.querySelector('[name="acknowledge_problem"]').checked;
-		}
-
-		const acknowledge_checkbox = this.form_element
-			.querySelector('.js-operation-checkbox[name="acknowledge_problem"]');
-
-		if (acknowledge_checkbox) {
-			acknowledge_checkbox.disabled = this.form_element.querySelector('[name="unacknowledge_problem"]').checked
-		}
-
 		const suppress_checked = document.getElementById('suppress_problem').checked;
 		const unsuppress_checked = document.getElementById('unsuppress_problem').checked;
 		const close_problem_checked = document.getElementById('close_problem').checked;
@@ -81,6 +78,7 @@ window.update_problem_popup = new class {
 		this.#update_suppress_problem_state(close_problem_checked || unsuppress_checked);
 		this.#update_unsuppress_problem_state(close_problem_checked || suppress_checked);
 		this.#update_suppress_time_options();
+		this.#syncAcknowledgeCheckboxes();
 
 		this.#validateOperations();
 	}
