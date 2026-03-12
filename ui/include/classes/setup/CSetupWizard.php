@@ -599,21 +599,21 @@ class CSetupWizard extends CForm {
 				(new CVar('verify_certificate', 0))->removeId(),
 				(new CVar('verify_host', 0))->removeId()
 			])
-			->addRow(new CLabel([
-					_('Database type'),
-					makeHelpIcon([
-						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
-						BR(),
-						_('If no port is specified, the "Database port" value is used.')
-					])
-				], 'label-type'),
+			->addRow(new CLabel(_('Database type'), 'label-type'),
 				(new CSelect('type'))
 					->setId('type')
 					->setFocusableElementId('label-type')
 					->setValue($DB['TYPE'])
 					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 			)
-			->addRow(_('Database host'),
+			->addRow(new CLabel([
+					_('Database host'),
+					makeHelpIcon([
+						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
+						BR(),
+						_('If no port is specified, the "Database port" value is used.')
+					])
+				], 'server'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', $config->config['DB']['SERVER'])))
 					->setAttribute('placeholder', $config->config['DB']['SERVER'])
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)

@@ -78,7 +78,7 @@ const view = new class {
 		const vault_url = document.getElementById('vault_url');
 		const db_type = document.querySelector('[name=type]').value;
 		const host = document.querySelector('[name=server]').value;
-		const hintbox = document.querySelector('label[for="label-type"] button[data-hintbox]');
+		const hintbox = document.querySelector('label[for="server"] button[data-hintbox]');
 
 		hintbox.style.display = db_type === ZBX_DB_POSTGRESQL ? '' : 'none';
 
