@@ -27,6 +27,7 @@ static zbx_metric_t	parameters_specific[] =
 
 	{"vfs.dev.read",	CF_HAVEPARAMS,	vfs_dev_read,		"hdisk0,operations"},
 	{"vfs.dev.write",	CF_HAVEPARAMS,	vfs_dev_write,		"hdisk0,operations"},
+	{"vfs.dev.get",		CF_HAVEPARAMS,	vfs_dev_get,		NULL},
 
 	{"net.if.in",		CF_HAVEPARAMS,	net_if_in,		"lo0,bytes"},
 	{"net.if.out",		CF_HAVEPARAMS,	net_if_out,		"lo0,bytes"},
