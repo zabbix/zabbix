@@ -115,10 +115,9 @@ class CTask extends CApiService {
 						}
 				}
 
-				unset($row['result_info'], $row['result_status'], $row['mobile_enrollment_token'],
-					$row['bridge_enrollment_key'], $row['enrollment_url'], $row['task_device_status'],
-					$row['task_device_info']
-				);
+				$row = array_diff_key($row, array_flip(['result_info', 'result_status', 'mobile_enrollment_token',
+					'bridge_enrollment_key', 'enrollment_url', 'task_device_status', 'task_device_info'
+				]));
 			}
 
 			$db_tasks[$row['taskid']] = $row;
@@ -146,7 +145,8 @@ class CTask extends CApiService {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$sql_parts['join']['td2'] = ['table' => 'task_device', 'using' => 'taskid'];
-			$sql_parts['where'][] = dbConditionId('td2.userid', [self::$userData['userid']]);
+			$sql_parts['join']['d2'] = ['left_table' => 'td2', 'table' => 'device', 'using' => 'deviceid'];
+			$sql_parts['where'][] = dbConditionId('d2.userid', [self::$userData['userid']]);
 		}
 
 		return $sql_parts;
@@ -497,9 +497,8 @@ class CTask extends CApiService {
 			$sql_parts = $this->addQuerySelect('req.data AS request_data', $sql_parts);
 
 			$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'task_device', 'using' => 'taskid'];
-			$sql_parts['join']['d'] = ['type' => 'left', 'left_table' => 'td', 'table' => 'device', 'using' => 'uuid'];
 
-			$sql_parts = $this->addQuerySelect('d.deviceid', $sql_parts);
+			$sql_parts = $this->addQuerySelect('td.deviceid', $sql_parts);
 		}
 
 		if ($this->outputIsRequested('result', $options['output'])) {
