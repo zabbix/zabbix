@@ -403,7 +403,6 @@ define('INTERFACE_USE_DNS',	0);
 define('INTERFACE_USE_IP',	1);
 
 define('INTERFACE_TYPE_OPT',			-2);
-define('INTERFACE_TYPE_ANY',			-1);
 define('INTERFACE_TYPE_UNKNOWN',		0);
 define('INTERFACE_TYPE_AGENT',			1);
 define('INTERFACE_TYPE_SNMP',			2);
@@ -1297,6 +1296,9 @@ define('SVG_GRAPH_TYPE_LINE',		0);
 define('SVG_GRAPH_TYPE_POINTS',		1);
 define('SVG_GRAPH_TYPE_STAIRCASE',	2);
 define('SVG_GRAPH_TYPE_BAR',		3);
+
+define('SVG_GRAPH_INVERT_VALUES_OFF',	0);
+define('SVG_GRAPH_INVERT_VALUES_ON',	1);
 
 define('SVG_GRAPH_STACKED_OFF',	0);
 define('SVG_GRAPH_STACKED_ON',	1);

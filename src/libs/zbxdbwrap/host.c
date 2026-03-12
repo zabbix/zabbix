@@ -1116,15 +1116,15 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 
 		sql_offset = 0;
 
+		/* check if items from template require interfaces and */
+		/* are interfaces of required types configured for host */
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select distinct type"
 				" from items"
-				" where type not in (%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)"
+				" where type in (%d,%d,%d,%d,%d)"
 					" and",
-				/* item types with interface types INTERFACE_TYPE_OPT or INTERFACE_TYPE_UNKNOWN */
-				ITEM_TYPE_TRAPPER, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE,
-				ITEM_TYPE_HTTPTEST, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_CALCULATED, ITEM_TYPE_DEPENDENT,
-				ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED_LLD);
+				ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_JMX, ITEM_TYPE_SNMPTRAP, ITEM_TYPE_SNMP);
+
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "hostid",
 				templateids->values, templateids->values_num);
 
@@ -1135,21 +1135,9 @@ static int	validate_host(zbx_uint64_t hostid, zbx_vector_uint64_t *templateids, 
 			type = (unsigned char)atoi(trow[0]);
 			type = zbx_get_interface_type_by_item_type(type);
 
-			if (INTERFACE_TYPE_ANY == type)
-			{
-				for (i = 0; INTERFACE_TYPE_COUNT > i; i++)
-				{
-					if (0 != interfaceids[i])
-						break;
-				}
-
-				if (INTERFACE_TYPE_COUNT == i)
-				{
-					zbx_strlcpy(error, "cannot find any interfaces on host", max_error_len);
-					ret = FAIL;
-				}
-			}
-			else if (0 == interfaceids[type - 1])
+			if ((INTERFACE_TYPE_AGENT == type || INTERFACE_TYPE_SNMP == type ||
+					INTERFACE_TYPE_IPMI == type || INTERFACE_TYPE_JMX == type) &&
+					0 == interfaceids[type - 1])
 			{
 				zbx_snprintf(error, max_error_len, "cannot find \"%s\" host interface",
 						zbx_interface_type_string((zbx_interface_type_t)type));

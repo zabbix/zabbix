@@ -3916,7 +3916,7 @@ static void	lld_process_lost_triggers(zbx_vector_lld_trigger_ptr_t *triggers, co
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck, int dflags, const zbx_vector_uint64_t *ruleids)
+		int lastcheck, int dflags, const zbx_vector_uint64_t *ruleids, int auditlog_enabled, int auditlog_mode)
 {
 	zbx_vector_lld_trigger_prototype_ptr_t	trigger_prototypes;
 	zbx_vector_lld_trigger_ptr_t		triggers;
@@ -3964,6 +3964,8 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 
 	/* making triggers */
 
+	zbx_audit_init(auditlog_enabled, auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
+
 	lld_triggers_make(&trigger_prototypes, &triggers, &items, lld_rows, lastcheck, error);
 	lld_triggers_validate(hostid, &triggers, error);
 	lld_trigger_dependencies_make(&trigger_prototypes, &triggers, lld_rows, error);
@@ -3971,6 +3973,8 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers, dflags |  ZBX_FLAG_DISCOVERY_CREATED);
 	lld_process_lost_triggers(&triggers, lifetime, enabled_lifetime, lastcheck);
+
+	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 
 	/* cleaning */
 

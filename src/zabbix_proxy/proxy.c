@@ -328,6 +328,8 @@ static char	*config_socket_path	= NULL;
 static int	config_history_storage_pipelines	= 0;
 static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
+static int	config_vps_limit		= 0;
+static int	config_vps_overcommit_limit	= 0;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
@@ -1104,6 +1106,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 						&config_max_concurrent_checks_per_poller,
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	1,			1000},
+		{"VPSLimit",			&config_vps_limit,			ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
+		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
@@ -1797,6 +1803,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
+	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
+
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
@@ -1892,6 +1900,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_proxy, &config_comms);
+	zbx_register_stats_ext_get_data_func(zbx_vps_monitor_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);

@@ -26,8 +26,10 @@ class CControllerGraphUpdate extends CController {
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
 			'hostid' =>				'required|db hosts.hostid',
 			'name' =>				'required|db graphs.name|not_empty',
-			'width' =>				'required|db graphs.width|not_empty|ge 20|le 65535',
-			'height' => 			'required|db graphs.height|not_empty|ge 20|le 65535',
+			'width' =>				'required|db graphs.width|not_empty|ge '.CGraphDraw::GRAPH_WIDTH_MIN.
+				'|le '.CGraphDraw::GRAPH_WIDTH_MAX,
+			'height' => 			'required|db graphs.height|not_empty|ge '.CGraphDraw::GRAPH_HEIGHT_MIN.
+				'|le '.CGraphDraw::GRAPH_HEIGHT_MAX,
 			'graphtype' =>			'required|db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),

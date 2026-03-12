@@ -532,14 +532,13 @@ class testFormItem extends CLegacyWebTest {
 				case INTERFACE_TYPE_SNMP :
 				case INTERFACE_TYPE_JMX :
 				case INTERFACE_TYPE_IPMI :
-				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_OPT :
 					$this->assertTrue($form->query('id:js-item-interface-label')->one()->isDisplayed());
 					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
+							($interfaceType === INTERFACE_TYPE_OPT ? '' : ' AND type='.$interfaceType)
 					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {

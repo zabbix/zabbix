@@ -29,9 +29,10 @@ use Widgets\SvgGraph\Includes\{
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const GRAPH_WIDTH_MIN = 1;
-	private const GRAPH_WIDTH_MAX = 65535;
+	private const GRAPH_WIDTH_MAX = 8000;
+
 	private const GRAPH_HEIGHT_MIN = 1;
-	private const GRAPH_HEIGHT_MAX = 65535;
+	private const GRAPH_HEIGHT_MAX = 4500;
 
 	protected function init(): void {
 		parent::init();
