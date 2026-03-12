@@ -8457,8 +8457,8 @@ return [
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
 			],
-			'auth_scheme' => [
-				'null' => true,
+			'auth_type' => [
+				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
