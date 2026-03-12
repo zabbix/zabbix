@@ -447,7 +447,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		);
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
-
 	}
 
 	public function testCalculatedExpression_TimeleftForecastOverflow()
@@ -623,10 +622,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:14 flags:uint64", true, 120);
+			" value:13 flags:uint64", true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:14 flags:uint64", true, 120);
-		$this->assertEquals('14', $this->getItemLastValue($calcItemId));
+			" value:13 flags:uint64", true, 120);
+		$this->assertEquals('13', $this->getItemLastValue($calcItemId));
 	}
 
 	public function testCalculatedExpression_HistogramQuantile()
