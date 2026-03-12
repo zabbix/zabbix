@@ -29,6 +29,8 @@ class CApiDpopHelper {
 
 	public static function verifyDpopSignature(string $signature, string $encoded_jwk, string $access_token,
 			string $request_api_method): bool {
+		$check_time = time();
+
 		$jwk = json_decode($encoded_jwk, true);
 
 		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
@@ -60,19 +62,19 @@ class CApiDpopHelper {
 			return false;
 		}
 
-		if (!self::chechAth($payload, $access_token)) {
+		if (!self::checkAth($payload, $access_token)) {
 			return false;
 		}
 
-		if (!self::checkIat($payload)) {
+		if (!self::checkIat($payload, $check_time)) {
 			return false;
 		}
 
-		if (!self::checkExp($payload)) {
+		if (!self::checkExp($payload, $check_time)) {
 			return false;
 		}
 
-		if (!self::checkJti($payload)) {
+		if (!self::checkJti($payload, $check_time)) {
 			return false;
 		}
 
@@ -84,31 +86,33 @@ class CApiDpopHelper {
 	}
 
 	private static function checkHtu(array $payload, string $request_api_method): bool {
-		return array_key_exists('htu', $payload) && $payload['htu'] === $request_api_method;
+		// todo - use method get server_id
+		$expected_htu = 'urn:zbx:server_id:'.$request_api_method;
+
+		return array_key_exists('htu', $payload) && hash_equals($expected_htu, $payload['htu']);
 	}
 
-	private static function chechAth(array $payload, string $access_token): bool {
+	private static function checkAth(array $payload, string $access_token): bool {
 		$expected_ath = JWT::urlsafeB64Encode(hash('sha256', $access_token, true));
 
 		return array_key_exists('ath', $payload) && hash_equals($expected_ath, $payload['ath']);
 	}
 
-	private static function checkIat(array $payload): bool {
+	private static function checkIat(array $payload, int $check_time): bool {
 		if (!array_key_exists('iat', $payload)) {
 			return false;
 		}
 
 		$iat = (int) $payload['iat'];
-		$time = time();
 
-		if ($iat > $time) {
+		if ($iat > $check_time) {
 			return false;
 		}
 
-		return $time - $iat <= self::IAT_DELAY;
+		return $check_time - $iat <= self::IAT_DELAY;
 	}
 
-	private static function checkExp(array $payload): bool {
+	private static function checkExp(array $payload, int $check_time): bool {
 		if (!array_key_exists('exp', $payload)) {
 			return false;
 		}
@@ -124,15 +128,15 @@ class CApiDpopHelper {
 			return true;
 		}
 
-		return $exp > time();
+		return $exp > $check_time;
 	}
 
-	private static function checkJti(array $payload): bool {
+	private static function checkJti(array $payload, int $check_time): bool {
 		if (!array_key_exists('jti', $payload)) {
 			return false;
 		}
 
-		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.time());
+		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.$check_time);
 
 		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['exp'])))) {
 			return false;
