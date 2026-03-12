@@ -113,7 +113,7 @@ window.update_problem_popup = new class {
 		const ack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="acknowledge_problem"]');
 		const unack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
 
-		if (ack_checkbox  && unack_checkbox) {
+		if (ack_checkbox && unack_checkbox) {
 			unack_checkbox.disabled = ack_checkbox.checked;
 			ack_checkbox.disabled = unack_checkbox.checked;
 		}
