@@ -10301,7 +10301,7 @@ return [
 				'default' => ''
 			],
 			'name' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
@@ -10313,7 +10313,7 @@ return [
 				'default' => '0'
 			],
 			'push_token' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
@@ -10374,13 +10374,6 @@ return [
 			'deviceid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'device',
-				'ref_field' => 'deviceid'
-			],
-			'userid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
 			],
 			'mobile_enrollment_token' => [
@@ -10408,7 +10401,7 @@ return [
 				'default' => '0'
 			],
 			'info' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
