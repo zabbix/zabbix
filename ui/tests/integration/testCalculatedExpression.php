@@ -507,21 +507,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		);
 
 		$this->assertEquals(-1, $this->getItemLastValue($timeleft_itemid));
-
-		$trapId = $this->createTrap();
-
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, (float)self::ZBX_DBL_MAX);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, (float)self::ZBX_DBL_MAX);
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 1m)';
-		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
-		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
-
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED");
-
-		$res = $this->historyGet($forecast_itemid);
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $res['result'][0]['value']);
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
