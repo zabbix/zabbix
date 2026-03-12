@@ -108,7 +108,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	}
 
 	// create calculated item with given formula and return its itemid
-	private function createCalculatedItemWithFormula($formula, $keySuffix)
+	private function createCalculatedItemWithFormula($formula, $keySuffix, $delay = '1s')
 	{
 		$response = $this->call('item.create', [
 			'name'		=> self::CALCULATED_ITEM_KEY . '.' . $keySuffix,
@@ -116,7 +116,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			'type'		=> ITEM_TYPE_CALCULATED,
 			'params'	=> $formula,
 			'hostid'	=> self::$hostid,
-			'delay'		=> '1s',
+			'delay'		=> $delay,
 			'value_type' => ITEM_VALUE_TYPE_FLOAT
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -171,13 +171,19 @@ class testCalculatedExpression extends CIntegrationTest {
 		return $response['result'][$itemid]['lastvalue'];
 	}
 
-	private function historyGet($itemid)
+	private function historyGet($itemid, $limit = null)
 	{
-		$data = $this->call('history.get', [
-			'itemids'	=> $itemid,
-			'history'	=> ITEM_VALUE_TYPE_FLOAT,
-			'sortorder'	=> ZBX_SORT_UP
-		]);
+		$params = [
+				'itemids'   => $itemid,
+				'history'   => ITEM_VALUE_TYPE_FLOAT,
+				'sortorder' => ZBX_SORT_UP,
+		];
+
+		if ($limit !== null) {
+			$params['limit'] = $limit;
+		}
+
+		$data = $this->call('history.get', $params);
 
 		return $data;
 	}
@@ -449,53 +455,71 @@ class testCalculatedExpression extends CIntegrationTest {
 		$trapId = $this->createTrap();
 
 		$formula = 'timeleft(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3, -1)';
-		$timeleft_itemid = $this->createCalculatedItemWithFormula($formula, 'timeleft_overflow');
+		$timeleft_itemid = $this->createCalculatedItemWithFormula($formula, 'timeleft_overflow', '1s');
 
 		self::$itemIds = array_merge(self::$itemIds, [$timeleft_itemid]);
 
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3, 1h)';
-		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow');
-		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
-
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
+		$his1 = 1.0;
+		$his2 = 2.0;
+		$his3 = 3.0;
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, -((float)self::ZBX_DBL_MAX));
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his2);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his3);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				-((float)self::ZBX_DBL_MAX),
-				0.0,
-				((float)self::ZBX_DBL_MAX),
+				$his1,
+				$his2,
+				$his3,
 			],
 			array_map('floatval', $values)
 		);
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 
+		$his4 = (float)self::ZBX_DBL_MAX / 1000;
+		$his5 = (float)self::ZBX_DBL_MAX / 100;
+		$his6 = (float)self::ZBX_DBL_MAX / 10;
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 0);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, ((float)self::ZBX_DBL_MAX - 1));
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his4);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his5);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his6);
 
 		$history = $this->historyGet($trapId);
 		$values = $this->extractHistoryValues($history);
 
 		$this->assertSame(
 			[
-				0.0,
-				1.0,
-				((float)self::ZBX_DBL_MAX - 1)
+				$his1,
+				$his2,
+				$his3,
+				$his4,
+				$his5,
+				$his6,
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($forecast_itemid));
+		$this->assertEquals(-1, $this->getItemLastValue($timeleft_itemid));
+		CDataHelper::call('history.clear', $trapId);
+
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 1h)';
+		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
+		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$history = $this->historyGet($trapId, 3);
+		$values = $this->extractHistoryValues($history);
+
+		$res = $this->historyGet($forecast_itemid);
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $res['result'][0]['value']);
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
