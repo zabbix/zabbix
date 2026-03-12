@@ -10262,7 +10262,7 @@ return [
 			'jti' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64
+				'length' => 36
 			],
 			'expires_at' => [
 				'null' => false,
