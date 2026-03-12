@@ -100,9 +100,9 @@ class CDevice extends CApiService {
 		$uuid = generateUuidV7();
 		$time_start = time();
 
-		self::createDevice($db_user, $enrollment_token, $uuid, $time_start);
+		$deviceid = self::createDevice($db_user, $enrollment_token, $uuid, $time_start);
 
-		$taskid = self::createTaskInit($db_user['userid'], $uuid, $time_start);
+		$taskid = self::createTaskInit($deviceid, $time_start);
 
 		// todo - AuditLog $enrollment_token
 
@@ -233,7 +233,7 @@ class CDevice extends CApiService {
 			'SELECT et.deviceid'.
 			' FROM enrollment_token et'.
 			' WHERE '.dbConditionString('et.enrollment_token', [hash('sha512', $options['enrollment_token'])]).
-			' AND enrollment_token_expiration>'.time(),
+				' AND enrollment_token_expiration>'.time(),
 			1
 		));
 
@@ -280,7 +280,7 @@ class CDevice extends CApiService {
 	}
 
 	private static function createDevice(array $db_user, string $enrollment_token, string $uuid,
-			int $time_start): void {
+			int $time_start): string {
 		$ins_device = [
 			'userid' => $db_user['userid'],
 			'uuid' => $uuid,
@@ -298,9 +298,11 @@ class CDevice extends CApiService {
 		];
 
 		DB::insertBatch('enrollment_token', [$ins_enrollment_token], false);
+
+		return $deviceid;
 	}
 
-	private static function createTaskInit(string $userid, string $deviceid, int $time_start): string {
+	private static function createTaskInit(string $deviceid, int $time_start): string {
 		$ins_task = [
 			'type' =>ZBX_TM_TASK_ENROLL_DEVICE,
 			'status' => ZBX_TM_STATUS_NEW,
@@ -314,8 +316,7 @@ class CDevice extends CApiService {
 
 		$ins_task_device_init = [
 			'taskid' => $taskid,
-			'deviceid' => $deviceid,
-			'userid' => $userid
+			'deviceid' => $deviceid
 		];
 
 		DB::insertBatch('task_device_init', [$ins_task_device_init], false);
@@ -348,26 +349,32 @@ class CDevice extends CApiService {
 	}
 
 	private static function createTasksOffboard(array $db_devices): void {
+		$device_cnt = count(array_keys($db_devices));
+		$taskid = DB::reserveIds('task', $device_cnt);
+
+		$time = time();
+
 		$ins_tasks = [];
 		$ins_task_device_offboards = [];
 
-		foreach ($db_devices as $device) {
+		foreach ($db_devices as $db_device) {
 			$ins_tasks[] = [
+				'taskid' => $taskid,
 				'type' =>ZBX_TM_TASK_OFFBOARD_DEVICE,
 				'status' => ZBX_TM_STATUS_NEW,
-				'clock' => time(),
+				'clock' => $time,
 				'ttl' => self::TASK_DEVICE_OFFBOARD_TTL
 			];
 
-			$ins_task_device_offboards[]['uuid'] = $device['uuid'];
+			$ins_task_device_offboards[] = [
+				'taskid' => $taskid,
+				'uuid' => $db_device['uuid']
+			];
+
+			$taskid = bcadd($taskid, 1, 0);
 		}
 
-		$taskids = DB::insertBatch('task', $ins_tasks);
-
-		foreach ($taskids as $key => $taskid) {
-			$ins_task_device_offboards[$key]['taskid'] = $taskid;
-		}
-
+		DB::insertBatch('task', $ins_tasks, false);
 		DB::insertBatch('task_device_offboard', $ins_task_device_offboards, false);
 	}
 }
