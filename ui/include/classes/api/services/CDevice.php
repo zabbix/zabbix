@@ -22,22 +22,23 @@ class CDevice extends CApiService {
 	public const ACCESS_RULES = [
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'init' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
-		'onboard' => []
+		'onboard' => [],
+		'offboard' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'device';
 	protected $tableAlias = 'd';
-	protected $sortColumns = ['name', 'last_access_time'];
+	protected $sortColumns = ['name', 'lastaccess'];
 
-	private array $output_fields = ['deviceid', 'userid', 'uuid', 'name', 'status', 'last_access_time'];
+	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'tokenid', 'uuid', 'name', 'status', 'lastaccess'];
 
-	public const DEVICE_STATUS_NEW = 0;
-	public const DEVICE_STATUS_ENABLED = 1;
-	public const DEVICE_STATUS_DISABLED = 2;
+	private const DEVICE_STATUS_NEW = 0;
+	private const DEVICE_STATUS_ENABLED = 1;
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
-	private const TASK_DEVICE_CHECK_TTL = 30;
+	private const TASK_DEVICE_INIT_TTL = 30;
+	private const TASK_DEVICE_OFFBOARD_TTL = 86400;
 
 	public const MOBILE_IDENTITY_KEY = 0;
 	public const MOBILE_ENCRYPTION_KEY = 1;
@@ -54,7 +55,7 @@ class CDevice extends CApiService {
 	public function get(array $options = []) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// output
-			'output' =>		  ['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>		  ['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>  ['type' => API_FLAG, 'default' => false],
 			// sort and limit
 			'sortfield' =>	  ['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', $this->sortColumns), 'uniq' => true, 'default' => []],
@@ -69,7 +70,7 @@ class CDevice extends CApiService {
 		}
 
 		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = $this->output_fields;
+			$options['output'] = self::OUTPUT_FIELDS;
 		}
 
 		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
@@ -99,9 +100,9 @@ class CDevice extends CApiService {
 		$uuid = generateUuidV7();
 		$time_start = time();
 
-		$deviceid = self::createDevice($db_user, $enrollment_token, $uuid, $time_start);
+		self::createDevice($db_user, $enrollment_token, $uuid, $time_start);
 
-		$taskid = self::createTask($deviceid, $time_start);
+		$taskid = self::createTaskInit($db_user['userid'], $uuid, $time_start);
 
 		// todo - AuditLog $enrollment_token
 
@@ -146,6 +147,36 @@ class CDevice extends CApiService {
 		// todo - auditlog
 
 		return ['token' => $db_token['token']];
+	}
+
+	public function delete(array $deviceids): array {
+		$this->validateDelete($deviceids, $db_devices);
+
+		$deviceids = self::deleteForce($db_devices);
+
+		// todo - auditlog
+
+		return ['deviceids' => $deviceids];
+	}
+
+	public static function deleteForce(array $db_devices): array {
+		self::createTasksOffboard($db_devices);
+
+		$deviceids = array_keys($db_devices);
+
+		DBexecute(
+			'DELETE FROM token'.
+			' WHERE EXISTS ('.
+				'SELECT NULL'.
+				' FROM device d'.
+				' WHERE token.tokenid=d.tokenid'.
+					' AND '.dbConditionId('d.deviceid', $deviceids).
+			')'
+		);
+
+		DB::delete('device', ['deviceid' => $deviceids]);
+
+		return $deviceids;
 	}
 
 	private function validateInit(array $user, ?array &$db_user): void {
@@ -220,6 +251,24 @@ class CDevice extends CApiService {
 		$db_device = reset($db_devices);
 	}
 
+	private function validateDelete(array $deviceids, ?array &$db_devices): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $deviceids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_devices = $this->get([
+			'output' => ['deviceid', 'uuid'],
+			'deviceids' => $deviceids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_devices) != count($deviceids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
 	private static function getJwkValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
 			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => ['P-256']],
@@ -231,7 +280,7 @@ class CDevice extends CApiService {
 	}
 
 	private static function createDevice(array $db_user, string $enrollment_token, string $uuid,
-			int $time_start): string {
+			int $time_start): void {
 		$ins_device = [
 			'userid' => $db_user['userid'],
 			'uuid' => $uuid,
@@ -249,55 +298,30 @@ class CDevice extends CApiService {
 		];
 
 		DB::insertBatch('enrollment_token', [$ins_enrollment_token], false);
-
-		return $deviceid;
 	}
 
-	private static function createTask(string $deviceid, int $time_start): string {
+	private static function createTaskInit(string $userid, string $deviceid, int $time_start): string {
 		$ins_task = [
 			'type' =>ZBX_TM_TASK_ENROLL_DEVICE,
 			'status' => ZBX_TM_STATUS_NEW,
 			'clock' => $time_start,
-			'ttl' => self::TASK_DEVICE_CHECK_TTL
+			'ttl' => self::TASK_DEVICE_INIT_TTL
 		];
 
 		$taskids = DB::insertBatch('task', [$ins_task]);
 
 		$taskid = array_shift($taskids);
 
-		$ins_task_device = [
+		$ins_task_device_init = [
 			'taskid' => $taskid,
-			'deviceid' => $deviceid
+			'deviceid' => $deviceid,
+			'userid' => $userid
 		];
 
-		DB::insertBatch('task_device', [$ins_task_device], false);
+		DB::insertBatch('task_device_init', [$ins_task_device_init], false);
 
 		return $taskid;
 	}
-
-//	private static function getTaskDeviceResult(string $taskid, int $time_start): array {
-//		do {
-//			sleep(self::TASK_DEVICE_CHECK_DELAY);
-//
-//			$task_result = DBfetch(DBselect(
-//				'SELECT t.status,td.mobile_enrollment_token,td.bridge_enrollment_key,td.enrollment_url,'.
-//					'td.status AS task_device_status,td.info'.
-//				' FROM task t'.
-//				' JOIN task_device td ON td.taskid=t.taskid'.
-//				' WHERE '.dbConditionId('t.taskid', [$taskid]),
-//				1
-//			));
-//
-//			$is_init_process_expired = time() > $time_start + self::TASK_DEVICE_CHECK_TTL;
-//		}
-//		while ($task_result['status'] <= ZBX_TM_STATUS_INPROGRESS && !$is_init_process_expired);
-//
-//		if ($is_init_process_expired) {
-//			$task_result['task_device_status'] = self::TASK_DEVICE_STATUS_FAILED;
-//		}
-//
-//		return $task_result;
-//	}
 
 	private static function createDeviceKeys(string $deviceid, array $mobile_identity_key,
 			array $mobile_encryption_key): void {
@@ -321,5 +345,29 @@ class CDevice extends CApiService {
 		];
 
 		DB::insertBatch('device_key', $fields, false);
+	}
+
+	private static function createTasksOffboard(array $db_devices): void {
+		$ins_tasks = [];
+		$ins_task_device_offboards = [];
+
+		foreach ($db_devices as $device) {
+			$ins_tasks[] = [
+				'type' =>ZBX_TM_TASK_OFFBOARD_DEVICE,
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => time(),
+				'ttl' => self::TASK_DEVICE_OFFBOARD_TTL
+			];
+
+			$ins_task_device_offboards[]['uuid'] = $device['uuid'];
+		}
+
+		$taskids = DB::insertBatch('task', $ins_tasks);
+
+		foreach ($taskids as $key => $taskid) {
+			$ins_task_device_offboards[$key]['taskid'] = $taskid;
+		}
+
+		DB::insertBatch('task_device_offboard', $ins_task_device_offboards, false);
 	}
 }

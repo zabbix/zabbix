@@ -4628,6 +4628,35 @@ return [
 			]
 		]
 	],
+	'history_json' => [
+		'key' => 'itemid,clock,ns',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'clock' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'ns' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'value' => [
+				'null' => false,
+				'type' => t_json,
+				'length' => 10
+			]
+		]
+	],
 	'proxy_history' => [
 		'key' => 'id',
 		'fields' => [
@@ -5914,27 +5943,18 @@ return [
 		'fields' => [
 			'housekeeperid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
+				'type' => DB::FIELD_TYPE_UINT,
 				'length' => 20
 			],
-			'tablename' => [
+			'object' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10
 			],
-			'field' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 64,
-				'default' => ''
-			],
-			'value' => [
+			'objectid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'items',
-				'ref_field' => 'value'
+				'length' => 20
 			]
 		]
 	],
@@ -7577,8 +7597,8 @@ return [
 			],
 			'value_str' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_TEXT,
+				'length' => 65535,
 				'default' => ''
 			],
 			'value_groupid' => [
@@ -8437,14 +8457,8 @@ return [
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
 			],
-			'client_public_key' => [
+			'auth_scheme' => [
 				'null' => true,
-				'type' => DB::FIELD_TYPE_TEXT,
-				'length' => 65535,
-				'default' => ''
-			],
-			'auth_type' => [
-				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
@@ -10248,7 +10262,7 @@ return [
 			'jti' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 36
+				'length' => 64
 			],
 			'expires_at' => [
 				'null' => false,
@@ -10274,7 +10288,7 @@ return [
 				'ref_field' => 'userid'
 			],
 			'tokenid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'token',
@@ -10283,7 +10297,7 @@ return [
 			'uuid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 36,
 				'default' => ''
 			],
 			'name' => [
@@ -10336,7 +10350,7 @@ return [
 			'key_' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 511,
+				'length' => 512,
 				'default' => ''
 			],
 			'active' => [
@@ -10347,7 +10361,7 @@ return [
 			]
 		]
 	],
-	'task_device' => [
+	'task_device_init' => [
 		'key' => 'taskid',
 		'fields' => [
 			'taskid' => [
@@ -10357,15 +10371,17 @@ return [
 				'ref_table' => 'task',
 				'ref_field' => 'taskid'
 			],
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
+			],
 			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
-			],
-			'uuid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128
 			],
 			'mobile_enrollment_token' => [
 				'null' => false,
@@ -10395,6 +10411,24 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => ''
+			]
+		]
+	],
+	'task_device_offboard' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 36,
 				'default' => ''
 			]
 		]
