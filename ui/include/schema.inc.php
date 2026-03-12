@@ -10297,7 +10297,7 @@ return [
 			'uuid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
+				'length' => 36,
 				'default' => ''
 			],
 			'name' => [
@@ -10361,7 +10361,7 @@ return [
 			]
 		]
 	],
-	'task_device' => [
+	'task_device_init' => [
 		'key' => 'taskid',
 		'fields' => [
 			'taskid' => [
@@ -10371,16 +10371,17 @@ return [
 				'ref_table' => 'task',
 				'ref_field' => 'taskid'
 			],
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
+			],
 			'userid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20
-			],
-			'uuid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 128,
-				'default' => ''
 			],
 			'mobile_enrollment_token' => [
 				'null' => false,
@@ -10410,6 +10411,24 @@ return [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
+				'default' => ''
+			]
+		]
+	],
+	'task_device_offboard' => [
+		'key' => 'taskid',
+		'fields' => [
+			'taskid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'task',
+				'ref_field' => 'taskid'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 36,
 				'default' => ''
 			]
 		]
