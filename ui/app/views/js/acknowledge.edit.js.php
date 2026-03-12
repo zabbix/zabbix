@@ -31,19 +31,11 @@ window.update_problem_popup = new class {
 		this.unack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
 
 		const return_url = new URL('zabbix.php', location.href);
+
 		return_url.searchParams.set('action', 'problem.view');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initEvents();
-	}
-
-	#syncAcknowledgeCheckboxes() {
-		if (!this.ack_checkbox  || !this.unack_checkbox) {
-			return;
-		}
-
-		this.unack_checkbox.disabled = this.ack_checkbox.checked;
-		this.ack_checkbox.disabled = this.unack_checkbox.checked;
 	}
 
 	#initEvents () {
@@ -60,7 +52,7 @@ window.update_problem_popup = new class {
 		});
 
 		document.getElementById('suppress_time_option').addEventListener('change', () =>
-			this.#update_suppress_time_options()
+			this.#updateSuppressTimeOptions()
 		);
 
 		document.getElementById('message').addEventListener('input', () => this.#validateOperations());
@@ -75,15 +67,15 @@ window.update_problem_popup = new class {
 		const unsuppress_checked = document.getElementById('unsuppress_problem').checked;
 		const close_problem_checked = document.getElementById('close_problem').checked;
 
-		this.#update_suppress_problem_state(close_problem_checked || unsuppress_checked);
-		this.#update_unsuppress_problem_state(close_problem_checked || suppress_checked);
-		this.#update_suppress_time_options();
+		this.#updateSuppressProblemState(close_problem_checked || unsuppress_checked);
+		this.#updateUnsuppressProblemState(close_problem_checked || suppress_checked);
+		this.#updateSuppressTimeOptions();
 		this.#syncAcknowledgeCheckboxes();
 
 		this.#validateOperations();
 	}
 
-	#update_suppress_problem_state(state) {
+	#updateSuppressProblemState(state) {
 		if (this.problem_suppressible) {
 			document.getElementById('suppress_problem').disabled = state;
 
@@ -93,7 +85,7 @@ window.update_problem_popup = new class {
 		}
 	}
 
-	#update_unsuppress_problem_state(state) {
+	#updateUnsuppressProblemState(state) {
 		if (this.problem_unsuppressible) {
 			document.getElementById('unsuppress_problem').disabled = state;
 
@@ -103,7 +95,7 @@ window.update_problem_popup = new class {
 		}
 	}
 
-	#update_suppress_time_options() {
+	#updateSuppressTimeOptions() {
 		for (const element of document.querySelectorAll('#suppress_time_option input[type="radio"]')) {
 			element.disabled = !document.getElementById('suppress_problem').checked;
 
@@ -117,6 +109,15 @@ window.update_problem_popup = new class {
 			document.getElementById('suppress_until_problem').disabled = true;
 			document.getElementById('suppress_until_problem_calendar').disabled = true;
 		}
+	}
+
+	#syncAcknowledgeCheckboxes() {
+		if (!this.ack_checkbox  || !this.unack_checkbox) {
+			return;
+		}
+
+		this.unack_checkbox.disabled = this.ack_checkbox.checked;
+		this.ack_checkbox.disabled = this.unack_checkbox.checked;
 	}
 
 	#validateOperations() {
