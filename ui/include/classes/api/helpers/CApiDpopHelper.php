@@ -132,38 +132,17 @@ class CApiDpopHelper {
 			return false;
 		}
 
-		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at < '.time().';');
+		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.time());
+
+		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['exp'])))) {
+			return false;
+		}
 
 		return DBexecute(
 			'INSERT INTO dpop_jti_cache (jti, expires_at)'.
-				' VALUES ('.zbx_dbstr($payload['jti']).', '.zbx_dbstr($payload['exp']).');'
+				' VALUES ('.zbx_dbstr($payload['jti']).', '.zbx_dbstr($payload['exp']).')'
 		);
 	}
-
-	// todo - double check if its not needed
-
-//	private static function getDpopJwkFromPem(string $pem): array {
-//		$public_key = openssl_pkey_get_public($pem);
-//		$details = openssl_pkey_get_details($public_key);
-//
-//		return [
-//			'crv' => 'P-256',
-//			'kty' => 'EC',
-//			'x' => JWT::urlsafeB64Encode($details['ec']['x']),
-//			'y' => JWT::urlsafeB64Encode($details['ec']['y'])
-//		];
-//	}
-
-//	public static function checkThumbprint(array $jwk, string $kid): bool {
-//		$canonical_jwk = array_intersect_key($jwk, array_flip(['crv', 'kty', 'x', 'y']));
-//		ksort($canonical_jwk);
-//
-//		$expected_jwk_hash = JWT::urlsafeB64Encode(
-//			hash('sha256', json_encode($canonical_jwk, JSON_UNESCAPED_SLASHES), true)
-//		);
-//
-//		return hash_equals($expected_jwk_hash, $kid);
-//	}
 
 	public static function checkJwkIntegrity(array $jwk): bool {
 		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);

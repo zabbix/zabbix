@@ -2464,7 +2464,7 @@ function generateUuidV4($seed = '') {
 }
 
 /**
- * Generates UUID version 7.
+ * Generate UUID version 7 (non-monotonic when resolving multiple IDs within 1 millisecond).
  *
  * @return string
  */
@@ -2473,10 +2473,10 @@ function generateUuidV7() {
 	$unix_timestamp = (int) floor(microtime(true) * 1000);
 
 	// 32 bit leftmost bits
-	$left_time_part = ($unix_timestamp >> 16) & 0xFFFFFFFF;
+	$left_time_part = ($unix_timestamp >> 16) & 0xffffffff;
 
 	// 16 bit rightmost bits
-	$right_time_part = $unix_timestamp & 0xFFFF;
+	$right_time_part = $unix_timestamp & 0xffff;
 
 	// 6 bytes time part
 	$time_data = pack('Nn', $left_time_part, $right_time_part);
