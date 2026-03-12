@@ -115,7 +115,7 @@ window.graph_edit_popup = new class {
 				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 				freeze_end: 1,
 				enable_sorting: !this.readonly
-			}).on(CSortable.EVENT_SORT, this.#recalculateSortOrder);
+			}).on(CSortable.EVENT_SORT, () => this.#recalculateSortOrder());
 		}
 
 		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
