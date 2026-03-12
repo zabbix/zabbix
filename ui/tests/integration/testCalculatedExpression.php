@@ -508,9 +508,13 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertEquals(-1, $this->getItemLastValue($timeleft_itemid));
 
-		CDataHelper::call('history.clear', $trapId);
+		// timescale with compression does not supoprt history clear
+		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
+			$trapId = $this->createTrap();
+		} else {
+			CDataHelper::call('history.clear', $trapId);
+		}
 
-		$trapId = $this->createTrap();
 		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 1h)';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
 		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
