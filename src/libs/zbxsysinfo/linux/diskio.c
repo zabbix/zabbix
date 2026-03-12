@@ -1107,9 +1107,9 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	devids_init(&devices);
 
 	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
-	zbx_json_init(&cfg, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_initarray(&cfg, ZBX_JSON_STAT_BUF_LEN);
 	if (1 == has_vals)
-		zbx_json_init(&val, ZBX_JSON_STAT_BUF_LEN);
+		zbx_json_initarray(&val, ZBX_JSON_STAT_BUF_LEN);
 
 	while (NULL != (entry = readdir(dir)))
 		vfs_dev_get_process_entry(entry->d_name, devnames_rxp, imode, &devices, &cfg, &val);
