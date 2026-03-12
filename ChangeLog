@@ -212,8 +212,6 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 --------------------------------------------------------------------------------
 Changes for 7.4.8rc3
 
-New features:
-
 Bug fixes:
 .......PS. [ZBX-27590] reverted the custom on fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
 ..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
