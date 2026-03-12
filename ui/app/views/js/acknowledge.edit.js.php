@@ -27,8 +27,6 @@ window.update_problem_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.problem_suppressible = !document.getElementById('suppress_problem').disabled;
 		this.problem_unsuppressible = !document.getElementById('unsuppress_problem').disabled;
-		this.ack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="acknowledge_problem"]');
-		this.unack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
 
 		const return_url = new URL('zabbix.php', location.href);
 
@@ -112,12 +110,13 @@ window.update_problem_popup = new class {
 	}
 
 	#syncAcknowledgeCheckboxes() {
-		if (!this.ack_checkbox  || !this.unack_checkbox) {
-			return;
-		}
+		const ack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="acknowledge_problem"]');
+		const unack_checkbox = this.form_element.querySelector('.js-operation-checkbox[name="unacknowledge_problem"]');
 
-		this.unack_checkbox.disabled = this.ack_checkbox.checked;
-		this.ack_checkbox.disabled = this.unack_checkbox.checked;
+		if (ack_checkbox  && unack_checkbox) {
+			unack_checkbox.disabled = ack_checkbox.checked;
+			ack_checkbox.disabled = unack_checkbox.checked;
+		}
 	}
 
 	#validateOperations() {
