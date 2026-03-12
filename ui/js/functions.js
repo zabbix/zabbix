@@ -891,6 +891,46 @@ function getFormFields(form) {
 }
 
 /**
+ * Convert nested data object into URL search parameters object.
+ *
+ * @param {Object|Array} object
+ *
+ * @returns {URLSearchParams}
+ */
+function objectToSearchParams(object) {
+	const combine = (data, search_params = new URLSearchParams(), name_prefix = '') => {
+		if (Array.isArray(data)) {
+			for (const [index, datum] of data.entries()) {
+				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${index}]` : index);
+			}
+		}
+		else if (typeof data === 'object') {
+			for (const [name, datum] of Object.entries(data)) {
+				combine(datum, search_params, name_prefix !== '' ? `${name_prefix}[${name}]` : name);
+			}
+		}
+		else {
+			search_params.append(name_prefix, data);
+		}
+
+		return search_params;
+	};
+
+	return combine(object);
+}
+
+/**
+ * Create a URL pointing to zabbix.php.
+ *
+ * @param arguments
+ *
+ * @returns {string}
+ */
+function zabbixUrl(arguments) {
+	return `zabbix.php?${objectToSearchParams(arguments)}`;
+}
+
+/**
  * Convert RGB encoded color into HSL encoded color.
  *
  * @param {number} r  Red component in range of 0-1.
