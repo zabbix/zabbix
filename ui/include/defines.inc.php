@@ -403,7 +403,6 @@ define('INTERFACE_USE_DNS',	0);
 define('INTERFACE_USE_IP',	1);
 
 define('INTERFACE_TYPE_OPT',			-2);
-define('INTERFACE_TYPE_ANY',			-1);
 define('INTERFACE_TYPE_UNKNOWN',		0);
 define('INTERFACE_TYPE_AGENT',			1);
 define('INTERFACE_TYPE_SNMP',			2);
