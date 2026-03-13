@@ -484,10 +484,29 @@ class testCalculatedExpression extends CIntegrationTest {
 
 
 		// forecast
+
+		$his4 = 1.79e+10;
+		$his5 = 1.79e+300;
+
 		$trapId = $this->createTrap();
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1.79e+10);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1.79e+300);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his4);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his5);
+
+		$history = $this->historyGet($trapId);
+		$values = $this->extractHistoryValues($history);
+
+		$this->assertSame(
+			[
+				$his1,
+				$his2,
+				$his3,
+				$his4,
+				$his5
+
+			],
+			array_map('floatval', $values)
+		);
 		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 3000w,"exponential")';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
 		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
