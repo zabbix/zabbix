@@ -759,6 +759,8 @@ void	*zbx_cep_manager_thread(void *args)
 
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 
+	zbx_deinit_regexp_env();
+
 	zbx_vector_cep_task_ptr_destroy(&tasks);
 
 	cep_manager_free(manager);
