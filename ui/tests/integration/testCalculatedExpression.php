@@ -176,7 +176,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$params = [
 				'itemids'   => $itemid,
 				'history'   => ITEM_VALUE_TYPE_FLOAT,
-				'sortorder' => ZBX_SORT_UP,
+				'sortorder' => ZBX_SORT_UP
 		];
 
 		if ($limit !== null) {
@@ -474,7 +474,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			[
 				$his1,
 				$his2,
-				$his3,
+				$his3
 			],
 			array_map('floatval', $values)
 		);

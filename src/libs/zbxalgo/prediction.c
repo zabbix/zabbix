@@ -1112,7 +1112,6 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	/* these checks are needed in case of +/- infinity */
 	else if (ZBX_DBL_MAX < result)
 	{
 		result = ZBX_DBL_MAX;
