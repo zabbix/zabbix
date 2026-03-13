@@ -4534,6 +4534,23 @@ out:
       return: SUCCEED
       value: -1
 ---
+    test case: Evaluate forecast inf (#2,1s)
+    in:
+      history:
+      - itemid: 1
+        value type: ITEM_VALUE_TYPE_FLOAT
+        data:
+        - value: 1.79e+100
+          ts: 2017-01-10 10:01:00.000000000 +00:00
+        - value: 1.79e+300
+          ts: 2017-01-10 10:02:00.000000000 +00:00
+      time: 2017-01-10 10:04:00.000000000 +00:00
+      function: forecast
+      params: '#2,3000w,"exponential"'
+    out:
+      return: SUCCEED
+      value: 1.79e+308
+---
 test case: Evaluate timeleft(5m,65,power)
 in:
   history:

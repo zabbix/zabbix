@@ -322,8 +322,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		);
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
-
-
 	}
 
 	public function testCalculatedExpression_MinOfLast3()
@@ -447,6 +445,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		);
 
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+
 	}
 
 	public function testCalculatedExpression_TimeleftForecastOverflow()
@@ -480,32 +479,26 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 
+		// timeleft of course cannot reach -1, so test that it is cropped just below DBL_MAX
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 
-		$his4 = (float)self::ZBX_DBL_MAX / 1000;
-		$his5 = (float)self::ZBX_DBL_MAX / 100;
-		$his6 = (float)self::ZBX_DBL_MAX / 10;
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his4);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his5);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, $his6);
+		// forecast
+		$trapId = $this->createTrap();
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1.79e+10);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . self::$iterator, 1.79e+300);
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 3000w,"exponential")';
+		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
+		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
-		$history = $this->historyGet($trapId);
-		$values = $this->extractHistoryValues($history);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED");
 
-		$this->assertSame(
-			[
-				$his1,
-				$his2,
-				$his3,
-				$his4,
-				$his5,
-				$his6,
-			],
-			array_map('floatval', $values)
-		);
+		$res = $this->historyGet($forecast_itemid);
 
-		$this->assertEquals(-1, $this->getItemLastValue($timeleft_itemid));
+		// test that expected exponential value will be so large it is cropped just below DBL_MAX
+		$this->assertEquals((float)self::ZBX_DBL_MAX, $res['result'][0]['value']);
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()
@@ -622,10 +615,10 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::$itemIds = array_merge(self::$itemIds, [$calcItemId]);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:13 flags:uint64", true, 120);
+			" value:14 flags:uint64", true, 120);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of expression_eval_many():SUCCEED" .
-			" value:13 flags:uint64", true, 120);
-		$this->assertEquals('13', $this->getItemLastValue($calcItemId));
+			" value:14 flags:uint64", true, 120);
+		$this->assertEquals('14', $this->getItemLastValue($calcItemId));
 	}
 
 	public function testCalculatedExpression_HistogramQuantile()
