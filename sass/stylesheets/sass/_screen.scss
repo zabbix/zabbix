@@ -3380,14 +3380,17 @@ svg {
 	}
 
 	.on-fail-options {
+		display: flex;
+		align-items: flex-start;
 		padding-right: $on-fail-width + $action-width + 5px;
-		margin-bottom: 5px;
+		margin-top: 6px;
 
 		> label {
+			padding-top: 0;
 			padding-left: 30px;
 		}
 
-		input[type=text] {
+		z-textarea-flexible {
 			flex: 1;
 
 			&:not(:first-child) {

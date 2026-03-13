@@ -822,7 +822,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			]))
 			->setDisabled($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT);
 
-		$error_handler_params = (new CTextBox('preprocessing['.$i.'][error_handler_params]',
+		$error_handler_params = (new CTextAreaFlexible('preprocessing['.$i.'][error_handler_params]',
 			$step['error_handler_params'])
 		)->setErrorContainer("preprocessing-$i-error-container")->setTitle($step['error_handler_params']);
 

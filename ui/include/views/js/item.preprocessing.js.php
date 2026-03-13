@@ -70,7 +70,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 					ZBX_PREPROC_FAIL_SET_ERROR => _('Set error to')
 				]))
 				->setDisabled(),
-			(new CTextBox('preprocessing[#{rowNum}][error_handler_params]'))
+			(new CTextAreaFlexible('preprocessing[#{rowNum}][error_handler_params]'))
 				->setErrorLabel(_('Error message'))
 				->setErrorContainer('preprocessing-#{rowNum}-error-container')
 				->setEnabled(false)
@@ -98,7 +98,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 	(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', ''))
 		->setErrorLabel(_('Pattern'))
 		->setErrorContainer('preprocessing-#{rowNum}-error-container')
-		->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value> '))
+		->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>'))
 		->addClass('js-preproc-param-prometheus-placeholder')
 ))->show();
 
@@ -742,13 +742,13 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 
 				if ($(this).is(':checked')) {
 					$on_fail_options
-						.find('z-select[name*="[error_handler]"], input[name*="error_handler_params"]')
+						.find('z-select[name*="[error_handler]"], z-textarea-flexible[name*="error_handler_params"]')
 						.prop('disabled', false);
 					$on_fail_options.show();
 				}
 				else {
 					$on_fail_options
-						.find('z-select[name*="[error_handler]"], input[name*="error_handler_params"]')
+						.find('z-select[name*="[error_handler]"], z-textarea-flexible[name*="error_handler_params"]')
 						.prop('disabled', true);
 					$on_fail_options.hide();
 				}
