@@ -309,7 +309,8 @@ void	*zbx_proxyconfig_thread(void *args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 	unsigned char			process_type = info->process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD};
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_PROF_ENABLE,
+							ZBX_RTC_PROF_DISABLE};
 	char				*process_title;
 	sigjmp_buf			jmp_ret;
 	time_t				nextcheck;
