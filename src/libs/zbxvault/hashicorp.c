@@ -74,6 +74,7 @@ static int	zbx_vault_app_role_login_hashicorp(const char *url, const char *app_r
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(&jp_data, "client_token", token, &value_alloc, NULL))
 	{
+		zbx_free(*token);
 		*error = zbx_dsprintf(*error, "cannot find the client_token object in the received JSON object.");
 		goto fail;
 	}
