@@ -35,6 +35,11 @@ ZBX_VECTOR_IMPL(rtc_msg, zbx_rtc_msg_t)
 ZBX_PTR_VECTOR_IMPL(rtc_sub, zbx_rtc_sub_t *)
 ZBX_PTR_VECTOR_IMPL(rtc_hook, zbx_rtc_hook_t *)
 
+static zbx_get_config_forks_f		get_config_forks;
+static zbx_get_process_info_by_thread_f	get_process_info_by_thread;
+static zbx_get_threads_f		get_threads;
+static zbx_get_config_int_f		get_threads_num;
+
 static int	zbx_json_getuint64(const char *tag, const struct zbx_json_parse *jp, zbx_uint64_t *itemid,
 		char **error)
 {
@@ -151,6 +156,77 @@ static void	rtc_change_service_loglevel(zbx_uint32_t code)
 	zabbix_report_log_level_change();
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validate that the requested process instance exists               *
+ *                                                                            *
+ * Parameters: proc_type - [IN]  process type identifier                      *
+ *             proc_num  - [IN]  process instance number                      *
+ *             result    - [OUT] error message describing validation failure  *
+ *                                                                            *
+ * Return value: SUCCEED if the process exists, FAIL otherwise                *
+ *                                                                            *
+ ******************************************************************************/
+static int	rtc_process_validate_target(int proc_type, int proc_num, char **result)
+{
+	int	runing_num = get_config_forks(proc_type);
+
+	if (0 == runing_num || runing_num < proc_num)
+	{
+		*result = zbx_dsprintf(NULL, "Cannot perform operation: \"%s #%d\" process does not exist\n",
+					get_process_type_string(proc_type), proc_num);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send an RTC control message to a process identified by PID        *
+ *                                                                            *
+ * Parameters: rtc    - [IN] runtime control context                          *
+ *             pid    - [IN] target process identifier                        *
+ *             code   - [IN] RTC message code                                 *
+ *             result - [OUT] error message in case signaling fails           *
+ *                                                                            *
+ * Comments: The function first attempts to deliver the control message via   *
+ *           the RTC notification mechanism. If no process has been           *
+ *           subscribed to this messaage, then it's delivered by a signal.    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rtc_control_process_by_pid(zbx_rtc_t *rtc, pid_t pid, zbx_uint32_t code, char **result)
+{
+	unsigned char	proc_type;
+	int		proc_num, sent_num = 0, threads_num;
+
+	threads_num = get_threads_num();
+
+	for (int i = 0; i < threads_num; i++)
+	{
+		if (get_threads()[i] == pid)
+		{
+			if (SUCCEED == get_process_info_by_thread(i + 1, &proc_type, &proc_num))
+			{
+				struct zbx_json	j;
+
+				zbx_json_init(&j, ZBX_KIBIBYTE);
+
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_PROCESS_NAME,get_process_type_string(proc_type),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addint64(&j, ZBX_PROTO_TAG_PROCESS_NUM, proc_num);
+				sent_num = zbx_rtc_notify(rtc, proc_type, proc_num, code, j.buffer, j.buffer_size + 1);
+
+				zbx_json_free(&j);
+			}
+
+			break;
+		}
+	}
+
+	if (0 == sent_num)
+		zbx_signal_process_by_pid((int)pid, (int)ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -174,6 +250,12 @@ static void	rtc_process_loglevel_option(zbx_rtc_t *rtc, zbx_uint32_t code, const
 		return;
 	}
 
+	if (0 != proc_num && ZBX_PROCESS_TYPE_UNKNOWN != proc_type)
+	{
+		if (FAIL == rtc_process_validate_target(proc_type, proc_num, result))
+			return;
+	}
+
 	if (0 != pid)
 	{
 		if (pid == getpid())
@@ -183,7 +265,9 @@ static void	rtc_process_loglevel_option(zbx_rtc_t *rtc, zbx_uint32_t code, const
 			*result = zbx_strdup(NULL, "Changed log level for the main process\n");
 		}
 		else
-			zbx_signal_process_by_pid((int)pid, (int)ZBX_RTC_MAKE_MESSAGE(code, 0, 0), result);
+		{
+			rtc_control_process_by_pid(rtc, pid, code, result);
+		}
 
 		return;
 	}
@@ -212,12 +296,18 @@ static void	rtc_process_profiler_option(zbx_rtc_t *rtc, zbx_uint32_t code, const
 		return;
 	}
 
+	if (0 != proc_num && ZBX_PROCESS_TYPE_UNKNOWN != proc_type)
+	{
+		if (FAIL == rtc_process_validate_target(proc_num, proc_type, result))
+			return;
+	}
+
 	if (0 != pid)
 	{
 		if (pid == getpid())
 			*result = zbx_strdup(NULL, "Cannot use profiler with main process\n");
 		else
-			zbx_signal_process_by_pid((int)pid, (int)ZBX_RTC_MAKE_MESSAGE(code, scope, 0), result);
+			rtc_control_process_by_pid(rtc, pid, code, result);
 
 		return;
 	}
@@ -1005,8 +1095,15 @@ static void	rtc_process(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_uint32_t c
  * Purpose: initialize runtime control service                                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error)
+int	zbx_rtc_init(zbx_rtc_t *rtc, zbx_get_threads_f get_threads_cb, zbx_get_config_int_f get_threads_num_cb,
+		zbx_get_config_forks_f get_config_forks_cb,
+		zbx_get_process_info_by_thread_f get_process_info_by_thread_cb, char **error)
 {
+	get_threads = get_threads_cb;
+	get_threads_num = get_threads_num_cb;
+	get_config_forks = get_config_forks_cb;
+	get_process_info_by_thread = get_process_info_by_thread_cb;
+
 	zbx_vector_rtc_sub_create(&rtc->subs);
 	zbx_vector_rtc_hook_create(&rtc->hooks);
 	return zbx_ipc_service_start(&rtc->service, ZBX_IPC_SERVICE_RTC, error);

@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxnix.h"
 
 #include "nix_internal.h"
@@ -145,7 +146,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	int	threads_num = get_threads_num_func_cb();
 	for (i = 0; i < threads_num; i++)
 	{
-		int	thread_pid = get_threads_func_cb()[i];
+		int		thread_pid = get_threads_func_cb()[i];
 
 		if ((0 != pid && thread_pid != pid) || 0 == thread_pid)
 			continue;
