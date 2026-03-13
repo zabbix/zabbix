@@ -61,6 +61,8 @@ window.graph_edit_popup = new class {
 		this.#initPopupListeners();
 
 		this.overlay.recoverFocus();
+
+		this.form.discoverAllFields();
 		this.initial_form_fields = this.form.getAllValues();
 	}
 
@@ -639,7 +641,7 @@ window.graph_edit_popup = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(getFormFields(this.form.getAllValues()))
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.form.getAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
