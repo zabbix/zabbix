@@ -189,7 +189,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Host name' => 'Host prototype with existen visible {#NAME}',
+						'Host name' => 'Host prototype with existing visible {#NAME}',
 						'Host groups' => 'Discovered hosts',
 						'Visible name' => 'Host prototype visible name'
 					],
@@ -342,7 +342,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Host name' => 'Host prototype with existen visible {#NAME}',
+						'Host name' => 'Host prototype with existing visible {#NAME}',
 						'Visible name' => 'Host prototype visible name'
 					],
 					'inline_errors' => [

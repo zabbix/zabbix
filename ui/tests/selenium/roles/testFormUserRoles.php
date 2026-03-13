@@ -1561,7 +1561,9 @@ class testFormUserRoles extends CWebTest {
 			// Check the layout of tag related fields in Service section of user role config form.
 			$tag_field = $form->getField($field.' access to services with tag');
 			foreach (['tag', 'value'] as $input_type) {
-				$input = $tag_field->query('xpath:.//input[contains(@name, '.CXPathHelper::escapeQuotes('tag_'.$input_type).')]')->one();
+				$input = $tag_field->query('xpath:.//z-textarea-flexible[contains(@name, '.
+						CXPathHelper::escapeQuotes('tag_'.$input_type).')]'
+				)->one();
 				$this->assertEquals($input_type, $input->getAttribute('placeholder'));
 				$this->assertEquals(255, $input->getAttribute('maxlength'));
 			}

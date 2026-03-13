@@ -2370,7 +2370,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 		// Fill Parameters.
 		if (array_key_exists('Parameters', $data)) {
-			$this->fillComplexFields($data['Parameters'], $form, 'Parameters', 'z-textarea-flexible');
+			$this->fillComplexFields($data['Parameters'], $form, 'Parameters', 'input');
 		}
 
 		// Fill LLD macros tab.
@@ -2478,7 +2478,7 @@ class testLowLevelDiscovery extends CWebTest {
 
 			// Check Parameters.
 			if (array_key_exists('Parameters', $data)) {
-				$this->checkComplexFields($data['Parameters'], $form, 'Parameters', 'z-textarea-flexible');
+				$this->checkComplexFields($data['Parameters'], $form, 'Parameters', 'input');
 			}
 
 			// Check LLD macros.
