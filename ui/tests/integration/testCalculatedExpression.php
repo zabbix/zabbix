@@ -504,14 +504,26 @@ class testCalculatedExpression extends CIntegrationTest {
 			],
 			array_map('floatval', $values)
 		);
-		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#2, 3000w,"exponential")';
+		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator .
+				',#2, 3000w,"exponential")';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
 		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED");
 
-		$res = $this->historyGet($forecast_itemid);
+		$res = null;
+		for ($i = 0; $i < 10; $i++)
+		{
+			$res = $this->historyGet($forecast_itemid);
+
+			if (!empty($res['result']))
+			{
+				break;
+			}
+
+			sleep(1);
+		}
 
 		// test that expected exponential value will be so large it is cropped just below DBL_MAX
 		$this->assertEquals((float)self::ZBX_DBL_MAX, $res['result'][0]['value']);
