@@ -17,7 +17,7 @@
 class CFilter extends CDiv {
 
 	// Filter form object name and id attribute.
-	private const FORM_NAME = 'zbx_filter';
+	public const FORM_NAME = 'zbx_filter';
 
 	// Filter form object.
 	private $form;
@@ -100,7 +100,7 @@ class CFilter extends CDiv {
 			->setId(uniqid('filter_'));
 
 		$this->form = (new CForm('get'))
-			->setAttribute('name', self::FORM_NAME);
+			->setName(self::FORM_NAME);
 
 		$this->reset_url = new CUrl();
 	}
@@ -410,6 +410,19 @@ class CFilter extends CDiv {
 				'}'.
 			'});';
 		}
+
+		$js .= 'document.addEventListener("DOMContentLoaded", () => {'.
+			'ZABBIX.EventHub.subscribe({'.
+				'require: {'.
+					'context: CONTEXT_PAGE_NAVIGATION,'.
+					'event: EVENT_BACK_FORWARD'.
+				'},'.
+				'callback: ({event})=> {'.
+					'document.forms["'.self::FORM_NAME.'"]?.reset();'.
+				'},'.
+				'accept_cached: true'.
+			'});'.
+		'});';
 
 		return $js;
 	}

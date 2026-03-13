@@ -1066,7 +1066,7 @@ $.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
 	_getParentOffset: function () {
 		this.offsetParent = this.helper.offsetParent();
 
-		const pos = this.offsetParent.offset();
+		let pos = this.offsetParent.offset();
 
 		if (this.scrollParent[0] !== this.document[0]
 				&& $.contains(this.scrollParent[0], this.offsetParent[0])) {
@@ -1085,3 +1085,25 @@ $.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
 		};
 	}
 }));
+
+// Publish an event for back/forward navigation.
+// Use the Navigation Timing API as a fallback (in case the browser bypasses the bfcache).
+window.addEventListener('pageshow', event => {
+	if (!event.persisted) {
+		if (!PerformanceObserver.supportedEntryTypes.includes('navigation')) {
+			return;
+		}
+
+		const entries = performance.getEntriesByType('navigation').filter(entry => entry.type === 'back_forward');
+		if (entries.length === 0) {
+			return;
+		}
+	}
+
+	ZABBIX.EventHub.publish(new CEventHubEvent({
+		descriptor: {
+			context: CONTEXT_PAGE_NAVIGATION,
+			event: EVENT_BACK_FORWARD
+		}
+	}))
+});
