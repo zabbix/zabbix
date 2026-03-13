@@ -1,0 +1,1 @@
+........S. [ZBX-27453] corrected maximum allowed double to 1.79e+308 to prevent trends from collapsing into INF; updated timeleft and forecast functions to crop return values to 1.79e+308 (arimdjonoks)
