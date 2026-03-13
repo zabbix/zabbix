@@ -190,7 +190,7 @@ class testFormUserGroups extends CWebTest {
 				);
 			}
 			else {
-				// Check value of the interactible fields and make sure they are enabled.
+				// Check value of the interactable fields and make sure they are enabled.
 				$this->assertEquals($parameters['value'], $field->getValue());
 				$this->assertTrue($field->isEnabled());
 			}
@@ -316,7 +316,7 @@ class testFormUserGroups extends CWebTest {
 	protected function executeAction($data, $update = false) {
 		// Add word "update" to update cases to ensure uniqueness. Only for cases where name validation is not checked.
 		if ($update && !in_array($data['fields']['Group name'], [' ', 'Zabbix administrators'])) {
-			$data['fields']['Group name'] =  str_replace('group', 'group update', $data['fields']['Group name']);
+			$data['fields']['Group name'] = str_replace('group', 'group update', $data['fields']['Group name']);
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
@@ -343,13 +343,13 @@ class testFormUserGroups extends CWebTest {
 				$data['fields']['Group name'] = trim($data['fields']['Group name']);
 			}
 
-			// Once success message is there the name of the  group to be updated in next cases needs to be saved.
+			// Once success message is there the name of the group to be updated in next cases needs to be saved.
 			if ($update) {
 				self::$user_group = $data['fields']['Group name'];
 			}
 
-			$this->assertEquals(1, CDBHelper::getCount('SELECT usrgrpid FROM usrgrp WHERE name='
-					.zbx_dbstr($data['fields']['Group name'])
+			$this->assertEquals(1, CDBHelper::getCount('SELECT usrgrpid FROM usrgrp WHERE name='.
+					zbx_dbstr($data['fields']['Group name'])
 			));
 
 			// Check that the previously entered values are saved.
