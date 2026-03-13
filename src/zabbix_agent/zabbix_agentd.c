@@ -1424,16 +1424,22 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
+#ifndef _WINDOWS
 				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
+#endif
 				zbx_thread_start(zbx_collector_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listener_args;
+#ifndef _WINDOWS
 				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
+#endif
 				zbx_thread_start(listener_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+#ifndef _WINDOWS
 				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
+#endif
 				thread_args->args = &config_active_args[j++];
 				zbx_thread_start(active_checks_thread, thread_args, &zbx_threads[i]);
 				break;
