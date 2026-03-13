@@ -50,17 +50,28 @@ window.correlation_edit_popup = new class {
 					this.#addConditionRow(e.detail);
 					this.#processTypeOfCalculation();
 				});
-				overlay.$dialogue[0].addEventListener('dialogue.close', ({detail: {close_by}}) => {
-					if (close_by === 'close-by-user') {
-						this.form.validateFieldsForAction(['conditions']);
-					}
-				});
 			}
 			else if (e.target.classList.contains('js-condition-remove')) {
 				e.target.closest('tr').remove();
 				this.#processTypeOfCalculation();
 			}
 		});
+
+		let condition_add_timeout_id = null;
+
+		this.dialogue.querySelector('.js-condition-add').addEventListener('blur', () => {
+			clearTimeout(condition_add_timeout_id);
+			condition_add_timeout_id = setTimeout(() => {
+				if (document.getElementById('correlation-condition-form') === null) {
+					this.form.validateChanges(['conditions'], true);
+				}
+			}, 250);
+		});
+
+		this.dialogue.querySelector('.js-condition-add').addEventListener('focusin', () => {
+			 clearTimeout(condition_add_timeout_id);
+			 condition_add_timeout_id = null;
+		 });
 
 		templates_data.forEach((condition, index) => this.#addConditionRow(condition, index));
 
