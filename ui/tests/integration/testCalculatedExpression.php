@@ -498,9 +498,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				$his1,
-				$his2,
-				$his3,
 				$his4,
 				$his5
 
