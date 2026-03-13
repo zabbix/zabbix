@@ -1424,13 +1424,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				zbx_thread_start(zbx_collector_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listener_args;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				zbx_thread_start(listener_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
 				thread_args->args = &config_active_args[j++];
 				zbx_thread_start(active_checks_thread, thread_args, &zbx_threads[i]);
 				break;
@@ -1517,7 +1520,7 @@ void	zbx_free_service_resources(void)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, SUCCEED);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, SEC_PER_MIN);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);

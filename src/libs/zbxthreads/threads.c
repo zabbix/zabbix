@@ -330,11 +330,10 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
  *                                  FAIL                                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
-	int		timeout = SUCCEED == ret ? 0 : SEC_PER_MIN;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);
