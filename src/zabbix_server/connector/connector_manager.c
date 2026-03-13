@@ -180,6 +180,7 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 
 		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
 		worker->client = client;
+		zbx_ipc_client_addref(worker->client);
 		zbx_vector_uint64_create(&worker->ids);
 	}
 
