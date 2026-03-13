@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -35,7 +36,8 @@ class testPageTriggers extends CLegacyWebTest {
 	public function getBehaviors() {
 		return [
 			CTableBehavior::class,
-			CTagBehavior::class
+			CTagBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
@@ -103,8 +105,16 @@ class testPageTriggers extends CLegacyWebTest {
 		foreach ($labels as $label) {
 			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 		}
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc.
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
+
+		// Check selected count is updated correctly when entity is deleted (ZBX-27392).
+		$this->query('id:all_triggers')->asCheckbox()->one()->check();
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Trigger deleted');
+		$this->assertTableStats(0);
+		$this->assertEquals('0 selected', $this->query('id:selected_count')->waitUntilVisible()->one()->getText());
 	}
 
 	public static function getTagsFilterData() {
