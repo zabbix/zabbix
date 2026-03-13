@@ -425,8 +425,7 @@ void	diskstat_shm_extend(void)
 ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 {
 	unsigned char	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	int		server_num = ((zbx_thread_args_t *)args)->info.server_num,
-			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int		server_num = ((zbx_thread_args_t *)args)->info.server_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", server_num);
 
@@ -486,9 +485,6 @@ ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 
 	zbx_thread_exit(EXIT_SUCCESS);
 #else
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	exit(EXIT_SUCCESS);
 #endif
 }
