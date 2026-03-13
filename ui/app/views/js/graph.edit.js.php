@@ -559,6 +559,7 @@ window.graph_edit_popup = new class {
 		form_refresh.setAttribute('name', 'clone');
 		form_refresh.setAttribute('value', '1');
 
+		this.form_element.append(form_refresh);
 		this.form.findFieldByName('graphid').getField().remove();
 		this.graph.graphid = 0;
 
