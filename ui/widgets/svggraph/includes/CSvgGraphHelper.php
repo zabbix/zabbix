@@ -748,14 +748,15 @@ class CSvgGraphHelper {
 			if ($results) {
 				foreach ($tr_group['items'] as $index => $item) {
 					$metric = &$metrics[$index];
+					$multiplier = $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON ? -1 : 1;
 
 					// Collect and sort data points.
 					if (array_key_exists($item['itemid'], $results)) {
 						foreach ($results[$item['itemid']]['data'] as $point) {
 							$metric['points'][$point['clock']] = [
-								'min' => $point['min'],
-								'avg' => $point['avg'],
-								'max' => $point['max']
+								'min' => $multiplier * $point['min'],
+								'avg' => $multiplier * $point['avg'],
+								'max' => $multiplier * $point['max']
 							];
 						}
 
@@ -937,13 +938,14 @@ class CSvgGraphHelper {
 				}
 			}
 
+			$multiplier = $metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON ? -1 : 1;
 			$approximation_functions = ['min', 'avg', 'max'];
 
 			switch ($metric['options']['aggregate_function']) {
 				case AGGREGATE_MIN:
 					foreach ($metric_points as $tick => $points) {
 						$metric['points'][$tick] = array_fill_keys($approximation_functions,
-							min(array_column($points, 'value'))
+							$multiplier * min(array_column($points, 'value'))
 						);
 					}
 					break;
@@ -951,7 +953,7 @@ class CSvgGraphHelper {
 				case AGGREGATE_MAX:
 					foreach ($metric_points as $tick => $points) {
 						$metric['points'][$tick] = array_fill_keys($approximation_functions,
-							max(array_column($points, 'value'))
+							$multiplier * max(array_column($points, 'value'))
 						);
 					}
 					break;
@@ -967,13 +969,15 @@ class CSvgGraphHelper {
 								$num_sum += $point['num'];
 							}
 
-							$metric['points'][$tick] = array_fill_keys($approximation_functions, $value_sum / $num_sum);
+							$metric['points'][$tick] = array_fill_keys($approximation_functions,
+								$multiplier * $value_sum / $num_sum
+							);
 						}
 					}
 					else {
 						foreach ($metric_points as $tick => $points) {
 							$metric['points'][$tick] = array_fill_keys($approximation_functions,
-								CMathHelper::safeAvg(array_column($points, 'value'))
+								$multiplier * CMathHelper::safeAvg(array_column($points, 'value'))
 							);
 						}
 					}
@@ -983,7 +987,7 @@ class CSvgGraphHelper {
 				case AGGREGATE_SUM:
 					foreach ($metric_points as $tick => $points) {
 						$metric['points'][$tick] = array_fill_keys($approximation_functions,
-							array_sum(array_column($points, 'value'))
+							$multiplier * array_sum(array_column($points, 'value'))
 						);
 					}
 					break;
@@ -999,7 +1003,9 @@ class CSvgGraphHelper {
 							? $points[0]
 							: $points[count($points) - 1];
 
-						$metric['points'][$tick] = array_fill_keys($approximation_functions, $point['value']);
+						$metric['points'][$tick] = array_fill_keys($approximation_functions,
+							$multiplier * $point['value']
+						);
 					}
 					break;
 			}
@@ -1037,7 +1043,8 @@ class CSvgGraphHelper {
 					'units' => $metric['units'],
 					'min' => min($values),
 					'avg' => array_sum($values) / count($values),
-					'max' => max($values)
+					'max' => max($values),
+					'invert_values' => $metric['options']['invert_values']
 				];
 			}
 
@@ -1063,7 +1070,7 @@ class CSvgGraphHelper {
 		$simple_triggers = [];
 		$limit = 3;
 
-		foreach ($metrics as &$metric) {
+		foreach ($metrics as $metric) {
 			if ($metric['options']['stacked'] == SVG_GRAPH_STACKED_ON) {
 				continue;
 			}
@@ -1096,7 +1103,7 @@ class CSvgGraphHelper {
 				)[0]['expression'];
 
 				if (!preg_match('/^\{\d+\}\s*(?<operator>[><]=?|=)\s*(?<constant>.*)$/', $trigger['expression'],
-					$matches)) {
+						$matches)) {
 					continue;
 				}
 
@@ -1104,12 +1111,21 @@ class CSvgGraphHelper {
 					continue;
 				}
 
+				$value = $number_parser->calcValue();
+				$label_suffix = '';
+
+				if ($metric['options']['invert_values'] == SVG_GRAPH_INVERT_VALUES_ON) {
+					$value *= -1;
+					$label_suffix = ' ('._('inverted').')';
+				}
+
 				$simple_triggers[] = [
 					'axisy' => $metric['options']['axisy'],
-					'value' => $number_parser->calcValue(),
+					'value' => $value,
 					'color' => CSeverityHelper::getColor((int) $trigger['priority']),
 					'description' => _('Trigger').NAME_DELIMITER.CMacrosResolverHelper::resolveTriggerName($trigger),
-					'constant' => $matches['operator'].' '.$matches['constant']
+					'constant' => $matches['operator'].' '.$matches['constant'],
+					'label_suffix' => $label_suffix
 				];
 
 				$limit--;
