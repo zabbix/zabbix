@@ -450,6 +450,8 @@ void	*zbx_proxyconfig_thread(void *args)
 		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;
 	}
 stop:
+	zbx_deinit_regexp_env();
+
 	zbx_prof_destroy();
 
 	zbx_history_cache_destroy_local_cache();

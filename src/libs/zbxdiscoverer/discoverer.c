@@ -1359,6 +1359,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 		}
 	}
 
+	zbx_deinit_regexp_env();
+
 	discoverer_queue_deregister_worker(queue);
 	discoverer_queue_unlock(queue);
 

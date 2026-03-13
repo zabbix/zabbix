@@ -399,6 +399,8 @@ static void	*pg_service_entry(void *data)
 			zbx_ipc_client_release(client);
 	}
 
+	zbx_deinit_regexp_env();
+
 	zbx_prof_destroy();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);

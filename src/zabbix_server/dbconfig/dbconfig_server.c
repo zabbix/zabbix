@@ -223,6 +223,8 @@ void	*zbx_dbconfig_thread(void *args)
 				process_title, sec, dbconfig_args_in->config_confsyncer_frequency);
 	}
 stop:
+	zbx_deinit_regexp_env();
+
 	zbx_prof_destroy();
 
 	zbx_history_cache_destroy_local_cache();
