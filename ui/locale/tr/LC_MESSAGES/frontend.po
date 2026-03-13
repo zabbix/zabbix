@@ -21226,6 +21226,10 @@ msgstr "Bayt cinsinden veya toplamın yüzdesi olarak takas alanı boyutu. Bayt 
 msgid "Swedish (sv_SE)"
 msgstr "İsveççe (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Kimlik doğrulama yöntemini değiştirmek bu oturum dışındaki bütün oturumları sıfırlar! Devam edilsin mi?"
@@ -25469,6 +25473,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Bu işlemi gerçekleştirmek için izniniz yok."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

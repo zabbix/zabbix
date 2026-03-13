@@ -21207,6 +21207,10 @@ msgstr "Swap størrelse i bytes eller i procent af totalen. Returnerer heltal fo
 msgid "Swedish (sv_SE)"
 msgstr "Svensk (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Skift af godkendelsesmetode vil nulstille alle undtagen denne session! Blive ved?"
@@ -25444,6 +25448,10 @@ msgstr "Du kan ikke skifte skabeloner for det aktuelle valg."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Du har ikke tilladelse til at udføre denne handling."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

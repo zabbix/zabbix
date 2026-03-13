@@ -21395,6 +21395,10 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "Suedeză (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Schimbarea metodei de autentificare va reseta totul cu excepția acestei sesiuni! Continuați?"
@@ -25663,6 +25667,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Nu vă este permis să efectuați această operație."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
