@@ -77,8 +77,8 @@ function getMessageSettings() {
 		$messages['triggers.severities'] = $defSeverities;
 	}
 	else {
-		$messages['triggers.severities'] = array_fill_keys(json_decode($messages['triggers.severities'], true), 1)
-			?? [];
+		$selected = json_decode($messages['triggers.severities'], true) ?: [];
+		$messages['triggers.severities'] = array_fill_keys($selected, 1);
 	}
 
 	return $messages;
