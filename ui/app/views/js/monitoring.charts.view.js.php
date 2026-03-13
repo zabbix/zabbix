@@ -97,6 +97,8 @@
 						subfilter.matches('.subfilter-enabled')
 					);
 
+					this.withTimelineRangeFilters(filters);
+
 					location.href = zabbixUrl(filters);
 				}
 			});
@@ -111,6 +113,8 @@
 						delete filters[key];
 					}
 				});
+
+				this.withTimelineRangeFilters(filters);
 
 				location.href = zabbixUrl(filters);
 			});
@@ -181,6 +185,14 @@
 		replaceSubfilter(subfilter) {
 			if (document.getElementById('subfilter') !== null) {
 				document.getElementById('subfilter').outerHTML = subfilter;
+			}
+		},
+
+		withTimelineRangeFilters(filters) {
+			const {from, to} = timeControl.objectList['charts_view'].timeline ?? {};
+
+			if (from && to) {
+				Object.assign(filters, {from, to});
 			}
 		}
 	};
