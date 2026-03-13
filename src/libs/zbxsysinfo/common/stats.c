@@ -476,8 +476,6 @@ ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 	}
 
 #ifdef _WINDOWS
-	ZBX_UNUSED(process_num);
-
 	if (0 != cpu_collector_started())
 		free_cpu_collector(&(collector->cpus));
 
