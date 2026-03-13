@@ -642,7 +642,7 @@ class testPageUsers extends CWebTest {
 				[
 					'filter' => [
 						'User groups' => 'Zabbix administrators',
-						'Username' =>  'Admin',
+						'Username' => 'Admin',
 						'Last name' => 'Administrator'
 					],
 					'expected' => [
@@ -656,7 +656,7 @@ class testPageUsers extends CWebTest {
 				[
 					'filter' => [
 						'User groups' => 'Zabbix administrators',
-						'Username' =>  'Admin',
+						'Username' => 'Admin',
 						'Last name' => 'Administrator',
 						'User roles' => 'Super admin role',
 						'Name' => 'Zabbix'
@@ -857,8 +857,8 @@ class testPageUsers extends CWebTest {
 		foreach (self::$mfa_secrets as $secret) {
 			DBexecute('INSERT INTO mfa_totp_secret (mfa_totp_secretid, mfaid, userid, totp_secret, status, used_codes)'.
 					' VALUES ('.zbx_dbstr($secret['mfa_totp_secretid']).', '.zbx_dbstr($secret['mfaid']).', '.
-					zbx_dbstr($secret['userid']).', '.zbx_dbstr($secret['totp_secret']).', '. zbx_dbstr($secret['status']).
-					','. zbx_dbstr($secret['used_codes']).')'
+					zbx_dbstr($secret['userid']).', '.zbx_dbstr($secret['totp_secret']).', '.zbx_dbstr($secret['status']).
+					','.zbx_dbstr($secret['used_codes']).')'
 			);
 		}
 	}
