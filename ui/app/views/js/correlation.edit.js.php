@@ -29,15 +29,22 @@ window.correlation_edit_popup = new class {
 		this.form = new CForm(this.form_element, rules);
 		this.clone_rules = clone_rules;
 
+		const return_url = new URL('zabbix.php', location.href);
+		return_url.searchParams.set('action', 'correlation.list');
+		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+
 		this.row_templates = {}
 		for (const type of templates_types) {
 			this.row_templates[type] = new Template(document.getElementById(`condition-row-tmpl-${type}`).innerHTML);
 		}
 
-		const return_url = new URL('zabbix.php', location.href);
-		return_url.searchParams.set('action', 'correlation.list');
-		ZABBIX.PopupManager.setReturnUrl(return_url.href);
+		templates_data.forEach((condition, index) => this.#addConditionRow(condition, index));
+		this.#processTypeOfCalculation();
 
+		this.#initActions();
+	}
+
+	#initActions() {
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-condition-add')) {
 				const overlay = PopUp('correlation.condition.edit', {}, {
@@ -69,14 +76,11 @@ window.correlation_edit_popup = new class {
 		});
 
 		this.dialogue.querySelector('.js-condition-add').addEventListener('focusin', () => {
-			 clearTimeout(condition_add_timeout_id);
-			 condition_add_timeout_id = null;
-		 });
-
-		templates_data.forEach((condition, index) => this.#addConditionRow(condition, index));
+			clearTimeout(condition_add_timeout_id);
+			condition_add_timeout_id = null;
+		});
 
 		document.getElementById('evaltype').onchange = () => this.#processTypeOfCalculation();
-		this.#processTypeOfCalculation();
 
 		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 		this.footer.querySelector('.js-clone')?.addEventListener('click', () => this.#clone());
