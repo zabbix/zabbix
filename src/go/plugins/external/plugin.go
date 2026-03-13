@@ -69,7 +69,7 @@ func NewPlugin(
 		Logger: log.New(name),
 	}
 	base.SetExternal(true)
-	base.SetHandleTimeout(true)
+	base.SetForceEffectiveTimeoutExtension(true)
 
 	return &Plugin{
 		Base:          base,

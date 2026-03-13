@@ -195,28 +195,33 @@ type exporterTask struct {
 
 func invokeExport(a plugin.Accessor, key string, params []string, ctx plugin.ContextProvider) (any, error) {
 	exporter, _ := a.(plugin.Exporter)
-	timeout := ctx.Timeout()
-
-	if a.HandleTimeout() {
-		timeout = maxItemTimeout
-	}
-
-	exportStartedCtx := plugin.StartTimeout(ctx, time.Now())
+	ctx = plugin.StartTimeout(ctx, time.Now())
 
 	var ret any
 	var err error
 	tc := make(chan bool)
 
 	go func() {
-		ret, err = exporter.Export(key, params, exportStartedCtx)
+		ret, err = exporter.Export(key, params, ctx)
 		tc <- true
 	}()
+
+	// from an architectural standpoint we should not be supporting something
+	// like this, but alas, this evil hack was left behind by our predecessors
+	if a.ForceEffectiveTimeoutExtension() {
+		select {
+		case <-tc:
+			return ret, err //nolint:wrapcheck
+		case <-time.After(time.Duration(maxItemTimeout) * time.Second):
+			return nil, errs.New("timeout occurred while gathering data")
+		}
+	}
 
 	select {
 	case <-tc:
 		return ret, err //nolint:wrapcheck
-	case <-time.After(time.Second * time.Duration(timeout)):
-		return nil, errs.New("timeout occurred while gathering data")
+	case <-ctx.Done():
+		return nil, errs.Wrap(ctx.Err(), "timeout occurred while gathering data")
 	}
 }
 

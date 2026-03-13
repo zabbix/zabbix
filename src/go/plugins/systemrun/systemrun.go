@@ -44,7 +44,7 @@ func init() {
 		panic(errs.Wrap(err, "failed to register metrics"))
 	}
 
-	impl.SetHandleTimeout(true)
+	impl.SetForceEffectiveTimeoutExtension(true)
 }
 
 // Configure configures plugin based on options and other required initialization.
