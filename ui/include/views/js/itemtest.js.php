@@ -97,7 +97,7 @@
 			jQuery(':disabled', $form).removeAttr('disabled');
 		}
 
-		form_data = $form.serializeJSON();
+		form_data = getFormFields($form[0]);
 		delete $form;
 
 		const timeout = 'custom_timeout' in form_data
