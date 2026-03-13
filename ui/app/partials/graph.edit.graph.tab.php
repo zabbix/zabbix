@@ -240,6 +240,7 @@ $yaxis_min_item_prototpye = (new CDiv(
 		->setEnabled(!$data['readonly'])
 ))
 	->setId('yaxis_min_prototype_ms')
+	->addClass('align-top')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 $graph_tab->addItem([
@@ -322,6 +323,7 @@ $yaxis_max_item_prototpye = (new CDiv(
 		->setEnabled(!$data['readonly'])
 ))
 	->setId('yaxis_max_prototype_ms')
+	->addClass('align-top')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 $graph_tab
