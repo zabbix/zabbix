@@ -2420,8 +2420,6 @@ textarea.has-error {
   border: 1px solid #ff5555; }
 
 div[data-field-type="set"].has-error {
-  padding-left: 5px;
-  width: min-content;
   border: 1px solid #ff5555; }
 
 .radio-list-control.has-error input[type="radio"] + label {
@@ -8983,8 +8981,7 @@ svg {
 #graph-tab .yaxis-select {
   margin-right: 3px; }
 #graph-tab .graph-items {
-  max-width: 750px;
-  width: auto; }
+  max-width: 750px; }
 
 #graph-preview-tab {
   overflow: auto; }
