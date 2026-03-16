@@ -322,37 +322,42 @@ window.graph_edit_popup = new class {
 	}
 
 	#recalculateSortOrder() {
-		document.querySelectorAll('#items-table tbody tr.graph-item [id]').forEach(element => {
-			element.id = 'tmp' + element.id;
-		});
-
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach(element => {
-			element.id = 'tmp' + element.id;
-		});
-
 		for (const [index, row] of document.querySelectorAll('#items-table tbody tr.graph-item').entries()) {
-			row.id = row.id.substring(3).replace(/\d+/, `${index}`);
+			row.id = row.id.replace(/\d+/, `${index}`);
 
-			row.querySelectorAll('[id]').forEach(element => {
-				element.id = element.id.substring(3).replace(/\d+/, `${index}`);
+			row.querySelectorAll('input, z-select').forEach(input => {
+				input.id = input.id.replace(/\d+/, `${index}`);
+				input.name = input.name.replace(/\d+/, `${index}`);
 
-				if (element.id.includes('sortorder')) {
-					element.value = index;
+				if ('errorContainer' in input.dataset) {
+					input.dataset.errorContainer = input.dataset.errorContainer.replace(/\d+/, `${index}`);
+				}
+
+				if (input.name.includes('[sortorder]')) {
+					input.value = index;
 				}
 			});
 
-			row.querySelectorAll('[name]').forEach(element => {
-				element.name = element.name.replace(/\d+/, `${index}`);
-			});
-		}
+			const color_picker = row.querySelector('z-color-picker');
+			color_picker.setAttribute('color-field-name', color_picker.querySelector('input').name);
+			color_picker.dataset.errorContainer = color_picker.dataset.errorContainer.replace(/\d+/, `${index}`);
 
-		document.querySelectorAll('#items-table tbody tr.graph-item').forEach((row, index) => {
-			const remove_element = document.getElementById('items_' + index + '_remove');
+			const color_picker_button = color_picker.querySelector('button');
+			color_picker_button.id = color_picker_button.id.replace(/\d+/, `${index}`);
+
+			const item_name_field = row.querySelector('.js-item-name');
+			item_name_field.id = item_name_field.id.replace(/\d+/, `${index}`)
+
+			const remove_element = row.querySelector('.js-remove');
 
 			if (remove_element) {
-				remove_element.setAttribute('data-remove', index);
+				remove_element.id = remove_element.id.replace(/\d+/, `${index}`);
+				remove_element.dataset.remove = index;
 			}
-		});
+
+			const error_container = row.nextSibling.querySelector('td');
+			error_container.id = error_container.id.replace(/\d+/, `${index}`);
+		}
 
 		this.form.discoverAllFields();
 	}
@@ -421,6 +426,7 @@ window.graph_edit_popup = new class {
 		row.remove();
 
 		this.#recalculateSortOrder();
+		this.form.validateChanges(['items']);
 	}
 
 	#updateItemsTable(graph_type) {
