@@ -137,6 +137,46 @@ in:
   - "1"
   - "21"
 out:
+  error_msg: |
+    Cannot create Name1 item parameter: "11" already exists.
+  result: FAIL
+---
+test case: same names same values, but first name too long
+in:
+  names_src:
+  - "Name1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  - "Name2"
+  - "Name3"
+  values_src:
+  - "1"
+  - "2"
+  - "3"
+  names_dst:
+  - "Name1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  - "Name2"
+  - "Name3"
+  values_dst:
+  - "1"
+  - "2"
+  - "3"
+out:
+  error_msg: |
+    Cannot create item parameter: name "Name1aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa..." is too long.
+  result: FAIL
+---
+test case: empty name
+in:
+  names_src:
+  - ""
+  values_src:
+  - "1"
+  names_dst:
+  - "Name1"
+  values_dst:
+  - "1"
+out:
+  error_msg: |
+    Cannot create item parameter: empty item parameter name.
   result: FAIL
 ---
 test case: some ASCII and emojis
@@ -216,6 +256,8 @@ in:
   dst_value_buf:
     - '\x32\x00' # 2
 out:
+  error_msg: |
+    Cannot create item parameter: name "?" has invalid UTF-8 sequence.
   result: FAIL
 ---
 test case: broken utf8 rollback name
@@ -235,6 +277,8 @@ in:
     - '\x32\x00' # 2
   rollback: yes
 out:
+  error_msg: |
+    Cannot update item parameter: name "?" has invalid UTF-8 sequence.
   result: FAIL
   exp_names:
   - "name2"
@@ -258,6 +302,8 @@ in:
     - '\x35\x00' # 5
   rollback: yes
 out:
+  error_msg: |
+    Cannot update item parameter: value "?" has invalid UTF-8 sequence.
   result: FAIL
   exp_names:
   - "name3"

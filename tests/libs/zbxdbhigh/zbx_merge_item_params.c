@@ -76,6 +76,9 @@ void	zbx_mock_test_entry(void **state)
 	zbx_vector_item_param_ptr_t	item_params_src, item_params_dst;
 	char				*src_name_buf, *src_value_buf, *dst_name_buf, *dst_value_buf, *error = NULL;
 	zbx_vector_str_t		values_src, names_src, values_dst, names_dst, exp_names, exp_values;
+	zbx_mock_handle_t		param_handle;
+	const char			*expected_error_msg = NULL;
+	zbx_mock_error_t		mock_ret_code;
 
 	ZBX_UNUSED(state);
 
@@ -113,12 +116,32 @@ void	zbx_mock_test_entry(void **state)
 		fill_itemparam(&item_params_dst, values_dst.values_num, &names_dst, &values_dst);
 	}
 
+	exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
+
+	if (FAIL == exp_result)
+	{
+		if (ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_out_parameter("error_msg", &param_handle)) ||
+				ZBX_MOCK_SUCCESS != (mock_ret_code = zbx_mock_string(param_handle,
+				&expected_error_msg)))
+		{
+			fail_msg("Cannot get expected 'error_msg' parameters from test case data: %s",
+					zbx_mock_error_string(mock_ret_code));
+		}
+	}
 
 	result = zbx_merge_item_params(&item_params_dst, &item_params_src, &error);
 
-	exp_result = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.result"));
-
 	zbx_mock_assert_int_eq("return value", exp_result, result);
+
+	if (FAIL == exp_result)
+	{
+		if (0 != strcmp(expected_error_msg, error))
+		{
+			fail_msg("zbx_merge_item_params() error message: expected \"%s\", got \"%s\"",
+				expected_error_msg, error);
+				goto out;
+		}
+	}
 
 	zbx_vector_str_create(&exp_names);
 	zbx_vector_str_create(&exp_values);
@@ -151,7 +174,7 @@ void	zbx_mock_test_entry(void **state)
 		zbx_vector_str_destroy(&values_dst);
 		zbx_vector_str_destroy(&names_dst);
 	}
-
+out:
 	zbx_vector_str_clear_ext(&exp_names, zbx_str_free);
 	zbx_vector_str_clear_ext(&exp_values, zbx_str_free);
 
