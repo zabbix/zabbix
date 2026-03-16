@@ -381,6 +381,7 @@ void	*zbx_proxyconfig_thread(void *args)
 			}
 
 			sleeptime = 0;
+			zbx_free(rtc_data);
 		}
 
 		sleeptime = (0 == nextcheck || time(NULL) < nextcheck) ? 1 : 0;
@@ -456,6 +457,8 @@ stop:
 
 	zbx_history_cache_destroy_local_cache();
 	zbx_ipc_async_socket_close(&rtc);
+
+	zbx_tls_free();
 
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 
