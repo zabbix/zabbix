@@ -20,7 +20,7 @@
 class CModule extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'feature_flag' => CRoleHelper::MODULE_FEATURE_FLAG],
 		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
@@ -39,9 +39,7 @@ class CModule extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = [], bool $api_call = true) {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
+		$module_enabled = CRoleHelper::isFeatureEnabled();
 
 		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));

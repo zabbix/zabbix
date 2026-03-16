@@ -98,6 +98,8 @@ class CRoleHelper {
 	public const SERVICES_ACCESS_ALL = 1;
 	public const SERVICES_ACCESS_LIST = 2;
 
+	public const MODULE_FEATURE_FLAG = 'modules_config_enabled';
+
 	/**
 	 * Array for storing roles data (including rules) loaded from Role API object and converted to one format. The data
 	 * of specific role can be accessed in following way: self::roles[{role ID}].
@@ -650,4 +652,18 @@ class CRoleHelper {
 		self::$api_methods = $api_methods;
 		self::$api_method_masks = $api_method_masks;
 	}
+
+	public static function isFeatureEnabled(): bool {
+		foreach (CApiServiceFactory::API_SERVICES as $class_name) {
+			foreach (constant($class_name.'::ACCESS_RULES') as $rules) {
+				if (array_key_exists('feature_flag', $rules)) {
+					/** @var CConfigFile $config */
+					$config = APP::Component()->get('config');
+				}
+			}
+		}
+
+		return $config->getModuleFlag();
+	}
+
 }
