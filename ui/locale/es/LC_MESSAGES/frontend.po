@@ -13030,6 +13030,13 @@ msgstr "Campos de inventario"
 msgid "Inventory mode"
 msgstr "Modo de inventario"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "Invocar \"Ejecutar ahora\" en equipos de solo lectura"
@@ -21582,6 +21589,10 @@ msgstr "Tamaño del espacio de intercambio en bytes o porcentaje del total. Devu
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "¡Cambiar el método de autenticación reinicializará todas las sesiones menos ésta! ¿Continuar?"
@@ -25878,6 +25889,10 @@ msgstr "No puede cambiar de plantillas para la selección actual."
 msgid "You do not have permission to perform this operation."
 msgstr "No tiene permiso para realizar esta operación."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "No tiene permisos para acceder a esta página."
@@ -27397,6 +27412,10 @@ msgstr "hora no válida"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "período de almacenamiento de tendencias no válido"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"

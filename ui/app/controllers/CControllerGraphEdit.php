@@ -27,8 +27,10 @@ class CControllerGraphEdit extends CController {
 			'hostid' =>				'db hosts.hostid',
 			'graphid' =>			'db graphs.graphid',
 			'name' =>				'string',
-			'width' =>				'db graphs.width',
-			'height' => 			'db graphs.height',
+			'width' =>				'db graphs.width|ge '.CGraphDraw::GRAPH_WIDTH_MIN.
+				'|le '. CGraphDraw::GRAPH_WIDTH_MAX,
+			'height' => 			'db graphs.height|ge '.CGraphDraw::GRAPH_HEIGHT_MIN.
+				'|le '.CGraphDraw::GRAPH_HEIGHT_MAX,
 			'graphtype' =>			'db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),

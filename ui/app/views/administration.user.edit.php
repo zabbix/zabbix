@@ -535,7 +535,7 @@ if ($data['roleid']) {
 		);
 
 		if (!$data['modules']) {
-			$permissions_form_list->addRow(italic(_('No enabled modules founddddd.')));
+			$permissions_form_list->addRow(italic(_('No enabled modules found.')));
 		}
 		else {
 			$elements = [];

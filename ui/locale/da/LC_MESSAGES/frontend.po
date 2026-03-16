@@ -13028,6 +13028,13 @@ msgstr "Inventar felter"
 msgid "Inventory mode"
 msgstr "Inventar tilstand"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "Kald \"Udfør nu\" på skrivebeskyttede værter"
@@ -21580,6 +21587,10 @@ msgstr "Swap størrelse i bytes eller i procent af totalen. Returnerer heltal fo
 msgid "Swedish (sv_SE)"
 msgstr "Svensk (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Skift af godkendelsesmetode vil nulstille alle undtagen denne session! Blive ved?"
@@ -25876,6 +25887,10 @@ msgstr "Du kan ikke skifte skabeloner for det aktuelle valg."
 msgid "You do not have permission to perform this operation."
 msgstr "Du har ikke tilladelse til at udføre denne handling."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "Du har ingen tilladelser til at få adgang til denne side."
@@ -27395,6 +27410,10 @@ msgstr "ugyldig tid"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "ugyldig trendlagringsperiode"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"

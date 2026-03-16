@@ -20,7 +20,6 @@ import (
 	"errors"
 	"net"
 	"net/http"
-	"net/url"
 	"strings"
 	"sync"
 	"time"
@@ -106,8 +105,6 @@ func NewConnDetails(uriStr, user, pwd, service string) (*ConnDetails, error) {
 	if err != nil {
 		return nil, errs.WrapConst(err, ErrNewConnDetails)
 	}
-
-	service = url.QueryEscape(service)
 
 	onlyHostname, err := isOnlyHostnameOrIP(uriStr)
 	if err != nil {
