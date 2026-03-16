@@ -12897,6 +12897,13 @@ msgstr "资产字段"
 msgid "Inventory mode"
 msgstr "资产模式"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "在只读权限主机上调用“立即执行”"
@@ -21413,6 +21420,10 @@ msgstr "交换分区空间大小，字节或从总百分比。从字节返回整
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此会话之外的所有会话!继续吗?"
@@ -25684,6 +25695,10 @@ msgstr "当前所选不能切换模板。"
 msgid "You do not have permission to perform this operation."
 msgstr "您没有权限来完成此操作."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "你没有权限来访问这个页面."
@@ -27203,6 +27218,10 @@ msgstr "无效时间"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "无效的趋势存储期"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
