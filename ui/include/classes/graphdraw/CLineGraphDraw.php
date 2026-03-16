@@ -453,6 +453,10 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
+			if (!array_key_exists($item['itemid'], $results)) {
+				continue;
+			}
+
 			$delay = $item['source'] === 'trends' ? max($item['delay'], ZBX_MAX_TREND_DIFF) : $item['delay'];
 			$period = $time_to - $time_from;
 

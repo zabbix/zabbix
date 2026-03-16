@@ -12910,6 +12910,13 @@ msgstr ""
 msgid "Inventory mode"
 msgstr "資產紀錄模式"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr ""
@@ -21432,6 +21439,10 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切換認證方法將重設除了此連線期之外的所有連線!繼續嗎?"
@@ -25708,6 +25719,10 @@ msgstr ""
 msgid "You do not have permission to perform this operation."
 msgstr "您沒有許可權來完成此操作."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "您沒有許可權來操作本頁。"
@@ -27223,6 +27238,10 @@ msgstr ""
 #: widgets/piechart/actions/WidgetView.php:378
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
+msgstr ""
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
 msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
