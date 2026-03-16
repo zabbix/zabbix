@@ -19,8 +19,8 @@
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
 
-void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency);
-
+void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_timespec_t *ts, const zbx_events_funcs_t *events_cbs, int config_timeout,
+		int proxydata_frequency);
 
 #endif
