@@ -53,13 +53,13 @@ char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t *expected)
 	return buffer;
 }
 
-char *zbx_yaml_assemble_binary_sequence_member(zbx_mock_handle_t object, const char *member_name, size_t *expected)
+char	*zbx_yaml_assemble_binary_sequence_member(zbx_mock_handle_t object, const char *member_name, size_t *expected)
 {
-	zbx_mock_error_t error;
-	zbx_mock_handle_t field_handle, fragment, fragments;
-	const char *value;
-	size_t length, offset = 0;
-	char *buffer = NULL;
+	zbx_mock_error_t	error;
+	zbx_mock_handle_t	field_handle, fragment, fragments;
+	const char		*value;
+	size_t			length, offset = 0;
+	char			*buffer = NULL;
 
 	field_handle = zbx_mock_get_object_member_handle(object, member_name);
 

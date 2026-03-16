@@ -13,15 +13,12 @@
 **/
 
 #include "zbxmocktest.h"
-#include "zbxmockutil.h"
 #include "zbxmockassert.h"
 #include "zbxmockutil.h"
 #include "zbxmockhelper.h"
 
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
-
-#define TEST_ID 123
 
 static void	fill_itemparam(zbx_vector_item_param_ptr_t *v, int values_num, zbx_vector_str_t *names,
 		zbx_vector_str_t* values)
@@ -37,6 +34,7 @@ static void	fill_itemparam(zbx_vector_item_param_ptr_t *v, int values_num, zbx_v
 
 static void	fill_itemparam_buff(zbx_vector_item_param_ptr_t *v, const char *name_buf, const char *value_buf)
 {
+#define TEST_ID	123
 	zbx_item_param_t	*item_param;
 
 	item_param = zbx_item_param_create(name_buf, value_buf);
@@ -44,11 +42,11 @@ static void	fill_itemparam_buff(zbx_vector_item_param_ptr_t *v, const char *name
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.rollback"))
 		item_param->item_parameterid = TEST_ID;
-
+#undef TEST_ID
 }
 
 static int	compare_results(zbx_vector_item_param_ptr_t *item_params, zbx_vector_str_t *names,
-		zbx_vector_str_t* values)
+		zbx_vector_str_t *values)
 {
 	if (item_params->values_num != names->values_num)
 		return FAIL;
@@ -68,10 +66,8 @@ static int	compare_results(zbx_vector_item_param_ptr_t *item_params, zbx_vector_
 
 static void	clear_param_vector(zbx_vector_item_param_ptr_t *item_params)
 {
-	for (int i =0; item_params->values_num > i; i++)
-	{
+	for (int i = 0; item_params->values_num > i; i++)
 		zbx_item_param_free(item_params->values[i]);
-	}
 }
 
 void	zbx_mock_test_entry(void **state)
@@ -88,9 +84,9 @@ void	zbx_mock_test_entry(void **state)
 
 	if (SUCCEED == zbx_mock_parameter_exists("in.used_buffer"))
 	{
-		size_t	src_name_buffer_len= zbx_mock_get_parameter_uint64("in.src_name_buf_length"),
+		size_t	src_name_buffer_len = zbx_mock_get_parameter_uint64("in.src_name_buf_length"),
 			src_value_buffer_len = zbx_mock_get_parameter_uint64("in.src_value_buf_length"),
-			dst_name_buffer_len= zbx_mock_get_parameter_uint64("in.dst_name_buf_length"),
+			dst_name_buffer_len = zbx_mock_get_parameter_uint64("in.dst_name_buf_length"),
 			dst_value_buffer_len = zbx_mock_get_parameter_uint64("in.dst_value_buf_length");
 
 		src_name_buf = zbx_yaml_assemble_binary_sequence("in.src_name_buf", &src_name_buffer_len);
@@ -161,7 +157,6 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_vector_str_destroy(&exp_names);
 	zbx_vector_str_destroy(&exp_values);
-
 
 	clear_param_vector(&item_params_src);
 	clear_param_vector(&item_params_dst);
