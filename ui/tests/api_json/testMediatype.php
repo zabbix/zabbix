@@ -201,15 +201,13 @@ class testMediatype extends CAPITest {
 					'mediatypeid' => ':media_type:Oauth SMTP token_url with tokens_status',
 					'token_url' => 'http://example123.com',
 					'client_secret' => 'secret'
-				]],
-				'tokens_status is set to 0 when token_url is changed'
+				]]
 			],
 			'tokens_status is set to 0 when authorization_url is changed' => [
 				[[
 					'mediatypeid' => ':media_type:Oauth SMTP authorization_url with tokens_status',
 					'authorization_url' => 'http://example123.com'
-				]],
-				'tokens_status is set to 0 when authorization_url is changed'
+				]]
 			]
 		];
 	}
@@ -226,7 +224,7 @@ class testMediatype extends CAPITest {
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid')
 		])['result'];
 
-		$this->assertEquals(0, $result[0]['tokens_status'], $error_message);
+		$this->assertEquals(0, $result[0]['tokens_status'], $this->dataName());
 	}
 
 	public static function updateAccessTokenUpdatedDataProvider(): array {
