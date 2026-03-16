@@ -21,32 +21,52 @@ class CControllerPopupMediaCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'row_index' =>		'required|int32',
-			'userid' =>			'required|db users.userid',
-			'mediaid' =>		'db media.mediaid',
-			'mediatypeid' =>	'required|db media.mediatypeid',
-			'sendto' =>			'db media.sendto',
-			'sendto_emails'	=>	'array',
-			'period' =>			'required|time_periods',
-			'severities' =>		'array',
-			'active' =>			'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]),
-			'provisioned' =>	'in '.implode(',', [CUser::PROVISION_STATUS_NO, CUser::PROVISION_STATUS_YES])
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'row_index' => ['integer', 'required'],
+			'userid' => ['db users.userid', 'required'],
+			'mediaid' => ['db media.mediaid'],
+			'mediatypeid' => ['db media.mediatypeid', 'required'],
+			'mediatype_type' => ['integer', 'required'],
+			'sendto' => ['db media.sendto', 'not_empty',
+				'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
+			],
+			'sendto_emails' => ['array', 'required', 'not_empty',
+				'field' => ['string'
+					// TODO: uncomment with DEV-4644
+					// 'not_empty', 'use' => [CEmailValidator::class, []]
+				],
+				'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EMAIL]]
+			],
+			'period' => ['string', 'required', 'not_empty',
+				'use' => [CTimePeriodsParser::class, ['usermacros' => true]],
+				'messages' => ['use' => _('Invalid period.')]
+			],
+			'severities' => ['array',
+				'field' => ['integer', 'min' => 0, 'max' => 6]
+			],
+			'active' => ['integer', 'required', 'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]],
+			'provisioned' => ['integer', 'required', 'in' => [CUser::PROVISION_STATUS_NO, CUser::PROVISION_STATUS_YES]]
+		]];
+	}
 
-		$ret = $this->validateInput($fields) && $this->validateMediatypeid() && $this->validateSendto();
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules()) && $this->validateMediatypeid() && $this->validateSendto();
 
 		if (!$ret) {
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
 			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
+				new CControllerResponseData(['main_block' => json_encode($response)])
 			);
 		}
 
@@ -128,7 +148,8 @@ class CControllerPopupMediaCheck extends CController {
 			'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
 			'provisioned' => $this->getInput('provisioned', CUser::PROVISION_STATUS_NO),
 			'mediatype_name' => $this->mediatype['name'],
-			'mediatype_status' => $this->mediatype['status']
+			'mediatype_status' => $this->mediatype['status'],
+			'mediatype_type' => $this->mediatype['type']
 		];
 
 		if ($this->hasInput('mediaid')) {

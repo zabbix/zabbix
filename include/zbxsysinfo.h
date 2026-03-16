@@ -26,6 +26,7 @@
 #define ZBX_GET_STR_RESULT(res)		((char **)get_result_value_by_type(res, AR_STRING))
 #define ZBX_GET_TEXT_RESULT(res)	((char **)get_result_value_by_type(res, AR_TEXT))
 #define ZBX_GET_BIN_RESULT(res)		((char **)get_result_value_by_type(res, AR_BIN))
+#define ZBX_GET_JSON_RESULT(res)	((char **)get_result_value_by_type(res, AR_JSON))
 #define ZBX_GET_LOG_RESULT(res)		((zbx_log_t *)get_result_value_by_type(res, AR_LOG))
 #define ZBX_GET_MSG_RESULT(res)		((char **)get_result_value_by_type(res, AR_MESSAGE))
 

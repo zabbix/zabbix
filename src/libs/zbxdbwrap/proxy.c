@@ -711,8 +711,15 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 
 				SET_LOG_RESULT(&result, log);
 			}
-			else
-				zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value);
+			else if (ITEM_VALUE_TYPE_JSON == item->value_type)
+			{
+				if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_JSON, value->value))
+					return FAIL;
+			}
+			else if (FAIL == zbx_set_agent_result_type(&result, ITEM_VALUE_TYPE_TEXT, value->value))
+			{
+				return FAIL;
+			}
 		}
 
 		if (0 != value->meta)
@@ -1837,16 +1844,20 @@ static void	zbx_dservice_ptr_free(zbx_dservice_t *service)
 	zbx_free(service);
 }
 
-static void	zbx_drule_ip_free(zbx_drule_ip_t *ip)
+static void	zbx_drule_ip_free(void *ptr)
 {
+	zbx_drule_ip_t	*ip = (zbx_drule_ip_t*)ptr;
+
 	zbx_vector_dservice_ptr_clear_ext(&ip->services, zbx_dservice_ptr_free);
 	zbx_vector_dservice_ptr_destroy(&ip->services);
 	zbx_free(ip);
 }
 
-static void	zbx_drule_free(zbx_drule_t *drule)
+static void	zbx_drule_free(void *ptr)
 {
-	zbx_vector_ptr_clear_ext(&drule->ips, (zbx_clean_func_t)zbx_drule_ip_free);
+	zbx_drule_t	*drule = (zbx_drule_t*)ptr;
+
+	zbx_vector_ptr_clear_ext(&drule->ips, zbx_drule_ip_free);
 	zbx_vector_ptr_destroy(&drule->ips);
 	zbx_vector_uint64_destroy(&drule->dcheckids);
 	zbx_free(drule);
@@ -2262,7 +2273,7 @@ json_parse_error:
 json_parse_return:
 	zbx_free(value);
 
-	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
+	zbx_vector_ptr_clear_ext(&drules, zbx_drule_free);
 	zbx_vector_ptr_destroy(&drules);
 	zbx_vector_discoverer_drule_error_clear_ext(&drule_errors, zbx_discoverer_drule_error_free);
 	zbx_vector_discoverer_drule_error_destroy(&drule_errors);

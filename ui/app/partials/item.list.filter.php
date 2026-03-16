@@ -117,7 +117,8 @@ $info_type_select = (new CSelect('filter_value_type'))
 		ITEM_VALUE_TYPE_STR => _('Character'),
 		ITEM_VALUE_TYPE_LOG => _('Log'),
 		ITEM_VALUE_TYPE_TEXT => _('Text'),
-		ITEM_VALUE_TYPE_BINARY => _('Binary')
+		ITEM_VALUE_TYPE_BINARY => _('Binary'),
+		ITEM_VALUE_TYPE_JSON => _('JSON')
 	]));
 
 $filter_columns[1]
@@ -261,14 +262,18 @@ if ($data['filtered_count'] > 1) {
 	}
 }
 
+$reset_url = (new CUrl('zabbix.php'))
+	->setArgument('action', $data['action'])
+	->setArgument('context', $data['context']);
+
+if (count($data['filter_data']['filter_hostids']) == 1) {
+	$reset_url->setArgument('filter_hostids', $data['filter_data']['filter_hostids']);
+}
+
 $filter
 	->setProfile($data['filter_data']['filter_profile'])
 	->setActiveTab($data['filter_data']['filter_tab'])
-	->setResetUrl(
-		(new CUrl('zabbix.php'))
-			->setArgument('action', $data['action'])
-			->setArgument('context', $data['context'])
-	)
+	->setResetUrl($reset_url)
 	->addVar('action', $data['action'], uniqid('item_'))
 	->addVar('context', $data['context'], uniqid('item_'))
 	->addFilterTab(_('Filter'), $filter_columns, $subfilters_table);

@@ -86,7 +86,8 @@ class CControllerPopupMediaEdit extends CController {
 			],
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'js_validation_rules' => (new CFormValidator(CControllerPopupMediaCheck::getValidationRules()))->getRules()
 		];
 
 		$this->setResponse(new CControllerResponseData($data));
