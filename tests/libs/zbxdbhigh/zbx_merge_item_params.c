@@ -21,7 +21,7 @@
 #include "zbxdbhigh.h"
 
 static void	fill_itemparam(zbx_vector_item_param_ptr_t *v, int values_num, zbx_vector_str_t *names,
-		zbx_vector_str_t* values)
+		zbx_vector_str_t *values)
 {
 	zbx_item_param_t	*item_param;
 
