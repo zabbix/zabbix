@@ -2390,6 +2390,9 @@ div[data-field-type="set"].has-error {
     background-color: #ff5e5e;
     color: #000000 !important; }
 
+z-color-picker.has-error .color-picker-box {
+  border: 1px solid #ff5e5e; }
+
 .list-check-radio .error {
   margin-top: 0; }
 
@@ -4305,8 +4308,6 @@ z-color-picker {
   line-height: 24px; }
   z-color-picker[readonly] .color-picker-box {
     cursor: default; }
-  z-color-picker.has-error .color-picker-box {
-    border: 1px solid #ff5e5e; }
   z-color-picker .color-picker-box {
     position: relative;
     vertical-align: top;

@@ -146,6 +146,14 @@ div[data-field-type="set"] {
 	}
 }
 
+z-color-picker {
+	&.has-error {
+		.color-picker-box {
+			border: 1px solid $error;
+		}
+	}
+}
+
 .list-check-radio {
 	.error {
 		margin-top: 0;
