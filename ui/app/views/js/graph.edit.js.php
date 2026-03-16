@@ -453,7 +453,7 @@ window.graph_edit_popup = new class {
 
 			const new_row = template.evaluateToElement(row_data);
 
-			if (!('gitemid' in row_data)) {
+			if (!('gitemid' in row_data) || !row_data.gitemid) {
 				new_row.querySelector(`input[name="items[${index}][gitemid]"]`).remove();
 			}
 
