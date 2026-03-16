@@ -138,8 +138,9 @@ void	zbx_mock_test_entry(void **state)
 		if (0 != strcmp(expected_error_msg, error))
 		{
 			fail_msg("zbx_merge_item_params() error message: expected \"%s\", got \"%s\"",
-				expected_error_msg, error);
-				goto out;
+					expected_error_msg, error);
+
+			goto out;
 		}
 	}
 
