@@ -74,8 +74,10 @@ char	*zbx_yaml_assemble_binary_sequence_member(zbx_mock_handle_t object, const c
 			fail_msg("Cannot read binary data from '%s': %s", member_name, zbx_mock_error_string(error));
 
 		if (0 != *expected && offset + length > *expected)
+		{
 			fail_msg("Incorrect message size for '%s', expected:%ld actual:%ld", member_name, *expected,
 					offset + length);
+		}
 
 		buffer = zbx_realloc(buffer, offset + length);
 		memcpy(buffer + offset, value, length);
@@ -83,8 +85,10 @@ char	*zbx_yaml_assemble_binary_sequence_member(zbx_mock_handle_t object, const c
 	}
 
 	if (0 != *expected && offset != *expected)
+	{
 		fail_msg("Assembled message is smaller than expected for '%s': %ld < %ld", member_name, offset,
 				*expected);
+	}
 
 	*expected = offset;
 
