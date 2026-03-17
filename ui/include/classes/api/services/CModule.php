@@ -39,7 +39,7 @@ class CModule extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = [], bool $api_call = true) {
-		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
+		if ($api_call && self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
