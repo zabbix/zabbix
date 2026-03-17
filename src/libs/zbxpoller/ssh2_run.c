@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -278,7 +278,7 @@ int	ssh_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, con
 
 	/* Create a session instance and start it up. This will trade welcome */
 	/* banners, exchange keys, and setup crypto, compression, and MAC layers */
-	while (0 != (rc = libssh2_session_startup(session, s.socket)))
+	while (0 != (rc = libssh2_session_handshake(session, s.socket)))
 	{
 		if (SUCCEED != ssh_nonblocking_error(&s, session, rc, &ssherr))
 		{

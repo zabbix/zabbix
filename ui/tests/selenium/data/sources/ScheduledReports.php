@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -215,7 +215,7 @@ class ScheduledReports {
 			],
 			[
 				'userid' => '1',
-				'name' => 'Report for filter - disabled',
+				'name' => 'Report for filter -   disabled',
 				'dashboardid' => '57',
 				'period' => '2',
 				'cycle' => '2',

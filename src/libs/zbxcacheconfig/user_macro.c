@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -56,6 +56,13 @@ static zbx_um_cache_t	*um_cache_dup(zbx_um_cache_t *cache)
 
 	dup = (zbx_um_cache_t *)dbconfig_shmem_malloc_func(NULL, sizeof(zbx_um_cache_t));
 	dup->refcount = 1;
+	memset(&dup->hosts, 0, sizeof(dup->hosts));
+
+	if (0 != get_dc_config()->um_hosts.num_slots)
+	{
+		dup->hosts = get_dc_config()->um_hosts;
+		memset(&get_dc_config()->um_hosts, 0 , sizeof(get_dc_config()->um_hosts));
+	}
 
 	zbx_hashset_copy(&dup->hosts, &cache->hosts, sizeof(zbx_um_host_t *));
 	zbx_hashset_iter_reset(&dup->hosts, &iter);
@@ -193,7 +200,11 @@ void	um_cache_release(zbx_um_cache_t *cache)
 	zbx_hashset_iter_reset(&cache->hosts, &iter);
 	while (NULL != (host = (zbx_um_host_t **)zbx_hashset_iter_next(&iter)))
 		um_host_release(*host);
-	zbx_hashset_destroy(&cache->hosts);
+
+	if (0 == get_dc_config()->um_hosts.num_slots)
+		get_dc_config()->um_hosts = cache->hosts;
+	else
+		zbx_hashset_destroy(&cache->hosts);
 
 	dbconfig_shmem_free_func(cache);
 }
@@ -856,7 +867,7 @@ static void	um_cache_sync_hosts(zbx_um_cache_t *cache, zbx_dbsync_t *sync)
  *********************************************************************************/
 zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_dbsync_t *gmacros,
 		zbx_dbsync_t *hmacros, zbx_dbsync_t *htmpls, const zbx_config_vault_t *config_vault,
-		unsigned char program_type)
+		double *um_cache_dup_sec, zbx_int64_t *um_cache_dup_size, unsigned char program_type)
 {
 	if (ZBX_DBSYNC_INIT != gmacros->mode && ZBX_DBSYNC_INIT != hmacros->mode && ZBX_DBSYNC_INIT != htmpls->mode &&
 			0 == gmacros->rows.values_num && 0 == hmacros->rows.values_num && 0 == htmpls->rows.values_num)
@@ -866,8 +877,14 @@ zbx_um_cache_t	*um_cache_sync(zbx_um_cache_t *cache, zbx_uint64_t revision, zbx_
 
 	if (SUCCEED == um_cache_is_locked(cache))
 	{
+		double		sec = zbx_time();
+		zbx_int64_t	used_size = dbconfig_used_size();
+
 		um_cache_release(cache);
 		cache = um_cache_dup(cache);
+
+		*um_cache_dup_sec = zbx_time() - sec;
+		*um_cache_dup_size = dbconfig_used_size() - used_size;
 	}
 
 	cache->revision = revision;

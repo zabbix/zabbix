@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup config, hstgrp, widget
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  *
  * @onBefore prepareDashboardData, prepareProblemsData
  */
@@ -763,7 +763,7 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 	 */
 	public function testDashboardProblemsWidgetDisplay_CheckTable($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = CDashboardElement::find()->one()->waitUntilReady();
 		$form = $this->openWidgetAndFill($dashboard, 'Problems', $data['fields']);
 
 		if (array_key_exists('Tags', $data)) {
@@ -775,12 +775,13 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 
 		// Check saved dashboard.
 		$form->waitUntilNotVisible();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Assert widget's table.
-		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$dashboard->getWidget($data['fields']['Name']);
+		$table->waitUntilReloaded();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -587,6 +587,7 @@ void	zbx_setproctitle_deinit(void);
 void	zbx_error(const char *fmt, ...) __zbx_attr_format_printf(1, 2);
 
 /* misc functions */
+int	zbx_validate_hostname_len(const char *hostname, size_t hostname_len);
 int	zbx_validate_hostname(const char *hostname);
 
 int	get_nearestindex(const void *p, size_t sz, int num, zbx_uint64_t id);
@@ -784,6 +785,7 @@ zbx_log_component_t;
 
 void	zbx_set_log_component(const char *name, zbx_log_component_t *component);
 void	zbx_change_component_log_level(zbx_log_component_t *component, int direction);
+void	zbx_malloc_trim(time_t now, int period, size_t pad);
 #endif
 
 #endif

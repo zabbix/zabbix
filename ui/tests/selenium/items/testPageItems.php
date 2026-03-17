@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,25 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
+/**
+ * @backup items
+ *
+ * @onBefore prepareItemData
+ */
 class testPageItems extends CLegacyWebTest {
+
+	public static function prepareItemData() {
+		$hostid = CDBHelper::getValue("SELECT hostid FROM hosts WHERE host='Host for trigger tags filtering'");
+		CDataHelper::call('item.create', [
+			[
+				'hostid' => $hostid,
+				'name' => 'Multiple   spaces   in item name',
+				'key_' => 'customItemkey123',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => 0
+			]
+		]);
+	}
 
 	public static function data() {
 		return CDBHelper::getDataProvider(
@@ -30,11 +48,8 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
-		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestCheckHeader('Items');
-
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
+			$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
 				[
@@ -49,8 +64,11 @@ class testPageItems extends CLegacyWebTest {
 					'Info'
 				]
 			);
+			$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
+			$this->zbxTestTextPresent('Clear history and trends');
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$this->zbxTestLogin('zabbix.php?action=item.list&context=template&filter_set=1&filter_hostids[0]='.$data['hostid']);
 			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
 				[
@@ -61,30 +79,31 @@ class testPageItems extends CLegacyWebTest {
 					'History',
 					'Trends',
 					'Type',
-					'Status',
-					'Info'
+					'Status'
 				]
 			);
+			$this->zbxTestAssertElementNotPresentXpath("//button[text()='Execute now']");
+			$this->zbxTestAssertElementNotPresentXpath("//button[text()='Clear history and trends']");
 		}
 
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
-
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history and trends', 'Delete');
+		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestCheckHeader('Items');
+		$this->zbxTestTextPresent(['Enable', 'Disable', 'Mass update', 'Copy', 'Delete']);
 	}
 
 	/**
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
+		$this->zbxTestLogin('zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
-			$this->assertFalse($this->query('button:Clear history and trends')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Execute now')->exists());
+			$this->assertFalse($this->query('button:Clear history and trends')->exists());
 		}
 		else {
 			$this->zbxTestClickButtonText('Execute now');
@@ -170,7 +189,19 @@ class testPageItems extends CLegacyWebTest {
 						['Host for triggers filtering' => 'Discovered item one'],
 						['Host for triggers filtering' => 'Inheritance item for triggers filtering'],
 						['Host for triggers filtering' => 'Item for triggers filtering'],
+						['Host for trigger tags filtering' => 'Multiple spaces in item name'],
 						['Host for trigger tags filtering' => 'Trapper']
+					]
+				]
+			],
+			// Multiple spaces in Name field.
+			[
+				[
+					'filter_options' => [
+						'Name' => '   '
+					],
+					'result' => [
+						['Host for trigger tags filtering' => 'Multiple spaces in item name']
 					]
 				]
 			]

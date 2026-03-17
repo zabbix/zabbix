@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -114,9 +114,11 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		if ($confirmation) {
 			$this->zbxTestAcceptAlert();
 		}
-			$this->zbxTestCheckHeader('Macros');
-			$this->zbxTestTextPresent('Macros');
-			$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
+
+		$this->page->waitUntilReady();
+		$this->zbxTestCheckHeader('Macros');
+		$this->zbxTestTextPresent('Macros');
+		$this->zbxTestTextPresent(['Macro', 'Value', 'Description']);
 	}
 
 	private function calculateHash($conditions = null) {
@@ -922,6 +924,7 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 		$setting_form = $this->query('name:otherForm')->asForm()->one();
 		$setting_form->fill(['Vault provider' => 'CyberArk Vault']);
 		$setting_form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		// Try to create macros with Vault type different from settings.
 		$this->page->open('zabbix.php?action=macros.edit')->waitUntilReady();

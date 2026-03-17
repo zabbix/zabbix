@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -599,8 +599,11 @@ static void	__snmpidx_mapping_clean(void *data)
 	zbx_free(mapping->index);
 }
 
-static int	zbx_snmp_oid_compare(const zbx_snmp_oid_t **s1, const zbx_snmp_oid_t **s2)
+static int	zbx_snmp_oid_compare(const void *a1, const void *a2)
 {
+	const zbx_snmp_oid_t * const	*s1 = (const zbx_snmp_oid_t *const *)a1;
+	const zbx_snmp_oid_t * const	*s2 = (const zbx_snmp_oid_t *const *)a2;
+
 	return strcmp((*s1)->str_oid, (*s2)->str_oid);
 }
 
@@ -865,7 +868,11 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	if (STAT_SUCCESS == status)
 	{
 		zbx_snprintf(error, max_error_len, "SNMP error: %s", snmp_errstring(response->errstat));
-		ret = NOTSUPPORTED;
+
+		if (SNMP_ERR_AUTHORIZATIONERROR == response->errstat)
+			ret = NETWORK_ERROR;
+		else
+			ret = NOTSUPPORTED;
 	}
 	else if (STAT_ERROR == status)
 	{
@@ -2433,7 +2440,7 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
+	zbx_vector_snmp_oid_sort(oids, zbx_snmp_oid_compare);
 
 	for (int i = 1; i < oids->values_num; i++)
 	{
@@ -2493,7 +2500,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 
 	if (1 < oids_out->values_num)
 	{
-		zbx_vector_snmp_oid_sort(oids_out, (zbx_compare_func_t)zbx_snmp_oid_compare);
+		zbx_vector_snmp_oid_sort(oids_out, zbx_snmp_oid_compare);
 		snmp_bulkwalk_remove_matching_oids(oids_out);
 	}
 
@@ -2606,6 +2613,7 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 {
 #define TYPE_STR_HEX_STRING	"Hex-STRING: "
 #define TYPE_STR_STRING		"STRING: "
+#define TYPE_STR_BITS		"BITS: "
 	int	ret;
 	char	*buf;
 	char	quoted_buf[MAX_STRING_LEN];
@@ -2621,6 +2629,12 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 	buf += 3;
 
 	if (0 == var->val_len && 0 == strcmp(buf, "\"\""))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (0 == strncmp(buf, TYPE_STR_BITS, sizeof(TYPE_STR_BITS) - 1))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -2702,6 +2716,7 @@ out:
 	return ret;
 #undef TYPE_STR_HEX_STRING
 #undef TYPE_STR_STRING
+#undef TYPE_STR_BITS
 }
 
 static void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
@@ -2731,7 +2746,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len,
 				(int)*results_offset);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s", itemid, error);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s errstat:%ld", itemid, error,
+				response->errstat);
 
 		bulkwalk_context->running = 0;
 		goto out;
@@ -2975,12 +2991,14 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				&snmp_context->item.interface, snmp_context->snmp_oid_type, snmp_context->item.itemid,
 				error, sizeof(error))))
 		{
+			snmp_context->item.ret = ret;
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
 	}
 	else
 	{
 		zbx_free(bulkwalk_context->error);
+		snmp_context->item.ret = NOTSUPPORTED;
 		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "SNMP error: [%d]", stat);
 	}
 out:
@@ -3176,6 +3194,7 @@ void	zbx_unset_snmp_bulkwalk_options(void)
 static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_address_t *addresses,
 		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
+#define ZBX_SNMP_TIMEOUT_WATERMARK	30
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	char			error[MAX_STRING_LEN];
@@ -3214,11 +3233,17 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 			goto stop;
 		}
 
+		const char	*high_timeout_msg = "";
+
+		if (ZBX_SNMP_TIMEOUT_WATERMARK < snmp_context->config_timeout)
+			high_timeout_msg = " (timeout value may be too high)";
+
 		if (0 < snmp_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot receive response from [[%s]:%hu]:"
-					" timed out, retrying", snmp_context->item.itemid,
-					snmp_context->item.interface.addr, snmp_context->item.interface.port);
+					" timed out%s, retrying", snmp_context->item.itemid,
+					snmp_context->item.interface.addr, snmp_context->item.interface.port,
+					high_timeout_msg);
 
 			snmp_sess_timeout(snmp_context->ssp);
 
@@ -3259,9 +3284,9 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 		}
 
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-				"%s: '%s' from [[%s]:%hu]:"
-				" timed out", err_detail, buffer, snmp_context->item.interface.addr,
-				snmp_context->item.interface.port));
+				"%s: '%s' from [[%s]:%hu]: timed out%s", err_detail, buffer,
+				snmp_context->item.interface.addr, snmp_context->item.interface.port,
+				high_timeout_msg));
 
 		goto stop;
 	}
@@ -3338,7 +3363,6 @@ static int	snmp_task_process(short event, void *data, int *fd, zbx_vector_addres
 
 		if (NULL != bulkwalk_context->error)
 		{
-			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, bulkwalk_context->error);
 			bulkwalk_context->error = NULL;
 			goto stop;
@@ -3426,6 +3450,7 @@ stop:
 	}
 
 	return task_ret;
+#undef ZBX_SNMP_TIMEOUT_WATERMARK
 }
 
 zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)

@@ -1,0 +1,54 @@
+# This workflow will install PHP dependencies, run tests and lint with a variety of PHP versions
+# For more information see: https://github.com/marketplace/actions/setup-php-action
+
+name: php-saml 4.x package
+
+on:
+  push:
+    branches: [ 4.* ]
+  pull_request:
+    branches: [ 4.* ]
+
+jobs:
+  test:
+    runs-on: ${{ matrix.operating-system }}
+    strategy:
+      fail-fast: false
+      matrix:
+        operating-system: ['ubuntu-latest']
+        php-versions: [7.3, 7.4, 8.0, 8.1, 8.2, 8.3, 8.4]
+    steps:
+      - name: Setup PHP, with composer and extensions
+        uses: shivammathur/setup-php@v2 #https://github.com/shivammathur/setup-php
+        with:
+          php-version: ${{ matrix.php-versions }}
+          extensions: mbstring, intl, mcrypt, xml
+          tools: composer:v2
+          ini-values: post_max_size=256M, max_execution_time=180
+          coverage: xdebug
+
+      - name: Set git to use LF
+        run: |
+          git config --global core.autocrlf false
+          git config --global core.eol lf
+      - uses: actions/checkout@v2
+
+      - name: Validate composer.json and composer.lock
+        run: composer validate
+
+      - name: Install Composer dependencies
+        run: |
+          composer self-update
+          composer install --prefer-source --no-interaction
+      - name: Syntax check PHP
+        run: |
+          php vendor/bin/phpcpd --exclude tests --exclude vendor .
+          php vendor/bin/phploc src/.
+          mkdir -p tests/build/dependences
+          php vendor/bin/pdepend --summary-xml=tests/build/logs/dependence-summary.xml --jdepend-chart=tests/build/dependences/jdepend.svg --overview-pyramid=tests/build/dependences/pyramid.svg  src/.
+
+      - name: PHP Code Sniffer
+        run: php vendor/bin/phpcs --standard=tests/ZendModStandard src/Saml2 demo1 demo2 endpoints tests/src
+
+      - name: Run unit tests
+        run: vendor/bin/phpunit --verbose --debug

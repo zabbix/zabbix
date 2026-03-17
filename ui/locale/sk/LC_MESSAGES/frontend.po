@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-27 12:36+0000\n"
+"PO-Revision-Date: 2025-12-03 10:01+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -3921,7 +3921,7 @@ msgstr "Nie je možné nastaviť \"Agregáciu množiny údajov\", keď je do gra
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Nie je možné nastaviť znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -20060,6 +20060,10 @@ msgstr "Veľkosť voľného swap miesta v bytoch alebo v percentách. Vráti cel
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých sedeni okrem Vásho! Pokračovať?"
@@ -24025,6 +24029,10 @@ msgstr "Pre aktuálny výber nemôžete prepínať templaty."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnenie na vykonanie tejto operácie."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

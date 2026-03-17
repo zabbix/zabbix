@@ -8,7 +8,11 @@ SERVER_tests = \
 	substitute_lld_macros \
 	macro_fmttime \
 	macro_functions \
-	valuemaps
+	valuemaps \
+	zbx_format_value \
+	zbx_substitute_expression_lld_macros \
+	zbx_substitute_macros_in_json_pairs
+
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -219,7 +223,10 @@ evaluate_function_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
 
 evaluate_function_LDADD += @SERVER_LIBS@
 
-evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+evaluate_function_LDFLAGS = @SERVER_LDFLAGS@ \
+	-Wl,--wrap=zbx_baseline_get_data \
+	-Wl,--wrap=zbx_recalc_time_period \
+	$(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 evaluate_stl_SOURCES = \
 	evaluate_stl.c \
@@ -305,5 +312,74 @@ valuemaps_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcachevalue \
 	-I@top_srcdir@/src/libs/zbxhistory \
 	-I@top_srcdir@/src/libs/zbxexpression
+
+#zbx_format_value
+
+zbx_format_value_SOURCES = \
+	zbx_format_value.c \
+	$(COMMON_SRC_FILES)
+
+zbx_format_value_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_format_value_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+zbx_format_value_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+zbx_format_value_LDADD += @SERVER_LIBS@
+
+zbx_format_value_LDFLAGS = @SERVER_LDFLAGS@ $(YAML_LDFLAGS) $(CMOCKA_LDFLAGS)
+
+#zbx_substitute_expression_lld_macros
+
+zbx_substitute_expression_lld_macros_SOURCES = \
+	zbx_substitute_expression_lld_macros.c \
+	lld_common.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_expression_lld_macros_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_substitute_expression_lld_macros_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+zbx_substitute_expression_lld_macros_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+zbx_substitute_expression_lld_macros_LDADD += @SERVER_LIBS@
+
+zbx_substitute_expression_lld_macros_LDFLAGS = @SERVER_LDFLAGS@ $(YAML_LDFLAGS) $(CMOCKA_LDFLAGS)
+
+#zbx_substitute_macros_in_json_pairs
+
+zbx_substitute_macros_in_json_pairs_SOURCES = \
+	zbx_substitute_macros_in_json_pairs.c \
+	lld_common.c \
+	$(COMMON_SRC_FILES)
+
+zbx_substitute_macros_in_json_pairs_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxalgo \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxhistory
+
+zbx_substitute_macros_in_json_pairs_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+zbx_substitute_macros_in_json_pairs_LDADD += $(EVALUATE_LIB_FILES) $(TLS_LIBS)
+
+zbx_substitute_macros_in_json_pairs_LDADD += @SERVER_LIBS@
+
+zbx_substitute_macros_in_json_pairs_LDFLAGS = @SERVER_LDFLAGS@ $(YAML_LDFLAGS) $(CMOCKA_LDFLAGS)
+
 endif
 

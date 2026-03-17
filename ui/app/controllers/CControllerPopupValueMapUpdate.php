@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -95,7 +95,7 @@ class CControllerPopupValueMapUpdate extends CController {
 
 					return false;
 				}
-				elseif (@preg_match('/'.str_replace('/', '\/', $value).'/', '') === false) {
+				elseif (!(new CRegexValidator)->validate($value)) {
 					error(_s('Incorrect value for field "%1$s": %2$s.', _('Value'), _('invalid regular expression')));
 
 					return false;
