@@ -1,3 +1,29 @@
+Changes for 7.4.9rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.4.8
+
+7.4.8rc3 was released as 7.4.8 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.4.8rc3
+
+Bug fixes:
+.......PS. [ZBX-27590] reverted the custom-on-fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
+
+--------------------------------------------------------------------------------
+Changes for 7.4.8rc2
+
+Bug fixes:
+.......PS. [ZBX-27583] fixed interface selection when linking templates (askolmeisters)
+........S. [ZBX-27563] improved trigger-related postprocessing after configuration cache sync (wiper)
+
+--------------------------------------------------------------------------------
 Changes for 7.4.8rc1
 
 New features:
@@ -22,7 +48,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ........S. [ZBX-27407] fixed Zabbix HA manager process crashing on failed commits with Galera cluster (mkorotkov)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
-...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64) (Andris)
 ..F....... [ZBX-27419] fixed dialogue not resizing properly when hiding/expanding error message details (gklavins)
 ..F....... [ZBX-26503] fixed validation rules for item, item prototype, trigger, trigger prototype (gberzina, vmurzins)
 ..F....... [ZBX-26984] updated documentation links for Create template group and Create host group (msnihach)
@@ -345,6 +371,7 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.1
@@ -1296,6 +1323,32 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
 
 --------------------------------------------------------------------------------
+Changes for 7.0.25rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24
+
+7.0.24rc3 was released as 7.0.24 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24rc3
+
+Bug fixes:
+.......PS. [ZBX-27590] reverted the custom-on-fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24rc2
+
+Bug fixes:
+........S. [ZBX-27563] improved trigger-related postprocessing after configuration cache sync (wiper)
+..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.24rc1
 
 New features:
@@ -1315,7 +1368,7 @@ A......... [ZBX-27448] fixed inability to delete host, user, or template groups 
 ...G...... [ZBX-27427] fixed system.run not terminating commands correctly on Zabbix agent 2 (esneiders)
 ..F....... [ZBX-27348] fixed showing some selected value by default for Map navigation tree widget if listener does not exist (wczerneha)
 ........S. [ZBX-27460] fixed multiple event generation not to generate changelog entries on new events (vso)
-...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64), thanks to Alexey Pustovalov for fix (Andris)
+...G...... [ZBX-27305] fixed compilation of Zabbix agent on HP-UX 11.23 (ia64) (Andris)
 .......PS. [ZBX-27279] fixed "daylight saving time" error for scheduled reports (MVekslers)
 ...G...PS. [ZBX-26383] fixed inability to return "not supported" via user parameters (dgoloscapov, mkorotkov)
 .......PS. [ZBX-27176] fixed discovery uniqueness criteria bug (vsmelovs)
@@ -1609,6 +1662,7 @@ A......... [ZBX-26078] fixed filtering by inherited tags with negative operators
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.17
@@ -5265,6 +5319,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
 
 --------------------------------------------------------------------------------
+Changes for 6.0.46rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.45
+
+6.0.45rc1 was released as 6.0.45 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.45rc1
 
 New features:
@@ -5355,6 +5421,7 @@ A......... [ZBX-27060] fixed scope of information available via user.get (jfreib
 .......... [ZBX-27061] moved OpenSSL directory to system-protected path on build server (yurii)
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
+A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
