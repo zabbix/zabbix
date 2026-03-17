@@ -69,7 +69,7 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'error_handler_params',
-				'selector'	=> 'xpath:.//input[contains(@id, "_error_handler_params")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_error_handler_params")]',
 				'value'		=> ['getValue']
 			],
 			[
@@ -205,7 +205,7 @@ class CPreprocessingBehavior extends CBehavior {
 				}
 
 				if (!$control['element']->isValid()) {
-					$this->fail('Field "'.$field['name'].'" is not present.');
+					$this->test->fail('Field "'.$field['name'].'" is not present.');
 				}
 
 				$value = call_user_func_array([$control['element'], $field['value'][0]],
