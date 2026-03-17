@@ -901,8 +901,12 @@ window.host_wizard_edit = new class {
 							row_index,
 							type: 'integer',
 							required: true,
-							min: <?= ZBX_MIN_PORT_NUMBER ?>,
-							max: <?= ZBX_MAX_PORT_NUMBER ?>
+							min: interface_type === <?= INTERFACE_TYPE_AGENT ?>
+								? <?= ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER ?>
+								: <?= ZBX_MIN_PORT_NUMBER ?>,
+							max:  interface_type === <?= INTERFACE_TYPE_AGENT ?>
+								? <?= ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER ?>
+								: <?= ZBX_MAX_PORT_NUMBER ?>
 						},
 						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
 							[`interfaces.${row_index}.details.community`]: {
