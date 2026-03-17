@@ -1,0 +1,1 @@
+A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
