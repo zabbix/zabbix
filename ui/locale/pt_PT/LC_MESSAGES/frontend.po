@@ -21224,6 +21224,10 @@ msgstr "Tamanho do espaço do swap em bytes ou percentagem relativo ao total. Re
 msgid "Swedish (sv_SE)"
 msgstr "Sueco (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Ao alterar o método de autenticação irá terminar todas as sessões com excepção da actual! Continuar?"
@@ -25467,6 +25471,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "O utilizador actual não tem permissões para realizar esta operação."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
