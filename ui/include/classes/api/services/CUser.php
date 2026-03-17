@@ -3015,26 +3015,29 @@ class CUser extends CApiService {
 
 		$db_token = self::tokenAuthentication($params['token'], ZBX_API_HEADER_AUTHENTICATE_DPOP, $time);
 
-		$db_device_keys = DBfetch(DBselect(
+		$resource = DBselect(
 			'SELECT d.deviceid,dk.key_,dk.kid,dk.scope'.
 			' FROM device d'.
 			' JOIN device_key dk ON dk.deviceid=d.deviceid'.
 			' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
 				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
 			2
-		));
-
-		if (!($db_device_keys && count($db_device_keys) == 2)) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
+		);
 
 		$keys_per_scope = [];
+		$deviceid = '';
 
-		foreach ($db_device_keys as $db_device_key) {
+		while ($db_device_key = DBfetch($resource)) {
 			$keys_per_scope[$db_device_key['scope']] = [
 				'kid' => $db_device_key['kid'],
 				'key' => $db_device_key['key_']
 			];
+
+			$deviceid = $db_device_key['deviceid'];
+		}
+
+		if (!($keys_per_scope && count($keys_per_scope) == 2)) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
 		$mobile_identity_key = $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY];
@@ -3055,7 +3058,7 @@ class CUser extends CApiService {
 			'where' => ['tokenid' => $db_token['tokenid']]
 		]);
 
-		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $db_device_keys[0]['deviceid']] +
+		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $deviceid] +
 			$keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY];
 
 		unset($db_user['ugsetid']);

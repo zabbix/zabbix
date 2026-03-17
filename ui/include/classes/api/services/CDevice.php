@@ -100,7 +100,7 @@ class CDevice extends CApiService {
 		$uuid = generateUuidV7();
 		$time_start = time();
 
-		$deviceid = self::createDevice($db_user, $enrollment_token, $uuid, $time_start);
+		$deviceid = self::createDevice($db_user['userid'], $enrollment_token, $uuid, $time_start);
 
 		$taskid = self::createTaskInit($deviceid, $time_start);
 
@@ -138,8 +138,11 @@ class CDevice extends CApiService {
 		$db_token = reset($db_tokens);
 
 		DB::update('device', [
-			'values' => ['name' => $options['device_name'], 'tokenid' =>$db_token['tokenid'],
-				'push_token' => $options['push_token'], 'status' => self::DEVICE_STATUS_ENABLED
+			'values' => [
+				'name' => $options['device_name'],
+				'tokenid' =>$db_token['tokenid'],
+				'push_token' => $options['push_token'],
+				'status' => self::DEVICE_STATUS_ENABLED
 			],
 			'where' => ['deviceid' => $db_device['deviceid']]
 		]);
@@ -190,7 +193,9 @@ class CDevice extends CApiService {
 
 		if ($user) {
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $user['userid'] != self::$userData['userid']) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 
 			$db_users = API::User()->get([
@@ -201,7 +206,9 @@ class CDevice extends CApiService {
 			]);
 
 			if (!$db_users) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
 			}
 
 			$db_user = $db_users[$user['userid']];
@@ -233,8 +240,7 @@ class CDevice extends CApiService {
 			'SELECT et.deviceid'.
 			' FROM enrollment_token et'.
 			' WHERE '.dbConditionString('et.enrollment_token', [hash('sha512', $options['enrollment_token'])]).
-				' AND enrollment_token_expiration>'.time(),
-			1
+				' AND et.enrollment_token_expiration>'.time()
 		));
 
 		if (!$db_enrollment_token) {
@@ -279,17 +285,17 @@ class CDevice extends CApiService {
 		]];
 	}
 
-	private static function createDevice(array $db_user, string $enrollment_token, string $uuid,
+	private static function createDevice(string $userid, string $enrollment_token, string $uuid,
 			int $time_start): string {
 		$ins_device = [
-			'userid' => $db_user['userid'],
+			'userid' => $userid,
 			'uuid' => $uuid,
 			'status' => self::DEVICE_STATUS_NEW
 		];
 
 		$deviceids = DB::insertBatch('device', [$ins_device]);
 
-		$deviceid = array_shift($deviceids);
+		$deviceid = reset($deviceids);
 
 		$ins_enrollment_token = [
 			'deviceid' => $deviceid,
