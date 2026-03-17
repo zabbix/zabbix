@@ -319,7 +319,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (SYSINFO_RET_FAIL == ret)
 	{
-		*error = zbx_dsprintf(NULL, "Cannot find information for this network interface in \"%s\".",
+		*error = zbx_dsprintf(NULL, "Cannot find information for this network interface in %s.",
 				ZBX_PROC_NET_DEV);
 		return SYSINFO_RET_FAIL;
 	}
