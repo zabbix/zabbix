@@ -177,6 +177,8 @@
 						page: search_params.get('page') ?? 1
 					};
 
+					this.withTimelineRangeFilters(filters);
+
 					location.href = zabbixUrl(filters);
 				});
 			});
