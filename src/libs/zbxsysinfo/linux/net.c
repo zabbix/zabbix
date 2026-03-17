@@ -294,7 +294,7 @@ static int	get_net_stat(const char *if_name, net_stat_t *result, char **error)
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		*error = zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV, zbx_strerror(errno));
+		*error = zbx_dsprintf(NULL, "Cannot open %s: %s", ZBX_PROC_NET_DEV, zbx_strerror(errno));
 		return SYSINFO_RET_FAIL;
 	}
 
@@ -616,7 +616,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV,
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s", ZBX_PROC_NET_DEV,
 				zbx_strerror(errno)));
 		return SYSINFO_RET_FAIL;
 	}
@@ -1401,7 +1401,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open \"%s\": \"%s\"", ZBX_PROC_NET_DEV,
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s", ZBX_PROC_NET_DEV,
 				zbx_strerror(errno)));
 
 		ret = SYSINFO_RET_FAIL;
