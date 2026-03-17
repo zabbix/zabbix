@@ -53,8 +53,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementValue('host', $name);
 		$this->zbxTestAssertElementValue('name', $visible_name);
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/z-textarea-flexible[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/z-textarea-flexible[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_1" and text()="IP"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_0" and text()="DNS"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
