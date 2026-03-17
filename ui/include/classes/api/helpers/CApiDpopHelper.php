@@ -18,7 +18,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\JWK;
 
 /**
- * Helper class containing methods for DPoP signature verification.
+ * Helper class containing methods for DPoP signature and JWK integrity verifications.
  */
 class CApiDpopHelper {
 
@@ -27,10 +27,8 @@ class CApiDpopHelper {
 
 	private const SIGNATURE_ALGORITHM = 'ES256';
 
-	public static function verifyDpopSignature(string $signature, string $encoded_jwk, string $access_token,
-			string $request_api_method): bool {
-		$check_time = time();
-
+	public static function verifyDpopSignature(string $signature, string $encoded_jwk, string $kid,
+			string $access_token, string $requested_api_method, int $check_time): bool {
 		$jwk = json_decode($encoded_jwk, true);
 
 		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
@@ -51,14 +49,14 @@ class CApiDpopHelper {
 			return false;
 		}
 
-		if (!self::checkKid($header, $jwk)) {
+		if (!self::checkKid($header, $kid)) {
 			return false;
 		}
 
 		// payload check section
 		$payload = json_decode(JWT::urlsafeB64Decode($encoded_payload), true);
 
-		if (!self::checkHtu($payload, $request_api_method)) {
+		if (!self::checkHtu($payload, $requested_api_method)) {
 			return false;
 		}
 
@@ -81,13 +79,13 @@ class CApiDpopHelper {
 		return true;
 	}
 
-	private static function checkKid(array $header, array $dpop_jwk): bool {
-		return array_key_exists('kid', $header) && hash_equals($dpop_jwk['kid'], $header['kid']);
+	private static function checkKid(array $header, string $kid): bool {
+		return array_key_exists('kid', $header) && hash_equals($kid, $header['kid']);
 	}
 
-	private static function checkHtu(array $payload, string $request_api_method): bool {
+	private static function checkHtu(array $payload, string $requested_api_method): bool {
 		// todo - use method get server_id
-		$expected_htu = 'urn:zbx:server_id:'.$request_api_method;
+		$expected_htu = 'urn:zbx:server_id:'.$requested_api_method;
 
 		return array_key_exists('htu', $payload) && hash_equals($expected_htu, $payload['htu']);
 	}

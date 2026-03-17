@@ -23,7 +23,7 @@ class CHttpRequest {
 	 * Additional HTTP headers not prefixed with HTTP_ in the $_SERVER super global variable.
 	 * Must be in upper case.
 	 */
-	private array $extra_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'AUTHORIZATION', 'PATH_INFO'];
+	private array $extra_headers = ['CONTENT_TYPE', 'CONTENT_LENGTH', 'AUTHORIZATION', 'PATH_INFO', 'X-HPKE-NEED-HINT'];
 
 	private $body;
 	private $method;
@@ -114,26 +114,16 @@ class CHttpRequest {
 		return $this->headers;
 	}
 
-	public function getAuthenticationData(): array {
-		$auth_data = [
-			'type' => null,
-			'auth' => null
-		];
+	public function getParsedAuthHeader():array {
+		$auth_data = ['type' => null, 'auth' => null];
 
-		$authorization = $this->header('AUTHORIZATION');
+		$auth_header = $this->header('AUTHORIZATION');
 
-		if (is_string($authorization)) {
-			$auth_type = explode(' ', $authorization)[0];
+		if (is_string($auth_header)) {
+			$auth_type = explode(' ', $auth_header, 1)[0];
 
-			if ($auth_type === CJsonRpc::HEADER_AUTHENTICATE_BEARER) {
-				$auth_data['type'] = ZBX_API_HEADER_AUTHENTICATE_BEARER;
-				$auth_data['auth'] = substr($authorization, strlen($auth_type) + 1);
-			}
-			elseif ($auth_type === CJsonRpc::HEADER_AUTHENTICATE_DPOP) {
-				$auth_data['type'] = ZBX_API_HEADER_AUTHENTICATE_DPOP;
-				$auth_data['auth'] = substr($authorization, strlen($auth_type) + 1);
-				$auth_data['sign'] = (string) $this->header(CJsonRpc::HEADER_AUTHENTICATE_DPOP);
-			}
+			$auth_data['type'] = $auth_type;
+			$auth_data['auth'] = substr($auth_header, strlen($auth_type) + 1);
 		}
 
 		return $auth_data;
@@ -193,5 +183,9 @@ class CHttpRequest {
 		$this->raw .= "\r\n".$this->body;
 
 		return $this->raw;
+	}
+
+	public function isHpkeHeadersRequested(): bool {
+		return $this->header('X-HPKE-NEED-HINT') == 1;
 	}
 }

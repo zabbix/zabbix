@@ -1890,7 +1890,7 @@ FIELD	|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD	|expires_at	|t_time		|'0'	|NOT NULL	|0
 FIELD	|created_at	|t_time		|'0'	|NOT NULL	|0
 FIELD	|creator_userid	|t_id		|	|NULL		|0	|2	|users	|userid	|RESTRICT
-FIELD	|auth_scheme	|t_integer	|'0'	|NULL		|0
+FIELD	|auth_type	|t_integer	|'0'	|NULL		|0
 INDEX	|1		|name
 UNIQUE	|2		|userid,auth_type,name
 UNIQUE	|3		|token

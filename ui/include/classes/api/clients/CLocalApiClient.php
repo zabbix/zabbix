@@ -33,6 +33,10 @@ class CLocalApiClient extends CApiClient {
 	 */
 	protected $debug = false;
 
+	public function getUserData(): ?array {
+		return CApiService::$userData;
+	}
+
 	/**
 	 * Set service factory.
 	 *
@@ -49,7 +53,7 @@ class CLocalApiClient extends CApiClient {
 	 * @param string $requestMethod  API method.
 	 * @param array  $params         API parameters.
 	 * @param array  $auth
-	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
+	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_BEARER, CJsonRpc::AUTH_TYPE_COOKIE, CJsonRpc::AUTH_TYPE_DPOP
 	 * @param string $auth['auth']   Authentication token.
 	 *
 	 * @return CApiClientResponse
@@ -169,32 +173,30 @@ class CLocalApiClient extends CApiClient {
 	 * Checks if the authentication token is valid.
 	 *
 	 * @param array  $auth
-	 * @param string $request_api_method
+	 * @param string $requested_api_method
 	 *
 	 * @throws APIException
 	 */
-	protected function authenticate(array $auth, string $request_api_method): void {
+	protected function authenticate(array $auth, string $requested_api_method): void {
 		if ($auth['auth'] === null) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		if ($auth['type'] === ZBX_API_HEADER_AUTHENTICATE_BEARER) {
-			$auth_data = strlen($auth['auth']) == 64
-				? ['token' => $auth['auth']]
-				: ['sessionid' => $auth['auth']];
-		}
-		elseif ($auth['type'] === ZBX_API_HEADER_AUTHENTICATE_DPOP) {
-			$auth_data = [
+		if ($auth['type'] === CJsonRpc::AUTH_TYPE_DPOP) {
+			$user = $this->serviceFactory->getObject('user')->checkAuthenticationDpop([
 				'token' => $auth['auth'],
 				'signature' => $auth['sign'],
-				'request_api_method' => $request_api_method
-			];
+				'requested_api_method' => $requested_api_method
+			]);
 		}
 		else {
-			$auth_data = ['sessionid' => $auth['auth']];
+			$auth_data = $auth['type'] === CJsonRpc::AUTH_TYPE_BEARER && strlen($auth['auth']) == 64
+				? ['token' => $auth['auth']]
+				: ['sessionid' => $auth['auth']];
+
+			$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
 		}
 
-		$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
 		if (array_key_exists('debug_mode', $user)) {
 			$this->debug = $user['debug_mode'];
 		}

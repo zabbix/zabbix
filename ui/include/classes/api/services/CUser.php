@@ -2907,15 +2907,7 @@ class CUser extends CApiService {
 				['if' => static fn(array $data): bool => $data['sessionid'] !== null, 'type' => API_BOOLEAN, 'default' => true],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'token' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
-			'signature' => ['type' => API_MULTIPLE, 'rules' => [
-				['if' => static fn(array $data): bool => $data['token'] !== null, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'default' => null],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'request_api_method' => ['type' => API_MULTIPLE, 'rules' => [
-				['if' => static fn(array $data): bool => $data['token'] !== null, 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'default' => null],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]]
+			'token' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
@@ -2942,37 +2934,11 @@ class CUser extends CApiService {
 			$userid = $db_session['userid'];
 		}
 		else {
-			$db_token = self::tokenAuthentication($session['token'], $time, $session['signature'],
-				$session['request_api_method']
-			);
-
+			$db_token = self::tokenAuthentication($session['token'], ZBX_API_HEADER_AUTHENTICATE_BEARER, $time);
 			$userid = $db_token['userid'];
 		}
 
-		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-			'userdirectoryid', 'ts_provisioned'
-		];
-
-		[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
-
-		self::addUserGroupFields($db_user, $group_status, $group_auth_type);
-
-		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
-				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
-				&& !$this->provisionLdapUser($db_user)) {
-			[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
-
-			self::addUserGroupFields($db_user, $group_status, $group_auth_type);
-		}
-
-		$db_user['auth_type'] =
-			$db_user['userdirectoryid'] == 0 || !self::isLdapUserDirectory($db_user['userdirectoryid'])
-				? $group_auth_type
-				: ZBX_AUTH_LDAP;
-
-		self::addAdditionalFields($db_user);
-		self::setTimezone($db_user['timezone']);
+		$this->getAuthenticationUserData($userid, $db_user, $group_status);
 
 		if ($session['sessionid'] !== null) {
 			$autologout = timeUnitToSeconds($db_user['autologout']);
@@ -3023,22 +2989,115 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Authenticates user based on API token.
+	 * Checks if user is authenticated by API DPoP token.
 	 *
-	 * @param string	  $auth_token		   API token.
-	 * @param int		  $time				   Current time unix timestamp.
-	 * @param null|string $signature           DPoP header content.
-	 * @param null|string $request_api_method  Requested API method <API name>.<method name> (ex.: 'user.get').
+	 * @param array  $params
+	 * @param string $params[]['token']                 API DPoP token to be checked.
+	 * @param string $params[]['signature']             DPoP header to be checked.
+	 * @param bool   $params[]['requested_api_method']  The API method that was called.
 	 *
 	 * @throws APIException
 	 *
 	 * @return array
 	 */
-	private static function tokenAuthentication(string $auth_token, int $time, ?string $signature,
-			?string $request_api_method): array {
+	public function checkAuthenticationDpop(array $params): array {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'signature' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'requested_api_method' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$time = time();
+
+		$db_token = self::tokenAuthentication($params['token'], ZBX_API_HEADER_AUTHENTICATE_DPOP, $time);
+
+		$db_device_keys = DBfetch(DBselect(
+			'SELECT d.deviceid,dk.key_,dk.kid,dk.scope'.
+			' FROM device d'.
+			' JOIN device_key dk ON dk.deviceid=d.deviceid'.
+			' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
+				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
+			2
+		));
+
+		if (!($db_device_keys && count($db_device_keys) == 2)) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$keys_per_scope = [];
+
+		foreach ($db_device_keys as $db_device_key) {
+			$keys_per_scope[$db_device_key['scope']] = [
+				'kid' => $db_device_key['kid'],
+				'key' => $db_device_key['key_']
+			];
+		}
+
+		$mobile_identity_key = $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY];
+
+		if (!CApiDpopHelper::verifyDpopSignature($params['signature'], $mobile_identity_key['key'],
+				$mobile_identity_key['kid'], $params['token'], $params['requested_api_method'], $time)) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$this->getAuthenticationUserData($db_token['userid'], $db_user, $group_status);
+
+		if ($group_status == GROUP_STATUS_DISABLED) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		DB::update('token', [
+			'values' => ['lastaccess' => $time],
+			'where' => ['tokenid' => $db_token['tokenid']]
+		]);
+
+		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $db_device_keys[0]['deviceid']] +
+			$keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY];
+
+		unset($db_user['ugsetid']);
+
+		return $db_user;
+	}
+
+	private function getAuthenticationUserData(string $userid, ?array &$db_user, ?array &$group_status): void {
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
+			'userdirectoryid', 'ts_provisioned'
+		];
+
+		[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
+
+		self::addUserGroupFields($db_user, $group_status, $group_auth_type);
+
+		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
+				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
+				&& !$this->provisionLdapUser($db_user)) {
+			[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
+
+			self::addUserGroupFields($db_user, $group_status, $group_auth_type);
+		}
+
+		$db_user['auth_type'] =
+			$db_user['userdirectoryid'] == 0 || !self::isLdapUserDirectory($db_user['userdirectoryid'])
+				? $group_auth_type
+				: ZBX_AUTH_LDAP;
+
+		self::addAdditionalFields($db_user);
+		self::setTimezone($db_user['timezone']);
+	}
+
+	private static function tokenAuthentication(string $auth_token, int $auth_type, int $time): array {
 		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'userid', 'auth_type', 'expires_at'],
-			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
+			'output' => ['userid', 'expires_at', 'tokenid'],
+			'filter' => [
+				'token' => hash('sha512', $auth_token),
+				'status' => ZBX_AUTH_TOKEN_ENABLED,
+				'auth_type' => $auth_type
+			]
 		]);
 
 		if (!$db_tokens) {
@@ -3052,32 +3111,7 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('API token expired.'));
 		}
 
-		if ($db_token['auth_type'] == ZBX_API_HEADER_AUTHENTICATE_DPOP) {
-			if ($signature === null || $request_api_method === null) {
-				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-			}
-
-			$db_device_key = DBfetch(DBselect(
-				'SELECT dk.key_'.
-				' FROM device_key dk'.
-				' JOIN device d ON d.deviceid=dk.deviceid'.
-				' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
-					' AND '.dbConditionInt('dk.scope', [CDevice::MOBILE_IDENTITY_KEY]).
-					' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
-				1
-			));
-
-			if (!$db_device_key) {
-				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-			}
-
-			if (!CApiDpopHelper::verifyDpopSignature($signature, $db_device_key['key_'], $auth_token,
-					$request_api_method)) {
-				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-			}
-		}
-
-		return array_diff_key($db_token, array_flip(['expires_at', 'flags']));
+		return $db_token;
 	}
 
 	/**

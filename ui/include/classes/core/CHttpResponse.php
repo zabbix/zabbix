@@ -14,24 +14,14 @@
 **/
 
 
-/**
- * This class should be used for calling API services.
- */
-abstract class CApiClient {
+class CHttpResponse {
 
-	/**
-	 * Call the given API service method and return the response.
-	 *
-	 * @param string $api
-	 * @param string $method
-	 * @param array  $params
-	 * @param array  $auth
-	 * @param int    $auth['type']  CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
-	 * @param string $auth['auth']
-	 *
-	 * @return CApiClientResponse
-	 */
-	abstract public function callMethod(string $api, string $method, array $params, array $auth);
+	public string $body;
 
-	abstract public function getUserData(): ?array;
+	public array $headers;
+
+	public function __construct(string $body = '', array $headers = []) {
+		$this->body = $body;
+		$this->headers = $headers;
+	}
 }
