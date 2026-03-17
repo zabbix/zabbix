@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup icon_map
  */
@@ -421,7 +419,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitForPageToLoad();
 
 		if (array_key_exists('name', $data)) {
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_name'));
+			$this->query('id:iconmap_name')->waitUntilVisible()->one();
 			$this->zbxTestInputType('iconmap_name', $data['name']);
 		}
 
@@ -926,7 +924,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				case 'update':
 					if (!$this->zbxTestElementPresentId('iconmap_mappings_'.$i.'_expression')) {
 						$this->zbxTestClick('addMapping');
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('iconmap_mappings_'.$i.'_expression'));
+						$this->query('id:iconmap_mappings_'.$i.'_expression')->one();
 					}
 					$this->zbxTestInputType('iconmap_mappings_'.$i.'_expression', $mapping_row['expression']);
 					break;

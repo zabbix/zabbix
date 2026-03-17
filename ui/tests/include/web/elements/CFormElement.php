@@ -275,7 +275,7 @@ class CFormElement extends CElement {
 		$parts = explode(':', $name, 2);
 		if (count($parts) === 2 && in_array($parts[0], ['id', 'name', 'css', 'class', 'tag', 'link', 'button', 'xpath'])
 				&& ($element = $this->query($name)->one(false))->isValid()) {
-			$element = $element->detect();
+			$element = $element->detect([], true);
 		}
 		else {
 			try {
