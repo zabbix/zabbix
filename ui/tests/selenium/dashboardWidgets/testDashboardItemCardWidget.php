@@ -1124,7 +1124,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				}
 
 				// Check default color code.
-				$this->assertEquals('#42A5F5', $form->getField('id:lbl_sparkline_color')->getAttribute('title'));
+				$this->assertEquals('42A5F5', $form->getField('name:sparkline[color]')->getAttribute('value'));
 
 				// Check radio button options.
 				$radio_buttons = [
