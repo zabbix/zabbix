@@ -866,7 +866,7 @@ function getUserSettingsSubmenu(): array {
 		->getMenuItems();
 
 	foreach ($menu_items as $menu_item) {
-		$user_settings_items[$menu_item->getUrl()->getUrl()] = _($menu_item->getLabel());
+		$user_settings_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
 	}
 
 	return [
@@ -892,7 +892,7 @@ function getAdministrationGeneralSubmenu(): array {
 		->getMenuItems();
 
 	foreach ($menu_items as $menu_item) {
-		$general_items[$menu_item->getUrl()->getUrl()] = _($menu_item->getLabel());
+		$general_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
 	}
 
 	return [
@@ -918,7 +918,7 @@ function getAdministrationQueueSubmenu(): array {
 		->getMenuItems();
 
 	foreach ($menu_items as $menu_item) {
-		$queue_items[$menu_item->getUrl()->getUrl()] = _($menu_item->getLabel());
+		$queue_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
 	}
 
 	return [
@@ -944,7 +944,7 @@ function getAlertsActionsSubmenu(): array {
 		->getMenuItems();
 
 	foreach ($menu_items as $menu_item) {
-		$actions_items[$menu_item->getUrl()->getUrl()] = _($menu_item->getLabel());
+		$actions_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
 	}
 
 	return [
