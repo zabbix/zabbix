@@ -1685,6 +1685,9 @@ define('ZBX_JAN_2038', 2145916800);
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
 
+define('ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER', 1024);
+define('ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER', 32767);
+
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.
 define('ZBX_MACRO_TYPE_VAULT', 2); // Display macro value as text (path to secret in Vault).
