@@ -68,6 +68,22 @@ div[data-field-type="set"] {
 	}
 }
 
+div[data-field-type="array"] {
+	&.has-error {
+		input[type="checkbox"]:not([readonly]) {
+			+ label span {
+				border: 1px solid $error;
+				color: $white;
+			}
+
+			&:checked + label span::after {
+				border-left-color: $error;
+				border-bottom-color: $error;
+			}
+		}
+	}
+}
+
 .radio-list-control {
 	&.has-error {
 		input[type="radio"] {
