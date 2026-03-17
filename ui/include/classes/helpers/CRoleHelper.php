@@ -652,18 +652,4 @@ class CRoleHelper {
 		self::$api_methods = $api_methods;
 		self::$api_method_masks = $api_method_masks;
 	}
-
-	public static function isFeatureEnabled(): bool {
-		foreach (CApiServiceFactory::API_SERVICES as $class_name) {
-			foreach (constant($class_name.'::ACCESS_RULES') as $rules) {
-				if (array_key_exists('feature_flag', $rules)) {
-					/** @var CConfigFile $config */
-					$config = APP::Component()->get('config');
-				}
-			}
-		}
-
-		return $config->getModuleFlag();
-	}
-
 }

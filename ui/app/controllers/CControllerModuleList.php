@@ -44,11 +44,9 @@ class CControllerModuleList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
+		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		if (!$module_enabled) {
+		if (!$modules_enabled) {
 			return false;
 		}
 		else {

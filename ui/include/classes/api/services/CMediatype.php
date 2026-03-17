@@ -398,20 +398,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$denied_media_types = $config->getMediaTypeFlag();
-
-		$all_media_types = ['sms', 'email', 'script', 'webhook'];
-
-		if (is_array($denied_media_types)) {
-			$allowed_media_types = (array_diff($all_media_types, $denied_media_types) != []);
-		}
-		else {
-			$allowed_media_types = true;
-		}
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$allowed_media_types) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || empty(CFeatureFlagHelper::getSupportedMediaTypes())) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -459,7 +446,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function update(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || empty(CFeatureFlagHelper::getSupportedMediaTypes())) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -511,7 +498,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = $this->get([
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
-			'filter' => ['type' => self::getSupportedTypes()],
+			'filter' => ['type' => array_flip(CFeatureFlagHelper::getSupportedMediaTypes())],
 			'preservekeys' => true
 		]);
 
@@ -537,16 +524,14 @@ class CMediatype extends CApiService {
 			]
 			: [];
 
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$denied_media_types = $config->getMediaTypeFlag();
+		$media_types_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG);
 
-		$specific_fields += (!is_array($denied_media_types))
+		$specific_fields += ($media_types_enabled)
 			? [
 				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])]
 			]
 			: [
-				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', self::getSupportedTypes())]
+				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', array_keys(CFeatureFlagHelper::getSupportedMediaTypes()))]
 			];
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
@@ -566,26 +551,6 @@ class CMediatype extends CApiService {
 				'message' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('media_type_message', 'message')]
 			]]
 		]];
-	}
-
-	private static function getSupportedTypes(): array {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$denied_media_types = $config->getMediaTypeFlag();
-
-		$all_types = [
-			MEDIA_TYPE_EMAIL => 'email',
-			MEDIA_TYPE_EXEC => 'script',
-			MEDIA_TYPE_SMS => 'sms',
-			MEDIA_TYPE_WEBHOOK => 'webhook'
-		];
-
-		if (!is_array($denied_media_types)) {
-			return array_flip($all_types);
-		}
-		else {
-			return array_diff_key(array_flip($all_types), array_flip($denied_media_types));
-		}
 	}
 
 	/**
@@ -1296,7 +1261,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $mediatypeids): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || empty(CFeatureFlagHelper::getSupportedMediaTypes())) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -1311,7 +1276,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = DB::select('media_type', [
 			'output' => ['mediatypeid', 'name', 'type'],
 			'mediatypeids' => $mediatypeids,
-			'filter' => ['type' => self::getSupportedTypes()],
+			'filter' => ['type' => array_flip(CFeatureFlagHelper::getSupportedMediaTypes())],
 			'preservekeys' => true
 		]);
 

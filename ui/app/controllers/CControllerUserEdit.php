@@ -257,12 +257,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 		}
 
 		$data['modules'] = [];
+		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
-
-		$db_modules = $module_enabled
+		$db_modules = $modules_enabled
 			? API::Module()->get([
 				'output' => ['moduleid', 'relative_path', 'status']
 			])
@@ -290,7 +287,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 
-		if (!$module_enabled) {
+		if (!$modules_enabled) {
 			$data['modules_config_enabled'] = false;
 		}
 

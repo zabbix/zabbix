@@ -29,11 +29,9 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}']]
 		];
 
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
+		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		$specific_fields = $module_enabled
+		$specific_fields = $modules_enabled
 			? [
 				'modules' => ['array', 'required', 'field' => ['boolean']],
 				'modules_default_access' => ['boolean']

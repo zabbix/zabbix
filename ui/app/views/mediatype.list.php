@@ -21,19 +21,6 @@
 
 $this->includeJsFile('mediatype.list.js.php');
 
-/** @var CConfigFile $config */
-$config = APP::Component()->get('config');
-$denied_media_types = $config->getMediaTypeFlag();
-
-$all_media_types = ['sms', 'email', 'script', 'webhook'];
-
-if (is_array($denied_media_types)) {
-	$allowed_media_types = (array_diff($all_media_types, $denied_media_types) != []);
-}
-else {
-	$allowed_media_types = true;
-}
-
 $html_page = (new CHtmlPage())
 	->setTitle(_('Media types'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_LIST))
@@ -42,7 +29,7 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CSimpleButton(_('Create media type')))
 					->setId('js-create')
-					->setEnabled($allowed_media_types)
+					->setEnabled(!empty(CFeatureFlagHelper::getSupportedMediaTypes()))
 			)
 			->addItem(
 				(new CSimpleButton(_('Import')))
@@ -55,7 +42,7 @@ $html_page = (new CHtmlPage())
 							dialogue_class: "modal-popup-generic"
 						});'
 					)
-					->setEnabled($allowed_media_types)
+					->setEnabled(!empty(CFeatureFlagHelper::getSupportedMediaTypes()))
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -137,7 +124,7 @@ $media_type_table = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 $csrf_token = CCsrfTokenHelper::get('mediatype');
-$supported_types = CMediatypeHelper::getSupportedMediaTypes();
+$supported_types = CFeatureFlagHelper::getSupportedMediaTypes();
 
 foreach ($data['mediatypes'] as $media_type) {
 	switch ($media_type['typeid']) {
@@ -197,7 +184,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	if (in_array($media_type['type'], $supported_types)) {
+	if (in_array($media_type['typeid'], array_keys($supported_types))) {
 		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_GREEN)
@@ -235,7 +222,7 @@ foreach ($data['mediatypes'] as $media_type) {
 
 	$checkbox = new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']);
 
-	if (in_array($media_type['type'], $supported_types)) {
+	if (in_array($media_type['typeid'], array_keys($supported_types))) {
 		$name = new CLink($media_type['name'], $media_type_url);
 	}
 	else {

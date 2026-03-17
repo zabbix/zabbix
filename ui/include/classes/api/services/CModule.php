@@ -20,10 +20,10 @@
 class CModule extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'feature_flag' => CRoleHelper::MODULE_FEATURE_FLAG],
-		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG]
 	];
 
 	protected $tableName = 'module';
@@ -39,9 +39,7 @@ class CModule extends CApiService {
 	 * @return array|string
 	 */
 	public function get(array $options = [], bool $api_call = true) {
-		$module_enabled = CRoleHelper::isFeatureEnabled();
-
-		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled)) {
+		if ($api_call && (self::$userData['type'] != USER_TYPE_SUPER_ADMIN)) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
@@ -104,11 +102,7 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function create(array $modules): array {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
 			);
@@ -159,11 +153,7 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function update(array $modules): array {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
 			);
@@ -236,11 +226,7 @@ class CModule extends CApiService {
 	 * @return array
 	 */
 	public function delete(array $moduleids): array {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$module_enabled = $config->getModuleFlag();
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !$module_enabled) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'module', __FUNCTION__)
 			);

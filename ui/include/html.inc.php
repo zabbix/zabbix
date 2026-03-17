@@ -1031,9 +1031,7 @@ function getAdministrationGeneralSubmenu(): array {
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
-	/** @var CConfigFile $config */
-	$config = APP::Component()->get('config');
-	$module_enabled = $config->getModuleFlag();
+	$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
 	return [
 		'main_section' => [
@@ -1046,7 +1044,7 @@ function getAdministrationGeneralSubmenu(): array {
 				$regex_url          => _('Regular expressions'),
 				$trigdisplay_url    => _('Trigger displaying options'),
 				$geomap_url			=> _('Geographical maps'),
-				$modules_url        => $module_enabled ? _('Modules') : null,
+				$modules_url        => $modules_enabled ? _('Modules') : null,
 				$connectors_url     => _('Connectors'),
 				$miscconfig_url     => _('Other')
 			])

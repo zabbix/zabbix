@@ -303,6 +303,11 @@ class CLocalApiClient extends CApiClient {
 			}
 		}
 
+		if (array_key_exists('feature_flag', $method_rules)
+			&& !CFeatureFlagHelper::isFeatureEnabled($method_rules['feature_flag'])) {
+			return false;
+		}
+
 		if (!$api_methods) {
 			return true;
 		}
