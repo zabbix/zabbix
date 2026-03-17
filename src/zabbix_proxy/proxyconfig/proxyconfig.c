@@ -458,8 +458,9 @@ stop:
 	zbx_history_cache_destroy_local_cache();
 	zbx_ipc_async_socket_close(&rtc);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
-
+#endif
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 
 	zbx_free(process_title);
