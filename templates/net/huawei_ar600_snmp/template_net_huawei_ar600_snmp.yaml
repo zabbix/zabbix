@@ -596,7 +596,7 @@ zabbix_export:
               name: '{#IFNAME} {#DIRECTION} queue {#QUEUE}: Discarded bytes rate'
               type: DEPENDENT
               key: 'huawei.ar600.cbqos.discarded.rate[{#SNMPINDEX}]'
-              units: bps
+              units: Bps
               description: |
                 Rate of bytes discarded by the CoS queue.
                 
@@ -624,7 +624,7 @@ zabbix_export:
                     avg(/Huawei AR600 by SNMP/huawei.ar600.cbqos.discarded.rate[{#SNMPINDEX}],5m)
                     > {$HUAWEI.AR600.COS.DISCARDED.BPS.WARN}
                   name: 'Huawei AR600: COS [{#IFNAME} {#DIRECTION} queue {#QUEUE}]: Discarded traffic (warning)'
-                  opdata: 'Current value: {ITEM.LASTVALUE} bps, threshold: {$HUAWEI.AR600.COS.DISCARDED.BPS.WARN} bps'
+                  opdata: 'Current value: {ITEM.LASTVALUE} Bps, threshold: {$HUAWEI.AR600.COS.DISCARDED.BPS.WARN} Bps'
                   priority: AVERAGE
                   description: 'Discarded byte rate exceeds warning threshold.'
                   tags:
@@ -634,7 +634,7 @@ zabbix_export:
               name: '{#IFNAME} {#DIRECTION} queue {#QUEUE}: Enqueued bytes rate'
               type: DEPENDENT
               key: 'huawei.ar600.cbqos.enqueued.rate[{#SNMPINDEX}]'
-              units: bps
+              units: Bps
               description: |
                 Rate of bytes enqueued into the CoS queue.
                 
@@ -659,7 +659,7 @@ zabbix_export:
               name: '{#IFNAME} {#DIRECTION} queue {#QUEUE}: Matched bytes rate'
               type: DEPENDENT
               key: 'huawei.ar600.cbqos.matched.rate[{#SNMPINDEX}]'
-              units: bps
+              units: Bps
               description: |
                 Rate of bytes matched to this CoS queue based on classification rules.
                 
@@ -1002,7 +1002,7 @@ zabbix_export:
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: Jitter avg'
               type: DEPENDENT
               key: 'huawei.ar600.nqa.jitter[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
+              units: '!ms'
               description: |
                 Average jitter measured by the NQA test.
                 
@@ -1066,7 +1066,7 @@ zabbix_export:
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT avg'
               type: DEPENDENT
               key: 'huawei.ar600.nqa.rtt.avg[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
+              units: '!ms'
               description: |
                 Average round-trip time (RTT) measured by the NQA test.
                 
@@ -1098,7 +1098,7 @@ zabbix_export:
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT max'
               type: DEPENDENT
               key: 'huawei.ar600.nqa.rtt.max[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
+              units: '!ms'
               description: |
                 Maximum round-trip time (RTT) observed during the NQA test interval.
                 
@@ -1120,7 +1120,7 @@ zabbix_export:
               name: 'NQA [{#NQA.ADMIN}/{#NQA.TEST}]: RTT min'
               type: DEPENDENT
               key: 'huawei.ar600.nqa.rtt.min[{#NQA.ADMIN},{#NQA.TEST}]'
-              units: ms
+              units: '!ms'
               description: |
                 Minimum round-trip time (RTT) observed during the NQA test interval.
                 
@@ -1718,13 +1718,13 @@ zabbix_export:
             description: 'Used to exclude CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).'
         - macro: '{$HUAWEI.AR600.COS.DISCARDED.BPS.WARN}'
           value: '100000'
-          description: 'Warning threshold for discarded byte rate (bps).'
+          description: 'Warning threshold for discarded byte rate (Bps).'
           config:
             type: TEXT
             priority: '27'
             section_name: Thresholds
             label: 'Threshold for discarded byte rate (warning)'
-            description: 'Warning threshold for discarded byte rate (bps).'
+            description: 'Warning threshold for discarded byte rate (Bps).'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$HUAWEI.AR600.COS.IFNAME.MATCHES}'
           value: '.*'

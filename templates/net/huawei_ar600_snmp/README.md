@@ -72,7 +72,7 @@ This template has been tested on:
 |{$HUAWEI.AR600.NQA.ADMIN.NOT_MATCHES}|<p>Used to exclude NQA metrics by admin name regex.</p>|`CHANGE_IF_NEEDED`|
 |{$HUAWEI.AR600.NQA.TEST.MATCHES}|<p>Used to include NQA metrics by test class name regex.</p>|`.*`|
 |{$HUAWEI.AR600.NQA.TEST.NOT_MATCHES}|<p>Used to exclude NQA metrics by test class name regex.</p>|`CHANGE_IF_NEEDED`|
-|{$HUAWEI.AR600.COS.DISCARDED.BPS.WARN}|<p>Warning threshold for discarded byte rate (bps).</p>|`100000`|
+|{$HUAWEI.AR600.COS.DISCARDED.BPS.WARN}|<p>Warning threshold for discarded byte rate (Bps).</p>|`100000`|
 |{$HUAWEI.AR600.COS.DIRECTION.MATCHES}|<p>Used to include CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).</p>|`^OUT$`|
 |{$HUAWEI.AR600.COS.DIRECTION.NOT_MATCHES}|<p>Used to exclude CoS metrics by queue direction: `IN`, `OUT`, or regex (default: `OUT` only).</p>|`CHANGE_IF_NEEDED`|
 |{$HUAWEI.AR600.COS.IFNAME.MATCHES}|<p>Used to include interfaces by name regex (e.g., `^GigabitEthernet0/0/3$`).</p>|`.*`|
