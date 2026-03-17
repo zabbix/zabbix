@@ -16,6 +16,7 @@
 
 #include "proxyconfigwrite/proxyconfigwrite.h"
 
+#include "zbxregexp.h"
 #include "zbxtimekeeper.h"
 #include "zbxlog.h"
 #include "zbxnix.h"

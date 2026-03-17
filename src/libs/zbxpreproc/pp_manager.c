@@ -18,6 +18,7 @@
 #include "pp_task.h"
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
+#include "zbxregexp.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
 #include "zbxstr.h"

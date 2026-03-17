@@ -18,6 +18,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
+#include "zbxregexp.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"

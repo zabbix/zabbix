@@ -20,6 +20,7 @@
 #include "zbxnix.h"
 #include "zbxpgservice.h"
 #include "zbxprof.h"
+#include "zbxregexp.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"

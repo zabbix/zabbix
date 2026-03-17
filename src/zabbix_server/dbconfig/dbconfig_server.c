@@ -15,6 +15,7 @@
 #include "dbconfig_server.h"
 
 #include "zbxcommon.h"
+#include "zbxregexp.h"
 #include "zbxsupervisor_client.h"
 #include "../dbconfigworker/dbconfigworker.h"
 
