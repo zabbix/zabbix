@@ -97,7 +97,9 @@ func (t *taskBase) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// collectorTask provides access to plugin Collector interaface.
+// Calls a plugin's Collector interface's Collect() method.
+// When this scheduled task is performed, it will call the Collect() method of
+// the task's plugin.
 type collectorTask struct {
 	taskBase
 	seed uint64
@@ -152,8 +154,10 @@ func (t *collectorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// exporterTask provides access to plugin Exporter interaface. It's used
-// for active check items.
+// Calls a plugin's Exporter interface's Export() method.
+// When this scheduled task is performed, it will call the Export() method of
+// the task's plugin.
+// It is used for active item checks.
 type exporterTask struct {
 	taskBase
 	item    clientItem
@@ -291,10 +295,12 @@ func (t *exporterTask) Delay() string {
 	return t.item.delay
 }
 
-// directExporterTask provides access to plugin Exporter interaface.
-// It's used for non-recurring exporter requests - single passive checks
-// and internal requests to obtain HostnameItem, HostMetadataItem,
-// HostInterfaceItem etc values.
+// Calls a plugin's Exporter interface's Export() method.
+// When this scheduled task is performed, it will call the Export() method of
+// the task's plugin.
+// It is used for non-recurring exporter requests, i.e. single passive checks,
+// as well as internal requests to obtain values of HostnameItem,
+// HostMetadataItem, HostInterfaceItem, etc.
 type directExporterTask struct {
 	taskBase
 	item   clientItem
@@ -410,7 +416,9 @@ func (t *directExporterTask) Delay() string {
 	return t.item.delay
 }
 
-// starterTask provides access to plugin Exporter interaface Start() method.
+// Calls a plugin's Runner interface's Start() method.
+// Assists in scheduling the startup of a plugin. When this scheduled task is
+// performed, it will call the Start() method of the task's plugin.
 type starterTask struct {
 	taskBase
 }
@@ -437,7 +445,9 @@ func (t *starterTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// stopperTask provides access to plugin Exporter interaface Start() method.
+// Calls a plugin's Runner interface's Stop() method.
+// Assists in scheduling the shutdown of a plugin. When this scheduled task is
+// performed, it will call the Stop() method of the task's plugin.
 type stopperTask struct {
 	taskBase
 }
@@ -464,7 +474,9 @@ func (t *stopperTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// stopperTask provides access to plugin Watcher interaface.
+// Calls a plugin's Watcher interface's Watch() method.
+// When this scheduled task is performed, it will call the Watch() method of
+// the task's plugin.
 type watcherTask struct {
 	taskBase
 	items  []*plugin.Item
@@ -523,7 +535,9 @@ func (t *watcherTask) Delay() string {
 	return ""
 }
 
-// configuratorTask provides access to plugin Configurator interaface.
+// Calls a plugin's Configurator interface's Configure() method.
+// Assists in scheduling the configuration of a plugin. When this scheduled
+// task is performed, it will call the Configure() method of the task's plugin.
 type configuratorTask struct {
 	taskBase
 	options *agent.AgentOptions
@@ -551,7 +565,9 @@ func (t *configuratorTask) isItemKeyEqual(itemkey string) bool {
 	return false
 }
 
-// commandTask executes remote commands received with active requests
+// Executes a remote command.
+// This task essentially will just Export() the item 'system.run', which is
+// handled separately from other items, due to security concerns.
 type commandTask struct {
 	taskBase
 	id      uint64
