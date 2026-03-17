@@ -630,7 +630,7 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
-static int	DBpatch_7000051(void)
+static int	DBpatch_7050051(void)
 {
 	int			ret = SUCCEED;
 	zbx_db_insert_t		db_insert;
