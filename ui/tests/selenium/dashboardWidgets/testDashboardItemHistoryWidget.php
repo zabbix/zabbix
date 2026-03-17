@@ -2360,7 +2360,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2371,29 +2371,34 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'result' => [
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
-							'Master item' => '1' // Value rounding is expected.
+							'Name' => 'Master item',
+							'Value' => 1
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-15 hours')),
-							'Host name' => STRING_128
+							'Name' => 'Host name',
+							'Value' => '<b>'.STRING_128.'</b>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
-							'Host name' => 'TEST'
+							'Name' => 'Host name',
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
-							'Host name' => STRING_255
+							'Name' => 'Host name',
+							'Value' => STRING_255
 						]
 					],
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">test</span>',
 								'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
-					]
+					],
+					'screenshot' => true
 				]
 			],
 			// #5 Test case for 'Items location' and 'Show text as Single line' options check.
@@ -2421,7 +2426,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2450,7 +2455,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">test</span>',
 								'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
@@ -2535,7 +2540,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2552,7 +2557,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-16 hours')),
 							'Name' => 'Host name',
-							'Value' => '<span style="text-transform:uppercase;">'.'test'.'</span>'
+							'Value' => '<span style="text-transform:uppercase;">test</span>'
 						],
 						[
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('-25 hours')),
@@ -2563,7 +2568,7 @@ class testDashboardItemHistoryWidget extends testWidgets {
 					'item_data' => [
 						['itemid' => '99142', 'values' => '1.00001', 'time' => strtotime('now')],
 						['itemid' => '42227', 'values' => '<b>'.STRING_128.'</b>', 'time' => strtotime('-15 hours')],
-						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">'.'test'.'</span>',
+						['itemid' => '42227', 'values' => '<span style="text-transform:uppercase;">test</span>',
 							'time' => strtotime('-16 hours')
 						],
 						['itemid' => '42227', 'values' => STRING_255, 'time' => strtotime('-25 hours')]
@@ -2625,6 +2630,73 @@ class testDashboardItemHistoryWidget extends testWidgets {
 	}
 
 	/**
+	 * Get widget table data, including handling of HTML content in iframes.
+	 *
+	 * @param CWidgetElement $widget    widget element
+	 *
+	 * @return array
+	 */
+	protected function getWidgetTableData($widget) {
+		$widget->waitUntilReady();
+
+		// Return empty array if no data is present in the widget.
+		if ($widget->query('class:no-data-message')->one(false)->isVisible()) {
+			return [];
+		}
+
+		$table = $widget->getContent()->asTable()->waitUntilPresent();
+
+		$headers = $table->getHeadersText();
+		$data = [];
+
+		foreach ($table->getRows() as $row) {
+			$raw_row = [];
+
+			foreach ($headers as $i => $name) {
+				$column = $row->getColumn($i);
+				$iframe = $column->query('class:js-iframe')->one(false);
+
+				if ($iframe->isValid()) {
+					/**
+					 * The content is stored as encoded HTML inside the iframe's 'srcdoc' attribute.
+					 * 1. getAttribute: Retrieves the raw encoded string.
+					 * 2. htmlspecialchars_decode: Converts entities (like &lt;) back to tags (<).
+					 */
+					$value = htmlspecialchars_decode($iframe->getAttribute('srcdoc'));
+				}
+				else {
+					$value = $column->getText();
+				}
+
+				$raw_row[$name] = $value;
+			}
+
+			/**
+			 * Format row data based on layout (Horizontal or Vertical):
+			 * Vertical layout has fixed "Timestamp", "Name", and "Value" columns;
+			 * Horizontal layout uses item names as column headers (the "Value" key is absent).
+			 */
+			if (!array_key_exists('Value', $raw_row) && count($raw_row) > 0) {
+				$formatted_row = ['Timestamp' => CTestArrayHelper::get($raw_row, 'Timestamp', '')];
+
+				foreach ($raw_row as $key => $value) {
+					if ($key !== 'Timestamp' && $value !== '') {
+						$formatted_row['Name'] = $key;
+						$formatted_row['Value'] = $value;
+					}
+				}
+
+				$data[] = $formatted_row;
+			}
+			else {
+				$data[] = $raw_row;
+			}
+		}
+
+		return $data;
+	}
+
+	/**
 	 * @backup !history, !history_uint, !history_str
 	 *
 	 * @dataProvider getTableData
@@ -2637,7 +2709,10 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_data)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
-		$this->assertTableData($data['initial_data']);
+		$widget = $dashboard->getWidget(self::DATA_WIDGET);
+
+		// Check initial data.
+		$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 
 		$default_values = [
 			'fields' => [
@@ -2660,24 +2735,38 @@ class testDashboardItemHistoryWidget extends testWidgets {
 			$this->widgetConfigurationChange($data['fields'], $dashboard,
 					CTestArrayHelper::get($data, 'edit_columns', [])
 			);
-			$this->assertTableData($data['result']);
+
+			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
+
+			if (CTestArrayHelper::get($data, 'screenshot')) {
+				// Find all the values ​​of the Timestamp column to hide them in the screenshot, since the values ​​are dynamic.
+				$timestamp_cells = $widget->query('xpath:.//tbody/tr/*[1]')->all()->asArray();
+				$this->assertScreenshotExcept($widget, $timestamp_cells, 'HTML encode check');
+			}
+
 			$this->widgetConfigurationChange($default_values['fields'], $dashboard, $default_values['columns']);
 		}
 
 		if (array_key_exists('host_select', $data)) {
 			$multiselect_field = $dashboard->getControls()->query('class:multiselect-control')->asMultiselect()->one();
 			$multiselect_field->fill($data['host_select']['without_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData();
+			$widget->waitUntilReady();
+			$this->assertEquals([], $this->getWidgetTableData($widget));
+
+			// Check "No data found" widget text.
+			$this->assertEquals('No data found', $widget->getContent()->query('class:no-data-message')->one()->getText());
+
 			$multiselect_field->fill($data['host_select']['with_data']);
-			$dashboard->waitUntilReady();
-			$this->assertTableData($data['result']);
+			$widget->waitUntilReady();
+
+			$this->assertEquals($data['result'], $this->getWidgetTableData($widget));
+
 			$multiselect_field->clear();
-			$dashboard->waitUntilReady();
+			$widget->waitUntilReady();
 		}
 
 		if (array_key_exists('result', $data)) {
-			$this->assertTableData($data['initial_data']);
+			$this->assertEquals($data['initial_data'], $this->getWidgetTableData($widget));
 		}
 	}
 

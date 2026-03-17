@@ -873,7 +873,9 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		// Reset subfilter configuration by pressing the "Apply" button in filter form.
 		if (array_key_exists('reset_subfilter', $data)) {
+			$table = $this->getTable();
 			$form->fill($data['filter'])->submit()->waitUntilStalled();
+			$table->waitUntilReloaded();
 		}
 
 		// Check result amount and graph/item ids.

@@ -62,17 +62,53 @@
 				const target = e.target;
 
 				if (target.matches('.link-action') && target.closest('.subfilter') !== null) {
-					const url = this.getPageUrl();
+					const filters = {...this._init_filter_values, subfilter_set: 1};
 					const subfilter = target.closest('.subfilter');
 
-					if (subfilter.matches('.subfilter-enabled')) {
-						url.searchParams.delete(target.getAttribute('data-name'), target.getAttribute('data-value'));
-					}
-					else {
-						url.searchParams.append(target.getAttribute('data-name'), target.getAttribute('data-value'));
-					}
+					const key_parts = [...target.getAttribute('data-name').matchAll(/[^\[\]]+|\[\]/g)];
 
-					this.#loadPageWithFilters(url, {subfilter_set: 1});
+					const update_filter = (current_filter, key_parts, i, value, remove) => {
+						const key_name = key_parts[i][0];
+
+						if (i == key_parts.length - 1) {
+							if (remove) {
+								current_filter.forEach((value, idx) => {
+									if (value == target.getAttribute('data-value')) {
+										delete current_filter[idx];
+									}
+								});
+							}
+							else {
+								current_filter.push(value);
+							}
+
+							return current_filter;
+						}
+						else {
+							if (!(key_name in current_filter)) {
+								current_filter[key_name] = [];
+							}
+
+							update_filter(current_filter[key_name], key_parts, i + 1, value, remove);
+
+							if (i == key_parts.length - 2) {
+								current_filter[key_name] = Object.values(current_filter[key_name]);
+							}
+							else {
+								current_filter[key_name] = Object.assign({}, current_filter[key_name]);
+							}
+
+							if (Object.values(current_filter[key_name]).length == 0) {
+								delete current_filter[key_name];
+							}
+						}
+					};
+
+					update_filter(filters, key_parts, 0, target.getAttribute('data-value'),
+						subfilter.matches('.subfilter-enabled')
+					);
+
+					location.href = zabbixUrl(filters);
 				}
 				else if (target.matches('[name="filter_state"]')) {
 					const disabled = e.target.getAttribute('value') != -1;
@@ -86,18 +122,20 @@
 			this.filter_form.addEventListener('submit', e => {
 				e.preventDefault();
 
-				const search_params = new URLSearchParams(new FormData(e.target));
-				const url = new URL('', window.location.origin + window.location.pathname);
+				const filters = {
+					...getFormFields(e.target),
+					filter_set: 1,
+					sort: this._init_filter_values.sort,
+					sortorder: this._init_filter_values.sortorder
+				};
 
-				url.searchParams.set('filter_set', '1');
-
-				search_params.forEach((filter_value, filter_key) => {
-					if (!filter_key.startsWith('subfilter_')) {
-						url.searchParams.append(filter_key, filter_value);
+				Object.keys(filters).forEach(key => {
+					if (key.startsWith('subfilter_')) {
+						delete filters[key];
 					}
 				});
 
-				this.#loadPageWithFilters(url, {filter_set: 1}, false);
+				location.href = zabbixUrl(filters);
 			});
 
 			this.form.querySelectorAll('.list-table thead th a').forEach(link => {
@@ -106,11 +144,13 @@
 
 					const search_params = new URLSearchParams(e.currentTarget.href);
 
-					this.#loadPageWithFilters(this.getPageUrl(), {
+					const filters = {...this._init_filter_values,
 						subfilter_set: 1,
 						sort: search_params.get('sort'),
 						sortorder: search_params.get('sortorder')
-					});
+					};
+
+					location.href = zabbixUrl(filters);
 				});
 			});
 
@@ -169,38 +209,14 @@
 		}
 
 		getInitFilterValues(filter_values) {
-			const filters = Object.keys(filter_values).reduce((filtered, filter_key) => {
-				if (filter_key.includes('filter_') || filter_key.startsWith('sort')) {
-					if (Array.isArray(filter_values[filter_key])) {
-						filter_values[filter_key].forEach(value => filtered.push({key: `${filter_key}[]`, value}));
-					}
-					else if (typeof filter_values[filter_key] === 'object') {
-						Object.keys(filter_values[filter_key]).forEach(key =>
-							filter_values[filter_key][key].forEach(value =>
-								filtered.push({key: `${filter_key}[${key}][]`, value})
-							)
-						)
-					}
-					else {
-						filtered.push({key: filter_key, value: filter_values[filter_key]});
-					}
-				}
+			filter_values.action = 'item.list';
+			filter_values.context = this.context;
 
-				return filtered;
-			}, []);
+			const clear_keys = ['filter_set', 'filter_rst', 'page', 'subfilter_set'];
 
-			return filters;
-		}
+			clear_keys.forEach(key => delete filter_values[key]);
 
-		getPageUrl() {
-			const url = new URL('', window.location.origin + window.location.pathname);
-
-			url.searchParams.set('action', 'item.list');
-			url.searchParams.set('context', this.context);
-
-			this._init_filter_values.forEach(filter => url.searchParams.append(filter.key, filter.value));
-
-			return url;
+			return filter_values;
 		}
 
 		editItem(target, data) {
@@ -264,18 +280,6 @@
 			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', this.elementSuccess.bind(this), {once: true});
-		}
-
-		#loadPageWithFilters(url, overwriteFilters = {}) {
-			const clear_keys = ['filter_set', 'filter_rst', 'page', 'subfilter_set'];
-
-			clear_keys.forEach(key => url.searchParams.delete(key));
-
-			Object.keys(overwriteFilters).forEach(
-				filter_key => url.searchParams.set(filter_key, overwriteFilters[filter_key])
-			);
-
-			window.location.href = url.href;
 		}
 
 		#edit(target, parameters = {}) {
@@ -416,7 +420,6 @@
 
 					list_url.setArgument('action', 'item.list');
 					list_url.setArgument('context', this.context);
-					list_url.setArgument('filter_set', 1);
 					new_href = list_url.getUrl();
 				}
 			}
