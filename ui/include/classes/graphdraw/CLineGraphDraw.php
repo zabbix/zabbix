@@ -1617,7 +1617,9 @@ class CLineGraphDraw extends CGraphDraw {
 						: '-';
 					$side_str = ($side == GRAPH_YAXIS_SIDE_LEFT) ? _('left') : _('right');
 					$legend->addCell($rowNum, [
-						'text' => _s('Percentile %1$s: %2$s', $percentile['percent'], $convertedUnit.' ('.$side_str.')'),
+						'text' => _s('Percentile %1$s: %2$s', $percentile['percent'],
+							$convertedUnit.' ('.$side_str.')'
+						),
 						ITEM_CONVERT_NO_UNITS
 					]);
 					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
