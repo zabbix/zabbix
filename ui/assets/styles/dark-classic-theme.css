@@ -2275,7 +2275,8 @@ button {
   position: relative;
   border: 1px solid #303030; }
   .datatable.is-loading::before {
-    background-color: rgba(43, 43, 43, 0.5); }
+    background-color: rgba(43, 43, 43, 0.5);
+    z-index: 20; }
   .datatable .hidden {
     display: none !important; }
   .datatable .datatable-customize {
