@@ -41,12 +41,12 @@ class testFormUserGroups extends CWebTest {
 	 * Create test data for "Multi-factor authentication" field in user group form.
 	 */
 	public function prepareMfaHostgroupData() {
-		CDataHelper::call('mfa.create', [
+		$mfaids = CDataHelper::call('mfa.create', [
 			[
 				'type' => MFA_TYPE_TOTP,
 				'name' => 'User groups TOTP',
 				'hash_function' => TOTP_HASH_SHA1,
-				'code_length' => '6'
+				'code_length' => TOTP_CODE_LENGTH_6
 			],
 			[
 				'type' => MFA_TYPE_DUO,
@@ -55,9 +55,49 @@ class testFormUserGroups extends CWebTest {
 				'clientid' => 'client_id_123',
 				'client_secret' => 'secret'
 			]
-		]);
+		])['mfaids'];
 
 		CDataHelper::call('authentication.update', ['mfa_status' => MFA_ENABLED]);
+
+		CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'User group with all specified fields for deletion',
+				'gui_access' => GROUP_GUI_ACCESS_LDAP,
+				'users_status' => GROUP_STATUS_DISABLED,
+				'debug_mode' => GROUP_DEBUG_MODE_ENABLED,
+				'userdirectoryid' => 0,
+				'mfa_status' => MFA_ENABLED,
+				'mfaid' => $mfaids[0],
+				'hostgroup_rights' => [
+					[
+						'id' => 2, // Linux servers
+						'permission' => PERM_READ
+					],
+					[
+						'id' => 4, // Zabbix servers
+						'permission' => PERM_DENY
+					],
+					[
+						'id' => 7, // Hypervizors
+						'permission' => PERM_READ_WRITE
+					]
+				],
+				'templategroup_rights' => [
+					[
+						'id' => 10, // Templates/Operating systems
+						'permission' => PERM_READ_WRITE
+					],
+					[
+						'id' => 12, // Templates/Applications
+						'permission' => PERM_DENY
+					],
+					[
+						'id' => 13, // Templates/Databases
+						'permission' => PERM_READ
+					]
+				]
+			]
+		]);
 	}
 
 	public function testFormUserGroups_CheckLayout() {
@@ -87,6 +127,7 @@ class testFormUserGroups extends CWebTest {
 		$form->checkValue($default_values);
 
 		$this->assertEquals(64, $form->getField('Group name')->getAttribute('maxlength'));
+		$this->assertEquals('type here to search', $this->query('id:userids__ms')->one()->getAttribute('placeholder'));
 
 		$dropdowns = [
 			'Frontend access' => ['System default', 'Internal', 'LDAP', 'Disabled'],
@@ -195,6 +236,11 @@ class testFormUserGroups extends CWebTest {
 				$this->assertTrue($field->isEnabled());
 			}
 		}
+
+		// Check the action buttons in User group update form.
+		$this->assertEquals(['Update', 'Delete', 'Cancel'], $this->query('class:tfoot-buttons')->one()->query('tag:button')
+				->all()->filter(CElementFilter::CLICKABLE)->asText()
+		);
 	}
 
 	public static function getCommonData() {
@@ -394,7 +440,7 @@ class testFormUserGroups extends CWebTest {
 			],
 			[
 				[
-					'name' => 'User group %#$@^%$&%^🙈😂😱*&^(*_))}{|" with symbols'
+					'name' => 'User group with all specified fields for deletion'
 				]
 			]
 		];
