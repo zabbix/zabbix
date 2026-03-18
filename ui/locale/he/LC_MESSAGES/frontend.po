@@ -13035,6 +13035,13 @@ msgstr ""
 msgid "Inventory mode"
 msgstr "מצב מאגר"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "הרצת „הפעלה כעת” על מארחים לקריאה בלבד"
@@ -21590,6 +21597,10 @@ msgstr "גודל נפח זיכרון התחלופה בבתים או באחוזי
 msgid "Swedish (sv_SE)"
 msgstr "שוודית (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "החלפת שיטת אימות תאפס את הכול פרט להפעלה הזאת! להמשיך?"
@@ -25892,6 +25903,10 @@ msgstr "לא ניתן להחליף תבניות לבחירה הנוכחית."
 msgid "You do not have permission to perform this operation."
 msgstr "אין לך הרשאה לבצע פעולה זו."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "אין לך הרשאה לגשת לעמוד זה."
@@ -27411,6 +27426,10 @@ msgstr "שעה שגויה"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "תקופת אחסון המגמות שגויה"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
