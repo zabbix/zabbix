@@ -937,6 +937,11 @@ zabbix_export:
                 - 1h
           master_item:
             key: 'db.odbc.get[get_status_variables,"{$PERCONA.DSN}"]'
+          tags:
+            - tag: component
+              value: innodb
+            - tag: component
+              value: tables
         - uuid: 31417695b7154c019a76ca730e68e833
           name: 'InnoDB row lock time max'
           type: DEPENDENT
@@ -1337,9 +1342,6 @@ zabbix_export:
             - lld_macro: '{#TABLES_NOT_MATCHES}'
               path: $.not_matches
           preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1352,6 +1354,9 @@ zabbix_export:
                   });
                   
                   return JSON.stringify(dbs);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
         - uuid: 3141d04c1b7a45a4b8c581d728eb1563
           name: 'Replication discovery'
           type: DEPENDENT
@@ -1412,9 +1417,6 @@ zabbix_export:
             - lld_macro: '{#REPLICA.KEY}'
               path: $.replica_key
           preprocessing:
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 1d
             - type: JAVASCRIPT
               parameters:
                 - |
@@ -1450,6 +1452,9 @@ zabbix_export:
                   }
                   
                   return JSON.stringify(dataReplica);
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
         - uuid: 314135c0267c48e28bc6ecb99fb2380d
           name: 'Replication [{#REPLICA.KEY}]: Replica discovery'
           type: DEPENDENT

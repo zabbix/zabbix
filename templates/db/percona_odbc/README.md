@@ -167,7 +167,7 @@ Optionally, it is possible to customize the template:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database discovery|<p>Used for the discovery of databases.</p>|Dependent item|percona.database.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Database discovery|<p>Used for the discovery of databases.</p>|Dependent item|percona.database.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Database discovery
 
@@ -218,7 +218,7 @@ Optionally, it is possible to customize the template:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>Discovery of the replication.</p>|Dependent item|percona.replication.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Replication discovery|<p>Discovery of the replication.</p>|Dependent item|percona.replication.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 
