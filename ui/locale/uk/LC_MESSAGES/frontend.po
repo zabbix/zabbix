@@ -13187,6 +13187,13 @@ msgstr ""
 msgid "Inventory mode"
 msgstr "Режим інвентарних даних"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr ""
@@ -21779,6 +21786,10 @@ msgstr "Розмір файлу підкачки в байтах або у ві�
 msgid "Swedish (sv_SE)"
 msgstr "Шведська (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Переключення методу аутентифікації скине всі сесії за виключенням цієї! Продовжити?"
@@ -26106,6 +26117,10 @@ msgstr ""
 msgid "You do not have permission to perform this operation."
 msgstr "У вас немає повноважень для виконання цієї операції."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "У вас недостатньо прав для доступу до цієї сторінки."
@@ -27622,6 +27637,10 @@ msgstr ""
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "некоректний період зберігання трендів"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
