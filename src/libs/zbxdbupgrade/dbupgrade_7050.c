@@ -662,7 +662,7 @@ static int	DBpatch_7050051(void)
 		while ('0' <= *p && *p <= '9')
 			count = count * 10 + (*p++ - '0');
 
-		if (count > 6 || ':' != *p || '{' != *(p + 1))
+		if (6 < count || ':' != *p || '{' != *(p + 1))
 			continue;
 
 		p += 2;
@@ -694,7 +694,7 @@ static int	DBpatch_7050051(void)
 
 			p++;
 
-			/* Parse value: i:N; — value is validated but not stored */
+			/* Parse value: i:N; - value is validated but not stored */
 			if ('i' != *p || ':' != *(p + 1))
 			{
 				valid = 0;
