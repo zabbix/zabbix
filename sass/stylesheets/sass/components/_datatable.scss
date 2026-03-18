@@ -10,6 +10,7 @@
 	&.is-loading {
 		&::before {
 			background-color: rgba($ui-bg-color, .5);
+			z-index: 20;
 		}
 	}
 
