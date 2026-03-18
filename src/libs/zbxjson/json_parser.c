@@ -548,3 +548,16 @@ zbx_int64_t	zbx_json_validate(const char *start, char **error)
 
 	return len;
 }
+
+zbx_int64_t	zbx_json_validate_ext(const char *start, char **error)
+{
+	zbx_int64_t	len = json_parse_value(start, NULL, 0, error);
+
+	start += len;
+	SKIP_WHITESPACE(start);
+
+	if ('\0' != *start)
+		return json_error("invalid character following JSON object", start, error);
+
+	return len;
+}

@@ -2736,7 +2736,7 @@ class CHostPrototype extends CHostBase {
 		), 'groupid');
 
 		if ($db_groups) {
-			API::HostGroup()->deleteForce($db_groups);
+			CHostGroup::deleteForce($db_groups);
 		}
 
 		DB::delete('group_discovery', ['parent_group_prototypeid' => $group_prototypeids]);

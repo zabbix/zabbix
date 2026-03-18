@@ -399,6 +399,11 @@ static char	*config_sms_devices			= NULL;
 static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
+/* adapter config */
+static char	*config_adapter_url;
+static char	*config_adapter_cert;
+static char	*config_adapter_key;
+
 struct zbx_db_version_info_t	db_version_info;
 
 static	const zbx_events_funcs_t	events_cbs = {
@@ -688,7 +693,7 @@ static void	zbx_set_defaults(void)
 		config_ssl_key_location = zbx_strdup(config_ssl_key_location, DEFAULT_SSL_KEY_LOCATION);
 
 	if (NULL == config_history_storage_opts)
-		config_history_storage_opts = zbx_strdup(config_history_storage_opts, "uint,dbl,str,log,text");
+		config_history_storage_opts = zbx_strdup(config_history_storage_opts, "uint,dbl,str,log,text,json");
 #endif
 
 #ifdef HAVE_SQLITE3
@@ -1185,6 +1190,12 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
+		{"AdapterURL",			&config_adapter_url,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"BridgeAdapterSSLCertFile",	&config_adapter_cert,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"BridgeAdapterSSLKeyFile",	&config_adapter_key,			ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
 
@@ -1707,7 +1718,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args =
 		{
 			.config_timeout = zbx_config_timeout,
-			.config_startup_time = config_startup_time
+			.config_startup_time = config_startup_time,
+			.config_adapter_url = config_adapter_url,
+			.config_adapter_ca_file = zbx_config_tls->ca_file,
+			.config_adapter_cert_file = config_adapter_cert,
+			.config_adapter_key_file = config_adapter_key
 		};
 
 	zbx_thread_dbconfig_args	dbconfig_args =
@@ -1727,7 +1742,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		{
 			.config_source_ip = zbx_config_source_ip,
 			.config_ssl_ca_location = config_ssl_ca_location,
-			.config_sms_devices = config_sms_devices
+			.config_sms_devices = config_sms_devices,
+			.config_adapter_url = config_adapter_url,
+			.config_adapter_ca_file = zbx_config_tls->ca_file,
+			.config_adapter_cert_file = config_adapter_cert,
+			.config_adapter_key_file = config_adapter_key
 		};
 
 	zbx_thread_pinger_args		pinger_args =
@@ -2526,6 +2545,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			goto out;
 	}
 
+	if (SUCCEED != zbx_db_check_serverid())
+		goto out;
+
 	zbx_db_save_server_status();
 
 	if (SUCCEED != zbx_db_check_instanceid())
@@ -2589,6 +2611,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_vps_monitor_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);

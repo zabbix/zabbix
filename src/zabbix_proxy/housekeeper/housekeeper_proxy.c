@@ -91,11 +91,15 @@ static int	delete_history(const char *table, const char *lastid_field, const cha
 
 	zbx_db_commit();
 
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() records:%d", __func__, records);
+
 	return records;
 rollback:
 	zbx_db_free_result(result);
 
 	zbx_db_rollback();
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End %s() rollback", __func__);
 
 	return 0;
 }
@@ -126,6 +130,11 @@ static int	housekeeping_history(int now, int config_offline_buffer, int config_l
 			config_local_buffer);
 
 	return records;
+}
+
+static void	housekeeper_table_clean(void)
+{
+	zbx_db_execute("delete from housekeeper");
 }
 
 ZBX_THREAD_ENTRY(housekeeper_thread, args)
@@ -219,6 +228,7 @@ ZBX_THREAD_ENTRY(housekeeper_thread, args)
 		sec = zbx_time();
 		records = housekeeping_history(start, housekeeper_args_in->config_proxy_offline_buffer,
 				housekeeper_args_in->config_proxy_local_buffer);
+		housekeeper_table_clean();
 		sec = zbx_time() - sec;
 
 		zbx_db_close();

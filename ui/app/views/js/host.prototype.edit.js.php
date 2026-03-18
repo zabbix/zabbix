@@ -414,8 +414,6 @@ window.host_prototype_edit_popup = new class {
 				if (!this.readonly) {
 					$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
 				}
-
-				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});

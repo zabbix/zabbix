@@ -114,6 +114,8 @@
 /* Binary item type can only be as a dependent item. */
 #define ZBX_HISTORY_BIN_VALUE_LEN		(ZBX_MEBIBYTE * 16)
 
+#define ZBX_HISTORY_JSON_VALUE_LEN		(ZBX_MEBIBYTE * 127)
+
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
 
@@ -227,7 +229,8 @@ typedef enum
 	MEDIA_TYPE_EMAIL = 0,
 	MEDIA_TYPE_EXEC,
 	MEDIA_TYPE_SMS,
-	MEDIA_TYPE_WEBHOOK = 4
+	MEDIA_TYPE_WEBHOOK = 4,
+	MEDIA_TYPE_PUSH = 5
 }
 zbx_media_type_t;
 
@@ -313,15 +316,6 @@ typedef struct
 	char		*message;
 }
 zbx_db_alert;
-
-typedef struct
-{
-	zbx_uint64_t	housekeeperid;
-	char		*tablename;
-	char		*field;
-	zbx_uint64_t	value;
-}
-zbx_db_housekeeper;
 
 typedef struct
 {
@@ -630,6 +624,7 @@ void	zbx_db_save_item_changes(char **sql, size_t *sql_alloc, size_t *sql_offset,
 
 int	zbx_db_check_instanceid(void);
 int	zbx_db_update_software_update_checkid(void);
+int	zbx_db_check_serverid(void);
 
 /* tags */
 typedef struct

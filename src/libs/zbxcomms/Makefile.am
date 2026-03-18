@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 
-noinst_LIBRARIES = libzbxcomms.a libzbxagent2comms.a
+noinst_LIBRARIES = libzbxcomms.a
 
 libzbxcomms_a_SOURCES = \
 	comms.h \
@@ -22,11 +22,3 @@ if HAVE_GNUTLS
 libzbxcomms_a_SOURCES += tls.c tls_gnutls.c
 endif
 endif
-
-# AGENT2 version of comms library
-libzbxagent2comms_a_CFLAGS = \
-	-DWITH_AGENT2_METRICS
-
-libzbxagent2comms_a_SOURCES = \
-	comms.h \
-	comms.c

@@ -1003,106 +1003,6 @@ class CTemplate extends CHostGeneral {
 	}
 
 	/**
-	 * Replace template groups, macros and templates on the given templates.
-	 *
-	 * @param array $data
-	 *
-	 * @return array
-	 */
-	public function massUpdate(array $data) {
-		$this->validateMassUpdate($data, $templates, $db_templates);
-
-		$this->updateForce($templates, $db_templates);
-
-		return ['templateids' => array_column($data['templates'], 'templateid')];
-	}
-
-	private function validateMassUpdate(array &$data, ?array &$templates, ?array &$db_templates): void {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'templates' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'groups' =>				['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['groupid']], 'fields' => [
-				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'macros' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['macro']], 'fields' => [
-				'macro' =>				['type' => API_USER_MACRO, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hostmacro', 'macro')],
-				'type' =>				['type' => API_INT32, 'in' => implode(',', [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]), 'default' => ZBX_MACRO_TYPE_TEXT],
-				'value' =>				['type' => API_MULTIPLE, 'flags' => API_REQUIRED, 'rules' => [
-											['if' => ['field' => 'type', 'in' => implode(',', [ZBX_MACRO_TYPE_VAULT])], 'type' => API_VAULT_SECRET, 'provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER), 'length' => DB::getFieldLength('hostmacro', 'value')],
-											['else' => true, 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'value')]
-				]],
-				'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('hostmacro', 'description')],
-				'config' => 			['type' => API_ANY]
-			]],
-			'templates_link' =>		['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]],
-			'templates_clear' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
-				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_templates = $this->get([
-			'output' => ['templateid', 'host'],
-			'templateids' => array_column($data['templates'], 'templateid'),
-			'editable' => true,
-			'preservekeys' => true
-		]);
-
-		foreach ($data['templates'] as $i => $template) {
-			if (!array_key_exists($template['templateid'], $db_templates)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _s('Invalid parameter "%1$s": %2$s.',
-					'/templates/'.($i + 1), _('object does not exist, or you have no permissions to it')
-				));
-			}
-		}
-
-		$templates = $data['templates'];
-
-		$this->addObjectsByData($data, $templates);
-		$this->addAffectedObjects($templates, $db_templates);
-
-		if (array_key_exists('groups', $data)) {
-			$this->checkGroups($templates, $db_templates, '/groups',
-				array_flip(array_column($data['groups'], 'groupid'))
-			);
-			$this->checkHostsWithoutGroups($templates, $db_templates);
-		}
-
-		if (array_key_exists('macros', $data) && $data['macros']) {
-			self::addHostMacroIds($templates, $db_templates);
-			self::validateMacroConfig($templates, $db_templates, '/macros',
-				array_flip(array_column($data['macros'], 'macro'))
-			);
-		}
-
-		if (array_key_exists('templates_link', $data)
-				|| (array_key_exists('templates_clear', $data) && $data['templates_clear'])) {
-			$path = array_key_exists('templates_link', $data) ? '/templates_link' : null;
-			$template_indexes = array_key_exists('templates_link', $data)
-				? array_flip(array_column($data['templates_link'], 'templateid'))
-				: null;
-
-			$path_clear = array_key_exists('templates_clear', $data) && $data['templates_clear']
-				? '/templates_clear'
-				: null;
-			$template_clear_indexes = array_key_exists('templates_clear', $data) && $data['templates_clear']
-				? array_flip(array_column($data['templates_clear'], 'templateid'))
-				: null;
-
-			$this->checkTemplates($templates, $db_templates, $path, $template_indexes, $path_clear,
-				$template_clear_indexes
-			);
-			$this->checkTemplatesLinks($templates, $db_templates);
-		}
-	}
-
-	/**
 	 * Remove given template groups, macros and templates from given templates.
 	 *
 	 * @param array $data
@@ -1159,7 +1059,7 @@ class CTemplate extends CHostGeneral {
 
 		if (array_key_exists('groupids', $data) && $data['groupids']) {
 			$this->checkGroups($templates, $db_templates, '/groupids', array_flip($data['groupids']));
-			$this->checkHostsWithoutGroups($templates, $db_templates);
+			self::checkHostsWithoutGroups($templates, $db_templates);
 		}
 
 		if ((array_key_exists('templateids_link', $data) && $data['templateids_link'])
@@ -1184,13 +1084,13 @@ class CTemplate extends CHostGeneral {
 	}
 
 	private function addUnchangedObjects(array &$templates, array $db_templates, array $del_objectids = []): void {
-		$this->addUnchangedGroups($templates, $db_templates, $del_objectids);
+		self::addUnchangedGroups($templates, $db_templates, $del_objectids);
 		$this->addUnchangedMacros($templates, $db_templates, $del_objectids);
 		$this->addUnchangedTemplates($templates, $db_templates, $del_objectids);
 	}
 
 	private function addAffectedObjects(array $hosts, array &$db_hosts): void {
-		$this->addAffectedGroups($hosts, $db_hosts);
+		self::addAffectedGroups($hosts, $db_hosts);
 		$this->addAffectedTemplates($hosts, $db_hosts);
 		$this->addAffectedTags($hosts, $db_hosts);
 		self::addAffectedMacros($hosts, $db_hosts);
@@ -1326,5 +1226,33 @@ class CTemplate extends CHostGeneral {
 		]);
 
 		$result = $relation_map->mapMany($result, $groups, 'templategroups');
+	}
+
+	public function unlinkGroups(array $groupids): void {
+		$db_templates = $this->get([
+			'output' => ['host'],
+			'groupids' => $groupids,
+			'preservekeys' => true
+		]);
+
+		if (!$db_templates) {
+			return;
+		}
+
+		$templates = [];
+
+		foreach ($db_templates as $templateid => $foo) {
+			$templates[] = [
+				'templateid' => $templateid,
+				'groups' => []
+			];
+		}
+
+		self::addAffectedGroups($templates, $db_templates);
+		self::addUnchangedGroups($templates, $db_templates, ['groupids' => $groupids]);
+
+		self::checkHostsWithoutGroups($templates, $db_templates);
+
+		$this->updateForce($templates, $db_templates);
 	}
 }

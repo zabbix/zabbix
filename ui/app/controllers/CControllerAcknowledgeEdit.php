@@ -94,7 +94,9 @@ class CControllerAcknowledgeEdit extends CController {
 			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
 			'allowed_change_problem_ranking' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING),
-			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d')
+			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d'),
+			'js_validation_rules' => (new CFormValidator(CControllerPopupAcknowledgeCreate::getValidationRules()))
+				->getRules()
 		];
 
 		// Select events.

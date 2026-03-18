@@ -338,13 +338,13 @@ class testFormAction extends CLegacyWebTest {
 			// Open Condition overlay dialog and fill first condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@class, "condition-create")]');
 			$this->zbxTestLaunchOverlayDialog('New condition');
-			$this->zbxTestInputTypeByXpath('//textarea[@id="value"]', 'TEST1');
+			$this->zbxTestInputTypeByXpath('//z-textarea-flexible[@id="value"]', 'TEST1');
 			$this->query('xpath://div[@data-dialogueid="action-condition"]//button[text()="Add"]')->one()->click()->waitUntilNotVisible();
 			$this->zbxTestAssertVisibleXpath('//*[@id="conditionTable"]//tr[@data-row_index="0"]');
 			// Open Condition overlay dialog again and fill second condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@class, "condition-create")]');
 			$this->zbxTestLaunchOverlayDialog('New condition');
-			$this->zbxTestInputTypeByXpath('//textarea[@id="value"]', 'TEST2');
+			$this->zbxTestInputTypeByXpath('//z-textarea-flexible[@id="value"]', 'TEST2');
 			$this->query('xpath://div[@data-dialogueid="action-condition"]//button[text()="Add"]')->one()->click()->waitUntilNotVisible();
 			// Wait until overlay is closed and value is added, so that Type of calculation dropdown is clickable.
 			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
@@ -560,10 +560,10 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->zbxTestAssertElementPresentXpath('//input[@id="value"] | //textarea[@id="value"]');
+				$this->zbxTestAssertElementPresentXpath('//input[@id="value"] | //z-textarea-flexible[@id="value"]');
 				break;
 			default:
-				$this->zbxTestAssertElementNotPresentXpath('//input[@id="value"] | //textarea[@id="value"]');
+				$this->zbxTestAssertElementNotPresentXpath('//input[@id="value"] | //z-textarea-flexible[@id="value"]');
 				break;
 		}
 
@@ -580,7 +580,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Host name':
 			case 'Host metadata':
 			case 'Service port':
-				$this->zbxTestAssertAttribute('//textarea[@id="value"] | //input[@id="value"]', 'maxlength', 255);
+				$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="value"] | //input[@id="value"]', 'maxlength', 255);
 				break;
 			case 'Uptime/Downtime':
 				$this->zbxTestAssertAttribute('//input[@id="value"]', 'maxlength', 7);

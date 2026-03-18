@@ -883,7 +883,6 @@ int	item_preproc_get_error_from_json(const zbx_variant_t *value, const char *par
 
 	if (FAIL == (ret = item_preproc_convert_value(&value_str, ZBX_VARIANT_STR, error)))
 	{
-		THIS_SHOULD_NEVER_HAPPEN;
 		goto out;
 	}
 

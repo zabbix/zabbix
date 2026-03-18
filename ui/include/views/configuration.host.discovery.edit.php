@@ -975,22 +975,20 @@ elseif ($data['form_refresh'] == 0) {
 }
 
 foreach ($lld_macro_paths as $i => $lld_macro_path) {
-	$lld_macro = (new CTextAreaFlexible('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'], [
-		'readonly' => $readonly,
-		'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
-	]))
+	$lld_macro = (new CTextAreaFlexible('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro']))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
 		->setAttribute('placeholder', '{#MACRO}')
-		->disableSpellcheck();
+		->disableSpellcheck()
+		->setReadonly($readonly)
+		->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'));
 
-	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], [
-		'readonly' => $readonly,
-		'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
-	]))
+	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 		->setAttribute('placeholder', _('$.path.to.node'))
-		->disableSpellcheck();
+		->disableSpellcheck()
+		->setReadonly($readonly)
+		->setMaxlength(DB::getFieldLength('lld_macro_path', 'path'));
 
 	$remove = [
 		(new CButton('lld_macro_paths['.$i.'][remove]', _('Remove')))

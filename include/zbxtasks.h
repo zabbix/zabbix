@@ -37,6 +37,8 @@
 #define ZBX_TM_TASK_DATA_RESULT				8
 #define ZBX_TM_PROXYDATA				9
 #define ZBX_TM_TASK_COPY_NESTED_HOST_PROTOTYPES		10
+#define ZBX_TM_TASK_INIT_DEVICE				11
+#define ZBX_TM_TASK_OFFBOARD_DEVICE			12
 
 /* task manager task states */
 #define ZBX_TM_STATUS_NEW			1
@@ -55,6 +57,10 @@
 
 /* the time period after which finished (done/expired) tasks are removed */
 #define ZBX_TM_CLEANUP_TASK_AGE			SEC_PER_DAY
+
+/* task device status */
+#define ZBX_TM_TASK_DEVICE_STATUS_SUCCESS	0
+#define ZBX_TM_TASK_DEVICE_STATUS_FAIL		1
 
 typedef struct
 {

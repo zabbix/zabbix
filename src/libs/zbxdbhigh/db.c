@@ -23,14 +23,6 @@
 
 #define ZBX_DB_WAIT_DOWN	10
 
-#define ZBX_MAX_SQL_SIZE	262144	/* 256KB */
-#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
-#	define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
-#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
-	(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
-#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
-#endif
-
 #ifdef HAVE_MULTIROW_INSERT
 #	define ZBX_ROW_DL	","
 #else
@@ -753,5 +745,44 @@ int	zbx_db_update_software_update_checkid(void)
 	}
 	zbx_db_free_result(result);
 
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks serverid value in settings table and generates new         *
+ *          serverid if it is not present                                     *
+ *                                                                            *
+ * Return value: SUCCEED - valid serverid either exists or was created        *
+ *               FAIL    - no valid serverid exists and could not create one  *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_db_check_serverid(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		ret = SUCCEED;
+
+	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		char	*uuid7 = zbx_gen_uuid7();
+
+		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+				"('serverid',1,'%s',0)", uuid7))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "cannot setup serverid in settings table");
+			ret = FAIL;
+		}
+		zbx_free(uuid7);
+	}
+
+	zbx_db_free_result(result);
+out:
 	return ret;
 }

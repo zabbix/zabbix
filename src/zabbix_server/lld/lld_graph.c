@@ -1652,7 +1652,7 @@ static void	lld_process_lost_graphs(zbx_vector_lld_graph_ptr_t *graphs, const zb
  ******************************************************************************/
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags,
-		const zbx_vector_uint64_t *ruleids)
+		const zbx_vector_uint64_t *ruleids, int auditlog_enabled, int auditlog_mode)
 {
 	int				ret = SUCCEED;
 	zbx_db_result_t			result;
@@ -1667,6 +1667,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 							/* updated by the graph prototype */
 	zbx_vector_lld_gitem_ptr_create(&gitems_proto);	/* list of graphs_items which are used by the graph prototype */
 	zbx_vector_lld_item_ptr_create(&items);		/* list of items which are related to the graph prototype */
+
+	zbx_audit_init(auditlog_enabled, auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
 	result = zbx_db_select(
 			"select distinct g.graphid,g.name,g.width,g.height,g.yaxismin,g.yaxismax,g.show_work_period,"
@@ -1733,6 +1735,8 @@ int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_ve
 		lld_graphs_free(&graphs);
 	}
 	zbx_db_free_result(result);
+
+	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 
 	zbx_vector_lld_item_ptr_destroy(&items);
 	zbx_vector_lld_gitem_ptr_destroy(&gitems_proto);

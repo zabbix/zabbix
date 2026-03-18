@@ -172,10 +172,15 @@ class testItem extends CAPITest {
 				],
 				'expected_error' => $type == ITEM_TYPE_DEPENDENT
 					? null
-					: 'Invalid parameter "/1/value_type": value must be one of '.implode(', ', [
+					:
+					($type == ITEM_TYPE_CALCULATED ? 'Invalid parameter "/1/value_type": value must be one of '.implode(', ', [
+							ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
+							ITEM_VALUE_TYPE_TEXT
+						]).'.' :
+					'Invalid parameter "/1/value_type": value must be one of '.implode(', ', [
 						ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_UINT64,
-						ITEM_VALUE_TYPE_TEXT
-					]).'.'
+						ITEM_VALUE_TYPE_TEXT, ITEM_VALUE_TYPE_JSON
+					]).'.')
 			];
 
 			// Additional type-specific cases.
@@ -571,6 +576,31 @@ class testItem extends CAPITest {
 								]
 							],
 							'expected_error' => 'Invalid parameter "/1/headers": value is too long.'
+						],
+						'Accept value type JSON' => [
+							'request_data' => $params + [
+									'hostid' => '50009',
+									'key_' => 'httpagent.accept.json',
+									'name' => 'httpagent.accept.json',
+									'type' => $type,
+									'value_type' => ITEM_VALUE_TYPE_JSON
+								],
+							'expected_error' => null
+						]
+					];
+					break;
+
+				case ITEM_TYPE_CALCULATED:
+					$item_type_tests += [
+						'Reject invalid value type' => [
+							'request_data' => $params + [
+									'hostid' => '50009',
+									'key_' => 'calculated.reject.value.type',
+									'name' => 'calculated.reject.value.type',
+									'type' => $type,
+									'value_type' => ITEM_VALUE_TYPE_JSON
+								],
+							'expected_error' => 'Invalid parameter "/1/value_type": value must be one of 0, 1, 2, 3, 4.'
 						]
 					];
 					break;
@@ -929,6 +959,14 @@ class testItem extends CAPITest {
 						'url' => 'test.com',
 						'authtype' => ZBX_HTTP_AUTH_BASIC,
 						'delay' => '1m'
+					],
+					[
+						'name' => 'httpagent.json.type',
+						'key_' => 'httpagent.json.type',
+						'type' => ITEM_TYPE_HTTPAGENT,
+						'value_type' => ITEM_VALUE_TYPE_JSON,
+						'url' => 'test.com',
+						'delay' => '1m'
 					]
 				]
 			]
@@ -1001,6 +1039,13 @@ class testItem extends CAPITest {
 				'request_data' => [
 					'item' => 'testItem_Update:httpagent.credentials.length',
 					'password' => str_repeat('z', 255)
+				],
+				'expected_error' => null
+			],
+			[
+				'request_data' => [
+					'item' => 'testItem_Update:httpagent.json.type',
+					'key_' => 'httpagent.json.type.updated'
 				],
 				'expected_error' => null
 			]

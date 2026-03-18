@@ -669,7 +669,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 					}
 
 					if ($items_by_source['history']) {
-						$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
+						// Extra byte to trim values that exceeds length limit.
+						$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
+						$values = Manager::History()->getLastValues($items_by_source['history'], 1,
+							$history_period_s, $length
+						);
 
 						$result += array_column(array_column($values, 0), 'value', 'itemid');
 					}
