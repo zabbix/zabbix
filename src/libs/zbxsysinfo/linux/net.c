@@ -256,7 +256,7 @@ out:
  ******************************************************************************/
 static int	net_if_row_scan(const char *line, char *if_name, net_stat_t *net_stat)
 {
-	return sscanf(line, "%s\t"
+	return sscanf(line, "%2047s\t"
 			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
 			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
 			ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t" ZBX_FS_UI64 "\t"
@@ -1245,6 +1245,7 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 static void	if_type_add(const char *ifname, struct zbx_json *j)
 {
 #define ARPHRD_LOOPBACK	772
+#define JSON_KEY_TYPE	"type"
 #define VIRTFN_PFX	"virtfn"
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
@@ -1289,13 +1290,14 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 
 		if (0 == found)
 		{
-			zbx_json_addstring(j, ZBX_PROTO_TAG_TYPE, "physical", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, JSON_KEY_TYPE, "physical", ZBX_JSON_TYPE_STRING);
 			return;
 		}
 	}
 
-	zbx_json_addstring(j, ZBX_PROTO_TAG_TYPE, "virtual", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, JSON_KEY_TYPE, "virtual", ZBX_JSON_TYPE_STRING);
 #undef ARPHRD_LOOPBACK
+#undef JSON_KEY_TYPE
 #undef VIRTFN_PFX
 }
 
@@ -1420,7 +1422,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		if (ZBX_PROC_NET_DEV_COLS_NUM != (num_filled = net_if_row_scan(line, if_name, &ns)))
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "cannot read interface from of \"%s\"", ZBX_PROC_NET_DEV);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse \"%s\" line \"%s\"", ZBX_PROC_NET_DEV, line);
 			continue;
 		}
 
