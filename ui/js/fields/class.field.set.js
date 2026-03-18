@@ -74,6 +74,32 @@ class CFieldSet extends CField {
 		}}));
 	}
 
+	/**
+	 * Attaches blur handling to a button. Validation is done when the button loses focus, unless the blur
+	 * was caused by opening the related overlay.
+	 *
+	 * @param {string} button_class	 Class name for the button.
+	 * @param {string} dialogue_id   ID for a dialogue opened by the button.
+	 */
+	setButtonOnBlur(button_class, dialogue_id) {
+		const button = this._field.querySelector('.' + button_class);
+		let timeout_id = null;
+
+		button.addEventListener('blur', () => {
+			clearTimeout(timeout_id);
+			timeout_id = setTimeout(() => {
+				if (overlays_stack.getById(dialogue_id) === undefined) {
+					this.onBlur();
+				}
+			}, 250);
+		});
+
+		button.addEventListener('focusin', () => {
+			clearTimeout(timeout_id);
+			timeout_id = null;
+		});
+	}
+
 	#discoverAllFields() {
 		const fields = {};
 		const fields_rediscovered = [];

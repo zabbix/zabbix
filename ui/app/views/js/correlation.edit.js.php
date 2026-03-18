@@ -64,21 +64,7 @@ window.correlation_edit_popup = new class {
 			}
 		});
 
-		let condition_add_timeout_id = null;
-
-		this.dialogue.querySelector('.js-condition-add').addEventListener('blur', () => {
-			clearTimeout(condition_add_timeout_id);
-			condition_add_timeout_id = setTimeout(() => {
-				if (document.getElementById('correlation-condition-form') === null) {
-					this.form.validateChanges(['conditions'], true);
-				}
-			}, 250);
-		});
-
-		this.dialogue.querySelector('.js-condition-add').addEventListener('focusin', () => {
-			clearTimeout(condition_add_timeout_id);
-			condition_add_timeout_id = null;
-		});
+		this.form.findFieldByName('conditions').setButtonOnBlur('js-condition-add', 'correlation-condition-form');
 
 		document.getElementById('evaltype').onchange = () => this.#processTypeOfCalculation();
 
