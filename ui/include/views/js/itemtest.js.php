@@ -50,13 +50,18 @@
 			}
 			else if (type == <?= ZBX_PREPROC_VALIDATE_NOT_SUPPORTED ?>) {
 				['params_0_not_supported', 'params_1_not_supported'].forEach(function(name) {
-					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
+					const node = $preprocessing[0]
+						.querySelector(`input[name^="preprocessing[${num}][${name}]"],
+							z-textarea-flexible[name^="preprocessing[${num}][${name}]"]`);
 					node && params.push(node.value);
 				});
 			}
 			else {
 				['params_0', 'params_1', 'params_2'].forEach(function(name) {
-					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
+
+					const node = $preprocessing[0]
+						.querySelector(`input[name^="preprocessing[${num}][${name}]"],
+							z-textarea-flexible[name^="preprocessing[${num}][${name}]"]`);
 
 					if (node && !node.disabled) {
 						let value = node.value;
