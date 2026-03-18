@@ -106,6 +106,7 @@ class CUser extends CApiService {
 			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'mediaids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'mediatypeids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'current' =>				['type' => API_BOOLEAN, 'default' => false],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_FLAG, 'default' => false],
 			'excludeSearch' =>			['type' => API_FLAG, 'default' => false],
@@ -183,6 +184,10 @@ class CUser extends CApiService {
 			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 				$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
 			}
+		}
+
+		if ($options['current']) {
+			$sql_parts['where']['userid'] = 'u.userid='.self::$userData['userid'];
 		}
 
 		if ($options['filter'] !== null) {
