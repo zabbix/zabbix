@@ -29,7 +29,7 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CSimpleButton(_('Create media type')))
 					->setId('js-create')
-					->setEnabled(!empty(CFeatureFlagHelper::getSupportedMediaTypes()))
+					->setEnabled((bool) CFeatureFlagHelper::getSupportedMediaTypes())
 			)
 			->addItem(
 				(new CSimpleButton(_('Import')))
@@ -42,7 +42,7 @@ $html_page = (new CHtmlPage())
 							dialogue_class: "modal-popup-generic"
 						});'
 					)
-					->setEnabled(!empty(CFeatureFlagHelper::getSupportedMediaTypes()))
+					->setEnabled((bool) CFeatureFlagHelper::getSupportedMediaTypes())
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -184,7 +184,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	if (in_array($media_type['typeid'], array_keys($supported_types))) {
+	if (array_key_exists($media_type['typeid'], $supported_types)) {
 		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_GREEN)
@@ -201,10 +201,10 @@ foreach ($data['mediatypes'] as $media_type) {
 		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 			? (new CSpan(_('Enabled')))
 				->addClass(ZBX_STYLE_GREEN)
-				->setAttribute('data-mediatypeid', (int)$media_type['mediatypeid'])
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid'])
 			: (new CSpan(_('Disabled')))
 				->addClass(ZBX_STYLE_RED)
-				->setAttribute('data-mediatypeid', (int)$media_type['mediatypeid']);
+				->setAttribute('data-mediatypeid', (int) $media_type['mediatypeid']);
 	}
 
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
@@ -222,13 +222,12 @@ foreach ($data['mediatypes'] as $media_type) {
 
 	$checkbox = new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']);
 
-	if (in_array($media_type['typeid'], array_keys($supported_types))) {
+	if (array_key_exists($media_type['typeid'], $supported_types)) {
 		$name = new CLink($media_type['name'], $media_type_url);
 	}
 	else {
 		$name = (new CSpan($media_type['name']))->addClass(ZBX_STYLE_GREY);
-		$checkbox
-			->setEnabled(false);
+		$checkbox->setEnabled(false);
 	}
 
 	// append row

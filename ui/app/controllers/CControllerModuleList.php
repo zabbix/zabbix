@@ -43,15 +43,9 @@ class CControllerModuleList extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
-		if (!$modules_enabled) {
-			return false;
-		}
-		else {
-			return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
-		}
+	protected function checkPermissions(): bool	{
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+			&& CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 	}
 
 	protected function doAction(): void {

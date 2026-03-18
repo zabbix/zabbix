@@ -243,7 +243,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_FEATURE_FLAGS, $ZBX_SERVER_TLS;
+			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -253,7 +253,6 @@ class CConfigFile {
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
-		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -292,31 +291,6 @@ class CConfigFile {
 			return false;
 		}
 	}
-
-	public function getHttpAuthFlag() {
-		if (!isset($this->config['ZBX_FEATURE_FLAGS'])) {
-			return null;
-		}
-
-		return $this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] ?? null;
-	}
-
-	public function getModuleFlag() {
-		if (!isset($this->config['ZBX_FEATURE_FLAGS'])) {
-			return null;
-		}
-
-		return $this->config['ZBX_FEATURE_FLAGS']['modules_config_enabled'] ?? null;
-	}
-
-	public function getMediaTypeFlag() {
-		if (!isset($this->config['ZBX_FEATURE_FLAGS'])) {
-			return null;
-		}
-
-		return $this->config['ZBX_FEATURE_FLAGS']['media_type_denylist'] ?? null;
-	}
-
 
 	public function getString() {
 		return
@@ -434,7 +408,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['ZBX_FEATURE_FLAGS'] = [
 			'http_auth_enabled' => true,
 			'modules_config_enabled' => true,
-			'media_type_denylist' => null
+			'media_type_denylist' => []
 		];
 		$this->config['ZBX_SERVER_TLS'] = [
 			'ACTIVE' => 0,

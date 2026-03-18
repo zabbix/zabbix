@@ -398,7 +398,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function create(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || empty(CFeatureFlagHelper::getSupportedMediaTypes())) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !CFeatureFlagHelper::getSupportedMediaTypes()) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
@@ -524,17 +524,8 @@ class CMediatype extends CApiService {
 			]
 			: [];
 
-		$media_types_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG);
-
-		$specific_fields += ($media_types_enabled)
-			? [
-				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])]
-			]
-			: [
-				'type' =>	['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', array_keys(CFeatureFlagHelper::getSupportedMediaTypes()))]
-			];
-
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
+			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', array_keys(CFeatureFlagHelper::getSupportedMediaTypes()))],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],

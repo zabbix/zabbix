@@ -529,7 +529,7 @@ if ($data['roleid']) {
 
 	// Modules section.
 
-	if (!array_key_exists('modules_config_enabled', $data)) {
+	if ($data['modules_config_disabled']) {
 		$permissions_form_list->addRow(
 			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')
 		);

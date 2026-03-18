@@ -256,39 +256,36 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
-		$data['modules'] = [];
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$data['modules_config_disabled'] = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		$db_modules = $modules_enabled
-			? API::Module()->get([
+		if ($data['modules_config_disabled']) {
+			$data['modules'] = [];
+
+			$db_modules = API::Module()->get([
 				'output' => ['moduleid', 'relative_path', 'status']
-			])
-			: [];
+			]);
 
-		if ($db_modules) {
-			$module_manager = new CModuleManager(APP::getRootDir());
+			if ($db_modules) {
+				$module_manager = new CModuleManager(APP::getRootDir());
 
-			foreach ($db_modules as $db_module) {
-				$manifest = $module_manager->addModule($db_module['relative_path']);
+				foreach ($db_modules as $db_module) {
+					$manifest = $module_manager->addModule($db_module['relative_path']);
 
-				if ($manifest !== null) {
-					$data['modules'][$db_module['moduleid']] = $manifest['name'];
+					if ($manifest !== null) {
+						$data['modules'][$db_module['moduleid']] = $manifest['name'];
+					}
 				}
 			}
-		}
 
-		natcasesort($data['modules']);
+			natcasesort($data['modules']);
 
-		$disabled_modules = array_filter($db_modules,
-			static function (array $db_module): bool {
-				return $db_module['status'] == MODULE_STATUS_DISABLED;
-			}
-		);
+			$disabled_modules = array_filter($db_modules,
+				static function (array $db_module): bool {
+					return $db_module['status'] == MODULE_STATUS_DISABLED;
+				}
+			);
 
-		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
-
-		if (!$modules_enabled) {
-			$data['modules_config_enabled'] = false;
+			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 		}
 
 		$data['js_validation_rules'] = $data['userid'] === null

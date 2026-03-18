@@ -54,7 +54,7 @@ class CAuthentication extends CApiService {
 	 * required.
 	 */
 	public static function getPublic(): array {
-		return (CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)
+		return (CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)
 				? []
 				: ['http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED]) +
 			CApiSettingsHelper::getParameters([
@@ -131,7 +131,7 @@ class CAuthentication extends CApiService {
 			'mfaid' =>						['type' => API_ID]
 		]];
 
-		if (CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)) {
+		if (CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)) {
 			$api_input_rules['fields'] += [
 				'http_auth_enabled' =>		['type' => API_INT32, 'in' => ZBX_AUTH_HTTP_DISABLED.','.ZBX_AUTH_HTTP_ENABLED],
 				'http_login_form' =>		['type' => API_INT32, 'in' => ZBX_AUTH_FORM_ZABBIX.','.ZBX_AUTH_FORM_HTTP],
@@ -260,7 +260,7 @@ class CAuthentication extends CApiService {
 
 		$http_output_fields = ['http_auth_enabled', 'http_login_form', 'http_strip_domains', 'http_case_sensitive'];
 
-		return CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)
+		return CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)
 			? array_merge($output_fields, $http_output_fields)
 			: $output_fields;
 	}

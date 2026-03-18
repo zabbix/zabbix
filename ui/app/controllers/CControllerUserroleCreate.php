@@ -29,9 +29,9 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}']]
 		];
 
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		$specific_fields = $modules_enabled
+		$specific_fields = $module_feature_flag_disabled
 			? [
 				'modules' => ['array', 'required', 'field' => ['boolean']],
 				'modules_default_access' => ['boolean']

@@ -243,6 +243,11 @@ class CLocalApiClient extends CApiClient {
 			return false;
 		}
 
+		if (array_key_exists('feature_flag', $method_rules)
+				&& !CFeatureFlagHelper::isFeatureDisabled($method_rules['feature_flag'])) {
+			return false;
+		}
+
 		$exists_action_rule = array_key_exists('action', $method_rules);
 
 		$name_conditions = 'name LIKE '.zbx_dbstr('api%');
@@ -301,11 +306,6 @@ class CLocalApiClient extends CApiClient {
 			if (!$is_action_allowed) {
 				return false;
 			}
-		}
-
-		if (array_key_exists('feature_flag', $method_rules)
-			&& !CFeatureFlagHelper::isFeatureEnabled($method_rules['feature_flag'])) {
-			return false;
 		}
 
 		if (!$api_methods) {

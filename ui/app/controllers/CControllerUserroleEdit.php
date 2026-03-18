@@ -107,12 +107,12 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'super_admin_role_clone' =>						'in 1'
 		];
 
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		if ($modules_enabled) {
+		if ($module_feature_flag_disabled) {
 			$fields += [
-				'modules' => 									'array',
-				'modules_default_access' => 					'in 0,1'
+				'modules' =>				'array',
+				'modules_default_access' => 'in 0,1'
 			];
 		}
 
@@ -223,9 +223,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 		}
 
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$data['rules']['modules_config_disabled'] = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		$db_modules = $modules_enabled
+		$db_modules = $data['rules']['modules_config_disabled']
 			? API::Module()->get([
 				'output' => ['moduleid', 'relative_path', 'status']
 			])
@@ -239,10 +239,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			);
 
 			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
-		}
-
-		if (!$modules_enabled) {
-			$data['rules']['modules_config_enabled'] = false;
 		}
 
 		$data['labels'] = $this->getLabels($db_modules);
@@ -417,14 +413,14 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	 * @throws APIException
 	 */
 	private function getRulesByRoleid(string $roleid): array {
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
 		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
 			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
 			'services.write.mode', 'services.write.list', 'services.write.tag'
 		];
 
-		if ($modules_enabled) {
+		if ($module_feature_flag_disabled) {
 			$select_rules = array_merge($select_rules, ['modules', 'modules.default_access']);
 		}
 
@@ -470,9 +466,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$rules['service_write_list'] = $input['services.write.list'];
 		$rules['service_write_tag'] = $input['services.write.tag'];
 
-		$modules_enabled = CFeatureFlagHelper::isFeatureEnabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
 
-		if ($modules_enabled) {
+		if ($module_feature_flag_disabled) {
 			foreach ($input['modules'] as $rule) {
 				$rules['modules'][$rule['moduleid']] = $rule['status'];
 			}

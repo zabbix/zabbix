@@ -20,14 +20,11 @@
 class CFeatureFlagHelper {
 
 	public const MODULE_FEATURE_FLAG = 'modules_config_enabled';
-	public const HTTP_AUTH_FEATURE_FLAG = 'http_auth_config_enabled';
-	public const MEDIATYPES_FEATURE_FLAG = 'mediatypes_config_enabled';
-
+	public const HTTP_AUTH_FEATURE_FLAG = 'http_auth_enabled';
+	public const MEDIATYPES_FEATURE_FLAG = 'media_type_denylist';
 
 	public static function getSupportedMediaTypes(): array {
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-		$denied_media_types = $config->getMediatypeFlag();
+		$denied_media_types = APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
 
 		$all_types = [
 			MEDIA_TYPE_EMAIL => 'Email',
@@ -46,24 +43,11 @@ class CFeatureFlagHelper {
 		return array_intersect_key($all_types, array_flip($supported_media_types));
 	}
 
-	public static function isFeatureEnabled($type): bool {
-		$result = true;
-
-		/** @var CConfigFile $config */
-		$config = APP::Component()->get('config');
-
-		if ($type === 'modules_config_enabled') {
-			$result = $config->getModuleFlag();
-		}
-
-		if ($type === 'http_auth_config_enabled') {
-			$result = $config->getHttpAuthFlag();
-		}
-
-		if ($type === 'mediatypes_config_enabled' && $config->getMediatypeFlag() != null) {
-			$result = false;
-		}
-
-		return $result;
+	public static function isFeatureDisabled(string $type): bool {
+		return match ($type) {
+			self::MODULE_FEATURE_FLAG => APP::getConfig()['ZBX_FEATURE_FLAGS'][$type],
+			self::HTTP_AUTH_FEATURE_FLAG => APP::getConfig()['ZBX_FEATURE_FLAGS'][$type],
+			self::MEDIATYPES_FEATURE_FLAG => APP::getConfig()['ZBX_FEATURE_FLAGS'][$type] != null
+		};
 	}
 }
