@@ -630,6 +630,17 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
+static int	DBpatch_7050051(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+			"('banner_data',1,'',0)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -687,5 +698,6 @@ DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
 DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
+DBPATCH_ADD(7050051, 0, 1)
 
 DBPATCH_END()

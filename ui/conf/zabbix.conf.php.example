@@ -63,6 +63,9 @@ $SSO['CERT_STORAGE']		= 'database';
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
 
+// If set to false, support for banners will be disabled.
+// $ALLOW_BANNERS = true;
+
 $ZBX_SERVER_TLS['ACTIVE'] = '0';
 $ZBX_SERVER_TLS['CA_FILE'] = '';
 $ZBX_SERVER_TLS['KEY_FILE'] = '';

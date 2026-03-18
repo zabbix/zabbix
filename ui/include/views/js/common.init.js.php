@@ -37,7 +37,7 @@
 	 *
 	 * @param {string} 	idx					User profile index
 	 * @param {string} 	value				Value
-	 * @param {object} 	idx2				An array of IDs
+	 * @param {Array} 	idx2				An array of IDs
 	 * @param {int} 	profile_type		Profile type
 	 */
 	function updateUserProfile(idx, value, idx2, profile_type = PROFILE_TYPE_INT) {

@@ -32,6 +32,8 @@ const ZBX_STYLE_BTN_ICON = 'btn-icon';
 const ZBX_STYLE_BTN_LINK = 'btn-link';
 const ZBX_STYLE_BTN_SMALL = 'btn-small';
 
+const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
+
 const ZBX_STYLE_OVERLAY_DIALOGUE_HEADER = 'overlay-dialogue-header';
 
 const ZBX_STYLE_GRID_COLUMN_FIRST = 'column-first';
@@ -105,6 +107,7 @@ const ZBX_ICON_CHEVRON_RIGHT = 'zi-chevron-right';
 const ZBX_ICON_CHEVRON_UP = 'zi-chevron-up';
 const ZBX_ICON_COG_FILLED = 'zi-cog-filled';
 const ZBX_ICON_COPY = 'zi-copy';
+const ZBX_ICON_CROSS = 'zi-cross';
 const ZBX_ICON_EYE_OFF = 'zi-eye-off';
 const ZBX_ICON_FILTER = 'zi-filter';
 const ZBX_ICON_HELP_SMALL = 'zi-help-small';
@@ -121,6 +124,7 @@ const ZBX_ICON_REMOVE_SMALLER = 'zi-remove-smaller';
 const ZBX_ICON_SEARCH_LARGE = 'zi-search-large';
 const ZBX_ICON_SPEAKER = 'zi-speaker';
 const ZBX_ICON_SPEAKER_OFF = 'zi-speaker-off';
+const ZBX_ICON_TIMES = 'zi-times';
 const ZBX_ICON_TEXT = 'zi-text';
 const ZBX_ICON_WIDGET_AWAITING_DATA_LARGE = 'zi-widget-awaiting-data-large';
 const ZBX_ICON_WIDGET_EMPTY_REFERENCES_LARGE = 'zi-widget-empty-references-large';

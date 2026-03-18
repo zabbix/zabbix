@@ -192,6 +192,10 @@ class CConfigFile {
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
+		if (isset($ALLOW_BANNERS)) {
+			$this->config['ALLOW_BANNERS'] = $ALLOW_BANNERS;
+		}
+
 		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
 			if (array_key_exists('ACTIVE', $ZBX_SERVER_TLS)) {
 				$this->config['ZBX_SERVER_TLS']['ACTIVE'] = $ZBX_SERVER_TLS['ACTIVE'];
@@ -225,7 +229,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+			$ALLOW_HTTP_AUTH, $ALLOW_BANNERS, $ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -235,6 +239,7 @@ class CConfigFile {
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
+		$ALLOW_BANNERS = $this->config['ALLOW_BANNERS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -341,6 +346,9 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
 
+// If set to false, support for banners will be disabled.
+// $ALLOW_BANNERS = true;
+
 $ZBX_SERVER_TLS[\'ACTIVE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['ACTIVE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['KEY_FILE'], "'\\").'\';
@@ -381,6 +389,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;
+		$this->config['ALLOW_BANNERS'] = true;
 		$this->config['ZBX_SERVER_TLS'] = [
 			'ACTIVE' => 0,
 			'CA_FILE' => '',

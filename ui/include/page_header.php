@@ -13,7 +13,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-global $page;
+global $ALLOW_BANNERS, $page;
 
 if (!isset($page['type'])) {
 	$page['type'] = PAGE_TYPE_HTML;
@@ -133,6 +133,10 @@ if ($page['type'] == PAGE_TYPE_HTML) {
 
 				if (CSettingsHelper::isSoftwareUpdateCheckEnabled()) {
 					$page['scripts'][] = 'class.software-version-check.js';
+				}
+
+				if ($ALLOW_BANNERS && $page['web_layout_mode'] != ZBX_LAYOUT_KIOSKMODE) {
+					$page['scripts'][] = 'class.banner.js';
 				}
 			}
 		}

@@ -87,6 +87,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.user.token.filter.active':
 				case 'web.usergroup.filter.active':
 				case 'web.web.filter.active':
+				case 'web.banner.dismissed_ids':
 					$ret = true;
 					break;
 
@@ -107,6 +108,7 @@ class CControllerProfileUpdate extends CController {
 				case 'web.dashboard.last_widget_type':
 				case 'web.dashboard.widget.geomap.default_view':
 				case 'web.dashboard.widget.geomap.severity_filter':
+				case 'web.banner.dismissed_ids':
 					$ret = $this->hasInput('value_str');
 					break;
 
@@ -134,6 +136,7 @@ class CControllerProfileUpdate extends CController {
 		switch ($idx) {
 			// PROFILE_TYPE_STR
 			case 'web.dashboard.last_widget_type':
+			case 'web.banner.dismissed_ids':
 				$value_str = $this->getInput('value_str');
 				if ($value_str === '') {
 					CProfile::delete($idx);
