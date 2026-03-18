@@ -135,8 +135,7 @@
 					new CDataTableColumn('linked_to_templates', <?= json_encode(_('Linked to templates')); ?>)
 						.setFields(['templates'])
 						.setRenderer('linked_to_templates'),
-					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
-						.setFields(['tags']),
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
 				])
 				.setPage(page)

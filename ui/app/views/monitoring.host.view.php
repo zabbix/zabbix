@@ -110,6 +110,14 @@ $html_page
 	])
 	->show();
 
+(new CTemplateTag('tagvalue'))
+	->addItem([
+		(new CLabel(_('Tag name'), 'tag_name'))
+			->addClass('form-label'),
+		new CFormField(new CTextBox('tag_name'))
+	])
+	->show();
+
 (new CScriptTag('
 	view.init('.json_encode([
 		'layout_mode' => $web_layout_mode,
