@@ -47,6 +47,8 @@ void	zbx_mock_test_entry(void **state)
 	dc_sync_settings(&settings_sync, in_revision, ZBX_PROGRAM_TYPE_SERVER);
 
 out:
+	zbx_dbsync_clear(&settings_sync);
+
 	zbx_config_wlock_set_unlocked();
 
 	zbx_mock_assert_int_eq("return value", exp_result, result);
