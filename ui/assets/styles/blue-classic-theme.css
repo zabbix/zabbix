@@ -2679,10 +2679,6 @@ button {
           height: 16px; }
           .datatable .cell.cell-checkbox .checkbox-radio + label span {
             margin: 0; }
-    .datatable .cell.cell-resizing:not(.cell-bg) {
-      background-color: #e8f5ff; }
-      .datatable .cell.cell-resizing:not(.cell-bg) .datatable-context-link {
-        background-color: #e8f5ff; }
     .datatable .cell.cell-timeline {
       padding-right: 0; }
   .datatable.datatable-resizing {

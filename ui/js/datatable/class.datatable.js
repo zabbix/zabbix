@@ -1225,8 +1225,7 @@ class CDataTable {
 
 		document.querySelector('.sidebar').style.pointerEvents = 'none';
 
-		[...this.#findHeaderCells(column_index), ...this.#findDataCells(column_index)]
-			.forEach(cell => cell.classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING));
+		this.#findHeaderCell(column_index).classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING);
 
 		window.addEventListener('mousemove', this.onResizeMouseMove);
 		window.addEventListener('mouseup', this.onResizeMouseUp);
@@ -1246,8 +1245,7 @@ class CDataTable {
 
 		const column_index = column_config.getColumnIndex();
 
-		[...this.#findHeaderCells(column_index), ...this.#findDataCells(column_index)]
-			.forEach(cell => cell.classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING));
+		this.#findHeaderCell(column_index).classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING);
 
 		this.#resizing = false;
 		this.#resize_column_index = -1;

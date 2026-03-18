@@ -693,16 +693,6 @@
 			}
 		}
 
-		&.cell-resizing {
-			&:not(.cell-bg) {
-				background-color: $ui-hover-bg-color;
-
-				.datatable-context-link {
-					background-color: $ui-hover-bg-color;
-				}
-			}
-		}
-
 		&.cell-timeline {
 			padding-right: 0;
 		}
