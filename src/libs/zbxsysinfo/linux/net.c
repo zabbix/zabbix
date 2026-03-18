@@ -1244,13 +1244,11 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
  ******************************************************************************/
 static void	if_type_add(const char *ifname, struct zbx_json *j)
 {
-#define ARPHRD_VOID	0xFFFF
 #define ARPHRD_LOOPBACK	772
-#define JSON_KEY_TYPE	"type"
 #define VIRTFN_PFX	"virtfn"
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
-	int		type = ARPHRD_VOID;
+	int		type = 0;
 	zbx_stat_t	st;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/type", ifname);
@@ -1264,7 +1262,7 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 
 	if (ARPHRD_LOOPBACK == type)
 	{
-		zbx_json_addstring(j, JSON_KEY_TYPE, "loopback", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, ZBX_PROTO_TAG_TYPE, "loopback", ZBX_JSON_TYPE_STRING);
 		return;
 	}
 
@@ -1291,15 +1289,13 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 
 		if (0 == found)
 		{
-			zbx_json_addstring(j, JSON_KEY_TYPE, "physical", ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(j, ZBX_PROTO_TAG_TYPE, "physical", ZBX_JSON_TYPE_STRING);
 			return;
 		}
 	}
 
-	zbx_json_addstring(j, JSON_KEY_TYPE, "virtual", ZBX_JSON_TYPE_STRING);
-#undef ARPHRD_VOID
+	zbx_json_addstring(j, ZBX_PROTO_TAG_TYPE, "virtual", ZBX_JSON_TYPE_STRING);
 #undef ARPHRD_LOOPBACK
-#undef JSON_KEY_TYPE
 #undef VIRTFN_PFX
 }
 
