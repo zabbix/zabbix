@@ -34,6 +34,8 @@ class CAudit {
 	public const ACTION_HISTORY_CLEAR = 10;
 	public const ACTION_CONFIG_REFRESH = 11;
 	public const ACTION_PUSH = 12;
+	public const ACTION_INIT = 13;
+	public const ACTION_ONBOARD = 14;
 
 	/**
 	 * Audit resources.
@@ -87,6 +89,7 @@ class CAudit {
 	public const RESOURCE_MFA = 54;
 	public const RESOURCE_PROXY_GROUP = 55;
 	public const RESOURCE_LLD_RULE_PROTOTYPE = 56;
+	public const RESOURCE_DEVICE = 57;
 
 	/**
 	 * Audit details actions.
@@ -116,6 +119,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DEVICE => 'device',
 		self::RESOURCE_LLD_RULE => 'items',
 		self::RESOURCE_LLD_RULE_PROTOTYPE => 'items',
 		self::RESOURCE_HOST => 'hosts',
@@ -168,6 +172,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'name',
 		self::RESOURCE_CORRELATION => 'name',
 		self::RESOURCE_DASHBOARD => 'name',
+		self::RESOURCE_DEVICE => 'name',
 		self::RESOURCE_LLD_RULE => 'name',
 		self::RESOURCE_LLD_RULE_PROTOTYPE => 'name',
 		self::RESOURCE_HOST => 'host',
@@ -212,6 +217,7 @@ class CAudit {
 		self::RESOURCE_CONNECTOR => 'connector',
 		self::RESOURCE_CORRELATION => 'correlation',
 		self::RESOURCE_DASHBOARD => 'dashboard',
+		self::RESOURCE_DEVICE => 'device',
 		self::RESOURCE_LLD_RULE => 'discoveryrule',
 		self::RESOURCE_LLD_RULE_PROTOTYPE => 'discoveryruleprototype',
 		self::RESOURCE_HOST => 'host',
@@ -720,7 +726,9 @@ class CAudit {
 
 				foreach ($objects as $object) {
 					$resourceid = $object[$pk];
-					$db_object = $action == self::ACTION_UPDATE ? $db_objects[$resourceid] : [];
+					$db_object = $action == self::ACTION_UPDATE || $action == self::ACTION_ONBOARD
+						? $db_objects[$resourceid]
+						: [];
 					$diff = self::handleObjectDiff($resource, $action, $object, $db_object);
 
 					if ($action == self::ACTION_UPDATE && !$diff) {
@@ -805,7 +813,7 @@ class CAudit {
 	 * @return array
 	 */
 	private static function handleObjectDiff(int $resource, int $action, array $object, array $db_object): array {
-		if (!in_array($action, [self::ACTION_ADD, self::ACTION_UPDATE])) {
+		if (!in_array($action, [self::ACTION_ADD, self::ACTION_UPDATE, self::ACTION_INIT, self::ACTION_ONBOARD])) {
 			return [];
 		}
 
@@ -814,9 +822,11 @@ class CAudit {
 
 		switch ($action) {
 			case self::ACTION_ADD:
+			case self::ACTION_INIT:
 				return self::handleAdd($resource, $details);
 
 			case self::ACTION_UPDATE:
+			case self::ACTION_ONBOARD:
 				self::intersectObjectFields($api_name, $db_object, $object);
 
 				$db_details = self::convertKeysToPaths($api_name, $db_object);
