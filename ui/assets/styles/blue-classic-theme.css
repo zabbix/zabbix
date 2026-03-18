@@ -1325,6 +1325,9 @@ footer {
   .form-grid .btn-icon.btn-small {
     top: 1px;
     vertical-align: text-bottom; }
+  .form-grid.form-subgrid {
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1; }
 
 button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-grey-icon, .btn-link, .btn-overlay-close, .btn-debug {
   position: relative;
@@ -2418,6 +2421,13 @@ div[data-field-type="set"].has-error {
   padding-left: 5px;
   width: min-content;
   border: 1px solid #cc0000; }
+
+div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {
+  border: 1px solid #cc0000;
+  color: #ffffff; }
+div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]):checked + label span::after {
+  border-left-color: #cc0000;
+  border-bottom-color: #cc0000; }
 
 .radio-list-control.has-error input[type="radio"] + label {
   border-color: #cc0000; }
@@ -5310,6 +5320,22 @@ div.dashboard-widget-itemcard .item-card {
           div.dashboard-widget-itemcard .item-card .sections .section.section-tags .tags .btn-icon {
             height: 14px;
             margin-top: 2px; }
+
+.dashboard-widget-itemcard-hintbox-image .dashboard-widget-itemhcard-hintbox {
+  overflow: hidden; }
+.dashboard-widget-itemcard-hintbox-image.is-loading {
+  min-width: 100px;
+  min-height: 56px; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading::before {
+    content: ' '; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading img {
+    opacity: 0; }
+.dashboard-widget-itemcard-hintbox-image img {
+  display: block;
+  max-width: 50vw;
+  max-height: 50vh;
+  opacity: 1;
+  transition: opacity 0.3s ease-out; }
 
 form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
   max-width: 250px; }
