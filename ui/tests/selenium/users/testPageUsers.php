@@ -822,7 +822,7 @@ class testPageUsers extends CWebTest {
 			'type' => MFA_TYPE_TOTP,
 			'name' => 'Users page TOTP',
 			'hash_function' => TOTP_HASH_SHA1,
-			'code_length' => '6'
+			'code_length' => TOTP_CODE_LENGTH_6
 		])['mfaids'][0];
 
 		CDataHelper::call('authentication.update', [
@@ -830,20 +830,28 @@ class testPageUsers extends CWebTest {
 		]);
 
 		CDataHelper::call('usergroup.update', [
-			'usrgrpid' => CDataHelper::get('LoginUsers.usrgrpids.LDAP user group'),
-			'mfa_status' => MFA_ENABLED,
-			'mfaid' => self::$mfaid
+			[
+				'usrgrpid' => CDataHelper::get('LoginUsers.usrgrpids.LDAP user group'),
+				'mfa_status' => MFA_ENABLED,
+				'mfaid' => self::$mfaid
+			],
+			[
+				'usrgrpid' => CDataHelper::get('UserPermissions.usrgrpids.Selenium user group for tag permissions AAA'),
+				'mfa_status' => MFA_DISABLED
+			]
 		]);
 
 		self::$mfa_secrets = [
+			// User that should preserve his TOTP secret after test execution.
 			[
 				'mfa_totp_secretid' => '123',
 				'mfaid' => self::$mfaid,
-				'userid' => CDataHelper::get('LoginUsers.userids.test-user'),
+				'userid' => CDataHelper::get('LoginUsers.userids.user-for-blocking'),
 				'totp_secret' => 'MAVQ3SNOTLEUMOARF22NOVSDH6JBNXUC',
 				'status' => MFA_ENABLED,
 				'used_codes' => ',123123,321321'
 			],
+			// User for TOTP secret reset with usergroup and MFA enabled.
 			[
 				'mfa_totp_secretid' => '124',
 				'mfaid' => self::$mfaid,
@@ -851,6 +859,24 @@ class testPageUsers extends CWebTest {
 				'totp_secret' => '76PDQKY7K2ZXF5N6JELVK4Q7OUSHZIPL',
 				'status' => MFA_ENABLED,
 				'used_codes' => ',456456'
+			],
+			// User for TOTP secret reset with usergroup and MFA disabled.
+			[
+				'mfa_totp_secretid' => '125',
+				'mfaid' => self::$mfaid,
+				'userid' => CDataHelper::get('UserPermissions.userids.Tag-user'),
+				'totp_secret' => '32DDACU8J1XZE9M5IQWAC5P8LOANGJRK',
+				'status' => MFA_DISABLED,
+				'used_codes' => ',987654'
+			],
+			// User for TOTP secret reset without a usergroup and MFA enabled.
+			[
+				'mfa_totp_secretid' => '126',
+				'mfaid' => self::$mfaid,
+				'userid' => CDataHelper::get('LoginUsers.userids.test-user'),
+				'totp_secret' => 'NBWR4CMADMIYNAOPE33MABCBN5IDMZOS',
+				'status' => MFA_ENABLED,
+				'used_codes' => ',543210,102345'
 			]
 		];
 
@@ -876,7 +902,7 @@ class testPageUsers extends CWebTest {
 		$this->query('name:zbx_filter')->one()->query('button:Reset')->waitUntilClickable()->one()->click();
 
 		// Reset TOTP secret for 3 users, only one of which actually has a TOTP secret defined.
-		$this->selectTableRows(['user-zabbix', 'guest', 'LDAP user'], 'Username');
+		$this->selectTableRows(['user-zabbix', 'guest', 'LDAP user', 'Tag-user', 'test-user'], 'Username');
 		$this->query('button:Reset TOTP secret')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
@@ -884,9 +910,8 @@ class testPageUsers extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'TOTP secret reset successful.');
 		$this->assertSelectedCount(0);
 
-		// Check that MFA secret of user "LDAP user" is removed from DB, and that secret of test-user is unchanged.
-		unset(self::$mfa_secrets[1]);
-		$this->assertEquals(self::$mfa_secrets, CDBHelper::getAll($secret_sql));
+		// Check that MFA secrets of selected users are removed from DB, and that secret of user-for-blocking is unchanged.
+		$this->assertEquals([self::$mfa_secrets[0]], CDBHelper::getAll($secret_sql));
 	}
 
 
