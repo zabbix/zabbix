@@ -1849,9 +1849,16 @@ class CDataTable {
 	}
 
 	#duplicateColumnConfig(column_config, user_column_config = {}) {
+		const id = column_config.getId();
+		const name = this.#columns.find(column_config => column_config.getId() === id).getName();
+
+		const duplicate_count = this.#columns
+			.filter(column_config => column_config.getName().replace(/\s*\(\d+\)$/g, '') === name)
+			.length;
+
 		const defaults = column_config.clone()
 			.setDuplicate(false)
-			.setName(`${column_config.getName()} ` + t('duplicate'))
+			.setName(`${name} (${duplicate_count})`)
 			.setSpan(1);
 
 		return defaults.clone()
