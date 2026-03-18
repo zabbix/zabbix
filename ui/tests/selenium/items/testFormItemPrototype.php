@@ -18,12 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemGeneral.php';
 require_once dirname(__FILE__).'/../../../include/classes/api/services/CItemPrototype.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -2276,7 +2275,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestClickLinkTextWait($itemName);
 			}
 
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+			$this->query('id:name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('name', $itemName);
 			$this->zbxTestAssertElementValue('key', $keyName);
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");

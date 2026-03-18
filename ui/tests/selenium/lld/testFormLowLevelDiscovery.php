@@ -18,10 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup items
@@ -1694,7 +1693,7 @@ class testFormLowLevelDiscovery extends CLegacyWebTest {
 				$dbName = $name;
 			}
 			$this->zbxTestClickLinkTextWait($dbName);
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+			$this->query('id:name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('name', $name);
 			$this->zbxTestAssertElementValue('key', $key);
 			$this->zbxTestAssertElementPresentXpath("//z-select[@id='type']//li[text()='$type']");

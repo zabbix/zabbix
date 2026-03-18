@@ -18,9 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * @backup items
@@ -35,9 +34,9 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/*
 	 * Check form fields after create or update item.
 	 */
-	private function checkFormFields($rows) {
+	protected function checkFormFields($rows) {
 		$this->zbxTestClickLinkTextWait($rows['Name']);
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('name'));
+		$this->query('id:name')->waitUntilVisible()->one();
 
 		foreach ($rows as $field_name => $value) {
 			$field_xpath = '//label[text()="'.$field_name.'"]/../..//*[@id]';
@@ -61,7 +60,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Add, update, delete query or headers fields.
 	 */
-	private function processPairFields($rows, $id_part) {
+	protected function processPairFields($rows, $id_part) {
 		foreach ($rows as $i => $field_pair) {
 			$i++;
 
@@ -69,16 +68,16 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 				case 'add':
 					if (!$this->zbxTestElementPresentId($id_part.'_name_'.$i)) {
 						$this->zbxTestClickXpathWait('//div[contains(@id, "'.$id_part.'")]//button[@data-row-action="add_row"]');
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i));
+						$this->query('id', $id_part.'_name_'.$i)->waitUntilVisible()->one();
 					}
 					// break is not missing here.
 				case 'update':
 					if (array_key_exists('name', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_name_'.$i));
+						$this->query('id', $id_part.'_name_'.$i)->waitUntilVisible()->one();
 						$this->zbxTestInputType($id_part.'_name_'.$i, $field_pair['name']);
 					}
 					if (array_key_exists('value', $field_pair)) {
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id($id_part.'_value_'.$i));
+						$this->query('id', $id_part.'_name_'.$i)->waitUntilVisible()->one();
 						$this->zbxTestInputType($id_part.'_value_'.$i, $field_pair['value']);
 					}
 					break;
@@ -93,7 +92,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Parse url and check result in query fields.
 	 */
-	private function parseUrlAndCheckQuery($rows, $parsed_url = false) {
+	protected function parseUrlAndCheckQuery($rows, $parsed_url = false) {
 		$this->zbxTestClick('httpcheck_parseurl');
 
 		foreach ($rows as $i => $parsed_query) {
@@ -301,7 +300,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/*
 	 * Test form validation.
 	 */
-	private function executeValidation($data, $action) {
+	protected function executeValidation($data, $action) {
 		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');
 
 		switch ($action) {
@@ -1337,7 +1336,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 	/**
 	 * Cancel updating, cloning or deleting of HTTP agent item.
 	 */
-	private function executeCancelAction($action) {
+	protected function executeCancelAction($action) {
 		$sql_hash = 'SELECT * FROM items ORDER BY itemid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 		$this->zbxTestLogin('items.php?filter_set=1&filter_hostids[0]='.self::HOSTID.'&context=host');

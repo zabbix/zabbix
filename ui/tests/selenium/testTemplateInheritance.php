@@ -20,8 +20,6 @@
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
  *
@@ -443,7 +441,7 @@ class testTemplateInheritance extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//a[text()='Test LLD trigger']/parent::td", "$this->templateName: Test LLD trigger");
 		$this->zbxTestClickLinkTextWait('Test LLD trigger');
 
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('description'));
+		$this->query('id:description')->waitUntilVisible()->one();
 		$getName = $this->zbxTestGetValue("//input[@name='description']");
 		$this->assertEquals($getName, 'Test LLD trigger');
 		$this->zbxTestAssertElementValue('expression', 'last(/Template inheritance test host/item-discovery-prototype,#1)=0');
