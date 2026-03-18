@@ -10288,7 +10288,7 @@ return [
 				'ref_field' => 'userid'
 			],
 			'tokenid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'token',
