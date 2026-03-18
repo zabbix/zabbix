@@ -156,6 +156,7 @@ function getMappingEntryView(string $sortorder, string $expression, string $icon
 			)
 		)
 		->addItem((new CCol())
+			->addClass(ZBX_STYLE_ALIGN_TOP)
 			->addItem((new CTextAreaFlexible("mappings[$sortorder][expression]", $expression))
 				->setErrorContainer('mapping-'.$sortorder.'-error-container')
 				->setErrorLabel(_('Expression'))
