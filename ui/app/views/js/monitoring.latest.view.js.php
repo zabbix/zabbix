@@ -220,6 +220,8 @@
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
 				.setTabFilterItem(this.active_filter)
+				.setStickyHeaders(true)
+				.setStickyFooter(true)
 				.setRenderer('host', ({column_data, cell_inner}) => {
 					const [host, maintenance] = column_data;
 

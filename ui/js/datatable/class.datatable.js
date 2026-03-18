@@ -606,7 +606,7 @@ class CDataTable {
 		this.#footer.classList.add(CDataTable.ZBX_STYLE_FOOTER);
 
 		if (this.#sticky_footer) {
-			this.#headers.classList.add(CDataTable.ZBX_STYLE_FOOTER_STICKY);
+			this.#footer.classList.add(CDataTable.ZBX_STYLE_FOOTER_STICKY);
 		}
 
 		const selected_count = document.createElement('div');

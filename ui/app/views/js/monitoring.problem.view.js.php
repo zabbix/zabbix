@@ -161,6 +161,8 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
+				.setStickyHeaders(true)
+				.setStickyFooter(true)
 				.setRenderer(CDataTableColumn.CHECKBOX, ({column_config, column_data, row_index, cell, cell_inner}) => {
 					const [eventid, nested, symptom_count, cause_eventid, severity] = column_data;
 

@@ -145,6 +145,8 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
+				.setStickyHeaders(true)
+				.setStickyFooter(true)
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [templateid, name] = column_data;
 

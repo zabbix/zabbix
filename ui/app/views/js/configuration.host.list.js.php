@@ -304,6 +304,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
+				.setStickyHeaders(true)
+				.setStickyFooter(true)
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [hostid, name, discovery, flags, maintenance, status] = column_data;
 
