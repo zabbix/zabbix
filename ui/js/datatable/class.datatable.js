@@ -71,7 +71,7 @@ class CDataTable {
 	 *
 	 * @type {number}
 	 */
-	static RESIZE_MIN_WIDTH = 32;
+	static RESIZE_MIN_WIDTH = 37;
 
 	/**
 	 * Delay in milliseconds before `#resize_click_count` is reset.
@@ -1182,6 +1182,9 @@ class CDataTable {
 		let min_width = CDataTable.RESIZE_MIN_WIDTH;
 		if (column_config.getContextPopupHandler()) {
 			min_width *= 2;
+		}
+		if (column_config.isSortable()) {
+			min_width += 10;
 		}
 
 		const min_width_percent = (min_width / total_width) * 100;
