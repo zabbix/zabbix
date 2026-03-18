@@ -2032,12 +2032,15 @@ class CUser extends CApiService {
 			'where' => ['userid' => $userids]
 		]);
 
-		$tokenids = DB::select('token', [
-			'output' => [],
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'name'],
 			'filter' => ['userid' => $userids],
 			'preservekeys' => true
 		]);
-		CToken::deleteForce(array_keys($tokenids));
+
+		if ($db_tokens) {
+			CToken::deleteForce($db_tokens);
+		}
 
 		DB::delete('users', ['userid' => $userids]);
 
@@ -3026,7 +3029,11 @@ class CUser extends CApiService {
 	private static function tokenAuthentication(string $auth_token, int $time): array {
 		$db_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
-			'filter' => ['token' => hash('sha512', $auth_token), 'status' => ZBX_AUTH_TOKEN_ENABLED]
+			'filter' => [
+				'auth_type' => ZBX_AUTH_TOKEN_TYPE_BEARER,
+				'status' => ZBX_AUTH_TOKEN_ENABLED,
+				'token' => hash('sha512', $auth_token)
+			]
 		]);
 
 		if (!$db_tokens) {

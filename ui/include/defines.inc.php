@@ -1676,6 +1676,9 @@ define('API_ERR_DISCOVERED', 1);
 define('API_OUTPUT_EXTEND',		'extend');
 define('API_OUTPUT_COUNT',		'count');
 
+define('ZBX_AUTH_TOKEN_TYPE_BEARER',	0);
+define('ZBX_AUTH_TOKEN_TYPE_DPOP',		1);
+
 define('ZBX_AUTH_TOKEN_ENABLED', 0);
 define('ZBX_AUTH_TOKEN_DISABLED', 1);
 
