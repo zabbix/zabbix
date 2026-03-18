@@ -120,7 +120,7 @@ class CHttpRequest {
 		$auth_header = $this->header('AUTHORIZATION');
 
 		if (is_string($auth_header)) {
-			$auth_type = explode(' ', $auth_header, 1)[0];
+			$auth_type = explode(' ', $auth_header)[0];
 
 			$auth_data['type'] = $auth_type;
 			$auth_data['auth'] = substr($auth_header, strlen($auth_type) + 1);

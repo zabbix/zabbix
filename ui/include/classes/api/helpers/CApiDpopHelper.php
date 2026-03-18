@@ -33,6 +33,8 @@ class CApiDpopHelper {
 
 		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
 
+		JWT::$timestamp = $check_time;
+
 		try {
 			JWT::decode($signature, $key);
 		}

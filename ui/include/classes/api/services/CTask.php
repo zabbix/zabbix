@@ -144,8 +144,8 @@ class CTask extends CApiService {
 		$sql_parts['where'][] = dbConditionInt($table_alias.'.type', $allowed_types);
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sql_parts['join']['td2'] = ['table' => 'task_device', 'using' => 'taskid'];
-			$sql_parts['join']['d2'] = ['left_table' => 'td2', 'table' => 'device', 'using' => 'deviceid'];
+			$sql_parts['join']['tdi2'] = ['table' => 'task_device_init', 'using' => 'taskid'];
+			$sql_parts['join']['d2'] = ['left_table' => 'tdi2', 'table' => 'device', 'using' => 'deviceid'];
 			$sql_parts['where'][] = dbConditionId('d2.userid', [self::$userData['userid']]);
 		}
 
@@ -496,9 +496,9 @@ class CTask extends CApiService {
 
 			$sql_parts = $this->addQuerySelect('req.data AS request_data', $sql_parts);
 
-			$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'task_device', 'using' => 'taskid'];
+			$sql_parts['join']['tdi'] = ['type' => 'left', 'table' => 'task_device_init', 'using' => 'taskid'];
 
-			$sql_parts = $this->addQuerySelect('td.deviceid', $sql_parts);
+			$sql_parts = $this->addQuerySelect('tdi.deviceid', $sql_parts);
 		}
 
 		if ($this->outputIsRequested('result', $options['output'])) {
@@ -508,13 +508,13 @@ class CTask extends CApiService {
 			$sql_parts = $this->addQuerySelect('resp.info AS result_info', $sql_parts);
 			$sql_parts = $this->addQuerySelect('resp.status AS result_status', $sql_parts);
 
-			$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'task_device', 'using' => 'taskid'];
+			$sql_parts['join']['tdi'] = ['type' => 'left', 'table' => 'task_device_init', 'using' => 'taskid'];
 
-			$sql_parts = $this->addQuerySelect('td.mobile_enrollment_token', $sql_parts);
-			$sql_parts = $this->addQuerySelect('td.bridge_enrollment_key', $sql_parts);
-			$sql_parts = $this->addQuerySelect('td.enrollment_url', $sql_parts);
-			$sql_parts = $this->addQuerySelect('td.status AS task_device_status', $sql_parts);
-			$sql_parts = $this->addQuerySelect('td.info AS task_device_info', $sql_parts);
+			$sql_parts = $this->addQuerySelect('tdi.mobile_enrollment_token', $sql_parts);
+			$sql_parts = $this->addQuerySelect('tdi.bridge_enrollment_key', $sql_parts);
+			$sql_parts = $this->addQuerySelect('tdi.enrollment_url', $sql_parts);
+			$sql_parts = $this->addQuerySelect('tdi.status AS task_device_status', $sql_parts);
+			$sql_parts = $this->addQuerySelect('tdi.info AS task_device_info', $sql_parts);
 		}
 
 		return $sql_parts;

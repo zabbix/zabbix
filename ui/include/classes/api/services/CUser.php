@@ -3014,7 +3014,7 @@ class CUser extends CApiService {
 		$db_token = self::tokenAuthentication($params['token'], ZBX_API_HEADER_AUTHENTICATE_DPOP, $time);
 
 		$resource = DBselect(
-			'SELECT d.deviceid,dk.key_,dk.kid,dk.scope'.
+			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
 			' FROM device d'.
 			' JOIN device_key dk ON dk.deviceid=d.deviceid'.
 			' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
@@ -3023,7 +3023,7 @@ class CUser extends CApiService {
 		);
 
 		$keys_per_scope = [];
-		$deviceid = '';
+		$uuid = '';
 
 		while ($db_device_key = DBfetch($resource)) {
 			$keys_per_scope[$db_device_key['scope']] = [
@@ -3031,7 +3031,7 @@ class CUser extends CApiService {
 				'key' => $db_device_key['key_']
 			];
 
-			$deviceid = $db_device_key['deviceid'];
+			$uuid = $db_device_key['uuid'];
 		}
 
 		if (!($keys_per_scope && count($keys_per_scope) == 2)) {
@@ -3056,7 +3056,7 @@ class CUser extends CApiService {
 			'where' => ['tokenid' => $db_token['tokenid']]
 		]);
 
-		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $deviceid] +
+		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $uuid] +
 			$keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY];
 
 		unset($db_user['ugsetid']);

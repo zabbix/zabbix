@@ -139,7 +139,7 @@ class CDevice extends CApiService {
 
 		DB::update('device', [
 			'values' => [
-				'name' => $options['device_name'],
+				'name' => $options['name'],
 				'tokenid' =>$db_token['tokenid'],
 				'push_token' => $options['push_token'],
 				'status' => self::DEVICE_STATUS_ENABLED
@@ -276,12 +276,12 @@ class CDevice extends CApiService {
 	}
 
 	private static function getJwkValidationRules(): array {
-		return ['type' => API_OBJECT, 'flags' => API_REQUIRED, 'fields' => [
-			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => ['P-256']],
-			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => ['EC']],
+		return ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'P-256'],
+			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'EC'],
 			'kid' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'x' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 32],
-			'y' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => 32]
+			'x' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'y' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 	}
 
