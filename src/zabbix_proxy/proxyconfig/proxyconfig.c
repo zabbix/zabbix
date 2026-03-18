@@ -462,6 +462,7 @@ stop:
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free();
 #endif
+	zbx_db_close();
 	zbx_supervisor_update_activity("%s [terminated]", process_title);
 
 	zbx_free(process_title);
