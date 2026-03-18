@@ -355,8 +355,6 @@ class CDataTableContextPopup {
 		const popup_rect = this.#element.getBoundingClientRect();
 		const offset_top = wrapper.scrollTop + this.#datatable.getElement().getBoundingClientRect().top;
 
-		this.#element.style.maxHeight = `${wrapper.scrollHeight - popup_rect.top}px`;
-
 		if (handle_rect.left + popup_rect.width > window.innerWidth) {
 			this.#element.style.right = `${element_rect.right - handle_rect.right - 1}px`;
 		}
@@ -379,7 +377,7 @@ class CDataTableContextPopup {
 	onClickOutside = event => {
 		const elements = [this.#handle, this.#element];
 
-		if (event.target == this.#element) {
+		if (!event.target.parentElement || event.target == this.#element) {
 			return;
 		}
 

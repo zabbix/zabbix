@@ -953,6 +953,8 @@ class CDataTable {
 
 		this.updateUserConfig();
 
+		this.#context_popup_updated = true;
+
 		this.dispatchEvent(CDataTable.EVENT_INIT, {
 			onSuccess: () => requestAnimationFrame(() => this.#scrollToColumn(column_index))
 		});
@@ -1382,11 +1384,14 @@ class CDataTable {
 	}
 
 	onScroll() {
+		console.log(this.#context_popup_updated);
 		if (this.#context_popup_updated) {
 			this.#context_popup_updated = false;
 
 			return;
 		}
+
+		console.log('here');
 
 		this.#context_popup?.dispatchEvent(CDataTableContextPopup.EVENT_CLOSE);
 
