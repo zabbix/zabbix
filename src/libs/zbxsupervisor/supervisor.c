@@ -661,6 +661,22 @@ static zbx_supervisor_unit_t	*supervisor_get_unit(zbx_supervisor_t *sv, unsigned
 	return &sv->unitsets[type].units[num - 1];
 }
 
+static int	unit_is_running(void *args)
+{
+	_Atomic zbx_supervisor_runstate_t	*runstate = (_Atomic zbx_supervisor_runstate_t *)args;
+
+	return UNIT_RUNNING == *runstate;
+}
+
+static void	*unit_entry(void *args)
+{
+	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
+
+	zbx_set_is_running(unit_is_running, unit_args->runstate);
+
+	return unit_args->thread_entry(args);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: start a unit thread with specified entry function and arguments   *
@@ -681,10 +697,11 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 	unit_args->args = *args;
 	unit_args->logger = &unit->logger;
 	unit_args->runstate = &unit->runstate;
+	unit_args->thread_entry = thread_entry;
 	unit->runstate = UNIT_RUNNING;
 
 	zbx_pthread_init_attr(&attr);
-	if (0 != (err = pthread_create(&unit->handle, &attr, thread_entry, (void *)unit_args)))
+	if (0 != (err = pthread_create(&unit->handle, &attr, unit_entry, (void *)unit_args)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create thread: %s", zbx_strerror(err));
 		zbx_exit(EXIT_FAILURE);

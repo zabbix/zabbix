@@ -41,6 +41,7 @@ typedef struct
 	zbx_thread_args_t			args;
 	zbx_log_component_t			*logger;
 	_Atomic zbx_supervisor_runstate_t	*runstate;
+	void 					*(*thread_entry)(void *);
 }
 zbx_supervisor_unit_args_t;
 
