@@ -8076,6 +8076,8 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   margin: 10px;
   background-color: #fcf7c2;
   border: 1px solid #dfe4e7; }
+  .debug-output.debug-output-table-refresh {
+    margin: 10px 0 0 0; }
 
 .overlay-descr {
   max-height: 150px;
