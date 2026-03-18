@@ -19,6 +19,7 @@ class CDataTable {
 	static EVENT_RESET = 'reset';
 	static EVENT_SAVE = 'save';
 	static EVENT_SCROLL = 'scroll';
+	static EVENT_DATA_SORT = 'data:sort';
 	static EVENT_COLUMNS_SORT = 'columns:sort';
 	static EVENT_COLUMN_RESIZE = 'column:resize';
 	static EVENT_COLUMN_RESIZE_START = 'column:resize:start';
@@ -63,6 +64,7 @@ class CDataTable {
 	static ZBX_STYLE_CELL_CHECKBOX = 'cell-checkbox';
 
 	static ZBX_STYLE_LINK_HEADER = 'header-link';
+	static ZBX_STYLE_LINK_HEADER_SORTED = 'header-link-sorted';
 
 	/**
 	 * Minimum width of the resized column in pixels.
@@ -214,6 +216,7 @@ class CDataTable {
 		[CDataTable.EVENT_RESET]: this.onReset,
 		[CDataTable.EVENT_SAVE]: this.onSave,
 		[CDataTable.EVENT_SCROLL]: this.onScroll,
+		[CDataTable.EVENT_DATA_SORT]: this.onDataSort,
 		[CDataTable.EVENT_COLUMNS_SORT]: this.onColumnsSort,
 		[CDataTable.EVENT_COLUMN_RESIZE]: this.onColumnResize,
 		[CDataTable.EVENT_COLUMN_RESIZE_START]: this.onColumnResizeStart,
@@ -251,26 +254,32 @@ class CDataTable {
 					url.searchParams.set('sort', sort_field);
 					url.searchParams.set('sortorder', sort_order);
 
-					const cell_inner = document.createElement('a');
-					cell_inner.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER);
-					cell_inner.setAttribute('href', url.href);
-					cell_inner.appendChild(label);
-					cell_inner.addEventListener('click', event => {
-						event.preventDefault();
-
-						this.onDataSort(event, sort_field, sort_order);
-					});
+					const icon = document.createElement('span');
 
 					if (this.#sort_field == sort_field) {
-						const icon = document.createElement('span');
 						icon.classList.add(sort_order == 'ASC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
-
-						cell_inner.appendChild(icon);
+					}
+					else {
+						icon.classList.add(sort_order == 'DESC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 					}
 
-					cell.classList.add(CDataTable.ZBX_STYLE_CELL_HEADER_LINK);
+					const header_link = document.createElement('a');
+					header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER);
 
-					cell.appendChild(cell_inner);
+					if (this.#sort_field == sort_field) {
+						header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER_SORTED);
+					}
+
+					header_link.setAttribute('href', url.href);
+					header_link.append(label, icon);
+					header_link.addEventListener('click', event => {
+						event.preventDefault();
+
+						this.dispatchEvent(CDataTable.EVENT_DATA_SORT, {sort_field, sort_order});
+					});
+
+					cell.classList.add(CDataTable.ZBX_STYLE_CELL_HEADER_LINK);
+					cell.appendChild(header_link);
 				}
 				else if (![this.#checkboxid, CDataTableColumn.CUSTOMIZE_TABLE].includes(column_config.getId())) {
 					const cell_inner = document.createElement('span');
@@ -1252,10 +1261,12 @@ class CDataTable {
 		window.removeEventListener('mouseup', this.onResizeMouseUp);
 	}
 
-	onDataSort(event, sort_field, sort_order) {
-		event.preventDefault();
+	onDataSort(event) {
+		const {sort_field, sort_order} = event.detail;
 
-		new CState(event.target.href).push();
+		const state = new CState();
+		state.setParams({ sort: sort_field, sortorder: sort_order });
+		state.push();
 
 		this.#sort_field = sort_field;
 		this.#sort_order = sort_order;

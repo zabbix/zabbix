@@ -365,7 +365,7 @@
 			display: flex;
 			justify-content: space-between;
 			height: var(--datatable-row-height);
-			color: $font-alt-color;
+			color: $font-color;
 			background-color: $ui-bg-color;
 			user-select: none;
 
@@ -392,6 +392,7 @@
 				}
 
 				.header-link {
+					color: $font-color;
 					display: flex;
 					align-items: center;
 					gap: 3px;
@@ -424,6 +425,16 @@
 						flex-shrink: 0;
 						border-top-color: $font-alt-color;
 						pointer-events: none;
+					}
+
+					&.header-link-sorted {
+						.arrow-up {
+							border-bottom-color: $font-color;
+						}
+
+						.arrow-down {
+							border-top-color: $font-color;
+						}
 					}
 				}
 			}

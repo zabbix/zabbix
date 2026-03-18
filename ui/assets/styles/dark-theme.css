@@ -2487,7 +2487,7 @@ button {
       display: flex;
       justify-content: space-between;
       height: var(--datatable-row-height);
-      color: #737373;
+      color: #f2f2f2;
       background-color: #2b2b2b;
       user-select: none; }
       .datatable .cell.cell-header:focus {
@@ -2504,6 +2504,7 @@ button {
         .datatable .cell.cell-header.cell-header-link .cell-inner {
           padding: 0 8px; }
         .datatable .cell.cell-header.cell-header-link .header-link {
+          color: #f2f2f2;
           display: flex;
           align-items: center;
           gap: 3px;
@@ -2528,6 +2529,10 @@ button {
             flex-shrink: 0;
             border-top-color: #737373;
             pointer-events: none; }
+          .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-up {
+            border-bottom-color: #f2f2f2; }
+          .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-down {
+            border-top-color: #f2f2f2; }
       .datatable .cell.cell-header .datatable-context-popup-link {
         box-sizing: border-box;
         display: flex;

@@ -582,6 +582,7 @@
 
 					requestAnimationFrame(() => this.initExpandables());
 				})
+				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
 				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
 				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
 				.init(user_configs);

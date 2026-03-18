@@ -2419,7 +2419,7 @@ button {
       display: flex;
       justify-content: space-between;
       height: var(--datatable-row-height);
-      color: #cacaca;
+      color: #ffffff;
       background-color: #000000;
       user-select: none; }
       .datatable .cell.cell-header:focus {
@@ -2436,6 +2436,7 @@ button {
         .datatable .cell.cell-header.cell-header-link .cell-inner {
           padding: 0 8px; }
         .datatable .cell.cell-header.cell-header-link .header-link {
+          color: #ffffff;
           display: flex;
           align-items: center;
           gap: 3px;
@@ -2460,6 +2461,10 @@ button {
             flex-shrink: 0;
             border-top-color: #cacaca;
             pointer-events: none; }
+          .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-up {
+            border-bottom-color: #ffffff; }
+          .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-down {
+            border-top-color: #ffffff; }
       .datatable .cell.cell-header .datatable-context-popup-link {
         box-sizing: border-box;
         display: flex;
