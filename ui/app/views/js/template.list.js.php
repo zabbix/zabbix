@@ -37,7 +37,7 @@
 			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-massupdate')) {
 					openMassupdatePopup('template.massupdate', {
-						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('template')) ?>
+						[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('template')); ?>
 					}, {
 						dialogue_class: 'modal-popup-static',
 						trigger_element: e.target
@@ -58,7 +58,7 @@
 			document.getElementById('js-import').addEventListener('click', () => {
 				PopUp("popup.import", {
 					rules_preset: "template",
-					[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('import')) ?>
+					[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('import')); ?>
 				}, {
 					dialogueid: "popup_import",
 					dialogue_class: "modal-popup-generic"
@@ -136,7 +136,8 @@
 						.setFields(['templates'])
 						.setRenderer('linked_to_templates'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
-						.setFields(['tags'])
+						.setFields(['tags']),
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)
@@ -444,13 +445,13 @@
 			}
 			else {
 				confirmation = templateids.length > 1
-					? <?= json_encode(_('Delete selected templates?')) ?>
-					: <?= json_encode(_('Delete selected template?')) ?>;
+					? <?= json_encode(_('Delete selected templates?')); ?>
+					: <?= json_encode(_('Delete selected template?')); ?>;
 
 				curl.setArgument('action', 'template.delete');
 			}
 
-			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('template')) ?>);
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('template')); ?>);
 
 			if (!window.confirm(confirmation)) {
 				return;
@@ -489,7 +490,7 @@
 				.catch(() => {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')); ?>]);
 
 					addMessage(message_box);
 				})

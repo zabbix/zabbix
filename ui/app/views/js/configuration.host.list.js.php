@@ -95,7 +95,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.catch(error => {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')); ?>]);
 
 					addMessage(message_box);
 
@@ -177,8 +177,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				const hostids = Object.keys(chkbxRange.getSelectedIds());
 
 				const message = hostids.length > 1
-					? <?= json_encode(_('Enable selected hosts?')) ?>
-					: <?= json_encode(_('Enable selected host?')) ?>;
+					? <?= json_encode(_('Enable selected hosts?')); ?>
+					: <?= json_encode(_('Enable selected host?')); ?>;
 
 				if (window.confirm(message)) {
 					this.enable(e.target, {hostids}, this.reload);
@@ -189,8 +189,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				const hostids = Object.keys(chkbxRange.getSelectedIds());
 
 				const message = hostids.length > 1
-					? <?= json_encode(_('Disable selected hosts?')) ?>
-					: <?= json_encode(_('Disable selected host?')) ?>;
+					? <?= json_encode(_('Disable selected hosts?')); ?>
+					: <?= json_encode(_('Disable selected host?')); ?>;
 
 				if (window.confirm(message)) {
 					this.disable(e.target, {hostids}, this.reload);
@@ -295,8 +295,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info_icons'])
 						.setRenderer('info'),
-					new CDataTableColumnTags('tags', '<?= _('Tags');?>'),
-					new CDataTableColumnTagValue('tagvalue', '<?= _('Tag value');?>')
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)
@@ -798,8 +798,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 		massDeleteHosts(button) {
 			const confirm_text = Object.keys(chkbxRange.getSelectedIds()).length > 1
-				? <?= json_encode(_('Delete selected hosts?')) ?>
-				: <?= json_encode(_('Delete selected host?')) ?>;
+				? <?= json_encode(_('Delete selected hosts?')); ?>
+				: <?= json_encode(_('Delete selected host?')); ?>;
 
 			if (!confirm(confirm_text)) {
 				return;
@@ -821,7 +821,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.catch(() => {
 					clearMessages();
 
-					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')) ?>]);
+					const message_box = makeMessageBox('bad', [<?= json_encode(_('Unexpected server error.')); ?>]);
 
 					addMessage(message_box);
 				})

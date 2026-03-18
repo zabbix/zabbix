@@ -128,38 +128,38 @@
 
 			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
 				.setColumns([
-					new CDataTableColumn('name', '<?= _('Name') ?>')
+					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'status', 'maintenance', 'maintenanceid', 'maintenance_type',
 							'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false),
-					new CDataTableColumn('interface', '<?= _('Interface') ?>')
+					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
 						.setFields(['interface']),
-					new CDataTableColumn('availability', '<?= _('Availability') ?>')
+					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
 						.setFields(['availability', 'active_available'])
 						.setRenderer('availability'),
-					new CDataTableColumnTags('tags', '<?= _('Tags') ?>')
-						.setFields(['tags']),
-					new CDataTableColumn('status', '<?= _('Status') ?>')
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
+					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['status'])
 						.setRenderer('status'),
-					new CDataTableColumn('latest_data', '<?= _('Latest data') ?>')
+					new CDataTableColumn('latest_data', <?= _('Latest data'); ?>)
 						.setFields(['hostid', 'items_count'])
 						.setRenderer('latest_data'),
-					new CDataTableColumn('problems', '<?= _('Problems') ?>')
+					new CDataTableColumn('problems', <?= json_encode(_('Problems')); ?>)
 						.setContextPopupData({
 							show_suppressed: false
 						})
 						.setContextPopupHandler('problems')
 						.setFields(['problems']),
-					new CDataTableColumn('graphs', '<?= _('Graphs') ?>')
+					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
 						.setRenderer('graphs'),
-					new CDataTableColumn('dashboards', '<?= _('Dashboards') ?>')
+					new CDataTableColumn('dashboards', <?= json_encode(_('Dashboards')); ?>)
 						.setFields(['hostid', 'dashboards'])
 						.setRenderer('dashboards'),
-					new CDataTableColumn('web', '<?= _('Web') ?>')
+					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
 						.setRenderer('web')
 				])

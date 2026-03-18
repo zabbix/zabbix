@@ -202,8 +202,8 @@
 						.setFields(['last_value']),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change']),
-					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
-						.setRenderer('tags'),
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
+					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('actions', '')
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
 						.setRenderer('actions')
@@ -510,7 +510,7 @@
 			let clear_checkboxes = false;
 			const curl = new Curl('zabbix.php');
 			curl.setArgument('action', 'item.execute');
-			data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('item')) ?>;
+			data[CSRF_TOKEN_NAME] = <?= json_encode(CCsrfTokenHelper::get('item')); ?>;
 
 			fetch(curl.getUrl(), {
 				method: 'POST',
@@ -537,7 +537,7 @@
 					}
 				})
 				.catch(() => {
-					const title = <?= json_encode(_('Unexpected server error.')) ?>;
+					const title = <?= json_encode(_('Unexpected server error.')); ?>;
 
 					CMessageHelper.error(this.datatable.getElement(), [], title);
 				})
