@@ -1422,10 +1422,9 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\t';
 
-		if (1 > (num_filled = net_if_row_scan(line, if_name, &ns)))
+		if (ZBX_PROC_NET_DEV_COLS_NUM != (num_filled = net_if_row_scan(line, if_name, &ns)))
 		{
-			/* we need the interface name for getting metrics via sysfs */
-			THIS_SHOULD_NEVER_HAPPEN_MSG("cannot read interface name from of \"%s\"", ZBX_PROC_NET_DEV);
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot read interface from of \"%s\"", ZBX_PROC_NET_DEV);
 			continue;
 		}
 
@@ -1448,35 +1447,27 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		sys_class_net_uint_add(if_name, "carrier_up_count", "carrier_up_count", &jval, NULL);
 		sys_class_net_uint_add(if_name, "carrier_down_count", "carrier_down_count", &jval, NULL);
 
-		if (ZBX_PROC_NET_DEV_COLS_NUM == num_filled)
-		{
-			zbx_json_addobject(&jval, "in");
-			zbx_json_adduint64(&jval, "bytes", ns.ibytes);
-			zbx_json_adduint64(&jval, "packets", ns.ipackets);
-			zbx_json_adduint64(&jval, "errors", ns.ierr);
-			zbx_json_adduint64(&jval, "dropped", ns.idrop);
-			zbx_json_adduint64(&jval, "overruns", ns.ififo);
-			zbx_json_adduint64(&jval, "frame", ns.iframe);
-			zbx_json_adduint64(&jval, "compressed", ns.icompressed);
-			zbx_json_adduint64(&jval, "multicast", ns.imulticast);
-			zbx_json_close(&jval);
+		zbx_json_addobject(&jval, "in");
+		zbx_json_adduint64(&jval, "bytes", ns.ibytes);
+		zbx_json_adduint64(&jval, "packets", ns.ipackets);
+		zbx_json_adduint64(&jval, "errors", ns.ierr);
+		zbx_json_adduint64(&jval, "dropped", ns.idrop);
+		zbx_json_adduint64(&jval, "overruns", ns.ififo);
+		zbx_json_adduint64(&jval, "frame", ns.iframe);
+		zbx_json_adduint64(&jval, "compressed", ns.icompressed);
+		zbx_json_adduint64(&jval, "multicast", ns.imulticast);
+		zbx_json_close(&jval);
 
-			zbx_json_addobject(&jval, "out");
-			zbx_json_adduint64(&jval, "bytes", ns.obytes);
-			zbx_json_adduint64(&jval, "packets", ns.opackets);
-			zbx_json_adduint64(&jval, "errors", ns.oerr);
-			zbx_json_adduint64(&jval, "dropped", ns.odrop);
-			zbx_json_adduint64(&jval, "overruns", ns.ofifo);
-			zbx_json_adduint64(&jval, "collisions", ns.ocolls);
-			zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
-			zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
-			zbx_json_close(&jval);
-		}
-		else
-		{
-			THIS_SHOULD_NEVER_HAPPEN_MSG("could read just %d values from \"%s\" for interface \"%s\"",
-					num_filled, ZBX_PROC_NET_DEV, if_name);
-		}
+		zbx_json_addobject(&jval, "out");
+		zbx_json_adduint64(&jval, "bytes", ns.obytes);
+		zbx_json_adduint64(&jval, "packets", ns.opackets);
+		zbx_json_adduint64(&jval, "errors", ns.oerr);
+		zbx_json_adduint64(&jval, "dropped", ns.odrop);
+		zbx_json_adduint64(&jval, "overruns", ns.ofifo);
+		zbx_json_adduint64(&jval, "collisions", ns.ocolls);
+		zbx_json_adduint64(&jval, "carrier", ns.ocarrier);
+		zbx_json_adduint64(&jval, "compressed", ns.ocompressed);
+		zbx_json_close(&jval);
 
 		zbx_json_close(&jval);
 		zbx_json_close(&jcfg);
