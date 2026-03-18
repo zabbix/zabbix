@@ -966,20 +966,18 @@ class CDataTable {
 		const {items, index, index_to} = event.detail;
 
 		const [offset, start, end] = index > index_to
-			? [1, index_to, index]
-			: [-1, index, index_to];
+			? [1, index_to + 1, index]
+			: [-1, index, index_to - 1];
 
-		const indices = [...items].slice(start, end + 1).map(item => parseInt(item.getAttribute('data-col')));
-		const lowest = Math.min(...indices);
-		const highest = Math.max(...indices);
 		const item = items.item(index_to);
 		const column_index = parseInt(item.getAttribute('data-col'));
+		const lowest_order = this.getColumnConfig(parseInt(items[start].getAttribute('data-col'))).getOrder();
+		const highest_order = this.getColumnConfig(parseInt(items[end].getAttribute('data-col'))).getOrder();
 
 		const columns = this.#columns.filter(
 			column_config => ![this.#checkboxid, CDataTableColumn.CUSTOMIZE_TABLE].includes(column_config.getId())
-				&& column_config.getColumnIndex() >= lowest
-				&& column_config.getColumnIndex() <= highest
-				&& column_config.getColumnIndex() != column_index
+				&& column_config.getOrder() >= lowest_order
+				&& column_config.getOrder() <= highest_order
 		);
 
 		const column_config = this.getColumnConfig(column_index);
