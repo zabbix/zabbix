@@ -7,6 +7,12 @@
 	position: relative;
 	border: 1px solid $ui-border-color;
 
+	&.is-loading {
+		&::before {
+			background-color: rgba($ui-bg-color, .5);
+		}
+	}
+
 	.hidden {
 		display: none !important;
 	}
@@ -224,19 +230,6 @@
 
 		&.no-data-message {
 			padding: 100px 0;
-		}
-
-		&.datatable-body-loading {
-			&:after {
-				content: '';
-				position: absolute;
-				top: 2px;
-				right: 0;
-				left: 0;
-				bottom: 0;
-				width: 100%;
-				background-color: $datatable-overlay-color;
-			}
 		}
 	}
 

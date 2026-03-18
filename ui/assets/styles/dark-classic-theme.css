@@ -2274,6 +2274,8 @@ button {
 .datatable {
   position: relative;
   border: 1px solid #303030; }
+  .datatable.is-loading::before {
+    background-color: rgba(43, 43, 43, 0.5); }
   .datatable .hidden {
     display: none !important; }
   .datatable .datatable-customize {
@@ -2395,15 +2397,6 @@ button {
     border-radius: 2px; }
     .datatable .datatable-body.no-data-message {
       padding: 100px 0; }
-    .datatable .datatable-body.datatable-body-loading:after {
-      content: '';
-      position: absolute;
-      top: 2px;
-      right: 0;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      background-color: rgba(56, 56, 56, 0.4); }
   .datatable .datatable-footer {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
