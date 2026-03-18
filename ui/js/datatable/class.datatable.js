@@ -122,6 +122,8 @@ class CDataTable {
 	 */
 	#resize_start_width = 0;
 
+	#resize_start_scroll_left = 0;
+
 	/**
 	 * Timeout ID used to reset `#resize_click_count` after a delay.
 	 * This prevents conflicts between single and double-click events on the column resizer.
@@ -1197,9 +1199,7 @@ class CDataTable {
 		visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
 
 		this.#applyColumnWidths();
-
 		this.#applyScrollableRows();
-		this.#scrollToColumn(this.#resize_column_index);
 	}
 
 	onColumnResizeStart(event) {
@@ -1220,6 +1220,7 @@ class CDataTable {
 		this.#resize_column_index = column_index;
 		this.#resize_start_x = x;
 		this.#resize_start_width = parseFloat(this.#getWidthWithoutUnit(column_config.getWidth()));
+		this.#resize_start_scroll_left = this.#rows.scrollLeft;
 
 		this.#element.classList.add(CDataTable.ZBX_STYLE_RESIZING);
 
@@ -1251,6 +1252,7 @@ class CDataTable {
 		this.#resize_column_index = -1;
 		this.#resize_start_x = 0;
 		this.#resize_start_width = 0;
+		this.#resize_start_scroll_left = 0;
 
 		this.#element.classList.remove(CDataTable.ZBX_STYLE_RESIZING);
 
@@ -2055,6 +2057,9 @@ class CDataTable {
 		const column_config = this.getColumnConfig(column_index);
 
 		resizer.addEventListener('mousedown', event => {
+			const resizer = event.target;
+			resizer.setPointerCapture(event.pointerId);
+
 			this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_START, {
 				x: event.clientX,
 				column_index,
