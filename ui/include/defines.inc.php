@@ -908,6 +908,7 @@ define('MEDIA_TYPE_EMAIL',		0);
 define('MEDIA_TYPE_EXEC',		1);
 define('MEDIA_TYPE_SMS',		2);
 define('MEDIA_TYPE_WEBHOOK',	4);
+define('MEDIA_TYPE_PUSH',		5);
 
 define('SMTP_SECURITY_NONE',		0);
 define('SMTP_SECURITY_STARTTLS',	1);

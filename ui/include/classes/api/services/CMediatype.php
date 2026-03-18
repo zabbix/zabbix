@@ -524,7 +524,7 @@ class CMediatype extends CApiService {
 			: [];
 
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK])],
+			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH])],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -673,7 +673,7 @@ class CMediatype extends CApiService {
 	private static function getCommonTypeValidationFields(): array {
 		return [
 			'maxsessions' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK])], 'type' => API_INT32, 'in' => '0:100'],
+									['if' => ['field' => 'type', 'in' => implode(',', [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_WEBHOOK, MEDIA_TYPE_PUSH])], 'type' => API_INT32, 'in' => '0:100'],
 									['else' => true] + self::getDefaultTypeValidationRules('maxsessions')
 			]],
 			'parameters' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -1013,7 +1013,8 @@ class CMediatype extends CApiService {
 			MEDIA_TYPE_EMAIL => array_keys(self::getEmailTypeValidationFields()),
 			MEDIA_TYPE_SMS => array_keys(self::getSmsTypeValidationFields()),
 			MEDIA_TYPE_EXEC => array_keys(self::getScriptTypeValidationFields()),
-			MEDIA_TYPE_WEBHOOK => array_keys(self::getWebhookTypeValidationFields())
+			MEDIA_TYPE_WEBHOOK => array_keys(self::getWebhookTypeValidationFields()),
+			MEDIA_TYPE_PUSH => []
 		};
 	}
 
