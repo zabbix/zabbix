@@ -2228,19 +2228,26 @@ button {
     .datatable .datatable-customize .datatable-customize-list {
       display: flex;
       flex-direction: column;
-      gap: 10px;
       margin-bottom: 10px; }
       .datatable .datatable-customize .datatable-customize-list .datatable-customize-list-item {
+        cursor: grab;
         display: flex;
         flex-direction: row;
         align-items: center;
         gap: 5px;
+        padding: 5px;
         height: 25px; }
+        .datatable .datatable-customize .datatable-customize-list .datatable-customize-list-item:hover {
+          background-color: #f4f4f4; }
         .datatable .datatable-customize .datatable-customize-list .datatable-customize-list-item .checkbox-radio {
           display: none; }
+          .datatable .datatable-customize .datatable-customize-list .datatable-customize-list-item .checkbox-radio + label span {
+            margin-top: -1px;
+            vertical-align: middle; }
         .datatable .datatable-customize .datatable-customize-list .datatable-customize-list-item .datatable-customize-list-item-label {
+          cursor: grab;
           display: inline-block;
-          max-width: 160px;
+          max-width: 140px;
           vertical-align: middle; }
   .datatable .datatable-context {
     position: absolute;

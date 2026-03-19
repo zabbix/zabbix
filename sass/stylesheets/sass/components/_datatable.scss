@@ -30,23 +30,36 @@
 		.datatable-customize-list {
 			display: flex;
 			flex-direction: column;
-			gap: 10px;
 			margin-bottom: 10px;
 
 			.datatable-customize-list-item {
+				cursor: grab;
 				display: flex;
 				flex-direction: row;
 				align-items: center;
 				gap: 5px;
+				padding: 5px;
 				height: 25px;
+
+				&:hover {
+					background-color: $ui-hover-bg-color;
+				}
 
 				.checkbox-radio {
 					display: none;
+
+					& + label {
+						span {
+							margin-top: -1px;
+							vertical-align: middle;
+						}
+					}
 				}
 
 				.datatable-customize-list-item-label {
 					@extend %overflow-ellipsis;
 
+					cursor: grab;
 					display: inline-block;
 					max-width: 140px;
 					vertical-align: middle;
