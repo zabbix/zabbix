@@ -742,8 +742,7 @@ static int	DBpatch_7050052(void)
 			char	*value_str_esc = zbx_db_dyn_escape_string(json.buffer);
 
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update profiles set value_str='%s' where profileid=%s",
-					value_str_esc, row[0]);
+					"update profiles set value_str='%s' where profileid=%s", value_str_esc, row[0]);
 			zbx_free(value_str_esc);
 
 			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
