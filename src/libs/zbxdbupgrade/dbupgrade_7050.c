@@ -657,15 +657,13 @@ static int	DBpatch_7050051(void)
 			continue;
 
 		p += 2;
-		count = 0;
 
-		while ('0' <= *p && *p <= '9')
-			count = count * 10 + (*p++ - '0');
-
+		count = *p++ - '0';
 		if (6 < count || ':' != *p || '{' != *(p + 1))
 			continue;
 
 		p += 2;
+
 		zbx_json_initarray(&json, 64);
 		valid = 1;
 
