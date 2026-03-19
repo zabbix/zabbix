@@ -103,7 +103,7 @@ class CApiDpopHelper {
 		$iat = (int) $payload['iat'];
 		$exp = (int) $payload['exp'];
 
-		if ($iat > $check_time + self::TIME_SKEW) {
+		if ($iat > $exp || $iat > $check_time + self::TIME_SKEW) {
 			return false;
 		}
 
