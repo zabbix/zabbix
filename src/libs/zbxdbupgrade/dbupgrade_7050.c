@@ -694,25 +694,59 @@ static int	DBpatch_7050051(void)
 
 			p++;
 
-			/* Parse value: i:N; - value is validated but not stored */
-			if ('i' != *p || ':' != *(p + 1))
+			/* Parse value: accept i:N; OR s:L:"..."; */
+			if ('i' == *p && ':' == *(p + 1))
 			{
-				valid = 0;
-				break;
-			}
+				/* integer value */
+				p += 2;
 
-			p += 2;
+				while ('0' <= *p && *p <= '9')
+					p++;
 
-			while ('0' <= *p && *p <= '9')
+				if (';' != *p)
+				{
+					valid = 0;
+					break;
+				}
+
 				p++;
+			}
+			else if ('s' == *p && ':' == *(p + 1))
+			{
+				int len = 0;
 
-			if (';' != *p)
+				/* string value */
+				p += 2;
+
+				/* parse length */
+				while ('0' <= *p && *p <= '9')
+					len = len * 10 + (*p++ - '0');
+
+				if (':' != *p || '"' != *(p + 1))
+				{
+					valid = 0;
+					break;
+				}
+
+				p += 2;
+
+				/* skip string content */
+				p += len;
+
+				if ('"' != *p || ';' != *(p + 1))
+				{
+					valid = 0;
+					break;
+				}
+
+				p += 2;
+			}
+			else
 			{
 				valid = 0;
 				break;
 			}
 
-			p++;
 			zbx_json_addint64(&json, NULL, (zbx_int64_t)key);
 		}
 
