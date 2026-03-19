@@ -332,14 +332,6 @@ class testPageReportsTopTriggers extends CWebTest {
 		// Create events and problems.
 		self::$time = time();
 
-		/**
-		 * If test data is created on one day, but test cases that test day-based time selectors are executed on the
-		 * next day, then these cases will fail. On Jenkins, the time between test data creation and execution of these
-		 * test cases is 45 - 55 seconds. To avoid such failures, creation of day-based problems needs to be moved to
-		 * the next day, if creation time is closer to midnight than 1 minute.
-		 */
-		$delta = (strtotime('Tomorrow') - self::$time < 60) ? 1 : 0;
-
 		$trigger_data = [
 			[
 				'name' => 'Problem Warning',
@@ -398,12 +390,12 @@ class testPageReportsTopTriggers extends CWebTest {
 			],
 			[
 				'name' => 'Problem Disaster',
-				'time' => strtotime('yesterday + '.$delta.' days'),
+				'time' => strtotime('yesterday'),
 				'problem_count' => '1'
 			],
 			[
 				'name' => 'Problem Warning',
-				'time' => strtotime('-2 days + '.$delta.' days'),
+				'time' => strtotime('-2 days'),
 				'problem_count' => '1'
 			],
 			[
@@ -1033,7 +1025,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					],
 					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg'
-					]
+					],
+					'day_based' => true
 				]
 			],
 			// #21.
@@ -1052,7 +1045,8 @@ class testPageReportsTopTriggers extends CWebTest {
 					],
 					'background_colors' => [
 						'Problem Warning' => 'warning-bg'
-					]
+					],
+					'day_based' => true
 				]
 			],
 			// #22 Search by custom time period.
@@ -1215,6 +1209,10 @@ class testPageReportsTopTriggers extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageReportsTopTriggers_Filter($data) {
+		if (CTestArrayHelper::get($data, 'day_based') && date('Y-m-d', self::$time) !== date('Y-m-d')) {
+			$this->markTestSkipped('Test data was created on a previous calendar day. Skipping day-based time filter case.');
+		}
+
 		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 
