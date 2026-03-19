@@ -20,9 +20,7 @@
 #include "../dbconfigworker/dbconfigworker.h"
 
 #include "zbxtimekeeper.h"
-#include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxlog.h"
 #include "zbxcachehistory.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"

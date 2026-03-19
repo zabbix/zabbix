@@ -18,8 +18,6 @@
 
 #include "zbxregexp.h"
 #include "zbxtimekeeper.h"
-#include "zbxlog.h"
-#include "zbxnix.h"
 #include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtime.h"
