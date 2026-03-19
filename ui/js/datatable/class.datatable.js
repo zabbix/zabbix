@@ -832,8 +832,7 @@ class CDataTable {
 
 		const idx2 = this.#tabfilter_item ? [this.#tabfilter_item._index] : [];
 
-		/* global updateUserProfile */
-		this.#save_config_request = updateUserProfile(this.#storage_idx, JSON.stringify(config), idx2, PROFILE_TYPE_STR);
+		this.#save_config_request = this.#updateUserProfile(JSON.stringify(config), idx2);
 	}
 
 	onRender() {
@@ -2037,17 +2036,24 @@ class CDataTable {
 
 				this.#user_configs[item._index] = this.getConfig();
 
-				/* global updateUserProfile */
-				updateUserProfile(this.#storage_idx, JSON.stringify({}), [item._index], PROFILE_TYPE_STR);
+				this.#updateUserProfile(JSON.stringify({}), [item._index]);
 			});
 
 			this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, event => {
 				const {idx2} = event.detail;
 
-				/* global updateUserProfile */
-				updateUserProfile(this.#storage_idx, '', [idx2], PROFILE_TYPE_STR);
+				this.#updateUserProfile(JSON.stringify({}), [idx2]);
 			});
 		}
+	}
+
+	#updateUserProfile(value, idx2) {
+		if (!this.#storage_idx) {
+			return;
+		}
+
+		/* global updateUserProfile */
+		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR);
 	}
 
 	#bindColumnResizeEvent(header_cell) {
