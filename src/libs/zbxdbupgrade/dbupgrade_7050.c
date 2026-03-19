@@ -646,11 +646,9 @@ static int	DBpatch_7050051(void)
 
 	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
 	{
-		zbx_uint64_t	profileid;
 		const char	*p = row[1];
-		int		count, i, valid;
+		int		count, i, valid = 1;
 		struct zbx_json	json;
-		char		*value_str_esc;
 
 		/* Validate and parse PHP serialized array header: a:N:{ */
 		if ('a' != *p || ':' != *(p + 1))
@@ -665,34 +663,23 @@ static int	DBpatch_7050051(void)
 		p += 2;
 
 		zbx_json_initarray(&json, 64);
-		valid = 1;
 
 		for (i = 0; i < count; i++)
 		{
 			int	key;
 
 			/* Parse key: i:N; */
-			if ('i' != *p || ':' != *(p + 1))
+			if ('i' != *p || ':' != *(p + 1) || '0' > *(p + 2) || *(p + 2) > '5' || ';' != *(p + 3))
 			{
 				valid = 0;
 				break;
 			}
 
-			p += 2;
-			key = 0;
+			key = *(p + 2) - '0';
+			p += 4;
 
-			while ('0' <= *p && *p <= '9')
-				key = key * 10 + (*p++ - '0');
-
-			if (';' != *p)
-			{
-				valid = 0;
-				break;
-			}
-
-			p++;
-
-			while (*p && ';' != *p)
+			/* Skip value: i:N; or s:"N"; */
+			while ('\0' != *p && ';' != *p)
 				p++;
 
 			if (';' != *p)
@@ -707,7 +694,8 @@ static int	DBpatch_7050051(void)
 
 		if (1 == valid && '}' == *p)
 		{
-			value_str_esc = zbx_db_dyn_escape_string(json.buffer);
+			char	*value_str_esc = zbx_db_dyn_escape_string(json.buffer);
+
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 					"update profiles set value_str='%s' where profileid=%s",
 					value_str_esc, row[0]);
