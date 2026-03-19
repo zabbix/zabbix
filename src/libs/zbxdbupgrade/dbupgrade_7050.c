@@ -694,70 +694,25 @@ static int	DBpatch_7050051(void)
 
 			p++;
 
-			/* Parse value: accept i:N; OR s:L:"..."; */
-			if ('i' == *p && ':' == *(p + 1))
-			{
-				/* integer value */
-				p += 2;
-
-				while ('0' <= *p && *p <= '9')
-					p++;
-
-				if (';' != *p)
-				{
-					valid = 0;
-					break;
-				}
-
+			while (*p && ';' != *p)
 				p++;
-			}
-			else if ('s' == *p && ':' == *(p + 1))
-			{
-				int len = 0;
 
-				/* string value */
-				p += 2;
-
-				/* parse length */
-				while ('0' <= *p && *p <= '9')
-					len = len * 10 + (*p++ - '0');
-
-				if (':' != *p || '"' != *(p + 1))
-				{
-					valid = 0;
-					break;
-				}
-
-				p += 2;
-
-				/* skip string content */
-				p += len;
-
-				if ('"' != *p || ';' != *(p + 1))
-				{
-					valid = 0;
-					break;
-				}
-
-				p += 2;
-			}
-			else
+			if (';' != *p)
 			{
 				valid = 0;
 				break;
 			}
+			p++;
 
 			zbx_json_addint64(&json, NULL, (zbx_int64_t)key);
 		}
 
 		if (1 == valid && '}' == *p)
 		{
-			ZBX_DBROW2UINT64(profileid, row[0]);
-
 			value_str_esc = zbx_db_dyn_escape_string(json.buffer);
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"update profiles set value_str='%s' where profileid=" ZBX_FS_UI64 ";\n",
-					value_str_esc, profileid);
+					"update profiles set value_str='%s' where profileid=%s",
+					value_str_esc, row[0]);
 			zbx_free(value_str_esc);
 
 			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
