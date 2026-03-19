@@ -91,11 +91,13 @@ $form_grid = (new CFormGrid())
 				),
 			(new CTemplateTag('tag-row-tmpl', [
 				(new CRow([
-					(new CTextAreaFlexible('tags[#{rowNum}][tag]', '#{tag}'))
-						->setErrorContainer('tags-#{rowNum}-error-container')
-						->setAttribute('placeholder', _('tag'))
-						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setMaxlength(DB::getFieldLength('connector_tag', 'tag')),
+					(new CCol(
+						(new CTextAreaFlexible('tags[#{rowNum}][tag]', '#{tag}'))
+							->setErrorContainer('tags-#{rowNum}-error-container')
+							->setAttribute('placeholder', _('tag'))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setMaxlength(DB::getFieldLength('connector_tag', 'tag'))
+					))->addClass(ZBX_STYLE_ALIGN_TOP),
 					(new CSelect('tags[#{rowNum}][operator]'))
 						->setErrorContainer('tags-#{rowNum}-error-container')
 						->addClass('js-tag-operator')
@@ -108,12 +110,14 @@ $form_grid = (new CFormGrid())
 							CONDITION_OPERATOR_NOT_EQUAL => _('Does not equal'),
 							CONDITION_OPERATOR_NOT_LIKE => _('Does not contain')
 						])),
-					(new CTextAreaFlexible('tags[#{rowNum}][value]', '#{value}'))
-						->setErrorContainer('tags-#{rowNum}-error-container')
-						->addClass('js-tag-value')
-						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
-						->setMaxlength(DB::getFieldLength('connector_tag', 'value')),
+					(new CCol(
+						(new CTextAreaFlexible('tags[#{rowNum}][value]', '#{value}'))
+							->setErrorContainer('tags-#{rowNum}-error-container')
+							->addClass('js-tag-value')
+							->setAttribute('placeholder', _('value'))
+							->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+							->setMaxlength(DB::getFieldLength('connector_tag', 'value'))
+					))->addClass(ZBX_STYLE_ALIGN_TOP),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 				]))->addClass('form_row'),
 				(new CRow())
