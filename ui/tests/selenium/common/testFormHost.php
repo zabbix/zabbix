@@ -2261,13 +2261,14 @@ class testFormHost extends CWebTest {
 						['name' => 'id:interface_main_'.$discovered_interface_id , 'value' => $discovered_interface_id,
 								'enabled' => false],
 						['name' => 'Description', 'value' => '', 'maxlength' => 65535, 'enabled' => true],
-						['name' => 'id:monitored_by', 'value' => 'Server', 'enabled' => false],
+						['name' => 'Monitored by', 'value' => 'Server', 'enabled' => false],
 						['name' => 'Enabled', 'value' => true, 'enabled' => true]
 					];
 
 					foreach ($host_fields as $field) {
 						$this->assertTrue($form->getField($field['name'])->isEnabled($field['enabled']));
 						$this->assertEquals($field['value'], $form->getField($field['name'])->getValue());
+
 						if (CTestArrayHelper::get($field, 'maxlength')) {
 							$this->assertEquals($field['maxlength'], $form->getField($field['name'])->getAttribute('maxlength'));
 						}
@@ -2336,7 +2337,6 @@ class testFormHost extends CWebTest {
 							'Value' => 'update'
 						]
 					];
-
 					$tags_table->checkValue($expected_tags);
 
 					$this->assertEquals(['Name', 'Value', ''], $tags_table->getHeadersText());
@@ -2351,7 +2351,7 @@ class testFormHost extends CWebTest {
 				case 'Macros':
 					$radio_switcher = $this->query('id:show_inherited_macros')->asSegmentedRadio()->waitUntilPresent()->one();
 					$macros_table = $this->query('id:tbl_macros')->asMultifieldTable()->one();
-					$macros_table->checkValue([['Macro' => '','Value' => '', 'Description' => '']]);
+					$macros_table->checkValue([['Macro' => '', 'Value' => '', 'description' => '']]);
 					$radio_switcher->select('Inherited and host macros');
 					$macros_table->waitUntilReloaded();
 					$this->assertSame(['Macro', 'Effective value', '', '', 'Template value', '', 'Global value (configure)'],
