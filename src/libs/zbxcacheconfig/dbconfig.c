@@ -4773,7 +4773,7 @@ static void	dc_update_trigger_timer(ZBX_DC_TRIGGER *trigger, zbx_hashset_t *tren
  ******************************************************************************/
 static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now,
 		zbx_vector_dc_function_ptr_t *function_timers, zbx_vector_trigger_ptr_t *trigger_timers,
-		int *timers_num)
+		int *function_timers_num, int *trigger_timers_num)
 {
 	ZBX_DC_FUNCTION	*function;
 
@@ -4783,12 +4783,13 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now,
 
 		zbx_hashset_iter_reset(&config->functions, &iter);
 		while (NULL != (function = (ZBX_DC_FUNCTION *)zbx_hashset_iter_next(&iter)))
-			dc_update_function_timer(function, trend_queue, now, timers_num);
+			dc_update_function_timer(function, trend_queue, now, function_timers_num);
 	}
 	else
 	{
 		for (int i = 0; i < function_timers->values_num; i++)
-			dc_update_function_timer(function_timers->values[i], trend_queue, now, timers_num);
+			dc_update_function_timer(function_timers->values[i], trend_queue, now, function_timers_num);
+		*function_timers_num = function_timers->values_num;
 	}
 
 	ZBX_DC_TRIGGER	*trigger;
@@ -4799,12 +4800,13 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now,
 
 		zbx_hashset_iter_reset(&config->triggers, &iter);
 		while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
-			dc_update_trigger_timer(trigger, trend_queue, now, timers_num);
+			dc_update_trigger_timer(trigger, trend_queue, now, trigger_timers_num);
 	}
 	else
 	{
 		for (int i = 0; i < trigger_timers->values_num; i++)
-			dc_update_trigger_timer(trigger_timers->values[i], trend_queue, now, timers_num);
+			dc_update_trigger_timer(trigger_timers->values[i], trend_queue, now, trigger_timers_num);
+		*trigger_timers_num = trigger_timers->values_num;
 	}
 }
 
@@ -4892,7 +4894,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync, zbx_uint64_t revision, zbx_vect
 		function->type = zbx_get_function_type(function->function);
 		function->revision = revision;
 
-		if (NULL != function_timers && dc_function_type_require_timer(function->type))
+		if (NULL != function_timers && SUCCEED == dc_function_type_require_timer(function->type))
 			zbx_vector_dc_function_ptr_append(function_timers, function);
 	}
 
@@ -8121,7 +8123,8 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
 
-	int		i, flags, changelog_num, dberr = ZBX_DB_FAIL, itemtrigs_num = 0, timers_num = 0;
+	int		i, flags, changelog_num, dberr = ZBX_DB_FAIL, itemtrigs_num = 0, function_timers_num = 0,
+			trigger_timers_num = 0;
 	double		sec, queues_sec, changelog_sec, update_sec = 0, timers_sec = 0, topology_sec = 0,
 			um_cache_dup_sec = 0;
 
@@ -8579,7 +8582,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		used_size = dbconfig_used_size();
 
 		dc_schedule_trigger_timers((ZBX_DBSYNC_INIT == mode ? &trend_queue : NULL), time(NULL),
-				pfunction_timers, ptrigger_timers, &timers_num);
+				pfunction_timers, ptrigger_timers, &function_timers_num, &trigger_timers_num);
 
 		timers_sec = zbx_time() - sec;
 		timers_size = dbconfig_used_size() - used_size;
@@ -8594,8 +8597,9 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() reindex    : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes (%d).",
 				__func__, update_sec, update_size, itemtrigs_num);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() timers     : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes (%d).", __func__,
-				timers_sec, timers_size, timers_num);
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() timers     : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes "
+				"(%d function, %d trigger).", __func__,
+				timers_sec, timers_size, function_timers_num, trigger_timers_num);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() topology   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.", __func__,
 				topology_sec, topology_size);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() um_cache   : " ZBX_FS_DBL " sec " ZBX_FS_I64 " bytes.",
