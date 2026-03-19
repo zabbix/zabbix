@@ -33,6 +33,8 @@ class CFeatureFlagHelper {
 			MEDIA_TYPE_WEBHOOK => 'Webhook'
 		];
 
+		natsort($all_types);
+
 		if (!is_array($denied_media_types)) {
 			return $all_types;
 		}
