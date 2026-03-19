@@ -57,7 +57,6 @@
 #include "zbxinterface.h"
 #include "zbxhistory.h"
 #include "zbx_expression_constants.h"
-#include "zbxhash.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
 
