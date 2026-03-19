@@ -6037,6 +6037,7 @@ int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char 
 	char		*sql;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
+	int		ret = FAIL;
 
 	sql = zbx_dsprintf(NULL,
 			"select ip"
@@ -6052,10 +6053,11 @@ int	zbx_db_get_main_interface_ip(const zbx_uint64_t hostid, const unsigned char 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		zbx_strlcpy(ip_buffer, row[0], sz_ip_buffer);
-		return SUCCEED;
+		ret = SUCCEED;
 	}
+	zbx_db_free_result(result);
 
-	return FAIL;
+	return ret;
 }
 
 /******************************************************************************
