@@ -14,6 +14,7 @@
 
 #include "zbxlog.h"
 
+#include "zbxcommon.h"
 #include "zbxmutexs.h"
 #include "zbxstr.h"
 #include "zbxtime.h"
@@ -38,7 +39,7 @@ static ZBX_THREAD_LOCAL int	*plog_level = &log_level;
 #define LOG_LEVEL_INC_SUCCEED	1
 #define LOG_LEVEL_INC_FAIL	2
 
-#define LOG_COMPONENT_NAME_LEN	64
+#define LOG_COMPONENT_NAME_LEN	ZBX_MAX_PROCNAME_LEN
 static ZBX_THREAD_LOCAL int	log_level_change = LOG_LEVEL_UNCHANGED;
 static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
 #undef LOG_COMPONENT_NAME_LEN

@@ -116,6 +116,13 @@ typedef struct
 }
 zbx_supervisor_t;
 
+typedef struct
+{
+	zbx_supervisor_unit_args_t	*unit_args;
+	void				*(*unit_entry)(void *);
+}
+zbx_supervisor_thread_args_t;
+
 /******************************************************************************
  *                                                                            *
  * Purpose: get process owner and runlevel information for specified process  *
@@ -668,13 +675,21 @@ static int	unit_is_running(void *args)
 	return UNIT_RUNNING == *runstate;
 }
 
-static void	*unit_entry(void *args)
+static void	*supervisor_thread_entry(void *args)
 {
-	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
+	zbx_supervisor_thread_args_t	*thread_args = (zbx_supervisor_thread_args_t *)args;
+	zbx_supervisor_unit_args_t	*unit_args = thread_args->unit_args;
+	void				*(*unit_entry)(void *) = thread_args->unit_entry;
+	sigjmp_buf			jmp_ret;
 
-	zbx_set_is_running(unit_is_running, unit_args->runstate);
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
-	return unit_args->thread_entry(args);
+	zbx_set_is_running(unit_is_running, thread_args->unit_args->runstate);
+	zbx_set_log_component(unit_args->name, unit_args->logger);
+
+	zbx_free(args);
+
+	return unit_entry(unit_args);
 }
 
 /******************************************************************************
@@ -692,16 +707,22 @@ static void	supervisor_unit_start(zbx_supervisor_unit_t *unit, void *(*thread_en
 	int				err;
 	pthread_attr_t			attr;
 	zbx_supervisor_unit_args_t	*unit_args;
+	zbx_supervisor_thread_args_t	*thread_args;
 
+	thread_args = (zbx_supervisor_thread_args_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_thread_args_t));
 	unit_args = (zbx_supervisor_unit_args_t *)zbx_malloc(NULL, sizeof(zbx_supervisor_unit_args_t));
 	unit_args->args = *args;
 	unit_args->logger = &unit->logger;
 	unit_args->runstate = &unit->runstate;
-	unit_args->thread_entry = thread_entry;
 	unit->runstate = UNIT_RUNNING;
+	zbx_snprintf(unit_args->name, sizeof(unit_args->name), "%s #%d",
+			get_process_type_string(args->info.process_type), args->info.process_num);
+
+	thread_args->unit_args = unit_args;
+	thread_args->unit_entry = thread_entry;
 
 	zbx_pthread_init_attr(&attr);
-	if (0 != (err = pthread_create(&unit->handle, &attr, unit_entry, (void *)unit_args)))
+	if (0 != (err = pthread_create(&unit->handle, &attr, supervisor_thread_entry, (void *)thread_args)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot create thread: %s", zbx_strerror(err));
 		zbx_exit(EXIT_FAILURE);
