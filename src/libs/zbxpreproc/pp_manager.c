@@ -1447,7 +1447,6 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_pp_manager_free(manager);
 
 	zbx_ipc_service_close(&service);
-	zbx_free(args);
 
 	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 	zbx_free(args);
