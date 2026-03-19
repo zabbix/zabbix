@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -241,6 +241,12 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		]);
 
 		$data['form_refresh'] = $this->getInput('form_refresh', 0);
+		$data['js_validation_rules'] = $data['roleid'] == null
+			? (new CFormValidator(CControllerUserroleCreate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerUserroleUpdate::getValidationRules()))->getRules();
+
+		$data['js_validation_rules_create'] = (new CFormValidator(CControllerUserroleCreate::getValidationRules()))
+			->getRules();
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user roles'));

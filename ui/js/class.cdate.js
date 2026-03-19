@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -118,37 +118,6 @@ CDate.prototype = {
 				return yr + '-' + appendZero(mnth + 1) + '-' + appendZero(dt) + ' ' + appendZero(hrs) + ':' +
 					appendZero(mnts) + ':' + appendZero(sec);
 		}
-	},
-
-	getZBXDate: function() {
-		var thedate = [];
-		thedate[0] = this.serverDate.getDate();
-		thedate[1] = this.serverDate.getMonth() + 1;
-		thedate[2] = this.serverDate.getFullYear();
-		thedate[3] = this.serverDate.getHours();
-		thedate[4] = this.serverDate.getMinutes();
-		thedate[5] = this.serverDate.getSeconds();
-
-		for (var i = 0; i < thedate.length; i++) {
-			if ((thedate[i] + '').length < 2) {
-				thedate[i] = '0' + thedate[i];
-			}
-		}
-
-		return '' + thedate[2] + thedate[1] + thedate[0] + thedate[3] + thedate[4] + thedate[5];
-	},
-
-	setZBXDate: function(strdate) {
-		this.setTimeObject(
-			strdate.toString().substr(0, 4),
-			strdate.toString().substr(4, 2) - 1,
-			strdate.toString().substr(6, 2),
-			strdate.toString().substr(8, 2),
-			strdate.toString().substr(10, 2),
-			strdate.toString().substr(12, 2)
-		);
-
-		return this.getTime();
 	},
 
 	toString: function() {

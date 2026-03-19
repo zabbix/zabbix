@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,9 @@
 #define ZABBIX_EXPR_H
 
 #include "zbxcommon.h"
+
+#define ZBX_MACRO_EXPAND_NO			0
+#define ZBX_MACRO_EXPAND_YES			1
 
 int	zbx_is_hostname_char(unsigned char c);
 int	zbx_is_key_char(int c);
@@ -37,6 +40,8 @@ int	zbx_user_macro_parse_dyn(const char *macro, char **name, char **context, int
 		unsigned char *context_op);
 char	*zbx_user_macro_unquote_context_dyn(const char *context, int len);
 char	*zbx_user_macro_quote_context_dyn(const char *context, int force_quote, char **error);
+int	zbx_is_user_macro(const char *str);
+
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r, char *error,
 		int max_error_len);
 char	*zbx_function_param_unquote_dyn_ext(const char *param, size_t len, int *quoted, int esc_bs);
@@ -98,6 +103,11 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 #define ZBX_TOKEN_JSONPATH	0x0400000
 #define ZBX_TOKEN_STR_REPLACE	0x0800000
 #define ZBX_TOKEN_STRING	0x1000000
+
+/* lld macro context */
+#define ZBX_MACRO_ANY		(ZBX_TOKEN_LLD_MACRO | ZBX_TOKEN_LLD_FUNC_MACRO | ZBX_TOKEN_USER_MACRO)
+#define ZBX_MACRO_JSON		(ZBX_MACRO_ANY | ZBX_TOKEN_JSON)
+#define ZBX_MACRO_FUNC		(ZBX_MACRO_ANY | ZBX_TOKEN_FUNC_MACRO | ZBX_TOKEN_USER_FUNC_MACRO)
 
 /* location of a substring */
 typedef struct
@@ -285,9 +295,17 @@ const char	*zbx_macro_in_list(const char *str, zbx_strloc_t strloc, const char *
 char		*zbx_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
 const char	**zbx_get_indexable_macros(void);
 
+typedef void (*zbx_rem_create_func_t)(void *);
+typedef void (*zbx_rem_destroy_func_t)(void *);
+
+void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
+		zbx_rem_destroy_func_t destroy_func);
+
 int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_resolv_func_t resolver, ...);
 int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, ...);
+int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+		zbx_macro_resolv_func_t resolver, va_list args);
 
 /* macro function calculation */
 int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);

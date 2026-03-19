@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -113,16 +113,20 @@ class CUploadFile {
 	}
 
 	/**
-	 * Validate image size.
+	 * Validate file size.
 	 *
-	 * @throws Exception if image size is 1MB or greater.
+	 * @param int $max_file_size	maximum size in B
+	 * @param string $file_type		affects exception text
+	 *
+	 * @throws Exception if file size is over the provided limit
 	 */
-	public function validateImageSize() {
-		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > ZBX_MAX_IMAGE_SIZE) {
-			throw new Exception(_s('Image size must be less than %1$s.', convertUnits([
-				'value' => ZBX_MAX_IMAGE_SIZE,
-				'units' => 'B'
-			])));
+	public function validateFileSize(int $max_file_size, string $file_type = 'file') {
+		if ($this->error === UPLOAD_ERR_INI_SIZE || $this->size > $max_file_size) {
+			if ($file_type === 'image') {
+				throw new Exception(_s('Image size must be less than %1$s.', convertUnits(['value' => $max_file_size, 'units' => 'B'])));
+			}
+
+			throw new Exception(_s('File size must be less than %1$s.', convertUnits(['value' => $max_file_size, 'units' => 'B'])));
 		}
 	}
 

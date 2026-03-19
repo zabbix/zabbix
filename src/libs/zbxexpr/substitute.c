@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,6 +16,15 @@
 
 #include "zbx_expression_constants.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
+
+typedef struct
+{
+	const void		*obj;
+	void			*ptr;
+	zbx_rem_destroy_func_t	destroy_func;
+}
+expr_cache_element_t;
 
 /* macros that can be indexed */
 static const char	*ex_macros[] =
@@ -41,14 +50,10 @@ static const char	*ex_macros[] =
 	MVAR_INVENTORY_POC_SECONDARY_NAME, MVAR_INVENTORY_POC_SECONDARY_EMAIL, MVAR_INVENTORY_POC_SECONDARY_PHONE_A,
 	MVAR_INVENTORY_POC_SECONDARY_PHONE_B, MVAR_INVENTORY_POC_SECONDARY_CELL, MVAR_INVENTORY_POC_SECONDARY_SCREEN,
 	MVAR_INVENTORY_POC_SECONDARY_NOTES,
-	/* PROFILE.* is deprecated, use INVENTORY.* instead */
-	MVAR_PROFILE_DEVICETYPE, MVAR_PROFILE_NAME, MVAR_PROFILE_OS, MVAR_PROFILE_SERIALNO,
-	MVAR_PROFILE_TAG, MVAR_PROFILE_MACADDRESS, MVAR_PROFILE_HARDWARE, MVAR_PROFILE_SOFTWARE,
-	MVAR_PROFILE_CONTACT, MVAR_PROFILE_LOCATION, MVAR_PROFILE_NOTES,
-	MVAR_HOST_HOST, MVAR_HOSTNAME, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
-	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_IPADDRESS, MVAR_HOST_ID,
+	MVAR_HOST_HOST, MVAR_HOST_NAME, MVAR_HOST_DESCRIPTION, MVAR_PROXY_NAME, MVAR_PROXY_DESCRIPTION,
+	MVAR_HOST_CONN, MVAR_HOST_DNS, MVAR_HOST_IP, MVAR_HOST_PORT, MVAR_HOST_ID,
 	MVAR_ITEM_ID, MVAR_ITEM_NAME, MVAR_ITEM_NAME_ORIG, MVAR_ITEM_DESCRIPTION, MVAR_ITEM_DESCRIPTION_ORIG,
-	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG, MVAR_TRIGGER_KEY,
+	MVAR_ITEM_KEY, MVAR_ITEM_KEY_ORIG,
 	MVAR_ITEM_LASTVALUE,
 	MVAR_ITEM_STATE,
 	MVAR_ITEM_VALUE, MVAR_ITEM_VALUETYPE,
@@ -60,16 +65,52 @@ static const char	*ex_macros[] =
 	NULL
 };
 
+static ZBX_THREAD_LOCAL zbx_hashset_t	*expr_cache = NULL;
+
 const char	**zbx_get_indexable_macros(void)
 {
 	return ex_macros;
 }
 
-static int	substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
+/********************************************************************************
+ *                                                                              *
+ * Purpose: request memory to be remembered between calls of resolver function  *
+ *                                                                              *
+ * Parameters: obj          - [IN] unique pointer to attach data to             *
+ *             sz           - [IN] size of required memory                      *
+ *             create_func  - [IN] function for initialize memory               *
+ *             destroy_func - [IN] callback to free related memory              *
+ *                                                                              *
+ * Return value: pointer to remembered memory                                   *
+ *                                                                              *
+ ********************************************************************************/
+void	*zbx_expr_rem(const void *obj, size_t sz, zbx_rem_create_func_t create_func,
+		zbx_rem_destroy_func_t destroy_func)
+{
+	expr_cache_element_t	*entry, local_entry = {0};
+
+	if (NULL == (entry = (expr_cache_element_t *)zbx_hashset_search(expr_cache, &obj)))
+	{
+		entry = &local_entry;
+
+		entry->obj = obj;
+		entry->ptr = zbx_calloc(NULL, 1, sz);
+		entry->destroy_func = destroy_func;
+
+		if (NULL != create_func)
+			create_func(entry->ptr);
+
+		zbx_hashset_insert(expr_cache, entry, sizeof(expr_cache_element_t));
+	}
+
+	return entry->ptr;
+}
+
+int	zbx_substitute_macros_args(zbx_token_search_t search, char **data, char *error, size_t maxerrlen,
 		zbx_macro_resolv_func_t resolver, va_list args)
 {
 	zbx_macro_resolv_data_t	p = {0};
-	int			found, res = SUCCEED;
+	int			found, res = SUCCEED, is_expr_cache_owner = 0;
 	char			c, *m_ptr, *replace_to = NULL;
 	size_t			data_alloc, data_len;
 
@@ -85,6 +126,13 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 
 	if (SUCCEED != zbx_token_find(*data, p.pos, &p.token, p.token_search))
 		goto out;
+
+	if (NULL == expr_cache)
+	{
+		expr_cache = zbx_malloc(expr_cache, sizeof(zbx_hashset_t));
+		zbx_hashset_create(expr_cache, 10, ZBX_DEFAULT_PTR_HASH_FUNC, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+		is_expr_cache_owner = 1;
+	}
 
 	data_alloc = data_len = strlen(*data) + 1;
 
@@ -180,7 +228,8 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 
 			va_end(pargs);
 
-			if (SUCCEED < ret) continue; /* resolver did everything */
+			if (SUCCEED < ret) /* resolver did everything */
+				continue;
 
 			if ((ZBX_TOKEN_FUNC_MACRO == p.token.type || ZBX_TOKEN_USER_FUNC_MACRO == p.token.type) &&
 					NULL != replace_to)
@@ -230,6 +279,26 @@ static int	substitute_macros_args(zbx_token_search_t search, char **data, char *
 			zbx_free(m_ptr);
 
 		p.pos++;
+	}
+
+	if (1 == is_expr_cache_owner)
+	{
+		zbx_hashset_iter_t	iter;
+		expr_cache_element_t	*entry;
+
+		zbx_hashset_iter_reset(expr_cache, &iter);
+
+		while (NULL != (entry = (expr_cache_element_t *)zbx_hashset_iter_next(&iter)))
+		{
+			if (NULL != entry->destroy_func && NULL != entry->ptr)
+				entry->destroy_func(entry->ptr);
+
+			zbx_free(entry->ptr);
+			zbx_hashset_iter_remove(&iter);
+		}
+
+		zbx_hashset_destroy(expr_cache);
+		zbx_free(expr_cache);
 	}
 
 out:
@@ -287,7 +356,7 @@ int	zbx_substitute_macros(char **data, char *error, size_t maxerrlen, zbx_macro_
 
 	va_start(args, resolver);
 
-	ret = substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
+	ret = zbx_substitute_macros_args(ZBX_TOKEN_SEARCH_BASIC, data, error, maxerrlen, resolver, args);
 
 	va_end(args);
 
@@ -302,7 +371,7 @@ int	zbx_substitute_macros_ext_search(zbx_token_search_t search, char **data, cha
 
 	va_start(args, resolver);
 
-	ret = substitute_macros_args(search, data, error, maxerrlen, resolver, args);
+	ret = zbx_substitute_macros_args(search, data, error, maxerrlen, resolver, args);
 
 	va_end(args);
 

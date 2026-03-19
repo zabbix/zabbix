@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -277,8 +277,8 @@ class testFormHostGroup extends testFormGroups {
 			$link = $discovered_by->query('link', $lld_name)->one();
 			$this->assertTrue($link->isClickable());
 
-			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].'&hostid='.
-					$link_ids[$lld_name]['host_prototype_id'].'&context=host';
+			$link_url = 'zabbix.php?action=popup&popup=host.prototype.edit&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].
+					'&hostid='.$link_ids[$lld_name]['host_prototype_id'].'&context=host';
 			$this->assertEquals($link_url, $link->getAttribute('href'));
 		}
 

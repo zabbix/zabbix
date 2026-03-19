@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -198,7 +198,8 @@ class testFormTabIndicators extends CWebTest {
 			[
 				[
 					// Zabbix server, Discovery rule => Block devices discovery
-					'url' => 'host_prototypes.php?form=create&parent_discoveryid=66355&context=host',
+					'url' => 'zabbix.php?action=host.prototype.list&parent_discoveryid=66355&context=host',
+					'create_button' => 'Create host prototype',
 					'form' => 'name:hostPrototypeForm',
 					'tabs' => [
 						[

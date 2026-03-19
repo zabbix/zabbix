@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -172,38 +172,6 @@ function checkAll(form_name, chkMain, shkName) {
 
 function Confirm(msg) {
 	return confirm(msg);
-}
-
-/**
- * Function removes input elements in specified form that matches given selector.
- *
- * @param {object}|{string}  form_name  Form element in which input elements will be selected. If given value is 'null',
- *                                      the DOM document object will be used.
- * @param {string} selector             String containing one or more commas separated CSS selectors.
- *
- * @returns {bool}
- */
-function removeVarsBySelector(form_name, selector) {
-	if (form_name !== null) {
-		var source = is_string(form_name) ? document.forms[form_name] : form_name;
-	}
-	else {
-		var source = document;
-	}
-
-	if (!source) {
-		return false;
-	}
-
-	var inputs = source.querySelectorAll(selector);
-
-	if (inputs.length) {
-		for (var i in inputs) {
-			if (typeof inputs[i] === 'object') {
-				inputs[i].parentNode.removeChild(inputs[i]);
-			}
-		}
-	}
 }
 
 function create_var(form_name, var_name, var_value, doSubmit) {
@@ -880,36 +848,6 @@ function showHideVisible(obj) {
  */
 function isVisible(element) {
 	return element.getClientRects().length > 0 && window.getComputedStyle(element).visibility !== 'hidden';
-}
-
-/**
- * Switch element classes and return final class.
- *
- * @param object|string obj			object or object id
- * @param string        class1
- * @param string        class2
- *
- * @return string
- */
-function switchElementClass(obj, class1, class2) {
-	obj = (typeof obj === 'string') ? jQuery('#' + obj) : jQuery(obj);
-
-	if (obj.length > 0) {
-		if (obj.hasClass(class1)) {
-			obj.removeClass(class1);
-			obj.addClass(class2);
-
-			return class2;
-		}
-		else if (obj.hasClass(class2)) {
-			obj.removeClass(class2);
-			obj.addClass(class1);
-
-			return class1;
-		}
-	}
-
-	return null;
 }
 
 /**

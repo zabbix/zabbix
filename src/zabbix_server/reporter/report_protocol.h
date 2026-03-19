@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -57,6 +57,7 @@ void	report_deserialize_begin_report(const unsigned char *data, char **name, cha
 		zbx_vector_ptr_pair_t *params);
 
 zbx_uint32_t	report_serialize_send_report(unsigned char **data, const zbx_db_mediatype *mt,
-		const zbx_vector_str_t *emails);
-void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos);
+		const zbx_vector_str_t *emails, zbx_uint64_t reportid, int message_type);
+void	report_deserialize_send_report(const unsigned char *data, zbx_db_mediatype *mt, zbx_vector_str_t *sendtos,
+		zbx_uint64_t *reportid, int *message_type);
 #endif

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,22 +55,6 @@ class CApiPskHelper {
 
 			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 				'/'.($i + 1).'/tls_psk', _('another tls_psk value is already associated with given tls_psk_identity')
-			));
-		}
-	}
-
-	public static function checkPskOfIdentityInAutoregistration(array $psk_pair): void {
-		$row = DBfetch(DBselect(
-			'SELECT NULL'.
-			' FROM config_autoreg_tls'.
-			' WHERE '.dbConditionString('tls_psk_identity', [$psk_pair['tls_psk_identity']]).
-				' AND '.dbConditionString('tls_psk', [$psk_pair['tls_psk']], true),
-			1
-		));
-
-		if ($row) {
-			throw new APIException(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/tls_psk',
-				_('another tls_psk value is already associated with given tls_psk_identity')
 			));
 		}
 	}

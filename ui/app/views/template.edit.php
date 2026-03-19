@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -168,6 +168,7 @@ if ($data['vendor']) {
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'template',
 	'tags' => $data['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
 	'readonly' => $data['readonly'],
 	'tabs_id' => 'template-tabs',
 	'tags_tab_id' => 'template-tags-tab',
@@ -187,8 +188,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	)
 	->addRow(null, new CPartial($macros_tmpl, [
 		'macros' => $data['macros'],
-		'readonly' => $data['readonly'],
-		'has_inline_validation' => true
+		'readonly' => $data['readonly']
 	]), 'template_macros_container');
 
 if (!$data['readonly']) {
@@ -196,7 +196,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setErrorLabel(_('Macro'))
 						->addClass('macro')
@@ -210,7 +210,7 @@ if (!$data['readonly']) {
 						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -237,7 +237,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setErrorLabel(_('Macro'))
 						->addClass('macro')
@@ -274,7 +274,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))

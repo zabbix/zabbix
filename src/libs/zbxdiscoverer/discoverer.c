@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,7 +18,6 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
-#include "zbxexpression.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -41,6 +40,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
+#include "zbxcalc.h"
 
 #ifdef HAVE_NETSNMP
 #	include "zbxpoller.h"
@@ -794,6 +794,11 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 
 				dcheck->timeout = tmt_simple;
 			}
+		}
+
+		for (i = 0; i < drule->dchecks.values_num; i++)
+		{
+			zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
 			if (0 != dcheck->uniq)
 			{

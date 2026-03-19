@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1168,8 +1168,8 @@ class testItemTest extends CWebTest {
 						 * (0)macro (1)=> (2)value
 						 */
 						$macros['actual'][] = [
-							'macro' => $columns[0]->getText(),
-							'value' => $columns[2]->getText()
+							'macro' => $columns[0]->query('tag:z-textarea-flexible')->one()->getValue(),
+							'value' => $columns[2]->query('tag:z-textarea-flexible')->one()->getValue()
 						];
 					}
 					foreach ($macros as &$array) {

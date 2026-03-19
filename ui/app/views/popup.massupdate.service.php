@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -42,7 +42,7 @@ $tags_form_grid = (new CFormGrid())
 					->setHeader([_('Name'), _('Value'), ''])
 					->addClass('tags-table'),
 				(new CTemplateTag('tag-row-tmpl'))
-					->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false]))
+					->addItem(renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => '']))
 			]))
 				->setId('tags-field')
 				->addClass(ZBX_STYLE_TABLE_FORMS)

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -215,6 +215,7 @@ class CControllerTriggerList extends CController {
 		if ($filter_tags) {
 			$options['evaltype'] = $filter_evaltype;
 			$options['tags'] = $filter_tags;
+			$options['inheritedTags'] = true;
 		}
 
 		$prefetched_triggers = API::Trigger()->get($options);
@@ -245,10 +246,13 @@ class CControllerTriggerList extends CController {
 				'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
 				'selectDiscoveryData' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
 				'selectTags' => ['tag', 'value'],
+				'selectInheritedTags' => ['tag', 'value'],
 				'triggerids' => array_keys($prefetched_triggers),
 				'preservekeys' => true,
 				'nopermissions' => true
 			]);
+
+			CTagHelper::mergeOwnAndInheritedTags($triggers, true);
 
 			foreach ($triggers as &$trigger) {
 				CArrayHelper::sort($trigger['hosts'], ['name']);
@@ -409,7 +413,7 @@ class CControllerTriggerList extends CController {
 			'parent_templates' => getTriggerParentTemplates($triggers, ZBX_FLAG_DISCOVERY_NORMAL),
 			'paging' => $paging,
 			'dep_triggers' => $dep_triggers,
-			'tags' => makeTags($triggers, true, 'triggerid', ZBX_TAG_COUNT_DEFAULT, $filter_tags),
+			'tags' => CTagHelper::getTagsHtml($triggers, ZBX_TAG_OBJECT_TRIGGER, ['filter_tags' => $filter_tags]),
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 

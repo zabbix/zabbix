@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -49,18 +49,20 @@ class CControllerHostGroupDisable extends CController {
 
 		DBstart();
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'status', 'host'],
+			'output' => ['hostid'],
 			'groupids' => $groupids,
 			'editable' => true
 		]);
 
+		foreach ($hosts as &$host) {
+			$host['status'] = HOST_STATUS_NOT_MONITORED;
+		}
+		unset($host);
+
 		$result = true;
 
 		if ($hosts) {
-			$result = API::Host()->massUpdate([
-				'hosts' => $hosts,
-				'status' => HOST_STATUS_NOT_MONITORED
-			]);
+			$result = API::Host()->update($hosts);
 		}
 
 		$result = DBend($result);

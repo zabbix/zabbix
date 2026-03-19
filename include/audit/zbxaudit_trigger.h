@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -59,7 +59,7 @@ void	zbx_audit_trigger_update_json_add_dependency(int audit_context_mode, int fl
 void	zbx_audit_trigger_update_json_remove_dependency(int audit_context_mode, int flags, zbx_uint64_t triggerdepid,
 		zbx_uint64_t triggerid);
 void	zbx_audit_trigger_update_json_add_tags_and_values(int audit_context_mode, zbx_uint64_t triggerid, int flags,
-		zbx_uint64_t triggertagid, const char *tag, const char *value);
+		zbx_uint64_t triggertagid, const char *tag, const char *value, int automatic);
 void	zbx_audit_trigger_update_json_delete_tags(int audit_context_mode, zbx_uint64_t triggerid, int flags,
 		zbx_uint64_t triggertagid);
 void	zbx_audit_trigger_update_json_update_trigger_tag_create_entry(int audit_context_mode, zbx_uint64_t triggerid,
@@ -70,5 +70,6 @@ void	zbx_audit_trigger_update_json_update_tag_##resource(int audit_context_mode,
 		int trigger_flags, zbx_uint64_t triggertagid, type1 resource##_old, type1 resource##_new);
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(tag, const char*)
 PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(value, const char*)
+PREPARE_AUDIT_TRIGGER_UPDATE_TAG_H(automatic, int)
 
 #endif	/* ZABBIX_AUDIT_TRIGGER_H */

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -174,7 +174,7 @@ class CMenuHelper {
 						'trigger.list?context=template', 'graph.list?context=template',
 						'host_discovery.php?context=template', 'item.prototype.list?context=template',
 						'trigger.prototype.list?context=template', 'graph.prototype.list?context=template',
-						'host_prototypes.php?context=template', 'httpconf.php?context=template',
+						'host.prototype.list?context=template', 'httpconf.php?context=template',
 						'host_discovery_prototypes.php?context=template'
 					])
 				: null,
@@ -185,7 +185,7 @@ class CMenuHelper {
 						'item.list?context=host', 'trigger.list?context=host', 'graph.list?context=host',
 						'host_discovery.php?context=host', 'item.prototype.list?context=host',
 						'trigger.prototype.list?context=host', 'graph.prototype.list?context=host',
-						'host_prototypes.php?context=host', 'httpconf.php?context=host',
+						'host.prototype.list?context=host', 'httpconf.php?context=host',
 						'host_discovery_prototypes.php?context=host'
 					])
 				: null,

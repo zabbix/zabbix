@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -664,12 +664,12 @@ function getActionOperationDescriptions(array $operations, int $eventsource, arr
 					CArrayHelper::sort($operation['optag'], ['tag', 'value']);
 
 					foreach ($operation['optag'] as $tag) {
-						$value = getTagString($tag);
+						$value = CTagHelper::getTagString($tag);
 
 						if ($value !== '') {
 							$tags[] = (new CSpan($value))
 								->addClass(ZBX_STYLE_TAG)
-								->setHint(getTagString($tag));
+								->setHint($value);
 						}
 					}
 

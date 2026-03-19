@@ -24,7 +24,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -619,6 +619,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.data.process[''odbc poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes odbc poller not started'
           master_item:
             key: 'zabbix[stats,{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -4498,7 +4500,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -5093,6 +5095,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.data.process[''odbc poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes odbc poller not started'
           master_item:
             key: 'zabbix.stats[{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:
@@ -6896,7 +6900,7 @@ zabbix_export:
         Specify the address of the remote Zabbix proxy as the values for the `Zabbix proxy Address` and `Zabbix proxy Port` configuration fields. Don't forget to adjust the `StatsAllowedIP` parameter in the remote proxy's configuration file to allow the collection of statistics.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -7491,6 +7495,8 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.data.process[''odbc poller''].busy.avg'
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Processes odbc poller not started'
           master_item:
             key: 'zabbix.stats[{$ZABBIX.PROXY.ADDRESS},{$ZABBIX.PROXY.PORT}]'
           tags:

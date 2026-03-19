@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,11 +19,7 @@
  * @var array $data
  */
 
-$form_action = (new CUrl('zabbix.php'))
-	->setArgument('action', 'popup.usergroupmapping.check')
-	->getUrl();
-
-$form = (new CForm('post', $form_action))
+$form = (new CForm())
 	->setId('user-group-mapping-edit-form')
 	->setName('user-group-mapping-edit-form');
 
@@ -46,7 +42,6 @@ $usergroup_multiselect = (new CMultiSelect([
 	]
 ]))
 	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
-$inline_js = $usergroup_multiselect->getPostJS();
 
 $user_role_multiselect = (new CMultiSelect([
 	'name' => 'roleid',
@@ -64,7 +59,6 @@ $user_role_multiselect = (new CMultiSelect([
 ]))
 	->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 	->setId('roleid');
-$inline_js .= $user_role_multiselect->getPostJS();
 
 $source = $data['idp_type'] == IDP_TYPE_SAML ? _('SAML') : _('LDAP');
 
@@ -96,11 +90,6 @@ $form
 			(new CLabel(_('User role'), 'roleid_ms'))->setAsteriskMark(),
 			new CFormField($user_role_multiselect)
 		])
-	)
-	->addItem(
-		(new CScriptTag('
-			user_group_mapping_edit_popup.init();
-		'))->setOnDocumentReady()
 	);
 
 if ($data['add_group']) {
@@ -108,10 +97,9 @@ if ($data['add_group']) {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => 'js-add',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'user_group_mapping_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -120,17 +108,21 @@ else {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => 'js-update',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'user_group_mapping_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
 
 $output = [
 	'header' => $title,
-	'script_inline' => $inline_js . $this->readJsFile('popup.usergroupmapping.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.usergroupmapping.edit.js.php').
+		'user_group_mapping_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'existing_names' => $data['existing_names']
+		]).');',
 	'body' => $form->toString(),
 	'buttons' => $buttons
 ];

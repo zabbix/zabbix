@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -46,6 +46,7 @@ class CControllerPopup extends CController {
 			'graph.edit' => _('Graph edit'),
 			'graph.prototype.edit' => _('Graph prototype edit'),
 			'host.edit' => _('Host edit'),
+			'host.prototype.edit' => _('Host prototype edit'),
 			'host.wizard.edit' => _('Host Wizard'),
 			'hostgroup.edit' => _('Host group edit'),
 			'item.edit' => _('Item edit'),

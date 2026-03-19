@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,6 +17,8 @@
 #include "zbxtypes.h"
 #ifndef _WINDOWS
 #	include "zbxnix.h"
+#else
+#	include "zbxwin32.h"
 #endif
 /* unresolved symbols needed for linking */
 
@@ -124,6 +126,12 @@ int	get_zbx_config_enable_remote_commands(void)
 	return zbx_config_enable_remote_commands;
 }
 
+static void	zbx_backtrace_with_exit(void)
+{
+	zbx_backtrace();
+	_exit(1);
+}
+
 /* test itself */
 
 int	main (void)
@@ -134,7 +142,7 @@ int	main (void)
 	};
 
 	zbx_set_log_level(LOG_LEVEL_TRACE);
-	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zbx_mock_log_impl, get_zbx_progname, zbx_backtrace_with_exit);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif

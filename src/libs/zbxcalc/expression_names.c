@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcalc.h"
+
 #include "eval.h"
 
 #include "zbx_discoverer_constants.h"
-#include "zbxexpression.h"
 
 const char	*zbx_dservice_type_string(zbx_dservice_type_t service)
 {

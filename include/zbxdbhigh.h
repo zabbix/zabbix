@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -113,6 +113,8 @@
 
 /* Binary item type can only be as a dependent item. */
 #define ZBX_HISTORY_BIN_VALUE_LEN		(ZBX_MEBIBYTE * 16)
+
+#define ZBX_HISTORY_JSON_VALUE_LEN		(ZBX_MEBIBYTE * 127)
 
 #define ZBX_HISTORY_LOG_SOURCE_LEN		64
 #define ZBX_HISTORY_LOG_SOURCE_LEN_MAX		(ZBX_HISTORY_LOG_SOURCE_LEN + 1)
@@ -316,15 +318,6 @@ zbx_db_alert;
 
 typedef struct
 {
-	zbx_uint64_t	housekeeperid;
-	char		*tablename;
-	char		*field;
-	zbx_uint64_t	value;
-}
-zbx_db_housekeeper;
-
-typedef struct
-{
 	zbx_uint64_t	httptestid;
 	char		*name;
 	char		*agent;
@@ -521,7 +514,7 @@ typedef struct
 } zbx_user_names_t;
 
 int	zbx_db_get_user_names(zbx_uint64_t userid, zbx_user_names_t **names);
-void	zbx_user_names_clean(zbx_user_names_t *names);
+void	zbx_user_names_clean(zbx_user_names_t **names);
 char	*zbx_db_get_unique_hostname_by_sample(const char *host_name_sample, const char *field_name);
 
 typedef enum

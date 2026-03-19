@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -132,7 +132,7 @@ static int	check_ssh(const char *host, unsigned short port, int timeout, int *va
 	*value_int = 0;
 
 	if (SUCCEED == (ret = zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout,
-			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
+			ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL, ZBX_DNS_FAILOVER_DISABLED)))
 	{
 		while (NULL != (buf = zbx_tcp_recv_line(&s)))
 		{
@@ -242,7 +242,7 @@ static int	check_telnet(const char *host, unsigned short port, int timeout, int 
 	*value_int = 0;
 
 	if (SUCCEED == zbx_tcp_connect(&s, sysinfo_get_config_source_ip(), host, port, timeout, ZBX_TCP_SEC_UNENCRYPTED,
-			NULL, NULL))
+			NULL, NULL, ZBX_DNS_FAILOVER_DISABLED))
 	{
 		if (SUCCEED == zbx_telnet_test_login(&s))
 			*value_int = 1;

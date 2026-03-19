@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,8 +44,9 @@ if ($host_is_discovered) {
 	if ($data['host']['discoveryRule']) {
 		if ($data['is_discovery_rule_editable']) {
 			$discovery_rule = (new CLink($data['host']['discoveryRule']['name'],
-				(new CUrl('host_prototypes.php'))
-					->setArgument('form', 'update')
+				(new CUrl('zabbix.php'))
+					->setArgument('action', 'popup')
+					->setArgument('popup', 'host.prototype.edit')
 					->setArgument('parent_discoveryid', $data['host']['discoveryRule']['itemid'])
 					->setArgument('hostid', $data['host']['discoveryData']['parent_hostid'])
 					->setArgument('context', 'host')
@@ -420,6 +421,7 @@ $ipmi_tab = (new CFormGrid())
 $tags_tab = new CPartial('configuration.tags.tab', [
 	'source' => 'host',
 	'tags' => $data['host']['tags'],
+	'show_inherited_tags' => $data['show_inherited_tags'],
 	'with_automatic' => true,
 	'tabs_id' => 'host-tabs',
 	'tags_tab_id' => 'host-tags-tab',
@@ -437,8 +439,7 @@ $macros_tab = (new CFormList('macrosFormList'))
 	->addRow(null,
 		new CPartial('hostmacros.list.html', [
 			'macros' => $data['host']['macros'],
-			'readonly' => false,
-			'has_inline_validation' => true
+			'readonly' => false
 		]), 'macros_container'
 	);
 
@@ -446,7 +447,7 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 	->addItem(
 		(new CRow([
 			(new CCol([
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -463,7 +464,7 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 					->setErrorLabel(_('Value'))
 			))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -483,14 +484,13 @@ $macro_row_tmpl = (new CTemplateTag('macro-row-tmpl'))
 				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 				->setColSpan(4)
 		)
-
 	);
 
 $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 	->addItem(
 		(new CRow([
 			(new CCol([
-				(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->addClass('macro')
 					->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -529,7 +529,7 @@ $macro_row_inherited_tmpl = (new CTemplateTag('macro-row-tmpl-inherited'))
 	->addItem(
 		(new CRow([
 			(new CCol(
-				(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+				(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 					->setErrorContainer('macros_#{rowNum}_error_container')
 					->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)

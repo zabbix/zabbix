@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,20 +19,22 @@
  */
 ?>
 
-window.token_edit_popup = {
-	overlay: null,
-	dialogue: null,
-	form: null,
-	form_name: null,
-	expires_at_field: null,
-	expires_at_label: null,
-	expires_at: null,
-	expires_state: null,
+window.token_edit_popup = new class {
+	overlay = null;
+	dialogue = null;
+	form = null;
+	form_element = null;
+	form_name = null;
+	expires_at_field = null;
+	expires_at_label = null;
+	expires_at = null;
+	expires_state = null;
 
-	init({admin_mode}) {
+	init({rules, admin_mode}) {
 		this.overlay = overlays_stack.getById('token.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', admin_mode == 1 ? 'token.list' : 'user.token.list');
@@ -42,72 +44,120 @@ window.token_edit_popup = {
 		this.expires_at_label = this.expires_at_field.previousSibling;
 		this.expires_at = document.getElementById('expires_at');
 		this.expires_state = document.getElementById('expires_state');
-		this.expiresAtHandler();
+		this.#expiresAtHandler();
+		this.#initActions();
+	}
 
-		this.expires_state.addEventListener('change', () => this.expiresAtHandler());
-	},
+	#initActions() {
+		const footer = this.overlay.$dialogue.$footer[0];
 
-	submit() {
-		this.removePopupMessages();
+		footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		footer.querySelector('.js-delete')?.addEventListener('click', () => this.#delete());
+		footer.querySelector('.js-regenerate')?.addEventListener('click', () => this.#regenerate());
 
-		const fields = this.preprocessFormFields(getFormFields(this.form));
-		const curl = new Curl(this.form.getAttribute('action'));
+		// Name field value shall be unique per selected user, trigger API unique validation.
+		jQuery(document.getElementById('userid')).change(() => this.form.validateChanges(['name', 'userid']));
+		this.expires_state.addEventListener('change', () => this.#expiresAtHandler());
+	}
 
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
+	#submit() {
+		this.#removePopupMessages();
 
-				if ('data' in response) {
-					this.loadTokenView(response.data);
-				}
-				else {
-					overlayDialogueDestroy(this.overlay.dialogueid);
+		const fields = this.form.getAllValues();
+		const curl = new Curl('zabbix.php');
+		curl.setArgument('action', fields.tokenid == 0 ? 'token.create' : 'token.update');
 
-					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-				}
-			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
+		this.form.validateSubmit(fields).then((result) => {
+			if (!result) {
 				this.overlay.unsetLoading();
-			});
-	},
 
-	regenerate() {
-		this.removePopupMessages();
+				return;
+			}
 
-		const fields = this.preprocessFormFields(getFormFields(this.form));
-		fields.regenerate = '1';
-
-		const curl = new Curl(this.form.getAttribute('action'));
-
-		fetch(curl.getUrl(), {
-			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
-			body: JSON.stringify(fields)
-		})
-			.then((response) => response.json())
-			.then((response) => {
-				if ('error' in response) {
-					throw {error: response.error};
-				}
-
-				this.loadTokenView(response.data);
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
 			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
-	},
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
 
-	delete(tokenid) {
-		this.removePopupMessages();
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+
+						return;
+					}
+
+					if ('data' in response) {
+						this.#loadTokenView(response.data);
+					}
+					else {
+						overlayDialogueDestroy(this.overlay.dialogueid);
+
+						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+					}
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.finally(() => this.overlay.unsetLoading());
+		});
+	}
+
+	#regenerate() {
+		this.#removePopupMessages();
+
+		const fields = {...this.form.getAllValues(), regenerate: '1'};
+
+		this.form.validateSubmit(fields).then(result => {
+			if (!result) {
+				this.overlay.unsetLoading();
+
+				return;
+			}
+
+			const confirmation = <?=
+				json_encode(_('Regenerate selected API token? Previously generated token will become invalid.'))
+			?>;
+
+			if (!window.confirm(confirmation)) {
+				this.overlay.unsetLoading();
+
+				return;
+			}
+
+			const curl = new Curl('zabbix.php');
+			curl.setArgument('action', fields.tokenid == 0 ? 'token.create' : 'token.update');
+
+			fetch(curl.getUrl(), {
+				method: 'POST',
+				headers: {'Content-Type': 'application/json'},
+				body: JSON.stringify(fields)
+			})
+				.then((response) => response.json())
+				.then((response) => {
+					if ('error' in response) {
+						throw {error: response.error};
+					}
+
+					if ('form_errors' in response) {
+						this.form.setErrors(response.form_errors, true, true);
+						this.form.renderErrors();
+
+						return;
+					}
+
+					this.#loadTokenView(response.data);
+				})
+				.catch((exception) => this.#ajaxExceptionHandler(exception))
+				.finally(() => this.overlay.unsetLoading());
+		});
+	}
+
+	#delete() {
+		this.#removePopupMessages();
 
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'token.delete');
@@ -117,7 +167,7 @@ window.token_edit_popup = {
 			method: 'POST',
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({
-				tokenids: [tokenid],
+				tokenids: [this.form.getAllValues().tokenid],
 				admin_mode: '1'
 			})
 		})
@@ -131,27 +181,23 @@ window.token_edit_popup = {
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
-			.catch(this.ajaxExceptionHandler)
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
-	},
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
+	}
 
 	close() {
 		this.overlay.$dialogue[0].dispatchEvent(new CustomEvent('token-edit.close'));
-	},
+	}
 
-	removePopupMessages() {
-		for (const el of this.form.parentNode.children) {
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
 			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
 				el.parentNode.removeChild(el);
 			}
 		}
-	},
+	}
 
-	ajaxExceptionHandler: (exception) => {
-		const form = token_edit_popup.form;
-
+	#ajaxExceptionHandler(exception) {
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -164,26 +210,10 @@ window.token_edit_popup = {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		form.parentNode.insertBefore(message_box, form);
-	},
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
 
-	preprocessFormFields(fields) {
-		this.trimFields(fields);
-		fields.status = fields.status || <?= ZBX_AUTH_TOKEN_DISABLED ?>;
-
-		return fields;
-	},
-
-	trimFields(fields) {
-		const fields_to_trim = ['name', 'description'];
-		for (const field of fields_to_trim) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
-			}
-		}
-	},
-
-	expiresAtHandler() {
+	#expiresAtHandler() {
 		if (this.expires_state.checked == false) {
 			let expires_state_hidden = document.createElement('input');
 			expires_state_hidden.setAttribute('type', 'hidden');
@@ -205,9 +235,9 @@ window.token_edit_popup = {
 				expires_state_hidden.parentNode.removeChild(expires_state_hidden);
 			}
 		}
-	},
+	}
 
-	loadTokenView(data) {
+	#loadTokenView(data) {
 		const curl = new Curl('zabbix.php');
 		curl.setArgument('action', 'popup.token.view');
 
@@ -239,7 +269,7 @@ window.token_edit_popup = {
 
 				this.overlay.setProperties({...response, prevent_navigation: false});
 			})
-			.catch(this.ajaxExceptionHandler)
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => {
 				this.overlay.unsetLoading();
 				this.overlay.recoverFocus();

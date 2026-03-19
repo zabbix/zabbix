@@ -1,0 +1,25 @@
+---
+test case: "ZBX_TCP_SEC_UNENCRYPTED"
+in:
+  type: "ZBX_TCP_SEC_UNENCRYPTED"
+out:
+  type: "unencrypted"
+---
+test case: "ZBX_TCP_SEC_TLS_CERT"
+in:
+  type: "ZBX_TCP_SEC_TLS_CERT"
+out:
+  type: "TLS with certificate"
+---
+test case: "ZBX_TCP_SEC_TLS_PSK"
+in:
+  type: "ZBX_TCP_SEC_TLS_PSK"
+out:
+  type: "TLS with PSK"
+---
+test case: "unknown"
+in:
+  type: "unknown"
+out:
+  type: "unknown"
+...

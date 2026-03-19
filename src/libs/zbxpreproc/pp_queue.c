@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,7 +15,6 @@
 #include "pp_queue.h"
 #include "pp_task.h"
 #include "zbxalgo.h"
-#include "zbxpreprocbase.h"
 
 #define PP_TASK_QUEUE_INIT_NONE		0x00
 #define PP_TASK_QUEUE_INIT_LOCK		0x01

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,7 +19,7 @@ require_once __DIR__.'/../common/testFormFilter.php';
 /**
  * @backup profiles, hosts
  *
- * @dataSource UserPermissions, WidgetCommunication
+ * @dataSource UserPermissions, WidgetCommunication, MonitoringOverview
  *
  * @onBefore prepareProblemsData
  */
@@ -333,7 +333,7 @@ class testFormFilterProblems extends testFormFilter {
 		if ($data['filter']['Name'] === 'Timeselect_1') {
 			// Enable Set custom time period option.
 			$filter->editProperties();
-			$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
+			$dialog = COverlayDialogElement::get('Filter properties')->asForm();
 			$dialog->fill(['Override time period selector' => true, 'From' => 'now-2y']);
 			$dialog->submit();
 			COverlayDialogElement::ensureNotPresent();

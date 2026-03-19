@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -99,6 +99,7 @@ abstract class CControllerLatest extends CController {
 				'webitems' => true,
 				'evaltype' => $filter['evaltype'],
 				'tags' => $filter['tags'] ?: null,
+				'inheritedTags' => true,
 				'filter' => [
 					'status' => [ITEM_STATUS_ACTIVE],
 					'state' => $filter['state'] == -1 ? null : $filter['state']
@@ -116,11 +117,14 @@ abstract class CControllerLatest extends CController {
 					'status', 'value_type', 'units', 'description', 'state', 'error'
 				],
 				'selectTags' => ['tag', 'value'],
+				'selectInheritedTags' => ['tag', 'value'],
 				'selectValueMap' => ['mappings'],
 				'itemids' => array_keys($select_items),
 				'webitems' => true,
 				'preservekeys' => true
 			]), ['name_resolved' => 'name']);
+
+			CTagHelper::mergeOwnAndInheritedTags($items);
 
 			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is ON, read-write items are the same.
 			$items_rw = $items;
@@ -178,8 +182,10 @@ abstract class CControllerLatest extends CController {
 		$items = CMacrosResolverHelper::resolveItemDescriptions($items);
 		$items = CMacrosResolverHelper::resolveTimeUnitMacros($items, ['delay', 'history', 'trends']);
 
+		// Extra byte to trim values that exceeds length limit.
+		$length = ZBX_HINTBOX_CONTENT_LIMIT + 1;
 		$history = Manager::History()->getLastValues($items, 2,
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD))
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD)), $length
 		);
 
 		$hosts_on_page = array_intersect_key($prepared_data['hosts'],

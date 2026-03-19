@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -29,8 +29,7 @@ typedef enum
 	INTERFACE_TYPE_SNMP,
 	INTERFACE_TYPE_IPMI,
 	INTERFACE_TYPE_JMX,
-	INTERFACE_TYPE_OPT = 254,
-	INTERFACE_TYPE_ANY = 255
+	INTERFACE_TYPE_OPT = 254
 }
 zbx_interface_type_t;
 const char	*zbx_interface_type_string(zbx_interface_type_t type);

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -86,16 +86,6 @@ function get_trigger_by_triggerid($triggerid) {
 	error(_s('No trigger with trigger ID "%1$s".', $triggerid));
 
 	return false;
-}
-
-function get_triggers_by_hostid($hostid) {
-	return DBselect(
-		'SELECT DISTINCT t.*'.
-		' FROM triggers t,functions f,items i'.
-		' WHERE i.hostid='.zbx_dbstr($hostid).
-			' AND f.itemid=i.itemid'.
-			' AND f.triggerid=t.triggerid'
-	);
 }
 
 /**

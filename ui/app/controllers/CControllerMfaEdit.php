@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,6 +24,7 @@ class CControllerMfaEdit extends CController {
 		$fields = [
 			'mfaid' =>			'db mfa.mfaid',
 			'type' =>			'in '.MFA_TYPE_TOTP.','.MFA_TYPE_DUO,
+			'existing_names' =>	'array',
 			'name' =>			'db mfa.name',
 			'hash_function' =>	'in '.TOTP_HASH_SHA1.','.TOTP_HASH_SHA256.','.TOTP_HASH_SHA512,
 			'code_length' =>	'in '.TOTP_CODE_LENGTH_6.','.TOTP_CODE_LENGTH_8,
@@ -66,8 +67,13 @@ class CControllerMfaEdit extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'add_mfa_method' => 1
+			'add_mfa_method' => 1,
+			'existing_names' =>	[]
 		];
+
+		$data['js_validation_rules'] = (new CFormValidator(
+			CControllerMfaCheck::getValidationRules($this->getInput('existing_names', []))
+		))->getRules();
 
 		$this->getInputs($data, array_keys($data));
 

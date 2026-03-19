@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -154,6 +154,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 			'axisy' => _('Y-axis'),
 			'axisy'.GRAPH_YAXIS_SIDE_LEFT => _('Left'),
 			'axisy'.GRAPH_YAXIS_SIDE_RIGHT => _('Right'),
+			'invert_values' => _('Invert values'),
+			'invert_values'.SVG_GRAPH_INVERT_VALUES_OFF => _('Off'),
+			'invert_values'.SVG_GRAPH_INVERT_VALUES_ON => _('On'),
 			'timeshift' => _('Time shift')
 		];
 	}
@@ -228,6 +231,9 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 
 						['name' => _('Y-axis').'/'._('Left'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_LEFT]],
 						['name' => _('Y-axis').'/'._('Right'), 'callback' => 'addOverride', 'args' => ['axisy', GRAPH_YAXIS_SIDE_RIGHT]],
+
+						['name' => _('Invert values').'/'._('Off'), 'callback' => 'addOverride', 'args' => ['invert_values', SVG_GRAPH_INVERT_VALUES_OFF]],
+						['name' => _('Invert values').'/'._('On'), 'callback' => 'addOverride', 'args' => ['invert_values', SVG_GRAPH_INVERT_VALUES_ON]],
 
 						['name' => _('Time shift'), 'callback' => 'addOverride', 'args' => ['timeshift']]
 					]

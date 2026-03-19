@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -114,7 +114,7 @@ $filter->addFilterTab(_('Filter'), [
 		])
 ]);
 
-(new CHtmlPage())
+$page = (new CHtmlPage())
 	->setTitle(_('Services'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::SERVICES_SERVICE_EDIT))
 	->setControls(
@@ -132,17 +132,28 @@ $filter->addFilterTab(_('Filter'), [
 	)
 	->setNavigation(
 		$breadcrumbs ? new CList([new CBreadcrumbs($breadcrumbs)]) : null
-	)
-	->addItem($filter)
-	->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
-		'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
-		'paging', 'return_url'
-	]))))
-	->show();
+	);
+
+if ($data['is_inaccessible']) {
+	$page->addItem(
+		makeMessageBox(ZBX_STYLE_MSG_BAD, [], _('No permissions to referred object or it does not exist!'))
+	);
+}
+else {
+	$page
+		->addItem($filter)
+		->addItem(new CPartial('service.list.edit', array_intersect_key($data, array_flip([
+			'can_monitor_problems', 'path', 'is_filtered', 'max_in_table', 'service', 'services', 'events', 'tags',
+			'paging', 'return_url'
+		]))));
+}
+
+$page->show();
 
 (new CScriptTag('
 	view.init('.json_encode([
 		'serviceid' => $data['service'] !== null ? $data['service']['serviceid'] : null,
+		'is_inaccessible' => $data['is_inaccessible'],
 		'path' => $data['path'],
 		'is_filtered' => $data['is_filtered'],
 		'mode_switch_url' => $data['view_mode_url'],

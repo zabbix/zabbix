@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -70,7 +70,9 @@ class CControllerPopupMediaTypeMappingEdit extends CController {
 			'period' => ZBX_DEFAULT_INTERVAL,
 			'severity' => $this->hasInput('add_media_type_mapping')
 				? DB::getDefault('userdirectory_media', 'severity') : 0,
-			'active' => MEDIA_STATUS_ACTIVE
+			'active' => MEDIA_STATUS_ACTIVE,
+			'js_validation_rules' => (new CFormValidator(CControllerPopupMediaTypeMappingCheck::getValidationRules()))
+				->getRules()
 		];
 		$this->getInputs($data, array_keys($data));
 		$data += [

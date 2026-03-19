@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -28,15 +28,17 @@ class CSvgGraphSimpleTrigger extends CSvgGroup {
 
 	private $constant;
 	private $description;
+	private $label_suffix;
 	private $value;
 	private $min;
 	private $max;
 
-	public function __construct($constant, $description, $value, $min, $max) {
+	public function __construct($constant, $description, $label_suffix, $value, $min, $max) {
 		parent::__construct();
 
 		$this->constant = $constant;
 		$this->description = $description;
+		$this->label_suffix = $label_suffix;
 		$this->value = $value;
 		$this->min = $min;
 		$this->max = $max;
@@ -94,7 +96,7 @@ class CSvgGraphSimpleTrigger extends CSvgGroup {
 
 		$this->addItem([
 			new CSvgLine($this->x, $y, $this->x + $this->width, $y),
-			(new CSvgText($this->constant, $label_x, $y - self::LABEL_MARGIN / 2))
+			(new CSvgText($this->constant.$this->label_suffix, $label_x, $y - self::LABEL_MARGIN / 2))
 				->setAttribute('text-anchor', $this->side == GRAPH_YAXIS_SIDE_RIGHT ? 'end' : null)
 		]);
 	}

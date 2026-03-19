@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,8 +26,10 @@ class CControllerGraphPrototypeUpdate extends CController {
 			'context' =>			'required|in '.implode(',', ['host', 'template']),
 			'parent_discoveryid'=>	'required|db items.itemid',
 			'name' =>				'required|db graphs.name|not_empty',
-			'width' =>				'required|db graphs.width|not_empty|ge 20|le 65535',
-			'height' => 			'required|db graphs.height|not_empty|ge 20|le 65535',
+			'width' =>				'required|db graphs.width|not_empty|ge '.CGraphDraw::GRAPH_WIDTH_MIN.
+				'|le '.CGraphDraw::GRAPH_WIDTH_MAX,
+			'height' => 			'required|db graphs.height|not_empty|ge '.CGraphDraw::GRAPH_HEIGHT_MIN.
+				'|le '.CGraphDraw::GRAPH_HEIGHT_MAX,
 			'graphtype' =>			'required|db graphs.graphtype|in '.implode(',', [
 				GRAPH_TYPE_NORMAL, GRAPH_TYPE_STACKED, GRAPH_TYPE_PIE, GRAPH_TYPE_EXPLODED
 			]),

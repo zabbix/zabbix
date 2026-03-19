@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -456,7 +456,6 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 
 	$ts = [];
-	$ts['now'] = time();
 	$range_time_parser = new CRangeTimeParser();
 
 	foreach (['from' => $from, 'to' => $to] as $field => $value) {
@@ -467,10 +466,7 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 
 	$period = $ts['to'] - $ts['from'] + 1;
-	$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-	$max_period = 1 + $ts['now'] - $range_time_parser
-		->getDateTime(true)
-		->getTimestamp();
+	$max_period = CTimePeriodHelper::getMaxPeriod();
 
 	if ($period < ZBX_MIN_PERIOD) {
 		error(_n('Minimum time period to display is %1$s minute.',
@@ -479,24 +475,13 @@ function validateTimeSelectorPeriod($from, $to) {
 
 		invalid_url();
 	}
-	elseif ($period > $max_period) {
+	elseif ($period > $max_period + 1) {
 		error(_n('Maximum time period to display is %1$s day.',
 			'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 		));
 
 		invalid_url();
 	}
-}
-
-/**
- * Validate, if unix time in (1970.01.01 00:00:01 - 2038.01.19 00:00:00).
- *
- * @param int $time
- *
- * @return bool
- */
-function validateUnixTime($time) {
-	return (is_numeric($time) && $time > 0 && $time <= 2147464800);
 }
 
 /**

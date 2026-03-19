@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,6 +44,7 @@ typedef struct
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
 	zbx_uint64_t	history_bin_counter;	/* the number of processed bin values */
+	zbx_uint64_t	history_json_counter;	/* the number of processed json values */
 	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 }
 zbx_dc_stats_t;
@@ -87,6 +88,7 @@ zbx_wcache_info_t;
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 #define ZBX_STATS_HISTORY_BIN_COUNTER	22
+#define ZBX_STATS_HISTORY_JSON_COUNTER	23
 
 /* 'zbx_pp_value_opt_t' element 'flags' values */
 #define ZBX_PP_VALUE_OPT_NONE		0x0000	/* 'zbx_pp_value_opt_t' has no data */
@@ -175,6 +177,7 @@ int	zbx_hc_queue_get_size(void);
 int	zbx_hc_get_history_compression_age(void);
 double	zbx_hc_mem_pused(void);
 double	zbx_hc_mem_pused_lock(void);
+void	zbx_hc_remove_items_by_ids(zbx_vector_uint64_t *itemids);
 
 typedef void (*zbx_sync_history_cache_f)(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
 		int config_history_storage_pipelines, zbx_history_sync_stats_t *stats);

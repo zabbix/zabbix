@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -246,27 +246,44 @@ func Test_prepareConnectString(t *testing.T) {
 			"+tnsServiceDecodeOk",
 			args{
 				tnsNone,
-				newConnDetHostname(t, "localhost", "XE%23"),
+				// service name can only be [a...z] [A...Z] [0...9] _ with first alphanumeric.
+				// QueryEscape removes the hashtag in the result.
+				newConnDetHostname(t, "localhost", "XE#"),
 				1,
 			},
 			want{
 				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))` +
-					`(CONNECT_DATA=(SERVICE_NAME="XE#"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
+					`(CONNECT_DATA=(SERVICE_NAME="XE"))(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))`,
 				false,
 				false,
 			},
 		},
 		{
-			"-tnsServiceDecodeFail",
+			"+tlsTcps",
+			args{
+				tnsNone,
+				newConnDetHostname(t, "tcps://myhost:2484", "XE"),
+				1000000000, //any
+			},
+			want{
+				`(DESCRIPTION=(ADDRESS=(PROTOCOL=tcps)(HOST=myhost)(PORT=2484))` +
+					`(CONNECT_DATA=(SERVICE_NAME="XE"))(CONNECT_TIMEOUT=1)(RETRY_COUNT=0))`,
+				false,
+				false,
+			},
+		},
+		{
+			"+tnsServiceDecodeQueryEscapes",
 			args{
 				tnsNone,
 				newConnDetHostname(t, "localhost", "XE%ZZ"),
 				1, //any
 			},
 			want{
-				"",
+				"(DESCRIPTION=(ADDRESS=(PROTOCOL=tcp)(HOST=localhost)(PORT=))" +
+					"(CONNECT_DATA=(SERVICE_NAME=\"XE%25ZZ\"))" +
+					"(CONNECT_TIMEOUT=0)(RETRY_COUNT=0))", false,
 				false,
-				true,
 			},
 		},
 		{

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -111,8 +111,9 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 			$last = count($data['macros']) - 1;
 
 			foreach ($data['macros'] as $i => $lld_macro) {
-				$this->zbxTestInputType('lld_macro_paths_'.$i.'_lld_macro', $lld_macro['macro'] );
-				$this->zbxTestInputType('lld_macro_paths_'.$i.'_path', $lld_macro['path'] );
+				$this->query('id:lld_macro_paths_'.$i.'_lld_macro')->one()->fill($lld_macro['macro']);
+				$this->query('id:lld_macro_paths_'.$i.'_path')->one()->fill($lld_macro['path']);
+
 				if ($i !== $last) {
 					$this->zbxTestClick('lld_macro_add');
 				}
@@ -166,8 +167,12 @@ class testInheritanceDiscoveryRule extends CLegacyWebTest {
 				if (array_key_exists('macros', $data)) {
 					$this->zbxTestTabSwitch('LLD macros');
 					foreach ($data['macros'] as $i => $lld_macro) {
-						$this->zbxTestAssertElementPresentXpath('//textarea[@id="lld_macro_paths_'.$i.'_lld_macro"][text()="'.$lld_macro['macro'].'"][@readonly]');
-						$this->zbxTestAssertElementPresentXpath('//textarea[@id="lld_macro_paths_'.$i.'_path"][text()="'.$lld_macro['path'].'"][@readonly]');
+						$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="lld_macro_paths_'.$i.
+								'_lld_macro"][@value="'.$lld_macro['macro'].'"][@readonly]'
+						);
+						$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="lld_macro_paths_'.$i.
+								'_path"][@value="'.$lld_macro['path'].'"][@readonly]'
+						);
 					}
 				}
 				break;

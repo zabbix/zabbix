@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -325,16 +325,14 @@ static int	threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_
  * Parameters: threads       - [IN] handles to threads or processes           *
  *             threads_flags - [IN] thread priority flags                     *
  *             threads_num   - [IN] number of handles                         *
- *             ret           - [IN] terminate thread politely on SUCCEED or   *
- *                                  ask all threads to exit immediately on    *
- *                                  FAIL                                      *
+ *             timeout       - [IN] terminate thread politely or ask threads  *
+ *                                  to exit immediately on timeout            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret)
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout)
 {
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 	sigset_t	set;
-	int		timeout = SUCCEED == ret ? 0 : SEC_PER_MIN;
 
 	/* ignore SIGCHLD signals in order for zbx_sleep() to work */
 	sigemptyset(&set);

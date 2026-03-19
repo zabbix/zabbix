@@ -1078,20 +1078,7 @@
 	}
 }
 
-// Dashboard list table.
-.dashboard-list {
-	.status-green {
-		background-color: $dashboard-my-bg-color;
-		border-color: $dashboard-my-bg-color;
-	}
-
-	.status-yellow {
-		background-color: $dashboard-shared-bg-color;
-		border-color: $dashboard-shared-bg-color;
-	}
-}
-
-.overlay-dialogue {
+.overlay-dialogue.modal {
 	&.modal-widget-configuration {
 		--modal-width: auto;
 		--modal-max-width: calc(100vw - 20px);
@@ -1114,6 +1101,14 @@
 	}
 
 	.table-tags {
+		.table-tags-input {
+			width: 150px;
+		}
+
+		z-select {
+			min-width: 140px;
+		}
+
 		tr:last-of-type {
 			td {
 				padding-bottom: 0;

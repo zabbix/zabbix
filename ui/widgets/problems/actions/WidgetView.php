@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,6 +21,7 @@ use CControllerDashboardWidgetView,
 	CRoleHelper,
 	CScreenProblem,
 	CSettingsHelper,
+	CTagHelper,
 	API;
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -206,10 +207,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 
 			if ($this->fields_values['show_tags']) {
-				$data['tags'] = makeTags($data['problems'] + $symptom_data['problems'], true, 'eventid',
-					$this->fields_values['show_tags'], $this->fields_values['tags'], null,
-					$this->fields_values['tag_name_format'], $this->fields_values['tag_priority']
-				);
+				$object_type = $this->fields_values['show'] == TRIGGERS_OPTION_ALL
+					? ZBX_TAG_OBJECT_EVENT
+					: ZBX_TAG_OBJECT_PROBLEM;
+
+				$data['tags'] = CTagHelper::getTagsHtml($data['problems'] + $symptom_data['problems'], $object_type, [
+					'filter_tags' => $this->fields_values['tags'],
+					'tag_priority' => $this->fields_values['tag_priority'],
+					'show_tags_limit' => $this->fields_values['show_tags'],
+					'tag_name_format' => $this->fields_values['tag_name_format']
+				]);
 			}
 
 			$this->setResponse(new CControllerResponseData($data + [

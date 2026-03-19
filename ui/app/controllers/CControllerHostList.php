@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -197,7 +197,8 @@ class CControllerHostList extends CController {
 		$hosts = API::Host()->get([
 			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
-			'tags' => $filter['tags'],
+			'tags' => $filter['tags'] ?: null,
+			'inheritedTags' => true,
 			'groupids' => $filter_groupids,
 			'templateids' => $filter['templates'] ? array_keys($filter['templates']) : null,
 			'proxyids' => $proxyids,
@@ -251,6 +252,7 @@ class CControllerHostList extends CController {
 			'selectDiscoveryRule' => ['itemid', 'name', 'lifetime_type', 'enabled_lifetime_type'],
 			'selectDiscoveryData' => ['parent_hostid', 'status', 'ts_delete', 'ts_disable', 'disable_source'],
 			'selectTags' => ['tag', 'value'],
+			'selectInheritedTags' => ['tag', 'value'],
 			'hostids' => array_column($hosts, 'hostid'),
 			'preservekeys' => true
 		]);
@@ -406,6 +408,8 @@ class CControllerHostList extends CController {
 			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
 		}
 
+		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
+
 		$data = [
 			'action' => $this->getAction(),
 			'hosts' => $hosts,
@@ -423,7 +427,7 @@ class CControllerHostList extends CController {
 			'proxy_groups_ms' => $proxy_groups_ms,
 			'profileIdx' => 'web.hosts.filter',
 			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-			'tags' => makeTags($hosts, true, 'hostid', ZBX_TAG_COUNT_DEFAULT, $filter['tags']),
+			'tags' => CTagHelper::getTagsHtml($hosts, ZBX_TAG_OBJECT_HOST, ['filter_tags' => $filter['tags']]),
 			'config' => [
 				'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 			],

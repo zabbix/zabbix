@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -223,7 +223,7 @@ static void	async_wake(evutil_socket_t fd, short events, void *arg)
 
 static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, const char *zbx_progname)
 {
-	zbx_dc_item_t			*items = NULL;
+	zbx_dc_poller_item_t		items = { .any = NULL };
 	AGENT_RESULT			*results;
 	int				*errcodes, total = 0;
 	zbx_timespec_t			timespec;
@@ -233,11 +233,11 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 #ifdef HAVE_NETSNMP
 	if (0 != poller_config->clear_cache)
 	{
-		if (0 != poller_config->processing)
-			goto exit;
-
 		if (ZBX_SNMP_POLLER_CLEAR_CACHE == poller_config->clear_cache)
 		{
+			if (0 != poller_config->processing)
+				goto exit;
+
 			zbx_unset_snmp_bulkwalk_options();
 			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
 			zbx_set_snmp_bulkwalk_options(zbx_progname);
@@ -260,9 +260,11 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 	for (int j = 0; j < poller_items.values_num; j++)
 	{
-		int	num;
+		int		num;
+		unsigned char 	poller_type;
 
 		items = poller_items.values[j]->items;
+		poller_type = poller_items.values[j]->poller_type;
 		results = poller_items.values[j]->results;
 		errcodes = poller_items.values[j]->errcodes;
 		num = poller_items.values[j]->num;
@@ -274,40 +276,41 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			if (SUCCEED != errcodes[i])
 				continue;
 
-			if (ITEM_TYPE_HTTPAGENT == items[i].type)
+			if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 			{
-	#ifdef HAVE_LIBCURL
-				errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i],
+#ifdef HAVE_LIBCURL
+				errcodes[i] = zbx_async_check_httpagent(&items.httpagent_items[i], &results[i],
 						poller_config->config_source_ip, poller_config->config_ssl_ca_location,
 						poller_config->config_ssl_cert_location,
 						poller_config->config_ssl_key_location, poller_config->curl_handle);
-	#else
+#else
 				errcodes[i] = NOTSUPPORTED;
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled"
-						" in: missing cURL library"));
-	#endif
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
+						"Support for HTTP agent was not compiled in: missing cURL library"));
+#endif
 			}
-			else if (ITEM_TYPE_ZABBIX == items[i].type)
+			else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 			{
-				errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
-						poller_config, poller_config, poller_config->base,
-						poller_config->channel, poller_config->dnsbase,
+				errcodes[i] = zbx_async_check_agent(&items.agent_items[i], &results[i],
+						process_agent_result, poller_config, poller_config,
+						poller_config->base, poller_config->channel, poller_config->dnsbase,
 						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 			}
-			else
+			else /* ZBX_POLLER_TYPE_SNMP */
 			{
-	#ifdef HAVE_NETSNMP
+#ifdef HAVE_NETSNMP
 				zbx_set_snmp_bulkwalk_options(zbx_progname);
 
-				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
-					poller_config, poller_config, poller_config->base, poller_config->channel,
-					poller_config->dnsbase, poller_config->config_source_ip,
-					ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO, ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
-	#else
+				errcodes[i] = zbx_async_check_snmp(&items.snmp_items[i], &results[i],
+						process_snmp_result, poller_config, poller_config,
+						poller_config->base, poller_config->channel, poller_config->dnsbase,
+						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO,
+						ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES);
+#else
 				errcodes[i] = NOTSUPPORTED;
-				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled"
-						"in."));
-	#endif
+				SET_MSG_RESULT(&results[i], zbx_strdup(NULL,
+						"Support for SNMP checks was not compiled in."));
+#endif
 			}
 
 			if (SUCCEED == errcodes[i])
@@ -319,18 +322,44 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		/* process item values */
 		for (int i = 0; i < num; i++)
 		{
-			if (SUCCEED != errcodes[i])
-			{
-				if (ZBX_IS_RUNNING())
-				{
-					zbx_preprocess_item_value(items[i].itemid, items[i].value_type, items[i].flags,
-							items[i].preprocessing, NULL, &timespec,
-							ITEM_STATE_NOTSUPPORTED, results[i].msg);
-				}
+			if (SUCCEED == errcodes[i])
+				continue;
 
-				zbx_async_manager_requeue(poller_config->manager, items[i].itemid, errcodes[i],
-						timespec.sec);
+			zbx_uint64_t	itemid;
+			unsigned char	value_type;
+			unsigned char	flags;
+			unsigned char	preprocessing;
+
+			switch (poller_type)
+			{
+				case ZBX_POLLER_TYPE_HTTPAGENT:
+					itemid = items.httpagent_items[i].itemid;
+					value_type = items.httpagent_items[i].value_type;
+					flags = items.httpagent_items[i].flags;
+					preprocessing = items.httpagent_items[i].preprocessing;
+					break;
+				case ZBX_POLLER_TYPE_AGENT:
+					itemid = items.agent_items[i].itemid;
+					value_type = items.agent_items[i].value_type;
+					flags = items.agent_items[i].flags;
+					preprocessing = items.agent_items[i].preprocessing;
+					break;
+				default: /* ZBX_POLLER_TYPE_SNMP */
+					itemid = items.snmp_items[i].itemid;
+					value_type = items.snmp_items[i].value_type;
+					flags = items.snmp_items[i].flags;
+					preprocessing = items.snmp_items[i].preprocessing;
 			}
+
+			if (ZBX_IS_RUNNING())
+			{
+				zbx_preprocess_item_value(itemid, value_type, flags,
+						preprocessing, NULL, &timespec,
+						ITEM_STATE_NOTSUPPORTED, results[i].msg);
+			}
+
+			zbx_async_manager_requeue(poller_config->manager, itemid, errcodes[i],
+					timespec.sec);
 		}
 
 		zbx_poller_item_free(poller_items.values[j]);
@@ -425,6 +454,11 @@ static void	fd_event_clean(zbx_fd_event *fd_event)
 	event_free(fd_event->event);
 }
 
+static void	fd_event_clean_wrapper(void *data)
+{
+	fd_event_clean((zbx_fd_event*)data);
+}
+
 static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_poller_args *poller_args_in,
 		int process_num)
 {
@@ -434,11 +468,11 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_hashset_create_ext(&poller_config->interfaces, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
-			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)zbx_interface_status_clean,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC, zbx_interface_status_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	zbx_hashset_create_ext(&poller_config->fd_events, 100, fd_event_hash_func,
-			fd_event_compare_func, (zbx_clean_func_t)fd_event_clean,
+			fd_event_compare_func, fd_event_clean_wrapper,
 			ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
 	if (NULL == (poller_config->base = event_base_new()))
@@ -535,22 +569,22 @@ static void	sock_state_cb(void *data, int s, int read, int write)
 		goto out;
 	}
 
-	struct event	*ev = event_new(poller_config->base, s, events|EV_PERSIST, ares_process_fd_cb,
+	fd_event_local.event = event_new(poller_config->base, s, events|EV_PERSIST, ares_process_fd_cb,
 			poller_config->channel);
 
-	if (NULL == ev)
+	if (NULL == fd_event_local.event)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot create new event");
 		goto out;
 	}
 
-	if (0 != event_add(ev, NULL))
+	if (0 != event_add(fd_event_local.event, NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot add event");
-		event_free(ev);
+		event_free(fd_event_local.event);
 		goto out;
 	}
-	fd_event_local.event = ev;
+
 	zbx_hashset_insert(&poller_config->fd_events, &fd_event_local, sizeof(fd_event_local));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -562,7 +596,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 {
 	char			*timeout;
 #ifdef HAVE_ARES
-	struct ares_options	options;
+	struct ares_options	options = {0};
 	int			optmask, status;
 
 	status = ares_library_init(ARES_LIB_INIT_ALL);
@@ -574,6 +608,10 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	}
 
 	optmask = ARES_OPT_SOCK_STATE_CB|ARES_OPT_TIMEOUT;
+#ifdef ARES_OPT_QUERY_CACHE
+	optmask |= ARES_OPT_QUERY_CACHE;
+	options.qcache_max_ttl = SEC_PER_HOUR;
+#endif
 	options.sock_state_cb = sock_state_cb;
 	options.sock_state_cb_data = poller_config;
 	options.timeout = poller_args_in->config_comms->config_timeout;
@@ -673,7 +711,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 {
 	zbx_thread_poller_args		*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	time_t				last_stat_time;
+	time_t				last_stat_time, now = 0;
 #ifdef HAVE_NETSNMP
 	time_t				last_snmp_engineid_hk_time = 0;
 #endif
@@ -778,9 +816,12 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		if (ZBX_IS_RUNNING())
 			zbx_preprocessor_flush();
 
-		if (STAT_INTERVAL <= time(NULL) - last_stat_time)
+		now = time(NULL);
+
+		if (STAT_INTERVAL <= now - last_stat_time)
 		{
 			zbx_update_env(get_process_type_string(process_type), zbx_time());
+			zbx_malloc_trim(now, SEC_PER_HOUR, ZBX_MEBIBYTE);
 
 			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec, awaiting %d%s]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
@@ -788,7 +829,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
-			last_stat_time = time(NULL);
+			last_stat_time = now;
 			zabbix_log(LOG_LEVEL_TRACE, "number of active events:%d",
 				event_base_get_num_events(poller_config.base, EVENT_BASE_COUNT_ADDED));
 		}
@@ -811,10 +852,10 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 #ifdef HAVE_NETSNMP
 #define	SNMP_ENGINEID_HK_INTERVAL	86400
-		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
+		if (ZBX_POLLER_TYPE_SNMP == poller_type && now >=
 				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
-			last_snmp_engineid_hk_time = time(NULL);
+			last_snmp_engineid_hk_time = now;
 			poller_config.clear_cache = ZBX_SNMP_POLLER_HOUSEKEEP_CACHE;
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL

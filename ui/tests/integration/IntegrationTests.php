@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,19 +17,20 @@ require_once dirname(__FILE__).'/testInitialConfSync.php';
 require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
-require_once dirname(__FILE__).'/testBinaryValueTypeDataCollection.php';
+require_once dirname(__FILE__).'/testBinaryAndJSONValueTypesDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
 require_once dirname(__FILE__).'/testItemState.php';
 require_once dirname(__FILE__).'/testValuemaps.php';
 require_once dirname(__FILE__).'/testTriggerLinking.php';
+require_once dirname(__FILE__).'/testTagInheritance.php';
 require_once dirname(__FILE__).'/testGraphLinking.php';
 require_once dirname(__FILE__).'/testEscalations.php';
 require_once dirname(__FILE__).'/testAlertingForServices.php';
 require_once dirname(__FILE__).'/testComplexServiceStatus.php';
 require_once dirname(__FILE__).'/testServiceRoles.php';
-require_once dirname(__FILE__).'/testExpressionMacros.php';
+require_once dirname(__FILE__).'/testMacros.php';
 require_once dirname(__FILE__).'/testExpressionTriggerMacros.php';
 require_once dirname(__FILE__).'/testAgentItems.php';
 require_once dirname(__FILE__).'/testScriptItems.php';
@@ -41,7 +42,7 @@ require_once dirname(__FILE__).'/testTriggerState.php';
 /* require_once dirname(__FILE__).'/testTlsRequest.php'; */
 require_once dirname(__FILE__).'/testActiveAvailability.php';
 require_once dirname(__FILE__).'/testEventsCauseAndSymptoms.php';
-require_once dirname(__FILE__).'/testDiscoveryRules.php';
+/* require_once dirname(__FILE__).'/testDiscoveryRules.php'; snmpsim does not work properly on new Debian */
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
@@ -61,6 +62,7 @@ require_once dirname(__FILE__).'/testLLDLinking.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
+require_once dirname(__FILE__).'/testCalculatedExpression.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -71,25 +73,27 @@ class IntegrationTests {
 		if  (substr(getenv('DB'), 0, 4) === "tsdb" ) {
 			$suite->addTestSuite('testTimescaleDb');
 		}
-		$suite->addTestSuite('testDiscoveryRules');
+		/*$suite->addTestSuite('testDiscoveryRules'); */
 		$suite->addTestSuite('testAutoregistration');
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
-		$suite->addTestSuite('testBinaryValueTypeDataCollection');
+		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
 		$suite->addTestSuite('testItemState');
 		$suite->addTestSuite('testValuemaps');
 		$suite->addTestSuite('testTriggerLinking');
+		$suite->addTestSuite('testTagInheritance');
 		$suite->addTestSuite('testGraphLinking');
 		$suite->addTestSuite('testEscalations');
 		$suite->addTestSuite('testAlertingForServices');
 		$suite->addTestSuite('testComplexServiceStatus');
 		$suite->addTestSuite('testServiceRoles');
-		$suite->addTestSuite('testExpressionMacros');
+		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
@@ -117,7 +121,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContext');
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
-
+		$suite->addTestSuite('testCalculatedExpression');
 		return $suite;
 	}
 }

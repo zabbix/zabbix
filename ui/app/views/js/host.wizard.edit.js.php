@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -175,7 +175,10 @@ window.host_wizard_edit = new class {
 				fields: {
 					id: {
 						regex: /^<?= ZBX_PREG_HOST_FORMAT ?>$/,
-						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>
+						maxlength: <?= DB::getFieldLength('hosts', 'host') ?>,
+						messages: {
+							regex: <?= json_encode(_('Incorrect characters used for host name.')) ?>
+						}
 					}
 				}
 			},
@@ -901,8 +904,12 @@ window.host_wizard_edit = new class {
 							row_index,
 							type: 'integer',
 							required: true,
-							min: <?= ZBX_MIN_PORT_NUMBER ?>,
-							max: <?= ZBX_MAX_PORT_NUMBER ?>
+							min: interface_type === <?= INTERFACE_TYPE_AGENT ?>
+								? <?= ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER ?>
+								: <?= ZBX_MIN_PORT_NUMBER ?>,
+							max:  interface_type === <?= INTERFACE_TYPE_AGENT ?>
+								? <?= ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER ?>
+								: <?= ZBX_MAX_PORT_NUMBER ?>
 						},
 						...(interface_type === <?= INTERFACE_TYPE_SNMP ?> && {
 							[`interfaces.${row_index}.details.community`]: {
@@ -2106,7 +2113,9 @@ window.host_wizard_edit = new class {
 				}
 
 				if (rule.regex && !rule.regex.test(value)) {
-					return <?= json_encode(_('This value does not match pattern.')) ?>;
+					return rule.messages && rule.messages.regex
+						? rule.messages.regex
+						: <?= json_encode(_('This value does not match pattern.')) ?>;
 				}
 			}
 

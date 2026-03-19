@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,7 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 /**
  * @backup token, connector
  *
- * @dataSource ScheduledReports, Proxies, Services, Sla
+ * @dataSource ScheduledReports, Proxies, Services, Sla, MonitoringOverview
  *
  * @onBefore prepareData
  */
@@ -39,6 +39,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	const ACCESS_DENIED_WITHOUT_HTML = '{"error":{"title":"Access denied","messages":["You are logged in as \"Admin\".'.
 			' You have no permissions to access this page.","If you think this message is wrong, please consult your'.
 			' administrators about getting the necessary permissions."]}}';
+	protected static $hostids;
+	protected static $groupids;
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -50,6 +52,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	}
 
 	public function prepareData() {
+		self::$groupids = CDataHelper::get('MonitoringOverview.groupids');
+		self::$hostids = CDataHelper::get('MonitoringOverview.hostids');
+
 		$tokens = CDataHelper::call('token.create', [
 			'name' => 'api_token_update',
 			'userid' => '1'
@@ -115,8 +120,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #3 Host group update.
 			[
 				[
+					'replace' => true,
 					'db' => 'SELECT * FROM hstgrp',
-					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid=50012'
+					'link' => 'zabbix.php?action=popup&popup=hostgroup.edit&groupid={groupid}'
 				]
 			],
 			// #4 Template group create.
@@ -186,16 +192,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #10 Item update.
 			[
 				[
+					'replace' => true,
 					'db' => 'SELECT * FROM items',
-					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]={hostid}&context=host',
 					'overlay' => 'item_update'
 				]
 			],
 			// #11 Item create.
 			[
 				[
+					'replace' => true,
 					'db' => 'SELECT * FROM items',
-					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]=50011&context=host',
+					'link' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids[0]={hostid}&context=host',
 					'overlay' => 'create',
 					'fields' => [
 						'id:name' => 'CSRF validation item create',
@@ -206,16 +214,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #12 Trigger update.
 			[
 				[
+					'replace' => true,
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]={hostid}',
 					'overlay' => 'trigger_update'
 				]
 			],
 			// #13 Trigger create.
 			[
 				[
+					'replace' => true,
 					'db' => 'SELECT * FROM triggers',
-					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]=50011',
+					'link' => 'zabbix.php?action=trigger.list&filter_set=1&context=host&filter_hostids[0]={hostid}',
 					'overlay' => 'create',
 					'fields' => [
 						'id:name' => 'CSRF test name',
@@ -234,8 +244,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			// #15 Graph create.
 			[
 				[
+					'replace' => true,
 					'db' => 'SELECT * FROM graphs',
-					'link' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D=50011&context=host',
+					'link' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={hostid}&context=host',
 					'overlay' => 'create'
 				]
 			],
@@ -372,26 +383,29 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM images',
-					'link' => 'zabbix.php?action=image.edit&imageid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=image.edit&imageid=1'
 				]
 			],
-			// #32 Image create.
+			/* Commented till problem with file upload solved.
+			// Image create.
 			[
 				[
 					'db' => 'SELECT * FROM images',
 					'link' => 'zabbix.php?action=image.edit&imagetype=1',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF image test name',
+						'id:image' => PHPUNIT_BASEDIR.'/ui/tests/images/image.png'
+					]
 				]
-			],
-			// #33 Icon map update.
+			],*/
+			// #32 Icon map update.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
 					'link' => 'zabbix.php?action=iconmap.edit&iconmapid=101'
 				]
 			],
-			// #34 Icon map create.
+			// #33 Icon map create.
 			[
 				[
 					'db' => 'SELECT * FROM icon_map',
@@ -402,32 +416,32 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #35 Regular expression update.
+			// #34 Regular expression update.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit&regexpid=2'
 				]
 			],
-			// #36 Regular expression create.
+			// #35 Regular expression create.
 			[
 				[
 					'db' => 'SELECT * FROM regexps',
 					'link' => 'zabbix.php?action=regex.edit',
 					'fields' => [
-						'id:name' => 'CSRF test name',
+						'id:name' => 'CSRF regex test name',
 						'id:expressions_0_expression' => 'abc'
 					]
 				]
 			],
-			// #37 Macros update.
+			// #36 Macros update.
 			[
 				[
 					'db' => 'SELECT * FROM globalmacro',
 					'link' => 'zabbix.php?action=macros.edit'
 				]
 			],
-			// #38 Trigger displaying options update.
+			// #37 Trigger displaying options update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -435,15 +449,20 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #39 API token create.
+			// #38 API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
 					'link' => 'zabbix.php?action=token.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'API token create',
+						'xpath://div[@id="userid"]/..' => 'Admin',
+						'id:expires_at' => '2038-01-01 00:00:00'
+					]
 				]
 			],
-			// #40 API token update.
+			// #39 API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -451,7 +470,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #41 Other parameters update.
+			// #40 Other parameters update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -459,31 +478,36 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #42 Proxy update.
+			// #41 Proxy update.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'update'
+					'overlay' => 'update',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy update'
+					]
 				]
 			],
-			// #43 Proxy create.
+			// #42 Proxy create.
 			[
 				[
 					'db' => 'SELECT * FROM hosts',
 					'link' => 'zabbix.php?action=proxy.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation proxy create'
+					]
 				]
 			],
-			// #44 Authentication update.
+			// #43 Authentication update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
-					'link' => 'zabbix.php?action=authentication.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=authentication.edit'
 				]
 			],
-			//#45 User group update.
+			// #44 User group update.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
@@ -491,7 +515,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #46 User group create.
+			// #45 User group create.
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
@@ -499,23 +523,33 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #47 User update.
+			// #46 User update.
 			[
 				[
 					'db' => 'SELECT * FROM users',
-					'link' => 'zabbix.php?action=user.edit&userid=1',
-					'return_button' => true
+					'link' => 'zabbix.php?action=user.edit&userid=1'
 				]
 			],
-			// #48 User create.
+			// #47 User create.
 			[
 				[
 					'db' => 'SELECT * FROM users',
 					'link' => 'zabbix.php?action=user.edit',
-					'return_button' => true
+					'form' => [
+						'selector' => 'id:user-form',
+						'tab' => 'Permissions',
+						'fields' => [
+							'Role' => CFormElement::RELOADABLE_FILL('Admin role')
+						]
+					],
+					'fields' => [
+						'id:username' => 'CSRF user test',
+						'id:password1' => 'ZaBB1x26',
+						'id:password2' => 'ZaBB1x26'
+					]
 				]
 			],
-			// #49 Media update.
+			// #48 Media update.
 			[
 				[
 					'db' => 'SELECT * FROM media',
@@ -523,15 +557,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #50 Media create.
+			// #49 Media create.
 			[
 				[
 					'db' => 'SELECT * FROM media',
 					'link' => 'zabbix.php?action=mediatype.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation media type create'
+					]
 				]
 			],
-			// #51 Script update.
+			// #50 Script update.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
@@ -539,7 +576,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #52 Script create.
+			// #51 Script create.
 			[
 				[
 					'db' => 'SELECT * FROM scripts',
@@ -547,39 +584,43 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'create'
 				]
 			],
-			// #53 User profile update.
+			// #52 User profile update.
 			[
 				[
 					'db' => 'SELECT * FROM profiles',
-					'link' => 'zabbix.php?action=userprofile.edit',
-					'return_button' => true
+					'link' => 'zabbix.php?action=userprofile.edit'
 				]
 			],
-			// #54 User role update.
+			// #53 User role update.
 			[
 				[
 					'db' => 'SELECT * FROM role',
-					'link' => 'zabbix.php?action=userrole.edit&roleid=2',
-					'return_button' => true
+					'link' => 'zabbix.php?action=userrole.edit&roleid=2'
 				]
 			],
-			// #55 User role create.
+			// #54 User role create.
 			[
 				[
 					'db' => 'SELECT * FROM role',
 					'link' => 'zabbix.php?action=userrole.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'User role name'
+					]
 				]
 			],
-			// #56 User API token create.
+			// #55 User API token create.
 			[
 				[
 					'db' => 'SELECT * FROM token',
 					'link' => 'zabbix.php?action=user.token.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'User API token create',
+						'id:expires_at' => '2038-01-01 00:00:00'
+					]
 				]
 			],
-			// #57 User API token update.
+			// #56 User API token update.
 			[
 				[
 					'db' => 'SELECT * FROM token',
@@ -587,7 +628,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #58 Scheduled report create.
+			// #57 Scheduled report create.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -595,7 +636,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #59 Scheduled report update.
+			// #58 Scheduled report update.
 			[
 				[
 					'db' => 'SELECT * FROM report',
@@ -603,15 +644,19 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #60 Connector create.
+			// #59 Connector create.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
 					'link' => 'zabbix.php?action=connector.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF connector test name',
+						'id:url' => 'csrfurl.com'
+					]
 				]
 			],
-			// #61 Connector update.
+			// #60 Connector update.
 			[
 				[
 					'db' => 'SELECT * FROM connector',
@@ -619,15 +664,18 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #62 Problem update.
+			// #61 Problem update.
 			[
 				[
 					'db' => 'SELECT * FROM problem, events, acknowledges',
 					'link' => 'zabbix.php?&action=problem.view&filter_set=1',
-					'overlay' => 'problem'
+					'overlay' => 'problem',
+					'fields' => [
+						'id:message' => 'random Message'
+					]
 				]
 			],
-			// #63 Service create.
+			// #62 Service create.
 			[
 				[
 					'db' => 'SELECT * FROM services',
@@ -638,7 +686,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					]
 				]
 			],
-			// #64 Service update.
+			// #63 Service update.
 			[
 				[
 					'db' => 'SELECT * FROM services',
@@ -646,15 +694,21 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'service'
 				]
 			],
-			// #65 SLA create.
+			// #64 SLA create.
 			[
 				[
 					'db' => 'SELECT * FROM sla',
 					'link' => 'zabbix.php?action=sla.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF SLA create',
+						'id:slo' => '66.6',
+						'id:service_tags_0_tag' => 'csrf_tag',
+						'id:service_tags_0_value' => 'csrf_tag_value'
+					]
 				]
 			],
-			// #66 SLA update.
+			// #65 SLA update.
 			[
 				[
 					'db' => 'SELECT * FROM sla',
@@ -662,14 +716,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #67 Geomap update.
+			// #66 Geomap update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=geomaps.edit'
 				]
 			],
-			// #68 Module update.
+			// #67 Module update.
 			[
 				[
 					'db' => 'SELECT * FROM module',
@@ -677,7 +731,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'overlay' => 'update'
 				]
 			],
-			// #69 Audit log administration update.
+			// #68 Audit log administration update.
 			[
 				[
 					'db' => 'SELECT * FROM module',
@@ -685,7 +739,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'return_button' => true
 				]
 			],
-			// #70 Timeout options update.
+			// #69 Timeout options update.
 			[
 				[
 					'db' => 'SELECT * FROM settings',
@@ -706,6 +760,15 @@ class testPermissionsWithoutCSRF extends CWebTest {
 	 */
 	public function testPermissionsWithoutCSRF_ElementRemove($data) {
 		$old_hash = CDBHelper::getHash($data['db']);
+
+		if (CTestArrayHelper::get($data, 'replace')) {
+			$replacements = [
+				'{hostid}' => self::$hostids['1_Host_to_check_Monitoring_Overview'],
+				'{groupid}' => self::$groupids['Another group to check Overview']
+			];
+			$data['link'] = str_replace(array_keys($replacements), array_values($replacements), $data['link']);
+		}
+
 		$this->page->login()->open($data['link'])->waitUntilReady();
 
 		// If form opens in the overlay dialog - open that dialog.
@@ -734,6 +797,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			}
 		}
 
+		// Fill in mandatory fields that are not editable from initial form view.
+		if (CTestArrayHelper::get($data, 'form')) {
+			$form = $this->query($data['form']['selector'])->asForm()->one();
+			$form->selectTab($data['form']['tab']);
+			$form->fill(CTestArrayHelper::get($data, 'form.fields'));
+		}
+
 		// Fill in mandatory fields in a secondary form if it contains fields that are required for form submission.
 		if (array_key_exists('secondary_dialog', $data)) {
 			$this->query($data['secondary_dialog']['field'])->one()->query('button:Add')->one()->click();
@@ -749,7 +819,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 
 		// Submit Update or Create form.
 		$update_button = 'xpath://div[contains(@class, "tfoot-buttons")]//button[text()="Update"] |'.
-				'//div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
+				' //div[@class="overlay-dialogue-footer"]//button[text()="Update"] |'.
 				' //div[contains(@class, "form-actions")]//button[text()="Update"]';
 		$add_button = 'xpath://button[text()="Add" and @type="submit"] | '.
 				' //div[@class="overlay-dialogue-footer"]//button[text()="Add"]';
@@ -790,8 +860,8 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'token' => true,
 					'token_url' => 'zabbix.php?action=macros.edit',
 					'db' => 'SELECT * FROM globalmacro',
-					'link' => 'zabbix.php?macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0'
-						.'&macros%5B0%5D%5Bdescription%5D=&update=Update&_csrf_token=',
+					'link' => 'zabbix.php?macros%5B0%5D%5Bmacro%5D=&macros%5B0%5D%5Bvalue%5D=&macros%5B0%5D%5Btype%5D=0'.
+						'&macros%5B0%5D%5Bdescription%5D=&update=Update&_csrf_token=',
 					'error' => [
 						'message' => 'Page not found',
 						'details' => null
@@ -803,19 +873,19 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM report',
 					'link' => 'zabbix.php?form_refresh=1&reportid=4&old_dashboardid=1&userid=95'.
-							'&name=Report+for+delete&dashboardid=1&period=0&cycle=0&hours=00&minutes=00&weekdays%5B1%5D=1'.
-							'&weekdays%5B2%5D=2&weekdays%5B4%5D=4&weekdays%5B8%5D=8&weekdays%5B16%5D=16&weekdays%5B32%5D=32'.
-							'&weekdays%5B64%5D=64&active_since=&active_till=&subject=subject+for+report+delete+test'.
-							'&message=message+for+report+delete+test&subscriptions%5B0%5D%5Brecipientid%5D=96'.
-							'&subscriptions%5B0%5D%5Brecipient_type%5D=0&subscriptions%5B0%5D%5Brecipient_name%5D=user-recipient+of+the+report'.
-							'&subscriptions%5B0%5D%5Brecipient_inaccessible%5D=0&subscriptions%5B0%5D%5Bcreatorid%5D=96'.
-							'&subscriptions%5B0%5D%5Bcreator_type%5D=0&subscriptions%5B0%5D%5Bcreator_name%5D=user-recipient+of+the+report'.
-							'&subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0'.
-							'&subscriptions%5B1%5D%5Brecipientid%5D=7&subscriptions%5B1%5D%5Brecipient_type%5D=1'.
-							'&subscriptions%5B1%5D%5Brecipient_name%5D=Zabbix+administrators&subscriptions%5B1%5D%5Brecipient_inaccessible%5D=0'.
-							'&subscriptions%5B1%5D%5Bcreatorid%5D=0&subscriptions%5B1%5D%5Bcreator_type%5D=1'.
-							'&subscriptions%5B1%5D%5Bcreator_name%5D=Recipient&subscriptions%5B1%5D%5Bcreator_inaccessible%5D=0'.
-							'&description=&status=0&action=scheduledreport.update',
+						'&name=Report+for+delete&dashboardid=1&period=0&cycle=0&hours=00&minutes=00&weekdays%5B1%5D=1'.
+						'&weekdays%5B2%5D=2&weekdays%5B4%5D=4&weekdays%5B8%5D=8&weekdays%5B16%5D=16&weekdays%5B32%5D=32'.
+						'&weekdays%5B64%5D=64&active_since=&active_till=&subject=subject+for+report+delete+test'.
+						'&message=message+for+report+delete+test&subscriptions%5B0%5D%5Brecipientid%5D=96'.
+						'&subscriptions%5B0%5D%5Brecipient_type%5D=0&subscriptions%5B0%5D%5Brecipient_name%5D=user-recipient+of+the+report'.
+						'&subscriptions%5B0%5D%5Brecipient_inaccessible%5D=0&subscriptions%5B0%5D%5Bcreatorid%5D=96'.
+						'&subscriptions%5B0%5D%5Bcreator_type%5D=0&subscriptions%5B0%5D%5Bcreator_name%5D=user-recipient+of+the+report'.
+						'&subscriptions%5B0%5D%5Bcreator_inaccessible%5D=0&subscriptions%5B0%5D%5Bexclude%5D=0'.
+						'&subscriptions%5B1%5D%5Brecipientid%5D=7&subscriptions%5B1%5D%5Brecipient_type%5D=1'.
+						'&subscriptions%5B1%5D%5Brecipient_name%5D=Zabbix+administrators&subscriptions%5B1%5D%5Brecipient_inaccessible%5D=0'.
+						'&subscriptions%5B1%5D%5Bcreatorid%5D=0&subscriptions%5B1%5D%5Bcreator_type%5D=1'.
+						'&subscriptions%5B1%5D%5Bcreator_name%5D=Recipient&subscriptions%5B1%5D%5Bcreator_inaccessible%5D=0'.
+						'&description=&status=0&action=scheduledreport.update',
 					'error' => self::ACCESS_DENIED,
 					'return_button' => true
 				]
@@ -825,31 +895,30 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM role',
 					'link' => 'zabbix.php?form_refresh=1&_csrf_token=&roleid=2&name=Admin+role&type=2&ui_monitoring_dashboard=1'.
-							'&ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_latest_data=1&ui_monitoring_maps=1'.
-							'&ui_monitoring_discovery=1&ui_services_services=1&ui_services_sla=1&ui_services_sla_report=1'.
-							'&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_scheduled_reports=1'.
-							'&ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
-							'&ui_reports_notifications=1&ui_configuration_template_groups=1&ui_configuration_host_groups=1'.
-							'&ui_configuration_templates=1&ui_configuration_hosts=1&ui_configuration_maintenance=1'.
-							'&ui_configuration_event_correlation=0&ui_configuration_discovery=1&ui_configuration_trigger_actions=1'.
-							'&ui_configuration_service_actions=1&ui_configuration_discovery_actions=1&ui_configuration_autoregistration_actions=1'.
-							'&ui_configuration_internal_actions=1&ui_administration_media_types=0&ui_administration_scripts=0&ui_administration_user_groups=0'.
-							'&ui_administration_user_roles=0&ui_administration_users=0&ui_administration_api_tokens=0&ui_administration_authentication=0'.
-							'&ui_administration_general=0&ui_administration_audit_log=0&ui_administration_housekeeping=0&ui_administration_proxies=0'.
-							'&ui_administration_macros=0&ui_administration_queue=0&ui_default_access=1&service_write_access=1&service_write_tag_tag='.
-							'&service_write_tag_value=&service_read_access=1&service_read_tag_tag=&service_read_tag_value='.
-							'&modules%5B1%5D=1&modules%5B2%5D=1&modules%5B3%5D=1&modules%5B4%5D=1&modules%5B5%5D=1'.
-							'&modules%5B6%5D=1&modules%5B7%5D=1&modules%5B19%5D=1&modules%5B8%5D=1&modules%5B9%5D=1'.
-							'&modules%5B10%5D=1&modules%5B11%5D=1&modules%5B12%5D=1&modules%5B13%5D=1&modules%5B14%5D='.
-							'1&modules%5B15%5D=1&modules%5B16%5D=1&modules%5B17%5D=1&modules%5B18%5D=1&modules%5B20%5D=1'.
-							'&modules%5B21%5D=1&modules%5B22%5D=1&modules%5B23%5D=1&modules%5B24%5D=1&modules_default_access=1'.
-							'&api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=1'.
-							'&actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1'.
-							'&actions_suppress_problems=1&actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1'.
-							'&actions_manage_scheduled_reports=1&actions_manage_sla=1&actions_invoke_execute_now=1&actions_change_problem_ranking=1'.
-							'&actions_default_access=1&action=userrole.update',
-					'error' => self::ACCESS_DENIED,
-					'return_button' => true
+						'&ui_monitoring_problems=1&ui_monitoring_hosts=1&ui_monitoring_latest_data=1&ui_monitoring_maps=1'.
+						'&ui_monitoring_discovery=1&ui_services_services=1&ui_services_sla=1&ui_services_sla_report=1'.
+						'&ui_inventory_overview=1&ui_inventory_hosts=1&ui_reports_system_info=0&ui_reports_scheduled_reports=1'.
+						'&ui_reports_availability_report=1&ui_reports_top_triggers=1&ui_reports_audit=0&ui_reports_action_log=0'.
+						'&ui_reports_notifications=1&ui_configuration_template_groups=1&ui_configuration_host_groups=1'.
+						'&ui_configuration_templates=1&ui_configuration_hosts=1&ui_configuration_maintenance=1'.
+						'&ui_configuration_event_correlation=0&ui_configuration_discovery=1&ui_configuration_trigger_actions=1'.
+						'&ui_configuration_service_actions=1&ui_configuration_discovery_actions=1&ui_configuration_autoregistration_actions=1'.
+						'&ui_configuration_internal_actions=1&ui_administration_media_types=0&ui_administration_scripts=0&ui_administration_user_groups=0'.
+						'&ui_administration_user_roles=0&ui_administration_users=0&ui_administration_api_tokens=0&ui_administration_authentication=0'.
+						'&ui_administration_general=0&ui_administration_audit_log=0&ui_administration_housekeeping=0&ui_administration_proxies=0'.
+						'&ui_administration_macros=0&ui_administration_queue=0&ui_default_access=1&service_write_access=1&service_write_tag_tag='.
+						'&service_write_tag_value=&service_read_access=1&service_read_tag_tag=&service_read_tag_value='.
+						'&modules%5B1%5D=1&modules%5B2%5D=1&modules%5B3%5D=1&modules%5B4%5D=1&modules%5B5%5D=1'.
+						'&modules%5B6%5D=1&modules%5B7%5D=1&modules%5B19%5D=1&modules%5B8%5D=1&modules%5B9%5D=1'.
+						'&modules%5B10%5D=1&modules%5B11%5D=1&modules%5B12%5D=1&modules%5B13%5D=1&modules%5B14%5D='.
+						'1&modules%5B15%5D=1&modules%5B16%5D=1&modules%5B17%5D=1&modules%5B18%5D=1&modules%5B20%5D=1'.
+						'&modules%5B21%5D=1&modules%5B22%5D=1&modules%5B23%5D=1&modules%5B24%5D=1&modules_default_access=1'.
+						'&api_access=1&api_mode=0&actions_edit_dashboards=1&actions_edit_maps=1&actions_edit_maintenance=1'.
+						'&actions_add_problem_comments=1&actions_change_severity=1&actions_acknowledge_problems=1'.
+						'&actions_suppress_problems=1&actions_close_problems=1&actions_execute_scripts=1&actions_manage_api_tokens=1'.
+						'&actions_manage_scheduled_reports=1&actions_manage_sla=1&actions_invoke_execute_now=1&actions_change_problem_ranking=1'.
+						'&actions_default_access=1&action=userrole.update',
+					'error' => self::ACCESS_DENIED_WITHOUT_HTML
 				]
 			],
 			// #4 Incorrect token.
@@ -857,7 +926,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?_csrf_token=12345abcd&tls_accept=1&tls_in_none=1&tls_psk_identity=&tls_psk='.
-							'&action=autoreg.update',
+						'&action=autoreg.update',
 					'error' => self::ACCESS_DENIED_WITHOUT_HTML
 				]
 			]

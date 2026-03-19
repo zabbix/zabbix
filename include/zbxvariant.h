@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,6 +37,8 @@ typedef union
 	/* length prefixed (4 bytes) binary data */
 	void			*bin;
 
+	char			*json;
+
 	zbx_vector_var_t	*vector;
 
 	/* null terminated error message */
@@ -57,6 +59,7 @@ struct zbx_variant
 #define ZBX_VARIANT_BIN		4
 #define ZBX_VARIANT_VECTOR	5
 #define ZBX_VARIANT_ERR		6
+#define ZBX_VARIANT_JSON	7
 
 void		zbx_variant_clear(zbx_variant_t *value);
 void		zbx_variant_set_none(zbx_variant_t *value);
@@ -64,6 +67,7 @@ void		zbx_variant_set_str(zbx_variant_t *value, char *text);
 void		zbx_variant_set_dbl(zbx_variant_t *value, double value_dbl);
 void		zbx_variant_set_ui64(zbx_variant_t *value, zbx_uint64_t value_ui64);
 void		zbx_variant_set_bin(zbx_variant_t *value, void *value_bin);
+void		zbx_variant_set_json(zbx_variant_t *value, char *value_json);
 void		zbx_variant_set_error(zbx_variant_t *value, char *error);
 void		zbx_variant_set_dbl_vector(zbx_variant_t *value, zbx_vector_dbl_t *dbl_vector);
 

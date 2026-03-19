@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,7 +24,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareUserData
  *
- * @dataSource UserPermissions
+ * @dataSource UserPermissions, MonitoringOverview
  */
 class testFormUserPermissions extends CWebTest {
 
@@ -143,7 +143,12 @@ class testFormUserPermissions extends CWebTest {
 		// Change user role.
 		$form = $this->query('xpath://form[@name="user_form"]')->waitUntilPresent()->one()->asForm();
 		$form->selectTab('Permissions');
-		$form->getField('Role')->fill($data['new_role']);
+		if (CTestArrayHelper::get($data, 'new_role') === '') {
+			$form->fill(['Role' => $data['new_role']]);
+		}
+		else {
+			$form->fill(['Role' => CFormElement::RELOADABLE_FILL($data['new_role'])]);
+		}
 
 		if (array_key_exists('User type', $data)) {
 			$form->checkValue(['User type' => $data['user_type']]);
@@ -152,7 +157,7 @@ class testFormUserPermissions extends CWebTest {
 		$form->submit();
 
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, 'Cannot update user', 'Field "roleid" is mandatory.');
+			$this->assertInlineError($form, ['Role' => 'This field cannot be empty.']);
 			$this->page->open('zabbix.php?action=user.list');
 			$this->assertEquals($standard_role, $table->findRow('Username', $data['user_name'])->getColumn('User role')->getText());
 			$this->assertEquals($hash_before, CDBHelper::getHash('SELECT * FROM users'));
@@ -482,9 +487,10 @@ class testFormUserPermissions extends CWebTest {
 	public function testFormUserPermissions_Module() {
 		$widget_modules = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps',
 			'Gauge', 'Geomap', 'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability',
-			'Host card', 'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map', 'Map navigation tree',
-			'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report', 'System information',
-			'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring'
+			'Host card', 'Host navigator', 'Item card', 'Item history', 'Item navigator', 'Item value', 'Map',
+			'Map navigation tree', 'Pie chart', 'Problem hosts', 'Problems', 'Problems by severity', 'Scatter plot',
+			'SLA report', 'System information', 'Top hosts', 'Top items', 'Top triggers', 'Trigger overview', 'URL',
+			'Web monitoring'
 		];
 
 		$this->page->login()->open('zabbix.php?action=user.edit&userid='.self::$admin_user)->waitUntilReady();

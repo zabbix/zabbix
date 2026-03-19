@@ -30,7 +30,7 @@ zabbix_export:
         Learn more about Cisco ASAv: https://www.cisco.com/c/en/us/products/collateral/security/adaptive-security-virtual-appliance-asav/adapt-security-virtual-appliance-ds.html
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Network devices'
       items:
@@ -1293,21 +1293,23 @@ zabbix_export:
             description: 'Filter to exclude discovered interfaces by name.'
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
+          description: 'Critical threshold of CPU utilization in %.'
           config:
             type: TEXT
             priority: '9'
             section_name: Thresholds
             label: 'Threshold for CPU utilization (critical)'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Critical threshold of CPU utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
+          description: 'Threshold for maximum memory utilization in %.'
           config:
             type: TEXT
             priority: '10'
             section_name: Thresholds
             label: 'Threshold for memory utilization'
-            description: 'In the range from 0 to 100 inclusive.'
+            description: 'Threshold for maximum memory utilization in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m

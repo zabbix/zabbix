@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -84,7 +84,7 @@ class CControllerPopupServices extends CController {
 
 		$problem_tags_html = [];
 
-		foreach (makeTags($problem_tags, true, 'serviceid') as $serviceid => $service_tags) {
+		foreach (CTagHelper::getTagsHtml($problem_tags, ZBX_TAG_OBJECT_SERVICE) as $serviceid => $service_tags) {
 			$problem_tags_html[$serviceid] = implode('', $service_tags);
 		}
 
@@ -96,8 +96,8 @@ class CControllerPopupServices extends CController {
 			'exclude_serviceids' => $exclude_serviceids,
 			'is_multiple' => $this->getInput('multiple', 1) == 1,
 			'services' => $services,
-			'tags' => makeTags($tags, true, 'serviceid'),
-			'problem_tags' => makeTags($problem_tags, true, 'serviceid'),
+			'tags' => CTagHelper::getTagsHtml($tags, ZBX_TAG_OBJECT_SERVICE),
+			'problem_tags' => CTagHelper::getTagsHtml($problem_tags, ZBX_TAG_OBJECT_SERVICE),
 			'problem_tags_html' => $problem_tags_html,
 			'user' => [
 				'debug_mode' => $this->getDebugMode()

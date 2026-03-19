@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -26,7 +26,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	public $source = 'host';
 	public $tag = '3a Host prototype monitored discovered {#H}';
 
-	protected $link = 'host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
+	protected $link = 'zabbix.php?action=host.prototype.list&context=host&parent_discoveryid=';
 	protected static $prototype_hostids;
 	protected static $host_druleids;
 
@@ -127,7 +127,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	 * @dataProvider getHostPrototypesSortingData
 	 */
 	public function testPageHostPrototypes_Sorting($data) {
-		$this->page->login()->open('host_prototypes.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
+		$this->page->login()->open('zabbix.php?action=host.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}

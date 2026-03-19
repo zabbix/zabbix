@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,14 +27,12 @@ $form = (new CForm())
 	->addVar('userid', $data['userid'])
 	->addVar('provisioned', $data['provisioned'])
 	->addStyle('display: none;')
+	->addVar('mediaid', $data['mediaid'])
+	->addVar('mediatype_type', 0)
 	->addItem(getMessages());
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
-
-if ($data['mediaid'] !== null) {
-	$form->addVar('mediaid', $data['mediaid']);
-}
 
 $mediatype_select = (new CSelect('mediatypeid'))
 	->setId('mediatypeid')
@@ -86,6 +84,8 @@ $form_grid = (new CFormGrid())
 		(new CFormField([
 			(new CTable())
 				->setId('sendto_emails')
+				->setAttribute('data-field-type', 'array')
+				->setAttribute('data-field-name', 'sendto_emails')
 				->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH)
 				->setFooter(
 					(new CCol(
@@ -129,7 +129,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enabled'), 'active'),
 		new CFormField(
-			(new CCheckBox('active', MEDIA_STATUS_ACTIVE))->setChecked($data['form']['active'] == MEDIA_STATUS_ACTIVE)
+			(new CCheckBox('active', MEDIA_STATUS_ACTIVE))
+				->setUncheckedValue(MEDIA_STATUS_DISABLED)
+				->setChecked($data['form']['active'] == MEDIA_STATUS_ACTIVE)
 		)
 	]);
 
@@ -138,6 +140,7 @@ $form
 	->addItem(
 		(new CScriptTag('
 			media_edit_popup.init('.json_encode([
+				'rules' => $data['js_validation_rules'],
 				'mediatypes' => $data['mediatypes'],
 				'sendto_emails' => $data['form']['sendto_emails']
 			]).');

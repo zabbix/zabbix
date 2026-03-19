@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,6 +48,7 @@
 #	define ZBX_TYPE_UINT_STR		"bigint unsigned"
 #	define ZBX_TYPE_LONGTEXT_STR		"longtext"
 #	define ZBX_TYPE_BLOB_STR		"longblob"
+#	define ZBX_TYPE_JSON_STR		"json"
 #	define ZBX_TYPE_SERIAL_STR		"bigint unsigned"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	"auto_increment"
 #elif defined(HAVE_POSTGRESQL)
@@ -56,6 +57,7 @@
 #	define ZBX_TYPE_UINT_STR		"numeric(20)"
 #	define ZBX_TYPE_LONGTEXT_STR		"text"
 #	define ZBX_TYPE_BLOB_STR		"bytea"
+#	define ZBX_TYPE_JSON_STR		"jsonb"
 #	define ZBX_TYPE_SERIAL_STR		"bigserial"
 #	define ZBX_TYPE_SERIAL_SUFFIX_STR	""
 #endif
@@ -95,6 +97,9 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_BLOB:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_BLOB_STR);
 			break;
+		case ZBX_TYPE_JSON:
+			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_JSON_STR);
+			break;
 		case ZBX_TYPE_CUID:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, CUID_LEN - 1);
 			break;
@@ -120,6 +125,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_LONGTEXT:
 		case ZBX_TYPE_TEXT:
 		case ZBX_TYPE_BLOB:
+		case ZBX_TYPE_JSON:
 		case ZBX_TYPE_CUID:
 			return;
 		case ZBX_TYPE_SERIAL:
@@ -151,7 +157,18 @@ static void	DBfield_definition_string(char **sql, size_t *sql_alloc, size_t *sql
 			default:
 #endif
 				default_value_esc = zbx_db_dyn_escape_string(field->default_value);
-				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'", default_value_esc);
+
+				if (field->type == ZBX_TYPE_JSON)
+				{
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'::json",
+							default_value_esc);
+				}
+				else
+				{
+					zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " default '%s'",
+							default_value_esc);
+				}
+
 				zbx_free(default_value_esc);
 #if defined(HAVE_MYSQL)
 		}
@@ -1122,6 +1139,19 @@ static int	DBget_changelog_table_by_name(const char *table_name)
 	return FAIL;
 }
 
+static int	DBget_housekeeper_object_by_name(const char *table_name)
+{
+	const zbx_db_table_housekeeper_t	*table;
+
+	for (table = zbx_dbschema_get_housekeeper_tables(); NULL != table->table_name; table++)
+	{
+		if (0 == strcmp(table_name, table->table_name))
+			return table->object_type;
+	}
+
+	return FAIL;
+}
+
 int	DBcreate_changelog_insert_trigger(const char *table_name, const char *field_name)
 {
 	char	*sql = NULL;
@@ -1198,6 +1228,47 @@ int	DBcreate_changelog_update_trigger(const char *table_name, const char *field_
 					"execute procedure changelog_%s_update();",
 				table_name, table_type, field_name, ZBX_CHANGELOG_OP_UPDATE, table_name, table_name,
 				table_name);
+#endif
+
+	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))
+		ret = SUCCEED;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+int	DBcreate_housekeeper_trigger(const char *table_name, const char *field_name)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	object_type, ret = FAIL;
+
+	if (FAIL == (object_type = DBget_housekeeper_object_by_name(table_name)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return FAIL;
+	}
+
+#if HAVE_MYSQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create trigger %s_housekeeping before delete on %s\n"
+				"for each row\n"
+					"insert into housekeeper (object,objectid)\n"
+						"values (%d,old.%s)",
+				table_name, table_name, object_type, field_name);
+#elif HAVE_POSTGRESQL
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"create or replace function %s_housekeeping_proc() returns trigger as $$\n"
+			"begin\n"
+				"insert into housekeeper (object,objectid) values (%d,old.%s);\n"
+				"return old;\n"
+			"end;\n"
+			"$$ language plpgsql;\n"
+			"create trigger %s_housekeeping before delete on %s\n"
+				"for each row\n"
+					"execute procedure %s_housekeeping_proc();",
+				table_name, object_type, field_name, table_name, table_name, table_name);
 #endif
 
 	if (ZBX_DB_OK <= zbx_db_execute("%s", sql))

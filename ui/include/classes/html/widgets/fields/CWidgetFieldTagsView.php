@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,7 +30,7 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 		}
 
 		$view = (new CTable())
-			->setId('tags_table_'.$this->field->getName())
+			->setId('tags_table_'.zbx_formatDomId($this->field->getName()))
 			->addClass('table-tags')
 			->addClass(ZBX_STYLE_TABLE_INITIAL_WIDTH);
 
@@ -59,7 +59,8 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 			CWidgetForm.addField(
 				new CWidgetFieldTags('.json_encode([
 					'name' => $this->field->getName(),
-					'form_name' => $this->form_name
+					'form_name' => $this->form_name,
+					'field_id' => zbx_formatDomId($this->field->getName())
 				]).')
 			);
 		';
@@ -67,14 +68,18 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 
 	public function getTemplates(): array {
 		return [
-			new CTemplateTag($this->field->getName().'-row-tmpl', $this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG))
+			new CTemplateTag(zbx_formatDomId($this->field->getName()).'-row-tmpl',
+				$this->getRowTemplate(CWidgetFieldTags::DEFAULT_TAG)
+			)
 		];
 	}
 
 	private function getRowTemplate(array $tag, $row_num = '#{rowNum}'): CRow {
+		$id = zbx_formatDomId($this->field->getName());
+
 		return (new CRow([
 			(new CTextBox($this->field->getName().'['.$row_num.'][tag]', $tag['tag']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->addClass('table-tags-input')
 				->setAriaRequired($this->isRequired())
 				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 				->setAttribute('placeholder', _('tag')),
@@ -88,13 +93,14 @@ class CWidgetFieldTagsView extends CWidgetFieldView {
 					TAG_OPERATOR_NOT_LIKE => _('Does not contain')
 				]))
 				->setValue($tag['operator'])
-				->setFocusableElementId($this->field->getName().'-'.$row_num.'-operator-select')
-				->setId($this->field->getName().'_'.$row_num.'_operator')
+				->setWidthAuto()
+				->setFocusableElementId($id.'-'.$row_num.'-operator-select')
+				->setId($id.'_'.$row_num.'_operator')
 				->setDisabled($this->isDisabled() && $row_num !== '#{rowNum}'),
 			(new CTextBox($this->field->getName().'['.$row_num.'][value]', $tag['value']))
-				->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+				->addClass('table-tags-input')
 				->setAriaRequired($this->isRequired())
-				->setId($this->field->getName().'_'.$row_num.'_value')
+				->setId($id.'_'.$row_num.'_value')
 				->setEnabled(!$this->isDisabled() || $row_num === '#{rowNum}')
 				->setAttribute('placeholder', _('value')),
 			(new CCol(

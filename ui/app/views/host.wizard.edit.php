@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -537,7 +537,7 @@ function stepInstallAgent($agent_script_data): array {
 							(new CListItem(
 								(new CDiv())
 									->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-									->addclass('js-install-agent-readme')
+									->addClass('js-install-agent-readme')
 							))
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 								->addClass(ZBX_STYLE_GRID_COLUMNS)
@@ -558,7 +558,7 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true,
-							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.sh | bash -s -- #{server_host} #{hostname} #{psk_identity} #{psk}"
+							"$(command -v curl || echo $(command -v wget) -O -) https://cdn.zabbix.com/scripts/install-zabbix.sh | bash -s -- --version {$agent_script_data['version']} #{server_host} #{hostname} #{psk_identity} #{psk}"
 						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)
@@ -574,10 +574,10 @@ function stepInstallAgent($agent_script_data): array {
 				->addItem(
 					(new CDiv([
 						new CTag('pre', true,
-							"Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/{$agent_script_data['version']}/install-zabbix.ps1 -OutFile install-zabbix.ps1"
+							"Invoke-WebRequest -Uri https://cdn.zabbix.com/scripts/install-zabbix.ps1 -OutFile install-zabbix.ps1"
 						),
 						new CTag('pre', true,
-							"powershell -executionpolicy bypass .\install-zabbix.ps1 #{server_host} #{hostname} #{psk_identity} #{psk}"
+							"powershell -executionpolicy bypass .\install-zabbix.ps1 -zabbixVersion {$agent_script_data['version']} #{server_host} #{hostname} #{psk_identity} #{psk}"
 						)
 					]))->addClass(ZBX_STYLE_FORMATED_TEXT)
 				)

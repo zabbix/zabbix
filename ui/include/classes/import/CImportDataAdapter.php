@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -366,6 +366,35 @@ class CImportDataAdapter {
 	}
 
 	/**
+	 * Get global dashboards from the imported data.
+	 *
+	 * @return array
+	 */
+	public function getDashboards(): array {
+		$dashboards = [];
+
+		if (array_key_exists('dashboards', $this->data)) {
+			foreach ($this->data['dashboards'] as $dashboard) {
+				foreach ($dashboard['pages'] as &$dashboard_page) {
+					// Rename hide_header to view_mode in widgets.
+					if (array_key_exists('widgets', $dashboard_page)) {
+						$dashboard_page['widgets'] = array_map(function (array $widget): array {
+							$widget = CArrayHelper::renameKeys($widget, ['hide_header' => 'view_mode']);
+
+							return $widget;
+						}, $dashboard_page['widgets']);
+					}
+				}
+				unset($dashboard_page);
+
+				$dashboards[$dashboard['name']] = $dashboard;
+			}
+		}
+
+		return $dashboards;
+	}
+
+	/**
 	 * Get media types from the imported data.
 	 *
 	 * @return array
@@ -411,7 +440,10 @@ class CImportDataAdapter {
 	 */
 	protected function formatDiscoveryRule(array $discovery_rule, $host) {
 		if (!$discovery_rule['filter']) {
-			unset($discovery_rule['filter']);
+			$discovery_rule['filter'] = [
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+				'conditions' => []
+			];
 		}
 
 		$discovery_rule = $this->renameItemFields($discovery_rule);

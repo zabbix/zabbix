@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -298,19 +298,6 @@ class CWidgetTopHosts extends CWidget {
 				container.innerHTML = '';
 				container.append(content);
 
-				e.target.resize_observer = new ResizeObserver((entries) => {
-					entries.forEach(entry => {
-						if (entry.contentBoxSize) {
-							const overlay = content.closest('.dashboard-widget-tophosts-hintbox-image');
-							const size = entry.contentBoxSize[0];
-
-							overlay.style.width = `${size.inlineSize}px`;
-							overlay.style.height = `${size.blockSize}px`;
-						}
-					})
-				});
-				e.target.resize_observer.observe(content);
-
 				if (!content.complete) {
 					hint_box.classList.add('is-loading');
 
@@ -325,14 +312,6 @@ class CWidgetTopHosts extends CWidget {
 					});
 				}
 			});
-
-			button.addEventListener('onHideHint.hintBox', e => {
-				if (e.target.resize_observer !== undefined) {
-					e.target.resize_observer.disconnect();
-
-					delete e.target.resize_observer;
-				}
-			})
 		}
 		else {
 			if (curl !== null) {

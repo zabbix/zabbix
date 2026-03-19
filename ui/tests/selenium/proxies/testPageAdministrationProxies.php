@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,6 +25,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  * @dataSource Proxies
  *
  * @backup hosts
+ *
+ * @onBefore prepareProxyData
  */
 class testPageAdministrationProxies extends CWebTest {
 
@@ -41,6 +43,18 @@ class testPageAdministrationProxies extends CWebTest {
 	}
 
 	private $sql = 'SELECT * FROM hosts ORDER BY hostid';
+
+	/**
+	 * Function used to create proxy.
+	 */
+	public function prepareProxyData() {
+		CDataHelper::call('proxy.create', [
+			[
+				'name' => 'Multiple   spaces   in proxy name',
+				'operating_mode' => PROXY_OPERATING_MODE_ACTIVE
+			]
+		]);
+	}
 
 	public function testPageAdministrationProxies_Layout() {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
@@ -104,12 +118,12 @@ class testPageAdministrationProxies extends CWebTest {
 
 				// Check version hint.
 				$column->query('xpath:.//button[@data-hintbox="1"]')->one()->waitUntilClickable()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilVisible()->one();
 				$this->assertEquals($parameters['hint_text'], $hint->getText());
 
 				if (array_key_exists('hint_color', $parameters)) {
-					$this->assertTrue($hint->query("xpath:.//div[@class=".
-							CXPathHelper::escapeQuotes("hintbox-wrap ".$parameters['hint_color'])."]")->exists()
+					$this->assertTrue($hint->query('xpath:.//div[contains(@class,'.
+							CXPathHelper::escapeQuotes('hintbox-wrap '.$parameters['hint_color']).')]')->exists()
 					);
 				}
 
@@ -256,6 +270,26 @@ class testPageAdministrationProxies extends CWebTest {
 					],
 					'result' => [
 						'active_current'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   '
+					],
+					'result' => [
+						'Multiple spaces in proxy name'
+					]
+				]
+			],
+			[
+				[
+					'filter' => [
+						'Name' => '   spaces   '
+					],
+					'result' => [
+						'Multiple spaces in proxy name'
 					]
 				]
 			],

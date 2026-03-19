@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -199,9 +199,13 @@ class CTableElement extends CElement {
 			$column = $index + 1;
 		}
 
-		$suffix = $contains ? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
+		$suffix = $contains
+			? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
 			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
-		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/th'.$suffix];
+		$textarea_suffix = $contains
+			? '['.$column.']/z-textarea-flexible[contains(@value, '.CXPathHelper::escapeQuotes($value).')]/../..'
+			: '['.$column.']/z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($value).']/../..';
+		$xpaths = ['.//tbody/tr/td'.$suffix, './/tbody/tr/td'.$textarea_suffix, './/tbody/tr/th'.$suffix];
 
 		return $this->query('xpath', implode('|', $xpaths))->asTableRow([
 			'parent' => $this,

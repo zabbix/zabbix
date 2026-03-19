@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -271,8 +271,9 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'host' => ['not_empty', 'integer']
 				]],
-				null,
-				'[RULES ERROR] Rule "not_empty" is not compatible with type "integer" (Path: /host)'
+				['type' => 'object', 'fields' => [
+					'host' => [['not_empty' => true, 'type' => 'integer']]
+				]]
 			],
 			[
 				['object', 'fields' => [
@@ -670,7 +671,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], [], []]
+						['host.get', ['filter' => []], [], []]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -690,7 +691,7 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', ['host' => '{host}'], null, null]
+						['host.get', ['filter' => ['host' => '{host}']], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -710,8 +711,36 @@ class CFormValidatorTest extends TestCase {
 				],
 				['type' => 'object',
 					'api_uniq' => [
-						['host.get', [], null, null],
-						['host.get', [], null, null]
+						['host.get', ['filter' => []], null, null],
+						['host.get', ['filter' => []], null, null]
+					],
+					'fields' => [
+						'ip' => [['type' => 'string', 'messages' => [
+							'type' => 'String error.'
+						]]]
+					]
+				]
+			],
+			[
+				['object',
+					'api_uniq' => [
+						['host.get', [], null, null, ['param_1' => 'value_1']],
+						['host.get', ['filter_param_1' => 'filter_value_1'], null, null, ['param_1' => 'value_1']],
+						['host.get']
+					],
+					'fields' => [
+						'ip' => ['string', 'messages' => [
+							'type' => 'String error.'
+						]]
+					]
+				],
+				['type' => 'object',
+					'api_uniq' => [
+						['host.get', ['filter' => [], 'param_1' => 'value_1'], null, null],
+						['host.get', ['filter' => ['filter_param_1' => 'filter_value_1'], 'param_1' => 'value_1'],
+							null, null
+						],
+						['host.get', ['filter' => []], null, null]
 					],
 					'fields' => [
 						'ip' => [['type' => 'string', 'messages' => [
@@ -816,6 +845,269 @@ class CFormValidatorTest extends TestCase {
 				]],
 				null,
 				'[RULES ERROR] Only fields defined prior to this can be used for "when" checks (Path: /dns)'
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, [], ['min' => 2147464799]]]
+				]],
+				null,
+				'[RULES ERROR] Rule "use" should contain an array with up to two elements (Path: /value)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => 'string'
+					]
+				]],
+				null,
+				'[RULES ERROR] Count values condition should be an array (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => []
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'items' => [['type' => 'objects',
+						'fields' => [
+							'field1' => [['type' => 'string']]
+						],
+						'count_values' => []
+					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['string']
+					]
+				]],
+				null,
+				'[RULES ERROR] Count values rule should be an array (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [['string']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Unknown count values rule "0" (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => []]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => [1 => null]]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid number of parameters for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [[]]
+					]
+				]],
+				null,
+				'[RULES ERROR] Counted field_rules is required (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field', 'in']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Only fields defined prior to this can be used for "count_values" checks (Path: /items, Field path: /items/field)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field1', 'in']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Unknown count values field rule "1" (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field1', 'in' => 'string']]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid value for rule "in" or "not_in" in "count_values" check (Path: /items, Field path: field1)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => ['field_rules' => ['field1', 'in' => []]]
+					]
+				]],
+				null,
+				'[RULES ERROR] Counted field requires min or max rule (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => ['field1', 'in' => []],
+							'min' => 0
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'items' => [['type' => 'objects',
+						'fields' => [
+							'field1' => [['type' => 'string']]
+						],
+						'count_values' => [[
+							'field_rules' => [['field1', 'in' => []]],
+							'min' => 0
+						]]
+					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => ['field1', 'in' => []],
+							'min' => null
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Rule "min" should contain a number (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => [
+								['field1', 'in' => []],
+								[]
+							]
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => [
+								['', 'in' => []]
+							]
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Invalid field name for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string']
+						],
+						'count_values' => [
+							'field_rules' => [
+								[1 => 'field1', 'in' => []]
+							]
+						]
+					]
+				]],
+				null,
+				'[RULES ERROR] Missing field name parameter for "field_rules" option of "count_values" check (Path: /items)'
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => ['objects',
+						'fields' => [
+							'field1' => ['string'],
+							'field2' => ['integer']
+						],
+						'count_values' => [
+							'field_rules' => ['field2', 'in' => [1,2]],
+							'min' => 3, 'max' => 100,
+							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+						]
+					]
+				]],
+				['type' => 'object', 'fields' => [
+					'items_enabled' => [['type' => 'integer', 'in' => [0,1]]],
+					'items' => [['type' => 'objects',
+						'fields' => [
+							'field1' => [['type' => 'string']],
+							'field2' => [['type' => 'integer']]
+						],
+						'count_values' => [[
+							'field_rules' => [['field2', 'in' => [1,2]]],
+							'min' => 3, 'max' => 100,
+							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+						]]
+					]]
+				]]
 			]
 		];
 	}
@@ -1664,8 +1956,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ''
 				]],
 				['interfaces' => [
-					'status' => 2,
-					'value' => ''
+					'status' => 2
 				]],
 				CFormValidator::SUCCESS,
 				[]
@@ -1715,7 +2006,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['templates', 'not_empty']]
 				]],
 				['templates' => [], 'value' => ''],
-				['templates' => [], 'value' => ''],
+				['templates' => []],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1725,7 +2016,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['templates', 'empty']]
 				]],
 				['templates' => ['1', '2', '3'], 'value' => ''],
-				['templates' => ['1', '2', '3'], 'value' => ''],
+				['templates' => ['1', '2', '3']],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1759,7 +2050,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['host', 'exist']]
 				]],
 				['value' => ''],
-				['value' => ''],
+				[],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -1805,7 +2096,7 @@ class CFormValidatorTest extends TestCase {
 					'value' => ['string', 'not_empty', 'when' => ['host', 'not_exist']]
 				]],
 				['host' => '', 'value' => ''],
-				['host' => '', 'value' => ''],
+				['host' => ''],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2060,7 +2351,9 @@ class CFormValidatorTest extends TestCase {
 				[],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+					['message' => 'This value does not match pattern.',
+						'level' => CFormValidator::ERROR_LEVEL_PRIMARY
+					]
 				]]
 			],
 			[
@@ -2145,7 +2438,9 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 0, 'max' => ZBX_MAX_DATE]]]
+					'value' => ['string',
+						'use' => [CAbsoluteTimeValidator::class, ['min' => 0, 'max' => ZBX_MAX_DATE]]
+					]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
@@ -2154,24 +2449,28 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['max' => 1704700000]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['max' => 1704700000]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be smaller than 2024-01-08 09:46:40.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be less than or equal to 2024-01-08 09:46:40.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
 				]]
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['string', 'use' => [CAbsoluteTimeParser::class, [], ['min' => 2147464799]]]
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class, ['min' => 2147464799]]]
 				]],
 				['value' => '2024-01-08 12:00:00'],
 				['value' => '2024-01-08 12:00:00'],
 				CFormValidator::ERROR,
 				['/value' => [
-					['message' => 'Value must be greater than 2038-01-18 23:59:59.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+					['message' => 'Value must be greater than or equal to 2038-01-18 23:59:59.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
 				]]
 			],
 			[
@@ -2209,7 +2508,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['objects', 'uniq' => ['macro','value'], 'fields' => [
+					'value' => ['objects', 'uniq' => ['macro', 'value'], 'fields' => [
 						'macro' => ['string']
 					]]
 				]],
@@ -2225,7 +2524,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['objects', 'uniq' => [['macro','value']], 'fields' => [
+					'value' => ['objects', 'uniq' => [['macro', 'value']], 'fields' => [
 						'macro' => ['string']
 					]]
 				]],
@@ -2241,7 +2540,7 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['objects', 'uniq' => [['macro','value'], 'description'], 'fields' => [
+					'value' => ['objects', 'uniq' => [['macro', 'value'], 'description'], 'fields' => [
 						'macro' => ['string']
 					]]
 				]],
@@ -2335,7 +2634,7 @@ class CFormValidatorTest extends TestCase {
 					'field2' => ['integer', 'min' => 3, 'when' => ['field1', 'exist']]
 				]],
 				['field2' => 2],
-				['field2' => 2],
+				[],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2345,7 +2644,7 @@ class CFormValidatorTest extends TestCase {
 					'field2' => ['integer', 'min' => 3, 'when' => ['field1', 'not_exist']]
 				]],
 				['field1' => 1, 'field2' => 2],
-				['field1' => 1, 'field2' => 2],
+				['field1' => 1],
 				CFormValidator::SUCCESS,
 				[]
 			],
@@ -2401,6 +2700,544 @@ class CFormValidatorTest extends TestCase {
 				['/value' => [
 					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'in' => ['abc']]
+				]],
+				['value' => '{$USER_MACRO}'],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value must be "abc".', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'required', 'not_empty']
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'No file was uploaded.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => '', 'error' => UPLOAD_ERR_NO_FILE, 'size' => 0]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'max-size' => 1024]
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'File size must be less than 1 KB.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 1300
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'file-type' => 'image']
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'File format is unsupported.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file', 'file-type' => 'image', 'messages' => ['file-type' => 'msg1']]
+				]],
+				[],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'msg1', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['file']
+				]],
+				[],
+				[],
+				CFormValidator::SUCCESS,
+				[],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]],
+				['value' => ['name' => '', 'type' => '', 'tmp_name' => 'phpunit.xml', 'error' => UPLOAD_ERR_OK,
+					'size' => 10
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 1, 'value' => [1,2,3]],
+				['test' => 1, 'value' => []],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer']
+					]
+				]],
+				['value' => [1,2,3]],
+				[],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'not_empty', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 1, 'value' => [1,2,3]],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This field cannot be empty.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'test' => ['boolean'],
+					'value' => ['array', 'when' => ['test', 'exist'],
+						'field' => ['integer', 'when' => ['../test', 'in' => [0]]]
+					]
+				]],
+				['test' => 0, 'value' => [1,2,3]],
+				['test' => 0, 'value' => [1,2,3]],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => 61]]]
+				]],
+				['value' => 70],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 0 and 61s (1m 1s).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class, ['min' => 0, 'max' => 60]]]
+				]],
+				['value' => 70],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 0 and 60s (1m).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CTimeUnitValidator::class, ['min' => SEC_PER_HOUR, 'max' => 86400]]
+					]
+				]],
+				['value' => 10],
+				[],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Value must be between 3600s (1h) and 86400s (1d).',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CTimeUnitValidator::class]]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'A time unit is expected.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'use' => [CAbsoluteTimeValidator::class]]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Invalid date.', 'level' => CFormValidator::ERROR_LEVEL_DELAYED]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => [
+						['objects', 'when' => ['items_enabled', 'exist'],
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer'],
+								'field3' => ['integer']
+							]
+						],
+						['objects', 'when' => ['items_enabled', 'in' => [1]],
+							'count_values' => [
+								'field_rules' => [['field2', 'in' => [1,2]], ['field3', 'in' => [1,2,3]]],
+								'min' => 3, 'max' => 100,
+								'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+							]
+						]
+					]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10]
+				]],
+				[],
+				CFormValidator::ERROR,
+				['/items' => [
+					['message' => 'Must have 3-100 items with field2 equal to 1 or 2.',
+						'level' => CFormValidator::ERROR_LEVEL_OBJECTS_COUNT
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => [
+						['objects', 'when' => ['items_enabled', 'exist'],
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer'],
+								'field3' => ['integer']
+							]
+						],
+						['objects', 'when' => ['items_enabled', 'in' => [1]],
+							'count_values' => [
+								'field_rules' => [['field2', 'in' => [1,2]], ['field3', 'in' => [1,2,3]]],
+								'min' => 4, 'max' => 100
+							]
+						]
+					]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10]
+				]],
+				[],
+				CFormValidator::ERROR,
+				['/items' => [
+					['message' => 'At least 4 items based on field "field2", "field3" rules',
+						'level' => CFormValidator::ERROR_LEVEL_OBJECTS_COUNT
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'items_enabled' => ['boolean'],
+					'items' => [
+						['objects', 'when' => ['items_enabled', 'exist'],
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer']
+							]
+						],
+						['objects', 'when' => ['items_enabled', 'in' => [1]],
+							'count_values' => [
+								'field_rules' => ['field2', 'in' => [1,2]],
+								'min' => 3, 'max' => 100,
+								'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
+							]
+						]
+					]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				['items_enabled' => 1, 'items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'items' => [
+						['objects',
+							'fields' => [
+								'field1' => ['string'],
+								'field2' => ['integer']
+							],
+							'count_values' => [
+								'field_rules' => ['field2'],
+								'min' => 3, 'max' => 5,
+								'message' => 'Must have 3-5 items with field2.'
+							]
+						]
+					]
+				]],
+				['items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc1'],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2'],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				['items' => [
+					['field1' => 'abc', 'field2' => 1],
+					['field1' => 'abc1'],
+					['field1' => 'abc', 'field2' => 2],
+					['field1' => 'abc', 'field2' => 10],
+					['field1' => 'abc2'],
+					['field1' => 'abc2', 'field2' => 1]
+				]],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min' => strtotime('2025-02-01')]]
+					]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
+						'messages' => ['use' => 'Must be in the future']
+					]
+				]],
+				['value' => '2025-01-01'],
+				['value' => '2025-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Must be in the future',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]]
+					]
+				]],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, []]
+					]
+				]],
+				['value' => '2040-01-01'],
+				['value' => '2040-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.0001],
+				['value' => 5.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 4.9999],
+				['value' => 4.9999],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '455.01E-2'],
+				['value' => 4.5501],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '4.51E1'],
+				['value' => 45.1],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.00001],
+				['value' => 5.00001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => '1.22E-3'],
+				['value' => 0.00122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
 			]
 		];
 	}
@@ -2415,7 +3252,7 @@ class CFormValidatorTest extends TestCase {
 	 * @param array $expected_errors
 	 */
 	public function testFormValidator(array $rules, array $data, array $expected_data, int $expected_result,
-			array $expected_errors) {
+			array $expected_errors, array $files = [], array $expected_files = []): void {
 		global $DB;
 
 		$DB['TYPE'] = ZBX_DB_MYSQL;
@@ -2425,13 +3262,14 @@ class CFormValidatorTest extends TestCase {
 
 		$this->assertSame('array', gettype($normalized_rules));
 
-		$result = $validator->validate($data);
+		$result = $validator->validate($data, $files);
 
 		$this->assertSame($expected_result, $result);
 		$this->assertSame($expected_errors, $validator->getErrors());
 
 		if ($expected_result == CFormValidator::SUCCESS) {
 			$this->assertSame($expected_data, $data);
+			$this->assertSame($files, $expected_files);
 		}
 	}
 }

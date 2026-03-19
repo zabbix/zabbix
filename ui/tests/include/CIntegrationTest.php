@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -623,8 +623,15 @@ class CIntegrationTest extends CAPITest {
 			$bin_path = PHPUNIT_BINARY_DIR.'zabbix_'.$component;
 		}
 
-		self::executeCommand($bin_path, ['-c', $config], $background);
-		self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+		if (defined('PHPUNIT_SERVER_GDBSERVER_DEBUG') && $component === self::COMPONENT_SERVER) {
+			fwrite(STDERR, "Starting server debug session: ".PHPUNIT_SERVER_GDBSERVER_DEBUG." $bin_path\n");
+			self::executeCommand(PHPUNIT_SERVER_GDBSERVER_DEBUG, [$bin_path, '-f', '-c', $config], true);
+			fwrite(STDOUT, "Press ENTER to continue ...");
+			fgets(STDIN);
+		} else {
+			self::executeCommand($bin_path, ['-c', $config], $background);
+			self::waitForStartup($component, $waitLogLineOverride, $skip_pid);
+		}
 	}
 
 	/**

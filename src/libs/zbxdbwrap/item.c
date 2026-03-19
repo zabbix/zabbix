@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -158,7 +158,7 @@ int	zbx_db_item_lastvalue(const zbx_db_trigger *trigger, char **lastvalue, int N
  ******************************************************************************/
 int	zbx_db_item_value_type_changed_category(unsigned char value_type_new, unsigned char value_type_old)
 {
-	if (value_type_new == ITEM_VALUE_TYPE_BIN)
+	if (value_type_new == ITEM_VALUE_TYPE_BIN || value_type_new == ITEM_VALUE_TYPE_JSON)
 		return SUCCEED;
 
 	if (value_type_new == ITEM_VALUE_TYPE_UINT64 || value_type_new == ITEM_VALUE_TYPE_FLOAT)

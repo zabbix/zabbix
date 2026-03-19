@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -62,7 +62,7 @@ class CControllerUsergroupTagFilterList extends CController {
 			}
 		}
 
-		$data['tag_filters_badges'] = makeTags($tag_filters_badges, true, 'groupid');
+		$data['tag_filters_badges'] = CTagHelper::getTagsHtml($tag_filters_badges, ZBX_TAG_OBJECT_HOST_GROUP);
 
 		$this->setResponse(new CControllerResponseData($data));
 	}

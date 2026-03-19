@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,10 +14,16 @@
 
 #include "../sysinfo.h"
 
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxcomms.h"
+#endif
+
 #include "zbxjson.h"
-#include "zbxcomms.h"
 #include "zbxnum.h"
-#include "zbxip.h"
+
+#if !defined(WITH_AGENT2_METRICS)
+#	include "zbxip.h"
+#endif
 
 typedef struct
 {
@@ -782,6 +788,7 @@ out:
 	return ret;
 }
 
+#if !defined(WITH_AGENT2_METRICS)
 static unsigned char	get_connection_state_tcp(const char *name)
 {
 	unsigned char	state;
@@ -897,11 +904,11 @@ static void	get_proc_net_count_ipv6(const char *filename, unsigned char state, n
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, &sockaddr_l,
-				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai->ai_addr, exp_l->ai->ai_family,
+						&sockaddr_l, 1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, &sockaddr_r,
-				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai->ai_addr,  exp_r->ai->ai_family,
+						&sockaddr_r, 1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;
 		}
@@ -954,11 +961,12 @@ static void	get_proc_net_count_ipv4(const char *filename, unsigned char state, n
 				(0 != exp_r->port && exp_r->port != rport) ||
 				(0 != state && state != state_f) ||
 				(NULL != exp_l->ai &&
-				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai, &sockaddr_l,
-				1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
+				FAIL == zbx_ip_cmp(exp_l->prefix_sz, exp_l->ai->ai_addr, exp_l->ai->ai_family,
+						&sockaddr_l, 1 == exp_l->mapped && 0 != exp_l->prefix_sz ? 0 : 1)) ||
 				(NULL != exp_r->ai &&
-				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai, &sockaddr_r,
-				1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
+				FAIL == zbx_ip_cmp(exp_r->prefix_sz, exp_r->ai->ai_addr,
+						exp_r->ai->ai_family, &sockaddr_r,
+						1 == exp_r->mapped && 0 != exp_r->prefix_sz ? 0 : 1)))
 		{
 			continue;
 		}
@@ -969,36 +977,36 @@ static void	get_proc_net_count_ipv4(const char *filename, unsigned char state, n
 	zbx_fclose(f);
 }
 
-static int	get_addr_info(const char *addr_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info,
+static int	get_addr_info(const char *ip_in, const char *port_in, struct addrinfo *hints, net_count_info_t *info,
 		char **error)
 {
-	char		*cidr_sep, *addr;
+	char		*cidr_sep, *ip;
 	const char	*service = NULL;
 	int		ret = FAIL, res, prefix_sz_local;
 
-	if (NULL != addr_in && '\0' != *addr_in)
+	if (NULL != ip_in && '\0' != *ip_in)
 	{
 		prefix_sz_local = -1;
-		addr = zbx_strdup(NULL, addr_in);
+		ip = zbx_strdup(NULL, ip_in);
 
-		if (NULL != (cidr_sep = strchr(addr, '/')))
+		if (NULL != (cidr_sep = strchr(ip, '/')))
 		{
 			*cidr_sep = '\0';
 
-			if (FAIL == validate_cidr(addr, cidr_sep + 1, &prefix_sz_local))
+			if (FAIL == zbx_validate_cidr(ip, cidr_sep + 1, &prefix_sz_local))
 			{
-				*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s/%s\"", addr, cidr_sep + 1);
+				*error = zbx_dsprintf(*error, "Cannot validate CIDR \"%s/%s\"", ip, cidr_sep + 1);
 				goto err;
 			}
 		}
-		else if (FAIL == zbx_is_supported_ip(addr))
+		else if (FAIL == zbx_is_supported_ip(ip))
 		{
-			*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
+			*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", ip_in);
 			goto err;
 		}
 	}
 	else
-		addr = NULL;
+		ip = NULL;
 
 	if (NULL != port_in && '\0' != *port_in)
 	{
@@ -1014,10 +1022,10 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 		}
 	}
 
-	if (NULL == addr && NULL == service)
+	if (NULL == ip && NULL == service)
 		return SUCCEED;
 
-	if (EAI_SERVICE == (res = getaddrinfo(addr, service, hints, &info->ai)))
+	if (EAI_SERVICE == (res = getaddrinfo(ip, service, hints, &info->ai)))
 	{
 		*error = zbx_dsprintf(*error, "The service \"%s\" is not available for the requested socket type.",
 				port_in);
@@ -1025,7 +1033,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 	}
 	else if (0 != res)
 	{
-		*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", addr_in);
+		*error = zbx_dsprintf(*error, "IP is not supported: \"%s\"", ip_in);
 		goto err;
 	}
 #ifdef HAVE_IPV6
@@ -1033,7 +1041,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 	{
 		const unsigned char	ipv6_mapped[12] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255};
 
-		if (NULL != addr)
+		if (NULL != ip)
 		{
 			if (-1 == prefix_sz_local)
 				prefix_sz_local = ZBX_IPV6_MAX_CIDR_PREFIX;
@@ -1048,14 +1056,14 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 	else
 #endif
 	{
-		if (NULL != addr && -1 == prefix_sz_local)
+		if (NULL != ip && -1 == prefix_sz_local)
 			prefix_sz_local = ZBX_IPV4_MAX_CIDR_PREFIX;
 
 		if (NULL != service)
 			info->port = ntohs(((struct sockaddr_in*)info->ai->ai_addr)->sin_port);
 	}
 
-	if (NULL == addr)
+	if (NULL == ip)
 	{
 		freeaddrinfo(info->ai);
 		info->ai = NULL;
@@ -1065,7 +1073,7 @@ static int	get_addr_info(const char *addr_in, const char *port_in, struct addrin
 
 	ret = SUCCEED;
 err:
-	zbx_free(addr);
+	zbx_free(ip);
 
 	return ret;
 }
@@ -1161,3 +1169,4 @@ int	net_udp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	return net_socket_count(NET_CONN_TYPE_UDP, request, result);
 }
+#endif

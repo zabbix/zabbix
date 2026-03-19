@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -33,9 +33,10 @@ class CControllerTemplateEdit extends CController {
 			'template_groups_new' =>			'array',
 			'template_groups' =>				'array',
 			'description' =>					'db hosts.description',
+			'show_inherited_tags' =>			'in 0,1',
 			'tags' =>							'array',
-			'macros' =>							'array',
 			'show_inherited_template_macros' =>	'in 0,1',
+			'macros' =>							'array',
 			'valuemaps' =>						'array',
 			'clone' =>							'in 1'
 		];
@@ -94,6 +95,7 @@ class CControllerTemplateEdit extends CController {
 				'original_templates' => [],
 				'groups_ms' => [],
 				'description' => $this->getInput('description', ''),
+				'show_inherited_tags' => $this->getInput('show_inherited_tags', 0),
 				'tags' => $this->getInput('tags', []),
 				'show_inherited_template_macros' => $this->getInput('show_inherited_template_macros', 0),
 				'valuemaps' => array_values($this->getInput('valuemaps', [])),
@@ -234,10 +236,11 @@ class CControllerTemplateEdit extends CController {
 
 				$data['valuemaps'] = array_values($data['dbTemplate']['valuemaps']);
 
-				$data['vendor'] = array_filter([
+				$vendor_data = [
 					'name' => $data['dbTemplate']['vendor_name'],
 					'version' => $data['dbTemplate']['vendor_version']
-				], 'strlen');
+				];
+				$data['vendor'] = array_filter($vendor_data, 'strlen') ? $vendor_data : [];
 
 				foreach ($data['dbTemplate']['parentTemplates'] as $parentTemplate) {
 					$data['original_templates'][$parentTemplate['templateid']] = $parentTemplate['templateid'];
@@ -386,9 +389,10 @@ class CControllerTemplateEdit extends CController {
 			'templates' => [],
 			'groups_ms' => [],
 			'description' => '',
+			'show_inherited_tags' => 0,
 			'tags' => [],
-			'macros' => [],
 			'show_inherited_template_macros' => 0,
+			'macros' => [],
 			'valuemaps' => [],
 			'readonly' => false,
 			'vendor' => [],

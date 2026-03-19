@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -34,6 +34,9 @@
 #include "zbxipcservice.h"
 #include "zbxnum.h"
 #include "zbxjson.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_t *synced,
 		const zbx_thread_info_t *thread_info, zbx_thread_proxyconfig_args *args)
@@ -130,7 +133,11 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock.peer, &jp, &status, &error)))
 	{
-		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, NULL, args->config_vault,
+		zbx_vector_uint64_t	deleted_itemids;
+
+		zbx_vector_uint64_create(&deleted_itemids);
+
+		zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, *synced, &deleted_itemids, args->config_vault,
 				args->config_proxyconfig_frequency);
 		*synced = ZBX_SYNCED_NEW_CONFIG_YES;
 
@@ -142,6 +149,8 @@ static void	process_configuration_sync(size_t *data_size, zbx_synced_new_config_
 		}
 
 		zbx_dc_update_interfaces_availability();
+		zbx_hc_remove_items_by_ids(&deleted_itemids);
+		zbx_vector_uint64_destroy(&deleted_itemids);
 	}
 	else
 	{
@@ -286,6 +295,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(proxyconfig_args_in->config_tls, proxyconfig_args_in->zbx_get_program_type_cb_arg,
 			zbx_dc_get_psk_by_identity);
@@ -331,15 +343,20 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 		{
 			if (0 != config_cache_reload)
 			{
+				zbx_vector_uint64_t	deleted_itemids;
+
 				zbx_setproctitle("%s [loading configuration]", get_process_type_string(process_type));
 
-				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, NULL,
+				zbx_vector_uint64_create(&deleted_itemids);
+
+				zbx_dc_sync_configuration(ZBX_DBSYNC_UPDATE, synced, &deleted_itemids,
 						proxyconfig_args_in->config_vault,
 						proxyconfig_args_in->config_proxyconfig_frequency);
 				synced = ZBX_SYNCED_NEW_CONFIG_YES;
 				zbx_dc_update_interfaces_availability();
 
 				proxyconfig_update_vault_macros(proxyconfig_args_in);
+				zbx_hc_remove_items_by_ids(&deleted_itemids);
 				zbx_rtc_notify_finished_sync(proxyconfig_args_in->config_timeout,
 					ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type), &rtc);
 
@@ -349,6 +366,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 					last_template_cleanup_sec = sec;
 				}
 
+				zbx_vector_uint64_destroy(&deleted_itemids);
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						get_process_type_string(process_type), zbx_time() - sec);
 			}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,7 +25,6 @@ abstract class CHostGeneral extends CHostBase {
 		'update' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massadd' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
-		'massupdate' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN],
 		'massremove' => ['min_user_type' => USER_TYPE_ZABBIX_ADMIN]
 	];
 
@@ -87,14 +86,14 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	public function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function checkHostsWithoutGroups(array $hosts, array $db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		foreach ($hosts as $host) {
 			if (array_key_exists('groups', $host) && !$host['groups']
 					&& (!array_key_exists('nopermissions_groups', $db_hosts[$host[$id_field_name]])
 						|| !$db_hosts[$host[$id_field_name]]['nopermissions_groups'])) {
-				$error = $this instanceof CTemplate
+				$error = self::isTemplate()
 					? _s('Template "%1$s" cannot be without template group.', $db_hosts[$host[$id_field_name]]['host'])
 					: _s('Host "%1$s" cannot be without host group.', $db_hosts[$host[$id_field_name]]['host']);
 
@@ -480,114 +479,121 @@ abstract class CHostGeneral extends CHostBase {
 		), 'hgsetid');
 
 		if ($del_hgsetids) {
-			DB::delete('permission', ['hgsetid' => $del_hgsetids]);
-			DB::delete('hgset_group', ['hgsetid' => $del_hgsetids]);
 			DB::delete('hgset', ['hgsetid' => $del_hgsetids]);
 		}
 	}
 
-	/**
-	 * Update table "hosts_templates" and change objects of linked or unliked templates on target hosts or templates.
-	 *
-	 * @param array      $hosts
-	 * @param array|null $db_hosts
-	 * @param array|null $upd_hostids
-	 */
-	protected function updateTemplates(array &$hosts, ?array &$db_hosts = null, ?array &$upd_hostids = null): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		parent::updateTemplates($hosts, $db_hosts);
+	protected static function updateTemplates(array &$hosts, ?array &$db_hosts = null): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$ins_links = [];
-		$del_links = [];
-		$del_links_clear = [];
+		$del_links_by_action = ['clear' => [], 'unlink' => []];
 
-		foreach ($hosts as $host) {
+		foreach ($hosts as &$host) {
 			if (!array_key_exists('templates', $host) && !array_key_exists('templates_clear', $host)) {
 				continue;
 			}
 
-			if (array_key_exists('templates', $host)) {
-				$db_templates = ($db_hosts !== null)
-					? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
-					: [];
+			$db_templates = ($db_hosts !== null)
+				? array_column($db_hosts[$host[$id_field_name]]['templates'], null, 'templateid')
+				: [];
 
-				foreach ($host['templates'] as $template) {
+			if (array_key_exists('templates', $host)) {
+				foreach ($host['templates'] as &$template) {
 					if (array_key_exists($template['templateid'], $db_templates)) {
+						$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
 						unset($db_templates[$template['templateid']]);
 					}
 					else {
-						$ins_links[$template['templateid']][] = $host[$id_field_name];
+						$ins_links[$template['templateid']][$host[$id_field_name]] = &$template;
+					}
+				}
+				unset($template);
+
+				$templates_clear_indexes = [];
+
+				if (array_key_exists('templates_clear', $host)) {
+					foreach ($host['templates_clear'] as $index => $template) {
+						$templates_clear_indexes[$template['templateid']] = $index;
 					}
 				}
 
-				$templates_clear = array_key_exists('templates_clear', $host)
-					? array_column($host['templates_clear'], null, 'templateid')
-					: [];
-
 				foreach ($db_templates as $del_template) {
-					if (array_key_exists($del_template['templateid'], $templates_clear)) {
-						$del_links_clear[$del_template['templateid']][] = $host[$id_field_name];
+					if (array_key_exists($del_template['templateid'], $templates_clear_indexes)) {
+						$index = $templates_clear_indexes[$del_template['templateid']];
+						$host['templates_clear'][$index]['hosttemplateid'] = $del_template['hosttemplateid'];
+
+						$del_links_by_action['clear'][$del_template['templateid']][$host[$id_field_name]] =
+							$del_template['hosttemplateid'];
 					}
 					else {
-						$del_links[$del_template['templateid']][] = $host[$id_field_name];
+						$del_links_by_action['unlink'][$del_template['templateid']][$host[$id_field_name]] =
+							$del_template['hosttemplateid'];
 					}
 				}
 			}
 			elseif (array_key_exists('templates_clear', $host)) {
-				foreach ($host['templates_clear'] as $template) {
-					$del_links_clear[$template['templateid']][] = $host[$id_field_name];
+				foreach ($host['templates_clear'] as &$template) {
+					$template['hosttemplateid'] = $db_templates[$template['templateid']]['hosttemplateid'];
+
+					$del_links_by_action['clear'][$template['templateid']][$host[$id_field_name]] =
+						$db_templates[$template['templateid']]['hosttemplateid'];
 				}
+				unset($template);
 			}
 		}
+		unset($host);
 
-		while ($del_links_clear) {
-			$templateid = key($del_links_clear);
-			$hostids = reset($del_links_clear);
-			$templateids = [$templateid];
-			unset($del_links_clear[$templateid]);
+		foreach (self::getHostTemplateSetsToUnlink($del_links_by_action) as $set_to_unlink) {
+			DB::delete('hosts_templates', ['hosttemplateid' => $set_to_unlink['del_hosttemplateids']]);
 
-			foreach ($del_links_clear as $templateid => $_hostids) {
-				if ($_hostids === $hostids) {
-					$templateids[] = $templateid;
-					unset($del_links_clear[$templateid]);
-				}
-			}
-
-			self::unlinkTemplatesObjects($templateids, $hostids, true);
+			self::unlinkTemplatesObjects($set_to_unlink['templateids'], $set_to_unlink['hostids'],
+				$set_to_unlink['clear']
+			);
 		}
 
-		while ($del_links) {
-			$templateid = key($del_links);
-			$hostids = reset($del_links);
-			$templateids = [$templateid];
-			unset($del_links[$templateid]);
+		foreach (self::getHostTemplateSetsToLink($ins_links) as $set_to_link) {
+			$hosttemplateids = DB::insertBatch('hosts_templates', $set_to_link['ins_hosts_templates']);
 
-			foreach ($del_links as $templateid => $_hostids) {
-				if ($_hostids === $hostids) {
-					$templateids[] = $templateid;
-					unset($del_links[$templateid]);
-				}
+			foreach ($set_to_link['ins_templates'] as &$template) {
+				$template['hosttemplateid'] = array_shift($hosttemplateids);
 			}
+			unset($template);
 
-			self::unlinkTemplatesObjects($templateids, $hostids);
+			self::linkTemplatesObjects($set_to_link['templateids'], $set_to_link['hostids']);
 		}
+	}
 
-		while ($ins_links) {
-			$templateid = key($ins_links);
-			$hostids = reset($ins_links);
-			$templateids = [$templateid];
-			unset($ins_links[$templateid]);
+	private static function getHostTemplateSetsToUnlink(array $del_links_by_action): array {
+		$sets_to_unlink = [];
 
-			foreach ($ins_links as $templateid => $_hostids) {
-				if ($_hostids === $hostids) {
-					$templateids[] = $templateid;
-					unset($ins_links[$templateid]);
+		foreach ($del_links_by_action as $action => &$del_links) {
+			while ($del_links) {
+				$templateid = key($del_links);
+				$hostids = array_keys($del_links[$templateid]);
+				$del_hosttemplateids = array_values($del_links[$templateid]);
+				$templateids = [$templateid];
+				unset($del_links[$templateid]);
+
+				foreach ($del_links as $templateid => $_del_hosttemplateids) {
+					if (array_keys($_del_hosttemplateids) === $hostids) {
+						$del_hosttemplateids = array_merge($del_hosttemplateids, array_values($_del_hosttemplateids));
+						$templateids[] = $templateid;
+						unset($del_links[$templateid]);
+					}
 				}
-			}
 
-			self::linkTemplatesObjects($templateids, $hostids);
+				$sets_to_unlink[] = [
+					'del_hosttemplateids' => $del_hosttemplateids,
+					'templateids' => $templateids,
+					'hostids' => $hostids,
+					'clear' => $action === 'clear'
+				];
+			}
 		}
+		unset($del_links);
+
+		return $sets_to_unlink;
 	}
 
 	/**
@@ -777,6 +783,55 @@ abstract class CHostGeneral extends CHostBase {
 			CItem::unlinkTemplateObjects($templateids, $hostids);
 			CHttpTest::unlinkTemplateObjects($templateids, $hostids);
 		}
+	}
+
+	private static function getHostTemplateSetsToLink(array $ins_links): array {
+		$sets_to_link = [];
+
+		while ($ins_links) {
+			$templateid = key($ins_links);
+			$hostids = array_keys($ins_links[$templateid]);
+			$ins_hosts_templates = [];
+			$ins_templates = [];
+
+			foreach ($ins_links[$templateid] as $hostid => &$template) {
+				$ins_hosts_templates[] = [
+					'hostid' => $hostid,
+					'templateid' => $templateid
+				];
+
+				$ins_templates[] = &$template;
+			}
+			unset($template);
+
+			$templateids = [$templateid];
+			unset($ins_links[$templateid]);
+
+			foreach ($ins_links as $templateid => $host_templates) {
+				if (array_keys($host_templates) === $hostids) {
+					foreach ($host_templates as $hostid => &$template) {
+						$ins_hosts_templates[] = [
+							'hostid' => $hostid,
+							'templateid' => $templateid
+						];
+						$ins_templates[] = &$template;
+					}
+					unset($template);
+
+					$templateids[] = $templateid;
+					unset($ins_links[$templateid]);
+				}
+			}
+
+			$sets_to_link[] = [
+				'ins_hosts_templates' => $ins_hosts_templates,
+				'ins_templates' => $ins_templates,
+				'templateids' => $templateids,
+				'hostids' => $hostids
+			];
+		}
+
+		return $sets_to_link;
 	}
 
 	/**
@@ -1306,8 +1361,8 @@ abstract class CHostGeneral extends CHostBase {
 	 * @param array $hosts
 	 * @param array $db_hosts
 	 */
-	public function addAffectedGroups(array $hosts, array &$db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addAffectedGroups(array $hosts, array &$db_hosts): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		$hostids = [];
 
@@ -1325,7 +1380,7 @@ abstract class CHostGeneral extends CHostBase {
 		$editable_groups = null;
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if ($this instanceof CTemplate) {
+			if (self::isTemplate()) {
 				$permitted_groups = API::TemplateGroup()->get([
 					'output' => [],
 					'templateids' => $hostids,
@@ -1381,30 +1436,8 @@ abstract class CHostGeneral extends CHostBase {
 		}
 	}
 
-	protected function addHostMacroIds(array &$hosts, array $db_hosts): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
-
-		foreach ($hosts as &$host) {
-			$db_hostmacroids = [];
-
-			foreach ($db_hosts[$host[$id_field_name]]['macros'] as $db_macro) {
-				$db_hostmacroids[CApiInputValidator::trimMacro($db_macro['macro'])] = $db_macro['hostmacroid'];
-			}
-
-			foreach ($host['macros'] as &$macro) {
-				$trimmed_macro = CApiInputValidator::trimMacro($macro['macro']);
-
-				if (array_key_exists($trimmed_macro, $db_hostmacroids)) {
-					$macro['hostmacroid'] = $db_hostmacroids[$trimmed_macro];
-				}
-			}
-			unset($macro);
-		}
-		unset($host);
-	}
-
-	public function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
-		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
+	protected static function addUnchangedGroups(array &$hosts, array $db_hosts, array $del_objectids = []): void {
+		$id_field_name = self::isTemplate() ? 'templateid' : 'hostid';
 
 		if (!array_key_exists('groups', reset($hosts))) {
 			return;
