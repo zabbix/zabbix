@@ -30,9 +30,6 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
-	private const DEVICE_STATUS_NEW = 0;
-	private const DEVICE_STATUS_ENABLED = 1;
-
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
 	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'lastaccess'];
@@ -41,7 +38,6 @@ class CDevice extends CApiService {
 
 	private const STATUS_NEW = 0;
 	private const STATUS_ENABLED = 1;
-	private const STATUS_DISABLED = 2;
 	public const MOBILE_IDENTITY_KEY = 0;
 	public const MOBILE_ENCRYPTION_KEY = 1;
 
@@ -204,7 +200,7 @@ class CDevice extends CApiService {
 				'name' => $options['name'],
 				'tokenid' =>$db_token['tokenid'],
 				'push_token' => $options['push_token'],
-				'status' => self::DEVICE_STATUS_ENABLED
+				'status' => self::STATUS_ENABLED
 			],
 			'where' => ['deviceid' => $db_device['deviceid']]
 		]);
@@ -354,7 +350,7 @@ class CDevice extends CApiService {
 		$ins_device = [
 			'userid' => $userid,
 			'uuid' => $uuid,
-			'status' => self::DEVICE_STATUS_NEW
+			'status' => self::STATUS_NEW
 		];
 
 		$deviceids = DB::insertBatch('device', [$ins_device]);
