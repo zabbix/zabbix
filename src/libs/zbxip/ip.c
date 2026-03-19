@@ -19,7 +19,7 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check is string is valid hostname name used for services          *
+ * Purpose: check if string is valid DNS hostname used for checking services  *
  *                                                                            *
  * Parameters: host - [IN]                                                    *
  *                                                                            *
@@ -27,21 +27,21 @@
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_is_dns(const char *host)
+int	zbx_is_dnsname(const char *host)
 {
 #define STATE_DASH	1
-#define STATE_SEPARATOR	2
+#define STATE_DOT	2
 	const char	*p = host;
 	int		state = 0;
 	int		len = 1;
 
 	/* DNS name should start with [0-9A-Za-z] */
-	if ('\0' == *p || 0 == isalnum(*p++))
+	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p++))\
 		return FAIL;
 
 	while ('\0' != *p)
 	{
-		if (0 != isalnum(*p))
+		if (0 == (0x80 & *p) && 0 != isalnum(*p))
 		{
 			state = 0;
 			len++;
@@ -49,20 +49,20 @@ int	zbx_is_dns(const char *host)
 		else if ('-' == *p)
 		{
 			/* Labels should not start with dash. */
-			if (STATE_SEPARATOR == state)
+			if (STATE_DOT == state)
 				return FAIL;
 			state = STATE_DASH;
 			len++;
 		}
 		else if ('.' == *p)
 		{
-			/* Dashes are not allowed before separator. */
+			/* Labels should not end with dash. */
 			if (STATE_DASH == state)
 				return FAIL;
 			/* Empty labels are not allowed. */
 			if (0 == len)
 				return FAIL;
-			state = STATE_SEPARATOR;
+			state = STATE_DOT;
 			len = 0;
 		}
 		else
@@ -77,12 +77,13 @@ int	zbx_is_dns(const char *host)
 	}
 
 	/* Total length should not exceed 253 characters. */
+	/* This is excluding trailing dot and additional byte usually used when saved. */
 	if (253 < p - host)
 		return FAIL;
 
 	return 0 == state ? SUCCEED : FAIL;
 #undef STATE_DASH
-#undef STATE_SEPARATOR
+#undef STATE_DOT
 }
 
 /******************************************************************************

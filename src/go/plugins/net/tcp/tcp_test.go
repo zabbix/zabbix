@@ -108,7 +108,7 @@ func Test_loginReceived(t *testing.T) {
 func Test_isDNS(t *testing.T) {
 	t.Parallel()
 
-	// Synchronize with tests/libs/zbxip/zbx_is_dns.yaml
+	// Synchronize with tests/libs/zbxip/zbx_is_dnsname.yaml
 
 	type args struct {
 		host string

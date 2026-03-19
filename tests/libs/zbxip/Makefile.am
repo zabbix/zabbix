@@ -12,7 +12,7 @@ BINARIES_tests = \
 	zbx_iprange_uniq_next \
 	zbx_portrange_uniq_next \
 	zbx_join_hostport \
-	zbx_is_dns
+	zbx_is_dnsname
 
 noinst_PROGRAMS = $(BINARIES_tests)
 
@@ -197,17 +197,17 @@ zbx_join_hostport_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
 zbx_join_hostport_CFLAGS = $(IP_COMPILER_FLAGS)
 
-#zbx_is_dns
+#zbx_is_dnsname
 
-zbx_is_dns_SOURCES = \
-	zbx_is_dns.c \
+zbx_is_dnsname_SOURCES = \
+	zbx_is_dnsname.c \
 	$(COMMON_SRC_FILES)
 
-zbx_is_dns_LDADD = \
+zbx_is_dnsname_LDADD = \
 	$(IP_LIBS)
 
-zbx_is_dns_LDADD += @SERVER_LIBS@
+zbx_is_dnsname_LDADD += @SERVER_LIBS@
 
-zbx_is_dns_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
+zbx_is_dnsname_LDFLAGS = @SERVER_LDFLAGS@ $(CMOCKA_LDFLAGS)
 
-zbx_is_dns_CFLAGS = $(IP_COMPILER_FLAGS)
+zbx_is_dnsname_CFLAGS = $(IP_COMPILER_FLAGS)

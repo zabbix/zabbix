@@ -26,7 +26,7 @@ void	zbx_mock_test_entry(void **state)
 
 	ZBX_UNUSED(state);
 
-	int		act_result = zbx_is_dns(src);
+	int		act_result = zbx_is_dnsname(src);
 
 	zbx_mock_assert_int_eq("return value", exp_result, act_result);
 }
