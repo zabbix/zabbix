@@ -239,7 +239,7 @@ class CControllerProblemViewData extends CControllerDataTable
 					'show_rank_change_symptom' => true
 				]));
 
-			if ($trigger['opdata'] != '' && $options['compact_view'] && $context_popup_data['show_opdata'] == 1) {
+			if ($trigger['opdata'] != '' && !$options['compact_view'] && $context_popup_data['show_opdata'] == 1) {
 				$description[] = ' (';
 				$description[] = $opdata;
 				$description[] = ')';
@@ -503,10 +503,12 @@ class CControllerProblemViewData extends CControllerDataTable
 			$filter['to'] = $timeline['to_ts'];
 		}
 
-		$context_popup_data['show_opdata'] = $context_popup_data['show_opdata'] == 1
-			?: OPERATIONAL_DATA_SHOW_SEPARATELY;
-
-		$data = CScreenProblem::getData($filter, $context_popup_data, $limit, true);
+		$data = CScreenProblem::getData(
+			$filter,
+			['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $context_popup_data,
+			$limit,
+			true
+		);
 		$data = CScreenProblem::sortData($data, $limit, $sort_field, $sort_order);
 
 		if ($export == null) {

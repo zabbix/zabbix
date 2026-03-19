@@ -253,9 +253,6 @@ $template = (new CForm('get'))
 	->addItem([
 		$template,
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
-//		(new CVar('show_opdata', $data['show_opdata']))->removeId(),
-//		(new CVar('details', $data['details']))->removeId(),
-//		(new CVar('show_suppressed', $data['show_suppressed']))->removeId(),
 		(new CVar('filter_name', '#{filter_name}'))->removeId(),
 		(new CVar('filter_show_counter', '#{filter_show_counter}'))->removeId(),
 		(new CVar('filter_custom_time', '#{filter_custom_time}'))->removeId(),

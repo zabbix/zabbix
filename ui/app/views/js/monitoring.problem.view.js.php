@@ -393,15 +393,6 @@
 						return;
 					}
 
-					/**
-					 * @var {{
-					 *     add_comments: boolean|undefined,
-					 *     change_severity: boolean|undefined,
-					 *     acknowledge: boolean|undefined,
-					 *     suppress_problems: boolean|undefined,
-					 *     rank_change: boolean|undefined
-					 * }}
-					 */
 					const {allowed} = this.datatable.getDataProvider().getLastResponse();
 
 					if (!allowed) {

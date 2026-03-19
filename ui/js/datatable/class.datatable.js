@@ -174,7 +174,7 @@ class CDataTable {
 
 	#filter = {};
 
-	#tabfilter_item = { _index: 0 };
+	#tabfilter_item = { _index: 1 };
 
 	#pager = null;
 

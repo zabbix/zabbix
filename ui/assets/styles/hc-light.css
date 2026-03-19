@@ -2212,7 +2212,7 @@ button {
     break-after: page; } }
 :root {
   --datatable-row-height: 32px;
-  --datatable-compact-row-height: calc(var(--datatable-row-height) - 10px); }
+  --datatable-compact-row-height: calc(var(--datatable-row-height) - 6px); }
 
 .datatable {
   position: relative;

@@ -144,7 +144,7 @@
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['status'])
 						.setRenderer('status'),
-					new CDataTableColumn('latest_data', <?= _('Latest data'); ?>)
+					new CDataTableColumn('latest_data', <?= json_encode(_('Latest data')); ?>)
 						.setFields(['hostid', 'items_count'])
 						.setRenderer('latest_data'),
 					new CDataTableColumn('problems', <?= json_encode(_('Problems')); ?>)

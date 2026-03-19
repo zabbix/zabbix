@@ -64,14 +64,14 @@ class CDataTableContextPopupMonitoringProblemsProblem extends CDataTableContextP
 		super.onInit();
 
 		const context_popup_data = this.getColumnConfig().getContextPopupData();
-		const {compact_view} = this.getDataTable().getFilter();
+		const compact_view = this.getDataTable().getOption('compact_view');
 
 		for (const field of Object.keys(this.getDefaultData())) {
 			const input = this.getField(field);
 			input.checked = context_popup_data[field] == 1;
 
 			if (['show_opdata', 'details'].includes(field)) {
-				input.disabled = compact_view == 1;
+				input.disabled = compact_view.checked;
 			}
 
 			input.addEventListener('input', event => event.stopPropagation());

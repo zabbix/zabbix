@@ -52,7 +52,7 @@ class CDataTableContextPopupMonitoringProblemsTime extends CDataTableContextPopu
 		super.onInit();
 
 		const {show_timeline} = this.getColumnConfig().getContextPopupData();
-		const compact_view = this.getDataTable().getOption('compact_view')
+		const compact_view = this.getDataTable().getOption('compact_view');
 
 		const show_timeline_field = this.getField('show_timeline');
 		show_timeline_field.checked = show_timeline == 1;
