@@ -8675,7 +8675,8 @@ svg {
     display: flex;
     align-items: flex-start;
     padding-right: 293px;
-    margin-top: 6px; }
+    margin-top: 6px;
+    line-height: 24px; }
     .preprocessing-list .on-fail-options > label {
       padding-top: 0;
       padding-left: 30px; }
