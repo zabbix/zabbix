@@ -22,8 +22,8 @@ use Firebase\JWT\JWK;
  */
 class CApiDpopHelper {
 
-	private const IAT_DELAY = 2;
-	private const IAT_EXP_MAX_DIFFERENCE = 60;
+	private const TIME_SKEW = 2;
+	private const TOKEN_LIFE_TIME = 60;
 
 	private const SIGNATURE_ALGORITHM = 'ES256';
 
@@ -34,6 +34,7 @@ class CApiDpopHelper {
 		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
 
 		JWT::$timestamp = $check_time;
+		JWT::$leeway = self::TIME_SKEW;
 
 		try {
 			JWT::decode($signature, $key);
@@ -66,11 +67,7 @@ class CApiDpopHelper {
 			return false;
 		}
 
-		if (!self::checkIat($payload, $check_time)) {
-			return false;
-		}
-
-		if (!self::checkExp($payload, $check_time)) {
+		if (!self::checkTokenLifeTime($payload, $check_time)) {
 			return false;
 		}
 
@@ -98,37 +95,23 @@ class CApiDpopHelper {
 		return array_key_exists('ath', $payload) && hash_equals($expected_ath, $payload['ath']);
 	}
 
-	private static function checkIat(array $payload, int $check_time): bool {
-		if (!array_key_exists('iat', $payload)) {
-			return false;
-		}
-
-		$iat = (int) $payload['iat'];
-
-		if ($iat > $check_time) {
-			return false;
-		}
-
-		return $check_time - $iat <= self::IAT_DELAY;
-	}
-
-	private static function checkExp(array $payload, int $check_time): bool {
-		if (!array_key_exists('exp', $payload)) {
+	private static function checkTokenLifeTime(array $payload, int $check_time): bool {
+		if (!array_key_exists('iat', $payload) || !array_key_exists('exp', $payload)) {
 			return false;
 		}
 
 		$iat = (int) $payload['iat'];
 		$exp = (int) $payload['exp'];
 
-		if ($iat > $exp) {
+		if ($iat > $check_time + self::TIME_SKEW) {
 			return false;
 		}
 
-		if ($exp - $iat < self::IAT_EXP_MAX_DIFFERENCE) {
-			return true;
+		if ($exp - $iat <= self::TOKEN_LIFE_TIME) {
+			return $check_time <= $exp + self::TIME_SKEW;
 		}
 
-		return $exp > $check_time;
+		return $check_time <= $iat + self::TOKEN_LIFE_TIME + self::TIME_SKEW;
 	}
 
 	private static function checkJti(array $payload, int $check_time): bool {
