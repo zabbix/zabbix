@@ -112,7 +112,9 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 	onOpen() {
 		super.onOpen();
 
-		const sortable = new CSortable(this.#sortable, {selector_handle: `.${ZBX_STYLE_DRAG_ICON}`})
+		const sortable = new CSortable(this.#sortable, {
+			selector_handle: `.${CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM}`
+		})
 			.on(CSortable.EVENT_SORT, event => {
 				const items = sortable.getTarget()
 					.querySelectorAll(`.${CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM}`);
