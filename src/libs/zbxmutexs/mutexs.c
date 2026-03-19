@@ -451,7 +451,9 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 
 	if (0 != pthread_mutex_lock(mutex))
 	{
-		zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
+		long	id = mutex - shared_lock->mutexes;
+
+		zbx_error("[file:'%s',line:%d] mutex:%ld failed: %s", filename, line, id, zbx_strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 #else
