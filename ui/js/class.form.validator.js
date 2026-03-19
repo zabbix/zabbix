@@ -445,7 +445,13 @@ class CFormValidator {
 
 			if (rule_set.type === 'objects' || rule_set.type === 'array') {
 				if (data[field] !== null) {
-					Object.entries(data[field]).forEach(([key, value]) => scanObject(value, field_path + '/' + key));
+					Object.entries(data[field]).forEach(([key, value]) => {
+						scanObject(value, field_path + '/' + key);
+
+						if (rule_set.field) {
+							checkUse(rule_set.field, field_path + '/' + key);
+						}
+					});
 				}
 			}
 			else if (rule_set.type === 'object') {
