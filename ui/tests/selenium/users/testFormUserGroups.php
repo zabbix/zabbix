@@ -70,29 +70,29 @@ class testFormUserGroups extends CWebTest {
 				'mfaid' => $mfaids[0],
 				'hostgroup_rights' => [
 					[
-						'id' => 2, // Linux servers
+						'id' => 2, // Linux servers.
 						'permission' => PERM_READ
 					],
 					[
-						'id' => 4, // Zabbix servers
+						'id' => 4, // Zabbix servers.
 						'permission' => PERM_DENY
 					],
 					[
-						'id' => 7, // Hypervizors
+						'id' => 7, // Hypervizors.
 						'permission' => PERM_READ_WRITE
 					]
 				],
 				'templategroup_rights' => [
 					[
-						'id' => 10, // Templates/Operating systems
+						'id' => 10, // Templates/Operating systems.
 						'permission' => PERM_READ_WRITE
 					],
 					[
-						'id' => 12, // Templates/Applications
+						'id' => 12, // Templates/Applications.
 						'permission' => PERM_DENY
 					],
 					[
-						'id' => 13, // Templates/Databases
+						'id' => 13, // Templates/Databases.
 						'permission' => PERM_READ
 					]
 				]

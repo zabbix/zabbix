@@ -901,7 +901,7 @@ class testPageUsers extends CWebTest {
 		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$this->query('name:zbx_filter')->one()->query('button:Reset')->waitUntilClickable()->one()->click();
 
-		// Reset TOTP secret for 3 users, only one of which actually has a TOTP secret defined.
+		// Reset TOTP secret for users both with and without registered TOTP secrets.
 		$this->selectTableRows(['user-zabbix', 'guest', 'LDAP user', 'Tag-user', 'test-user'], 'Username');
 		$this->query('button:Reset TOTP secret')->one()->waitUntilClickable()->click();
 		$this->page->acceptAlert();
