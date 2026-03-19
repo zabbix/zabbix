@@ -315,6 +315,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 * @onAfter closeAndAcknowledgeEvents
+	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
 		// Trigger problem.
@@ -608,6 +609,7 @@ class testAlarmNotification extends CWebTest {
 	 *
 	 * @onBefore resetTriggerSeverities
 	 * @onAfter closeAndAcknowledgeEvents
+	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
 	 */
@@ -655,8 +657,12 @@ class testAlarmNotification extends CWebTest {
 			// Check close button.
 			$alarm_dialog->query('xpath:.//button[@title="Close"]')->one()->click()->waitUntilNotVisible();
 		}
+	}
 
-		// Delete the events so they don't appear in the next test case.
+	/**
+	 * Delete the events so they don't appear in the next test case.
+	 */
+	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
 	}
 
