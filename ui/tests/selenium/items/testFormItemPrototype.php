@@ -1103,8 +1103,8 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->zbxTestAssertAttribute("//z-select[@id='preprocessing_".($itemPreproc['step']-1)."_type']", 'readonly');
 				$this->zbxTestDropdownAssertSelected("preprocessing_".($itemPreproc['step']-1)."_type", $preprocessing_type);
 				if ((1 <= $itemPreproc['type']) && ($itemPreproc['type'] <= 4)) {
-					$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="preprocessing_'.($itemPreproc['step']-1)
-							.'_params_0"]', 'readonly'
+					$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="preprocessing_'.($itemPreproc['step']-1).
+							'_params_0"]', 'readonly'
 					);
 					$this->zbxTestAssertElementValue('preprocessing_'.($itemPreproc['step']-1).'_params_0',
 							$itemPreproc['params']
