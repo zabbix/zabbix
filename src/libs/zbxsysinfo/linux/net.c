@@ -647,7 +647,7 @@ int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 
@@ -1484,7 +1484,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_json_addraw(&j, "values", jval.buffer);
 	zbx_json_close(&j);
 
-	SET_STR_RESULT(result, strdup(j.buffer));
+	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
 	zbx_json_free(&j);
 	zbx_json_free(&jval);
