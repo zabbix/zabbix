@@ -44,6 +44,9 @@ class ZTextareaFlexible extends HTMLElement {
 	/** @type {number | null} */
 	#animation_frame_id = null;
 
+	/** @type {boolean} */
+	#is_spellcheck_allowed = false;
+
 	constructor() {
 		super();
 
@@ -159,6 +162,7 @@ class ZTextareaFlexible extends HTMLElement {
 
 			case 'spellcheck':
 				this.#textarea.spellcheck = value !== 'false';
+				this.#is_spellcheck_allowed = this.#textarea.spellcheck;
 				break;
 
 			case 'value':
@@ -209,15 +213,15 @@ class ZTextareaFlexible extends HTMLElement {
 	#addEventListeners() {
 		this.#textarea.addEventListener('input', this.#inputHandler);
 		this.#textarea.addEventListener('keydown', this.#keydownHandler);
-		this.#textarea.addEventListener('blur', this.#reemitFocus);
-		this.#textarea.addEventListener('focus', this.#reemitFocus);
+		this.#textarea.addEventListener('blur', this.#blurHandler);
+		this.#textarea.addEventListener('focus', this.#focusHandler);
 	}
 
 	#removeEventListeners() {
 		this.#textarea.removeEventListener('input', this.#inputHandler);
 		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
-		this.#textarea.removeEventListener('blur', this.#reemitFocus);
-		this.#textarea.removeEventListener('focus', this.#reemitFocus);
+		this.#textarea.removeEventListener('blur', this.#blurHandler);
+		this.#textarea.removeEventListener('focus', this.#focusHandler);
 	}
 
 	#inputHandler = (e) => {
@@ -231,7 +235,17 @@ class ZTextareaFlexible extends HTMLElement {
 		}
 	}
 
-	#reemitFocus = (e) => {
+	#blurHandler = (e) => {
+		this.#textarea.spellcheck = false;
+
+		this.dispatchEvent(new FocusEvent(e.type));
+	}
+
+	#focusHandler = (e) => {
+		if (this.#is_spellcheck_allowed) {
+			this.#textarea.spellcheck = true;
+		}
+
 		this.dispatchEvent(new FocusEvent(e.type));
 	}
 
