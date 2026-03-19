@@ -1378,14 +1378,11 @@ class CDataTable {
 	}
 
 	onScroll() {
-		console.log(this.#context_popup_updated);
 		if (this.#context_popup_updated) {
 			this.#context_popup_updated = false;
 
 			return;
 		}
-
-		console.log('here');
 
 		this.#context_popup?.dispatchEvent(CDataTableContextPopup.EVENT_CLOSE);
 
