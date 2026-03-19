@@ -1171,7 +1171,8 @@ out:
  *                                                                            *
  * Purpose: throttles value by suppressing identical values                   *
  *                                                                            *
- * Parameters: value             - [IN/OUT] value to process                  *
+ * Parameters: value_type        - [IN] item value type                       *
+ *             value             - [IN/OUT] value to process                  *
  *             ts                - [IN] value timestamp                       *
  *             history_value_in  - [IN] historical (previous) data            *
  *             history_value_out - [OUT] historical (next) data               *
