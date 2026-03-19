@@ -30,11 +30,22 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
+	private const DEVICE_STATUS_NEW = 0;
+	private const DEVICE_STATUS_ENABLED = 1;
+
+	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
+
 	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'lastaccess'];
+	private const TASK_DEVICE_INIT_TTL = 30;
+	private const TASK_DEVICE_OFFBOARD_TTL = 86400;
 
 	private const STATUS_NEW = 0;
 	private const STATUS_ENABLED = 1;
 	private const STATUS_DISABLED = 2;
+	public const MOBILE_IDENTITY_KEY = 0;
+	public const MOBILE_ENCRYPTION_KEY = 1;
+
+	public const DEVICE_KEY_ACTIVE = 0;
 
 	/**
 	 * @return array|string
@@ -139,55 +150,83 @@ class CDevice extends CApiService {
 		return $sql_parts;
 	}
 
-	public function init(array $user = []): array {
-//		$device = ['deviceid' => '1', 'uuid' => '123', 'name' => '', 'userid' => '1'];
+	/**
+	 * @param array  $user
+	 *
+	 * @return array
+	 */
+	public function init(array $user): array {
+		$this->validateInit($user, $db_user);
+
+		$enrollment_token = CApiTokenHelper::generateToken();
+		$uuid = generateUuidV7();
+		$time_start = time();
+
+		$deviceid = self::createDevice($db_user['userid'], $enrollment_token, $uuid, $time_start);
+
+		$taskid = self::createTaskInit($deviceid, $time_start);
 
 //		self::addAuditLog(CAudit::ACTION_INIT, CAudit::RESOURCE_DEVICE, [$device]);
 
 		return [
-			'deviceid',
-			'uuid',
-			'taskid',
-			'enrollment_token'
+			'enrollment_token' => $enrollment_token,
+			'uuid' => $uuid,
+			'taskid' => $taskid
 		];
 	}
 
+	/**
+	 * @param array  $options
+	 *
+	 * @return array
+	 */
 	public function onboard(array $options): array {
-//		$devices = [['deviceid' => '1', 'name' => 'Device 1']];
-//		$db_devices = ['1' => ['deviceid' => '1', 'name' => '']];
+		$this->validateOnboard($options, $db_device);
 
-//		self::addAuditLog(CAudit::ACTION_ONBOARD, CAudit::RESOURCE_DEVICE, $devices, $db_devices);
+		self::createDeviceKeys($db_device['deviceid'], $options['mobile_identity_key'],
+			$options['mobile_encryption_key']
+		);
 
-		return ['token'];
+		$tokens_data = CToken::createForce([[
+			'name' => $db_device['uuid'],
+			'userid' => $db_device['userid'],
+			'status' => ZBX_AUTH_TOKEN_ENABLED,
+			'auth_type' => ZBX_API_HEADER_AUTHENTICATE_DPOP,
+			'expires_at' => 0
+		]], $db_device['userid'], false);
+
+		$db_tokens = CToken::generateForce($tokens_data['tokenids'], $db_device['userid'], false);
+
+		$db_token = reset($db_tokens);
+
+		DB::update('device', [
+			'values' => [
+				'name' => $options['name'],
+				'tokenid' =>$db_token['tokenid'],
+				'push_token' => $options['push_token'],
+				'status' => self::DEVICE_STATUS_ENABLED
+			],
+			'where' => ['deviceid' => $db_device['deviceid']]
+		]);
+
+		// self::addAuditLog(CAudit::ACTION_ONBOARD, CAudit::RESOURCE_DEVICE, $devices, $db_devices);
+
+		return ['token' => $db_token['token']];
 	}
 
 	public function delete(array $deviceids): array {
 		$this->validateDelete($deviceids, $db_devices);
 
-		self::deleteForce($db_devices);
+		$deviceids = self::deleteForce($db_devices);
+
+		// todo - auditlog
 
 		return ['deviceids' => $deviceids];
 	}
 
-	private function validateDelete(array $deviceids, ?array &$db_devices): void {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+	public static function deleteForce(array $db_devices): array {
+		self::createTasksOffboard($db_devices);
 
-		if (!CApiInputValidator::validate($api_input_rules, $deviceids, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
-		$db_devices = $this->get([
-			'output' => ['deviceid', 'name'],
-			'deviceids' => $deviceids,
-			'preservekeys' => true
-		]);
-
-		if (count($db_devices) != count($deviceids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-	}
-
-	public static function deleteForce(array $db_devices): void {
 		$deviceids = array_keys($db_devices);
 
 		DBexecute(
@@ -203,5 +242,209 @@ class CDevice extends CApiService {
 		DB::delete('device', ['deviceid' => $deviceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
+
+		return $deviceids;
+	}
+
+	private function validateInit(array $user, ?array &$db_user): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'userid' =>	['type' => API_ID]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($user) {
+			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $user['userid'] != self::$userData['userid']) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$db_users = API::User()->get([
+				'output' => ['userid'],
+				'userids' => $user['userid'],
+				'editable' => true,
+				'preservekeys' => true
+			]);
+
+			if (!$db_users) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS,
+					_('No permissions to referred object or it does not exist!')
+				);
+			}
+
+			$db_user = $db_users[$user['userid']];
+		}
+		else {
+			$db_user = ['userid' => self::$userData['userid']];
+		}
+	}
+
+	private function validateOnboard(array $options, ?array &$db_device): void {
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
+			'enrollment_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'mobile_identity_key' => self::getJwkValidationRules(),
+			'mobile_encryption_key' => self::getJwkValidationRules(),
+			'push_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if (!CApiDpopHelper::checkJwkIntegrity($options['mobile_identity_key']) ||
+				!CApiDpopHelper::checkJwkIntegrity($options['mobile_encryption_key'])) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		$db_enrollment_token = DBfetch(DBselect(
+			'SELECT et.deviceid'.
+			' FROM enrollment_token et'.
+			' WHERE '.dbConditionString('et.enrollment_token', [hash('sha512', $options['enrollment_token'])]).
+				' AND et.enrollment_token_expiration>'.time()
+		));
+
+		if (!$db_enrollment_token) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
+
+		DB::delete('enrollment_token', ['deviceid' => $db_enrollment_token['deviceid']]);
+
+		$db_devices = DB::select('device', [
+			'output' => ['deviceid', 'uuid', 'userid'],
+			'filter' => ['deviceid' => $db_enrollment_token['deviceid']]
+		]);
+
+		$db_device = reset($db_devices);
+	}
+
+	private function validateDelete(array $deviceids, ?array &$db_devices): void {
+		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+
+		if (!CApiInputValidator::validate($api_input_rules, $deviceids, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		$db_devices = $this->get([
+			'output' => ['deviceid', 'uuid'],
+			'deviceids' => $deviceids,
+			'preservekeys' => true
+		]);
+
+		if (count($db_devices) != count($deviceids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+	}
+
+	private static function getJwkValidationRules(): array {
+		return ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
+			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'P-256'],
+			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'EC'],
+			'kid' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'x' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'y' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+		]];
+	}
+
+	private static function createDevice(string $userid, string $enrollment_token, string $uuid,
+			int $time_start): string {
+		$ins_device = [
+			'userid' => $userid,
+			'uuid' => $uuid,
+			'status' => self::DEVICE_STATUS_NEW
+		];
+
+		$deviceids = DB::insertBatch('device', [$ins_device]);
+
+		$deviceid = reset($deviceids);
+
+		$ins_enrollment_token = [
+			'deviceid' => $deviceid,
+			'enrollment_token' => hash('sha512', $enrollment_token),
+			'enrollment_token_expiration' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
+		];
+
+		DB::insertBatch('enrollment_token', [$ins_enrollment_token], false);
+
+		return $deviceid;
+	}
+
+	private static function createTaskInit(string $deviceid, int $time_start): string {
+		$ins_task = [
+			'type' =>ZBX_TM_TASK_ENROLL_DEVICE,
+			'status' => ZBX_TM_STATUS_NEW,
+			'clock' => $time_start,
+			'ttl' => self::TASK_DEVICE_INIT_TTL
+		];
+
+		$taskids = DB::insertBatch('task', [$ins_task]);
+
+		$taskid = array_shift($taskids);
+
+		$ins_task_device_init = [
+			'taskid' => $taskid,
+			'deviceid' => $deviceid
+		];
+
+		DB::insertBatch('task_device_init', [$ins_task_device_init], false);
+
+		return $taskid;
+	}
+
+	private static function createDeviceKeys(string $deviceid, array $mobile_identity_key,
+			array $mobile_encryption_key): void {
+		$device_keyid = DB::reserveIds('device_key', 2);
+
+		$fields = [
+			[
+				'device_keyid' => $device_keyid,
+				'deviceid' => $deviceid,
+				'scope' => self::MOBILE_IDENTITY_KEY,
+				'kid' => $mobile_identity_key['kid'],
+				'key_' => json_encode($mobile_identity_key)
+			],
+			[
+				'device_keyid' => bcadd($device_keyid, 1, 0),
+				'deviceid' => $deviceid,
+				'scope' => self::MOBILE_ENCRYPTION_KEY,
+				'kid' => $mobile_encryption_key['kid'],
+				'key_' => json_encode($mobile_encryption_key)
+			]
+		];
+
+		DB::insertBatch('device_key', $fields, false);
+	}
+
+	private static function createTasksOffboard(array $db_devices): void {
+		$device_cnt = count(array_keys($db_devices));
+		$taskid = DB::reserveIds('task', $device_cnt);
+
+		$time = time();
+
+		$ins_tasks = [];
+		$ins_task_device_offboards = [];
+
+		foreach ($db_devices as $db_device) {
+			$ins_tasks[] = [
+				'taskid' => $taskid,
+				'type' =>ZBX_TM_TASK_OFFBOARD_DEVICE,
+				'status' => ZBX_TM_STATUS_NEW,
+				'clock' => $time,
+				'ttl' => self::TASK_DEVICE_OFFBOARD_TTL
+			];
+
+			$ins_task_device_offboards[] = [
+				'taskid' => $taskid,
+				'uuid' => $db_device['uuid']
+			];
+
+			$taskid = bcadd($taskid, 1, 0);
+		}
+
+		DB::insertBatch('task', $ins_tasks, false);
+		DB::insertBatch('task_device_offboard', $ins_task_device_offboards, false);
 	}
 }

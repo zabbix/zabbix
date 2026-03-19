@@ -2855,7 +2855,7 @@ class testUsers extends CAPITest {
 				'limit' => 1
 			],
 			'id' => '1'
-		], bin2hex(random_bytes(32)));
+		], CApiTokenHelper::generateToken());
 
 		$this->assertTrue(array_key_exists('error', $res));
 
@@ -2864,7 +2864,7 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenDisabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_DISABLED,
@@ -2891,7 +2891,7 @@ class testUsers extends CAPITest {
 
 	public function testUsers_AuthTokenExpired() {
 		$now = time();
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
@@ -2919,7 +2919,7 @@ class testUsers extends CAPITest {
 
 	public function testUsers_AuthTokenNotExpired() {
 		$now = time();
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
@@ -2943,7 +2943,7 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenDebugModeEnabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
@@ -2978,7 +2978,7 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenDebugModeDisabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
@@ -3003,7 +3003,7 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenLastaccessIsUpdated() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 		$formeraccess = time() - 1;
 
 		$tokenids = DB::insert('token', [[
@@ -3033,7 +3033,7 @@ class testUsers extends CAPITest {
 	}
 
 	public function testUsers_AuthTokenUserDisabled() {
-		$token = bin2hex(random_bytes(32));
+		$token = CApiTokenHelper::generateToken();
 
 		DB::insert('token', [[
 			'status' => ZBX_AUTH_TOKEN_ENABLED,

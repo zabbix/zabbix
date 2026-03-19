@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -14,24 +14,9 @@
 **/
 
 
-/**
- * This class should be used for calling API services.
- */
-abstract class CApiClient {
+class CApiTokenHelper {
 
-	/**
-	 * Call the given API service method and return the response.
-	 *
-	 * @param string $api
-	 * @param string $method
-	 * @param array  $params
-	 * @param array  $auth
-	 * @param int    $auth['type']  CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
-	 * @param string $auth['auth']
-	 *
-	 * @return CApiClientResponse
-	 */
-	abstract public function callMethod(string $api, string $method, array $params, array $auth);
-
-	abstract public function getUserData(): ?array;
+	public static function generateToken(): string {
+		return bin2hex(random_bytes(32));
+	}
 }

@@ -18,8 +18,12 @@ class CJsonRpc {
 
 	const VERSION = '2.0';
 
-	public const AUTH_TYPE_HEADER = 2;
+	public const AUTH_TYPE_BEARER = 2;
 	public const AUTH_TYPE_COOKIE = 3;
+	public const AUTH_TYPE_DPOP = 4;
+
+	private const HEADER_AUTHENTICATE_BEARER = 'Bearer';
+	private const HEADER_AUTHENTICATE_DPOP = 'DPoP';
 
 	/**
 	 * API client to use for making requests.
@@ -48,22 +52,33 @@ class CJsonRpc {
 		$this->_jsonDecoded = json_decode($data, true);
 	}
 
-	/**
-	 * Executes API requests.
-	 *
-	 * @param CHttpRequest $request
-	 *
-	 * @return string JSON encoded value
-	 */
-	public function execute(CHttpRequest $request) {
+	public function execute(CHttpRequest $request): CHttpResponse {
 		if (json_last_error()) {
 			$this->jsonError([], '-32700', null, null, true);
-			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
+			return new CHttpResponse(json_encode($this->_response[0], JSON_UNESCAPED_SLASHES));
 		}
 
 		if (!is_array($this->_jsonDecoded) || $this->_jsonDecoded === []) {
 			$this->jsonError([], '-32600', null, null, true);
-			return json_encode($this->_response[0], JSON_UNESCAPED_SLASHES);
+			return new CHttpResponse(json_encode($this->_response[0], JSON_UNESCAPED_SLASHES));
+		}
+
+		$auth_header = $request->getParsedAuthHeader();
+
+		if ($auth_header['type'] === self::HEADER_AUTHENTICATE_DPOP) {
+			$auth['type'] = self::AUTH_TYPE_DPOP;
+			$auth['auth'] = $auth_header['auth'];
+			$auth['sign'] = (string) $request->header(self::HEADER_AUTHENTICATE_DPOP);
+		}
+		elseif ($auth_header['type'] === self::HEADER_AUTHENTICATE_BEARER) {
+			$auth['type'] = self::AUTH_TYPE_BEARER;
+			$auth['auth'] = $auth_header['auth'];
+		}
+		else {
+			$session = new CEncryptedCookieSession();
+
+			$auth['type'] = self::AUTH_TYPE_COOKIE;
+			$auth['auth'] = $session->extractSessionId();
 		}
 
 		foreach (zbx_toArray($this->_jsonDecoded) as $call) {
@@ -71,40 +86,39 @@ class CJsonRpc {
 				continue;
 			}
 
-			list($api, $method) = explode('.', $call['method']) + [1 => ''];
-
-			$header = $request->getAuthBearerValue();
-			if ($header != null) {
-				$auth = [
-					'type' => self::AUTH_TYPE_HEADER,
-					'auth' => $header
-				];
-			}
-			else {
-				$session = new CEncryptedCookieSession();
-
-				$auth = [
-					'type' => self::AUTH_TYPE_COOKIE,
-					'auth' => $session->extractSessionId()
-				];
-			}
+			[$api, $method] = explode('.', $call['method']) + [1 => ''];
 
 			$result = $this->apiClient->callMethod($api, $method, $call['params'], $auth);
 
 			$this->processResult($call, $result);
 		}
 
+		$response = new CHttpResponse();
+
+		$user_data = $this->apiClient->getUserData();
+
+		if ($auth['type'] == self::AUTH_TYPE_DPOP && $request->isHpkeHeadersRequested() && $user_data !== null) {
+			$response->headers[] = 'X-Recipient-ID: '.$user_data['deviceid'];
+			$response->headers[] = 'X-HPKE-Recipient-KID: '.$user_data['kid'];
+			$response->headers[] = 'X-HPKE-Recipient-Pub: '.$user_data['key'];
+		}
+
 		if ($this->_response === array_fill(0, count($this->_response), null)) {
-			return '';
+			return $response;
 		}
 
 		if (is_array($this->_jsonDecoded)
 				&& array_keys($this->_jsonDecoded) === range(0, count($this->_jsonDecoded) - 1)) {
 			// Return response as encoded batch if $this->_jsonDecoded is associative array.
-			return json_encode(array_values(array_filter($this->_response)), JSON_UNESCAPED_SLASHES);
+			$response->body = json_encode(array_values(array_filter($this->_response)), JSON_UNESCAPED_SLASHES);
+		}
+		else {
+			$response->body = ($this->_response[0] !== null)
+				? json_encode($this->_response[0], JSON_UNESCAPED_SLASHES)
+				: '';
 		}
 
-		return ($this->_response[0] !== null) ? json_encode($this->_response[0], JSON_UNESCAPED_SLASHES) : '';
+		return $response;
 	}
 
 	public function validate(&$call) {
@@ -236,7 +250,8 @@ class CJsonRpc {
 			ZBX_API_ERROR_NO_AUTH => '-32602',
 			ZBX_API_ERROR_PERMISSIONS => '-32500',
 			ZBX_API_ERROR_INTERNAL => '-32500',
-			ZBX_API_ERROR_DB => '-32500'
+			ZBX_API_ERROR_DB => '-32500',
+			ZBX_API_ERROR_NO_ENTITY => '-32500'
 		];
 	}
 }

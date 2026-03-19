@@ -38,10 +38,13 @@ class API {
 		$method = strtolower($request->method());
 		$input = $this->getRequestData($request);
 		$response->setRequestDetails($endpoint, $method, $input);
+
+		$auth_header = $request->getParsedAuthHeader();
+
 		$response->setResponse(
 			$client->callMethod($endpoint, $method, $input, [
-				'type' => CJsonRpc::AUTH_TYPE_HEADER,
-				'auth' => $request->getAuthBearerValue()
+				'type' => CJsonRpc::AUTH_TYPE_BEARER,
+				'auth' => $auth_header['auth']
 			])
 		);
 

@@ -33,6 +33,10 @@ class CLocalApiClient extends CApiClient {
 	 */
 	protected $debug = false;
 
+	public function getUserData(): ?array {
+		return CApiService::$userData;
+	}
+
 	/**
 	 * Set service factory.
 	 *
@@ -49,7 +53,7 @@ class CLocalApiClient extends CApiClient {
 	 * @param string $requestMethod  API method.
 	 * @param array  $params         API parameters.
 	 * @param array  $auth
-	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_HEADER, CJsonRpc::AUTH_TYPE_COOKIE
+	 * @param int    $auth['type']   CJsonRpc::AUTH_TYPE_BEARER, CJsonRpc::AUTH_TYPE_COOKIE, CJsonRpc::AUTH_TYPE_DPOP
 	 * @param string $auth['auth']   Authentication token.
 	 *
 	 * @return CApiClientResponse
@@ -93,7 +97,7 @@ class CLocalApiClient extends CApiClient {
 		try {
 			// authenticate
 			if ($requiresAuthentication) {
-				$this->authenticate($auth['auth']);
+				$this->authenticate($auth, $requestApi.'.'.$requestMethod);
 
 				// check permissions
 				if (APP::getMode() === APP::EXEC_MODE_API && !$this->isAllowedMethod($api, $method)) {
@@ -108,7 +112,7 @@ class CLocalApiClient extends CApiClient {
 			unset($params['nopermissions']);
 
 			// if no transaction has been started yet - start one
-			if ($DB['TRANSACTIONS'] == 0) {
+			if ($DB['TRANSACTIONS'] == 0 && !($api === 'device' && $method === 'init')) {
 				DBstart();
 				$newTransaction = true;
 			}
@@ -168,18 +172,31 @@ class CLocalApiClient extends CApiClient {
 	/**
 	 * Checks if the authentication token is valid.
 	 *
-	 * @param string $auth
+	 * @param array  $auth
+	 * @param string $requested_api_method
 	 *
 	 * @throws APIException
 	 */
-	protected function authenticate($auth) {
-		if (zbx_empty($auth)) {
+	protected function authenticate(array $auth, string $requested_api_method): void {
+		if ($auth['auth'] === null) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$auth_data = strlen($auth) == 64 ? ['token' => $auth] : ['sessionid' => $auth];
+		if ($auth['type'] === CJsonRpc::AUTH_TYPE_DPOP) {
+			$user = $this->serviceFactory->getObject('user')->checkAuthenticationDpop([
+				'token' => $auth['auth'],
+				'signature' => $auth['sign'],
+				'requested_api_method' => $requested_api_method
+			]);
+		}
+		else {
+			$auth_data = $auth['type'] === CJsonRpc::AUTH_TYPE_BEARER && strlen($auth['auth']) == 64
+				? ['token' => $auth['auth']]
+				: ['sessionid' => $auth['auth']];
 
-		$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
+			$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
+		}
+
 		if (array_key_exists('debug_mode', $user)) {
 			$this->debug = $user['debug_mode'];
 		}
@@ -221,7 +238,8 @@ class CLocalApiClient extends CApiClient {
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
-			|| ($api === 'apiinfo' && $method === 'version'));
+			|| ($api === 'apiinfo' && $method === 'version')
+			|| ($api === 'device' && $method === 'onboard'));
 	}
 
 	/**
