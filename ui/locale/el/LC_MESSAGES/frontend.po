@@ -13049,6 +13049,13 @@ msgstr ""
 msgid "Inventory mode"
 msgstr "Τρόπος απογραφής"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr ""
@@ -21611,6 +21618,10 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "Σουηδικά (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Εναλλαγή μεθόδου ταυτοποίησης, θα επαναφέρει όλες εκτός αυτής της συνεδρίας! Συνέχεια;"
@@ -25914,6 +25925,10 @@ msgstr ""
 msgid "You do not have permission to perform this operation."
 msgstr "Δεν έχετε άδεια για να εκτελέσετε αυτή τη λειτουργία."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "Χωρίς δικαίωμα πρόσβασης σε αυτή τη σελίδα."
@@ -27429,6 +27444,10 @@ msgstr ""
 #: widgets/piechart/actions/WidgetView.php:378
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
+msgstr ""
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
 msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29

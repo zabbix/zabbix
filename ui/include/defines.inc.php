@@ -1297,6 +1297,9 @@ define('SVG_GRAPH_TYPE_POINTS',		1);
 define('SVG_GRAPH_TYPE_STAIRCASE',	2);
 define('SVG_GRAPH_TYPE_BAR',		3);
 
+define('SVG_GRAPH_INVERT_VALUES_OFF',	0);
+define('SVG_GRAPH_INVERT_VALUES_ON',	1);
+
 define('SVG_GRAPH_STACKED_OFF',	0);
 define('SVG_GRAPH_STACKED_ON',	1);
 
@@ -1681,6 +1684,9 @@ define('ZBX_JAN_2038', 2145916800);
 
 define('ZBX_MIN_PORT_NUMBER', 0);
 define('ZBX_MAX_PORT_NUMBER', 65535);
+
+define('ZBX_AGENT_INTERFACE_MIN_PORT_NUMBER', 1024);
+define('ZBX_AGENT_INTERFACE_MAX_PORT_NUMBER', 32767);
 
 define('ZBX_MACRO_TYPE_TEXT', 0); // Display macro value as text.
 define('ZBX_MACRO_TYPE_SECRET', 1); // Display masked macro value.

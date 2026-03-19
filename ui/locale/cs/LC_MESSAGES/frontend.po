@@ -13166,6 +13166,13 @@ msgstr "Pole inventáře"
 msgid "Inventory mode"
 msgstr "Režim inventáře"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr ""
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "Vyvolá \"Provést hned\" na hostech pouze pro čtení"
@@ -21754,6 +21761,10 @@ msgstr "Swap velikost prostoru v bytech nebo v procentech z celkového počtu. N
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Přepnutí autentizační metody způsobí ukončení všech sezení mimo Vašeho! Pokračovat?"
@@ -26075,6 +26086,10 @@ msgstr "Nemůžete změnit šablony pro aktuální označení."
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnění na vykonání této operace."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "Nemáte oprávnění pro přístup k této stránce."
@@ -27594,6 +27609,10 @@ msgstr "neplatný čas"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "neplatná perioda ukládání trendů"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr ""
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
