@@ -248,7 +248,11 @@ out:
  *                                                                            *
  * Purpose: scans one line from /proc/net/dev representing network interface  *
  *                                                                            *
- * Returns: sscanf return value, number of items successfully filled          *
+ * Parameters: line     - [IN]  line from /proc/net/dev to scan               *
+ *             if_name  - [OUT] network interface name                        *
+ *             net_stat - [OUT] network statistics structure                  *
+ *                                                                            *
+ * Return value: sscanf return value, number of items successfully filled     *
  *                                                                            *
  * Comments: the line input parameter must be a line from /proc/net/dev       *
  *           representing network interface with ":" replaced by "\t" symbol  *
@@ -1226,6 +1230,9 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 /******************************************************************************
  *                                                                            *
  * Purpose: adds network interface type to JSON                               *
+ *                                                                            *
+ * Parameters: ifname - [IN] network interface name                           *
+ *             j      - [IN/OUT] JSON object                                  *
  *                                                                            *
  * Comments:                                                                  *
  *          if /sys/class/net/<name>/type contains ARPHRD_LOOPBACK value then *
