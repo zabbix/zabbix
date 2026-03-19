@@ -4668,12 +4668,13 @@ static int	dc_function_type_require_timer(unsigned char type)
 	return SUCCEED;
 }
 
-static void	dc_update_function_timer(ZBX_DC_FUNCTION *function, zbx_hashset_t *trend_queue, int now, int *timers_num)
+static void	dc_update_function_timer(ZBX_DC_FUNCTION *function, zbx_hashset_t *trend_queue, int now,
+		int *timers_num)
 {
 	time_t			offset;
 	ZBX_DC_TRIGGER		*trigger;
 	zbx_trigger_timer_t	*timer, *old;
-	zbx_timespec_t		ts = {.ns = 0};	
+	zbx_timespec_t		ts = {.ns = 0};
 
 	if (FAIL == dc_function_type_require_timer(function->type))
 		return;
@@ -4774,7 +4775,7 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now,
 		zbx_vector_dc_function_ptr_t *function_timers, zbx_vector_trigger_ptr_t *trigger_timers,
 		int *timers_num)
 {
-	ZBX_DC_FUNCTION		*function;
+	ZBX_DC_FUNCTION	*function;
 
 	if (NULL == function_timers)
 	{
