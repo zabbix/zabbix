@@ -1,8 +1,10 @@
 Changes for 6.0.46rc1
 
 New features:
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45
