@@ -69,7 +69,6 @@ typedef struct
 	int			script_bin_sz;
 	unsigned char		message_format;
 	unsigned char		flags;
-
 }
 zbx_am_mediatype_t;
 
@@ -118,7 +117,6 @@ typedef struct
 	unsigned char		message_format;
 	unsigned char		process_tags;
 	time_t			last_access;
-
 }
 zbx_am_db_mediatype_t;
 

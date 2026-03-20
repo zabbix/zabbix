@@ -401,8 +401,6 @@ static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1}
 
 /* adapter config */
 static char	*config_adapter_url;
-static char	*config_adapter_cert;
-static char	*config_adapter_key;
 
 struct zbx_db_version_info_t	db_version_info;
 
@@ -1190,11 +1188,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
-		{"AdapterURL",			&config_adapter_url,			ZBX_CFG_TYPE_STRING,
-				ZBX_CONF_PARM_OPT,	0,			0},
-		{"BridgeAdapterSSLCertFile",	&config_adapter_cert,			ZBX_CFG_TYPE_STRING,
-				ZBX_CONF_PARM_OPT,	0,			0},
-		{"BridgeAdapterSSLKeyFile",	&config_adapter_key,			ZBX_CFG_TYPE_STRING,
+		{"BridgeAdapterURL",			&config_adapter_url,		ZBX_CFG_TYPE_STRING,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -1722,8 +1716,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.config_startup_time = config_startup_time,
 			.config_adapter_url = config_adapter_url,
 			.config_adapter_ca_file = zbx_config_tls->ca_file,
-			.config_adapter_cert_file = config_adapter_cert,
-			.config_adapter_key_file = config_adapter_key
+			.config_adapter_cert_file = zbx_config_tls->cert_file,
+			.config_adapter_key_file = zbx_config_tls->key_file
 		};
 
 	zbx_thread_dbconfig_args	dbconfig_args =
@@ -1746,8 +1740,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 			.config_sms_devices = config_sms_devices,
 			.config_adapter_url = config_adapter_url,
 			.config_adapter_ca_file = zbx_config_tls->ca_file,
-			.config_adapter_cert_file = config_adapter_cert,
-			.config_adapter_key_file = config_adapter_key
+			.config_adapter_cert_file = zbx_config_tls->cert_file,
+			.config_adapter_key_file = zbx_config_tls->key_file
 		};
 
 	zbx_thread_pinger_args		pinger_args =

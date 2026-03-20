@@ -326,8 +326,7 @@ static void	alerter_serialize_mediatype(unsigned char **data, zbx_uint32_t *data
 		const char *script, const char *timeout)
 {
 	zbx_uint32_t	data_len = 0, name_len, smtp_server_len, smtp_helo_len, smtp_email_len, exec_path_len,
-			gsm_modem_len, username_len, passwd_len, script_len, attempt_interval_len, timeout_len,
-			adapter_address_len, adapter_psk_len;
+			gsm_modem_len, username_len, passwd_len, script_len, attempt_interval_len, timeout_len;
 	unsigned char	*ptr;
 
 	zbx_serialize_prepare_value(data_len, mediatypeid);
