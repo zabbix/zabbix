@@ -145,8 +145,8 @@ class CTask extends CApiService {
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$sql_parts['join']['tdi2'] = ['table' => 'task_device_init', 'using' => 'taskid'];
-			$sql_parts['join']['d2'] = ['left_table' => 'tdi2', 'table' => 'device', 'using' => 'deviceid'];
-			$sql_parts['where'][] = dbConditionId('d2.userid', [self::$userData['userid']]);
+			$sql_parts['join']['d'] = ['left_table' => 'tdi2', 'table' => 'device', 'using' => 'deviceid'];
+			$sql_parts['where'][] = dbConditionId('d.userid', [self::$userData['userid']]);
 		}
 
 		return $sql_parts;

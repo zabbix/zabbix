@@ -23,7 +23,7 @@ use Firebase\JWT\JWK;
 class CApiDpopHelper {
 
 	private const TIME_SKEW = 2;
-	private const TOKEN_LIFE_TIME = 60;
+	private const MAX_ALLOWED_IAT_AGE = 60;
 
 	private const SIGNATURE_ALGORITHM = 'ES256';
 
@@ -107,11 +107,11 @@ class CApiDpopHelper {
 			return false;
 		}
 
-		if ($exp - $iat <= self::TOKEN_LIFE_TIME) {
+		if ($exp - $iat <= self::MAX_ALLOWED_IAT_AGE) {
 			return $check_time <= $exp + self::TIME_SKEW;
 		}
 
-		return $check_time <= $iat + self::TOKEN_LIFE_TIME + self::TIME_SKEW;
+		return $check_time <= $iat + self::MAX_ALLOWED_IAT_AGE + self::TIME_SKEW;
 	}
 
 	private static function checkJti(array $payload, int $check_time): bool {
