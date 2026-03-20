@@ -1390,7 +1390,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (1 < request->nparam)
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "too many parameters"));
 		ret = SYSINFO_RET_FAIL;
 		goto out;
 	}
@@ -1410,7 +1410,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	if (NULL == (f = fopen(ZBX_PROC_NET_DEV, "r")))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open %s: %s", ZBX_PROC_NET_DEV,
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "cannot open %s: %s", ZBX_PROC_NET_DEV,
 				zbx_strerror(errno)));
 
 		ret = SYSINFO_RET_FAIL;
