@@ -252,7 +252,7 @@ out:
  *             if_name  - [OUT] network interface name                        *
  *             net_stat - [OUT] network statistics structure                  *
  *                                                                            *
- * Return value: sscanf return value, number of items successfully filled     *
+ * Return value: sscanf() return value, number of items successfully filled   *
  *                                                                            *
  * Comments: the line input parameter must be a line from /proc/net/dev       *
  *           representing network interface with ":" replaced by "\t" symbol  *
@@ -1214,10 +1214,10 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 			errno = 0;
 			flags = (zbx_uint64_t)strtoul(buf, &endptr, 16);
 
-			if (errno == 0 && endptr != buf)
+			if (0 == errno && endptr != buf)
 			{
 				found = 1;
-				zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, ((flags & IFF_UP) != 0 ? "up" : "down"),
+				zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, ((0 != (flags & IFF_UP)) ? "up" : "down"),
 						ZBX_JSON_TYPE_STRING);
 			}
 		}
@@ -1323,19 +1323,20 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 	{
 		if (NULL != fgets(buf, sizeof(buf), f))
 		{
+			zbx_uint64_t	speed;
+
 			zbx_rtrim(buf, "\n");
 
-			zbx_uint64_t	ui64_speed;
-
-			if (SUCCEED == zbx_is_uint64(buf, &ui64_speed))
+			if (SUCCEED == zbx_is_uint64(buf, &speed))
 			{
 				found = 1;
-				zbx_json_adduint64(j1, key, ui64_speed);
+				zbx_json_adduint64(j1, key, speed);
 
 				if (NULL != j2)
-					zbx_json_adduint64(j2, key, ui64_speed);
+					zbx_json_adduint64(j2, key, speed);
 			}
 		}
+
 		zbx_fclose(f);
 	}
 

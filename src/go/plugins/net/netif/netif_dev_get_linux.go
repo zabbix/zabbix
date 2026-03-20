@@ -240,6 +240,7 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 		ifName, stats, err := p.ifRowScan(line)
 		if err != nil {
 			log.Debugf("cannot parse \"%s\" line \"%s\"", p.netDevFilepath, line)
+
 			continue
 		}
 
