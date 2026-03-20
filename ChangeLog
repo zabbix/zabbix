@@ -1,8 +1,21 @@
 Changes for 7.0.25rc1
 
 New features:
+.........T [ZBXNEXT-10422] added Cradlepoint NCM v2 by HTTP and Cradlepoint NCM v2 device by HTTP templates (aiantsen)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
+..F....... [ZBX-26899] fixed yaml markings for import compare (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+....I..... [ZBX-27306] added optional upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.24
@@ -3997,8 +4010,10 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.46rc1
 
 New features:
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45
