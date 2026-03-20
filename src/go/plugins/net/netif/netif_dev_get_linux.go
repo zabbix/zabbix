@@ -199,7 +199,7 @@ func (p *Plugin) ifRowScan(line string) (string, []uint64, error) {
 		)
 	}
 
-	ui64 := make([]uint64, 0, len(stats)-1)
+	ui64 := make([]uint64, 0, len(stats))
 
 	for i, s := range stats {
 		n, err := strconv.ParseUint(s, 10, 64)

@@ -1272,7 +1272,7 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 
 	if (ARPHRD_LOOPBACK == type)
 	{
-		zbx_json_addstring(j, ZBX_PROTO_TAG_TYPE, "loopback", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(j, JSON_KEY_TYPE, "loopback", ZBX_JSON_TYPE_STRING);
 		return;
 	}
 
