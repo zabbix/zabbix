@@ -3891,7 +3891,11 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		ZBX_STR2UCHAR(trigger->flags, row[19]);
 
 		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+		{
+			memset((char *)trigger + sizeof(zbx_uint64_t), 0,
+					sizeof(ZBX_DC_TRIGGER) - sizeof(zbx_uint64_t));
 			continue;
+		}
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
 
@@ -4525,7 +4529,8 @@ static void	dc_function_remove_item_trigger_link(ZBX_DC_FUNCTION *function)
 		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &function->itemid)))
 			dc_item_remove_trigger(item, trigger);
 
-		dc_trigger_remove_itemid(trigger, function->itemid);
+		if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			dc_trigger_remove_itemid(trigger, function->itemid);
 	}
 }
 
