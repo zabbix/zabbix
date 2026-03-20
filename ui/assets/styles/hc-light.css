@@ -2400,6 +2400,9 @@ div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]):ch
     background-color: #ad1f1f;
     color: #ffffff; }
 
+z-color-picker.has-error .color-picker-box {
+  border: 1px solid #ad1f1f; }
+
 .list-check-radio .error {
   margin-top: 0; }
 
@@ -4312,8 +4315,6 @@ z-color-picker {
   line-height: 24px; }
   z-color-picker[readonly] .color-picker-box {
     cursor: default; }
-  z-color-picker.has-error .color-picker-box {
-    border: 1px solid #ad1f1f; }
   z-color-picker .color-picker-box {
     position: relative;
     vertical-align: top;
