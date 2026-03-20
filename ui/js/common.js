@@ -1135,6 +1135,16 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 	}
 }
 
+/**
+ * Determines whether the user has opened a hintbox or a popup.
+ *
+ * @returns {boolean}
+ */
+function isUserInteracting() {
+	return document
+		.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
+}
+
 // Fix jQuery ui.sortable vertical positioning bug.
 $.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
 	_getParentOffset: function () {
