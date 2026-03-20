@@ -24,6 +24,7 @@ import (
 	"golang.org/x/sys/unix"
 	"golang.zabbix.com/agent2/pkg/procfs"
 	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 type ifStatsIn struct {
@@ -238,8 +239,8 @@ func (p *Plugin) getIfGet(rgx *regexp.Regexp) (*netIfResult, error) {
 	for _, line := range data {
 		ifName, stats, err := p.ifRowScan(line)
 		if err != nil {
-			/* should never happen */
-			return nil, err
+			log.Debugf("cannot parse \"%s\" line \"%s\"", p.netDevFilepath, line)
+			continue
 		}
 
 		if rgx != nil && !rgx.MatchString(ifName) {
