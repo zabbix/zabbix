@@ -2486,7 +2486,7 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 		const zbx_variant_t *value, zbx_timespec_t ts, unsigned char value_flags, int mtime,
 		zbx_uint64_t lastlogsize)
 {
-	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.json))
+	if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(value->data.str))
 	{
 		dc_local_add_history_notsupported(itemid, &ts, "JSON is too large. ", lastlogsize, mtime, value_flags);
 		return;
@@ -2494,7 +2494,7 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 
 	char	*err = NULL;
 
-	if (0 == zbx_json_validate_ext(value->data.json, &err))
+	if (FAIL == zbx_json_validate_ext(value->data.str, &err))
 	{
 		dc_local_add_history_notsupported(itemid, &ts, err, lastlogsize, mtime, value_flags);
 		zbx_free(err);
@@ -2502,7 +2502,7 @@ static void	validate_json_and_add_to_history(zbx_uint64_t itemid, unsigned char 
 		return;
 	}
 
-	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.json,
+	dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_JSON, itemid, value_type, &ts, value->data.str,
 			lastlogsize, mtime, value_flags);
 }
 
@@ -2637,10 +2637,6 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 				dc_local_add_history_text_bin_json_helper(ITEM_VALUE_TYPE_TEXT, itemid, value_type, &ts,
 						value->data.str, lastlogsize, mtime, value_flags);
 			}
-			break;
-		case ZBX_VARIANT_JSON:
-			validate_json_and_add_to_history(itemid, value_type, value, ts, value_flags, mtime,
-					lastlogsize);
 			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_BIN:

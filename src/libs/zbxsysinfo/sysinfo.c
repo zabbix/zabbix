@@ -1064,7 +1064,7 @@ void	zbx_test_parameters(void)
 static int	zbx_check_user_parameter(const char *param, int config_unsafe_user_parameters, char *error,
 		int max_error_len)
 {
-	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@\n", *c;
+	const char	suppressed_chars[] = "\\'\"`*?[]{}~$!&;()<>|#@%\n", *c;
 	char		*buf = NULL;
 	size_t		buf_alloc = 128, buf_offset = 0;
 
