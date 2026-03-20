@@ -601,6 +601,7 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t objectid)
 {
 	zbx_uint64_t	alertpoolid;
+	zbx_hash_t	id_hash;
 
 	if (source < 0 || source > 0xffff)
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -612,7 +613,9 @@ static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t obj
 	alertpoolid <<= 16;
 	alertpoolid |= object & 0xffff;
 	alertpoolid <<= 32;
-	alertpoolid |= ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+
+	id_hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+	alertpoolid |= ((id_hash ^ (id_hash >> 32)) & 0xffffffff);
 
 	return alertpoolid;
 }
