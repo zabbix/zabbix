@@ -4121,7 +4121,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		unsigned char	modified = 0, status, recovery_mode, timer;
+		unsigned char	modified = 0, status, recovery_mode, timer, flags;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -4134,14 +4134,17 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		/* store new information in trigger structure */
 
-		ZBX_STR2UCHAR(trigger->flags, row[19]);
+		ZBX_STR2UCHAR(flags, row[19]);
 
-		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+		if (ZBX_FLAG_DISCOVERY_PROTOTYPE == flags)
 		{
 			memset((char *)trigger + sizeof(zbx_uint64_t), 0,
 					sizeof(ZBX_DC_TRIGGER) - sizeof(zbx_uint64_t));
+			trigger->flags = flags;
 			continue;
 		}
+
+		trigger->flags = flags;
 
 		dc_strpool_replace(found, &trigger->description, row[1]);
 
