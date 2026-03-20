@@ -25,12 +25,40 @@ zabbix_export:
         - name: event_value
           value: '{EVENT.VALUE}'
         - name: glpi_app_token
+        - name: glpi_client_id
+          value: '<PLACE GLPI CLIENT ID>'
+        - name: glpi_client_secret
+          value: '<PLACE GLPI CLIENT SECRET>'
+        - name: glpi_legacy_api
+          value: 'false'
+        - name: glpi_password
+          value: '<PLACE GLPI USER PASSWORD>'
         - name: glpi_problem_id
           value: '{EVENT.TAGS.__zbx_glpi_problem_id}'
+        - name: glpi_urgency_autoregistration
+          value: Low
+        - name: glpi_urgency_discovery
+          value: Low
+        - name: glpi_urgency_internal
+          value: Low
         - name: glpi_url
           value: '<PLACE GLPI URL>'
+        - name: glpi_username
+          value: '<PLACE GLPI USERNAME>'
         - name: glpi_user_token
           value: '<PLACE GLPI USER TOKEN>'
+        - name: severity_average
+          value: Medium
+        - name: severity_disaster
+          value: 'Very high'
+        - name: severity_high
+          value: High
+        - name: severity_information
+          value: 'Very low'
+        - name: severity_not_classified
+          value: 'Very low'
+        - name: severity_warning
+          value: Low
         - name: trigger_id
           value: '{TRIGGER.ID}'
         - name: zabbix_url
@@ -436,6 +464,19 @@ zabbix_export:
         
         };
         
+        var ZABBIX_SEVERITY_MAP = ["not_classified", "information", "warning", "average", "high", "disaster"];
+        
+        var URGENCY_MAP = {
+        	"very low": 1,
+        	"low": 2,
+        	"medium": 3,
+        	"high": 4,
+        	"very high": 5
+        };
+        
+        var LEGACY_ENDPOINT = '/apirest.php'
+        var CURRENT_ENDPOINT = '/api.php/v2.2'
+        
         const serviceLogName = 'GLPi Webhook',
         	Logger = new CLogger(serviceLogName),
         	GLPi = CWebhook;
@@ -446,13 +487,25 @@ zabbix_export:
         		alert_subject: { type: 'string' },
         		zabbix_url: { type: 'string', url: true },
         		glpi_url: { type: 'string', url: true },
-        		glpi_user_token: { type: 'string' }
+        		glpi_legacy_api: { type: 'boolean' },
+        		event_nseverity: { type: 'integer', default: 0 }
         	}, this.params);
         
-        	this.params.use_app_token = false;
+        	if (this.params.glpi_legacy_api) {
+        		CParamValidator.validate({ glpi_user_token: { type: 'string' } }, this.params);
         
-        	if (CParamValidator.isDefined(this.params.glpi_app_token) && !CParamValidator.isEmpty(this.params.glpi_app_token)) {
-        		this.params.use_app_token = true;
+        		this.params.use_app_token = false;
+        
+        		if (CParamValidator.isDefined(this.params.glpi_app_token) && !CParamValidator.isEmpty(this.params.glpi_app_token)) {
+        			this.params.use_app_token = true;
+        		}
+        	} else {
+        		CParamValidator.validate({
+        			glpi_client_id: { type: 'string' },
+        			glpi_client_secret: { type: 'string' },
+        			glpi_username: { type: 'string' },
+        			glpi_password: { type: 'string' },
+        		}, this.params);
         	}
         
         	if (this.params.event_source === '0') {
@@ -460,103 +513,155 @@ zabbix_export:
         		this.params.zabbix_url = CWebhookHelper.createProblemURL(this.params.event_source, this.params.zabbix_url, this.params.trigger_id, this.params.event_id);
         	}
         
-        	if (params.event_value != '0' && CParamValidator.isMacroSet(this.params.glpi_problem_id)) {
+        	if (params.event_value !== '0' && CParamValidator.isMacroSet(this.params.glpi_problem_id)) {
         		this.params.event_update_status = '1';
         	}
         
+        	this.urgency = this.params.event_source === 3
+        		? urgencyMapper(this.params.glpi_urgency_internal)
+        		: urgencyMapper(this.params['severity_' + ZABBIX_SEVERITY_MAP[this.params.event_nseverity]]);
+        
         	this.data = {
-        		input: {
-        			name: this.params.alert_subject,
-        			urgency: (this.params.event_nseverity = isNaN(Number(this.params.event_nseverity)) ? 2 : this.params.event_nseverity)
-        		}
+        		name: this.params.alert_subject,
+        		urgency: this.urgency
         	};
         
         	this.dataFollowup = {
-        		input: {
-        			items_id: this.params.glpi_problem_id,
-        			itemtype: 'Problem',
-        			content: this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>',
-        		}
+        		items_id: this.params.glpi_problem_id,
+        		itemtype: 'Ticket',
+        		content: this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>',
         	};
         
         	this.result = { tags: {} };
         }
         
-        GLPi.prototype.getAuthToken = function () {
-        
-        	this.request.addHeaders('Authorization: user_token ' + this.params.glpi_user_token);
-        	if (this.params.use_app_token) {
-        		this.request.addHeaders('App-Token: ' + this.params.glpi_app_token);
+        function urgencyMapper(urgency) {
+        	if (typeof urgency === "number") {
+        		return urgency;
         	}
-        	var response = this.request.jsonRequest('post', this.params.glpi_url + '/apirest.php/initSession');
         
-        	if ((this.request.getStatus() !== 200 && this.request.getStatus() !== 201)) {
-        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus());
+        	if (typeof urgency !== "string") {
+        		throw 'Urgency must be a string or number. Got: ' + urgency + ' (typeof: ' + typeof urgency + ')';
+        	}
+        
+        	var normalized = urgency.trim().toLowerCase();
+        
+        	if (!URGENCY_MAP.hasOwnProperty(normalized)) {
+        		throw 'Unknown urgency value: ' + urgency;
+        	}
+        
+        	return URGENCY_MAP[normalized];
+        }
+        
+        function checkResponseStatus(status, response) {
+        	if (status !== 200 && status !== 201) {
+        		Logger.log(Logger.INFO, 'HTTP code: ' + status);
+        
         		if (CParamValidator.isType(response.description, 'string')) {
         			throw response.description;
-        		}
-        		else {
+        		} else {
         			Logger.log(Logger.INFO, 'Request not successful. Received response: ' + JSON.stringify(response));
         			throw 'Unknown INFO. Check debug log for more information.';
         		}
         	}
-        	if (!CParamValidator.isType(response.session_token, 'string') || CParamValidator.isEmpty(response.session_token)) {
-        		Logger.log(Logger.INFO, 'Check getting GLPi sessionToken: ' + response.session_token);
-        		throw 'Required GLPi sessionToken is not received.';
+        }
+        
+        function wrapInput(data) {
+        	return { input: data };
+        }
+        
+        GLPi.prototype.getAuthToken = function () {
+        	if (this.params.glpi_legacy_api) {
+        		this.request.addHeaders('Authorization: user_token ' + this.params.glpi_user_token);
+        
+        		if (this.params.use_app_token) {
+        			this.request.addHeaders('App-Token: ' + this.params.glpi_app_token);
+        		}
+        
+        		var response = this.request.jsonRequest('post', this.params.glpi_url + LEGACY_ENDPOINT + '/initSession');
+        	} else {
+        		var body = {
+        			grant_type: 'password',
+        			client_id: this.params.glpi_client_id,
+        			client_secret: this.params.glpi_client_secret,
+        			username: this.params.glpi_username,
+        			password: this.params.glpi_password,
+        			scope: 'api'
+        		};
+        
+        		var response = this.request.jsonRequest('post', this.params.glpi_url + CURRENT_ENDPOINT + '/token', body);
         	}
         
-        	return response.session_token;
+        	checkResponseStatus(this.request.getStatus(), response);
+        
+        	return response[this.params.glpi_legacy_api ? 'session_token' : 'access_token'];
         }
         
         GLPi.prototype.sendRequest = function (method, path, data) {
-        
         	this.request.clearHeader();
-        	this.request.addHeaders('Session-Token:' + this.params.authToken);
-        	if (this.params.use_app_token) {
-        		this.request.addHeaders('App-Token: ' + this.params.glpi_app_token);
+        
+        	if (this.params.glpi_legacy_api) {
+        		this.request.addHeaders('Session-Token:' + this.params.authToken);
+        
+        		if (this.params.use_app_token) {
+        			this.request.addHeaders('App-Token: ' + this.params.glpi_app_token);
+        		}
+        
+        	} else {
+        		this.request.addHeaders('Authorization: Bearer ' + this.params.authToken);
         	}
+        
         	var response = this.request.jsonRequest(method, this.params.glpi_url + path, data);
         
-        	if ((this.request.getStatus() !== 200 && this.request.getStatus() !== 201)) {
-        		Logger.log(Logger.INFO, 'HTTP code: ' + this.request.getStatus());
-        		if (CParamValidator.isType(response.description, 'string')) {
-        			throw response.description;
-        		}
-        		else {
-        			Logger.log(Logger.INFO, 'Request not successful. Received response: ' + JSON.stringify(response));
-        			throw 'Unknown INFO. Check debug log for more information.';
-        		}
-        	}
+        	checkResponseStatus(this.request.getStatus(), response);
         
         	return response;
         }
         
         GLPi.prototype.createProblem = function (status) {
-        	this.data.input.content = this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>';
+        	this.data.urgency = this.urgency;
+        	this.data.content = this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>';
         
         	if (CParamValidator.isDefined(status)) {
-        		this.data.input.status = status;
+        		this.data.status = status;
         	}
         
-        	var response = this.sendRequest('post', '/apirest.php/Problem/', this.data);
+        	var api = this.params.glpi_legacy_api ?
+        		{url: LEGACY_ENDPOINT + '/Ticket/', data: wrapInput(this.data)} :
+        		{url: CURRENT_ENDPOINT + '/Assistance/Ticket/', data: this.data};
+        
+        	var response = this.sendRequest('post', api.url, api.data);
         
         	if (!CParamValidator.isDefined(response.id)) {
-        		throw 'Cannot create GPLi problem. Check debug log for more information.';
+        		throw 'Cannot create GPLi ticket. Check debug log for more information.';
         	}
         
-        	return response.id
+        	return response.id;
         }
         
         GLPi.prototype.updateProblem = function (status) {
         	CParamValidator.validate({ glpi_problem_id: { type: 'string' } }, this.params);
-        	this.data.id = this.params.glpi_problem_id;
         
         	if (CParamValidator.isDefined(status)) {
-        		this.data.input.status = status;
+        		this.data.status = status;
         	}
         
-        	this.sendRequest('put', '/apirest.php/Problem/' + this.params.glpi_problem_id, this.data);
-        	this.sendRequest('post', '/apirest.php/Problem/' + this.params.glpi_problem_id + '/ITILFollowup', this.dataFollowup);
+        	var api = this.params.glpi_legacy_api ? {
+        		url: LEGACY_ENDPOINT + '/Ticket/' + encodeURIComponent(this.params.glpi_problem_id),
+        		url2: LEGACY_ENDPOINT + '/Ticket/' + encodeURIComponent(this.params.glpi_problem_id) + '/ITILFollowup',
+        		data: wrapInput(this.data),
+        		dataFollowup: wrapInput(this.dataFollowup)
+        	} : {
+        		url: CURRENT_ENDPOINT + '/Assistance/Ticket/' + encodeURIComponent(this.params.glpi_problem_id),
+        		url2: CURRENT_ENDPOINT + '/Assistance/Ticket/' + encodeURIComponent(this.params.glpi_problem_id) + '/Timeline/Followup',
+        		data: this.data,
+        		dataFollowup: this.dataFollowup
+        	};
+        
+        	api.data.id = this.params.glpi_problem_id;
+        
+        	this.sendRequest('patch', api.url, api.data);
+        	this.sendRequest('post', api.url2, api.dataFollowup);
         }
         
         GLPi.prototype.onProblem = function (alert) {
@@ -564,7 +669,7 @@ zabbix_export:
         	const problem_id = this.createProblem(1)
         
         	this.result.tags.__zbx_glpi_problem_id = problem_id;
-        	this.result.tags.__zbx_glpi_link = this.params.glpi_url + '/front/problem.form.php?id=' + problem_id;
+        	this.result.tags.__zbx_glpi_link = this.params.glpi_url + '/front/ticket.form.php?id=' + problem_id;
         
         	return this.result;
         }
@@ -583,11 +688,17 @@ zabbix_export:
         	return this.result;
         }
         
-        GLPi.prototype.onDiscovery = function () {
+        GLPi.prototype.onDiscovery = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source);
+        	this.urgency = urgencyMapper(this.params.glpi_urgency_discovery);
+        
         	return this.createProblem();
         }
         
-        GLPi.prototype.onAutoreg = function () {
+        GLPi.prototype.onAutoreg = function (alert) {
+        	Logger.log(Logger.INFO, 'Source: ' + alert.source);
+        	this.urgency = urgencyMapper(this.params.glpi_urgency_autoregistration);
+        
         	return this.createProblem();
         }
         
@@ -608,7 +719,33 @@ zabbix_export:
       description: |
         This media type integrates your Zabbix installation with your GLPi installation using the Zabbix webhook feature.
         
-        GLPi configuration:
+        GLPi configuration (GLPi 11+ - recommended RESTful API V2):
+        
+        1. Enable access to the GLPi API:
+        - In the GLPi web interface, go to "Setup" → "General" → "API".
+        - Set the "Enable API" and click the "Save" button.
+        
+        2. Add an OAuth client:
+        - Click the "Add" button on the top of the page.
+        - Set the "client name", select "api" for scope and choose "password" for grants.
+        - Click the "Add" button.
+        - Open the settings of the created client, and then copy and save the "client id" and "client secret".
+        
+        3. Create a new user profile with permissions to tickets and followups (alternatively, you can use an existing profile with sufficient privileges):
+        - Go to "Administration" → "Profiles" and click the "Add" button on the top of the page.
+        - Specify the profile name and set the "Profile's Interface" option to "Standard Interface", and then click the "Add" button.
+        - Open the created profile and click the "Assistance" tab.
+        - Set the "Update", "Create", and "See all tickets" permissions in the "Ticket" section.
+        - Set the "Add followup (requester)" permission for the "Followups" line in the "Followups/Tasks" section.
+        - Click the "Save" button.
+        
+        4. Create a new user:
+        - Go to "Administration" → "Users" and click the "Add User" button on the top of the page.
+        - Specify the user login and set the "Profiles" option to the profile that you created in the previous step (or any other existing profile with permissions to create tickets and followups).
+        - Set the password for the user.
+        - Click the "Add" button.
+        
+        GLPi configuration (GLPi 10 - REST API V1 - legacy API):
         
         1. Enable access to the GLPi REST API:
         - In the GLPi web interface, go to "Setup" → "General" → "API".
@@ -621,17 +758,17 @@ zabbix_export:
         - Click the "Add" button.
         - If you've opted to create an application token, open the settings of the created API client, and then copy and save the generated application token.
         
-        3. Create a new user profile with permissions to create problems and followups (alternatively, you can use an existing profile with sufficient privileges):
+        3. Create a new user profile with permissions to create tickets and followups (alternatively, you can use an existing profile with sufficient privileges):
         - Go to "Administration" → "Profiles" and click the "Add" button on the top of the page.
         - Specify the profile name and set the "Profile's Interface" option to "Standard Interface", and then click the "Add" button.
         - Open the created profile and click the "Assistance" tab.
+        - Set the "Update", "Create", and "See all" permissions in the "Tickets" section.
         - Set the "Add followup (requester)" permission for the "Followups" line in the "Followups/Tasks" section.
-        - Set the "Update", "Create", and "See all" permissions in the "Problems" section.
         - Click the "Save" button.
         
         4. Create a new user:
         - Go to "Administration" → "Users" and click the "Add User" button on the top of the page.
-        - Specify the user login and set the "Profiles" option to the profile that you created in the previous step (or any other existing profile with permissions to create problems and followups).
+        - Specify the user login and set the "Profiles" option to the profile that you created in the previous step (or any other existing profile with permissions to create tickets and followups).
         - Click the "Add" button.
         - Open the profile of the created user and check the "Regenerate" checkbox of the "API token" option; click "Save".
         - Copy and save the generated user API token.
@@ -652,8 +789,17 @@ zabbix_export:
           - http://zabbix/
         
         2. Set the following webhook parameters:
+        - glpi_url - the frontend URL of your GLPI installation, without any path suffix (e.g. http://glpi.example.com:8080).
+        - glpi_legacy_api - determine whether you are using RESTful API V2 with OAuth2 authorization (default, parameter value false) or legacy API (parameter value true).
+        
+        If using RESTful API V2 with OAuth2, set the required parameters:
+        - glpi_client_id - the client id that was generated during creation of "OAuth client"
+        - glpi_client_secret - the client secret that was generated during creation of "OAuth client"
+        - glpi_username - GLPi username created for webhook
+        - glpi_password - password for the GLPI webhook user
+        
+        If using legacy API, set the parameters:
         - glpi_app_token - if you've opted to use an application token during the creation of API client, specify it here; otherwise leave it empty
-        - glpi_url - the frontend URL of your GLPi installation
         - glpi_user_token - the user token that was generated during creation of GLPi user
         
         3. Click the "Enabled" checkbox to enable the media type and click the "Update" button to save the webhook settings.
@@ -663,7 +809,7 @@ zabbix_export:
         - In the "Media" tab, click "Add" and select the type "GLPi" from the drop-down list. Add any value in the "Send to" field: it is not used in the webhook, but is required.
         - Make sure this user has access to all hosts for which you would like problem notifications to be sent to GLPi.
         
-        5. Done! You can now start using this media type in actions and create problem items in GLPi.
+        5. Done! You can now start using this media type in actions and create ticket items in GLPi.
         
         You can find the latest version of this media and additional information in the official Zabbix repository:
         https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/glpi
