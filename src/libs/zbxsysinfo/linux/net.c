@@ -1208,11 +1208,13 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 	{
 		if (NULL != fgets(buf, sizeof(buf), f))
 		{
-			char	*endptr;
+			char		*endptr;
+			zbx_uint64_t	flags;
 
-			unsigned int flags = (unsigned int)strtoul(buf, &endptr, 16);
+			errno = 0;
+			flags = (zbx_uint64_t)strtoul(buf, &endptr, 16);
 
-			if (0 != flags && errno != ERANGE && endptr != buf)
+			if (errno == 0 && endptr != buf)
 			{
 				found = 1;
 				zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, ((flags & IFF_UP) != 0 ? "up" : "down"),
@@ -1329,6 +1331,7 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 			{
 				found = 1;
 				zbx_json_adduint64(j1, key, ui64_speed);
+
 				if (NULL != j2)
 					zbx_json_adduint64(j2, key, ui64_speed);
 			}
