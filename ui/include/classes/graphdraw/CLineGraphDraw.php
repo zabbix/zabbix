@@ -15,8 +15,7 @@
 
 
 class CLineGraphDraw extends CGraphDraw {
-	const GRAPH_WIDTH_MIN = 20;
-	const GRAPH_HEIGHT_MIN = 20;
+
 	const LEGEND_OFFSET_Y = 90;
 
 	private $cell_height_min;
@@ -451,6 +450,10 @@ class CLineGraphDraw extends CGraphDraw {
 
 			if ($item['throttling_type'] == ZBX_PREPROC_THROTTLE_TIMED_VALUE
 					&& ($throttling_delay = timeUnitToSeconds($item['throttling_delay'])) === null) {
+				continue;
+			}
+
+			if (!array_key_exists($item['itemid'], $results)) {
 				continue;
 			}
 
@@ -1614,7 +1617,9 @@ class CLineGraphDraw extends CGraphDraw {
 						: '-';
 					$side_str = ($side == GRAPH_YAXIS_SIDE_LEFT) ? _('left') : _('right');
 					$legend->addCell($rowNum, [
-						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side_str.')',
+						'text' => _s('Percentile %1$s: %2$s', $percentile['percent'],
+							$convertedUnit.' ('.$side_str.')'
+						),
 						ITEM_CONVERT_NO_UNITS
 					]);
 					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)

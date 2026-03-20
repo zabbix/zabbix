@@ -2705,7 +2705,7 @@ class testLowLevelDiscovery extends CWebTest {
 		if (array_key_exists('Overrides', $data) && CTestArrayHelper::get($data, 'change_overrides')) {
 			$form->selectTab('Overrides');
 			$form->query('link:Override')->waitUntilClickable()->one()->click();
-			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 			$override_dialog_form->fill($data['Overrides']);
 			$override_dialog_form->submit();
 			$override_dialog_form->waitUntilNotVisible();
@@ -2734,7 +2734,7 @@ class testLowLevelDiscovery extends CWebTest {
 					? $data['Overrides']['Name']
 					: 'Override';
 				$form->query('link', $override_name)->waitUntilClickable()->one()->click();
-				$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+				$override_dialog_form = COverlayDialogElement::get($override_name)->asForm();
 				$override_dialog_form->checkValue($data['Overrides']);
 				$override_dialog_form->submit();
 				$override_dialog_form->waitUntilNotVisible();
@@ -2874,7 +2874,7 @@ class testLowLevelDiscovery extends CWebTest {
 				$form->query('link:Cancel override')->waitUntilClickable()->one()->click();
 			}
 
-			$override_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();
+			$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 			$override_dialog_form->fill($fields['overrides_fields']['filters']);
 			$override_dialog_form->getFieldContainer('Operations')->query('button:Add')->waitUntilClickable()->one()->click();
 			$operation_dialog_form = COverlayDialogElement::find()->all()->last()->asForm()->waitUntilReady();

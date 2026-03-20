@@ -88,7 +88,7 @@ class ColumnEdit extends CController {
 
 		$field = new CWidgetFieldColumnsList('columns', '');
 
-		if (!$this->hasInput('edit') && !$this->hasInput('update')) {
+		if (!$this->hasInput('edit')) {
 			$input += self::getColumnDefaults();
 			$input['sparkline'] = array_replace(CWidgetFieldColumnsList::SPARKLINE_DEFAULT, $input['sparkline']);
 		}
