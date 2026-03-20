@@ -63,7 +63,7 @@ require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
-require_once dirname(__FILE__).'/testItemDependent.php';
+require_once dirname(__FILE__).'/testDiagInfo.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -94,6 +94,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
@@ -122,7 +123,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
-		$suite->addTestSuite('testItemDependent');
+		$suite->addTestSuite('testDiagInfo');
 		return $suite;
 	}
 }
