@@ -1138,10 +1138,11 @@ function uncheckTableRows(page, keepids = [], mvc = true) {
 /**
  * Determines whether the user has opened a hintbox or a popup.
  *
+ * @param {HTMLElement|undefined} target
  * @returns {boolean}
  */
-function isUserInteracting() {
-	return document
+function isUserInteracting(target) {
+	return (target || document)
 		.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
 }
 
