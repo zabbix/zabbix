@@ -241,6 +241,17 @@
 		<delete dir="tests_results"/>
 		<mkdir dir="tests_results"/>
 		<mkdir dir="tests_results/html"/>
+
+		<exec executable="sh" failonerror="on">
+			<arg value="-c"/>
+			<arg value="find src -name '*.c' -exec sed -i -E '/^\s*ZBX_(PTR_)?VECTOR_IMPL\(/i/* LCOV_EXCL_START */' {} \;"/>
+		</exec>
+
+		<exec executable="sh" failonerror="on">
+			<arg value="-c"/>
+			<arg value="find src -name '*.c' -exec sed -i -E '/^\s*ZBX_(PTR_)?VECTOR_IMPL\(/a/* LCOV_EXCL_STOP */' {} \;"/>
+		</exec>
+
 		<exec executable="lcov" failonerror="on">
 			<arg line="--directory"/>
 			<arg line="src"/>
