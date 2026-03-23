@@ -1009,7 +1009,7 @@ class testFormItem extends CLegacyWebTest {
 		$sqlItems = "SELECT * FROM items ORDER BY itemid";
 		$oldHashItems = CDBHelper::getHash($sqlItems);
 		// Open hosts page.
-		$this->zbxTestLogin(self::HOST_LIST_PAGE.'&filter_name=%27%27');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
 		$table = $this->getTable();
 		// Clean Name field first, added for more stable local tests.
@@ -1633,24 +1633,13 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'item-simple-check',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			// #44.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Simple check',
-					'name' => 'Simple check with username and passowrd',
-					'key' => 'item-simple-check-username-password',
 					'username' => 'username-test',
 					'password' => 'password-test',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #45.
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1662,7 +1651,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #46.
+			// #45.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1672,7 +1661,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #47.
+			// #46.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1683,7 +1672,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// 48.
+			// #47.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1694,7 +1683,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #49.
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1706,7 +1695,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #50.
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1718,7 +1707,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #51.
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1730,7 +1719,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #52.
+			// #51.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1743,7 +1732,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #53.
+			// #52.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1756,7 +1745,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #54.
+			// #53.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1767,25 +1756,13 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #55.
+			// #54.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
-					'params_ap' => 'query',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			// #56.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'Database monitor',
-					'name' => 'Database monitor with username and password',
-					'key' => 'item-database-monitor-username-password',
 					'username' => 'username-test',
 					'password' => 'password-test',
 					'params_ap' => 'query',
@@ -1793,7 +1770,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #57.
+			// #55.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1805,7 +1782,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #58 IPMI sensor is optional if item key is ipmi.get.
+			// #56 IPMI sensor is optional if item key is ipmi.get.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1816,7 +1793,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #59.
+			// #57.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1829,7 +1806,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #60.
+			// #58.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1842,7 +1819,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #61.
+			// #59.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1854,7 +1831,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #62.
+			// #60.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1865,7 +1842,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #63.
+			// #61.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1878,7 +1855,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #64.
+			// #62.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1891,7 +1868,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #65.
+			// #63.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1905,7 +1882,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #66.
+			// #64.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1918,7 +1895,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #67.
+			// #65.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1930,7 +1907,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #68.
+			// #66.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1942,7 +1919,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #69.
+			// #67.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1950,24 +1927,13 @@ class testFormItem extends CLegacyWebTest {
 					'name' => 'SSH agent error',
 					'key' => 'item-ssh-agent-error',
 					'inline_errors' => [
-						'User name' => 'This field cannot be empty.'
-					]
-				]
-			],
-			// #70.
-			[
-				[
-					'expected' => TEST_BAD,
-					'type' => 'TELNET agent',
-					'name' => 'TELNET agent error',
-					'key' => 'item-telnet-agent-error',
-					'inline_errors' => [
 						'User name' => 'This field cannot be empty.',
 						'id:params_es' => 'This field cannot be empty.'
+
 					]
 				]
 			],
-			// #71.
+			// #68.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1980,18 +1946,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #72.
-			[
-				[
-					'expected' => TEST_GOOD,
-					'type' => 'JMX agent',
-					'name' => 'JMX agent',
-					'key' => 'item-jmx-agent',
-					'dbCheck' => true,
-					'formCheck' => true
-				]
-			],
-			// #73.
+			// #69.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2004,12 +1959,12 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #74.
+			// #70.
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
-					'name' => 'JMX agent with filled username and empty password ',
+					'name' => 'JMX agent with filled username and empty password',
 					'key' => 'item-jmx-agent-with-empty-password',
 					'username' => 'test',
 					'inline_errors' => [
@@ -2017,12 +1972,12 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #75.
+			// #71.
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'JMX agent',
-					'name' => 'JMX agent with filled password and empty username ',
+					'name' => 'JMX agent with filled password and empty username',
 					'key' => 'item-jmx-agent-with-empty-username',
 					'password' => 'test',
 					'inline_errors' => [
@@ -2030,7 +1985,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #76.
+			// #72.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2042,7 +1997,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #77.
+			// #73.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2054,7 +2009,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #78.
+			// #75.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2066,7 +2021,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #79 Default.
+			// #76 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2077,7 +2032,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #80 Default.
+			// #77 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2089,7 +2044,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #81 Default.
+			// #78 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2102,7 +2057,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #82 Default.
+			// #79 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2115,7 +2070,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #83 Default.
+			// #80 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2134,7 +2089,7 @@ class testFormItem extends CLegacyWebTest {
 	 * @dataProvider create
 	 */
 	public function testFormItem_SimpleCreate($data) {
-		$this->zbxTestLogin(self::HOST_LIST_PAGE.'&filter_name=%27%27');
+		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->filterEntriesAndOpenItems();
 		$this->zbxTestCheckTitle('Configuration of items');
 		$this->zbxTestCheckHeader('Items');
