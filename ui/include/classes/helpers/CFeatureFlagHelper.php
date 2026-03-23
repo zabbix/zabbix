@@ -23,21 +23,22 @@ class CFeatureFlagHelper {
 	public const HTTP_AUTH_FEATURE_FLAG = 'http_auth_enabled';
 	public const MEDIATYPES_FEATURE_FLAG = 'media_type_denylist';
 
-	public static function getSupportedMediaTypes(): array {
-		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
+	public static function isFlagModulesEnabled(): bool {
+		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MODULE_FEATURE_FLAG];
 	}
 
 	public static function isFlagHttpAuthEnabled(): bool {
 		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::HTTP_AUTH_FEATURE_FLAG];
 	}
 
-	public static function isFlagModulesEnabled(): bool {
-		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MODULE_FEATURE_FLAG];
+	public static function getSupportedMediaTypes(): array {
+		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
 	}
 
 	public static function isFeatureFlagEnabled(string $type): bool {
 		return match ($type) {
-			self::MODULE_FEATURE_FLAG => self::isFlagModulesEnabled()
+			self::MODULE_FEATURE_FLAG => self::isFlagModulesEnabled(),
+			self::HTTP_AUTH_FEATURE_FLAG => self::isFlagHttpAuthEnabled()
 		};
 	}
 }
