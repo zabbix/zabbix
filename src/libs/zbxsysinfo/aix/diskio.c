@@ -429,7 +429,7 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 #if defined(HAVE_LIBPERFSTAT)
 	char		*devnames, *mode, *rxp_error = NULL;
-	int		has_vals, imode, ret = SYSINFO_RET_OK;;
+	int		has_vals, imode, ret = SYSINFO_RET_OK;
 	struct zbx_json	j, cfg, val;
 	zbx_regexp_t	*devnames_rxp = NULL;
 

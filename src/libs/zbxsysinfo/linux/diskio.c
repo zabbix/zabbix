@@ -655,11 +655,10 @@ static void	dev_stats_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 
 		if (NULL != fgets(buf, sizeof(buf), f))
 		{
-#define DELIMS	" "
 			char	*tok, *saveptr;
 			int	tok_idx = 0;
 
-			tok = strtok_r(buf, DELIMS, &saveptr);
+			tok = strtok_r(buf, " ", &saveptr);
 
 			while (NULL != tok && 10 >= tok_idx)
 			{
@@ -684,10 +683,9 @@ static void	dev_stats_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 						break;
 				}
 
-				tok = strtok_r(NULL, DELIMS, &saveptr);
+				tok = strtok_r(NULL, " ", &saveptr);
 				tok_idx++;
 			}
-#undef DELIMS
 		}
 		zbx_fclose(f);
 	}
@@ -1033,12 +1031,12 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 
 	char			*devnames, *mode, *rxp_error = NULL;
-	int			has_vals, imode, ret = SYSINFO_RET_OK;;
+	int			has_vals, imode, ret = SYSINFO_RET_OK;
 	DIR			*dir;
 	zbx_stat_t		stat_buf;
 	struct dirent		*entry;
 	struct zbx_json		j, cfg, val;
-	zbx_vector_device_ptr_t devices;
+	zbx_vector_device_ptr_t	devices;
 	zbx_regexp_t		*devnames_rxp = NULL;
 
 	if (2 < request->nparam)
