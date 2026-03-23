@@ -29,7 +29,11 @@ class CControllerProxyGroupCreate extends CController {
 			'failover_delay' => ['db proxy_group.failover_delay', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 10, 'max' => 15 * SEC_PER_MIN, 'usermacros' => true]]
 			],
-			'min_online' => ['integer', 'required', 'min' => 1, 'max' => 1000],
+			'min_online' => ['db proxy_group.min_online', 'required',
+				'use' => [CNumberValidator::class, ['min' => 1, 'max' => 1000, 'usermacros' => true,
+					'with_float' => false
+				]]
+			],
 			'description' => ['db proxy_group.description']
 		]];
 	}
