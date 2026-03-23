@@ -1253,6 +1253,10 @@ class testFormGraphs extends CWebTest {
 		$this->page->acceptAlert();
 		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' deleted');
+		$title = ($this->prototype)
+			? 'Configuration of graph prototypes'
+			: 'Configuration of graphs';
+		$this->page->assertTitle($title);
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
 	}
 
