@@ -1297,9 +1297,9 @@ static void	tm_process_device_init(zbx_uint64_t taskid, const char *adapter_url,
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(taskid);
 	ZBX_UNUSED(adapter_url);
-	ZBX_UNUSED(config_push_ca_file);
-	ZBX_UNUSED(config_push_cert_file);
-	ZBX_UNUSED(config_push_key_file);
+	ZBX_UNUSED(config_adapter_ca_file);
+	ZBX_UNUSED(config_adapter_cert_file);
+	ZBX_UNUSED(config_adapter_key_file);
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 
