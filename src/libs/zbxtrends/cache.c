@@ -185,7 +185,7 @@ static void	tfc_free_func(void *ptr)
 	__tfc_shmem_free_func(ptr);
 }
 
-static void	tfc_lru_update_recent_cutoff()
+static void	tfc_lru_update_recent_cutoff(void)
 {
 	time_t	time_now = time(NULL);
 
