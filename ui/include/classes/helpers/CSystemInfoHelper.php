@@ -27,19 +27,16 @@ class CSystemInfoHelper {
 	 * @throws APIException
 	 */
 	public static function getData(): array {
-		global $ZBX_SERVER, $ZBX_SERVER_PORT, $ALLOW_HTTP_AUTH;
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$data = [
 			'is_global_scripts_enabled' => CSettingsHelper::isGlobalScriptsEnabled(),
 			'is_software_update_check_enabled' => CSettingsHelper::isSoftwareUpdateCheckEnabled(),
 			'status' => static::getServerStatus($ZBX_SERVER, $ZBX_SERVER_PORT),
 			'server_details' => '',
-			'failover_delay' => 0
+			'failover_delay' => 0,
+			'http_auth_warning' => array_key_exists('ALLOW_HTTP_AUTH', APP::getConfig())
 		];
-
-		if (isset($ALLOW_HTTP_AUTH)) {
-			$data += ['allow_http_auth' => true];
-		}
 
 		if ($data['is_software_update_check_enabled']) {
 			$data['software_update_check_data'] = [];
