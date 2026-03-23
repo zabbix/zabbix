@@ -244,7 +244,7 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		if (array_key_exists('feature_flag', $method_rules)
-				&& !CFeatureFlagHelper::isFeatureDisabled($method_rules['feature_flag'])) {
+				&& !CFeatureFlagHelper::isFeatureFlagEnabled($method_rules['feature_flag'])) {
 			return false;
 		}
 

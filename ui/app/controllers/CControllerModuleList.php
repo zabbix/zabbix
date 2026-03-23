@@ -44,8 +44,8 @@ class CControllerModuleList extends CController {
 	}
 
 	protected function checkPermissions(): bool	{
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
-			&& CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL
+			&& CFeatureFlagHelper::isFlagModulesEnabled());
 	}
 
 	protected function doAction(): void {

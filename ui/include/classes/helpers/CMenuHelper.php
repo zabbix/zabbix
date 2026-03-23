@@ -328,8 +328,6 @@ class CMenuHelper {
 			);
 		}
 
-		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
 		$submenu_administration = [
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 				? (new CMenuItem(_('General')))
@@ -353,7 +351,7 @@ class CMenuHelper {
 							->setAction('trigdisplay.edit'),
 						(new CMenuItem(_('Geographical maps')))
 							->setAction('geomaps.edit'),
-						$module_feature_flag_disabled
+						CFeatureFlagHelper::isFlagModulesEnabled()
 							? (new CMenuItem(_('Modules')))
 								->setAction('module.list')
 								->setAliases(['module.edit', 'module.scan'])

@@ -24,32 +24,20 @@ class CFeatureFlagHelper {
 	public const MEDIATYPES_FEATURE_FLAG = 'media_type_denylist';
 
 	public static function getSupportedMediaTypes(): array {
-		$denied_media_types = APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
-
-		$all_types = [
-			MEDIA_TYPE_EMAIL => 'Email',
-			MEDIA_TYPE_EXEC => 'Script',
-			MEDIA_TYPE_SMS => 'SMS',
-			MEDIA_TYPE_WEBHOOK => 'Webhook'
-		];
-
-		natsort($all_types);
-
-		if (!is_array($denied_media_types)) {
-			return $all_types;
-		}
-
-		$supported_media_types = array_change_key_case(array_flip($all_types));
-		$supported_media_types = array_diff_key($supported_media_types, array_flip($denied_media_types));
-
-		return array_intersect_key($all_types, array_flip($supported_media_types));
+		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
 	}
 
-	public static function isFeatureDisabled(string $type): bool {
+	public static function isFlagHttpAuthEnabled(): bool {
+		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::HTTP_AUTH_FEATURE_FLAG];
+	}
+
+	public static function isFlagModulesEnabled(): bool {
+		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MODULE_FEATURE_FLAG];
+	}
+
+	public static function isFeatureFlagEnabled(string $type): bool {
 		return match ($type) {
-			self::MODULE_FEATURE_FLAG => APP::getConfig()['ZBX_FEATURE_FLAGS'][$type],
-			self::HTTP_AUTH_FEATURE_FLAG => APP::getConfig()['ZBX_FEATURE_FLAGS'][$type],
-			self::MEDIATYPES_FEATURE_FLAG => APP::getConfig()['ZBX_FEATURE_FLAGS'][$type] != null
+			self::MODULE_FEATURE_FLAG => self::isFlagModulesEnabled()
 		};
 	}
 }

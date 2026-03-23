@@ -23,12 +23,10 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function getRulesInput(int $user_type): array {
-		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
 		return array_merge(
 			$this->getUiSectionRules($user_type),
 			$this->getServiceSectionRules(),
-			$module_feature_flag_disabled ? $this->getModuleSectionRules() : [],
+			CFeatureFlagHelper::isFlagModulesEnabled() ? $this->getModuleSectionRules() : [],
 			$this->getApiSectionRules(),
 			$this->getActionSectionRules($user_type)
 		);

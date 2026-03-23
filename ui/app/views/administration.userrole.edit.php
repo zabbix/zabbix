@@ -241,7 +241,7 @@ $form_grid
 			->addStyle('display: none;')
 	]);
 
-if ($data['rules']['modules_config_disabled']) {
+if ($data['rules']['modules_config_enabled']) {
 	$form_grid->addItem(
 		(new CFormField(
 			(new CTag('h4', true, _('Access to modules')))->addClass('input-section-header')

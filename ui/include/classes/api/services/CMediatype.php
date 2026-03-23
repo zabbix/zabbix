@@ -498,7 +498,7 @@ class CMediatype extends CApiService {
 		$db_mediatypes = $this->get([
 			'output' => array_diff(self::OUTPUT_FIELDS, ['parameters']),
 			'mediatypeids' => array_column($mediatypes, 'mediatypeid'),
-			'filter' => ['type' => array_flip(CFeatureFlagHelper::getSupportedMediaTypes())],
+			'filter' => ['type' => CFeatureFlagHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 
@@ -524,11 +524,8 @@ class CMediatype extends CApiService {
 			]
 			: [];
 
-		$supported_media_types = CFeatureFlagHelper::getSupportedMediaTypes();
-		uksort($supported_media_types, 'strnatcmp');
-
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['name']], 'fields' => $specific_fields + [
-			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', array_keys($supported_media_types))],
+			'type' =>					['type' => API_INT32, 'flags' => $api_required, 'in' => implode(',', CFeatureFlagHelper::getSupportedMediaTypes())],
 			'name' =>					['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('media_type', 'name')],
 			'status' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED])],
 			'maxattempts' =>			['type' => API_INT32, 'in' => '1:100'],
@@ -1268,9 +1265,9 @@ class CMediatype extends CApiService {
 		}
 
 		$db_mediatypes = DB::select('media_type', [
-			'output' => ['mediatypeid', 'name', 'type'],
+			'output' => ['mediatypeid', 'name'],
 			'mediatypeids' => $mediatypeids,
-			'filter' => ['type' => array_flip(CFeatureFlagHelper::getSupportedMediaTypes())],
+			'filter' => ['type' => CFeatureFlagHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 

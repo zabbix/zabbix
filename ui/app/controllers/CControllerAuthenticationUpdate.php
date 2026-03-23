@@ -394,7 +394,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if (CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)) {
+		if (CFeatureFlagHelper::isFlagHttpAuthEnabled()) {
 			$rules['fields'] += [
 				'http_auth_enabled' => ['setting http_auth_enabled',
 					'in' => [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]
@@ -666,7 +666,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfaid' => $mfaid
 		];
 
-		if (CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG)) {
+		if (CFeatureFlagHelper::isFlagHttpAuthEnabled()) {
 			$auth_params = array_merge($auth_params, [
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,

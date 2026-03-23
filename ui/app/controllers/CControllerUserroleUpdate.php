@@ -31,9 +31,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}'], 'roleid']
 		];
 
-		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
-		$specific_fields = $module_feature_flag_disabled
+		$specific_fields = CFeatureFlagHelper::isFlagModulesEnabled()
 			? [
 				'modules' => ['array', 'required', 'field' => ['boolean']],
 				'modules_default_access' => ['boolean']

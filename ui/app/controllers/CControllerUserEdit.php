@@ -256,9 +256,9 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
-		$data['modules_config_disabled'] = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
+		$data['modules_config_enabled'] = CFeatureFlagHelper::isFlagModulesEnabled();
 
-		if ($data['modules_config_disabled']) {
+		if ($data['modules_config_enabled']) {
 			$data['modules'] = [];
 
 			$db_modules = API::Module()->get([

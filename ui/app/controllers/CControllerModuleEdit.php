@@ -43,7 +43,7 @@ class CControllerModuleEdit extends CController {
 
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
-				&& !CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG)) {
+				&& !CFeatureFlagHelper::isFlagModulesEnabled()) {
 			return false;
 		}
 

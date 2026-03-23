@@ -162,9 +162,7 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateCreate(array &$roles): void {
-		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
-		$specific_fields = $module_feature_flag_disabled
+		$specific_fields = CFeatureFlagHelper::isFlagModulesEnabled()
 			? [
 				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
@@ -268,9 +266,7 @@ class CRole extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateUpdate(array &$roles, ?array &$db_roles): void {
-		$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
-		$specific_fields = $module_feature_flag_disabled
+		$specific_fields = CFeatureFlagHelper::isFlagModulesEnabled()
 			? [
 				'modules' =>				['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => [
 					'moduleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],

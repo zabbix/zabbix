@@ -1031,8 +1031,6 @@ function getAdministrationGeneralSubmenu(): array {
 		->setArgument('action', 'miscconfig.edit')
 		->getUrl();
 
-	$module_feature_flag_disabled = CFeatureFlagHelper::isFeatureDisabled(CFeatureFlagHelper::MODULE_FEATURE_FLAG);
-
 	return [
 		'main_section' => [
 			'items' => array_filter([
@@ -1044,7 +1042,7 @@ function getAdministrationGeneralSubmenu(): array {
 				$regex_url          => _('Regular expressions'),
 				$trigdisplay_url    => _('Trigger displaying options'),
 				$geomap_url			=> _('Geographical maps'),
-				$modules_url        => $module_feature_flag_disabled ? _('Modules') : null,
+				$modules_url        => CFeatureFlagHelper::isFlagModulesEnabled() ? _('Modules') : null,
 				$connectors_url     => _('Connectors'),
 				$miscconfig_url     => _('Other')
 			])
