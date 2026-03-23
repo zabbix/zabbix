@@ -2308,7 +2308,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
 			$dialog_title = ($action === 'update') ? 'Update column' : 'New column';
 			$form->query($selector)->waitUntilClickable()->one()->click();
-			$column_form = COverlayDialogElement::get($dialog_title)->asForm();
+			$column_overlay = COverlayDialogElement::get($dialog_title);
+			$column_form = $column_overlay->asForm();
 
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $values)) {
@@ -2319,7 +2320,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$column_form->fill($values);
 
 			// waitUntilClickable is required because selecting an item in "Item name" briefly disables the submit button.
-			$column_form->query('xpath:.//button[@type="submit"]')->waitUntilClickable()->one()->click();
+			$column_overlay->getFooter()->query('button', ($action === 'update') ? 'Update' : 'Add')
+					->waitUntilClickable()->one()->click();
 
 			// Updating top host several columns, change it count number.
 			if ($action === 'update') {
