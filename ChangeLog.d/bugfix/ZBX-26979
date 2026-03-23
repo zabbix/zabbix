@@ -1,1 +1,0 @@
-..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template, updated the inline validation for template groups and host group fields (msnihach)
