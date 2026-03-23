@@ -108,6 +108,8 @@ const char	*zbx_result_string(int result);
 
 #define ZBX_MALLOC_TRIM (128 * ZBX_KIBIBYTE)
 
+#define ZBX_MAX_PROCNAME_LEN	64
+
 /******************************************************************************
  *                                                                            *
  * Macro: ZBX_UNUSED                                                          *

@@ -137,18 +137,18 @@ void	zbx_cep_assessment_query_clear(zbx_cep_assessment_query_t *query)
  ******************************************************************************/
 static	zbx_ipc_socket_t	*cep_client_socket(void)
 {
-	static ZBX_THREAD_LOCAL zbx_ipc_socket_t	socket;
+		static ZBX_THREAD_LOCAL zbx_ipc_socket_t	socket;
 
-	if (FAIL == zbx_ipc_socket_connected(&socket))
-	{
-		char	*error = NULL;
-
-		if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &error))
+		if (FAIL == zbx_ipc_socket_connected(&socket))
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "cannot connect to CEP service: %s", error);
-			zbx_exit(EXIT_FAILURE);
+			char	*error = NULL;
+
+			if (FAIL == zbx_ipc_socket_open(&socket, ZBX_IPC_SERVICE_CEP, SEC_PER_MIN, &error))
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot connect to CEP service: %s", error);
+				zbx_exit(EXIT_FAILURE);
+			}
 		}
-	}
 
 	return &socket;
 }

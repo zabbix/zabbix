@@ -12,21 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_TYPES_EXT_H
-#define ZABBIX_TYPES_EXT_H
+#ifndef ZABBIX_MW_QUEUE_H
+#define ZABBIX_MW_QUEUE_H
 
-/* type declarations using post c99 features */
+#include "zbxmw.h"
 
-#include "zbxsysinc.h"
-
-#if defined(HAVE_STDATOMIC_H)
-typedef _Atomic uint64_t zbx_atomic_uint64_t;
-typedef _Atomic uint32_t zbx_atomic_uint32_t;
-typedef _Atomic int zbx_atomic_int_t;
-#else
-typedef uint64_t zbx_atomic_uint64_t;
-typedef uint32_t zbx_atomic_uint32_t;
-typedef volatile int zbx_atomic_int_t;
-#endif
+int	mw_queue_init(zbx_mw_queue_t *queue, char **error);
+void	mw_queue_clear(zbx_mw_queue_t *queue);
 
 #endif

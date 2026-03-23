@@ -135,6 +135,7 @@ SERVER_SUBDIRS = \
 	zbxipcservice \
 	zbxkvs \
 	zbxmedia \
+	zbxmw \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
