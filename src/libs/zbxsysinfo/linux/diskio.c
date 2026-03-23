@@ -722,7 +722,7 @@ static void	dev_disk_partition_sizes_add(zbx_stat_t *stat_buf, struct zbx_json *
 				minor(stat_buf->st_rdev), entry->d_name);
 
 		/* partition directories should contain a text file named "partition" */
-		if (zbx_stat(buf, &st) != 0 || !S_ISREG(st.st_mode))
+		if (0 != zbx_stat(buf, &st) || 0 == S_ISREG(st.st_mode))
 			continue;
 
 		zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/%s/size", major(stat_buf->st_rdev),
@@ -882,9 +882,9 @@ static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const 
 	{
 		char c = model[i];
 
-		if (isalnum(c) || c == '.' || c == ' ')
+		if (0 != isalnum(c) || '.' == c || ' ' == c)
 		{
-			norm_model[j] = (c == ' ' ? '_' : c);
+			norm_model[j] = (' ' == c ? '_' : c);
 			i++;
 			j++;
 		}
