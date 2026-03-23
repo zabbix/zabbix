@@ -1439,7 +1439,7 @@ static void	tm_process_device_init(zbx_uint64_t taskid, const char *adapter_url,
 
 	if (FAIL == zbx_json_brackets_by_name(&jp, "result", &jp_result))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "missing 'result' in bridge-adapter resonse body: %s",
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing 'result' in bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
 		goto out;
 	}
