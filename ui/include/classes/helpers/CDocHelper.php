@@ -161,6 +161,7 @@ class CDocHelper {
 	const USERS_AUTHENTICATION_EDIT =							'web_interface/frontend_sections/users/authentication';
 	const USERS_TOKEN_LIST =									'web_interface/frontend_sections/users/api_tokens';
 	const USERS_USER_EDIT =										'config/users_and_usergroups/user';
+	const USERS_USER_DEVICE_LIST =								'web_interface/frontend_sections/users/device_list';
 	const USERS_USER_LIST =										'web_interface/frontend_sections/users/user_list';
 	const USERS_USER_TOKEN_LIST =								'web_interface/user_profile#api-tokens';
 	const USERS_USERGROUP_EDIT =								'config/users_and_usergroups/usergroup#configuration';

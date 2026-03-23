@@ -315,7 +315,9 @@ class CMenuHelper {
 			CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_AUTHENTICATION)
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
-				: null
+				: null,
+			// TODO: access check
+			(new CMenuItem(_('Linked devices')))->setAction('user.device.list')
 		];
 		$submenu_users = array_filter($submenu_users);
 
@@ -467,7 +469,9 @@ class CMenuHelper {
 						(new CMenuItem(_('Notifications')))
 							->setAction('userprofile.notification.edit'),
 						(new CMenuItem(_('API tokens')))
-							->setAction('user.token.list')
+							->setAction('user.token.list'),
+						(new CMenuItem(_('Linked devices')))
+							->setAction('userprofile.device.list')
 					]))
 			);
 		}
