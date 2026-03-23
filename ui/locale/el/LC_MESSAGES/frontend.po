@@ -12367,6 +12367,11 @@ msgstr ""
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr ""
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr ""
@@ -12747,6 +12752,11 @@ msgstr ""
 #: include/classes/import/validators/CXmlValidator.php:64
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
+msgstr ""
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
 msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
@@ -21238,6 +21248,10 @@ msgstr ""
 msgid "Swedish (sv_SE)"
 msgstr "Σουηδικά (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Εναλλαγή μεθόδου ταυτοποίησης, θα επαναφέρει όλες εκτός αυτής της συνεδρίας! Συνέχεια;"
@@ -23248,6 +23262,10 @@ msgstr ""
 
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
+msgstr ""
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
 msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
@@ -25482,6 +25500,10 @@ msgstr ""
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Δεν έχετε άδεια για να εκτελέσετε αυτή τη λειτουργία."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
