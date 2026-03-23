@@ -21,6 +21,8 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 
+#define TFC_RECENT_CUTOFF SEC_PER_DAY
+
 typedef struct
 {
 	zbx_uint64_t		itemid;		/* the itemid */
@@ -33,6 +35,7 @@ typedef struct
 	zbx_uint32_t		next;		/* index of the next LRU list or unused entry */
 	zbx_uint32_t		prev_value;	/* index of the previous value list */
 	zbx_uint32_t		next_value;	/* index of the next value list */
+	time_t			last_accessed;	/* the last time the entry was accessed */
 }
 zbx_tfc_data_t;
 
@@ -57,6 +60,11 @@ typedef struct
 	zbx_uint64_t	misses;
 	zbx_uint64_t	items_num;
 	zbx_uint64_t	conf_size;
+	zbx_uint32_t	lru_recent_cutoff;	/* Index of the farthest node from the tail the value of  */
+						/* "last_accessed" of which is still within the last */
+						/* TFC_RECENT_CUTOFF seconds. */
+						/* Or UINT32_MAX if such node does not exist. */
+	zbx_uint64_t	recent_entry_num;
 }
 zbx_tfc_t;
 
@@ -177,6 +185,18 @@ static void	tfc_free_func(void *ptr)
 	__tfc_shmem_free_func(ptr);
 }
 
+static void	tfc_lru_update_recent_cutoff()
+{
+	time_t	time_now = time(NULL);
+
+	while (UINT32_MAX != cache->lru_recent_cutoff &&
+			time_now - cache->slots[cache->lru_recent_cutoff].data.last_accessed > TFC_RECENT_CUTOFF)
+	{
+		cache->recent_entry_num--;
+		cache->lru_recent_cutoff = cache->slots[cache->lru_recent_cutoff].data.next;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: append data to the tail of least recently used slot list          *
@@ -197,6 +217,14 @@ static void	tfc_lru_append(zbx_tfc_data_t *data)
 		cache->lru_head = index;
 
 	cache->lru_tail = index;
+
+	data->last_accessed = time(NULL);
+
+	cache->recent_entry_num++;
+	if (UINT32_MAX == cache->lru_recent_cutoff)
+		cache->lru_recent_cutoff = index;
+
+	tfc_lru_update_recent_cutoff();
 }
 
 /******************************************************************************
@@ -206,6 +234,16 @@ static void	tfc_lru_append(zbx_tfc_data_t *data)
  ******************************************************************************/
 static void	tfc_lru_remove(zbx_tfc_data_t *data)
 {
+	if (UINT32_MAX != cache->lru_recent_cutoff)
+	{
+		zbx_uint32_t	index = tfc_data_slot_index(data);
+		if (data->last_accessed >= cache->slots[cache->lru_recent_cutoff].data.last_accessed)
+			cache->recent_entry_num--;
+
+		if (index == cache->lru_recent_cutoff)
+			cache->lru_recent_cutoff = data->next;
+	}
+
 	if (UINT32_MAX != data->prev)
 		cache->slots[data->prev].data.next = data->next;
 	else
@@ -215,6 +253,8 @@ static void	tfc_lru_remove(zbx_tfc_data_t *data)
 		cache->slots[data->next].data.prev = data->prev;
 	else
 		cache->lru_tail = data->prev;
+
+	tfc_lru_update_recent_cutoff();
 }
 
 /******************************************************************************
@@ -435,6 +475,9 @@ int	zbx_tfc_init(zbx_uint64_t cache_size, char **error)
 	cache->hits = 0;
 	cache->misses = 0;
 	cache->items_num = 0;
+
+	cache->recent_entry_num = 0;
+	cache->lru_recent_cutoff = UINT32_MAX;
 
 	ret = SUCCEED;
 out:
@@ -679,6 +722,10 @@ int	zbx_tfc_get_stats(zbx_tfc_stats_t *stats, char **error)
 	stats->misses = cache->misses;
 	stats->items_num = cache->items_num;
 	stats->requests_num = cache->index.num_data - cache->items_num;
+	stats->slots_num = cache->slots_num;
+
+	tfc_lru_update_recent_cutoff();
+	stats->recent_entry_num = cache->recent_entry_num;
 
 	UNLOCK_CACHE;
 
