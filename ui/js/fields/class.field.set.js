@@ -88,15 +88,10 @@ class CFieldSet extends CField {
 		button.addEventListener('blur', () => {
 			clearTimeout(timeout_id);
 			timeout_id = setTimeout(() => {
-				if (overlays_stack.getById(dialogue_id) === undefined) {
+				if (document.activeElement !== button && overlays_stack.getById(dialogue_id) === undefined) {
 					this.onBlur();
 				}
 			}, 250);
-		});
-
-		button.addEventListener('focusin', () => {
-			clearTimeout(timeout_id);
-			timeout_id = null;
 		});
 	}
 
