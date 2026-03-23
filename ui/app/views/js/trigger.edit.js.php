@@ -56,7 +56,6 @@ window.trigger_edit_popup = new class {
 
 		this.#initActions();
 		this.#initPopupListeners();
-		this.#initTriggersTab();
 		this.#changeRecoveryMode();
 		this.#changeCorrelationMode();
 
@@ -72,7 +71,6 @@ window.trigger_edit_popup = new class {
 			this.name.addEventListener(event_type,
 				(e) => {
 					this.form_element.querySelector('#event_name').placeholder = e.target.value;
-					$(this.form_element.querySelector('#event_name')).textareaFlexible('updateHeight');
 				}
 			);
 			this.name.dispatchEvent(new Event('input'));
@@ -242,15 +240,6 @@ window.trigger_edit_popup = new class {
 				callback: () => ZABBIX.EventHub.unsubscribeAll(subscriptions)
 			})
 		);
-	}
-
-	#initTriggersTab() {
-		$('#tabs').on('tabsactivate', (event, ui) => {
-			if (ui.newPanel.is('#triggersTab')) {
-				ui.newPanel.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-			}
-		});
-		$('#triggersTab .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#addDepTrigger(button) {
@@ -510,9 +499,24 @@ window.trigger_edit_popup = new class {
 	}
 
 	#openPopupTriggerExpr(trigger_options) {
-		PopUp('popup.triggerexpr', {...this.expression_popup_parameters, ...trigger_options},
+		const dialogue = PopUp('popup.triggerexpr.edit', {...this.expression_popup_parameters, ...trigger_options},
 			{dialogueid: 'trigger-expr', dialogue_class: 'modal-popup-generic'}
-		);
+		).$dialogue[0];
+
+		dialogue.addEventListener('dialogue.submit', (e) => {
+			overlayDialogueDestroy('trigger-expr');
+			const expression_field = document.getElementById(trigger_options.dstfld1);
+
+			if (trigger_options.dstfld1 === 'expr_temp' || trigger_options.dstfld1 === 'recovery_expr_temp') {
+				expression_field.value = e.detail.expression;
+			}
+			else {
+				expression_field.value += e.detail.expression;
+			}
+
+			expression_field.dispatchEvent(new Event('change'));
+			this.form.validateChanges(['expression', 'recovery_expression']);
+		});
 	}
 
 	#expressionConstructor(fields = {}, expression_type = <?= TRIGGER_EXPRESSION ?>) {

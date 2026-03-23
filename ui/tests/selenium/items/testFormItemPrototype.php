@@ -682,7 +682,6 @@ class testFormItemPrototype extends CLegacyWebTest {
 				case INTERFACE_TYPE_SNMP :
 				case INTERFACE_TYPE_IPMI :
 				case INTERFACE_TYPE_AGENT :
-				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_JMX :
 				case INTERFACE_TYPE_OPT :
 					$this->zbxTestTextPresent('Host interface');
@@ -690,7 +689,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
+							($interfaceType === INTERFACE_TYPE_OPT ? '' : ' AND type='.$interfaceType)
 					);
 					while ($row = DBfetch($dbInterfaces)) {
 						$data[] = [$row];
@@ -908,14 +907,17 @@ class testFormItemPrototype extends CLegacyWebTest {
 				$this->assertFalse($form->getField('Update interval')->isDisplayed());
 		}
 
-		$value_types = ($type === 'Dependent item')
-			? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary']
-			: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'];
+		$value_types = ($type === 'Dependent item') ?
+				['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'Binary', 'JSON']
+				: (($type === 'Calculated')
+					? ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text']
+					: ['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text', 'JSON']
+				);
 
 		if (!isset($templateid)) {
 			$this->assertEquals($value_types, $form->getField('Type of information')->asDropdown()->getOptions()->asText());
 
-			foreach (['Numeric (unsigned)', 'Numeric (float)', 'Character', 'Log', 'Text'] as $info_type) {
+			foreach ($value_types as $info_type) {
 				$this->zbxTestIsEnabled('//*[@id="value_type"]//li[text()='.CXPathHelper::escapeQuotes($info_type).']');
 			}
 		}

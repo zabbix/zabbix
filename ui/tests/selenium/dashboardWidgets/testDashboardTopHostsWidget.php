@@ -520,7 +520,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 				// Check hintbox text.
 				$hint_text = 'Aggregation function does not affect the sparkline.';
-				$hint_dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one();
+				$hint_dialog = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilVisible()->one();
 				$this->assertEquals($hint_text, $hint_dialog->getText());
 
 				// Close the hintbox.
@@ -2812,8 +2812,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 		foreach ($data['column_fields'] as $column) {
 			// Open the Column configuration add or column update dialog depending on the action type.
 			$selector = ($action === 'create') ? 'id:add' : 'xpath:(.//button[@name="edit"])['.$column_count.']';
+			$dialog_title = ($action === 'update') ? 'Update column' : 'New column';
 			$form->query($selector)->waitUntilClickable()->one()->click();
-			$column_form = COverlayDialogElement::find()->waitUntilReady()->asForm()->all()->last();
+			$column_overlay = COverlayDialogElement::get($dialog_title);
+			$column_form = $column_overlay->asForm();
 
 			// Fill Thresholds values.
 			if (array_key_exists('Thresholds', $column)) {
@@ -2833,7 +2835,9 @@ class testDashboardTopHostsWidget extends testWidgets {
 				$column_form->fill($column);
 			}
 
-			$column_form->submit();
+			// waitUntilClickable is required because selecting an item in "Item name" briefly disables the submit button.
+			$column_overlay->getFooter()->query('button', ($action === 'update') ? 'Update' : 'Add')
+					->waitUntilClickable()->one()->click();
 
 			// Updating top host several columns, change it count number.
 			if ($action === 'update') {
@@ -2848,8 +2852,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				}
 
 				$this->assertMessage(TEST_BAD, null, $data['column_error']);
-				$selector = ($action === 'update') ? 'Update column' : 'New column';
-				$this->query('xpath://div/h4[text()="'.$selector.'"]/../button[@title="Close"]')->one()->click();
+				$this->query('xpath://div/h4[text()="'.$dialog_title.'"]/../button[@title="Close"]')->one()->click();
 			}
 
 			$column_form->waitUntilNotVisible();
@@ -6649,7 +6652,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			foreach ($data['check_maintenance'] as $host => $hint_text) {
 				$this->query('xpath://td/a[text()='.CXPathHelper::escapeQuotes($host).
 						']/..//button[contains(@class,"wrench")]')->waitUntilClickable()->one()->click();
-				$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent();
 				$this->assertEquals($hint_text, $hint->one()->getText());
 				$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
 				$hint->waitUntilNotPresent();
