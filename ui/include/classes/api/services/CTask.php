@@ -72,7 +72,7 @@ class CTask extends CApiService {
 			if ($this->outputIsRequested('request', $options['output'])) {
 				$row['request'] = match ((int) $row['type']) {
 					ZBX_TM_TASK_DATA => json_decode($row['request_data']),
-					ZBX_TM_TASK_ENROLL_DEVICE => ['deviceid' => $row['deviceid']]
+					ZBX_TM_TASK_INIT_DEVICE => ['deviceid' => $row['deviceid']]
 				};
 
 				unset($row['request_data'], $row['deviceid']);
@@ -99,7 +99,7 @@ class CTask extends CApiService {
 						}
 						break;
 
-					case ZBX_TM_TASK_ENROLL_DEVICE:
+					case ZBX_TM_TASK_INIT_DEVICE:
 						if ($row['status'] <= ZBX_TM_STATUS_INPROGRESS) {
 							$row['result'] = null;
 						}
@@ -138,8 +138,8 @@ class CTask extends CApiService {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		$allowed_types = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-			? [ZBX_TM_TASK_DATA, ZBX_TM_TASK_ENROLL_DEVICE]
-			: [ZBX_TM_TASK_ENROLL_DEVICE];
+			? [ZBX_TM_TASK_DATA, ZBX_TM_TASK_INIT_DEVICE]
+			: [ZBX_TM_TASK_INIT_DEVICE];
 
 		$sql_parts['where'][] = dbConditionInt($table_alias.'.type', $allowed_types);
 

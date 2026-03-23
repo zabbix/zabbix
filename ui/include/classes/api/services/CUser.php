@@ -2950,7 +2950,7 @@ class CUser extends CApiService {
 			$userid = $db_session['userid'];
 		}
 		else {
-			$db_token = self::tokenAuthentication($session['token'], ZBX_API_HEADER_AUTHENTICATE_BEARER, $time);
+			$db_token = self::tokenAuthentication($session['token'], ZBX_AUTH_TOKEN_TYPE_BEARER, $time);
 			$userid = $db_token['userid'];
 		}
 
@@ -3029,7 +3029,7 @@ class CUser extends CApiService {
 
 		$time = time();
 
-		$db_token = self::tokenAuthentication($params['token'], ZBX_API_HEADER_AUTHENTICATE_DPOP, $time);
+		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_TOKEN_TYPE_DPOP, $time);
 
 		$resource = DBselect(
 			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
@@ -3074,7 +3074,7 @@ class CUser extends CApiService {
 			'where' => ['tokenid' => $db_token['tokenid']]
 		]);
 
-		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $uuid] +
+		self::$userData = $db_user + ['token' => $params['token']] + ['uuid' => $uuid] +
 			$keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY];
 
 		unset($db_user['ugsetid']);

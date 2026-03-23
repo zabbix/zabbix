@@ -436,47 +436,41 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_count = $this->get([
-			'countOutput' => true,
-			'tokenids' => $tokenids
-		]);
-
-		if ($db_count != count($tokenids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		return self::generateForce($tokenids, self::$userData['userid']);
-	}
-
-	/**
-	 * @param array   $tokenids
-	 * @param string  $userid
-	 * @param boolean $audit_log
-	 *
-	 * @return array
-	 */
-	public static function generateForce(array $tokenids, string $userid, bool $audit_log = true): array {
-		if (!$tokenids) {
-			return [];
-		}
-
 		$db_tokens = DB::select('token', [
 			'output' => ['tokenid', 'name', 'token', 'creator_userid'],
 			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
 
+		if (count($db_tokens) != count($tokenids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
+		return self::generateForce($db_tokens);
+	}
+
+	/**
+	 * @param array   $db_tokens
+	 * @param boolean $audit_log
+	 *
+	 * @return array
+	 */
+	public static function generateForce(array $db_tokens, bool $audit_log = true): array {
+		if (!$db_tokens) {
+			return [];
+		}
+
 		$tokens = [];
 		$response = [];
 		$upd_tokens = [];
 
-		foreach ($tokenids as $tokenid) {
+		foreach ($db_tokens as $tokenid => $db_token) {
 			$new_token = CApiTokenHelper::generateToken();
 
 			$token = [
 				'tokenid' => $tokenid,
 				'token' => hash('sha512', $new_token),
-				'creator_userid' => $userid
+				'creator_userid' => self::$userData['userid']
 			];
 
 			$tokens[] = $token;
@@ -487,7 +481,7 @@ class CToken extends CApiService {
 			];
 
 			$upd_tokens[] = [
-				'values' => DB::getUpdatedValues('token', $token, $db_tokens[$tokenid]),
+				'values' => DB::getUpdatedValues('token', $token, $db_token),
 				'where' => ['tokenid' => $tokenid]
 			];
 		}

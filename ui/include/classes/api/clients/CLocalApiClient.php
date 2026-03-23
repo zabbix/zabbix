@@ -33,6 +33,8 @@ class CLocalApiClient extends CApiClient {
 	 */
 	protected $debug = false;
 
+	private bool $device_onboard_called = false;
+
 	public function getUserData(): ?array {
 		return CApiService::$userData;
 	}
@@ -182,20 +184,21 @@ class CLocalApiClient extends CApiClient {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		if ($auth['type'] === CJsonRpc::AUTH_TYPE_DPOP) {
-			$user = $this->serviceFactory->getObject('user')->checkAuthenticationDpop([
+		$user = match ($auth['type']) {
+			CJsonRpc::AUTH_TYPE_BEARER => $this->serviceFactory->getObject('user')->checkAuthentication(
+				strlen($auth['auth']) == 64
+					? ['token' => $auth['auth']]
+					: ['sessionid' => $auth['auth']]
+			),
+			CJsonRpc::AUTH_TYPE_COOKIE => $this->serviceFactory->getObject('user')->checkAuthentication([
+				'sessionid' => $auth['auth']
+			]),
+			CJsonRpc::AUTH_TYPE_DPOP => $this->serviceFactory->getObject('user')->checkAuthenticationDpop([
 				'token' => $auth['auth'],
 				'signature' => $auth['sign'],
 				'requested_api_method' => $requested_api_method
-			]);
-		}
-		else {
-			$auth_data = $auth['type'] === CJsonRpc::AUTH_TYPE_BEARER && strlen($auth['auth']) == 64
-				? ['token' => $auth['auth']]
-				: ['sessionid' => $auth['auth']];
-
-			$user = $this->serviceFactory->getObject('user')->checkAuthentication($auth_data);
-		}
+			])
+		};
 
 		if (array_key_exists('debug_mode', $user)) {
 			$this->debug = $user['debug_mode'];
@@ -236,10 +239,13 @@ class CLocalApiClient extends CApiClient {
 	 * @return bool
 	 */
 	protected function requiresAuthentication($api, $method) {
+		$this->device_onboard_called = $api === 'device' && $method === 'onboard';
+
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
 			|| ($api === 'apiinfo' && $method === 'version')
-			|| ($api === 'device' && $method === 'onboard'));
+			|| $this->device_onboard_called
+		);
 	}
 
 	/**
@@ -336,5 +342,9 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		return !$api_access_mode;
+	}
+
+	public function isDeviceOnboardCall(): bool {
+		return $this->device_onboard_called;
 	}
 }

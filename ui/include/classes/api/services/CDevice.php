@@ -248,7 +248,7 @@ class CDevice extends CApiService {
 
 	private static function createInitTask(string $deviceid, int $time_start): string {
 		$ins_task = [
-			'type' =>ZBX_TM_TASK_ENROLL_DEVICE,
+			'type' =>ZBX_TM_TASK_INIT_DEVICE,
 			'status' => ZBX_TM_STATUS_NEW,
 			'clock' => $time_start,
 			'ttl' => self::TASK_DEVICE_INIT_TTL
@@ -276,6 +276,15 @@ class CDevice extends CApiService {
 	public function onboard(array $options): array {
 		$this->validateOnboard($options, $db_device);
 
+		DB::delete('enrollment_token', ['deviceid' => $db_device['deviceid']]);
+
+		self::$userData = [
+			'userid' => $db_device['userid'],
+			'uuid' => $db_device['uuid'],
+			'kid' => $options['mobile_encryption_key']['kid'],
+			'key' => json_encode($options['mobile_encryption_key'])
+		];
+
 		self::createDeviceKeys($db_device['deviceid'], $options['mobile_identity_key'],
 			$options['mobile_encryption_key']
 		);
@@ -284,11 +293,17 @@ class CDevice extends CApiService {
 			'name' => $db_device['uuid'],
 			'userid' => $db_device['userid'],
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
-			'auth_type' => ZBX_API_HEADER_AUTHENTICATE_DPOP,
+			'auth_type' => ZBX_AUTH_TOKEN_TYPE_DPOP,
 			'expires_at' => 0
 		]], $db_device['userid'], false);
 
-		$db_tokens = CToken::generateForce($tokens_data['tokenids'], $db_device['userid'], false);
+		$db_tokens = DB::select('token', [
+			'output' => ['tokenid', 'name', 'token', 'creator_userid'],
+			'tokenids' => $tokens_data['tokenids'],
+			'preservekeys' => true
+		]);
+
+		$db_tokens = CToken::generateForce($db_tokens, false);
 
 		$db_token = reset($db_tokens);
 
@@ -346,8 +361,6 @@ class CDevice extends CApiService {
 		if (!$db_enrollment_token) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
-
-		DB::delete('enrollment_token', ['deviceid' => $db_enrollment_token['deviceid']]);
 
 		$db_device = DBfetch(DBselect(
 			'SELECT d.deviceid,d.uuid,d.userid,d.name,u.name AS username'.
