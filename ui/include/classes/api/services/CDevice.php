@@ -30,7 +30,7 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
-	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'lastaccess'];
+	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'created_at', 'lastaccess'];
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 	private const TASK_DEVICE_INIT_TTL = 30;
@@ -80,7 +80,7 @@ class CDevice extends CApiService {
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('device', self::OUTPUT_FIELDS), ['lastaccess'])],
+			'filter' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => array_merge(DB::getFilterFields('device', self::OUTPUT_FIELDS), ['created_at', 'lastaccess'])],
 			'search' =>					['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => DB::getSearchFields('device', self::OUTPUT_FIELDS)],
 			'searchByAny' =>			['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>			['type' => API_BOOLEAN, 'default' => false],
@@ -125,12 +125,13 @@ class CDevice extends CApiService {
 			$sql_parts['where'][] = dbConditionId('ug.usrgrpid', $options['usrgrpids']);
 		}
 
-		if ($options['filter'] !== null && array_key_exists('lastaccess', $options['filter'])
-				&& $options['filter']['lastaccess'] !== null) {
-			$sql_parts['join']['t'] = ['type' => 'left', 'table' => 'token', 'using' => 'tokenid'];
-			$this->dbFilter('token t', ['filter' => ['lastaccess' => $options['filter']['lastaccess']]] + $options,
-				$sql_parts
-			);
+		if ($options['filter'] !== null) {
+			$token_filter = array_intersect_key($options['filter'], array_flip(['created_at', 'lastaccess']));
+
+			if ($token_filter) {
+				$sql_parts['join']['t'] = ['type' => 'left', 'table' => 'token', 'using' => 'tokenid'];
+				$this->dbFilter('token t', ['filter' => $token_filter] + $options, $sql_parts);
+			}
 		}
 
 		return $sql_parts;
@@ -139,9 +140,16 @@ class CDevice extends CApiService {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput'] && in_array('lastaccess', $options['output'])) {
-			$sql_parts = $this->addQuerySelect('t.lastaccess', $sql_parts);
-			$sql_parts['join']['t'] = ['type' => 'left', 'table' => 'token', 'using' => 'tokenid'];
+		if (!$options['countOutput']) {
+			$token_output = array_intersect($options['output'], ['created_at', 'lastaccess']);
+
+			if ($token_output) {
+				$sql_parts['join']['t'] = ['type' => 'left', 'table' => 'token', 'using' => 'tokenid'];
+
+				foreach ($token_output as $field) {
+					$sql_parts = $this->addQuerySelect('t.'.$field, $sql_parts);
+				}
+			}
 		}
 
 		return $sql_parts;
