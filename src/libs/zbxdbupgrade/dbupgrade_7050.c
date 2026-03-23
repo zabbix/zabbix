@@ -630,6 +630,199 @@ static int	DBpatch_7050050(void)
 	return DBadd_foreign_key("dservices", 2, &field);
 }
 
+static int	DBpatch_7050051(void)
+{
+	const zbx_db_field_t	field = {"auth_type", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("token", &field);
+}
+
+static int	DBpatch_7050052(void)
+{
+	return DBdrop_index("token", "token_2");
+}
+
+static int	DBpatch_7050053(void)
+{
+	return DBcreate_index("token", "token_2", "userid,auth_type,name", 1);
+}
+
+static int	DBpatch_7050054(void)
+{
+	const zbx_db_table_t	table =
+			{"dpop_jti_cache", "jti", 0,
+				{
+					{"jti", NULL, NULL, NULL, 36, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050055(void)
+{
+	const zbx_db_table_t	table =
+			{"device", "deviceid", 0,
+				{
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"uuid", NULL, NULL, NULL, 36, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"uuid", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"push_token", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050056(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("device", 1, &field);
+}
+
+static int	DBpatch_7050057(void)
+{
+	const zbx_db_field_t	field = {"tokenid", NULL, "token", "tokenid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("device", 2, &field);
+}
+
+static int	DBpatch_7050058(void)
+{
+	return DBcreate_index("device", "device_1", "userid", 0);
+}
+
+static int	DBpatch_7050059(void)
+{
+	return DBcreate_index("device", "device_2", "tokenid", 0);
+}
+
+static int	DBpatch_7050060(void)
+{
+	const zbx_db_table_t	table =
+			{"device_key", "device_keyid", 0,
+				{
+					{"device_keyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"scope", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"varchar", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"key_", NULL, NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"active", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050061(void)
+{
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("device_key", 1, &field);
+}
+
+static int	DBpatch_7050062(void)
+{
+	return DBcreate_index("device_key", "device_1", "deviceid", 0);
+}
+
+static int	DBpatch_7050063(void)
+{
+	const zbx_db_table_t    table =
+			{"task_device_init", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"mobile_enrollment_token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL,
+						0},
+					{"bridge_enrollment_token", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL,
+						0},
+					{"enrollment_url", NULL, NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"info", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050064(void)
+{
+	const zbx_db_field_t    field = {"taskid", NULL, "task", "taskid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_device_init", 1, &field);
+}
+
+static int	DBpatch_7050065(void)
+{
+	const zbx_db_table_t	table =
+			{"task_device_offboard", "taskid", 0,
+				{
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"uuid", NULL, NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050066(void)
+{
+	const zbx_db_field_t	field = {"taskid", NULL, "task", "taskid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("task_device_offboard", 1, &field);
+}
+
+static int	DBpatch_7050067(void)
+{
+	const zbx_db_table_t	table =
+			{"enrollment_token", "deviceid", 0,
+				{
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"enrollment_token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"enrollment_token_expiration", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL,
+						0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050068(void)
+{
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("enrollment_token", 1, &field);
+}
+
+static int	DBpatch_7050069(void)
+{
+	return DBcreate_index("enrollment_token", "enrollment_token_1", "deviceid", 1);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -687,5 +880,24 @@ DBPATCH_ADD(7050047, 0, 1)
 DBPATCH_ADD(7050048, 0, 1)
 DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
+DBPATCH_ADD(7050051, 0, 1)
+DBPATCH_ADD(7050052, 0, 1)
+DBPATCH_ADD(7050053, 0, 1)
+DBPATCH_ADD(7050054, 0, 1)
+DBPATCH_ADD(7050055, 0, 1)
+DBPATCH_ADD(7050056, 0, 1)
+DBPATCH_ADD(7050057, 0, 1)
+DBPATCH_ADD(7050058, 0, 1)
+DBPATCH_ADD(7050059, 0, 1)
+DBPATCH_ADD(7050060, 0, 1)
+DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
+DBPATCH_ADD(7050064, 0, 1)
+DBPATCH_ADD(7050065, 0, 1)
+DBPATCH_ADD(7050066, 0, 1)
+DBPATCH_ADD(7050067, 0, 1)
+DBPATCH_ADD(7050068, 0, 1)
+DBPATCH_ADD(7050069, 0, 1)
 
 DBPATCH_END()
