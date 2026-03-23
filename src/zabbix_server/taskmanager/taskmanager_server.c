@@ -1349,7 +1349,7 @@ static void	tm_process_device_init(zbx_uint64_t taskid, const char *adapter_url,
 	zbx_json_addstring(&json, "device_id", uuid, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
-	zbx_json_addstring(&json, "id", taskid, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json, "id", taskid);
 	zbx_json_close(&json);
 
 	payload = zbx_strdup(NULL, json.buffer);
@@ -1552,7 +1552,7 @@ static void	tm_process_device_offboard(zbx_uint64_t taskid, const char *adapter_
 	zbx_json_addstring(&json, "device_id", uuid, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&json, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&json);
-	zbx_json_addstring(&json, "id", taskid, ZBX_JSON_TYPE_STRING);
+	zbx_json_adduint64(&json, "id", taskid);
 	zbx_json_close(&json);
 
 	payload = zbx_strdup(NULL, json.buffer);
@@ -1669,8 +1669,9 @@ out:
  * Return value: number of successfully processed tasks                       *
  *                                                                            *
  ******************************************************************************/
-static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, char *adapter_url,
-		char *config_adapter_ca_file, char *config_adapter_cert_file, char *config_adapter_key_file)
+static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const char *adapter_url,
+		const char *config_adapter_ca_file, const char *config_adapter_cert_file,
+		const char *config_adapter_key_file)
 {
 	zbx_db_row_t		row;
 	zbx_db_result_t		result;
