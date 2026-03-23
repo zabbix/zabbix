@@ -1168,8 +1168,8 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 			break;
 		case ITEM_VALUE_TYPE_UINT64:
 		case ITEM_VALUE_TYPE_FLOAT:
-		case ITEM_VALUE_TYPE_JSON:
 			break;
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
@@ -2533,6 +2533,26 @@ void	zbx_vc_reset(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if value type is supported by value cache                   *
+ *                                                                            *
+ * Return value:  SUCCEED - value type is supported                           *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_is_value_type_supported(unsigned char value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
+			return FAIL;
+		default:
+			return SUCCEED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds item values to history and value cache                       *
  *                                                                            *
  * Parameters:                                                                *
@@ -2563,6 +2583,14 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		h = history->values[i];
 
 		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+
+		if (FAIL == vc_is_value_type_supported(h->value_type))
+		{
+			if (NULL != item)
+				vc_remove_item(item);
+
+			continue;
+		}
 
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
@@ -2644,7 +2672,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d count:%d period:%d end_timestamp"
 			" '%s'", __func__, itemid, value_type, count, seconds, zbx_timespec_str(ts));
 
-	if (ITEM_VALUE_TYPE_BIN == value_type || ITEM_VALUE_TYPE_JSON == value_type)
+	if (SUCCEED != vc_is_value_type_supported(value_type))
 		return FAIL;
 
 	RDLOCK_CACHE;
@@ -2916,6 +2944,7 @@ void	zbx_vc_flush_stats(void)
 	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add newly created items with triggers to value cachel              *
@@ -2934,12 +2963,17 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 
 		for (i = 0; i < items->values_num; i++)
 		{
+			unsigned char	value_type = (unsigned char)items->values[i].second;
+
+			if (SUCCEED != vc_is_value_type_supported(value_type))
+				continue;
+
 			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i]))
 				continue;
 
 			zbx_vc_item_t	item_local = {
 					.itemid = items->values[i].first,
-					.value_type = (unsigned char)items->values[i].second,
+					.value_type = value_type,
 					.status = ZBX_ITEM_STATUS_CACHED_ALL,
 					.active_range = VC_MIN_RANGE,
 					.last_accessed = (int)time(NULL)
