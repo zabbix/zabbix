@@ -1731,12 +1731,12 @@ static char	*build_push_params(const zbx_db_event *event, zbx_uint64_t userid, c
 	zbx_json_addobject(&json, "payload");
 
 	zbx_json_addstring(&json, "version", "1", ZBX_JSON_TYPE_STRING); // TODO
-	zbx_json_addstring(&json, "clock", event->clock, ZBX_JSON_TYPE_INT);
+	zbx_json_adduint64(&json, "clock", event->clock);
 	//eventype TODO
-	zbx_json_addstring(&json, "event_id", event->eventid, ZBX_JSON_TYPE_INT);
+	zbx_json_adduint64(&json, "event_id", event->eventid);
 	//hostid? TODO
-	zbx_json_addstring(&json, "trigger_id", event->trigger.triggerid, ZBX_JSON_TYPE_INT);
-	zbx_json_addstring(&json, "user_id", userid, ZBX_JSON_TYPE_INT);
+	zbx_json_adduint64(&json, "trigger_id", event->trigger.triggerid);
+	zbx_json_adduint64(&json, "user_id", userid);
 	zbx_json_addstring(&json, "severity", zbx_severity_to_str(event->severity), ZBX_JSON_TYPE_STRING);
 
 	zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
