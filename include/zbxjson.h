@@ -425,6 +425,6 @@ int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index,
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_jsonobj_t *obj);
 zbx_jsonobj_t	*zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
 void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name);
-zbx_int64_t	zbx_json_validate_ext(const char *start, char **error);
+int	zbx_json_validate_ext(const char *start, char **error);
 
 #endif /* ZABBIX_ZJSON_H */

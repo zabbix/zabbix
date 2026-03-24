@@ -3151,7 +3151,7 @@ void	lld_rule_process_nested_rule(zbx_uint64_t itemid, const zbx_lld_row_t *lld_
 	zbx_timespec(&ts);
 
 	zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, ZBX_FLAG_DISCOVERY_RULE,
-			ZBX_ITEM_REQUIRES_PREPROCESSING_YES, &result, &ts, ITEM_STATE_NORMAL, NULL);
+			ZBX_ITEM_PREPROCESSING_REGULAR, &result, &ts, ITEM_STATE_NORMAL, NULL);
 	zbx_preprocessor_flush();
 
 	zbx_free(value);

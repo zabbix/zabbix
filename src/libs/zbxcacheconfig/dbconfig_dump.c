@@ -1648,7 +1648,7 @@ static void	DCdump_host_proxy_index(void)
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
-			get_dc_config()->revision.config);
+			dc_config_get_config_revision());
 
 	zabbix_log(LOG_LEVEL_TRACE, "  autoreg_tls_revision:" ZBX_FS_UI64, get_dc_config()->revision.autoreg_tls);
 
