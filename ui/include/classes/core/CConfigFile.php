@@ -406,7 +406,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			));
 		}
 
-		$flags[CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG] = array_keys(array_diff($type_flag, $media_types));
+		$flags[CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG] = array_keys(array_intersect($type_flag, $media_types));
 
 		return $flags;
 	}

@@ -32,7 +32,10 @@ class CFeatureFlagHelper {
 	}
 
 	public static function getSupportedMediaTypes(): array {
-		return APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
+		$types = [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK];
+		$media_type_denylist = APP::getConfig()['ZBX_FEATURE_FLAGS'][self::MEDIATYPES_FEATURE_FLAG];
+
+		return array_diff($types, $media_type_denylist);
 	}
 
 	public static function isFeatureFlagEnabled(string $type): bool {
