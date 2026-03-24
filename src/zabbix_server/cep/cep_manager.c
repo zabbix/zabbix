@@ -26,12 +26,9 @@
 #include "zbxmw.h"
 #include "zbxsupervisor_client.h"
 #include "zbxtimekeeper.h"
-#include "zbxlog.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxrtc.h"
-#include "zbxserialize.h"
-#include "zbxalgo.h"
 #include "zbxprof.h"
 #include "zbx_rtc_constants.h"
 #include "zbxthreads.h"
@@ -116,6 +113,10 @@ static zbx_cep_manager_t	*cep_manager_create(const zbx_thread_info_t *info, zbx_
 
 	manager = (zbx_cep_manager_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_manager_t));
 	workers = (zbx_cep_worker_t **)zbx_calloc(NULL, (size_t)CEP_WORKERS_MAX, sizeof(zbx_cep_worker_t));
+
+	for (int i = 0; i < CEP_WORKERS_MAX; i++)
+		workers[i] = cep_worker_create(dbpool);
+
 	queue = cep_queue_create();
 
 	zbx_vector_mw_task_ptr_create(&manager->commits);
@@ -163,7 +164,10 @@ static void	cep_manager_add_remote_task(zbx_cep_manager_t *manager, zbx_ipc_clie
 	zbx_mw_task_t	*task;
 
 	task = cep_create_task_remote(*client, *message, response, response_len);
+
+	zbx_mw_queue_lock(manager->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)manager->base.queue, task);
+	zbx_mw_queue_unlock(manager->base.queue);
 
 	*client = NULL;
 	*message = NULL;
@@ -258,7 +262,9 @@ static void	cep_manager_flush_commmits(zbx_cep_manager_t *manager)
 {
 	zbx_mw_task_t	*task = cep_create_task_commit(&manager->commits);
 
+	zbx_mw_queue_lock(manager->base.queue);
 	cep_queue_push((zbx_cep_queue_t *)manager->base.queue, task);
+	zbx_mw_queue_unlock(manager->base.queue);
 }
 
 /******************************************************************************
@@ -277,11 +283,10 @@ void	*zbx_cep_manager_thread(void *args)
 #define CEP_MANAGER_BATCH_LIMIT		1000
 #define CEP_MANAGER_FLUSH_TIMEOUT	1.0
 
-	char					*error = NULL, *process_title;
+	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
-	double					time_stat, time_idle = 0, time_timekeeper = 0, time_flush;
-	zbx_timespec_t				timeout = {CEP_MANAGER_DELAY_SEC, CEP_MANAGER_DELAY_NS};
+	double					time_stat, time_idle = 0, time_flush;
 	zbx_supervisor_unit_args_t		*unit_args = (zbx_supervisor_unit_args_t *)args;
 	const zbx_thread_info_t			*info = &unit_args->args.info;
 	int					server_num = info->server_num,
@@ -289,23 +294,16 @@ void	*zbx_cep_manager_thread(void *args)
 	unsigned char				process_type = info->process_type;
 	const zbx_thread_cep_manager_args_t	*cep_args = (const zbx_thread_cep_manager_args_t *)unit_args->args.args;
 	zbx_cep_manager_t			*manager;
-	sigjmp_buf				jmp_ret;
 	zbx_vector_mw_task_ptr_t		tasks;
-
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
-	zbx_set_log_component(process_title, unit_args->logger);
 
-	zbx_supervisor_update_activity("%s starting", process_title);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started", get_program_type_string(info->program_type), server_num);
+	zbx_supervisor_update_activity("%s starting", unit_args->name);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_vector_mw_task_ptr_create(&tasks);
 
@@ -396,7 +394,7 @@ void	*zbx_cep_manager_thread(void *args)
 		}
 	}
 
-	zbx_supervisor_update_activity("%s [terminating]", process_title);
+	zbx_supervisor_update_activity("%s [terminating]", unit_args->name);
 
 	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
 	if (SUCCEED != ZBX_EXIT_STATUS())
@@ -407,8 +405,7 @@ void	*zbx_cep_manager_thread(void *args)
 	zbx_deinit_regexp_env();
 	zbx_vector_mw_task_ptr_destroy(&tasks);
 
-	zbx_supervisor_update_activity("%s [terminated]", process_title);
-	zbx_free(process_title);
+	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 	zbx_free(args);
 
 #undef STAT_INTERVAL

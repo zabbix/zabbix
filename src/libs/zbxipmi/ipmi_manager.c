@@ -394,6 +394,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 
 		poller = manager->pollers.values[manager->next_poller_index++];
 		poller->client = client;
+		zbx_ipc_client_addref(poller->client);
 
 		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(zbx_ipmi_poller_t *));
 	}

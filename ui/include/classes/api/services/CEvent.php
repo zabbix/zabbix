@@ -679,8 +679,8 @@ class CEvent extends CApiService {
 			$db_acknowledges = DB::select('acknowledges', [
 				'output' => $this->outputExtend($output, ['acknowledgeid', 'eventid', 'userid']),
 				'filter' => ['eventid' => array_keys($result)],
-				'sortfield' => ['clock'],
-				'sortorder' => [ZBX_SORT_DOWN],
+				'sortfield' => ['clock', 'acknowledgeid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN],
 				'preservekeys' => true
 			]);
 

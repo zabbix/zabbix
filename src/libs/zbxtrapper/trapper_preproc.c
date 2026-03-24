@@ -302,47 +302,24 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 		if (0 == single)
 		{
 			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
-			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
-					value_type, &preproc_error))
+			if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				break;
-			}
-		}
+				if (FAIL == zbx_variant_to_value_type(&result->value, value_type, &preproc_error))
+					break;
 
-		if (ITEM_VALUE_TYPE_JSON == value_type)
-		{
-			char	*src_json_check;
+				/* for json value types check if the converted variant string is valid json */
+				if (ITEM_VALUE_TYPE_JSON == value_type)
+				{
+					if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->value.data.str))
+					{
+						preproc_error = zbx_strdup(NULL, "JSON is too large.");
+						break;
+					}
 
-			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
-
-			if (ZBX_VARIANT_JSON == result->value.type)
-			{
-				src_json_check = result->value.data.json;
+					if (FAIL == zbx_json_validate_ext(result->value.data.str, &preproc_error))
+						break;
+				}
 			}
-			else if (ZBX_VARIANT_STR == result->value.type)
-			{
-				src_json_check = result->value.data.str;
-			}
-			else if (ZBX_VARIANT_NONE == result->value.type)
-			{
-				break;
-			}
-			else
-			{
-				zabbix_log(LOG_LEVEL_CRIT, "unexpected result value type: %hhu for"
-						" ITEM_VALUE_TYPE_JSON value type", result->value.type);
-				THIS_SHOULD_NEVER_HAPPEN;
-				break;
-			}
-
-			if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(src_json_check))
-			{
-				preproc_error = zbx_strdup(NULL, "JSON is too large.");
-				break;
-			}
-
-			if (0 == zbx_json_validate_ext(src_json_check, &preproc_error))
-				break;
 		}
 	}
 

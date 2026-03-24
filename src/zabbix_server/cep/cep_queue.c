@@ -138,7 +138,7 @@ static int	cep_queue_task_limit_by_origin(const zbx_cep_origin_t *origin)
  *           group when the per-origin limit is reached.                      *
  *                                                                            *
  ******************************************************************************/
-static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_mw_task_t *task, const zbx_db_event *db_event)
+static void	cep_queue_push_event(zbx_cep_queue_t *queue, zbx_mw_task_t *task, const zbx_db_event *db_event)
 {
 	zbx_cep_task_group_t	pending_local = {
 						.origin = {
@@ -184,6 +184,8 @@ static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_mw_task_t *task,
  * Parameters: queue - [IN] queue instance                                    *
  *             task  - [IN] task to enqueue                                   *
  *                                                                            *
+ * Comments: The caller must hold the queue lock when calling this function.  *
+ *                                                                            *
  ******************************************************************************/
 void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 {
@@ -191,18 +193,16 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", __func__, task->type);
 
-	zbx_mw_queue_lock(&queue->base);
-
 	switch (task->type)
 	{
 		case CEP_TASK_REMOTE:
 			zbx_mw_queue_push_priority(&queue->base, task);
 			break;
 		case CEP_TASK_EVENT:
-			cep_queue_push_event_nl(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
+			cep_queue_push_event(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
 			break;
 		case CEP_TASK_CLOSE_EVENT:
-			cep_queue_push_event_nl(queue, task, ((zbx_cep_task_close_event_t *)task)->parent.db_event);
+			cep_queue_push_event(queue, task, ((zbx_cep_task_close_event_t *)task)->parent.db_event);
 			break;
 		default:
 			zbx_mw_queue_push_normal(&queue->base, task);
@@ -211,7 +211,6 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 
 	pending_num = queue->base.pending_num + queue->group_tasks_num;
 	zbx_mw_queue_notify(&queue->base);
-	zbx_mw_queue_unlock(&queue->base);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() queued:%d", __func__, pending_num);
 }
@@ -223,14 +222,14 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
  * Parameters: queue - [IN] queue instance                                    *
  *             tasks - [IN] vector of tasks to enqueue                        *
  *                                                                            *
+ * Comments: The caller must hold the queue lock when calling this function.  *
+ *                                                                            *
  ******************************************************************************/
 void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *tasks)
 {
 	int	pending_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
-
-	zbx_mw_queue_lock(&queue->base);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
@@ -242,10 +241,10 @@ void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *task
 				zbx_mw_queue_push_priority(&queue->base, task);
 				break;
 			case CEP_TASK_EVENT:
-				cep_queue_push_event_nl(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
+				cep_queue_push_event(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
 				break;
 			case CEP_TASK_CLOSE_EVENT:
-				cep_queue_push_event_nl(queue, task,
+				cep_queue_push_event(queue, task,
 						((zbx_cep_task_close_event_t *)task)->parent.db_event);
 				break;
 			default:
@@ -256,7 +255,6 @@ void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *task
 
 	pending_num = queue->base.pending_num + queue->group_tasks_num;
 	zbx_mw_queue_notify_all(&queue->base);
-	zbx_mw_queue_unlock(&queue->base);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() queued:%d", __func__, pending_num);
 }
@@ -346,4 +344,5 @@ void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() pending:%d finished:%d", __func__, queue->base.pending_num,
 			zbx_queue_ptr_values_num(&queue->base.completed));
 }
+
 

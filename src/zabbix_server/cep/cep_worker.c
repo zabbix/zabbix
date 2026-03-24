@@ -99,12 +99,18 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 
 	if (0 != events.values_num)
 	{
-		zbx_mw_queue_lock(worker->base.queue);
+		zbx_vector_mw_task_ptr_t	tasks;
+
+		zbx_vector_mw_task_ptr_create(&tasks);
 
 		for (int i = 0; i < events.values_num; i++)
-			zbx_mw_queue_push_normal(worker->base.queue, cep_create_task_event(events.values[i]));
+			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
 
+		zbx_mw_queue_lock(worker->base.queue);
+		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
 		zbx_mw_queue_unlock(worker->base.queue);
+
+		zbx_vector_mw_task_ptr_destroy(&tasks);
 	}
 
 	zbx_vector_db_event_destroy(&events);
@@ -128,8 +134,8 @@ static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_
 	t = cep_create_task_close_event(event, eventid, userid, 0);
 
 	zbx_mw_queue_lock(worker->base.queue);
-	zbx_mw_queue_push_normal(worker->base.queue, t);
-	zbx_mw_queue_unlock(worker->base.queue);
+	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);
+	zbx_mw_queue_lock(worker->base.queue);
 }
 
 /******************************************************************************
@@ -394,10 +400,7 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	if (0 != tasks.values_num)
 	{
 		zbx_mw_queue_lock(worker->base.queue);
-
-		for (int i = 0; i < tasks.values_num; i++)
-			zbx_mw_queue_push_normal(worker->base.queue, tasks.values[i]);
-
+		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
 		zbx_mw_queue_unlock(worker->base.queue);
 	}
 
@@ -760,10 +763,9 @@ void	*cep_worker_entry(void *args)
 #define CEP_RTC_OPEN_TIMEOUT	10
 
 	zbx_cep_worker_t	*worker = (zbx_cep_worker_t *)args;
-	char			component[ZBX_LOG_COMPONENT_NAME_LEN];
 	char			*error = NULL;
 
-	zbx_supervisor_update_activity("%s starting", component);
+	zbx_supervisor_update_activity("%s starting", worker->base.name);
 
 	zbx_init_regexp_env();
 
@@ -778,7 +780,7 @@ void	*cep_worker_entry(void *args)
 		worker->problem_export = zbx_problems_export_init("event-processor", worker->base.id);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
-	zbx_supervisor_update_activity("%s running", component);
+	zbx_supervisor_update_activity("%s running", worker->base.name);
 
 	zbx_mw_queue_lock(worker->base.queue);
 
@@ -836,9 +838,9 @@ void	*cep_worker_entry(void *args)
 	if (NULL != worker->problem_export)
 		zbx_export_deinit(worker->problem_export);
 
+	zbx_supervisor_update_activity("%s stopped", worker->base.name);
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
 
-	zbx_supervisor_update_activity("%s stopped", component);
 	return NULL;
 
 #undef CEP_RTC_OPEN_TIMEOUT

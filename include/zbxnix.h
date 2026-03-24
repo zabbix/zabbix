@@ -51,6 +51,8 @@ int	ZBX_EXIT_STATUS(void);
 int	ZBX_IS_NORMAL_EXIT(void);
 int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret);
 
+void	zbx_set_is_running(int (*is_running_func)(void *args), void *args);
+
 #define ZBX_THREAD_FAILURE	((void *)EXIT_FAILURE)
 
 #define ZBX_INIT_THREAD_OR_RETURN(jmp_ret)			\

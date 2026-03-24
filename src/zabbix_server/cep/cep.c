@@ -1507,7 +1507,7 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 {
 	/* WDN remove */
-	zabbix_increase_log_level();
+	int	log_level = zbx_set_log_level(LOG_LEVEL_DEBUG);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%seventid:" ZBX_FS_UI64, indent, event->eventid);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s  clock:%d ns:%d severity:%d refs:%u tags:",
@@ -1527,7 +1527,7 @@ static void	cep_dump_event(const char *indent, zbx_cep_event_t *event)
 	}
 
 	/* WDN remove */
-	zabbix_decrease_log_level();
+	zbx_set_log_level(log_level);
 }
 
 /******************************************************************************
@@ -1544,7 +1544,7 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 	zbx_cep_object_t	*obj;
 
 	/* WDN remove */
-	zabbix_increase_log_level();
+	int	log_level = zbx_set_log_level(LOG_LEVEL_DEBUG);
 
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		return;
@@ -1565,6 +1565,6 @@ void	cep_dump(zbx_cep_t *cep, const char *msg)
 	}
 
 	/* WDN remove */
-	zabbix_decrease_log_level();
+	zbx_set_log_level(log_level);
 }
 
