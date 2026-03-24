@@ -2891,6 +2891,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	}
 
 	/**
+	 * This test scenario is designed to check the requirement, that no element should be auto-selected on the broadcaster
+	 * widget when no listener widgets are present on the page.
+	 *
 	 * @dataProvider getNoListenersBroadcasterData
 	 *
 	 * @backupOnce !widget_field
@@ -2910,7 +2913,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			if ($broadcaster_type !== 'geomap') {
 				$this->assertFalse($broadcaster_widget->query('xpath:.//*[contains(@class, '.
 						CXPathHelper::escapeQuotes(self::SELECTED_CLASSES[$broadcaster_type]).')]')->one(false)->isValid(),
-						'Class "'.self::SELECTED_CLASSES[$broadcaster_type].'" was found on broadcaster with no listeners.'
+						'An element is unexpectedly selected in "'.$broadcaster.'" widget, which has no listeners.'
 				);
 			}
 			else {
@@ -3817,7 +3820,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 				case 'url':
 					if ($values === 'No data') {
-						$this->AssertEquals('No host selected.', $listener->query('tag:table')->one()->getText());
+						$this->assertEquals('No host selected.', $listener->query('tag:table')->one()->getText());
 					}
 					else {
 						$this->page->switchTo($listener->query('id:iframe')->one());
