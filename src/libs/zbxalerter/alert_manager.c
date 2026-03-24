@@ -2382,6 +2382,14 @@ static int	am_source_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	am_compare_source_stats_alerts_num_func(const void *d1, const void *d2)
+{
+	zbx_am_source_stats_t	*m1 = *(zbx_am_source_stats_t * const *)d1;
+	zbx_am_source_stats_t	*m2 = *(zbx_am_source_stats_t * const *)d2;
+
+	return m2->alerts_num - m1->alerts_num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: processes top alert sources by queued alerts                      *
@@ -2432,7 +2440,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 		}
 	}
 
-	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
+	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_source_stats_alerts_num_func);
 	sources_num = MIN(limit, view.values_num);
 
 	data_len = zbx_alerter_serialize_top_sources_result(&data, (zbx_am_source_stats_t **)view.values, sources_num);

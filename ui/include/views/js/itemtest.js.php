@@ -57,7 +57,16 @@
 			else {
 				['params_0', 'params_1', 'params_2'].forEach(function(name) {
 					const node = $preprocessing[0].querySelector(`input[name^="preprocessing[${num}][${name}]"]`);
-					node && !node.disabled && params.push(node.value);
+
+					if (node && !node.disabled) {
+						let value = node.value;
+
+						if (node.type === 'checkbox' && !node.checked) {
+							value = node.getAttribute('unchecked-value');
+						}
+
+						params.push(value)
+					}
 				});
 			}
 

@@ -775,17 +775,23 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 
 		// Check saved dashboard.
 		$form->waitUntilNotVisible();
+		$table = $this->query('class:list-table')->waitUntilVisible()->asTable()->one();
 		$dashboard->save();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Assert widget's table.
-		$dashboard->getWidget($data['fields']['Name'])->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$dashboard->getWidget($data['fields']['Name']);
+		$table->waitUntilReloaded();
 
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
 			if (CTestArrayHelper::get($row, 'Time')) {
-				$row['Time'] = date('H:i:s', self::$time);
+				// When the problem was created before midnight and the test runs after midnight,
+				// the widget displays the full date+time (Y-m-d H:i:s) instead of just the time (H:i:s).
+				// Use the appropriate format to match what the widget actually shows.
+				$row['Time'] = (date('Y-m-d', self::$time) !== date('Y-m-d'))
+					? date('Y-m-d H:i:s', self::$time)
+					: date('H:i:s', self::$time);
 			}
 			unset($row);
 		}
