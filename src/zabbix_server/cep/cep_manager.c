@@ -80,8 +80,6 @@ static void	cep_manager_free(zbx_cep_manager_t *manager)
 		}
 	}
 
-	zbx_timekeeper_free(manager->base.timekeeper);
-
 	cep_api_destroy();
 
 	zbx_vector_mw_task_ptr_clear_ext(&manager->commits, cep_task_free);
