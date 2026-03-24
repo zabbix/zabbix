@@ -61,7 +61,7 @@ const view = new class {
 		const confirm = this.#confirm_messages[urlparams.action];
 		const message = confirm ? confirm[data.deviceids.length > 1 ? 1 : 0] : '';
 
-		if (message != '' && !window.confirm(message)) {
+		if (!window.confirm(message)) {
 			return;
 		}
 

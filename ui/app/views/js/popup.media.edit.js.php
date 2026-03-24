@@ -75,19 +75,22 @@ window.media_edit_popup = new class {
 
 	#updateForm() {
 		const mediatypeid = this.#media_type.value;
+		const mediatype_type = mediatypeid in this.#mediatypes ? this.#mediatypes[mediatypeid].type : null;
+
 		if (mediatypeid in this.#mediatypes) {
 			document.getElementById('mediatype_type').setAttribute('value', this.#mediatypes[mediatypeid].type);
 		}
 
-		const is_type_email = mediatypeid in this.#mediatypes
-			&& this.#mediatypes[mediatypeid].type == <?= MEDIA_TYPE_EMAIL ?>;
-
 		for (const field of this.#form_element.querySelectorAll('.js-field-sendto')) {
-			field.style.display = is_type_email ? 'none' : '';
+			field.style.display = mediatype_type == <?= MEDIA_TYPE_EMAIL ?> ? 'none' : '';
+		}
+
+		for (const input of this.#form_element.querySelectorAll('.js-field-sendto input')) {
+			input.placeholder = mediatype_type == <?= MEDIA_TYPE_PUSH ?> ? '*' : '';
 		}
 
 		for (const field of this.#form_element.querySelectorAll('.js-field-sendto-emails')) {
-			field.style.display = is_type_email ? '' : 'none';
+			field.style.display = mediatype_type == <?= MEDIA_TYPE_EMAIL ?> ? '' : 'none';
 		}
 
 		if (mediatypeid in this.#mediatypes) {

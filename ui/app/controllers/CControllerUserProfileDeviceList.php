@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerUserDeviceList extends CController {
+class CControllerUserProfileDeviceList extends CController {
 
 	protected function init() {
 		$this->disableCsrfValidation();
@@ -22,11 +22,6 @@ class CControllerUserDeviceList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'filter_set' =>				'in 1',
-			'filter_rst' =>				'in 1',
-			'filter_userids' =>			'array_db users.userid',
-			'filter_roleids' =>			'array_db role.roleid',
-			'filter_usrgrpids' =>		'array_db users_groups.usrgrpid',
 			'sort' =>					'in name,uuid,created_at,lastaccess',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
@@ -42,35 +37,27 @@ class CControllerUserDeviceList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		// TODO: access check
+		if (CWebUser::isGuest() || !CWebUser::isLoggedIn()) {
+			return false;
+		}
+
+		// TODO: feature and permission check
 		return true;
 	}
 
 	private function getProfilePrefix(): string {
-		return 'web.user.device.list.';
+		return 'web.userprofile.device.list.';
 	}
 
 	protected function getProfileFilters(): array {
 		$prefix = $this->getProfilePrefix();
 
 		$filter = [
-			'filter_userids'				=> CProfile::getArray($prefix.'filter_userids', []),
-			'filter_roleids'				=> CProfile::getArray($prefix.'filter_roleids', []),
-			'filter_usrgrpids'				=> CProfile::getArray($prefix.'filter_usrgrpids', []),
-			'sort'							=> CProfile::get($prefix.'sort', 'lastaccess'),
-			'sortorder' 					=> CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
+			'sort'			=> CProfile::get($prefix.'sort', 'lastaccess'),
+			'sortorder'		=> CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
 		];
 
 		return $filter;
-	}
-
-	private function updateProfileFilters(): void {
-		$prefix = $this->getProfilePrefix();
-		CProfile::updateArray($prefix.'filter_userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
-		CProfile::updateArray($prefix.'filter_roleids', $this->getInput('filter_roleids', []), PROFILE_TYPE_ID);
-		CProfile::updateArray($prefix.'filter_usrgrpids', $this->getInput('filter_usrgrpids', []), PROFILE_TYPE_ID);
-
-		$this->updateProfileSort();
 	}
 
 	private function updateProfileSort(): void {
@@ -85,41 +72,8 @@ class CControllerUserDeviceList extends CController {
 		}
 	}
 
-	private function deleteProfileFilters(): void {
-		$prefix = $this->getProfilePrefix();
-
-		CProfile::deleteIdx($prefix.'filter_userids');
-		CProfile::deleteIdx($prefix.'filter_roleids');
-		CProfile::deleteIdx($prefix.'filter_usrgrpids');
-	}
-
 	private function getFilter(): array {
-		$filter = $this->getProfileFilters() + ['ms_users' => [], 'ms_roles' => [], 'ms_usrgrps' => []];
-
-		if ($filter['filter_userids']) {
-			$users = API::User()->get([
-				'output' => ['userid', 'username', 'name', 'surname'],
-				'userids' => $filter['filter_userids']
-			]);
-
-			foreach ($users as $user) {
-				$filter['ms_users'][] = ['id' => $user['userid'], 'name' => getUserFullname($user)];
-			}
-		}
-
-		if ($filter['filter_roleids']) {
-			$filter['ms_roles'] = CArrayHelper::renameObjectsKeys(API::Role()->get([
-				'output' => ['roleid', 'name'],
-				'roleids' => $filter['filter_roleids']
-			]), ['roleid' => 'id']);
-		}
-
-		if ($filter['filter_usrgrpids']) {
-			$filter['ms_usrgrps'] = CArrayHelper::renameObjectsKeys(API::UserGroup()->get([
-				'output' => ['usrgrpid', 'name'],
-				'usrgrpids' => $filter['filter_usrgrpids']
-			]), ['usrgrpid' => 'id']);
-		}
+		$filter = $this->getProfileFilters();
 
 		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
 				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
@@ -132,20 +86,9 @@ class CControllerUserDeviceList extends CController {
 
 	private function getDevices(array $filter): array {
 		$options = [
+			'userids' => CWebUser::$data['userid'],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
-
-		if ($filter['filter_userids']) {
-			$options['userids'] = $filter['filter_userids'];
-		}
-
-		if ($filter['filter_roleids']) {
-			$options['roleids'] = $filter['filter_roleids'];
-		}
-
-		if ($filter['filter_usrgrpids']) {
-			$options['usrgrpids'] = $filter['filter_usrgrpids'];
-		}
 
 		$devices = API::Device()->get($options);
 
@@ -157,16 +100,9 @@ class CControllerUserDeviceList extends CController {
 	}
 
 	protected function doAction(): void {
-		if ($this->hasInput('filter_set')) {
-			$this->updateProfileFilters();
-		}
-		elseif ($this->hasInput('filter_rst')) {
-			$this->deleteProfileFilters();
-		}
-
 		$page = $this->getInput('page', 1);
 		$filter = $this->getFilter();
-		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'user.device.list');
+		$view_url = (new CUrl('zabbix.php'))->setArgument('action', 'userprofile.device.list');
 		$devices = $this->getDevices($filter);
 		$paging = CPagerHelper::paginate($page, $devices, $filter['sortorder'], $view_url);
 

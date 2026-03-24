@@ -32,8 +32,13 @@ class CControllerPopupMediaCheck extends CController {
 			'mediaid' => ['db media.mediaid'],
 			'mediatypeid' => ['db media.mediatypeid', 'required'],
 			'mediatype_type' => ['integer', 'required'],
-			'sendto' => ['db media.sendto', 'not_empty',
-				'when' => ['mediatype_type', 'not_in' => [MEDIA_TYPE_EMAIL]]
+			'sendto' => [
+				['db media.sendto', 'required',
+					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_PUSH]]
+				],
+				['db media.sendto', 'required', 'not_empty',
+					'when' => ['mediatype_type', 'in' => [MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]]
+				]
 			],
 			'sendto_emails' => ['array', 'required', 'not_empty',
 				'field' => ['string'
@@ -114,11 +119,6 @@ class CControllerPopupMediaCheck extends CController {
 
 			$this->sendto_emails = $sendto_emails;
 		}
-		elseif ($this->getInput('sendto', '') === '') {
-			error(_s('Incorrect value for field "%1$s": %2$s.', 'sendto', _('cannot be empty')));
-
-			return false;
-		}
 
 		return true;
 	}
@@ -140,9 +140,6 @@ class CControllerPopupMediaCheck extends CController {
 		$data = [
 			'row_index' => $this->getInput('row_index'),
 			'mediatypeid' => $this->mediatype['mediatypeid'],
-			'sendto' => $this->mediatype['type'] == MEDIA_TYPE_EMAIL
-				? $this->sendto_emails
-				: $this->getInput('sendto'),
 			'period' => $this->getInput('period'),
 			'severity' => $severity,
 			'active' => $this->getInput('active', MEDIA_STATUS_DISABLED),
@@ -151,6 +148,16 @@ class CControllerPopupMediaCheck extends CController {
 			'mediatype_status' => $this->mediatype['status'],
 			'mediatype_type' => $this->mediatype['type']
 		];
+
+		if ($this->mediatype['type'] == MEDIA_TYPE_EMAIL) {
+			$data['sendto'] = $this->sendto_emails;
+		}
+		elseif ($this->mediatype['type'] == MEDIA_TYPE_PUSH) {
+			$data['sendto'] = $this->getInput('sendto') === '' ? '*' : $this->getInput('sendto');
+		}
+		else {
+			$data['sendto'] = $this->getInput('sendto');
+		}
 
 		if ($this->hasInput('mediaid')) {
 			$data['mediaid'] = $this->getInput('mediaid');

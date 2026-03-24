@@ -38,9 +38,10 @@ $deviceTable = (new CTableInfo())
 		(new CColHeader(
 			(new CCheckBox('all_items'))->onClick("checkAll('".$deviceForm->getName()."', 'all_items', 'g_deviceid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
-		make_sorting_header(_('Device name'), 'deviceid', $data['sort'], $data['sortorder'], $data['url']),
-		_('Linked'),
-		_('Last active'),
+		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Linked'), 'created_at', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		_('Action')
 	])
 	->setPageNavigation($data['paging']);
@@ -49,7 +50,8 @@ foreach ($data['devices'] as $device) {
 	$deviceTable->addRow([
 		(new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid'])),
 		$device['name'],
-		json_encode($device),
+		$device['uuid'],
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['created_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
 		(new CButton('', _('Unlink')))
 			->addClass(ZBX_STYLE_BTN_LINK)
@@ -81,7 +83,7 @@ $html_page
 	->show();
 
 $confirm_messages = [
-	'device.delete' => [_('Unlink selected device?'), _('Unlink selected devices?')]
+	'user.device.delete' => [_('Unlink selected device?'), _('Unlink selected devices?')]
 ];
 
 (new CScriptTag('
