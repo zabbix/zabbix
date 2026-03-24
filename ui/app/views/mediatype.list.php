@@ -193,7 +193,9 @@ foreach ($data['mediatypes'] as $media_type) {
 	$test_link = (new CButton('mediatypetest_edit', _('Test')))
 		->addClass(ZBX_STYLE_BTN_LINK)
 		->removeId()
-		->setEnabled(MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
+		->setEnabled(
+			$data['media_types_enabled'][$media_type['typeid']] && MEDIA_TYPE_STATUS_ACTIVE == $media_type['status']
+		)
 		->setAttribute('data-mediatypeid', $media_type['mediatypeid'])
 		->addClass('js-test-edit');
 

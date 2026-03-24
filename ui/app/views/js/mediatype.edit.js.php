@@ -22,7 +22,7 @@
 window.mediatype_edit_popup = new class {
 
 	init({rules, clone_rules, mediatype, message_templates, smtp_server_default, smtp_email_default,
-			oauth_defaults_by_provider}) {
+			oauth_defaults_by_provider, media_types_enabled}) {
 		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -36,6 +36,7 @@ window.mediatype_edit_popup = new class {
 		this.smtp_server_default = smtp_server_default;
 		this.smtp_email_default = smtp_email_default;
 		this.oauth_defaults_by_provider = oauth_defaults_by_provider;
+		this.media_types_enabled = media_types_enabled;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'mediatype.list');
@@ -473,9 +474,20 @@ window.mediatype_edit_popup = new class {
 	 * Toggles the "Add" button state and changes its text depending on already added message templates to the table.
 	 */
 	#toggleAddButton() {
-		const limit_reached = (
-			Object.keys(this.message_template_list).length == Object.keys(this.message_templates).length
-		);
+		const media_type = this.form.findFieldByName('type').getValue();
+
+		const remaining_templates = Object.values(this.message_templates).filter((template) => {
+			if (!template.media_types.find((type) => type == media_type)) {
+				return false;
+			}
+
+			const match = Object.values(this.message_template_list).find(el =>
+				el.eventsource == template.eventsource && el.recovery == template.recovery
+			);
+			return (match ? false : true)
+		});
+
+		const limit_reached = remaining_templates.length == 0;
 		const add_button = this.form_element.querySelector('#message-templates-footer .btn-link');
 
 		add_button.disabled = limit_reached;
@@ -512,6 +524,7 @@ window.mediatype_edit_popup = new class {
 			this.#hideFormFields('all');
 			this.#loadTypeFields(e);
 
+			this.form_element.querySelector('#status').disabled = !this.media_types_enabled[e.target.value];
 			this.form_element.querySelector('#smtp_authentication').dispatchEvent(new Event('change'));
 			this.form_element.querySelector('#smtp_security').dispatchEvent(new Event('change'));
 		};
@@ -618,6 +631,10 @@ window.mediatype_edit_popup = new class {
 					'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
 					'#webhook_event_menu_url_field'
 				];
+				break;
+
+			case <?= MEDIA_TYPE_PUSH ?>:
+				show_fields = ['#bridge_adapter_label', '#bridge_adapter_field'];
 				break;
 		}
 
@@ -885,7 +902,8 @@ window.mediatype_edit_popup = new class {
 				'#smtp-port-label', '#smtp-port-field', '#smtp-email-label', '#smtp-email-field', '#smtp-helo-label',
 				'#smtp-helo-field', '#smtp-security-label', '#smtp-security-field', '#verify-peer-label',
 				'#verify-peer-field', '#verify-host-label', '#verify-host-field', '#passwd_label', '#passwd_field',
-				'#smtp-authentication-label', '#smtp-authentication-field'
+				'#smtp-authentication-label', '#smtp-authentication-field',
+				'#bridge_adapter_label', '#bridge_adapter_field'
 			];
 		}
 		else if (type === 'all') {
@@ -900,7 +918,8 @@ window.mediatype_edit_popup = new class {
 				'#webhook_script_field', '#webhook_timeout_label', '#webhook_timeout_field', '#webhook_tags_label',
 				'#webhook_tags_field', '#webhook_event_menu_label', '#webhook_event_menu_field',
 				'#webhook_url_name_label', '#webhook_url_name_field', '#webhook_event_menu_url_label',
-				'#webhook_event_menu_url_field', '#oauth-token-label', '#oauth-token-field'
+				'#webhook_event_menu_url_field', '#oauth-token-label', '#oauth-token-field',
+				'#bridge_adapter_label', '#bridge_adapter_field'
 			];
 		}
 

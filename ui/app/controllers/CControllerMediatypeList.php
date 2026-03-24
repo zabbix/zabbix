@@ -76,7 +76,8 @@ class CControllerMediatypeList extends CController {
 			'sortorder' => $sort_order,
 			'filter' => $filter,
 			'profileIdx' => 'web.media_types.filter',
-			'active_tab' => CProfile::get('web.media_types.filter.active', 1)
+			'active_tab' => CProfile::get('web.media_types.filter.active', 1),
+			'media_types_enabled' => CMediatypeHelper::getMediaTypesEnabled()
 		];
 
 		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;

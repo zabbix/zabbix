@@ -451,6 +451,18 @@ $mediatype_form_grid
 				->setChecked($data['status'] == MEDIA_TYPE_STATUS_ACTIVE)
 				->setUncheckedValue(MEDIA_TYPE_STATUS_DISABLED)
 		)
+	])
+	->addItem([
+		(new CLabel([
+			_('Bridge adapter connection'),
+			makeHelpIcon(_('Bridge Adapter connection details can be found in Zabbix configuration file.'))
+		]))
+			->setId('bridge_adapter_label'),
+		(new CFormField(
+			CTemporaryMobileFeatureHelper::isConfigured() ? _('Configured') : _('Not configured')
+		))
+			->setId('bridge_adapter_field')
+			->addClass(CTemporaryMobileFeatureHelper::isConfigured() ? ZBX_STYLE_GREEN : ZBX_STYLE_RED)
 	]);
 
 $message_template = (new CTemplateTag('message-templates-row-tmpl'))
@@ -574,18 +586,7 @@ $email_defaults =  CMediatypeHelper::getEmailProviders(CMediatypeHelper::EMAIL_P
 // Append tabs to form.
 $form
 	->addItem($tabs)
-	->addItem($parameters_exec_template)
-	->addItem(
-		(new CScriptTag('mediatype_edit_popup.init('.json_encode([
-			'rules' => $data['js_validation_rules'],
-			'clone_rules' => $data['js_clone_validation_rules'],
-			'mediatype' => $data,
-			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
-			'smtp_server_default' => $email_defaults['smtp_server'],
-			'smtp_email_default' =>  $email_defaults['smtp_email'],
-			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider()
-		]).');'))->setOnDocumentReady()
-	);
+	->addItem($parameters_exec_template);
 
 if ($data['mediatypeid']) {
 	$buttons = [
@@ -625,7 +626,19 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::ALERTS_MEDIATYPE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('mediatype.edit.js.php').
+		'mediatype_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'mediatype' => $data,
+			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
+			'smtp_server_default' => $email_defaults['smtp_server'],
+			'smtp_email_default' =>  $email_defaults['smtp_email'],
+			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider(),
+			'media_types_enabled' => CMediatypeHelper::getMediaTypesEnabled()
+		]).');'
+	,
 	'dialogue_class' => 'modal-popup-static'
 ];
 

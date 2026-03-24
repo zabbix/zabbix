@@ -223,9 +223,14 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 			'description' => ['db media_type.description'],
 			'status' =>	['db media_type.status', 'in' => [MEDIA_TYPE_STATUS_ACTIVE, MEDIA_TYPE_STATUS_DISABLED]],
 			'message_templates' => ['objects', 'uniq' => ['eventsource', 'recovery'], 'fields' => [
-				'eventsource' => ['db media_type_message.eventsource', 'required',
-					'in' => [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
-						EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+				'eventsource' => [
+					['db media_type_message.eventsource', 'required',
+						'in' => [EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION,
+							EVENT_SOURCE_INTERNAL, EVENT_SOURCE_SERVICE
+						]
+					],
+					['db media_type_message.eventsource', 'required', 'in' => [EVENT_SOURCE_TRIGGERS],
+						'when' => ['../type', 'in' => [MEDIA_TYPE_PUSH]]
 					]
 				],
 				'recovery' => [

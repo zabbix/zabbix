@@ -59,14 +59,31 @@ class CControllerMediatypeEnable extends CController {
 			'preservekeys' => true
 		]);
 
+		$push_mediatypes = API::MediaType()->get([
+			'output' => ['name'],
+			'mediatypeids' => $mediatypeids,
+			'filter' => [
+				'type' => MEDIA_TYPE_PUSH,
+				'status' => MEDIA_TYPE_STATUS_DISABLED
+			],
+			'preservekeys' => true
+		]);
+
 		$mediatypes = [];
 		$incomplete_configurations = [];
+		$bridge_disabled_configurations = [];
 
 		foreach ($mediatypeids as $mediatypeid) {
 			if (array_key_exists($mediatypeid, $email_providers) && $email_providers[$mediatypeid]['passwd'] === '') {
 				$incomplete_configurations[] = $email_providers[$mediatypeid]['name'];
 				continue;
 			}
+
+			if (array_key_exists($mediatypeid, $push_mediatypes) && !CTemporaryMobileFeatureHelper::isConfigured()) {
+				$bridge_disabled_configurations[] = $push_mediatypes[$mediatypeid]['name'];
+				continue;
+			}
+
 			$mediatypes[] = [
 				'mediatypeid' => $mediatypeid,
 				'status' => MEDIA_TYPE_STATUS_ACTIVE
@@ -78,16 +95,22 @@ class CControllerMediatypeEnable extends CController {
 		$output = [];
 
 		if ($result) {
+			$output['success'] = [
+				'title' => _n('Media type enabled', 'Media types enabled', $updated),
+				'messages' => []
+			];
+
 			if ($incomplete_configurations) {
-				$output['success']['title'] = _s('%1$s. %2$s: %3$s. %4$s.',
-					_n('Media type enabled', 'Media types enabled', $updated),
-					_('Not enabled'),
-					implode(', ', $incomplete_configurations),
-					_('Incomplete configuration')
+				$output['success']['messages'][] = _s(
+					'%1$s: %2$s', _('Incomplete configuration'), implode(', ', $incomplete_configurations)
 				);
 			}
-			else {
-				$output['success']['title'] = _n('Media type enabled', 'Media types enabled', $updated);
+
+			if ($bridge_disabled_configurations) {
+				$output['success']['messages'][] = _s(
+					'%1$s: %2$s', _('Zabbix bridge must be configured to enable push notifications'),
+					implode(', ', $bridge_disabled_configurations)
+				);
 			}
 		}
 		else {
@@ -99,6 +122,13 @@ class CControllerMediatypeEnable extends CController {
 			if ($incomplete_configurations) {
 				$output['error']['messages'][] = _s(
 					'%1$s: %2$s', _('Incomplete configuration'), implode(', ', $incomplete_configurations)
+				);
+			}
+
+			if ($bridge_disabled_configurations) {
+				$output['error']['messages'][] = _s(
+					'%1$s: %2$s', _('Zabbix bridge must be configured to enable push notifications'),
+					implode(', ', $bridge_disabled_configurations)
 				);
 			}
 		}
