@@ -165,12 +165,16 @@ class CForm {
 	}
 
 	getAllValues() {
-		const fields = {};
+		const fields = Object.create(null);
 
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
 
-			const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
+			if (field.isDisabled()) {
+				continue;
+			}
+
+			const key_parts = [...key.matchAll(/[^\[\]]+/g)];
 
 			let key_fields = fields;
 
@@ -179,23 +183,19 @@ class CForm {
 
 				if (i === key_parts.length - 1) {
 					if (typeof field.getExtraFields === 'function') {
-						if (!field.isDisabled()) {
-							for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-								key_fields[extra_key] = values;
-							}
+						for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
+							key_fields[extra_key] = values;
 						}
 					}
 					else {
-						if (!field.isDisabled()) {
-							key_fields[key_part] = field.getValueTrimmed();
-						}
+						key_fields[key_part] = field.getValueTrimmed();
 					}
 
 					break;
 				}
 
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = {};
+				if (!Object.hasOwn(key_fields, key_part)) {
+					key_fields[key_part] = Object.create(null);
 				}
 
 				key_fields = key_fields[key_part];
