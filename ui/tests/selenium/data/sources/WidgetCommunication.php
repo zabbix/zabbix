@@ -288,9 +288,9 @@ class WidgetCommunication {
 						'selementid' => 1,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
 						'elements' => [
-							['groupid' => $host_groupids[self::FIRST_HOSTGROUP_NAME]]
+							['groupid' => $host_groupids[self::THIRD_HOSTGROUP_NAME]]
 						],
-						'label' => self::FIRST_HOSTGROUP_NAME,
+						'label' => self::THIRD_HOSTGROUP_NAME,
 						'iconid_off' => 136, // SAN_(96) element icon.
 						'x' => 50,
 						'y' => 30,
@@ -314,9 +314,9 @@ class WidgetCommunication {
 						'selementid' => 3,
 						'elementtype' => SYSMAP_ELEMENT_TYPE_HOST_GROUP,
 						'elements' => [
-							['groupid' => $host_groupids[self::THIRD_HOSTGROUP_NAME]]
+							['groupid' => $host_groupids[self::FIRST_HOSTGROUP_NAME]]
 						],
-						'label' => self::THIRD_HOSTGROUP_NAME,
+						'label' => self::FIRST_HOSTGROUP_NAME,
 						'iconid_off' => 136, // SAN_(96) element icon.
 						'x' => 340,
 						'y' => 30,

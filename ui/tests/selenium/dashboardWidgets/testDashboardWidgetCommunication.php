@@ -398,84 +398,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				[
 					'page' => 'Hostgroups page',
 					'broadcaster' => 'Map hostgroup broadcaster',
-					'autoselected' => self::FIRST_HOSTGROUP_NAME,
-					'expected' => [
-						'Data overview listener' => [
-							'Hosts' => self::FIRST_HOST_NAME,
-							'Trapper item' => '3'
-						],
-						'Geomap listener' => [
-							self::GEOMAP_FILTERED_ICON_INDEX => [
-								'Host' => self::FIRST_HOST_NAME,
-								'I' => '1'
-							]
-						],
-						'Honeycomb listener' => [
-							self::FIRST_HOST_NAME => 3
-						],
-						'Host availability listener' => [
-							'Total Hosts' => [
-								'Unknown' => '1',
-								'Total' => '1'
-							],
-							'Agent (passive)' => [
-								'Unknown' => '1',
-								'Total' => '1'
-							],
-							'JMX' => [
-								'Unknown' => '0',
-								'Total' => '0'
-							],
-							'IPMI' => [
-								'Unknown' => '0',
-								'Total' => '0'
-							]
-						],
-						'Problem hosts listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
-							'With problems' => '1',
-							'Total' => '1'
-						],
-						'Problems by severity listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
-							'Information' => '1'
-						],
-						'Top hosts listener' => [
-							'Hostname' => self::FIRST_HOST_NAME,
-							'Item value' => '3.00'
-						],
-						'Trigger overview listener' => [
-							'triggers' => [self::FIRST_HOST_TRIGGER],
-							'headers' => ['Triggers', self::FIRST_HOST_NAME]
-						],
-						'Web monitoring listener' => [
-							'Host group' => self::FIRST_HOSTGROUP_NAME,
-							'Unknown' => '1'
-						],
-						'Host navigator listener' => [
-							self::FIRST_HOST_NAME => [
-								'severity' => 'info',
-								'count' => 1
-							]
-						],
-						'Item navigator listener' => [
-							self::FIRST_HOST_NAME => [
-								'severity' => 'info',
-								'count' => 1
-							]
-						],
-						'Problems listener' => [
-							'Host' => self::FIRST_HOST_NAME,
-							'Problem • Severity' => self::FIRST_HOST_TRIGGER
-						]
-					]
-				]
-			],
-			'Broadcasting hostgroups from map - initial selection' => [
-				[
-					'page' => 'Hostgroups page',
-					'broadcaster' => 'Map hostgroup broadcaster',
-					'select_element' => self::THIRD_HOSTGROUP_NAME,
+					'autoselected' => self::THIRD_HOSTGROUP_NAME,
 					'expected' => [
 						'Data overview listener' => [
 							'Hosts' => self::THIRD_HOST_NAME,
@@ -544,6 +467,83 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Problems listener' => [
 							'Host' => self::THIRD_HOST_NAME,
 							'Problem • Severity' => self::THIRD_HOST_TRIGGER
+						]
+					]
+				]
+			],
+			'Broadcasting hostgroups from map - initial selection' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcaster' => 'Map hostgroup broadcaster',
+					'select_element' => self::FIRST_HOSTGROUP_NAME,
+					'expected' => [
+						'Data overview listener' => [
+							'Hosts' => self::FIRST_HOST_NAME,
+							'Trapper item' => '3'
+						],
+						'Geomap listener' => [
+							self::GEOMAP_FILTERED_ICON_INDEX => [
+								'Host' => self::FIRST_HOST_NAME,
+								'I' => '1'
+							]
+						],
+						'Honeycomb listener' => [
+							self::FIRST_HOST_NAME => 3
+						],
+						'Host availability listener' => [
+							'Total Hosts' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'Agent (passive)' => [
+								'Unknown' => '1',
+								'Total' => '1'
+							],
+							'JMX' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							],
+							'IPMI' => [
+								'Unknown' => '0',
+								'Total' => '0'
+							]
+						],
+						'Problem hosts listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'With problems' => '1',
+							'Total' => '1'
+						],
+						'Problems by severity listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Information' => '1'
+						],
+						'Top hosts listener' => [
+							'Hostname' => self::FIRST_HOST_NAME,
+							'Item value' => '3.00'
+						],
+						'Trigger overview listener' => [
+							'triggers' => [self::FIRST_HOST_TRIGGER],
+							'headers' => ['Triggers', self::FIRST_HOST_NAME]
+						],
+						'Web monitoring listener' => [
+							'Host group' => self::FIRST_HOSTGROUP_NAME,
+							'Unknown' => '1'
+						],
+						'Host navigator listener' => [
+							self::FIRST_HOST_NAME => [
+								'severity' => 'info',
+								'count' => 1
+							]
+						],
+						'Item navigator listener' => [
+							self::FIRST_HOST_NAME => [
+								'severity' => 'info',
+								'count' => 1
+							]
+						],
+						'Problems listener' => [
+							'Host' => self::FIRST_HOST_NAME,
+							'Problem • Severity' => self::FIRST_HOST_TRIGGER
 						]
 					]
 				]
@@ -1744,7 +1744,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				[
 					'page' => 'Hosts page',
 					'broadcaster' => 'Map host broadcaster',
-					'autoselected' => self::FIRST_HOSTGROUP_NAME
+					'autoselected' => self::THIRD_HOSTGROUP_NAME
 				]
 			],
 			'Broadcasting hosts from map widget - initial selection' => [
@@ -2980,12 +2980,12 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					],
 					'select' => [
 						'widget' => 'new',
-						'element' => self::FIRST_HOST_NAME
+						'element' => self::THIRD_HOST_NAME
 					],
 					'expected' => [
 						'Problems host listener' => [
-							'Host' => self::FIRST_HOST_NAME,
-							'Problem • Severity' => self::FIRST_HOST_TRIGGER
+							'Host' => self::THIRD_HOST_NAME,
+							'Problem • Severity' => self::THIRD_HOST_TRIGGER
 						]
 					]
 				]
