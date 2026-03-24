@@ -61,7 +61,7 @@ static void	zabbix_log_stub(int level, const char *fmt, va_list args)
 
 void	zbx_mock_test_entry(void **state)
 {
-	void	*old = NULL, *result;
+	void	*old = zbx_malloc(NULL, 10), *result;
 	size_t	in_size = zbx_mock_get_parameter_uint64("in.size");
 
 	ZBX_UNUSED(state);
