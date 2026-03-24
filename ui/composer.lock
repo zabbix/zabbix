@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eacd757f8c21b3585fa84b89e2f0f3b8",
+    "content-hash": "83dd6d89a6f02b88492095d6251d0b84",
     "packages": [
         {
             "name": "duosecurity/duo_universal_php",
@@ -613,5 +613,5 @@
     "prefer-lowest": false,
     "platform": [],
     "platform-dev": [],
-    "plugin-api-version": "2.6.0"
+    "plugin-api-version": "2.3.0"
 }
