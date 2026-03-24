@@ -55,6 +55,7 @@ DIST_SUBDIRS = \
 	zbxmedia \
 	zbxmodules \
 	zbxmutexs \
+	zbxmw \
 	zbxnix \
 	zbxnum \
 	zbxodbc \
@@ -209,6 +210,7 @@ PROXY_SUBDIRS = \
 	zbxip \
 	zbxipcservice \
 	zbxkvs \
+	zbxmw \
 	zbxnum \
 	zbxodbc \
 	zbxparam \
