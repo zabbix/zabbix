@@ -2466,9 +2466,9 @@ function generateUuidV4($seed = '') {
 /**
  * Generate UUID version 7 (non-monotonic when resolving multiple IDs within 1 millisecond).
  *
- * @return string
+ * @param bool $canonical_format  Switch the output format to canonical (with hyphens).
  */
-function generateUuidV7() {
+function generateUuidV7(bool $canonical_format = false): string {
 	// 48 bit
 	$unix_timestamp = (int) floor(microtime(true) * 1000);
 
@@ -2484,17 +2484,23 @@ function generateUuidV7() {
 	$data = $time_data.random_bytes(10);
 
 	// Set version: 7th byte to 0111 (0111xxxx)
-	$data[6] = chr((ord($data[6]) & 0x0f) | 0x70);
+	$data[6] = chr(ord($data[6]) & 0x0f | 0x70);
 
 	// Set variant: 9th byte to 10 (10xxxxxx)
-	$data[8] = chr((ord($data[8]) & 0x3f) | 0x80);
+	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
-	return vsprintf('%s-%s-%s-%s-%s', [
-		bin2hex(substr($data, 0, 4)),
-		bin2hex(substr($data, 4, 2)),
-		bin2hex(substr($data, 6, 2)),
-		bin2hex(substr($data, 8, 2)),
-		bin2hex(substr($data, 10, 6)),
+	$hex_data = bin2hex($data);
+
+	if (!$canonical_format) {
+		return $hex_data;
+	}
+
+	return implode('-', [
+		substr($hex_data, 0, 8),
+		substr($hex_data, 8, 4),
+		substr($hex_data, 12, 4),
+		substr($hex_data, 16, 4),
+		substr($hex_data, 20, 12),
 	]);
 }
 
