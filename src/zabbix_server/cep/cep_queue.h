@@ -15,26 +15,19 @@
 #ifndef ZABBIX_CEP_QUEUE_H
 #define ZABBIX_CEP_QUEUE_H
 
-#include "cep_task.h"
+#include "zbxmw.h"
 
 typedef struct zbx_cep_queue zbx_cep_queue_t;
 
-zbx_cep_queue_t	*cep_queue_create(char **error);
-void	cep_queue_destroy(zbx_cep_queue_t *queue);
+zbx_cep_queue_t	*cep_queue_create(void);
+void	cep_queue_clear(zbx_cep_queue_t *queue);
 
 void	cep_queue_lock(zbx_cep_queue_t *queue);
 void	cep_queue_unlock(zbx_cep_queue_t *queue);
 
-void	cep_queue_push(zbx_cep_queue_t *queue, zbx_cep_task_t *task);
-void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_cep_task_ptr_t *tasks);
-void	cep_queue_push_finished_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task);
-void	cep_queue_push_finished_direct(zbx_cep_queue_t *queue, zbx_cep_task_t *task);
-zbx_cep_task_t	*cep_queue_pop_nl(zbx_cep_queue_t *queue);
-
-int	cep_queue_wait(zbx_cep_queue_t *queue, char **error);
-void	cep_queue_notify(zbx_cep_queue_t *queue);
-void	cep_queue_notify_all(zbx_cep_queue_t *queue);
-int	cep_queue_pop_finished(zbx_cep_queue_t *queue, zbx_vector_cep_task_ptr_t *tasks);
+void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task);
+void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *tasks);
+void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task);
 
 #endif
 

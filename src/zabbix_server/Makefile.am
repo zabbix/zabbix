@@ -80,6 +80,7 @@ zabbix_server_LDADD = \
 	ha/libzbxha.a \
 	pgmanager/libzbxpgmanager.a \
 	cep/libzbxcep.a \
+	$(top_builddir)/src/libs/zbxmw/libzbxmw.a \
 	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \

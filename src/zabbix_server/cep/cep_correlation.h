@@ -15,7 +15,7 @@
 #ifndef ZABBIX_CEP_CORRELATION_H
 #define ZABBIX_CEP_CORRELATION_H
 
-#include "cep_task.h"
+#include "zbxmw.h"
 #include "zbxdbhigh.h"
 
 #define CORRELATION_RESULT_NONE		0x00
@@ -23,6 +23,6 @@
 #define CORRELATION_RESULT_CLOSE_OLD	0x02
 
 int	cep_correlate_db_event(const zbx_db_event *db_event, zbx_dbconn_pool_t *dbpool,
-		zbx_vector_cep_task_ptr_t *tasks);
+		zbx_vector_mw_task_ptr_t *tasks);
 
 #endif

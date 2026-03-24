@@ -31,8 +31,6 @@
 #define ZBX_CEP_UPDATE_SEVERITIES	(ZBX_IPC_RTC_MAX + 7)
 #define ZBX_CEP_ADD_EVENT_TAGS		(ZBX_IPC_RTC_MAX + 8)
 #define ZBX_CEP_DELETE_EVENTS		(ZBX_IPC_RTC_MAX + 9)
-#define ZBX_CEP_GET_WORKERS_NUM		(ZBX_IPC_RTC_MAX + 10)
-#define ZBX_CEP_GET_USAGE_STATS		(ZBX_IPC_RTC_MAX + 11)
 typedef enum
 {
 	CEP_EVENT_ALLOW,
@@ -103,10 +101,6 @@ void	zbx_buffer_serialize_event_tags(unsigned char **data, zbx_uint32_t *data_al
 
 void	zbx_cep_send_deleted_events(const zbx_uint64_t *eventids, int eventids_num);
 void	zbx_cep_deserialize_ids(const unsigned char *data, zbx_vector_uint64_t *ids);
-
-int	zbx_cep_get_workers_num(int *workers_num, char **error);
-int	zbx_cep_get_usage_stats(zbx_vector_dbl_t *usage, int *count, char **error);
-zbx_uint32_t	zbx_cep_serialize_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 
 #endif
 

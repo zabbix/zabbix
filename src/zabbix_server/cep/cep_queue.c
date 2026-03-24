@@ -20,6 +20,7 @@
 #include "zbxalgo.h"
 #include "zbxcommon.h"
 #include "zbxdbhigh.h"
+#include "zbxmw.h"
 
 typedef struct
 {
@@ -31,24 +32,15 @@ zbx_cep_task_group_t;
 
 struct zbx_cep_queue
 {
-	/* requests from other processes containing IPC messages, have priority over locally generated tasks */
-	zbx_queue_ptr_t	remote;
-
-	/* locally created tasks for processing */
-	zbx_queue_ptr_t	local;
-
-	/* tasks that have completed processing */
-	zbx_queue_ptr_t	finished;
+	/* remote requests (IPC messages) will be queued as priority tasks */
+	zbx_mw_queue_t	base;
 
 	/* pending tasks grouped by event origin (source, object, objectid), each group enforcing */
-	/* a limit on parallel tasks with excess tasks stored as pending in the group             */
 	zbx_hashset_t	groups;
+	/* a limit on parallel tasks with excess tasks stored as pending in the group             */
 
-	/* total number of pending tasks in remote and local queues plus pending tasks in groups */
-	int		pending_num;
-
-	pthread_mutex_t	lock;
-	pthread_cond_t	alarm;
+	/* number of pending tasks in groups */
+	int		group_tasks_num;
 };
 
 /******************************************************************************
@@ -59,9 +51,9 @@ struct zbx_cep_queue
 static void	cep_task_group_clear(void *d)
 {
 	zbx_cep_task_group_t	*group = (zbx_cep_task_group_t *)d;
-	zbx_cep_task_t		*task;
+	zbx_mw_task_t		*task;
 
-	while (NULL != (task = (zbx_cep_task_t *)zbx_queue_ptr_pop(&group->tasks)))
+	while (NULL != (task = (zbx_mw_task_t *)zbx_queue_ptr_pop(&group->tasks)))
 		cep_task_free(task);
 
 	zbx_queue_ptr_destroy(&group->tasks);
@@ -84,46 +76,19 @@ static int	cep_task_group_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create queue instance                                             *
- *                                                                            *
- * Parameters: error - [OUT] error message in case of failure                 *
- *                                                                            *
- * Return value: pointer to newly created queue instance or NULL on failure   *
+ * Purpose: initialize queue instance                                         *
  *                                                                            *
  ******************************************************************************/
-zbx_cep_queue_t	*cep_queue_create(char **error)
+zbx_cep_queue_t	*cep_queue_create(void)
 {
 	zbx_cep_queue_t	*queue;
-	int		err;
 
-	queue = (zbx_cep_queue_t *)zbx_malloc(NULL, sizeof(zbx_cep_queue_t));
-
-	if (0 != (err = pthread_mutex_init(&queue->lock, NULL)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize CEP task queue mutex: %s", zbx_strerror(err));
-		zbx_free(queue);
-
-		return NULL;
-	}
-
-	if (0 != (err = pthread_cond_init(&queue->alarm, NULL)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot initialize CEP task queue conditional variable: %s",
-			zbx_strerror(err));
-		pthread_mutex_destroy(&queue->lock);
-		zbx_free(queue);
-
-		return NULL;
-	}
-
-	zbx_queue_ptr_create(&queue->remote);
-	zbx_queue_ptr_create(&queue->local);
-	zbx_queue_ptr_create(&queue->finished);
+	queue = (zbx_cep_queue_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_queue_t));
 
 	zbx_hashset_create_ext(&queue->groups, 100, cep_task_group_hash, cep_task_group_compare, cep_task_group_clear,
 		ZBX_DEFAULT_MEM_MALLOC_FUNC, ZBX_DEFAULT_MEM_REALLOC_FUNC, ZBX_DEFAULT_MEM_FREE_FUNC);
 
-	queue->pending_num = 0;
+	queue->group_tasks_num = 0;
 
 	return queue;
 }
@@ -133,41 +98,9 @@ zbx_cep_queue_t	*cep_queue_create(char **error)
  * Purpose: destroy queue instance and free all associated resources          *
  *                                                                            *
  ******************************************************************************/
-void	cep_queue_destroy(zbx_cep_queue_t *queue)
+void	cep_queue_clear(zbx_cep_queue_t *queue)
 {
-	zbx_cep_task_t	*task;
-
 	zbx_hashset_destroy(&queue->groups);
-
-	while (NULL != (task = (zbx_cep_task_t *)zbx_queue_ptr_pop(&queue->remote)))
-		cep_task_free(task);
-
-	zbx_queue_ptr_destroy(&queue->remote);
-
-	while (NULL != (task = (zbx_cep_task_t *)zbx_queue_ptr_pop(&queue->local)))
-		cep_task_free(task);
-
-	zbx_queue_ptr_destroy(&queue->local);
-
-	while (NULL != (task = (zbx_cep_task_t *)zbx_queue_ptr_pop(&queue->finished)))
-		cep_task_free(task);
-
-	zbx_queue_ptr_destroy(&queue->finished);
-
-	pthread_mutex_destroy(&queue->lock);
-	pthread_cond_destroy(&queue->alarm);
-
-	zbx_free(queue);
-}
-
-void	cep_queue_lock(zbx_cep_queue_t *queue)
-{
-	pthread_mutex_lock(&queue->lock);
-}
-
-void	cep_queue_unlock(zbx_cep_queue_t *queue)
-{
-	pthread_mutex_unlock(&queue->lock);
 }
 
 /******************************************************************************
@@ -205,7 +138,7 @@ static int	cep_queue_task_limit_by_origin(const zbx_cep_origin_t *origin)
  *           group when the per-origin limit is reached.                      *
  *                                                                            *
  ******************************************************************************/
-static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task, const zbx_db_event *db_event)
+static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_mw_task_t *task, const zbx_db_event *db_event)
 {
 	zbx_cep_task_group_t	pending_local = {
 						.origin = {
@@ -230,7 +163,7 @@ static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task
 
 	if (group->processing_num < cep_queue_task_limit_by_origin(&group->origin))
 	{
-		zbx_queue_ptr_push(&queue->local, task);
+		zbx_mw_queue_push_normal(&queue->base, task);
 		group->processing_num++;
 		pending_num = 0;
 	}
@@ -238,6 +171,7 @@ static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task
 	{
 		zbx_queue_ptr_push(&group->tasks, task);
 		pending_num = zbx_queue_ptr_values_num(&group->tasks);
+		queue->group_tasks_num++;
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() pending:%d", __func__, pending_num);
@@ -251,18 +185,18 @@ static void	cep_queue_push_event_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task
  *             task  - [IN] task to enqueue                                   *
  *                                                                            *
  ******************************************************************************/
-void	cep_queue_push(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
+void	cep_queue_push(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 {
 	int	pending_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", __func__, task->type);
 
-	pthread_mutex_lock(&queue->lock);
+	zbx_mw_queue_lock(&queue->base);
 
 	switch (task->type)
 	{
 		case CEP_TASK_REMOTE:
-			zbx_queue_ptr_push(&queue->remote, task);
+			zbx_mw_queue_push_priority(&queue->base, task);
 			break;
 		case CEP_TASK_EVENT:
 			cep_queue_push_event_nl(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
@@ -271,13 +205,13 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
 			cep_queue_push_event_nl(queue, task, ((zbx_cep_task_close_event_t *)task)->parent.db_event);
 			break;
 		default:
-			zbx_queue_ptr_push(&queue->local, task);
+			zbx_mw_queue_push_normal(&queue->base, task);
 			break;
 	}
 
-	pending_num = ++queue->pending_num;
-	cep_queue_notify(queue);
-	pthread_mutex_unlock(&queue->lock);
+	pending_num = queue->base.pending_num + queue->group_tasks_num;
+	zbx_mw_queue_notify(&queue->base);
+	zbx_mw_queue_unlock(&queue->base);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() queued:%d", __func__, pending_num);
 }
@@ -290,22 +224,22 @@ void	cep_queue_push(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
  *             tasks - [IN] vector of tasks to enqueue                        *
  *                                                                            *
  ******************************************************************************/
-void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_cep_task_ptr_t *tasks)
+void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_mw_task_ptr_t *tasks)
 {
 	int	pending_num;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
-	pthread_mutex_lock(&queue->lock);
+	zbx_mw_queue_lock(&queue->base);
 
 	for (int i = 0; i < tasks->values_num; i++)
 	{
-		zbx_cep_task_t	*task = tasks->values[i];
+		zbx_mw_task_t	*task = tasks->values[i];
 
 		switch (task->type)
 		{
 			case CEP_TASK_REMOTE:
-				zbx_queue_ptr_push(&queue->remote, task);
+				zbx_mw_queue_push_priority(&queue->base, task);
 				break;
 			case CEP_TASK_EVENT:
 				cep_queue_push_event_nl(queue, task, ((zbx_cep_task_event_t *)task)->db_event);
@@ -315,15 +249,14 @@ void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_cep_task_ptr_t *tas
 						((zbx_cep_task_close_event_t *)task)->parent.db_event);
 				break;
 			default:
-				zbx_queue_ptr_push(&queue->local, task);
+				zbx_mw_queue_push_normal(&queue->base, task);
 				break;
 		}
 	}
 
-	queue->pending_num += tasks->values_num;
-	pending_num = queue->pending_num;
-	cep_queue_notify_all(queue);
-	pthread_mutex_unlock(&queue->lock);
+	pending_num = queue->base.pending_num + queue->group_tasks_num;
+	zbx_mw_queue_notify_all(&queue->base);
+	zbx_mw_queue_unlock(&queue->base);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() queued:%d", __func__, pending_num);
 }
@@ -340,7 +273,7 @@ void	cep_queue_push_batch(zbx_cep_queue_t *queue, zbx_vector_cep_task_ptr_t *tas
  *           next pending task from the group into the local queue.           *
  *                                                                            *
  ******************************************************************************/
-static void	cep_queue_push_next_event_task_nl(zbx_cep_queue_t *queue, zbx_cep_task_event_t *task)
+static void	cep_queue_push_next_event_task(zbx_cep_queue_t *queue, zbx_cep_task_event_t *task)
 {
 	zbx_cep_task_group_t	pending_local = {
 					.origin = {
@@ -357,12 +290,13 @@ static void	cep_queue_push_next_event_task_nl(zbx_cep_queue_t *queue, zbx_cep_ta
 
 	if (NULL != (group = (zbx_cep_task_group_t *)zbx_hashset_search(&queue->groups, &pending_local)))
 	{
-		zbx_cep_task_t	*next;
+		zbx_mw_task_t	*next;
 
-		if (NULL != (next = (zbx_cep_task_t *)zbx_queue_ptr_pop(&group->tasks)))
+		if (NULL != (next = (zbx_mw_task_t *)zbx_queue_ptr_pop(&group->tasks)))
 		{
-			zbx_queue_ptr_push(&queue->local, next);
+			zbx_mw_queue_push_normal(&queue->base, next);
 			pending_num = zbx_queue_ptr_values_num(&group->tasks);
+			queue->group_tasks_num--;
 		}
 		else
 		{
@@ -391,163 +325,25 @@ static void	cep_queue_push_next_event_task_nl(zbx_cep_queue_t *queue, zbx_cep_ta
  * Comments: The caller must hold the queue lock when calling this function.  *
  *                                                                            *
  ******************************************************************************/
-void	cep_queue_push_finished_nl(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
+void	cep_queue_push_completed(zbx_cep_queue_t *queue, zbx_mw_task_t *task)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() task:%d", __func__, task->type);
 
-	zbx_queue_ptr_push(&queue->finished, task);
-	queue->pending_num--;
+	zbx_mw_queue_push_completed(&queue->base, task);
 
 	switch (task->type)
 	{
 		case CEP_TASK_EVENT:
-			cep_queue_push_next_event_task_nl(queue, (zbx_cep_task_event_t *)task);
+			cep_queue_push_next_event_task(queue, (zbx_cep_task_event_t *)task);
 			break;
 		case CEP_TASK_CLOSE_EVENT:
-			cep_queue_push_next_event_task_nl(queue, &((zbx_cep_task_close_event_t *)task)->parent);
+			cep_queue_push_next_event_task(queue, &((zbx_cep_task_close_event_t *)task)->parent);
 			break;
 		default:
 			break;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() pending:%d finished:%d", __func__, queue->pending_num,
-			queue->finished);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: enqueue finished task                                             *
- *                                                                            *
- * Parameters: queue - [IN] queue instance                                    *
- *             task  - [IN] finished task to enqueue                          *
- *                                                                            *
- * Comments: Allows adding a task for committing without processing.          *
- *                                                                            *
- ******************************************************************************/
-void	cep_queue_push_finished_direct(zbx_cep_queue_t *queue, zbx_cep_task_t *task)
-{
-	pthread_mutex_lock(&queue->lock);
-	queue->pending_num++;
-	cep_queue_push_finished_nl(queue, task);
-	pthread_mutex_unlock(&queue->lock);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: pop next task from queue                                          *
- *                                                                            *
- * Parameters: queue - [IN] queue instance                                    *
- *                                                                            *
- * Return value: next task or NULL if the queue is empty                      *
- *                                                                            *
- * Comments: The caller must hold the queue lock when calling this function.  *
- *                                                                            *
- ******************************************************************************/
-
-zbx_cep_task_t	*cep_queue_pop_nl(zbx_cep_queue_t *queue)
-{
-	zbx_cep_task_t	*task;
-
-	if (NULL == (task = zbx_queue_ptr_pop(&queue->remote)))
-		task = zbx_queue_ptr_pop(&queue->local);
-
-	return task;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: wait on queue until notified                                      *
- *                                                                            *
- * Parameters: queue - [IN] queue instance                                    *
- *             error - [OUT] error message in case of failure                 *
- *                                                                            *
- * Return value: SUCCEED on success or FAIL on error                          *
- *                                                                            *
- * Comments: The caller must hold the queue lock when calling this function.  *
- *                                                                            *
- ******************************************************************************/
-int	cep_queue_wait(zbx_cep_queue_t *queue, char **error)
-{
-	int	err;
-
-	if (0 != (err = pthread_cond_wait(&queue->alarm, &queue->lock)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot wait for conditional variable: %s", zbx_strerror(err));
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: notify one waiting worker about queue update                      *
- *                                                                            *
- * Parameters: queue - [IN] queue instance                                    *
- *                                                                            *
- * Comments: Used to wake a single waiter when new task is available or       *
- *           queue state has changed.                                         *
- *                                                                            *
- ******************************************************************************/
-void	cep_queue_notify(zbx_cep_queue_t *queue)
-{
-	int	err;
-
-	if (0 != (err = pthread_cond_signal(&queue->alarm)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot signal conditional variable: %s", zbx_strerror(err));
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: notify all waiting workers about queue update                     *
- *                                                                            *
- * Parameters: queue - [IN] queue instance                                    *
- *                                                                            *
- * Comments: Used to wake all waiters when new tasks are available or the     *
- *           queue state has changed.                                         *
- *                                                                            *
- ******************************************************************************/
-void	cep_queue_notify_all(zbx_cep_queue_t *queue)
-{
-	int	err;
-
-	if (0 != (err = pthread_cond_broadcast(&queue->alarm)))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot broadcast conditional variable: %s", zbx_strerror(err));
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: pop all finished tasks from queue                                 *
- *                                                                            *
- * Parameters: queue - [IN]  queue instance                                   *
- *             tasks - [OUT] vector to store popped finished tasks            *
- *                                                                            *
- * Return value: total number of pending tasks after popping finished tasks   *
- *                                                                            *
- * Comments: The function acquires the queue lock, moves all finished tasks   *
- *           to the provided vector, reads the current pending task count,    *
- *           and then releases the lock.                                      *
- *                                                                            *
- ******************************************************************************/
-int	cep_queue_pop_finished(zbx_cep_queue_t *queue, zbx_vector_cep_task_ptr_t *tasks)
-{
-	zbx_cep_task_t	*task;
-	int		pending_num;
-
-	pthread_mutex_lock(&queue->lock);
-
-	zbx_vector_cep_task_ptr_reserve(tasks, zbx_queue_ptr_values_num(&queue->finished));
-	while (NULL != (task = (zbx_cep_task_t *)zbx_queue_ptr_pop(&queue->finished)))
-		zbx_vector_cep_task_ptr_append(tasks, task);
-
-	pending_num = queue->pending_num;
-
-	pthread_mutex_unlock(&queue->lock);
-
-	return pending_num;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() pending:%d finished:%d", __func__, queue->base.pending_num,
+			zbx_queue_ptr_values_num(&queue->base.completed));
 }
 

@@ -79,7 +79,12 @@ static void	*mw_worker_entry(void *a)
 	void *(*worker_entry)(void *) = args->worker_entry;
 	void			*ret;
 
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
+	zbx_init_thread_signal_handler(&jmp_ret);
+	if (0 != sigsetjmp(jmp_ret, 1))
+	{
+		atomic_fetch_or(&worker->state, MW_WORKER_STATE_STOPPED);
+		return ZBX_THREAD_FAILURE;
+	}
 
 	zbx_snprintf(worker->name, sizeof(worker->name), "%s #%d", get_process_type_string(args->process_type),
 		worker->id);

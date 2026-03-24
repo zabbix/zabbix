@@ -15,6 +15,7 @@
 #include "checks_internal.h"
 #include "checks_java.h"
 
+#include "zbxmw.h"
 #include "zbxpoller.h"
 
 #include "zbxalgo.h"
@@ -251,7 +252,7 @@ static int	get_worker_process_stats(unsigned char process_type, unsigned char ag
 			ret = zbx_get_usage_stats_discovery(&usage, &count, &error);
 			break;
 		case ZBX_PROCESS_TYPE_CEP_WORKER:
-			ret = zbx_cep_get_usage_stats(&usage, &count, &error);
+			ret = zbx_mw_get_worker_load(ZBX_IPC_SERVICE_CEP, &usage, &count, &error);
 			break;
 		default:
 			return FAIL;
@@ -549,7 +550,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		{
 			char	*error = NULL;
 
-			if (FAIL == zbx_cep_get_workers_num(&process_forks, &error))
+			if (FAIL == zbx_mw_get_worker_count(ZBX_IPC_SERVICE_CEP, &process_forks, &error))
 			{
 				SET_MSG_RESULT(result, error);
 				goto out;

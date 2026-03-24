@@ -286,15 +286,15 @@ zbx_mw_task_t	*zbx_mw_queue_pop_completed(zbx_mw_queue_t *queue)
  * Comments: Must be called with the queue lock held.                         *
  *                                                                            *
  ******************************************************************************/
-int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_ptr_t *tasks)
+int	zbx_mw_queue_drain_completed(zbx_mw_queue_t *queue, zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_mw_task_t	*task;
 
-	zbx_vector_ptr_reserve(tasks, (size_t)zbx_queue_ptr_values_num(&queue->completed));
+	zbx_vector_mw_task_ptr_reserve(tasks, (size_t)zbx_queue_ptr_values_num(&queue->completed));
 
 	while (NULL != (task = (zbx_mw_task_t *)zbx_queue_ptr_pop(&queue->completed)))
 	{
-		zbx_vector_ptr_append(tasks, task);
+		zbx_vector_mw_task_ptr_append(tasks, task);
 	}
 
 	return tasks->values_num;
