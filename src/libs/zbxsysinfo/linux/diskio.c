@@ -34,6 +34,8 @@
 #define ZBX_MODE_DEVICES	2
 #define ZBX_MODE_DEVICE_STATS	3
 
+#define ZBX_SECTOR_SIZE		512
+
 #if defined(KERNEL_2_4)
 #	define INFO_FILE_NAME	"/proc/partitions"
 #	define PARSE(line)	if (sscanf(line, ZBX_FS_UI64 ZBX_FS_UI64 " %*d %s "		\
@@ -589,7 +591,7 @@ static void	dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 			/* and it must be multiplied by 512 to get size in bytes. */
 			zbx_lrtrim(buf, ZBX_WHITESPACE);
 			ZBX_STR2UINT64(size, buf);
-			size *= 512;
+			size *= ZBX_SECTOR_SIZE;
 		}
 		zbx_fclose(f);
 	}
@@ -665,21 +667,23 @@ static void	dev_stats_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 				switch (tok_idx)
 				{
 					case 0:
-						stats.reads_completed = (zbx_uint64_t)strtoul(buf, NULL, 10);
+						ZBX_STR2UINT64(stats.reads_completed, tok);
 						break;
 					case 2:
+						ZBX_STR2UINT64(stats.bytes_read, tok);
 						/* units: sectors, must be multiplied by 512 to convert to bytes */
-						stats.bytes_read = (zbx_uint64_t)strtoul(buf, NULL, 10) * 512;
+						stats.bytes_read *= ZBX_SECTOR_SIZE;
 						break;
 					case 4:
-						stats.writes_completed = (zbx_uint64_t)strtoul(buf, NULL, 10);
+						ZBX_STR2UINT64(stats.writes_completed, tok);
 						break;
 					case 6:
+						ZBX_STR2UINT64(stats.bytes_written, tok);
 						/* units: sectors, must be multiplied by 512 to convert to bytes */
-						stats.bytes_written = (zbx_uint64_t)strtoul(buf, NULL, 10) * 512;
+						stats.bytes_written *= ZBX_SECTOR_SIZE;
 						break;
 					case 10:
-						stats.io_time_ms = (zbx_uint64_t)strtoul(buf, NULL, 10);
+						ZBX_STR2UINT64(stats.io_time_ms, tok);
 						break;
 				}
 
@@ -730,9 +734,15 @@ static void	dev_disk_partition_sizes_add(zbx_stat_t *stat_buf, struct zbx_json *
 
 		if (NULL != (f = fopen(buf, "r")) && NULL != fgets(buf, sizeof(buf), f))
 		{
+			zbx_uint64_t	size = 0;
+
 			/* The size is in standard UNIX 512 byte blocks           */
 			/* and it must be multiplied by 512 to get size in bytes. */
-			zbx_json_adduint64(j, entry->d_name, (zbx_uint64_t)strtoul(buf, NULL, 10) * 512);
+			zbx_lrtrim(buf, ZBX_WHITESPACE);
+			ZBX_STR2UINT64(size, buf);
+			size *= ZBX_SECTOR_SIZE;
+
+			zbx_json_adduint64(j, entry->d_name, size);
 		}
 
 		zbx_fclose(f);
