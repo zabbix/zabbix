@@ -244,12 +244,7 @@
 
 		<exec executable="sh" failonerror="on">
 			<arg value="-c"/>
-			<arg value="find src -name '*.c' -exec sed -i -E '/^\s*ZBX_(PTR_)?VECTOR_IMPL\(/i/* LCOV_EXCL_START */' {} \;"/>
-		</exec>
-
-		<exec executable="sh" failonerror="on">
-			<arg value="-c"/>
-			<arg value="find src -name '*.c' -exec sed -i -E '/^\s*ZBX_(PTR_)?VECTOR_IMPL\(/a/* LCOV_EXCL_STOP */' {} \;"/>
+			<arg value="find src -name '*.c' -exec sed -r -e '/^\s*ZBX_(PTR_)?VECTOR_IMPL\(/i/* LCOV_EXCL_START */' -e '/^\s*ZBX_(PTR_)?VECTOR_IMPL\(/a/* LCOV_EXCL_STOP */' -i {} \;"/>
 		</exec>
 
 		<exec executable="lcov" failonerror="on">
