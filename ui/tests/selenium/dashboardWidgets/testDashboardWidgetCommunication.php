@@ -2940,17 +2940,27 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$dashboard->edit();
 
-		foreach (['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item'] as $page => $field) {
+		$widget_fields = ['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item',
+			'Maps page' => 'Map'
+		];
+		foreach ($widget_fields as $page => $field) {
 			$dashboard->selectPage($page);
 			$broadcaster = self::$current_broadcasters[$page];
 
-			if ($page === 'Items page') {
-				$listeners = ['Gauge listener', 'Graph (classic) listener', 'Item value listener', 'SVG graph listener',
+			switch ($page) {
+				case 'Items page':
+					$listeners = ['Gauge listener', 'Graph (classic) listener', 'Item value listener', 'SVG graph listener',
 						'Pie chart listener', 'Item value'
-				];
-			}
-			else {
-				$listeners = array_keys(self::DEFAULT_WIDGET_CONTENT[$page]);
+					];
+					break;
+
+				case 'Maps page':
+					$listeners = ['Map listener'];
+					break;
+
+				default:
+					$listeners = array_keys(self::DEFAULT_WIDGET_CONTENT[$page]);
+					break;
 			}
 
 			$dashboard->deleteWidget($broadcaster);
