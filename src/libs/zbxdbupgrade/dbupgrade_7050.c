@@ -789,14 +789,14 @@ static int	DBpatch_7050057(void)
 	return DBcreate_index("token", "token_2", "userid,auth_type,name", 1);
 }
 
-static int	DBpatch_5030058(void)
+static int	DBpatch_7050058(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("token", 1, &field);
 }
 
-static int	DBpatch_5030059(void)
+static int	DBpatch_7050059(void)
 {
 	const zbx_db_field_t	field = {"creator_userid", NULL, "users", "userid", 0, 0, 0, 0};
 
