@@ -1553,7 +1553,10 @@ static void	vmware_service_alarm_uuid_update(zbx_vmware_data_t *data)
 			alarm->entity_uuid = zbx_strdup(NULL, data->datastores.values[j]->uuid);
 		}
 		else
+		{
 			skipped++;
+			zabbix_log(LOG_LEVEL_TRACE, "%s() skipped entity_type:%s", __func__, alarm->entity_type);
+		}
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() skipped uuid:%d", __func__, skipped);

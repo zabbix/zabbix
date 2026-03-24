@@ -711,14 +711,13 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 #define ZBX_VMWARE_TYPE_VSPHERE	1
 #define ZBX_VMWARE_TYPE_VCENTER	2
 
-#define ZBX_VMWARE_SOAP_DATACENTER	"Datacenter"
 #define ZBX_VMWARE_SOAP_FOLDER		"Folder"
 #define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
 #define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
+#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
-#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 #define ZBX_VMWARE_SOAP_RESOURCEPOOL	"ResourcePool"
 #define ZBX_VMWARE_SOAP_DVS		"VmwareDistributedVirtualSwitch"
 #define ZBX_VMWARE_SOAP_DVPG		"DistributedVirtualPortgroup"
