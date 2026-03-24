@@ -457,8 +457,11 @@ void	*zbx_proxyconfig_thread(void *args)
 	}
 stop:
 	zbx_deinit_regexp_env();
-
 	zbx_prof_destroy();
+
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_free();
+#endif
 
 	zbx_history_cache_destroy_local_cache();
 	zbx_ipc_async_socket_close(&rtc);
