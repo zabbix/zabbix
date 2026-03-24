@@ -1465,7 +1465,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find uuid entity of alarm by entity id                            *
+ * Purpose: finds uuid of alarm source entity by its id                       *
  *                                                                            *
  * Parameters: data - [IN] all collected data                                 *
  *                                                                            *
