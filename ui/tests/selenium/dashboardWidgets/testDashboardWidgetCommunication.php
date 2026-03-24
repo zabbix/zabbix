@@ -2868,9 +2868,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Item navigator broadcaster'
 					]
 				]
-			]
-			// TODO: Uncomment the below case once ZBX-27348 is merged.
-			/*
+			],
 			'Maps page with no listeners' => [
 				[
 					'page' => 'Maps page',
@@ -2879,7 +2877,6 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 					]
 				]
 			]
-			 */
 		];
 	}
 
