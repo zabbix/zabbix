@@ -84,7 +84,7 @@ zabbix_export:
           params: 'show global status'
           username: '{$PERCONA.USER}'
           password: '{$PERCONA.PASSWORD}'
-          description: 'Gets server global status information.'
+          description: 'Gets global server status information.'
           tags:
             - tag: component
               value: raw
@@ -452,7 +452,7 @@ zabbix_export:
           type: DEPENDENT
           key: percona.connection_errors_tcpwrap.rate
           value_type: FLOAT
-          description: 'Number of connections the libwrap library has refused.'
+          description: 'Number of connections the `libwrap` library has refused.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -584,7 +584,7 @@ zabbix_export:
           name: 'InnoDB buffer pool pages free'
           type: DEPENDENT
           key: percona.innodb_buffer_pool_pages_free
-          description: 'The total size of the InnoDB buffer pool, in pages.'
+          description: 'The number of free pages in the InnoDB buffer pool.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -688,7 +688,7 @@ zabbix_export:
           type: DEPENDENT
           key: percona.innodb_buffer_pool_wait_free
           value_type: FLOAT
-          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.'
+          description: 'Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of waits for this operation to finish. If this value is not small, consider increasing `innodb_buffer_pool_size`.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -708,7 +708,7 @@ zabbix_export:
           type: DEPENDENT
           key: percona.innodb_buffer_pool_wait_free.rate
           value_type: FLOAT
-          description: 'Number of times per second InnoDB waited for a free page before reading or creating a page. Non-zero values indicate the buffer pool is too small increase `innodb_buffer_pool_size`.'
+          description: 'Number of times per second InnoDB waited for a free page before reading or creating a page. Non-zero values indicate the buffer pool is too small; increase `innodb_buffer_pool_size`.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -730,7 +730,7 @@ zabbix_export:
           key: percona.innodb_log_file_size
           value_type: FLOAT
           params: '(last(//percona.innodb_os_log_written) - last(//percona.innodb_os_log_written,#1:now-1h)) / {$PERCONA.INNODB_LOG_FILES}'
-          description: '`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$PERCONA.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
+          description: '`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$PERCONA.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -859,7 +859,7 @@ zabbix_export:
             - tag: component
               value: tables
         - uuid: 31415108add1492b84e008fe44f4e95d
-          name: 'InnoDB rows update per second'
+          name: 'InnoDB rows updated per second'
           type: DEPENDENT
           key: percona.innodb_rows_updated.rate
           description: 'Number of rows updated in InnoDB tables per second.'
@@ -1199,7 +1199,7 @@ zabbix_export:
               name: 'Percona: Server has slow queries'
               event_name: 'Percona: Server has slow queries (over {$PERCONA.SLOW_QUERIES.MAX.WARN} for 5m)'
               priority: WARNING
-              description: 'The number of slow queries is more than `{$PERCONA.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
+              description: 'The number of slow queries has been more than `{$PERCONA.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.'
               tags:
                 - tag: scope
                   value: performance
@@ -1279,10 +1279,10 @@ zabbix_export:
           triggers:
             - uuid: 3141b4fc244b41a6a30237e7a382fa54
               expression: 'nodata(/Percona by ODBC/percona.uptime,30m)=1'
-              name: 'Percona: Failed to fetch info data'
-              event_name: 'Percona: Failed to fetch info data (or no data for 30m)'
+              name: 'Percona: Failed to fetch data'
+              event_name: 'Percona: Failed to fetch data (or no data for 30m)'
               priority: INFO
-              description: 'Zabbix has not received any data for items for the last 30 minutes.'
+              description: 'Zabbix has not received any data for the last 30 minutes.'
               dependencies:
                 - name: 'Percona: Service is unreachable'
                   expression: 'last(/Percona by ODBC/db.odbc.select[ping,"{$PERCONA.DSN}"])=0'
@@ -1361,7 +1361,7 @@ zabbix_export:
           name: 'Replication discovery'
           type: DEPENDENT
           key: percona.replication.discovery
-          description: 'Discovery of the replication.'
+          description: 'Discovery of replication.'
           item_prototypes:
             - uuid: 314136bd0bad47718fe345c1274203f5
               name: 'Replication {#REPLICA.KEY} status'
@@ -1459,7 +1459,7 @@ zabbix_export:
           name: 'Replication [{#REPLICA.KEY}]: Replica discovery'
           type: DEPENDENT
           key: 'percona.replication.discovery["{#REPLICA.KEY}_discovery","{$PERCONA.DSN}"]'
-          description: 'Discovery of the replication.'
+          description: 'Discovery of replication.'
           item_prototypes:
             - uuid: 314165c4bee84e74bb6e00061ab27f0c
               name: 'Replication: Get data'
@@ -1484,7 +1484,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'percona.master_host["{#REPLICA.KEY}/{#REPLICA.NAME}"]'
               value_type: CHAR
-              description: 'Describes the hostname or IP address of the Percona primary (source/master) server that the replica uses.'
+              description: 'The hostname or IP address of the Percona primary (source/master) server that the replica uses.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1756,7 +1756,7 @@ zabbix_export:
           name: 'Database [{#DATABASE}]: Table discovery'
           type: DEPENDENT
           key: 'percona.tables.discovery[{#SINGLETON}{#DATABASE}]'
-          description: 'Used for the discovery of tables of the databases.'
+          description: 'Used for the discovery of tables in the database.'
           item_prototypes:
             - uuid: 31410e0841b546069a28f104d8994138
               name: 'Table [{#DATABASE}/{#TABLE_NAME}]: Get data'
@@ -1851,7 +1851,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'percona.table.index_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]'
               units: B
-              description: 'The size occupied by the table''s indexes.'
+              description: 'The size of the table''s indexes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1968,12 +1968,12 @@ zabbix_export:
               parameters:
                 - 1d
         - uuid: 73796db19a2d496d83eec288e18f161f
-          name: 'Thread pool metrics discovery'
+          name: 'Thread pool metric discovery'
           type: DEPENDENT
           key: percona.threadpool.enable.discovery
           description: |
-            The discovery of additional Thread Pool metrics when thread_handling='pool-of-threads'.
-            For more details see [Thread pool](https://docs.percona.com/percona-server/8.4/threadpool.html).
+            The discovery of additional thread pool metrics when `thread_handling='pool-of-threads'`.
+            [Learn more](https://docs.percona.com/percona-server/8.4/threadpool.html).
           item_prototypes:
             - uuid: c93813538479427aac2720bf1bcd3799
               name: 'Thread pool idle threads'
@@ -2242,7 +2242,7 @@ zabbix_export:
             description: 'The free ratio threshold for warning fragmentation trigger expressions.'
         - macro: '{$PERCONA.FULLSCAN.RATIO.WARN}'
           value: '0.1'
-          description: 'Warning threshold for full table scan ratio.'
+          description: 'Warning threshold for the full table scan ratio.'
           config:
             type: TEXT
             priority: '7'
@@ -2292,23 +2292,23 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PERCONA.INNODB_SCANS.MIN.CRIT}'
           value: '1'
-          description: 'The minimum InnoDB total scans for critical trigger expressions.'
+          description: 'The minimum total InnoDB scans for critical trigger expressions.'
           config:
             type: TEXT
             priority: '15'
             section_name: Thresholds
             label: 'InnoDB total scans threshold'
-            description: 'The minimum InnoDB total scans for critical trigger expressions.'
+            description: 'The minimum total InnoDB scans for critical trigger expressions.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PERCONA.INNODB_SCANS.MIN.WARN}'
           value: '0'
-          description: 'The minimum InnoDB total scans for warning trigger expressions.'
+          description: 'The minimum total InnoDB scans for warning trigger expressions.'
           config:
             type: TEXT
             priority: '14'
             section_name: Thresholds
             label: 'InnoDB total scans threshold'
-            description: 'The minimum InnoDB total scans for warning trigger expressions.'
+            description: 'The minimum total InnoDB scans for warning trigger expressions.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$PERCONA.PASSWORD}'
           type: SECRET_TEXT

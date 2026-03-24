@@ -46,15 +46,15 @@ Optionally, it is possible to customize the template:
 |{$PERCONA.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the Percona server for trigger expressions.</p>|`3`|
 |{$PERCONA.REPL_LAG.MAX.WARN}|<p>Amount of time the slave is behind the master for trigger expressions.</p>|`30m`|
 |{$PERCONA.SLOW_QUERIES.MAX.WARN}|<p>Number of slow queries for trigger expressions.</p>|`3`|
-|{$PERCONA.FULLSCAN.RATIO.WARN}|<p>Warning threshold for full table scan ratio.</p>|`0.1`|
+|{$PERCONA.FULLSCAN.RATIO.WARN}|<p>Warning threshold for the full table scan ratio.</p>|`0.1`|
 |{$PERCONA.FULLSCAN.SELECT_RATE.MIN.WARN}|<p>The minimum `SELECT` statement rate (per second) for trigger expressions.</p>|`5`|
 |{$PERCONA.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percent for trigger expressions.</p>|`50`|
 |{$PERCONA.CREATED_TMP_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created in memory per second for trigger expressions.</p>|`30`|
 |{$PERCONA.CREATED_TMP_DISK_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created on a disk per second for trigger expressions.</p>|`10`|
 |{$PERCONA.CREATED_TMP_FILES.MAX.WARN}|<p>The maximum number of temporary files created on a disk per second for trigger expressions.</p>|`10`|
 |{$PERCONA.INNODB_LOG_FILES}|<p>Number of physical files in the InnoDB redo log for calculating `innodb_log_file_size`.</p>|`2`|
-|{$PERCONA.INNODB_SCANS.MIN.WARN}|<p>The minimum InnoDB total scans for warning trigger expressions.</p>|`0`|
-|{$PERCONA.INNODB_SCANS.MIN.CRIT}|<p>The minimum InnoDB total scans for critical trigger expressions.</p>|`1`|
+|{$PERCONA.INNODB_SCANS.MIN.WARN}|<p>The minimum total InnoDB scans for warning trigger expressions.</p>|`0`|
+|{$PERCONA.INNODB_SCANS.MIN.CRIT}|<p>The minimum total InnoDB scans for critical trigger expressions.</p>|`1`|
 |{$PERCONA.INNODB_EFFICIENCY.MIN.WARN}|<p>The minimum InnoDB scan efficiency in percent for warning trigger expressions.</p>|`80`|
 |{$PERCONA.INNODB_EFFICIENCY.MIN.CRIT}|<p>The minimum InnoDB scan efficiency in percent for critical trigger expressions.</p>|`50`|
 |{$PERCONA.DBNAME.MATCHES}|<p>Filter of discoverable databases.</p>|`.+`|
@@ -77,7 +77,7 @@ Optionally, it is possible to customize the template:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get status variables|<p>Gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$PERCONA.DSN}"]|
+|Get status variables|<p>Gets global server status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$PERCONA.DSN}"]|
 |Get global variables||Database monitor|db.odbc.get[get_global_variables,"{$PERCONA.DSN}"]|
 |Get database|<p>Used for scanning databases in DBMS.</p>|Database monitor|db.odbc.get[get_database,"{$PERCONA.DSN}"]|
 |Status|<p>Percona server status.</p>|Database monitor|db.odbc.select[ping,"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
@@ -90,7 +90,7 @@ Optionally, it is possible to customize the template:
 |Connection errors max connections per second|<p>Number of refused connections due to the `max_connections` limit being reached.</p>|Dependent item|percona.connection_errors_max_connections.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |Connection errors peer address per second|<p>Number of errors while searching for the connecting client's IP address.</p>|Dependent item|percona.connection_errors_peer_address.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |Connection errors select per second|<p>Number of errors during calls to `select()` or `poll()` on the listening port. The client would not necessarily have been rejected in these cases.</p>|Dependent item|percona.connection_errors_select.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
-|Connection errors tcpwrap per second|<p>Number of connections the libwrap library has refused.</p>|Dependent item|percona.connection_errors_tcpwrap.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|Connection errors tcpwrap per second|<p>Number of connections the `libwrap` library has refused.</p>|Dependent item|percona.connection_errors_tcpwrap.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |Connections per second|<p>Number of connection attempts (successful or not) to the Percona server.</p>|Dependent item|percona.connections.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Connections')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Max used connections|<p>The maximum number of connections that have been in use simultaneously since the server start.</p>|Dependent item|percona.max_used_connections<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Max_used_connections')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Threads cached|<p>Number of threads in the thread cache.</p>|Dependent item|percona.threads_cached<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Threads_cached')].Value.first()`</p></li></ul>|
@@ -102,7 +102,7 @@ Optionally, it is possible to customize the template:
 |Created tmp files on disk per second|<p>How many temporary files `perconad` has created.</p>|Dependent item|percona.created_tmp_files.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Created_tmp_files')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Created tmp tables on disk per second|<p>Number of internal on-disk temporary tables created by the server while executing statements.</p>|Dependent item|percona.created_tmp_disk_tables.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |Created tmp tables on memory per second|<p>Number of internal temporary tables created by the server while executing statements.</p>|Dependent item|percona.created_tmp_tables.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Created_tmp_tables')].Value.first()`</p></li><li>Change per second</li></ul>|
-|InnoDB buffer pool pages free|<p>The total size of the InnoDB buffer pool, in pages.</p>|Dependent item|percona.innodb_buffer_pool_pages_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|InnoDB buffer pool pages free|<p>The number of free pages in the InnoDB buffer pool.</p>|Dependent item|percona.innodb_buffer_pool_pages_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |InnoDB buffer pool pages total|<p>The total size of the InnoDB buffer pool, in pages.</p>|Dependent item|percona.innodb_buffer_pool_pages_total<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB buffer pool read requests|<p>Number of logical read requests.</p>|Dependent item|percona.innodb_buffer_pool_read_requests<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |InnoDB buffer pool read requests per second|<p>Number of logical read requests per second.</p>|Dependent item|percona.innodb_buffer_pool_read_requests.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
@@ -117,7 +117,7 @@ Optionally, it is possible to customize the template:
 |InnoDB rows deleted per second|<p>Number of rows deleted from InnoDB tables per second.</p>|Dependent item|percona.innodb_rows_deleted.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_deleted')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB rows inserted per second|<p>Number of rows inserted into InnoDB tables per second.</p>|Dependent item|percona.innodb_rows_inserted.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_inserted')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB rows read per second|<p>Number of rows read from InnoDB tables per second.</p>|Dependent item|percona.innodb_rows_read.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_read')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|InnoDB rows update per second|<p>Number of rows updated in InnoDB tables per second.</p>|Dependent item|percona.innodb_rows_updated.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_updated')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|InnoDB rows updated per second|<p>Number of rows updated in InnoDB tables per second.</p>|Dependent item|percona.innodb_rows_updated.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_updated')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB buffered aio submitted per second|<p>Number of submitted buffered asynchronous I/O requests per second.</p>|Dependent item|percona.innodb_buffered_aio_submitted.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB scan pages contiguous per second|<p>Number of contiguous page reads inside a query per second.</p>|Dependent item|percona.innodb_scan_pages_contiguous.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB scan pages disjointed per second|<p>Number of disjointed page reads inside a query per second.</p>|Dependent item|percona.innodb_scan_pages_disjointed.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -136,13 +136,13 @@ Optionally, it is possible to customize the template:
 |Binlog cache disk use|<p>Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than `binlog_cache_size`.</p>|Dependent item|percona.binlog_cache_disk_use<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Binlog_cache_disk_use')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Select scan per second|<p>The number of `SELECT` queries that required a full table scan. A high value indicates a lack of or improper use of indexes.</p>|Dependent item|percona.select_scan.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Select_scan')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Full table scan ratio|<p>The ratio of `SELECT` statements executed as full table scans to all `SELECT` statements.</p>|Calculated|percona.full_scans.ratio<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|InnoDB buffer pool wait free|<p>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.</p>|Dependent item|percona.innodb_buffer_pool_wait_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|InnoDB buffer pool wait free per second|<p>Number of times per second InnoDB waited for a free page before reading or creating a page. Non-zero values indicate the buffer pool is too small increase `innodb_buffer_pool_size`.</p>|Dependent item|percona.innodb_buffer_pool_wait_free.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|InnoDB buffer pool wait free|<p>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of waits for this operation to finish. If this value is not small, consider increasing `innodb_buffer_pool_size`.</p>|Dependent item|percona.innodb_buffer_pool_wait_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|InnoDB buffer pool wait free per second|<p>Number of times per second InnoDB waited for a free page before reading or creating a page. Non-zero values indicate the buffer pool is too small; increase `innodb_buffer_pool_size`.</p>|Dependent item|percona.innodb_buffer_pool_wait_free.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |InnoDB number open files|<p>Number of open files held by InnoDB. InnoDB only.</p>|Dependent item|percona.innodb_num_open_files<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_num_open_files')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Open table definitions|<p>Number of cached table definitions.</p>|Dependent item|percona.open_table_definitions<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Open tables|<p>Number of tables that are open.</p>|Dependent item|percona.open_tables<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Open_tables')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |InnoDB log written|<p>Number of bytes written to the InnoDB log.</p>|Dependent item|percona.innodb_os_log_written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_os_log_written')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Calculated value of innodb_log_file_size|<p>`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$PERCONA.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p>|Calculated|percona.innodb_log_file_size<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Calculated value of innodb_log_file_size|<p>`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$PERCONA.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p>|Calculated|percona.innodb_log_file_size<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 
@@ -151,7 +151,7 @@ Optionally, it is possible to customize the template:
 |Percona: Service is unreachable|<p>Percona is unreachable.</p>|`last(/Percona by ODBC/db.odbc.select[ping,"{$PERCONA.DSN}"])=0`|High||
 |Percona: Version has changed|<p>The Percona version has changed. Acknowledge to close the problem manually.</p>|`last(/Percona by ODBC/db.odbc.select[version,"{$PERCONA.DSN}"],#1)<>last(/Percona by ODBC/db.odbc.select[version,"{$PERCONA.DSN}"],#2) and length(last(/Percona by ODBC/db.odbc.select[version,"{$PERCONA.DSN}"]))>0`|Info|**Manual close**: Yes|
 |Percona: Service has been restarted|<p>Percona uptime is less than 10 minutes.</p>|`last(/Percona by ODBC/percona.uptime)<10m`|Info||
-|Percona: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/Percona by ODBC/percona.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>Percona: Service is unreachable</li></ul>|
+|Percona: Failed to fetch data|<p>Zabbix has not received any data for the last 30 minutes.</p>|`nodata(/Percona by ODBC/percona.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>Percona: Service is unreachable</li></ul>|
 |Percona: Server has aborted connections|<p>The number of failed attempts to connect to the Percona server has been more than `{$PERCONA.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.</p>|`min(/Percona by ODBC/percona.aborted_connects.rate,5m)>{$PERCONA.ABORTED_CONN.MAX.WARN}`|Average|**Depends on**:<br><ul><li>Percona: Refused connections</li></ul>|
 |Percona: Refused connections|<p>Number of refused connections due to the `max_connections` limit being reached.</p>|`last(/Percona by ODBC/percona.connection_errors_max_connections.rate)>0`|Average||
 |Percona: Buffer pool utilization is too low|<p>The buffer pool utilization has been less than `{$PERCONA.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes with server uptime over 1 hour. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p>|`max(/Percona by ODBC/percona.buffer_pool_utilization,5m)<{$PERCONA.BUFF_UTIL.MIN.WARN} and last(/Percona by ODBC/percona.uptime)>3600`|Warning||
@@ -160,7 +160,7 @@ Optionally, it is possible to customize the template:
 |Percona: Number of internal temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/Percona by ODBC/percona.created_tmp_tables.rate,5m)>{$PERCONA.CREATED_TMP_TABLES.MAX.WARN}`|Warning||
 |Percona: InnoDB efficiency is too low|<p>The InnoDB efficiency has been less than `{$PERCONA.INNODB_EFFICIENCY.MIN.CRIT}`% in the last 5 minutes.</p>|`max(/Percona by ODBC/percona.innodb_scan.efficiency,5m)<{$PERCONA.INNODB_EFFICIENCY.MIN.CRIT} and last(/Percona by ODBC/percona.innodb_total_scans.rate)>{$PERCONA.INNODB_SCANS.MIN.CRIT}`|High||
 |Percona: InnoDB efficiency is low|<p>The InnoDB efficiency has been less than `{$PERCONA.INNODB_EFFICIENCY.MIN.WARN}`% in the last 5 minutes.</p>|`max(/Percona by ODBC/percona.innodb_scan.efficiency,5m)<{$PERCONA.INNODB_EFFICIENCY.MIN.WARN} and last(/Percona by ODBC/percona.innodb_total_scans.rate)>{$PERCONA.INNODB_SCANS.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>Percona: InnoDB efficiency is too low</li></ul>|
-|Percona: Server has slow queries|<p>The number of slow queries is more than `{$PERCONA.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.</p>|`min(/Percona by ODBC/percona.slow_queries.rate,5m)>{$PERCONA.SLOW_QUERIES.MAX.WARN}`|Warning||
+|Percona: Server has slow queries|<p>The number of slow queries has been more than `{$PERCONA.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.</p>|`min(/Percona by ODBC/percona.slow_queries.rate,5m)>{$PERCONA.SLOW_QUERIES.MAX.WARN}`|Warning||
 |Percona: High rate of full table scans|<p>The rate of `SELECT` statements exceeds `{$PERCONA.FULLSCAN.SELECT_RATE.MIN.WARN}` per second and the full table scan ratio has been above `{$PERCONA.FULLSCAN.RATIO.WARN}` for the last 5 minutes.</p>|`avg(/Percona by ODBC/percona.full_scans.ratio,5m)>{$PERCONA.FULLSCAN.RATIO.WARN} and avg(/Percona by ODBC/percona.com_select.rate,5m)>{$PERCONA.FULLSCAN.SELECT_RATE.MIN.WARN}`|Warning||
 
 ### LLD rule Database discovery
@@ -191,7 +191,7 @@ Optionally, it is possible to customize the template:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database [{#DATABASE}]: Table discovery|<p>Used for the discovery of tables of the databases.</p>|Dependent item|percona.tables.discovery[{#SINGLETON}{#DATABASE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Database [{#DATABASE}]: Table discovery|<p>Used for the discovery of tables in the database.</p>|Dependent item|percona.tables.discovery[{#SINGLETON}{#DATABASE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Database [{#DATABASE}]: Table discovery
 
@@ -199,7 +199,7 @@ Optionally, it is possible to customize the template:
 |----|-----------|----|-----------------------|
 |Table [{#DATABASE}/{#TABLE_NAME}]: Get data|<p>Database table data.</p>|Database monitor|db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Table [{#DATABASE}/{#TABLE_NAME}]: Data length|<p>The size of the data in the table.</p>|Dependent item|percona.table.data_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DATA_LENGTH`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Table [{#DATABASE}/{#TABLE_NAME}]: Index length|<p>The size occupied by the table's indexes.</p>|Dependent item|percona.table.index_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.INDEX_LENGTH`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Index length|<p>The size of the table's indexes.</p>|Dependent item|percona.table.index_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.INDEX_LENGTH`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Table [{#DATABASE}/{#TABLE_NAME}]: Total size|<p>The sum of `DATA_LENGTH` and `INDEX_LENGTH` represents the total size of the table.</p>|Calculated|percona.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Table [{#DATABASE}/{#TABLE_NAME}]: Data free|<p>The amount of unused but allocated space.</p>|Dependent item|percona.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DATA_FREE`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Table [{#DATABASE}/{#TABLE_NAME}]: Free ratio|<p>The fraction of allocated table space that is currently unused (`DATA_FREE` / (`DATA_LENGTH` + `INDEX_LENGTH`)).</p><p>High values indicate potential table fragmentation or inefficient space usage.</p>|Calculated|percona.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -218,7 +218,7 @@ Optionally, it is possible to customize the template:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>Discovery of the replication.</p>|Dependent item|percona.replication.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Replication discovery|<p>Discovery of replication.</p>|Dependent item|percona.replication.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 
@@ -230,14 +230,14 @@ Optionally, it is possible to customize the template:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication [{#REPLICA.KEY}]: Replica discovery|<p>Discovery of the replication.</p>|Dependent item|percona.replication.discovery["{#REPLICA.KEY}_discovery","{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Replication [{#REPLICA.KEY}]: Replica discovery|<p>Discovery of replication.</p>|Dependent item|percona.replication.discovery["{#REPLICA.KEY}_discovery","{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 
 ### Item prototypes for Replication [{#REPLICA.KEY}]: Replica discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |Replication: Get data|<p>Gets status information on the essential parameters of the `{#REPLICA.KEY}` threads.</p>|Database monitor|db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$PERCONA.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Replication: {#SOURCE.NAME} Host|<p>Describes the hostname or IP address of the Percona primary (source/master) server that the replica uses.</p>|Dependent item|percona.master_host["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#SOURCE.NAME}_Host`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication: {#SOURCE.NAME} Host|<p>The hostname or IP address of the Percona primary (source/master) server that the replica uses.</p>|Dependent item|percona.master_host["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#SOURCE.NAME}_Host`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Replication: SQL running state|<p>Shows the state of the SQL driver threads.</p>|Dependent item|percona.slave_sql_running_state["{#REPLICA.KEY}.{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Replication: Seconds behind {#SOURCE.NAME}|<p>The number of seconds the `{#REPLICA.KEY}` SQL thread has been behind processing the `{#SOURCE.KEY}` binary log. A high number (or an increasing one) can indicate that the `{#REPLICA.KEY}` is unable to handle events from the `{#SOURCE.KEY}` in a timely fashion.</p>|Dependent item|percona.seconds_behind_master["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_{#SOURCE.NAME}`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Replication: {#REPLICA.NAME} IO running|<p>Indicates whether the I/O thread for reading the `{#SOURCE.KEY}` binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|percona.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_IO_Running`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
@@ -254,13 +254,13 @@ Optionally, it is possible to customize the template:
 |Percona: The {#REPLICA.KEY} I/O thread is not connected to a replication {#SOURCE.KEY}|<p>Indicates whether the `{#REPLICA.KEY}` I/O thread is connected to the `{#SOURCE.KEY}`.</p>|`last(/Percona by ODBC/percona.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])<>1`|Warning|**Depends on**:<br><ul><li>Percona: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
 |Percona: The SQL thread is not running|<p>Indicates whether the SQL thread for executing events in the relay log is running.</p>|`last(/Percona by ODBC/percona.slave_sql_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0`|Warning|**Depends on**:<br><ul><li>Percona: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
 
-### LLD rule Thread pool metrics discovery
+### LLD rule Thread pool metric discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Thread pool metrics discovery|<p>The discovery of additional Thread Pool metrics when thread_handling='pool-of-threads'.</p><p>For more details see [Thread pool](https://docs.percona.com/percona-server/8.4/threadpool.html).</p>|Dependent item|percona.threadpool.enable.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='thread_handling')].Value.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Thread pool metric discovery|<p>The discovery of additional thread pool metrics when `thread_handling='pool-of-threads'`.</p><p>[Learn more](https://docs.percona.com/percona-server/8.4/threadpool.html).</p>|Dependent item|percona.threadpool.enable.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='thread_handling')].Value.first()`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
-### Item prototypes for Thread pool metrics discovery
+### Item prototypes for Thread pool metric discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
@@ -271,7 +271,7 @@ Optionally, it is possible to customize the template:
 |Thread pool utilization|<p>Percentage of the configured thread pool capacity currently in use.</p>|Calculated|percona.thread_pool_utilization[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Thread pool idle ratio|<p>Percentage of thread pool worker threads that are currently idle.</p>|Calculated|percona.thread_pool_idle_ratio[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### Trigger prototypes for Thread pool metrics discovery
+### Trigger prototypes for Thread pool metric discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
