@@ -126,6 +126,7 @@ class CUserMacro extends CApiService {
 			else {
 				$sqlParts['join']['hh'] = ['table' => 'host_hgset', 'using' => 'hostid'];
 				$sqlParts['join']['p'] = ['left_table' => 'hh', 'table' => 'permission', 'using' => 'hgsetid'];
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
 				if ($options['editable']) {
 					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
@@ -198,6 +199,8 @@ class CUserMacro extends CApiService {
 			$sqlPartsGlobal['limit'] = $options['limit'];
 		}
 
+		$output_original = $options['output'];
+
 		// init GLOBALS
 		if (!is_null($options['globalmacro'])) {
 			$sqlPartsGlobal = $this->applyQueryFilterOptions('globalmacro', 'gm', $options, $sqlPartsGlobal);
@@ -234,7 +237,7 @@ class CUserMacro extends CApiService {
 
 		if ($result) {
 			$result = $this->addRelatedObjects($options, $result);
-			$result = $this->unsetExtraFields($result, ['hostid', 'type'], $options['output']);
+			$result = $this->unsetExtraFields($result, ['hostid', 'type'], $output_original);
 
 			if (!$options['preservekeys']) {
 				$result = array_values($result);
