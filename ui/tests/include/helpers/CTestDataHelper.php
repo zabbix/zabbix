@@ -20,6 +20,8 @@
 class CTestDataHelper {
 	private static $objectids = [];
 
+	private static $sessionids = [];
+
 	/**
 	 * Create objects using API.
 	 * Usually only the object's "name/key" need to be provided. Some defaults (e.g. item's type, value_type) are mixed
@@ -1105,6 +1107,29 @@ class CTestDataHelper {
 		}
 
 		self::$objectids = [];
+		self::$sessionids = [];
+	}
+
+	public static function authorizeActors(array $users): void {
+		$id = 0;
+
+		foreach ($users as $user_reference => $user) {
+			$result = CDataHelper::callRaw([
+				'jsonrpc' => '2.0',
+				'method' => 'user.login',
+				'params' => [
+					'username' => $user['username'],
+					'password' => $user['passwd']
+				],
+				'id' => ++$id
+			]);
+
+			self::$sessionids[$user_reference] = $result['result'];
+		}
+	}
+
+	public static function setActor(string $user_reference) {
+		CAPIHelper::setSessionId(self::$sessionids[$user_reference]);
 	}
 
 	private static function prepareEnabledGuestUser(): array {
@@ -1176,6 +1201,24 @@ class CTestDataHelper {
 
 		if ($guest) {
 			CDataHelper::call('user.update', $guest);
+		}
+	}
+
+	/**
+	 * Avoid adding objects that are cleaned up.
+	 *
+	 * @see CTestDataHelper::cleanUp()
+	 */
+	public static function addCustomReference(string $object_type, string $object_name, string $id): void {
+		self::$objectids[$object_type][$object_name] = $id;
+	}
+
+	public static function convertCustomObjectReference(array &$object, string $property,
+			bool $multiple_values = false): void {
+		if (array_key_exists($property, $object)) {
+			$object[$property] = $multiple_values
+				? self::getConvertedValueReferences($object[$property])
+				: self::getConvertedValueReference($object[$property]);
 		}
 	}
 }
