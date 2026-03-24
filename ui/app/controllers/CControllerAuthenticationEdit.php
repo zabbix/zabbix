@@ -109,7 +109,7 @@ class CControllerAuthenticationEdit extends CController {
 
 		$data = [
 			'action_passw_change' => 'authentication.edit',
-			'is_http_auth_allowed' => (CFeatureFlagHelper::isFlagHttpAuthEnabled()),
+			'is_http_auth_allowed' => CFeatureFlagHelper::isFlagHttpAuthEnabled(),
 			'ldap_error' => ($ldap_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $ldap_status['error'],
 			'saml_error' => ($openssl_status['result'] == CFrontendSetup::CHECK_OK) ? '' : $openssl_status['error'],
 			'saml_certs_editable' => CAuthenticationHelper::isSamlCertsStorageDatabase(),

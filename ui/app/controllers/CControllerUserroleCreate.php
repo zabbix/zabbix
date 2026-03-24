@@ -36,7 +36,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			]
 			: [];
 
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => $specific_fields + [
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'name' => ['db role.name', 'required', 'not_empty'],
 			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
 				USER_TYPE_SUPER_ADMIN
@@ -45,7 +45,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 				'field' => ['string', 'in' => CRoleHelper::getUiElementsByUserType(USER_TYPE_SUPER_ADMIN)],
 				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
-			'ui_default_access' => ['boolean'],
+			'ui_default_access' => ['boolean']] + $specific_fields + [
 			'actions' => ['array', 'required',
 				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]
 			],

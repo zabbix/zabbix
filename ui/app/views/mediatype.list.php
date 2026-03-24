@@ -183,7 +183,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	if (array_key_exists($media_type['typeid'], array_flip(CFeatureFlagHelper::getSupportedMediaTypes()))) {
+	if (in_array($media_type['typeid'], CFeatureFlagHelper::getSupportedMediaTypes())) {
 		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_GREEN)
@@ -221,7 +221,7 @@ foreach ($data['mediatypes'] as $media_type) {
 
 	$checkbox = new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']);
 
-	if (array_key_exists($media_type['typeid'], array_flip(CFeatureFlagHelper::getSupportedMediaTypes()))) {
+	if (in_array($media_type['typeid'], CFeatureFlagHelper::getSupportedMediaTypes())) {
 		$name = new CLink($media_type['name'], $media_type_url);
 	}
 	else {

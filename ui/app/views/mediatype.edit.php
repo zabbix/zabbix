@@ -30,8 +30,6 @@ $form = (new CForm())
 	->addItem((new CInput('submit', null))->addStyle('display: none;'))
 	->addStyle('display: none;');
 
-$supported_media_types = array_intersect_key(CMediatypeHelper::getMediaTypes(), array_flip(CFeatureFlagHelper::getSupportedMediaTypes()));
-
 // Create form grid.
 $mediatype_form_grid = (new CFormGrid())
 	->addItem([
@@ -49,7 +47,11 @@ $mediatype_form_grid = (new CFormGrid())
 			(new CSelect('type'))
 				->setId('type')
 				->setFocusableElementId('label-type')
-				->addOptions(CSelect::createOptionsFromArray($supported_media_types))
+				->addOptions(CSelect::createOptionsFromArray(
+					array_intersect_key(
+						CMediatypeHelper::getMediaTypes(),
+						array_flip(CFeatureFlagHelper::getSupportedMediaTypes())
+					)))
 				->setValue($data['type'])
 		))->setId('type-field')
 	])
