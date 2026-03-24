@@ -713,4 +713,31 @@ class testPageAdministrationProxies extends CWebTest {
 			}
 		}
 	}
+
+	public function testPageAdministrationProxies_VisitedHostColor() {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$table = $this->query('class:list-table')->asTable()->one();
+
+		// Check host name and color for enabled and disabled hosts.
+		$hosts = [
+			'active_proxy2' => ['host_name' => 'enabled_host2', 'host_color' => 'rgba(2, 117, 184, 1)'],
+			'active_proxy4' => ['host_name' => 'disabled_host6', 'host_color' => 'rgba(227, 55, 52, 1)']
+		];
+
+		foreach ($hosts as $proxy => $host_parameters) {
+			$column = $table->findRow('Name', $proxy, true);
+			$host_link = $column->query('link', $host_parameters['host_name'])->one();
+
+			// Check host-link text color.
+			$this->assertEquals($host_parameters['host_color'], $host_link->getCSSValue('color'));
+			// Open and close host-link dialog form.
+			$host_link->waitUntilClickable()->click();
+			COverlayDialogElement::find()->one()->close();
+			// Refresh the page.
+			$this->page->refresh();
+
+			// Check visited host-link text color.
+			$this->assertEquals($host_parameters['host_color'], $host_link->getCSSValue('color'));
+		}
+	}
 }
