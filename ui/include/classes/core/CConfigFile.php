@@ -234,7 +234,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+			$ZBX_SERVER_TLS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -243,7 +243,6 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
-		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -441,7 +440,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['IMAGE_FORMAT_DEFAULT'] = IMAGE_FORMAT_PNG;
 		$this->config['HISTORY'] = null;
 		$this->config['SSO'] = null;
-		$this->config['ALLOW_HTTP_AUTH'] = null; // Deprecated. Use ZBX_FEATURE_FLAGS instead.
 		$this->config['ZBX_FEATURE_FLAGS'] = [
 			'http_auth_enabled' => true,
 			'modules_config_enabled' => true,
