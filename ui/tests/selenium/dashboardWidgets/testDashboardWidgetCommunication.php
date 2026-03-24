@@ -380,7 +380,11 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				'class' => 'item-value-content',
 				'value' => 3
 			],
-			'URL listener' => 'No data'
+			'URL listener' => 'No data',
+			'SVG graph listener' => [
+				'class' => 'svg-graph-legend-item',
+				'value' => self::SECOND_HOST_NAME.': Trapper item'
+			]
 		]
 	];
 
@@ -3792,20 +3796,24 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			if ($field) {
 				$widget_form = $listener_widget->edit();
 
-				if (in_array($listener_name, ['SVG graph listener', 'Pie chart listener'])) {
+				if (in_array($listener_name, ['SVG graph listener', 'Pie chart listener']) && $field === 'Item') {
 					$this->assertEquals('Unavailable widget', $widget_form->query('xpath:.//td[contains(@class,"table-col-name")]')
 							->one()->getText()
 					);
 					$error_field = 'Data set/1';
 				}
 				else {
-					$unavailable_field = ($field === 'Hosts' && in_array($listener_name, ['Item card listener', 'Gauge listener',
-							'Graph (classic) listener', 'Item history listener', 'Item value listener', 'URL listener']))
+					$listeners_with_override = ['Item card listener', 'Gauge listener', 'Graph (classic) listener',
+						'Item history listener', 'Item value listener', 'URL listener', 'SVG graph listener'
+					];
+					$unavailable_field = ($field === 'Hosts' && in_array($listener_name, $listeners_with_override))
 						? 'Override host'
 						: (($listener_name === 'Host card listener') ? 'Host' : $field);
 
 					$this->assertEquals(['Unavailable widget'], $widget_form->getField($unavailable_field)->getValue());
-					$error_field = $unavailable_field;
+					$error_field = ($listener_name === 'SVG graph listener')
+						? 'Data set/1/Override host'
+						: $unavailable_field;
 				}
 
 				$widget_form->submit();
