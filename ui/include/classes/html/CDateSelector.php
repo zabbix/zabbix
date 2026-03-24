@@ -21,7 +21,7 @@ class CDateSelector extends CTag {
 	/**
 	 * Default CSS class name for HTML root element.
 	 */
-	const ZBX_STYLE_CLASS = 'calendar-control';
+	const ZBX_STYLE_CLASS = 'date-selector';
 
 	/**
 	 * Input name.

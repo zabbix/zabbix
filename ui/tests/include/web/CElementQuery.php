@@ -608,7 +608,7 @@ class CElementQuery implements IWaitable {
 			],
 			'CCompositeInputElement'	=> [
 				'/div[contains(@class, "range-control")]',
-				'/div[contains(@class, "calendar-control")]'
+				'/div[contains(@class, "date-selector")]'
 			],
 			'CColorPickerElement'		=> [
 				'/z-color-picker'

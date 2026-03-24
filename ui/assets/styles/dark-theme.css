@@ -2267,6 +2267,16 @@ button {
   .dashboard-page {
     margin: 10px;
     break-after: page; } }
+.date-selector {
+  display: flex;
+  flex-wrap: wrap; }
+  .date-selector .btn-icon:not(:first-child) {
+    margin-left: 2px; }
+  .date-selector .btn-icon::before {
+    font-size: 22px; }
+  .date-selector .error {
+    flex-basis: 100%; }
+
 .diff {
   padding: 4px;
   background: #0e1012; }
@@ -7344,11 +7354,6 @@ z-select .list, z-textarea-flexible textarea, input[type="text"], input[type="pa
       color: #f2f2f2;
       background-color: #4f4f4f;
       border-bottom: 0; }
-
-.calendar-control .btn-icon:not(:first-child) {
-  margin-left: 2px; }
-.calendar-control .btn-icon::before {
-  font-size: 22px; }
 
 .header-kioskmode-controls {
   position: fixed;

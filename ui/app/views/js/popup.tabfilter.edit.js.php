@@ -20,7 +20,7 @@
 ?>
 
 $('.overlay-dialogue-body #filter_custom_time').on('change', function() {
-	let $calendars = $(this).closest('form').find('.calendar-control');
+	let $calendars = $(this).closest('form').find('.date-selector');
 
 	$('input,button', $calendars).prop('disabled', !$(this).is(':checked'));
 });

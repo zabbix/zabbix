@@ -1,0 +1,18 @@
+.date-selector {
+	display: flex;
+	flex-wrap: wrap;
+
+	.btn-icon {
+		&:not(:first-child) {
+			margin-left: 2px;
+		}
+
+		&::before {
+			font-size: 22px;
+		}
+	}
+
+	.error {
+		flex-basis: 100%;
+	}
+}

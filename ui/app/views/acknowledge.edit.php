@@ -84,19 +84,15 @@ $form_list
 			makeHelpIcon(_('Manual problem suppression. Date-time input accepts relative and absolute time format.'))
 		], 'suppress_problem'),
 		(new CList([
-			(new CListItem(
-				(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
-					->addClass('js-operation-checkbox')
-					->setChecked($data['suppress_problem'])
-					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
-			))->addClass('align-top'),
-			(new CListItem(
-				(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
-					->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
-					->addValue(_('Until'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
-					->setEnabled(false)
-					->setModern(true)
-			))->addClass('align-top'),
+			(new CCheckBox('suppress_problem', ZBX_PROBLEM_UPDATE_SUPPRESS))
+				->addClass('js-operation-checkbox')
+				->setChecked($data['suppress_problem'])
+				->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed']),
+			(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
+				->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
+				->addValue(_('Until'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
+				->setEnabled(false)
+				->setModern(true),
 			(new CDateSelector('suppress_until_problem', $data['suppress_until_problem']))
 				->setDateFormat(ZBX_FULL_DATE_TIME)
 				->setPlaceholder(_($data['suppress_until_problem']))
