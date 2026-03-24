@@ -826,7 +826,6 @@ static int	DBpatch_7050061(void)
 					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"uuid", NULL, NULL, NULL, 36, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"uuid", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"status", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"push_token", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
