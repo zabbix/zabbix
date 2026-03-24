@@ -1575,7 +1575,7 @@ void	zbx_xml_node_dump(xmlNode *node, int log_level)
 		return;
 
 	xmlNodeDump(buffer, node->doc, node, 0, 1);
-	zabbix_log(log_level, "outer XML:%s", (char *)xmlBufferContent(buffer));
+	zabbix_log(log_level, "outer XML:%s", (const char *)xmlBufferContent(buffer));
 	xmlBufferFree(buffer);
 }
 #endif // HAVE_LIBXML2 && HAVE_LIBCURL
