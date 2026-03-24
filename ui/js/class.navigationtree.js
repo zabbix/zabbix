@@ -350,7 +350,7 @@ class CNavigationTree {
 
 		const description = maintenance.description !== '' ? `\n${maintenance.description}` : '';
 
-		element.dataset.hintboxContents = `${maintenance.name} [${type}]${description}`;
+		element.dataset.hintboxContents = `${escapeHtml(maintenance.name)} [${type}]${escapeHtml(description)}`;
 	}
 
 	/**
