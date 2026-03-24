@@ -763,6 +763,7 @@ static int	DBpatch_7050052(void)
 }
 
 static int	DBpatch_7050053(void)
+{
 	const zbx_db_field_t	field = {"auth_type", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("token", &field);
