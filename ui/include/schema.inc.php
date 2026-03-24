@@ -8457,7 +8457,7 @@ return [
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
 			],
-			'auth_type' => [
+			'auth_scheme' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
@@ -10262,7 +10262,8 @@ return [
 			'jti' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 36
+				'length' => 36,
+				'default' => ''
 			],
 			'expires_at' => [
 				'null' => false,
@@ -10287,13 +10288,6 @@ return [
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
 			],
-			'tokenid' => [
-				'null' => true,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
-				'ref_table' => 'token',
-				'ref_field' => 'tokenid'
-			],
 			'uuid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
@@ -10317,6 +10311,31 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			],
+			'activated_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			]
+		]
+	],
+	'device_token' => [
+		'key' => 'tokenid',
+		'fields' => [
+			'tokenid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'token',
+				'ref_field' => 'tokenid'
+			],
+			'deviceid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'device',
+				'ref_field' => 'deviceid'
 			]
 		]
 	],
@@ -10426,7 +10445,7 @@ return [
 			]
 		]
 	],
-	'enrollment_token' => [
+	'device_enrollment_token' => [
 		'key' => 'deviceid',
 		'fields' => [
 			'deviceid' => [
@@ -10436,13 +10455,13 @@ return [
 				'ref_table' => 'device',
 				'ref_field' => 'deviceid'
 			],
-			'enrollment_token' => [
+			'token' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 128,
 				'default' => ''
 			],
-			'enrollment_token_expiration' => [
+			'expires_at' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
