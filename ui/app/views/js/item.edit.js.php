@@ -91,6 +91,10 @@ window.item_edit_form = new class {
 		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
+
+		this.form.findFieldByName('interfaceid')?.setChanged();
+		this.form.findFieldByName('type').setChanged();
+		this.form.validateChanges(['interfaceid', 'type']);
 	}
 
 	initForm(field_switches) {
