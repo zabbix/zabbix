@@ -91,7 +91,9 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'actions_edit_own_media' =>						'in 0,1',
 			'actions_edit_user_media' =>					'in 0,1',
 			'ui_default_access' => 							'in 0,1',
+			'modules_default_access' =>						'in 0,1',
 			'actions_default_access' => 					'in 0,1',
+			'modules' =>									'array',
 			'api_access' => 								'in 0,1',
 			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
 			'api_methods' => 								'array',
@@ -107,12 +109,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'super_admin_role_clone' =>						'in 1'
 		];
 
-
-		if (CFeatureFlagHelper::isFlagModulesEnabled()) {
-			$fields += [
-				'modules' =>				'array',
-				'modules_default_access' => 'in 0,1'
-			];
+		if (!CFeatureFlagHelper::isFlagModulesEnabled()) {
+			unset($fields['fields']['modules'], $fields['fields']['modules_default_access']);
 		}
 
 		$ret = $this->validateInput($fields);
@@ -230,15 +228,14 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			])
 			: [];
 
-		if ($db_modules) {
-			$disabled_modules = array_filter($db_modules,
-				static function (array $db_module): bool {
-					return $db_module['status'] == MODULE_STATUS_DISABLED;
-				}
-			);
+		$disabled_modules = array_filter($db_modules,
+			static function (array $db_module): bool {
+				return $db_module['status'] == MODULE_STATUS_DISABLED;
+			}
+		);
 
-			$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
-		}
+		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
+
 
 		$data['labels'] = $this->getLabels($db_modules);
 

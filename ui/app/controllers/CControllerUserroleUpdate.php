@@ -31,14 +31,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			['role.get', ['name' => '{name}'], 'roleid']
 		];
 
-		$specific_fields = CFeatureFlagHelper::isFlagModulesEnabled()
-			? [
-				'modules' => ['array', 'required', 'field' => ['boolean']],
-				'modules_default_access' => ['boolean']
-			]
-			: [];
-
-		return ['object', 'api_uniq' => $api_uniq, 'fields' => $specific_fields + [
+		$rules = ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'roleid' => ['db role.roleid', 'required'],
 			'name' => ['db role.name', 'required', 'not_empty'],
 			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
@@ -49,6 +42,8 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
 			],
 			'ui_default_access' => ['boolean'],
+			'modules' => ['array', 'required', 'field' => ['boolean']],
+			'modules_default_access' => ['boolean']	,
 			'actions' => ['array', 'required',
 				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]
 			],
@@ -102,6 +97,12 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			],
 			'form_refresh' => ['integer']
 		]];
+
+		if (!CFeatureFlagHelper::isFlagModulesEnabled()) {
+			unset($rules['fields']['modules'], $rules['fields']['modules_default_access']);
+		}
+
+		return $rules;
 	}
 
 	protected function checkInput(): bool {
