@@ -298,7 +298,7 @@ static void	rtc_process_profiler_option(zbx_rtc_t *rtc, zbx_uint32_t code, const
 
 	if (0 != proc_num && ZBX_PROCESS_TYPE_UNKNOWN != proc_type)
 	{
-		if (FAIL == rtc_process_validate_target(proc_num, proc_type, result))
+		if (FAIL == rtc_process_validate_target(proc_type, proc_num, result))
 			return;
 	}
 
