@@ -824,12 +824,12 @@ static int	DBpatch_7050061(void)
 			{"device", "deviceid", 0,
 				{
 					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"status", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"status", 0, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"push_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"activated_at", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"activated_at", 0, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -855,8 +855,8 @@ static int	DBpatch_7050064(void)
 	const zbx_db_table_t	table =
 			{"device_token", "tokenid", 0,
 				{
-					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -896,11 +896,11 @@ static int	DBpatch_7050069(void)
 			{"device_key", "device_keyid", 0,
 				{
 					{"device_keyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"scope", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"scope", 0, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{"kid", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"key_", "", NULL, NULL, 512, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"active", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"active", 0, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -932,15 +932,15 @@ static int	DBpatch_7050073(void)
 	const zbx_db_table_t    table =
 			{"task_device_init", "taskid", 0,
 				{
-					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"mobile_enrollment_token", NULL, NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL,
+					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"mobile_enrollment_token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL,
 						0},
-					{"bridge_enrollment_token", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL,
+					{"bridge_enrollment_token", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL,
 						0},
-					{"enrollment_url", NULL, NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"status", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
-					{"info", NULL, NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"enrollment_url", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", 0, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"info", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -963,7 +963,7 @@ static int	DBpatch_7050075(void)
 			{"task_device_offboard", "taskid", 0,
 				{
 					{"taskid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
-					{"uuid", NULL, NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"uuid", "", NULL, NULL, 32, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -987,7 +987,7 @@ static int	DBpatch_7050077(void)
 				{
 					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 					{"token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-					{"expires_at", NULL, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"expires_at", 0, NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
