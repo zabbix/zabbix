@@ -3865,11 +3865,6 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		/* store new information in trigger structure */
 
-		ZBX_STR2UCHAR(trigger->flags, row[18]);
-
-		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			continue;
-
 		dc_strpool_replace(found, &trigger->description, row[1]);
 
 		if (SUCCEED == dc_strpool_replace(found, &trigger->expression, row[2]))
@@ -3944,39 +3939,36 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &rowid)))
 				continue;
 
-			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			/* force trigger list update for items used in removed trigger */
+			if (NULL != trigger->itemids)
 			{
-				/* force trigger list update for items used in removed trigger */
-				if (NULL != trigger->itemids)
+				for (itemid = trigger->itemids; 0 != *itemid; itemid++)
 				{
-					for (itemid = trigger->itemids; 0 != *itemid; itemid++)
+					if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+							itemid)))
 					{
-						if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
-								itemid)))
-						{
-							dc_item_remove_trigger(item, trigger);
-						}
+						dc_item_remove_trigger(item, trigger);
 					}
 				}
-
-				dc_strpool_release(trigger->description);
-				dc_strpool_release(trigger->expression);
-				dc_strpool_release(trigger->recovery_expression);
-				dc_strpool_release(trigger->error);
-				dc_strpool_release(trigger->correlation_tag);
-				dc_strpool_release(trigger->opdata);
-				dc_strpool_release(trigger->event_name);
-
-				zbx_vector_ptr_destroy(&trigger->tags);
-
-				if (NULL != trigger->expression_bin)
-					__config_shmem_free_func((void *)trigger->expression_bin);
-				if (NULL != trigger->recovery_expression_bin)
-					__config_shmem_free_func((void *)trigger->recovery_expression_bin);
-
-				if (NULL != trigger->itemids)
-					__config_shmem_free_func((void *)trigger->itemids);
 			}
+
+			dc_strpool_release(trigger->description);
+			dc_strpool_release(trigger->expression);
+			dc_strpool_release(trigger->recovery_expression);
+			dc_strpool_release(trigger->error);
+			dc_strpool_release(trigger->correlation_tag);
+			dc_strpool_release(trigger->opdata);
+			dc_strpool_release(trigger->event_name);
+
+			zbx_vector_ptr_destroy(&trigger->tags);
+
+			if (NULL != trigger->expression_bin)
+				__config_shmem_free_func((void *)trigger->expression_bin);
+			if (NULL != trigger->recovery_expression_bin)
+				__config_shmem_free_func((void *)trigger->recovery_expression_bin);
+
+			if (NULL != trigger->itemids)
+				__config_shmem_free_func((void *)trigger->itemids);
 
 			zbx_hashset_remove_direct(&config->triggers, trigger);
 		}
@@ -4420,9 +4412,6 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now, int 
 		if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &function->triggerid)))
 			continue;
 
-		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			continue;
-
 		if (TRIGGER_STATUS_ENABLED != trigger->status || TRIGGER_FUNCTIONAL_TRUE != trigger->functional)
 			continue;
 
@@ -4465,9 +4454,6 @@ static void	dc_schedule_trigger_timers(zbx_hashset_t *trend_queue, int now, int 
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			continue;
-
 		if (NULL == trigger->itemids)
 			continue;
 
@@ -5110,11 +5096,8 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			trigger_tag->triggerid = triggerid;
-			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			{
-				zbx_vector_ptr_reserve(&trigger->tags, ZBX_VECTOR_ARRAY_RESERVE);
-				zbx_vector_ptr_append(&trigger->tags, trigger_tag);
-			}
+			zbx_vector_ptr_reserve(&trigger->tags, ZBX_VECTOR_ARRAY_RESERVE);
+			zbx_vector_ptr_append(&trigger->tags, trigger_tag);
 		}
 	}
 
@@ -5127,20 +5110,17 @@ static void	DCsync_trigger_tags(zbx_dbsync_t *sync)
 
 		if (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &trigger_tag->triggerid)))
 		{
-			if (0 == (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
+			if (FAIL != (index = zbx_vector_ptr_search(&trigger->tags, trigger_tag,
+					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
-				if (FAIL != (index = zbx_vector_ptr_search(&trigger->tags, trigger_tag,
-						ZBX_DEFAULT_PTR_COMPARE_FUNC)))
-				{
-					zbx_vector_ptr_remove_noorder(&trigger->tags, index);
+				zbx_vector_ptr_remove_noorder(&trigger->tags, index);
 
-					/* recreate empty tags vector to release used memory */
-					if (0 == trigger->tags.values_num)
-					{
-						zbx_vector_ptr_destroy(&trigger->tags);
-						zbx_vector_ptr_create_ext(&trigger->tags, __config_shmem_malloc_func,
-								__config_shmem_realloc_func, __config_shmem_free_func);
-					}
+				/* recreate empty tags vector to release used memory */
+				if (0 == trigger->tags.values_num)
+				{
+					zbx_vector_ptr_destroy(&trigger->tags);
+					zbx_vector_ptr_create_ext(&trigger->tags, __config_shmem_malloc_func,
+							__config_shmem_realloc_func, __config_shmem_free_func);
 				}
 			}
 		}
@@ -6396,9 +6376,6 @@ static void	dc_trigger_update_topology(void)
 	zbx_hashset_iter_reset(&config->triggers, &iter);
 	while (NULL != (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-			continue;
-
 		trigger->topoindex = 1;
 	}
 
@@ -6572,9 +6549,6 @@ static void	dc_trigger_add_item_links(ZBX_DC_TRIGGER *trigger, zbx_vector_uint64
 		zbx_vector_uint64_t *functionids, zbx_hashset_t *item_triggers)
 {
 	ZBX_DC_FUNCTION	*function;
-
-	if (0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-		return;
 
 	zbx_get_serialized_expression_functionids(trigger->expression, trigger->expression_bin, functionids);
 
@@ -12435,8 +12409,7 @@ static void	DCconfig_sort_triggers_topologically(void)
 	{
 		trigger = trigdep->trigger;
 
-		if (NULL == trigger || 0 != (trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) || 1 < trigger->topoindex ||
-				0 == trigdep->dependencies.values_num)
+		if (NULL == trigger || 1 < trigger->topoindex || 0 == trigdep->dependencies.values_num)
 		{
 			continue;
 		}
@@ -13047,7 +13020,7 @@ static void	get_trigger_statistics(zbx_hashset_t *triggers, zbx_dc_status_diff_t
 	/* loop over triggers to gather enabled and disabled trigger statistics */
 	while (NULL != (dc_trigger = (ZBX_DC_TRIGGER *)zbx_hashset_iter_next(&iter)))
 	{
-		if (0 != (dc_trigger->flags & ZBX_FLAG_DISCOVERY_PROTOTYPE) || NULL == dc_trigger->itemids)
+		if (NULL == dc_trigger->itemids)
 			continue;
 
 		switch (dc_trigger->status)

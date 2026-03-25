@@ -1978,11 +1978,10 @@ int	zbx_dbsync_compare_triggers(zbx_dbsync_t *sync)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 			"select t.triggerid,t.description,t.expression,rt.error,t.priority,t.type,rt.state,"
 			"rt.lastchange,t.status,t.recovery_mode,t.recovery_expression,t.correlation_mode,"
-			"t.correlation_tag,t.opdata,t.event_name,null,null,null,t.flags"
-			" from triggers t left join trigger_rtdata rt on t.triggerid=rt.triggerid"
-			" where rt.state is not null");
+			"t.correlation_tag,t.opdata,t.event_name,null,null,null"
+			" from triggers t join trigger_rtdata rt on t.triggerid=rt.triggerid");
 
-	dbsync_prepare(sync, 19, dbsync_trigger_preproc_row);
+	dbsync_prepare(sync, 18, dbsync_trigger_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
