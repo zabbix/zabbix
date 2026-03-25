@@ -169,6 +169,8 @@ class CForm {
 	getAllValues() {
 		const fields = {};
 
+		let simple_fields = {};
+
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
 
@@ -176,33 +178,16 @@ class CForm {
 				continue;
 			}
 
-			const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
-
-			let key_fields = fields;
-
-			for (let i = 0; i < key_parts.length; i++) {
-				const key_part = key_parts[i][0];
-
-				if (i === key_parts.length - 1) {
-					if (typeof field.getExtraFields === 'function') {
-						for (const [extra_key, value] of Object.entries(field.getExtraFields())) {
-							const extra_field_key_parts = [...extra_key.matchAll(/[^\[\]]+|\[\]/g)];
-							objectSetDeepValue(fields, extra_field_key_parts, value);
-						}
-					}
-					else {
-						key_fields[key_part] = field.getValueTrimmed();
-					}
-
-					break;
-				}
-
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = {};
-				}
-
-				key_fields = key_fields[key_part];
+			if (typeof field.getExtraFields === 'function') {
+				simple_fields = {...simple_fields, ...field.getExtraFields()};
 			}
+			else {
+				simple_fields[key] = field.getValueTrimmed();
+			}
+		}
+
+		for (const [key, value] of Object.entries(simple_fields)) {
+			objectSetDeepValue(fields, [...key.matchAll(/[^\[\]]+/g)], value);
 		}
 
 		return fields;
