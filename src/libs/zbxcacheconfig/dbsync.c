@@ -1943,7 +1943,7 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 
 	if (TRIGGER_RECOVERY_MODE_RECOVERY_EXPRESSION == mode)
 	{
-		row[1] = encode_expression(&ctx_r);
+		row[16] = encode_expression(&ctx_r);
 		zbx_eval_clear(&ctx_r);
 	}
 
