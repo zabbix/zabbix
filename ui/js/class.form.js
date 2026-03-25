@@ -167,8 +167,7 @@ class CForm {
 	}
 
 	getAllValues() {
-		const fields = {};
-
+		let result = {};
 		let simple_fields = {};
 
 		for (const [key, field] of Object.entries(this.#fields)) {
@@ -187,10 +186,10 @@ class CForm {
 		}
 
 		for (const [key, value] of Object.entries(simple_fields)) {
-			objectSetDeepValue(fields, [...key.matchAll(/[^\[\]]+/g)], value);
+			result = objectSetDeepValue(result, [...key.matchAll(/[^\[\]]+/g)], value);
 		}
 
-		return fields;
+		return result;
 	}
 
 	validateChanges(fields, force_display_errors = false) {

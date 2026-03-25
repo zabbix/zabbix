@@ -137,6 +137,7 @@ class CFieldSet extends CField {
 
 	getInnerValue(trim_value) {
 		let result = {};
+		let simple_fields = {};
 
 		for (const field of Object.values(this.#fields)) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
@@ -144,25 +145,21 @@ class CFieldSet extends CField {
 			}
 
 			if (typeof field.getExtraFields === 'function') {
-				for (const [extra_field_name, value] of Object.entries(field.getExtraFields())) {
-					const name_parts = this.#subFieldNameParts(extra_field_name);
-
-					if (name_parts === false) {
-						continue;
-					}
-
-					result = objectSetDeepValue(result, name_parts, value);
-				}
+				simple_fields = {...simple_fields, ...field.getExtraFields()};
 			}
 			else {
-				const name_parts = this.#subFieldNameParts(field.getName());
-
-				if (name_parts === false) {
-					continue;
-				}
-
-				result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
+				simple_fields[field.getName()] = trim_value ? field.getValueTrimmed() : field.getValue();
 			}
+		}
+
+		for (const [key, value] of Object.entries(simple_fields)) {
+			const name_parts = this.#subFieldNameParts(key);
+
+			if (name_parts === false) {
+				continue;
+			}
+
+			result = objectSetDeepValue(result, name_parts, value);
 		}
 
 		return result;
