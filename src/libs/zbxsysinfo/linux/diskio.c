@@ -328,11 +328,11 @@ int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
  *                                                                            *
  * Purpose: gets device type                                                  *
  *                                                                            *
- * Parameters: dev_name    [IN]  - like in /dev/<dev_name>                    *
- *           : sysfs_found [IN]  - 1 if sysfs a filesystem for exporting      *
+ * Parameters: dev_name    - [IN]  like in /dev/<dev_name>                    *
+ *             sysfs_found - [IN]  1 if sysfs a filesystem for exporting      *
  *                                 kernel objects is available at             *
  *                                 /sys/dev/block/, otherwise 0               *
- *             stat_buf    [out] - can be used to get major-id and minor-id   *
+ *             stat_buf    - [OUT] can be used to get major-id and minor-id   *
  *                                 of the device                              *
  *                                                                            *
  * Return value: device type, examples: disk, rom, partition                  *
@@ -808,11 +808,11 @@ static void	devids_init(zbx_vector_device_ptr_t *devices)
  *                                                                            *
  * Purpose: adds device ID in format like in /dev/disk/by-id/                 *
  *                                                                            *
- * Parameters: devices  [IN]  - cache of pre-sorted devices with IDs          *
- *           : stat_buf [IN]  - needed to identify current device by          *
- *                              major-id and minor-id                         *
- *             model    [IN]                                                  *
- *             json     [out]                                                 *
+ * Parameters: devices  - [IN] cache of pre-sorted devices with IDs           *
+ *             stat_buf - [IN] needed to identify current device by           *
+ *                             major-id and minor-id                          *
+ *             model    - [IN]                                                *
+ *             json     - [OUT]                                               *
  *                                                                            *
  * Comments:                                                                  *
  *                                                                            *
@@ -875,7 +875,7 @@ static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const 
 
 	while ('\0' != model[i] && j < (int)sizeof(norm_model) - 1)
 	{
-		char c = model[i];
+		char	c = model[i];
 
 		if (0 != isalnum(c) || '.' == c || ' ' == c)
 		{
@@ -990,12 +990,14 @@ out:
  *                                                                            *
  * Purpose: discovers disks and partitions                                    *
  *                                                                            *
- * Return value: JSON                                                         *
+ * Parameters: request - [IN]                                                 *
+ *             result  - [OUT]                                                *
+ *                                                                            *
+ * Return value: SYSINFO_RET_OK or SYSINFO_RET_FAIL.                          *
  *                                                                            *
  ******************************************************************************/
 int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-
 	char			*devnames, *mode, *rxp_error = NULL;
 	int			has_vals, imode, ret = SYSINFO_RET_OK;
 	DIR			*dir;

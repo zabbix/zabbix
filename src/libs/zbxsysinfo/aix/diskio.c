@@ -254,7 +254,8 @@ int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result)
 }
 
 #if defined(HAVE_LIBODM)
-static char	*get_unique_id(char *hdisk, zbx_vector_disk_ptr_t *devices) {
+static char	*get_unique_id(char *hdisk, zbx_vector_disk_ptr_t *devices)
+{
 	int		index;
 	zbx_disk_t	disk_local;
 
@@ -265,7 +266,6 @@ static char	*get_unique_id(char *hdisk, zbx_vector_disk_ptr_t *devices) {
 		return devices->values[index]->unique_id;
 	else
 		return "";
-
 }
 
 static void	log_odm_err(const char *err_prefix)
@@ -280,7 +280,10 @@ static void	log_odm_err(const char *err_prefix)
 
 static void	get_unique_ids(const zbx_regexp_t *disknames_rxp, zbx_vector_disk_ptr_t *disks)
 {
-	char	crit[MAX_STRING_LEN];
+	char		crit[MAX_STRING_LEN];
+	CLASS_SYMBOL	cuat_cls;
+	struct CuAt	cuat;
+	struct CuAt	*p;
 
 	zbx_vector_disk_ptr_create(disks);
 
@@ -291,7 +294,7 @@ static void	get_unique_ids(const zbx_regexp_t *disknames_rxp, zbx_vector_disk_pt
 		return;
 	}
 
-	CLASS_SYMBOL	cuat_cls = odm_open_class(CuAt_CLASS);
+	cuat_cls = odm_open_class(CuAt_CLASS);
 
 	if ((CLASS_SYMBOL)-1 == cuat_cls)
 	{
@@ -301,8 +304,7 @@ static void	get_unique_ids(const zbx_regexp_t *disknames_rxp, zbx_vector_disk_pt
 
 	zbx_snprintf(crit, sizeof(crit), "attribute='unique_id'");
 
-	struct CuAt	cuat;
-	struct CuAt	*p = (struct CuAt *)odm_get_first(cuat_cls, crit, &cuat);
+	p = (struct CuAt *)odm_get_first(cuat_cls, crit, &cuat);
 
 	if ((struct CuAt *)-1 == p)
 	{
@@ -315,6 +317,7 @@ static void	get_unique_ids(const zbx_regexp_t *disknames_rxp, zbx_vector_disk_pt
 		if (NULL == disknames_rxp || 0 == zbx_regexp_match_precompiled(cuat.name, disknames_rxp))
 		{
 			zbx_disk_t	*disk = zbx_malloc(NULL, sizeof(zbx_disk_t));
+
 			disk->name = zbx_strdup(NULL, cuat.name);
 			disk->unique_id = zbx_strdup(NULL, cuat.value);
 			zbx_vector_disk_ptr_append(disks, disk);
@@ -422,7 +425,10 @@ out:
  *                                                                            *
  * Purpose: discovers disks and partitions                                    *
  *                                                                            *
- * Return value: JSON                                                         *
+ * Parameters: request - [IN]                                                 *
+ *             result  - [OUT]                                                *
+ *                                                                            *
+ * Return value: SYSINFO_RET_OK or SYSINFO_RET_FAIL.                          *
  *                                                                            *
  ******************************************************************************/
 int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
