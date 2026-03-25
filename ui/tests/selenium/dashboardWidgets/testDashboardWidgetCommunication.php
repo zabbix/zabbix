@@ -2941,11 +2941,13 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 		$dashboard->edit();
 
 		$widget_fields = ['Hostgroups page' => 'Host groups', 'Hosts page' => 'Hosts', 'Items page' => 'Item',
-			'Maps page' => 'Map'
+			'Maps page' => 'Map', 'Multi-broadcasting page' => 'Host groups'
 		];
 		foreach ($widget_fields as $page => $field) {
 			$dashboard->selectPage($page);
-			$broadcaster = self::$current_broadcasters[$page];
+			$broadcaster = ($page === 'Multi-broadcasting page')
+				? 'Map mixed broadcaster'
+				: self::$current_broadcasters[$page];
 
 			switch ($page) {
 				case 'Items page':
@@ -2956,6 +2958,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 				case 'Maps page':
 					$listeners = ['Map listener'];
+					break;
+
+				case 'Multi-broadcasting page':
+					$listeners = ['Both host and group from single broadcaster', 'Host and group from different broadcasters'];
 					break;
 
 				default:
@@ -3664,11 +3670,25 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						: $field;
 
 					$this->assertEquals(['Unavailable widget'], $widget_form->getField($unavailable_field)->getValue());
+
+					// The below widget listens to the same broadcaster both for hosts and hostgroups.
+					if ($listener_name === 'Both host and group from single broadcaster') {
+						$this->assertEquals(['Unavailable widget'], $widget_form->getField('Hosts')->getValue());
+					}
+
 					$error_field = $unavailable_field;
 				}
 
 				$widget_form->submit();
-				$this->assertMessage(TEST_BAD, null, 'Invalid parameter "'.$error_field.'": referred widget is unavailable.');
+				// The below widget listens to the same broadcaster both for hosts and hostgroups.
+				if ($listener_name === 'Both host and group from single broadcaster') {
+					$this->assertMessage(TEST_BAD, null, ['Invalid parameter "Host groups": referred widget is unavailable.',
+						'Invalid parameter "Hosts": referred widget is unavailable.'
+					]);
+				}
+				else {
+					$this->assertMessage(TEST_BAD, null, 'Invalid parameter "'.$error_field.'": referred widget is unavailable.');
+				}
 
 				COverlayDialogElement::find()->one()->close();
 			}
