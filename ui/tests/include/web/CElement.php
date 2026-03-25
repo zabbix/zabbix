@@ -672,7 +672,7 @@ class CElement extends CBaseElement implements IWaitable {
 	 *
 	 * @param type $options
 	 */
-	public function detect($options = [], $ignore_warnings = false) {
+	public function detect($options = []) {
 
 		$tag = $this->getTagName();
 		if ($tag === 'textarea') {
@@ -741,9 +741,7 @@ class CElement extends CBaseElement implements IWaitable {
 			}
 		}
 
-		if (!$ignore_warnings) {
-			CTest::zbxAddWarning('No specific element was detected');
-		}
+		CTest::zbxAddWarning('No specific element was detected');
 
 		return $this;
 	}
