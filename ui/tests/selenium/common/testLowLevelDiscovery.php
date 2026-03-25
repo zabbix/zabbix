@@ -2734,7 +2734,7 @@ class testLowLevelDiscovery extends CWebTest {
 					? $data['Overrides']['Name']
 					: 'Override';
 				$form->query('link', $override_name)->waitUntilClickable()->one()->click();
-				$override_dialog_form = COverlayDialogElement::get($override_name)->asForm();
+				$override_dialog_form = COverlayDialogElement::get('Override')->asForm();
 				$override_dialog_form->checkValue($data['Overrides']);
 				$override_dialog_form->submit();
 				$override_dialog_form->waitUntilNotVisible();

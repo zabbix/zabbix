@@ -405,7 +405,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	if (NULL == (db->conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (1 == db->autoincrement)

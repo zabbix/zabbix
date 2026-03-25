@@ -15,6 +15,8 @@
 #ifndef ZABBIX_PP_MANAGER_H
 #define ZABBIX_PP_MANAGER_H
 
+#include "zbxcommon.h"
+#include "zbxtypes.h"
 #include "pp_worker.h"
 #include "pp_queue.h"
 #include "zbxalgo.h"
