@@ -919,12 +919,12 @@ static int	DBpatch_7050070(void)
 
 static int	DBpatch_7050071(void)
 {
-	return DBcreate_index("device_key", "device_1", "deviceid", 0);
+	return DBcreate_index("device_key", "device_key_1", "deviceid", 0);
 }
 
 static int	DBpatch_7050072(void)
 {
-	return DBcreate_index("device_key", "device_2", "kid", 0);
+	return DBcreate_index("device_key", "device_key_2", "kid", 0);
 }
 
 static int	DBpatch_7050073(void)
