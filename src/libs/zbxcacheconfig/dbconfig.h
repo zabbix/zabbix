@@ -236,6 +236,12 @@ typedef struct
 }
 ZBX_DC_BROWSERITEM;
 
+typedef struct
+{
+	const char	*query_fields;
+}
+ZBX_DC_TQITEM;
+
 typedef union
 {
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -251,6 +257,7 @@ typedef union
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_BROWSERITEM	*browseritem;
+	ZBX_DC_TQITEM		*tqitem;
 }
 ZBX_DC_ITEMTYPE;
 

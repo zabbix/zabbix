@@ -536,6 +536,11 @@ static void	DCdump_browseritem(const ZBX_DC_BROWSERITEM *browseritem)
 	}
 }
 
+static void	DCdump_tqitem(const ZBX_DC_TQITEM *tqitem)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "  telemetry_query:[query fields:'%s']", tqitem->query_fields);
+}
+
 static void	DCdump_telnetitem(const ZBX_DC_TELNETITEM *telnetitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:[username:'%s' password:'%s' params:'%s']",
@@ -720,6 +725,9 @@ static void	DCdump_items(void)
 				DCdump_browseritem(item->itemtype.browseritem);
 				break;
 			case ITEM_TYPE_NESTED_LLD:
+				break;
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				DCdump_tqitem(item->itemtype.tqitem);
 				break;
 		}
 

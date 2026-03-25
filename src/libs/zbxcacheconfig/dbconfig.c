@@ -2920,6 +2920,11 @@ static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type, zbx_uint6
 			break;
 		case ITEM_TYPE_NESTED_LLD:
 			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			dc_strpool_release(item->itemtype.tqitem->query_fields);
+
+			__config_shmem_free_func(item->itemtype.tqitem);
+			break;
 	}
 }
 
@@ -3176,6 +3181,15 @@ static void	dc_item_type_update(int found, ZBX_DC_ITEM *item, zbx_item_type_t *o
 			}
 			break;
 		case ITEM_TYPE_NESTED_LLD:
+			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			if (0 == found)
+			{
+				item->itemtype.tqitem = (ZBX_DC_TQITEM *)__config_shmem_malloc_func(NULL,
+						sizeof(ZBX_DC_TQITEM));
+			}
+
+			dc_strpool_replace(found, &item->itemtype.tqitem->query_fields, row[32]);
 			break;
 	}
 
