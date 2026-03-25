@@ -322,6 +322,6 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 #else
 	ZBX_UNUSED(args);
 	THIS_SHOULD_NEVER_HAPPEN;
-	zbx_thread_exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #endif
 }

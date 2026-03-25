@@ -641,60 +641,6 @@ function addSelectedValues(object, parentid) {
 	jQuery(document).trigger('add.popup', data);
 }
 
-/**
- * Send trigger expression form data to server for validation before adding it to trigger expression field.
- *
- * @param {Overlay} overlay
- */
-function validate_trigger_expression(overlay) {
-	var $form = overlay.$dialogue.find('form'),
-		url = new Curl($form.attr('action'));
-
-	url.setArgument('add', 1);
-
-	overlay.setLoading();
-	overlay.xhr = jQuery.ajax({
-		url: url.getUrl(),
-		data: $form.serialize(),
-		complete: function() {
-			overlay.unsetLoading();
-		},
-		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
-			if ('error' in ret) {
-				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
-
-				message_box.insertBefore($form);
-
-				return;
-			}
-
-			var form = window.document.forms[ret.dstfrm];
-			var obj = (typeof form !== 'undefined')
-				? jQuery(form).find('#' + ret.dstfld1).get(0)
-				: document.getElementById(ret.dstfld1);
-
-			if ((ret.dstfld1 === 'expr_temp' || ret.dstfld1 === 'recovery_expr_temp')) {
-				jQuery(obj).val(ret.expression);
-			}
-			else {
-				jQuery(obj).val(jQuery(obj).val() + ret.expression);
-			}
-
-			overlayDialogueDestroy(overlay.dialogueid);
-
-			obj.dispatchEvent(new Event('change'));
-
-			if (window.trigger_edit_popup) {
-				window.trigger_edit_popup.form.validateChanges(['expression', 'recovery_expression']);
-			}
-		},
-		dataType: 'json',
-		type: 'POST'
-	});
-}
-
 function redirect(uri, method, needle, invert_needle, allow_empty) {
 	method = (method || 'get').toLowerCase();
 
