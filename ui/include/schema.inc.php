@@ -10262,7 +10262,7 @@ return [
 			'jti' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 36,
+				'length' => 32,
 				'default' => ''
 			],
 			'expires_at' => [
@@ -10291,7 +10291,7 @@ return [
 			'uuid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 36,
+				'length' => 32,
 				'default' => ''
 			],
 			'name' => [
@@ -10311,6 +10311,12 @@ return [
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 255,
 				'default' => ''
+			],
+			'expires_at' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			],
 			'activated_at' => [
 				'null' => false,
@@ -10440,7 +10446,7 @@ return [
 			'uuid' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 36,
+				'length' => 32,
 				'default' => ''
 			]
 		]
