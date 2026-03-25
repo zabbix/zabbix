@@ -8622,7 +8622,7 @@ svg {
     align-items: center;
     box-sizing: border-box; }
   .preprocessing-list .step-parameters {
-    align-items: flex-start; }
+    align-items: baseline; }
   .preprocessing-list .step-name,
   .preprocessing-list .step-parameters,
   .preprocessing-list .step-on-fail,
