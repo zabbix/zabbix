@@ -123,7 +123,6 @@ if ($data['has_unack_events']) {
 		], 'acknowledge_problem'),
 		(new CCheckBox('acknowledge_problem', ZBX_PROBLEM_UPDATE_ACKNOWLEDGE))
 			->addClass('js-operation-checkbox')
-			->onChange("$('#unacknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
 	);
 }
@@ -139,7 +138,6 @@ if ($data['has_ack_events']) {
 		new CLabel([_('Unacknowledge'), makeHelpIcon(_('Undo problem acknowledgement.'))], 'unacknowledge_problem'),
 		(new CCheckBox('unacknowledge_problem', ZBX_PROBLEM_UPDATE_UNACKNOWLEDGE))
 			->addClass('js-operation-checkbox')
-			->onChange("$('#acknowledge_problem').prop('disabled', this.checked)")
 			->setEnabled($data['allowed_acknowledge'])
 	);
 }
