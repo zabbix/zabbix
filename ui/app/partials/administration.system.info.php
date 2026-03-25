@@ -323,9 +323,10 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 
 	if ($data['system_info']['http_auth_warning']) {
 		$info_table->addRow([
-			'ALLOW_HTTP_AUTH',
+			'$ALLOW_HTTP_AUTH',
 			_('Deprecated'),
-			(new CSpan(_('Use http_auth_enabled instead')))->addClass(ZBX_STYLE_COLOR_WARNING)
+			(new CSpan(_s('Use %1$s instead', '$ZBX_FEATURE_FLAGS[\'http_auth_enabled\']')))
+				->addClass(ZBX_STYLE_COLOR_WARNING)
 		]);
 	}
 }

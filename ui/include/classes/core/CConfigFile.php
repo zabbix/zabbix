@@ -189,7 +189,8 @@ class CConfigFile {
 		}
 
 		if (isset($ALLOW_HTTP_AUTH) && isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
-			self::exception(_('Can not use both $ALLOW_HTTP_AUTH and $ZBX_FEATURE_FLAGS at the same time.'));
+			self::exception(_s('Cannot use both %1$s and %2$s at the same time.', '$ALLOW_HTTP_AUTH',
+				'$ZBX_FEATURE_FLAGS[\'http_auth_enabled\']'));
 		}
 
 		if (isset($ALLOW_HTTP_AUTH)) {
@@ -398,8 +399,8 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		}
 
 		if ($error !== null) {
-			self::exception(_s('Incorrect configuration %1$s: %2$s.','
-				$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
+			self::exception(_s('Incorrect configuration %1$s: %2$s.',
+				'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
 				$error
 			));
 		}
