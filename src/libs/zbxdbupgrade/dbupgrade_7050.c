@@ -764,7 +764,7 @@ static int	DBpatch_7050052(void)
 
 static int	DBpatch_7050053(void)
 {
-	const zbx_db_field_t	field = {"auth_type", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"auth_scheme", "0", NULL, NULL, 32, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("token", &field);
 }
@@ -786,7 +786,7 @@ static int	DBpatch_7050056(void)
 
 static int	DBpatch_7050057(void)
 {
-	return DBcreate_index("token", "token_2", "userid,auth_type,name", 1);
+	return DBcreate_index("token", "token_2", "userid,auth_scheme,name", 1);
 }
 
 static int	DBpatch_7050058(void)
@@ -1001,12 +1001,12 @@ static int	DBpatch_7050078(void)
 	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
-	return DBadd_foreign_key("enrollment_token", 1, &field);
+	return DBadd_foreign_key("device_enrollment_token", 1, &field);
 }
 
 static int	DBpatch_7050079(void)
 {
-	return DBcreate_index("enrollment_token", "enrollment_token_1", "deviceid", 1);
+	return DBcreate_index("device_enrollment_token", "device_enrollment_token_1", "token", 1);
 }
 
 #endif
