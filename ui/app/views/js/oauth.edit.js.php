@@ -88,6 +88,8 @@ window.oauth_edit_popup = new class {
 							}
 
 							return Promise.reject(error);
+						}).catch(error => {
+							throw {error};
 						})
 					)
 					.catch(error => {
