@@ -2305,9 +2305,9 @@ FIELD		|uuid		|t_varchar(36)	|''	|NOT NULL	|0
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|push_token	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|expires_at	|t_time		|'0'	|NOT NULL	|0
 FIELD		|activated_at	|t_time		|'0'	|NOT NULL	|0
 INDEX		|1		|userid
-INDEX		|2		|tokenid
 
 TABLE|device_token|tokenid|0
 FIELD		|tokenid	|t_id		|	|NOT NULL	|0|1|token	|tokenid	|RESTRICT
