@@ -487,21 +487,6 @@ static void	dev_path_add(const char *d_name, struct zbx_json *j)
 	zbx_json_addstring(j, "path", path, ZBX_JSON_TYPE_STRING);
 }
 
-static void	dev_name_add(const char *d_name, struct zbx_json *j)
-{
-	zbx_json_addstring(j, "name", d_name, ZBX_JSON_TYPE_STRING);
-}
-
-static void	dev_type_add(const char *type, struct zbx_json *j)
-{
-	zbx_json_addstring(j, "type", type, ZBX_JSON_TYPE_STRING);
-}
-
-static void	dev_model_add(const char *model, struct zbx_json *j)
-{
-	zbx_json_addstring(j, "model", model, ZBX_JSON_TYPE_STRING);
-}
-
 static void	dev_serial_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE	*f;
@@ -949,84 +934,55 @@ static void	vfs_dev_get_process_entry(const char *dev_name, const zbx_regexp_t *
 	if (NULL == (type = dev_type_get(dev_name, 1, &stat_buf)))
 		return;
 
-	switch (mode)
+	if (ZBX_MODE_DEVICE_STATS == mode)
 	{
-		case ZBX_MODE_DISKS:
-			if (SUCCEED != dev_is_disk(type))
-				break;
-
-			model = dev_model_get(&stat_buf);
-			zbx_json_addobject(cfg, NULL);
-
-			dev_name_add(dev_name, cfg);
-			vfs_dev_get_devid_add(devices, &stat_buf, model, cfg);
-			dev_type_add(type, cfg);
-			dev_path_add(dev_name, cfg);
-			dev_model_add(model, cfg);
-			dev_serial_add(&stat_buf, cfg);
-			dev_wwn_add(&stat_buf, cfg);
-			dev_size_bytes_add(&stat_buf, cfg);
-			dev_logical_blksize_add(&stat_buf, cfg);
-			dev_physical_blksize_add(&stat_buf, cfg);
-
-			zbx_json_close(cfg);
-			zbx_free(model);
-			break;
-		case ZBX_MODE_DISK_STATS:
-			if (SUCCEED != dev_is_disk(type))
-				break;
-
-			zbx_json_addobject(cfg, NULL);
-			zbx_json_addobject(val, NULL);
-
-			dev_name_add(dev_name, cfg);
-			vfs_dev_get_devid_add(devices, &stat_buf, model, cfg);
-			dev_type_add(type, cfg);
-			dev_size_bytes_add(&stat_buf, cfg);
-
-			dev_name_add(dev_name, val);
-			dev_stats_add(&stat_buf, val);
-
-			zbx_json_close(cfg);
-			zbx_json_close(val);
-			break;
-		case ZBX_MODE_DEVICES:
-			if (SUCCEED != dev_is_disk(type))
-				break;
-
-			model = dev_model_get(&stat_buf);
-			zbx_json_addobject(cfg, NULL);
-
-			dev_name_add(dev_name, cfg);
-			vfs_dev_get_devid_add(devices, &stat_buf, model, cfg);
-			dev_type_add(type, cfg);
-			dev_disk_partition_sizes_add(&stat_buf, cfg);
-
-			zbx_json_close(cfg);
-			zbx_free(model);
-			break;
-		case ZBX_MODE_DEVICE_STATS:
-			if (SUCCEED != dev_is_disk(type) && SUCCEED != dev_is_partition(type))
-				break;
-
-			model = dev_model_get(&stat_buf);
-			zbx_json_addobject(cfg, NULL);
-			zbx_json_addobject(val, NULL);
-
-			dev_name_add(dev_name, cfg);
-			vfs_dev_get_devid_add(devices, &stat_buf, model, cfg);
-			dev_type_add(type, cfg);
-			dev_size_bytes_add(&stat_buf, cfg);
-
-			dev_name_add(dev_name, val);
-			dev_stats_add(&stat_buf, val);
-
-			zbx_json_close(cfg);
-			zbx_json_close(val);
-			zbx_free(model);
-			break;
+		if (SUCCEED != dev_is_disk(type) && SUCCEED != dev_is_partition(type))
+			goto out;
+	}
+	else
+	{
+		if (SUCCEED != dev_is_disk(type))
+			goto out;
 	}
 
+	model = dev_model_get(&stat_buf);
+
+	zbx_json_addobject(cfg, NULL);
+	zbx_json_addstring(cfg, "name", dev_name, ZBX_JSON_TYPE_STRING);
+	vfs_dev_get_devid_add(devices, &stat_buf, model, cfg);
+	zbx_json_addstring(cfg, "type", type, ZBX_JSON_TYPE_STRING);
+
+	if (ZBX_MODE_DISKS == mode)
+	{
+		dev_path_add(dev_name, cfg);
+		zbx_json_addstring(cfg, "model", model, ZBX_JSON_TYPE_STRING);
+		dev_serial_add(&stat_buf, cfg);
+		dev_wwn_add(&stat_buf, cfg);
+		dev_size_bytes_add(&stat_buf, cfg);
+		dev_logical_blksize_add(&stat_buf, cfg);
+		dev_physical_blksize_add(&stat_buf, cfg);
+	}
+	else if (ZBX_MODE_DISK_STATS == mode || ZBX_MODE_DEVICE_STATS == mode)
+	{
+		dev_size_bytes_add(&stat_buf, cfg);
+	}
+	else if (ZBX_MODE_DEVICES == mode)
+	{
+		dev_disk_partition_sizes_add(&stat_buf, cfg);
+	}
+
+	zbx_json_close(cfg);
+
+	if (ZBX_MODE_DISK_STATS == mode || ZBX_MODE_DEVICE_STATS == mode)
+	{
+		zbx_json_addobject(val, NULL);
+		zbx_json_addstring(val, "name", dev_name, ZBX_JSON_TYPE_STRING);
+		dev_stats_add(&stat_buf, val);
+		zbx_json_close(val);
+	}
+
+	zbx_free(model);
+out:
 	zbx_free(type);
 }
 
