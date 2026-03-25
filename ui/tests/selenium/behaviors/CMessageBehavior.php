@@ -63,7 +63,10 @@ class CMessageBehavior extends CBehavior {
 	 */
 	public function assertInlineError($form, $fields) {
 		foreach ($fields as $selector => $error_text) {
-			$field = $form->getField($selector);
+			$field = (strpos($selector, ':') === false)
+				? $form->getField($selector)
+				: $form->query($selector)->one();
+
 			$field->waitUntilClassesPresent('has-error');
 
 			if ($field->isAttributePresent('data-error-container')) {
