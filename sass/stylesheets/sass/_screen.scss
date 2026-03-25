@@ -3316,10 +3316,6 @@ svg {
 		box-sizing: border-box;
 	}
 
-	.step-parameters {
-		align-items: baseline;
-	}
-
 	.step-name,
 	.step-parameters,
 	.step-on-fail,
@@ -3347,6 +3343,13 @@ svg {
 		.step-on-fail,
 		.step-action {
 			height: 34px;
+		}
+	}
+
+	.preprocessing-list-item {
+		.step-parameters {
+			align-items: baseline;
+			line-height: 22px;
 		}
 	}
 

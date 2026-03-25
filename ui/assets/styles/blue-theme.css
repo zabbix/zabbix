@@ -8624,8 +8624,6 @@ svg {
     display: flex;
     align-items: center;
     box-sizing: border-box; }
-  .preprocessing-list .step-parameters {
-    align-items: baseline; }
   .preprocessing-list .step-name,
   .preprocessing-list .step-parameters,
   .preprocessing-list .step-on-fail,
@@ -8646,6 +8644,9 @@ svg {
     .preprocessing-list .preprocessing-step .step-on-fail,
     .preprocessing-list .preprocessing-step .step-action {
       height: 34px; }
+  .preprocessing-list .preprocessing-list-item .step-parameters {
+    align-items: baseline;
+    line-height: 22px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
     .preprocessing-list .step-parameters z-select {
