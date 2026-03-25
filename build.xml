@@ -616,6 +616,8 @@
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="--do-not-cache-result"/>
 			<arg line="--dont-report-useless-tests"/>
+			<arg line="--testdox"/>
+			<arg line="--verbose"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
 		</exec>

@@ -245,6 +245,7 @@ class testFunctionChangeCount extends CIntegrationTest {
 	}
 
 	/**
+	 * @required-components inherit
 	 * @depends testFunctionChangeCount_Send_NotEnoughData
 	 */
 	public function testFunctionChangeCount_Get_NotEnoughData() {

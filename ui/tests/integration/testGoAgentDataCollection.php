@@ -531,7 +531,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		}
 
 		// Delay to ensure that all metrics were collected.
-		sleep(110);
+		sleep(15);
 	}
 
 	/**

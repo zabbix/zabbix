@@ -357,12 +357,12 @@ class testTagInheritance extends CIntegrationTest {
 	}
 
 	public function testInheritedTags() {
-		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . '0', self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . '0', self::VALUE_TO_FIRE_TRIGGER, null, 0);
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'hostids' => [self::$host_id],
 			'selectTags' => ['tag', 'value']
-		], 5, 2);
+		], 5, 1);
 
 		$this->assertCount(1, self::$event_response['result']);
 
@@ -388,12 +388,12 @@ class testTagInheritance extends CIntegrationTest {
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_template_tags), json_encode($result_tags));
 
-		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER, null, 0);
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'objectids' => self::$host_trigger_id,
 			'hostids' => [self::$host_id],
 			'selectTags' => ['tag', 'value']
-		], 5, 2);
+		], 5, 1);
 
 		$this->assertCount(1, self::$event_response['result']);
 
@@ -704,19 +704,20 @@ class testTagInheritance extends CIntegrationTest {
 
 	private function generateEvent($n) {
 
-		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . $n, self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . $n, self::VALUE_TO_FIRE_TRIGGER, null, 0);
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'tags' => [['tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
 						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n]],
 			'selectTags' => ['tag', 'value']
-		], 5, 2);
+		], 5, 1);
 
 		$this->assertCount(1, self::$event_response['result']);
 		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
 	}
 
 	/**
+	 * @required-components inherit
 	 * @depends testInheritedTags
 	 * @dataProvider event_get_data
 	 */

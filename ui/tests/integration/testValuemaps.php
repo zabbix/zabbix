@@ -249,7 +249,7 @@ class testValuemaps extends CIntegrationTest {
 
 	/**
 	 * Test valuemaps cases.
-	 *
+	 * @required-components inherit
 	 * @dataProvider getValuemaps
 	 */
 	public function testValuemaps_checkProblemName($inputData, $inputType, $valuemap, $outputData) {
@@ -276,14 +276,14 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['triggerids']));
 		$triggerid =  $response['result']['triggerids'];
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCache(null, 1);
 
-		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
+		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData, null, 0);
 
-		['result' => $result] = $this->call('problem.get', [
+		['result' => $result] = $this->callUntilDataIsPresent('problem.get', [
 			'output' => ['name'],
 			'objectids' => $triggerid
-		]);
+		], 5, 1);
 
 		$result = array_column($result, 'name');
 		$this->assertEquals(' '.$outputData, $result[0]);

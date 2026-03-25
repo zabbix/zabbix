@@ -121,6 +121,7 @@ class testDiagnosticDataTask extends CIntegrationTest {
 	}
 
 	/**
+	 * @required-components inherit
 	 * @dataProvider dataTask_dataProvider
 	 */
 	public function testDataTask($request, $expected_error) {

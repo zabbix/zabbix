@@ -27,13 +27,16 @@ class CIntegrationTest extends CAPITest {
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
 
+	// Set to true to print delay trace messages to STDERR.
+	const TRACE_DELAYS = true;
+
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
-	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 3; // Shutdown may legitimately take a lot of time
-	const CACHE_RELOAD_DELAY			= 5; // Configuration cache reload delay.
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1; // Shutdown may legitimately take a lot of time
+	const CACHE_RELOAD_DELAY			= 2; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
 	const HOUSEKEEPER_EXEC_DELAY			= 5; // Housekeeper execution delay.
-	const DATA_PROCESSING_DELAY			= 10; // Data processing delay.
+	const DATA_PROCESSING_DELAY			= 2; // Data processing delay.
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER			= 'server';
@@ -81,6 +84,9 @@ class CIntegrationTest extends CAPITest {
 	 */
 	private $case_components = [];
 
+	private static $case_components_inherit = false;
+	private static $case_components_started = false;
+
 	/**
 	 * Hosts to be enabled for test case.
 	 *
@@ -116,6 +122,9 @@ class CIntegrationTest extends CAPITest {
 				$component = self::COMPONENT_AGENT;
 			} else if ($component === 'agent_3.0') {
 				$component = self::COMPONENT_AGENT_3_0;
+			} else if ($component === 'inherit') {
+				self::$case_components_inherit = true;
+				break;
 			}
 
 			self::validateComponent($component);
@@ -235,18 +244,20 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
-
-		foreach ($this->case_components as $component) {
-			if (in_array($component, self::$suite_components)) {
-				throw new Exception('Component "'.$component.'" already started on suite level.');
+		if (self::$case_components_inherit === false || self::$case_components_started === false) {
+			foreach ($this->case_components as $component) {
+				if (in_array($component, self::$suite_components)) {
+					throw new Exception('Component "'.$component.'" already started on suite level.');
+				}
 			}
-		}
 
-		$components = array_merge(self::$suite_components, $this->case_components);
+			$components = array_merge(self::$suite_components, $this->case_components);
 
-		foreach ($components as $component) {
-			self::prepareComponentConfiguration($component, self::$case_configuration);
-			self::startComponent($component);
+			foreach ($components as $component) {
+				self::prepareComponentConfiguration($component, self::$case_configuration);
+				self::startComponent($component);
+				self::$case_components_started = true;
+			}
 		}
 	}
 
@@ -258,8 +269,12 @@ class CIntegrationTest extends CAPITest {
 	public function onAfterTestCase() {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
-		foreach ($components as $component) {
-			self::stopComponent($component);
+		if (self::$case_components_inherit === false)
+		{
+			foreach ($components as $component) {
+				self::stopComponent($component);
+			}
+			$case_components_started === false;
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
@@ -291,6 +306,8 @@ class CIntegrationTest extends CAPITest {
 	 * @afterClass
 	 */
 	public static function onAfterTestSuite() {
+		self::$case_components_inherit = false;
+		self::$case_components_started = false;
 		foreach (self::$suite_components as $component) {
 			self::stopComponent($component);
 		}
@@ -384,6 +401,7 @@ class CIntegrationTest extends CAPITest {
 				return true;
 			}
 
+			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
@@ -738,7 +756,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendDataValues($type, $values, $component = null) {
+	protected function sendDataValues($type, $values, $component = null, $delayOverride = null) {
 		if ($component === null) {
 			$component = $this->getActiveComponent();
 		}
@@ -757,8 +775,14 @@ class CIntegrationTest extends CAPITest {
 				'Processed value count doesn\'t match sent value count.'
 		);
 
-		sleep(self::DATA_PROCESSING_DELAY);
+		// Determine delay: override if provided, else use default constant.
+		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
 
+		// Sleep only if delay > 0
+		if ($delay > 0) {
+			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("sendDataValues delay:%d\n", $delay));
+			sleep($delay);
+		}
 		return $result;
 	}
 
@@ -773,7 +797,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendDataValue($type, $host, $key, $value, $component = null) {
+	protected function sendDataValue($type, $host, $key, $value, $component = null, $delayOverride = null) {
 		if (!is_scalar($value)) {
 			$value = json_encode($value);
 		}
@@ -784,7 +808,7 @@ class CIntegrationTest extends CAPITest {
 			'value' => $value
 		];
 
-		return $this->sendDataValues($type, [$data], $component);
+		return $this->sendDataValues($type, [$data], $component, $delayOverride);
 	}
 
 	/**
@@ -795,8 +819,8 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendSenderValues($values, $component = null) {
-		return $this->sendDataValues('sender', $values, $component);
+	protected function sendSenderValues($values, $component = null, $delayOverride = null) {
+		return $this->sendDataValues('sender', $values, $component, $delayOverride);
 	}
 
 	/**
@@ -809,8 +833,8 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendSenderValue($host, $key, $value, $component = null) {
-		return $this->sendDataValue('sender', $host, $key, $value, $component);
+	protected function sendSenderValue($host, $key, $value, $component = null, $delayOverride = null) {
+		return $this->sendDataValue('sender', $host, $key, $value, $component, $delayOverride);
 	}
 
 	/**
@@ -867,7 +891,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component    component name or null for active component
 	 */
-	protected function reloadConfigurationCache($component = null) {
+	protected function reloadConfigurationCache($component = null, $delayOverride = null) {
 		if ($component === null) {
 			$component = $this->getActiveComponent();
 		}
@@ -880,7 +904,9 @@ class CIntegrationTest extends CAPITest {
 			self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
 		}
 
-		sleep(self::CACHE_RELOAD_DELAY);
+		$delay = ($delayOverride !== null) ? $delayOverride : self::CACHE_RELOAD_DELAY;
+		if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
+		sleep($delay);
 	}
 
 	/**
@@ -932,6 +958,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
+		$usleep_total = 0;
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $params);
@@ -944,6 +971,14 @@ class CIntegrationTest extends CAPITest {
 				$exception = $e;
 			}
 
+			if ($usleep_total < 1000000 && $iterations > 1) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$i = -1;
+				continue;
+			}
+
+			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
 			sleep($delay);
 		}
 
@@ -1050,6 +1085,7 @@ class CIntegrationTest extends CAPITest {
 				return true;
 			}
 
+			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
 			sleep($delay);
 		}
 

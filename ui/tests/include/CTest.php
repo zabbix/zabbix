@@ -293,7 +293,22 @@ class CTest extends TestCase {
 		if (self::$last_test_case !== $case_name) {
 			// Restore data from backup if test case changed.
 			if (self::$case_backup_once !== null) {
+				$start = microtime(true);
 				CDBHelper::restoreTables();
+				$caseDuration = microtime(true) - $start;
+
+fwrite(
+	STDERR,
+	sprintf(
+"[%s::%s] 111 Backup restore took %.4fs\n",
+get_class($this),
+$this->getName(),
+$caseDuration
+)
+);
+
+
+
 				self::$case_backup_once = null;
 			}
 
@@ -411,7 +426,21 @@ class CTest extends TestCase {
 		}
 
 		if ($this->case_backup !== null) {
-			CDBHelper::restoreTables();
+
+				$start = microtime(true);
+				CDBHelper::restoreTables();
+
+				$caseDuration = microtime(true) - $start;
+fwrite(
+STDERR,
+sprintf(
+"[%s::%s] 222 Backup restore took %.4fs\n",
+get_class($this),
+$this->getName(),
+$caseDuration
+)
+);
+
 		}
 
 		// Execute callbacks that should be executed after specific test case.
@@ -455,13 +484,42 @@ class CTest extends TestCase {
 
 		// Restore case level backups.
 		if (self::$case_backup_once !== null) {
-			CDBHelper::restoreTables();
+
+				$start = microtime(true);
+				CDBHelper::restoreTables();
+
+				$caseDuration = microtime(true) - $start;
+
+fwrite(
+STDERR,
+sprintf(
+"[%s::%s] 333 Backup restore took %.4fs\n",
+get_class($this),
+$this->getName(),
+$caseDuration
+)
+);
+
+
 			self::$case_backup_once = null;
 		}
 
 		// Restore suite level backups.
 		if (self::$suite_backup !== null) {
-			CDBHelper::restoreTables();
+			$start = microtime(true);
+				CDBHelper::restoreTables();
+
+				$caseDuration = microtime(true) - $start;
+
+fwrite(
+STDERR,
+sprintf(
+"[Suite] 444 Backup restore took %.4fs\n",
+$caseDuration
+)
+);
+
+
 			self::$suite_backup = null;
 		}
 
