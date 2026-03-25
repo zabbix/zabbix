@@ -1900,12 +1900,7 @@ static char	**dbsync_trigger_preproc_row(zbx_dbsync_t *sync, char **row)
 {
 	zbx_eval_context_t	ctx, ctx_r;
 	char			*error = NULL;
-	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT, flags;
-
-	ZBX_STR2UCHAR(flags, row[18]);
-
-	if (0 != (flags & ZBX_FLAG_DISCOVERY_PROTOTYPE))
-		return row;
+	unsigned char		mode, timer = ZBX_TRIGGER_TIMER_DEFAULT;
 
 	memcpy(sync->row, row, sizeof(char *) * (size_t)sync->columns_num);
 	row = sync->row;
@@ -2011,73 +2006,29 @@ out:
  ******************************************************************************/
 int	zbx_dbsync_compare_trigger_dependency(zbx_dbsync_t *sync)
 {
-	zbx_db_row_t		dbrow;
-	zbx_db_result_t		result;
-	zbx_hashset_t		deps;
-	zbx_hashset_iter_t	iter;
-	ZBX_DC_TRIGGER_DEPLIST	*dep_down, *dep_up;
-	zbx_uint64_pair_t	*dep, dep_local;
-	char			down_s[MAX_ID_LEN + 1], up_s[MAX_ID_LEN + 1];
-	char			*del_row[2] = {down_s, up_s};
-	int			i;
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	ret = SUCCEED;
 
 	zbx_dcsync_sql_start(sync);
-
-	if (NULL == (result = zbx_dbconn_select(sync->db, "select triggerid_down,triggerid_up from trigger_depends")))
-		return FAIL;
-
-	dbsync_prepare(sync, 2, NULL);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select triggerdepid, triggerid_down,triggerid_up from trigger_depends");
+	dbsync_prepare(sync, 3, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
-		sync->dbresult = result;
-		zbx_dcsync_sql_end(sync);
-		return SUCCEED;
+		if (NULL == (sync->dbresult = zbx_dbconn_select(sync->db, "%s", sql)))
+			ret = FAIL;
+		goto out;
 	}
 
-	zbx_hashset_create(&deps, 100, ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC, ZBX_DEFAULT_UINT64_PAIR_COMPARE_FUNC);
-
-	/* index all host->template links */
-	zbx_hashset_iter_reset(&dbsync_env.cache->trigdeps, &iter);
-	while (NULL != (dep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_iter_next(&iter)))
-	{
-		dep_local.first = dep_down->triggerid;
-
-		for (i = 0; i < dep_down->dependencies.values_num; i++)
-		{
-			dep_up = (ZBX_DC_TRIGGER_DEPLIST *)dep_down->dependencies.values[i];
-			dep_local.second = dep_up->triggerid;
-			zbx_hashset_insert(&deps, &dep_local, sizeof(dep_local));
-		}
-	}
-
-	/* add new rows, remove existing rows from index */
-	while (NULL != (dbrow = zbx_db_fetch(result)))
-	{
-		ZBX_STR2UINT64(dep_local.first, dbrow[0]);
-		ZBX_STR2UINT64(dep_local.second, dbrow[1]);
-
-		if (NULL == (dep = (zbx_uint64_pair_t *)zbx_hashset_search(&deps, &dep_local)))
-			dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_ADD, dbrow);
-		else
-			zbx_hashset_remove_direct(&deps, dep);
-	}
-
-	/* add removed rows */
-	zbx_hashset_iter_reset(&deps, &iter);
-	while (NULL != (dep = (zbx_uint64_pair_t *)zbx_hashset_iter_next(&iter)))
-	{
-		zbx_snprintf(down_s, sizeof(down_s), ZBX_FS_UI64, dep->first);
-		zbx_snprintf(up_s, sizeof(up_s), ZBX_FS_UI64, dep->second);
-		dbsync_add_row(sync, 0, ZBX_DBSYNC_ROW_REMOVE, del_row);
-	}
-
-	zbx_db_free_result(result);
-	zbx_hashset_destroy(&deps);
-
+	ret = dbsync_read_journal(sync, &sql, &sql_alloc, &sql_offset, "triggerdepid", "where", NULL,
+			&dbsync_env.journals[ZBX_DBSYNC_JOURNAL(ZBX_DBSYNC_OBJ_TRIGGER_DEP)]);
+out:
+	zbx_free(sql);
 	zbx_dcsync_sql_end(sync);
 
-	return SUCCEED;
+	return ret;
 }
 
 /******************************************************************************

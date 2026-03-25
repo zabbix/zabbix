@@ -4032,9 +4032,10 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 
 	ZBX_DC_TRIGGER_DEPLIST	*trigdep_down, *trigdep_up;
 
-	int			found, index, ret;
-	zbx_uint64_t		triggerid_down, triggerid_up;
-	ZBX_DC_TRIGGER		*trigger_up, *trigger_down;
+	int				found, index, ret;
+	zbx_uint64_t			triggerdepid;
+	ZBX_DC_TRIGGER			*trigger_up, *trigger_down;
+	zbx_dc_trigger_depends_t	*td;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4046,17 +4047,26 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
+		ZBX_STR2UINT64(triggerdepid, row[0]);
+
+		td = (zbx_dc_trigger_depends_t *)DCfind_id(&config->trigger_depends, triggerdepid,
+				sizeof(zbx_dc_trigger_depends_t), &found);
+
+		ZBX_STR2UINT64(td->triggerid_down, row[1]);
+		ZBX_STR2UINT64(td->triggerid_up, row[2]);
+
 		/* find trigdep_down pointer */
 
-		ZBX_STR2UINT64(triggerid_down, row[0]);
-		if (NULL == (trigger_down = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerid_down)))
+		if (NULL == (trigger_down = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
+				&td->triggerid_down)))
+		{
+			continue;
+		}
+
+		if (NULL == (trigger_up = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &td->triggerid_up)))
 			continue;
 
-		ZBX_STR2UINT64(triggerid_up, row[1]);
-		if (NULL == (trigger_up = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers, &triggerid_up)))
-			continue;
-
-		trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)DCfind_id(&config->trigdeps, triggerid_down,
+		trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)DCfind_id(&config->trigdeps, td->triggerid_down,
 				sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
 
 		if (0 == found)
@@ -4064,7 +4074,7 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 		else
 			trigdep_down->refcount++;
 
-		trigdep_up = (ZBX_DC_TRIGGER_DEPLIST *)DCfind_id(&config->trigdeps, triggerid_up,
+		trigdep_up = (ZBX_DC_TRIGGER_DEPLIST *)DCfind_id(&config->trigdeps, td->triggerid_up,
 				sizeof(ZBX_DC_TRIGGER_DEPLIST), &found);
 
 		if (0 == found)
@@ -4078,25 +4088,28 @@ static void	DCsync_trigdeps(zbx_dbsync_t *sync)
 	/* remove deleted trigger dependencies from buffer */
 	for (; SUCCEED == ret; ret = zbx_dbsync_next(sync, &rowid, &row, &tag))
 	{
-		ZBX_STR2UINT64(triggerid_down, row[0]);
+		if (NULL == (td = (zbx_dc_trigger_depends_t *)zbx_hashset_search(&config->trigger_depends, &rowid)))
+			continue;
+
 		if (NULL == (trigdep_down = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps,
-				&triggerid_down)))
+				&td->triggerid_down)))
 		{
+			zbx_hashset_remove_direct(&config->trigger_depends, td);
 			continue;
 		}
 
-		ZBX_STR2UINT64(triggerid_up, row[1]);
 		if (NULL != (trigdep_up = (ZBX_DC_TRIGGER_DEPLIST *)zbx_hashset_search(&config->trigdeps,
-				&triggerid_up)))
+				&td->triggerid_up)))
 		{
 			dc_trigger_deplist_release(trigdep_up);
 		}
 
 		if (SUCCEED != dc_trigger_deplist_release(trigdep_down))
 		{
-			if (FAIL == (index = zbx_vector_ptr_search(&trigdep_down->dependencies, &triggerid_up,
+			if (FAIL == (index = zbx_vector_ptr_search(&trigdep_down->dependencies, &td->triggerid_up,
 					ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 			{
+				zbx_hashset_remove_direct(&config->trigger_depends, td);
 				continue;
 			}
 
@@ -7460,7 +7473,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(zbx_dbconn_t *db, unsigned char mode, zbx
 	zbx_dbsync_init_changelog(&items_sync, "items", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&item_discovery_sync, "item_discovery", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&triggers_sync, "triggers", changelog_sync_mode, db);
-	zbx_dbsync_init(&tdep_sync, "trigger_depends", mode, db);
+	zbx_dbsync_init_changelog(&tdep_sync, "trigger_depends", changelog_sync_mode, db);
 	zbx_dbsync_init_changelog(&func_sync, "functions", changelog_sync_mode, db);
 	zbx_dbsync_init(&expr_sync, "regexps", mode, db);
 	zbx_dbsync_init(&action_sync, "actions", mode, db);
@@ -8515,6 +8528,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	CREATE_HASHSET(config->functions, 0);
 	CREATE_HASHSET(config->triggers, 0);
 	CREATE_HASHSET(config->trigdeps, 0);
+	CREATE_HASHSET(config->trigger_depends, 0);
 	CREATE_HASHSET(config->hosts, 10);
 	CREATE_HASHSET(config->proxies, 0);
 	CREATE_HASHSET(config->host_inventories, 0);

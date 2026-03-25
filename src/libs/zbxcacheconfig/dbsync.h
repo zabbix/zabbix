@@ -72,9 +72,11 @@
 #define ZBX_DBSYNC_OBJ_PROXY		19
 #define ZBX_DBSYNC_OBJ_PROXY_GROUP	20
 #define ZBX_DBSYNC_OBJ_HOST_PROXY	21
-#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	22	/* virtual object */
+#define ZBX_DBSYNC_OBJ_TRIGGER_DEP	22
+
+#define ZBX_DBSYNC_OBJ_ITEM_DISCOVERY	23	/* virtual object */
 /* number of dbsync objects - keep in sync with above defines */
-#define ZBX_DBSYNC_OBJ_COUNT		22
+#define ZBX_DBSYNC_OBJ_COUNT		23
 
 /******************************************************************************
  *                                                                            *

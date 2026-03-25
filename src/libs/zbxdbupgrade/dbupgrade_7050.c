@@ -838,6 +838,21 @@ static int	DBpatch_7050060(void)
 	return DBdrop_field("triggers", "error");
 }
 
+static int	DBpatch_7050061(void)
+{
+	return DBcreate_changelog_insert_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050062(void)
+{
+	return DBcreate_changelog_update_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050063(void)
+{
+	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -905,5 +920,8 @@ DBPATCH_ADD(7050057, 0, 1)
 DBPATCH_ADD(7050058, 0, 1)
 DBPATCH_ADD(7050059, 0, 1)
 DBPATCH_ADD(7050060, 0, 1)
+DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
 
 DBPATCH_END()
