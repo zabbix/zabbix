@@ -1423,7 +1423,6 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	while (NULL != fgets(line, sizeof(line), f))
 	{
-		int	num_filled;
 		char	*p;
 
 		if (NULL == (p = strstr(line, ":")))
@@ -1431,7 +1430,7 @@ int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		*p = '\t';
 
-		if (ZBX_PROC_NET_DEV_COLS_NUM != (num_filled = net_if_row_scan(line, if_name, &ns)))
+		if (ZBX_PROC_NET_DEV_COLS_NUM != net_if_row_scan(line, if_name, &ns))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "cannot parse \"%s\" line \"%s\"", ZBX_PROC_NET_DEV, line);
 			continue;
