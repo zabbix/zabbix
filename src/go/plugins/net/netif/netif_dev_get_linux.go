@@ -37,6 +37,7 @@ type ifStatsIn struct {
 	Compressed uint64 `json:"compressed"`
 	Multicast  uint64 `json:"multicast"`
 }
+
 type ifStatsOut struct {
 	Bytes      uint64 `json:"bytes"`
 	Packets    uint64 `json:"packets"`
