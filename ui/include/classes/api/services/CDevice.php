@@ -235,13 +235,13 @@ class CDevice extends CApiService {
 
 		$deviceid = reset($deviceids);
 
-		$ins_enrollment_token = [
+		$ins_device_enrollment_token = [
 			'deviceid' => $deviceid,
-			'enrollment_token' => hash('sha512', $enrollment_token),
-			'enrollment_token_expiration' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
+			'token' => hash('sha512', $enrollment_token),
+			'expires_at' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
 		];
 
-		DB::insertBatch('enrollment_token', [$ins_enrollment_token], false);
+		DB::insertBatch('device_enrollment_token', [$ins_device_enrollment_token], false);
 
 		return $deviceid;
 	}
@@ -276,14 +276,14 @@ class CDevice extends CApiService {
 	public function onboard(array $options): array {
 		$this->validateOnboard($options, $db_device);
 
-		DB::delete('enrollment_token', ['deviceid' => $db_device['deviceid']]);
-
 		self::$userData = [
 			'userid' => $db_device['userid'],
 			'uuid' => $db_device['uuid'],
 			'kid' => $options['mobile_encryption_key']['kid'],
 			'key' => json_encode($options['mobile_encryption_key'])
 		];
+
+		DB::delete('device_enrollment_token', ['deviceid' => $db_device['deviceid']]);
 
 		self::createDeviceKeys($db_device['deviceid'], $options['mobile_identity_key'],
 			$options['mobile_encryption_key']
@@ -293,7 +293,7 @@ class CDevice extends CApiService {
 			'name' => $db_device['uuid'],
 			'userid' => $db_device['userid'],
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
-			'auth_type' => ZBX_AUTH_TOKEN_TYPE_DPOP,
+			'auth_scheme' => ZBX_AUTH_SCHEME_DPOP,
 			'expires_at' => 0
 		]], $db_device['userid'], false);
 
@@ -310,12 +310,19 @@ class CDevice extends CApiService {
 		DB::update('device', [
 			'values' => [
 				'name' => $options['name'],
-				'tokenid' =>$db_token['tokenid'],
+				'status' => self::STATUS_ENABLED,
 				'push_token' => $options['push_token'],
-				'status' => self::STATUS_ENABLED
+				'activated_at' => time()
 			],
 			'where' => ['deviceid' => $db_device['deviceid']]
 		]);
+
+		$ins_device_token = [
+			'tokenid' => $db_token['tokenid'],
+			'deviceid' => $db_device['deviceid']
+		];
+
+		DB::insertBatch('device_token', [$ins_device_token]);
 
 		$device = [
 			'deviceid' => $db_device['deviceid'],
@@ -351,14 +358,14 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$db_enrollment_token = DBfetch(DBselect(
-			'SELECT et.deviceid'.
-			' FROM enrollment_token et'.
-			' WHERE '.dbConditionString('et.enrollment_token', [hash('sha512', $options['enrollment_token'])]).
-				' AND et.enrollment_token_expiration>'.time()
+		$db_device_enrollment_token = DBfetch(DBselect(
+			'SELECT det.deviceid'.
+			' FROM device_enrollment_token det'.
+			' WHERE '.dbConditionString('det.token', [hash('sha512', $options['enrollment_token'])]).
+				' AND det.expires_at>'.time()
 		));
 
-		if (!$db_enrollment_token) {
+		if (!$db_device_enrollment_token) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
@@ -366,7 +373,7 @@ class CDevice extends CApiService {
 			'SELECT d.deviceid,d.uuid,d.userid,d.name,u.name AS username'.
 			' FROM device d'.
 			' JOIN users u ON d.userid = u.userid'.
-			' WHERE '.dbConditionId('d.deviceid', [$db_enrollment_token['deviceid']])
+			' WHERE '.dbConditionId('d.deviceid', [$db_device_enrollment_token['deviceid']])
 		));
 	}
 
@@ -436,26 +443,26 @@ class CDevice extends CApiService {
 	}
 
 	public static function deleteForce(array $db_devices): void {
-		self::createDeleteTasks($db_devices);
+		self::createOffboardTasks($db_devices);
 
 		$deviceids = array_keys($db_devices);
 
-		DBexecute(
-			'DELETE FROM token'.
-			' WHERE EXISTS ('.
-				'SELECT NULL'.
-				' FROM device d'.
-				' WHERE token.tokenid=d.tokenid'.
-					' AND '.dbConditionId('d.deviceid', $deviceids).
-			')'
-		);
+		$db_device_tokens = DB::select('device_token', [
+			'output' => ['tokenid'],
+			'filter' => ['deviceid' => $deviceids],
+			'preservekeys' => true
+		]);
 
+		$tokenids = array_keys($db_device_tokens);
+
+		DB::delete('device_token', ['tokenid' => $tokenids]);
+		DB::delete('token', ['tokenid' => $tokenids]);
 		DB::delete('device', ['deviceid' => $deviceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 	}
 
-	private static function createDeleteTasks(array $db_devices): void {
+	private static function createOffboardTasks(array $db_devices): void {
 		$device_cnt = count(array_keys($db_devices));
 		$taskid = DB::reserveIds('task', $device_cnt);
 

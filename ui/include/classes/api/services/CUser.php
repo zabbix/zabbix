@@ -2950,7 +2950,7 @@ class CUser extends CApiService {
 			$userid = $db_session['userid'];
 		}
 		else {
-			$db_token = self::tokenAuthentication($session['token'], ZBX_AUTH_TOKEN_TYPE_BEARER, $time);
+			$db_token = self::tokenAuthentication($session['token'], ZBX_AUTH_SCHEME_BEARER, $time);
 			$userid = $db_token['userid'];
 		}
 
@@ -3029,13 +3029,14 @@ class CUser extends CApiService {
 
 		$time = time();
 
-		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_TOKEN_TYPE_DPOP, $time);
+		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_SCHEME_DPOP, $time);
 
 		$resource = DBselect(
 			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
-			' FROM device d'.
-			' JOIN device_key dk ON dk.deviceid=d.deviceid'.
-			' WHERE '.dbConditionId('d.tokenid', [$db_token['tokenid']]).
+			' FROM device_token dt,device d,device_key dk'.
+			' WHERE dt.deviceid=d.deviceid'.
+				' AND d.deviceid=dk.deviceid'.
+				' AND '.dbConditionId('dt.tokenid', [$db_token['tokenid']]).
 				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
 			2
 		);
@@ -3109,13 +3110,13 @@ class CUser extends CApiService {
 		self::setTimezone($db_user['timezone']);
 	}
 
-	private static function tokenAuthentication(string $auth_token, int $auth_type, int $time): array {
+	private static function tokenAuthentication(string $auth_token, int $auth_scheme, int $time): array {
 		$db_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
 			'filter' => [
 				'token' => hash('sha512', $auth_token),
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'auth_type' => $auth_type
+				'auth_scheme' => $auth_scheme
 			]
 		]);
 
