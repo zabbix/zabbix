@@ -393,7 +393,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		if (!is_array($media_types)) {
 			$error = _('an array is expected');
 		}
-
 		elseif (array_diff($media_types, $type_flag)) {
 			$error = _s('value must be one of %1$s', implode(',', $type_flag));
 		}
