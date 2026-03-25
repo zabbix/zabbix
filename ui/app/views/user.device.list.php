@@ -107,7 +107,7 @@ $deviceTable = (new CTableInfo())
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
 		_('User'),
 		_('User role'),
-		make_sorting_header(_('Linked'), 'created_at', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Linked on'), 'created_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		_('Action')
 	])

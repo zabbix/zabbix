@@ -40,7 +40,7 @@ $deviceTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
-		make_sorting_header(_('Linked'), 'created_at', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Linked on'), 'created_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		_('Action')
 	])
