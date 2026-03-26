@@ -1692,73 +1692,37 @@ static const char	*zbx_severity_to_str(int sev)
 	}
 }
 
-static char	*build_push_params(const zbx_db_event *event, zbx_uint64_t userid, const char *subject,
-		const char *message)
+static void	get_build_push_params(const zbx_db_event *event, zbx_uint64_t userid, char **params)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	struct zbx_json	json;
 
+	ZBX_UNUSED(event);
+
 	zbx_json_init(&json, 4096);
 
-	zbx_json_addstring(&json, "version", "1", ZBX_JSON_TYPE_STRING); // should be changed
-	zbx_json_addobject(&json, "to");
-
 	result = zbx_db_select(
-		"select d.deviceid,d.push_token,"
-		"dk.kid,dk.key,dk.scope "
-		"from devices d "
-		"left join device_keys dk "
-		"on dk.device_ref=d.deviceid and dk.active=1 "
-		"where d.user_ref=" ZBX_FS_UI64
-		" and d.status=1",
-		userid);
+		"select d.deviceid,d.push_token,dk.kid,dk.key,dk.scope"
+			" from device d "
+			" left join device_key dk"
+				" on dk.device_ref=d.deviceid and dk.active=1"
+					" where d.userid=" ZBX_FS_UI64 " and d.status=1", userid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_json_addstring(&json, "token", row[1], ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "device_id", row[0], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "token", row[1], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "kid", row[2], ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "key", row[3], ZBX_JSON_TYPE_STRING);
 	}
 
 	zbx_json_close(&json);
 
-	zbx_json_addstring(&json, "priority", "High", ZBX_JSON_TYPE_STRING); //Priority? TODO
-
-	/*  data */
-	zbx_json_addobject(&json, "data");
-
-	/* payload */
-	zbx_json_addobject(&json, "payload");
-
-	zbx_json_addstring(&json, "version", "1", ZBX_JSON_TYPE_STRING); // TODO
-	zbx_json_adduint64(&json, "clock", event->clock);
-	//eventype TODO
-	zbx_json_adduint64(&json, "event_id", event->eventid);
-	//hostid? TODO
-	zbx_json_adduint64(&json, "trigger_id", event->trigger.triggerid);
-	zbx_json_adduint64(&json, "user_id", userid);
-	zbx_json_addstring(&json, "severity", zbx_severity_to_str(event->severity), ZBX_JSON_TYPE_STRING);
-
-	zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "body", message, ZBX_JSON_TYPE_STRING);
-
-	zbx_json_close(&json);
-
-	/* encryption info */
-	zbx_json_addobject(&json, "enc_key");
-
-	zbx_json_addstring(&json, "kid", row[2], ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&json, "key", row[3], ZBX_JSON_TYPE_STRING);
-
-	zbx_json_close(&json);
-	zbx_json_close(&json);
+	*params = zbx_strdup(NULL, json.buffer);
 
 	zbx_db_free_result(result);
-
-	char	*out = zbx_strdup(NULL, json.buffer);
 	zbx_json_free(&json);
-
-	return out;
 }
 
 static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_event, zbx_uint64_t actionid,
@@ -1892,14 +1856,15 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 			get_mediatype_params_array(event, r_event, actionid, userid, mediatypeid, row[1], subject,
 					message, ack, service_alarm, service, &params, tz);
 		}
+		else if (MEDIA_TYPE_PUSH == type)
+		{
+			get_build_push_params(event, userid, &params);
+		}
 		else
 		{
 			get_mediatype_params_object(event, r_event, actionid, userid, mediatypeid, row[1], subject,
 					message, ack, service_alarm, service, &params, tz);
 		}
-
-		if (MEDIA_TYPE_PUSH == type)
-			params = build_push_params(event, userid, subject, message);
 
 		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
 				now, mediatypeid, row[1], subject, message, status, perror, esc_step,
