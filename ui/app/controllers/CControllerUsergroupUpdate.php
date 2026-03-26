@@ -28,7 +28,6 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'usrgrpid' => ['db usrgrp.usrgrpid', 'required'],
-			'userids' => ['array', 'field' => ['db users_groups.userid']],
 			'name' => ['db usrgrp.name', 'required', 'not_empty'],
 			'gui_access' => ['integer',
 				'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_INTERNAL, GROUP_GUI_ACCESS_LDAP,
@@ -40,6 +39,27 @@ class CControllerUsergroupUpdate extends CControllerUsergroupUpdateGeneral {
 			],
 			'mfaid' => ['integer'],
 			'users_status' => ['db usrgrp.users_status', 'in' => [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]],
+			'userids' => [
+				['array', 'field' => ['db users_groups.userid']],
+				['array',
+					'field' => [
+						'string', 'not_in' => [CWebUser::$data['userid']],
+						'messages' => ['not_in' =>
+							_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
+						]
+					],
+					'when' => ['gui_access', 'in' => [GROUP_GUI_ACCESS_DISABLED]]
+				],
+				['array',
+					'field' => [
+						'string', 'not_in' => [CWebUser::$data['userid']],
+						'messages' => ['not_in' =>
+							_('User cannot add oneself to a disabled group or a group with disabled GUI access.')
+						]
+					],
+					'when' => ['users_status', 'in' => [GROUP_STATUS_DISABLED]]
+				]
+			],
 			'debug_mode' => ['db usrgrp.debug_mode', 'in' => [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED]],
 			'templategroup_rights' => ['objects', 'fields' => [
 				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
