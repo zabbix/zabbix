@@ -38,8 +38,8 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 				'when' => ['gui_access', 'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP]]
 			],
 			'mfaid' => ['integer'],
-			'users_status' => ['db usrgrp.users_status'],
-			'debug_mode' => ['db usrgrp.debug_mode'],
+			'users_status' => ['db usrgrp.users_status', 'in' => [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]],
+			'debug_mode' => ['db usrgrp.debug_mode', 'in' => [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED]],
 			'templategroup_rights' => ['objects', 'fields' => [
 				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
