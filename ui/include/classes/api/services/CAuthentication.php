@@ -54,9 +54,7 @@ class CAuthentication extends CApiService {
 	 * required.
 	 */
 	public static function getPublic(): array {
-		return (CFeatureFlagHelper::isFlagHttpAuthEnabled()
-				? []
-				: ['http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED]) +
+		return (CFeatureFlagHelper::isFlagHttpAuthEnabled() ? [] : ['http_auth_enabled' => ZBX_AUTH_HTTP_DISABLED]) +
 			CApiSettingsHelper::getParameters([
 				'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
 				'http_case_sensitive', 'saml_auth_enabled', 'saml_case_sensitive',	'saml_jit_status',
