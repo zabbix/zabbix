@@ -96,20 +96,22 @@ class CControllerMediatypeEnable extends CController {
 
 		if ($result) {
 			$output['success'] = [
-				'title' => _n('Media type enabled', 'Media types enabled', $updated),
-				'messages' => []
+				'title' => _n('Media type enabled', 'Media types enabled', $updated)
 			];
 
 			if ($incomplete_configurations) {
-				$output['success']['messages'][] = _s(
-					'%1$s: %2$s', _('Incomplete configuration'), implode(', ', $incomplete_configurations)
+				$output['success']['title'] .= _s(' %1$s: %2$s. %3$s.',
+					_('Not enabled'),
+					implode(', ', $incomplete_configurations),
+					_('Incomplete configuration')
 				);
 			}
 
 			if ($bridge_disabled_configurations) {
-				$output['success']['messages'][] = _s(
-					'%1$s: %2$s', _('Zabbix bridge must be configured to enable push notifications'),
-					implode(', ', $bridge_disabled_configurations)
+				$output['success']['title'] .= _s(' %1$s: %2$s. %3$s.',
+					_('Not enabled'),
+					implode(', ', $bridge_disabled_configurations),
+					_('Zabbix bridge must be configured to enable push notifications')
 				);
 			}
 		}

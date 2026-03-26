@@ -230,6 +230,7 @@ class CControllerMediatypeUpdate extends CControllerMediatypeUpdateGeneral {
 						]
 					],
 					['db media_type_message.eventsource', 'required', 'in' => [EVENT_SOURCE_TRIGGERS],
+						'messages' => ['in' => _('Message type is not supported for push notifications.')],
 						'when' => ['../type', 'in' => [MEDIA_TYPE_PUSH]]
 					]
 				],

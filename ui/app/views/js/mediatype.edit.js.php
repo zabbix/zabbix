@@ -477,7 +477,7 @@ window.mediatype_edit_popup = new class {
 		const media_type = this.form.findFieldByName('type').getValue();
 
 		const remaining_templates = Object.values(this.message_templates).filter((template) => {
-			if (!template.media_types.find((type) => type == media_type)) {
+			if (template.media_types.findIndex((typeid) => typeid == media_type) == -1) {
 				return false;
 			}
 
@@ -523,6 +523,7 @@ window.mediatype_edit_popup = new class {
 		this.form_element.querySelector('#type').onchange = (e) => {
 			this.#hideFormFields('all');
 			this.#loadTypeFields(e);
+			this.#toggleAddButton();
 
 			this.form_element.querySelector('#status').disabled = !this.media_types_enabled[e.target.value];
 			this.form_element.querySelector('#smtp_authentication').dispatchEvent(new Event('change'));
