@@ -74,7 +74,7 @@ class CToken extends CApiService {
 		$sql_parts = [
 			'select' => [],
 			'from'   => $this->tableName().' '.$this->tableAlias(),
-			'where'  => ['t.auth_type='.ZBX_AUTH_SCHEME_BEARER],
+			'where'  => ['t.auth_scheme='.ZBX_AUTH_SCHEME_BEARER],
 			'group'  => [],
 			'order'  => []
 		];
