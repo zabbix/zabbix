@@ -18,16 +18,9 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
- * Tests for "Configuration -> Maintenance".
- *
- * Forms:
- * - Create maintenance.
- * - Clone maintenance.
- * - Delete maintenance.
+ * @backup maintenances
  *
  * @onBefore prepareMaintenanceData
- *
- * @backup maintenances
  */
 class testFormMaintenance extends CLegacyWebTest {
 
@@ -43,126 +36,208 @@ class testFormMaintenance extends CLegacyWebTest {
 		];
 	}
 
-	public $name = 'Test maintenance';
-	public $periods_table = 'id:timeperiods';
+	const MAINTENANCE_NAME = 'Test maintenance';
+	const PERIODS_TABLE = 'id:timeperiods';
 
 	public function prepareMaintenanceData() {
 		CDataHelper::call('maintenance.create', [
 			[
-				'name' => 'Maintenance for update (data collection)',
+				'name' => self::MAINTENANCE_NAME,
 				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'active_since' => 1534885200,
-				'active_till' => 1534971600,
+				'active_since' => 1681765260, // 18.04.2023 00:01
+				'active_till' => 1899410340, // 10.03.2030 23:59
 				'description' => 'Test description update',
 				'groups' => [['groupid' => 4]], // Zabbix servers.
-				'tags_evaltype' => 2,
+				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_OR,
 				'tags' => [
 					['tag' => 'Tag1', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => 'A'],
 					['tag' => 'Tag2', 'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL, 'value' => 'B']
 				],
 				'timeperiods' => [
 					[
-						'period' => 90000,
 						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-						'start_date' => 1534950000
+						'start_date' => 1774013400, // 20.03.2026.
+						'period' => 5400
+					],
+					[
+						'timeperiod_type' => TIMEPERIOD_TYPE_DAILY,
+						'start_time' => 50400, // 14:00
+						'every' => 3,
+						'period' => 300
+					],
+					[
+						'timeperiod_type' => TIMEPERIOD_TYPE_WEEKLY,
+						'start_time' => 3600, // 01:00
+						'every' => 2,
+						'dayofweek' => 1 + 64, // Monday + Sunday.
+						'period' => 7200
+					],
+					[
+						'timeperiod_type' => TIMEPERIOD_TYPE_MONTHLY,
+						'start_time' => 82800, // 23:00
+						'day' => 15,
+						'month' => 1 + 1024, // January + November.
+						'period' => 86399940
 					]
 				]
+
 			]
 		]);
 	}
 
-	/**
-	 * Create maintenance with periods and host group.
-	 */
-	public function testFormMaintenance_Create() {
+	public function testFormMaintenance_Layout() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->page->assertTitle('Configuration of maintenance periods');
-		$this->page->assertHeader('Maintenance periods');
 		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
 
-		// Type maintenance name.
-		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		$form->fill(['Name' => $this->name, 'Host groups' => 'Zabbix servers', 'id:tags_evaltype' => 'Or']);
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 
-		$periods = [
-			[
-				'fields' => '',
-				'result' => [['Period type' => 'One time only']]
-			],
-			[
-				'fields' => [
-					'Period type' => 'Daily'
-				],
-				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day']]
-			],
-			[
-				'fields' => [
-					'Period type' => 'Weekly',
-					'Monday' => true,
-					'Sunday' => true
-				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every 1 week']]
-			],
-			[
-				'fields' => [
-					'Period type' => 'Monthly',
-					'January' => true,
-					'November' => true
-				],
-				'result' => [['Period type' => 'Monthly', 'Schedule' => 'At 00:00 on day 1 of every January, November']]
-			]
+		$today = date('Y-m-d');
+		$tomorrow = date('Y-m-d', strtotime('+1 day'));
+
+		// Check default state.
+		$default_state = [
+			'Name' => '',
+			'Maintenance type' => 'With data collection',
+			'Active since' => $today.' 00:00',
+			'Active till' => $tomorrow.' 00:00',
+			'Periods' => [],
+			'Host groups' => '',
+			'Hosts' => '',
+			'id:tags_evaltype' => 'And/Or',
+			'id:tags_0_tag' => '',
+			'id:tags_0_operator_0' => 'Contains',
+			'id:tags_0_value' => '',
+			'Description' => ''
 		];
-		foreach ($periods as $period) {
-			$form->query('button:Add')->one()->click();
-			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
-			$period_overlay->fill($period['fields']);
-			$period_overlay->submit();
-			$period_overlay->waitUntilNotVisible();
-			$this->assertTableHasData($period['result'], $this->periods_table);
+
+		$form->checkValue($default_state);
+
+		// Check asterisk in required field labels.
+		$this->assertEquals(['Name', 'Active since', 'Active till', 'Periods'], $form->getRequiredLabels());
+		$this->assertTrue($this->query('xpath://label[contains(@class,"form-label-asterisk") and contains(text(),
+			"At least one host group or host must be selected.")]')->exists()
+		);
+
+		$check_fields = [
+			'Name' => ['maxlength' => 128],
+			'id:active_since' => ['maxlength' => 255, 'placeholder' => 'YYYY-MM-DD hh:mm'],
+			'id:active_till' => ['maxlength' => 255, 'placeholder' => 'YYYY-MM-DD hh:mm'],
+			'id:groupids__ms' => ['placeholder' => 'type here to search'],
+			'id:hostids__ms' => ['placeholder' => 'type here to search'],
+			'id:tags_0_tag' => ['maxlength' => 255, 'placeholder' => 'tag'],
+			'id:tags_0_value' => ['maxlength' => 255, 'placeholder' => 'value'],
+			'Description' => ['maxlength' => 65535],
+		];
+		foreach ($check_fields as $field => $attributes) {
+			foreach ($attributes as $attribute => $value) {
+				$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
+			}
 		}
 
-		// Add problem tags.
-		$value = 'Value';
-		$tags = [
-			[
-				'action' => USER_ACTION_UPDATE,
-				'index' => 0,
-				'tag' => 'Tag1',
-				'value' => $value
-			],
-			[
-				'tag' => 'Tag2',
-				'value' => $value
-			],
-			[
-				'tag' => 'Tag3',
-				'value' => $value
-			]
+		// Check Periods table.
+		$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
+		$this->assertEquals(['Period type', 'Schedule', 'Period', 'Action'], $periods_table->getHeadersText());
+		$this->assertEquals(0, $periods_table->getRows()->count());
+
+		// Check radio buttons.
+		$radio_buttons = [
+			'Maintenance type' => ['With data collection', 'No data collection'],
+			'id:tags_evaltype' => ['And/Or', 'Or'],
+			'id:tags_0_operator' => ['Contains', 'Equals']
 		];
-		$this->query('id:tags')->asMultifieldTable()->one()->fill($tags);
+		foreach ($radio_buttons as $name => $labels) {
+			$this->assertEquals($labels, $form->getField($name)->getLabels()->asText());
+		}
 
-		// Create maintenance and check the results in frontend.
-		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
-		$this->assertTableHasData([['Name' => $this->name, 'Type' => 'With data collection']]);
+		// Check Periods and Tags table buttons.
+		$this->assertEquals(1, $form->getField('Periods')->query('button:Add')->all()->filter((CElementFilter::CLICKABLE))->count());
+		$this->assertEquals(2, $form->query('id:tags')->one()->query('button', ['Add', 'Remove'])->all()
+				->filter((CElementFilter::CLICKABLE))->count()
+		);
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
-		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
+		// Check calendar buttons.
+		foreach (['active_since_calendar', 'active_till_calendar'] as $button) {
+			$this->assertTrue($form->query('id', $button)->one()->isClickable());
+		}
+
+		// Check Select buttons and dialogs they open.
+		foreach (['Host groups', 'Hosts'] as $field) {
+			$this->assertTrue($form->getField($field)->query('button:Select')->one()->isClickable());
+			$form->getField($field)->query('button:Select')->one()->click();
+
+			$list = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+			$this->assertEquals($field, $list->getTitle());
+			$this->assertEquals(['Select', 'Cancel'], $list->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+			);
+			$list->close();
+		}
+
+		// Check footer buttons.
+		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
 	}
 
-	/**
-	 * Check screenshots of period form.
-	 */
-	public function testFormMaintenance_CheckPeriodForm() {
+	public function testFormMaintenance_PeriodFormLayout() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
 
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
-		$form->getField('Periods')->query('button:Add')->one()->waitUntilClickable()->click();
-		$period_overlay = COverlayDialogElement::find(1)->waitUntilReady()->one();
+		$datetime_now = date('Y-m-d H:i');
+		$datetime_plus_one_minute = date('Y-m-d H:i', strtotime($datetime_now . ' +1 minute'));
 
+		$form->getField('Periods')->query('button:Add')->one()->waitUntilClickable()->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
+		$period_overlay = $dialog->asForm();
+
+		// Check default state.
+		$default_state = [
+			'Period type' => 'One time only',
+			'id:period_days' => '0',
+			'name:period_hours' => '1',
+			'name:period_minutes' => '0'
+		];
+
+		$period_overlay->checkValue($default_state);
+		$this->assertTrue($period_overlay->checkValue(['Date' => $datetime_now], false)
+				|| $period_overlay->checkValue(['Date' => $datetime_plus_one_minute], false));
+
+		// Check asterisk in required field labels.
+		$this->assertEquals(['Date', 'Maintenance period length'], $period_overlay->getRequiredLabels());
+
+		$check_fields = [
+			'id:start_date' => ['maxlength' => 255, 'placeholder' => 'YYYY-MM-DD hh:mm'],
+			'id:period_days' => ['maxlength' => 3]
+		];
+		foreach ($check_fields as $field => $attributes) {
+			foreach ($attributes as $attribute => $value) {
+				$this->assertEquals($value, $period_overlay->getField($field)->getAttribute($attribute));
+			}
+		}
+
+		// Check calendar button.
+		$this->assertTrue($period_overlay->query('id:start_date_calendar')->one()->isClickable());
+
+		// Check dropdown options.
+		$options = [
+			'Period type' => ['One time only', 'Daily', 'Weekly', 'Monthly'],
+			'name:period_hours' => array_map('strval', range(0, 23)),
+			'name:period_minutes' => array_map('strval', range(0, 59))
+
+		];
+		foreach ($options as $field => $values) {
+			$this->assertEquals($values, $period_overlay->getField($field)->asDropdown()->getOptions()->asText());
+		}
+
+		// Check footer buttons.
+		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
+				->filter(CElementFilter::CLICKABLE)->asText()
+		);
+
+		// Check screenshots.
 		$periods = [
 			'One time only',
 			'Daily',
@@ -203,23 +278,148 @@ class testFormMaintenance extends CLegacyWebTest {
 		COverlayDialogElement::closeAll();
 	}
 
+	public static function getCancelData() {
+		return [
+			// #0 Cancel create.
+			[
+				[
+					'action' => 'create',
+					'title' => 'create'
+				]
+			],
+			// #1 Cancel update.
+			[
+				[
+					'action' => 'update',
+					//'maintenance_type' = 'No data collection',
+					'title' => 'update without maintenance type change'
+				]
+			],
+			// #2 Cancel update when changing maintenance type.
+			[
+				[
+					'action' => 'update',
+					'title' => 'update with maintenance type change',
+				]
+			],
+			// #3 Cancel clone
+			[
+				[
+					'action' => 'clone',
+					'title' => 'clone'
+				]
+			],
+			// #4 Cancel delete.
+			[
+				[
+					'action' => 'delete'
+				]
+			]
+		];
+	}
+
 	/**
-	 * Changes not preserve when close edit form using cancel button.
-	 *
-	 * @depends testFormMaintenance_Create
+	 * @dataProvider getCancelData
 	 */
-	public function testFromMaintenance_Cancel() {
+	public function testFormMaintenance_Cancel($data) {
 		$sql_hash = 'SELECT * FROM maintenances ORDER BY maintenanceid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		// Open form and change maintenance name.
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->query('link', $this->name)->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		$form->fill(['Name' => 'Some random text']);
 
-		// Remove 4th defined period.
-		$form->query('xpath:.//td[contains(text(), "Monthly")]/..//button[text()="Remove"]')->one()->click()->waitUntilNotvisible();
+		if ($data['action'] === 'create') {
+			$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
+		}
+		else {
+			$this->query('link', self::MAINTENANCE_NAME)->waitUntilClickable()->one()->click();
+		}
+
+		// te vajag ielikt delete ar ifu, ja delete, tad sito visu izlaizam
+		// ja delete, tad click delete un pazinojumaa cancel
+
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+
+		if ($data['action'] !== 'delete') {
+			if ($data['action'] === 'clone') {
+				COverlayDialogElement::find()->waitUntilReady();
+				$this->query('button:Clone')->one()->click()->waitUntilNotVisible();
+			}
+
+			if ($data['title'] === 'update with maintenance type change') {
+				$maintenance_type = 'No data collection';
+			}
+			else {
+				$maintenance_type = 'With data collection';
+			}
+
+			$test_data = [
+				'field_values' => [
+					'Name' => 'Cancel maintenance '.$data['title'],
+					'Maintenance type' => $maintenance_type,
+					'Active since' => '2020-01-03 11:24',
+					'Active till' => '2029-11-21 00:25',
+					'Host groups' => '',
+					'Hosts' => 'ЗАББИКС Сервер',
+					'Description' => 'Description of '.$data['title']
+				],
+				'periods' => [
+					['Period type' => 'One time only'],
+					['Period type' => 'Daily']
+				],
+				'tags' => [
+					[
+						'action' => USER_ACTION_UPDATE,
+						'index' => 0,
+						'tag' => 'EditedTag1',
+						'value' => 'EditedA'
+					],
+					[
+						'tag' => 'TagAdded1',
+						'value' => 'ValueAdded1'
+					],
+					[
+						'tag' => 'TagAdded2',
+						'value' => 'ValueAdded2'
+					]
+				]
+			];
+
+			// Fill tags first since when maintenance type 'No data collection' is selected, tags become disabled
+			$form->query('id:tags')->asMultifieldTable()->one()->fill($test_data['tags']);
+
+			// Modify the existing periods and tags.
+			if ($data['action'] === 'update' || $data['action'] === 'clone')  {
+
+				// Remove 4th defined period.
+				$timeperiods_table = $this->query('id:timeperiods')->one();
+				$timeperiods_table->query('xpath:.//tr[@data-row_index="3"]')->one()->query('button:Remove')->one()->click();
+
+				// Edit 2nd defined period.
+				$timeperiods_table->query('xpath:.//tr[@data-row_index="1"]')->one()->query('button:Edit')->one()->click();
+				$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+				$period_overlay->fill(['id:every_day' => '2']);
+				$period_overlay->submit();
+				$period_overlay->waitUntilNotVisible();
+
+				// Remove 2nd tag.
+				$form->query('id:tags')->asMultifieldTable()->one()->query('id:tags_1_remove')->one()->click();
+			}
+
+			$form->fill($test_data['field_values']);
+
+			foreach ($test_data['periods'] as $period) {
+				$form->query('button:Add')->one()->click();
+				$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+				$period_overlay->fill($period);
+				$period_overlay->submit();
+				$period_overlay->waitUntilNotVisible();
+			}
+		}
+		else {
+			//COverlayDialogElement::find()->waitUntilReady()->one()
+			COverlayDialogElement::find()->waitUntilReady()->one()->getFooter()->query('button:Delete')->one()->click();
+			$this->page->dismissAlert();
+		}
 
 		// Close the form.
 		$this->query('button:Cancel')->one()->click();
@@ -229,14 +429,94 @@ class testFormMaintenance extends CLegacyWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 
 		// Open form to check changes was not saved.
-		$this->query('link', $this->name)->one()->waitUntilClickable()->click();
+		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
 		$form->invalidate();
-		$form->checkValue(['Name' => $this->name]);
+		$form->checkValue(['Name' => self::MAINTENANCE_NAME]);
 
 		// Check that 4th period exist.
-		$this->assertTableHasData([['Period type' => 'Monthly']], $this->periods_table);
+		//$this->assertTableHasData([['Period type' => 'Monthly']], self::PERIODS_TABLE);
 		$this->query('button:Cancel')->one()->click();
 		COverlayDialogElement::ensureNotPresent();
+	}
+
+	/**
+	 * Create maintenance with periods and host group.
+	 */
+	public function testFormMaintenance_Create() {
+		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
+		$this->page->assertTitle('Configuration of maintenance periods');
+		$this->page->assertHeader('Maintenance periods');
+		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
+
+		// Type maintenance name.
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$form->fill(['Name' => 'Tessssssst', 'Host groups' => 'Zabbix servers', 'id:tags_evaltype' => 'Or']);
+
+		$periods = [
+			[
+				'fields' => '',
+				'result' => [['Period type' => 'One time only']]
+			],
+			[
+				'fields' => [
+					'Period type' => 'Daily'
+				],
+				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day']]
+			],
+			[
+				'fields' => [
+					'Period type' => 'Weekly',
+					'Monday' => true,
+					'Sunday' => true
+				],
+				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every 1 week']]
+			],
+			[
+				'fields' => [
+					'Period type' => 'Monthly',
+					'January' => true,
+					'November' => true
+				],
+				'result' => [['Period type' => 'Monthly', 'Schedule' => 'At 00:00 on day 1 of every January, November']]
+			]
+		];
+		foreach ($periods as $period) {
+			$form->query('button:Add')->one()->click();
+			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+			$period_overlay->fill($period['fields']);
+			$period_overlay->submit();
+			$period_overlay->waitUntilNotVisible();
+			$this->assertTableHasData($period['result'], self::PERIODS_TABLE);
+		}
+
+		// Add problem tags.
+		$value = 'Value';
+		$tags = [
+			[
+				'action' => USER_ACTION_UPDATE,
+				'index' => 0,
+				'tag' => 'Tag1',
+				'value' => $value
+			],
+			[
+				'tag' => 'Tag2',
+				'value' => $value
+			],
+			[
+				'tag' => 'Tag3',
+				'value' => $value
+			]
+		];
+		$this->query('id:tags')->asMultifieldTable()->one()->fill($tags);
+
+		// Create maintenance and check the results in frontend.
+		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
+		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
+		$this->assertTableHasData([['Name' => self::MAINTENANCE_NAME, 'Type' => 'With data collection']]);
+
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
+		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
 	}
 
 	/**
@@ -246,15 +526,15 @@ class testFormMaintenance extends CLegacyWebTest {
 	 */
 	public function testFormMaintenance_Update() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->query('link', $this->name)->one()->waitUntilClickable()->click();
+		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		// Change maintenance type.
 		$form->fill(['Maintenance type' => 'No data collection']);
 
 		// Remove "One time only".
-		$table = $this->query($this->periods_table)->asTable()->one();
-		$table->findRow('Period type', 'One time only')->getColumn('Actions')->query('button:Remove')->one()->click()->waitUntilNotvisible();
+		$table = $this->query(self::PERIODS_TABLE)->asTable()->one();
+		$table->findRow('Period type', 'One time only')->getColumn('Action')->query('button:Remove')->one()->click()->waitUntilNotvisible();
 
 		$periods = [
 			[
@@ -276,7 +556,7 @@ class testFormMaintenance extends CLegacyWebTest {
 			]
 		];
 		foreach ($periods as $period) {
-			$table->findRow('Period type', $period['schedule'])->getColumn('Actions')->query('button:Edit')->one()->click();
+			$table->findRow('Period type', $period['schedule'])->getColumn('Action')->query('button:Edit')->one()->click();
 			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
 			$period_overlay->fill($period['fields']);
 
@@ -286,21 +566,21 @@ class testFormMaintenance extends CLegacyWebTest {
 
 			$period_overlay->submit();
 			$period_overlay->waitUntilNotVisible();
-			$this->assertTableHasData($period['result'], $this->periods_table);
+			$this->assertTableHasData($period['result'], self::PERIODS_TABLE);
 		}
 
 		// Check the results in frontend.
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Maintenance period updated');
-		$this->assertTableHasData([['Name' => $this->name, 'Type' => 'No data collection']]);
+		$this->assertTableHasData([['Name' => self::MAINTENANCE_NAME, 'Type' => 'No data collection']]);
 
 		// Check the results in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
 	}
 
 	public function testFormMaintenance_UpdateTags() {
-		$maintenance = 'Maintenance for update (data collection)';
+		$maintenance = self::MAINTENANCE_NAME;
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('link', $maintenance)->one()->waitUntilClickable()->click();
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
@@ -338,37 +618,35 @@ class testFormMaintenance extends CLegacyWebTest {
 	/**
 	 * Test cloning of maintenance.
 	 *
-	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Clone() {
 		$suffix = ' (clone)';
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->query('link', $this->name)->one()->waitUntilClickable()->click();
+		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
 		COverlayDialogElement::find()->waitUntilReady();
 
 		// Clone maintenance, rename the clone and save it.
 		$this->query('button:Clone')->one()->click()->waitUntilNotVisible();
 		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		$form->fill(['Name' => $this->name.$suffix]);
+		$form->fill(['Name' => self::MAINTENANCE_NAME.$suffix]);
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 
 		// Check the result in frontend.
 		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
-		$this->assertTableHasData([['Name' => $this->name], ['Name' => $this->name.$suffix]]);
+		$this->assertTableHasData([['Name' => self::MAINTENANCE_NAME], ['Name' => self::MAINTENANCE_NAME.$suffix]]);
 
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name.$suffix)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
+		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME.$suffix)));
 	}
 
 	/**
 	 * Test deleting of maintenance.
 	 *
-	 * @depends testFormMaintenance_Create
 	 */
 	public function testFormMaintenance_Delete() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->query('link', $this->name)->one()->waitUntilClickable()->click();
+		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 
 		// Delete a maintenance and check the result in frontend.
@@ -377,6 +655,6 @@ class testFormMaintenance extends CLegacyWebTest {
 		COverlayDialogElement::ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Maintenance period deleted');
 
-		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($this->name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
 	}
 }
