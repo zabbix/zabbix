@@ -177,6 +177,7 @@ func vfsDevGetParamsValidate(params []string) (vfsDevGetMode, *regexp.Regexp, er
 			return modeNone, nil, err
 		}
 	case 0:
+		mode = modeDisks
 	default:
 		return modeNone, nil, zbxerr.ErrorTooManyParameters
 	}
