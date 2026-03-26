@@ -700,7 +700,11 @@ static void	dev_disk_partition_sizes_add(zbx_stat_t *stat_buf, struct zbx_json *
 	zbx_json_addobject(j, "partitions");
 
 	if (NULL == (dir = opendir(buf)))
+	{
+		zbx_json_close(j);
+
 		return;
+	}
 
 	while (NULL != (entry = readdir(dir)))
 	{
