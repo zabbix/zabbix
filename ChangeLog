@@ -1,3 +1,30 @@
+Changes for 7.4.9rc1
+
+New features:
+.........T [ZBXNEXT-10422] added Cradlepoint NCM v2 by HTTP and Cradlepoint NCM v2 device by HTTP templates (aiantsen)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
+.........T [ZBXNEXT-10403] implemented the template for Huawei AR600 devices (kflorowski)
+
+Bug fixes:
+..F....... [ZBX-27123] changed the redirect page after deleting the graph prototype to the same graph prototype's list page (msnihach)
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-26799] adjusted OAuth token field behavior in Media type configuration form when access token update time exceeds current Unix timestamp (kkuzmina)
+....I..... [ZBX-27306] added optional upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
+..F....... [ZBX-26459] fixed host macros view to avoid displaying both macro types when switching quickly (gberzina)
+..F....... [ZBX-27416] fixed message box display bug in Monitoring Problems page (gberzina)
+..F....... [ZBX-26899] fixed yaml markings for import compare (gberzina)
+..F....... [ZBX-27467] fixed host name error message in the host wizard (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template, updated the inline validation for template groups and host group fields (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+..F....... [ZBX-26633] changed host wizard agent port validation to accept values from 1024 to 32767 (aluchko)
+
+--------------------------------------------------------------------------------
 Changes for 7.4.8
 
 7.4.8rc3 was released as 7.4.8 without any changes
@@ -1314,6 +1341,26 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 ...GI..PS. [ZBX-25140] updated configure to reject TLS-unaware compilers (jxl)
 ...G...... [ZBX-25149] fixed Zabbix agent build on AIX and Solaris (arimdjonoks)
 ....I..... [ZBX-23881] dropped preference list when searching for compiler (jxl)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.25rc1
+
+New features:
+.........T [ZBXNEXT-10422] added Cradlepoint NCM v2 by HTTP and Cradlepoint NCM v2 device by HTTP templates (aiantsen)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
+
+Bug fixes:
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
+..F....... [ZBX-26899] fixed yaml markings for import compare (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+....I..... [ZBX-27306] added optional upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.24
@@ -5303,6 +5350,15 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.46rc1
+
+New features:
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
+
+Bug fixes:
+A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45
