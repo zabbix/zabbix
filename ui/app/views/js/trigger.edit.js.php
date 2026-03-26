@@ -67,25 +67,12 @@ window.trigger_edit_popup = new class {
 	}
 
 	#initActions() {
-		['input', 'keydown', 'paste'].forEach((event_type) => {
-			this.name.addEventListener(event_type,
-				(e) => {
-					this.form_element.querySelector('#event_name').placeholder = e.target.value;
-				}
-			);
-			this.name.dispatchEvent(new Event('input'));
-		});
+		const update_event_name_placeholder = placeholder => {
+			this.form_element.querySelector('#event_name').placeholder = placeholder;
+		};
 
-		// Form submit on Enter for event_name field, because textareaflexible.js triggers JQuery event.
-		this.form_element.querySelector('[name="event_name"]').addEventListener('keyup', e => {
-			if (e.key === 'Enter') {
-				if (e.target.readOnly) {
-					return;
-				}
-
-				$(this.form_element).submit();
-			}
-		});
+		this.name.addEventListener('input', e => update_event_name_placeholder(e.target.value));
+		update_event_name_placeholder(this.name.value);
 
 		// Tags tab events.
 		this.form_element.querySelectorAll('[name="show_inherited_tags"]')

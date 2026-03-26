@@ -812,14 +812,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 	 * @hosts proxy_agent
 	 */
 	public function testBinaryValueTypeDataCollection_checkProxyData() {
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'sending configuration data to proxy "proxy"');
 		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, 'received configuration data from server');
-		self::waitForLogLineToBePresent(self::COMPONENT_PROXY, [
-			'enabling Zabbix agent checks on host "proxy_agent": interface became available',
-			'resuming Zabbix agent checks on host "proxy_agent": connection restored'
-		]);
-
-		$this->reloadConfigurationCache(self::COMPONENT_PROXY);
 
 		$base64_image = self::base64_image;
 

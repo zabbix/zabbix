@@ -597,7 +597,7 @@ void	zbx_audit_update_json_append_string(const zbx_uint64_t id, const int id_tab
 	if (NULL == found_audit_entry)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	details_append_str(&((*found_audit_entry)->details), audit_op, key, value);
@@ -641,7 +641,7 @@ void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int
 	if (NULL == found_audit_entry)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	details_append_str(&((*found_audit_entry)->details), audit_op, key, ZBX_SECRET_MASK);
@@ -666,7 +666,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 	if (NULL == found_audit_entry)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	details_append_uint64(&((*found_audit_entry)->details), audit_op, key, value);
@@ -699,7 +699,7 @@ void	zbx_audit_update_json_append_uint64(const zbx_uint64_t id, const int id_tab
 		}												\
 														\
 		THIS_SHOULD_NEVER_HAPPEN;									\
-		exit(EXIT_FAILURE);										\
+		zbx_exit(EXIT_FAILURE);										\
 	}													\
 
 void	zbx_audit_update_json_append_no_value(const zbx_uint64_t id, const int id_table, const char *audit_op,
@@ -790,7 +790,7 @@ zbx_audit_entry_t	*audit_get_entry(zbx_uint64_t id, const char *cuid, int id_tab
 	if (NULL == (paudit_entry = (zbx_audit_entry_t**)zbx_hashset_search(&zbx_audit, &plocal_audit_entry)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *paudit_entry;
@@ -868,7 +868,7 @@ static void	audit_entry_make_key(const zbx_audit_entry_t *entry, const char *nam
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unknown resource type: %d", entry->resource_type);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_snprintf(key, key_size, "%s.%s", owner, name);

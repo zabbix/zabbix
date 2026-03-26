@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbx_rtc_constants.h"
 #include "zbxalerter.h"
 
 #include "alerter_defs.h"
@@ -544,7 +545,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to alert manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	alerter_register(&alerter_socket);
@@ -584,7 +585,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		{
 			if (ZBX_IS_RUNNING())
 				zabbix_log(LOG_LEVEL_CRIT, "cannot read alert manager service request");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
@@ -614,6 +615,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 						alerter_args_in->config_adapter_ca_file,
 						alerter_args_in->config_adapter_cert_file,
 						alerter_args_in->config_adapter_key_file);
+			case ZBX_RTC_SHUTDOWN:
+				zbx_set_exiting_with_succeed();
 				break;
 		}
 

@@ -57,6 +57,7 @@
 #include "zbxinterface.h"
 #include "zbxhistory.h"
 #include "zbx_expression_constants.h"
+#include "module.h"
 #include "zbxhash.h"
 
 #define	ZBX_VECTOR_ARRAY_RESERVE	3
@@ -85,7 +86,8 @@ typedef enum
 {
 	ZBX_DB_SYNC_STATUS_UNLOCKED,
 	ZBX_DB_SYNC_STATUS_LOCKED
-}zbx_db_sync_status;
+}
+zbx_db_sync_status;
 
 typedef struct
 {
@@ -155,7 +157,7 @@ static int	dc_item_ref_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-static int	sync_in_progress = 0;
+static ZBX_THREAD_LOCAL int	sync_in_progress = 0;
 
 int	zbx_get_sync_in_progress(void)
 {
@@ -231,7 +233,7 @@ void	set_dc_config(zbx_dc_config_t *in)
 }
 
 static zbx_rwlock_t	config_lock = ZBX_RWLOCK_NULL;
-static int		wlock_is_locked;
+static ZBX_THREAD_LOCAL int	wlock_is_locked;
 
 zbx_rwlock_t	zbx_get_config_lock(void)
 {
@@ -367,7 +369,7 @@ struct zbx_dc_um_handle_t
 	unsigned char		macro_env;
 };
 
-static zbx_dc_um_handle_t	*dc_um_handle = NULL;
+static ZBX_THREAD_LOCAL zbx_dc_um_handle_t	*dc_um_handle = NULL;
 
 /******************************************************************************
  *                                                                            *
@@ -1956,7 +1958,10 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 		{
 			START_SYNC;
 
-			config->revision.config++;
+			zbx_uint64_t	config_revision = dc_config_get_config_revision();
+
+			config_revision++;
+			dc_config_set_config_revision(config_revision);
 
 			for (j = 0; j < diff.values_num; j++)
 			{
@@ -1976,7 +1981,7 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 				}
 
 				config->um_cache = um_cache_set_value_to_macros(config->um_cache,
-						config->revision.config, &dc_kv->macros, dc_kv->value);
+						config_revision, &dc_kv->macros, dc_kv->value);
 
 				dc_kv->update = 0;
 			}
@@ -6293,7 +6298,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			int	delay_new = 0;
 
-			if (0 == found && 0 < config->revision.config)
+			if (0 == found && 0 < dc_config_get_config_revision())
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
 			else if (ZBX_LOC_NOWHERE == drule->location || delay != drule->delay)
 				delay_new = delay;
@@ -6602,7 +6607,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		{
 			int	delay_new = 0;
 
-			if (0 == found && 0 < config->revision.config)
+			if (0 == found && 0 < dc_config_get_config_revision())
 				delay_new = delay > SEC_PER_MIN ? SEC_PER_MIN : delay;
 			else if (ZBX_LOC_NOWHERE == httptest->location || delay != httptest->delay)
 				delay_new = delay;
@@ -7871,7 +7876,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_hashset_t			trend_queue;
 	zbx_vector_uint64_t		active_avail_diff, triggerids, *ptriggerids = NULL;
 	zbx_hashset_t			activated_hosts;
-	zbx_uint64_t			new_revision = config->revision.config + 1;
+	zbx_uint64_t			new_revision = dc_config_get_config_revision() + 1;
 	int				connectors_num = 0;
 	zbx_hashset_t			psk_owners;
 	zbx_vector_objmove_t		pg_host_reloc, *pg_host_reloc_ref;
@@ -7904,7 +7909,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		/* track host - proxy group relocations only during incremental sync */
 		zbx_vector_objmove_create(&pg_host_reloc);
 		pg_host_reloc_ref = &pg_host_reloc;
-
 	}
 	else
 		pg_host_reloc_ref = NULL;
@@ -8300,7 +8304,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		timers_size = dbconfig_used_size() - used_size;
 	}
 
-	config->revision.config = new_revision;
+	dc_config_set_config_revision(new_revision);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 	{
@@ -9413,8 +9417,10 @@ int	zbx_dc_check_host_conn_permissions(const char *host, const zbx_socket_t *soc
 	um_cache_get_host_revision(config->um_cache, *hostid, revision);
 
 	/* configuration is not yet fully synced */
-	if (*revision > config->revision.config)
-		*revision = config->revision.config;
+	zbx_uint64_t	config_revision = dc_config_get_config_revision();
+
+	if (*revision > config_revision)
+		*revision = config_revision;
 
 	UNLOCK_CACHE;
 
@@ -10467,7 +10473,7 @@ static void	dc_preproc_sync_item(zbx_hashset_t *items, ZBX_DC_ITEM *dc_item, zbx
 		zbx_pp_item_preproc_release(pp_item->preproc);
 	}
 
-	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->type, dc_item->value_type, dc_item->flags);
+	pp_item->preproc = zbx_pp_item_preproc_create(dc_item->hostid, dc_item->value_type, dc_item->flags);
 	pp_item->revision = revision;
 
 	if (NULL != dc_item->master_item)
@@ -10525,9 +10531,6 @@ static int	dc_preproc_item_changed(ZBX_DC_ITEM *dc_item, zbx_pp_item_t *pp_item)
 	if (dc_item->value_type != pp_item->preproc->value_type)
 		return SUCCEED;
 
-	if (dc_item->type != pp_item->preproc->type)
-		return SUCCEED;
-
 	if (NULL != dc_item->master_item)
 	{
 		if (dc_item->master_item->revision > pp_item->revision)
@@ -10552,10 +10555,10 @@ unsigned char	zbx_dc_item_requires_preprocessing(const ZBX_DC_ITEM *dc_item)
 	if (NULL == dc_item->preproc_item && NULL == dc_item->master_item &&
 			0 == (dc_item->flags & ZBX_FLAG_DISCOVERY_RULE))
 	{
-		return ZBX_ITEM_REQUIRES_PREPROCESSING_NO;
+		return ZBX_ITEM_PREPROCESSING_NONE;
 	}
 
-	return ZBX_ITEM_REQUIRES_PREPROCESSING_YES;
+	return ITEM_TYPE_INTERNAL == dc_item->type ? ZBX_ITEM_PREPROCESSING_PRIORITY : ZBX_ITEM_PREPROCESSING_REGULAR;
 }
 
 /******************************************************************************
@@ -10580,13 +10583,15 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 	zbx_vector_dc_item_ptr_t	items_sync;
 	zbx_dc_um_shared_handle_t	*um_handle_new = NULL;
 
-	if (config->revision.config == *revision)
+	if (zbx_dc_config_get_config_revision() == *revision)
 		return;
 
 	zbx_vector_dc_item_ptr_create(&items_sync);
 	zbx_vector_dc_item_ptr_reserve(&items_sync, MAX(items->num_data, 100));
 
 	RDLOCK_CACHE;
+
+	zbx_uint64_t	config_revision = dc_config_get_config_revision();
 
 	um_handle_new = zbx_dc_um_shared_handle_update(*um_handle);
 
@@ -10607,7 +10612,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			if (ITEM_STATUS_ACTIVE != dc_item->status || ITEM_TYPE_DEPENDENT == dc_item->type)
 				continue;
 
-			if (ZBX_ITEM_REQUIRES_PREPROCESSING_NO == zbx_dc_item_requires_preprocessing(dc_item))
+			if (ZBX_ITEM_PREPROCESSING_NONE == zbx_dc_item_requires_preprocessing(dc_item))
 				continue;
 
 			if (HOST_MONITORED_BY_SERVER == dc_host->monitored_by ||
@@ -10633,7 +10638,7 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 			{
 				if (FAIL == dc_preproc_item_changed(dci, pp_item))
 				{
-					pp_item->revision = config->revision.config;
+					pp_item->revision = config_revision;
 					zbx_vector_dc_item_ptr_remove_noorder(&items_sync, i);
 					continue;
 				}
@@ -10643,12 +10648,12 @@ void	zbx_dc_config_get_preprocessable_items(zbx_hashset_t *items, zbx_dc_um_shar
 		}
 
 		for (i = 0; i < items_sync.values_num; i++)
-			dc_preproc_sync_item(items, items_sync.values[i], config->revision.config);
+			dc_preproc_sync_item(items, items_sync.values[i], config_revision);
 
 		zbx_vector_dc_item_ptr_clear(&items_sync);
 	}
 
-	*revision = config->revision.config;
+	*revision = config_revision;
 
 	UNLOCK_CACHE;
 
@@ -15779,7 +15784,8 @@ int	zbx_dc_register_proxy_config_session(zbx_uint64_t hostid, const char *token,
 		session->last_id = session_config_revision;
 		session->lastaccess = now;
 	}
-	*dc_revision = config->revision;
+
+	dc_config_get_revision(dc_revision);
 
 	*macro_revision = config->um_cache->revision;
 
@@ -16633,8 +16639,8 @@ int	zbx_dc_maintenance_has_tags(void)
  ******************************************************************************/
 static zbx_dc_um_handle_t	*dc_open_user_macros(unsigned char macro_env)
 {
-	zbx_dc_um_handle_t	*handle;
-	static zbx_um_cache_t	*um_cache = NULL;
+	zbx_dc_um_handle_t			*handle;
+	static ZBX_THREAD_LOCAL zbx_um_cache_t	*um_cache = NULL;
 
 	handle = (zbx_dc_um_handle_t *)zbx_malloc(NULL, sizeof(zbx_dc_um_handle_t));
 

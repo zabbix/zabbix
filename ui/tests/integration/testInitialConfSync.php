@@ -925,7 +925,7 @@ class testInitialConfSync extends CIntegrationTest
 
 		$sync_lines1 = preg_replace(
 			[
-				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ zbx_dc_sync_configuration\(\) /",
+				"/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+ \[configuration syncer #1\] zbx_dc_sync_configuration\(\) /",
 				"/\s+/",
 				"/-?[0-9]+bytes/",
 				"/:sql:[0-9]+\.[0-9]+sync:[0-9]+\.[0-9]+sec/",

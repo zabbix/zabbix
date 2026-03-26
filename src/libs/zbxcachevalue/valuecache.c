@@ -641,7 +641,7 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_history_record_clear(vector);
@@ -1174,7 +1174,7 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	item->values_total -= (last - first + 1);
@@ -2457,7 +2457,7 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 
 	ret = SUCCEED;
 out:
-	zbx_vc_disable();
+	zbx_vc_enable();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
