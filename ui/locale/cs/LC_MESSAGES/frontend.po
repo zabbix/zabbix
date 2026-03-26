@@ -12484,6 +12484,11 @@ msgstr "Neplatná emailová adresa \"%1$s\"."
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná emailová adresa pro typ médií s ID \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "Neplatný vstup"
@@ -12865,6 +12870,11 @@ msgstr "Neplatný řetězec."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Neplatná značka \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -21381,6 +21391,10 @@ msgstr "Swap velikost prostoru v bytech nebo v procentech z celkového počtu. N
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Přepnutí autentizační metody způsobí ukončení všech sezení mimo Vašeho! Pokračovat?"
@@ -23401,6 +23415,10 @@ msgstr "Vrátit zpět odsouhlasení problému."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Neočekávaný stavový kód odpovědi HTTP."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25643,6 +25661,10 @@ msgstr "Nemůžete změnit šablony pro aktuální označení."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnění na vykonání této operace."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

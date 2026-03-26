@@ -87,9 +87,11 @@
 					uncheckTableRows(`graph_prototypes_${this.checkbox_hash}`, [], false);
 
 					if (data.submit.success?.action === 'delete') {
-						const url = new URL('host_discovery.php', location.href);
+						const url = new URL('zabbix.php', location.href);
 
+						url.searchParams.set('action', 'graph.prototype.list');
 						url.searchParams.set('context', this.context);
+						url.searchParams.set('parent_discoveryid', this.parent_discoveryid);
 
 						event.setRedirectUrl(url.href);
 					}
