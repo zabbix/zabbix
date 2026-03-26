@@ -20,6 +20,7 @@
 #include "checks_script.h"
 #include "checks_browser.h"
 #include "checks_simple.h"
+#include "checks_telemetry.h"
 
 #ifdef HAVE_NETSNMP
 #	include "checks_snmp.h"
@@ -139,6 +140,9 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_agent
 			break;
 		case ITEM_TYPE_BROWSER:
 			res = get_value_browser(item, config_webdriver_url, config_comms->config_source_ip, result);
+			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			res = get_value_telemetry(item, result);
 			break;
 		default:
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Not supported item type:%d", item->type));

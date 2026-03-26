@@ -33,6 +33,8 @@ libzbxpoller_a_SOURCES = \
 	checks_http.h \
 	checks_simple_vmware.c \
 	checks_simple_vmware.h \
+	checks_telemetry.c \
+	checks_telemetry.h \
 	async_poller.c \
 	async_manager.c \
 	async_manager.h \
