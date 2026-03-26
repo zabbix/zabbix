@@ -140,7 +140,32 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 	 * Test for checking form update without changing any data.
 	 */
 	public function testFormAdministrationGeneralTimeouts_SimpleUpdate() {
-		$this->executeSimpleUpdate();
+		$config = CDBHelper::getRow('SELECT * FROM settings ORDER BY name');
+
+		$this->page->login()->open($this->config_link);
+		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
+		$labels = $form->getLabels(CElementFilter::ATTRIBUTES_PRESENT, ['for'])->asText();
+		$values = [];
+
+		/**
+		 * Form contains two fields with no labels or values, which provides PHP errors.
+		 * To avoid issues, each value is taken separately only for labels with attribute.
+		 */
+		foreach ($labels as $label) {
+			$values[$label] = $form->getField($label)->getValue();
+		}
+
+		$form->submit();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
+
+		$this->page->refresh();
+		$this->page->waitUntilReady();
+		$form->invalidate();
+		// Check that DBdata is not changed.
+		$this->assertEquals($config, CDBHelper::getRow('SELECT * FROM settings ORDER BY name'));
+		// Check that Frontend form is not changed.
+		$form->checkValue($values);
 	}
 
 	public static function getUpdateValueData() {
