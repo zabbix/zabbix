@@ -12,6 +12,8 @@ libzbxdiscoverer_a_SOURCES = \
 	discoverer_taskprep.h \
 	discoverer_async.c \
 	discoverer_async.h \
+	discoverer_snmp.c \
+	discoverer_snmp.h \
 	async_tcpsvc.c \
 	async_tcpsvc.h \
 	async_telnet.c \

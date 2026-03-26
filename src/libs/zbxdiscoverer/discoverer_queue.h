@@ -21,7 +21,7 @@ typedef struct
 {
 	int					workers_num;
 	zbx_list_t				jobs;
-	zbx_uint64_t				pending_checks_count;
+	zbx_uint64_t				pending_checks_count;	/* ZBX_IPC_DISCOVERER_QUEUE */
 	int					snmp_allowed_workers;
 	int					checks_per_worker_max;
 	pthread_mutex_t				lock;
@@ -48,4 +48,5 @@ void	discoverer_queue_append_error(zbx_vector_discoverer_drule_error_t *errors, 
 			const char *error);
 
 zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue);
+zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_discoverer_queue_t *queue, zbx_discoverer_task_t *task);
 #endif

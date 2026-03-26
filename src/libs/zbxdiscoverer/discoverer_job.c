@@ -21,7 +21,7 @@ ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
 int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 {
-	int			ret;
+	int		ret;
 	zbx_ds_dcheck_t	*dcheck = task->ds_dchecks.values[task->range.state.index_dcheck];
 
 	if (0 == task->range.state.count)
@@ -93,7 +93,7 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 	zbx_free(task);
 }
 
-zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
+zbx_uint64_t	discoverer_task_check_count_get(const zbx_discoverer_task_t *task)
 {
 	return task->range.state.count;
 }
@@ -259,3 +259,4 @@ void	discoverer_job_abort(zbx_discoverer_job_t *job, zbx_uint64_t *pending_check
 	discoverer_queue_append_error(errors, job->druleid, error);
 	*pending_checks_count -= discoverer_job_tasks_free(job);
 }
+

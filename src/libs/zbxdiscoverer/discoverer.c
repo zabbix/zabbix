@@ -884,7 +884,8 @@ zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port,
 	return service;
 }
 
-zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid)
+zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid,
+			const unsigned int max_checks_per_ip)
 {
 	zbx_discoverer_results_t	*result;
 
@@ -897,6 +898,7 @@ zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const z
 	result->ip = result->dnsname = NULL;
 	result->now = time(NULL);
 	result->processed_checks_per_ip = 0;
+	result->max_checks_per_ip = max_checks_per_ip;
 
 	return result;
 }
@@ -1090,11 +1092,9 @@ static void	discoverer_results_move_value(zbx_discoverer_results_t *src, zbx_has
 	results_free(src);
 }
 
-int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src,
-		zbx_discoverer_task_t *task, int force)
+int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_results_ptr_t *vr_src,int force)
 {
-	int		i, ret = SUCCEED;
-	zbx_uint64_t	druleid = task->ds_dchecks.values[0]->dcheck.druleid;
+	int	i, ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() src:%d dst:%d", log_worker_id, __func__, vr_src->values_num,
 			hr_dst->num_data);
@@ -1103,17 +1103,17 @@ int	discoverer_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discove
 	{
 		zbx_discoverer_results_t	*src = vr_src->values[0];
 
-		ret = discoverer_drule_check(&dmanager.incomplete_checks_count, druleid, src->ip);
+		ret = discoverer_drule_check(&dmanager.incomplete_checks_count, src->druleid, src->ip);
 	}
 
 	for (i = vr_src->values_num - 1; i >= 0 && SUCCEED == ret; i--)
 	{
 		zbx_discoverer_results_t	*src = vr_src->values[i];
 
-		if (0 == force && src->processed_checks_per_ip != task->range.state.checks_per_ip)
+		if (0 == force && src->processed_checks_per_ip != src->max_checks_per_ip)
 			continue;
 
-		if (FAIL == (ret = discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
+		if (FAIL == (ret = discoverer_check_count_decrease(&dmanager.incomplete_checks_count, src->druleid,
 				src->ip, src->processed_checks_per_ip)))
 		{
 			break;	/* config revision id was changed */
@@ -1306,15 +1306,22 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			/* process checks */
 
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
+			dcheck_type = GET_DTYPE(task);
 
 			if (FAIL == dcheck_is_async(task->ds_dchecks.values[0]))
 			{
 				ret = discoverer_net_check_common(druleid, task, &error);
 			}
-			else if (SVC_ICMPPING == GET_DTYPE(task))
+			else if (SVC_ICMPPING == dcheck_type)
 			{
 				ret = discoverer_net_check_icmp(druleid, task, concurrency_max, &worker->stop, queue,
 						&error);
+			}
+			else if (SVC_SNMPv3 == dcheck_type || SVC_SNMPv2c == dcheck_type || SVC_SNMPv1 == dcheck_type)
+			{
+				ret = discovery_jobs_check_snmp(druleid, task, concurrency_max, &worker->stop,
+						&dmanager, log_worker_id, &error);
+
 			}
 			else
 			{
@@ -1328,7 +1335,6 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 						worker->worker_id, druleid, ZBX_NULL2STR(error));
 			}
 
-			dcheck_type = GET_DTYPE(task);
 			discoverer_task_free(task);
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);
 

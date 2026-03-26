@@ -302,3 +302,98 @@ void	discoverer_queue_append_error(zbx_vector_discoverer_drule_error_t *errors, 
 
 	derror_ptr->error = zbx_dsprintf(derror_ptr->error, "%s\n%s", derror_ptr->error, error);
 }
+
+zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_discoverer_queue_t *queue, zbx_discoverer_task_t *task)
+{
+	zbx_discoverer_task_t	*ret_task = NULL;
+	zbx_uint64_t		task_druleid = NULL == task ? 0 :
+					task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.druleid;
+	zbx_list_item_t		*job_current = NULL, *task_current = NULL;
+	zbx_list_iterator_t	job_li;
+
+	discoverer_queue_lock(queue);
+
+	zbx_list_iterator_init(&queue->jobs, &job_li);
+
+	if (0 != task_druleid)
+	{
+		do
+		{
+			zbx_list_iterator_t	li;
+			zbx_discoverer_job_t	*job;
+
+			(void)zbx_list_iterator_peek(&job_li, (void*)&job);
+
+			if (task_druleid != job->druleid)
+				continue;
+
+			zbx_list_iterator_init(&job->tasks, &li);
+
+			do
+			{
+				(void)zbx_list_iterator_peek(&li, (void*)&ret_task);
+
+				if (0 != discoverer_task_compare(task, ret_task))
+					continue;
+
+				task_current = li.current;
+				break;
+			}
+			while (SUCCEED == zbx_list_iterator_next(&li));
+
+			if (NULL == task_current)
+				THIS_SHOULD_NEVER_HAPPEN;
+
+			job_current = job_li.current;
+			break;
+		}
+		while (SUCCEED == zbx_list_iterator_next(&job_li));
+	}
+
+
+	zbx_list_iterator_init_with(&queue->jobs, job_current, &job_li);
+
+	do
+	{
+		zbx_list_iterator_t	li;
+		zbx_discoverer_job_t	*job;
+
+		(void)zbx_list_iterator_peek(&job_li, (void*)&job);
+		zbx_list_iterator_init_with(&job->tasks, task_current, &li);
+
+		do
+		{
+			unsigned char	dtype;
+
+			(void)zbx_list_iterator_peek(&li, (void*)&ret_task);
+			dtype = GET_DTYPE(ret_task);
+
+			if (SVC_SNMPv3 != dtype && SVC_SNMPv2c != dtype && SVC_SNMPv1 != dtype)
+			{
+				ret_task = NULL;
+				continue;
+			}
+
+			if (NULL == task)
+				break;
+
+			if (0 == discoverer_task_compare(task, ret_task))
+			{
+				ret_task = NULL;
+				continue;
+			}
+
+			break;
+		}
+		while (SUCCEED == zbx_list_iterator_next(&li));
+
+		if (NULL != ret_task)
+			break;
+
+	}
+	while (SUCCEED == zbx_list_iterator_next(&job_li));
+
+	discoverer_queue_unlock(queue);
+
+	return ret_task;
+}
