@@ -853,6 +853,30 @@ static int	DBpatch_7050063(void)
 	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
 }
 
+static int	DBpatch_7050064(void)
+{
+	return DBdrop_foreign_key("trigger_depends", 2);
+}
+
+static int	DBpatch_7050065(void)
+{
+	return DBdrop_foreign_key("trigger_depends", 1);
+}
+
+static int	DBpatch_7050066(void)
+{
+	const zbx_db_field_t	field = {"triggerid_down", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_depends", 1, &field);
+}
+
+static int	DBpatch_7050067(void)
+{
+	const zbx_db_field_t	field = {"triggerid_up", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_depends", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -923,5 +947,9 @@ DBPATCH_ADD(7050060, 0, 1)
 DBPATCH_ADD(7050061, 0, 1)
 DBPATCH_ADD(7050062, 0, 1)
 DBPATCH_ADD(7050063, 0, 1)
+DBPATCH_ADD(7050064, 0, 1)
+DBPATCH_ADD(7050065, 0, 1)
+DBPATCH_ADD(7050066, 0, 1)
+DBPATCH_ADD(7050067, 0, 1)
 
 DBPATCH_END()
