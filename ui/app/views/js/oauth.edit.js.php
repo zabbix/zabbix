@@ -113,12 +113,16 @@ window.oauth_edit_popup = new class {
 	}
 
 	#showClientSecretWithWarning() {
+		if (this.form.querySelector('[name="client_secret_button"]') === null) {
+			return;
+		}
+
 		this.#showClientSecretField();
 		this.form.querySelector('.js-client-secret-warning').style.display = '';
 	}
 
 	#showClientSecretField() {
-		this.form.querySelector('[name="client_secret_button"]')?.remove();
+		this.form.querySelector('[name="client_secret_button"]').remove();
 
 		const input_element = this.form.querySelector('[name="client_secret"]');
 		input_element.style.display = '';
