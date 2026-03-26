@@ -23,6 +23,7 @@
 
 typedef int zbx_prof_scope_t;
 
+void	zbx_prof_destroy(void);
 void	zbx_prof_enable(zbx_prof_scope_t scope);
 void	zbx_prof_disable(void);
 void	zbx_prof_start(const char *func_name, zbx_prof_scope_t scope);

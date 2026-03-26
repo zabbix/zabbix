@@ -2659,7 +2659,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < hvs.values_num; i++)
