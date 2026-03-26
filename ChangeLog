@@ -1,8 +1,40 @@
-Changes for 7.0.24rc2
+Changes for 7.0.25rc1
 
 New features:
+.........T [ZBXNEXT-10422] added Cradlepoint NCM v2 by HTTP and Cradlepoint NCM v2 device by HTTP templates (aiantsen)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
+..F....... [ZBX-26899] fixed yaml markings for import compare (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+....I..... [ZBX-27306] added optional upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24
+
+7.0.24rc3 was released as 7.0.24 without any changes
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24rc3
+
+Bug fixes:
+.......PS. [ZBX-27590] reverted the custom-on-fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
+..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
+
+--------------------------------------------------------------------------------
+Changes for 7.0.24rc2
+
+Bug fixes:
+........S. [ZBX-27563] improved trigger-related postprocessing after configuration cache sync (wiper)
+..F....... [ZBX-27423] fixed graph rendering for items using throttling (Sasha)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.24rc1
@@ -3973,6 +4005,20 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.46rc1
+
+New features:
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
+
+Bug fixes:
+A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.45
+
+6.0.45rc1 was released as 6.0.45 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45rc1
