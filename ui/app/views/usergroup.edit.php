@@ -95,8 +95,11 @@ if ($data['can_update_group']) {
 		->setValue($data['userdirectoryid'])
 		->setFocusableElementId('userdirectoryid')
 		->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_DEFAULT_OPTION))
-		->addOptions(CSelect::createOptionsFromArray($data['userdirectories']))
 		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+
+	foreach ($data['userdirectories'] as $db_userdirectory) {
+		$userdirectory->addOption((new CSelectOption($db_userdirectory['userdirectoryid'], $db_userdirectory['name'])));
+	}
 
 	$ldap_warning = (makeWarningIcon(_('LDAP authentication is disabled system-wide.')))->setId('ldap-warning');
 
@@ -148,11 +151,23 @@ else {
 		$mfa_name = $mfa_index == -1 ? 'Disabled' : 'Default';
 	}
 
+	$userdirectory_name = array_key_exists($data['userdirectoryid'], $data['userdirectories'])
+		? $data['userdirectories'][$data['userdirectoryid']]['name']
+		: 'Default';
+
 	$form_grid
 		->addItem([
 			new CLabel(_('Frontend access')),
 			new CFormField(
 				(new CSpan(user_auth_type2str($data['gui_access'])))
+					->addClass('text-field')
+					->addClass(ZBX_STYLE_GREEN)
+			)
+		])
+		->addItem([
+			new CLabel(_('LDAP Server')),
+			new CFormField(
+				(new CSpan($userdirectory_name))
 					->addClass('text-field')
 					->addClass(ZBX_STYLE_GREEN)
 			)

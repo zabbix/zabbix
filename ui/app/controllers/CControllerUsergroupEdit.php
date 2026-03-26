@@ -148,14 +148,14 @@ class CControllerUsergroupEdit extends CController {
 			'userids' => CWebUser::$data['userid']
 		]);
 
-		if ($data['can_update_group']) {
-			$userdirectories = API::UserDirectory()->get([
-				'output' => ['userdirectoryid', 'name'],
-				'filter' => ['idp_type' => IDP_TYPE_LDAP]
-			]);
-			CArrayHelper::sort($userdirectories, ['name']);
-			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');
+		$data['userdirectories'] = API::UserDirectory()->get([
+			'output' => ['userdirectoryid', 'name'],
+			'filter' => ['idp_type' => IDP_TYPE_LDAP],
+			'preservekeys' => true
+		]);
+		CArrayHelper::sort($data['userdirectories'], ['name']);
 
+		if ($data['can_update_group']) {
 			$data['ldap_status'] = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED);
 		}
 
