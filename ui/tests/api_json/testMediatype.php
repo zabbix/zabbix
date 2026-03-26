@@ -215,7 +215,7 @@ class testMediatype extends CAPITest {
 	/**
 	 * @dataProvider updateValidResetTokenStatusDataProvider
 	 */
-	public function testMediatypeUpdateUrlResetTokenStatus(array $mediatypes, string $error_message) {
+	public function testMediatypeUpdateUrlResetTokenStatus(array $mediatypes) {
 		CTestDataHelper::convertMediatypesReferences($mediatypes);
 		$this->call('mediatype.update', $mediatypes);
 
