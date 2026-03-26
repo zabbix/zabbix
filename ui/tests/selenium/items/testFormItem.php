@@ -1728,7 +1728,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-zabbix-trapper-incorrect-ip',
 					'allowed_hosts' => 'localhost;127.0.0.1',
 					'inline_errors' => [
-						'id:trapper_hosts' => 'Incorrect address starting from ";127.0.0.1".'
+						'Allowed hosts' => 'Incorrect address starting from ";127.0.0.1".'
 					]
 				]
 			],
@@ -1737,11 +1737,11 @@ class testFormItem extends CLegacyWebTest {
 				[
 					'expected' => TEST_BAD,
 					'type' => 'Zabbix trapper',
-					'name' => 'Zabbix trapper with invalid delimiter in allowed hosts field',
+					'name' => 'Zabbix trapper with empty delimiter in allowed hosts field',
 					'key' => 'item-zabbix-trapper-multiple-spaces-ip',
 					'allowed_hosts' => 'localhost    dd',
 					'inline_errors' => [
-						'id:trapper_hosts' => 'Incorrect address starting from "dd".'
+						'Allowed hosts' => 'Incorrect address starting from "dd".'
 					]
 				]
 			],
@@ -1928,7 +1928,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-ssh-agent-error',
 					'inline_errors' => [
 						'User name' => 'This field cannot be empty.',
-						'id:params_es' => 'This field cannot be empty.'
+						'Executed script' => 'This field cannot be empty.'
 
 					]
 				]
@@ -1940,9 +1940,9 @@ class testFormItem extends CLegacyWebTest {
 					'type' => 'TELNET agent',
 					'name' => 'TELNET agent with empty executed script',
 					'key' => 'item-telnet-agent-empty-script',
-					'username' => 'test',
 					'inline_errors' => [
-						'id:params_es' => 'This field cannot be empty.'
+						'User name' => 'This field cannot be empty.',
+						'Executed script' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1968,7 +1968,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-jmx-agent-with-empty-password',
 					'username' => 'test',
 					'inline_errors' => [
-						'id:password' => 'This field cannot be empty.'
+						'Password' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -1981,7 +1981,7 @@ class testFormItem extends CLegacyWebTest {
 					'key' => 'item-jmx-agent-with-empty-username',
 					'password' => 'test',
 					'inline_errors' => [
-						'id:password' => 'Both username and password should be either present or empty.'
+						'Password' => 'Both username and password should be either present or empty.'
 					]
 				]
 			],
@@ -2122,7 +2122,7 @@ class testFormItem extends CLegacyWebTest {
 		}
 
 		if (isset($data['password'])) {
-			$this->zbxTestInputType('password', $data['password']);
+			$form->getField('Password')->fill($data['password']);
 		}
 
 		if (isset($data['ipmi_sensor'])) {
@@ -2345,15 +2345,15 @@ class testFormItem extends CLegacyWebTest {
 			}
 
 			if (isset($data['allowed_hosts'])) {
-				$this->assertEquals($this->zbxTestGetValue("//input[@id='trapper_hosts']"), $data['allowed_hosts']);
+				$check_form->checkValue(['Allowed hosts' => $data['allowed_hosts']]);
 			}
 
 			if (isset($data['username'])) {
-				$this->assertEquals($this->zbxTestGetValue("//input[@id='username']"), $data['username']);
+				$check_form->checkValue(['User name' => $data['username']]);
 			}
 
 			if (isset($data['password'])) {
-				$this->assertEquals($this->zbxTestGetValue("//input[@id='password']"), $data['password']);
+				$check_form->checkValue(['Password' => $data['password']]);
 			}
 
 			$dialog_check->close();
