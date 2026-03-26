@@ -40,8 +40,9 @@ class CControllerModuleDisable extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
+	protected function checkPermissions(): bool	{
+		return ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
+			&& CFeatureFlagHelper::isFlagModulesEnabled());
 	}
 
 	protected function doAction(): void {
