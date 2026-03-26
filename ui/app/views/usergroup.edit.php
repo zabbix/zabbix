@@ -148,12 +148,12 @@ else {
 		$mfa_name = $data['mfas'][$data['mfaid']];
 	}
 	else {
-		$mfa_name = $mfa_index == -1 ? 'Disabled' : 'Default';
+		$mfa_name = $mfa_index == -1 ? _('Disabled') : _('Default');
 	}
 
 	$userdirectory_name = array_key_exists($data['userdirectoryid'], $data['userdirectories'])
 		? $data['userdirectories'][$data['userdirectoryid']]['name']
-		: 'Default';
+		: _('Default');
 
 	$form_grid
 		->addItem([
