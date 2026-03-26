@@ -87,8 +87,9 @@
 				}
 			})
 
-			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')
-				.addEventListener('click', (e) => this.#delete(e.target));
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')?.addEventListener('click', (e) =>
+				this.#delete(e.target)
+			);
 
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
