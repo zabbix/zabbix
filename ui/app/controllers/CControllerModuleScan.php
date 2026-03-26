@@ -23,7 +23,7 @@ class CControllerModuleScan extends CController {
 		return true;
 	}
 
-	protected function checkPermissions(): bool	{
+	protected function checkPermissions(): bool {
 		return ($this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL)
 			&& CFeatureFlagHelper::isFlagModulesEnabled());
 	}
