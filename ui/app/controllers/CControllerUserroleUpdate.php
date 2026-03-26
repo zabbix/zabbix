@@ -43,7 +43,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			],
 			'ui_default_access' => ['boolean'],
 			'modules' => ['array', 'required', 'field' => ['boolean']],
-			'modules_default_access' => ['boolean']	,
+			'modules_default_access' => ['boolean'],
 			'actions' => ['array', 'required',
 				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]
 			],
