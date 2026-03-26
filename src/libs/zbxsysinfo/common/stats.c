@@ -289,14 +289,14 @@ void	diskstat_shm_init(void)
 	if (-1 == (collector->diskstat_shmid = zbx_shm_create(shm_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for disk statistics collector");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if ((void *)(-1) == (diskdevices = (zbx_diskdevices_data *)shmat(collector->diskstat_shmid, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 				zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	diskdevices->count = 0;
@@ -326,7 +326,7 @@ void	diskstat_shm_reattach(void)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared"
 						" memory: %s", zbx_strerror(errno));
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 			diskdevices = NULL;
 			my_diskstat_shmid = ZBX_NONEXISTENT_SHMID;
@@ -336,7 +336,7 @@ void	diskstat_shm_reattach(void)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for disk statistics collector: %s",
 					zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		my_diskstat_shmid = collector->diskstat_shmid;
 
@@ -377,14 +377,14 @@ void	diskstat_shm_extend(void)
 	if (-1 == (new_shmid = zbx_shm_create(new_shm_size)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate shared memory for extending disk statistics collector");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if ((void *)(-1) == (new_diskdevices = (zbx_diskdevices_data *)shmat(new_shmid, NULL, 0)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot attach shared memory for extending disk statistics collector: %s",
 				zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* copy data from the old segment */
@@ -395,13 +395,13 @@ void	diskstat_shm_extend(void)
 	if (-1 == shmdt((void *) diskdevices))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot detach from disk statistics collector shared memory");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (-1 == zbx_shm_destroy(collector->diskstat_shmid))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot destroy old disk statistics collector shared memory");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* switch to the new segment */
@@ -425,8 +425,7 @@ void	diskstat_shm_extend(void)
 ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 {
 	unsigned char	process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	int		server_num = ((zbx_thread_args_t *)args)->info.server_num,
-			process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	int		server_num = ((zbx_thread_args_t *)args)->info.server_num;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #%d started [collector]", server_num);
 
@@ -477,8 +476,6 @@ ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 	}
 
 #ifdef _WINDOWS
-	ZBX_UNUSED(process_num);
-
 	if (0 != cpu_collector_started())
 		free_cpu_collector(&(collector->cpus));
 
@@ -486,9 +483,6 @@ ZBX_THREAD_ENTRY(zbx_collector_thread, args)
 
 	zbx_thread_exit(EXIT_SUCCESS);
 #else
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	exit(EXIT_SUCCESS);
 #endif
 }
