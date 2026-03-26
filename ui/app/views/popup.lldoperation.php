@@ -65,9 +65,10 @@ $operations_popup_form_list = (new CFormList())
 			]))
 			->setReadonly($options['readonly'])
 			->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('value', $options['value'], $options['readonly'],
-				DB::getFieldLength('lld_override_operation', 'value')))
+		(new CTextAreaFlexible('value', $options['value']))
 			->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+			->setMaxlength(DB::getFieldLength('lld_override_operation', 'value'))
+			->setReadonly($options['readonly'])
 			->setAttribute('placeholder', _('pattern'))
 	])
 	->addRow(
