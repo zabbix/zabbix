@@ -719,37 +719,38 @@ zabbix_export:
       description: |
         This media type integrates your Zabbix installation with your GLPi installation using the Zabbix webhook feature.
         
-        GLPi configuration (GLPi 11+ - recommended RESTful API V2):
+        RESTful API (V2) with OAuth2 - recommended configuration for GLPi 11+:
         
         1. Enable access to the GLPi API:
         - In the GLPi web interface, go to "Setup" → "General" → "API".
-        - Set the "Enable API" and click the "Save" button.
+        - Switch the toggle to activate "Enable API" and click the "Save" button.
         
         2. Add an OAuth client:
+        - Go to "Setup" → "OAuth clients".
         - Click the "Add" button on the top of the page.
-        - Set the "client name", select "api" for scope and choose "password" for grants.
+        - Set the client name; enter "api" in the "Scopes" field and "Password" in "Grants".
         - Click the "Add" button.
-        - Open the settings of the created client, and then copy and save the "client id" and "client secret".
+        - Open the settings of the created client, and then copy and save the client ID and client secret.
         
         3. Create a new user profile with permissions to tickets and followups (alternatively, you can use an existing profile with sufficient privileges):
         - Go to "Administration" → "Profiles" and click the "Add" button on the top of the page.
         - Specify the profile name and set the "Profile's Interface" option to "Standard Interface", and then click the "Add" button.
         - Open the created profile and click the "Assistance" tab.
-        - Set the "Update", "Create", and "See all tickets" permissions in the "Ticket" section.
-        - Set the "Add followup (requester)" permission for the "Followups" line in the "Followups/Tasks" section.
+        - In the "Tickets" section, set the "Update", "Create", and "See all tickets" permissions.
+        - In the "Followups/Tasks" section, set the "Add (Requester)" permission for the "Followups" row.
         - Click the "Save" button.
         
         4. Create a new user:
-        - Go to "Administration" → "Users" and click the "Add User" button on the top of the page.
-        - Specify the user login and set the "Profiles" option to the profile that you created in the previous step (or any other existing profile with permissions to create tickets and followups).
+        - Go to "Administration" → "Users" and click the "Add" button on the top of the page.
+        - Specify the user login and set the "Authorization" → "Profile" option to the profile you created in the previous step (or any other existing profile with permissions to create tickets and followups).
         - Set the password for the user.
         - Click the "Add" button.
         
-        GLPi configuration (GLPi 10 - REST API V1 - legacy API):
+        REST API (V1) - legacy configuration for GLPi 10:
         
         1. Enable access to the GLPi REST API:
         - In the GLPi web interface, go to "Setup" → "General" → "API".
-        - Set the "Enable Rest API" and "Enable Rest API" options to "Yes" and click the "Save" button.
+        - Set the "Enable Rest API" and "Enable login with external token" options to "Yes" and click the "Save" button.
         
         2. Add a new API client:
         - Click the "Add API client" button.
@@ -763,7 +764,7 @@ zabbix_export:
         - Specify the profile name and set the "Profile's Interface" option to "Standard Interface", and then click the "Add" button.
         - Open the created profile and click the "Assistance" tab.
         - Set the "Update", "Create", and "See all" permissions in the "Tickets" section.
-        - Set the "Add followup (requester)" permission for the "Followups" line in the "Followups/Tasks" section.
+        - Set the "Add followup (Requester)" permission for the "Followups" line in the "Followups/Tasks" section.
         - Click the "Save" button.
         
         4. Create a new user:
