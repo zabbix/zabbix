@@ -58,8 +58,9 @@ $form
 				makeHelpIcon(_('Shown as the label to all MFA users in authenticator apps.'))
 			], 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['name'], false, DB::getFieldLength('mfa', 'name')))
+				(new CTextAreaFlexible('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+					->setMaxlength(DB::getFieldLength('mfa', 'name'))
 					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)

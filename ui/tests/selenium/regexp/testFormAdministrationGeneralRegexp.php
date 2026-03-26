@@ -51,9 +51,9 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
 		$this->zbxTestAssertElementPresentId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 128);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", "maxlength", 128);
 
-		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='expressions_0_expression']", "maxlength", 255);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
 			'Character string included',
@@ -90,9 +90,13 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickButtonText('New regular expression');
 
-		$this->zbxTestInputType('name', $name);
-		$this->zbxTestInputType('expressions_0_expression', $expression);
-		$this->zbxTestDropdownSelect('expressions_0_expression_type', $expression_type);
+		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
+		$form->fill([
+			'Name' => $name,
+			'id:expressions_0_expression' => $expression,
+			'id:expressions_0_expression_type' => $expression_type
+		]);
+
 		if ($case_sensitive == 1) {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		}
@@ -168,7 +172,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestClickWait('clone');
-		$this->zbxTestInputType('name', $this->regexp.'_clone');
+		$this->query('id:name')->one()->fill($this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
@@ -180,7 +184,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
+		$this->query('id:name')->one()->fill($this->regexp.'2');
 		$this->zbxTestClickWait('update');
 		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
 

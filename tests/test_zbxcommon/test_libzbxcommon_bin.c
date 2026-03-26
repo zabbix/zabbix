@@ -14,11 +14,16 @@
 
 #include "zbxcommon.h"
 
-static void	zbx_log_impl(int level, const char *fmt, va_list args)
+static void	log_impl(int level, const char *fmt, va_list args)
 {
 	ZBX_UNUSED(level);
 	ZBX_UNUSED(fmt);
 	ZBX_UNUSED(args);
+}
+
+static int	get_log_level_impl(void)
+{
+	return LOG_LEVEL_TRACE;
 }
 
 ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_progname")
@@ -26,7 +31,7 @@ ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, "common_progname")
 int	main(void)
 {
 	/* intentionally not specifying the backtrace, to avoid dependencies on zbxnix/zbxwin32 */
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, NULL);
+	zbx_init_library_common(log_impl, get_log_level_impl, get_zbx_progname, NULL);
 
 	return SUCCEED;
 }
