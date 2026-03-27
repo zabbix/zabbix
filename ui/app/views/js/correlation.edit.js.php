@@ -125,13 +125,8 @@ window.correlation_edit_popup = new class {
 	#getConditionNextIndex() {
 		let next_index = 0;
 
-		while (true) {
-			if (!document.getElementById('condition_table').querySelector(`[data-row_index="${next_index}"]`)) {
-				break;
-			}
-			else {
-				next_index++;
-			}
+		while (this.form_element.querySelector(`#condition_table [data-row_index="${next_index}"]`) !== null) {
+			next_index++;
 		}
 
 		return next_index;
