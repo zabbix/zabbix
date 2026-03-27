@@ -23,7 +23,7 @@ class CDefaultDataProvider extends CDataProvider {
 	/**
 	 * @var {array}
 	 */
-	#last_fields = [];
+	#last_data_fields = [];
 
 	/**
 	 * @type {Object}
@@ -33,7 +33,7 @@ class CDefaultDataProvider extends CDataProvider {
 	/**
 	 * @type {Object}
 	 */
-	#last_context_popup_data = {};
+	#last_column_options = {};
 
 	/**
 	 * @type {Object}
@@ -61,11 +61,6 @@ class CDefaultDataProvider extends CDataProvider {
 	#last_response = null;
 
 	/**
-	 * @type {boolean}
-	 */
-	#data_changed = false;
-
-	/**
 	 * @var {AbortController|null}
 	 */
 	#abort_controller = null;
@@ -91,40 +86,39 @@ class CDefaultDataProvider extends CDataProvider {
 	 * @returns {Promise<any>}
 	 */
 	getData({columns, filter, options, page, sort_field, sort_order, force_load, export_file}) {
-		const visible_columns = columns.filter(column_config => {
-			return column_config.isVisible() && column_config.getId() != CDataTableColumn.CUSTOMIZE_TABLE;
-		});
-		const fields = Array.from(new Set(visible_columns.flatMap(column_config => column_config.getFields())));
+		const data_fields = [...new Set(columns.flatMap(column => {
+			return column.isVisible() && column.getId() !== CDataTableColumn.CUSTOMIZE_TABLE ? column.getFields() : [];
+		}))];
 
-		let context_popup_data = {};
-		for (const column_config of columns) {
-			context_popup_data = Object.values(Object.assign(context_popup_data, column_config.getContextPopupData()));
-		}
+		const columns_options = columns.reduce((settings, column) => {
+			return Object.assign(settings, column.getContextPopupData());
+		}, {});
 
-		for (const key of ['filter_src', 'filter_view_data', 'filter_show_counter']) {
-			delete filter[key];
-		}
+		filter = Object.fromEntries(
+			Object.entries(filter).filter(([key]) => {
+				return !['filter_src', 'filter_view_data', 'filter_show_counter'].includes(key);
+			})
+		);
 
-		if (this.#last_response && !force_load) {
-			const has_all_fields = fields.every(field => this.#last_fields.includes(field));
+		if (this.#last_response !== null && !force_load) {
+			const fields_set_changed = !data_fields.every(field => this.#last_data_fields.includes(field));
 			const filter_changed = !deepCompare(this.#last_filter, filter);
-			const context_popup_data_changed = !deepCompare(this.#last_context_popup_data, context_popup_data);
-			const option_changed = !deepCompare(this.#last_options, options);
+			const options_changed = !deepCompare(this.#last_options, options);
+			const columns_options_changed = !deepCompare(this.#last_column_options, columns_options);
 			const page_changed = this.#last_page !== page;
 			const sort_changed = this.#last_sort_field !== sort_field || this.#last_sort_order !== sort_order;
 
-			this.#data_changed = !has_all_fields || context_popup_data_changed || filter_changed || option_changed
-				|| page_changed || sort_changed;
-
-			if (!this.#data_changed) {
+			if (fields_set_changed || columns_options_changed || filter_changed || options_changed
+				|| page_changed || sort_changed
+			) {
 				return Promise.resolve(this.#last_response);
 			}
 		}
 
-		this.#last_fields = fields;
+		this.#last_data_fields = data_fields;
 		this.#last_filter = filter;
-		this.#last_context_popup_data = context_popup_data;
 		this.#last_options = options;
+		this.#last_column_options = columns_options;
 		this.#last_page = page;
 		this.#last_sort_field = sort_field;
 		this.#last_sort_order = sort_order;
@@ -133,8 +127,10 @@ class CDefaultDataProvider extends CDataProvider {
 			delete filter['filter_name'];
 		}
 
+		const abort_controller = new AbortController();
+
 		this.#abort_controller?.abort();
-		this.#abort_controller = new AbortController();
+		this.#abort_controller = abort_controller;
 
 		return fetch(this.#url, {
 			method: 'POST',
@@ -142,7 +138,7 @@ class CDefaultDataProvider extends CDataProvider {
 				['Content-Type', 'application/json']
 			],
 			body: JSON.stringify({
-				columns: columns.map(column_config => column_config.toObject()),
+				columns: columns.map(column => column.toObject()),
 				filter,
 				options,
 				page,
@@ -161,7 +157,9 @@ class CDefaultDataProvider extends CDataProvider {
 				return response;
 			})
 			.finally(() => {
-				this.#abort_controller = null;
+				if (this.#abort_controller === abort_controller) {
+					this.#abort_controller = null;
+				}
 			});
 	}
 
