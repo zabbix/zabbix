@@ -84,7 +84,7 @@ class CIntegrationTest extends CAPITest {
 	 */
 	private $case_components = [];
 
-	private static $suite_components_inherit = false;
+	private static $suite_components_reuse = false;
 	private static $suite_components_running = false;
 
 	/**
@@ -116,9 +116,9 @@ class CIntegrationTest extends CAPITest {
 			'configuration'	=> []
 		];
 
-		// Get suite-components flag.
-		if (in_array('true', $this->getAnnotationTokensByName($annotations, 'suite-components'))) {
-			self::$suite_components_inherit = true;
+		// Get suite-components-reuse flag.
+		if (in_array('true', $this->getAnnotationTokensByName($annotations, 'suite-components-reuse'))) {
+			self::$suite_components_reuse = true;
 		}
 
 		// Get required components.
@@ -246,9 +246,9 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
-		if (!(self::$suite_components_inherit && self::$suite_components_running)) {
+		if (!(self::$suite_components_reuse && self::$suite_components_running)) {
 
-			if (self::$suite_components_inherit) {
+			if (self::$suite_components_reuse) {
 				foreach ($this->case_components as $component) {
 					if (in_array($component, self::$suite_components)) {
 						throw new Exception('Component "'.$component.'" already started on suite level.');
@@ -276,7 +276,7 @@ class CIntegrationTest extends CAPITest {
 	public function onAfterTestCase() {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
-		if (self::$suite_components_inherit === false) {
+		if (self::$suite_components_reuse === false) {
 			foreach ($components as $component) {
 				self::stopComponent($component);
 			}
@@ -312,7 +312,7 @@ class CIntegrationTest extends CAPITest {
 	 * @afterClass
 	 */
 	public static function onAfterTestSuite() {
-		self::$suite_components_inherit = false;
+		self::$suite_components_reuse = false;
 		self::$suite_components_running = false;
 		foreach (self::$suite_components as $component) {
 			self::stopComponent($component);
