@@ -133,7 +133,10 @@ window.oauth_edit_popup = new class {
 		const client_secret_button = this.form_element.querySelector('[name="client_secret_button"]');
 
 		if (client_secret_button !== null) {
-			client_secret_button.addEventListener('click', () => this.#showClientSecretField());
+			client_secret_button.addEventListener('click', () => {
+				this.#showClientSecretField();
+				this.form_element.querySelector('[name="client_secret"]').focus();
+			});
 
 			if (this.is_advanced_form) {
 				const token_url = this.form_element.querySelector('[name="token_url"]');
@@ -160,6 +163,8 @@ window.oauth_edit_popup = new class {
 
 		this.#showClientSecretField();
 		this.form_element.querySelector('.js-client-secret-warning').style.display = '';
+		this.form.findFieldByName('client_secret').setChanged();
+		this.form.validateChanges(['client_secret']);
 	}
 
 	#showClientSecretField() {
@@ -168,9 +173,6 @@ window.oauth_edit_popup = new class {
 		const input_element = this.form_element.querySelector('[name="client_secret"]');
 		input_element.style.display = '';
 		input_element.disabled = false;
-
-		this.form.findFieldByName('client_secret').setChanged();
-		this.form.validateChanges(['client_secret']);
 	}
 
 	#initDynamicRows(url_selector, parameters_selector, options) {
