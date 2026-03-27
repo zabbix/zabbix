@@ -43,7 +43,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	for (int i = 0; i < query.aggregated_columns.values_num; i++) {
 		const zbx_tq_aggr_column_t	*aggr_col = &query.aggregated_columns.values[i];
 		out_str = zbx_strdcatf(out_str, "-- column_name: '%s', function: %d, args: {",
-				ZBX_NULL2STR(aggr_col->column_name), aggr_col->function);
+				ZBX_NULL2STR(aggr_col->column_name), (int)aggr_col->function);
 		for (int j = 0; j < aggr_col->args.values_num; j++) {
 			out_str = zbx_strdcatf(out_str, "'%s'%s", aggr_col->args.values[j],
 				(j == aggr_col->args.values_num - 1) ? "" : ", ");

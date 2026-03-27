@@ -16,6 +16,14 @@
 #include "zbxtelemetry.h"
 #include "zbxcommon.h"
 
+/******************************************************************************
+ *                                                                            *
+ * Return value: integer value of the enum that out points to after it has    *
+ *               been changed                                                 *
+ *                                                                            *
+ ******************************************************************************/
+typedef int (*tq_enum_set_func_t)(const char *str, void *out);
+
 ZBX_VECTOR_IMPL(tq_column, zbx_tq_column_t)
 ZBX_VECTOR_IMPL(tq_aggr_column, zbx_tq_aggr_column_t)
 ZBX_VECTOR_IMPL(tq_condition, zbx_tq_condition_t)
@@ -52,7 +60,6 @@ static void	tq_aggr_column_init(zbx_tq_aggr_column_t *aggr_column)
 	aggr_column->function		= ZBX_TQ_FUNCTION_UNKNOWN;
 	zbx_vector_str_create(&aggr_column->args);
 	aggr_column->alias		= NULL;
-
 }
 
 static void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
@@ -79,6 +86,51 @@ static void	tq_condition_clean(zbx_tq_condition_t *condition)
 	zbx_free(condition->value);
 }
 
+static int	tq_read_string(const char *p, char **out) {
+	size_t		out_alloc = 0;
+	zbx_json_type_t	type;
+
+	if (NULL != *out)
+		return FAIL;
+
+	if (NULL == (p = zbx_json_decodevalue_dyn(p, out, &out_alloc, &type)) || ZBX_JSON_TYPE_STRING != type)
+	{
+		zbx_free(*out);
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Comments: val must be set to the integer value of the enum that out points *
+ *           to                                                               *
+ *                                                                            *
+ ******************************************************************************/
+static int	tq_read_enum(const char *p, char *buf, size_t buf_size, tq_enum_set_func_t set_func, void *out,
+		int val, int val_unknown)
+{
+	zbx_json_type_t	type;
+
+	if (val != val_unknown)
+		return FAIL;
+
+	if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type)) || ZBX_JSON_TYPE_STRING != type)
+		return FAIL;
+
+	if (set_func(buf, out) == val_unknown)
+		return FAIL;
+
+	return SUCCEED;
+}
+
+#define TQ_SET_FUNC_DEF(__set_func_name, __match_func, __type)	\
+static int	__set_func_name(const char *__str, void *__out)	\
+{								\
+	return (int)(*(__type *)__out = __match_func(__str));		\
+}
+
 static zbx_tq_category_t	tq_match_category(const char *str)
 {
 	if (0 == strcmp(str, "apm_traces"))
@@ -90,6 +142,8 @@ static zbx_tq_category_t	tq_match_category(const char *str)
 
 	return ZBX_TQ_CATEGORY_UNKNOWN;
 }
+
+TQ_SET_FUNC_DEF(tq_set_category, tq_match_category, zbx_tq_category_t)
 
 static zbx_tq_metric_type_t	tq_match_metric_type(const char *str)
 {
@@ -104,6 +158,8 @@ static zbx_tq_metric_type_t	tq_match_metric_type(const char *str)
 
 	return ZBX_TQ_METRIC_TYPE_UNKNOWN;
 }
+
+TQ_SET_FUNC_DEF(tq_set_metric_type, tq_match_metric_type, zbx_tq_metric_type_t)
 
 static zbx_tq_function_type_t	tq_match_function_type(const char *str)
 {
@@ -123,6 +179,8 @@ static zbx_tq_function_type_t	tq_match_function_type(const char *str)
 	return ZBX_TQ_FUNCTION_UNKNOWN;
 }
 
+TQ_SET_FUNC_DEF(tq_set_function_type, tq_match_function_type, zbx_tq_function_type_t)
+
 static zbx_tq_eval_type_t	tq_match_eval_type(const char *str)
 {
 	if (0 == strcmp(str, "and"))
@@ -136,6 +194,8 @@ static zbx_tq_eval_type_t	tq_match_eval_type(const char *str)
 
 	return ZBX_TQ_EVAL_TYPE_UNKNOWN;
 }
+
+TQ_SET_FUNC_DEF(tq_set_eval_type, tq_match_eval_type, zbx_tq_eval_type_t)
 
 static zbx_tq_operator_t	tq_match_operator(const char *str)
 {
@@ -151,10 +211,11 @@ static zbx_tq_operator_t	tq_match_operator(const char *str)
 	return ZBX_TQ_OPERATOR_UNKNOWN;
 }
 
+TQ_SET_FUNC_DEF(tq_set_operator, tq_match_operator, zbx_tq_operator_t)
+
 static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *buf, size_t buf_size)
 {
 	int		ret = FAIL;
-	zbx_json_type_t	type;
 	const char	*p = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -165,21 +226,13 @@ static int	tq_parse_col(struct zbx_json_parse *jp, zbx_tq_column_t *col, char *b
 	{
 		if (0 == strcmp(buf, "name"))
 		{
-			if (NULL != col->name)
+			if (FAIL == tq_read_string(p, &col->name))
 				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			col->name = zbx_strdup(NULL, buf);
 		}
 		else if (0 == strcmp(buf, "key"))
 		{
-			if (NULL != col->key)
+			if (FAIL == tq_read_string(p, &col->key))
 				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			col->key = zbx_strdup(NULL, buf);
 		}
 		else
 		{
@@ -252,7 +305,6 @@ out:
 static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *aggr_col, char *buf, size_t buf_size)
 {
 	int		ret = FAIL;
-	zbx_json_type_t	type;
 	const char	*p = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -263,22 +315,13 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 	{
 		if (0 == strcmp(buf, "column_name"))
 		{
-			if (NULL != aggr_col->column_name)
+			if (FAIL == tq_read_string(p, &aggr_col->column_name))
 				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			aggr_col->column_name = zbx_strdup(NULL, buf);
 		}
 		else if (0 == strcmp(buf, "function"))
 		{
-			if (ZBX_TQ_FUNCTION_UNKNOWN != aggr_col->function)
-				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			if (ZBX_TQ_FUNCTION_UNKNOWN == (aggr_col->function = tq_match_function_type(buf)))
-				goto out;
+			tq_read_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function, aggr_col->function,
+				ZBX_TQ_FUNCTION_UNKNOWN);
 		}
 		else if (0 == strcmp(buf, "args"))
 		{
@@ -293,12 +336,8 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 		}
 		else if (0 == strcmp(buf, "alias"))
 		{
-			if (NULL != aggr_col->alias)
+			if (FAIL == tq_read_string(p, &aggr_col->alias))
 				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			aggr_col->alias = zbx_strdup(NULL, buf);
 		}
 		else
 		{
@@ -366,7 +405,6 @@ int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
 	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
 	size_t			buf_size = sizeof(buf);
-	zbx_json_type_t		type;
 	const char		*p = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -382,23 +420,14 @@ int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
 
 		if (0 == strcmp(buf, "category"))
 		{
-			if (ZBX_TQ_CATEGORY_UNKNOWN != query->category)
+			if (FAIL == tq_read_enum(p, buf, buf_size, tq_set_category, &query->category, query->category,
+					ZBX_TQ_CATEGORY_UNKNOWN))
 				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			if (ZBX_TQ_CATEGORY_UNKNOWN == (query->category = tq_match_category(buf)))
-				goto out;
-
 		}
 		else if (0 == strcmp(buf, "metric_type"))
 		{
-			if (ZBX_TQ_METRIC_TYPE_UNKNOWN != query->metric_type)
-				goto out;
-			if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type))
-					|| ZBX_JSON_TYPE_STRING != type)
-				goto out;
-			if (ZBX_TQ_METRIC_TYPE_UNKNOWN == (query->metric_type = tq_match_metric_type(buf)))
+			if (FAIL == tq_read_enum(p, buf, buf_size, tq_set_metric_type, &query->metric_type,
+					query->metric_type, ZBX_TQ_METRIC_TYPE_UNKNOWN))
 				goto out;
 		}
 		else if (0 == strcmp(buf, "columns"))
