@@ -2312,9 +2312,13 @@ FIELD		|cep_conditionid|t_id		|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value1_str	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|value2_str	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|tag_name	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|0
+FIELD		|host_group	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|time_period	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
 
 TABLE|cep_window|cep_windowid|ZBX_DATA
@@ -2335,15 +2339,16 @@ FIELD		|cep_window_conditionid|t_id||NOT NULL|0
 FIELD		|cep_windowid	|t_id		|	|NOT NULL	|0	|1|cep_window
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|old_tag_name	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|old_tag_value	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|new_tag_name	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_windowid
 
 TABLE|cep_operation|cep_operationid|ZBX_DATA
 FIELD		|cep_operationid|t_id		|	|NOT NULL	|0
 FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
-FIELD		|when		|t_integer	|'0'	|NOT NULL	|0
+FIELD		|execute_when	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|value1_str	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value2_str	|t_varchar(255)	|''	|NOT NULL	|0
