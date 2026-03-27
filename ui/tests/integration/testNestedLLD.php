@@ -2220,7 +2220,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match");
+		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match, response: ".json_encode($response));
 
 		$response = $this->call('discoveryrule.get', [
 			'hostids' => [$hostid],
