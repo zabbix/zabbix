@@ -16,7 +16,6 @@
 #define ZABBIX_ZBXTELEMETRY_H
 
 #include "zbxalgo.h"
-#include "zbxvariant.h"
 
 #define ZBX_TQ_TIME_INTERVAL_INVALID -1
 
@@ -45,8 +44,9 @@ typedef enum
 	ZBX_TQ_FUNCTION_COUNT,
 	ZBX_TQ_FUNCTION_MIN,
 	ZBX_TQ_FUNCTION_MAX,
-	ZBX_TQ_FUNCTION_SUM,
 	ZBX_TQ_FUNCTION_AVG,
+	ZBX_TQ_FUNCTION_SUM,
+	ZBX_TQ_FUNCTION_PERCENTILE,
 }
 zbx_tq_function_type_t;
 
@@ -83,7 +83,7 @@ typedef struct
 {
 	char			*column_name;
 	zbx_tq_function_type_t	function;
-	zbx_vector_var_t	args;
+	zbx_vector_str_t	args;
 	char			*alias;
 }
 zbx_tq_aggr_column_t;

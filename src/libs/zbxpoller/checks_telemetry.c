@@ -15,6 +15,7 @@
 #include "checks_telemetry.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
+#include "zbxstr.h"
 #include "zbxtelemetry.h"
 
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
@@ -22,11 +23,38 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	// FIXME: placeholder
 
 	zbx_tq_query_t query;
-	zbx_tq_query_from_json(item->query_fields, &query);
+	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
+	{
+		// FIXME: placeholder
+		SET_TEXT_RESULT(result, zbx_strdup(NULL, "invalid format!!"));
+		return SUCCEED;
+	}
 
-	char *out_str = zbx_strdup(NULL, item->query_fields);
+	char *out_str = strdup("Parsed:\n");
+	out_str = zbx_strdcatf(out_str, "category: %d,\n", (int)query.category);
+	out_str = zbx_strdcatf(out_str, "metric_type: %d,\n", (int)query.metric_type);
+	out_str = zbx_strdcatf(out_str, "columns:\n");
+	for (int i = 0; i < query.columns.values_num; i++) {
+		out_str = zbx_strdcatf(out_str, "-- name: '%s', key: '%s'\n",
+				ZBX_NULL2STR(query.columns.values[i].name),
+				ZBX_NULL2STR(query.columns.values[i].key));
+	}
+	out_str = zbx_strdcatf(out_str, "aggregated_columns:\n");
+	for (int i = 0; i < query.aggregated_columns.values_num; i++) {
+		const zbx_tq_aggr_column_t	*aggr_col = &query.aggregated_columns.values[i];
+		out_str = zbx_strdcatf(out_str, "-- column_name: '%s', function: %d, args: {",
+				ZBX_NULL2STR(aggr_col->column_name), aggr_col->function);
+		for (int j = 0; j < aggr_col->args.values_num; j++) {
+			out_str = zbx_strdcatf(out_str, "'%s'%s", aggr_col->args.values[j],
+				(j == aggr_col->args.values_num - 1) ? "" : ", ");
+		}
+		out_str = zbx_strdcatf(out_str, "}, alias: '%s'\n", aggr_col->alias);
+	}
+	out_str = zbx_strdcatf(out_str, "TODO...\n");
+
 	SET_TEXT_RESULT(result, out_str);
 
 	zbx_tq_query_clean(&query);
+
 	return SUCCEED;
 }
