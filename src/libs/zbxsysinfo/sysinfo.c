@@ -65,6 +65,8 @@ typedef struct
 	zbx_vector_str_t		elements;
 	zbx_key_access_rule_type_t	type;
 	int				empty_arguments;
+	int				is_regexp;
+	zbx_regexp_t			*regexp;
 }
 zbx_key_access_rule_t;
 
@@ -460,6 +462,9 @@ void	zbx_init_key_access_rules(void)
  ******************************************************************************/
 static void	zbx_key_access_rule_free(zbx_key_access_rule_t *rule)
 {
+	if (NULL != rule->regexp)
+		zbx_regexp_free(rule->regexp);
+
 	zbx_free(rule->pattern);
 	zbx_vector_str_clear_ext(&rule->elements, zbx_str_free);
 	zbx_vector_str_destroy(&rule->elements);
@@ -483,6 +488,8 @@ static zbx_key_access_rule_t	*zbx_key_access_rule_create(char *pattern, zbx_key_
 	rule = zbx_malloc(NULL, sizeof(zbx_key_access_rule_t));
 	rule->type = type;
 	rule->pattern = zbx_strdup(NULL, pattern);
+	rule->is_regexp = 0;
+	rule->regexp = NULL;
 	zbx_vector_str_create(&rule->elements);
 
 	if (SUCCEED != zbx_parse_key_access_rule(pattern, rule))
@@ -540,11 +547,23 @@ void	zbx_finalize_key_access_rules_configuration(void)
 
 		if (i != key_access_rules.values_num)
 		{
+			const char	*rule_name;
+
 			for (j = ++i; j < key_access_rules.values_num; j++)
 			{
 				rule = (zbx_key_access_rule_t*)key_access_rules.values[j];
-				zabbix_log(LOG_LEVEL_WARNING, "removed unreachable %s \"%s\" rule",
-						(ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKey" : "DenyKey"),
+
+				if (0 != rule->is_regexp)
+				{
+					rule_name = (ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKeyRegexp" :
+							"DenyKeyRegexp");
+				}
+				else
+				{
+					rule_name = (ZBX_KEY_ACCESS_ALLOW == rule->type ? "AllowKey" : "DenyKey");
+				}
+
+				zabbix_log(LOG_LEVEL_WARNING, "removed unreachable %s \"%s\" rule", rule_name,
 						rule->pattern);
 				zbx_key_access_rule_free(rule);
 			}
@@ -557,6 +576,10 @@ void	zbx_finalize_key_access_rules_configuration(void)
 			rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
 
 			if (ZBX_KEY_ACCESS_ALLOW != rule->type)
+				break;
+
+			/* regex rule redundancy cannot be determined statically */
+			if (0 != rule->is_regexp)
 				break;
 
 			/* system.run allow rules are not redundant because of default system.run[*] deny rule */
@@ -738,24 +761,112 @@ int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: adds new key access rule from AllowKeyRegexp and DenyKeyRegexp    *
+ *          parameters                                                        *
+ *                                                                            *
+ * Parameters: parameter - [IN] parameter that defined rule                   *
+ *             pattern   - [IN] key access rule regular expression            *
+ *             type      - [IN] key access rule type (allow/deny)             *
+ *                                                                            *
+ * Return value: SUCCEED - successful execution                               *
+ *               FAIL    - regular expression compilation failed              *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key_access_rule_type_t type)
+{
+	zbx_key_access_rule_t	*rule, *r;
+	char			*err_msg = NULL, *anchored = NULL;
+	size_t			anchored_alloc = 0, anchored_offset = 0;
+	int			ret;
+
+	if ('\0' == *pattern)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "%s regular expression pattern must not be empty", parameter);
+		return FAIL;
+	}
+
+	for (int i = 0; i < key_access_rules.values_num; i++)
+	{
+		r = (zbx_key_access_rule_t *)key_access_rules.values[i];
+
+		if (0 != r->is_regexp && 0 == strcmp(r->pattern, pattern))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s access rule \"%s\" was not added because it %s another rule "
+					"defined above", parameter, pattern,
+					r->type == type ? "duplicates" : "conflicts with");
+			return SUCCEED;
+		}
+	}
+
+	rule = zbx_malloc(NULL, sizeof(zbx_key_access_rule_t));
+	rule->type = type;
+	rule->pattern = zbx_strdup(NULL, pattern);
+	rule->is_regexp = 1;
+	rule->regexp = NULL;
+	rule->empty_arguments = 0;
+	zbx_vector_str_create(&rule->elements);
+
+	zbx_snprintf_alloc(&anchored, &anchored_alloc, &anchored_offset, "\\A(?:%s)\\z", pattern);
+
+	ret = zbx_regexp_compile_ext(anchored, &rule->regexp, 0, &err_msg);
+	zbx_free(anchored);
+
+	if (SUCCEED != ret)
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "failed to compile %s regular expression \"%s\": %s", parameter, pattern,
+				err_msg);
+		zbx_free(err_msg);
+		zbx_key_access_rule_free(rule);
+		return FAIL;
+	}
+
+	zbx_vector_ptr_append(&key_access_rules, rule);
+
+	return SUCCEED;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: checks agent metric request against configured access rules       *
  *                                                                            *
- * Parameters: request - [IN] metric request (key and parameters)             *
+ * Parameters: metric  - [IN] full metric string (key and parameters),        *
+ *                            must not be NULL                                *
+ *             request - [IN] metric request (key and parameters)             *
  *                                                                            *
  * Return value: ZBX_KEY_ACCESS_ALLOW - metric access allowed                 *
  *               ZBX_KEY_ACCESS_DENY  - metric access denied                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_request_access_rules(AGENT_REQUEST *request)
+int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *request)
 {
 	zbx_key_access_rule_t	*rule;
 
 	/* empty arguments flag means key is followed by empty brackets, which is not the same as no brackets */
 	int	empty_arguments = (1 == request->nparam && 0 == strlen(request->params[0]));
 
+	assert(NULL != metric);
+
 	for (int i = 0; key_access_rules.values_num > i; i++)
 	{
 		rule = (zbx_key_access_rule_t*)key_access_rules.values[i];
+
+		if (0 != rule->is_regexp)
+		{
+			char	*re_err = NULL;
+			int	re_ret = zbx_regexp_match_precompiled2(metric, rule->regexp, &re_err);
+
+			if (ZBX_REGEXP_MATCH == re_ret)
+				return rule->type;
+
+			if (ZBX_REGEXP_RUNTIME_FAIL == re_ret)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "regex runtime error for rule \"%s\" against \"%s\": %s",
+						rule->pattern, metric, re_err);
+				zbx_free(re_err);
+			}
+
+			continue;
+		}
 
 		if (0 == strcmp("*", rule->elements.values[0]) && 1 == rule->elements.values_num)
 			return rule->type; /* match all */
@@ -837,7 +948,7 @@ int	zbx_check_key_access_rules(const char *metric)
 	zbx_init_agent_request(&request);
 
 	if (SUCCEED == zbx_parse_item_key(metric, &request))
-		ret = zbx_check_request_access_rules(&request);
+		ret = zbx_check_request_access_rules(metric, &request);
 	else
 		ret = ZBX_KEY_ACCESS_DENY;
 
@@ -1173,18 +1284,20 @@ int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT
 	int		ret = NOTSUPPORTED;
 	zbx_metric_t	*command = NULL;
 	AGENT_REQUEST	request;
+	const char	*resolved_key;
 
 	zbx_init_agent_request(&request);
 
-	if (SUCCEED != zbx_parse_item_key((0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command :
-			zbx_alias_get(in_command)), &request))
+	resolved_key = (0 == (flags & ZBX_PROCESS_WITH_ALIAS) ? in_command : zbx_alias_get(in_command));
+
+	if (SUCCEED != zbx_parse_item_key(resolved_key, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid item key format."));
 		goto notsupported;
 	}
 
 	if (0 == (flags & ZBX_PROCESS_LOCAL_COMMAND) && ZBX_KEY_ACCESS_ALLOW !=
-			zbx_check_request_access_rules(&request))
+			zbx_check_request_access_rules(resolved_key, &request))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "Key access denied: \"%s\"", in_command);
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unsupported item key."));
