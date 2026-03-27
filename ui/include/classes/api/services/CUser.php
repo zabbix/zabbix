@@ -3017,16 +3017,6 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	public function checkAuthenticationDpop(array $params): array {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'signature' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'requested_api_method' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $params, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
 		$time = time();
 
 		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_SCHEME_DPOP, $time);

@@ -73,6 +73,7 @@ class CJsonRpc {
 			$auth['type'] = self::AUTH_TYPE_DPOP;
 			$auth['auth'] = $auth_header['auth'];
 			$auth['sign'] = (string) $request->header(self::HEADER_AUTHENTICATE_DPOP);
+			$auth['hpke_headers_requested'] = $request->isHpkeHeadersRequested();
 		}
 		else {
 			$session = new CEncryptedCookieSession();
@@ -97,10 +98,7 @@ class CJsonRpc {
 
 		$user_data = $this->apiClient->getUserData();
 
-		$needs_hpke_headers = $auth['type'] == self::AUTH_TYPE_DPOP && $request->isHpkeHeadersRequested();
-		$needs_hpke_headers = $needs_hpke_headers || $this->apiClient->isDeviceOnboardCall();
-
-		if ($needs_hpke_headers && $user_data !== null) {
+		if ($auth['type'] == self::AUTH_TYPE_DPOP && $request->isHpkeHeadersRequested() && $user_data !== null) {
 			$response->headers[] = 'X-Recipient-ID: '.$user_data['uuid'];
 			$response->headers[] = 'X-HPKE-Recipient-KID: '.$user_data['kid'];
 			$response->headers[] = 'X-HPKE-Recipient-Pub: '.$user_data['key'];

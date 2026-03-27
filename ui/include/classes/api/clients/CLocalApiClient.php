@@ -33,8 +33,6 @@ class CLocalApiClient extends CApiClient {
 	 */
 	protected $debug = false;
 
-	private bool $device_onboard_called = false;
-
 	public function getUserData(): ?array {
 		return CApiService::$userData;
 	}
@@ -77,18 +75,27 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		// check method
-		if (!$this->isValidMethod($api, $method)) {
+		if (!$this->isValidMethod($api, $method, $auth)) {
 			$response->errorCode = ZBX_API_ERROR_NO_METHOD;
 			$response->errorMessage = _s('Incorrect method "%1$s.%2$s".', $requestApi, $requestMethod);
 
 			return $response;
 		}
 
+		// check the mobile device global flag
+		if ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && false) {
+			$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
+			$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
+
+			return $response;
+		}
+
 		$requiresAuthentication = $this->requiresAuthentication($api, $method);
 
-		// check that no authentication token is passed to methods that don't require it
-		if (!$requiresAuthentication && $auth['type'] != CJsonRpc::AUTH_TYPE_COOKIE && $auth['auth'] !== null) {
+		// check that no authentication token (except DPoP token) is passed to methods that don't require it
+		if (!$requiresAuthentication && $auth['type'] == CJsonRpc::AUTH_TYPE_BEARER) {
 			$error = _('The "%1$s.%2$s" method must be called without authorization header.');
+
 			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
 			$response->errorMessage = _params($error, [$requestApi, $requestMethod]);
 
@@ -98,7 +105,8 @@ class CLocalApiClient extends CApiClient {
 		$newTransaction = false;
 		try {
 			// authenticate
-			if ($requiresAuthentication) {
+			if ($requiresAuthentication ||
+					($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && $auth['hpke_headers_requested'])) {
 				$this->authenticate($auth, $requestApi.'.'.$requestMethod);
 
 				// check permissions
@@ -221,11 +229,17 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @param string $api
 	 * @param string $method
+	 * @param array  $auth
 	 *
 	 * @return bool
 	 */
-	protected function isValidMethod(string $api, string $method): bool {
+	protected function isValidMethod(string $api, string $method, array $auth): bool {
 		$api_service = $this->serviceFactory->getObject($api);
+
+		if ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP &&
+				in_array($api.'.'.$method, ['user.login', 'user.checkauthentication'])) {
+			return false;
+		}
 
 		return array_key_exists($method, $api_service::ACCESS_RULES);
 	}
@@ -239,12 +253,10 @@ class CLocalApiClient extends CApiClient {
 	 * @return bool
 	 */
 	protected function requiresAuthentication($api, $method) {
-		$this->device_onboard_called = $api === 'device' && $method === 'onboard';
-
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
 			|| ($api === 'apiinfo' && $method === 'version')
-			|| $this->device_onboard_called
+			|| ($api === 'device' && $method === 'onboard')
 		);
 	}
 
@@ -261,8 +273,11 @@ class CLocalApiClient extends CApiClient {
 		$user_data = $api_service::$userData;
 		$method_rules = $api_service::ACCESS_RULES[$method];
 
-		if (!array_key_exists('min_user_type', $method_rules)
-				|| !in_array($user_data['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
+		if (!array_key_exists('min_user_type', $method_rules)) {
+			return true;
+		}
+
+		if (!in_array($user_data['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN])
 				|| $user_data['type'] < $method_rules['min_user_type']) {
 			return false;
 		}
@@ -342,9 +357,5 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		return !$api_access_mode;
-	}
-
-	public function isDeviceOnboardCall(): bool {
-		return $this->device_onboard_called;
 	}
 }
