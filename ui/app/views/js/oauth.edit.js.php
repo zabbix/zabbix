@@ -95,7 +95,10 @@ window.oauth_edit_popup = new class {
 		const client_secret_button = this.form.querySelector('[name="client_secret_button"]');
 
 		if (client_secret_button !== null) {
-			client_secret_button.addEventListener('click', () => this.#showClientSecretField());
+			client_secret_button.addEventListener('click', () => {
+				this.#showClientSecretField();
+				this.form.querySelector('[name="client_secret"]').focus();
+			});
 
 			if (this.is_advanced_form) {
 				const token_url = this.form.querySelector('[name="token_url"]');
