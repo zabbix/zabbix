@@ -1788,6 +1788,7 @@ class testNestedLLD extends CIntegrationTest{
 	}
 
 	private function sendRuleData($hostname, $rule, $data) {
+		$this->clearLog(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 120, 1, true);
