@@ -1703,10 +1703,10 @@ static void	get_build_push_params(const zbx_db_event *event, zbx_uint64_t userid
 	zbx_json_init(&json, 4096);
 
 	result = zbx_db_select(
-		"select d.deviceid,d.push_token,dk.kid,dk.key,dk.scope"
+		"select d.deviceid,d.push_token,dk.kid,dk.key_,dk.scope"
 			" from device d "
 			" left join device_key dk"
-				" on dk.device_ref=d.deviceid and dk.active=1"
+				" on dk.deviceid=d.deviceid and dk.active=1"
 					" where d.userid=" ZBX_FS_UI64 " and d.status=1", userid);
 
 	if (NULL != (row = zbx_db_fetch(result)))

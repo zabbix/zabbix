@@ -506,6 +506,13 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 		const char *push_adapter_url, const char *push_ca_file, const char *push_cert_file,
 		const char *push_key_file)
 {
+	zbx_uint64_t	alertid;
+	char		*params;
+
+	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
+
+	zbx_free(params);
+
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
 	ZBX_UNUSED(push_adapter_url);
