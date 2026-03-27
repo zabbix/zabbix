@@ -20,7 +20,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * Test suite for value mapping.
  *
  * @required-components server
- * @ssuite-components-reuse true
+ * @suite-components-reuse true
  * @hosts test_valuemaps
  * @backup history
  */
