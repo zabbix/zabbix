@@ -43,7 +43,11 @@ class testWidgetCommunication extends testWidgets {
 		'Navigation tree map broadcaster' => 'TAPOK._mapid'
 	];
 
-	const OVERRIDE_HOST_REFERENCES = [
+	const SINGLE_ENTITY_BROADCASTER_REFERENCES = [
+		'Map hostgroup broadcaster' => 'NRDLG._hostgroupid',
+		'Problem hosts hostgroup broadcaster' => 'EKBHR._hostgroupid',
+		'Problems by severity hostgroup broadcaster' => 'ZYWLY._hostgroupid',
+		'Web monitoring hostgroup broadcaster' => 'XTPSV._hostgroupid',
 		'Geomap host broadcaster' => 'JRVYU._hostid',
 		'Honeycomb host broadcaster' => 'RICVX._hostid',
 		'Map host broadcaster' => 'BFSOY._hostid',

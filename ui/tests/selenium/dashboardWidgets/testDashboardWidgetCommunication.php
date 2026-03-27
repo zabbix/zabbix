@@ -2740,19 +2740,9 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	 * @dataProvider getWidgetData
 	 */
 	public function testDashboardWidgetCommunication_CheckDataBroadcasting($data) {
-		// Change broadcasting widget for listener widgets on corresponding page, if required.
+		// Change broadcasting widget, if required.
 		if ($data['broadcaster'] !== self::$current_broadcasters[$data['page']]) {
-			DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[$data['broadcaster']]).
-					' WHERE value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[self::$current_broadcasters[$data['page']]])
-			);
-
-			if ($data['page'] === 'Hosts page') {
-				DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::OVERRIDE_HOST_REFERENCES[$data['broadcaster']]).
-						' WHERE value_str='.zbx_dbstr(self::OVERRIDE_HOST_REFERENCES[self::$current_broadcasters[$data['page']]])
-				);
-			}
-
-			self::$current_broadcasters[$data['page']] = $data['broadcaster'];
+			$this->changeBroadcaster($data['page'], $data['broadcaster']);
 		}
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$entityids['dashboardid'])
@@ -2794,6 +2784,238 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 			$host_in_name = (array_key_exists('autoselected', $data)) ? $data['autoselected'] : $data['select_element'];
 			$this->assertTrue($dashboard->getWidget($host_in_name.': Trapper item')->isValid());
 		}
+	}
+
+	public static function getMisconfigurationListenerData() {
+		return [
+			'Misconfiguration for hostgroup listeners' => [
+				[
+					'page' => 'Hostgroups page',
+					'broadcaster' => 'Map hostgroup broadcaster',
+					'select_element' => self::FIRST_HOSTGROUP_NAME,
+					'listeners_common_update' => [
+						'Top items listener',
+						'Geomap listener',
+						'Honeycomb listener',
+						'Problem hosts listener',
+						'Problems by severity listener',
+						'Top hosts listener',
+						'Trigger overview listener',
+						'Web monitoring listener',
+						'Item navigator listener',
+						'Problems listener'
+					],
+					'common_fill' => [
+						'Hosts' => self::SECOND_HOST_NAME
+					],
+					'listeners_different_update' => [
+						'Host navigator listener' => [
+							'Host patterns' => self::SECOND_HOST_NAME
+						]
+					],
+					'expected' => [
+						'Top items listener' => 'No data found',
+						'Geomap listener' => 'Empty map',
+						'Honeycomb listener' => 'No data',
+						'Problem hosts listener' => 'No data found',
+						'Problems by severity listener' => 'No data found',
+						'Top hosts listener' => 'No data found',
+						'Host navigator listener' => 'No data found',
+						'Trigger overview listener' => 'No data found',
+						'Web monitoring listener' => 'No data found',
+						'Item navigator listener' => 'No data found',
+						'Problems listener' => 'No data found'
+					]
+				]
+			],
+			'Misconfiguration for host listeners' => [
+				[
+					'page' => 'Hosts page',
+					'broadcaster' => 'Geomap host broadcaster',
+					'select_element' => self::GEOMAP_ICON_INDEXES[self::THIRD_HOST_NAME],
+					'listeners_common_update' => [
+						'Top items listener',
+						'Geomap listener',
+						'Honeycomb listener',
+						'Problem hosts listener',
+						'Problems listener',
+						'Problems by severity listener',
+						'Top hosts listener',
+						'Trigger overview listener',
+						'Web monitoring listener',
+						'Item navigator listener',
+						'Problems listener'
+					],
+					'common_fill' => [
+						'Host groups' => self::FIRST_HOSTGROUP_NAME
+					],
+					'listeners_different_update' => [
+						'Item card listener' => [
+							'Item' => 'Unique trapper item'
+						],
+						'Gauge listener' => [
+							'Item' => 'Unique trapper item'
+						],
+						'Graph (classic) listener' => [
+							'Item' => 'Unique trapper item'
+						],
+						'Item value listener' => [
+							'Item' => 'Unique trapper item'
+						],
+						'SVG graph listener' => [
+							'xpath://div[@id="ds_0_items_"]/..' => 'Unique trapper item'
+						]
+					],
+					'multistep_listener_update' => [
+						'Item history listener' => [
+							[
+								'operation' => 'open_secondary_form',
+								'element' => 'button:Edit'
+							],
+							[
+								'operation' => 'fill',
+								'element' => ['Item' => 'Unique trapper item']
+							]
+						]
+					],
+					'expected' => [
+						'Top items listener' => 'No data found',
+						'Geomap listener' => 'Empty map',
+						'Honeycomb listener' => 'No data',
+						'Problem hosts listener' => 'No data found',
+						'Problems listener' => 'No data found',
+						'Problems by severity listener' => 'No data found',
+						'Top hosts listener' => 'No data found',
+						'Trigger overview listener' => 'No data found',
+						'Web monitoring listener' => 'No data found',
+						'Item card listener' => 'No data found',
+						'Item navigator listener' => 'No data found',
+						'Gauge listener' => 'No permissions to referred object or it does not exist!',
+						'Graph (classic) listener' => 'No permissions to referred object or it does not exist!',
+						'Item history listener' => 'No data found',
+						'Item value listener' => 'No permissions to referred object or it does not exist!',
+						'SVG graph listener' => 'No legend'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check the "No data" message in listener widgets, when misconfiguration figuration occurs due to data selected on the
+	 * broadcaster widget. This test is implemented only for those widgets where such misconfiguration is possible.
+	 * Scenario is implemented only for Hostgroups and Hosts page, since it is not possible to implement different
+	 * misconfiguration in Items page and Maps page.
+	 *
+	 * @dataProvider getMisconfigurationListenerData
+	 */
+	public function testDashboardWidgetCommunication_CheckListenerMisconfiguration($data) {
+		// Change broadcasting widget, if required.
+		if ($data['broadcaster'] !== self::$current_broadcasters[$data['page']]) {
+			$this->changeBroadcaster($data['page'], $data['broadcaster']);
+		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$entityids['dashboardid'])
+				->waitUntilReady();
+		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
+
+		if ($dashboard->getSelectedPageName() !== $data['page']) {
+			$dashboard->selectPage($data['page']);
+			$dashboard->waitUntilReady();
+		}
+
+		/**
+		 * Data in listener widgets is updated in three parts:
+		 * 1 - At first, update of the listeners with the most common field to be updated takes place;
+		 * 2 - Then, listeners for which different fields need to be updated are modified;
+		 * 3 - And then, the listeners, where the update requires multiple steps are modified.
+		 */
+		foreach ($data['listeners_common_update'] as $listener_name) {
+			$dashboard->getWidget($listener_name)->edit()->fill($data['common_fill'])->submit();
+			COverlayDialogElement::ensureNotPresent();
+		}
+
+		foreach ($data['listeners_different_update'] as $listener_name => $fields) {
+			$dashboard->getWidget($listener_name)->edit()->fill($fields)->submit();
+			COverlayDialogElement::ensureNotPresent();
+		}
+
+		if (array_key_exists('multistep_listener_update', $data)) {
+			foreach ($data['multistep_listener_update'] as $listener_name => $steps) {
+				$widget_form = $dashboard->getWidget($listener_name)->edit();
+
+				// Currently, there are two possible steps: opening a secondary form and updating a field in this form.
+				foreach ($steps as $step) {
+					if ($step['operation'] === 'open_secondary_form') {
+						$widget_form->query($step['element'])->one()->waitUntilClickable()->click();
+						COverlayDialogElement::find(1)->waitUntilReady();
+					}
+					if ($step['operation'] === 'fill') {
+						$secondary_dialog = COverlayDialogElement::find(1)->waitUntilReady()->asForm()->one();
+						$secondary_form = $secondary_dialog->asForm();
+						$secondary_form->fill($step['element']);
+						$secondary_form->submit();
+						$secondary_dialog->waitUntilNotPresent();
+						$widget_form = COverlayDialogElement::get('Edit widget')->asForm();
+					}
+				}
+
+				$widget_form->submit();
+				COverlayDialogElement::ensureNotPresent();
+			}
+		}
+
+		// Select an element on the broadcaster that would cause misconfiguration in the listener widgets.
+		$this->getWidgetElement($data['select_element'], $dashboard->getWidget($data['broadcaster']))->click();
+		$dashboard->waitUntilReady();
+		$this->closeOpenedPopup();
+
+		// Go through all updated listeners and theck that no data is available on the listener widget.
+		foreach ($data['expected'] as $listener_name => $outcome) {
+			$listener = $dashboard->getWidget($listener_name);
+
+			switch ($outcome) {
+				case 'No data found':
+				case 'No data':
+				case 'No permissions to referred object or it does not exist!':
+					$class = ($outcome === 'No data') ? 'svg-honeycomb-content' : 'no-data-message';
+					$no_data_message = $listener->query('class', $class)->one();
+					$this->assertTrue($no_data_message->isDisplayed(), 'No data message is missing.');
+					$this->assertEquals($outcome, $no_data_message->getText());
+					break;
+
+				case 'Empty map':
+					$this->assertFalse($listener->query('class:leaflet-marker-icon')->one(false)->isValid(),
+							'Host icon is unexpectedly present on geomap widget.'
+					);
+					break;
+
+				case 'No legend':
+					$this->assertFalse($listener->query('class:svg-graph-legend-item')->one(false)->isValid(),
+							'Legend with selected item is unexpectedly present on graph widget.'
+					);
+			}
+		}
+	}
+
+	/**
+	 * Change broadcasting widget for listener widgets on corresponding page.
+	 *
+	 * @param string   $page			Name of the dashboard page for which the broadcaster needs to be changed.
+	 * @param string   $broadcaster		Name of the new broadcaster widget.
+	 */
+	protected function changeBroadcaster($page, $broadcaster) {
+		DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[$broadcaster]).
+				' WHERE value_str='.zbx_dbstr(self::BROADCASTER_REFERENCES[self::$current_broadcasters[$page]])
+		);
+
+		if (in_array($page, ['Hostgroups page', 'Hosts page'])) {
+			DBexecute('UPDATE widget_field SET value_str='.zbx_dbstr(self::SINGLE_ENTITY_BROADCASTER_REFERENCES[$broadcaster]).
+					' WHERE value_str='.zbx_dbstr(self::SINGLE_ENTITY_BROADCASTER_REFERENCES[self::$current_broadcasters[$page]])
+			);
+		}
+
+		self::$current_broadcasters[$page] = $broadcaster;
 	}
 
 	/**
@@ -3025,10 +3247,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 
 	protected function removeAllBroadcasters() {
 		$reference_values = implode('\', \'', array_merge(array_values(self::BROADCASTER_REFERENCES),
-				array_values(self::OVERRIDE_HOST_REFERENCES)
+				array_values(self::SINGLE_ENTITY_BROADCASTER_REFERENCES)
 		));
 
-		DBexecute('DELETE FROM widget_field WHERE value_str IN (\''.$reference_values.'\')');
+		DBexecute('DELETE FROM widget_field WHERE value_str IN (\''.$reference_values.'\') OR name=\'groupids._reference\'');
 	}
 
 	/**
