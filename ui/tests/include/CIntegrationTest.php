@@ -84,8 +84,8 @@ class CIntegrationTest extends CAPITest {
 	 */
 	private $case_components = [];
 
-	private static $case_components_inherit = false;
-	private static $case_components_started = false;
+	private static $suite_components_inherit = false;
+	private static $suite_components_running = false;
 
 	/**
 	 * Hosts to be enabled for test case.
@@ -123,7 +123,7 @@ class CIntegrationTest extends CAPITest {
 			} else if ($component === 'agent_3.0') {
 				$component = self::COMPONENT_AGENT_3_0;
 			} else if ($component === 'inherit') {
-				self::$case_components_inherit = true;
+				self::$suite_components_inherit = true;
 				break;
 			}
 
@@ -244,20 +244,25 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
-		if (self::$case_components_inherit === false || self::$case_components_started === false) {
-			foreach ($this->case_components as $component) {
-				if (in_array($component, self::$suite_components)) {
-					throw new Exception('Component "'.$component.'" already started on suite level.');
-				}
-			}
+		if (!(self::$suite_components_inherit && self::$suite_components_running)) {
 
-			$components = array_merge(self::$suite_components, $this->case_components);
+			if (self::$suite_components_inherit) {
+				foreach ($this->case_components as $component) {
+					if (in_array($component, self::$suite_components)) {
+						throw new Exception('Component "'.$component.'" already started on suite level.');
+					}
+				}
+
+				$components = array_merge(self::$suite_components, $this->case_components);
+			} else {
+				$components = self::$suite_components;
+			}
 
 			foreach ($components as $component) {
 				self::prepareComponentConfiguration($component, self::$case_configuration);
 				self::startComponent($component);
-				self::$case_components_started = true;
 			}
+			self::$suite_components_running = true;
 		}
 	}
 
@@ -269,12 +274,11 @@ class CIntegrationTest extends CAPITest {
 	public function onAfterTestCase() {
 		$components = array_merge(self::$suite_components, $this->case_components);
 
-		if (self::$case_components_inherit === false)
-		{
+		if (self::$suite_components_inherit === false) {
 			foreach ($components as $component) {
 				self::stopComponent($component);
 			}
-			self::$case_components_started = false;
+			self::$suite_components_running = false;
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
@@ -306,8 +310,8 @@ class CIntegrationTest extends CAPITest {
 	 * @afterClass
 	 */
 	public static function onAfterTestSuite() {
-		self::$case_components_inherit = false;
-		self::$case_components_started = false;
+		self::$suite_components_inherit = false;
+		self::$suite_components_running = false;
 		foreach (self::$suite_components as $component) {
 			self::stopComponent($component);
 		}
