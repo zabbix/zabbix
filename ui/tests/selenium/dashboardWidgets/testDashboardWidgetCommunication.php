@@ -2843,8 +2843,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 						'Top hosts listener',
 						'Trigger overview listener',
 						'Web monitoring listener',
-						'Item navigator listener',
-						'Problems listener'
+						'Item navigator listener'
 					],
 					'common_fill' => [
 						'Host groups' => self::FIRST_HOSTGROUP_NAME
@@ -3250,7 +3249,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				array_values(self::SINGLE_ENTITY_BROADCASTER_REFERENCES)
 		));
 
-		DBexecute('DELETE FROM widget_field WHERE value_str IN (\''.$reference_values.'\') OR name=\'groupids._reference\'');
+		DBexecute('DELETE FROM widget_field WHERE value_str IN (\''.$reference_values.'\')');
 	}
 
 	/**
