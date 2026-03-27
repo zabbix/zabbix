@@ -1539,7 +1539,6 @@ class testNestedLLD extends CIntegrationTest{
 
 	// Check if everything was correctly discovered for 'DB discovery' template
 	private function checkNestedLLDFromTemplate($hostname) {
-		$this->clearLog(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, 'main_drule', self::$trapper_data_nested1);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
@@ -1789,16 +1788,11 @@ class testNestedLLD extends CIntegrationTest{
 	}
 
 	private function sendRuleData($hostname, $rule, $data) {
-		$this->clearLog(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 120, 1, true);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		sleep(3);
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 120, 1, true);
-		sleep(3);
 	}
 
 	/*
@@ -2058,7 +2052,6 @@ class testNestedLLD extends CIntegrationTest{
 	// Test removal of multiple level nested LLD rules.
 	public function testNestedLLD_testRemovalOfMultilevelNestedRules() {
 		$hostname = "lld_test_multilevel";
-		$this->clearLog(self::COMPONENT_SERVER);
 
 		$this->importData($hostname);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -2096,6 +2089,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
@@ -2498,7 +2492,6 @@ class testNestedLLD extends CIntegrationTest{
 	 */
 	public function testNestedLLD_testNestedLLDMacros() {
 		// a helper function to get and test items
-		$this->clearLog(self::COMPONENT_SERVER);
 		$itemsTest = function(int $hostid, array $expected_item_keys): array {
 			$response = $this->call('item.get', [
 				'hostids' => [$hostid],
