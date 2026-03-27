@@ -719,24 +719,27 @@ class testTagInheritance extends CIntegrationTest {
 
 	/**
 	 * @depends testInheritedTags
-	 * @dataProvider event_get_data
 	 */
-	public function testEvent_Get($filter, $expected) {
+	public function testEvent_Get() {
 
-		$request = [
-			'output' => ['name'],
-			'groupids' => 4, // Zabbx servers
-			'hostids' => [self::$host_id]
-		] + $filter;
+		foreach ($this->event_get_data() as $case) {
+			[$filter, $expected] = array_values($case);
 
-		['result' => $result] = $this->call('event.get', $request);
+			$request = [
+				'output' => ['name'],
+				'groupids' => 4, // Zabbx servers
+				'hostids' => [self::$host_id]
+			] + $filter;
 
-		$result = array_column($result, 'name');
+			['result' => $result] = $this->call('event.get', $request);
 
-		sort($result);
-		sort($expected);
+			$result = array_column($result, 'name');
 
-		$this->assertEquals(json_encode($result), json_encode($expected));
+			sort($result);
+			sort($expected);
+
+			$this->assertEquals(json_encode($result), json_encode($expected));
+		}
 	}
 
 	/**
