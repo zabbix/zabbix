@@ -316,9 +316,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					event->objectid, DOBJECT_STATUS_UP);
 		}
 
-		zbx_vector_op_dinterface_ptr_t 	d_ifs_agent;
-		zbx_vector_op_dinterface_ptr_t 	d_ifs_snmp;
-		zbx_op_dinterface_t 		*d_if;
+		zbx_vector_op_dinterface_ptr_t	d_ifs_agent;
+		zbx_vector_op_dinterface_ptr_t	d_ifs_snmp;
+		zbx_op_dinterface_t		*d_if;
 		zbx_uint64_t			interfaceid;
 
 		zbx_vector_op_dinterface_ptr_create(&d_ifs_agent);
@@ -610,8 +610,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			}
 		}
 
-		char if_ip[ZBX_INTERFACE_IP_LEN_MAX];
-		int if_idx;
+		char	if_ip[ZBX_INTERFACE_IP_LEN_MAX];
+		int	if_idx;
 
 		if (0 != d_ifs_agent.values_num)
 		{

@@ -6025,7 +6025,7 @@ clean:
  * Parameters:                                                                *
  *             hostid             - [IN] host id from database                *
  *             type               - [IN] interface type                       *
- *             ip_buffer          - [OUT] buffer for main interface IP         *
+ *             ip_buffer          - [OUT] buffer for main interface IP        *
  *             sz_ip_buffer       - [IN] size of ip_buffer                    *
  *                                                                            *
  * Return value: SUCCEED or FAIL                                              *

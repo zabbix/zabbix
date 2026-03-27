@@ -98,7 +98,7 @@ static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	result = zbx_db_select(
-			"select distinct ip, status"
+			"select distinct ip,status"
 			" from dservices"
 			" where dhostid=" ZBX_FS_UI64
 			" order by ip",
@@ -121,7 +121,6 @@ static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 			last_interface_idx = interfaces->values_num - 1;
 		}
 	}
-
 	zbx_db_free_result(result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -144,7 +143,7 @@ static void	discovery_get_host_interfaces(const zbx_uint64_t dhostid,
 static int	discovery_get_host_status(const char *interface_ip,
 		const zbx_vector_discoverer_interface_ptr_t *interfaces)
 {
-	int	host_status = DOBJECT_STATUS_DOWN, last_idx;
+	int	host_status = DOBJECT_STATUS_DOWN, last_idx = -1;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -153,17 +152,23 @@ static int	discovery_get_host_status(const char *interface_ip,
 		if (DOBJECT_STATUS_UP == interfaces->values[i]->status)
 		{
 			host_status = DOBJECT_STATUS_UP;
-			break;
+			goto out;
 		}
+
 		last_idx = i;
 	}
 
-	if (NULL != interface_ip && DOBJECT_STATUS_UP != host_status &&
-			0 != strcmp(interface_ip, interfaces->values[last_idx]->ip))
+	if (-1 == last_idx)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		goto out;
+	}
+
+	if (NULL != interface_ip && 0 != strcmp(interface_ip, interfaces->values[last_idx]->ip))
 	{
 		host_status = FAIL;
 	}
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return host_status;
@@ -781,7 +786,7 @@ void	zbx_discovery_update_service_down_server(const zbx_uint64_t dhostid, const 
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		zbx_db_dservice dservice;
+		zbx_db_dservice	dservice;
 
 		ZBX_STR2UINT64(dservice.dserviceid, row[0]);
 		dservice.status = atoi(row[1]);

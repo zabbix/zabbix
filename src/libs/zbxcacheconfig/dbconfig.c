@@ -16937,9 +16937,9 @@ static void	dc_reschedule_httptests(zbx_hashset_t *activated_hosts)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get active drules for a specified proxy                           *
+ * Purpose: get active drules for specified proxy                             *
  *                                                                            *
- * Parameter: proxyid - [IN] the id of proxy to get drules for                *
+ * Parameter: proxyid - [IN] id of proxy to get drules for                    *
  *            drules  - [OUT] active drules                                   *
  *                                                                            *
  ******************************************************************************/
