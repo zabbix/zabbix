@@ -511,6 +511,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X FINAL XSTRATA: %s", params);
 	zbx_free(params);
 
 	ZBX_UNUSED(socket);

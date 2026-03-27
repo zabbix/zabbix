@@ -1678,50 +1678,60 @@ static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_e
 	zbx_json_free(&json);
 }
 
-static const char	*zbx_severity_to_str(int sev)
+static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
+		zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto,
+		const char *subject, const char *message, const zbx_db_acknowledge *ack,
+		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, char **params, const char *tz)
 {
-	switch (sev)
-	{
-		case 0: return "Not classified";
-		case 1: return "Information";
-		case 2: return "Warning";
-		case 3: return "Average";
-		case 4: return "High";
-		case 5: return "Disaster";
-		default: return "Unknown";
-	}
-}
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	struct zbx_json		json;
+	int			message_type;
+	zbx_dc_um_handle_t	*um_handle_unmasked;
 
-static void	get_build_push_params(const zbx_db_event *event, zbx_uint64_t userid, char **params)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	struct zbx_json	json;
+	if (NULL != ack)
+		message_type = ZBX_MESSAGE_TYPE_UPDATE;
+	else
+		message_type = (NULL != r_event ? ZBX_MESSAGE_TYPE_RECOVERY : ZBX_MESSAGE_TYPE_NORMAL);
 
-	ZBX_UNUSED(event);
-
-	zbx_json_init(&json, 4096);
+	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
 	result = zbx_db_select(
 		"select d.deviceid,d.push_token,dk.kid,dk.key_,dk.scope"
-			" from device d "
-			" left join device_key dk"
-				" on dk.deviceid=d.deviceid and dk.active=1"
-					" where d.userid=" ZBX_FS_UI64 " and d.status=1", userid);
+		" from device d "
+		" left join device_key dk"
+			" on dk.deviceid=d.deviceid and dk.active=1"
+				" where d.userid=" ZBX_FS_UI64 " and d.status=1", userid);
 
-	if (NULL != (row = zbx_db_fetch(result)))
+	zbx_json_initarray(&json, 1024);
+
+	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		zbx_db_alert	alert = {.sendto = (char *)sendto,
+					.subject = (char *)(uintptr_t)subject,
+					.message = (char *)(uintptr_t)message
+				};
+
+		char		*value = zbx_strdup(NULL,"{ALERT.MESSAGE}");
+
+		substitute_message_macros(&value, NULL, 0, message_type, um_handle_unmasked, &actionid, event, r_event,
+				&userid, NULL, &alert, service_alarm, service, tz, ack);
+
+		zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+
 		zbx_json_addstring(&json, "device_id", row[0], ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "token", row[1], ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "kid", row[2], ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "key", row[3], ZBX_JSON_TYPE_STRING);
+
+		zbx_free(value);
 	}
 
-	zbx_json_close(&json);
+	zbx_db_free_result(result);
+
+	zbx_dc_close_user_macros(um_handle_unmasked);
 
 	*params = zbx_strdup(NULL, json.buffer);
-
-	zbx_db_free_result(result);
 	zbx_json_free(&json);
 }
 
@@ -1858,7 +1868,8 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		}
 		else if (MEDIA_TYPE_PUSH == type)
 		{
-			get_build_push_params(event, userid, &params);
+			get_build_push_params(event, r_event, actionid, userid, mediatypeid, row[1], subject,
+					message, ack, service_alarm, service, &params, tz);
 		}
 		else
 		{
