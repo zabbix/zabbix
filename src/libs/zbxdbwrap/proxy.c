@@ -720,7 +720,7 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
 			case ITEM_VALUE_TYPE_UINT64:
 				if ((HOST_MONITORED_BY_PROXY == item->host.monitored_by ||
 						HOST_MONITORED_BY_PROXY_GROUP == item->host.monitored_by ||
-						ZBX_ITEM_REQUIRES_PREPROCESSING_NO == item->preprocessing) &&
+						ZBX_ITEM_PREPROCESSING_NONE == item->preprocessing) &&
 						SUCCEED == zbx_set_agent_result_type(&result,
 								item->value_type, value->value))
 				{
