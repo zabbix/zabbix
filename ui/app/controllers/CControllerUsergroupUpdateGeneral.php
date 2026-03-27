@@ -19,11 +19,9 @@
  */
 abstract class CControllerUsergroupUpdateGeneral extends CController {
 	protected function getUserGroupInputData(): array {
-		$user_group = [];
-		$user_group['users'] = zbx_toObject($this->getInput('userids', []), 'userid');
-		$this->getInputs($user_group, ['users_status', 'gui_access', 'debug_mode', 'userdirectoryid', 'mfaid',
-			'name', 'hostgroup_rights', 'templategroup_rights', 'tag_filters'
-		]);
+		$user_group = $this->getInputAll();
+		$user_group['users'] = zbx_toObject($user_group['userids'], 'userid');
+		unset($user_group['userids']);
 
 		return $user_group;
 	}
@@ -32,14 +30,6 @@ abstract class CControllerUsergroupUpdateGeneral extends CController {
 		$user_group['hostgroup_rights'] = self::processRights($user_group['hostgroup_rights']);
 		$user_group['templategroup_rights'] = self::processRights($user_group['templategroup_rights']);
 		$user_group['tag_filters'] = self::processTagFilters($user_group['tag_filters']);
-
-		if (array_key_exists('mfaid', $user_group) && $user_group['mfaid'] == -1) {
-			$user_group['mfa_status'] = GROUP_MFA_DISABLED;
-			unset($user_group['mfaid']);
-		}
-		elseif (array_key_exists('mfaid', $user_group)) {
-			$user_group['mfa_status'] = GROUP_MFA_ENABLED;
-		}
 
 		return $user_group;
 	}

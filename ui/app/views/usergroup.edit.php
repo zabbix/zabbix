@@ -101,24 +101,25 @@ if ($data['can_update_group']) {
 		$userdirectory->addOption((new CSelectOption($db_userdirectory['userdirectoryid'], $db_userdirectory['name'])));
 	}
 
-	$ldap_warning = (makeWarningIcon(_('LDAP authentication is disabled system-wide.')))->setId('ldap-warning');
+	$ldap_warning = (makeWarningIcon(_('LDAP authentication is disabled system-wide.')))
+		->addStyle('display: none')
+		->setId('ldap-warning');
 
-	$mfa_warning = (makeWarningIcon(_('Multi-factor authentication is disabled system-wide.')))->setId('mfa-warning');
-	$mfa = (new CSelect('mfaid'))
+	$mfa_warning = (makeWarningIcon(_('Multi-factor authentication is disabled system-wide.')))
+		->addStyle('display: none')
+		->setId('mfa-warning');
+
+	$mfa_select = (new CSelect('mfaid'))
 		->setValue($mfa_index)
+		->setDisabled($mfa_index == -1)
+		->addOption((new CSelectOption(0, _('Default')))
+			->addClass(ZBX_STYLE_DEFAULT_OPTION)
+		)
 		->setFocusableElementId('mfaid')
-		->addOptions(CSelect::createOptionsFromArray($data['mfas']))
-		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
+		->setWidthAuto();
 
-	if ($data['mfa_config_status'] == MFA_ENABLED && !$data['usrgrpid']) {
-		$mfa
-			->addOption((new CSelectOption(-1, _('Disabled'))))
-			->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_DEFAULT_OPTION));
-	}
-	else {
-		$mfa
-			->addOption((new CSelectOption(-1, _('Disabled')))->addClass(ZBX_STYLE_DEFAULT_OPTION))
-			->addOption((new CSelectOption(0, _('Default'))));
+	foreach ($data['mfas'] as $db_mfa) {
+		$mfa_select->addOption((new CSelectOption($db_mfa['mfaid'], $db_mfa['name'])));
 	}
 
 	$form_grid
@@ -131,8 +132,17 @@ if ($data['can_update_group']) {
 			new CFormField($userdirectory)
 		])
 		->addItem([
-			(new CLabel([_('Multi-factor authentication'), $mfa_warning], $mfa->getFocusableElementId())),
-			new CFormField($mfa)
+			(new CLabel([_('Multi-factor authentication'), $mfa_warning], 'mfa_status')),
+			new CFormField(
+				(new CDiv([
+					(new CCheckBox('mfa_status'))
+						->setChecked($mfa_index != -1)
+						->setUncheckedValue(GROUP_MFA_DISABLED),
+					$mfa_select
+				]))
+					->addClass(CFormField::ZBX_STYLE_FORM_FIELD_INLINE)
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			)
 		])
 		->addItem([
 			new CLabel(_('Enabled'), 'users_status'),

@@ -159,11 +159,12 @@ class CControllerUsergroupEdit extends CController {
 			$data['ldap_status'] = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED);
 		}
 
-		$mfas = API::Mfa()->get([
+		$data['mfas'] = API::Mfa()->get([
 			'output' => ['mfaid', 'name'],
-			'sortfield' => ['name']
+			'sortfield' => ['name'],
+			'preservekeys' => true
 		]);
-		$data['mfas'] = array_column($mfas, 'name', 'mfaid');
+		CArrayHelper::sort($data['mfas'], ['name']);
 		$data['mfa_config_status'] = $mfa_config_status;
 
 		$data['js_validation_rules'] = $data['usrgrpid'] === null

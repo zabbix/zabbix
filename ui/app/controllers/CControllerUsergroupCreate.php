@@ -36,7 +36,8 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 			'userdirectoryid' => ['db userdirectory.userdirectoryid',
 				'when' => ['gui_access', 'in' => [GROUP_GUI_ACCESS_SYSTEM, GROUP_GUI_ACCESS_LDAP]]
 			],
-			'mfaid' => ['integer'],
+			'mfa_status' => ['integer', 'in' => [GROUP_MFA_DISABLED, GROUP_MFA_ENABLED]],
+			'mfaid' => ['db mfa.mfaid', 'when' => ['mfa_status', 'in' => [GROUP_MFA_ENABLED]]],
 			'users_status' => ['db usrgrp.users_status', 'in' => [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]],
 			'userids' => [
 				['array', 'field' => ['db users_groups.userid']],
