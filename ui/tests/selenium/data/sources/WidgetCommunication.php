@@ -69,6 +69,12 @@ class WidgetCommunication {
 				],
 				'items' => [
 					[
+						'name' => 'Unique trapper item',
+						'key_' => 'unique.trap.widget.communication',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
 						'name' => 'Trapper item',
 						'key_' => 'trap.widget.communication',
 						'type' => ITEM_TYPE_TRAPPER,
@@ -184,8 +190,12 @@ class WidgetCommunication {
 		$item_data_timestamp = time();
 
 		// Send values 3, 4, 5 and 6 to the created items.
-		foreach (array_values($itemids) as $i => $itemid) {
-			CDataHelper::addItemData($itemid, $i + 3, $item_data_timestamp);
+		$i = 0;
+		foreach ($itemids as $host_and_key => $itemid) {
+			if ($host_and_key !== self::FIRST_HOST_NAME.':unique.trap.widget.communication') {
+				CDataHelper::addItemData($itemid, $i + 3, $item_data_timestamp);
+				$i++;
+			}
 		}
 
 		// Create host triggers.
@@ -1011,7 +1021,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'groupids._reference',
-										'value' => 'NRDLG._hostgroupids'
+										'value' => 'NRDLG._hostgroupid'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1036,7 +1046,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'groupids._reference',
-										'value' => 'NRDLG._hostgroupids'
+										'value' => 'NRDLG._hostgroupid'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1752,7 +1762,7 @@ class WidgetCommunication {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
 										'name' => 'hostids._reference',
-										'value' => 'JRVYU._hostids'
+										'value' => 'JRVYU._hostid'
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
