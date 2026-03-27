@@ -393,10 +393,20 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 		zbx_json_addstring(cfg, "devid", "unknown (agent compiled without ODM support)", ZBX_JSON_TYPE_STRING);
 #endif
 		zbx_json_addstring(cfg, "type", "disk", ZBX_JSON_TYPE_STRING);
-		zbx_snprintf(buf, sizeof(buf), ZBX_DEV_PFX "%s", dsk->name);
-		zbx_json_addstring(cfg, "path", buf, ZBX_JSON_TYPE_STRING);
-		zbx_json_adduint64(cfg, "size_bytes", (zbx_uint64_t)dsk->size * 1000000); /* MB -> B*/
-		zbx_json_adduint64(cfg, "logical_block_size", (zbx_uint64_t)dsk->bsize);
+
+		if (ZBX_MODE_DISKS == mode)
+		{
+			zbx_snprintf(buf, sizeof(buf), ZBX_DEV_PFX "%s", dsk->name);
+			zbx_json_addstring(cfg, "path", buf, ZBX_JSON_TYPE_STRING);
+		}
+
+		zbx_json_adduint64(cfg, "size_bytes", (zbx_uint64_t)dsk->size * 1000000);
+
+		if (ZBX_MODE_DISKS == mode)
+		{
+			zbx_json_adduint64(cfg, "logical_block_size", (zbx_uint64_t)dsk->bsize);
+		}
+
 		zbx_json_close(cfg);
 
 		if (ZBX_MODE_DISK_STATS == mode)
