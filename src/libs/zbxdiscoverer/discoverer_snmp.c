@@ -211,7 +211,8 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 	zbx_vector_discoverer_results_ptr_t	results;
 	discovery_poller_config_t		poller_config;
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX], first_ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int					ret = FAIL, abort = SUCCEED, is_snmpv3 = FAIL, drule_n = 0, task_n = 0;
+	int					ret = FAIL, abort = SUCCEED, is_snmpv3 = FAIL, drule_n = 0, task_n = 0,
+						check_n = 0;
 	zbx_uint64_t				dec_counter = 0;
 	zbx_discoverer_task_t			*task = NULL;
 
@@ -251,10 +252,10 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 		task_n++;
 		zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() start druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64
 				" state.count:" ZBX_FS_UI64 " checks per ip:%u dchecks:%d type:%u concurrency_max:%d "
-				"checks_per_worker_max:%d drule_n:%d task_n:%d", log_worker_id, __func__,
+				"checks_per_worker_max:%d drule_n:%d task_n:%d check_n:%d", log_worker_id, __func__,
 				druleid, task->range.id, task->range.state.count, task->range.state.checks_per_ip,
 				task->ds_dchecks.values_num, GET_DTYPE(task), concurrency_max,
-				dmanager->queue.checks_per_worker_max, drule_n, task_n);
+				dmanager->queue.checks_per_worker_max, drule_n, task_n, check_n);
 
 		if (SVC_SNMPv3 == GET_DTYPE(task))
 			is_snmpv3 = SUCCEED;
@@ -269,11 +270,11 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG) && '\0' == *first_ip)
 				zbx_strlcpy(first_ip, ip, sizeof(first_ip));
 
-			result = discoverer_result_create(druleid, task->unique_dcheckid,
-					task->range.state.checks_per_ip);
+			result = discoverer_result_create(druleid, task);
 			result->ip = zbx_strdup(NULL, ip);
 			zbx_vector_discoverer_results_ptr_append(&results, result);
 			dcheck = &task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck;
+			check_n++;
 
 			ret = discovery_snmp(&poller_config, dcheck, ip,
 					(unsigned short)task->range.state.port, result, error);
@@ -298,9 +299,10 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 				task->range.state.count + dec_counter);
 
 		zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() end druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
-				" first ip:%s last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
-				GET_DTYPE(task), task->range.state.count, first_ip, ip, abort, ret);
-
+				" first ip:%s last ip:%s abort:%d ret:%d drule_n:%d task_n:%d check_n:%d",
+				log_worker_id, __func__, druleid, GET_DTYPE(task), task->range.state.count, first_ip,
+				ip, abort, ret, drule_n, task_n, check_n);
+		*first_ip = '\0';
 	}
 out:
 	while (0 != poller_config.processing)	/* try to close all handles if they are exhausted */
@@ -318,8 +320,8 @@ out:
 	if (SUCCEED == is_snmpv3)
 		zbx_clear_cache_snmp(dmanager->process_type, FAIL);
 general_fail:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()  drule_n:%d task_n:%d abort:%d ret:%d", log_worker_id, __func__,
-			drule_n, task_n, abort, ret);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()  drule_n:%d task_n:%d check_n:%d abort:%d ret:%d", log_worker_id,
+			__func__, drule_n, task_n, check_n, abort, ret);
 
 	return ret;
 }

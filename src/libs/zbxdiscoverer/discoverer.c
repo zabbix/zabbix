@@ -477,6 +477,23 @@ static void	process_results_incompletecheckscount_remove(zbx_discoverer_manager_
 	}
 }
 
+static int	process_results_lastip_check(zbx_discoverer_results_t *result, zbx_vector_uint64_t *del_jobs)
+{
+	if (ZBX_DISCOVERER_RESULT_CHECK_INIT == result->status ||
+			0 != (result->status & ZBX_DISCOVERER_RESULT_JOB_FINISH))
+	{
+		return FAIL;
+	}
+
+	if (0 == del_jobs->values_num)
+		return SUCCEED;
+
+	if (FAIL != zbx_vector_uint64_bsearch(del_jobs, result->druleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		result->status |= ZBX_DISCOVERER_RESULT_JOB_FINISH;
+
+	return 0 != (result->status & ZBX_DISCOVERER_RESULT_JOB_FINISH) ? FAIL : SUCCEED;
+}
+
 static void	process_results_incompleteresult_remove(zbx_discoverer_manager_t *manager,
 		zbx_vector_discoverer_drule_error_t *drule_errors)
 {
@@ -510,7 +527,7 @@ static void	process_results_incompleteresult_remove(zbx_discoverer_manager_t *ma
 }
 
 static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
-		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks,
+		zbx_vector_uint64_t *del_jobs, zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks,
 		zbx_vector_discoverer_drule_error_t *drule_errors, const zbx_events_funcs_t *events_cbs,
 		zbx_discovery_open_func_t discovery_open_cb, zbx_discovery_close_func_t discovery_close_cb,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
@@ -520,13 +537,14 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 {
 #define DISCOVERER_BATCH_RESULTS_NUM	1000
 	zbx_uint64_t				res_check_total = 0,res_check_count = 0;
-	zbx_vector_discoverer_results_ptr_t	results;
+	zbx_vector_discoverer_results_ptr_t	results, results_lastip;
 	zbx_discoverer_results_t		*result, *result_tmp;
 	zbx_hashset_iter_t			iter;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() del_druleids:%d", __func__, del_druleids->values_num);
 
 	zbx_vector_discoverer_results_ptr_create(&results);
+	zbx_vector_discoverer_results_ptr_create(&results_lastip);
 	zbx_hashset_clear(incomplete_druleids);
 
 	pthread_mutex_lock(&manager->results_lock);
@@ -552,7 +570,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 		res_check_total += (zbx_uint64_t)result->services.values_num;
 
-		if (DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ||
+		if (SUCCEED == process_results_lastip_check(result, del_jobs) ||
+				DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ||
 				(NULL != (check_count = zbx_hashset_search(&manager->incomplete_checks_count, &cmp)) &&
 				0 != check_count->count))
 		{
@@ -567,7 +586,12 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 		result_tmp = (zbx_discoverer_results_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_results_t));
 		memcpy(result_tmp, result, sizeof(zbx_discoverer_results_t));
-		zbx_vector_discoverer_results_ptr_append(&results, result_tmp);
+
+		if (0 == (result_tmp->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
+			zbx_vector_discoverer_results_ptr_append(&results, result_tmp);
+		else
+			zbx_vector_discoverer_results_ptr_append(&results_lastip, result_tmp);
+
 		zbx_hashset_iter_remove(&iter);
 	}
 
@@ -578,6 +602,10 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			del_druleids->values_num, incomplete_druleids->num_data);
 
 	pthread_mutex_unlock(&manager->results_lock);
+
+	zbx_vector_discoverer_results_ptr_append_array(&results, results_lastip.values, results_lastip.values_num);
+	zbx_vector_discoverer_results_ptr_clear(&results_lastip);
+
 
 	if (0 != results.values_num)
 	{
@@ -626,6 +654,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);
 	zbx_vector_discoverer_results_ptr_destroy(&results);
+	zbx_vector_discoverer_results_ptr_destroy(&results_lastip);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__,
 			DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ? 1 : 0);
@@ -645,10 +674,6 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 
 	if (0 == del_jobs->values_num)
 		return;
-
-	/* multiple errors can duplicate druleid */
-	zbx_vector_uint64_sort(del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-	zbx_vector_uint64_uniq(del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
 	now = time(NULL);
 	handle = discovery_open_cb();
@@ -884,8 +909,7 @@ zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port,
 	return service;
 }
 
-zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid,
-			const unsigned int max_checks_per_ip)
+zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_discoverer_task_t *task)
 {
 	zbx_discoverer_results_t	*result;
 
@@ -894,12 +918,13 @@ zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const z
 	zbx_vector_discoverer_services_ptr_create(&result->services);
 
 	result->druleid = druleid;
-	result->unique_dcheckid = unique_dcheckid;
+	result->unique_dcheckid = task->unique_dcheckid;
 	result->ip = result->dnsname = NULL;
 	result->now = time(NULL);
 	result->processed_checks_per_ip = 0;
-	result->max_checks_per_ip = max_checks_per_ip;
-
+	result->max_checks_per_ip = task->range.state.checks_per_ip;
+	result->status = 0 == discoverer_task_check_count_get(task) ?
+			ZBX_DISCOVERER_RESULT_CHECK_LAST : ZBX_DISCOVERER_RESULT_CHECK_INIT;
 	return result;
 }
 
@@ -1761,10 +1786,15 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		discoverer_queue_unlock(&dmanager.queue);
 
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		/* multiple errors can duplicate druleid */
+		zbx_vector_uint64_sort(&del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+		zbx_vector_uint64_uniq(&del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks,
-				&drule_errors, discoverer_args_in->events_cbs, discoverer_args_in->discovery_open_cb,
-				discoverer_args_in->discovery_close_cb, discoverer_args_in->discovery_update_host_cb,
+
+		more_results = process_results(&dmanager, &del_druleids, &del_jobs, &incomplete_druleids,
+				&unsaved_checks, &drule_errors, discoverer_args_in->events_cbs,
+				discoverer_args_in->discovery_open_cb, discoverer_args_in->discovery_close_cb,
+				discoverer_args_in->discovery_update_host_cb,
 				discoverer_args_in->discovery_update_service_cb,
 				discoverer_args_in->discovery_update_service_down_cb,
 				discoverer_args_in->discovery_find_host_cb);

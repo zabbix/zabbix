@@ -546,7 +546,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG) && '\0' == *first_ip)
 			zbx_strlcpy(first_ip, ip, sizeof(first_ip));
 
-		result = discoverer_result_create(druleid, task->unique_dcheckid, task->range.state.checks_per_ip);
+		result = discoverer_result_create(druleid, task);
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 		dcheck = &task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck;
