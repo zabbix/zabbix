@@ -162,42 +162,46 @@ window.correlation_edit_popup = new class {
 	}
 
 	#hasConditionDuplicate(condition) {
-		const result = [];
+		for (const element of this.form_element.querySelectorAll('#condition_table>tbody>tr')) {
+			const sibling_type = parseInt(element.querySelector('input[name*="type"]').value, 10);
+			const condition_type = parseInt(condition.type, 10);
 
-		[...this.form_element.querySelectorAll('#condition_table>tbody>tr')].forEach((element) => {
-			const type = element.querySelector('input[name*="type"]').value;
-			const same_type = parseInt(condition.type, 10) == parseInt(type, 10);
+			if (sibling_type != condition_type) {
+				continue;
+			}
 
-			switch (parseInt(type)) {
+			switch (sibling_type) {
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG ?>:
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG ?>:
-					result.push(same_type && condition.tag === element.querySelector('input[name*="tag"]').value);
+					if (condition.tag === element.querySelector('input[name*="tag"]').value) {
+						return true;
+					}
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE ?>:
 				case <?= ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE ?>:
-					result.push(same_type
-						&& condition.tag === element.querySelector('input[name*="tag"]').value
-						&& condition.value === element.querySelector('input[name*="value"]').value
-					);
+					if (condition.tag === element.querySelector('input[name*="tag"]').value
+							&& condition.value === element.querySelector('input[name*="value"]').value) {
+						return true;
+					}
 					break;
 
 				case <?= ZBX_CORR_CONDITION_EVENT_TAG_PAIR ?>:
-					result.push(same_type
-						&& condition.oldtag === element.querySelector('input[name*="oldtag"]').value
-						&& condition.newtag === element.querySelector('input[name*="newtag"]').value
-					);
+					if (condition.oldtag === element.querySelector('input[name*="oldtag"]').value
+							&& condition.newtag === element.querySelector('input[name*="newtag"]').value) {
+						return true;
+					}
 					break;
 
 				case <?= ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP ?>:
-					result.push(same_type
-						&& condition.groupid === element.querySelector('input[name*="groupid"]').value
-					);
+					if (condition.groupid === element.querySelector('input[name*="groupid"]').value) {
+						return true;
+					}
 					break;
 			}
-		});
+		}
 
-		return result.some((element) => element === true);
+		return false;
 	}
 
 	#clone() {
