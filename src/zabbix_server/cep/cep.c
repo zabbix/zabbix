@@ -1486,6 +1486,9 @@ void	cep_delete_events(zbx_cep_t *cep, const zbx_vector_uint64_t *eventids, zbx_
 				if (obj->events.values[j]->event->eventid == h->event->eventid)
 				{
 					zbx_vector_cep_event_handle_remove_noorder(&obj->events, j);
+
+					if (0 == obj->events.values_num && 0 == obj->pending_events_num)
+						zbx_hashset_remove_direct(&cep->objects, obj);
 					break;
 				}
 			}
