@@ -450,7 +450,7 @@ $output = [
 		'correlation_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
 			'clone_rules' => $data['js_clone_validation_rules'],
-			'templates_data' => $data['templates_data']
+			'conditions' => $data['correlation']['filter']['conditions']
 		]).');',
 	'dialogue_class' => 'modal-popup-medium'
 ];

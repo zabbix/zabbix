@@ -21,7 +21,7 @@
 
 window.correlation_edit_popup = new class {
 
-	init({rules, clone_rules, templates_data}) {
+	init({rules, clone_rules, conditions}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
@@ -39,7 +39,7 @@ window.correlation_edit_popup = new class {
 			this.row_templates[type] = new Template(template.innerHTML);
 		}
 
-		templates_data.forEach((condition, index) => this.#addConditionRow(condition, index));
+		conditions.forEach((condition, index) => this.#addConditionRow(condition, index));
 		this.#processTypeOfCalculation();
 
 		this.#initActions();

@@ -76,6 +76,7 @@ class CControllerCorrelationEdit extends CController {
 
 	protected function doAction(): void {
 		$correlation = $this->correlation + DB::getDefaults('correlation');
+		$correlation['filter']['conditions'] = $this->prepareConditions($correlation);
 
 		$js_validation_rules = $correlation['correlationid']
 			? CControllerCorrelationUpdate::getValidationRules()
@@ -83,19 +84,20 @@ class CControllerCorrelationEdit extends CController {
 
 		$data = [
 			'correlation' => $correlation,
-			'templates_data' => $this->prepareTemplatesData($correlation),
+			'templates_data' => $this->prepareConditions($correlation),
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
 			'js_clone_validation_rules' => (new CFormValidator(CControllerCorrelationCreate::getValidationRules()))
 				->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Event correlation rules'));
 		$this->setResponse($response);
 	}
 
-	protected function prepareTemplatesData(array $correlation): array {
+	protected function prepareConditions(array $correlation): array {
 		$result = [];
 		$hostgroup_names = $this->fetchHostGroupNames($correlation);
 
