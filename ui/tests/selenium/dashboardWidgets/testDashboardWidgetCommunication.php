@@ -3996,13 +3996,14 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	 * Close popup or dialog that is opened when clicking on element in broadcaster widget.
 	 */
 	protected function closeOpenedPopup() {
-		if ($this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one(false)->isValid()) {
-			$this->query('class:btn-overlay-close')->all()->last()->click();
+		$dialog = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one(false);
+		if ($dialog->isValid()) {
+			$dialog->query('class:btn-overlay-close')->one()->click();
 		}
 
-		if (CPopupMenuElement::find()->one(false)->isValid()) {
-
-			CPopupMenuElement::find()->one()->close();
+		$popup = CPopupMenuElement::find()->one(false);
+		if ($popup->isValid()) {
+			$popup->close();
 		}
 	}
 
