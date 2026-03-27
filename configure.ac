@@ -198,7 +198,7 @@ dnl ISO C Standard Library
 dnl
 AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
                   inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
-                  stdint.h stdio.h stdlib.h string.h time.h                  \
+                  stdint.h stdio.h stdlib.h string.h time.h setjmp.h         \
 ])
 
 dnl POSIX C Standard Library
@@ -210,6 +210,9 @@ AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
                   pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
                   utmpx.h libgen.h                                           \
 ])
+
+dnl atomics
+AC_CHECK_HEADERS([stdatomic.h])
 
 dnl X/Open and SUS
 AC_CHECK_HEADERS([sys/timeb.h])
@@ -2236,9 +2239,12 @@ AC_CONFIG_FILES([
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
+	src/libs/zbxsupervisor/Makefile
+    src/libs/zbxsupervisor_client/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmp/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxvmware/Makefile
@@ -2302,7 +2308,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/audit/Makefile
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile

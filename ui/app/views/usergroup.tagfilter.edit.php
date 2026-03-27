@@ -72,15 +72,13 @@ $form_grid
 
 $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
 	(new CRow([
-		(new CTextBox('new_tag_filter[#{rowid}][tag]', '#{tag}', false,
-			DB::getFieldLength('tag_filter', 'tag')
-		))
+		(new CTextAreaFlexible('new_tag_filter[#{rowid}][tag]', '#{tag}'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setMaxlength(DB::getFieldLength('tag_filter', 'tag'))
 			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('new_tag_filter[#{rowid}][value]', '#{value}', false,
-			DB::getFieldLength('tag_filter', 'value')
-		))
+		(new CTextAreaFlexible('new_tag_filter[#{rowid}][value]', '#{value}'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setMaxlength(DB::getFieldLength('tag_filter', 'value'))
 			->setAttribute('placeholder', _('value')),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
 	]))->addClass('form_row')
