@@ -398,7 +398,7 @@ class CForm {
 
 			if (field instanceof CFieldMultiselect) {
 				const affixed_path = '/' + field_name + '_new';
-				const affixed_subfield = new RegExp(`^/(${field_name}_new/)|(${field_name}/)`);
+				const affixed_subfield = new RegExp(`^/(${field_name}|${field_name}_new)/`);
 
 				for (const error_path in raw_errors) {
 					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
