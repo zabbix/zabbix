@@ -248,7 +248,7 @@ class CIntegrationTest extends CAPITest {
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
 		if (!(self::$suite_components_reuse && self::$suite_components_running)) {
 
-			if (self::$suite_components_reuse) {
+			if (!self::$suite_components_reuse) {
 				foreach ($this->case_components as $component) {
 					if (in_array($component, self::$suite_components)) {
 						throw new Exception('Component "'.$component.'" already started on suite level.');
