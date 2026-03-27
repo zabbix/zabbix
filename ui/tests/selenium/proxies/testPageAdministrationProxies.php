@@ -714,6 +714,10 @@ class testPageAdministrationProxies extends CWebTest {
 		}
 	}
 
+	/**
+	* Function uses previously created data to check that host-links to enabled and disabled hosts in the Hosts column
+	* have correct coloring after host configuration form was visited.
+	*/
 	public function testPageAdministrationProxies_VisitedHostColor() {
 		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -725,16 +729,14 @@ class testPageAdministrationProxies extends CWebTest {
 		];
 
 		foreach ($hosts as $proxy => $host_parameters) {
-			$column = $table->findRow('Name', $proxy, true);
-			$host_link = $column->query('link', $host_parameters['host_name'])->one();
+			$host_link = $table->findRow('Name', $proxy)->query('link', $host_parameters['host_name'])->one();
 
 			// Check host-link text color.
 			$this->assertEquals($host_parameters['host_color'], $host_link->getCSSValue('color'));
 			// Open and close host-link dialog form.
 			$host_link->waitUntilClickable()->click();
-			COverlayDialogElement::find()->one()->close();
-			// Refresh the page.
-			$this->page->refresh();
+			COverlayDialogElement::find()->waitUntilReady()->one()->close();
+			$this->page->refresh()->waitUntilReady();
 
 			// Check visited host-link text color.
 			$this->assertEquals($host_parameters['host_color'], $host_link->getCSSValue('color'));
