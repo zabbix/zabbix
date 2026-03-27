@@ -274,7 +274,7 @@ class CIntegrationTest extends CAPITest {
 			foreach ($components as $component) {
 				self::stopComponent($component);
 			}
-			$case_components_started === false;
+			self::$case_components_started === false;
 		}
 
 		$case_name = strtr($this->getName(true), [' ' => '-']);
