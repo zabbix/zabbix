@@ -155,7 +155,7 @@ if ($data['can_update_group']) {
 }
 else {
 	if (array_key_exists($data['mfaid'], $data['mfas'])) {
-		$mfa_name = $data['mfas'][$data['mfaid']];
+		$mfa_name = $data['mfas'][$data['mfaid']]['name'];
 	}
 	else {
 		$mfa_name = $mfa_index == -1 ? _('Disabled') : _('Default');
