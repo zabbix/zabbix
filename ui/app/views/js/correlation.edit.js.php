@@ -126,7 +126,7 @@ window.correlation_edit_popup = new class {
 		let next_index = 0;
 
 		while (true) {
-			if (!document.getElementById('condition_table').querySelector(`[data-row-index="${next_index}"]`)) {
+			if (!document.getElementById('condition_table').querySelector(`[data-row_index="${next_index}"]`)) {
 				break;
 			}
 			else {
