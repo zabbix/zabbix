@@ -93,7 +93,7 @@ class CLocalApiClient extends CApiClient {
 		$requiresAuthentication = $this->requiresAuthentication($api, $method);
 
 		// check that no authentication token (except DPoP token) is passed to methods that don't require it
-		if (!$requiresAuthentication && $auth['type'] == CJsonRpc::AUTH_TYPE_BEARER) {
+		if (!$requiresAuthentication && $auth['type'] !== CJsonRpc::AUTH_TYPE_COOKIE) {
 			$error = _('The "%1$s.%2$s" method must be called without authorization header.');
 
 			$response->errorCode = ZBX_API_ERROR_PARAMETERS;
@@ -105,8 +105,7 @@ class CLocalApiClient extends CApiClient {
 		$newTransaction = false;
 		try {
 			// authenticate
-			if ($requiresAuthentication ||
-					($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && $auth['hpke_headers_requested'])) {
+			if ($requiresAuthentication) {
 				$this->authenticate($auth, $requestApi.'.'.$requestMethod);
 
 				// check permissions
@@ -229,17 +228,11 @@ class CLocalApiClient extends CApiClient {
 	 *
 	 * @param string $api
 	 * @param string $method
-	 * @param array  $auth
 	 *
 	 * @return bool
 	 */
-	protected function isValidMethod(string $api, string $method, array $auth): bool {
+	protected function isValidMethod(string $api, string $method): bool {
 		$api_service = $this->serviceFactory->getObject($api);
-
-		if ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP &&
-				in_array($api.'.'.$method, ['user.login', 'user.checkauthentication'])) {
-			return false;
-		}
 
 		return array_key_exists($method, $api_service::ACCESS_RULES);
 	}

@@ -73,7 +73,6 @@ class CJsonRpc {
 			$auth['type'] = self::AUTH_TYPE_DPOP;
 			$auth['auth'] = $auth_header['auth'];
 			$auth['sign'] = (string) $request->header(self::HEADER_AUTHENTICATE_DPOP);
-			$auth['hpke_headers_requested'] = $request->isHpkeHeadersRequested();
 		}
 		else {
 			$session = new CEncryptedCookieSession();

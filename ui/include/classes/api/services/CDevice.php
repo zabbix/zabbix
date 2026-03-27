@@ -278,9 +278,8 @@ class CDevice extends CApiService {
 
 		self::$userData = [
 			'userid' => $db_device['userid'],
-			'uuid' => $db_device['uuid'],
-			'kid' => $options['mobile_encryption_key']['kid'],
-			'key' => json_encode($options['mobile_encryption_key'])
+			'userip' => CWebUser::getIp(),
+			'username' => $db_device['username']
 		];
 
 		DB::delete('device_enrollment_token', ['deviceid' => $db_device['deviceid']]);
@@ -333,9 +332,7 @@ class CDevice extends CApiService {
 			$db_device['deviceid'] => array_intersect_key($db_device, array_flip(['deviceid', 'name']))
 		];
 
-		self::addAuditLogByUser($db_device['userid'], CWebUser::getIp(), $db_device['username'], CAudit::ACTION_ONBOARD,
-			CAudit::RESOURCE_DEVICE, [$device], $db_devices
-		);
+		self::addAuditLog(CAudit::ACTION_ONBOARD, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
 
 		return ['token' => $db_token['token']];
 	}
