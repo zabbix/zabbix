@@ -7,6 +7,13 @@ New features:
 .........T [ZBXNEXT-10403] implemented the template for Huawei AR600 devices (kflorowski)
 
 Bug fixes:
+..F....... [ZBX-27044] fixed inconsistent focusing and selecting of primary fields on forms (averza)
+..F....... [ZBX-26820] fixed the eventids error after clicking Update problem on Trigger overview widget (aluchko)
+..F....... [ZBX-27056] enabled the displaying of settings links in the top dropdown menu for custom UI modules (aluchko)
+........S. [ZBX-27582] fixed history syncer being blocked when checking if new timers are added or updated (vso)
+.........T [ZBX-27147] added RESTful API v2 support with OAuth2 and updated endpoints in GLPi media type (mruszczyk)
+........S. [ZBX-27626] fixed crash during configuration sync after removing prototype trigger with non-prototype item (wiper)
+A.F....... [ZBX-26128] fixed sort order for problem and event acknowledgements to use ID for same timestamp records (gberzina, rgontarski)
 ..F....... [ZBX-27123] changed the redirect page after deleting the graph prototype to the same graph prototype's list page (msnihach)
 ..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
 .........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
@@ -1351,6 +1358,12 @@ New features:
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27044] fixed inconsistent focusing and selecting of primary fields on forms (averza)
+..F....... [ZBX-27056] enabled the displaying of settings links in the top dropdown menu for custom UI modules (aluchko)
+........S. [ZBX-27582] fixed history syncer being blocked when checking if new timers are added or updated (vso)
+.........T [ZBX-27147] added RESTful API v2 support with OAuth2 and updated endpoints in GLPi media type (mruszczyk)
+........S. [ZBX-27626] fixed crash during configuration sync after removing prototype trigger with non-prototype item (wiper)
+A.F....... [ZBX-26128] fixed sort order for problem and event acknowledgements to use ID for same timestamp records (gberzina, rgontarski)
 ..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
 .........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
 ..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
