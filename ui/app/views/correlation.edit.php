@@ -401,41 +401,6 @@ $form_grid
 		)
 	]);
 
-$templates_data = [];
-foreach ($data['correlation']['filter']['conditions'] as $index => $condition) {
-	$type = (int) $condition['type'];
-
-	$template_data = [
-		'row_index' => $index,
-		'type' => $condition['type'],
-		'formulaid' => $condition['formulaid']
-	];
-
-	$templates_data[] = $template_data + match ($type) {
-		ZBX_CORR_CONDITION_OLD_EVENT_TAG,
-		ZBX_CORR_CONDITION_NEW_EVENT_TAG => [
-			'tag' => $condition['tag']
-		],
-		ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP => [
-			'groupid' => $condition['groupid'],
-			'group_name' => $data['hostgroup_names'][$condition['groupid']],
-			'operator' => $condition['operator'],
-			'operator_name' => CCorrelationHelper::getLabelByOperator($condition['operator'])
-		],
-		ZBX_CORR_CONDITION_EVENT_TAG_PAIR => [
-			'oldtag' => $condition['oldtag'],
-			'newtag' => $condition['newtag']
-		],
-		ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
-		ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE => [
-			'tag' => $condition['tag'],
-			'value' => $condition['value'],
-			'operator' => $condition['operator'],
-			'operator_name' => CCorrelationHelper::getLabelByOperator($condition['operator'])
-		]
-	};
-}
-
 $form
 	->addItem($form_grid);
 
@@ -482,7 +447,7 @@ $output = [
 		'correlation_edit_popup.init('.json_encode([
 			'rules' => $data['js_validation_rules'],
 			'clone_rules' => $data['js_clone_validation_rules'],
-			'templates_data' => $templates_data,
+			'templates_data' => $data['templates_data'],
 			'templates_types' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG,
 				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR,
 				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE
