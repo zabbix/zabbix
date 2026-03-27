@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * Test suite for tag inheritance.
  *
  * @required-components server
+ * @suite-components true
  * @configurationDataProvider serverConfigurationProvider
  * @onAfter clearData
  */
@@ -717,7 +718,6 @@ class testTagInheritance extends CIntegrationTest {
 	}
 
 	/**
-	 * @required-components inherit
 	 * @depends testInheritedTags
 	 * @dataProvider event_get_data
 	 */

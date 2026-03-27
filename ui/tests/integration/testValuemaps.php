@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * Test suite for value mapping.
  *
  * @required-components server
+ * @suite-components true
  * @hosts test_valuemaps
  * @backup history
  */
@@ -249,7 +250,6 @@ class testValuemaps extends CIntegrationTest {
 
 	/**
 	 * Test valuemaps cases.
-	 * @required-components inherit
 	 * @dataProvider getValuemaps
 	 */
 	public function testValuemaps_checkProblemName($inputData, $inputType, $valuemap, $outputData) {

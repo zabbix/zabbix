@@ -19,6 +19,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for changecount() function evaluation.
  *
  * @required-components server
+ * @suite-components true
  * @hosts test_host
  * @backup history
  */
@@ -245,7 +246,6 @@ class testFunctionChangeCount extends CIntegrationTest {
 	}
 
 	/**
-	 * @required-components inherit
 	 * @depends testFunctionChangeCount_Send_NotEnoughData
 	 */
 	public function testFunctionChangeCount_Get_NotEnoughData() {

@@ -116,15 +116,17 @@ class CIntegrationTest extends CAPITest {
 			'configuration'	=> []
 		];
 
+		// Get suite-components flag.
+		if (in_array('true', $this->getAnnotationTokensByName($annotations, 'suite-components'))) {
+			self::$suite_components_inherit = true;
+		}
+
 		// Get required components.
 		foreach ($this->getAnnotationTokensByName($annotations, 'required-components') as $component) {
 			if ($component === 'agent') {
 				$component = self::COMPONENT_AGENT;
 			} else if ($component === 'agent_3.0') {
 				$component = self::COMPONENT_AGENT_3_0;
-			} else if ($component === 'inherit') {
-				self::$suite_components_inherit = true;
-				break;
 			}
 
 			self::validateComponent($component);
