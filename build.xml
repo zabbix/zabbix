@@ -621,6 +621,16 @@
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
 		</exec>
+	<exec executable="bash">
+		<arg value="-c"/>
+		<arg value="
+			echo '=== Test suite durations (seconds) ===';
+			grep '&lt;testsuite ' ${basedir}/build/logs/phpunit.xml \
+			| sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' \
+			| sort -nr
+		"/>
+	</exec>
+
 	</target>
 
 	<target name="build-phpunit" depends="test-phpunit"/>
