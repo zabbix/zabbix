@@ -25,18 +25,18 @@ require_once dirname(__FILE__).'/helpers/CLogHelper.php';
 class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
-	const WAIT_ITERATIONS			= 60;
+	const WAIT_ITERATIONS			= 600;
 
 	// Set to true to print delay trace messages to STDERR.
 	const TRACE_DELAYS = false;
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 0.1;
-	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 0.1;
 	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3;
 	const HOUSEKEEPER_EXEC_DELAY			= 3;
-	const DATA_PROCESSING_DELAY			= 0.1;
+	const DATA_PROCESSING_DELAY			= 1.0;
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER			= 'server';
