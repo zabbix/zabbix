@@ -31,12 +31,12 @@ class CIntegrationTest extends CAPITest {
 	const TRACE_DELAYS = false;
 
 	// Default delays (in seconds):
-	const WAIT_ITERATION_DELAY			= 0.1;
+	const WAIT_ITERATION_DELAY			= 1;
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
 	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3;
-	const HOUSEKEEPER_EXEC_DELAY			= 3;
-	const DATA_PROCESSING_DELAY			= 0.1;
+	const HOUSEKEEPER_EXEC_DELAY			= 5;
+	const DATA_PROCESSING_DELAY			= 2;
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER			= 'server';
@@ -389,7 +389,7 @@ class CIntegrationTest extends CAPITest {
 				return;
 			}
 
-			usleep(self::WAIT_ITERATION_DELAY * 1000000);
+			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to start. Waited '.(time() - $saved_time).' seconds..');
@@ -787,7 +787,7 @@ class CIntegrationTest extends CAPITest {
 		// Sleep only if delay > 0
 		if ($delay > 0) {
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("sendDataValues delay:%d\n", $delay));
-			usleep($delay * 1000000);
+			sleep($delay);
 		}
 		return $result;
 	}
@@ -989,7 +989,7 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
-			usleep($delay * 1000000);
+			sleep($delay);
 		}
 
 		if ($exception !== null) {
