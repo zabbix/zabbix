@@ -1099,7 +1099,7 @@ class CIntegrationTest extends CAPITest {
 			if ($usleep_total < 1000000 && $iterations > 1) {
 				$usleep_total += 100000;
 				usleep(100000);
-				$i = -1;
+				$r = -1;
 				continue;
 			}
 
