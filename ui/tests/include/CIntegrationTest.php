@@ -357,7 +357,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param string $component              component name
 	 * @param string $waitLogLineOverride    already log line to use to consider component as running
-	 * @param bool $skip_pid    skip PID check
+	 * @param bool   $skip_pid               skip PID check
 	 *
 	 * @throws Exception    on failed wait operation
 	 */
@@ -756,9 +756,10 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Send value for items to server.
 	 *
-	 * @param string $type         data type
-	 * @param array  $values       item values
-	 * @param string $component    component name or null for active component
+	 * @param string  $type          data type
+	 * @param array   $values        item values
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride
 	 *
 	 * @return array    processing result
 	 */
@@ -781,7 +782,6 @@ class CIntegrationTest extends CAPITest {
 				'Processed value count doesn\'t match sent value count.'
 		);
 
-		// Determine delay: override if provided, else use default constant.
 		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
 
 		// Sleep only if delay > 0
@@ -795,11 +795,12 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Send single item value.
 	 *
-	 * @param string $type         data type
-	 * @param string $host         host name
-	 * @param string $key          item key
-	 * @param mixed  $value        item value
-	 * @param string $component    component name or null for active component
+	 * @param string  $type         data type
+	 * @param string  $host         host name
+	 * @param string  $key          item key
+	 * @param mixed   $value        item value
+	 * @param string  $component    component name or null for active component
+	 * @param integer $delayOverride
 	 *
 	 * @return array    processing result
 	 */
@@ -820,8 +821,9 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Send values to trapper items.
 	 *
-	 * @param array  $values       item values
-	 * @param string $component    component name or null for active component
+	 * @param array   $values        item values
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride
 	 *
 	 * @return array    processing result
 	 */
@@ -832,10 +834,11 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Send single value for trapper item.
 	 *
-	 * @param string $host         host name
-	 * @param string $key          item key
-	 * @param mixed  $value        item value
-	 * @param string $component    component name or null for active component
+	 * @param string  $host          host name
+	 * @param string  $key           item key
+	 * @param mixed   $value         item value
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride
 	 *
 	 * @return array    processing result
 	 */
@@ -895,7 +898,8 @@ class CIntegrationTest extends CAPITest {
 	/**
 	 * Reload configuration cache.
 	 *
-	 * @param string $component    component name or null for active component
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride
 	 */
 	protected function reloadConfigurationCache($component = null, $delayOverride = null) {
 		if ($component === null) {
