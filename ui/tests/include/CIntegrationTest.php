@@ -33,7 +33,7 @@ class CIntegrationTest extends CAPITest {
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 0.1;
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 0.1;
-	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
+	const CACHE_RELOAD_DELAY			= 2.0; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3;
 	const HOUSEKEEPER_EXEC_DELAY			= 3;
 	const DATA_PROCESSING_DELAY			= 1.0;
@@ -408,7 +408,7 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
-			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
+			usleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN * 1000000);
 		}
 
 		return false;
@@ -916,7 +916,7 @@ class CIntegrationTest extends CAPITest {
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::CACHE_RELOAD_DELAY;
 		if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
-		sleep($delay);
+		usleep($delay * 1000000);
 	}
 
 	/**
