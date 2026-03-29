@@ -365,6 +365,7 @@ class CIntegrationTest extends CAPITest {
 		self::validateComponent($component);
 
 		$saved_time = time();
+		$usleep_total = 0;
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {
@@ -389,6 +390,12 @@ class CIntegrationTest extends CAPITest {
 				return;
 			}
 
+			if ($usleep_total < 1000000 && $iterations > 1) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$r = -1;
+				continue;
+			}
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
@@ -402,12 +409,22 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 */
 	private static function checkPidKilled($component) {
+		$usleep_total = 0;
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			if (!file_exists(self::getPidPath($component))) {
 				return true;
 			}
 
-			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
+			}
+
+			if ($usleep_total < 1000000 && $iterations > 1) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$r = -1;
+				continue;
+			}
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
