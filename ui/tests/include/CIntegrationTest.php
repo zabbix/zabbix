@@ -34,7 +34,7 @@ class CIntegrationTest extends CAPITest {
 	const WAIT_ITERATION_DELAY			= 0.1;
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 0.1;
 	const CACHE_RELOAD_DELAY			= 2.0; // Configuration cache reload delay.
-	const USER_PARAM_RELOAD_DELAY			= 3;
+	const USER_PARAM_RELOAD_DELAY			= 3.0;
 	const HOUSEKEEPER_EXEC_DELAY			= 3;
 	const DATA_PROCESSING_DELAY			= 1.0;
 
@@ -759,7 +759,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param string  $type          data type
 	 * @param array   $values        item values
 	 * @param string  $component     component name or null for active component
-	 * @param integer $delayOverride
+	 * @param float   $delayOverride
 	 *
 	 * @return array    processing result
 	 */
@@ -931,7 +931,7 @@ class CIntegrationTest extends CAPITest {
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'userparameter_reload']);
 
-		sleep(self::USER_PARAM_RELOAD_DELAY);
+		usleep(self::USER_PARAM_RELOAD_DELAY * 1000000);
 	}
 
 	/**
@@ -944,7 +944,7 @@ class CIntegrationTest extends CAPITest {
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'housekeeper_execute']);
 
-		sleep(self::HOUSEKEEPER_EXEC_DELAY);
+		usleep(self::HOUSEKEEPER_EXEC_DELAY * 1000000);
 	}
 
 	/**
@@ -953,7 +953,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param string   $method        API method to be called
 	 * @param mixed    $params        API call params
 	 * @param integer  $iterations    iteration count
-	 * @param integer  $delay         iteration delay
+	 * @param float    $delay         iteration delay
 	 * @param callable $callback      Callback function to test if API response is valid.
 	 *
 	 * @return array
@@ -1076,7 +1076,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param string|array $lines         line(s) to look for
 	 * @param boolean      $incremental   flag to be used to enable incremental read
 	 * @param integer      $iterations    iteration count
-	 * @param integer      $delay         iteration delay
+	 * @param float        $delay         iteration delay
 	 * @param boolean      $match_regex   flag to be used to match line by regex
 	 *
 	 * @throws Exception    on failed wait operation
@@ -1096,7 +1096,7 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
-			sleep($delay);
+			usleep($delay * 1000000);
 		}
 
 		if (is_array($lines)) {
