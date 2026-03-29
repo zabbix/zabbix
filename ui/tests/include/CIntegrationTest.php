@@ -407,7 +407,10 @@ class CIntegrationTest extends CAPITest {
 				return true;
 			}
 
-			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
+			}
+
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
@@ -915,7 +918,11 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::CACHE_RELOAD_DELAY;
-		if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
+
+		if (self::TRACE_DELAYS) {
+			fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
+		}
+
 		sleep($delay);
 	}
 
@@ -988,7 +995,10 @@ class CIntegrationTest extends CAPITest {
 				continue;
 			}
 
-			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
+			}
+
 			sleep($delay);
 		}
 
@@ -1103,7 +1113,10 @@ class CIntegrationTest extends CAPITest {
 				continue;
 			}
 
-			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("waitForLogLineToBePresent delay:%d\n", $delay));
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("waitForLogLineToBePresent delay:%d\n", $delay));
+			}
+
 			sleep($delay);
 		}
 
