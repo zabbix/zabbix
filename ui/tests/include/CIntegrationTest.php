@@ -25,18 +25,18 @@ require_once dirname(__FILE__).'/helpers/CLogHelper.php';
 class CIntegrationTest extends CAPITest {
 
 	// Default iteration count for wait operations.
-	const WAIT_ITERATIONS			= 120;
+	const WAIT_ITERATIONS			= 60;
 
 	// Set to true to print delay trace messages to STDERR.
 	const TRACE_DELAYS = false;
 
 	// Default delays (in seconds):
-	const WAIT_ITERATION_DELAY			= 0.5;
-	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 0.5;
-	const CACHE_RELOAD_DELAY			= 3.0; // Configuration cache reload delay.
-	const USER_PARAM_RELOAD_DELAY			= 3.0;
-	const HOUSEKEEPER_EXEC_DELAY			= 5.0;
-	const DATA_PROCESSING_DELAY			= 2.0;
+	const WAIT_ITERATION_DELAY			= 0.1;
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
+	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
+	const USER_PARAM_RELOAD_DELAY			= 3;
+	const HOUSEKEEPER_EXEC_DELAY			= 3;
+	const DATA_PROCESSING_DELAY			= 0.1;
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER			= 'server';
@@ -408,7 +408,7 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
-			usleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN * 1000000);
+			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
 		return false;
@@ -759,7 +759,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param string  $type          data type
 	 * @param array   $values        item values
 	 * @param string  $component     component name or null for active component
-	 * @param float   $delayOverride
+	 * @param integer $delayOverride
 	 *
 	 * @return array    processing result
 	 */
@@ -916,7 +916,7 @@ class CIntegrationTest extends CAPITest {
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::CACHE_RELOAD_DELAY;
 		if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
-		usleep($delay * 1000000);
+		sleep($delay);
 	}
 
 	/**
@@ -931,7 +931,7 @@ class CIntegrationTest extends CAPITest {
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'userparameter_reload']);
 
-		usleep(self::USER_PARAM_RELOAD_DELAY * 1000000);
+		sleep(self::USER_PARAM_RELOAD_DELAY);
 	}
 
 	/**
@@ -944,7 +944,7 @@ class CIntegrationTest extends CAPITest {
 
 		self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'housekeeper_execute']);
 
-		usleep(self::HOUSEKEEPER_EXEC_DELAY * 1000000);
+		sleep(self::HOUSEKEEPER_EXEC_DELAY);
 	}
 
 	/**
@@ -953,7 +953,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param string   $method        API method to be called
 	 * @param mixed    $params        API call params
 	 * @param integer  $iterations    iteration count
-	 * @param float    $delay         iteration delay
+	 * @param integer  $delay         iteration delay
 	 * @param callable $callback      Callback function to test if API response is valid.
 	 *
 	 * @return array
@@ -968,7 +968,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
-		//$usleep_total = 0;
+		$usleep_total = 0;
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $params);
@@ -981,12 +981,12 @@ class CIntegrationTest extends CAPITest {
 				$exception = $e;
 			}
 
-			//if ($usleep_total < 1000000 && $iterations > 1) {
-			//	$usleep_total += 100000;
-			//	usleep(100000);
-			//	$i = -1;
-			//	continue;
-			//}
+			if ($usleep_total < 1000000 && $iterations > 1) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$i = -1;
+				continue;
+			}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
 			usleep($delay * 1000000);
@@ -1076,7 +1076,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param string|array $lines         line(s) to look for
 	 * @param boolean      $incremental   flag to be used to enable incremental read
 	 * @param integer      $iterations    iteration count
-	 * @param float        $delay         iteration delay
+	 * @param integer      $delay         iteration delay
 	 * @param boolean      $match_regex   flag to be used to match line by regex
 	 *
 	 * @throws Exception    on failed wait operation
@@ -1096,7 +1096,7 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
-			usleep($delay * 1000000);
+			sleep($delay);
 		}
 
 		if (is_array($lines)) {
