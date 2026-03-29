@@ -968,7 +968,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
-		$usleep_total = 0;
+		//$usleep_total = 0;
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $params);
@@ -981,12 +981,12 @@ class CIntegrationTest extends CAPITest {
 				$exception = $e;
 			}
 
-			if ($usleep_total < 1000000 && $iterations > 1) {
-				$usleep_total += 100000;
-				usleep(100000);
-				$i = -1;
-				continue;
-			}
+			//if ($usleep_total < 1000000 && $iterations > 1) {
+			//	$usleep_total += 100000;
+			//	usleep(100000);
+			//	$i = -1;
+			//	continue;
+			//}
 
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
 			usleep($delay * 1000000);
