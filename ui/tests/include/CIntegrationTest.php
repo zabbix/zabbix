@@ -31,16 +31,16 @@ class CIntegrationTest extends CAPITest {
 	const TRACE_DELAYS = false;
 
 	// Default delays (in seconds):
-	const WAIT_ITERATION_DELAY			= 1; // Wait iteration delay.
-	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1; // Shutdown may legitimately take a lot of time
+	const WAIT_ITERATION_DELAY			= 1;
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
 	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
-	const USER_PARAM_RELOAD_DELAY			= 3; // User parameters reload delay.
-	const HOUSEKEEPER_EXEC_DELAY			= 5; // Housekeeper execution delay.
-	const DATA_PROCESSING_DELAY			= 2; // Data processing delay.
+	const USER_PARAM_RELOAD_DELAY			= 3;
+	const HOUSEKEEPER_EXEC_DELAY			= 5;
+	const DATA_PROCESSING_DELAY			= 2;
 
 	// Zabbix component constants.
 	const COMPONENT_SERVER			= 'server';
-	const COMPONENT_SERVER_HANODE1	= 'server_ha1';
+	const COMPONENT_SERVER_HANODE1		= 'server_ha1';
 	const COMPONENT_PROXY			= 'proxy';
 	const COMPONENT_PROXY_HANODE1		= 'proxy_ha1';
 	const COMPONENT_AGENT			= 'agentd';

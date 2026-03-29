@@ -296,18 +296,7 @@ class CTest extends TestCase {
 				$start = microtime(true);
 				CDBHelper::restoreTables();
 				$caseDuration = microtime(true) - $start;
-
-fwrite(
-	STDERR,
-	sprintf(
-"[%s::%s] 111 Backup restore took %.4fs\n",
-get_class($this),
-$this->getName(),
-$caseDuration
-)
-);
-
-
+				fwrite(STDERR, sprintf("[%s::%s] onBeforeTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
 
 				self::$case_backup_once = null;
 			}
@@ -429,18 +418,8 @@ $caseDuration
 
 				$start = microtime(true);
 				CDBHelper::restoreTables();
-
 				$caseDuration = microtime(true) - $start;
-fwrite(
-STDERR,
-sprintf(
-"[%s::%s] 222 Backup restore took %.4fs\n",
-get_class($this),
-$this->getName(),
-$caseDuration
-)
-);
-
+				fwrite(STDERR,sprintf("[%s::%s] onAfterTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
 		}
 
 		// Execute callbacks that should be executed after specific test case.
@@ -487,40 +466,20 @@ $caseDuration
 
 				$start = microtime(true);
 				CDBHelper::restoreTables();
-
 				$caseDuration = microtime(true) - $start;
+				fwrite(STDERR, sprintf("[%s::%s] onAfterTestSuite Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
 
-fwrite(
-STDERR,
-sprintf(
-"[%s::%s] 333 Backup restore took %.4fs\n",
-get_class($this),
-$this->getName(),
-$caseDuration
-)
-);
-
-
-			self::$case_backup_once = null;
+				self::$case_backup_once = null;
 		}
 
 		// Restore suite level backups.
 		if (self::$suite_backup !== null) {
-			$start = microtime(true);
+				$start = microtime(true);
 				CDBHelper::restoreTables();
-
 				$caseDuration = microtime(true) - $start;
+				fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Backup restore took %.4fs\n", $caseDuration));
 
-fwrite(
-STDERR,
-sprintf(
-"[Suite] 444 Backup restore took %.4fs\n",
-$caseDuration
-)
-);
-
-
-			self::$suite_backup = null;
+				self::$suite_backup = null;
 		}
 
 		$context = get_called_class();

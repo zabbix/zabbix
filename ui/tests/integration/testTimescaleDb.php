@@ -223,7 +223,7 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Sets compress older value using Zabbix API.
 	 *
-	 * Zabbix server configures TimescaleDB compression on the the next Zabbix server start.
+	 * Zabbix server configures TimescaleDB compression on the next Zabbix server start.
 	 */
 	private function compressOlderSet($compress_older) {
 		$response = $this->call('housekeeping.update', [
@@ -235,7 +235,7 @@ class testTimescaleDb extends CIntegrationTest {
 	/**
 	 * Sets compression on/off using Zabbix API.
 	 *
-	 * Zabbix server configures TimescaleDB compression on the the next Zabbix server start.
+	 * Zabbix server configures TimescaleDB compression on the next Zabbix server start.
 	 */
 	private function compressionSet(int $compression_status) {
 		$response = $this->call('housekeeping.update', [
@@ -349,7 +349,7 @@ class testTimescaleDb extends CIntegrationTest {
 		/* Requires disabled compression. This may be changed in future. */
 		$this->generateHistoryData();
 
-		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
+		/* Zabbix server configures TimescaleDB compression on the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);
 	}
 
@@ -485,7 +485,7 @@ class testTimescaleDb extends CIntegrationTest {
 		/* Requires disabled compression. This may be changed in future. */
 		$this->generateHistoryData();
 
-		/* Zabbix server configures TimescaleDB compression on the the next Zabbix server start */
+		/* Zabbix server configures TimescaleDB compression on the next Zabbix server start */
 		$this->compressionSet(self::COMPRESSION_STATUS_ON);
 	}
 

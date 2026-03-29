@@ -19,6 +19,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * Test suite for alerting for services.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_services_alerting
  * @backup history,items,triggers,alerts,services
