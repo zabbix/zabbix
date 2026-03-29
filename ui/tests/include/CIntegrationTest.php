@@ -1103,7 +1103,7 @@ class CIntegrationTest extends CAPITest {
 				continue;
 			}
 
-			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
+			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("waitForLogLineToBePresent delay:%d\n", $delay));
 			sleep($delay);
 		}
 
