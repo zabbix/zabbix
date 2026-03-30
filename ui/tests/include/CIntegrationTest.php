@@ -922,6 +922,7 @@ class CIntegrationTest extends CAPITest {
 			]);
 		} else {
 			self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
+			fwrite(STDERR, sprintf("component '%s'\n", $component));
 			if ($component == self::COMPONENT_SERVER) {
 				self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'finished forced reloading of the configuration cache');
 				return;
