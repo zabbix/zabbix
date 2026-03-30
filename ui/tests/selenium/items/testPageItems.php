@@ -48,11 +48,8 @@ class testPageItems extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckLayout($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
-		$this->zbxTestCheckTitle('Configuration of items');
-		$this->zbxTestCheckHeader('Items');
-
 		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
+			$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
 			$this->zbxTestTextPresent('All hosts');
 			$this->zbxTestTextPresent(
 				[
@@ -67,8 +64,11 @@ class testPageItems extends CLegacyWebTest {
 					'Info'
 				]
 			);
+			$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
+			$this->zbxTestTextPresent('Clear history and trends');
 		}
 		elseif ($data['status'] == HOST_STATUS_TEMPLATE) {
+			$this->zbxTestLogin('zabbix.php?action=item.list&context=template&filter_set=1&filter_hostids[0]='.$data['hostid']);
 			$this->zbxTestTextPresent('All templates');
 			$this->zbxTestTextPresent(
 				[
@@ -79,30 +79,31 @@ class testPageItems extends CLegacyWebTest {
 					'History',
 					'Trends',
 					'Type',
-					'Status',
-					'Info'
+					'Status'
 				]
 			);
+			$this->zbxTestAssertElementNotPresentXpath("//button[text()='Execute now']");
+			$this->zbxTestAssertElementNotPresentXpath("//button[text()='Clear history and trends']");
 		}
 
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Execute now'][@disabled]");
-
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Clear history and trends', 'Delete');
+		$this->zbxTestCheckTitle('Configuration of items');
+		$this->zbxTestCheckHeader('Items');
+		$this->zbxTestTextPresent(['Enable', 'Disable', 'Mass update', 'Copy', 'Delete']);
 	}
 
 	/**
 	 * @dataProvider data
 	 */
 	public function testPageItems_CheckNowAll($data) {
-		$this->zbxTestLogin('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids[0]='.$data['hostid']);
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
+		$this->zbxTestLogin('zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$data['hostid']);
 		$this->zbxTestCheckHeader('Items');
 
 		$this->zbxTestClick('all_items');
 
 		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-			$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
-			$this->assertFalse($this->query('button:Clear history and trends')->one()->isEnabled());
+			$this->assertFalse($this->query('button:Execute now')->exists());
+			$this->assertFalse($this->query('button:Clear history and trends')->exists());
 		}
 		else {
 			$this->zbxTestClickButtonText('Execute now');

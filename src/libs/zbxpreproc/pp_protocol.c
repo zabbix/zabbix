@@ -134,7 +134,8 @@ static zbx_uint32_t	message_pack_data(zbx_ipc_message_t *message, zbx_packed_fie
 }
 
 static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
-		AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state, const char *error)
+		unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state,
+		const char *error)
 {
 	zbx_uint32_t	data_len = 0, value_len = 0, source_len = 0;
 	unsigned char	var_type = ZBX_VARIANT_NONE, opt_flags = 0;
@@ -152,6 +153,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	zbx_serialize_prepare_value(data_len, itemid);
 	zbx_serialize_prepare_value(data_len, value_type);
 	zbx_serialize_prepare_value(data_len, item_flags);
+	zbx_serialize_prepare_value(data_len, preprocessing);
 	zbx_serialize_prepare_value(data_len, var_type);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
@@ -199,11 +201,11 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 		else if (ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 		else if (ZBX_ISSET_JSON(result))
 		{
-			var_type = ZBX_VARIANT_JSON;
+			var_type = ZBX_VARIANT_STR;
 			zbx_serialize_prepare_str_len(data_len, result->json, value_len);
 		}
 	}
@@ -270,6 +272,7 @@ static void     preprocessor_serialize_value(zbx_uint64_t itemid, unsigned char 
 	ptr += zbx_serialize_value(ptr, itemid);
 	ptr += zbx_serialize_value(ptr, value_type);
 	ptr += zbx_serialize_value(ptr, item_flags);
+	ptr += zbx_serialize_value(ptr, preprocessing);
 	ptr += zbx_serialize_value(ptr, var_type);
 
 	if (ITEM_STATE_NOTSUPPORTED == state)
@@ -332,9 +335,6 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 		case ZBX_VARIANT_STR:
 			ptr += zbx_deserialize_str(ptr, &value->data.str, len);
 			break;
-		case ZBX_VARIANT_JSON:
-			ptr += zbx_deserialize_str(ptr, &value->data.json, len);
-			break;
 		case ZBX_VARIANT_ERR:
 			ptr += zbx_deserialize_str(ptr, &value->data.err, len);
 			break;
@@ -342,15 +342,15 @@ static zbx_uint32_t	preprocessor_deserialize_variant(const unsigned char *data, 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("Unsupported variant type: %s", zbx_variant_type_desc(value));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return ptr - data;
 }
 
 zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zbx_uint64_t *itemid,
-		unsigned char *value_type, unsigned char *item_flags, zbx_variant_t *value, zbx_timespec_t *ts,
-		zbx_pp_value_opt_t *opt)
+		unsigned char *value_type, unsigned char *item_flags, unsigned char *preprocessing,
+		zbx_variant_t *value, zbx_timespec_t *ts, zbx_pp_value_opt_t *opt)
 {
 	const unsigned char	*ptr = data;
 	unsigned char		opt_flags;
@@ -358,6 +358,7 @@ zbx_uint32_t    zbx_preprocessor_deserialize_value(const unsigned char *data, zb
 	ptr += zbx_deserialize_value(ptr, itemid);
 	ptr += zbx_deserialize_value(ptr, value_type);
 	ptr += zbx_deserialize_value(ptr, item_flags);
+	ptr += zbx_deserialize_value(ptr, preprocessing);
 
 	ptr += preprocessor_deserialize_variant(ptr, value);
 	ptr += zbx_deserialize_value(ptr, &ts->sec);
@@ -419,10 +420,6 @@ static int	preprocessor_pack_variant(zbx_packed_field_t *fields, const zbx_varia
 
 		case ZBX_VARIANT_ERR:
 			fields[offset++] = PACKED_FIELD(value->data.err, 0);
-			break;
-
-		case ZBX_VARIANT_JSON:
-			fields[offset++] = PACKED_FIELD(value->data.json, 0);
 			break;
 
 		case ZBX_VARIANT_BIN:
@@ -532,15 +529,12 @@ static int	preprocessor_unpack_variant(const unsigned char *data, zbx_variant_t 
 		case ZBX_VARIANT_BIN:
 			offset += zbx_deserialize_bin(offset, &value->data.bin, value_len);
 			break;
-		case ZBX_VARIANT_JSON:
-			offset += zbx_deserialize_str(offset, &value->data.json, value_len);
-			break;
 		case ZBX_VARIANT_NONE:
 		case ZBX_VARIANT_VECTOR:
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	return (int)(offset - data);
@@ -1069,19 +1063,19 @@ static void	preprocessor_send(zbx_uint32_t code, unsigned char *data, zbx_uint32
 			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot connect to preprocessing service: %s", error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_socket_write(&socket, code, data, size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to preprocessing service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != response && FAIL == zbx_ipc_socket_read(&socket, response))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot receive data from preprocessing service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -1128,7 +1122,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		if (0 != ZBX_ISSET_BIN(result))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (0 != ZBX_ISSET_JSON(result))
@@ -1145,9 +1139,10 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 		}
 	}
 
-	if (ZBX_ITEM_REQUIRES_PREPROCESSING_YES == preprocessing)
+	if (ZBX_ITEM_PREPROCESSING_NONE != preprocessing)
 	{
-		preprocessor_serialize_value(itemid, item_value_type, item_flags, result, ts, state, error);
+		preprocessor_serialize_value(itemid, item_value_type, item_flags, preprocessing, result, ts, state,
+				error);
 
 		if (ZBX_PREPROCESSING_BATCH_SIZE < ++preproc_values)
 			zbx_preprocessor_flush();
@@ -1204,7 +1199,7 @@ void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_typ
 				state = ITEM_STATE_NOTSUPPORTED;
 				dyn_error = zbx_strdup(NULL, "JSON is too large.");
 			}
-			else if (0 == zbx_json_validate_ext(json_val, &dyn_error))
+			else if (FAIL == zbx_json_validate_ext(json_val, &dyn_error))
 			{
 				state = ITEM_STATE_NOTSUPPORTED;
 			}

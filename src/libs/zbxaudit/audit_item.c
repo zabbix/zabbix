@@ -62,7 +62,7 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	else
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported item flag detected: %d", flag);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -87,7 +87,7 @@ const char	*lld_audit_item_prop(int flags, const char *field, char *buf, size_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported resource type: %d", resource_type);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	if (offset < len - 1)

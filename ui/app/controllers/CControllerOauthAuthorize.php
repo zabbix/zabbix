@@ -70,6 +70,21 @@ class CControllerOauthAuthorize extends CController {
 			return false;
 		}
 
+		if (!array_key_exists('client_secret', $state)) {
+			$db_mediatype_token_url = (bool) API::MediaType()->get([
+				'output' => ['token_url'],
+				'mediatypeids' => [$state['mediatypeid']],
+				'search' => ['token_url' => $state['token_url']],
+				'startSearch' => true
+			]);
+
+			if (!$db_mediatype_token_url) {
+				error(_s('Incorrect value for field "%1$s": %2$s.', 'client_secret', _('cannot be empty')), true);
+
+				return false;
+			}
+		}
+
 		$state_sign = $state['sign'];
 		unset($state['sign']);
 		$sign = CEncryptHelper::sign(json_encode($state));

@@ -120,7 +120,12 @@ class CControllerHostCreate extends CControllerHostUpdateGeneral {
 			'main_interface_'.INTERFACE_TYPE_SNMP => ['db interface.interfaceid'],
 			'main_interface_'.INTERFACE_TYPE_IPMI => ['db interface.interfaceid'],
 			'main_interface_'.INTERFACE_TYPE_JMX => ['db interface.interfaceid'],
-			'groups_new' => ['array', 'field' => ['db hstgrp.name']],
+			'groups_new' => ['array', 'field' => [
+					'db hstgrp.name',
+					'use' => [CHostGroupNameParser::class, []],
+					'messages' => ['use' => _('Invalid host group name.')]
+				]
+			],
 			'groups' => [
 				['array', 'field' => ['db hstgrp.groupid']],
 				['array', 'required', 'not_empty', 'when' => ['groups_new', 'empty']]
