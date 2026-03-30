@@ -50,7 +50,7 @@ window.proxy_group_edit_popup = new class {
 		this.#form = new CForm(this.#form_element, rules);
 
 		this.#proxy_groupid = proxy_groupid;
-		this.#initial_form_fields = getFormFields(this.#form_element);
+		this.#initial_form_fields = this.#form.getAllValues();
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'proxygroup.list');
@@ -99,7 +99,7 @@ window.proxy_group_edit_popup = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(getFormFields(this.#form_element))
+		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(this.#form.getAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
