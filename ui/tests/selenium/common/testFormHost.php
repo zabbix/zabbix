@@ -253,8 +253,9 @@ class testFormHost extends CWebTest {
 		}
 		// Interface fields maxlength attribute.
 		foreach (['IP address' => 64, 'DNS name' => 255, 'Port' => 64] as $field => $maxlength) {
+			$tag = ($field === 'Port') ? 'input' : 'z-textarea-flexible';
 			$this->assertEquals($maxlength, $interfaces_form->getRow(0)->getColumn($field)
-					->query('tag:input')->one()->getAttribute('maxlength')
+					->query('tag', $tag)->one()->getAttribute('maxlength')
 			);
 		}
 
@@ -952,7 +953,7 @@ class testFormHost extends CWebTest {
 		$this->page->login()->open($this->link)->waitUntilReady();
 
 		$this->query('button:Create host')->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		$form->fill(CTestArrayHelper::get($data, 'host_fields', []));
 
@@ -2208,7 +2209,7 @@ class testFormHost extends CWebTest {
 			$host_link->one()->click();
 		}
 
-		return COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
+		return COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 	}
 
 	/**

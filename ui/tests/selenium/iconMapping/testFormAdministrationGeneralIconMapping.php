@@ -1001,11 +1001,12 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 						$this->zbxTestClickXpath('//button[@id="add" and @type="button"]');
 						$this->query('id:iconmap_mappings_'.$i.'_expression')->waitUntilVisible()->one();
 					}
-					$this->zbxTestInputType('mappings_'.$i.'_expression', $mapping_row['expression']);
+					$this->query('id:mappings_'.$i.'_expression')->one()->fill($mapping_row['expression']);
+
 					break;
 
 				case 'remove':
-					$this->zbxTestClickXpathWait('//input[@id="mappings_'.$i.'_expression"]/../../td/button');
+					$this->zbxTestClickXpathWait('//z-textarea-flexible[@id="mappings_'.$i.'_expression"]/../../td/button');
 
 					break;
 			}

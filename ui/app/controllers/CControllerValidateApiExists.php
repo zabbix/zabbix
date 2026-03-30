@@ -35,7 +35,7 @@ class CControllerValidateApiExists extends CController {
 				'method' => ['string', 'required', 'in' => ['get']],
 				'field' => ['string', 'required'],
 				'options' => ['array'],
-				'exclude_id' => ['integer'],
+				'exclude_id' => ['id'],
 				'error_msg' => ['string']
 			]]
 		]];
