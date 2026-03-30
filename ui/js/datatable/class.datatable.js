@@ -2066,9 +2066,6 @@ class CDataTable {
 		const column_config = this.getColumnConfig(column_index);
 
 		resizer.addEventListener('mousedown', event => {
-			const resizer = event.target;
-			resizer.setPointerCapture(event.pointerId);
-
 			this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_START, {
 				x: event.clientX,
 				column_index,
