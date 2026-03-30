@@ -83,7 +83,6 @@ class CIntegrationTest extends CAPITest {
 
 	private static $suite_components_reuse = false;
 	private static $suite_components_running = false;
-	private static $last_test_case_name;
 
 	/**
 	 * Hosts to be enabled for test case.

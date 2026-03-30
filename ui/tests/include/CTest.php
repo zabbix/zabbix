@@ -263,6 +263,8 @@ class CTest extends TestCase {
 			self::$suite_callbacks[$key] = $this->getAnnotationTokensByName($class_annotations, 'on'.ucfirst($key));
 		}
 	}
+	private static $last_test_case_name;
+	private static $total_backup_time = 0.0;
 
 	/**
 	 * Callback executed before every test case.
@@ -297,10 +299,10 @@ class CTest extends TestCase {
 			if (self::$case_backup_once !== null) {
 				$start = microtime(true);
 				CDBHelper::restoreTables();
-				$caseDuration = microtime(true) - $start;
 
 				if (self::TRACE_DELAYS) {
-					fwrite(STDERR, sprintf("[%s::%s] onBeforeTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+					$caseDuration = microtime(true) - $start;
+					self::$total_backup_time += $caseDuration;
 				}
 
 				self::$case_backup_once = null;
@@ -400,6 +402,7 @@ class CTest extends TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		self::$last_test_case_name = get_class($this);
 		if (!CDBHelper::isValid()) {
 			return;
 		}
@@ -422,10 +425,10 @@ class CTest extends TestCase {
 		if ($this->case_backup !== null) {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
-			$caseDuration = microtime(true) - $start;
 
 			if (self::TRACE_DELAYS) {
-				fwrite(STDERR,sprintf("[%s::%s] onAfterTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+				$caseDuration = microtime(true) - $start;
+				self::$total_backup_time += $caseDuration;
 			}
 		}
 
@@ -462,6 +465,13 @@ class CTest extends TestCase {
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {
 
+
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Total backup restore took %.4fs\n", self::$total_backup_time));
+
+				self::$total_backup_time = 0;
+			}
+
 			// Nothing to do after test suite.
 			return;
 		}
@@ -472,10 +482,10 @@ class CTest extends TestCase {
 		if (self::$case_backup_once !== null) {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
-			$caseDuration = microtime(true) - $start;
 
 			if (self::TRACE_DELAYS) {
-				fwrite(STDERR, sprintf("[%s::%s] onAfterTestSuite Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+				$caseDuration = microtime(true) - $start;
+				self::$total_backup_time += $caseDuration;
 			}
 
 			self::$case_backup_once = null;
@@ -485,13 +495,18 @@ class CTest extends TestCase {
 		if (self::$suite_backup !== null) {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
-			$caseDuration = microtime(true) - $start;
 
 			if (self::TRACE_DELAYS) {
-				fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Backup restore took %.4fs\n", $caseDuration));
+				$caseDuration = microtime(true) - $start;
+				self::$total_backup_time += $caseDuration;
 			}
 
 			self::$suite_backup = null;
+		}
+
+		if (self::TRACE_DELAYS) {
+			fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Total backup restore took %.4fs\n", self::$total_backup_time));
+			self::$total_backup_time = 0;
 		}
 
 		$context = get_called_class();
