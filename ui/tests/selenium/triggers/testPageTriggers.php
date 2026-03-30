@@ -29,7 +29,7 @@ use Facebook\WebDriver\WebDriverBy;
 class testPageTriggers extends CLegacyWebTest {
 
 	/**
-	 * Attach TagBehavior and TableBehavior to the test.
+	 * Attach TableBehavior, TagBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
@@ -105,16 +105,8 @@ class testPageTriggers extends CLegacyWebTest {
 		foreach ($labels as $label) {
 			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 		}
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc.
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
-
-		// Check selected count is updated correctly when entity is deleted (ZBX-27392).
-		$this->query('id:all_triggers')->asCheckbox()->one()->check();
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->assertMessage(TEST_GOOD, 'Trigger deleted');
-		$this->assertTableStats(0);
-		$this->assertEquals('0 selected', $this->query('id:selected_count')->waitUntilVisible()->one()->getText());
 	}
 
 	public static function getTagsFilterData() {
@@ -921,5 +913,30 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->assertTrue($this->query('class:breadcrumb')->all()->isEmpty());
 		// Check results in table.
 		$this->assertTableData(CTestArrayHelper::get($data, 'result', []), $this->selector);
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	public function testPageTriggers_Delete($data) {
+		$context = ($data['status'] === '3') ? '&context=template' : '&context=host';
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$data['hostid'].$context)->waitUntilReady();
+
+		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
+		$this->assertTableStats($table_rows_count);
+
+		// Cancel delete.
+		$this->query('id:all_triggers')->asCheckbox()->one()->check();
+		$this->query('button:Delete')->one()->click();
+		$this->page->dismissAlert();
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+
+		// Delete all.
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Trigger deleted');
+		$this->assertTableStats(0);
+		$this->assertSelectedCount('0');
 	}
 }

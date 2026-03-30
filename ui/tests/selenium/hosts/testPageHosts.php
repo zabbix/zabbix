@@ -895,4 +895,54 @@ class testPageHosts extends CLegacyWebTest {
 			CMessageElement::find()->one()->close();
 		}
 	}
+
+	public function testPageHosts_Delete() {
+		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		$filter = $this->query('name:zbx_filter')->asForm()->one();
+		$filter->query('button:Reset')->one()->click();
+		$filter->getField('Name')->fill('Host for');
+		$filter->submit();
+		$table->waitUntilReloaded();
+
+		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
+		$this->assertTableStats($table_rows_count);
+
+		// Cancel delete.
+		$this->query('id:all_hosts')->asCheckbox()->one()->check();
+		$this->query('button:Delete')->one()->click();
+		$this->page->dismissAlert();
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+
+		// Cannot delete.
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_BAD, 'Cannot delete hosts');
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+		$this->query('id:all_hosts')->asCheckbox()->one()->uncheck();
+
+		// Delete one.
+		$this->selectTableRows(['Host for tags filtering']);
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Host deleted');
+		$table_rows_count = $table_rows_count - 1;
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount('0');
+
+		// Delete multiple.
+		$this->selectTableRows(['Host for tags filtering - clone', 'Host for tags filtering - update']);
+		$this->query('button:Delete')->one()->click();
+		$this->page->acceptAlert();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Hosts deleted');
+		$table_rows_count = $table_rows_count - 2;
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount('0');
+	}
 }

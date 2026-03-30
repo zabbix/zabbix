@@ -1260,9 +1260,7 @@ class testPagePrototypes extends CWebTest {
 		// Check that after canceling Delete, prototype still exists in DB and displayed in table.
 		if (array_key_exists('cancel', $data)) {
 			$this->page->dismissAlert();
-			$this->assertEquals(count($data['name']).' selected',
-				$this->query('id:selected_count')->waitUntilVisible()->one()->getText()
-			);
+			$this->assertSelectedCount(count($data['name']));
 			foreach ($data['name'] as $name) {
 				$this->assertTrue(in_array($name, $prototype_names));
 			}
@@ -1281,7 +1279,7 @@ class testPagePrototypes extends CWebTest {
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, $data['message']);
-			$this->assertEquals('0 selected', $this->query('id:selected_count')->waitUntilVisible()->one()->getText());
+			$this->assertSelectedCount('0');
 
 			// Check that prototype doesn't exist and not displayed in prototype table.
 			foreach ($data['name'] as $name) {

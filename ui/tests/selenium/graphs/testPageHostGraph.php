@@ -616,15 +616,13 @@ class testPageHostGraph extends CLegacyWebTest {
 		$before_rows_count = $table->getRows()->count();
 		$this->assertTableStats($before_rows_count);
 		$selected_count = ($data['graph'] === 'all') ? $before_rows_count : count($data['graph']);
-		$this->assertEquals($selected_count.' selected',
-				$this->query('id:selected_count')->waitUntilVisible()->one()->getText()
-		);
+		$this->assertSelectedCount($selected_count);
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
 		$this->assertTableStats($before_rows_count - $selected_count);
-		$this->assertEquals('0 selected', $this->query('id:selected_count')->waitUntilVisible()->one()->getText());
+		$this->assertSelectedCount('0');
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 
