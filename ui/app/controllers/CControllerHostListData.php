@@ -32,7 +32,7 @@ class CControllerHostListData extends CControllerDataTable {
 		$filter['groups'] = $filter['groups']
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => $filter['groups'],
+				'groupids' => array_column($filter['groups'], 'id'),
 				'preservekeys' => true
 			]), ['groupid' => 'id'])
 			: [];
