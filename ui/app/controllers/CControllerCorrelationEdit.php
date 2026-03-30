@@ -16,10 +16,7 @@
 
 class CControllerCorrelationEdit extends CController {
 
-	/**
-	 * @var mixed
-	 */
-	private $correlation = [];
+	private array $correlation = [];
 
 	protected function init(): void {
 		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
@@ -64,19 +61,39 @@ class CControllerCorrelationEdit extends CController {
 
 			$this->correlation = $correlations[0];
 		}
-		else {
-			$this->correlation = [
-				'correlationid' => null, 'operations' => [],
-				'filter' => ['formula' => '', 'conditions' => [], 'evaltype' => CONDITION_EVAL_TYPE_AND_OR]
-			];
-		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$correlation = $this->correlation + DB::getDefaults('correlation');
-		$correlation['filter']['conditions'] = $this->prepareConditions($correlation);
+		if (!$this->correlation) {
+			$correlation = [
+				'correlationid' => null,
+				'name' => DB::getDefault('correlation', 'name'),
+				'filter' => [
+					'evaltype' => DB::getDefault('correlation', 'evaltype'),
+					'formula' => DB::getDefault('correlation', 'formula'),
+					'conditions' => [],
+				],
+				'operations' => [],
+				'description' => DB::getDefault('correlation', 'description'),
+				'status' => DB::getDefault('correlation', 'status')
+			];
+		}
+		else {
+			$correlation = [
+				'correlationid' => $this->correlation['correlationid'],
+				'name' => $this->correlation['name'],
+				'filter' => [
+					'evaltype' => $this->correlation['filter']['evaltype'],
+					'formula' => $this->correlation['filter']['formula'],
+					'conditions' =>	$this->prepareConditions($this->correlation)
+				],
+				'operations' => $this->correlation['operations'],
+				'description' => $this->correlation['description'],
+				'status' => $this->correlation['status']
+			];
+		}
 
 		$js_validation_rules = $correlation['correlationid']
 			? CControllerCorrelationUpdate::getValidationRules()
@@ -84,7 +101,6 @@ class CControllerCorrelationEdit extends CController {
 
 		$data = [
 			'correlation' => $correlation,
-			'templates_data' => $this->prepareConditions($correlation),
 			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
 			'js_clone_validation_rules' => (new CFormValidator(CControllerCorrelationCreate::getValidationRules()))
 				->getRules(),
