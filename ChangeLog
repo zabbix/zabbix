@@ -1,6 +1,11 @@
 Changes for 8.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-10053] implemented autoresizing for selected input fields (aluchko, ashubin)
+.........T [ZBXNEXT-10325] added Percona by ODBC template (mruszczyk)
+..F....... [ZBXNEXT-10542] implemented inline validation for trigger expression condition form (gberzina)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.........T [ZBXNEXT-10403] implemented the template for Huawei AR600 devices (kflorowski)
 ..F....... [ZBXNEXT-943] added support for Y-axis values inversion in SVG Graph widget (dfofanovs)
 .........T [ZBXNEXT-10312] updated PostgreSQL by ODBC template (smansurovs)
 ..F....... [ZBXNEXT-9747] implemented inline validation for user roles form (gberzina)
@@ -13,6 +18,31 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-27044] fixed inconsistent focusing and selecting of primary fields on forms (averza)
+..F....... [ZBX-26820] fixed the eventids error after clicking Update problem on Trigger overview widget (aluchko)
+..F....... [ZBX-27056] enabled the displaying of settings links in the top dropdown menu for custom UI modules (aluchko)
+........S. [ZBX-27582] fixed history syncer being blocked when checking if new timers are added or updated (vso)
+.........T [ZBX-27147] added RESTful API v2 support with OAuth2 and updated endpoints in GLPi media type (mruszczyk)
+........S. [ZBX-27626] fixed crash during configuration sync after removing prototype trigger with non-prototype item (wiper)
+..F....... [ZBX-27581] fixed update problem to work in case acknowledge/unacknowledge was clicked (gberzina)
+A.F....... [ZBX-26128] fixed sort order for problem and event acknowledgements to use ID for same timestamp records (gberzina, rgontarski)
+..F....... [ZBX-27123] changed the redirect page after deleting the graph prototype to the same graph prototype's list page (msnihach)
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+........S. [ZBX-27524] fixed 'multiply by' preprocessing testing with JSON value type, fixed tag generation by webhooks (wiper)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-27545] fixed runtime error in import comparison view (averza)
+..F....... [ZBX-27586] fixed ordinal form for percentile line label in graph widgets (gklavins)
+..F....... [ZBX-26799] adjusted OAuth token field behavior in Media type configuration form when access token update time exceeds current Unix timestamp (kkuzmina)
+....I..... [ZBX-27306] added upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+..F....... [ZBX-27416] fixed message box display bug in Monitoring Problems page (gberzina)
+..F....... [ZBX-26899] fixed yaml markings and how empty dashboard page difference is displayed for import compare (gberzina)
+..F....... [ZBX-27467] fixed host name error message in the host wizard (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template, updated the inline validation for template groups and host group fields (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+..F....... [ZBX-26633] changed host wizard agent port validation to accept values from 1024 to 32767 (aluchko)
 .......PS. [ZBX-27590] reverted the custom-on-fail discard value behavior so that it now correctly discards the value instead of resetting the error state and recalculating dependent items (vso)
 ..F....... [ZBX-26579] added possibility to switch SSO user on internal login failures (jfreibergs)
 ........S. [ZBX-27563] improved trigger-related postprocessing after configuration cache sync (wiper)
@@ -217,8 +247,35 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 Changes for 7.4.9rc1
 
 New features:
+.........T [ZBXNEXT-10422] added Cradlepoint NCM v2 by HTTP and Cradlepoint NCM v2 device by HTTP templates (aiantsen)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
+.........T [ZBXNEXT-10403] implemented the template for Huawei AR600 devices (kflorowski)
 
 Bug fixes:
+..F....... [ZBX-27044] fixed inconsistent focusing and selecting of primary fields on forms (averza)
+..F....... [ZBX-26820] fixed the eventids error after clicking Update problem on Trigger overview widget (aluchko)
+..F....... [ZBX-27056] enabled the displaying of settings links in the top dropdown menu for custom UI modules (aluchko)
+........S. [ZBX-27582] fixed history syncer being blocked when checking if new timers are added or updated (vso)
+.........T [ZBX-27147] added RESTful API v2 support with OAuth2 and updated endpoints in GLPi media type (mruszczyk)
+........S. [ZBX-27626] fixed crash during configuration sync after removing prototype trigger with non-prototype item (wiper)
+A.F....... [ZBX-26128] fixed sort order for problem and event acknowledgements to use ID for same timestamp records (gberzina, rgontarski)
+..F....... [ZBX-27123] changed the redirect page after deleting the graph prototype to the same graph prototype's list page (msnihach)
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-26799] adjusted OAuth token field behavior in Media type configuration form when access token update time exceeds current Unix timestamp (kkuzmina)
+....I..... [ZBX-27306] added optional upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
+..F....... [ZBX-26459] fixed host macros view to avoid displaying both macro types when switching quickly (gberzina)
+..F....... [ZBX-27416] fixed message box display bug in Monitoring Problems page (gberzina)
+..F....... [ZBX-26899] fixed yaml markings for import compare (gberzina)
+..F....... [ZBX-27467] fixed host name error message in the host wizard (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template, updated the inline validation for template groups and host group fields (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+..F....... [ZBX-26633] changed host wizard agent port validation to accept values from 1024 to 32767 (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.8
@@ -1542,8 +1599,27 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.25rc1
 
 New features:
+.........T [ZBXNEXT-10422] added Cradlepoint NCM v2 by HTTP and Cradlepoint NCM v2 device by HTTP templates (aiantsen)
+.........T [ZBXNEXT-9961] added webhook for IBM Maximo service request creation (abrosimovs)
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27044] fixed inconsistent focusing and selecting of primary fields on forms (averza)
+..F....... [ZBX-27056] enabled the displaying of settings links in the top dropdown menu for custom UI modules (aluchko)
+........S. [ZBX-27582] fixed history syncer being blocked when checking if new timers are added or updated (vso)
+.........T [ZBX-27147] added RESTful API v2 support with OAuth2 and updated endpoints in GLPi media type (mruszczyk)
+........S. [ZBX-27626] fixed crash during configuration sync after removing prototype trigger with non-prototype item (wiper)
+A.F....... [ZBX-26128] fixed sort order for problem and event acknowledgements to use ID for same timestamp records (gberzina, rgontarski)
+..F....... [ZBX-27108] fixed an issue where the graph time selector caused a full page refresh and lost the current pagination (msnihach)
+.........T [ZBX-27058] fixed unsupported items in HPE iLO by HTTP (kflorowski)
+..F....... [ZBX-25988] fixed problem with multiple columns being created on column create in widgets (wczerneha)
+..F....... [ZBX-26931] fixed service list to display inaccessible service error when opening or refreshing list of deleted service (gberzina)
+.......P.. [ZBX-27584] improved configuration sync performance on Zabbix proxy by deleting in batches (vso)
+...G...... [ZBX-27312] fixed issue of Zabbix agent 2 sometimes returning wrong result for proc.num (arimdjonoks)
+..F....... [ZBX-26899] fixed yaml markings for import compare (gberzina)
+..F....... [ZBX-26979] fixed issue causing empty error message when adding a new template group to a template (msnihach)
+..F....... [ZBX-26542] fixed max period calculation method for Graphs in the validate parameters for allowed period functionality (msnihach)
+....I..... [ZBX-27306] added optional upgrade patch to ensure that web scenario item tags correspond to web scenario tags (arimdjonoks)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.24
@@ -5538,8 +5614,10 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.46rc1
 
 New features:
+.......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45

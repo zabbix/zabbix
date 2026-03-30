@@ -109,13 +109,13 @@ window.host_edit_popup = {
 	 * Sets up visible name placeholder synchronization.
 	 */
 	initHostTab(host_interfaces, host_is_discovered) {
+		const update_visible_name_placeholder = placeholder => {
+			this.form_element.querySelector('#visiblename').placeholder = placeholder;
+		};
 		const host_field = this.form_element.querySelector('#host');
 
-		['input', 'paste'].forEach((event_type) => {
-			host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
-		});
-
-		this.setVisibleNamePlaceholder(host_field.value);
+		host_field.addEventListener('input', e => update_visible_name_placeholder(e.target.value));
+		update_visible_name_placeholder(host_field.value);
 		this.initHostInterfaces(host_interfaces, host_is_discovered);
 
 		const $groups_ms = $('#groups_');
@@ -135,15 +135,6 @@ window.host_edit_popup = {
 		jQuery('#proxy_groupid').on('change', () => this.updateMonitoredBy());
 
 		this.updateMonitoredBy();
-	},
-
-	/**
-	 * Updates visible name placeholder.
-	 *
-	 * @param {string} placeholder  Text to display as default host alias.
-	 */
-	setVisibleNamePlaceholder(placeholder) {
-		this.form_element.querySelector('#visiblename').placeholder = placeholder;
 	},
 
 	initHostInterfaces(host_interfaces, host_is_discovered) {

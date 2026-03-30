@@ -17,7 +17,7 @@ define('ZABBIX_VERSION',		'8.0.0beta1');
 define('ZABBIX_API_VERSION',	'8.0.0');
 define('ZABBIX_EXPORT_VERSION',	'8.0');
 
-define('ZABBIX_DB_VERSION',		7050050);
+define('ZABBIX_DB_VERSION',		7050052);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -1936,6 +1936,7 @@ define('ZBX_COLOR_SCHEME_LIGHT', 'light');
 define('ZBX_STYLE_ACTION_BUTTONS', 'action-buttons');
 define('ZBX_STYLE_ACTION_CONTAINER', 'action-container');
 define('ZBX_STYLE_ADM_IMG', 'adm-img');
+define('ZBX_STYLE_ALIGN_TOP', 'align-top');
 define('ZBX_STYLE_AVERAGE_BG', 'average-bg');
 define('ZBX_STYLE_ARROW_DOWN', 'arrow-down');
 define('ZBX_STYLE_ARROW_LEFT', 'arrow-left');
