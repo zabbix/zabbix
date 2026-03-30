@@ -53,6 +53,17 @@ class CIntegrationTest extends CAPITest {
 	const AGENT_3_0_PORT_SUFFIX = '54';
 	const PROXY_HANODE1_PORT_SUFFIX = '62';
 
+
+	private static $shutdown_time_per_test_file = 0.0;
+	private static $shutdown_time_total = 0.0;
+	private static $startup_time_per_test_file = 0.0;
+	private static $startup_time_total = 0.0;
+	private static $delay_call_data_present_per_test_file = 0.0;
+	private static $delay_call_data_present_total = 0.0;
+	private static $delay_wait_log_line_per_test_file = 0.0;
+	private static $delay_wait_log_line_total = 0.0;
+
+
 	/**
 	 * Components required by test suite.
 	 *
@@ -326,19 +337,18 @@ class CIntegrationTest extends CAPITest {
 		parent::onAfterTestSuite();
 
 		if (self::TRACE_DELAYS) {
-			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs\n", self::$last_test_case_name, self::$delay_call_data_present_per_test_file));
+			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$delay_call_data_present_per_test_file, self::$delay_call_data_present_total));
 			self::$delay_call_data_present_per_test_file = 0.0;
 
 
-			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs\n", self::$last_test_case_name, self::$delay_wait_log_line_per_test_file));
+			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$delay_wait_log_line_per_test_file, self::$delay_wait_log_line_total));
 			self::$delay_wait_log_line_per_test_file = 0.0;
 
+			fwrite(STDERR, sprintf("[%s] waitForStartup: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$startup_time_per_test_file, self::$startup_time_total));
+			self::$startup_time_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] waitForStartup: %.4fs\n", self::$last_test_case_name, self::$total_startup_time));
-			self::$total_startup_time = 0.0;
-
-			fwrite(STDERR, sprintf("[%s] waitForShutdown: %.4fs\n", self::$last_test_case_name, self::$total_shutdown_time));
-			self::$total_shutdown_time = 0.0;
+			fwrite(STDERR, sprintf("[%s] waitForShutdown: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$shutdown_time_per_test_file, self::$shutdown_time_total));
+			self::$shutdown_time_per_test_file = 0.0;
 		}
 	}
 
@@ -404,7 +414,8 @@ class CIntegrationTest extends CAPITest {
 
 				if (self::TRACE_DELAYS) {
 					$total = microtime(true) - $start;
-					self::$total_startup_time += $total;
+					self::$startup_time_per_test_file += $total;
+					self::$startup_time_total += $total;
 				}
 
 				return;
@@ -415,7 +426,8 @@ class CIntegrationTest extends CAPITest {
 
 		if (self::TRACE_DELAYS) {
 			$total = microtime(true) - $start;
-			self::$total_startup_time += $total;
+			self::$startup_time_per_test_file += $total;
+			self::$startup_time_total += $total;
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to start. Waited '.(time() - $saved_time).' seconds..');
@@ -442,9 +454,6 @@ class CIntegrationTest extends CAPITest {
 
 		return false;
 	}
-
-	private static $total_shutdown_time = 0.0;
-	private static $total_startup_time = 0.0;
 
 	/**
 	 * Wait for component to stop.
@@ -481,7 +490,8 @@ class CIntegrationTest extends CAPITest {
 
 			if (self::TRACE_DELAYS) {
 				$total = microtime(true) - $start;
-				self::$total_shutdown_time += $total;
+				self::$shutdown_time_per_test_file += $total;
+				self::$shutdown_time_total += $total;
 			}
 
 			return;
@@ -494,7 +504,8 @@ class CIntegrationTest extends CAPITest {
 
 		if (self::TRACE_DELAYS) {
 			$total = microtime(true) - $start;
-			self::$total_shutdown_time += $total;
+			self::$shutdown_time_per_test_file += $total;
+			self::$shutdown_time_total += $total;
 		}
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
@@ -1006,9 +1017,6 @@ class CIntegrationTest extends CAPITest {
 
 		sleep(self::HOUSEKEEPER_EXEC_DELAY);
 	}
-
-	private static $delay_call_data_present_per_test_file = 0.0;
-	private static $delay_wait_log_line_per_test_file = 0.0;
 
 	/**
 	 * Request data from API until data is present (@see call).
