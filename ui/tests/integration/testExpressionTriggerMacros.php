@@ -235,8 +235,7 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 	public function testExpressionTriggerMacros_testOperation() {
 		$this->createScripts();
 		$this->clearLog(self::COMPONENT_SERVER);
-		$this->reloadConfigurationCache(null, 0);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'finished forced reloading of the configuration cache');
+		$this->reloadConfigurationCacheAndWait();
 
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_1, 51);
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_2, 50);

@@ -936,6 +936,17 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Reload configuration cache and wait for it to finish.
+	 *
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride
+	 */
+	protected function reloadConfigurationCacheAndWait($component = null, $delayOverride = 0) {
+		$this->reloadConfigurationCache($component, $delayOverride);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'finished forced reloading of the configuration cache');
+	}
+
+	/**
 	 * Reload user parameters.
 	 *
 	 * @param string $component    component name or null for active component
