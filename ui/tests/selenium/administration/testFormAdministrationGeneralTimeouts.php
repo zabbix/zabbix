@@ -147,9 +147,9 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 		$labels = $form->getLabels(CElementFilter::ATTRIBUTES_PRESENT, ['for'])->asText();
 		$values = [];
 
-		/**
-		 * Form contains two fields with no labels or values, which provides PHP errors.
-		 * To avoid issues, each value is taken separately only for labels with attribute.
+		/*
+		 * Form contains two fields with no labels or values, which provides warnings on PHP (8.5 version).
+		 * To avoid warnings, only fields with attribute is checked for this specific form.
 		 */
 		foreach ($labels as $label) {
 			$values[$label] = $form->getField($label)->getValue();
