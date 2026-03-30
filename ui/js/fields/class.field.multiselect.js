@@ -71,7 +71,7 @@ class CFieldMultiselect extends CField {
 		const name = this.getName();
 
 		if (name.endsWith(']')) {
-			return name.substring(0, name.length - 1) + '_new]';
+			return name.slice(0, -1) + '_new]';
 		}
 
 		return name + '_new';
