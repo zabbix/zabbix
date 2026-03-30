@@ -53,7 +53,6 @@ class CIntegrationTest extends CAPITest {
 	const AGENT_3_0_PORT_SUFFIX = '54';
 	const PROXY_HANODE1_PORT_SUFFIX = '62';
 
-
 	private static $shutdown_time_per_test_file = 0.0;
 	private static $shutdown_time_total = 0.0;
 	private static $startup_time_per_test_file = 0.0;
@@ -62,7 +61,6 @@ class CIntegrationTest extends CAPITest {
 	private static $delay_call_data_present_total = 0.0;
 	private static $delay_wait_log_line_per_test_file = 0.0;
 	private static $delay_wait_log_line_total = 0.0;
-
 
 	/**
 	 * Components required by test suite.
@@ -337,17 +335,24 @@ class CIntegrationTest extends CAPITest {
 		parent::onAfterTestSuite();
 
 		if (self::TRACE_DELAYS) {
-			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$delay_call_data_present_per_test_file, self::$delay_call_data_present_total));
+			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs [total: %.4fs]\n",
+				self::$last_test_case_name, self::$delay_call_data_present_per_test_file,
+				self::$delay_call_data_present_total));
 			self::$delay_call_data_present_per_test_file = 0.0;
 
-
-			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$delay_wait_log_line_per_test_file, self::$delay_wait_log_line_total));
+			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs [total: %.4fs]\n",
+				self::$last_test_case_name, self::$delay_wait_log_line_per_test_file,
+				self::$delay_wait_log_line_total));
 			self::$delay_wait_log_line_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] waitForStartup: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$startup_time_per_test_file, self::$startup_time_total));
+			fwrite(STDERR, sprintf("[%s] waitForStartup: %.4fs [total: %.4fs]\n",
+				self::$last_test_case_name, self::$startup_time_per_test_file,
+				self::$startup_time_total));
 			self::$startup_time_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] waitForShutdown: %.4fs [total: %.4fs]\n", self::$last_test_case_name, self::$shutdown_time_per_test_file, self::$shutdown_time_total));
+			fwrite(STDERR, sprintf("[%s] waitForShutdown: %.4fs [total: %.4fs]\n",
+				self::$last_test_case_name, self::$shutdown_time_per_test_file,
+				self::$shutdown_time_total));
 			self::$shutdown_time_per_test_file = 0.0;
 		}
 	}
@@ -443,10 +448,6 @@ class CIntegrationTest extends CAPITest {
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			if (!file_exists(self::getPidPath($component))) {
 				return true;
-			}
-
-			if (self::TRACE_DELAYS) {
-				fwrite(STDERR, sprintf("checkPidKilled delay:%ds\n", self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN));
 			}
 
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
@@ -840,7 +841,6 @@ class CIntegrationTest extends CAPITest {
 		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
 
 		if ($delay > 0) {
-			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("sendDataValues delay:%d\n", $delay));
 			sleep($delay);
 		}
 		return $result;
@@ -969,10 +969,6 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::CACHE_RELOAD_DELAY;
-
-		if (self::TRACE_DELAYS) {
-			fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
-		}
 
 		if ($delay !== 0) {
 			sleep($delay);
