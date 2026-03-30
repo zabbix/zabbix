@@ -121,6 +121,7 @@ window.proxy_group_edit_popup = new class {
 		];
 
 		this.#proxy_groupid = null;
+		document.getElementById('proxy_groupid').remove();
 
 		for (const element of this.#form_element.querySelectorAll('.js-field-proxies')) {
 			element.remove();
