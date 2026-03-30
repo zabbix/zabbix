@@ -922,10 +922,6 @@ class CIntegrationTest extends CAPITest {
 			]);
 		} else {
 			self::executeCommand(PHPUNIT_BINARY_DIR.'zabbix_'.$component, ['--runtime-control', 'config_cache_reload']);
-			if ($component == self::COMPONENT_SERVER) {
-				self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'finished forced reloading of the configuration cache');
-				return;
-			}
 		}
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::CACHE_RELOAD_DELAY;
@@ -934,7 +930,9 @@ class CIntegrationTest extends CAPITest {
 			fwrite(STDERR, sprintf("reloadConfigurationCache delay:%d\n", $delay));
 		}
 
-		sleep($delay);
+		if ($delay !== 0) {
+			sleep($delay);
+		}
 	}
 
 	/**
