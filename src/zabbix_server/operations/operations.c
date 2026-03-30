@@ -609,6 +609,14 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				}
 			}
 		}
+		zbx_db_free_result(result);
+
+		if (0 != hostid)
+		{
+			/* other functions that use add_discovered_host() rely on audit entry being created here */
+			zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+					ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
+		}
 
 		char	if_ip[ZBX_INTERFACE_IP_LEN_MAX];
 		int	if_idx;
@@ -632,9 +640,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			if (FAIL == if_idx)
 			{
 				d_if = d_ifs_agent.values[0];
-
-				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
-						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
 				zbx_db_add_interface(hostid, d_if->type, 1, d_if->ip, d_if->dns, d_if->port,
 						ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
@@ -663,9 +668,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 			{
 				d_if = d_ifs_snmp.values[0];
 
-				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
-						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
-
 				interfaceid = zbx_db_add_interface(hostid, d_if->type, 1, d_if->ip, d_if->dns,
 						d_if->port, ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
 
@@ -682,8 +684,6 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		zbx_vector_op_dinterface_ptr_destroy(&d_ifs_agent);
 		zbx_vector_op_dinterface_ptr_destroy(&d_ifs_snmp);
-
-		zbx_db_free_result(result);
 	}
 	else if (EVENT_OBJECT_ZABBIX_ACTIVE == event->object)
 	{
@@ -1572,7 +1572,6 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 		host_tag->automatic = atoi(row[3]);
 		zbx_vector_db_tag_ptr_append(&host_tags, host_tag);
 	}
-
 	zbx_db_free_result(result);
 
 	if (0 != new_optagids->values_num)
