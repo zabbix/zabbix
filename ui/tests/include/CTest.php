@@ -467,7 +467,7 @@ class CTest extends TestCase {
 
 
 			if (self::TRACE_DELAYS) {
-				fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Total backup restore took %.4fs\n", self::$total_backup_time));
+				fwrite(STDERR, sprintf("[%s] onAfterTestSuite Total backup restore took %.4fs\n", self::$last_test_case_name, self::$total_backup_time));
 
 				self::$total_backup_time = 0;
 			}
@@ -505,7 +505,7 @@ class CTest extends TestCase {
 		}
 
 		if (self::TRACE_DELAYS) {
-			fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Total backup restore took %.4fs\n", self::$total_backup_time));
+			fwrite(STDERR, sprintf("[%s] onAfterTestSuite Total backup restore took %.4fs\n", self::$last_test_case_name, self::$total_backup_time));
 			self::$total_backup_time = 0;
 		}
 

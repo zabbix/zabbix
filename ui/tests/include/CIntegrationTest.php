@@ -332,6 +332,13 @@ class CIntegrationTest extends CAPITest {
 
 			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs\n", self::$last_test_case_name, self::$delay_wait_log_line_per_test_file));
 			self::$delay_wait_log_line_per_test_file = 0.0;
+
+
+			fwrite(STDERR, sprintf("[%s] waitForStartup: %.4fs\n", self::$last_test_case_name, self::$total_startup_time));
+			self::$total_startup_time = 0.0;
+
+			fwrite(STDERR, sprintf("[%s] waitForShutdown: %.4fs\n", self::$last_test_case_name, self::$total_shutdown_time));
+			self::$total_shutdown_time = 0.0;
 		}
 	}
 
@@ -369,6 +376,7 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on failed wait operation
 	 */
 	protected static function waitForStartup($component, $waitLogLineOverride = '', $skip_pid = false) {
+		$start = microtime(true);
 		self::validateComponent($component);
 
 		$saved_time = time();
@@ -393,10 +401,21 @@ class CIntegrationTest extends CAPITest {
 						self::waitForLogLineToBePresent($component, 'Zabbix Agent2 hostname', false, 5, 1);
 						break;
 				}
+
+				if (self::TRACE_DELAYS) {
+					$total = microtime(true) - $start;
+					self::$total_startup_time += $total;
+				}
+
 				return;
 			}
 
 			sleep(self::WAIT_ITERATION_DELAY);
+		}
+
+		if (self::TRACE_DELAYS) {
+			$total = microtime(true) - $start;
+			self::$total_startup_time += $total;
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to start. Waited '.(time() - $saved_time).' seconds..');
@@ -424,6 +443,9 @@ class CIntegrationTest extends CAPITest {
 		return false;
 	}
 
+	private static $total_shutdown_time = 0.0;
+	private static $total_startup_time = 0.0;
+
 	/**
 	 * Wait for component to stop.
 	 *
@@ -433,6 +455,7 @@ class CIntegrationTest extends CAPITest {
 	 * @throws Exception    on failed wait operation
 	 */
 	protected static function waitForShutdown($component, array $child_pids) {
+		$start = microtime(true);
 		if (!self::checkPidKilled($component)) {
 			$pid = @file_get_contents(self::getPidPath($component));
 
@@ -455,6 +478,12 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (!$failed_pids) {
+
+			if (self::TRACE_DELAYS) {
+				$total = microtime(true) - $start;
+				self::$total_shutdown_time += $total;
+			}
+
 			return;
 		}
 
@@ -462,6 +491,11 @@ class CIntegrationTest extends CAPITest {
 		$failed_kills = $failed_kills
 			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
 			: '';
+
+		if (self::TRACE_DELAYS) {
+			$total = microtime(true) - $start;
+			self::$total_shutdown_time += $total;
+		}
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
 			implode(', ', $failed_pids).$failed_kills."\n".
@@ -794,7 +828,6 @@ class CIntegrationTest extends CAPITest {
 
 		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
 
-		// Sleep only if delay > 0
 		if ($delay > 0) {
 			if (self::TRACE_DELAYS) fwrite(STDERR, sprintf("sendDataValues delay:%d\n", $delay));
 			sleep($delay);
