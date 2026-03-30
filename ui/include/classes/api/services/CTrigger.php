@@ -265,12 +265,14 @@ class CTrigger extends CTriggerGeneral {
 
 		// lastChangeSince
 		if ($options['lastChangeSince'] !== null) {
-			$sqlParts['where']['lastchangesince'] = 't.lastchange>'.zbx_dbstr($options['lastChangeSince']);
+			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['where']['lastchangesince'] = 'tr.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 		// lastChangeTill
 		if ($options['lastChangeTill'] !== null) {
-			$sqlParts['where']['lastchangetill'] = 't.lastchange<'.zbx_dbstr($options['lastChangeTill']);
+			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['where']['lastchangetill'] = 'tr.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
 		// withUnacknowledgedEvents
@@ -343,6 +345,12 @@ class CTrigger extends CTriggerGeneral {
 
 		// search
 		if (is_array($options['search'])) {
+			if (array_key_exists('error', $options['search']) && $options['search']['error'] !== null) {
+				zbx_db_search('trigger_rtdata tr', ['search' => ['error' => $options['search']['error']]] + $options,
+					$sqlParts
+				);
+			}
+
 			zbx_db_search('triggers t', $options, $sqlParts);
 		}
 
@@ -352,6 +360,18 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		if (is_array($options['filter'])) {
+			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
+				$this->dbFilter('trigger_rtdata tr', ['filter' => ['state' => $options['filter']['state']]] + $options,
+					$sqlParts
+				);
+			}
+
+			if (array_key_exists('lastchange', $options['filter']) && $options['filter']['lastchange'] !== null) {
+				$this->dbFilter('trigger_rtdata tr', ['filter' => ['lastchange' => $options['filter']['lastchange']]] + $options,
+					$sqlParts
+				);
+			}
+
 			if (!array_key_exists('flags', $options['filter'])) {
 				$options['filter']['flags'] = [
 					ZBX_FLAG_DISCOVERY_NORMAL,
@@ -722,14 +742,22 @@ class CTrigger extends CTriggerGeneral {
 		self::checkDependenciesOfTemplateTriggers($trigger_dependencies, $trigger_hosts);
 	}
 
-	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
-		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
+	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
-			$sqlParts = $this->addQuerySelect($this->fieldId('expression'), $sqlParts);
+		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
+					|| $this->outputIsRequested('lastchange', $options['output'])
+					|| $this->outputIsRequested('error', $options['output'])))
+			|| (is_array($options['filter']) && (array_key_exists('state', $options['filter'])
+					|| array_key_exists('lastchange', $options['filter'])))) {
+			$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 		}
 
-		return $sqlParts;
+		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
+			$sql_parts = $this->addQuerySelect($this->fieldId('expression'), $sql_parts);
+		}
+
+		return $sql_parts;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

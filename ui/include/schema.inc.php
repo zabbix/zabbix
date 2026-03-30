@@ -2696,6 +2696,36 @@ return [
 			]
 		]
 	],
+	'trigger_rtdata' => [
+		'key' => 'triggerid',
+		'fields' => [
+			'triggerid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'triggers',
+				'ref_field' => 'triggerid'
+			],
+			'state' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'lastchange' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			]
+		]
+	],
 	'graphs' => [
 		'key' => 'graphid',
 		'fields' => [
