@@ -302,7 +302,7 @@ class CDevice extends CApiService {
 			'deviceid' => $db_device['deviceid']
 		];
 
-		DB::insertBatch('device_token', [$ins_device_token]);
+		DB::insertBatch('token_device', [$ins_device_token]);
 
 		$device = [
 			'deviceid' => $db_device['deviceid'],
@@ -436,7 +436,7 @@ class CDevice extends CApiService {
 
 		$deviceids = array_keys($db_devices);
 
-		$db_device_tokens = DB::select('device_token', [
+		$db_device_tokens = DB::select('token_device', [
 			'output' => ['tokenid'],
 			'filter' => ['deviceid' => $deviceids],
 			'preservekeys' => true
@@ -444,7 +444,7 @@ class CDevice extends CApiService {
 
 		$tokenids = array_keys($db_device_tokens);
 
-		DB::delete('device_token', ['tokenid' => $tokenids]);
+		DB::delete('token_device', ['tokenid' => $tokenids]);
 		DB::delete('token', ['tokenid' => $tokenids]);
 		DB::delete('device', ['deviceid' => $deviceids]);
 
