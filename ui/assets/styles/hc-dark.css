@@ -4589,8 +4589,9 @@ z-sparkline {
     left: 0; }
 
 z-textarea-flexible {
-  display: inline-block; }
+  display: inline-grid; }
   z-textarea-flexible textarea {
+    display: block !important;
     width: 100%;
     height: 24px;
     overflow: hidden;
@@ -5262,6 +5263,21 @@ div.dashboard-widget-itemcard .item-card {
           div.dashboard-widget-itemcard .item-card .sections .section.section-tags .tags .btn-icon {
             height: 14px;
             margin-top: 2px; }
+
+.dashboard-widget-itemcard-hintbox-image .dashboard-widget-itemhcard-hintbox {
+  overflow: hidden; }
+.dashboard-widget-itemcard-hintbox-image.is-loading {
+  min-width: 100px;
+  min-height: 56px; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading::before {
+    content: ' '; }
+  .dashboard-widget-itemcard-hintbox-image.is-loading img {
+    opacity: 0; }
+.dashboard-widget-itemcard-hintbox-image img {
+  display: block;
+  max-width: 50vw;
+  max-height: 50vh;
+  opacity: 1; }
 
 form.dashboard-widget-itemhistory #list_columns .overflow-ellipsis {
   max-width: 250px; }
@@ -7664,6 +7680,9 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
     border-top: 1px solid #333333; }
   .overlay-dialogue .table-forms-td-right td label {
     display: block; }
+  .overlay-dialogue #lldoperation_form .table-forms-td-right:has(z-textarea-flexible) {
+    display: flex;
+    align-items: flex-start; }
   .overlay-dialogue .maps-container {
     max-height: 128px;
     overflow-y: auto;
@@ -8534,7 +8553,8 @@ svg {
     line-height: 24px;
     padding-right: 5px; }
   .preprocessing-list input[type=text],
-  .preprocessing-list select {
+  .preprocessing-list select,
+  .preprocessing-list z-textarea-flexible {
     width: 100%;
     min-width: 0; }
   .preprocessing-list .btn-link:not(:first-child) {
@@ -8570,12 +8590,16 @@ svg {
     .preprocessing-list .preprocessing-step .step-on-fail,
     .preprocessing-list .preprocessing-step .step-action {
       height: 34px; }
+  .preprocessing-list .preprocessing-list-item .step-parameters {
+    align-items: baseline;
+    line-height: 22px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
     .preprocessing-list .step-parameters z-select {
       flex: 0 0 auto; }
     .preprocessing-list .step-parameters > input[type=text]:not(:last-child),
-    .preprocessing-list .step-parameters z-select:not(:last-child) {
+    .preprocessing-list .step-parameters z-select:not(:last-child),
+    .preprocessing-list .step-parameters z-textarea-flexible:not(:last-child) {
       margin-right: 5px; }
   .preprocessing-list .step-on-fail {
     flex: 0 0 100px;
@@ -8587,13 +8611,17 @@ svg {
     max-width: 188px;
     padding-right: 0; }
   .preprocessing-list .on-fail-options {
+    display: flex;
+    align-items: flex-start;
     padding-right: 293px;
-    margin-bottom: 5px; }
+    margin-top: 6px;
+    line-height: 24px; }
     .preprocessing-list .on-fail-options > label {
+      padding-top: 0;
       padding-left: 30px; }
-    .preprocessing-list .on-fail-options input[type=text] {
+    .preprocessing-list .on-fail-options z-textarea-flexible {
       flex: 1; }
-      .preprocessing-list .on-fail-options input[type=text]:not(:first-child) {
+      .preprocessing-list .on-fail-options z-textarea-flexible:not(:first-child) {
         margin-left: 5px; }
   .preprocessing-list .preprocessing-list-head {
     color: #cacaca;
