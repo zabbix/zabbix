@@ -72,6 +72,7 @@ window.tag_filter_edit = new class {
 		});
 
 		this.form = new CForm(this.form_element, rules);
+		this.overlay.recoverFocus();
 	}
 
 	/**
