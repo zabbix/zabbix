@@ -263,7 +263,7 @@ class CTest extends TestCase {
 			self::$suite_callbacks[$key] = $this->getAnnotationTokensByName($class_annotations, 'on'.ucfirst($key));
 		}
 	}
-	private static $last_test_case_name;
+	static $last_test_case_name;
 	private static $total_backup_time = 0.0;
 
 	/**
