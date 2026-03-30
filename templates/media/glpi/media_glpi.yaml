@@ -1,7 +1,7 @@
 zabbix_export:
   version: '7.4'
   media_types:
-    - name: GLPi
+    - name: GLPI
       type: WEBHOOK
       parameters:
         - name: alert_message
@@ -477,11 +477,11 @@ zabbix_export:
         var LEGACY_ENDPOINT = '/apirest.php'
         var CURRENT_ENDPOINT = '/api.php/v2.2'
         
-        const serviceLogName = 'GLPi Webhook',
+        const serviceLogName = 'GLPI Webhook',
         	Logger = new CLogger(serviceLogName),
-        	GLPi = CWebhook;
+        	GLPI = CWebhook;
         
-        GLPi.prototype.onCheckParams = function () {
+        GLPI.prototype.onCheckParams = function () {
         	CParamValidator.validate({
         		alert_message: { type: 'string' },
         		alert_subject: { type: 'string' },
@@ -570,7 +570,7 @@ zabbix_export:
         	return { input: data };
         }
         
-        GLPi.prototype.getAuthToken = function () {
+        GLPI.prototype.getAuthToken = function () {
         	if (this.params.glpi_legacy_api) {
         		this.request.addHeaders('Authorization: user_token ' + this.params.glpi_user_token);
         
@@ -597,7 +597,7 @@ zabbix_export:
         	return response[this.params.glpi_legacy_api ? 'session_token' : 'access_token'];
         }
         
-        GLPi.prototype.sendRequest = function (method, path, data) {
+        GLPI.prototype.sendRequest = function (method, path, data) {
         	this.request.clearHeader();
         
         	if (this.params.glpi_legacy_api) {
@@ -618,7 +618,7 @@ zabbix_export:
         	return response;
         }
         
-        GLPi.prototype.createProblem = function (status) {
+        GLPI.prototype.createProblem = function (status) {
         	this.data.urgency = this.urgency;
         	this.data.content = this.params.alert_message + '<br> <a href=' + this.params.zabbix_url + '>Link to problem in Zabbix</a>';
         
@@ -639,7 +639,7 @@ zabbix_export:
         	return response.id;
         }
         
-        GLPi.prototype.updateProblem = function (status) {
+        GLPI.prototype.updateProblem = function (status) {
         	CParamValidator.validate({ glpi_problem_id: { type: 'string' } }, this.params);
         
         	if (CParamValidator.isDefined(status)) {
@@ -664,7 +664,7 @@ zabbix_export:
         	this.sendRequest('post', api.url2, api.dataFollowup);
         }
         
-        GLPi.prototype.onProblem = function (alert) {
+        GLPI.prototype.onProblem = function (alert) {
         	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
         	const problem_id = this.createProblem(1)
         
@@ -674,28 +674,28 @@ zabbix_export:
         	return this.result;
         }
         
-        GLPi.prototype.onUpdate = function (alert) {
+        GLPI.prototype.onUpdate = function (alert) {
         	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
         	this.updateProblem();
         
         	return this.result;
         }
         
-        GLPi.prototype.onResolve = function (alert) {
+        GLPI.prototype.onResolve = function (alert) {
         	Logger.log(Logger.INFO, 'Source: ' + alert.source + '; Event: ' + alert.event);
         	this.updateProblem(5);
         
         	return this.result;
         }
         
-        GLPi.prototype.onDiscovery = function (alert) {
+        GLPI.prototype.onDiscovery = function (alert) {
         	Logger.log(Logger.INFO, 'Source: ' + alert.source);
         	this.urgency = urgencyMapper(this.params.glpi_urgency_discovery);
         
         	return this.createProblem();
         }
         
-        GLPi.prototype.onAutoreg = function (alert) {
+        GLPI.prototype.onAutoreg = function (alert) {
         	Logger.log(Logger.INFO, 'Source: ' + alert.source);
         	this.urgency = urgencyMapper(this.params.glpi_urgency_autoregistration);
         
@@ -703,7 +703,7 @@ zabbix_export:
         }
         
         try {
-        	var hook = new GLPi(value);
+        	var hook = new GLPI(value);
         	hook.request = new CHttpRequest(Logger);
         	hook.params.authToken = hook.getAuthToken();
         	return hook.run();
@@ -715,14 +715,14 @@ zabbix_export:
       process_tags: 'YES'
       show_event_menu: 'YES'
       event_menu_url: '{EVENT.TAGS.__zbx_glpi_link}'
-      event_menu_name: 'GLPi: Problem {EVENT.TAGS.__zbx_glpi_problem_id}'
+      event_menu_name: 'GLPI: Problem {EVENT.TAGS.__zbx_glpi_problem_id}'
       description: |
-        This media type integrates your Zabbix installation with your GLPi installation using the Zabbix webhook feature.
+        This media type integrates your Zabbix installation with your GLPI installation using the Zabbix webhook feature.
         
-        RESTful API (V2) with OAuth2 - recommended configuration for GLPi 11+:
+        RESTful API (V2) with OAuth2 - recommended configuration for GLPI 11+:
         
-        1. Enable access to the GLPi API:
-        - In the GLPi web interface, go to "Setup" → "General" → "API".
+        1. Enable access to the GLPI API:
+        - In the GLPI web interface, go to "Setup" → "General" → "API".
         - Switch the toggle to activate "Enable API" and click the "Save" button.
         
         2. Add an OAuth client:
@@ -746,10 +746,10 @@ zabbix_export:
         - Set the password for the user.
         - Click the "Add" button.
         
-        REST API (V1) - legacy configuration for GLPi 10:
+        REST API (V1) - legacy configuration for GLPI 10:
         
-        1. Enable access to the GLPi REST API:
-        - In the GLPi web interface, go to "Setup" → "General" → "API".
+        1. Enable access to the GLPI REST API:
+        - In the GLPI web interface, go to "Setup" → "General" → "API".
         - Set the "Enable Rest API" and "Enable login with external token" options to "Yes" and click the "Save" button.
         
         2. Add a new API client:
@@ -776,7 +776,7 @@ zabbix_export:
         
         Zabbix configuration:
         
-        1. Before you can start using the GLPi webhook, set the global macro "{$ZABBIX.URL}":
+        1. Before you can start using the GLPI webhook, set the global macro "{$ZABBIX.URL}":
         - In the Zabbix web interface, go to "Administration" → "Macros" in the top-left drop-down menu.
         - Set the global macro "{$ZABBIX.URL}" to the URL of the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or localhost.
         - Specifying a protocol is mandatory, whereas the port is optional. Depending on the web server configuration, you might also need to append "/zabbix" to the end of URL. Good examples:
@@ -796,21 +796,21 @@ zabbix_export:
         If using RESTful API V2 with OAuth2, set the required parameters:
         - glpi_client_id - the client id that was generated during creation of "OAuth client"
         - glpi_client_secret - the client secret that was generated during creation of "OAuth client"
-        - glpi_username - GLPi username created for webhook
+        - glpi_username - GLPI username created for webhook
         - glpi_password - password for the GLPI webhook user
         
         If using legacy API, set the parameters:
         - glpi_app_token - if you've opted to use an application token during the creation of API client, specify it here; otherwise leave it empty
-        - glpi_user_token - the user token that was generated during creation of GLPi user
+        - glpi_user_token - the user token that was generated during creation of GLPI user
         
         3. Click the "Enabled" checkbox to enable the media type and click the "Update" button to save the webhook settings.
         
         4. Create a Zabbix user and add media:
         - To create a new user, go to the "Users" → "Users" section, click the "Create user" button in the top right corner. In the "User" tab, fill in all required fields (marked with red asterisks).
-        - In the "Media" tab, click "Add" and select the type "GLPi" from the drop-down list. Add any value in the "Send to" field: it is not used in the webhook, but is required.
-        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to GLPi.
+        - In the "Media" tab, click "Add" and select the type "GLPI" from the drop-down list. Add any value in the "Send to" field: it is not used in the webhook, but is required.
+        - Make sure this user has access to all hosts for which you would like problem notifications to be sent to GLPI.
         
-        5. Done! You can now start using this media type in actions and create ticket items in GLPi.
+        5. Done! You can now start using this media type in actions and create ticket items in GLPI.
         
         You can find the latest version of this media and additional information in the official Zabbix repository:
         https://git.zabbix.com/projects/ZBX/repos/zabbix/browse/templates/media/glpi
