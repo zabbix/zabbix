@@ -838,7 +838,7 @@ int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key
  *               ZBX_KEY_ACCESS_DENY  - metric access denied                  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *request)
+static int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *request)
 {
 	zbx_key_access_rule_t	*rule;
 

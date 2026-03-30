@@ -103,7 +103,6 @@ void	zbx_finalize_key_access_rules_configuration(void);
 int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
 int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key_access_rule_type_t type);
 int	zbx_check_key_access_rules(const char *metric);
-int	zbx_check_request_access_rules(const char *metric, AGENT_REQUEST *request);
 void	zbx_free_key_access_rules(void);
 
 int	zbx_execute_agent_check(const char *in_command, unsigned flags, AGENT_RESULT *result, int timeout);
