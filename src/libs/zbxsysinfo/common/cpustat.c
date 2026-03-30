@@ -1333,7 +1333,10 @@ int	get_cpus(zbx_vector_uint64_pair_t *vector)
 			index -= ZBX_MAX_COLLECTOR_HISTORY;
 
 		pair.first = cpu->cpu_num;
-		pair.second = get_cpu_status(cpu->h_status[index]);
+		if (index >= cpu->h_first && index < cpu->h_first + cpu->h_count)
+			pair.second = get_cpu_status(cpu->h_status[index]);
+		else
+			pair.second = ZBX_CPU_STATUS_UNKNOWN;
 #else
 		pair.first = idx - 1;
 		pair.second = get_cpu_perf_counter_status(pcpus->cpu_counter[idx]->status);
