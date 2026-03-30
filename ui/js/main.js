@@ -300,7 +300,7 @@ const hintBox = {
 				hintBox.hideHint($target[0], false);
 			}
 
-			if ($target[0].dataset.hintboxContents) {
+			if ($target[0].dataset.hintboxHtml) {
 				hintBox.showHintStart(e, $target, delay);
 			}
 		};
@@ -355,7 +355,7 @@ const hintBox = {
 
 	showHintStart: function (e, $target, delay) {
 		const showHintHandler = function() {
-			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxContents, $target.data('hintbox-class'),
+			hintBox.showHint(e, $target[0], $target[0].dataset.hintboxHtml, $target.data('hintbox-class'),
 				false, $target.data('hintbox-style')
 			);
 		}
@@ -397,35 +397,35 @@ const hintBox = {
 		}).appendTo(box);
 
 		xhr.done(function(resp) {
-			let hintbox_contents = '';
+			let hintbox_html = '';
 
 			if ('error' in resp) {
 				const message_box = makeMessageBox('bad', resp.error.messages, resp.error.title, false, true)[0];
 
-				hintbox_contents += message_box.innerHTML;
+				hintbox_html += message_box.innerHTML;
 			}
 			else {
 				if (resp.messages) {
-					hintbox_contents += resp.messages;
+					hintbox_html += resp.messages;
 				}
 
 				if (resp.data) {
-					hintbox_contents += resp.data;
+					hintbox_html += resp.data;
 				}
 
 				if (resp.value) {
-					hintbox_contents += resp.value;
+					hintbox_html += resp.value;
 				}
 			}
 
-			target.dataset.hintboxContents = hintbox_contents;
+			target.dataset.hintboxHtml = hintbox_html;
 
 			$preloader.remove();
 
 			if (target.hintBoxItem !== undefined) {
 				const hintbox_container = box[0].querySelector('.hintbox-container');
 
-				hintbox_container.innerHTML = hintbox_contents;
+				hintbox_container.innerHTML = hintbox_html;
 
 				// Reset hintbox position.
 				box.css({
@@ -512,7 +512,7 @@ const hintBox = {
 			box.prepend(hintbox_header);
 		}
 
-		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
+		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxHtml === '') {
 			hintBox.preloadHint(e, target, box);
 		}
 
@@ -561,7 +561,7 @@ const hintBox = {
 
 		if (!isStatic) {
 			if (typeof hintText === 'undefined') {
-				hintText = target.dataset.hintboxContents;
+				hintText = target.dataset.hintboxHtml;
 			}
 
 			target.isStatic = true;

@@ -366,7 +366,7 @@ class CWidgetItemHistory extends CWidget {
 					break;
 
 				case CWidgetItemHistory.VALUE_TYPE_RAW:
-					const curl = this.#getHintboxContentCUrl(button);
+					const curl = this.#getHintboxHtmlCUrl(button);
 					curl.setArgument('action', 'widget.itemhistory.binary_value.get');
 
 					this.#addHintbox(button, '', curl);
@@ -390,7 +390,7 @@ class CWidgetItemHistory extends CWidget {
 		}
 	}
 
-	#getHintboxContentCUrl(button) {
+	#getHintboxHtmlCUrl(button) {
 		const curl = new Curl('zabbix.php');
 		const value = this.#binary_buttons.get(button);
 
@@ -413,7 +413,7 @@ class CWidgetItemHistory extends CWidget {
 
 				hint_box.classList.add('dashboard-widget-itemhistory-hintbox-image');
 
-				const curl = this.#getHintboxContentCUrl(button);
+				const curl = this.#getHintboxHtmlCUrl(button);
 
 				curl.setArgument('action', 'widget.itemhistory.image_value.get');
 				content.src = curl.getUrl();
@@ -437,11 +437,11 @@ class CWidgetItemHistory extends CWidget {
 		}
 		else {
 			if (curl !== null) {
-				button.dataset.hintboxContents = '';
+				button.dataset.hintboxHtml = '';
 				button.dataset.hintboxPreload = JSON.stringify({action: curl.args.action, data: curl.args});
 			}
 			else {
-				button.dataset.hintboxContents = content || t('Empty value.');
+				button.dataset.hintboxHtml = content || t('Empty value.');
 			}
 		}
 	}

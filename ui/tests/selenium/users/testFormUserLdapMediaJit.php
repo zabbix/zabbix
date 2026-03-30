@@ -199,7 +199,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					->query('xpath:.//button['.CXPathHelper::fromClass('zi-i-warning').']')->one()->isValid()
 			);
 			$this->assertEquals('Media type disabled by Administration.', $row->getColumn('Type')
-					->query('tag:button')->one()->getAttribute('data-hintbox-contents')
+					->query('tag:button')->one()->getAttribute('data-hintbox-html')
 			);
 		}
 
@@ -1365,14 +1365,14 @@ class testFormUserLdapMediaJit extends CWebTest {
 			// Check that the passed severities are turned on.
 			foreach ($data[$expected]['Use if severity'] as $used_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$reference_severities[$used_severity].']')
-						->one()->getAttribute('data-hintbox-contents');
+						->one()->getAttribute('data-hintbox-html');
 				$this->assertEquals($actual_severity, $used_severity.' (on)');
 				unset($reference_severities[$used_severity]);
 			}
 			// Check that other severities are turned off.
 			foreach ($reference_severities as $name => $unused_severity) {
 				$actual_severity = $row->query('xpath:./td[4]/div/span['.$unused_severity.']')->one()
-						->getAttribute('data-hintbox-contents');
+						->getAttribute('data-hintbox-html');
 				$this->assertEquals($name.' (off)', $actual_severity);
 			}
 		}

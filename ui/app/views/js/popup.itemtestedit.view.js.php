@@ -235,7 +235,7 @@ function itemGetValueTest(overlay) {
 			jQuery('#value_warning', $form)
 				.toggle('value_warning' in ret)
 				.toggleClass('js-retrieved', 'value_warning' in ret)
-				.attr('data-hintbox-contents', ret.value_warning);
+				.attr('data-hintbox-html', ret.value_warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -347,7 +347,7 @@ function itemCompleteTest(overlay) {
 			jQuery('#value_warning', $form)
 				.toggle('value_warning' in ret)
 				.toggleClass('js-retrieved', 'value_warning' in ret)
-				.attr('data-hintbox-contents', ret.value_warning);
+				.attr('data-hintbox-html', ret.value_warning);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
