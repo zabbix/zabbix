@@ -298,8 +298,7 @@ class testValuemaps extends CIntegrationTest {
 			$triggerid = $response['result']['triggerids'];
 
 			$t0 = microtime(true);
-			$this->reloadConfigurationCache(null, 0);
-			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'finished forced reloading of the configuration cache');
+			$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 			$t_reload_cache = microtime(true) - $t0;
 
 			$t0 = microtime(true);

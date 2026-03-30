@@ -600,8 +600,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
 
@@ -643,8 +642,7 @@ class testDataCollection extends CIntegrationTest {
 		$hostid = $response['result']['hostids'][0];
 		self::$hostids = array_merge(self::$hostids, [$hostid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 
 		$response = $this->call('host.get', [
 			'output' => ['host'],
@@ -692,8 +690,7 @@ class testDataCollection extends CIntegrationTest {
 		$itemid = $response['result']['itemids'][0];
 		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',

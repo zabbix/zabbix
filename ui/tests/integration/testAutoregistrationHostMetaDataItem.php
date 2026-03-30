@@ -146,9 +146,7 @@ class testAutoregistrationHostMetaDataItem extends CIntegrationTest {
 		$actionids = $response['result']['actionids'];
 		$this->assertCount(1, $actionids, 'Failed to create an autoregistration action');
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
-				"finished forced reloading of the configuration cache", true, 60, 1);
+		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 
 		if (file_exists(self::$metadata_file)) {
 			unlink(self::$metadata_file);
