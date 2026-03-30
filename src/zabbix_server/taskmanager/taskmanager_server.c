@@ -2038,7 +2038,11 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 	zbx_thread_taskmanager_args	*taskmanager_args_in = (zbx_thread_taskmanager_args *)
 			((((zbx_thread_args_t *)args))->args);
 
-	const char		*adapter_url = taskmanager_args_in->config_adapter_url,
+	int			adapter_port = taskmanager_args_in->config_adapter_timeout,
+				adapter_timeout = taskmanager_args_in->config_adapter_timeout;
+
+	const char *adapter_url; //REMOVE
+	const char		*config_adapter_ip = taskmanager_args_in->config_adapter_ip,
 				*config_push_ca_file = taskmanager_args_in->config_adapter_ca_file,
 				*config_push_cert_file = taskmanager_args_in->config_adapter_cert_file,
 				*config_push_key_file = taskmanager_args_in->config_adapter_key_file;

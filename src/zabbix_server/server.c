@@ -403,7 +403,9 @@ static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 /* adapter config */
-static char	*config_adapter_url;
+static char	*config_adapter_ip;
+static int	config_adapter_port;
+static int	config_adapter_timeout = 10;
 
 struct zbx_db_version_info_t	db_version_info;
 
@@ -1198,7 +1200,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 				ZBX_CONF_PARM_OPT,	0,			1},
 		{"FrontendAllowedIP",		&config_frontend_allowed_ip,		ZBX_CFG_TYPE_STRING_LIST,
 			ZBX_CONF_PARM_OPT,	0,			0},
-		{"BridgeAdapterURL",			&config_adapter_url,		ZBX_CFG_TYPE_STRING,
+		{"BridgeAdapterIP",			&config_adapter_ip,		ZBX_CFG_TYPE_STRING,
+				ZBX_CONF_PARM_OPT,	0,			0},
+		{"BridgeAdapterPort",			&config_adapter_port,		ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			0},
 		{0}
 	};
@@ -1723,7 +1727,9 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		{
 			.config_timeout = zbx_config_timeout,
 			.config_startup_time = config_startup_time,
-			.config_adapter_url = config_adapter_url,
+			.config_adapter_ip = config_adapter_ip,
+			.config_adapter_port = config_adapter_port,
+			.config_adapter_timeout = config_adapter_timeout,
 			.config_adapter_ca_file = zbx_config_tls->ca_file,
 			.config_adapter_cert_file = zbx_config_tls->cert_file,
 			.config_adapter_key_file = zbx_config_tls->key_file
@@ -1747,7 +1753,9 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_source_ip = zbx_config_source_ip,
 			.config_ssl_ca_location = config_ssl_ca_location,
 			.config_sms_devices = config_sms_devices,
-			.config_adapter_url = config_adapter_url,
+			.config_adapter_ip = config_adapter_ip,
+			.config_adapter_port = config_adapter_port,
+			.config_adapter_timeout = config_adapter_timeout,
 			.config_adapter_ca_file = zbx_config_tls->ca_file,
 			.config_adapter_cert_file = zbx_config_tls->cert_file,
 			.config_adapter_key_file = zbx_config_tls->key_file

@@ -502,8 +502,15 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_free(script_bin);
 }
 
-static void	alerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
-		const char *push_adapter_url, const char *push_ca_file, const char *push_cert_file,
+static void	alerter_process_push(
+		zbx_ipc_socket_t *socket,
+		zbx_ipc_message_t *ipc_message,
+		const char *config_source_ip,
+		const char *config_adapter_ip,
+		int config_adapter_port,
+		int config_adapter_timeout,
+		const char *push_ca_file,
+		const char *push_cert_file,
 		const char *push_key_file)
 {
 	zbx_uint64_t	alertid;
@@ -512,11 +519,54 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ip
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X FINAL XSTRATA: %s", params);
+
+	char		*result;
+	zbx_socket_t	s;
+
+	if (SUCCEED == zbx_tcp_connect(&s, config_source_ip, config_adapter_ip, config_adapter_port,
+			config_adapter_timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL, ZBX_DNS_FAILOVER_ENABLED))
+	{
+		if (SUCCEED == zbx_tcp_send(&s, params))
+		{
+			if (SUCCEED == zbx_tcp_recv(&s) && NULL != s.buffer)
+			{
+				if ('\0' == *s.buffer)
+				{
+					result =  zbx_strdup(NULL, "FAILED TO PROCESS_PUSH");
+				}
+				else
+				{
+					result = zbx_dsprintf(result, "BADGER OK PUSH, RECEIVED: ->%s<-", s.buffer);
+				}
+			}
+			else
+			{
+				result =  zbx_strdup(NULL, "FAILED TO PROCESS_PUSH 2");
+			}
+		}
+		else
+		{
+				result =  zbx_dsprintf(result, "FAILED TO PROCESS_PUSH 3: %s", zbx_socket_strerror());
+		}
+
+		zbx_tcp_close(&s);
+	}
+	else
+	{
+				result =  zbx_dsprintf(result, "FAILED TO PROCESS_PUSH 4: %s", zbx_socket_strerror());
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X RESULT: %s", result);
+
+
+
+
+
+
 	zbx_free(params);
 
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
-	ZBX_UNUSED(push_adapter_url);
 	ZBX_UNUSED(push_ca_file);
 	ZBX_UNUSED(push_cert_file);
 	ZBX_UNUSED(push_key_file);
@@ -619,7 +669,10 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 				break;
 			case ZBX_IPC_ALERTER_PUSH:
 				alerter_process_push(&alerter_socket, &message,
-						alerter_args_in->config_adapter_url,
+						alerter_args_in->config_source_ip,
+						alerter_args_in->config_adapter_ip,
+						alerter_args_in->config_adapter_port,
+						alerter_args_in->config_adapter_timeout,
 						alerter_args_in->config_adapter_ca_file,
 						alerter_args_in->config_adapter_cert_file,
 						alerter_args_in->config_adapter_key_file);

@@ -26,7 +26,9 @@ typedef struct
 {
 	int		config_timeout;
 	int		config_startup_time;
-	char		*config_adapter_url;
+	const char	*config_adapter_ip;
+	int		config_adapter_port;
+	int		config_adapter_timeout;
 	const char	*config_adapter_ca_file;
 	const char	*config_adapter_cert_file;
 	const char	*config_adapter_key_file;
