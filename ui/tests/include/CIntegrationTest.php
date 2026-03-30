@@ -1100,17 +1100,9 @@ class CIntegrationTest extends CAPITest {
 			$delay = self::WAIT_ITERATION_DELAY;
 		}
 
-		$usleep_total = 0;
 		for ($r = 0; $r < $iterations; $r++) {
 			if (self::isLogLinePresent($component, $lines, $incremental, $match_regex)) {
 				return true;
-			}
-
-			if ($usleep_total < 1000000 && $iterations > 1) {
-				$usleep_total += 100000;
-				usleep(100000);
-				$r = -1;
-				continue;
 			}
 
 			if (self::TRACE_DELAYS) {
