@@ -276,8 +276,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
 							'proxy_group', 'assigned_proxy'])
 						.setRenderer('proxy')
-						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>)
-						.setTogglable(<?= !$show_monitored_by ? 'true' : 'false'; ?>),
+						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>),
 					new CDataTableColumn('templates', <?= json_encode(_('Templates')); ?>)
 						.setFields(['templates', 'parentTemplates'])
 						.setRenderer('templates'),
