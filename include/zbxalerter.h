@@ -72,8 +72,7 @@ typedef struct
 	const char	*config_source_ip;
 	const char	*config_ssl_ca_location;
 	const char	*config_sms_devices;
-	const char	*config_adapter_ip;
-	const int	config_adapter_port;
+	const char	*config_adapter_url;
 	const int	config_adapter_timeout;
 	const char	*config_adapter_ca_file;
 	const char	*config_adapter_cert_file;
