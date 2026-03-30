@@ -50,3 +50,4 @@ class CTextareaFlexibleElement extends CElement {
 		return $this;
 	}
 }
+

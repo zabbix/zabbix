@@ -1105,7 +1105,6 @@ class testFormServicesSla extends CWebTest {
 
 		if (array_key_exists('inline_errors', $data)) {
 			$this->page->removeFocus();
-			$form->getField(array_keys($data['inline_errors'])[0])->waitUntilClassesPresent('has-error');
 			$this->assertInlineError($form, $data['inline_errors']);
 		}
 

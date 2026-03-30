@@ -69,16 +69,18 @@ class CMessageBehavior extends CBehavior {
 
 			$field->waitUntilClassesPresent('has-error');
 
+			$error_object = $field->isAttributePresent('data-error-container')
+				? $form->query('id', $field->getAttribute('data-error-container'))->one()
+				: $field->query('xpath:./../span[@class="error"]|./../../span[@class="error"]');
+
 			if ($field->isAttributePresent('data-error-container')) {
-				$container_field = $form->query('id', $field->getAttribute('data-error-container'))->one();
-				$this->test->assertTrue(in_array($error_text, $container_field->query('class:error')->waitUntilPresent()
+				$error_object->waitUntilTextPresent($error_text);
+				$this->test->assertTrue(in_array($error_text, $error_object->query('class:error')->waitUntilPresent()
 						->all()->asText()), $error_text.' was not found among inline error messages.'
 				);
 			}
 			else {
-				$this->test->assertEquals($error_text, $field->query('xpath:./../span[@class="error"]|./../../span[@class="error"]')
-						->waitUntilPresent()->one()->getText()
-				);
+				$this->test->assertEquals($error_text, $error_object->waitUntilPresent()->one()->getText());
 			}
 		}
 	}
