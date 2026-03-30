@@ -83,7 +83,7 @@ class CIntegrationTest extends CAPITest {
 
 	private static $suite_components_reuse = false;
 	private static $suite_components_running = false;
-	private static $test_case_name;
+	private static $last_test_case_name;
 
 	/**
 	 * Hosts to be enabled for test case.
@@ -272,7 +272,7 @@ class CIntegrationTest extends CAPITest {
 	 * @after
 	 */
 	public function onAfterTestCase() {
-		$test_case_name = get_class($this);
+		self::$last_test_case_name = get_class($this);
 		$components = array_merge(self::$suite_components, $this->case_components);
 
 		if (self::$suite_components_reuse === false) {
@@ -327,11 +327,11 @@ class CIntegrationTest extends CAPITest {
 		parent::onAfterTestSuite();
 
 		if (self::TRACE_DELAYS) {
-			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs\n", self::$test_case_name, self::$delay_call_data_present_per_test_file));
+			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs\n", self::$last_test_case_name, self::$delay_call_data_present_per_test_file));
 			self::$delay_call_data_present_per_test_file = 0.0;
 
 
-			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs\n", self::$test_case_name, self::$delay_wait_log_line_per_test_file));
+			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs\n", self::$last_test_case_name, self::$delay_wait_log_line_per_test_file));
 			self::$delay_wait_log_line_per_test_file = 0.0;
 		}
 	}
@@ -1007,10 +1007,13 @@ class CIntegrationTest extends CAPITest {
 				$response = $this->call($method, $params);
 
 				if (is_array($response['result']) && count($response['result']) > 0
-						&& ($callback === null || call_user_func($callback, $response))) {
-					if (self::TRACE_DELAYS && $usleep_total !== 0) {
-						fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%f\n", $usleep_total));
+					&& ($callback === null || call_user_func($callback, $response))) {
+
+					if (self::TRACE_DELAYS) {
+						$total = microtime(true) - $start;
+						self::$delay_call_data_present_per_test_file += $total;
 					}
+
 					return $response;
 				}
 			} catch (Exception $e) {
@@ -1134,8 +1137,9 @@ class CIntegrationTest extends CAPITest {
 
 		for ($r = 0; $r < $iterations; $r++) {
 			if (self::isLogLinePresent($component, $lines, $incremental, $match_regex)) {
-				if (self::TRACE_DELAYS && $usleep_total !== 0) {
-					fwrite(STDERR, sprintf("waitForLogLineToBePresent delay:%f\n", $usleep_total));
+				if (self::TRACE_DELAYS) {
+					$total = microtime(true) - $start;
+					self::$delay_wait_log_line_per_test_file += $total;
 				}
 				return true;
 			}
