@@ -877,6 +877,382 @@ static int	DBpatch_7050067(void)
 	return DBadd_foreign_key("trigger_depends", 2, &field);
 }
 
+static int	DBpatch_7050068(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_rule", "cep_ruleid", 0,
+				{
+					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"description", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"window_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"stop", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050069(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_rule", "cep_ruleid");
+}
+
+static int	DBpatch_7050070(void)
+{
+	return DBcreate_changelog_update_trigger("cep_rule", "cep_ruleid");
+}
+
+static int	DBpatch_7050071(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_rule", "cep_ruleid");
+}
+
+static int	DBpatch_7050072(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_condition", "cep_conditionid", 0,
+				{
+					{"cep_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"host_group", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"time_period", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050073(void)
+{
+	return DBcreate_index("cep_condition", "cep_condition_1", "cep_ruleid", 0);
+}
+
+static int	DBpatch_7050074(void)
+{
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_condition", 1, &field);
+}
+
+static int	DBpatch_7050075(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_condition", "cep_conditionid");
+}
+
+static int	DBpatch_7050076(void)
+{
+	return DBcreate_changelog_update_trigger("cep_condition", "cep_conditionid");
+}
+
+static int	DBpatch_7050077(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_condition", "cep_conditionid");
+}
+
+static int	DBpatch_7050078(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_window", "cep_windowid", 0,
+				{
+					{"cep_windowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"duration", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"capacity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"symptom_num_tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"formula", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"script", "", NULL, NULL, 0, ZBX_TYPE_TEXT, ZBX_NOTNULL, 0},
+					{"group_by", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"group_tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050079(void)
+{
+	return DBcreate_index("cep_window", "cep_window_1", "cep_ruleid", 0);
+}
+
+static int	DBpatch_7050080(void)
+{
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_window", 1, &field);
+}
+
+static int	DBpatch_7050081(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_window", "cep_windowid");
+}
+
+static int	DBpatch_7050082(void)
+{
+	return DBcreate_changelog_update_trigger("cep_window", "cep_windowid");
+}
+
+static int	DBpatch_7050083(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_window", "cep_windowid");
+}
+
+static int	DBpatch_7050084(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_window_condition", "cep_window_conditionid", 0,
+				{
+					{"cep_window_conditionid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_windowid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"old_tag_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"old_tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"new_tag_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050085(void)
+{
+	return DBcreate_index("cep_window_condition", "cep_window_condition_1", "cep_windowid", 0);
+}
+
+static int	DBpatch_7050086(void)
+{
+	const zbx_db_field_t	field = {"cep_windowid", NULL, "cep_window", "cep_windowid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_window_condition", 1, &field);
+}
+
+static int	DBpatch_7050087(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_window_condition", "cep_window_conditionid");
+}
+
+static int	DBpatch_7050088(void)
+{
+	return DBcreate_changelog_update_trigger("cep_window_condition", "cep_window_conditionid");
+}
+
+static int	DBpatch_7050089(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_window_condition", "cep_window_conditionid");
+}
+
+static int	DBpatch_7050090(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_operation", "cep_operationid", 0,
+				{
+					{"cep_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"execute_when", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"evaltype", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"event_name", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"new_tag_name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"severity", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"sortorder", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050091(void)
+{
+	return DBcreate_index("cep_operation", "cep_operation_1", "cep_ruleid", 0);
+}
+
+static int	DBpatch_7050092(void)
+{
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_operation", 1, &field);
+}
+
+static int	DBpatch_7050093(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_operation", "cep_operationid");
+}
+
+static int	DBpatch_7050094(void)
+{
+	return DBcreate_changelog_update_trigger("cep_operation", "cep_operationid");
+}
+
+static int	DBpatch_7050095(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_operation", "cep_operationid");
+}
+
+static int	DBpatch_7050096(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_operation_tag", "cep_operation_tagid", 0,
+				{
+					{"cep_operation_tagid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_operationid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"operator", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
+					{"tag", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050097(void)
+{
+	return DBcreate_index("cep_operation_tag", "cep_operation_tag_1", "cep_operationid", 0);
+}
+
+static int	DBpatch_7050098(void)
+{
+	const zbx_db_field_t	field = {"cep_operationid", NULL, "cep_operation", "cep_operationid", 0, ZBX_TYPE_ID,
+			ZBX_NOTNULL, 0};
+
+	return DBadd_foreign_key("cep_operation_tag", 1, &field);
+}
+
+static int	DBpatch_7050099(void)
+{
+	return DBcreate_changelog_insert_trigger("cep_operation_tag", "cep_operation_tagid");
+}
+
+static int	DBpatch_7050100(void)
+{
+	return DBcreate_changelog_update_trigger("cep_operation_tag", "cep_operation_tagid");
+}
+
+static int	DBpatch_7050101(void)
+{
+	return DBcreate_changelog_delete_trigger("cep_operation_tag", "cep_operation_tagid");
+}
+
+static int	DBpatch_7050102(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_group", "cep_groupid", 0,
+				{
+					{"cep_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"cep_ruleid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"tag_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050103(void)
+{
+	return DBcreate_index("cep_group", "cep_group_1", "cep_ruleid", 0);
+}
+
+static int	DBpatch_7050104(void)
+{
+	return DBcreate_index("cep_group", "cep_group_2", "groupid", 0);
+}
+
+static int	DBpatch_7050105(void)
+{
+	return DBcreate_index("cep_group", "cep_group_3", "hostid", 0);
+}
+
+static int	DBpatch_7050106(void)
+{
+	const zbx_db_field_t	field = {"cep_ruleid", NULL, "cep_rule", "cep_ruleid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("cep_group", 1, &field);
+}
+
+static int	DBpatch_7050107(void)
+{
+	const zbx_db_field_t	field = {"groupid", NULL, "hstgrp", "groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("cep_group", 2, &field);
+}
+
+static int	DBpatch_7050108(void)
+{
+	const zbx_db_field_t	field = {"hostid", NULL, "hosts", "hostid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("cep_group", 3, &field);
+}
+
+static int	DBpatch_7050109(void)
+{
+	const zbx_db_table_t	table =
+			{"cep_group_event", "cep_groupid,eventid", 0,
+				{
+					{"cep_groupid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"eventid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_7050110(void)
+{
+	return DBcreate_index("cep_group_event", "cep_group_event_1", "eventid", 0);
+}
+
+static int	DBpatch_7050111(void)
+{
+	const zbx_db_field_t	field = {"cep_groupid", NULL, "cep_group", "cep_groupid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("cep_group_event", 1, &field);
+}
+
+static int	DBpatch_7050112(void)
+{
+	const zbx_db_field_t	field = {"eventid", NULL, "events", "eventid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+			ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("cep_group_event", 2, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -951,5 +1327,50 @@ DBPATCH_ADD(7050064, 0, 1)
 DBPATCH_ADD(7050065, 0, 1)
 DBPATCH_ADD(7050066, 0, 1)
 DBPATCH_ADD(7050067, 0, 1)
+DBPATCH_ADD(7050068, 0, 1)
+DBPATCH_ADD(7050069, 0, 1)
+DBPATCH_ADD(7050070, 0, 1)
+DBPATCH_ADD(7050071, 0, 1)
+DBPATCH_ADD(7050072, 0, 1)
+DBPATCH_ADD(7050073, 0, 1)
+DBPATCH_ADD(7050074, 0, 1)
+DBPATCH_ADD(7050075, 0, 1)
+DBPATCH_ADD(7050076, 0, 1)
+DBPATCH_ADD(7050077, 0, 1)
+DBPATCH_ADD(7050078, 0, 1)
+DBPATCH_ADD(7050079, 0, 1)
+DBPATCH_ADD(7050080, 0, 1)
+DBPATCH_ADD(7050081, 0, 1)
+DBPATCH_ADD(7050082, 0, 1)
+DBPATCH_ADD(7050083, 0, 1)
+DBPATCH_ADD(7050084, 0, 1)
+DBPATCH_ADD(7050085, 0, 1)
+DBPATCH_ADD(7050086, 0, 1)
+DBPATCH_ADD(7050087, 0, 1)
+DBPATCH_ADD(7050088, 0, 1)
+DBPATCH_ADD(7050089, 0, 1)
+DBPATCH_ADD(7050090, 0, 1)
+DBPATCH_ADD(7050091, 0, 1)
+DBPATCH_ADD(7050092, 0, 1)
+DBPATCH_ADD(7050093, 0, 1)
+DBPATCH_ADD(7050094, 0, 1)
+DBPATCH_ADD(7050095, 0, 1)
+DBPATCH_ADD(7050096, 0, 1)
+DBPATCH_ADD(7050097, 0, 1)
+DBPATCH_ADD(7050098, 0, 1)
+DBPATCH_ADD(7050099, 0, 1)
+DBPATCH_ADD(7050100, 0, 1)
+DBPATCH_ADD(7050101, 0, 1)
+DBPATCH_ADD(7050102, 0, 1)
+DBPATCH_ADD(7050103, 0, 1)
+DBPATCH_ADD(7050104, 0, 1)
+DBPATCH_ADD(7050105, 0, 1)
+DBPATCH_ADD(7050106, 0, 1)
+DBPATCH_ADD(7050107, 0, 1)
+DBPATCH_ADD(7050108, 0, 1)
+DBPATCH_ADD(7050109, 0, 1)
+DBPATCH_ADD(7050110, 0, 1)
+DBPATCH_ADD(7050111, 0, 1)
+DBPATCH_ADD(7050112, 0, 1)
 
 DBPATCH_END()

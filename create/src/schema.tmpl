@@ -601,8 +601,8 @@ HOUSEKEEPER	|1
 
 TABLE|trigger_depends|triggerdepid|ZBX_TEMPLATE
 FIELD		|triggerdepid	|t_id		|	|NOT NULL	|0
-FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid		|RESTRICT
-FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid		|RESTRICT
+FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid	|RESTRICT
+FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid	|RESTRICT
 UNIQUE		|1		|triggerid_down,triggerid_up
 INDEX		|2		|triggerid_up
 CHANGELOG	|22
@@ -2307,10 +2307,11 @@ FIELD		|formula	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|status		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|stop		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
+CHANGELOG	|23
 
 TABLE|cep_condition|cep_conditionid|ZBX_DATA
 FIELD		|cep_conditionid|t_id		|	|NOT NULL	|0
-FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule
+FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule	|cep_ruleid	|RESTRICT
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
@@ -2321,10 +2322,11 @@ FIELD		|host_group	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|time_period	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
+CHANGELOG	|24
 
 TABLE|cep_window|cep_windowid|ZBX_DATA
 FIELD		|cep_windowid	|t_id		|	|NOT NULL	|0
-FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule
+FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule	|cep_ruleid	|RESTRICT
 FIELD		|duration	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|capacity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|symptom_num_tag|t_varchar(255)	|''	|NOT NULL	|0
@@ -2334,51 +2336,60 @@ FIELD		|script		|t_text		|''	|NOT NULL	|0
 FIELD		|group_by	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|group_tag	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
+CHANGELOG	|25
 
 TABLE|cep_window_condition|cep_window_conditionid|ZBX_DATA
 FIELD		|cep_window_conditionid|t_id||NOT NULL|0
-FIELD		|cep_windowid	|t_id		|	|NOT NULL	|0	|1|cep_window
+FIELD		|cep_windowid	|t_id		|	|NOT NULL	|0	|1|cep_window		|cep_windowid	|RESTRICT
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|old_tag_name	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|old_tag_value	|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|new_tag_name	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_windowid
+CHANGELOG	|26
 
 TABLE|cep_operation|cep_operationid|ZBX_DATA
 FIELD		|cep_operationid|t_id		|	|NOT NULL	|0
-FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule
+FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule	|cep_ruleid	|RESTRICT
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|execute_when	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|evaltype	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|value1_str	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|value2_str	|t_varchar(255)	|''	|NOT NULL	|0
-FIELD		|value_int	|t_integer	|'0'	|NOT NULL	|0
+FIELD		|event_name	|t_varchar(2048)|''	|NOT NULL	|0
+FIELD		|tag_name	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|new_tag_name	|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|sortorder	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
+CHANGELOG	|27
 
 TABLE|cep_operation_tag|cep_operation_tagid|ZBX_DATA
-FIELD		|cep_operation_tag|t_id||NOT NULL|0
-FIELD		|cep_operationid|t_id		|	|NOT NULL	|0	|1|cep_operation
+FIELD		|cep_operation_tagid|t_id	|	|NOT NULL	|0
+FIELD		|cep_operationid|t_id		|	|NOT NULL	|0	|1|cep_operation	|cep_operationid	|RESTRICT
 FIELD		|operator	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_operationid
+CHANGELOG	|28
 
 TABLE|cep_group|cep_groupid|ZBX_DATA
 FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0
-FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule
-FIELD		|groupid	|t_id		|	|NULL		|0	|2|hstgrp
-FIELD		|hostid		|t_id		|	|NULL		|0	|3|hosts
-FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|cep_ruleid	|t_id		|	|NOT NULL	|0	|1|cep_rule	|cep_ruleid
+FIELD		|groupid	|t_id		|	|NULL		|0	|2|hstgrp	|groupid
+FIELD		|hostid		|t_id		|	|NULL		|0	|3|hosts	|hostid
+FIELD		|tag_value	|t_varchar(255)	|''	|NOT NULL	|0
 INDEX		|1		|cep_ruleid
+INDEX		|2		|groupid
+INDEX		|3		|hostid
 
 TABLE|cep_group_event|cep_groupid,eventid|ZBX_DATA
-FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0	|1|cep_group
-FIELD		|eventid	|t_id		|	|NULL		|0	|2|events
+FIELD		|cep_groupid	|t_id		|	|NOT NULL	|0	|1|cep_group	|cep_groupid
+FIELD		|eventid	|t_id		|	|NULL		|0	|2|events	|eventid
+INDEX		|1		|eventid
 
 TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050067	|7050067
+ROW		|1		|7050112	|7050112
