@@ -1,1 +1,0 @@
-..F....... [ZBX-26633] changed host wizard agent port validation to accept values from 1024 to 32767 (aluchko)
