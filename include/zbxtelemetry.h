@@ -92,7 +92,7 @@ ZBX_VECTOR_DECL(tq_aggr_column, zbx_tq_aggr_column_t)
 
 typedef struct
 {
-	char			*column;
+	char			*column_name;
 	char			*json_path;
 	char			*value;
 	zbx_tq_operator_t	operator;

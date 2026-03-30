@@ -50,7 +50,19 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		}
 		out_str = zbx_strdcatf(out_str, "}, alias: '%s'\n", aggr_col->alias);
 	}
-	out_str = zbx_strdcatf(out_str, "TODO...\n");
+	out_str = zbx_strdcatf(out_str, "evaltype: %d\n", (int)query.evaltype);
+	out_str = zbx_strdcatf(out_str, "formula: %s\n", query.formula);
+	out_str = zbx_strdcatf(out_str, "conditions:\n");
+	for (int i = 0; i < query.conditions.values_num; i++) {
+		out_str = zbx_strdcatf(out_str, "-- column_name: '%s', json_path: '%s', value: '%s', operator: %d\n",
+				ZBX_NULL2STR(query.conditions.values[i].column_name),
+				ZBX_NULL2STR(query.conditions.values[i].json_path),
+				ZBX_NULL2STR(query.conditions.values[i].value),
+				(int)query.conditions.values[i].operator);
+	}
+	out_str = zbx_strdcatf(out_str, "time_shift: %d\n", query.time_shift);
+	out_str = zbx_strdcatf(out_str, "loopback_limit: %d\n", query.loopback_limit);
+	out_str = zbx_strdcatf(out_str, "aggregation_size: %d\n", query.aggregation_size);
 
 	SET_TEXT_RESULT(result, out_str);
 
