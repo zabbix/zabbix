@@ -769,7 +769,8 @@ int	zbx_add_key_access_rule(const char *parameter, char *pattern, zbx_key_access
  *             type      - [IN] key access rule type (allow/deny)             *
  *                                                                            *
  * Return value: SUCCEED - successful execution                               *
- *               FAIL    - regular expression compilation failed              *
+ *               FAIL    - empty pattern or regular expression compilation    *
+ *                         failed                                             *
  *                                                                            *
  ******************************************************************************/
 int	zbx_add_key_access_rule_regexp(const char *parameter, char *pattern, zbx_key_access_rule_type_t type)
