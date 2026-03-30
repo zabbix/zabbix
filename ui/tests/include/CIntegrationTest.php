@@ -998,6 +998,9 @@ class CIntegrationTest extends CAPITest {
 
 				if (is_array($response['result']) && count($response['result']) > 0
 						&& ($callback === null || call_user_func($callback, $response))) {
+					if (self::TRACE_DELAYS && $usleep_total !== 0) {
+						fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%f\n", $usleep_total));
+					}
 					return $response;
 				}
 			} catch (Exception $e) {
