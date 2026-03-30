@@ -156,9 +156,9 @@ class testFormEventCorrelation extends CWebTest {
 		// Check mandatory fields.
 		$this->assertEquals(['Name', 'Conditions', 'Operations'], $form->getRequiredLabels());
 
-		// Check input attributes.
+		// Check input and textarea attributes.
 		$field_attributes = [
-			'Name' => ['type' => 'text', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
+			'Name' => ['data-field-type' => 'z-textarea-flexible', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
 			'id:evaltype' => ['value' => 0],
 			'id:formula' => ['type' => 'text', 'value' => '', 'maxlength' => 255, 'placeholder' => 'A or (B and C) ...',
 					'disabled' => 'true'],

@@ -12,16 +12,16 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_ZBXPREPROC_PP_MOCK_H
-#define ZABBIX_ZBXPREPROC_PP_MOCK_H
+#ifndef ZABBIX_SNMP_H
+#define ZABBIX_SNMP_H
 
-#include "zbxtime.h"
+#include "zbxcommon.h"
 
-int	str_to_preproc_type(const char *str);
+#if defined(HAVE_NETSNMP)
 
-void	mock_pp_read_variant(zbx_mock_handle_t handle, zbx_variant_t *value);
-void	mock_pp_read_value(zbx_mock_handle_t handle, unsigned char *value_type, zbx_variant_t *value,
-		zbx_timespec_t *ts);
-void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step);
+void	zbx_snmp_init(const char *progname);
+void	zbx_snmp_clear(const char *progname);
 
 #endif
+
+#endif /* ZABBIX_CURL_H */
