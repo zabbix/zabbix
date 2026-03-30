@@ -1052,6 +1052,7 @@ class CIntegrationTest extends CAPITest {
 					if (self::TRACE_DELAYS) {
 						$total = microtime(true) - $start;
 						self::$delay_call_data_present_per_test_file += $total;
+						self::$delay_call_data_present_total += $total;
 					}
 
 					return $response;
@@ -1073,6 +1074,7 @@ class CIntegrationTest extends CAPITest {
 		if (self::TRACE_DELAYS) {
 			$total = microtime(true) - $start;
 			self::$delay_call_data_present_per_test_file += $total;
+			self::$delay_call_data_present_total += $total;
 		}
 
 		if ($exception !== null) {
@@ -1180,6 +1182,7 @@ class CIntegrationTest extends CAPITest {
 				if (self::TRACE_DELAYS) {
 					$total = microtime(true) - $start;
 					self::$delay_wait_log_line_per_test_file += $total;
+					self::$delay_wait_log_line_total += $total;
 				}
 				return true;
 			}
@@ -1221,6 +1224,7 @@ class CIntegrationTest extends CAPITest {
 		if (self::TRACE_DELAYS) {
 			$total = microtime(true) - $start;
 			self::$delay_wait_log_line_per_test_file += $total;
+			self::$delay_wait_log_line_total += $total;
 		}
 
 		throw new Exception($error_msg);
