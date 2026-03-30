@@ -380,16 +380,16 @@ $form_grid
 						'label' => _('Close old events'),
 						'name' => 'operations['.ZBX_CORR_OPERATION_CLOSE_OLD.']',
 						'value' => ZBX_CORR_OPERATION_CLOSE_OLD,
-						'checked' => boolval(array_filter($data['correlation']['operations'], fn (array $operation) =>
-							$operation['type'] == ZBX_CORR_OPERATION_CLOSE_OLD
+						'checked' => in_array(ZBX_CORR_OPERATION_CLOSE_OLD, array_column(
+							$data['correlation']['operations'], 'type'
 						))
 					],
 					[
 						'label' => _('Close new event'),
 						'name' => 'operations['.ZBX_CORR_OPERATION_CLOSE_NEW.']',
 						'value' => ZBX_CORR_OPERATION_CLOSE_NEW,
-						'checked' => boolval(array_filter($data['correlation']['operations'], fn (array $operation) =>
-							$operation['type'] == ZBX_CORR_OPERATION_CLOSE_NEW
+						'checked' => in_array(ZBX_CORR_OPERATION_CLOSE_NEW, array_column(
+							$data['correlation']['operations'], 'type'
 						))
 					]
 				])
