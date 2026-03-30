@@ -6,7 +6,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
-A......... [ZBX-27306] prevented deletion of httptest items tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
+A......... [ZBX-27306] prevented deletion of httptest item tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.45
