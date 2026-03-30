@@ -301,6 +301,11 @@ class CIntegrationTest extends CAPITest {
 		parent::onAfterTestCase();
 
 		self::$case_configuration = [];
+
+		if (self::TRACE_DELAYS) {
+			fwrite(STDERR, sprintf("[%s::%s] TOTAL Test callUntilDataIsPresent delay: %.4fs\n", get_class($this), $this->getName(), self::$delay_per_test));
+			self::$delay_per_test = 0.0;
+		}
 	}
 
 	/**
@@ -323,6 +328,11 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		parent::onAfterTestSuite();
+
+		if (self::TRACE_DELAYS) {
+			fwrite(STDERR, sprintf("[%s::%s] TOTAL SUITE callUntilDataIsPresent delay: %.4fs\n", get_class($this), $this->getName(), self::$delay_per_suite));
+			self::$delay_per_suite = 0.0;
+		}
 	}
 
 	/**
@@ -951,6 +961,9 @@ class CIntegrationTest extends CAPITest {
 		sleep(self::HOUSEKEEPER_EXEC_DELAY);
 	}
 
+	private static $delay_per_test = 0.0;
+	private static $delay_per_suite = 0.0;
+
 	/**
 	 * Request data from API until data is present (@see call).
 	 *
@@ -973,6 +986,8 @@ class CIntegrationTest extends CAPITest {
 
 		$exception = null;
 		$usleep_total = 0;
+		$start = microtime(true);
+
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $params);
@@ -992,11 +1007,14 @@ class CIntegrationTest extends CAPITest {
 				continue;
 			}
 
-			if (self::TRACE_DELAYS) {
-				fwrite(STDERR, sprintf("callUntilDataIsPresent delay:%ds\n", $delay));
-			}
-
 			sleep($delay);
+		}
+
+		if (self::TRACE_DELAYS) {
+			$total = microtime(true) - $start;
+			fwrite(STDERR, sprintf("callUntilDataIsPresent took %.4fs\n", $total));
+			self::$delay_per_test += $total;
+			self::$delay_per_suite += $total;
 		}
 
 		if ($exception !== null) {
