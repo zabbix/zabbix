@@ -163,11 +163,6 @@ class CControllerCorrelationUpdate extends CController {
 			unset($condition);
 		}
 
-		foreach ($correlation['filter']['conditions'] as &$condition) {
-			unset($condition['row_index']);
-		}
-		unset($condition);
-
 		foreach ($this->getInput('operations') as $operation) {
 			$correlation['operations'][] = ['type' => $operation];
 		}
