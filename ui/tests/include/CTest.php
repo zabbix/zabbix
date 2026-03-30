@@ -52,6 +52,8 @@ use PHPUnit\Framework\TestCase;
 
 class CTest extends TestCase {
 
+	const TRACE_DELAYS = true;
+
 	// Table that should be backed up at the test suite level.
 	protected static $suite_backup = null;
 	// Table that should be backed up at the test case level.
@@ -296,7 +298,10 @@ class CTest extends TestCase {
 				$start = microtime(true);
 				CDBHelper::restoreTables();
 				$caseDuration = microtime(true) - $start;
-				fwrite(STDERR, sprintf("[%s::%s] onBeforeTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+
+				if (self::TRACE_DELAYS) {
+					fwrite(STDERR, sprintf("[%s::%s] onBeforeTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+				}
 
 				self::$case_backup_once = null;
 			}
@@ -418,7 +423,10 @@ class CTest extends TestCase {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
 			$caseDuration = microtime(true) - $start;
-			fwrite(STDERR,sprintf("[%s::%s] onAfterTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR,sprintf("[%s::%s] onAfterTestCase Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+			}
 		}
 
 		// Execute callbacks that should be executed after specific test case.
@@ -465,7 +473,10 @@ class CTest extends TestCase {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
 			$caseDuration = microtime(true) - $start;
-			fwrite(STDERR, sprintf("[%s::%s] onAfterTestSuite Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("[%s::%s] onAfterTestSuite Backup restore took %.4fs\n", get_class($this), $this->getName(), $caseDuration));
+			}
 
 			self::$case_backup_once = null;
 		}
@@ -475,7 +486,10 @@ class CTest extends TestCase {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
 			$caseDuration = microtime(true) - $start;
-			fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Backup restore took %.4fs\n", $caseDuration));
+
+			if (self::TRACE_DELAYS) {
+				fwrite(STDERR, sprintf("[Suite] onAfterTestSuite Backup restore took %.4fs\n", $caseDuration));
+			}
 
 			self::$suite_backup = null;
 		}

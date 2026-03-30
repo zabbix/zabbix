@@ -27,9 +27,6 @@ class CIntegrationTest extends CAPITest {
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
 
-	// Set to true to print delay trace messages to STDERR.
-	const TRACE_DELAYS = false;
-
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
 	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
