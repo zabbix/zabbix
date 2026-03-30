@@ -108,8 +108,8 @@ class CDefaultDataProvider extends CDataProvider {
 			const page_changed = this.#last_page !== page;
 			const sort_changed = this.#last_sort_field !== sort_field || this.#last_sort_order !== sort_order;
 
-			if (fields_set_changed || columns_options_changed || filter_changed || options_changed
-				|| page_changed || sort_changed
+			if (!fields_set_changed && !columns_options_changed && !filter_changed && !options_changed
+				&& !page_changed && !sort_changed
 			) {
 				return Promise.resolve(this.#last_response);
 			}
