@@ -33,8 +33,6 @@ class CDevice extends CApiService {
 	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'activated_at', 'lastaccess'];
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
-	private const TASK_DEVICE_INIT_TTL = 30;
-	private const TASK_DEVICE_OFFBOARD_TTL = 86400;
 
 	private const STATUS_NEW = 0;
 	private const STATUS_ENABLED = 1;
@@ -150,11 +148,28 @@ class CDevice extends CApiService {
 
 		$enrollment_token = CApiTokenHelper::generateToken();
 		$uuid = generateUuidV7();
+
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		// todo - replace this mock for Server ID by real method
+		$server_id = 'server_id';
+
+		$init_device_data = ['serverid' => $server_id, 'uuid' => $uuid];
+
+		$result = $server->initDevice($init_device_data, self::getAuthIdentifier());
+
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
+		}
+
 		$time_start = time();
 
 		$deviceid = self::createDevice($db_user['userid'], $enrollment_token, $uuid, $time_start);
-
-		$taskid = self::createInitTask($deviceid, $time_start);
 
 		$device = [
 			'deviceid' => $deviceid,
@@ -167,8 +182,11 @@ class CDevice extends CApiService {
 
 		return [
 			'uuid' => $uuid,
-			'taskid' => $taskid,
-			'enrollment_token' => $enrollment_token
+			'server_id' => $server_id,
+			'enrollment_token' => $enrollment_token,
+			'mobile_enrollment_token' => $result['mobile_enrollment_token'],
+			'bridge_enrollment_key' => $result['bridge_enrollment_key'],
+			'enrollment_url' => $result['enrollment_url']
 		];
 	}
 
@@ -229,28 +247,6 @@ class CDevice extends CApiService {
 		DB::insertBatch('device_enrollment_token', [$ins_device_enrollment_token], false);
 
 		return $deviceid;
-	}
-
-	private static function createInitTask(string $deviceid, int $time_start): string {
-		$ins_task = [
-			'type' =>ZBX_TM_TASK_INIT_DEVICE,
-			'status' => ZBX_TM_STATUS_NEW,
-			'clock' => $time_start,
-			'ttl' => self::TASK_DEVICE_INIT_TTL
-		];
-
-		$taskids = DB::insertBatch('task', [$ins_task]);
-
-		$taskid = array_shift($taskids);
-
-		$ins_task_device_init = [
-			'taskid' => $taskid,
-			'deviceid' => $deviceid
-		];
-
-		DB::insertBatch('task_device_init', [$ins_task_device_init], false);
-
-		return $taskid;
 	}
 
 	/**
@@ -398,15 +394,15 @@ class CDevice extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function delete(array $deviceids): array {
-		$this->validateDelete($deviceids, $db_devices);
+	public function offboard(array $deviceids): array {
+		$this->validateOffboard($deviceids, $db_devices);
 
-		self::deleteForce($db_devices);
+		self::offboardForce($db_devices);
 
 		return ['deviceids' => $deviceids];
 	}
 
-	private function validateDelete(array $deviceids, ?array &$db_devices): void {
+	private function validateOffboard(array $deviceids, ?array &$db_devices): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $deviceids, '/', $error)) {
@@ -424,8 +420,19 @@ class CDevice extends CApiService {
 		}
 	}
 
-	public static function deleteForce(array $db_devices): void {
-		self::createOffboardTasks($db_devices);
+	public static function offboardForce(array $db_devices): void {
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$sid = self::getAuthIdentifier();
+
+		foreach ($db_devices as $db_device) {
+			$server->offboardDevice(['uuid' => $db_device['uuid']], $sid);
+		}
 
 		$deviceids = array_keys($db_devices);
 
@@ -442,35 +449,5 @@ class CDevice extends CApiService {
 		DB::delete('device', ['deviceid' => $deviceids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
-	}
-
-	private static function createOffboardTasks(array $db_devices): void {
-		$device_cnt = count(array_keys($db_devices));
-		$taskid = DB::reserveIds('task', $device_cnt);
-
-		$time = time();
-
-		$ins_tasks = [];
-		$ins_task_device_offboards = [];
-
-		foreach ($db_devices as $db_device) {
-			$ins_tasks[] = [
-				'taskid' => $taskid,
-				'type' =>ZBX_TM_TASK_OFFBOARD_DEVICE,
-				'status' => ZBX_TM_STATUS_NEW,
-				'clock' => $time,
-				'ttl' => self::TASK_DEVICE_OFFBOARD_TTL
-			];
-
-			$ins_task_device_offboards[] = [
-				'taskid' => $taskid,
-				'uuid' => $db_device['uuid']
-			];
-
-			$taskid = bcadd($taskid, 1, 0);
-		}
-
-		DB::insertBatch('task', $ins_tasks, false);
-		DB::insertBatch('task_device_offboard', $ins_task_device_offboards, false);
 	}
 }

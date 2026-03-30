@@ -37,7 +37,8 @@ class CControllerTimeoutsEdit extends CController {
 			'media_type_test_timeout' =>	'setting media_type_test_timeout',
 			'script_timeout' =>				'setting script_timeout',
 			'item_test_timeout' =>			'setting item_test_timeout',
-			'report_test_timeout' =>		'setting report_test_timeout'
+			'report_test_timeout' =>		'setting report_test_timeout',
+			'device_link_timeout' =>		'setting device_link_timeout'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -102,6 +103,9 @@ class CControllerTimeoutsEdit extends CController {
 			)),
 			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
+			)),
+			'device_link_timeout' => $this->getInput('device_link_timeout', CSettingsHelper::get(
+				CSettingsHelper::DEVICE_LINK_TIMEOUT
 			))
 		];
 

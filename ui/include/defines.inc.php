@@ -1197,8 +1197,6 @@ define('ZBX_TM_TASK_CLOSE_PROBLEM', 	1);
 define('ZBX_TM_TASK_ACKNOWLEDGE',		4);
 define('ZBX_TM_TASK_CHECK_NOW',			6);
 define('ZBX_TM_TASK_DATA',				7);
-define('ZBX_TM_TASK_INIT_DEVICE',		11);
-define('ZBX_TM_TASK_OFFBOARD_DEVICE',	12);
 
 define('ZBX_TM_STATUS_NEW',			1);
 define('ZBX_TM_STATUS_INPROGRESS',	2);

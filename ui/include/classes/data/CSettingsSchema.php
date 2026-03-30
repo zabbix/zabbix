@@ -569,6 +569,11 @@ final class CSettingsSchema {
 			'column' => 'value_str',
 			'default' => 'SAMEORIGIN',
 			'length' => 255
+		],
+		'device_link_timeout' => [
+			'column' => 'value_str',
+			'default' => '30s',
+			'length' => 32
 		]
 	];
 

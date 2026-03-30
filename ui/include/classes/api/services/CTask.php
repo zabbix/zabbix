@@ -20,15 +20,13 @@
 class CTask extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
+		'get' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
 		'create' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'task';
 	protected $tableAlias = 't';
 	protected $sortColumns = ['taskid'];
-
-	public const OUTPUT_FIELDS = ['taskid', 'type', 'status', 'clock', 'ttl', 'proxyid', 'request', 'result'];
 
 	private $item_cache = [];
 
@@ -45,11 +43,17 @@ class CTask extends CApiService {
 	 * @return array | boolean
 	 */
 	public function get(array $options): array {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
+		$output_fields = ['taskid', 'type', 'status', 'clock', 'ttl', 'proxyid', 'request', 'result'];
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'taskids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE | API_ALLOW_NULL, 'default' => null],
 			// output
-			'output' =>			['type' => API_OUTPUT, 'flags' => API_NORMALIZE, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'output' =>			['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			// flags
 			'preservekeys' =>	['type' => API_BOOLEAN, 'default' => false]
 		]];
@@ -70,61 +74,36 @@ class CTask extends CApiService {
 
 		while ($row = DBfetch($result, false)) {
 			if ($this->outputIsRequested('request', $options['output'])) {
-				$row['request'] = match ((int) $row['type']) {
-					ZBX_TM_TASK_DATA => json_decode($row['request_data']),
-					ZBX_TM_TASK_INIT_DEVICE => ['deviceid' => $row['deviceid']]
-				};
-
-				unset($row['request_data'], $row['deviceid']);
+				$row['request'] = json_decode($row['request_data']);
+				unset($row['request_data']);
 			}
 
 			if ($this->outputIsRequested('result', $options['output'])) {
-				switch ($row['type']) {
-					case ZBX_TM_TASK_DATA:
-						if ($row['result_status'] === null) {
-							$row['result'] = null;
-						}
-						else {
-							if ($row['result_status'] == self::RESULT_STATUS_ERROR) {
-								$result_data = $row['result_info'];
-							}
-							else {
-								$result_data = $row['result_info'] ? json_decode($row['result_info']) : [];
-							}
+				if ($row['result_status'] === null) {
+					$row['result'] = null;
+				}
+				else {
+					if ($row['result_status'] == self::RESULT_STATUS_ERROR) {
+						$result_data = $row['result_info'];
+					}
+					else {
+						$result_data = $row['result_info'] ? json_decode($row['result_info']) : [];
+					}
 
-							$row['result'] = [
-								'data' => $result_data,
-								'status' => $row['result_status']
-							];
-						}
-						break;
-
-					case ZBX_TM_TASK_INIT_DEVICE:
-						if ($row['status'] <= ZBX_TM_STATUS_INPROGRESS) {
-							$row['result'] = null;
-						}
-						else {
-							$row['result'] = [
-								'data' => $row['task_device_status'] == self::RESULT_STATUS_ERROR
-									? $row['task_device_info']
-									: array_intersect_key($row, array_flip(['mobile_enrollment_token',
-										'bridge_enrollment_key', 'enrollment_url'
-									])),
-								'status' => $row['task_device_status']
-							];
-						}
+					$row['result'] = [
+						'data' => $result_data,
+						'status' => $row['result_status']
+					];
 				}
 
-				$row = array_diff_key($row, array_flip(['result_info', 'result_status', 'mobile_enrollment_token',
-					'bridge_enrollment_key', 'enrollment_url', 'task_device_status', 'task_device_info'
-				]));
+				unset($row['result_info'], $row['result_status']);
 			}
 
 			$db_tasks[$row['taskid']] = $row;
 		}
 
 		if ($db_tasks) {
-			$db_tasks = $this->unsetExtraFields($db_tasks, ['taskid', 'type', 'status'], $options['output']);
+			$db_tasks = $this->unsetExtraFields($db_tasks, ['taskid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_tasks = array_values($db_tasks);
@@ -137,17 +116,7 @@ class CTask extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		$allowed_types = self::$userData['type'] == USER_TYPE_SUPER_ADMIN
-			? [ZBX_TM_TASK_DATA, ZBX_TM_TASK_INIT_DEVICE]
-			: [ZBX_TM_TASK_INIT_DEVICE];
-
-		$sql_parts['where'][] = dbConditionInt($table_alias.'.type', $allowed_types);
-
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$sql_parts['join']['tdi2'] = ['table' => 'task_device_init', 'using' => 'taskid'];
-			$sql_parts['join']['d'] = ['left_table' => 'tdi2', 'table' => 'device', 'using' => 'deviceid'];
-			$sql_parts['where'][] = dbConditionId('d.userid', [self::$userData['userid']]);
-		}
+		$sql_parts['where'][] = dbConditionInt('t.type', [ZBX_TM_TASK_DATA]);
 
 		return $sql_parts;
 	}
@@ -487,34 +456,21 @@ class CTask extends CApiService {
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
 
-		$sql_parts = $this->addQuerySelect($tableAlias.'.type', $sql_parts);
-		$sql_parts = $this->addQuerySelect($tableAlias.'.status', $sql_parts);
-
 		if ($this->outputIsRequested('request', $options['output'])) {
-			$sql_parts['join']['req'] =
-				['type' => 'left', 'table' => 'task_data', 'on' => ['taskid' => 'parent_taskid']];
+			$sql_parts['join']['req'] = ['type' => 'left', 'table' => 'task_data',
+				'on' => ['taskid' => 'parent_taskid']
+			];
 
 			$sql_parts = $this->addQuerySelect('req.data AS request_data', $sql_parts);
-
-			$sql_parts['join']['tdi'] = ['type' => 'left', 'table' => 'task_device_init', 'using' => 'taskid'];
-
-			$sql_parts = $this->addQuerySelect('tdi.deviceid', $sql_parts);
 		}
 
 		if ($this->outputIsRequested('result', $options['output'])) {
-			$sql_parts['join']['resp'] =
-				['type' => 'left', 'table' => 'task_result', 'on' => ['taskid' => 'parent_taskid']];
+			$sql_parts['join']['resp'] = ['type' => 'left', 'table' => 'task_result',
+				'on' => ['taskid' => 'parent_taskid']
+			];
 
 			$sql_parts = $this->addQuerySelect('resp.info AS result_info', $sql_parts);
 			$sql_parts = $this->addQuerySelect('resp.status AS result_status', $sql_parts);
-
-			$sql_parts['join']['tdi'] = ['type' => 'left', 'table' => 'task_device_init', 'using' => 'taskid'];
-
-			$sql_parts = $this->addQuerySelect('tdi.mobile_enrollment_token', $sql_parts);
-			$sql_parts = $this->addQuerySelect('tdi.bridge_enrollment_key', $sql_parts);
-			$sql_parts = $this->addQuerySelect('tdi.enrollment_url', $sql_parts);
-			$sql_parts = $this->addQuerySelect('tdi.status AS task_device_status', $sql_parts);
-			$sql_parts = $this->addQuerySelect('tdi.info AS task_device_info', $sql_parts);
 		}
 
 		return $sql_parts;

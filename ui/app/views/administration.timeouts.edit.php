@@ -199,6 +199,16 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
+			->addItem([
+				(new CLabel(_('Device link'), 'device_link_timeout'))->setAsteriskMark(),
+				new CFormField(
+					(new CTextBox('device_link_timeout', $data['device_link_timeout'], false,
+						CSettingsSchema::getFieldLength('device_link_timeout')
+					))
+						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+						->setAriaRequired()
+				)
+			])
 	)
 	->addItem(
 		new CFormActions(new CSubmit('update', _('Update')), [new CButton('reset-defaults', _('Reset defaults'))])
@@ -233,7 +243,8 @@ $form->addItem(
 			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
 			'script_timeout' => CSettingsSchema::getDefault('script_timeout'),
 			'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
-			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
+			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout'),
+			'device_link_timeout' => CSettingsSchema::getDefault('device_link_timeout')
 		]
 	]).');
 '))

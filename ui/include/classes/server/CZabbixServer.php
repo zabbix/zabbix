@@ -296,6 +296,39 @@ class CZabbixServer {
 	}
 
 	/**
+	 * Request server to init mobile device.
+	 *
+	 * @param array  $data
+	 * @param array  $data['uuid']      External device ID.
+	 * @param array  $data['serverid']  Server ID.
+	 * @param string $sid               User session ID or token.
+	 */
+	public function initDevice(array $data, string $sid): array|bool {
+		return $this->request([
+			'request' => 'device.init',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
+	}
+
+	/**
+	 * Request server to offboard mobile device.
+	 *
+	 * @param array  $data
+	 * @param array  $data['uuid']      External device ID.
+	 * @param string $sid               User session ID or token.
+	 */
+	public function offboardDevice(array $data, string $sid): array|bool {
+		return $this->request([
+			'request' => 'device.offboard',
+			'data' => $data,
+			'sid' => $sid,
+			'clientip' => CWebUser::getIp()
+		]);
+	}
+
+	/**
 	 * Retrieve System information.
 	 *
 	 * @param $sid

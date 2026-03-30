@@ -2044,7 +2044,7 @@ class CUser extends CApiService {
 		]);
 
 		if ($db_devices) {
-			CDevice::deleteForce($db_devices);
+			CDevice::offboardForce($db_devices);
 		}
 
 		$db_tokens = DB::select('token', [

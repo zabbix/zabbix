@@ -50,6 +50,7 @@ class CSettingsHelper {
 	public const SCRIPT_TIMEOUT = 'script_timeout';
 	public const ITEM_TEST_TIMEOUT = 'item_test_timeout';
 	public const SCHEDULED_REPORT_TEST_TIMEOUT = 'report_test_timeout';
+	public const DEVICE_LINK_TIMEOUT = 'device_link_timeout';
 
 	// Trigger displaying options.
 	public const CUSTOM_COLOR = 'custom_color';
@@ -136,7 +137,7 @@ class CSettingsHelper {
 					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
 					'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout',
-					'script_timeout', 'item_test_timeout', 'report_test_timeout',
+					'script_timeout', 'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
 
 					// Trigger displaying options.
 					'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color',

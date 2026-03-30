@@ -34,7 +34,7 @@ class CSettings extends CApiService {
 		'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
 		'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent', 'timeout_script',
 		'timeout_browser', 'socket_timeout', 'connect_timeout', 'media_type_test_timeout', 'script_timeout',
-		'item_test_timeout', 'report_test_timeout',
+		'item_test_timeout', 'report_test_timeout', 'device_link_timeout',
 
 		// Trigger displaying options.
 		'custom_color', 'problem_unack_color', 'problem_unack_style', 'problem_ack_color', 'problem_ack_style',
@@ -182,6 +182,7 @@ class CSettings extends CApiService {
 			'script_timeout' =>					['type' => API_TIME_UNIT, 'in' => '1:300'],
 			'item_test_timeout' =>				['type' => API_TIME_UNIT, 'in' => '1:600'],
 			'report_test_timeout' =>			['type' => API_TIME_UNIT, 'in' => '1:300'],
+			'device_link_timeout' =>			['type' => API_TIME_UNIT, 'in' => '1:300'],
 
 			// Trigger displaying options.
 			'custom_color' =>					['type' => API_INT32, 'in' => EVENT_CUSTOM_COLOR_DISABLED.','.EVENT_CUSTOM_COLOR_ENABLED],

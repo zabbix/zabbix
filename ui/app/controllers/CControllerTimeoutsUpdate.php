@@ -33,7 +33,8 @@ class CControllerTimeoutsUpdate extends CController {
 			'media_type_test_timeout' =>	'required|time_unit 1:300',
 			'script_timeout' =>				'required|time_unit 1:300',
 			'item_test_timeout' =>			'required|time_unit 1:600',
-			'report_test_timeout' =>		'required|time_unit 1:300'
+			'report_test_timeout' =>		'required|time_unit 1:300',
+			'device_link_timeout' =>		'required|time_unit 1:300'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -81,7 +82,8 @@ class CControllerTimeoutsUpdate extends CController {
 			CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT => $this->getInput('media_type_test_timeout'),
 			CSettingsHelper::SCRIPT_TIMEOUT => $this->getInput('script_timeout'),
 			CSettingsHelper::ITEM_TEST_TIMEOUT => $this->getInput('item_test_timeout'),
-			CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT => $this->getInput('report_test_timeout')
+			CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT => $this->getInput('report_test_timeout'),
+			CSettingsHelper::DEVICE_LINK_TIMEOUT => $this->getInput('device_link_timeout')
 		];
 
 		$result = API::Settings()->update($settings);
