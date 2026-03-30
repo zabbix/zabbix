@@ -84,7 +84,7 @@ class CControllerUsergroupEdit extends CController {
 			'userdirectoryid' => 0,
 			'users_status' => $db_defaults['users_status'],
 			'debug_mode' => $db_defaults['debug_mode'],
-			'group_mfa_status' => $mfa_config_status ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
+			'mfa_status' => $mfa_config_status == MFA_ENABLED ? GROUP_MFA_ENABLED : GROUP_MFA_DISABLED,
 			'mfaid' => 0
 		];
 
@@ -95,8 +95,11 @@ class CControllerUsergroupEdit extends CController {
 			$data['users_status'] = $this->user_group['users_status'];
 			$data['debug_mode'] = $this->user_group['debug_mode'];
 			$data['userdirectoryid'] = $this->user_group['userdirectoryid'];
-			$data['group_mfa_status'] = $this->user_group['mfa_status'];
-			$data['mfaid'] = $this->user_group['mfaid'];
+			$data['mfa_status'] = $this->user_group['mfa_status'];
+
+			if ($this->user_group['mfa_status'] == GROUP_MFA_ENABLED) {
+				$data['mfaid'] = $this->user_group['mfaid'];
+			}
 		}
 
 		$this->getInputs($data, ['name', 'gui_access', 'users_status', 'debug_mode']);

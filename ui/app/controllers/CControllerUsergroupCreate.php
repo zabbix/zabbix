@@ -40,7 +40,7 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 			'mfaid' => ['db mfa.mfaid', 'when' => ['mfa_status', 'in' => [GROUP_MFA_ENABLED]]],
 			'users_status' => ['db usrgrp.users_status', 'in' => [GROUP_STATUS_ENABLED, GROUP_STATUS_DISABLED]],
 			'userids' => [
-				['array', 'field' => ['db users_groups.userid']],
+				['array', 'required', 'field' => ['db users_groups.userid']],
 				['array',
 					'field' => [
 						'string', 'not_in' => [CWebUser::$data['userid']],
@@ -61,15 +61,15 @@ class CControllerUsergroupCreate extends CControllerUsergroupUpdateGeneral {
 				]
 			],
 			'debug_mode' => ['db usrgrp.debug_mode', 'in' => [GROUP_DEBUG_MODE_DISABLED, GROUP_DEBUG_MODE_ENABLED]],
-			'templategroup_rights' => ['objects', 'fields' => [
+			'templategroup_rights' => ['objects', 'required', 'fields' => [
 				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
-			'hostgroup_rights' => ['objects', 'fields' => [
+			'hostgroup_rights' => ['objects', 'required', 'fields' => [
 				'groupids' => ['array', 'required', 'not_empty', 'field' => ['db rights.groupid']],
 				'permission' => ['integer', 'required', 'in' => [PERM_DENY, PERM_READ, PERM_READ_WRITE]]
 			]],
-			'tag_filters' => ['objects',
+			'tag_filters' => ['objects', 'required',
 				'fields' => [
 					'groupid' => ['db tag_filter.groupid', 'required'],
 					'tags' => ['objects', 'fields' => [

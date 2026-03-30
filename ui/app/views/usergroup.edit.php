@@ -67,19 +67,6 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
-// If MFA is enabled, default option for new user groups should be 0 - 'Default' , otherwise -1 - 'Disabled' .
-if ($data['usrgrpid']) {
-	if ($data['group_mfa_status'] == GROUP_MFA_ENABLED) {
-		$mfa_index = $data['mfaid'] ?: 0;
-	}
-	else {
-		$mfa_index = -1;
-	}
-}
-else {
-	$mfa_index = $data['mfa_config_status'] == MFA_ENABLED ? 0 : -1;
-}
-
 if ($data['can_update_group']) {
 	$select_gui_access = (new CSelect('gui_access'))
 		->setValue($data['gui_access'])
@@ -110,8 +97,8 @@ if ($data['can_update_group']) {
 		->setId('mfa-warning');
 
 	$mfa_select = (new CSelect('mfaid'))
-		->setValue($mfa_index)
-		->setDisabled($mfa_index == -1)
+		->setValue($data['mfaid'])
+		->setDisabled($data['mfa_status'] == GROUP_MFA_DISABLED)
 		->addOption((new CSelectOption(0, _('Default')))
 			->addClass(ZBX_STYLE_DEFAULT_OPTION)
 		)
@@ -136,7 +123,7 @@ if ($data['can_update_group']) {
 			new CFormField(
 				(new CDiv([
 					(new CCheckBox('mfa_status'))
-						->setChecked($mfa_index != -1)
+						->setChecked($data['mfa_status'] == GROUP_MFA_ENABLED)
 						->setUncheckedValue(GROUP_MFA_DISABLED),
 					$mfa_select
 				]))
@@ -158,7 +145,7 @@ else {
 		$mfa_name = $data['mfas'][$data['mfaid']]['name'];
 	}
 	else {
-		$mfa_name = $mfa_index == -1 ? _('Disabled') : _('Default');
+		$mfa_name = $data['mfa_status'] == GROUP_MFA_DISABLED ? _('Disabled') : _('Default');
 	}
 
 	$userdirectory_name = array_key_exists($data['userdirectoryid'], $data['userdirectories'])
