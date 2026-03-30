@@ -265,7 +265,7 @@ static char	*get_unique_id(char *hdisk, zbx_vector_disk_ptr_t *devices)
 	if (FAIL != index)
 		return devices->values[index]->unique_id;
 	else
-		return "";
+		return NULL;
 }
 
 static void	log_odm_err(const char *err_prefix)
@@ -338,10 +338,10 @@ out2:
 }
 #endif /* HAVE_LIBODM */
 
-static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_rxp, struct zbx_json *cfg,
-		struct zbx_json *val)
+static int	vfs_dev_get_process_entries(AGENT_RESULT *result, int mode, const zbx_regexp_t *disknames_rxp,
+		struct zbx_json *cfg, struct zbx_json *val)
 {
-	int			i, num_avail, num_filled;
+	int			i, num_avail, num_filled, ret = SYSINFO_RET_FAIL;
 	perfstat_disk_t		*statp;
 	perfstat_id_t		first;
 #if defined(HAVE_LIBODM)
@@ -352,14 +352,12 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 
 	if (-1 == num_avail)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot retrieve number of available sets of disk statistics, %s",
-				zbx_strerror(errno));
-
-		return;
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain number of devices: %s", zbx_strerror(errno)));
+		return SYSINFO_RET_FAIL;
 	}
 
 	if (0 == num_avail)
-		return;
+		return SYSINFO_RET_OK;
 
 	statp = (perfstat_disk_t *)zbx_calloc(NULL, num_avail, sizeof(perfstat_disk_t));
 
@@ -369,9 +367,8 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 
 	if (-1 == num_filled)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "error while executing retrieving individual disk usage statistics, %s",
-				zbx_strerror(errno));
-
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain device information:: %s",
+				zbx_strerror(errno)));
 		goto out;
 	}
 #if defined(HAVE_LIBODM)
@@ -379,8 +376,11 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 #endif
 	for (i = 0; i < num_filled; i++)
 	{
-		char		buf[MAX_STRING_LEN];
 		perfstat_disk_t	*dsk = &statp[i];
+#if defined(HAVE_LIBODM)
+		char		*devid;
+#endif
+		char		buf[MAX_STRING_LEN];
 
 		if (NULL != disknames_rxp && 0 != zbx_regexp_match_precompiled(dsk->name, disknames_rxp))
 			continue;
@@ -388,9 +388,9 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 		zbx_json_addobject(cfg, NULL);
 		zbx_json_addstring(cfg, "name", dsk->name, ZBX_JSON_TYPE_STRING);
 #if defined(HAVE_LIBODM)
-		zbx_json_addstring(cfg, "devid", get_unique_id(dsk->name, &disks), ZBX_JSON_TYPE_STRING);
-#else
-		zbx_json_addstring(cfg, "devid", "unknown (agent compiled without ODM support)", ZBX_JSON_TYPE_STRING);
+		devid = get_unique_id(dsk->name, &disks);
+		if (NULL != devid)
+			zbx_json_addstring(cfg, "devid", devid, ZBX_JSON_TYPE_STRING);
 #endif
 		zbx_json_addstring(cfg, "type", "disk", ZBX_JSON_TYPE_STRING);
 
@@ -400,12 +400,10 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 			zbx_json_addstring(cfg, "path", buf, ZBX_JSON_TYPE_STRING);
 		}
 
-		zbx_json_adduint64(cfg, "size_bytes", (zbx_uint64_t)dsk->size * 1000000);
+		zbx_json_adduint64(cfg, "size_bytes", (zbx_uint64_t)dsk->size * ZBX_MEBIBYTE);
 
 		if (ZBX_MODE_DISKS == mode)
-		{
 			zbx_json_adduint64(cfg, "logical_block_size", (zbx_uint64_t)dsk->bsize);
-		}
 
 		zbx_json_close(cfg);
 
@@ -423,12 +421,16 @@ static void	vfs_dev_get_process_entries(int mode, const zbx_regexp_t *disknames_
 			zbx_json_close(val);
 		}
 	}
+
+	ret = SYSINFO_RET_OK;
 #if defined(HAVE_LIBODM)
 	zbx_vector_disk_ptr_clear_ext(&disks, disk_free);
 	zbx_vector_disk_ptr_destroy(&disks);
 #endif
 out:
 	zbx_free(statp);
+
+	return ret;
 }
 
 /******************************************************************************
@@ -490,7 +492,11 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (1 == has_vals)
 		zbx_json_initarray(&val, ZBX_JSON_STAT_BUF_LEN);
 
-	vfs_dev_get_process_entries(imode, devnames_rxp, &cfg, &val);
+	if (SYSINFO_RET_FAIL == vfs_dev_get_process_entries(result, imode, devnames_rxp, &cfg, &val))
+	{
+		ret = SYSINFO_RET_FAIL;
+		goto out;
+	}
 
 	zbx_json_addraw(&j, "config", cfg.buffer);
 	if (1 == has_vals)
@@ -498,6 +504,7 @@ int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	SET_STR_RESULT(result, zbx_strdup(NULL, j.buffer));
 
+out:
 	zbx_json_free(&cfg);
 	if (1 == has_vals)
 		zbx_json_free(&val);
