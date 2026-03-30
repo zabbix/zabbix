@@ -216,6 +216,7 @@
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=512"/>
+			<arg line="--with-ares"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-ares"/>
 			<arg line="--with-net-snmp"/>
@@ -440,6 +441,7 @@
 			<arg line="--prefix=${basedir}"/>
 			<arg line="--with-libcurl"/>
 			<arg line="--with-stacksize=512"/>
+			<arg line="--with-ares"/>
 			<arg line="--with-openssl"/>
 			<arg line="--with-net-snmp"/>
 			<arg line="--with-ssh2"/>

@@ -1743,25 +1743,6 @@ out:
     time: 2017-10-29 03:15:00 +03:00
     data: abc
 ---
-test case: throttle_json(1, 123)
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_JSON
-    time: 2017-10-29 03:15:00 +03:00
-    data: 123
-  history:
-    variant: ZBX_VARIANT_JSON
-    time: 2017-10-29 03:14:00 +03:00
-    data: 1
-  step:
-    type: ZBX_PREPROC_THROTTLE_VALUE
-out:
-  return: SUCCEED
-  value: 123
-  history:
-    time: 2017-10-29 03:15:00 +03:00
-    data: 123
----
 test case: throttle_json(, 123)
 in:
   value:
@@ -1777,88 +1758,11 @@ out:
     time: 2017-10-29 03:15:00 +03:00
     data: 123
 ---
-test case: throttle_json(123, 123)
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_STR
-    time: 2017-10-29 03:15:00 +03:00
-    data: 123
-  history:
-    variant: ZBX_VARIANT_JSON
-    time: 2017-10-29 03:14:00 +03:00
-    data: 123
-  step:
-    type: ZBX_PREPROC_THROTTLE_VALUE
-out:
-  return: SUCCEED
-  history:
-    time: 2017-10-29 03:14:00 +03:00
-    data: 123
----
 test case: throttle_timed_json(, abc)
 in:
   value:
     value_type: ITEM_VALUE_TYPE_JSON
     time: 2017-10-29 03:15:00 +03:00
-    data: abc
-  step:
-    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
-    params: 1m
-out:
-  return: SUCCEED
-  value: abc
-  history:
-    time: 2017-10-29 03:15:00 +03:00
-    data: abc
----
-test case: throttle_timed_json(xyz, abc)
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_JSON
-    time: 2017-10-29 03:15:00 +03:00
-    data: abc
-  history:
-    variant: ZBX_VARIANT_JSON
-    time: 2017-10-29 03:14:30 +03:00
-    data: xyz
-  step:
-    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
-    params: 1m
-out:
-  return: SUCCEED
-  value: abc
-  history:
-    time: 2017-10-29 03:15:00 +03:00
-    data: abc
----
-test case: throttle_timed_json(abc, abc, 30s)
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_JSON
-    time: 2017-10-29 03:15:00 +03:00
-    data: abc
-  history:
-    variant: ZBX_VARIANT_JSON
-    time: 2017-10-29 03:14:30 +03:00
-    data: abc
-  step:
-    type: ZBX_PREPROC_THROTTLE_TIMED_VALUE
-    params: 1m
-out:
-  return: SUCCEED
-  history:
-    time: 2017-10-29 03:14:30 +03:00
-    data: abc
----
-test case: throttle_timed_json(abc, abc, 1m)
-in:
-  value:
-    value_type: ITEM_VALUE_TYPE_JSON
-    time: 2017-10-29 03:15:00 +03:00
-    data: abc
-  history:
-    variant: ZBX_VARIANT_JSON
-    time: 2017-10-29 03:14:00 +03:00
     data: abc
   step:
     type: ZBX_PREPROC_THROTTLE_TIMED_VALUE

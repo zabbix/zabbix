@@ -16,9 +16,8 @@
 
 #include "proxyconfigwrite/proxyconfigwrite.h"
 
+#include "zbxregexp.h"
 #include "zbxtimekeeper.h"
-#include "zbxlog.h"
-#include "zbxnix.h"
 #include "zbxcachehistory.h"
 #include "zbxself.h"
 #include "zbxtime.h"
@@ -313,22 +312,16 @@ void	*zbx_proxyconfig_thread(void *args)
 	int				server_num = info->server_num;
 	int				process_num = info->process_num;
 	unsigned char			process_type = info->process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD};
-	char				*process_title;
-	sigjmp_buf			jmp_ret;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_PROF_ENABLE,
+							ZBX_RTC_PROF_DISABLE};
 	time_t				nextcheck;
 	zbx_dbconn_pool_t		*dbpool = unit_args->shared->dbpool;
 	zbx_dbconn_t			*db;
 
-	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
-	zbx_set_log_component(process_title, unit_args->logger);
-
-	zbx_supervisor_update_activity("%s starting", process_title);
+	zbx_supervisor_update_activity("%s starting", unit_args->name);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_dc_config_local_init();
 
@@ -342,7 +335,7 @@ void	*zbx_proxyconfig_thread(void *args)
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), proxyconfig_args_in->config_timeout,
 			&rtc);
 
-	zbx_supervisor_update_activity("%s [syncing configuration]", process_title);
+	zbx_supervisor_update_activity("%s [syncing configuration]", unit_args->name);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "starting initial configuration cache synchronization");
 
@@ -386,6 +379,7 @@ void	*zbx_proxyconfig_thread(void *args)
 			}
 
 			sleeptime = 0;
+			zbx_free(rtc_data);
 		}
 
 		sleeptime = (0 == nextcheck || time(NULL) < nextcheck) ? 1 : 0;
@@ -394,7 +388,7 @@ void	*zbx_proxyconfig_thread(void *args)
 			continue;
 
 		sec = zbx_time();
-		zbx_prof_update(process_title, sec);
+		zbx_prof_update(unit_args->name, sec);
 
 		if (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == info->program_type)
 		{
@@ -402,7 +396,7 @@ void	*zbx_proxyconfig_thread(void *args)
 			{
 				zbx_vector_uint64_t	deleted_itemids;
 
-				zbx_supervisor_update_activity("%s [loading configuration]", process_title);
+				zbx_supervisor_update_activity("%s [loading configuration]", unit_args->name);
 
 				zbx_vector_uint64_create(&deleted_itemids);
 
@@ -429,7 +423,7 @@ void	*zbx_proxyconfig_thread(void *args)
 
 				zbx_vector_uint64_destroy(&deleted_itemids);
 				zbx_supervisor_update_activity("%s [synced config in " ZBX_FS_DBL " sec]",
-						process_title, zbx_time() - sec);
+					unit_args->name, zbx_time() - sec);
 			}
 
 			continue;
@@ -438,7 +432,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		if (1 == config_cache_reload)
 			zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
 
-		zbx_supervisor_update_activity("%s [loading configuration]", process_title);
+		zbx_supervisor_update_activity("%s [loading configuration]", unit_args->name);
 
 		process_configuration_sync(dbpool, &data_size, &synced, info, proxyconfig_args_in);
 
@@ -447,7 +441,7 @@ void	*zbx_proxyconfig_thread(void *args)
 		interval = zbx_time() - sec;
 
 		zbx_supervisor_update_activity("%s [synced config " ZBX_FS_SIZE_T " bytes in " ZBX_FS_DBL
-				" sec, idle %d sec]", process_title, (zbx_fs_size_t)data_size, interval,
+				" sec, idle %d sec]", unit_args->name, (zbx_fs_size_t)data_size, interval,
 				proxyconfig_args_in->config_proxyconfig_frequency);
 
 		if (SEC_PER_HOUR < sec - last_template_cleanup_sec)
@@ -462,14 +456,19 @@ void	*zbx_proxyconfig_thread(void *args)
 		nextcheck = time(NULL) + proxyconfig_args_in->config_proxyconfig_frequency;
 	}
 stop:
+	zbx_deinit_regexp_env();
+	zbx_prof_destroy();
+
 	zbx_history_cache_destroy_local_cache();
 	zbx_ipc_async_socket_close(&rtc);
 
+#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
+	zbx_tls_free();
+#endif
 	zbx_dc_config_local_destroy();
 
-	zbx_supervisor_update_activity("%s [terminated]", process_title);
+	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 
-	zbx_free(process_title);
 	zbx_free(args);
 
 	return NULL;

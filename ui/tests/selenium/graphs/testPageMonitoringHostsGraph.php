@@ -528,6 +528,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -549,6 +550,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -567,6 +569,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -584,6 +587,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -608,6 +612,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -628,6 +633,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -647,6 +653,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -667,6 +674,7 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -683,26 +691,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #30 Simple graphs - filter by Tag and Tag value.
+			// #30 All graphs - filter by 2 Tags and Tag value.
 			[
 				[
 					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					]
-				]
-			],
-			// #31 All graphs - filter by 2 Tags and Tag value.
-			[
-				[
-					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -720,10 +713,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #32 Host graphs - filter by 2 Tags and Tag value.
+			// #31 Host graphs - filter by 2 Tags and Tag value.
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -741,27 +735,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #33 Simple graphs - filter by 2 Tags and Tag value.
+			// #32 All graphs - filter by 2 Tags and 2 Tag value.
 			[
 				[
 					'filter' => [
-						'Show' => 'Simple graphs'
-					],
-					'subfilter' => [
-						'Tags' => [
-							'tag_name_1',
-							'tag_name_2'
-						],
-						'Tag values' => [
-							'tag_value_3'
-						]
-					]
-				]
-			],
-			// #34 All graphs - filter by 2 Tags and 2 Tag value.
-			[
-				[
-					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'All graphs'
 					],
 					'subfilter' => [
@@ -786,10 +764,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #35 Host graphs - filter by 2 Tags and 2 Tag value.
+			// #33 Host graphs - filter by 2 Tags and 2 Tag value.
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Host graphs'
 					],
 					'subfilter' => [
@@ -810,10 +789,11 @@ class testPageMonitoringHostsGraph extends CWebTest {
 					]
 				]
 			],
-			// #36 Simple graphs - filter by 2 Tags and 2 Tag value.
+			// #34 Simple graphs - filter by 2 Tags and 2 Tag value.
 			[
 				[
 					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
 						'Show' => 'Simple graphs'
 					],
 					'subfilter' => [
@@ -831,6 +811,25 @@ class testPageMonitoringHostsGraph extends CWebTest {
 						'Item_for_graph_1',
 						'Item_for_graph_2'
 					]
+				]
+			],
+			// #35 Reset subfilter by submitting the filter.
+			[
+				[
+					'filter' => [
+						'Hosts' => 'Host_for_monitoring_graphs_1',
+						'Show' => 'Simple graphs'
+					],
+					'subfilter' => [
+						'Tags' => [
+							'tag_name_1'
+						],
+						'Tag values' => [
+							'tag_value_1'
+						]
+					],
+					'graphs_amount' => 3,
+					'reset_subfilter' => true
 				]
 			]
 		];
@@ -852,19 +851,15 @@ class testPageMonitoringHostsGraph extends CWebTest {
 
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->query('button:Reset')->one()->click()->waitUntilStalled();
+		$table = $this->getTable();
+		$form->fill($data['filter'])->submit()->waitUntilStalled();
+		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
 
-		// Filter using tags.
+		// Apply subfilter.
 		if (array_key_exists('subfilter', $data)) {
-			$table = $this->getTable();
-			$form->fill(['Hosts' => 'Host_for_monitoring_graphs_1', 'Show' => 'All graphs'])->submit()->waitUntilStalled();
-			$table->waitUntilReloaded();
-			$this->page->waitUntilReady();
-
-			// Click on subfilter.
 			foreach ($data['subfilter'] as $header => $values) {
 				foreach ($values as $value) {
-					// TODO: need to figure out why the table needs to be initialized again
-					$table = $this->getTable();
 					$xpath = 'xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
 							CXPathHelper::escapeQuotes($value).']';
 					$this->query($xpath)->waitUntilClickable()->one()->click();
@@ -876,10 +871,10 @@ class testPageMonitoringHostsGraph extends CWebTest {
 			}
 		}
 
-		$table = $this->getTable();
-		$form->fill($data['filter'])->submit()->waitUntilStalled();
-		$table->waitUntilReloaded();
-		$this->page->waitUntilReady();
+		// Reset subfilter configuration by pressing the "Apply" button in filter form.
+		if (array_key_exists('reset_subfilter', $data)) {
+			$form->fill($data['filter'])->submit()->waitUntilStalled();
+		}
 
 		// Check result amount and graph/item ids.
 		if (array_key_exists('graphs_amount', $data)) {

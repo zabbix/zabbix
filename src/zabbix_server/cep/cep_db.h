@@ -20,11 +20,11 @@
 #include "zbxtypes.h"
 #include "zbxipcservice.h"
 
-void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks);
-void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks,
+void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
+void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_ipc_async_socket_t *rtc);
-void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks,
+void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_export_file_t *problem_export);
-void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks);
+void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks);
 
 #endif

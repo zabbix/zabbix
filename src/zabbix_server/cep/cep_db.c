@@ -65,7 +65,7 @@ ZBX_VECTOR_IMPL(cep_object_value, zbx_cep_object_value_t)
  *               0 otherwise                                                  *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	cep_get_close_event_task_userid(const zbx_cep_task_t *task)
+static zbx_uint64_t	cep_get_close_event_task_userid(const zbx_mw_task_t *task)
 {
 	switch (task->type)
 	{
@@ -86,7 +86,7 @@ static zbx_uint64_t	cep_get_close_event_task_userid(const zbx_cep_task_t *task)
  *               correlation, 0 otherwise                                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	cep_get_close_event_task_correlationid(const zbx_cep_task_t *task)
+static zbx_uint64_t	cep_get_close_event_task_correlationid(const zbx_mw_task_t *task)
 {
 	switch (task->type)
 	{
@@ -105,7 +105,7 @@ static zbx_uint64_t	cep_get_close_event_task_correlationid(const zbx_cep_task_t 
  *             tasks  - [IN]  list of tasks containing events                 *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_cep_task_ptr_t *tasks)
+static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
@@ -166,7 +166,7 @@ static void	cep_db_write_events(zbx_dbconn_t *db, const zbx_vector_cep_task_ptr_
  *             tasks  - [IN]  list of tasks containing events                 *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_cep_task_ptr_t *tasks)
+static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
@@ -233,7 +233,7 @@ static void	cep_db_write_problems(zbx_dbconn_t *db, const zbx_vector_cep_task_pt
  *             tasks  - [IN]  list of tasks containing recovery events        *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_cep_task_ptr_t *tasks)
+static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_db_insert_t				db_insert_event_recovery = {0};
 	zbx_vector_cep_db_event_recovery_t	recoveries;
@@ -326,16 +326,16 @@ static void	cep_db_write_event_recovery(zbx_dbconn_t *db, const zbx_vector_cep_t
  *             tasks  - [IN]  list of tasks containing suppressed events      *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_cep_task_ptr_t *tasks)
+static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks)
 {
-	zbx_vector_cep_task_ptr_t	problem_tasks;
+	zbx_vector_mw_task_ptr_t	problem_tasks;
 	zbx_vector_uint64_t		maintenanceids;
 	zbx_db_insert_t			db_insert = {0};
 	int				suppress_num = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() tasks:%d", __func__, tasks->values_num);
 
-	zbx_vector_cep_task_ptr_create(&problem_tasks);
+	zbx_vector_mw_task_ptr_create(&problem_tasks);
 	zbx_vector_uint64_create(&maintenanceids);
 
 	for (int i = 0; i < tasks->values_num; i++)
@@ -385,7 +385,7 @@ static void	cep_db_write_event_suppress(zbx_dbconn_t *db, const zbx_vector_cep_t
  *             trigger_diffs - [IN/OUT] list of trigger state differences     *
  *                                                                            *
  ******************************************************************************/
-static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_cep_task_ptr_t *tasks,
+static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_vector_trigger_diff_ptr_t *trigger_diffs)
 {
 	zbx_vector_cep_object_value_t	updates;
@@ -455,7 +455,7 @@ static void	cep_db_write_trigger_rtdata(zbx_dbconn_t *db, const zbx_vector_cep_t
  *             tasks  - [IN] list of tasks containing events                  *
  *                                                                            *
  ******************************************************************************/
-void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks)
+void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_dbconn_t			*db;
 	zbx_vector_trigger_diff_ptr_t	trigger_diffs;
@@ -491,7 +491,7 @@ void	cep_db_flush_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_pt
  *             rtc    - [IN] RTC service socket                               *
  *                                                                            *
  ******************************************************************************/
-void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks,
+void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_ipc_async_socket_t *rtc)
 {
 	zbx_vector_uint64_pair_t	event_recovery;
@@ -560,7 +560,7 @@ void	cep_db_process_actions(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task
  *             problem_export - [IN] problem export context                   *
  *                                                                            *
  ******************************************************************************/
-void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks,
+void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks,
 		zbx_export_file_t *problem_export)
 {
 	zbx_vector_db_event_t		problems;
@@ -645,7 +645,7 @@ void	cep_db_export_events(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_p
  *             tasks  - [IN] list of tasks containing events and tags         *
  *                                                                            *
  ******************************************************************************/
-void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_cep_task_ptr_t *tasks)
+void	cep_db_add_tags(zbx_dbconn_pool_t *dbpool, const zbx_vector_mw_task_ptr_t *tasks)
 {
 	zbx_vector_uint64_t		eventids;
 	zbx_vector_event_tags_ptr_t	db_tags, event_tags;

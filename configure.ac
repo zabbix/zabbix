@@ -2224,6 +2224,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxmedia/Makefile
 	src/libs/zbxmodules/Makefile
 	src/libs/zbxmutexs/Makefile
+	src/libs/zbxmw/Makefile
 	src/libs/zbxpgservice/Makefile
 	src/libs/zbxprof/Makefile
 	src/libs/zbxnix/Makefile

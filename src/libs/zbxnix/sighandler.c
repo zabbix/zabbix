@@ -101,9 +101,25 @@ void	zbx_set_exiting_with_succeed(void)
 	sig_exiting = ZBX_EXIT_SUCCESS;
 }
 
+static int	zbx_is_running_default(void *args)
+{
+	ZBX_UNUSED(args);
+
+	return ZBX_EXIT_NONE == sig_exiting;
+}
+
+static ZBX_THREAD_LOCAL int	(*zbx_is_running_impl)(void *args) = zbx_is_running_default;
+static ZBX_THREAD_LOCAL void	*zbx_is_running_args = NULL;
+
 int	ZBX_IS_RUNNING(void)
 {
-	return ZBX_EXIT_NONE == sig_exiting;
+	return zbx_is_running_impl(zbx_is_running_args);
+}
+
+void	zbx_set_is_running(int (*is_running_func)(void *args), void *args)
+{
+	zbx_is_running_impl = is_running_func;
+	zbx_is_running_args = args;
 }
 
 int	ZBX_EXIT_STATUS(void)

@@ -706,20 +706,20 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, zbx_dbconn_t *db,
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
-	}
-	else
-	{
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, td->del_ids.values,
-				td->del_ids.values_num);
-	}
 
-	if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
-	{
-		*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
-		ret = FAIL;
+		if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
+		{
+			*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (FAIL == (ret = zbx_dbconn_execute_multiple_query(db, sql, td->table->recid, &td->del_ids)))
+			*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
+	}
 
 	zbx_free(sql);
 
@@ -847,20 +847,20 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, zbx_dbconn_t *db, id_u
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
-	}
-	else
-	{
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, updateids.values,
-				updateids.values_num);
-	}
 
-	if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
-	{
-		*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
-		ret = FAIL;
+		if (ZBX_DB_OK > zbx_dbconn_execute(db, "%s", sql))
+		{
+			*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (FAIL == (ret = zbx_dbconn_execute_multiple_query(db, sql, td->table->recid, &updateids)))
+			*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
+	}
 
 	zbx_free(sql);
 out:
@@ -974,6 +974,8 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, zbx_dbconn_t *db, id_un
 	if (0 == td->updates.values_num)
 		return SUCCEED;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, td->table->table);
+
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
 	for (i = 0; i < td->updates.values_num; i++)
@@ -1055,6 +1057,8 @@ out:
 
 	if (SUCCEED != ret && NULL == *error)
 		*error = zbx_dsprintf(NULL, "cannot update rows in table \"%s\"", td->table->table);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, td->table->table);
 
 	return ret;
 }
@@ -2169,7 +2173,7 @@ static int	proxyconfig_delete_globalmacros(zbx_dbconn_t *db, char **error)
 	return ret;
 }
 
-static int	proxyconfig_clear_host_proxy(zbx_table_data_t *proxy, char **error)
+static int	proxyconfig_clear_host_proxy(zbx_dbconn_t *db, zbx_table_data_t *proxy, char **error)
 {
 	char	*sql = NULL;
 	size_t	sql_alloc = 0, sql_offset = 0;
@@ -2179,7 +2183,7 @@ static int	proxyconfig_clear_host_proxy(zbx_table_data_t *proxy, char **error)
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "proxyid", proxy->del_ids.values,
 			proxy->del_ids.values_num);
 
-	ret = zbx_db_execute("%s", sql);
+	ret = zbx_dbconn_execute(db, "%s", sql);
 	zbx_free(sql);
 
 	if (ZBX_DB_OK > ret)
@@ -2241,7 +2245,7 @@ static int	proxyconfig_sync_proxy_group(zbx_vector_table_data_ptr_t *config_tabl
 
 		proxyconfig_prepare_table(proxy, db, NULL, NULL, NULL, NULL);
 
-		if (0 != proxy->del_ids.values_num && SUCCEED != proxyconfig_clear_host_proxy(proxy, error))
+		if (0 != proxy->del_ids.values_num && SUCCEED != proxyconfig_clear_host_proxy(db, proxy, error))
 			return FAIL;
 	}
 	else

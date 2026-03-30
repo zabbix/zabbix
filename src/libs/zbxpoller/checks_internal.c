@@ -15,6 +15,7 @@
 #include "checks_internal.h"
 #include "checks_java.h"
 
+#include "zbxmw.h"
 #include "zbxpoller.h"
 
 #include "zbxalgo.h"
@@ -251,7 +252,7 @@ static int	get_worker_process_stats(unsigned char process_type, unsigned char ag
 			ret = zbx_get_usage_stats_discovery(&usage, &count, &error);
 			break;
 		case ZBX_PROCESS_TYPE_CEP_WORKER:
-			ret = zbx_cep_get_usage_stats(&usage, &count, &error);
+			ret = zbx_mw_get_worker_load(ZBX_IPC_SERVICE_CEP, &usage, &count, &error);
 			break;
 		default:
 			return FAIL;
@@ -549,7 +550,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		{
 			char	*error = NULL;
 
-			if (FAIL == zbx_cep_get_workers_num(&process_forks, &error))
+			if (FAIL == zbx_mw_get_worker_count(ZBX_IPC_SERVICE_CEP, &process_forks, &error))
 			{
 				SET_MSG_RESULT(result, error);
 				goto out;
@@ -1132,6 +1133,83 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 		SET_TEXT_RESULT(result, zbx_strdup(NULL, j.buffer));
 		zbx_json_free(&j);
+	}
+	else if (0 == strcmp(tmp, "vps"))
+	{
+		zbx_vps_monitor_stats_t	stats;
+		zbx_vps_monitor_get_stats(&stats);
+
+		if (2 > nparams || 3 < nparams)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid number of parameters."));
+			goto out;
+		}
+
+		tmp1 = get_rparam(&request, 1);
+
+		if (2 == nparams)
+		{
+			if (0 == strcmp(tmp1, "status"))
+			{
+				zbx_uint64_t	value = (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0);
+				SET_UI64_RESULT(result, value);
+				ret = SUCCEED;
+
+				goto out;
+			}
+			else if (0 == strcmp(tmp1, "limit"))
+			{
+				SET_UI64_RESULT(result, stats.values_limit);
+				ret = SUCCEED;
+
+				goto out;
+			}
+		}
+
+		tmp = get_rparam(&request, 2);
+
+		if (0 == strcmp(tmp1, "written"))
+		{
+			if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "total"))
+			{
+				SET_UI64_RESULT(result, stats.written_num);
+				ret = SUCCEED;
+			}
+			else
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+
+			goto out;
+		}
+		else if (0 != strcmp(tmp1, "overcommit"))
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+			goto out;
+		}
+
+		if (0 == stats.values_limit)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "VPS throttling is disabled."));
+			goto out;
+		}
+
+		if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "pavailable"))
+		{
+			SET_DBL_RESULT(result, (double)(stats.overcommit_limit - stats.overcommit) * 100 /
+					stats.overcommit_limit);
+		}
+		else if (0 == strcmp(tmp, "available"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_limit - stats.overcommit);
+		}
+		else if (0 == strcmp(tmp, "limit"))
+		{
+			SET_UI64_RESULT(result, stats.overcommit_limit);
+		}
+		else
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
+			goto out;
+		}
 	}
 	else
 	{

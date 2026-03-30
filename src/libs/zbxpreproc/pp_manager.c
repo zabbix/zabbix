@@ -18,6 +18,7 @@
 #include "pp_task.h"
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
+#include "zbxregexp.h"
 #include "zbxtimekeeper.h"
 #include "zbxself.h"
 #include "zbxstr.h"
@@ -399,14 +400,14 @@ static void	pp_manager_queue_value_task_result(zbx_pp_manager_t *manager, zbx_pp
 	d->preproc->time_ms = task->time_ms;
 	d->preproc->total_ms += task->time_ms;
 
-	if (ZBX_VARIANT_NONE == d->result.type && 0 == (d->result.data.flags & ZBX_VARIANT_FLAG_CHANGED))
+	if (ZBX_VARIANT_NONE == d->result.type)
 		return;
 
 	if (NULL != (item = pp_manager_get_cacheable_dependent_item(manager, d->preproc->dep_itemids,
 			d->preproc->dep_itemids_num)))
 	{
 		zbx_pp_task_t	*dep_task;
-		zbx_variant_t	value = {0};
+		zbx_variant_t	value;
 
 		dep_task = pp_task_dependent_create(item->itemid, d->preproc);
 		zbx_pp_task_dependent_t	*d_dep = (zbx_pp_task_dependent_t *)PP_TASK_DATA(dep_task);
@@ -864,7 +865,7 @@ static void	preprocessor_reply_size(zbx_pp_manager_t *manager, zbx_ipc_client_t 
  *                                                                            *
  * Parameters: manager  - [IN] preprocessing manager                          *
  *             tasks    - [IN] processed tasks                                *
- *             runstate - [IN] preprocesing manager run state                 *
+ *             runstate - [IN] preprocexsing manager run state                *
  *                                                                            *
  ******************************************************************************/
 static void	prpeprocessor_flush_value_result(zbx_pp_manager_t *manager, zbx_pp_task_t *task,
@@ -917,7 +918,7 @@ static void	preprocessor_reply_test_result(zbx_pp_task_t *task)
  *                                                                            *
  * Parameters: manager  - [IN] preprocessing manager                          *
  *             tasks    - [IN] processed tasks                                *
- *             runstate - [IN] preprocesing manager run state                 *
+ *             runstate - [IN] preprocessing manager run state                *
  *                                                                            *
  ******************************************************************************/
 static void	preprocessor_flush_tasks(zbx_pp_manager_t *manager, zbx_vector_pp_task_ptr_t *tasks,
@@ -1198,7 +1199,7 @@ void	*zbx_pp_manager_thread(void *args)
 #define PP_MANAGER_DELAY_NS	5e8
 
 	zbx_ipc_service_t			service;
-	char					*error = NULL, *process_title;
+	char					*error = NULL;
 	zbx_ipc_client_t			*client;
 	zbx_ipc_message_t			*message;
 	double					time_stat, time_idle = 0, time_flush, time_vps_update, time_trim,
@@ -1220,21 +1221,15 @@ void	*zbx_pp_manager_thread(void *args)
 						processing_num = 0, counter_queued_num = 0, counter_queued_sz = 0,
 						counter_direct_num = 0, counter_direct_sz = 0, finished_peak_num = 0,
 						pending_peak_num = 0, counter_processed_num = 0;
-	sigjmp_buf				jmp_ret;
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
 
-	process_title = zbx_dsprintf(NULL, "%s #%d", get_process_type_string(process_type), process_num);
-	zbx_set_log_component(process_title, unit_args->logger);
-
-	zbx_supervisor_update_activity("%s starting", process_title);
+	zbx_supervisor_update_activity("%s starting", unit_args->name);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	if (FAIL == zbx_ipc_service_start(&service, ZBX_IPC_SERVICE_PREPROCESSING, &error))
 	{
@@ -1280,7 +1275,7 @@ void	*zbx_pp_manager_thread(void *args)
 		{
 			zbx_supervisor_update_activity("%s [queued " ZBX_FS_UI64 ", processed " ZBX_FS_UI64
 					" values, idle " ZBX_FS_DBL " sec during " ZBX_FS_DBL " sec]",
-					process_title, queued_num, processed_num, time_idle, time_now - time_stat);
+					unit_args->name, queued_num, processed_num, time_idle, time_now - time_stat);
 
 			time_stat = time_now;
 			time_idle = 0;
@@ -1435,10 +1430,14 @@ void	*zbx_pp_manager_thread(void *args)
 			break;
 	}
 
+	zbx_deinit_regexp_env();
+
+	zbx_prof_destroy();
+
 	zbx_dc_flush_history();
 	zbx_history_cache_destroy_local_cache();
 
-	zbx_supervisor_update_activity("%s [terminating]", process_title);
+	zbx_supervisor_update_activity("%s [terminating]", unit_args->name);
 
 	/* on normal exit the shutdown message already has been processed and no more messages will be sent */
 	if (SUCCEED != ZBX_IS_NORMAL_EXIT())
@@ -1448,10 +1447,8 @@ void	*zbx_pp_manager_thread(void *args)
 	zbx_pp_manager_free(manager);
 
 	zbx_ipc_service_close(&service);
-	zbx_free(args);
 
-	zbx_supervisor_update_activity("%s [terminated]", process_title);
-	zbx_free(process_title);
+	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 	zbx_free(args);
 
 #undef STAT_INTERVAL

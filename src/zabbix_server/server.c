@@ -1239,7 +1239,8 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num,
+				SUCCEED == ret ? 0 : SEC_PER_MIN);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -2522,7 +2523,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_free_config();
 
-	if (SUCCEED != zbx_rtc_init(&rtc, &error))
+	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_config_forks,
+			get_process_info_by_thread, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
 		zbx_free(error);
@@ -2663,6 +2665,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_register_stats_ext_get_data_func(zbx_preproc_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_discovery_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_data_func(zbx_stats_ext_get_data_server, NULL);
+	zbx_register_stats_ext_get_data_func(zbx_vps_monitor_stats_ext_get_data, NULL);
 	zbx_register_stats_ext_get_func(zbx_vmware_stats_ext_get, NULL);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_PREPROCESSOR, zbx_preprocessor_stats_procinfo);
 	zbx_register_stats_procinfo_func(ZBX_PROCESS_TYPE_DISCOVERER, zbx_discovery_stats_procinfo);

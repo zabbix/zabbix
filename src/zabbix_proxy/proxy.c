@@ -334,6 +334,8 @@ static char	*config_socket_path	= NULL;
 static int	config_history_storage_pipelines	= 0;
 static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
+static int	config_vps_limit		= 0;
+static int	config_vps_overcommit_limit	= 0;
 static char	*config_file		= NULL;
 static int	config_allow_root	= 0;
 
@@ -1112,6 +1114,10 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 						&config_max_concurrent_checks_per_poller,
 											ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	1,			1000},
+		{"VPSLimit",			&config_vps_limit,			ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
+		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,		ZBX_CFG_TYPE_INT,
+				ZBX_CONF_PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"StartBrowserPollers",		&config_forks[ZBX_PROCESS_TYPE_BROWSERPOLLER],	ZBX_CFG_TYPE_INT,
 				ZBX_CONF_PARM_OPT,	0,			1000},
 		{"WebDriverURL",		&config_webdriver_url,			ZBX_CFG_TYPE_STRING,
@@ -1173,7 +1179,8 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num,
+				SUCCEED == ret ? 0 : SEC_PER_MIN);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1693,7 +1700,7 @@ static void	start_processes(zbx_socket_t *listen_sock, const zbx_config_comms_ar
 		switch (thread_args.info.process_type)
 		{
 			case ZBX_PROCESS_TYPE_SUPERVISOR:
-				threads_flags[i] = ZBX_THREAD_PRIORITY_NONE;
+				threads_flags[i] = ZBX_THREAD_PRIORITY_SUPERVISOR;
 				thread_args.args = &supervisor_args;
 				zbx_thread_start(zbx_supervisor_thread, &thread_args, &zbx_threads[i]);
 				break;
@@ -1935,7 +1942,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 	zbx_free_config();
 
-	if (SUCCEED != zbx_rtc_init(&rtc, &error))
+	if (SUCCEED != zbx_rtc_init(&rtc, get_zbx_threads, get_zbx_threads_num, get_config_forks,
+			get_process_info_by_thread, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize runtime control service: %s", error);
 		zbx_free(error);
@@ -1969,6 +1977,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 		zbx_exit(EXIT_FAILURE);
 	}
+
+	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
 	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{

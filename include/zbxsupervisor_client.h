@@ -48,6 +48,7 @@ typedef struct
 	zbx_log_component_t			*logger;
 	_Atomic zbx_supervisor_runstate_t	*runstate;
 	zbx_supervisor_unit_shared_t		*shared;
+	char					name[ZBX_MAX_PROCNAME_LEN + 1];
 }
 zbx_supervisor_unit_args_t;
 
@@ -68,6 +69,5 @@ void	zbx_supervisor_worklog_init(void);
 void	zbx_supervisor_worklog_clear(void);
 void	zbx_supervisor_update_activity(const char *fmt, ...);
 char	*zbx_supervisor_get_activities(void);
-
 
 #endif
