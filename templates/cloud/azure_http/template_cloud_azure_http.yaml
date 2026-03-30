@@ -1304,7 +1304,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Cloud
       items:
@@ -1748,6 +1748,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -1827,6 +1828,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -1929,6 +1931,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -2020,6 +2023,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -2113,6 +2117,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -2183,6 +2188,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3674,6 +3680,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3738,6 +3745,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3810,6 +3818,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3854,7 +3863,7 @@ zabbix_export:
           value: azure
       macros:
         - macro: '{$AZURE.APP.ID}'
-          description: 'The App ID of Microsoft Azure.'
+          description: 'Client (Application) ID of the Azure service principal.'
           config:
             type: TEXT
             priority: '3'
@@ -3863,7 +3872,7 @@ zabbix_export:
             required: 'YES'
         - macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to include discovered Cosmos DB account locations by name.'
           config:
             type: TEXT
             priority: '47'
@@ -3872,7 +3881,7 @@ zabbix_export:
             description: 'Regex string to include discovered Cosmos DB account locations by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to exclude discovered Cosmos DB account locations by name.'
           config:
             type: TEXT
             priority: '48'
@@ -3881,7 +3890,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Cosmos DB account locations by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to include discovered Cosmos DB accounts by name.'
           config:
             type: TEXT
             priority: '45'
@@ -3890,7 +3899,7 @@ zabbix_export:
             description: 'Regex string to include discovered Cosmos DB accounts by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to exclude discovered Cosmos DB accounts by name.'
           config:
             type: TEXT
             priority: '46'
@@ -3899,7 +3908,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Cosmos DB accounts by name.'
         - macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
-          description: 'API response timeout.'
+          description: 'Maximum time to wait for Azure API responses before request fails.'
           config:
             type: TEXT
             priority: '5'
@@ -3908,7 +3917,7 @@ zabbix_export:
             description: 'API response timeout, in seconds.'
         - macro: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to include discovered MSSQL database locations by name.'
           config:
             type: TEXT
             priority: '42'
@@ -3917,7 +3926,7 @@ zabbix_export:
             description: 'Regex string to include discovered MSSQL database locations by name.'
         - macro: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to exclude discovered MSSQL database locations by name.'
           config:
             type: TEXT
             priority: '43'
@@ -3926,7 +3935,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MSSQL database locations by name.'
         - macro: '{$AZURE.MSSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to include discovered MSSQL databases by name.'
           config:
             type: TEXT
             priority: '40'
@@ -3935,7 +3944,7 @@ zabbix_export:
             description: 'Regex string to include discovered MSSQL databases by name.'
         - macro: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to exclude discovered MSSQL databases by name.'
           config:
             type: TEXT
             priority: '41'
@@ -3944,7 +3953,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MSSQL databases by name.'
         - macro: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
           value: ^System$
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to exclude discovered MSSQL database locations by SKU type.'
           config:
             type: TEXT
             priority: '44'
@@ -3953,7 +3962,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MSSQL database locations by SKU type.'
         - macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to include discovered MySQL server locations by name.'
           config:
             type: TEXT
             priority: '34'
@@ -3962,7 +3971,7 @@ zabbix_export:
             description: 'Regex string to include discovered MySQL server locations by name.'
         - macro: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to exclude discovered MySQL server locations by name.'
           config:
             type: TEXT
             priority: '35'
@@ -3971,7 +3980,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MySQL server locations by name.'
         - macro: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to include discovered MySQL servers by name.'
           config:
             type: TEXT
             priority: '32'
@@ -3980,7 +3989,7 @@ zabbix_export:
             description: 'Regex string to include discovered MySQL servers by name.'
         - macro: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to exclude discovered MySQL servers by name.'
           config:
             type: TEXT
             priority: '33'
@@ -3989,7 +3998,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MySQL servers by name.'
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Microsoft Azure password.'
+          description: 'Client secret of the Azure service principal used for API authentication.'
           config:
             type: TEXT
             priority: '4'
@@ -3998,7 +4007,7 @@ zabbix_export:
             required: 'YES'
         - macro: '{$AZURE.PGSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to include discovered PostgreSQL server locations by name.'
           config:
             type: TEXT
             priority: '38'
@@ -4007,7 +4016,7 @@ zabbix_export:
             description: 'Regex string to include discovered PostgreSQL server locations by name.'
         - macro: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to exclude discovered PostgreSQL server locations by name.'
           config:
             type: TEXT
             priority: '39'
@@ -4016,7 +4025,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered PostgreSQL server locations by name.'
         - macro: '{$AZURE.PGSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to include discovered PostgreSQL servers by name.'
           config:
             type: TEXT
             priority: '36'
@@ -4025,7 +4034,7 @@ zabbix_export:
             description: 'Regex string to include discovered PostgreSQL servers by name.'
         - macro: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to exclude discovered PostgreSQL servers by name.'
           config:
             type: TEXT
             priority: '37'
@@ -4033,7 +4042,7 @@ zabbix_export:
             label: 'Exclude PostgreSQL server filter'
             description: 'Regex string to exclude discovered PostgreSQL servers by name.'
         - macro: '{$AZURE.PROXY}'
-          description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+          description: 'HTTP proxy used for Azure API requests (leave empty to connect directly).'
           config:
             type: TEXT
             priority: '6'
@@ -4042,7 +4051,7 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AZURE.RESOURCE.GROUP.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rules.'
+          description: 'Regex string to include discovered resource groups by name.'
           config:
             type: TEXT
             priority: '30'
@@ -4051,7 +4060,7 @@ zabbix_export:
             description: 'Regex string to include discovered resource groups by name.'
         - macro: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rules.'
+          description: 'Regex string to exclude discovered resource groups by name.'
           config:
             type: TEXT
             priority: '31'
@@ -4060,7 +4069,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered resource groups by name.'
         - macro: '{$AZURE.SCALESET.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to include discovered VM scale set locations by name.'
           config:
             type: TEXT
             priority: '13'
@@ -4069,7 +4078,7 @@ zabbix_export:
             description: 'Regex string to include discovered VM scale set locations by name.'
         - macro: '{$AZURE.SCALESET.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to exclude discovered VM scale set locations by name.'
           config:
             type: TEXT
             priority: '14'
@@ -4078,7 +4087,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered VM scale set locations by name.'
         - macro: '{$AZURE.SCALESET.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to include discovered VM scale sets by name.'
           config:
             type: TEXT
             priority: '11'
@@ -4087,7 +4096,7 @@ zabbix_export:
             description: 'Regex string to include discovered VM scale sets by name.'
         - macro: '{$AZURE.SCALESET.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to exclude discovered VM scale sets by name.'
           config:
             type: TEXT
             priority: '12'
@@ -4096,7 +4105,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered VM scale sets by name.'
         - macro: '{$AZURE.SQL.INST.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to include discovered Azure SQL managed instance locations by name.'
           config:
             type: TEXT
             priority: '17'
@@ -4105,7 +4114,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure SQL managed instance locations by name.'
         - macro: '{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to exclude discovered Azure SQL managed instance locations by name.'
           config:
             type: TEXT
             priority: '18'
@@ -4114,7 +4123,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Azure SQL managed instance locations by name.'
         - macro: '{$AZURE.SQL.INST.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to include discovered Azure SQL managed instances by name.'
           config:
             type: TEXT
             priority: '15'
@@ -4123,7 +4132,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure SQL managed instances by name.'
         - macro: '{$AZURE.SQL.INST.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to exclude discovered Azure SQL managed instances by name.'
           config:
             type: TEXT
             priority: '16'
@@ -4152,7 +4161,7 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to include discovered storage account locations by name.'
           config:
             type: TEXT
             priority: '25'
@@ -4161,7 +4170,7 @@ zabbix_export:
             description: 'Regex string to include discovered storage account locations by name.'
         - macro: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to exclude discovered storage account locations by name.'
           config:
             type: TEXT
             priority: '26'
@@ -4170,7 +4179,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered storage account locations by name.'
         - macro: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to include discovered storage accounts by name.'
           config:
             type: TEXT
             priority: '23'
@@ -4179,7 +4188,7 @@ zabbix_export:
             description: 'Regex string to include discovered storage accounts by name.'
         - macro: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to exclude discovered storage accounts by name.'
           config:
             type: TEXT
             priority: '24'
@@ -4197,7 +4206,7 @@ zabbix_export:
             description: 'Warning threshold of the storage account table services availability, expressed in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
-          description: 'Microsoft Azure subscription ID.'
+          description: 'Azure Subscription ID used to scope all API requests.'
           config:
             type: TEXT
             priority: '1'
@@ -4205,7 +4214,7 @@ zabbix_export:
             description: 'Microsoft Azure subscription ID.'
             required: 'YES'
         - macro: '{$AZURE.TENANT.ID}'
-          description: 'Microsoft Azure tenant ID.'
+          description: 'Azure Tenant (Directory) ID used for authentication.'
           config:
             type: TEXT
             priority: '2'
@@ -4214,7 +4223,7 @@ zabbix_export:
             required: 'YES'
         - macro: '{$AZURE.VAULT.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to include discovered Azure Vault locations by name.'
           config:
             type: TEXT
             priority: '21'
@@ -4223,7 +4232,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure Vault locations by name.'
         - macro: '{$AZURE.VAULT.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to exclude discovered Azure Vault locations by name.'
           config:
             type: TEXT
             priority: '22'
@@ -4232,7 +4241,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Azure Vault locations by name.'
         - macro: '{$AZURE.VAULT.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to include discovered Azure Vaults by name.'
           config:
             type: TEXT
             priority: '19'
@@ -4241,7 +4250,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure Vaults by name.'
         - macro: '{$AZURE.VAULT.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to exclude discovered Azure Vaults by name.'
           config:
             type: TEXT
             priority: '20'
@@ -4250,7 +4259,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Azure Vaults by name.'
         - macro: '{$AZURE.VM.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to include discovered virtual machine locations by name.'
           config:
             type: TEXT
             priority: '9'
@@ -4259,7 +4268,7 @@ zabbix_export:
             description: 'Regex string to include discovered virtual machine locations by name.'
         - macro: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to exclude discovered virtual machine locations by name.'
           config:
             type: TEXT
             priority: '10'
@@ -4268,7 +4277,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered virtual machine locations by name.'
         - macro: '{$AZURE.VM.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to include discovered virtual machines by name.'
           config:
             type: TEXT
             priority: '7'
@@ -4277,7 +4286,7 @@ zabbix_export:
             description: 'Regex string to include discovered virtual machines by name.'
         - macro: '{$AZURE.VM.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to exclude discovered virtual machines by name.'
           config:
             type: TEXT
             priority: '8'
@@ -4286,7 +4295,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered virtual machines by name.'
         - macro: '{$AZURE.WORKSPACE.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to include discovered workspace locations by name.'
           config:
             type: TEXT
             priority: '51'
@@ -4295,7 +4304,7 @@ zabbix_export:
             description: 'Regex string to include discovered workspace locations by name.'
         - macro: '{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to exclude discovered workspace locations by name.'
           config:
             type: TEXT
             priority: '52'
@@ -4304,7 +4313,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered workspace locations by name.'
         - macro: '{$AZURE.WORKSPACE.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to include discovered workspace by name.'
           config:
             type: TEXT
             priority: '49'
@@ -4313,7 +4322,7 @@ zabbix_export:
             description: 'Regex string to include discovered workspace by name.'
         - macro: '{$AZURE.WORKSPACE.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to exclude discovered workspace by name.'
           config:
             type: TEXT
             priority: '50'
