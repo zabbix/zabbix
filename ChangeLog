@@ -1,6 +1,8 @@
 Changes for 6.0.46rc1
 
 New features:
+A.......S. [ZBXNEXT-10553] updated maximum supported TimescaleDB version to 2.26 (mprihodko)
+A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprihodko)
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
