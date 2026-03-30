@@ -91,51 +91,53 @@
 		}
 
 		#update() {
-			if (this.can_update_group) {
-				const gui_access = this.form.findFieldByName('gui_access').getValue();
-				const userdirectory_input = this.form_element.querySelector('[name="userdirectoryid"]');
-				const mfa_select = this.form_element.querySelector('[name="mfaid"]');
-				const mfa_status_checkbox = this.form_element.querySelector('.checkbox-radio[name="mfa_status"]');
+			if (!this.can_update_group) {
+				return;
+			}
 
-				switch (parseInt(gui_access)) {
-					case GROUP_GUI_ACCESS_DISABLED:
-						userdirectory_input.disabled = true;
-						mfa_status_checkbox.disabled = true;
-						mfa_select.disabled = true;
-						break;
+			const gui_access = this.form.findFieldByName('gui_access').getValue();
+			const userdirectory_input = this.form_element.querySelector('[name="userdirectoryid"]');
+			const mfa_select = this.form_element.querySelector('[name="mfaid"]');
+			const mfa_status_checkbox = this.form_element.querySelector('.checkbox-radio[name="mfa_status"]');
 
-					case GROUP_GUI_ACCESS_INTERNAL:
-						userdirectory_input.disabled = true;
-						mfa_status_checkbox.disabled = false;
-						mfa_select.disabled = !mfa_status_checkbox.checked;
-						break;
+			switch (parseInt(gui_access)) {
+				case GROUP_GUI_ACCESS_DISABLED:
+					userdirectory_input.disabled = true;
+					mfa_status_checkbox.disabled = true;
+					mfa_select.disabled = true;
+					break;
 
-					default:
-						userdirectory_input.disabled = false;
-						mfa_status_checkbox.disabled = false;
-						mfa_select.disabled = !mfa_status_checkbox.checked;
-				}
+				case GROUP_GUI_ACCESS_INTERNAL:
+					userdirectory_input.disabled = true;
+					mfa_status_checkbox.disabled = false;
+					mfa_select.disabled = !mfa_status_checkbox.checked;
+					break;
 
-				const mfa_warning_icon = document.getElementById('mfa-warning');
-				const mfaid_value = this.form.findFieldByName('mfaid').getValue();
+				default:
+					userdirectory_input.disabled = false;
+					mfa_status_checkbox.disabled = false;
+					mfa_select.disabled = !mfa_status_checkbox.checked;
+			}
 
-				if (this.mfa_status == <?= MFA_DISABLED ?> && mfaid_value != 0 && mfaid_value != null) {
-					mfa_warning_icon.style.display = '';
-				}
-				else {
-					mfa_warning_icon.style.display = 'none';
-				}
+			const mfa_warning_icon = document.getElementById('mfa-warning');
+			const mfaid_value = this.form.findFieldByName('mfaid').getValue();
 
-				const ldap_warning_icon = document.getElementById('ldap-warning');
-				const userdirectory_value = this.form.findFieldByName('userdirectoryid').getValue();
+			if (this.mfa_status == <?= MFA_DISABLED ?> && mfaid_value != 0 && mfaid_value != null) {
+				mfa_warning_icon.style.display = '';
+			}
+			else {
+				mfa_warning_icon.style.display = 'none';
+			}
 
-				if (this.ldap_status == <?= ZBX_AUTH_LDAP_DISABLED ?>
-						&& userdirectory_value != 0 && userdirectory_value != null) {
-					ldap_warning_icon.style.display = '';
-				}
-				else {
-					ldap_warning_icon.style.display = 'none';
-				}
+			const ldap_warning_icon = document.getElementById('ldap-warning');
+			const userdirectory_value = this.form.findFieldByName('userdirectoryid').getValue();
+
+			if (this.ldap_status == <?= ZBX_AUTH_LDAP_DISABLED ?>
+					&& userdirectory_value != 0 && userdirectory_value != null) {
+				ldap_warning_icon.style.display = '';
+			}
+			else {
+				ldap_warning_icon.style.display = 'none';
 			}
 		}
 
