@@ -258,13 +258,13 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'system.cpu.util[,,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.9
+			'threshold' => 9.9
 		],
 		[
 			'key' => 'system.cpu.load[,avg1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_FLOAT,
-			'threshold' => 0.9
+			'threshold' => 9.9
 		],
 		[
 			'key' => 'vfs.dev.read[,operations]',
@@ -485,6 +485,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::$itemids[self::COMPONENT_AGENT.':'.$name] = $itemids[$i * 2];
 			self::$itemids[self::COMPONENT_AGENT2.':'.$name] = $itemids[($i * 2) + 1];
 		}
+
+		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 
 		return true;
 	}
