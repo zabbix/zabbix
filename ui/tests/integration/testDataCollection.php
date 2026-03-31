@@ -601,14 +601,15 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 
 		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
-
-		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
+		$clock = time();
+		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER, $clock);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',
 			'sortorder' => 'DESC',
 			'limit' => 1,
-			'itemids' => [$itemid]
+			'itemids' => [$itemid],
+			'time_from' => $clock
 		], 60, 1);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
