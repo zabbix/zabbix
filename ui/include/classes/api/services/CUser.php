@@ -2918,17 +2918,21 @@ class CUser extends CApiService {
 	 */
 	public function checkAuthentication(array $session): array {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null],
+			'sessionid' => ['type' => API_STRING_UTF8],
 			'extend' => ['type' => API_MULTIPLE, 'rules' => [
-				['if' => static fn(array $data): bool => $data['sessionid'] !== null, 'type' => API_BOOLEAN, 'default' => true],
+				['if' => function (array $data): bool {
+					return !array_key_exists('token', $data);
+				}, 'type' => API_BOOLEAN, 'default' => true],
 				['else' => true, 'type' => API_UNEXPECTED]
 			]],
-			'token' => ['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_ALLOW_NULL, 'default' => null]
+			'token' => ['type' => API_STRING_UTF8]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $session, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
+
+		$session += ['sessionid' => null, 'token' => null];
 
 		if (($session['sessionid'] === null && $session['token'] === null)
 				|| ($session['sessionid'] !== null && $session['token'] !== null)) {
