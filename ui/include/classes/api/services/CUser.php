@@ -3023,10 +3023,10 @@ class CUser extends CApiService {
 
 		$resource = DBselect(
 			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
-			' FROM device_token dt,device d,device_key dk'.
-			' WHERE dt.deviceid=d.deviceid'.
+			' FROM token_device td,device d,device_key dk'.
+			' WHERE td.deviceid=d.deviceid'.
 				' AND d.deviceid=dk.deviceid'.
-				' AND '.dbConditionId('dt.tokenid', [$db_token['tokenid']]).
+				' AND '.dbConditionId('td.tokenid', [$db_token['tokenid']]).
 				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
 			2
 		);

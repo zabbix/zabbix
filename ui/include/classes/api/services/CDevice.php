@@ -143,7 +143,7 @@ class CDevice extends CApiService {
 	 *
 	 * @return array
 	 */
-	public function init(array $data): array {
+	public function init(array $data = []): array {
 		$this->validateInit($data);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -159,6 +159,12 @@ class CDevice extends CApiService {
 		$init_device_data = ['serverid' => $server_id, 'uuid' => $uuid];
 
 		$result = $server->initDevice($init_device_data, self::getAuthIdentifier());
+
+		$result = [
+			'mobile_enrollment_token' => 'kjsjkhdgfkjsdf',
+			'bridge_enrollment_key' => 'khjsadfiuhwkef',
+			'enrollment_url' => 'http://kajsdkajsd'
+		];
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
