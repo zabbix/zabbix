@@ -632,6 +632,138 @@ static int	DBpatch_7050050(void)
 
 static int	DBpatch_7050051(void)
 {
+	int			ret = SUCCEED;
+	zbx_db_insert_t		db_insert;
+	zbx_db_row_t		row;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_db_result_t	result = zbx_db_select("select i.itemid,t.tag,t.value from httptest_tag t"
+		" join ("
+			"select hsi.itemid,hs.httptestid from httpstepitem hsi"
+			" join httpstep hs on hs.httpstepid=hsi.httpstepid"
+			" union"
+			" select hti.itemid,hti.httptestid from httptestitem hti"
+		") as i"
+		" on i.httptestid=t.httptestid"
+		" where not exists ("
+			"select null from item_tag it"
+			" where it.itemid=i.itemid and it.tag=t.tag"
+		")");
+
+	if (NULL == result)
+		return FAIL;
+
+	zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	itemid;
+
+		ZBX_DBROW2UINT64(itemid, row[0]);
+		zbx_db_insert_add_values(&db_insert, __UINT64_C(0), itemid, row[1], row[2]);
+	}
+
+	zbx_db_insert_autoincrement(&db_insert, "itemtagid");
+	ret = zbx_db_insert_execute(&db_insert);
+
+	zbx_db_insert_clean(&db_insert);
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_7050052(void)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select profileid,value_str from profiles"
+			" where idx='web.messages' and source='triggers.severities'");
+
+	while (NULL != (row = zbx_db_fetch(result)) && SUCCEED == ret)
+	{
+		const char	*p = row[1];
+		int		count, i, valid = 1;
+		struct zbx_json	json;
+
+		/* Validate and parse PHP serialized array header: a:N:{ */
+		if ('a' != *p || ':' != *(p + 1))
+			continue;
+
+		p += 2;
+
+		count = *p++ - '0';
+		if (6 < count || ':' != *p || '{' != *(p + 1))
+			continue;
+
+		p += 2;
+
+		zbx_json_initarray(&json, 64);
+
+		for (i = 0; i < count; i++)
+		{
+			int	key;
+
+			/* Parse key: i:N; */
+			if ('i' != *p || ':' != *(p + 1) || '0' > *(p + 2) || *(p + 2) > '5' || ';' != *(p + 3))
+			{
+				valid = 0;
+				break;
+			}
+
+			key = *(p + 2) - '0';
+			p += 4;
+
+			/* Skip value: i:N; or s:"N"; */
+			while ('\0' != *p && ';' != *p)
+				p++;
+
+			if (';' != *p)
+			{
+				valid = 0;
+				break;
+			}
+			p++;
+
+			zbx_json_addint64(&json, NULL, (zbx_int64_t)key);
+		}
+
+		if (1 == valid && '}' == *p)
+		{
+			char	*value_str_esc = zbx_db_dyn_escape_string(json.buffer);
+
+			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+					"update profiles set value_str='%s' where profileid=%s;\n",
+					value_str_esc, row[0]);
+			zbx_free(value_str_esc);
+
+			ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+		}
+
+		zbx_json_free(&json);
+	}
+
+	zbx_db_free_result(result);
+
+	if (SUCCEED == ret && ZBX_DB_OK > zbx_db_flush_overflowed_sql(sql, sql_offset))
+		ret = FAIL;
+
+	zbx_free(sql);
+
+	return ret;
+}
+
+static int	DBpatch_7050053(void)
+{
 	const zbx_db_table_t	table =
 			{"trigger_rtdata", "triggerid", 0,
 				{
@@ -648,12 +780,12 @@ static int	DBpatch_7050051(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_7050052(void)
+static int	DBpatch_7050054(void)
 {
 	return DBcreate_index("trigger_rtdata", "trigger_rtdata_1", "value,lastchange", 0);
 }
 
-static int	DBpatch_7050053(void)
+static int	DBpatch_7050055(void)
 {
 	const zbx_db_field_t	field = {"triggerid", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -661,7 +793,7 @@ static int	DBpatch_7050053(void)
 	return DBadd_foreign_key("trigger_rtdata", 1, &field);
 }
 
-static int	DBpatch_7050054(void)
+static int	DBpatch_7050056(void)
 {
 	/* hosts.status 3 - HOST_STATUS_TEMPLATE */
 	/* triggers.flags 0, 4 - ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED */
@@ -686,24 +818,63 @@ static int	DBpatch_7050054(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_7050055(void)
+static int	DBpatch_7050057(void)
 {
 	return DBdrop_field("triggers", "value");
 }
 
-static int	DBpatch_7050056(void)
+static int	DBpatch_7050058(void)
 {
 	return DBdrop_field("triggers", "state");
 }
 
-static int	DBpatch_7050057(void)
+static int	DBpatch_7050059(void)
 {
 	return DBdrop_field("triggers", "lastchange");
 }
 
-static int	DBpatch_7050058(void)
+static int	DBpatch_7050060(void)
 {
 	return DBdrop_field("triggers", "error");
+}
+
+static int	DBpatch_7050061(void)
+{
+	return DBcreate_changelog_insert_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050062(void)
+{
+	return DBcreate_changelog_update_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050063(void)
+{
+	return DBcreate_changelog_delete_trigger("trigger_depends", "triggerdepid");
+}
+
+static int	DBpatch_7050064(void)
+{
+	return DBdrop_foreign_key("trigger_depends", 2);
+}
+
+static int	DBpatch_7050065(void)
+{
+	return DBdrop_foreign_key("trigger_depends", 1);
+}
+
+static int	DBpatch_7050066(void)
+{
+	const zbx_db_field_t	field = {"triggerid_down", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_depends", 1, &field);
+}
+
+static int	DBpatch_7050067(void)
+{
+	const zbx_db_field_t	field = {"triggerid_up", NULL, "triggers", "triggerid", 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_foreign_key("trigger_depends", 2, &field);
 }
 
 #endif
@@ -771,5 +942,14 @@ DBPATCH_ADD(7050055, 0, 1)
 DBPATCH_ADD(7050056, 0, 1)
 DBPATCH_ADD(7050057, 0, 1)
 DBPATCH_ADD(7050058, 0, 1)
+DBPATCH_ADD(7050059, 0, 1)
+DBPATCH_ADD(7050060, 0, 1)
+DBPATCH_ADD(7050061, 0, 1)
+DBPATCH_ADD(7050062, 0, 1)
+DBPATCH_ADD(7050063, 0, 1)
+DBPATCH_ADD(7050064, 0, 1)
+DBPATCH_ADD(7050065, 0, 1)
+DBPATCH_ADD(7050066, 0, 1)
+DBPATCH_ADD(7050067, 0, 1)
 
 DBPATCH_END()

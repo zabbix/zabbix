@@ -1291,7 +1291,7 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 			"url", "url_name", "type", "templateid", "flags", "recovery_mode", "correlation_mode",
 			"correlation_tag", "manual_close", "opdata", "discover", "event_name", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_rt, "triggers", "triggerid", "value", "state", (char *)NULL);
+	zbx_db_insert_prepare(&db_insert_rt, "trigger_rtdata", "triggerid", "value", "state", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
 			"parameter", (char *)NULL);

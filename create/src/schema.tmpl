@@ -601,10 +601,11 @@ HOUSEKEEPER	|1
 
 TABLE|trigger_depends|triggerdepid|ZBX_TEMPLATE
 FIELD		|triggerdepid	|t_id		|	|NOT NULL	|0
-FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid
-FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid
+FIELD		|triggerid_down	|t_id		|	|NOT NULL	|0			|1|triggers	|triggerid		|RESTRICT
+FIELD		|triggerid_up	|t_id		|	|NOT NULL	|0			|2|triggers	|triggerid		|RESTRICT
 UNIQUE		|1		|triggerid_down,triggerid_up
 INDEX		|2		|triggerid_up
+CHANGELOG	|22
 
 TABLE|functions|functionid|ZBX_TEMPLATE
 FIELD		|functionid	|t_id		|	|NOT NULL	|0
@@ -2300,7 +2301,7 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|7050058	|7050058
+ROW		|1		|7050067	|7050067
 
 TABLE|cep_rule|cep_ruleid|ZBX_DATA
 FIELD	|cep_ruleid	|t_id	|	|NOT NULL |0

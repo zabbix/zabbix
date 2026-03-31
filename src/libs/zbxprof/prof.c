@@ -234,6 +234,18 @@ static void	zbx_reset_prof(void)
 		zbx_vector_func_profiles_clear_ext(&zbx_func_profiles, func_profile_free);
 }
 
+void	zbx_prof_destroy(void)
+{
+	if (0 != zbx_prof_initialized)
+	{
+		zbx_reset_prof();
+		zbx_prof_disable();
+
+		zbx_vector_func_profiles_destroy(&zbx_func_profiles);
+		zbx_prof_initialized = 0;
+	}
+}
+
 void	zbx_prof_update(const char *info, double time_now)
 {
 #define PROF_UPDATE_INTERVAL	30

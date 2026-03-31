@@ -18,6 +18,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
+#include "zbxregexp.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -1358,6 +1359,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			worker->stop = 1;
 		}
 	}
+
+	zbx_deinit_regexp_env();
 
 	discoverer_queue_deregister_worker(queue);
 	discoverer_queue_unlock(queue);

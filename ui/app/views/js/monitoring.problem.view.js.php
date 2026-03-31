@@ -34,6 +34,8 @@
 		timeout: null,
 		deferred: null,
 		opened_eventids: [],
+		_refresh_message_box: null,
+		_popup_message_box: null,
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
 			this.refresh_url = new Curl(refresh_url);
@@ -219,10 +221,12 @@
 				callback: ({data, event}) => {
 					event.preventDefault();
 
-					clearMessages();
+					this._removePopupMessage();
 
 					if ('success' in data.submit) {
-						addMessage(makeMessageBox('good', data.submit.success.messages, data.submit.success.title));
+						this._addPopupMessage(
+							makeMessageBox('good', data.submit.success.messages, data.submit.success.title)
+						);
 					}
 
 					chkbxRange.checkObjectAll('eventids', false);
@@ -373,11 +377,38 @@
 			this.refreshBody(response.body);
 
 			if ('messages' in response) {
-				clearMessages();
-				addMessage(makeMessageBox('good', [], response.messages, true, false));
+				this._addRefreshMessage(response.messages);
 			}
 
 			('debug' in response) && this.refreshDebug(response.debug);
+		},
+
+		_addRefreshMessage(messages) {
+			this._removeRefreshMessage();
+
+			this._refresh_message_box = $($.parseHTML(messages));
+			addMessage(this._refresh_message_box);
+		},
+
+		_removeRefreshMessage() {
+			if (this._refresh_message_box !== null) {
+				this._refresh_message_box.remove();
+				this._refresh_message_box = null;
+			}
+		},
+
+		_addPopupMessage(message_box) {
+			this._removePopupMessage();
+
+			this._popup_message_box = message_box;
+			addMessage(this._popup_message_box);
+		},
+
+		_removePopupMessage() {
+			if (this._popup_message_box !== null) {
+				this._popup_message_box.remove();
+				this._popup_message_box = null;
+			}
 		},
 
 		/**

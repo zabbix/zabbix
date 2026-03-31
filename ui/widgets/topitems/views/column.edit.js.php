@@ -132,8 +132,6 @@ window.topitems_column_edit_form = new class {
 
 		this.#form.style.display = '';
 		this.#overlay.recoverFocus();
-
-		this.#form.addEventListener('submit', () => this.submit());
 	}
 
 	/**

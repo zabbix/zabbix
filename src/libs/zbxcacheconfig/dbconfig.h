@@ -67,7 +67,6 @@ typedef struct
 	unsigned char		recovery_mode;		/* see TRIGGER_RECOVERY_MODE_* defines   */
 	unsigned char		correlation_mode;	/* see ZBX_TRIGGER_CORRELATION_* defines */
 	unsigned char		timer;
-	unsigned char		flags;
 
 	zbx_uint64_t		*itemids;
 
@@ -75,11 +74,21 @@ typedef struct
 }
 ZBX_DC_TRIGGER;
 
+ZBX_PTR_VECTOR_DECL(trigger_ptr, ZBX_DC_TRIGGER *)
+
 /* specifies if trigger expression/recovery expression has timer functions */
 /* (date, time, now, dayofweek or dayofmonth)                              */
 #define ZBX_TRIGGER_TIMER_DEFAULT		0x00
 #define ZBX_TRIGGER_TIMER_EXPRESSION		0x01
 #define ZBX_TRIGGER_TIMER_RECOVERY_EXPRESSION	0x02
+
+typedef struct
+{
+	zbx_uint64_t	triggerdepid;
+	zbx_uint64_t	triggerid_down;
+	zbx_uint64_t	triggerid_up;
+}
+zbx_dc_trigger_depends_t;
 
 typedef struct zbx_dc_trigger_deplist
 {
@@ -945,6 +954,7 @@ typedef struct
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;
+	zbx_hashset_t		trigger_depends;
 	zbx_hashset_t		hosts;
 	zbx_hashset_t		hosts_h;		/* for searching hosts by 'host' name */
 	zbx_hashset_t		proxies_p;		/* for searching proxies by name */

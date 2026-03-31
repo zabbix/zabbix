@@ -21,6 +21,7 @@
 #include "cep_correlation.h"
 #include "zbxcep.h"
 #include "zbxcep_client.h"
+#include "zbxmw.h"
 
 #include "zbx_item_constants.h"
 #include "zbx_trigger_constants.h"
@@ -28,7 +29,6 @@
 #include "zbxcommon.h"
 #include "zbxipcservice.h"
 #include "zbxrtc.h"
-#include "zbxthreads.h"
 #include "zbxlog.h"
 #include "zbxnix.h"
 #include "zbxregexp.h"
@@ -40,26 +40,19 @@
  *                                                                            *
  * Purpose: initialize event processor worker                                 *
  *                                                                            *
- * Parameters: worker           - [IN] preprocessing worker                   *
- *             id               - [IN] worker id (index)                      *
- *             timekeeper       - [IN] timekeeper object for busy/idle worker *
- *                                     state reporting                        *
- *             queue            - [IN] task queue                             *
- *             dboool           - [IN] database connection pool               *
-*              service          - [IN] manager service, used for alerting     *
+ * Parameters: dboool           - [IN] database connection pool               *
  *                                                                            *
- * Return value: SUCCEED - the worker was initialized and started             *
- *               FAIL    - otherwise                                          *
+ * Return value: created worker                                               *
  *                                                                            *
  ******************************************************************************/
-void	cep_worker_init(zbx_cep_worker_t *worker, int id, zbx_timekeeper_t *timekeeper, zbx_cep_queue_t *queue,
-		zbx_dbconn_pool_t *dbpool, zbx_ipc_service_t *service)
+zbx_cep_worker_t	*cep_worker_create( zbx_dbconn_pool_t *dbpool)
 {
-	worker->id = id;
-	worker->timekeeper = timekeeper;
-	worker->queue = queue;
+	zbx_cep_worker_t	*worker;
+
+	worker = (zbx_cep_worker_t *)zbx_calloc(NULL, 1, sizeof(zbx_cep_worker_t));
 	worker->dbpool = dbpool;
-	worker->service = service;
+
+	return worker;
 }
 
 /******************************************************************************
@@ -99,19 +92,27 @@ static void	cep_worker_assess_trigger_events(zbx_cep_task_remote_t *task)
 static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
 	zbx_vector_db_event_t		events;
-	zbx_vector_cep_task_ptr_t	tasks;
 
 	zbx_vector_db_event_create(&events);
-	zbx_vector_cep_task_ptr_create(&tasks);
 
 	zbx_cep_deserialize_events(task->message->data, &events);
 
-	for (int i = 0; i < events.values_num; i++)
-		zbx_vector_cep_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
+	if (0 != events.values_num)
+	{
+		zbx_vector_mw_task_ptr_t	tasks;
 
-	cep_queue_push_batch(worker->queue, &tasks);
+		zbx_vector_mw_task_ptr_create(&tasks);
 
-	zbx_vector_cep_task_ptr_destroy(&tasks);
+		for (int i = 0; i < events.values_num; i++)
+			zbx_vector_mw_task_ptr_append(&tasks, cep_create_task_event(events.values[i]));
+
+		zbx_mw_queue_lock(worker->base.queue);
+		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
+		zbx_mw_queue_unlock(worker->base.queue);
+
+		zbx_vector_mw_task_ptr_destroy(&tasks);
+	}
+
 	zbx_vector_db_event_destroy(&events);
 }
 
@@ -126,13 +127,15 @@ static void	cep_worker_add_events(zbx_cep_worker_t *worker, zbx_cep_task_remote_
 static void	cep_worker_add_close_problem(zbx_cep_worker_t *worker, zbx_cep_task_remote_t *task)
 {
 	zbx_db_event	*event;
-	zbx_cep_task_t	*t;
+	zbx_mw_task_t	*t;
 	zbx_uint64_t	eventid, userid;
 
 	zbx_cep_deserialize_close_problem(task->message->data, &event, &eventid, &userid);
 	t = cep_create_task_close_event(event, eventid, userid, 0);
 
-	cep_queue_push(worker->queue, t);
+	zbx_mw_queue_lock(worker->base.queue);
+	cep_queue_push((zbx_cep_queue_t *)worker->base.queue, t);
+	zbx_mw_queue_lock(worker->base.queue);
 }
 
 /******************************************************************************
@@ -266,7 +269,9 @@ static void	cep_worker_add_event_tags(zbx_cep_worker_t *worker, zbx_cep_task_rem
 		}
 	}
 
-	cep_queue_push_finished_direct(worker->queue, (zbx_cep_task_t *)db_task);
+	zbx_mw_queue_lock(worker->base.queue);
+	zbx_mw_queue_push_completed_direct(worker->base.queue, (zbx_mw_task_t *)db_task);
+	zbx_mw_queue_unlock(worker->base.queue);
 
 	zbx_vector_uint64_destroy(&eventids);
 	zbx_vector_cep_event_handle_destroy(&handles);
@@ -382,18 +387,24 @@ static void	cep_worker_open_trigger_event(zbx_cep_worker_t *worker, zbx_cep_task
 	h = zbx_cep_event_handle_addref(cep_add_event(cep, event));
 	cep_cache_release(&cep);
 
-	zbx_vector_cep_task_ptr_t	tasks;
+	zbx_vector_mw_task_ptr_t	tasks;
 	int				corr_ret;
 
-	zbx_vector_cep_task_ptr_create(&tasks);
+	zbx_vector_mw_task_ptr_create(&tasks);
 	corr_ret = cep_correlate_db_event(db_event, worker->dbpool, &tasks);
 
 	/* 'close new' operations must skip actions for the problem and generated ok event */
 	if (0 != (corr_ret & CORRELATION_RESULT_CLOSE_NEW))
 		task->action_state = CEP_ACTION_DISABLED;
 
-	cep_queue_push_batch(worker->queue, &tasks);
-	zbx_vector_cep_task_ptr_destroy(&tasks);
+	if (0 != tasks.values_num)
+	{
+		zbx_mw_queue_lock(worker->base.queue);
+		cep_queue_push_batch((zbx_cep_queue_t *)worker->base.queue, &tasks);
+		zbx_mw_queue_unlock(worker->base.queue);
+	}
+
+	zbx_vector_mw_task_ptr_destroy(&tasks);
 
 	task->event_op = CEP_EVENT_OPEN;
 
@@ -670,10 +681,10 @@ static void	cep_worker_process_task_close_event(zbx_cep_task_close_event_t *task
  ******************************************************************************/
 static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_task_commit_t *task)
 {
-	zbx_vector_cep_task_ptr_t	event_tasks, add_tags_tasks;
+	zbx_vector_mw_task_ptr_t	event_tasks, add_tags_tasks;
 
-	zbx_vector_cep_task_ptr_create(&event_tasks);
-	zbx_vector_cep_task_ptr_create(&add_tags_tasks);
+	zbx_vector_mw_task_ptr_create(&event_tasks);
+	zbx_vector_mw_task_ptr_create(&add_tags_tasks);
 
 	for (int i = 0; i < task->tasks.values_num; i++)
 	{
@@ -681,13 +692,13 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		{
 			case CEP_TASK_EVENT:
 			case CEP_TASK_CLOSE_EVENT:
-				zbx_vector_cep_task_ptr_append(&event_tasks, task->tasks.values[i]);
+				zbx_vector_mw_task_ptr_append(&event_tasks, task->tasks.values[i]);
 				break;
 			case CEP_TASK_ADD_TAGS:
-				zbx_vector_cep_task_ptr_append(&add_tags_tasks, task->tasks.values[i]);
+				zbx_vector_mw_task_ptr_append(&add_tags_tasks, task->tasks.values[i]);
 				break;
 			default:
-				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %u in commit",
+				THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported task %d in commit",
 						task->tasks.values[i]->type);
 				break;
 		}
@@ -734,8 +745,8 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
 		}
 	}
 
-	zbx_vector_cep_task_ptr_destroy(&add_tags_tasks);
-	zbx_vector_cep_task_ptr_destroy(&event_tasks);
+	zbx_vector_mw_task_ptr_destroy(&add_tags_tasks);
+	zbx_vector_mw_task_ptr_destroy(&event_tasks);
 }
 
 /******************************************************************************
@@ -747,32 +758,14 @@ static void	cep_worker_process_task_commit(zbx_cep_worker_t *worker, zbx_cep_tas
  * Return value: NULL                                                         *
  *                                                                            *
  ******************************************************************************/
-static void	*cep_worker_entry(void *args)
+void	*cep_worker_entry(void *args)
 {
 #define CEP_RTC_OPEN_TIMEOUT	10
 
 	zbx_cep_worker_t	*worker = (zbx_cep_worker_t *)args;
-	zbx_cep_queue_t		*queue = worker->queue;
-	char			component[ZBX_LOG_COMPONENT_NAME_LEN];
-	sigjmp_buf		jmp_ret;
 	char			*error = NULL;
 
-	atomic_fetch_or(&worker->state, ZBX_CEP_WORKER_STATE_RUNNING);
-
-	zbx_snprintf(component, sizeof(component), "%s #%d", get_process_type_string(ZBX_PROCESS_TYPE_CEP_WORKER),
-		worker->id);
-	zbx_set_log_component(component, &worker->logger);
-
-	zbx_supervisor_update_activity("%s starting", component);
-
-	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
-
-	zbx_init_thread_signal_handler(&jmp_ret);
-	if (0 != sigsetjmp(jmp_ret, 1))
-	{
-		atomic_fetch_or(&worker->state, ZBX_CEP_WORKER_STATE_STOPPED);
-		return ZBX_THREAD_FAILURE;
-	}
+	zbx_supervisor_update_activity("%s starting", worker->base.name);
 
 	zbx_init_regexp_env();
 
@@ -784,22 +777,20 @@ static void	*cep_worker_entry(void *args)
 	}
 
 	if (SUCCEED == zbx_is_export_enabled(ZBX_FLAG_EXPTYPE_EVENTS))
-		worker->problem_export = zbx_problems_export_init("event-processor", worker->id);
+		worker->problem_export = zbx_problems_export_init("event-processor", worker->base.id);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
-	zbx_supervisor_update_activity("%s running", component);
+	zbx_supervisor_update_activity("%s running", worker->base.name);
 
-	cep_queue_lock(queue);
+	zbx_mw_queue_lock(worker->base.queue);
 
-	while (0 == (atomic_load(&worker->state) & ZBX_CEP_WORKER_STATE_STOPPING))
+	while (SUCCEED == zbx_mw_worker_is_running(&worker->base))
 	{
-		zbx_cep_task_t	*task;
+		zbx_mw_task_t	*task;
 
-		while (NULL != (task = cep_queue_pop_nl(queue)))
+		while (NULL != (task = zbx_mw_queue_pop(worker->base.queue)))
 		{
-			cep_queue_unlock(queue);
-
-			(void)zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_BUSY);
+			zbx_mw_queue_unlock(worker->base.queue);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() process task type:%u", __func__, task->type);
 
@@ -818,32 +809,28 @@ static void	*cep_worker_entry(void *args)
 					cep_worker_process_task_commit(worker, (zbx_cep_task_commit_t *)task);
 					break;
 				default:
-					THIS_SHOULD_NEVER_HAPPEN_MSG("unknown task type %u", task->type);
+					THIS_SHOULD_NEVER_HAPPEN_MSG("unknown task type %d", task->type);
 					break;
 			}
 
-			cep_queue_lock(queue);
-			cep_queue_push_finished_nl(queue, task);
-
-			if (CEP_TASK_REMOTE == task->type)
-				zbx_ipc_service_alert(worker->service);
-
-			(void)zbx_timekeeper_update(worker->timekeeper, worker->id - 1, ZBX_PROCESS_STATE_IDLE);
+			zbx_mw_queue_lock(worker->base.queue);
+			cep_queue_push_completed((zbx_cep_queue_t *)worker->base.queue, task);
 
 			continue;
 		}
 
-		if (SUCCEED != cep_queue_wait(queue, &error))
+		if (SUCCEED != zbx_mw_queue_wait(worker->base.queue, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->id, error);
+			zabbix_log(LOG_LEVEL_WARNING, "%s", error);
 			zbx_free(error);
-			atomic_fetch_or(&worker->state, ZBX_CEP_WORKER_STATE_STOPPING);
+
+			zbx_mw_worker_stop(&worker->base);
 
 			zbx_set_exiting_with_fail();
 		}
 	}
 
-	cep_queue_unlock(queue);
+	zbx_mw_queue_unlock(worker->base.queue);
 
 	zbx_ipc_async_socket_close(&worker->rtc);
 	zbx_deinit_regexp_env();
@@ -851,89 +838,11 @@ static void	*cep_worker_entry(void *args)
 	if (NULL != worker->problem_export)
 		zbx_export_deinit(worker->problem_export);
 
+	zbx_supervisor_update_activity("%s stopped", worker->base.name);
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
-
-	zbx_supervisor_update_activity("%s stopped", component);
-
-	atomic_fetch_or(&worker->state, ZBX_CEP_WORKER_STATE_STOPPED);
 
 	return NULL;
 
 #undef CEP_RTC_OPEN_TIMEOUT
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: start event processor thread                                      *
- *                                                                            *
- * Parameters: worker - [IN] event processor                                  *
- *             error  - [OUT] error message                                   *
- *                                                                            *
- * Return value: SUCCEED - thread started successfully                        *
- *               FAIL    - failed to start thread                             *
- *                                                                            *
- ******************************************************************************/
-int	cep_worker_start(zbx_cep_worker_t *worker, char **error)
-{
-	int		err, ret = FAIL;
-	pthread_attr_t	attr;
-
-	atomic_fetch_or(&worker->state, ZBX_CEP_WORKER_STATE_STARTING);
-
-	zbx_pthread_init_attr(&attr);
-	if (0 != (err = pthread_create(&worker->thread, &attr, cep_worker_entry, (void *)worker)))
-	{
-		*error = zbx_dsprintf(NULL, "cannot create thread: %s", zbx_strerror(err));
-		goto out;
-	}
-
-	ret = SUCCEED;
-out:
-	return ret;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: stop event processor thread                                       *
- *                                                                            *
- * Parameters: worker - [IN] event processor                                  *
- *                                                                            *
- ******************************************************************************/
-void	cep_worker_stop(zbx_cep_worker_t *worker)
-{
-	atomic_fetch_or(&worker->state, ZBX_CEP_WORKER_STATE_STOPPING);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: wait for event processor thread to finish                         *
- *                                                                            *
- * Parameters: worker - [IN] event processor                                  *
- *                                                                            *
- ******************************************************************************/
-void	cep_worker_join(zbx_cep_worker_t *worker)
-{
-	void	*retval;
-
-	pthread_join(worker->thread, &retval);
-	zbx_timekeeper_reset(worker->timekeeper, worker->id - 1);
-	atomic_store(&worker->state, ZBX_CEP_WORKER_STATE_FREE);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: destroy event processor                                           *
- *                                                                            *
- * Parameters: worker - [IN] event processor                                  *
- *                                                                            *
- ******************************************************************************/
-void	cep_worker_destroy(zbx_cep_worker_t *worker)
-{
-	if (0 == (atomic_load(&worker->state) & ZBX_CEP_WORKER_STATE_STARTING))
-		return;
-
-	void	*retval;
-
-	pthread_join(worker->thread, &retval);
 }
 
