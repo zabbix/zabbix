@@ -266,6 +266,8 @@
 #define ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND	"alert.send"
 #define ZBX_PROTO_VALUE_ZABBIX_ITEM_TEST	"item.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
+#define ZBX_PROTO_VALUE_DEVICE_INIT		"device.init"
+#define ZBX_PROTO_VALUE_DEVICE_OFFBOARD		"device.offboard"
 
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
 #define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"

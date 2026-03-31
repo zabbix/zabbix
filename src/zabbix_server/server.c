@@ -1640,7 +1640,11 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 			.config_webdriver_url = config_webdriver_url,
 			.trapper_process_request_func_cb = zbx_trapper_process_request_server,
 			.autoreg_update_host_cb = zbx_autoreg_update_host_server,
-			.config_frontend_allowed_ip = config_frontend_allowed_ip
+			.config_frontend_allowed_ip = config_frontend_allowed_ip,
+			.config_adapter_url = config_adapter_url,
+			.config_tls_ca_file = zbx_config_tls->ca_file,
+			.config_tls_cert_file = zbx_config_tls->cert_file,
+			.config_tls_key_file = zbx_config_tls->key_file,
 		};
 
 	zbx_thread_escalator_args	escalator_args =

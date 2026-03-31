@@ -54,6 +54,10 @@ typedef struct
 	const char				*config_webdriver_url;
 	zbx_trapper_process_request_func_t	trapper_process_request_func_cb;
 	zbx_autoreg_update_host_func_t		autoreg_update_host_cb;
+	const char				*config_adapter_url;
+	const char				*config_tls_ca_file;
+	const char				*config_tls_cert_file;
+	const char				*config_tls_key_file;
 }
 zbx_thread_trapper_args;
 
