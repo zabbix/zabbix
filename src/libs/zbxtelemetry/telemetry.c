@@ -67,7 +67,7 @@ static void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
 	zbx_free(aggr_column->column_name);
 	zbx_free(aggr_column->alias);
 
-	zbx_vector_str_clear(&aggr_column->args);
+	zbx_vector_str_clear_ext(&aggr_column->args, zbx_str_free);
 	zbx_vector_str_destroy(&aggr_column->args);
 }
 
@@ -287,7 +287,7 @@ out:
 
 static int	tq_parse_function_args(struct zbx_json_parse *jp, zbx_vector_str_t *args, char *buf, size_t buf_size)
 {
-	/* in case of an error the aggregated_columns vector is cleaned by the calling function */
+	/* in case of an error the args vector is cleaned by the calling function */
 	int		ret = FAIL;
 	const char	*p = NULL;
 
@@ -442,7 +442,7 @@ out:
 static int	tq_parse_conditions(struct zbx_json_parse *jp, zbx_vector_tq_condition_t *conditions, char *buf,
 		size_t buf_size)
 {
-	/* in case of an error the aggregated_columns vector is cleaned by the calling function */
+	/* in case of an error the conditions vector is cleaned by the calling function */
 	int		ret = FAIL;
 	const char	*p = NULL;
 
@@ -469,22 +469,10 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: parses json_str contents and stores them into query               *
- *                                                                            *
- * Parameters: json_str     - [IN]                                            *
- *             query        - [OUT] must not be initialized beforehand        *
- *                                                                            *
- * Return value: SUCCEED - json_str parsed successfully, query must be        *
- *                         cleaned after use                                  *
- *               FAIL    - otherwise, query is not initialized                *
- *                                                                            *
- ******************************************************************************/
-int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
+static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query)
 {
+	/* in case of an error the query is cleaned by the calling function */
 	int			ret = FAIL;
-	struct zbx_json_parse	jp;
 	char			buf[MAX_STRING_LEN];
 	size_t			buf_size = sizeof(buf);
 	const char		*p = NULL;
@@ -494,12 +482,7 @@ int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	tq_query_init(query);
-
-	if (FAIL == zbx_json_open(json_str, &jp))
-		goto out;
-
-	while (NULL != (p = zbx_json_pair_next(&jp, p, buf, buf_size)))
+	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "%s: p:'%s', buf:'%s'", __func__, p, buf);
 
@@ -590,16 +573,51 @@ int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
 	if (FAIL == zbx_is_time_suffix(aggregation_size, &query->aggregation_size, ZBX_LENGTH_UNLIMITED))
 		goto out;
 
+	ret = SUCCEED;
+out:
+	zbx_free(time_shift);
+	zbx_free(loopback_limit);
+	zbx_free(aggregation_size);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses json_str contents and stores them into query and validates *
+ *          it                                                                *
+ *                                                                            *
+ * Parameters: json_str     - [IN]                                            *
+ *             query        - [OUT] must not be initialized beforehand        *
+ *                                                                            *
+ * Return value: SUCCEED - json_str parsed successfully, query is valid,      *
+ *                         query must be cleaned after use                    *
+ *               FAIL    - otherwise, query is not initialized                *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
+{
+	int			ret = FAIL;
+	struct zbx_json_parse	jp;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	tq_query_init(query);
+
+	if (FAIL == zbx_json_open(json_str, &jp))
+		goto out;
+
+	if (FAIL == tq_parse_query(&jp, query))
+		goto out;
+
 	/* TODO: validate, be wary of SQL injection in formula, json_path, value (and maybe other fields too)! */
 
 	ret = SUCCEED;
 out:
 	if (FAIL == ret)
 		zbx_tq_query_clean(query);
-
-	zbx_free(time_shift);
-	zbx_free(loopback_limit);
-	zbx_free(aggregation_size);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
 
