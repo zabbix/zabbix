@@ -172,7 +172,7 @@ class CAPIHelper {
 	 * @returns CAPIHelper
 	 */
 	public static function authorize(string $username, string $password) {
-		static::$session = false;
+		static::$session = null;
 
 		$result = static::call('user.login', ['username' => $username, 'password' => $password]);
 		if (array_key_exists('result', $result)) {
