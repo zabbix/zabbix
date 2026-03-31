@@ -40,6 +40,11 @@
 #include "zbxresolver.h"
 #endif
 
+#if defined(HAVE_LIBCURL)
+#	include "zbxhttp.h"
+#	include "zbxcurl.h"
+#endif
+
 #define	ALARM_ACTION_TIMEOUT	40
 
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
@@ -507,31 +512,108 @@ static void	alerter_process_push(
 		zbx_ipc_message_t *ipc_message,
 		const char *config_adapter_url,
 		int config_adapter_timeout,
-		const char *push_ca_file,
-		const char *push_cert_file,
-		const char *push_key_file)
+		const char *config_adapter_ca_file,
+		const char *config_adapter_cert_file,
+		const char *config_adapter_key_file)
 {
-	zbx_uint64_t	alertid;
-	char		*params;
-
-	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER X FINAL XSTRATA: %s", params);
-
-
-
-
-
-
-
-
-	zbx_free(params);
-
+#ifndef HAVE_LIBCURL
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
+	ZBX_UNUSED(config_adapter_url);
+	ZBX_UNUSED(config_adapter_timeout);
 	ZBX_UNUSED(push_ca_file);
 	ZBX_UNUSED(push_cert_file);
 	ZBX_UNUSED(push_key_file);
+
+	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
+#else
+	zbx_uint64_t		alertid;
+	char			*params;
+	long			http_code = 0;
+	CURL			*curl = NULL;
+	CURLcode		err;
+	CURLoption		opt;
+	struct curl_slist	*headers = NULL;
+	zbx_http_response_t	body = {0}, response_header = {0};
+	char			*payload = NULL, *error = NULL, errbuf[CURL_ERROR_SIZE];
+
+	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
+	payload = zbx_strdup(NULL, params);
+
+	if (NULL == (curl = curl_easy_init()))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER failed initialize cURL library");
+		goto out;
+	}
+
+	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb, zbx_curl_write_cb,
+			errbuf, &error))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error));
+		goto out;
+	}
+
+	headers = curl_slist_append(headers, "Content-Type:application/json");
+
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECTTIMEOUT_MS, 2000L)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_https(curl, &error))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_https %s", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_ssl_version %s", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_adapter_ca_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_adapter_cert_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_adapter_key_file)))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK != (err = curl_easy_perform(curl)))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed connect to bridge-adapter: %s", curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed obtain bridge-adapter response code: %s",
+			curl_easy_strerror(err));
+		goto out;
+	}
+
+	if (http_code < 200 || http_code >= 300)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed to send notification " ZBX_FS_UI64 ": "
+				"bridge-adapter returned HTTP %ld", http_code);
+
+		goto out;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "ALERT SUCCESS: %d", http_code);
+	}
+out:
+	curl_easy_cleanup(curl);
+	zbx_free(params);
+#endif
 }
 
 /******************************************************************************
