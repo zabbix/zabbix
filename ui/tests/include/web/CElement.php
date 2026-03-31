@@ -695,6 +695,10 @@ class CElement extends CBaseElement implements IWaitable {
 			return $this->asTable($options);
 		}
 
+		if ($tag === 'z-textarea-flexible') {
+			return $this->asTextareaFlexible($options);
+		}
+
 		if ($tag === 'input') {
 			$type = $this->getAttribute('type');
 			if ($type === 'checkbox' || $type === 'radio') {

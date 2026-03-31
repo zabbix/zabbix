@@ -261,7 +261,6 @@ window.operation_popup = new class {
 				continue;
 			}
 			field.style.display = 'none';
-			field.getElementsByTagName('input')
 		}
 
 		for (const label of this.form.getElementsByTagName('label')) {
@@ -278,7 +277,7 @@ window.operation_popup = new class {
 			if (input.name === 'operation[operationtype]') {
 				continue;
 			}
-			input.setAttribute('disabled', true);
+			input.disabled = true;
 			input.style.display = 'none';
 		}
 	}
@@ -633,29 +632,25 @@ window.operation_popup = new class {
 	}
 
 	_customMessageFields() {
-		const default_msg = document.querySelector('#operation_opmessage_default_msg');
+		const default_msg = document.getElementById('operation_opmessage_default_msg');
 		const message_fields = [
 			'operation-message-subject-label', 'operation-opmessage-subject', 'operation-message-label',
 			'operation_opmessage_message', 'operation-message-subject', 'operation-message'
 		];
 
-		default_msg.onchange = function() {
-			if (document.querySelector('#operation_opmessage_default_msg').checked) {
-				message_fields.forEach((field) => {
-					document.getElementById(field).style.display='';
-					document.getElementById(field).removeAttribute('disabled');
-				});
+		const update_fields = () => {
+			const is_checked = default_msg.checked;
 
-				document.querySelector('#operation_opmessage_default_msg').value = 0;
-			}
-			else {
-				message_fields.forEach((field) => {
-					document.getElementById(field).style.display='none';
-				});
+			for (const field of message_fields) {
+				const field_element = document.getElementById(field);
 
-				document.querySelector('#operation_opmessage_default_msg').value = 1;
+				default_msg.value = is_checked ? 0 : 1;
+				field_element.style.display = is_checked ? '' : 'none';
+				field_element.disabled = !is_checked;
 			}
-		}
-		default_msg.dispatchEvent(new Event('change'));
+		};
+
+		default_msg.addEventListener('change', () => update_fields());
+		update_fields();
 	}
 }

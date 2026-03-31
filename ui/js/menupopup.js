@@ -763,7 +763,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 		url = new Curl('zabbix.php');
 		url.setArgument('action', 'popup');
 		url.setArgument('popup', 'acknowledge.edit');
-		url.setArgument('eventid', options.eventid);
+		url.setArgument('eventids[]', options.eventid);
 
 		sections.push({
 			label: t('Actions'),
