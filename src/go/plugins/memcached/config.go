@@ -22,7 +22,7 @@ import (
 	"golang.zabbix.com/sdk/plugin"
 )
 
-type Session struct {
+type session struct {
 	URI      string `conf:"name=Uri,optional"`
 	Password string `conf:"optional"`
 	User     string `conf:"optional"`
@@ -32,7 +32,7 @@ type Session struct {
 	// commit such a horrific act is beyond me).
 	// Since JSON can contain ints and ints can't be unmarshaled into strings,
 	// here we tell the marshaler to do the conversion during initial marshaling.
-	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
+	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"` //nolint:tagalign,tagliatelle
 }
 
 type PluginOptions struct {
@@ -43,10 +43,10 @@ type PluginOptions struct {
 	KeepAlive int `conf:"optional,range=60:900,default=300"`
 
 	// Sessions stores pre-defined named sets of connections settings.
-	Sessions map[string]Session `conf:"optional"`
+	Sessions map[string]session `conf:"optional"`
 
 	// Default stores default connection parameter values from configuration file
-	Default Session `conf:"optional"`
+	Default session `conf:"optional"`
 }
 
 // Configure implements the Configurator interface.
@@ -57,7 +57,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("[%s] Config value 'Plugins.Memcached.Timeout' is deprecated. Use 'Plugins.Memcached.Default.ConnectionTimeout' instead.", pluginName)
+		log.Debugf("[%s] Config value 'Plugins.Memcached.Timeout' is deprecated."+
+			"Use 'Plugins.Memcached.Default.ConnectionTimeout' instead.", pluginName)
 
 		if p.options.Default.ConnectionTimeout == 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout

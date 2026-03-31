@@ -15,9 +15,9 @@
 package systemrun
 
 import (
-	"context"
 	"log"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 	"golang.zabbix.com/agent2/pkg/zbxcmd"
@@ -37,7 +37,6 @@ type mockLogger struct {
 }
 
 type contextMock struct {
-	context.Context
 	clientID uint64
 }
 
@@ -101,6 +100,22 @@ func (cm *contextMock) Timeout() int { return 0 }
 
 // Delay empty mock function.
 func (cm *contextMock) Delay() string { return "" }
+
+func (contextMock) Deadline() (time.Time, bool) {
+	return time.Time{}, false
+}
+
+func (contextMock) Done() <-chan struct{} {
+	return nil
+}
+
+func (contextMock) Err() error {
+	return nil
+}
+
+func (contextMock) Value(key any) any {
+	return nil
+}
 
 func TestPlugin_Configure(t *testing.T) {
 	t.Parallel()

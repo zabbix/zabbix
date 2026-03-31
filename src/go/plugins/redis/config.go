@@ -46,7 +46,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("[%s] Config value 'Plugins.Redis.Timeout' is deprecated. Use 'Plugins.Redis.Default.ConnectionTimeout' instead.", pluginName)
+		log.Debugf("[%s] Config value 'Plugins.Redis.Timeout' is deprecated. "+
+			"Use 'Plugins.Redis.Default.ConnectionTimeout' instead.", pluginName)
 
 		if p.options.Default.ConnectionTimeout == 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout

@@ -229,7 +229,7 @@ func parseItemTimeout(s string) (int, error) {
 	return seconds, nil
 }
 
-// Parses and validates item timeouts.
+// ParseAndValidateItemTimeout parses and validates item timeouts.
 // Parses passive and active check item timeouts. Accepts nil, float, int and
 // string values. Timeout value must be in range from 1 to 600.
 // Nil and zero values are set to Agent.Options timeout value.
@@ -237,8 +237,8 @@ func parseItemTimeout(s string) (int, error) {
 // `150s`.
 // Returns item timeout in seconds.
 func ParseAndValidateItemTimeout(unparsedTimeout any) (int, error) {
-	var timeout int = 0
-	var err error = nil
+	var timeout int
+	var err error
 
 	switch v := unparsedTimeout.(type) {
 	case nil:
@@ -264,7 +264,9 @@ func ParseAndValidateItemTimeout(unparsedTimeout any) (int, error) {
 
 	if timeout > maxItemTimeout {
 		return 0, errs.Wrapf(
-			ErrUnsupportedTimeout, "timeout '%d' is larger than maximum allowed duration of '%d'", timeout, maxItemTimeout,
+			ErrUnsupportedTimeout,
+			"timeout '%d' is larger than maximum allowed duration of '%d'",
+			timeout, maxItemTimeout,
 		)
 	}
 

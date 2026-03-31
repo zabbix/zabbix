@@ -29,7 +29,9 @@ type containerDiscovery struct {
 	Name string `json:"{#NAME}"`
 }
 
-func keyContainersDiscovery(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
+func keyContainersDiscovery(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data []*container
 
 	body, err := queryDockerAPI(ctx, client, query)

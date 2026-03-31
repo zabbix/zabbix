@@ -25,14 +25,16 @@ import (
 
 // Session is a general structure for storing sessions' configuration.
 type Session struct {
-	URI               string `conf:"name=Uri,optional"`
-	Password          string `conf:"optional"`
-	User              string `conf:"optional"`
-	TLSConnect        string `conf:"name=TLSConnect,optional"`
-	TLSCAFile         string `conf:"name=TLSCAFile,optional"`
-	TLSCertFile       string `conf:"name=TLSCertFile,optional"`
-	TLSKeyFile        string `conf:"name=TLSKeyFile,optional"`
-	ConnectionTimeout int    `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
+	URI         string `conf:"name=Uri,optional"`
+	Password    string `conf:"optional"`
+	User        string `conf:"optional"`
+	TLSConnect  string `conf:"name=TLSConnect,optional"`
+	TLSCAFile   string `conf:"name=TLSCAFile,optional"`
+	TLSCertFile string `conf:"name=TLSCertFile,optional"`
+	TLSKeyFile  string `conf:"name=TLSKeyFile,optional"`
+
+	// json tag is a temporary workaround until metric.SetDefaults() supports integers
+	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"` //nolint:tagalign,tagliatelle
 }
 
 // PluginOptions option from config file.
@@ -69,7 +71,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	p.options.setCustomQueriesPathDefault()
 
 	if p.options.LegacyConnectionTimeout != 0 {
-		log.Debugf("[%s] Config value 'Plugins.Mysql.Timeout' is deprecated. Use 'Plugins.Mysql.Default.ConnectionTimeout' instead.", pluginName)
+		log.Debugf("[%s] Config value 'Plugins.Mysql.Timeout' is deprecated. "+
+			"Use 'Plugins.Mysql.Default.ConnectionTimeout' instead.", pluginName)
 
 		if p.options.Default.ConnectionTimeout == 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyConnectionTimeout

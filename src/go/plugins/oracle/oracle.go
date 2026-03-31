@@ -76,6 +76,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, errs.WrapConst(err, zbxerr.ErrorInvalidParams)
 	}
 
+	// temporary workaround until metric.SetDefaults() supports integers
 	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
 	if err != nil {
 		connectionTimeout = p.options.Default.ConnectionTimeout // shouldn't happen anyway

@@ -63,23 +63,28 @@ type taskBase struct {
 	recurring bool
 }
 
+// Done is implementing the context.Context interface.
 func (*taskBase) Done() <-chan struct{} {
 	return nil
 }
 
+// Err is implementing the context.Context interface.
 func (*taskBase) Err() error {
 	return nil
 }
 
-func (*taskBase) Value(key any) any {
+// Value is implementing the context.Context interface.
+func (*taskBase) Value(_ any) any {
 	return nil
 }
 
+// Deadline is implementing the context.Context interface.
 func (*taskBase) Deadline() (time.Time, bool) {
 	return time.Time{}, false
 }
 
-func (ctx *taskBase) LegacyTimeout() bool {
+// LegacyTimeout is implementing the context.Context interface.
+func (*taskBase) LegacyTimeout() bool {
 	return false
 }
 
@@ -326,6 +331,7 @@ func (t *exporterTask) Delay() string {
 	return t.item.delay
 }
 
+// LegacyTimeout is implementing the context.Context interface.
 func (t *exporterTask) LegacyTimeout() bool {
 	return t.item.legacyTimeout
 }
@@ -449,6 +455,7 @@ func (t *directExporterTask) Delay() string {
 	return t.item.delay
 }
 
+// LegacyTimeout is implementing the context.Context interface.
 func (t *directExporterTask) LegacyTimeout() bool {
 	return t.item.legacyTimeout
 }

@@ -29,7 +29,9 @@ type imageDiscovery struct {
 	Name string `json:"{#NAME}"`
 }
 
-func keyImagesDiscoveryHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
+func keyImagesDiscoveryHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data []image
 
 	body, err := queryDockerAPI(ctx, client, query)

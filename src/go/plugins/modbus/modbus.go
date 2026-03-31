@@ -223,7 +223,7 @@ func (p *Plugin) Validate(options interface{}) error {
 		}
 
 		if s.LegacyTimeout > 30 || s.LegacyTimeout < 0 {
-			return fmt.Errorf("Unacceptable session Timeout value:%d", s.LegacyTimeout)
+			return errs.Errorf("Unacceptable session Timeout value:%d", s.LegacyTimeout)
 		}
 
 		var p mbParams

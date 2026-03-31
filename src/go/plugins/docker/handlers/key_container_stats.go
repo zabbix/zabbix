@@ -95,7 +95,9 @@ type pidsStats struct {
 	Current uint64 `json:"current"`
 }
 
-func keyContainerStatsHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
+func keyContainerStatsHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data containerStats
 
 	body, err := queryDockerAPI(ctx, client, query)

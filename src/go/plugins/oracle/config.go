@@ -35,7 +35,8 @@ type Session struct {
 	// Service name that identifies a database instance
 	Service string `conf:"optional"`
 
-	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
+	// json tag is a temporary workaround until metric.SetDefaults() supports integers
+	ConnectionTimeout int `conf:"optional,range=1:30" json:"ConnectionTimeout,string"` //nolint:tagalign,tagliatelle
 }
 
 // PluginOptions option from the config file.
@@ -75,7 +76,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	p.options.setCustomQueriesPathDefault()
 
 	if p.options.LegacyConnectionTimeout != 0 {
-		log.Debugf("[%s] Config value 'Plugins.Oracle.ConnectTimeout' is deprecated. Use 'Plugins.Oracle.Default.ConnectionTimeout' instead.", pluginName)
+		log.Debugf("[%s] Config value 'Plugins.Oracle.ConnectTimeout' is deprecated."+
+			"Use 'Plugins.Oracle.Default.ConnectionTimeout' instead.", pluginName)
 
 		if p.options.Default.ConnectionTimeout == 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyConnectionTimeout

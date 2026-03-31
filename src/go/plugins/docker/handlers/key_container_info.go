@@ -127,7 +127,9 @@ type resources struct {
 	IOMaximumBandwidth uint64 `json:"IOMaximumBandwidth"`
 }
 
-func keyContainerInfoHandler(ctx plugin.ContextProvider, client *http.Client, query string, args ...string) (string, error) {
+func keyContainerInfoHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, args ...string,
+) (string, error) {
 	if len(args) != 1 {
 		return "", errs.WrapConst(errs.New("info must be either 'full' or 'short'"), zbxerr.ErrorInvalidParams)
 	}

@@ -52,7 +52,9 @@ type volumeUsageData struct {
 	Size     int64 `json:"Size"`
 }
 
-func keyDataUsageHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
+func keyDataUsageHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data diskUsage
 
 	body, err := queryDockerAPI(ctx, client, query)

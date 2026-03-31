@@ -99,6 +99,8 @@ func (c *client) Output() plugin.ResultWriter {
 
 // addRequest requests client to start monitoring/update item described by request 'r' using plugin 'p' (*pluginAgent)
 // with output writer 'sink'
+//
+//nolint:gocognit,gocyclo,cyclop,maintidx,lll // this is one of the importantest methods in the whole agent. that's why it's so long. the length is indicative of importantness.
 func (c *client) addRequest(p *pluginAgent, r *Request, sink plugin.ResultWriter, now time.Time,
 	firstActiveChecksRefreshed bool) error {
 	var info *pluginInfo
@@ -164,10 +166,16 @@ func (c *client) addRequest(p *pluginAgent, r *Request, sink plugin.ResultWriter
 				// create and register new exporter task
 				task = &exporterTask{
 					taskBase: taskBase{plugin: p, active: true, recurring: true},
-					item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: timeout, legacyTimeout: r.LegacyTimeout},
-					updated:  now,
-					client:   c,
-					output:   sink,
+					item: clientItem{
+						itemid:        r.Itemid,
+						delay:         r.Delay,
+						key:           r.Key,
+						timeout:       timeout,
+						legacyTimeout: r.LegacyTimeout,
+					},
+					updated: now,
+					client:  c,
+					output:  sink,
 				}
 
 				if !scheduling && !firstActiveChecksRefreshed && p.forceActiveChecksOnStart {
@@ -204,10 +212,16 @@ func (c *client) addRequest(p *pluginAgent, r *Request, sink plugin.ResultWriter
 			// handle single passive check or internal request
 			task := &directExporterTask{
 				taskBase: taskBase{plugin: p, active: true, recurring: true},
-				item:     clientItem{itemid: r.Itemid, delay: r.Delay, key: r.Key, timeout: timeout, legacyTimeout: r.LegacyTimeout},
-				expire:   now.Add(time.Duration(agent.Options.Timeout) * time.Second),
-				client:   c,
-				output:   sink,
+				item: clientItem{
+					itemid:        r.Itemid,
+					delay:         r.Delay,
+					key:           r.Key,
+					timeout:       timeout,
+					legacyTimeout: r.LegacyTimeout,
+				},
+				expire: now.Add(time.Duration(agent.Options.Timeout) * time.Second),
+				client: c,
+				output: sink,
 			}
 			if err = task.reschedule(now); err != nil {
 				return errs.Wrap(err, "reschedule failed")

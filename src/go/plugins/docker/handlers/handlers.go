@@ -34,7 +34,9 @@ var handlers = map[DockerKey]Handler{
 }
 
 // Handler function is a function that handles one of the docker keys.
-type Handler func(ctx plugin.ContextProvider, client *http.Client, query string, args ...string) (result string, err error)
+type Handler func(
+	ctx plugin.ContextProvider, client *http.Client, query string, args ...string,
+) (result string, err error)
 
 // GetDockerHandler returns appropriate handler based on key, if key not present - nil.
 func GetDockerHandler(key DockerKey) Handler {

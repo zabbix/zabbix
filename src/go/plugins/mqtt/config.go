@@ -39,7 +39,7 @@ type session struct {
 	TLSCAFile         string `conf:"name=TLSCAFile,optional"`
 	TLSCertFile       string `conf:"name=TLSCertFile,optional"`
 	TLSKeyFile        string `conf:"name=TLSKeyFile,optional"`
-	ConnectionTimeout int    `conf:"optional,range=1:30" json:"ConnectionTimeout,string"`
+	ConnectionTimeout int    `conf:"optional,range=1:30"`
 }
 
 // Configure implements plugin.Configurator methods.
@@ -50,7 +50,8 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("[MQTT plugin] DEBUG: Config value 'Plugins.MQTT.Timeout' is deprecated, use 'Plugins.MQTT.Default.ConnectionTimeout'' instead.")
+		log.Debugf("[MQTT plugin] DEBUG: Config value 'Plugins.MQTT.Timeout' is deprecated. " +
+			"Use 'Plugins.MQTT.Default.ConnectionTimeout'' instead.")
 
 		if p.options.Default.ConnectionTimeout != 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout

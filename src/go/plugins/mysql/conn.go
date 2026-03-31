@@ -204,6 +204,8 @@ func (c *ConnManager) housekeeper(ctx context.Context) {
 }
 
 // create creates a new connection with given credentials.
+//
+//nolint:gocritic // we'll leave this for the refactor.
 func (c *ConnManager) create(ck connKey, connectionTimeout int) (*MyConn, error) {
 	details, err := getTLSDetails(ck)
 	if err != nil {

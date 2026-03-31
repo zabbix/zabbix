@@ -64,7 +64,9 @@ type mount struct {
 	Type        string `json:"Type"`
 }
 
-func keyContainersHandler(ctx plugin.ContextProvider, client *http.Client, query string, _ ...string) (string, error) {
+func keyContainersHandler(
+	ctx plugin.ContextProvider, client *http.Client, query string, _ ...string,
+) (string, error) {
 	var data []container
 
 	body, err := queryDockerAPI(ctx, client, query)

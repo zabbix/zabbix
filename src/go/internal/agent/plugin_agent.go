@@ -33,7 +33,10 @@ var (
 	performTask   PerformTask
 )
 
-type PerformTask func(key string, timeout time.Duration, legacyTimeout bool, clientID uint64) (result *string, err error)
+// PerformTask is involved in task scheduling, but I forgot what it does exactly.
+type PerformTask func(
+	key string, timeout time.Duration, legacyTimeout bool, clientID uint64,
+) (result *string, err error)
 
 // Plugin -
 type Plugin struct {

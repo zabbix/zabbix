@@ -2079,8 +2079,8 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 	}
 }
 
+//nolint:gocognit,gocyclo,cyclop,paralleltest // it's a test, they're supposed to be like that
 func TestTimeoutParsing(t *testing.T) {
-
 	// !! this is why we don't globally variable
 	agentTimeoutBackup := agent.Options.Timeout
 	defer func() {
@@ -2096,7 +2096,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Nil value parse errored out")
 	}
-	if nilValue != UnmistakableNumber {
+	if nilValue != UnmistakableNumber { //nolint:wsl
 		t.Errorf("Got %v instead of %v for nil timeout", nilValue, UnmistakableNumber)
 	}
 
@@ -2104,7 +2104,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Integer value parse errored out")
 	}
-	if intValue != 23 {
+	if intValue != 23 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for int timeout", intValue, 23)
 	}
 
@@ -2112,7 +2112,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if floatValue != 23 {
+	if floatValue != 23 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for float timeout", floatValue, 23)
 	}
 
@@ -2120,7 +2120,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if stringValueA != 23 {
+	if stringValueA != 23 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for string timeout", stringValueA, 23)
 	}
 
@@ -2128,7 +2128,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if stringValueB != 2*60 {
+	if stringValueB != 2*60 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for string timeout", stringValueB, 2*60)
 	}
 
@@ -2138,7 +2138,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if floatFloorValueA != 23 {
+	if floatFloorValueA != 23 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for float timeout", floatFloorValueA, 23)
 	}
 
@@ -2146,7 +2146,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if floatFloorValueB != 23 {
+	if floatFloorValueB != 23 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for float timeout", floatFloorValueB, 23)
 	}
 
@@ -2157,7 +2157,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Integer value parse errored out")
 	}
-	if intZeroValue != UnmistakableNumber {
+	if intZeroValue != UnmistakableNumber { //nolint:wsl
 		t.Errorf("Got %v instead of %v for int zero timeout", intZeroValue, UnmistakableNumber)
 	}
 
@@ -2165,7 +2165,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if floatZeroValueA != UnmistakableNumber {
+	if floatZeroValueA != UnmistakableNumber { //nolint:wsl
 		t.Errorf("Got %v instead of %v for float timeout", floatZeroValueA, UnmistakableNumber)
 	}
 
@@ -2173,7 +2173,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Float value parse errored out")
 	}
-	if floatZeroValueB != UnmistakableNumber {
+	if floatZeroValueB != UnmistakableNumber { //nolint:wsl
 		t.Errorf("Got %v instead of %v for float timeout", floatZeroValueB, UnmistakableNumber)
 	}
 
@@ -2181,7 +2181,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Integer value parse errored out")
 	}
-	if stringZeroValueA != UnmistakableNumber {
+	if stringZeroValueA != UnmistakableNumber { //nolint:wsl
 		t.Errorf("Got %v instead of %v for string zero timeout", stringZeroValueA, UnmistakableNumber)
 	}
 
@@ -2189,7 +2189,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Integer value parse errored out")
 	}
-	if stringZeroValueB != UnmistakableNumber {
+	if stringZeroValueB != UnmistakableNumber { //nolint:wsl
 		t.Errorf("Got %v instead of %v for string zero timeout", stringZeroValueB, UnmistakableNumber)
 	}
 
@@ -2205,7 +2205,7 @@ func TestTimeoutParsing(t *testing.T) {
 	if err != nil {
 		t.Errorf("Integer value parse errored out")
 	}
-	if lastValidTimeoutValue != 600 {
+	if lastValidTimeoutValue != 600 { //nolint:wsl
 		t.Errorf("Got %v instead of %v for timeout", lastValidTimeoutValue, 600)
 	}
 
@@ -2253,5 +2253,4 @@ func TestTimeoutParsing(t *testing.T) {
 	if err == nil || !errors.Is(err, ErrUnsupportedTimeout) {
 		t.Errorf("Expected error %v, got %v instead", ErrUnsupportedTimeout, err)
 	}
-
 }

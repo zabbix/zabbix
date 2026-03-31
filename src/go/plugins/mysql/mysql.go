@@ -43,6 +43,8 @@ type Plugin struct {
 var impl Plugin
 
 // Export implements the Exporter interface.
+//
+//nolint:gocyclo,cyclop // it's an export method, they are supposed to be heavy
 func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvider) (any, error) {
 	if key == keyCustomQuery && !p.options.CustomQueriesEnabled {
 		return nil, errs.Errorf("key %q is disabled", keyCustomQuery)
@@ -68,6 +70,7 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
+	// temporary workaround until metric.SetDefaults() supports integers
 	connectionTimeout, err := strconv.Atoi(params["ConnectionTimeout"])
 	if err != nil {
 		connectionTimeout = p.options.Default.ConnectionTimeout // shouldn't happen anyway
