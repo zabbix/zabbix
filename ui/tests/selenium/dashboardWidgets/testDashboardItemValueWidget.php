@@ -86,7 +86,8 @@ class testDashboardItemValueWidget extends testWidgets {
 			'Indicator - Character' => 1,
 			'Indicator - Numeric (unsigned)' => 1,
 			'Indicator - Text' => 1,
-			'Indicator - Log' => 1
+			'Indicator - Log' => 1,
+			'Indicator - JSON' => 1
 		];
 
 		foreach ($items_data as $name => $value) {
@@ -1727,6 +1728,21 @@ class testDashboardItemValueWidget extends testWidgets {
 						self::INDICATOR_CHANGE_HOST => 'Indicator - Text'
 					]
 				]
+			],
+			// #58.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Item with unchecked value - JSON',
+						'Refresh interval' => '1 minute',
+						// Value checkbox.
+						'id:show_2' => false
+					],
+					'item' => [
+						self::INDICATOR_CHANGE_HOST => 'Indicator - JSON'
+					]
+				]
 			]
 		];
 	}
@@ -2533,6 +2549,22 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
+			// Non-numeric (JSON) item without data and with aggregation function avg.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
+						'Name' => 'Non-numeric (JSON) item without data and with aggregation function avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '-1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
 			// Non-numeric (Log) item without data and with aggregation function sum.
 			[
 				[
@@ -2570,6 +2602,22 @@ class testDashboardItemValueWidget extends testWidgets {
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
+						'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0.00']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (JSON) item without data and with aggregation function last.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
 						'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
@@ -2644,6 +2692,22 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
+			// Non-numeric (JSON) item without data but with aggregation function count (return 0).
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
+						'Name' => 'Non-numeric (JSON) item without data but with aggregation function count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
 			// Non-numeric (Log) item without data but with aggregation function count (return 0) and threshold equals 0.
 			[
 				[
@@ -2678,6 +2742,20 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
 						'Name' => 'Non-numeric (Text) item without data but with aggregation function count and threshold that match 0',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					]
+				]
+			],
+			// Non-numeric (JSON) item without data but with aggregation function count (return 0) and threshold equals 0.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
+						'Name' => 'Non-numeric (JSON) item without data but with aggregation function count and threshold that match 0',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2758,6 +2836,22 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
 						'Name' => 'Thresholds and non-nmeric (Text) item',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => 'DDAAFF', 'threshold' => '1'],
+						['color' => 'FFDDAA', 'threshold' => '2']
+					],
+					'value' => 'test'
+				]
+			],
+			// Non-numeric (JSON) item with data and aggregation function count.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
+						'Name' => 'Thresholds and non-nmeric (JSON) item',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2961,6 +3055,24 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
+			// Non-numeric (JSON) item with data and aggregation function avg.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
+						'Name' => 'Thresholds and non-nmeric (JSON) item with aggregation function avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '1'],
+						['color' => '80CBC4', 'threshold' => '2']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
 			// Non-numeric (Log) item with data and aggregation function sum.
 			[
 				[
@@ -3002,6 +3114,23 @@ class testDashboardItemValueWidget extends testWidgets {
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
 						'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '0']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (JSON) item with data and aggregation function last.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - JSON',
+						'Name' => 'Thresholds and non-nmeric (JSON) item with aggregation function last',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
