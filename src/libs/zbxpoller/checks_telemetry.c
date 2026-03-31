@@ -20,14 +20,13 @@
 
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
-	// FIXME: placeholder
+	/* FIXME: placeholder */
 
 	zbx_tq_query_t query;
 	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
 	{
-		// FIXME: placeholder
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, "invalid format!!"));
-		return SUCCEED;
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query format."));
+		return NOTSUPPORTED;
 	}
 
 	char *out_str = strdup("Parsed:\n");
