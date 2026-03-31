@@ -124,6 +124,8 @@
 
 				['tls_psk_identity', 'tls_psk']
 					.forEach((field) => this.#toggle(field, this.#psk_required.value == 1, true));
+
+				document.getElementById('tls_psk_identity').focus();
 			}
 			else {
 				this.#toggle('change_psk', false);
