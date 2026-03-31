@@ -335,22 +335,22 @@ class CIntegrationTest extends CAPITest {
 		parent::onAfterTestSuite();
 
 		if (self::TRACE_DELAYS) {
-			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent delay: %.4fs [total: %.4fs]\n",
+			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$delay_call_data_present_per_test_file,
 				self::$delay_call_data_present_total));
 			self::$delay_call_data_present_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent delay: %.4fs [total: %.4fs]\n",
+			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$delay_wait_log_line_per_test_file,
 				self::$delay_wait_log_line_total));
 			self::$delay_wait_log_line_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] waitForStartup: %.4fs [total: %.4fs]\n",
+			fwrite(STDERR, sprintf("[%s] waitForStartup took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$startup_time_per_test_file,
 				self::$startup_time_total));
 			self::$startup_time_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] waitForShutdown: %.4fs [total: %.4fs]\n",
+			fwrite(STDERR, sprintf("[%s] waitForShutdown took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$shutdown_time_per_test_file,
 				self::$shutdown_time_total));
 			self::$shutdown_time_per_test_file = 0.0;
