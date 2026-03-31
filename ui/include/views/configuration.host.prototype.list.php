@@ -215,6 +215,8 @@ $html_page
 	->addItem($itemForm)
 	->show();
 
+zbx_add_post_js("history.replaceState({}, '');");
+
 (new CScriptTag('
 	view.init('.json_encode([
 		'context' => $data['context'],
