@@ -2673,13 +2673,16 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 {
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_uint64_t		groupid, templateid, optagid, hostid = 0;
+	zbx_uint64_t		groupid, templateid, optagid;
 	zbx_vector_uint64_t	lnk_templateids, del_templateids, new_groupids, del_groupids, new_optagids,
 				del_optagids;
 	zbx_config_t		cfg;
-	int			host_status = HOST_STATUS_UNKNOWN;
+	zbx_op_host_t		ophost;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() actionid:" ZBX_FS_UI64, __func__, actionid);
+
+	ophost.hostid = 0;
+	ophost.status = HOST_STATUS_UNKNOWN;
 
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_uint64_create(&del_templateids);
@@ -2717,16 +2720,16 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 		switch (operationtype)
 		{
 			case ZBX_OPERATION_TYPE_HOST_ADD:
-				op_host_add(event, &cfg, &hostid, &host_status);
+				op_host_add(event, &cfg, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_REMOVE:
-				op_host_del(event, &hostid, &host_status);
+				op_host_del(event, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_ENABLE:
-				op_host_enable(event, &cfg, &hostid, &host_status);
+				op_host_enable(event, &cfg, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_DISABLE:
-				op_host_disable(event, &cfg, &hostid, &host_status);
+				op_host_disable(event, &cfg, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
@@ -2785,7 +2788,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				}
 				break;
 			case ZBX_OPERATION_TYPE_HOST_INVENTORY:
-				op_host_inventory_mode(event, &cfg, inventory_mode, &hostid, &host_status);
+				op_host_inventory_mode(event, &cfg, inventory_mode, &ophost);
 				break;
 			case ZBX_OPERATION_TYPE_HOST_TAGS_ADD:
 				if (0 != optagid)
@@ -2805,33 +2808,33 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	{
 		zbx_vector_uint64_sort(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_template_del(event, &del_templateids, &hostid, &host_status);
+		op_template_del(event, &del_templateids, &ophost);
 	}
 
 	if (0 != lnk_templateids.values_num)
 	{
 		zbx_vector_uint64_sort(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&lnk_templateids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_template_add(event, &cfg, &lnk_templateids, &hostid, &host_status);
+		op_template_add(event, &cfg, &lnk_templateids, &ophost);
 	}
 
 	if (0 != new_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&new_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_groups_add(event, &cfg, &new_groupids, &hostid, &host_status);
+		op_groups_add(event, &cfg, &new_groupids, &ophost);
 	}
 
 	if (0 != del_groupids.values_num)
 	{
 		zbx_vector_uint64_sort(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		op_groups_del(event, &del_groupids, &hostid, &host_status);
+		op_groups_del(event, &del_groupids, &ophost);
 	}
 
 	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
 	{
-		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids, &hostid, &host_status);
+		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids, &ophost);
 	}
 
 	zbx_config_clean(&cfg);
