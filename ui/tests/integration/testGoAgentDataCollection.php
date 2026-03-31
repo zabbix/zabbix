@@ -486,8 +486,6 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			self::$itemids[self::COMPONENT_AGENT2.':'.$name] = $itemids[($i * 2) + 1];
 		}
 
-		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
-
 		return true;
 	}
 
