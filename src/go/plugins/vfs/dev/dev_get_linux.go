@@ -329,6 +329,7 @@ func sysfsSizeGet(rdev uint64) *uint64 {
 	}
 
 	v := *val * sectorSize
+
 	return &v
 }
 
@@ -359,36 +360,24 @@ func sysfsDevStatsGet(rdev uint64) *vfsStats {
 			break
 		}
 
+		val, err := strconv.ParseUint(tok, 10, 64)
+		if err != nil {
+			continue
+		}
+
 		switch idx {
 		case 0:
-			val, err := strconv.ParseUint(tok, 10, 64)
-			if err == nil {
-				stats.ReadsCompleted = &val
-			}
+			stats.ReadsCompleted = &val
 		case 2:
-			/* units: sectors, must be multiplied by sector size to convert to bytes */
-			val, err := strconv.ParseUint(tok, 10, 64)
-			if err == nil {
-				v := val * sectorSize
-				stats.BytesRead = &v
-			}
+			v := val * sectorSize
+			stats.BytesRead = &v
 		case 4:
-			val, err := strconv.ParseUint(tok, 10, 64)
-			if err == nil {
-				stats.WritesCompleted = &val
-			}
+			stats.WritesCompleted = &val
 		case 6:
-			/* units: sectors, must be multiplied by sector size to convert to bytes */
-			val, err := strconv.ParseUint(tok, 10, 64)
-			if err == nil {
-				v := val * sectorSize
-				stats.BytesWritten = &v
-			}
+			v := val * sectorSize
+			stats.BytesWritten = &v
 		case 10:
-			val, err := strconv.ParseUint(tok, 10, 64)
-			if err == nil {
-				stats.IOTimeMs = &val
-			}
+			stats.IOTimeMs = &val
 		}
 	}
 
