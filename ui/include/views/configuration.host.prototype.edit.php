@@ -36,9 +36,15 @@ if ($data['form_refresh'] == 0) {
 }
 
 $url = (new CUrl('host_prototypes.php'))
+	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
 	->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-	->setArgument('context', $data['context'])
-	->getUrl();
+	->setArgument('context', $data['context']);
+
+if(getRequest('form') !== 'create') {
+	$url->setArgument('hostid', $host_prototype['hostid']);
+}
+
+$url = $url->getUrl();
 
 $form = (new CForm('post', $url))
 	->addItem((new CVar('form_refresh', $data['form_refresh'] + 1))->removeId())
@@ -611,7 +617,7 @@ $encryption_tab = (new CFormList('encryption'))
 
 $tabs->addTab('encryptionTab', _('Encryption'), $encryption_tab, TAB_INDICATOR_ENCRYPTION);
 
-if ($host_prototype['hostid'] != 0) {
+if (getRequest('form') === 'update') {
 	$tabs->setFooter(makeFormFooter(
 		(new CSubmit('update', _('Update')))->setEnabled(!$data['is_discovered_prototype']),
 		[
@@ -637,6 +643,8 @@ $form->addItem($tabs);
 $html_page
 	->addItem($form)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([

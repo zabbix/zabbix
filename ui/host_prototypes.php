@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/include/page_header.php';
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
-	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form}) && ({form} == "update")) || (isset({action}) && {action} == "hostprototype.updatediscover")'],
+	'hostid' =>					[T_ZBX_INT, O_NO,	P_SYS,	DB_ID, '(isset({form}) && ({form} == "update" || {form} == "clone")) || (isset({action}) && {action} == "hostprototype.updatediscover")'],
 	'parent_discoveryid' =>		[T_ZBX_INT, O_MAND, P_SYS,	DB_ID, null],
 	'host' =>					[T_ZBX_STR, O_OPT, null,	NOT_EMPTY,	'isset({add}) || isset({update})', _('Host name')],
 	'name' =>					[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
@@ -168,8 +168,6 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid'], $_REQUEST['form']);
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
-	unset($_REQUEST['hostid']);
-
 	if (hasRequest('group_prototypes')) {
 		foreach ($_REQUEST['group_prototypes'] as &$group_prototype) {
 			unset($group_prototype['group_prototypeid']);
@@ -284,17 +282,22 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$result = false;
 	}
 
-	if (hasRequest('add')) {
-		show_messages($result, _('Host prototype added'), _('Cannot add host prototype'));
-	}
-	else {
-		show_messages($result, _('Host prototype updated'), _('Cannot update host prototype'));
+	if ($result) {
+		$message_success = hasRequest('add') ? _('Host prototype added') : _('Host prototype updated');
+		CMessageHelper::setSuccessTitle($message_success);
+
+		uncheckTableRows($parent_discovery['itemid']);
+
+		$url = (new CUrl('host_prototypes.php'))
+			->setArgument('context', getRequest('context'))
+			->setArgument('parent_discoveryid', getRequest('parent_discoveryid'));
+
+		$response = new CControllerResponseRedirect($url);
+		$response->redirect();
 	}
 
-	if ($result) {
-		unset($_REQUEST['itemid'], $_REQUEST['form']);
-		uncheckTableRows($parent_discovery['itemid']);
-	}
+	$message_failed = hasRequest('add') ? _('Cannot add host prototype') : _('Cannot update host prototype');
+	show_error_message($message_failed);
 }
 elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscover') {
 	$result = API::HostPrototype()->update([
