@@ -476,6 +476,10 @@ window.host_edit_popup = {
 			document.getElementById(field_id).closest('div').style.display = use_cert ? '' : 'none';
 			document.querySelector(`[for="${field_id}"]`).style.display = use_cert ? '' : 'none';
 		});
+
+		if (use_psk) {
+			document.getElementById('tls_psk_identity').focus();
+		}
 	},
 
 	/**
