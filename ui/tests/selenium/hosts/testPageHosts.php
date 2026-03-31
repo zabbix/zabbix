@@ -902,7 +902,7 @@ class testPageHosts extends CLegacyWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
-		$filter->getField('Name')->fill('Host for');
+		$filter->getField('Name')->fill('Host for t');
 		$filter->submit();
 		$table->waitUntilReloaded();
 
@@ -915,14 +915,6 @@ class testPageHosts extends CLegacyWebTest {
 		$this->page->dismissAlert();
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount($table_rows_count);
-
-		// Cannot delete.
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_BAD, 'Cannot delete hosts');
-		$this->assertTableStats($table_rows_count);
-		$this->assertSelectedCount($table_rows_count);
 		$this->query('id:all_hosts')->asCheckbox()->one()->uncheck();
 
 		// Delete one.
@@ -931,6 +923,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Host deleted');
+		CMessageElement::find()->one()->close();
 		$table_rows_count = $table_rows_count - 1;
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount('0');

@@ -485,6 +485,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$this->page->acceptAlert();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Template deleted');
+		CMessageElement::find()->one()->close();
 		$table_rows_count = $table_rows_count - 1;
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount('0');
