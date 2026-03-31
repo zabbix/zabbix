@@ -139,15 +139,12 @@ class CDevice extends CApiService {
 	}
 
 	/**
-	 * @param array  $user
+	 * @param array  $data
 	 *
 	 * @return array
 	 */
-	public function init(array $user): array {
-		$this->validateInit($user, $db_user);
-
-		$enrollment_token = CApiTokenHelper::generateToken();
-		$uuid = generateUuidV7();
+	public function init(array $data): array {
+		$this->validateInit($data);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
@@ -156,8 +153,8 @@ class CDevice extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		// todo - replace this mock for Server ID by real method
-		$server_id = 'server_id';
+		$uuid = generateUuidV7();
+		$server_id = 'server_id'; // todo - replace this mock for Server ID by real method
 
 		$init_device_data = ['serverid' => $server_id, 'uuid' => $uuid];
 
@@ -167,15 +164,15 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
 		}
 
-		$time_start = time();
+		$enrollment_token = CApiTokenHelper::generateToken();
 
-		$deviceid = self::createDevice($db_user['userid'], $enrollment_token, $uuid, $time_start);
+		$deviceid = self::createDevice($data['userid'], $enrollment_token, $uuid);
 
 		$device = [
 			'deviceid' => $deviceid,
 			'uuid' => $uuid,
 			'name' => '',
-			'userid' => $db_user['userid']
+			'userid' => $data['userid']
 		];
 
 		self::addAuditLog(CAudit::ACTION_INIT, CAudit::RESOURCE_DEVICE, [$device]);
@@ -190,27 +187,20 @@ class CDevice extends CApiService {
 		];
 	}
 
-	private function validateInit(array $user, ?array &$db_user): void {
+	private function validateInit(array &$data): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'userid' =>	['type' => API_ID]
+			'userid' =>	['type' => API_ID, 'default' => self::$userData['userid']]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if ($user) {
-			if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && $user['userid'] != self::$userData['userid']) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('No permissions to referred object or it does not exist!')
-				);
-			}
-
+		if (bccomp($data['userid'], self::$userData['userid']) != 0) {
 			$db_users = API::User()->get([
 				'output' => ['userid'],
 				'userids' => $user['userid'],
-				'editable' => true,
-				'preservekeys' => true
+				'editable' => true
 			]);
 
 			if (!$db_users) {
@@ -218,16 +208,10 @@ class CDevice extends CApiService {
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
-
-			$db_user = $db_users[$user['userid']];
-		}
-		else {
-			$db_user = ['userid' => self::$userData['userid']];
 		}
 	}
 
-	private static function createDevice(string $userid, string $enrollment_token, string $uuid,
-			int $time_start): string {
+	private static function createDevice(string $userid, string $enrollment_token, string $uuid): string {
 		$ins_device = [
 			'userid' => $userid,
 			'uuid' => $uuid,
@@ -241,7 +225,7 @@ class CDevice extends CApiService {
 		$ins_device_enrollment_token = [
 			'deviceid' => $deviceid,
 			'token' => hash('sha512', $enrollment_token),
-			'expires_at' => $time_start + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
+			'expires_at' => time() + self::ENROLLMENT_TOKEN_EXPIRATION_TTL
 		];
 
 		DB::insertBatch('device_enrollment_token', [$ins_device_enrollment_token], false);
@@ -283,9 +267,9 @@ class CDevice extends CApiService {
 			'preservekeys' => true
 		]);
 
-		$db_tokens = CToken::generateForce($db_tokens, false);
+		$tokens_data = CToken::generateForce($db_tokens, false);
 
-		$db_token = reset($db_tokens);
+		$token_data = reset($tokens_data);
 
 		DB::update('device', [
 			'values' => [
@@ -298,7 +282,7 @@ class CDevice extends CApiService {
 		]);
 
 		$ins_device_token = [
-			'tokenid' => $db_token['tokenid'],
+			'tokenid' => $token_data['tokenid'],
 			'deviceid' => $db_device['deviceid']
 		];
 
@@ -315,10 +299,10 @@ class CDevice extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_ONBOARD, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
 
-		return ['token' => $db_token['token']];
+		return ['token' => $token_data['token']];
 	}
 
-	private function validateOnboard(array $options, ?array &$db_device): void {
+	private function validateOnboard(array $data, ?array &$db_device): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
 			'enrollment_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 			'mobile_identity_key' => self::getJwkValidationRules(),
@@ -327,32 +311,27 @@ class CDevice extends CApiService {
 			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!CApiDpopHelper::checkJwkIntegrity($options['mobile_identity_key']) ||
-				!CApiDpopHelper::checkJwkIntegrity($options['mobile_encryption_key'])) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
-		}
-
-		$db_device_enrollment_token = DBfetch(DBselect(
-			'SELECT det.deviceid'.
-			' FROM device_enrollment_token det'.
-			' WHERE '.dbConditionString('det.token', [hash('sha512', $options['enrollment_token'])]).
-				' AND det.expires_at>'.time()
-		));
-
-		if (!$db_device_enrollment_token) {
+		if (!CApiDpopHelper::checkJwkIntegrity($data['mobile_identity_key']) ||
+				!CApiDpopHelper::checkJwkIntegrity($data['mobile_encryption_key'])) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
 		$db_device = DBfetch(DBselect(
 			'SELECT d.deviceid,d.uuid,d.userid,d.name,u.name AS username'.
-			' FROM device d'.
-			' JOIN users u ON d.userid = u.userid'.
-			' WHERE '.dbConditionId('d.deviceid', [$db_device_enrollment_token['deviceid']])
+			' FROM device_enrollment_token det,device d,users u'.
+			' WHERE det.deviceid=d.deviceid'.
+				' AND d.userid=u.userid'.
+				' AND '.dbConditionString('det.token', [hash('sha512', $data['enrollment_token'])]).
+				' AND det.expires_at>'.time()
 		));
+
+		if (!$db_device) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		}
 	}
 
 	private static function getJwkValidationRules(): array {
