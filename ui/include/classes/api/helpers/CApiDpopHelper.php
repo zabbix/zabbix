@@ -84,7 +84,7 @@ class CApiDpopHelper {
 
 	private static function checkHtu(array $payload, string $requested_api_method): bool {
 		// todo - use method get server_id
-		$expected_htu = 'urn:zbx:server_id:'.$requested_api_method;
+		$expected_htu = 'urn:zbx:'.self::getDeviceFeatureFlag().':'.$requested_api_method;
 
 		return array_key_exists('htu', $payload) && hash_equals($expected_htu, $payload['htu']);
 	}
@@ -138,6 +138,16 @@ class CApiDpopHelper {
 			return false;
 		}
 
+		return true;
+	}
+
+	// todo - REMOVE THIS AFTER REPLACING WITH ORIGINAL METHODS
+
+	public static function getServerId(): string {
+		return 'server_id';
+	}
+
+	public static function getDeviceFeatureFlag(): bool {
 		return true;
 	}
 }

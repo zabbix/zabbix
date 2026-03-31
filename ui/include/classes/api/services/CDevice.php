@@ -154,17 +154,11 @@ class CDevice extends CApiService {
 		);
 
 		$uuid = generateUuidV7();
-		$server_id = 'server_id'; // todo - replace this mock for Server ID by real method
+		$server_id = CApiDpopHelper::getServerId(); // todo - replace this mock for Server ID by real method
 
 		$init_device_data = ['serverid' => $server_id, 'uuid' => $uuid];
 
 		$result = $server->initDevice($init_device_data, self::getAuthIdentifier());
-
-		$result = [
-			'mobile_enrollment_token' => 'kjsjkhdgfkjsdf',
-			'bridge_enrollment_key' => 'khjsadfiuhwkef',
-			'enrollment_url' => 'http://kajsdkajsd'
-		];
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
