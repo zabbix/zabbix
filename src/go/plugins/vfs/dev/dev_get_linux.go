@@ -39,6 +39,8 @@ const (
 	modeDeviceStats
 )
 
+const sectorSize = 512
+
 type vfsDevGetMode int
 
 type vfsDevice struct {
@@ -49,16 +51,16 @@ type vfsDevice struct {
 }
 
 type vfsDevDisksCfg struct {
-	Name            string `json:"name"`
-	Devid           string `json:"devid"`
-	Type            string `json:"type"`
-	Path            string `json:"path"`
-	Model           string `json:"model"`
-	Serial          string `json:"serial"`
-	WWN             string `json:"wwn"`
-	SizeBytes       uint64 `json:"size_bytes"`
-	LogicalBlkSize  uint64 `json:"logical_block_size"`
-	PhysicalBlkSize uint64 `json:"physical_block_size"`
+	Name            string  `json:"name"`
+	Devid           string  `json:"devid,omitempty"`
+	Type            string  `json:"type"`
+	Path            string  `json:"path"`
+	Model           string  `json:"model,omitempty"`
+	Serial          string  `json:"serial,omitempty"`
+	WWN             string  `json:"wwn,omitempty"`
+	SizeBytes       *uint64 `json:"size_bytes,omitempty"`
+	LogicalBlkSize  *uint64 `json:"logical_block_size,omitempty"`
+	PhysicalBlkSize *uint64 `json:"physical_block_size,omitempty"`
 }
 
 type vfsDevDisks struct {
@@ -66,23 +68,23 @@ type vfsDevDisks struct {
 }
 
 type vfsStats struct {
-	ReadsCompleted  uint64 `json:"reads_completed"`
-	WritesCompleted uint64 `json:"writes_completed"`
-	BytesRead       uint64 `json:"bytes_read"`
-	BytesWritten    uint64 `json:"bytes_written"`
-	IOTimeMs        uint64 `json:"io_time_ms"`
+	ReadsCompleted  *uint64 `json:"reads_completed,omitempty"`
+	BytesRead       *uint64 `json:"bytes_read,omitempty"`
+	WritesCompleted *uint64 `json:"writes_completed,omitempty"`
+	BytesWritten    *uint64 `json:"bytes_written,omitempty"`
+	IOTimeMs        *uint64 `json:"io_time_ms,omitempty"`
 }
 
 type vfsDevDiskStatsCfg struct {
-	Name      string `json:"name"`
-	Devid     string `json:"devid"`
-	Type      string `json:"type"`
-	SizeBytes uint64 `json:"size_bytes"`
+	Name      string  `json:"name"`
+	Devid     string  `json:"devid,omitempty"`
+	Type      string  `json:"type"`
+	SizeBytes *uint64 `json:"size_bytes,omitempty"`
 }
 
 type vfsDevDiskStatsVal struct {
-	Name  string   `json:"name"`
-	Stats vfsStats `json:"stats"`
+	Name  string    `json:"name"`
+	Stats *vfsStats `json:"stats,omitempty"`
 }
 
 type vfsDevDiskStats struct {
@@ -94,7 +96,7 @@ type vfsPartitions map[string]uint64
 
 type vfsDevicesCfg struct {
 	Name       string        `json:"name"`
-	Devid      string        `json:"devid"`
+	Devid      string        `json:"devid,omitempty"`
 	Type       string        `json:"type"`
 	Partitions vfsPartitions `json:"partitions"`
 }
@@ -104,15 +106,15 @@ type vfsDevices struct {
 }
 
 type vfsDeviceStatsCfg struct {
-	Name      string `json:"name"`
-	Devid     string `json:"devid"`
-	Type      string `json:"type"`
-	SizeBytes uint64 `json:"size_bytes"`
+	Name      string  `json:"name"`
+	Devid     string  `json:"devid,omitempty"`
+	Type      string  `json:"type"`
+	SizeBytes *uint64 `json:"size_bytes,omitempty"`
 }
 
 type vfsDeviceStatsVal struct {
-	Name  string   `json:"name"`
-	Stats vfsStats `json:"stats"`
+	Name  string    `json:"name"`
+	Stats *vfsStats `json:"stats,omitempty"`
 }
 
 type vfsDeviceStats struct {
@@ -243,18 +245,18 @@ func sysfsStrGet(rdev uint64, relPath string) string {
 	return strings.TrimSpace(string(data))
 }
 
-func sysfsUintGet(rdev uint64, relPath string) uint64 {
+func sysfsUintGet(rdev uint64, relPath string) *uint64 {
 	s := sysfsStrGet(rdev, relPath)
 	if s == "" {
-		return 0
+		return nil
 	}
 
 	val, err := strconv.ParseUint(s, 10, 64)
 	if err != nil {
-		return 0
+		return nil
 	}
 
-	return val
+	return &val
 }
 
 func devidsInit() []vfsDevice {
@@ -320,28 +322,37 @@ func devWWNGet(rdev uint64) string {
 	return sysfsStrGet(rdev, path.Join("device", "wwid"))
 }
 
-func sysfsSizeGet(rdev uint64) uint64 {
-	return sysfsUintGet(rdev, "size") * 512
+func sysfsSizeGet(rdev uint64) *uint64 {
+	val := sysfsUintGet(rdev, "size")
+	if val == nil {
+		return nil
+	}
+
+	v := *val * sectorSize
+	return &v
 }
 
-func sysfsLogicalBlksizeGet(rdev uint64) uint64 {
+func sysfsLogicalBlksizeGet(rdev uint64) *uint64 {
 	return sysfsUintGet(rdev, path.Join("queue", "logical_block_size"))
 }
 
-func sysfsPhysicalBlksizeGet(rdev uint64) uint64 {
+func sysfsPhysicalBlksizeGet(rdev uint64) *uint64 {
 	return sysfsUintGet(rdev, path.Join("queue", "physical_block_size"))
 }
 
 //nolint:gocyclo,cyclop // large switch over independent token indices, not genuinely complex
-func sysfsDevStatsGet(rdev uint64) vfsStats {
+func sysfsDevStatsGet(rdev uint64) *vfsStats {
 	var stats vfsStats
 
 	line := sysfsStrGet(rdev, "stat")
 	if line == "" {
-		return stats
+		return nil
 	}
 
 	tokens := strings.Fields(line)
+	if len(tokens) == 0 {
+		return nil
+	}
 
 	for idx, tok := range tokens {
 		if idx > 10 {
@@ -351,45 +362,37 @@ func sysfsDevStatsGet(rdev uint64) vfsStats {
 		switch idx {
 		case 0:
 			val, err := strconv.ParseUint(tok, 10, 64)
-			if err != nil {
-				break
+			if err == nil {
+				stats.ReadsCompleted = &val
 			}
-
-			stats.ReadsCompleted = val
 		case 2:
-			/* units: sectors, must be multiplied by 512 to convert to bytes */
+			/* units: sectors, must be multiplied by sector size to convert to bytes */
 			val, err := strconv.ParseUint(tok, 10, 64)
-			if err != nil {
-				break
+			if err == nil {
+				v := val * sectorSize
+				stats.BytesRead = &v
 			}
-
-			stats.BytesRead = val * 512
 		case 4:
 			val, err := strconv.ParseUint(tok, 10, 64)
-			if err != nil {
-				break
+			if err == nil {
+				stats.WritesCompleted = &val
 			}
-
-			stats.WritesCompleted = val
 		case 6:
-			/* units: sectors, must be multiplied by 512 to convert to bytes */
+			/* units: sectors, must be multiplied by sector size to convert to bytes */
 			val, err := strconv.ParseUint(tok, 10, 64)
-			if err != nil {
-				break
+			if err == nil {
+				v := val * sectorSize
+				stats.BytesWritten = &v
 			}
-
-			stats.BytesWritten = val * 512
 		case 10:
 			val, err := strconv.ParseUint(tok, 10, 64)
-			if err != nil {
-				break
+			if err == nil {
+				stats.IOTimeMs = &val
 			}
-
-			stats.IOTimeMs = val
 		}
 	}
 
-	return stats
+	return &stats
 }
 
 func sysfsDiskPartitionsGet(rdev uint64) vfsPartitions {
@@ -426,7 +429,7 @@ func sysfsDiskPartitionsGet(rdev uint64) vfsPartitions {
 
 		// The size is in standard UNIX 512 byte blocks
 		// and it must be multiplied by 512 to get size in bytes.
-		partitions[entry.Name()] = size * 512
+		partitions[entry.Name()] = size * sectorSize
 	}
 
 	return partitions
