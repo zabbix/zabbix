@@ -13,6 +13,7 @@
 **/
 
 #include "zbxjson.h"
+#include "zbxnum.h"
 #include "zbxtelemetry.h"
 #include "zbxcommon.h"
 #include "zbxtime.h"
@@ -566,11 +567,13 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query)
 
 	/* TODO: expand macros */
 
-	if (FAIL == zbx_is_time_suffix(time_shift, &query->time_shift, ZBX_LENGTH_UNLIMITED))
+	if (NULL == time_shift || FAIL == zbx_is_time_suffix(time_shift, &query->time_shift, ZBX_LENGTH_UNLIMITED))
 		goto out;
-	if (FAIL == zbx_is_time_suffix(loopback_limit, &query->loopback_limit, ZBX_LENGTH_UNLIMITED))
+	if (NULL == loopback_limit ||
+			FAIL == zbx_is_time_suffix(loopback_limit, &query->loopback_limit, ZBX_LENGTH_UNLIMITED))
 		goto out;
-	if (FAIL == zbx_is_time_suffix(aggregation_size, &query->aggregation_size, ZBX_LENGTH_UNLIMITED))
+	if (NULL == aggregation_size ||
+			FAIL == zbx_is_time_suffix(aggregation_size, &query->aggregation_size, ZBX_LENGTH_UNLIMITED))
 		goto out;
 
 	ret = SUCCEED;
@@ -582,6 +585,75 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
 
 	return ret;
+}
+
+static int	tq_validate_query(const zbx_tq_query_t *query)
+{
+	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
+		return FAIL;
+	if (ZBX_TQ_CATEGORY_APM_METRICS == query->category && ZBX_TQ_METRIC_TYPE_UNKNOWN == query->metric_type)
+		return FAIL;
+
+	for (int i = 0; i < query->columns.values_alloc; i++)
+	{
+		if (NULL == query->columns.values[i].name)
+		return FAIL;
+	}
+
+	if (0 == query->aggregated_columns.values_num)
+		return FAIL;
+	for (int i = 0; i < query->aggregated_columns.values_num; i++)
+	{
+		const zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
+
+		if (NULL == aggr_col->column_name)
+			return FAIL;
+		if (NULL == aggr_col->alias)
+			return FAIL;
+		if (ZBX_TQ_FUNCTION_UNKNOWN == aggr_col->function)
+			return FAIL;
+
+		if (ZBX_TQ_FUNCTION_PERCENTILE == aggr_col->function)
+		{
+			if (1 != aggr_col->args.values_num)
+				return FAIL;
+			if (NULL == aggr_col->args.values[0] || FAIL == zbx_is_double(aggr_col->args.values[0], NULL))
+				return FAIL;
+		}
+	}
+
+	if (0 != query->conditions.values_num)
+	{
+		if (ZBX_TQ_EVAL_TYPE_UNKNOWN == query->evaltype)
+			return FAIL;
+
+		if (ZBX_TQ_EVAL_TYPE_EXPRESSION == query->evaltype)
+		{
+			if (NULL == query->formula)
+				return FAIL;
+			/* TODO: validate formula,  be wary of SQL injection */
+		}
+
+		for (int i = 0; i < query->conditions.values_num; i++)
+		{
+			const zbx_tq_condition_t *condition = &query->conditions.values[i];
+
+			if (NULL == condition->column_name)
+				return FAIL;
+			if (NULL == condition->value)
+				return FAIL;
+			if (ZBX_TQ_OPERATOR_UNKNOWN == condition->operator)
+				return FAIL;
+		}
+	}
+
+	if (0 > query->aggregation_size || 0 > query->loopback_limit || 0 > query->time_shift)
+		return FAIL;
+	if (query->aggregation_size > query->loopback_limit)
+		return FAIL;
+	/* TODO: probably add upper limit */
+
+	return SUCCEED;
 }
 
 /******************************************************************************
@@ -612,7 +684,8 @@ int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
 	if (FAIL == tq_parse_query(&jp, query))
 		goto out;
 
-	/* TODO: validate, be wary of SQL injection in formula, json_path, value (and maybe other fields too)! */
+	if (FAIL == tq_validate_query(query))
+		goto out;
 
 	ret = SUCCEED;
 out:
