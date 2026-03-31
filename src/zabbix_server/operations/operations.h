@@ -19,19 +19,25 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 
-void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
-void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids);
-void	op_groups_add(const zbx_db_event *event,  zbx_config_t *cfg, zbx_vector_uint64_t *groupid,
-		zbx_uint64_t *hostid, int *host_add_failed);
-void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids);
-void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed);
-void	op_host_del(const zbx_db_event *event);
-void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed);
-void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed);
+/* not saved to database */
+#define HOST_STATUS_UNKNOWN	-1
+#define HOST_STATUS_FAILED	-2
+
+void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids,
+		zbx_uint64_t *hostid, int *host_status);
+void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids, zbx_uint64_t *hostid,
+		int *host_status);
+void	op_groups_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids, zbx_uint64_t *hostid,
+		int *host_status);
+void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids, zbx_uint64_t *hostid, int *host_status);
+void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_status);
+void	op_host_del(const zbx_db_event *event, zbx_uint64_t *hostid, int *host_status);
+void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_status);
+void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_status);
 void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode, zbx_uint64_t *hostid,
-		int *host_add_failed);
+		int *host_status);
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
-		zbx_vector_uint64_t *del_optagids, zbx_uint64_t *hostid, int *host_add_failed);
+		zbx_vector_uint64_t *del_optagids, zbx_uint64_t *hostid, int *host_status);
 
 int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 

@@ -55,7 +55,7 @@ zbx_host_tag_op_t;
  *                    0 - if not found                                        *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hostname)
+static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hostname, int *status)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -88,7 +88,7 @@ static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hos
 			zbx_db_free_result(result);
 
 			sql = zbx_dsprintf(sql,
-					"select h.hostid,h.name"
+					"select h.hostid,h.name,h.status"
 					" from hosts h,interface i"
 					" where h.hostid=i.hostid"
 						" and i.ip='%s'"
@@ -126,6 +126,7 @@ static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, char **hos
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		zbx_strcpy_alloc(hostname, &out_alloc, &out_offset, row[1]);
+		*status = atoi(row[2]);
 	}
 	zbx_db_free_result(result);
 exit:
@@ -227,13 +228,13 @@ static unsigned char	get_host_monitored_by(zbx_uint64_t src_proxyid, zbx_uint64_
  * Purpose: adds discovered host if it was not added already                  *
  *                                                                            *
  * Parameters: event          - [IN] source event                             *
- *             status         - [OUT] found or created host status            *
  *             cfg            - [IN] global configuration data                *
+ *             status         - [IN/OUT] host status                          *
  *                                                                            *
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
  ******************************************************************************/
-static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, const zbx_config_t *cfg)
+static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, const zbx_config_t *cfg, int *status)
 {
 	zbx_db_result_t		result, result2;
 	zbx_db_row_t		row, row2;
@@ -244,6 +245,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 	zbx_db_insert_t		db_insert, db_insert_host_rtdata, db_insert_host_template_cache;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventid:" ZBX_FS_UI64, __func__, event->eventid);
+
+	if (HOST_STATUS_FAILED == *status)
+		goto skip;
 
 	zbx_vector_uint64_create(&groupids);
 
@@ -824,6 +828,9 @@ clean:
 	zbx_vector_uint64_destroy(&groupids);
 	zbx_free(hostname);
 
+	if (0 == hostid)
+		*status = HOST_STATUS_FAILED;
+skip:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return hostid;
@@ -1029,20 +1036,14 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
  *             host_add_failed - [IN/OUT] flag indicating if host add failed  *
  *                                                                            *
  ******************************************************************************/
-void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed)
+void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_status)
 {
-	int	status;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != *host_add_failed || FAIL == is_discovery_or_autoregistration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
-	{
-		*host_add_failed = 1;
-		goto out;
-	}
+	*hostid = add_discovered_host(event, cfg, host_status);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1054,11 +1055,10 @@ out:
  * Parameters: event - [IN] source event data                                 *
  *                                                                            *
  ******************************************************************************/
-void	op_host_del(const zbx_db_event *event)
+void	op_host_del(const zbx_db_event *event, zbx_uint64_t *hostid, int *host_status)
 {
 	zbx_vector_uint64_t	hostids;
 	zbx_vector_str_t	hostnames;
-	zbx_uint64_t		hostid;
 	char			*hostname = NULL, *hostname_esc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1066,11 +1066,11 @@ void	op_host_del(const zbx_db_event *event)
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == (hostid = select_discovered_host(event, &hostname)))
+	if (0 == (*hostid = select_discovered_host(event, &hostname, host_status)))
 		goto out;
 
 	zbx_vector_uint64_create(&hostids);
-	zbx_vector_uint64_append(&hostids, hostid);
+	zbx_vector_uint64_append(&hostids, *hostid);
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
@@ -1082,8 +1082,10 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_destroy(&hostnames);
 	zbx_vector_uint64_destroy(&hostids);
 
-	zbx_audit_host_del(zbx_map_db_event_to_audit_context(event), hostid, hostname);
+	zbx_audit_host_del(zbx_map_db_event_to_audit_context(event), *hostid, hostname);
 out:
+	*hostid = 0;
+	*host_status = HOST_STATUS_UNKNOWN;
 	zbx_free(hostname);
 	zbx_free(hostname_esc);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1099,30 +1101,25 @@ out:
  *             host_add_failed - [IN/OUT] flag indicating if host add failed  *
  *                                                                            *
  ******************************************************************************/
-void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed)
+void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_status)
 {
-	int	status;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != *host_add_failed || FAIL == is_discovery_or_autoregistration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
-	{
-		*host_add_failed = 1;
+	if (0 == (*hostid = add_discovered_host(event, cfg, host_status)))
 		goto out;
-	}
 
-	if (HOST_STATUS_MONITORED != status)
+	if (HOST_STATUS_MONITORED != *host_status)
 	{
 		zbx_db_execute("update hosts"
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
 				HOST_STATUS_MONITORED, *hostid);
 
-		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), *hostid, status,
-				HOST_STATUS_MONITORED);
+		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), *hostid,
+				*host_status, HOST_STATUS_MONITORED);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1138,22 +1135,18 @@ out:
  *             host_add_failed - [IN/OUT] flag indicating if host add failed  *
  *                                                                            *
  ******************************************************************************/
-void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_add_failed)
+void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t *hostid, int *host_status)
 {
-	int		status;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != *host_add_failed || FAIL == is_discovery_or_autoregistration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
-	{
-		*host_add_failed = 1;
-		goto out;
-	}
+	if (0 == (*hostid = add_discovered_host(event, cfg, host_status)))
 
-	if (HOST_STATUS_NOT_MONITORED != status)
+		goto out;
+
+	if (HOST_STATUS_NOT_MONITORED != *host_status)
 	{
 		char		*sql;
 		zbx_db_result_t	result;
@@ -1163,8 +1156,8 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_uint64_t 
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
 				HOST_STATUS_NOT_MONITORED, *hostid);
-		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), *hostid, status,
-				HOST_STATUS_NOT_MONITORED);
+		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), *hostid,
+				*host_status, HOST_STATUS_NOT_MONITORED);
 
 		sql = zbx_dsprintf(NULL, "select null"
 				" from host_discovery"
@@ -1204,20 +1197,15 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode, zbx_uint64_t *hostid,
-		int *host_add_failed)
+		int *host_status)
 {
-	int		status;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != *host_add_failed || FAIL == is_discovery_or_autoregistration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
-	{
-		*host_add_failed = 1;
+	if (0 == (*hostid = add_discovered_host(event, cfg, host_status)))
 		goto out;
-	}
 
 	zbx_db_set_host_inventory(*hostid, inventory_mode, zbx_map_db_event_to_audit_context(event));
 out:
@@ -1236,20 +1224,15 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	op_groups_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids, zbx_uint64_t *hostid,
-		int *host_add_failed)
+		int *host_status)
 {
-	int		status;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (0 != *host_add_failed || FAIL == is_discovery_or_autoregistration(event))
+	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
-	{
-		*host_add_failed = 1;
+	if (0 == (*hostid = add_discovered_host(event, cfg, host_status)))
 		goto out;
-	}
 
 	add_discovered_host_groups(*hostid, groupids, event);
 out:
@@ -1264,10 +1247,9 @@ out:
  *             groupids - [IN] IDs of groups to delete                        *
  *                                                                            *
  ******************************************************************************/
-void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
+void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids, zbx_uint64_t *hostid, int *host_status)
 {
 	zbx_db_result_t	result;
-	zbx_uint64_t	hostid;
 	char		*sql = NULL, *hostname = NULL;
 	size_t		sql_alloc = 256, sql_offset = 0;
 
@@ -1276,7 +1258,7 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == (hostid = select_discovered_host(event, &hostname)))
+	if (0 == (*hostid = select_discovered_host(event, &hostname, host_status)))
 		goto out;
 
 	sql = (char *)zbx_malloc(sql, sql_alloc);
@@ -1287,7 +1269,7 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 			" from hosts_groups"
 			" where hostid=" ZBX_FS_UI64
 				" and not",
-			hostid);
+			*hostid);
 	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values, groupids->values_num);
 
 	result = zbx_db_select_n(sql, 1);
@@ -1297,7 +1279,7 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 		zbx_db_free_result(result);
 
 		zabbix_log(LOG_LEVEL_WARNING, "cannot remove host \"%s\" from all host groups:"
-				" it must belong to at least one", zbx_host_string(hostid));
+				" it must belong to at least one", zbx_host_string(*hostid));
 	}
 	else
 	{
@@ -1316,7 +1298,7 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 				" from hosts_groups"
 				" where hostid=" ZBX_FS_UI64
 					" and",
-				hostid);
+				*hostid);
 		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
 				groupids->values_num);
 
@@ -1337,8 +1319,8 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 
 		if (0 != hostgroupids.values_num)
 		{
-			zbx_host_groups_remove(hostid, &hostgroupids);
-			zbx_audit_host_hostgroup_delete(zbx_map_db_event_to_audit_context(event), hostid, hostname,
+			zbx_host_groups_remove(*hostid, &hostgroupids);
+			zbx_audit_host_hostgroup_delete(zbx_map_db_event_to_audit_context(event), *hostid, hostname,
 					&hostgroupids, &found_groupids);
 		}
 
@@ -1361,21 +1343,20 @@ out:
  *             lnk_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids)
+void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids,
+		zbx_uint64_t *hostid, int *host_status)
 {
-	zbx_uint64_t	hostid;
 	char		*error = NULL;
-	int		status;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
+	if (0 == (*hostid = add_discovered_host(event, cfg, host_status)))
 		goto out;
 
-	if (SUCCEED != zbx_db_copy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL,
+	if (SUCCEED != zbx_db_copy_template_elements(*hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL,
 			zbx_map_db_event_to_audit_context(event), &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
@@ -1393,9 +1374,9 @@ out:
  *             del_templateids - [IN] array of template IDs                   *
  *                                                                            *
  ******************************************************************************/
-void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids)
+void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids, zbx_uint64_t *hostid,
+		int *host_status)
 {
-	zbx_uint64_t	hostid;
 	char		*error, *hostname = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1403,10 +1384,10 @@ void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templat
 	if (FAIL == is_discovery_or_autoregistration(event))
 		goto out;
 
-	if (0 == (hostid = select_discovered_host(event, &hostname)))
+	if (0 == (*hostid = select_discovered_host(event, &hostname, host_status)))
 		goto out;
 
-	if (SUCCEED != zbx_db_delete_template_elements(hostid, hostname, del_templateids,
+	if (SUCCEED != zbx_db_delete_template_elements(*hostid, hostname, del_templateids,
 			zbx_map_db_event_to_audit_context(event), &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
@@ -1431,9 +1412,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
-		zbx_vector_uint64_t *del_optagids, zbx_uint64_t *hostid, int *host_add_failed)
+		zbx_vector_uint64_t *del_optagids, zbx_uint64_t *hostid, int *host_status)
 {
-	int			status;
 	char			*hostname = NULL;
 	zbx_vector_db_tag_ptr_t	host_tags;
 	zbx_db_result_t		result;
@@ -1446,17 +1426,10 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 
 	if (0 != new_optagids->values_num)
 	{
-		if (0 != *host_add_failed || FAIL == is_discovery_or_autoregistration(event))
-			goto out;
-
-		if (0 == *hostid && 0 == (*hostid = add_discovered_host(event, &status, cfg)))
-		{
-			*host_add_failed = 1;
-			goto out;
-		}
+		*hostid = add_discovered_host(event, cfg, host_status);
 	}
 	else
-		*hostid = select_discovered_host(event, &hostname);
+		*hostid = select_discovered_host(event, &hostname, host_status);
 
 	if (0 == *hostid)
 		goto out;
