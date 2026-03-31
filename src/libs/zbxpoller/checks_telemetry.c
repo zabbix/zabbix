@@ -45,7 +45,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 				ZBX_NULL2STR(aggr_col->column_name), (int)aggr_col->function);
 		for (int j = 0; j < aggr_col->args.values_num; j++) {
 			out_str = zbx_strdcatf(out_str, "'%s'%s", aggr_col->args.values[j],
-				(j == aggr_col->args.values_num - 1) ? "" : ", ");
+					(j == aggr_col->args.values_num - 1) ? "" : ", ");
 		}
 		out_str = zbx_strdcatf(out_str, "}, alias: '%s'\n", aggr_col->alias);
 	}

@@ -738,7 +738,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query)
  *          it                                                                *
  *                                                                            *
  * Parameters: json_str     - [IN]                                            *
- *             query        - [OUT] must not be initialized beforehand        *
+ *             query        - [OUT] parsed query, must not be initialized     *
+ *                                  beforehand                                *
  *                                                                            *
  * Return value: SUCCEED - json_str parsed successfully, query is valid,      *
  *                         query must be cleaned after use                    *
