@@ -128,6 +128,7 @@ window.ldap_edit_popup = new class {
 
 		password_field.style.display = '';
 		password_field.disabled = false;
+		password_field.focus();
 
 		if (password_var !== null) {
 			form_field.removeChild(password_var);
