@@ -47,8 +47,6 @@ abstract class CControllerDataTable extends CController {
 	abstract protected function getData(): array;
 
 	protected function init(): void {
-		parent::init();
-
 		$this->disableCsrfValidation();
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 

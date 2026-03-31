@@ -14,20 +14,19 @@
 **/
 
 
-class CControllerProblemViewData extends CControllerDataTable
-{
-	protected function checkPermissions(): bool
-	{
+class CControllerProblemViewData extends CControllerDataTable {
+
+	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
 
-	protected function getData(): array
-	{
+	protected function getData(): array {
 		$rows = [];
 		$data = $this->prepareData();
 
 		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $data['options'],
-			$data['context_popup_data']);
+			$data['context_popup_data']
+		);
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
 
@@ -60,7 +59,8 @@ class CControllerProblemViewData extends CControllerDataTable
 
 			if (!$tabfilter['filter_custom_time']) {
 				$tabfilter = ['from' => $profile->from, 'to' => $profile->to] + $tabfilter;
-			} else {
+			}
+			else {
 				$tabfilter['show'] = TRIGGERS_OPTION_ALL;
 			}
 
@@ -72,6 +72,7 @@ class CControllerProblemViewData extends CControllerDataTable
 
 	private function getCount(array $filter): int {
 		$range_time_parser = new CRangeTimeParser();
+
 		$range_time_parser->parse($filter['from']);
 		$filter['from'] = $range_time_parser->getDateTime(true)->getTimestamp();
 		$range_time_parser->parse($filter['to']);
