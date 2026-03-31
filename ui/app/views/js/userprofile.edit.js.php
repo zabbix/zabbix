@@ -111,31 +111,40 @@
 		}
 
 		#displayPasswordChange(visible = true) {
-			if (visible) {
-				document.getElementById('current_password')?.removeAttribute('disabled');
-				document.getElementById('password1')?.removeAttribute('disabled');
-				document.getElementById('password2')?.removeAttribute('disabled');
+			const password1_element = document.getElementById('password1');
+			const password2_element = document.getElementById('password2');
+			const current_password_element = document.getElementById('current_password');
 
-				this.form_element.querySelectorAll('.password-change-active').forEach(elem => {
-					elem.style.display = '';
-				})
-
-				this.form_element.querySelectorAll('.password-change-inactive').forEach(elem => {
-					elem.style.display = 'none';
-				})
+			if (password1_element === null && password2_element === null) {
+				return;
 			}
-			else {
-				document.getElementById('current_password')?.setAttribute('disabled', 'disabled');
-				document.getElementById('password1')?.setAttribute('disabled', 'disabled');
-				document.getElementById('password2')?.setAttribute('disabled', 'disabled');
 
-				this.form_element.querySelectorAll('.password-change-active').forEach(elem => {
-					elem.style.display = 'none';
-				})
+			const password_elements_disabled_state = !visible;
+			const active_elements_display_state = (visible === true ? '' : 'none');
+			const inactive_elements_display_state = (visible === true ? 'none' : '');
 
-				this.form_element.querySelectorAll('.password-change-inactive').forEach(elem => {
-					elem.style.display = '';
-				})
+			password1_element.toggleAttribute('disabled', password_elements_disabled_state);
+			password2_element.toggleAttribute('disabled', password_elements_disabled_state);
+
+			if (current_password_element !== null) {
+				current_password_element.toggleAttribute('disabled', password_elements_disabled_state);
+			}
+
+			this.form_element.querySelectorAll('.password-change-active').forEach(element => {
+				element.style.display = active_elements_display_state;
+			});
+
+			this.form_element.querySelectorAll('.password-change-inactive').forEach(element => {
+				element.style.display = inactive_elements_display_state;
+			});
+
+			if (visible === true) {
+				const default_focus_element = current_password_element;
+				const fallback_focus_element = password1_element;
+
+				const focus_element = (default_focus_element !== null ? default_focus_element : fallback_focus_element);
+
+				focus_element.focus();
 			}
 		}
 
