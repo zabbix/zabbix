@@ -950,6 +950,20 @@ static int	DBpatch_7050074(void)
 	return DBcreate_index("device_enrollment_token", "device_enrollment_token_1", "token", 1);
 }
 
+static int	DBpatch_7050075(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
+		" ('timeout_device_init_offboard',1,'30s',0)"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1031,5 +1045,6 @@ DBPATCH_ADD(7050071, 0, 1)
 DBPATCH_ADD(7050072, 0, 1)
 DBPATCH_ADD(7050073, 0, 1)
 DBPATCH_ADD(7050074, 0, 1)
+DBPATCH_ADD(7050075, 0, 1)
 
 DBPATCH_END()
