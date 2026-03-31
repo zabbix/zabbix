@@ -192,14 +192,14 @@ class CDevice extends CApiService {
 			'userid' =>	['type' => API_ID, 'default' => self::$userData['userid']]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		if (bccomp($data['userid'], self::$userData['userid']) != 0) {
 			$db_users = API::User()->get([
 				'output' => ['userid'],
-				'userids' => $user['userid'],
+				'userids' => $data['userid'],
 				'editable' => true
 			]);
 
