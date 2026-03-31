@@ -372,6 +372,12 @@ class CTrigger extends CTriggerGeneral {
 				);
 			}
 
+			if (array_key_exists('error', $options['filter']) && $options['filter']['error'] !== null) {
+				$this->dbFilter('trigger_rtdata tr', ['filter' => ['error' => $options['filter']['error']]] + $options,
+					$sqlParts
+				);
+			}
+
 			if (!array_key_exists('flags', $options['filter'])) {
 				$options['filter']['flags'] = [
 					ZBX_FLAG_DISCOVERY_NORMAL,
@@ -745,11 +751,14 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
-					|| $this->outputIsRequested('lastchange', $options['output'])
-					|| $this->outputIsRequested('error', $options['output'])))
-			|| (is_array($options['filter']) && (array_key_exists('state', $options['filter'])
-					|| array_key_exists('lastchange', $options['filter'])))) {
+		if ((!$options['countOutput'] && array_filter([
+					$this->outputIsRequested('state', $options['output']),
+					$this->outputIsRequested('lastchange', $options['output']),
+					$this->outputIsRequested('error', $options['output'])
+				]))
+			|| (is_array($options['filter'])
+				&& array_intersect_key($options['filter'], array_flip(['state', 'lastchange', 'error'])))
+			|| (is_array($options['search']) && array_key_exists('error', $options['search']))) {
 			$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 		}
 
