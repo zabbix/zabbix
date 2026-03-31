@@ -506,7 +506,8 @@ static void	dev_serial_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 		zbx_fclose(f);
 	}
 
-	zbx_json_addstring(j, "serial", (SUCCEED == found ? buf : ""), ZBX_JSON_TYPE_STRING);
+	if (SUCCEED == found)
+		zbx_json_addstring(j, "serial", buf, ZBX_JSON_TYPE_STRING);
 }
 
 static void	dev_wwn_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
@@ -528,7 +529,8 @@ static void	dev_wwn_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 		zbx_fclose(f);
 	}
 
-	zbx_json_addstring(j, "wwn", (SUCCEED == found ? buf : ""), ZBX_JSON_TYPE_STRING);
+	if (SUCCEED == found)
+		zbx_json_addstring(j, "wwn", buf, ZBX_JSON_TYPE_STRING);
 }
 
 /******************************************************************************
@@ -564,6 +566,7 @@ static void	dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
 	zbx_uint64_t	size = 0;
+	int		found = FAIL;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/size", major(stat_buf->st_rdev),
 			minor(stat_buf->st_rdev));
@@ -577,11 +580,13 @@ static void	dev_size_bytes_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 			zbx_lrtrim(buf, ZBX_WHITESPACE);
 			ZBX_STR2UINT64(size, buf);
 			size *= ZBX_SECTOR_SIZE;
+			found = SUCCEED;
 		}
 		zbx_fclose(f);
 	}
 
-	zbx_json_adduint64(j, "size_bytes", size);
+	if (SUCCEED == found)
+		zbx_json_adduint64(j, "size_bytes", size);
 }
 
 static void	dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
@@ -589,6 +594,7 @@ static void	dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json 
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
 	zbx_uint64_t	size = 0;
+	int		found = FAIL;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/queue/logical_block_size", major(stat_buf->st_rdev),
 			minor(stat_buf->st_rdev));
@@ -599,11 +605,13 @@ static void	dev_logical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json 
 		{
 			zbx_lrtrim(buf, ZBX_WHITESPACE);
 			ZBX_STR2UINT64(size, buf);
+			found = SUCCEED;
 		}
 		zbx_fclose(f);
 	}
 
-	zbx_json_adduint64(j, "logical_block_size", size);
+	if (SUCCEED == found)
+		zbx_json_adduint64(j, "logical_block_size", size);
 }
 
 static void	dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
@@ -611,6 +619,7 @@ static void	dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
 	zbx_uint64_t	size = 0;
+	int		found = FAIL;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/queue/physical_block_size", major(stat_buf->st_rdev),
 			minor(stat_buf->st_rdev));
@@ -621,71 +630,74 @@ static void	dev_physical_blksize_add(const zbx_stat_t *stat_buf, struct zbx_json
 		{
 			zbx_lrtrim(buf, ZBX_WHITESPACE);
 			ZBX_STR2UINT64(size, buf);
+			found = SUCCEED;
 		}
 		zbx_fclose(f);
 	}
 
-	zbx_json_adduint64(j, "physical_block_size", size);
+	if (SUCCEED == found)
+		zbx_json_adduint64(j, "physical_block_size", size);
 }
 
 static void	dev_stats_add(const zbx_stat_t *stat_buf, struct zbx_json *j)
 {
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
-	zbx_dev_stats_t	stats = {0};
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_BLKDEV_PFX "%u:%u/stat", major(stat_buf->st_rdev),
 			minor(stat_buf->st_rdev));
 
 	if (NULL != (f = fopen(buf, "r")))
 	{
-
 		if (NULL != fgets(buf, sizeof(buf), f))
 		{
-			char	*tok, *saveptr;
-			int	tok_idx = 0;
+			char		*tok, *saveptr;
+			int		tok_idx = 0, opened = 0;
+			zbx_uint64_t	val;
 
 			tok = strtok_r(buf, " ", &saveptr);
+
+			if (NULL != tok)
+			{
+				zbx_json_addobject(j, "stats");
+				opened = 1;
+			}
 
 			while (NULL != tok && 10 >= tok_idx)
 			{
 				switch (tok_idx)
 				{
 					case 0:
-						ZBX_STR2UINT64(stats.reads_completed, tok);
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "reads_completed", val);
 						break;
 					case 2:
-						ZBX_STR2UINT64(stats.bytes_read, tok);
-						/* units: sectors, must be multiplied by 512 to convert to bytes */
-						stats.bytes_read *= ZBX_SECTOR_SIZE;
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "bytes_read", val * ZBX_SECTOR_SIZE);
 						break;
 					case 4:
-						ZBX_STR2UINT64(stats.writes_completed, tok);
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "writes_completed", val);
 						break;
 					case 6:
-						ZBX_STR2UINT64(stats.bytes_written, tok);
-						/* units: sectors, must be multiplied by 512 to convert to bytes */
-						stats.bytes_written *= ZBX_SECTOR_SIZE;
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "bytes_written", val * ZBX_SECTOR_SIZE);
 						break;
 					case 10:
-						ZBX_STR2UINT64(stats.io_time_ms, tok);
+						ZBX_STR2UINT64(val, tok);
+						zbx_json_adduint64(j, "io_time_ms", val);
 						break;
 				}
 
 				tok = strtok_r(NULL, " ", &saveptr);
 				tok_idx++;
 			}
+
+			if (1 == opened)
+				zbx_json_close(j);
 		}
 		zbx_fclose(f);
 	}
-
-	zbx_json_addobject(j, "stats");
-	zbx_json_adduint64(j, "reads_completed", stats.reads_completed);
-	zbx_json_adduint64(j, "writes_completed", stats.writes_completed);
-	zbx_json_adduint64(j, "bytes_read", stats.bytes_read);
-	zbx_json_adduint64(j, "bytes_written", stats.bytes_written);
-	zbx_json_adduint64(j, "io_time_ms", stats.io_time_ms);
-	zbx_json_close(j);
 }
 
 static void	dev_disk_partition_sizes_add(zbx_stat_t *stat_buf, struct zbx_json *j)
@@ -907,7 +919,8 @@ static void	vfs_dev_get_devid_add(const zbx_vector_device_ptr_t *devices, const 
 	else
 		devid = devices->values[l]->devid;
 out:
-	zbx_json_addstring(json, "devid", devid, ZBX_JSON_TYPE_STRING);
+	if ('\0' != *devid)
+		zbx_json_addstring(json, "devid", devid, ZBX_JSON_TYPE_STRING);
 }
 
 static int	dev_is_disk(const char *dev_type)
@@ -959,7 +972,10 @@ static void	vfs_dev_get_process_entry(const char *dev_name, const zbx_regexp_t *
 	if (ZBX_MODE_DISKS == mode)
 	{
 		dev_path_add(dev_name, cfg);
-		zbx_json_addstring(cfg, "model", model, ZBX_JSON_TYPE_STRING);
+
+		if ('\0' != *model)
+			zbx_json_addstring(cfg, "model", model, ZBX_JSON_TYPE_STRING);
+
 		dev_serial_add(&stat_buf, cfg);
 		dev_wwn_add(&stat_buf, cfg);
 		dev_size_bytes_add(&stat_buf, cfg);
