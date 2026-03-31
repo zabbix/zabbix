@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcalc.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
 #include "zbxtelemetry.h"
@@ -587,6 +588,80 @@ out:
 	return ret;
 }
 
+static int	tq_validate_formula_char(char c)
+{
+	return (isalnum(c) || c == '(' || c == ')' || c == ' ') ? SUCCEED : FAIL;
+}
+
+static int	tq_formula_constant_to_condition_idx(const char *p, int len)
+{
+	int res = 0;
+	int mult = 1;
+
+	for (int i = len - 1; i >= 0; i--)
+	{
+		res += (p[i] - 'A') * mult;
+		mult *= ('Z' - 'A') + 1;
+	}
+
+	return res;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validates that:                                                   *
+ *              1) formula only contains valid characters                     *
+ *                 (see tq_validate_formula_char)                             *
+ *              2) every constant (e.g. A, B, AA, AB, ...) maps to an index   *
+ *                 that is < condition_count                                  *
+ *              3) formula evaluates correctly by zbx_evaluate()              *
+ *                                                                            *
+ ******************************************************************************/
+static int	tq_validate_formula(const char *formula, int condition_count)
+{
+	int	ret = FAIL;
+	char	*formula_copy = zbx_strdup(NULL, formula);
+	char	error[256];
+	double	dummy_value;
+
+	char	*p = formula_copy;
+	while (*p)
+	{
+		if (FAIL == tq_validate_formula_char(*p))
+			goto out;
+
+		if (!isupper(*p))
+		{
+			p++;
+			continue;
+		}
+
+		int	len = 1;
+		while (isupper(p[len]))
+			len++;
+
+		if (tq_formula_constant_to_condition_idx(p, len) >= condition_count)
+			return FAIL;
+
+		*p = '1';
+		memset(p + 1, ' ', len - 1);
+
+		p += len;
+	}
+
+	if (FAIL == zbx_evaluate(&dummy_value, formula_copy, error, sizeof(error), NULL))
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): formula evaluation failed: '%s'", __func__, error);
+		goto out;
+	}
+
+	ret = SUCCEED;
+out:
+	zbx_free(formula_copy);
+
+	return ret;
+}
+
 static int	tq_validate_query(const zbx_tq_query_t *query)
 {
 	if (ZBX_TQ_CATEGORY_UNKNOWN == query->category)
@@ -631,7 +706,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query)
 		{
 			if (NULL == query->formula)
 				return FAIL;
-			/* TODO: validate formula,  be wary of SQL injection */
+			if (FAIL == tq_validate_formula(query->formula, query->conditions.values_num))
+				return FAIL;
 		}
 
 		for (int i = 0; i < query->conditions.values_num; i++)
