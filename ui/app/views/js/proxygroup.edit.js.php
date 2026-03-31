@@ -28,10 +28,10 @@ window.proxy_group_edit_popup = new class {
 	#dialogue;
 
 	/** @type {HTMLFormElement} */
-	form_element;
+	#form_element;
 
 	/** @type {CForm} */
-	form;
+	#form;
 
 	/** @type {string|null} */
 	#proxy_groupid;
@@ -46,11 +46,11 @@ window.proxy_group_edit_popup = new class {
 		this.#rules_for_clone = rules_for_clone;
 		this.#overlay = overlays_stack.getById('proxygroup.edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
-		this.form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
-		this.form = new CForm(this.form_element, rules);
+		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
+		this.#form = new CForm(this.#form_element, rules);
 
 		this.#proxy_groupid = proxy_groupid;
-		this.#initial_form_fields = this.form.getAllValues();
+		this.#initial_form_fields = this.#form.getAllValues();
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'proxygroup.list');
@@ -99,7 +99,7 @@ window.proxy_group_edit_popup = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(this.form.getAllValues())
+		return JSON.stringify(this.#initial_form_fields) === JSON.stringify(this.#form.getAllValues())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -124,7 +124,7 @@ window.proxy_group_edit_popup = new class {
 		this.#proxy_groupid = null;
 		document.getElementById('proxy_groupid').remove();
 
-		for (const element of this.form_element.querySelectorAll('.js-field-proxies')) {
+		for (const element of this.#form_element.querySelectorAll('.js-field-proxies')) {
 			element.remove();
 		}
 
@@ -133,7 +133,7 @@ window.proxy_group_edit_popup = new class {
 		this.#overlay.recoverFocus();
 		this.#overlay.containFocus();
 		this.#initActions();
-		this.form.reload(this.#rules_for_clone);
+		this.#form.reload(this.#rules_for_clone);
 	}
 
 	#delete() {
@@ -149,12 +149,12 @@ window.proxy_group_edit_popup = new class {
 
 	#submit() {
 		this.#removePopupMessages();
-		const fields = this.form.getAllValues();
+		const fields = this.#form.getAllValues();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.#proxy_groupid === null ? 'proxygroup.create' : 'proxygroup.update');
 
-		this.form.validateSubmit(fields)
+		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
 					this.#overlay.unsetLoading();
@@ -179,8 +179,8 @@ window.proxy_group_edit_popup = new class {
 				}
 
 				if ('form_errors' in response) {
-					this.form.setErrors(response.form_errors, true, true);
-					this.form.renderErrors();
+					this.#form.setErrors(response.form_errors, true, true);
+					this.#form.renderErrors();
 
 					return;
 				}
@@ -192,25 +192,15 @@ window.proxy_group_edit_popup = new class {
 			.finally(() => this.#overlay.unsetLoading());
 	}
 
-	/**
-	 * Removes all popup message boxes above the form.
-	 */
 	#removePopupMessages() {
-		for (const element of this.form_element.parentNode.children) {
-			if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-				element.parentNode.removeChild(element);
+		for (const el of this.#form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
 			}
 		}
 	}
 
-	/**
-	 * Handles exceptions from AJAX requests and displays an error message box above the form.
-	 *
-	 * @param {object} exception  The exception object thrown during AJAX request.
-	 */
 	#ajaxExceptionHandler(exception) {
-		const form = proxy_group_edit_popup.form_element;
-
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
@@ -223,6 +213,6 @@ window.proxy_group_edit_popup = new class {
 
 		const message_box = makeMessageBox('bad', messages, title)[0];
 
-		form.parentNode.insertBefore(message_box, form);
+		this.#form_element.parentNode.insertBefore(message_box, this.#form_element);
 	}
 };
