@@ -1308,9 +1308,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click();
+		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click()->waitUntilNotPresent();
 		$dialog->query('button:Update')->one()->click();
 		$form->submit()->waitUntilStalled();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->page->waitUntilReady();
 
 		// Check that media is not present for LDAP provisioned user.

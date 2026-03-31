@@ -33,8 +33,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('sla_excluded_downtime', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('sla_excluded_downtime', 'name'))
 				->setAriaRequired()
 				->setAttribute('placeholder', _('short description'))
 				->setAttribute('autofocus', 'autofocus')

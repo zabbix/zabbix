@@ -639,8 +639,8 @@ const hintBox = {
 		target.hintBoxItem.show();
 
 		if (target.isStatic) {
-			Overlay.prototype.recoverFocus.call({'$dialogue': target.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': target.hintBoxItem});
+			Focuser.recoverFocus(target.hintBoxItem[0]);
+			Focuser.containFocus(target.hintBoxItem[0]);
 
 			target.dispatchEvent(new CustomEvent('onShowStaticHint'));
 		}
