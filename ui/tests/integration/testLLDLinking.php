@@ -180,7 +180,7 @@ class testLldLinking extends CIntegrationTest {
 			unlink(self::METADATA_FILE);
 		}
 
-		if (file_put_contents(self::METADATA_FILE, "\\".time()) === false) {
+		if (file_put_contents(self::METADATA_FILE, "\\".microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 	}
