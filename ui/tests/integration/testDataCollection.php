@@ -573,7 +573,7 @@ class testDataCollection extends CIntegrationTest {
 		$itemid = $response['result']['itemids'][0];
 		self::$itemidsToDelete = array_merge(self::$itemidsToDelete, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 
 		$this->sendSenderValue('trapper_host', 'trap', 1, self::COMPONENT_SERVER);
 
