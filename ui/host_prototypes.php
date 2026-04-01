@@ -267,7 +267,7 @@ elseif (hasRequest('add') || hasRequest('update')) {
 	}
 
 	$message_failed = hasRequest('add') ? _('Cannot add host prototype') : _('Cannot update host prototype');
-	show_messages(false, null, $message_failed);
+	show_error_message($message_failed);
 }
 elseif ($hostid != 0 && getRequest('action', '') === 'hostprototype.updatediscover') {
 	$result = API::HostPrototype()->update([
