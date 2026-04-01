@@ -36,7 +36,7 @@ type scenario struct {
 }
 
 func (r *accessRules) addRule(pattern string, ruleType RuleType) {
-	var n int = len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) +
+	n := len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) +
 		len(r.allowRegexpRecords.Nodes) + len(r.denyRegexpRecords.Nodes) + 1
 
 	if ruleType == ALLOW {
@@ -47,7 +47,7 @@ func (r *accessRules) addRule(pattern string, ruleType RuleType) {
 }
 
 func (r *accessRules) addRegexpRule(pattern string, ruleType RuleType) {
-	var n int = len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) +
+	n := len(r.allowRecords.Nodes) + len(r.denyRecords.Nodes) +
 		len(r.allowRegexpRecords.Nodes) + len(r.denyRegexpRecords.Nodes) + 1
 
 	if ruleType == ALLOW {
@@ -486,7 +486,7 @@ func TestIncompleteWhitelist(t *testing.T) {
 	records.addRule("system.localtime[*]", ALLOW)
 	// Trailing DenyKey=* is missing
 
-	var err error = LoadRules(
+	err := LoadRules(
 		&records.allowRecords, &records.denyRecords,
 		&records.allowRegexpRecords, &records.denyRegexpRecords,
 	)
