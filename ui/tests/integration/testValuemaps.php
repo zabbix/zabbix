@@ -258,123 +258,51 @@ class testValuemaps extends CIntegrationTest {
 
 	/**
 	 * Test valuemaps cases.
+	 *
+	 * @dataProvider getValuemaps
 	 */
-	public function testValuemaps_checkProblemName() {
-		$stats = [];
-
-		foreach ($this->getValuemaps() as $case) {
-			['inputData' => $inputData, 'inputType' => $inputType, 'valuemap' => $valuemap,
-				'outputData' => $outputData] = $case;
-
-			$t_case_start = microtime(true);
-
+	public function testValuemaps_checkProblemName($inputData, $inputType, $valuemap, $outputData) {
 			$valuemap['hostid'] = self::$hostid;
-			$t0 = microtime(true);
 			$response = $this->call('valuemap.create', $valuemap);
-			$t_valuemap_create = microtime(true) - $t0;
 			$this->assertArrayHasKey('valuemapids', $response['result']);
 			$this->assertEquals(1, count($response['result']['valuemapids']));
 			$valuemapid = $response['result']['valuemapids'];
 
-			$t0 = microtime(true);
 			$response = $this->call('item.update', [
 					'itemid' => self::$itemid[0],
 					'valuemapid' => $valuemapid[0],
 					'value_type' => $inputType
 			]);
-			$t_item_update = microtime(true) - $t0;
 			$this->assertArrayHasKey('itemids', $response['result']);
 			$this->assertEquals(1, count($response['result']['itemids']));
 			$this->assertEquals(self::$itemid, $response['result']['itemids']);
 
-			$t0 = microtime(true);
 			$response = $this->call('trigger.create', [
 				'description' => ' {ITEM.VALUE}',
 				'expression' => 'last(/'.self::HOST_NAME.'/'.self::ITEM_NAME.')='.$inputData
 			]);
-			$t_trigger_create = microtime(true) - $t0;
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertEquals(1, count($response['result']['triggerids']));
-			$triggerid = $response['result']['triggerids'];
+		$triggerid =  $response['result']['triggerids'];
 
-			$t0 = microtime(true);
-			$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
-			$t_reload_cache = microtime(true) - $t0;
+		$this->reloadConfigurationCache();
 
-			$t0 = microtime(true);
-			$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData, null, 0);
-			$t_send_value = microtime(true) - $t0;
+		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
 
-			$t0 = microtime(true);
-			['result' => $result] = $this->callUntilDataIsPresent('problem.get', [
+		['result' => $result] = $this->call('problem.get', [
 				'output' => ['name'],
 				'objectids' => $triggerid
-			], 5, 1);
-			$t_wait_problem = microtime(true) - $t0;
+		]);
 
 			$result = array_column($result, 'name');
 			$this->assertEquals(' '.$outputData, $result[0]);
 
-			$t0 = microtime(true);
 			$response = $this->call('trigger.delete', $triggerid);
-			$t_trigger_delete = microtime(true) - $t0;
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertEquals($triggerid, $response['result']['triggerids']);
 
-			$t0 = microtime(true);
 			$response = $this->call('valuemap.delete', $valuemapid);
-			$t_valuemap_delete = microtime(true) - $t0;
 			$this->assertArrayHasKey('valuemapids', $response['result']);
 			$this->assertEquals($valuemapid, $response['result']['valuemapids']);
-
-			$t_case_total = microtime(true) - $t_case_start;
-
-			$stats[] = [
-				'inputData'      => $inputData,
-				'valuemap.create'  => $t_valuemap_create,
-				'item.update'      => $t_item_update,
-				'trigger.create'   => $t_trigger_create,
-				'reloadCache'      => $t_reload_cache,
-				'sendValue'        => $t_send_value,
-				'waitProblem'      => $t_wait_problem,
-				'trigger.delete'   => $t_trigger_delete,
-				'valuemap.delete'  => $t_valuemap_delete,
-				'total'            => $t_case_total,
-			];
-		}
-
-		// Print per-case and aggregate timing statistics to STDERR.
-		$cols = ['valuemap.create', 'item.update', 'trigger.create', 'reloadCache',
-			'sendValue', 'waitProblem', 'trigger.delete', 'valuemap.delete', 'total'];
-
-		fwrite(STDERR, "\n=== testValuemaps_checkProblemName timing (seconds) ===\n");
-		fwrite(STDERR, sprintf("%-20s", 'inputData'));
-		foreach ($cols as $col) {
-			fwrite(STDERR, sprintf("%18s", $col));
-		}
-		fwrite(STDERR, "\n");
-
-		$sums = array_fill_keys($cols, 0.0);
-		foreach ($stats as $row) {
-			fwrite(STDERR, sprintf("%-20s", substr((string)$row['inputData'], 0, 19)));
-			foreach ($cols as $col) {
-				fwrite(STDERR, sprintf("%18.4f", $row[$col]));
-				$sums[$col] += $row[$col];
-			}
-			fwrite(STDERR, "\n");
-		}
-
-		$n = count($stats);
-		fwrite(STDERR, str_repeat('-', 20 + 18 * count($cols)) . "\n");
-		fwrite(STDERR, sprintf("%-20s", 'TOTAL'));
-		foreach ($cols as $col) {
-			fwrite(STDERR, sprintf("%18.4f", $sums[$col]));
-		}
-		fwrite(STDERR, "\n");
-		fwrite(STDERR, sprintf("%-20s", 'AVG (' . $n . ' cases)'));
-		foreach ($cols as $col) {
-			fwrite(STDERR, sprintf("%18.4f", $n > 0 ? $sums[$col] / $n : 0.0));
-		}
-		fwrite(STDERR, "\n\n");
 	}
 }
