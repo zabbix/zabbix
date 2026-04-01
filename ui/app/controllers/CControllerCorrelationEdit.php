@@ -87,7 +87,7 @@ class CControllerCorrelationEdit extends CController {
 				'filter' => [
 					'evaltype' => $this->correlation['filter']['evaltype'],
 					'formula' => $this->correlation['filter']['formula'],
-					'conditions' =>	$this->prepareConditions($this->correlation)
+					'conditions' =>	$this->prepareConditions($this->correlation['filter']['conditions'])
 				],
 				'operations' => $this->correlation['operations'],
 				'description' => $this->correlation['description'],
@@ -113,15 +113,14 @@ class CControllerCorrelationEdit extends CController {
 		$this->setResponse($response);
 	}
 
-	protected function prepareConditions(array $correlation): array {
+	protected function prepareConditions(array $conditions): array {
 		$result = [];
-		$hostgroup_names = $this->fetchHostGroupNames($correlation);
+		$hostgroup_names = $this->fetchHostGroupNames($conditions);
 
-		foreach ($correlation['filter']['conditions'] as $index => $condition) {
+		foreach ($conditions as $condition) {
 			$type = (int) $condition['type'];
 
 			$template_data = [
-				'row_index' => $index,
 				'type' => $condition['type'],
 				'formulaid' => $condition['formulaid']
 			];
@@ -155,19 +154,18 @@ class CControllerCorrelationEdit extends CController {
 	}
 
 	/**
-	 * @param array $correlation  API structure.
+	 * @param array $conditions
 	 *
-	 * @return array<string, string>  Group names keyed by group ID.
+	 * @return array<string, string>  Host group names keyed by group ID.
 	 */
-	protected function fetchHostGroupNames(array $correlation): array {
-		$groupids = array_column($correlation['filter']['conditions'], 'groupid', 'groupid');
+	protected function fetchHostGroupNames(array $conditions): array {
+		$groupids = array_column($conditions, 'groupid', 'groupid');
 		$group_names = [];
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
+				'groupids' => array_keys($groupids)
 			]);
 
 			$group_names = array_column($groups, 'name', 'groupid');
