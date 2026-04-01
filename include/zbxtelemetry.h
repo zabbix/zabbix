@@ -17,8 +17,6 @@
 
 #include "zbxalgo.h"
 
-#define ZBX_TQ_TIME_INTERVAL_INVALID -1
-
 typedef enum
 {
 	ZBX_TQ_CATEGORY_UNKNOWN = 0,

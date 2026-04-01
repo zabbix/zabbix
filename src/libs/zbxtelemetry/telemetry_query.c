@@ -28,9 +28,9 @@ void	tq_query_init(zbx_tq_query_t *query)
 	query->evaltype		= ZBX_TQ_EVAL_TYPE_UNKNOWN;
 	query->formula		= NULL;
 	zbx_vector_tq_condition_create(&query->conditions);
-	query->time_shift	= ZBX_TQ_TIME_INTERVAL_INVALID;
-	query->loopback_limit	= ZBX_TQ_TIME_INTERVAL_INVALID;
-	query->aggregation_size	= ZBX_TQ_TIME_INTERVAL_INVALID;
+	query->time_shift	= TQ_TIME_INTERVAL_INVALID;
+	query->loopback_limit	= TQ_TIME_INTERVAL_INVALID;
+	query->aggregation_size	= TQ_TIME_INTERVAL_INVALID;
 }
 
 void	tq_column_init(zbx_tq_column_t *column)

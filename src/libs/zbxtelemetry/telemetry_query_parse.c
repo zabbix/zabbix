@@ -507,14 +507,23 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query)
 
 	/* TODO: expand macros */
 
-	if (NULL == time_shift || FAIL == zbx_is_time_suffix(time_shift, &query->time_shift, ZBX_LENGTH_UNLIMITED))
-		goto out;
-	if (NULL == loopback_limit ||
-			FAIL == zbx_is_time_suffix(loopback_limit, &query->loopback_limit, ZBX_LENGTH_UNLIMITED))
-		goto out;
-	if (NULL == aggregation_size ||
-			FAIL == zbx_is_time_suffix(aggregation_size, &query->aggregation_size, ZBX_LENGTH_UNLIMITED))
-		goto out;
+	if (NULL != time_shift)
+	{
+		if (FAIL == zbx_is_time_suffix(time_shift, &query->time_shift, ZBX_LENGTH_UNLIMITED))
+			goto out;
+	}
+
+	if (NULL != loopback_limit)
+	{
+		if (FAIL == zbx_is_time_suffix(loopback_limit, &query->loopback_limit, ZBX_LENGTH_UNLIMITED))
+			goto out;
+	}
+
+	if (NULL != aggregation_size)
+	{
+		if (FAIL == zbx_is_time_suffix(aggregation_size, &query->aggregation_size, ZBX_LENGTH_UNLIMITED))
+			goto out;
+	}
 
 	ret = SUCCEED;
 out:
@@ -661,6 +670,13 @@ static int	tq_validate_query(const zbx_tq_query_t *query)
 				return FAIL;
 		}
 	}
+
+	if (TQ_TIME_INTERVAL_INVALID == query->time_shift)
+		return FAIL;
+	if (TQ_TIME_INTERVAL_INVALID == query->loopback_limit)
+		return FAIL;
+	if (TQ_TIME_INTERVAL_INVALID == query->aggregation_size)
+		return FAIL;
 
 	if (0 > query->aggregation_size || 0 > query->loopback_limit || 0 > query->time_shift)
 		return FAIL;

@@ -17,6 +17,8 @@
 
 #include "zbxtelemetry.h"
 
+#define TQ_TIME_INTERVAL_INVALID -1
+
 void	tq_query_init(zbx_tq_query_t *query);
 void	tq_column_init(zbx_tq_column_t *column);
 void	tq_column_clean(zbx_tq_column_t *column);
