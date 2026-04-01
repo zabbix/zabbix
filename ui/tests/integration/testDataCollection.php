@@ -170,7 +170,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 		sleep(5);
-		
+
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],
 			'hostids' => self::$hostids['agent'],
