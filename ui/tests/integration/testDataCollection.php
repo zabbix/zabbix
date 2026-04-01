@@ -475,7 +475,7 @@ class testDataCollection extends CIntegrationTest {
 
 	/**
 	 * Test if both active and passive agent checks are processed.
-	 * @suite-components-reuse true
+	 *
 	 * @required-components server, proxy, agent
 	 * @configurationDataProvider proxyConfigurationProvider
 	 * @hosts proxy_agent
@@ -531,6 +531,8 @@ class testDataCollection extends CIntegrationTest {
 
 	/**
 	 * Test incremental pre-processing manager cache refresh.
+	 *
+	 * @required-components server
 	 */
 	public function testDataCollection_preprocManagerCacheRefresh() {
 		$response = $this->call('host.create', [
@@ -585,8 +587,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(100, $response['result'][0]['value']);
-		$prev_clock = $response['result'][0]['clock'];
-
+		
 		$response = $this->call('item.update', [
 			'itemid' => $itemid,
 			'preprocessing' => [[
