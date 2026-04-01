@@ -226,7 +226,7 @@ class testHousekeeping extends CAPITest {
 			['hk_events_autoreg', '999'],
 
 			// compress_older: negative value.
-			['compress_older', '-100'],
+			['compress_older', '-100']
 		];
 	}
 
