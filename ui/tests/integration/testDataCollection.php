@@ -607,10 +607,11 @@ class testDataCollection extends CIntegrationTest {
 		$result = $this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER, null, $t);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
+			'sortfield' => ['clock', 'ns'],
 			'sortorder' => 'DESC',
-			'limit' => 2,
+			'limit' => 1,
 			'itemids' => [$itemid],
+			'time_from' => $t,
 		], 60, 1, function($response) {
 			return count($response['result']) === 2;
 		});
