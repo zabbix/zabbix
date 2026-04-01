@@ -49,7 +49,7 @@ zbx_host_tag_op_t;
  * Purpose: selects hostid of discovered host                                 *
  *                                                                            *
  * Parameters: event          - [IN] source event data                        *
- *             h              - [IN/OUT] event host data                      *
+ *             h              - [IN/OUT] host where event occurred            *
  *                                                                            *
  * Return value: hostid - existing hostid,                                    *
  *                    0 - if not found                                        *
@@ -233,7 +233,7 @@ static unsigned char	get_host_monitored_by(zbx_uint64_t src_proxyid, zbx_uint64_
  *                                                                            *
  * Parameters: event          - [IN] source event                             *
  *             cfg            - [IN] global configuration data                *
- *             h              - [IN/OUT] event host data                      *
+ *             h              - [IN/OUT] host where event occurred            *
  *                                                                            *
  * Return value: hostid - new/existing hostid                                 *
  *                                                                            *
@@ -1041,7 +1041,7 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
  *             cfg             - [IN] global configuration data               *
- *             h               - [IN/OUT] source event host data              *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_op_host_t *h)
@@ -1061,7 +1061,7 @@ out:
  * Purpose: deletes host                                                      *
  *                                                                            *
  * Parameters: event - [IN] source event data                                 *
- *             h     - [IN/OUT] event host data                               *
+ *             h     - [IN/OUT] host where event occurred                     *
  *                                                                            *
  ******************************************************************************/
 void	op_host_del(const zbx_db_event *event, zbx_op_host_t *h)
@@ -1106,7 +1106,7 @@ out:
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
  *             cfg             - [IN] global configuration data               *
- *             h               - [IN/OUT] event host data                     *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_op_host_t *h)
@@ -1139,7 +1139,7 @@ out:
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
  *             cfg             - [IN] global configuration data               *
- *             h               - [IN/OUT] event host data                     *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_op_host_t *h)
@@ -1195,7 +1195,7 @@ out:
  *             cfg             - [IN] global configuration data               *
  *             inventory_mode  - [IN] new inventory mode, see                 *
  *                                   HOST_INVENTORY_ defines                  *
- *             h               - [IN/OUT] event host data                     *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  * Comments: This function does not allow disabling host inventory - only     *
  *           setting manual or automatic host inventory mode is supported.    *
@@ -1223,7 +1223,7 @@ out:
  * Parameters: event           - [IN] source event data                       *
  *             cfg             - [IN] global configuration data               *
  *             groupids        - [IN] IDs of groups to add                    *
- *             h               - [IN/OUT] event host data                     *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_groups_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids, zbx_op_host_t *h)
@@ -1247,7 +1247,7 @@ out:
  *                                                                            *
  * Parameters: event    - [IN] source event data                              *
  *             groupids - [IN] IDs of groups to delete                        *
- *             h        - [IN/OUT] event host data                            *
+ *             h        - [IN/OUT] host where event occurred                  *
  *                                                                            *
  ******************************************************************************/
 void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids, zbx_op_host_t *h)
@@ -1343,7 +1343,7 @@ out:
  * Parameters: event           - [IN] source event data                       *
  *             cfg             - [IN] global configuration data               *
  *             lnk_templateids - [IN] array of template IDs                   *
-*              h               - [IN/OUT] event host data                     *
+*              h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids,
@@ -1375,7 +1375,7 @@ out:
  *                                                                            *
  * Parameters: event           - [IN] source event data                       *
  *             del_templateids - [IN] array of template IDs                   *
- *             h               - [IN/OUT] event host data                     *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids, zbx_op_host_t *h)
@@ -1409,7 +1409,7 @@ out:
  *             cfg             - [IN] global configuration data               *
  *             new_optagids    - [IN] IDs of tags to add                      *
  *             del_optagids    - [IN] IDs of tags to delete                   *
- *             h               - [IN/OUT] event host data                     *
+ *             h               - [IN/OUT] host where event occurred           *
  *                                                                            *
  ******************************************************************************/
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
