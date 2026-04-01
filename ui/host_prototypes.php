@@ -101,6 +101,7 @@ if (getRequest('parent_discoveryid')) {
 		]);
 		$hostPrototype = reset($hostPrototype);
 		if (!$hostPrototype) {
+			zbx_add_post_js("history.replaceState({}, '');");
 			access_deny();
 		}
 	}

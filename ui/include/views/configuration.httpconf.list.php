@@ -209,7 +209,6 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addCsrfToken($csrf_token)
@@ -261,6 +260,8 @@ $httpForm->addItem([$httpTable, new CActionButtonList('action', 'group_httptesti
 $html_page
 	->addItem($httpForm)
 	->show();
+
+zbx_add_post_js("history.replaceState({}, '');");
 
 (new CScriptTag('
 	view.init('.json_encode([
