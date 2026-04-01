@@ -26,6 +26,7 @@ typedef struct
 #define HOST_STATUS_UNKNOWN	-1
 #define HOST_STATUS_FAILED	-2
 	int		status;
+	char		*name;
 }
 zbx_op_host_t;
 

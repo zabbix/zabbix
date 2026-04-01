@@ -2683,6 +2683,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 
 	ophost.hostid = 0;
 	ophost.status = HOST_STATUS_UNKNOWN;
+	ophost.name = NULL;
 
 	zbx_vector_uint64_create(&lnk_templateids);
 	zbx_vector_uint64_create(&del_templateids);
@@ -2833,9 +2834,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	}
 
 	if (0 != new_optagids.values_num || 0 != del_optagids.values_num)
-	{
 		op_add_del_tags(event, &cfg,  &new_optagids, &del_optagids, &ophost);
-	}
 
 	zbx_config_clean(&cfg);
 
@@ -2847,6 +2846,8 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 	zbx_vector_uint64_destroy(&del_optagids);
 
 	zbx_audit_flush(zbx_map_db_event_to_audit_context(event));
+
+	zbx_free(ophost.name);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
