@@ -262,7 +262,7 @@ class testProxyHa extends CIntegrationTest {
 		}
 
 		$this->startComponent(self::COMPONENT_PROXY);
-		$px_logline = 'Proxy "' . $this->getConfigurationValue(self::COMPONENT_PROXY, 'Hostname') . '" changed state from offline to online';
+		$px_logline = 'proxy "' . $this->getConfigurationValue(self::COMPONENT_PROXY, 'Hostname') . '" changed state from offline to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $px_logline, true, 90, 1, true);
 
 		$assign_logline = 're-assigned hostid ' . $monitored_host['hostid'] . ' to proxyid ' . $monitored_host['initial_proxyid'];
@@ -543,7 +543,7 @@ HEREDOC;
 
 		$this->startComponent(self::COMPONENT_PROXY_HANODE1);
 
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$pg_logline = 'proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, false, 90, 1, true);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'assigned hostid', false, 90, 1);
@@ -671,7 +671,7 @@ HEREDOC;
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_PROXY);
 
-		$pg_logline = 'Proxy group "Proxy group X" changed state from \b[a-z]+\b to online';
+		$pg_logline = 'proxy group "Proxy group X" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$this->sendSenderValue('host3', 'trap', 333);
