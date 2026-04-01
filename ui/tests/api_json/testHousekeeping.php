@@ -114,9 +114,6 @@ class testHousekeeping extends CAPITest {
 	/**
 	 * Verify boundary values.
 	 */
-/**
- * Verify boundary values.
- */
 	public function testHousekeeping_BoundaryValues() {
 		// compress_older minimum valid value (604800 seconds = 7 days).
 		$this->call('housekeeping.update', ['compress_older' => '604800']);
