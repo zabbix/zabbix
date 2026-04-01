@@ -924,7 +924,7 @@ class testPageHosts extends CLegacyWebTest {
 			['Host for tags filtering - clone', 'Host for tags filtering - update']
 		];
 
-		// Delete sinlge/multiple hosts.
+		// Delete single/multiple hosts.
 		foreach ($delete_hosts as $selection) {
 			$host_count = count($selection);
 			$this->selectTableRows($selection);
