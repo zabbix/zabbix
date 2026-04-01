@@ -170,7 +170,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 		sleep(5);
-
+		
 		$data = $this->call('hostinterface.get', [
 			'output' => ['available'],
 			'hostids' => self::$hostids['agent'],
@@ -612,9 +612,7 @@ class testDataCollection extends CIntegrationTest {
 			'limit' => 1,
 			'itemids' => [$itemid],
 			'time_from' => $t,
-		], 60, 1, function($response) {
-			return count($response['result']) === 2;
-		});
+		], 60, 1);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(400, $response['result'][0]['value'], json_encode($response)." result:".json_encode($result)." time:".date("U", $t));
