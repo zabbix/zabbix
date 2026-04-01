@@ -87,7 +87,7 @@ class testScriptItems extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 		$itemid = $response['result']['itemids'][0];
 
-		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "[ BADGER X ] Debug auth: \"".self::MACRO_PASSWORD_VALUE_ESCAPED, true, 60, 1);
 	}
 }

@@ -703,7 +703,7 @@ class testBinaryAndJSONValueTypesDataCollection extends CIntegrationTest {
 			'resuming Zabbix agent checks on host "agent": connection restored'
 		]);
 
-		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Retrieve history data from API as soon it is available.
 		// image
