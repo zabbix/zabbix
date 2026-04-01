@@ -123,6 +123,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #0.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => false
@@ -138,6 +139,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #1.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
@@ -153,6 +155,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #2.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => false,
@@ -170,6 +173,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #3.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -186,6 +190,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #4.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -203,6 +208,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #5.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -218,6 +224,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #6.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -235,6 +242,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #7.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -251,6 +259,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #8.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -268,6 +277,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #9.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -284,6 +294,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #10.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => false,
@@ -301,6 +312,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #11.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -317,6 +329,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #12.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -334,6 +347,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #13.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -351,6 +365,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #14.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -367,6 +382,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #15.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -383,6 +399,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #16.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -399,6 +416,7 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #17.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => false,
@@ -422,7 +440,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '`!@#$%^&*()_+|'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #19.
@@ -435,7 +455,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => 'test'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #20.
@@ -447,7 +469,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => ' '
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #21.
@@ -460,7 +484,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '¯\_(ツ)_/¯'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #22.
@@ -472,7 +498,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '0s'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #23.
@@ -485,7 +513,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1s'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #24.
@@ -497,7 +527,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1m'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #25.
@@ -510,7 +542,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1439m'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #26.
@@ -522,7 +556,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13140001m'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #27.
@@ -535,7 +571,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1h'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #28.
@@ -547,7 +585,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '219001h'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #29.
@@ -560,7 +600,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86399s'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #30.
@@ -572,7 +614,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400001s'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #31.
@@ -585,7 +629,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '9126d'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #32.
@@ -597,7 +643,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1304w'
 					],
-					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'Data storage period' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
+					]
 				]
 			],
 			// #33.
@@ -610,7 +658,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '-1s'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #34.
@@ -622,7 +672,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '-1d'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #35.
@@ -635,7 +687,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '-1w'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #36.
@@ -647,7 +701,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => 'null'
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #37.
@@ -660,7 +716,9 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 						'Enable internal housekeeping' => true,
 						'Data storage period' => ''
 					],
-					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
+					'inline_errors' => [
+						'Data storage period' => 'This field cannot be empty.'
+					]
 				]
 			]
 		];

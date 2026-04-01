@@ -24,7 +24,7 @@ require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=gui.edit';
-	public $form_selector = 'xpath://form[contains(@action, "gui.update")]';
+	public $form_selector = 'id:gui-form';
 
 	public $default_values = [
 		'Default language' => 'English (en_US)',
@@ -118,6 +118,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #0 Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Default language' => 'English (en_US)',
 						'Default time zone' => 'UTC',
@@ -151,6 +152,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #1 In period fields minimal valid time in seconds without 's'.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Working time' => '1-5,09:00-18:00;5-7,12:00-16:00',
 						'Max history display period' => '86400',
@@ -168,6 +170,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #2 In period fields minimal valid time in minutes.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '1440m',
 						'Time filter default period' => '1m',
@@ -183,6 +186,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #3 In period fields minimal valid time in hours.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '24h',
 						'Max period for time selector' => '8760h'
@@ -196,6 +200,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #4 In period fields minimal valid time in days.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '1d',
 						'Max period for time selector' => '365d'
@@ -209,6 +214,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #5 In period fields minimal valid time in weeks.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max period for time selector' => '53w'
 					],
@@ -220,6 +226,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #6 In period fields minimal valid time in Months.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max period for time selector' => '13M'
 					],
@@ -231,6 +238,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #7 In period fields minimal valid time in years.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max period for time selector' => '1y'
 					],
@@ -242,6 +250,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #8 In period fields maximal valid time in seconds with 's'.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '604800s',
 						'Time filter default period' => '315360000s',
@@ -257,6 +266,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #9 In period fields maximal valid time in seconds without 's'.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Default time zone' => 'System',
 						'Default theme' => 'High-contrast dark',
@@ -276,6 +286,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #10 In period fields maximal valid time in minutes.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '10080m',
 						'Time filter default period' => '5256000m',
@@ -291,6 +302,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #11 In period fields maximal valid time in days.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '7d',
 						'Time filter default period' => '3650d',
@@ -306,6 +318,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #12 In period fields maximal valid time in weeks.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '1w',
 						'Time filter default period' => '521w',
@@ -321,6 +334,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #13 In period fields maximal valid time in Months.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Time filter default period' => '121M',
 						'Max period for time selector' => '121M'
@@ -334,6 +348,7 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #14 Maximal valid values. In period fields time in years.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Default time zone' => 'Pacific/Kiritimati',
 						'Default theme' => 'High-contrast light',
@@ -369,14 +384,14 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0',
 						'Max period for time selector' => '0'
 					],
-					'details' => [
-						'Incorrect value for field "search_limit": value must be no less than "1".',
-						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "max_in_table": value must be no less than "1".',
-						'Incorrect value for field "work_period": a time period is expected.',
-						'Incorrect value for field "history_period": value must be one of 86400-604800.',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Limit for search and filter results' => 'This value must be no less than "1".',
+						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Working time' => 'Invalid time period.',
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -389,10 +404,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0s',
 						'Max period for time selector' => '0s'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800.',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -409,14 +424,14 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '',
 						'Max period for time selector' => ''
 					],
-					'details' => [
-						'Incorrect value for field "search_limit": value must be no less than "1".',
-						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "max_in_table": value must be no less than "1".',
-						'Incorrect value for field "work_period": a time period is expected.',
-						'Incorrect value for field "history_period": a time unit is expected.',
-						'Incorrect value for field "period_default": a time unit is expected.',
-						'Incorrect value for field "max_period": a time unit is expected.'
+					'inline_errors' => [
+						'Limit for search and filter results' => 'This value must be no less than "1".',
+						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Working time' => 'This field cannot be empty.',
+						'Max history display period' => 'This field cannot be empty.',
+						'Time filter default period' => 'This field cannot be empty.',
+						'Max period for time selector' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -433,14 +448,14 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => 'text',
 						'Max period for time selector' => 'text'
 					],
-					'details' => [
-						'Incorrect value for field "search_limit": value must be no less than "1".',
-						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "max_in_table": value must be no less than "1".',
-						'Incorrect value for field "work_period": a time period is expected.',
-						'Incorrect value for field "history_period": a time unit is expected.',
-						'Incorrect value for field "period_default": a time unit is expected.',
-						'Incorrect value for field "max_period": a time unit is expected.'
+					'inline_errors' => [
+						'Limit for search and filter results' => 'This value must be no less than "1".',
+						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Working time' => 'Invalid time period.',
+						'Max history display period' => 'A time unit is expected.',
+						'Time filter default period' => 'A time unit is expected.',
+						'Max period for time selector' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -457,14 +472,14 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '!@#$%^&*()_+',
 						'Max period for time selector' => '!@#$%^&*()_+'
 					],
-					'details' => [
-						'Incorrect value for field "search_limit": value must be no less than "1".',
-						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "max_in_table": value must be no less than "1".',
-						'Incorrect value for field "work_period": a time period is expected.',
-						'Incorrect value for field "history_period": a time unit is expected.',
-						'Incorrect value for field "period_default": a time unit is expected.',
-						'Incorrect value for field "max_period": a time unit is expected.'
+					'inline_errors' => [
+						'Limit for search and filter results' => 'This value must be no less than "1".',
+						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max count of elements to show inside table cell' => 'This value must be no less than "1".',
+						'Working time' => 'Invalid time period.',
+						'Max history display period' => 'A time unit is expected.',
+						'Time filter default period' => 'A time unit is expected.',
+						'Max period for time selector' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -478,11 +493,11 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '59s',
 						'Max period for time selector' => '31535999s'
 					],
-					'details' => [
-						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -495,10 +510,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '59',
 						'Max period for time selector' => '31535999'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -511,10 +526,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0m',
 						'Max period for time selector' => '525599m'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -527,10 +542,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0h',
 						'Max period for time selector' => '8759h'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -543,10 +558,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0w',
 						'Max period for time selector' => '52w'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -559,10 +574,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0M',
 						'Max period for time selector' => '12M'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": a time unit is expected.',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'A time unit is expected.',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -574,9 +589,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '0y',
 						'Max period for time selector' => '0y'
 					],
-					'details' => [
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -589,10 +604,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '315360001',
 						'Max period for time selector' => '315360001'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -605,10 +620,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '315360001s',
 						'Max period for time selector' => '315360001s'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -621,10 +636,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '5256001m',
 						'Max period for time selector' => '5256001m'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -637,10 +652,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '87601h',
 						'Max period for time selector' => '87601h'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -653,10 +668,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '3651d',
 						'Max period for time selector' => '3651d'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -669,10 +684,10 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '522w',
 						'Max period for time selector' => '522w'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -684,9 +699,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '122M',
 						'Max period for time selector' => '122M'
 					],
-					'details' => [
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -698,9 +713,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '11y',
 						'Max period for time selector' => '11y'
 					],
-					'details' => [
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
@@ -713,14 +728,15 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '99999999999999999999999999999999',
 						'Max period for time selector' => '99999999999999999999999999999999'
 					],
-					'details' => [
-						'Incorrect value for field "history_period": value must be one of 86400-604800',
-						'Incorrect value for field "period_default": value must be one of 60-315360000.',
-						'Incorrect value for field "max_period": value must be one of 31536000-315360000.'
+					'inline_errors' => [
+						'Max history display period' => 'Value must be between 86400s (1d) and 604800s (7d).',
+						'Time filter default period' => 'Value must be between 60s (1m) and 315360000s (10y).',
+						'Max period for time selector' => 'Value must be between 31536000s (1y) and 315360000s (10y).'
 					]
 				]
 			],
 			// #36 Default period value larger than Max period.
+			// TODO: Move this check to inline validation once DEV-4632 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -740,7 +756,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-7 09:00-24:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #38.
@@ -750,7 +768,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '0-7,09:00-24:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #39.
@@ -760,7 +780,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-5,09:00-18:00,6-7,10:00-16:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #40.
@@ -770,7 +792,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-8,09:00-24:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #41.
@@ -780,7 +804,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-7,09:00-25:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #42.
@@ -790,7 +816,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-7,24:00-00:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #43.
@@ -800,7 +828,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-7,14:00-13:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #44.
@@ -810,7 +840,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-7,25:00-26:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #45.
@@ -820,7 +852,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-7,13:60-14:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #46.
@@ -830,7 +864,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '1-0'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #47.
@@ -840,7 +876,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '09:00-24:00'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #48.
@@ -850,7 +888,9 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 					'fields' => [
 						'Working time' => '{WORKING_HOURS}'
 					],
-					'details' => 'Incorrect value for field "work_period": a time period is expected.'
+					'inline_errors' => [
+						'Working time' => 'Invalid time period.'
+					]
 				]
 			],
 			// #49 Negative values.
@@ -866,18 +906,19 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 						'Time filter default period' => '-1',
 						'Max period for time selector' => '-1'
 					],
-					'details' => [
-						'Incorrect value for field "max_overview_table_size": value must be no less than "5".',
-						'Incorrect value for field "work_period": a time period is expected.',
-						'Incorrect value for field "history_period": a time unit is expected.',
-						'Incorrect value for field "period_default": a time unit is expected.',
-						'Incorrect value for field "max_period": a time unit is expected.'
+					'inline_errors' => [
+						'Max number of columns and rows in overview tables' => 'This value must be no less than "5".',
+						'Working time' => 'Invalid time period.',
+						'Max history display period' => 'A time unit is expected.',
+						'Time filter default period' => 'A time unit is expected.',
+						'Max period for time selector' => 'A time unit is expected.'
 					]
 				]
 			],
 			// #50 Trimming spaces.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'trim' => true,
 					'fields' => [
 						'Limit for search and filter results' => ' 50  ',

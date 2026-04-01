@@ -22,7 +22,7 @@ require_once __DIR__.'/../common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=trigdisplay.edit';
-	public $form_selector = 'xpath://form[contains(@action, "trigdisplay.update")]';
+	public $form_selector = 'id:trigdisplay-form';
 
 	public $default_values = [
 		'Use custom event status colours' => false,
@@ -211,6 +211,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #0 All valid custom values, checked checkboxes, custom colors.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Use custom event status colours' => true,
 						'Unacknowledged PROBLEM events' => true,
@@ -266,6 +267,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #1 Unchecked checkboxes.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Use custom event status colours' => false,
 						'Unacknowledged PROBLEM events' => false,
@@ -285,6 +287,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #2 Zeros in custom colors.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => '000000',
@@ -316,6 +319,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #3 Letters in custom colors.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => 'AAAAAA',
@@ -347,6 +351,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #4 Maximal valid values.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Use custom event status colours' => true,
 						'Not classified' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
@@ -390,6 +395,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #5 Valid zero values in time in period fields without "s".
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '0',
 						'On status change triggers blink for' => '0'
@@ -403,6 +409,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #6 Valid zero values in time in period fields with "s".
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '0s',
 						'On status change triggers blink for' => '0s'
@@ -416,6 +423,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #7 Valid zero values in minutes.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '0m',
 						'On status change triggers blink for' => '0m'
@@ -429,6 +437,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #8 Valid zero values in hours.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '0h',
 						'On status change triggers blink for' => '0h'
@@ -442,6 +451,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #9 Valid zero values in days.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '0d',
 						'On status change triggers blink for' => '0d'
@@ -455,6 +465,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #10 Valid zero values in weeks.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '0w',
 						'On status change triggers blink for' => '0w'
@@ -468,6 +479,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #11 Valid maximum values in period fields in seconds without "s".
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '86400',
 						'On status change triggers blink for' => '86400'
@@ -481,6 +493,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #12 Valid maximum values in period fields in seconds with "s".
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '86400s',
 						'On status change triggers blink for' => '86400s'
@@ -494,6 +507,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #13 Valid maximum values in period fields with in minutes.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '1440m',
 						'On status change triggers blink for' => '1440m'
@@ -507,6 +521,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #14 Valid maximum values in period fields with in hours.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '24h',
 						'On status change triggers blink for' => '24h'
@@ -520,6 +535,7 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 			// #15 Valid maximum values in period fields with in days.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'fields' => [
 						'Display OK triggers for' => '1d',
 						'On status change triggers blink for' => '1d'
@@ -538,9 +554,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '0M',
 						'On status change triggers blink for' => '0M'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'A time unit is expected.',
+						'On status change triggers blink for' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -552,9 +568,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '0y',
 						'On status change triggers blink for' => '0y'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'A time unit is expected.',
+						'On status change triggers blink for' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -566,9 +582,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '86401',
 						'On status change triggers blink for' => '86401'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": value must be one of 0-86400.',
-						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'Value must be between 0 and 86400s (1d).',
+						'On status change triggers blink for' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -580,9 +596,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '86401s',
 						'On status change triggers blink for' => '86401s'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": value must be one of 0-86400.',
-						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'Value must be between 0 and 86400s (1d).',
+						'On status change triggers blink for' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -594,9 +610,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '1441m',
 						'On status change triggers blink for' => '1441m'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": value must be one of 0-86400.',
-						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'Value must be between 0 and 86400s (1d).',
+						'On status change triggers blink for' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -608,9 +624,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '25h',
 						'On status change triggers blink for' => '25h'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": value must be one of 0-86400.',
-						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'Value must be between 0 and 86400s (1d).',
+						'On status change triggers blink for' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -622,9 +638,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '2d',
 						'On status change triggers blink for' => '2d'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": value must be one of 0-86400.',
-						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'Value must be between 0 and 86400s (1d).',
+						'On status change triggers blink for' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -636,9 +652,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '99999999999999999999999999999999',
 						'On status change triggers blink for' => '99999999999999999999999999999999'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": value must be one of 0-86400.',
-						'Incorrect value for field "blink_period": value must be one of 0-86400.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'Value must be between 0 and 86400s (1d).',
+						'On status change triggers blink for' => 'Value must be between 0 and 86400s (1d).'
 					]
 				]
 			],
@@ -650,9 +666,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'A time unit is expected.',
+						'On status change triggers blink for' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -664,9 +680,9 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '!@#$%^&*()_+',
 						'On status change triggers blink for' => '!@#$%^&*()_+'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'A time unit is expected.',
+						'On status change triggers blink for' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -684,15 +700,15 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'High' => '',
 						'Disaster' => ''
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.',
-						'Incorrect value for field "severity_name_0": cannot be empty.',
-						'Incorrect value for field "severity_name_1": cannot be empty.',
-						'Incorrect value for field "severity_name_2": cannot be empty.',
-						'Incorrect value for field "severity_name_3": cannot be empty.',
-						'Incorrect value for field "severity_name_4": cannot be empty.',
-						'Incorrect value for field "severity_name_5": cannot be empty.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'This field cannot be empty.',
+						'On status change triggers blink for' => 'This field cannot be empty.',
+						'Not classified' => 'This field cannot be empty.',
+						'Information' => 'This field cannot be empty.',
+						'Warning' => 'This field cannot be empty.',
+						'Average' => 'This field cannot be empty.',
+						'High' => 'This field cannot be empty.',
+						'Disaster' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -704,15 +720,16 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Display OK triggers for' => '-1',
 						'On status change triggers blink for' => '-1'
 					],
-					'details' => [
-						'Incorrect value for field "ok_period": a time unit is expected.',
-						'Incorrect value for field "blink_period": a time unit is expected.'
+					'inline_errors' => [
+						'Display OK triggers for' => 'A time unit is expected.',
+						'On status change triggers blink for' => 'A time unit is expected.'
 					]
 				]
 			],
 			// #28 Trimming spaces.
 			[
 				[
+					'expected' => TEST_GOOD,
 					'trim' => true,
 					'fields' => [
 						'Display OK triggers for' => '   25m   ',
