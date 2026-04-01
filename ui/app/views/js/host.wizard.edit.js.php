@@ -2242,6 +2242,9 @@ window.host_wizard_edit = new class {
 
 			if (field.parentElement.classList.contains(ZBX_STYLE_FORM_FIELD)) {
 				field.parentNode.insertBefore(message_element, field.nextSibling);
+			}
+			else if (field.parentElement.parentElement.classList.contains('macro-input-group')) {
+				field.parentElement.parentElement.parentNode.insertBefore(message_element, field.nextSibling);
 			} else {
 				field.parentElement.parentNode.insertBefore(message_element, field.parentElement.nextSibling);
 			}
