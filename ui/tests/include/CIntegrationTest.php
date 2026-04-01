@@ -29,7 +29,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
-	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN_MS	= 100;
 	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3;
 	const HOUSEKEEPER_EXEC_DELAY			= 5;
@@ -450,7 +450,7 @@ class CIntegrationTest extends CAPITest {
 				return true;
 			}
 
-			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
+			usleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN_MS);
 		}
 
 		return false;
