@@ -85,10 +85,10 @@
 			this.datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
-						.setContextPopupData({
+						.setColumnOptions({
 							show_timeline: '1'
 						})
-						.setContextPopupHandler('time')
+						.setOptionsPopupHandler('time')
 						.setFields(['clock', 'eventid', 'objectid'])
 						.setRenderer('time')
 						.setSortField('clock')
@@ -108,12 +108,12 @@
 						.setRenderer('host')
 						.setSortable(true),
 					new CDataTableColumn('problem', <?= json_encode(_('Problem')); ?>)
-						.setContextPopupData({
+						.setColumnOptions({
 							show_opdata: '0',
 							details: '0',
 							show_suppressed: '0'
 						})
-						.setContextPopupHandler('problem')
+						.setOptionsPopupHandler('problem')
 						.setFields(['description'])
 						.setSortField('name')
 						.setSortable(true)
@@ -161,7 +161,7 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
-				.setStickyHeaders(true)
+				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer(CDataTableColumn.CHECKBOX, ({column_config, column_data, row_index, cell, cell_inner}) => {
 					const [eventid, nested, symptom_count, cause_eventid, severity] = column_data;
@@ -195,7 +195,7 @@
 
 					const filter = this.datatable.getFilter();
 					const show_symptoms = filter.show_symptoms == 1;
-					const {show_two_columns, show_three_columns} = this.datatable.getDataProvider().getLastResponse();
+					const {show_two_columns, show_three_columns} = this.datatable.getData();
 
 					if (show_two_columns || show_three_columns) {
 						const symptoms = document.createElement('div');
@@ -278,9 +278,9 @@
 					}
 
 					const compact_view = this.datatable.getOption('compact_view');
-					const context_popup_data = column_config.getContextPopupData();
+					const column_options = column_config.getColumnOptions();
 
-					if (context_popup_data.show_timeline == 1 && !compact_view.checked
+					if (column_options.show_timeline == 1 && !compact_view.checked
 							&& this.datatable.getSortField() == 'clock') {
 
 						const axis = document.createElement('div');
@@ -307,9 +307,9 @@
 					cell_inner.appendChild(timeline);
 
 					const compact_view = this.datatable.getOption('compact_view');
-					const context_popup_data = column_config.getContextPopupData();
+					const column_options = column_config.getColumnOptions();
 
-					if (context_popup_data.show_timeline == 1 && !compact_view.checked) {
+					if (column_options.show_timeline == 1 && !compact_view.checked) {
 						const axis = document.createElement('div');
 						axis.classList.add('timeline-axis', 'timeline-dot-big');
 
@@ -393,7 +393,7 @@
 						return;
 					}
 
-					const {allowed} = this.datatable.getDataProvider().getLastResponse();
+					const {allowed} = this.datatable.getData();
 
 					if (!allowed) {
 						return;
@@ -438,7 +438,7 @@
 					cell_inner.appendChild(paging_container);
 				})
 				.setRowRenderer('default', ({columns, row, row_index, row_data}) => {
-					const {show_two_columns, show_three_columns} = this.datatable.getDataProvider().getLastResponse();
+					const {show_two_columns, show_three_columns} = this.datatable.getData();
 					const column_config = this.datatable.getCheckboxColumnConfig();
 
 					if (show_three_columns) {
@@ -549,10 +549,10 @@
 
 					row.append(...data_cells);
 				})
-				.setContextPopupHandler('time', 'CDataTableContextPopupMonitoringProblemsTime')
-				.setContextPopupHandler('problem', 'CDataTableContextPopupMonitoringProblemsProblem')
-				.setContextPopupHandler('tags', 'CDataTableContextPopupTags')
-				.setContextPopupHandler('tagvalue', 'CDataTableContextPopupTagValue')
+				.setOptionsHandler('time', 'CDataTableOptionsPopupMonitoringProblemsTime')
+				.setOptionsHandler('problem', 'CDataTableOptionsPopupMonitoringProblemsProblem')
+				.setOptionsHandler('tags', 'CDataTableOptionsPopupTags')
+				.setOptionsHandler('tagvalue', 'CDataTableOptionsPopupTagValue')
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();
 
@@ -571,13 +571,13 @@
 					requestAnimationFrame(() => this.initExpandables());
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.refreshCounters(this.datatable.getDataProvider().getLastResponse());
+					this.refreshCounters(this.datatable.getData());
 
 					requestAnimationFrame(() => this.initExpandables());
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
 				.init(user_configs);
 		},
 

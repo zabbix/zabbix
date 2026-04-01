@@ -13,7 +13,7 @@
 **/
 
 
-class CDataTableContextPopup {
+class CDataTableOptionsPopup {
 
 	static COLUMN_NAME_MAXLENGTH = 32;
 
@@ -24,9 +24,9 @@ class CDataTableContextPopup {
 	static EVENT_UPDATE = 'update';
 	static EVENT_SAVE = 'save';
 
-	static ZBX_STYLE_CONTEXT = 'datatable-context';
-	static ZBX_STYLE_CONTEXT_LINKS = 'datatable-context-links';
-	static ZBX_STYLE_CONTEXT_LINK = 'datatable-context-link';
+	static ZBX_STYLE_OPTIONS_POPUP = 'datatable-options-popup';
+	static ZBX_STYLE_OPTIONS_POPUP_LINKS = 'datatable-options-popup-links';
+	static ZBX_STYLE_OPTIONS_POPUP_LINK = 'datatable-options-popup-link';
 
 	/**
 	 * @type {CDataTable}
@@ -79,12 +79,12 @@ class CDataTableContextPopup {
 	 * @type {Object<string, function>}
 	 */
 	#events = {
-		[CDataTableContextPopup.EVENT_INIT]: this.onInit,
-		[CDataTableContextPopup.EVENT_OPEN]: this.onOpen,
-		[CDataTableContextPopup.EVENT_CLOSE]: this.onClose,
-		[CDataTableContextPopup.EVENT_RESET]: this.onReset,
-		[CDataTableContextPopup.EVENT_UPDATE]: this.onUpdate,
-		[CDataTableContextPopup.EVENT_SAVE]: this.onSave,
+		[CDataTableOptionsPopup.EVENT_INIT]: this.onInit,
+		[CDataTableOptionsPopup.EVENT_OPEN]: this.onOpen,
+		[CDataTableOptionsPopup.EVENT_CLOSE]: this.onClose,
+		[CDataTableOptionsPopup.EVENT_RESET]: this.onReset,
+		[CDataTableOptionsPopup.EVENT_UPDATE]: this.onUpdate,
+		[CDataTableOptionsPopup.EVENT_SAVE]: this.onSave,
 	}
 
 	/**
@@ -104,7 +104,7 @@ class CDataTableContextPopup {
 
 		this.#bindEvents();
 
-		requestAnimationFrame(() => this.dispatchEvent(CDataTableContextPopup.EVENT_INIT));
+		requestAnimationFrame(() => this.dispatchEvent(CDataTableOptionsPopup.EVENT_INIT));
 	}
 
 	/**
@@ -204,16 +204,16 @@ class CDataTableContextPopup {
 	}
 
 	onInit() {
-		const context_popup_data = this.#column_config.getContextPopupData();
+		const column_options = this.#column_config.getColumnOptions();
 
 		this.#fields = this.getFields();
-		this.#data = this.getValidatedData(context_popup_data);
+		this.#data = this.getValidatedData(column_options);
 	}
 
 	onOpen() {
 		const context_links = [];
 
-		this.#element.classList.add(CDataTableContextPopup.ZBX_STYLE_CONTEXT);
+		this.#element.classList.add(CDataTableOptionsPopup.ZBX_STYLE_OPTIONS_POPUP);
 		this.#element.setAttribute('role', 'dialog');
 		this.#element.setAttribute('tabindex', '-1');
 
@@ -247,11 +247,11 @@ class CDataTableContextPopup {
 			const form_input = document.createElement('input');
 			form_input.classList.add(ZBX_STYLE_FORM_FIELD);
 			form_input.setAttribute('type', 'text');
-			form_input.setAttribute('maxlength', CDataTableContextPopup.COLUMN_NAME_MAXLENGTH.toString());
+			form_input.setAttribute('maxlength', CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH.toString());
 			form_input.setAttribute('data-field-type', 'text-box');
 			form_input.value = this.#column_config.getName();
 			form_input.addEventListener('input', event => {
-				const name = event.target.value.substring(0, CDataTableContextPopup.COLUMN_NAME_MAXLENGTH);
+				const name = event.target.value.substring(0, CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH);
 
 				this.#datatable.dispatchEvent(CDataTable.EVENT_COLUMN_RENAME, {column_index, name});
 			});
@@ -275,7 +275,7 @@ class CDataTableContextPopup {
 
 		if (context_links.length > 0) {
 			const popup_links = document.createElement('div');
-			popup_links.classList.add(CDataTableContextPopup.ZBX_STYLE_CONTEXT_LINKS);
+			popup_links.classList.add(CDataTableOptionsPopup.ZBX_STYLE_OPTIONS_POPUP_LINKS);
 
 			for (const context_link of context_links) {
 				popup_links.appendChild(context_link);
@@ -288,9 +288,9 @@ class CDataTableContextPopup {
 		document.addEventListener('keydown', this.onKeyDown);
 
 		this.#element.addEventListener('input', () => {
-			const context_popup_data = this.getValidatedData(this.getFieldData());
+			const column_options = this.getValidatedData(this.getFieldData());
 
-			this.dispatchEvent(CDataTableContextPopup.EVENT_UPDATE, {column_index, context_popup_data});
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options});
 		});
 	}
 
@@ -302,10 +302,10 @@ class CDataTableContextPopup {
 			name: this.#column_name
 		});
 
-		this.#column_config.setContextPopupData(this.#data);
+		this.#column_config.setColumnOptions(this.#data);
 
-		this.dispatchEvent(CDataTableContextPopup.EVENT_SAVE,  {column_index});
-		this.dispatchEvent(CDataTableContextPopup.EVENT_CLOSE);
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE,  {column_index});
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
 	onClose() {
@@ -320,19 +320,22 @@ class CDataTableContextPopup {
 	onSave() {
 		const column_index = this.#column_config.getColumnIndex();
 		const name = this.#column_config.getName();
-		const context_popup_data = this.#column_config.getContextPopupData();
+		const column_options = this.#column_config.getColumnOptions();
 
-		const save = this.#column_name != name || !deepCompare(this.#data, context_popup_data);
+		const save = this.#column_name != name || !deepCompare(this.#data, column_options);
 
-		this.dispatchEvent(CDataTableContextPopup.EVENT_UPDATE, {column_index, context_popup_data, save});
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, save});
 	}
 
 	/**
 	 * @param {string}   event
 	 * @param {function} callback
+	 * @returns {CDataTableOptionsPopup}
 	 */
 	on(event, callback) {
 		this.#element.addEventListener(event, callback.bind(this));
+
+		return this;
 	}
 
 	/**
@@ -362,7 +365,7 @@ class CDataTableContextPopup {
 			this.#element.style.left = `${handle_rect.left - element_rect.left - 1}px`;
 		}
 
-		if (this.#datatable.isStickyHeaders()) {
+		if (this.#datatable.isStickyHeader()) {
 			const top = handle_rect.height + (handle_rect.top == 0 ? wrapper.scrollTop - offset_top : 0) + 2;
 
 			this.#element.style.top = `${top}px`;
@@ -385,8 +388,8 @@ class CDataTableContextPopup {
 			return;
 		}
 
-		this.dispatchEvent(CDataTableContextPopup.EVENT_SAVE);
-		this.dispatchEvent(CDataTableContextPopup.EVENT_CLOSE);
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE);
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
 	/**
@@ -396,15 +399,19 @@ class CDataTableContextPopup {
 	 */
 	onKeyDown = event => {
 		if (event.key == 'Enter') {
-			this.dispatchEvent(CDataTableContextPopup.EVENT_SAVE);
-			this.dispatchEvent(CDataTableContextPopup.EVENT_CLOSE);
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE);
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			this.position();
 		}
 
 		if (event.key == 'Escape') {
-			this.dispatchEvent(CDataTableContextPopup.EVENT_RESET);
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_RESET);
 		}
+	}
+
+	isOpen(handle) {
+		return this.#handle === handle;
 	}
 
 	#addContextLink(label, callback) {
@@ -414,7 +421,7 @@ class CDataTableContextPopup {
 		context_link.addEventListener('click', callback);
 
 		const context_link_container = document.createElement('div');
-		context_link_container.classList.add(CDataTableContextPopup.ZBX_STYLE_CONTEXT_LINK);
+		context_link_container.classList.add(CDataTableOptionsPopup.ZBX_STYLE_OPTIONS_POPUP_LINK);
 		context_link_container.appendChild(context_link);
 
 		return context_link_container;

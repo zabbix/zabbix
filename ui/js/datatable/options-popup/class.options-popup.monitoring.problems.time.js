@@ -13,7 +13,7 @@
 **/
 
 
-class CDataTableContextPopupMonitoringProblemsTime extends CDataTableContextPopup {
+class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopup {
 	getFields() {
 		const show_timeline = this.getElement().querySelector('[name="show_timeline"]');
 
@@ -25,7 +25,7 @@ class CDataTableContextPopupMonitoringProblemsTime extends CDataTableContextPopu
 	}
 
 	getFieldData() {
-		const show_timeline = (this.getField('show_timeline').checked) ? '1' : '0';
+		const show_timeline = this.getField('show_timeline').checked ? '1' : '0';
 
 		return {show_timeline};
 	}
@@ -51,7 +51,7 @@ class CDataTableContextPopupMonitoringProblemsTime extends CDataTableContextPopu
 	onInit() {
 		super.onInit();
 
-		const {show_timeline} = this.getColumnConfig().getContextPopupData();
+		const {show_timeline} = this.getColumnConfig().getColumnOptions();
 		const compact_view = this.getDataTable().getOption('compact_view');
 
 		const show_timeline_field = this.getField('show_timeline');
@@ -60,10 +60,10 @@ class CDataTableContextPopupMonitoringProblemsTime extends CDataTableContextPopu
 		show_timeline_field.addEventListener('input', event => {
 			event.stopPropagation();
 
-			const context_popup_data = this.getColumnConfig().getContextPopupData();
+			const column_options = this.getColumnConfig().getColumnOptions();
 
-			this.getColumnConfig().setContextPopupData({
-				...context_popup_data,
+			this.getColumnConfig().setColumnOptions({
+				...column_options,
 				show_timeline: event.target.checked ? '1' : '0'
 			});
 

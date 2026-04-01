@@ -13,14 +13,14 @@
 **/
 
 
-class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
+class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
-	static ZBX_STYLE_CUSTOMIZE_TABLE = 'datatable-customize';
-	static ZBX_STYLE_CUSTOMIZE_TABLE_HEADER = 'datatable-customize-header';
-	static ZBX_STYLE_CUSTOMIZE_LIST = 'datatable-customize-list';
-	static ZBX_STYLE_CUSTOMIZE_LIST_ITEM = 'datatable-customize-list-item';
-	static ZBX_STYLE_CUSTOMIZE_LIST_ITEM_LABEL = 'datatable-customize-list-item-label';
-	static ZBX_STYLE_CUSTOMIZE_RESET = 'datatable-customize-reset';
+	static ZBX_STYLE_OPTIONS_TABLE = 'datatable-options';
+	static ZBX_STYLE_OPTIONS_TABLE_HEADER = 'datatable-options-header';
+	static ZBX_STYLE_OPTIONS_LIST = 'datatable-options-list';
+	static ZBX_STYLE_OPTIONS_LIST_ITEM = 'datatable-options-list-item';
+	static ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL = 'datatable-options-list-item-label';
+	static ZBX_STYLE_OPTIONS_RESET = 'datatable-options-reset';
 
 	#sortable = null;
 
@@ -30,11 +30,11 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 
 		if (Object.keys(options).length > 0) {
 			const table_options_header = document.createElement('div');
-			table_options_header.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_TABLE_HEADER);
+			table_options_header.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE_HEADER);
 			table_options_header.innerText = t('Table options');
 
 			const table_options = document.createElement('ul');
-			table_options.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST);
+			table_options.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST);
 
 			for (const [id, option] of Object.entries(options)) {
 				const input = document.createElement('input');
@@ -47,7 +47,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 				input.addEventListener('change', event => option.onChange(event, option));
 
 				const label = document.createElement('div');
-				label.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM_LABEL);
+				label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
 				label.innerText = option.name;
 
 				const input_label = document.createElement('label');
@@ -55,7 +55,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 				input_label.append(document.createElement('span'), label);
 
 				const item = document.createElement('li');
-				item.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM);
+				item.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM);
 				item.append(input, input_label);
 
 				table_options.appendChild(item);
@@ -65,12 +65,12 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 		}
 
 		const popup_header = document.createElement('div');
-		popup_header.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_TABLE_HEADER);
+		popup_header.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE_HEADER);
 		popup_header.innerText = t('Column list');
 
 		this.#sortable = document.createElement('ul');
 		this.#sortable.classList.add(
-			CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST,
+			CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST,
 			CSortable.ZBX_STYLE_CLASS
 		);
 
@@ -87,7 +87,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 		});
 
 		const reset = document.createElement('div');
-		reset.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_RESET);
+		reset.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_RESET);
 		reset.appendChild(reset_button);
 
 		template.append(popup_header, this.#sortable, reset);
@@ -95,9 +95,9 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 		this.getDataTable().getColumns()
 			.filter(column_config => column_config.isShowInCustomizeTable())
 			.forEach(column_config => {
-				const customize_table_item = this.#createSortableItem(column_config);
+				const OPTIONS_table_item = this.#createSortableItem(column_config);
 
-				this.#sortable.appendChild(customize_table_item);
+				this.#sortable.appendChild(OPTIONS_table_item);
 			});
 
 		return template;
@@ -106,18 +106,18 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 	onInit() {
 		super.onInit();
 
-		this.getElement().classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_TABLE);
+		this.getElement().classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE);
 	}
 
 	onOpen() {
 		super.onOpen();
 
 		const sortable = new CSortable(this.#sortable, {
-			selector_handle: `.${CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM}`
+			selector_handle: `.${CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM}`
 		})
 			.on(CSortable.EVENT_SORT, event => {
 				const items = sortable.getTarget()
-					.querySelectorAll(`.${CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM}`);
+					.querySelectorAll(`.${CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM}`);
 
 				const {index, index_to} = event.detail;
 
@@ -147,7 +147,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 		});
 
 		const label = document.createElement('div');
-		label.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM_LABEL);
+		label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
 		label.innerText = column_config.getName();
 
 		const input_label = document.createElement('label');
@@ -155,7 +155,7 @@ class CDataTableCustomizeTablePopup extends CDataTableContextPopup {
 		input_label.append(document.createElement('span'), label);
 
 		const item = document.createElement('li');
-		item.classList.add(CDataTableCustomizeTablePopup.ZBX_STYLE_CUSTOMIZE_LIST_ITEM);
+		item.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM);
 		item.setAttribute('data-col', column_index.toString());
 		item.append(icon, input, input_label);
 

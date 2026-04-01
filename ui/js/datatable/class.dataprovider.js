@@ -22,11 +22,4 @@ class CDataProvider {
 	getData(params) {
 		return {};
 	}
-
-	/**
-	 * @returns {Object|null}
-	 */
-	getLastResponse() {
-		return null;
-	}
 }

@@ -13,7 +13,7 @@
 **/
 
 
-class CDataTableContextPopupTags extends CDataTableContextPopup {
+class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
 	static  = null;
 
 	getFields() {

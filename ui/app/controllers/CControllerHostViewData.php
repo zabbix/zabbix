@@ -23,7 +23,7 @@ class CControllerHostViewData extends CControllerDataTable {
 	protected function getData(): array {
 		$columns = $this->getInput('columns');
 		$fields = $this->extractFields($columns);
-		$context_popup_data = array_merge(...array_column($columns, 'context_popup_data'));
+		$column_options = array_merge(...array_column($columns, 'column_options'));
 
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
@@ -122,7 +122,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => ($context_popup_data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
+			'suppressed' => ($column_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
 			'symptom' => false
 		]);
 

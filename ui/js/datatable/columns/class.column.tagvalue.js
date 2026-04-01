@@ -13,33 +13,16 @@
 **/
 
 
-class CDataTableContextPopupTagValue extends CDataTableContextPopup {
+class CDataTableColumnTagValue extends CDataTableColumn {
 
-	getFields() {
-		const tag_name = this.getElement().querySelector('[name="tag_name"]');
+	constructor(id, name) {
+		super(id, name);
 
-		return {tag_name};
-	}
-
-	getTemplate() {
-		return document.querySelector('template#tagvalue');
-	}
-
-	getFieldData() {
-		const tag_name = this.getField('tag_name').value;
-
-		return {tag_name};
-	}
-
-	getDefaultData() {
-		return {tag_name: ''};
-	}
-
-	onInit() {
-		super.onInit();
-
-		const {tag_name} = this.getData();
-
-		this.getField('tag_name').value = tag_name;
+		this.setOptionsPopupHandler('tagvalue')
+			.setDuplicatable(true)
+			.setFields(['tags'])
+			.setRenamable(true)
+			.setRenderer('tagvalue')
+			.setVisible(false);
 	}
 }

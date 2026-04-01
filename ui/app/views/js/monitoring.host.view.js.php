@@ -148,10 +148,10 @@
 						.setFields(['hostid', 'items_count'])
 						.setRenderer('latest_data'),
 					new CDataTableColumn('problems', <?= json_encode(_('Problems')); ?>)
-						.setContextPopupData({
+						.setColumnOptions({
 							show_suppressed: false
 						})
-						.setContextPopupHandler('problems')
+						.setOptionsPopupHandler('problems')
 						.setFields(['problems']),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
@@ -169,7 +169,7 @@
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
 				.setTabFilterItem(this.active_filter)
-				.setStickyHeaders(true)
+				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [hostid, name, status, maintenance] = column_data;
@@ -242,7 +242,7 @@
 				})
 				.setRenderer('latest_data', ({column_data, cell_inner}) => {
 					const [hostid, items_count] = column_data;
-					const {allowed_ui_latest_data} = this.datatable.getDataProvider().getLastResponse();
+					const {allowed_ui_latest_data} = this.datatable.getData();
 
 					if (allowed_ui_latest_data) {
 						const url = new URL('zabbix.php', location.href);
@@ -337,7 +337,7 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setContextPopupHandler('problems', 'CDataTableContextPopupMonitoringHostProblems')
+				.setOptionsHandler('problems', 'CDataTableOptionsPopupMonitoringHostProblems')
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();
 
@@ -353,11 +353,11 @@
 					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.refreshCounters(this.datatable.getDataProvider().getLastResponse());
+					this.refreshCounters(this.datatable.getData());
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
 				.init(user_configs);
 		},
 

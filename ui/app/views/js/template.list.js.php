@@ -144,7 +144,7 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
-				.setStickyHeaders(true)
+				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [templateid, name] = column_data;
@@ -162,7 +162,7 @@
 				})
 				.setRenderer('hosts', ({column_data, cell_inner}) => {
 					const [templateid, editable_hosts] = column_data;
-					const {allowed_ui_conf_hosts} = this.datatable.getDataProvider().getLastResponse();
+					const {allowed_ui_conf_hosts} = this.datatable.getData();
 
 					let items = Object.keys(editable_hosts).length;
 
@@ -328,7 +328,7 @@
 				})
 				.setRenderer('linked_templates', ({column_data, cell_inner}) => {
 					const [parent_templates] = column_data;
-					const {max_in_table} = this.datatable.getDataProvider().getLastResponse();
+					const {max_in_table} = this.datatable.getData();
 					const length = Math.min(max_in_table, parent_templates.length);
 
 					for (let i = 0; i < length; i++) {
@@ -366,7 +366,7 @@
 				})
 				.setRenderer('linked_to_templates', ({column_data, cell_inner}) => {
 					const [templates] = column_data;
-					const {max_in_table} = this.datatable.getDataProvider().getLastResponse();
+					const {max_in_table} = this.datatable.getData();
 					const length = Math.min(max_in_table, templates.length);
 
 					for (let i = 0; i < length; i++) {

@@ -16,7 +16,7 @@
 class CDataTableColumn {
 
 	static CHECKBOX = 'checkbox';
-	static CUSTOMIZE_TABLE = 'customize_table';
+	static TABLE_OPTIONS = 'table_options';
 
 	static RENDERER_HTML = 'html';
 	static RENDERER_TEXT = 'text';
@@ -29,17 +29,17 @@ class CDataTableColumn {
 	/**
 	 * @type {string}
 	 */
-	#context_popup_handle_icon = ZBX_ICON_CONTEXT;
+	#options_popup_handle_icon = ZBX_ICON_CONTEXT;
 
 	/**
 	 * @type {Object}
 	 */
-	#context_popup_data = {};
+	#column_options = {};
 
 	/**
 	 * @type {string|null}
 	 */
-	#context_popup_handler = null;
+	#options_popup_handler = null;
 
 	/**
 	 * @type {CDataTableColumn|null}
@@ -176,16 +176,16 @@ class CDataTableColumn {
 	/**
 	 * @returns {string}
 	 */
-	getContextPopupHandleIcon() {
-		return this.#context_popup_handle_icon;
+	getOptionsPopupHandleIcon() {
+		return this.#options_popup_handle_icon;
 	}
 
 	/**
 	 * @param {string} context_popup_handle_icon
 	 * @returns {CDataTableColumn}
 	 */
-	setContextPopupHandleIcon(context_popup_handle_icon) {
-		this.#context_popup_handle_icon = context_popup_handle_icon;
+	setOptionsPopupHandleIcon(context_popup_handle_icon) {
+		this.#options_popup_handle_icon = context_popup_handle_icon;
 
 		return this;
 	}
@@ -193,16 +193,16 @@ class CDataTableColumn {
 	/**
 	 * @returns {Object}
 	 */
-	getContextPopupData() {
-		return this.#context_popup_data;
+	getColumnOptions() {
+		return this.#column_options;
 	}
 
 	/**
-	 * @param {Object} context_popup_data
+	 * @param {Object} column_options
 	 * @returns {CDataTableColumn}
 	 */
-	setContextPopupData(context_popup_data) {
-		this.#context_popup_data = context_popup_data;
+	setColumnOptions(column_options) {
+		this.#column_options = column_options;
 
 		return this;
 	}
@@ -210,16 +210,16 @@ class CDataTableColumn {
 	/**
 	 * @returns {string|null}
 	 */
-	getContextPopupHandler() {
-		return this.#context_popup_handler;
+	getOptionsPopupHandler() {
+		return this.#options_popup_handler;
 	}
 
 	/**
-	 * @param {string} context_popup_handler
+	 * @param {string} options_popup_handler
 	 * @returns {CDataTableColumn}
 	 */
-	setContextPopupHandler(context_popup_handler) {
-		this.#context_popup_handler = context_popup_handler;
+	setOptionsPopupHandler(options_popup_handler) {
+		this.#options_popup_handler = options_popup_handler;
 
 		return this;
 	}
@@ -635,9 +635,9 @@ class CDataTableColumn {
 	toObject() {
 		return {
 			column_index: this.#column_index,
-			context_popup_handle_icon: this.#context_popup_handle_icon,
-			context_popup_data: this.#context_popup_data,
-			context_popup_handler: this.#context_popup_handler,
+			column_options: this.#column_options,
+			options_popup_handler: this.#options_popup_handler,
+			options_popup_handle_icon: this.#options_popup_handle_icon,
 			duplicate_column_index: this.#duplicate_column_index,
 			duplicate: this.#duplicate,
 			duplicatable: this.#duplicatable,

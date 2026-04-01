@@ -174,10 +174,10 @@
 						.setRenderer('host')
 						.setSortable(true),
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
-						.setContextPopupData({
+						.setColumnOptions({
 							show_item_key: filter.show_item_key == 1
 						})
-						.setContextPopupHandler('name')
+						.setOptionsPopupHandler('name')
 						.setFields(['itemid', 'description_expanded', 'name', 'key_expanded'])
 						.setRenderer('name')
 						.setSortable(true)
@@ -220,7 +220,7 @@
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
 				.setTabFilterItem(this.active_filter)
-				.setStickyHeaders(true)
+				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer('host', ({column_data, cell_inner}) => {
 					const [host, maintenance] = column_data;
@@ -315,7 +315,7 @@
 
 					cell_inner.appendChild(action_container);
 
-					const {show_item_key} = column_config.getContextPopupData();
+					const {show_item_key} = column_config.getColumnOptions();
 
 					if (show_item_key) {
 						const item_key = document.createElement('span');
@@ -367,7 +367,7 @@
 
 					cell_inner.appendChild(item_icons);
 				})
-				.setContextPopupHandler('name', 'CDataTableContextPopupMonitoringLatestName')
+				.setOptionsHandler('name', 'CDataTableOptionsPopupMonitoringLatestName')
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();
 
@@ -383,11 +383,11 @@
 					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.refreshCounters(this.datatable.getDataProvider().getLastResponse());
+					this.refreshCounters(this.datatable.getData());
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_CONTEXT_POPUP_OPEN, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_CONTEXT_POPUP_CLOSE, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
 				.init(user_configs);
 		},
 

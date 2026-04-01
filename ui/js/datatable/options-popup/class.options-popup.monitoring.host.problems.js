@@ -13,7 +13,7 @@
 **/
 
 
-class CDataTableContextPopupMonitoringHostProblems extends CDataTableContextPopup {
+class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopup {
 	getFields() {
 		const show_suppressed = this.getElement().querySelector('[name="show_suppressed"]');
 
@@ -25,7 +25,7 @@ class CDataTableContextPopupMonitoringHostProblems extends CDataTableContextPopu
 	}
 
 	getFieldData() {
-		const show_suppressed = (this.getField('show_suppressed').checked) ? '1' : '0';
+		const show_suppressed = this.getField('show_suppressed').checked ? '1' : '0';
 
 		return {show_suppressed};
 	}
@@ -51,20 +51,20 @@ class CDataTableContextPopupMonitoringHostProblems extends CDataTableContextPopu
 	onInit() {
 		super.onInit();
 
-		const context_popup_data = this.getColumnConfig().getContextPopupData();
-		const {show_suppressed} = context_popup_data;
+		const column_options = this.getColumnConfig().getColumnOptions();
+		const {show_suppressed} = column_options;
 
 		const input = this.getField('show_suppressed');
 		input.checked = show_suppressed == 1;
 		input.addEventListener('input', event => {
 			event.stopPropagation();
 
-			const context_popup_data = {
-				...this.getColumnConfig().getContextPopupData(),
+			const column_options = {
+				...this.getColumnConfig().getColumnOptions(),
 				show_suppressed: event.target.checked ? '1' : '0'
 			};
 
-			this.getColumnConfig().setContextPopupData(context_popup_data);
+			this.getColumnConfig().setColumnOptions(column_options);
 
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_SAVE);

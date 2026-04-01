@@ -13,7 +13,7 @@
 **/
 
 
-class CDataTableContextPopupMonitoringLatestName extends CDataTableContextPopup {
+class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup {
 	getFields() {
 		const show_item_key = this.getElement().querySelector('[name="show_item_key"]');
 
@@ -51,16 +51,16 @@ class CDataTableContextPopupMonitoringLatestName extends CDataTableContextPopup 
 	onInit() {
 		super.onInit();
 
-		const context_popup_data = this.getColumnConfig().getContextPopupData();
-		const {show_item_key} = context_popup_data;
+		const column_options = this.getColumnConfig().getColumnOptions();
+		const {show_item_key} = column_options;
 
 		const input = this.getField('show_item_key');
 		input.checked = show_item_key == 1;
 		input.addEventListener('input', event => {
 			event.stopPropagation();
 
-			this.getColumnConfig().setContextPopupData({
-				...context_popup_data,
+			this.getColumnConfig().setColumnOptions({
+				...column_options,
 				show_item_key: event.target.checked
 			});
 

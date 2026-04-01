@@ -303,7 +303,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
-				.setStickyHeaders(true)
+				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [hostid, name, discovery, flags, maintenance, status] = column_data;
@@ -565,7 +565,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						return;
 					}
 
-					const {can_edit_proxies, can_edit_proxy_groups} = this.datatable.getDataProvider().getLastResponse();
+					const {can_edit_proxies, can_edit_proxy_groups} = this.datatable.getData();
 
 					const proxy_url = new URL('zabbix.php', location.href);
 					proxy_url.searchParams.set('action', 'popup');
@@ -628,7 +628,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				})
 				.setRenderer('templates', ({column_data, cell_inner}) => {
 					const [templates] = column_data;
-					const {max_in_table} = this.datatable.getDataProvider().getLastResponse();
+					const {max_in_table} = this.datatable.getData();
 					const max_in_table_exceeded = templates.length > max_in_table;
 					const visible_templates = Object.values(templates).slice(0, max_in_table);
 

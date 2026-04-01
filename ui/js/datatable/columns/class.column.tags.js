@@ -18,7 +18,7 @@ class CDataTableColumnTags extends CDataTableColumn {
 	constructor(id, name) {
 		super(id, name);
 
-		this.setContextPopupHandler('tags')
+		this.setOptionsPopupHandler('tags')
 			.setFields(['tags'])
 			.setRenderer('tags')
 			.setDuplicatable(true);

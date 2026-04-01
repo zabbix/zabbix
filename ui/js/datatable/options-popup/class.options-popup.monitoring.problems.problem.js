@@ -13,7 +13,7 @@
 **/
 
 
-class CDataTableContextPopupMonitoringProblemsProblem extends CDataTableContextPopup {
+class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsPopup {
 	getFields() {
 		const show_opdata = this.getElement().querySelector('[name="show_opdata"]');
 		const details = this.getElement().querySelector('[name="details"]');
@@ -63,12 +63,12 @@ class CDataTableContextPopupMonitoringProblemsProblem extends CDataTableContextP
 	onInit() {
 		super.onInit();
 
-		const context_popup_data = this.getColumnConfig().getContextPopupData();
+		const column_options = this.getColumnConfig().getColumnOptions();
 		const compact_view = this.getDataTable().getOption('compact_view');
 
 		for (const field of Object.keys(this.getDefaultData())) {
 			const input = this.getField(field);
-			input.checked = context_popup_data[field] == 1;
+			input.checked = column_options[field] == 1;
 
 			if (['show_opdata', 'details'].includes(field)) {
 				input.disabled = compact_view.checked;
@@ -79,12 +79,12 @@ class CDataTableContextPopupMonitoringProblemsProblem extends CDataTableContextP
 			input.addEventListener('change', event => {
 				event.stopPropagation();
 
-				const context_popup_data = {
-					...this.getColumnConfig().getContextPopupData(),
+				const column_options = {
+					...this.getColumnConfig().getColumnOptions(),
 					[field]: event.target.checked ? '1' : '0'
 				};
 
-				this.getColumnConfig().setContextPopupData(context_popup_data);
+				this.getColumnConfig().setColumnOptions(column_options);
 
 				this.getDataTable().updateUserConfig();
 

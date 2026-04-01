@@ -66,7 +66,11 @@ $html_page
 	->addItem(
 		(new CForm())
 			->setName('host_view')
-			->addItem((new CDiv())->setId('hosts'))
+			->addItem(
+				(new CDiv((new CDiv())->addClass(ZBX_STYLE_NO_DATA_MESSAGE)))
+					->setId('hosts')
+					->addClass(ZBX_STYLE_DATATABLE)
+			)
 	)
 	->show();
 

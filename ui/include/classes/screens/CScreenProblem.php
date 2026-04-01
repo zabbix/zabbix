@@ -131,15 +131,15 @@ class CScreenProblem extends CScreenBase {
 	 *        string $filter['tags'][]['value']
 	 *        int    $filter['show_symptoms']         (optional)
 	 *        array  $filter['cause_eventid']         (optional)
-	 * @param array  $context_popup_data
-	 *        int    $context_popup_data ['show_suppressed']       (optional)
-	 *        int    $context_popup_data ['show_opdata']           (optional)
+	 * @param array  $column_options
+	 *        int    $column_options ['show_suppressed']       (optional)
+	 *        int    $column_options ['show_opdata']           (optional)
 	 * @param int    $limit
 	 * @param bool   $resolve_comments
 	 *
 	 * @return array
 	 */
-	public static function getData(array $filter, array $context_popup_data, int $limit,
+	public static function getData(array $filter, array $column_options, int $limit,
 			bool $resolve_comments = false): array {
 
 		$filter_groupids = array_key_exists('groupids', $filter) && $filter['groupids']
@@ -149,7 +149,7 @@ class CScreenProblem extends CScreenBase {
 		$filter_triggerids = array_key_exists('triggerids', $filter) && $filter['triggerids']
 			? $filter['triggerids']
 			: null;
-		$show_opdata = array_key_exists('show_opdata', $context_popup_data) && $context_popup_data['show_opdata'] == 1;
+		$show_opdata = array_key_exists('show_opdata', $column_options) && $column_options['show_opdata'] == 1;
 
 		if (array_key_exists('exclude_groupids', $filter) && $filter['exclude_groupids']) {
 			$exclude_groupids = getSubGroups($filter['exclude_groupids']);
@@ -244,7 +244,7 @@ class CScreenProblem extends CScreenBase {
 			if (array_key_exists('tags', $filter) && $filter['tags']) {
 				$options['tags'] = $filter['tags'];
 			}
-			if (array_key_exists('show_suppressed', $context_popup_data) && $context_popup_data['show_suppressed']) {
+			if (array_key_exists('show_suppressed', $column_options) && $column_options['show_suppressed']) {
 				unset($options['suppressed']);
 			}
 
@@ -304,8 +304,8 @@ class CScreenProblem extends CScreenBase {
 						'preservekeys' => true
 					];
 
-					$details = (array_key_exists('details', $context_popup_data)
-						&& $context_popup_data['details'] == 1);
+					$details = (array_key_exists('details', $column_options)
+						&& $column_options['details'] == 1);
 
 					if ($show_opdata) {
 						$options['output'][] = 'opdata';
@@ -570,14 +570,14 @@ class CScreenProblem extends CScreenBase {
 	 *        array $data['triggers']
 	 * @param array $filter
 	 *        int   $filter['show']
-	 * @param array $context_popup_data
-	 *        int   $context_popup_data['details']
-	 *        int   $context_popup_data['show_opdata']
+	 * @param array $column_options
+	 *        int   $column_options['details']
+	 *        int   $column_options['show_opdata']
 	 * @param bool  $resolve_comments
 	 *
 	 * @return array
 	 */
-	public static function makeData(array $data, array $filter, array $context_popup_data = [],
+	public static function makeData(array $data, array $filter, array $column_options = [],
 			bool $resolve_comments = false): array {
 
 		// unset unused triggers
@@ -597,12 +597,12 @@ class CScreenProblem extends CScreenBase {
 			return $data;
 		}
 
-		$show_opdata = array_key_exists('show_opdata', $context_popup_data)
-			? $context_popup_data['show_opdata'] == 1
+		$show_opdata = array_key_exists('show_opdata', $column_options)
+			? $column_options['show_opdata'] == 1
 			: OPERATIONAL_DATA_SHOW_SEPARATELY;
 
 		// resolve macros
-		if ($context_popup_data['details'] == 1 || $show_opdata) {
+		if ($column_options['details'] == 1 || $show_opdata) {
 			foreach ($data['triggers'] as &$trigger) {
 				$trigger['expression_html'] = $trigger['expression'];
 				$trigger['recovery_expression_html'] = $trigger['recovery_expression'];

@@ -86,12 +86,12 @@ class CDefaultDataProvider extends CDataProvider {
 	 * @returns {Promise<any>}
 	 */
 	getData({columns, filter, options, page, sort_field, sort_order, force_load, export_file}) {
-		const data_fields = [...new Set(columns.flatMap(column => {
-			return column.isVisible() && column.getId() !== CDataTableColumn.CUSTOMIZE_TABLE ? column.getFields() : [];
-		}))];
+		const data_fields = [
+			...new Set(columns.flatMap(column => column.isVisible() ? column.getFields() : []))
+		];
 
 		const columns_options = columns.reduce((settings, column) => {
-			return Object.assign(settings, column.getContextPopupData());
+			return Object.assign(settings, column.getColumnOptions());
 		}, {});
 
 		filter = Object.fromEntries(
@@ -161,12 +161,5 @@ class CDefaultDataProvider extends CDataProvider {
 					this.#abort_controller = null;
 				}
 			});
-	}
-
-	/**
-	 * @returns {Object|null}
-	 */
-	getLastResponse() {
-		return this.#last_response;
 	}
 }

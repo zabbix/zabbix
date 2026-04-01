@@ -124,7 +124,9 @@ $form = (new CForm())
 	->setName('templates');
 
 $form->addItem([
-	(new CDiv())->setId('templates'),
+	(new CDiv((new CDiv())->addClass(ZBX_STYLE_NO_DATA_MESSAGE)))
+		->setId('templates')
+		->addClass(ZBX_STYLE_DATATABLE),
 	(new CActionButtonList('action', 'templates', [
 		'template.export' => [
 			'content' => new CButtonExport('export.templates',
