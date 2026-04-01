@@ -112,6 +112,7 @@ if (getRequest('parent_discoveryid')) {
 		]);
 
 		if (!$hostPrototype) {
+			zbx_add_post_js("history.replaceState({}, '');");
 			access_deny();
 		}
 
