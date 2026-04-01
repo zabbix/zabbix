@@ -602,7 +602,6 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 
 		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
-	
 
 		$result = $this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
 		$t = time();
