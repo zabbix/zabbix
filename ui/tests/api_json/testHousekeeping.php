@@ -110,7 +110,7 @@ class testHousekeeping extends CAPITest {
 			$this->assertEquals($value, $after[$key], 'Unexpected change in field: '.$key);
 		}
 	}
- 
+
 	/**
 	 * Verify boundary values.
 	 */
@@ -185,7 +185,7 @@ class testHousekeeping extends CAPITest {
 	public function testHousekeeping_Validation(string $field, $value): void {
 		$this->call('housekeeping.update', [$field => $value], true);
 	}
- 
+
 	public function invalidParamsProvider(): array {
 		return [
 			// Binary-flag fields must reject values outside {0, 1}.
@@ -232,7 +232,7 @@ class testHousekeeping extends CAPITest {
 			['compress_older', '-100'],
 		];
 	}
- 
+
 	/**
 	 * Verify permissions for housekeeping API methods.
 	 */
@@ -241,17 +241,17 @@ class testHousekeeping extends CAPITest {
 		$this->authorize('hk_user', 'zabbix12345');
 		$response = $this->call('housekeeping.get', ['output' => 'extend']);
 		$this->assertArrayHasKey('result', $response);
- 
+
 		// A user must NOT be allowed to update housekeeping settings.
 		$this->call('housekeeping.update', ['hk_events_mode' => '1'],
 			'No permissions to call "housekeeping.update".'
 		);
- 
+
 		// An admin must be allowed to get housekeeping settings.
 		$this->authorize('hk_admin', 'zabbix12345');
 		$response = $this->call('housekeeping.get', ['output' => 'extend']);
 		$this->assertArrayHasKey('result', $response);
- 
+
 		// An admin must NOT be allowed to update housekeeping settings.
 		$this->call('housekeeping.update', ['hk_events_mode' => '1'],
 			'No permissions to call "housekeeping.update".'
