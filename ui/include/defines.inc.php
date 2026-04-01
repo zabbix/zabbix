@@ -2476,6 +2476,8 @@ define('ZBX_NODE_STATUS_STOPPED',		1);
 define('ZBX_NODE_STATUS_UNAVAILABLE',	2);
 define('ZBX_NODE_STATUS_ACTIVE',		3);
 
+define('ZABBIX_MOBILE_VERSION',			1);
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;

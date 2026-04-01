@@ -29,34 +29,44 @@ $form = (new CForm('post'))
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 
-if ($data['admin_mode']) {
-	$form_grid = (new CFormGrid())
-		->addItem([
-			(new CLabel(_('Username'), 'username'))->setAsteriskMark(),
-			new CFormField(
-				(new CMultiSelect([
-					'name' => 'userid',
-					'object_name' => 'users',
-					'multiple' => false,
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'users',
-							'srcfld1' => 'userid',
-							'srcfld2' => 'fullname',
-							'dstfrm' => $form->getName(),
-							'dstfld1' => 'userid'
-						]
+$form_grid = (new CFormGrid())
+	->addItem([
+		(new CLabel(_('Username'), 'username'))->setAsteriskMark(),
+		new CFormField(
+			(new CMultiSelect([
+				'name' => 'userid',
+				'object_name' => 'users',
+				'multiple' => false,
+				'data' => $data['ms_user'],
+				'disabled' => !$data['admin_mode'],
+				'popup' => [
+					'parameters' => [
+						'srctbl' => 'users',
+						'srcfld1' => 'userid',
+						'srcfld2' => 'fullname',
+						'dstfrm' => $form->getName(),
+						'dstfld1' => 'userid'
 					]
-				]))
-					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-			)
-		]);
-
-	$form->addItem($form_grid);
-}
+				]
+			]))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+		)
+	]);
+$form->addItem($form_grid);
 
 $form->addItem(
-	(new CDiv())->addClass('qr-code')
+	(new CDiv([
+		(new CDiv())->addClass('qr-code'),
+		new CDiv(_('Scan this QR code to link your device and setup your notifications.')),
+		(new CDiv([
+			_('QR code will expire on') . ' ',
+			(new CTag('b'))
+				->addClass('js-qr-expires-at')
+		]))
+			->addClass('qr-code-expiration')
+	]))
+		->addClass('qr-code-container')
+		->addStyle('display: none')
 );
 
 $title = _('Select user to link a device');

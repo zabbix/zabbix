@@ -317,7 +317,10 @@ class CMenuHelper {
 					->setAction('authentication.edit')
 				: null,
 			// TODO: access check
-			(new CMenuItem(_('Linked devices')))->setAction('user.device.list')
+			CTemporaryMobileFeatureHelper::isEnabled()
+				? (new CMenuItem(_('Linked devices')))
+					->setAction('user.device.list')
+				: null
 		];
 		$submenu_users = array_filter($submenu_users);
 
@@ -458,34 +461,34 @@ class CMenuHelper {
 					->setTitle(getUserFullname($user))
 			);
 		}
-		elseif (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-			$menu->add(
-				(new CMenuItem(_('User settings')))
-					->setIcon(ZBX_ICON_USER_SETTINGS)
-					->setTitle(getUserFullname($user))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Profile')))
-							->setAction('userprofile.edit'),
-						(new CMenuItem(_('Notifications')))
-							->setAction('userprofile.notification.edit'),
-						(new CMenuItem(_('API tokens')))
-							->setAction('user.token.list'),
-						(new CMenuItem(_('Linked devices')))
-							->setAction('userprofile.device.list')
-					]))
-			);
-		}
 		else {
+			$submenu = new CMenu([
+				(new CMenuItem(_('Profile')))
+					->setAction('userprofile.edit'),
+				(new CMenuItem(_('Notifications')))
+					->setAction('userprofile.notification.edit')
+			]);
+
+			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
+				$submenu->add(
+					(new CMenuItem(_('API tokens')))
+						->setAction('user.token.list')
+				);
+			}
+
+			// TODO: permission check
+			if (CTemporaryMobileFeatureHelper::isEnabled()) {
+				$submenu->add(
+					(new CMenuItem(_('Linked devices')))
+						->setAction('userprofile.device.list')
+				);
+			}
+
 			$menu->add(
 				(new CMenuItem(_('User settings')))
 					->setIcon(ZBX_ICON_USER_SETTINGS)
 					->setTitle(getUserFullname($user))
-					->setSubMenu(new CMenu([
-						(new CMenuItem(_('Profile')))
-							->setAction('userprofile.edit'),
-						(new CMenuItem(_('Notifications')))
-							->setAction('userprofile.notification.edit')
-					]))
+					->setSubMenu($submenu)
 			);
 		}
 

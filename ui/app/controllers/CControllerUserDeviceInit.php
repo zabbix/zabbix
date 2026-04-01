@@ -55,11 +55,49 @@ class CControllerUserDeviceInit extends CController {
 		return true;
 	}
 
+	protected function initFakeDevice (): array {
+		return [
+			'expires_at' => time() + 3600,
+			'uuid' => 'dev-id-123',
+			'server_id' => 'server-id-123',
+			'enrollment_token' => 'BET',
+			'mobile_enrollment_token' => 'MET',
+			'bridge_enrollment_key' => ['b' => 'b', 'e' => 'e', 'k' => 'k'],
+			'enrollment_url' => 'URL'
+		];
+	}
+
 	protected function doAction() {
 		$userid = $this->getInput('userid', CWebUser::$data['userid']);
 
-		$result = API::Device()->init(['userid' => $userid]);
+		// TODO: uncomment and use actual init
+		//$device = API::Device()->init(['userid' => $userid]);
+		$device = $this->initFakeDevice();
+		$output = [];
 
-		$this->setResponse(new CControllerResponseData(['main_block' => json_encode(['device' => $result])]));
+		if ($device) {
+			$output = [
+				'expires_at' => zbx_date2str(TIME_FORMAT, $device['expires_at']),
+				'uuid' => $device['uuid'],
+				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
+					->setArgument('ver', ZABBIX_API_VERSION)
+					->setArgument('sid', $device['server_id'])
+					->setArgument('did', $device['uuid'])
+					->setArgument('url', $device['enrollment_url'])
+					->setArgument('met', $device['mobile_enrollment_token'])
+					->setArgument('zet', $device['enrollment_token'])
+					->setArgument('bek', base64_encode(json_encode($device['bridge_enrollment_key'])))
+					->getUrl()
+			];
+		}
+		else {
+			$output['error'] = [
+				'title' => _('Cannot link a device'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
+		}
+
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
+
 	}
 }

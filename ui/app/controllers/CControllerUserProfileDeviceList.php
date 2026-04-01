@@ -22,7 +22,7 @@ class CControllerUserProfileDeviceList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>					'in name,uuid,created_at,lastaccess',
+			'sort' =>					'in name,uuid,activated_at,lastaccess',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
 		];
@@ -37,7 +37,7 @@ class CControllerUserProfileDeviceList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (CWebUser::isGuest() || !CWebUser::isLoggedIn()) {
+		if (CWebUser::isGuest() || !CWebUser::isLoggedIn() || !CTemporaryMobileFeatureHelper::isEnabled()) {
 			return false;
 		}
 

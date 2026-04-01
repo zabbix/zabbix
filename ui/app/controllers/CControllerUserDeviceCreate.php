@@ -22,7 +22,7 @@ class CControllerUserDeviceCreate extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'admin_mode' =>	'required|in 0,1'
+			'admin_mode' =>	'in 0,1'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -47,7 +47,10 @@ class CControllerUserDeviceCreate extends CController {
 
 	protected function doAction() {
 		$data = [
-			'admin_mode' => $this->getInput('admin_mode'),
+			'admin_mode' => $this->getInput('admin_mode', 0) ? 1 : 0,
+			'ms_user' => $this->getInput('admin_mode', 0)
+				? []
+				: [['userid' => CWebUser::$data['userid'], 'name' => getUserFullname(CWebUser::$data)]],
 			'js_validation_rules' => (new CFormValidator(CControllerUserDeviceInit::getValidationRules()))->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()],
 		];

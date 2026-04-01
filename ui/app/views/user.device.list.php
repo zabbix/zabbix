@@ -105,9 +105,9 @@ $deviceTable = (new CTableInfo())
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
-		_('User'),
-		_('User role'),
-		make_sorting_header(_('Linked on'), 'created_at', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('User'), 'user_fullname', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('User role'), 'user_role', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		_('Action')
 	])
@@ -118,9 +118,9 @@ foreach ($data['devices'] as $device) {
 		(new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid'])),
 		$device['name'],
 		$device['uuid'],
-		$device['userid'],
-		json_encode($device),
-		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['created_at']),
+		$device['user_fullname'],
+		$device['user_role'],
+		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
 		(new CButton('', _('Unlink')))
 			->addClass(ZBX_STYLE_BTN_LINK)

@@ -26,7 +26,7 @@ window.user_device_create_popup = new class {
 	#dialogue;
 	#footer;
 	#overlay;
-	#device = null;
+	#deviceuuid = null;
 
 	init({rules, admin_mode}) {
 		this.#overlay = overlays_stack.getById('user.device.create');
@@ -40,7 +40,6 @@ window.user_device_create_popup = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#initEvents();
-		this.#displayQRCode({url: 'test.com'});
 
 		if (!admin_mode) {
 			this.#submit();
@@ -63,21 +62,24 @@ window.user_device_create_popup = new class {
 				}
 
 				this.#post(zabbixUrl({action: 'user.device.init'}), fields, (response) => {
-					this.#device = response.device;
-					setTimeout(this.#getTask(), 1000);
+					this.#footer.querySelector('.js-submit').remove();
+					this.#footer.querySelector('.js-cancel').remove();
+					this.#overlay.setProperties({title: <?= json_encode(_('Link a device')) ?>});
+					this.#form_element.querySelector('.js-qr-expires-at').textContent = response.expires_at;
+					this.#form_element.querySelector('.form-grid').style.display = 'none';
+					this.#form_element.querySelector('.qr-code-container').style.display = '';
+					this.#displayQRCode(response.url);
+					this.#deviceuuid = response.uuid;
 				});
 			});
 	}
 
-	#getTask() {
-		console.log('task get');
-	}
-
-	#displayQRCode(data) {
+	#displayQRCode(url) {
 		const qr_code_div = this.#form_element.querySelector('.qr-code');
+
 		const size = qr_code_div.clientWidth;
 		const qr = new QRCode(qr_code_div, {
-			text: data.url,
+			text: url,
 			width: size,
 			height: size,
 			correctLevel : QRCode.CorrectLevel.L

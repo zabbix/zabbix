@@ -27,7 +27,7 @@ class CControllerUserDeviceList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_roleids' =>			'array_db role.roleid',
 			'filter_usrgrpids' =>		'array_db users_groups.usrgrpid',
-			'sort' =>					'in name,uuid,created_at,lastaccess',
+			'sort' =>					'in name,uuid,activated_at,lastaccess,user_fullname,user_role',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
 		];
@@ -42,6 +42,10 @@ class CControllerUserDeviceList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+			return false;
+		}
+
 		// TODO: access check
 		return true;
 	}
@@ -149,9 +153,23 @@ class CControllerUserDeviceList extends CController {
 
 		$devices = API::Device()->get($options);
 
-		CArrayHelper::sort($devices, [
-			['field' => $filter['sort'], 'order' => $filter['sortorder']]
-		]);
+		if (count($devices) > 0) {
+			$users = API::User()->get([
+				'output' => ['userid', 'username', 'name', 'surname'],
+				'selectRole' => ['name'],
+				'userids' => array_unique(array_column($devices, 'userid')),
+				'preservekeys' => true
+			]);
+
+			foreach ($devices as &$device) {
+				$device['user_fullname'] = getUserFullname($users[$device['userid']]);
+				$device['user_role'] = $users[$device['userid']]['role']['name'];
+			}
+
+			CArrayHelper::sort($devices, [
+				['field' => $filter['sort'], 'order' => $filter['sortorder']]
+			]);
+		}
 
 		return $devices;
 	}

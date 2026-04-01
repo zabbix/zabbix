@@ -48,7 +48,7 @@ class CControllerUserDeviceDelete extends CController {
 	protected function doAction() {
 		$deviceids = $this->getInput('deviceids');
 
-		$result = API::Device()->delete($deviceids);
+		$result = API::Device()->offboard($deviceids);
 
 		if ($result) {
 			$output['success']['title'] = _n('Device unlinked', 'Devices unlinked', count($deviceids));
