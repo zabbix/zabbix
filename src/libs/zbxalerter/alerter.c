@@ -627,9 +627,15 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		ret = SUCCEED;
 	}
 out:
+	if (NULL != headers)
+		curl_slist_free_all(headers);
+
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 	curl_easy_cleanup(curl);
 	zbx_free(params);
+	zbx_free(response_header.data);
+	zbx_free(body.data);
+	zbx_free(payload);
 #endif
 }
 
