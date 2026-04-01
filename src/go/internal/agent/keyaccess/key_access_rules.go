@@ -121,9 +121,9 @@ func parse(rec Record) (r *Rule, err error) {
 	return r, nil
 }
 
-// findRule searches the existing rule list for a rule matching proto.
-// For regexp rules, matching is by pattern string. For wildcard rules, matching is by parsed key+params.
-// Regexp and wildcard rules are never considered duplicates of each other.
+// findRule returns a matching rule from the current list.
+// Regexp rules match by pattern; wildcard rules match by parsed key and params.
+// Regexp and wildcard rules are compared separately.
 func findRule(proto *Rule) (rule *Rule, index int) {
 	for j, r := range rules {
 		if proto.IsRegexp != r.IsRegexp {
@@ -175,11 +175,9 @@ func GetNumberOfRules() int {
 	return len(rules)
 }
 
-// LoadRules adds key access records to the access rule list. Records from all four parameters are
-// merged into a single ordered list (sorted by line number) before being evaluated, so AllowKey,
-// DenyKey, AllowKeyRegexp, and DenyKeyRegexp rules interleave naturally in config-file order.
-// Regexp patterns are compiled at load time; an invalid or empty pattern causes an error and the
-// agent will not start.
+// LoadRules adds key access records to access rule list.
+// LoadRules merges AllowKey/DenyKey/AllowKeyRegexp/DenyKeyRegexp in config order.
+// Regexp patterns are compiled at load time; invalid or empty patterns fail loading.
 func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords interface{}) (err error) {
 	rules = rules[:0]
 	var records []Record
