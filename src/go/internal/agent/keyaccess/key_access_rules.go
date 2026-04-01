@@ -32,7 +32,6 @@ var (
 	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
 )
 
-
 // RuleType Access rule permission type
 type RuleType int
 
@@ -314,11 +313,87 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 	return nil
 }
 
-// CheckRules checks if specified key and parameters are not restricted by defined rules
-func CheckRules(rawMetric string, key string, params []string) (result bool) {
-	result = true
+// matchWildcardRule evaluates a wildcard rule and reports whether it matched and, if so, whether it allows access.
+func matchWildcardRule(r *Rule, key string, params []string, emptyParams bool) (bool, bool) {
+	numParamsRule := len(r.Params)
+	numParams := len(params)
 
-	emptyParams := len(params) == 1 && len(params[0]) == 0
+	// match all rule
+	if r.Key == "*" && numParamsRule == 0 {
+		return true, r.Permission == ALLOW
+	}
+
+	if !wildcardParamCountMatches(r, numParamsRule, numParams) {
+		return false, false
+	}
+
+	if !wildcard.Match(key, r.Key) {
+		return false, false // key doesn't match
+	}
+
+	if numParamsRule == 0 {
+		if emptyParams {
+			return false, false // no parameters expected by rule
+		}
+
+		if numParams == 0 {
+			return true, r.Permission == ALLOW
+		}
+	}
+
+	if !wildcardParamsMatch(r, params, numParamsRule, numParams) {
+		return false, false
+	}
+
+	return true, r.Permission == ALLOW
+}
+
+func wildcardParamCountMatches(r *Rule, numParamsRule, numParams int) bool {
+	if numParamsRule == 0 {
+		return true
+	}
+
+	if r.Params[numParamsRule-1] == "*" {
+		// rule: key[*], request: key
+		return numParamsRule != 1 || numParams != 0
+	}
+
+	if numParams < numParamsRule {
+		return false // too few parameters
+	}
+
+	if numParams > numParamsRule {
+		return false // too many params
+	}
+
+	return true
+}
+
+func wildcardParamsMatch(r *Rule, params []string, numParamsRule, numParams int) bool {
+	for i, p := range r.Params {
+		if i == numParamsRule-1 { // last parameter
+			if p == "*" {
+				return true // skip next parameter checks
+			}
+
+			if numParams <= i {
+				return false // out of parameters
+			}
+
+			return wildcard.Match(params[i], p)
+		}
+
+		if numParams <= i || !wildcard.Match(params[i], p) {
+			return false // parameter doesn't match pattern
+		}
+	}
+
+	return false
+}
+
+// CheckRules checks if specified key and parameters are not restricted by defined rules.
+func CheckRules(rawMetric, key string, params []string) bool {
+	emptyParams := len(params) == 1 && params[0] == ""
 
 	for _, r := range rules {
 		if r.IsRegexp {
@@ -329,58 +404,9 @@ func CheckRules(rawMetric string, key string, params []string) (result bool) {
 			continue
 		}
 
-		numParamsRule := len(r.Params)
-		numParams := len(params)
-
-		// match all rule
-		if r.Key == "*" && numParamsRule == 0 {
-			return r.Permission == ALLOW
-		}
-
-		if numParamsRule > 0 {
-			if r.Params[numParamsRule-1] == "*" {
-				if numParamsRule == 1 && numParams == 0 {
-					continue // rule: key[*], request: key
-				}
-			} else {
-				if numParams < numParamsRule {
-					continue // too few parameters
-				}
-				if numParams > numParamsRule {
-					continue // too many params
-				}
-			}
-		}
-
-		if !wildcard.Match(key, r.Key) {
-			continue // key doesn't match
-		}
-
-		if numParamsRule == 0 {
-			if emptyParams {
-				continue // no parameters expected by rule
-			}
-			if numParams == 0 {
-				return r.Permission == ALLOW
-			}
-		}
-
-		for i, p := range r.Params {
-			if i == numParamsRule-1 { // last parameter
-				if p == "*" {
-					return r.Permission == ALLOW // skip next parameter checks
-				}
-				if numParams <= i {
-					break // out of parameters
-				}
-				if !wildcard.Match(params[i], p) {
-					break // parameter doesn't match pattern
-				}
-				return r.Permission == ALLOW
-			}
-			if numParams <= i || !wildcard.Match(params[i], p) {
-				break // parameter doesn't match pattern
-			}
+		matched, allowed := matchWildcardRule(r, key, params, emptyParams)
+		if matched {
+			return allowed
 		}
 	}
 
