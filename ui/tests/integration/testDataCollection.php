@@ -587,7 +587,9 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(100, $response['result'][0]['value']);
+
 		$prev_clock = $response['result'][0]['clock'];
+		$prev_ns    = $response['result'][0]['ns'];
 
 		$response = $this->call('item.update', [
 			'itemid' => $itemid,
@@ -604,13 +606,24 @@ class testDataCollection extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
 
+		// need callback function to filter out the previous sender value
 		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
+			'sortfield' => ['clock', 'ns'],
 			'sortorder' => 'DESC',
 			'limit' => 1,
 			'itemids' => [$itemid],
-			'time_from' => $prev_clock + 1
-		], 60, 1);
+			'time_from' => $prev_clock
+		], 60, 1,
+			function ($response) use ($prev_clock, $prev_ns) {
+				foreach ($response['result'] as $row) {
+					if ($row['clock'] > $prev_clock ||
+						($row['clock'] == $prev_clock && $row['ns'] > $prev_ns)
+					) {return true;}
+				}
+				return false;
+			}
+		);
+
 		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
