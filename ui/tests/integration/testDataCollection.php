@@ -602,7 +602,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
 		$clock = time();
-		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER, $clock);
+		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',
