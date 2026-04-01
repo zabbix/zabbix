@@ -468,36 +468,36 @@ class testPageTemplates extends CLegacyWebTest {
 		$filter->submit();
 		$table->waitUntilReloaded();
 
-		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
+		$table_rows_count = $table->getRows()->count();
 		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
 
 		// Cancel delete.
-		$this->query('id:all_templates')->asCheckbox()->one()->check();
-		$this->query('button:Delete')->one()->click();
+		$all_templates = $this->query('id:all_templates')->asCheckbox()->one();
+		$all_templates->check();
+		$delete_button->click();
 		$this->page->dismissAlert();
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount($table_rows_count);
-		$this->query('id:all_templates')->asCheckbox()->one()->uncheck();
+		$all_templates->uncheck();
 
-		// Delete one.
-		$this->selectTableRows(['Template for tags filtering']);
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Template deleted');
-		CMessageElement::find()->one()->close();
-		$table_rows_count = $table_rows_count - 1;
-		$this->assertTableStats($table_rows_count);
-		$this->assertSelectedCount('0');
+		$delete_templates = [
+			['Template for tags filtering'],
+			['Template for tags filtering - clone', 'Template for tags filtering - update']
+		];
 
-		// Delete multiple.
-		$this->selectTableRows(['Template for tags filtering - clone', 'Template for tags filtering - update']);
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Templates deleted');
-		$table_rows_count = $table_rows_count - 2;
-		$this->assertTableStats($table_rows_count);
-		$this->assertSelectedCount('0');
+		// Delete single/multiple templates.
+		foreach ($delete_templates as $selection) {
+			$template_count = count($selection);
+			$this->selectTableRows($selection);
+			$delete_button->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, ($template_count > 1) ? 'Templates deleted' : 'Template deleted');
+			CMessageElement::find()->one()->close();
+			$table_rows_count = $table_rows_count - $template_count;
+			$this->assertTableStats($table_rows_count);
+			$this->assertSelectedCount(0);
+		}
 	}
 }

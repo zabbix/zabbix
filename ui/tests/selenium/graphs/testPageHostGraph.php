@@ -622,7 +622,7 @@ class testPageHostGraph extends CLegacyWebTest {
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
 		$this->assertTableStats($before_rows_count - $selected_count);
-		$this->assertSelectedCount('0');
+		$this->assertSelectedCount(0);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

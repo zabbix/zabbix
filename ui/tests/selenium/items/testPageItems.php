@@ -269,23 +269,26 @@ class testPageItems extends CLegacyWebTest {
 	 */
 	public function testPageItems_Delete($data) {
 		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
-		$this->page->login()->open('zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.$data['hostid'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=item.list&context='.$context.'&filter_set=1&filter_hostids[0]='.
+				$data['hostid']
+		)->waitUntilReady();
 
 		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
 		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
 
 		// Cancel delete.
 		$this->query('id:all_items')->asCheckbox()->one()->check();
-		$this->query('button:Delete')->one()->click();
+		$delete_button->click();
 		$this->page->dismissAlert();
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount($table_rows_count);
 
 		// Delete all.
-		$this->query('button:Delete')->one()->click();
+		$delete_button->click();
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Item deleted');
 		$this->assertTableStats(0);
-		$this->assertSelectedCount('0');
+		$this->assertSelectedCount(0);
 	}
 }

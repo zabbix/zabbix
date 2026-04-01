@@ -906,36 +906,36 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->submit();
 		$table->waitUntilReloaded();
 
-		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
+		$table_rows_count = $table->getRows()->count();
 		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
 
 		// Cancel delete.
-		$this->query('id:all_hosts')->asCheckbox()->one()->check();
-		$this->query('button:Delete')->one()->click();
+		$all_hosts = $this->query('id:all_hosts')->asCheckbox()->one();
+		$all_hosts->check();
+		$delete_button->click();
 		$this->page->dismissAlert();
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount($table_rows_count);
-		$this->query('id:all_hosts')->asCheckbox()->one()->uncheck();
+		$all_hosts->uncheck();
 
-		// Delete one.
-		$this->selectTableRows(['Host for tags filtering']);
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Host deleted');
-		CMessageElement::find()->one()->close();
-		$table_rows_count = $table_rows_count - 1;
-		$this->assertTableStats($table_rows_count);
-		$this->assertSelectedCount('0');
+		$delete_hosts = [
+			['Host for tags filtering'],
+			['Host for tags filtering - clone', 'Host for tags filtering - update']
+		];
 
-		// Delete multiple.
-		$this->selectTableRows(['Host for tags filtering - clone', 'Host for tags filtering - update']);
-		$this->query('button:Delete')->one()->click();
-		$this->page->acceptAlert();
-		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Hosts deleted');
-		$table_rows_count = $table_rows_count - 2;
-		$this->assertTableStats($table_rows_count);
-		$this->assertSelectedCount('0');
+		// Delete sinlge/multiple hosts.
+		foreach ($delete_hosts as $selection) {
+			$host_count = count($selection);
+			$this->selectTableRows($selection);
+			$delete_button->click();
+			$this->page->acceptAlert();
+			$this->page->waitUntilReady();
+			$this->assertMessage(TEST_GOOD, ($host_count > 1) ? 'Hosts deleted' : 'Host deleted');
+			CMessageElement::find()->one()->close();
+			$table_rows_count = $table_rows_count - $host_count;
+			$this->assertTableStats($table_rows_count);
+			$this->assertSelectedCount(0);
+		}
 	}
 }

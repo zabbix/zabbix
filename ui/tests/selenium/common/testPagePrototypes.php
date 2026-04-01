@@ -1279,7 +1279,7 @@ class testPagePrototypes extends CWebTest {
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, $data['message']);
-			$this->assertSelectedCount('0');
+			$this->assertSelectedCount(0);
 
 			// Check that prototype doesn't exist and not displayed in prototype table.
 			foreach ($data['name'] as $name) {

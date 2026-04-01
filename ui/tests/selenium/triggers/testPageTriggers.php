@@ -105,7 +105,7 @@ class testPageTriggers extends CLegacyWebTest {
 		foreach ($labels as $label) {
 			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 		}
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc.
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
 	}
 
@@ -919,24 +919,26 @@ class testPageTriggers extends CLegacyWebTest {
 	 * @dataProvider data
 	 */
 	public function testPageTriggers_Delete($data) {
-		$context = ($data['status'] === '3') ? '&context=template' : '&context=host';
-		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$data['hostid'].$context)->waitUntilReady();
+		$context = ((int) $data['status'] === HOST_STATUS_TEMPLATE) ? '&context=template' : '&context=host';
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$data['hostid'].$context)
+				->waitUntilReady();
 
 		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
 		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
 
 		// Cancel delete.
 		$this->query('id:all_triggers')->asCheckbox()->one()->check();
-		$this->query('button:Delete')->one()->click();
+		$delete_button->click();
 		$this->page->dismissAlert();
 		$this->assertTableStats($table_rows_count);
 		$this->assertSelectedCount($table_rows_count);
 
 		// Delete all.
-		$this->query('button:Delete')->one()->click();
+		$delete_button->click();
 		$this->page->acceptAlert();
 		$this->assertMessage(TEST_GOOD, 'Trigger deleted');
 		$this->assertTableStats(0);
-		$this->assertSelectedCount('0');
+		$this->assertSelectedCount(0);
 	}
 }
