@@ -46,11 +46,11 @@ class CZabbixClient extends CZabbixServer {
 	 *
 	 * @return array|false    array with result data or false otherwise
 	 */
-	public function sendDataValues($type, $values) {
+	public function sendDataValues($type, $values, $time = null) {
 		$response = parent::request([
 			'request' => $type.' data',
 			'data' => $values,
-			'clock' => time(),
+			'clock' => $time ?? time(),
 			'ns' => 0
 		]);
 

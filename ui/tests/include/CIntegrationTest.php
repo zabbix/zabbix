@@ -819,13 +819,13 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendDataValues($type, $values, $component = null, $delayOverride = null) {
+	protected function sendDataValues($type, $values, $component = null, $delayOverride = null, $time = null) {
 		if ($component === null) {
 			$component = $this->getActiveComponent();
 		}
 
 		$client = $this->getClient($component);
-		$result = $client->sendDataValues($type, $values);
+		$result = $client->sendDataValues($type, $values, $time);
 
 		// Check that data was sent successfully.
 		$this->assertTrue(($result !== false),
@@ -858,7 +858,7 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendDataValue($type, $host, $key, $value, $component = null, $delayOverride = null) {
+	protected function sendDataValue($type, $host, $key, $value, $component = null, $delayOverride = null, $time = null) {
 		if (!is_scalar($value)) {
 			$value = json_encode($value);
 		}
@@ -869,7 +869,7 @@ class CIntegrationTest extends CAPITest {
 			'value' => $value
 		];
 
-		return $this->sendDataValues($type, [$data], $component, $delayOverride);
+		return $this->sendDataValues($type, [$data], $component, $delayOverride, $time);
 	}
 
 	/**
@@ -896,8 +896,8 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendSenderValue($host, $key, $value, $component = null, $delayOverride = null) {
-		return $this->sendDataValue('sender', $host, $key, $value, $component, $delayOverride);
+	protected function sendSenderValue($host, $key, $value, $component = null, $delayOverride = null, $time = null) {
+		return $this->sendDataValue('sender', $host, $key, $value, $component, $delayOverride, $time);
 	}
 
 	/**
