@@ -62,10 +62,8 @@ func (r *accessRules) addRegexpRule(pattern string, ruleType RuleType) {
 func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRules int) {
 	var err error
 
-	err := LoadRules(
-		&rules.allowRecords, &rules.denyRecords,
-		&rules.allowRegexpRecords, &rules.denyRegexpRecords,
-	if err != nil {
+	if err :=LoadRules(&rules.allowRecords, &rules.denyRecords,
+		&rules.allowRegexpRecords, &rules.denyRegexpRecords); err != nil {
 		t.Errorf("Failed to load rules: %s", err.Error())
 	}
 
