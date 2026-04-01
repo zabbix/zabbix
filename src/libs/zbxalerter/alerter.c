@@ -521,9 +521,9 @@ static void	alerter_process_push(
 	ZBX_UNUSED(ipc_message);
 	ZBX_UNUSED(config_adapter_url);
 	ZBX_UNUSED(config_adapter_timeout);
-	ZBX_UNUSED(push_ca_file);
-	ZBX_UNUSED(push_cert_file);
-	ZBX_UNUSED(push_key_file);
+	ZBX_UNUSED(config_adapter_ca_file);
+	ZBX_UNUSED(config_adapter_cert_file);
+	ZBX_UNUSED(config_adapter_key_file);
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 #else
@@ -718,6 +718,7 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 						alerter_args_in->config_adapter_ca_file,
 						alerter_args_in->config_adapter_cert_file,
 						alerter_args_in->config_adapter_key_file);
+				break;
 			case ZBX_RTC_SHUTDOWN:
 				zbx_set_exiting_with_succeed();
 				break;
