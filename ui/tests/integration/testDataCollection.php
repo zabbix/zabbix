@@ -575,7 +575,7 @@ class testDataCollection extends CIntegrationTest {
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue('trapper_host', 'trap', 1, self::COMPONENT_SERVER);
+		$this->sendSenderValue('trapper_host', 'trap', 1, self::COMPONENT_SERVER, 0);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',
@@ -604,7 +604,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$t = time();
-		$result = $this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER, null, $t);
+		$result = $this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER, 0, $t);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => ['clock', 'ns'],
