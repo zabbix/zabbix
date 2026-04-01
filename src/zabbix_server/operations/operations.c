@@ -839,6 +839,9 @@ out:
 	}
 clean:
 	zbx_vector_uint64_destroy(&groupids);
+
+	if (0 == h->hostid)
+		h->status = HOST_STATUS_FAILED;
 skip:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
