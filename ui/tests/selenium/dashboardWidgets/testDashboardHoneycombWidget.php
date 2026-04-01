@@ -58,8 +58,14 @@ class testDashboardHoneycombWidget extends testWidgets {
 	 */
 	protected static $disposable_dashboard_id;
 
+	protected static $dependent_items;
+
 	const DASHBOARD_FOR_MACRO_FUNCTIONS = 'Dashboard for testing macro functions';
 	const WIDGET_FOR_MACRO_FUNCTIONS = 'Widget for testing macro functions';
+	const HOST_CREATE_HONEY = 'Host for honeycomb 1';
+	const HOST_DISPLAY = 'Display';
+	const ITEM_KEY_TEXT = 'text_honey_1';
+	const ITEM_KEY_DISPLAY_TEXT = 'honey_display_text';
 
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
@@ -77,7 +83,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 
 		$response = CDataHelper::createHosts([
 			[
-				'host' => 'Host for honeycomb 1',
+				'host' => self::HOST_CREATE_HONEY,
 				'groups' => [['groupid' => 4]], // Zabbix servers.
 				'items' => [
 					[
@@ -85,11 +91,41 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'num_honey_1',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
-					]
+					],
+					[
+						'name' => 'Numeric (float) for honeycomb 1',
+						'key_' => 'float_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT
+					],
+					[
+						'name' => 'Character for honeycomb 1',
+						'key_' => 'char_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
+					],
+					[
+						'name' => 'Log for honeycomb 1',
+						'key_' => 'log_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
+					],
+					[
+						'name' => 'Text for honeycomb 1',
+						'key_' => self::ITEM_KEY_TEXT,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'JSON for honeycomb 1',
+						'key_' => 'json_honey_1',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON
+					],
 				]
 			],
 			[
-				'host' => 'Display',
+				'host' => self::HOST_DISPLAY,
 				'groups' => [['groupid' => 4]], // Zabbix servers.
 				'items' => [
 					[
@@ -121,6 +157,30 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'honey_display_5',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_UINT64
+					],
+					[
+						'name' => 'Non-numeric JSON',
+						'key_' => 'honey_display_json',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_JSON
+					],
+					[
+						'name' => 'Non-numeric TEXT',
+						'key_' => self::ITEM_KEY_DISPLAY_TEXT,
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_TEXT
+					],
+					[
+						'name' => 'Non-numeric CHAR',
+						'key_' => 'honey_display_char',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_STR
+					],
+					[
+						'name' => 'Non-numeric LOG',
+						'key_' => 'honey_display_log',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_LOG
 					]
 				]
 			],
@@ -222,11 +282,37 @@ class testDashboardHoneycombWidget extends testWidgets {
 			]
 		]);
 		$itemids = $response['itemids'];
-		$display_hostid = $response['hostids']['Display'];
+		$create_hostid = $response['hostids'][self::HOST_CREATE_HONEY];
+		$display_hostid = $response['hostids'][self::HOST_DISPLAY];
 		$maintenance_hostid = $response['hostids']['Host for maintenance filter'];
 
+		// Create dependent items.
+		$dependent = [
+			self::HOST_CREATE_HONEY => [
+				[
+					'name' => 'Binary for honeycomb 1',
+					'key_' => 'dependent_item_1',
+					'master_itemid' => $itemids[self::HOST_CREATE_HONEY.':'.self::ITEM_KEY_TEXT],
+					'type' => ITEM_TYPE_DEPENDENT,
+					'value_type' => ITEM_VALUE_TYPE_BINARY
+				]
+			],
+			self::HOST_DISPLAY => [
+				[
+					'name' => 'Non-numeric BINARY',
+					'key_' => 'honey_display_bin',
+					'master_itemid' => $itemids[self::HOST_DISPLAY.':'.self::ITEM_KEY_DISPLAY_TEXT],
+					'type' => ITEM_TYPE_DEPENDENT,
+					'value_type' => ITEM_VALUE_TYPE_BINARY
+				]
+			]
+		];
+
+		CDataHelper::createItems('item', $dependent, $response['hostids']);
+		self::$dependent_items = CDataHelper::getIds('name');
+
 		foreach ([100, 200, 300, 400, 500] as $i => $value) {
-			CDataHelper::addItemData($itemids['Display:honey_display_'.($i + 1)], $value);
+			CDataHelper::addItemData($itemids[self::HOST_DISPLAY.':honey_display_'.($i + 1)], $value);
 		}
 
 		// Items ids that used in filtering scenario.
@@ -1215,7 +1301,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'Name' => 'With existing item, hosts and hostgroup',
 						'Item patterns' => 'Numeric for honeycomb 1',
 						'Host groups' => 'Zabbix servers',
-						'Hosts' => 'Host for honeycomb 1'
+						'Hosts' => self::HOST_CREATE_HONEY
 					]
 				]
 			],
@@ -1372,15 +1458,225 @@ class testDashboardHoneycombWidget extends testWidgets {
 					]
 				]
 			],
-			// #20.
+			// #20 Numeric (uint) data type with all available fields.
 			[
 				[
 					'fields' => [
-						'Name' => 'All available fields filled',
+						'Name' => 'Numeric: all available fields filled',
 						'Item patterns' => 'Numeric for honeycomb 1',
 						'Refresh interval' => 'No refresh',
 						'Host groups' => 'Zabbix servers',
-						'Hosts' => 'Host for honeycomb 1',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #21 Float data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Float: all available fields filled',
+						'Item patterns' => 'Float for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #22 Char data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Character: all available fields filled',
+						'Item patterns' => 'Char for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #23 Log data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Log: all available fields filled',
+						'Item patterns' => 'Log for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #24 Text data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Text: all available fields filled',
+						'Item patterns' => 'Text for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #25 JSON data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'JSON: all available fields filled',
+						'Item patterns' => 'JSON for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label_decimal_places' => 6,
+						'id:secondary_label' => 'some text',
+						'id:primary_label_bold' => true,
+						'id:secondary_label_bold' => false,
+						'id:primary_label_size' => 99,
+						'id:secondary_label_size' => 99,
+						self::PATH_TO_COLOR_PICKER.'"primary_label_color"]' => '81C784', // Primary label Color.
+						self::PATH_TO_COLOR_PICKER.'"secondary_label_color"]' => '81C784', // Primary label Color.
+						'id:primary_label_units_pos' => 'Before value',
+						'id:primary_label_units' => 'primary',
+						'Background colour' => 'B2DFDB'
+					],
+					'thresholds' => [
+						[
+							'threshold' => '1',
+							'color' => 'FF465C'
+						],
+						[
+							'threshold' => '2',
+							'color' => 'FFFF00'
+						]
+					]
+				]
+			],
+			// #26 Binary data type with all available fields.
+			[
+				[
+					'fields' => [
+						'Name' => 'Binary: all available fields filled',
+						'Item patterns' => 'Binary for honeycomb 1',
+						'Refresh interval' => 'No refresh',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => self::HOST_CREATE_HONEY,
 						'id:primary_label_type' => 'Value',
 						'id:secondary_label_type' => 'Text',
 						'id:primary_label_decimal_places' => 6,
@@ -1913,7 +2209,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			'Item patterns' => 'Test_cancel',
 			'Refresh interval' => '15 minutes',
 			'Host groups' => 'Zabbix servers',
-			'Hosts' => 'Host for honeycomb 1',
+			'Hosts' => self::HOST_CREATE_HONEY,
 			'id:primary_label_type' => 'Value',
 			'id:secondary_label_type' => 'Text',
 			'id:primary_label_decimal_places' => 6,
