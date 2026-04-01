@@ -614,7 +614,7 @@ class testDataCollection extends CIntegrationTest {
 		});
 		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('value', $response['result'][0]);
-		$this->assertEquals(400, $response['result'][0]['value']);
+		$this->assertEquals(400, $response['result'][0]['value'], json_encode($response));
 	}
 
 	/**
