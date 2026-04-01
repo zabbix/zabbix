@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -53,7 +53,7 @@ int	zbx_vsnprintf_check_len(const char *fmt, va_list args)
 	if (0 > (rv = vsnprintf(NULL, 0, fmt, args)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return rv;
@@ -169,7 +169,7 @@ static int	test_vsnprintf(void)
 	zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", res);
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 int	zbx_hpux_vsnprintf_is_c99(void)
@@ -236,7 +236,7 @@ void	zbx_vsnprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const ch
 			zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", bytes_written);
 
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		*offset += bytes_written;

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -73,9 +73,10 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 
 		// Check hintbox.
 		$form->getLabel('Enable HTTP authentication')->query('class:zi-help-filled-small')->one()->click();
-		$hintbox = $form->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent();
+		$hintbox = $form->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent();
 		$this->assertEquals('If HTTP authentication is enabled, all users (even with frontend access set to LDAP/Internal)'.
-			' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText());
+				' will be authenticated by the web server, not by Zabbix.', $hintbox->one()->getText()
+		);
 
 		// Close the hintbox.
 		$hintbox->query('class:btn-overlay-close')->one()->click()->waitUntilNotPresent();
@@ -603,7 +604,7 @@ class testUsersAuthenticationHttp extends CLegacyWebTest {
 			}
 			// Check page header after successful login.
 			else {
-				$this->assertEquals($check['target'], $this->query('tag:h1')->one()->getText());
+				$this->assertEquals($check['target'], $this->query('tag:h1')->waitUntilVisible()->one()->getText());
 			}
 
 			// Check user data in DB after login.

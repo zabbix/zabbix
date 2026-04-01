@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -156,11 +156,13 @@ function getMappingEntryView(string $sortorder, string $expression, string $icon
 			)
 		)
 		->addItem((new CCol())
-			->addItem((new CTextBox("mappings[$sortorder][expression]", $expression, false, 64))
+			->addClass(ZBX_STYLE_ALIGN_TOP)
+			->addItem((new CTextAreaFlexible("mappings[$sortorder][expression]", $expression))
 				->setErrorContainer('mapping-'.$sortorder.'-error-container')
 				->setErrorLabel(_('Expression'))
 				->setAriaRequired()
 				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setMaxlength(DB::getFieldLength('icon_mapping', 'expression'))
 			)
 		)
 		->addItem((new CCol())

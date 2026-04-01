@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -126,8 +126,6 @@ window.operation_popup = new class {
 
 		optags.forEach((optag) => {
 			tags_table.rows[tags_table.rows.length - 1].insertAdjacentHTML('beforebegin', template.evaluate(optag));
-
-			$(`#operation_optag_${optag.row_index}_tag, #operation_optag_${optag.row_index}_value`).textareaFlexible();
 		});
 	}
 
@@ -263,7 +261,6 @@ window.operation_popup = new class {
 				continue;
 			}
 			field.style.display = 'none';
-			field.getElementsByTagName('input')
 		}
 
 		for (const label of this.form.getElementsByTagName('label')) {
@@ -273,14 +270,14 @@ window.operation_popup = new class {
 			label.style.display = 'none';
 		}
 
-		for (const input of this.form.querySelectorAll('input, textarea')) {
+		for (const input of this.form.querySelectorAll('input, textarea, z-textarea-flexible')) {
 			if (['operation_eventsource', 'operation_recovery', 'submit'].includes(input.id)) {
 				continue;
 			}
 			if (input.name === 'operation[operationtype]') {
 				continue;
 			}
-			input.setAttribute('disabled', true);
+			input.disabled = true;
 			input.style.display = 'none';
 		}
 	}
@@ -363,7 +360,7 @@ window.operation_popup = new class {
 			if (fields.includes(field.id)) {
 				field.style.display = '';
 
-				for (const input of field.querySelectorAll('input, textarea')) {
+				for (const input of field.querySelectorAll('input, textarea, z-textarea-flexible')) {
 					input.removeAttribute('disabled');
 					input.style.display = '';
 				}
@@ -635,29 +632,25 @@ window.operation_popup = new class {
 	}
 
 	_customMessageFields() {
-		const default_msg = document.querySelector('#operation_opmessage_default_msg');
+		const default_msg = document.getElementById('operation_opmessage_default_msg');
 		const message_fields = [
 			'operation-message-subject-label', 'operation-opmessage-subject', 'operation-message-label',
 			'operation_opmessage_message', 'operation-message-subject', 'operation-message'
 		];
 
-		default_msg.onchange = function() {
-			if (document.querySelector('#operation_opmessage_default_msg').checked) {
-				message_fields.forEach((field) => {
-					document.getElementById(field).style.display='';
-					document.getElementById(field).removeAttribute('disabled');
-				});
+		const update_fields = () => {
+			const is_checked = default_msg.checked;
 
-				document.querySelector('#operation_opmessage_default_msg').value = 0;
-			}
-			else {
-				message_fields.forEach((field) => {
-					document.getElementById(field).style.display='none';
-				});
+			for (const field of message_fields) {
+				const field_element = document.getElementById(field);
 
-				document.querySelector('#operation_opmessage_default_msg').value = 1;
+				default_msg.value = is_checked ? 0 : 1;
+				field_element.style.display = is_checked ? '' : 'none';
+				field_element.disabled = !is_checked;
 			}
-		}
-		default_msg.dispatchEvent(new Event('change'));
+		};
+
+		default_msg.addEventListener('change', () => update_fields());
+		update_fields();
 	}
 }

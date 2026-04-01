@@ -14,7 +14,6 @@ SUBDIRS = \
 	timer \
 	escalator \
 	operations \
-	postinit \
 	proxypoller \
 	taskmanager \
 	stats \
@@ -42,6 +41,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcalc/libzbxcalc.a \
 	$(top_builddir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_builddir)/src/libs/zbxpinger/libzbxpinger.a \
+	$(top_builddir)/src/libs/zbxsupervisor/libzbxsupervisor.a \
 	dbconfig/libzbxdbconfig.a \
 	diag/libzbxdiag_server.a \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
@@ -58,6 +58,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
+	$(top_builddir)/src/libs/zbxsnmp/libzbxsnmp.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
@@ -73,11 +74,11 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
-	postinit/libzbxpostinit.a \
 	operations/libzbxoperations.a \
 	stats/libzbxstats_server.a \
 	ha/libzbxha.a \
 	pgmanager/libzbxpgmanager.a \
+	$(top_builddir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
@@ -119,6 +120,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_builddir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_builddir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_builddir)/src/libs/zbxxml/libzbxxml.a \
 	$(top_builddir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_builddir)/src/libs/zbxalgo/libzbxalgo.a \

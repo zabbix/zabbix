@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -24,10 +24,11 @@ typedef void (*zbx_async_notify_cb_t)(void *data);
 
 typedef struct
 {
-	zbx_dc_item_t	*items;
-	AGENT_RESULT	*results;
-	int		*errcodes;
-	int		num;
+	unsigned char		poller_type;
+	zbx_dc_poller_item_t	items;
+	AGENT_RESULT		*results;
+	int			*errcodes;
+	int			num;
 }
 zbx_poller_item_t;
 

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -108,22 +108,26 @@ typedef struct
 	zbx_uint64_t		eventid;
 	/* problem event id for recovery events */
 	zbx_uint64_t		p_eventid;
-	int			nextsend;
+	zbx_uint64_t		actionid;
+	zbx_uint64_t		min_alertid;
 
 	/* alert data */
 	char			*sendto;
 	char			*subject;
 	zbx_shared_str_t	message;
 	char			*params;
-	unsigned char		message_format;
-	int			status;
-	int			retries;
 	char			*expression;
 	char			*recovery_expression;
 
 	zbx_uint64_t		objectid;
 	int			object;
 	int			source;
+
+	int 			message_type;
+	int			nextsend;
+	int			status;
+	int			retries;
+	unsigned char		message_format;
 }
 zbx_am_alert_t;
 
@@ -597,6 +601,7 @@ static int	am_release_mediatype(zbx_am_t *manager, zbx_am_mediatype_t *mediatype
 static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t objectid)
 {
 	zbx_uint64_t	alertpoolid;
+	zbx_hash_t	id_hash;
 
 	if (source < 0 || source > 0xffff)
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -608,7 +613,9 @@ static zbx_uint64_t	am_calc_alertpoolid(int source, int object, zbx_uint64_t obj
 	alertpoolid <<= 16;
 	alertpoolid |= object & 0xffff;
 	alertpoolid <<= 32;
-	alertpoolid |= ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+
+	id_hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&objectid);
+	alertpoolid |= ((id_hash ^ (id_hash >> 32)) & 0xffffffff);
 
 	return alertpoolid;
 }
@@ -732,8 +739,9 @@ static int	am_release_alertpool(zbx_am_t *manager, zbx_am_alertpool_t *alertpool
  *                                                                            *
  ******************************************************************************/
 static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediatypeid, int source, int object,
-		zbx_uint64_t objectid, const char *sendto, const char *subject, zbx_shared_str_t message,
-		const char *params, unsigned char message_format, int status, int retries, int nextsend)
+		zbx_uint64_t objectid, zbx_uint64_t eventid, zbx_uint64_t p_eventid, int message_type,
+		const char *sendto, const char *subject, zbx_shared_str_t message, const char *params,
+		unsigned char message_format, int status, int retries, int nextsend)
 {
 	zbx_am_alert_t	*alert;
 
@@ -743,8 +751,10 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
 	alert->alertpoolid = am_calc_alertpoolid(source, object, objectid);
 	alert->objectid = objectid;
 	alert->message_format = message_format;
-	alert->eventid = 0;
-	alert->p_eventid = 0;
+	alert->eventid = eventid;
+	alert->p_eventid = p_eventid;
+	alert->actionid = 0;
+	alert->min_alertid = 0;
 
 	if (NULL != sendto)
 		alert->sendto = zbx_strdup(NULL, sendto);
@@ -763,6 +773,7 @@ static zbx_am_alert_t	*am_create_alert(zbx_uint64_t alertid, zbx_uint64_t mediat
 	else
 		alert->params = NULL;
 
+	alert->message_type = message_type;
 	alert->status = status;
 	alert->retries = retries;
 	alert->nextsend = nextsend;
@@ -797,6 +808,8 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->objectid = db_alert->objectid;
 	alert->eventid = db_alert->eventid;
 	alert->p_eventid = db_alert->p_eventid;
+	alert->actionid = db_alert->actionid;
+	alert->min_alertid = db_alert->min_alertid;
 	alert->objectid = db_alert->objectid;
 	alert->object = db_alert->object;
 	alert->source = db_alert->source;
@@ -812,6 +825,7 @@ static zbx_am_alert_t	*am_copy_db_alert(zbx_am_db_alert_t *db_alert)
 	alert->expression = db_alert->expression;
 	alert->recovery_expression = db_alert->recovery_expression;
 
+	alert->message_type = db_alert->message_type;
 	alert->status = db_alert->status;
 	alert->retries = db_alert->retries;
 	alert->nextsend = 0;
@@ -996,7 +1010,7 @@ static void	am_register_alerter(zbx_am_t *manager, zbx_ipc_client_t *client, zbx
 		if (manager->next_alerter_index == manager->alerters.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		alerter = (zbx_am_alerter_t *)manager->alerters.values[manager->next_alerter_index++];
@@ -1053,7 +1067,7 @@ static zbx_am_alerter_t	*am_get_alerter_by_client(zbx_am_t *manager, zbx_ipc_cli
 	if (NULL == alerter)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *alerter;
@@ -1216,8 +1230,8 @@ static void	am_queue_watchdog_alerts(zbx_am_t *manager, const zbx_db_config_t *d
 
 		alert_params = am_substitute_mediatype_params(media->mediatype_params, alert_subject, alert_message);
 
-		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, media->sendto, alert_subject,
-				shared_str_new(alert_message), alert_params, mediatype->message_format, 0, 0, 0);
+		alert = am_create_alert(0, media->mediatypeid, 0, 0, 0, 0, 0, ZBX_ALERT_MESSAGE_WATCHDOG, media->sendto,
+			alert_subject, shared_str_new(alert_message), alert_params, mediatype->message_format, 0, 0, 0);
 
 		alertpool = am_get_alertpool(manager, alert->mediatypeid, alert->alertpoolid);
 		alertpool->refcount++;
@@ -1293,11 +1307,17 @@ static void	am_deinit(zbx_am_t *manager)
 		zbx_am_alerter_t	*alerter = manager->alerters.values[i];
 
 		if (NULL != alerter->client)
+		{
+			zbx_ipc_client_send(alerter->client, ZBX_RTC_SHUTDOWN, NULL, 0);
 			zbx_ipc_client_close(alerter->client);
+		}
 	}
 
 	if (NULL != manager->syncer_client)
+	{
+		zbx_ipc_client_send(manager->syncer_client, ZBX_RTC_SHUTDOWN, NULL, 0);
 		zbx_ipc_client_close(manager->syncer_client);
+	}
 
 	zbx_ipc_service_close(&manager->ipc);
 
@@ -1643,14 +1663,20 @@ static int	am_process_alert(zbx_am_t *manager, zbx_am_alerter_t *alerter, zbx_am
 	{
 		case MEDIA_TYPE_EMAIL:
 			command = ZBX_IPC_ALERTER_EMAIL;
-			p_eventid = (0 == alert->p_eventid ? alert->eventid : alert->p_eventid);
+			if (0 != alert->p_eventid)
+				p_eventid = alert->p_eventid;
+			else if (alert->alertid != alert->min_alertid)
+				p_eventid = alert->eventid;
+			else
+				p_eventid = 0;
 
 			if (ZBX_MEDIA_MESSAGE_FORMAT_DEFAULT == (message_format = alert->message_format))
 				message_format = mediatype->message_format;
 
 			data_len = zbx_alerter_serialize_email(&data, alert->alertid, alert->mediatypeid,
-					mediatype->name, mediatype->maxattempts, p_eventid, alert->source,
-					alert->object, alert->objectid, alert->sendto, alert->subject, alert->message,
+					mediatype->name, mediatype->maxattempts, alert->eventid, p_eventid,
+					alert->actionid, alert->source, alert->object, alert->objectid,
+					alert->message_type, alert->sendto, alert->subject, alert->message,
 					mediatype->smtp_server, mediatype->smtp_port, mediatype->smtp_helo,
 					mediatype->smtp_email, mediatype->smtp_security, mediatype->smtp_verify_peer,
 					mediatype->smtp_verify_host, mediatype->smtp_authentication,
@@ -2057,7 +2083,7 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 	char		*sendto, *subject, *message, *params, *smtp_server, *smtp_helo, *smtp_email, *exec_path,
 			*gsm_modem, *username, *passwd, *attempt_interval, *script, *timeout, *name;
 	unsigned short	smtp_port;
-	int		maxsessions, maxattempts;
+	int		maxsessions, maxattempts, message_type;
 	unsigned char	type, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, message_format;
 
 	zbx_am_alert_t		*alert;
@@ -2067,7 +2093,7 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 	zbx_alerter_deserialize_alert_send(data, &mediatypeid, &type, &name, &smtp_server, &smtp_helo, &smtp_email,
 			&exec_path, &gsm_modem, &username, &passwd, &smtp_port, &smtp_security, &smtp_verify_peer,
 			&smtp_verify_host, &smtp_authentication, &maxsessions, &maxattempts, &attempt_interval,
-			&message_format, &script, &timeout, &sendto, &subject, &message, &params);
+			&message_format, &script, &timeout, &message_type, &sendto, &subject, &message, &params);
 
 	zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
@@ -2079,8 +2105,8 @@ static void	am_process_external_alert_request(zbx_am_t *manager, zbx_uint64_t id
 
 	zbx_audit_flush(ZBX_AUDIT_ALL_CONTEXT);
 
-	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id, sendto, subject, shared_str_new(message),
-			params, message_format, 0, 0, 0);
+	alert = am_create_alert(id, mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id, 0, 0, message_type, sendto, subject,
+			shared_str_new(message), params, message_format, 0, 0, 0);
 
 	if (FAIL == am_queue_alert(manager, alert, 0))
 	{
@@ -2188,7 +2214,8 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 	zbx_db_mediatype	mt;
 	zbx_shared_str_t	message;
 	unsigned char		message_format;
-	zbx_uint64_t		id;
+	zbx_uint64_t		id, reportid;
+	int			message_type;
 	zbx_am_dispatch_t	*dispatch;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clientid:" ZBX_FS_UI64, __func__, zbx_ipc_client_id(client));
@@ -2205,7 +2232,7 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 
 	zbx_vector_str_create(&recipients);
 
-	zbx_alerter_deserialize_send_dispatch(data, &mt, &recipients);
+	zbx_alerter_deserialize_send_dispatch(data, &mt, &recipients, &reportid, &message_type);
 
 	zbx_audit_prepare(ZBX_AUDIT_ALL_CONTEXT);
 
@@ -2223,8 +2250,9 @@ static void	am_process_send_dispatch(zbx_am_t *manager, zbx_ipc_client_t *client
 
 	for (int i = 0; i < recipients.values_num; i++)
 	{
-		zbx_am_alert_t	*alert = am_create_alert(id, mt.mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id,
-				recipients.values[i], dispatch->subject, message, NULL, message_format, 0, 0, 0);
+		zbx_am_alert_t	*alert = am_create_alert(id, mt.mediatypeid, ALERT_SOURCE_EXTERNAL, 0, id, reportid,
+				reportid, message_type, recipients.values[i], dispatch->subject, message, NULL,
+				message_format, 0, 0, 0);
 
 		if (FAIL == am_queue_alert(manager, alert, 0))
 		{
@@ -2381,6 +2409,14 @@ static int	am_source_compare_func(const void *d1, const void *d2)
 	return 0;
 }
 
+static int	am_compare_source_stats_alerts_num_func(const void *d1, const void *d2)
+{
+	zbx_am_source_stats_t	*m1 = *(zbx_am_source_stats_t * const *)d1;
+	zbx_am_source_stats_t	*m2 = *(zbx_am_source_stats_t * const *)d2;
+
+	return m2->alerts_num - m1->alerts_num;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: processes top alert sources by queued alerts                      *
@@ -2431,7 +2467,7 @@ static void	am_process_diag_top_sources(zbx_am_t *manager, zbx_ipc_client_t *cli
 		}
 	}
 
-	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_mediatype_by_alerts_desc);
+	zbx_vector_am_source_stats_ptr_sort(&view, am_compare_source_stats_alerts_num_func);
 	sources_num = MIN(limit, view.values_num);
 
 	data_len = zbx_alerter_serialize_top_sources_result(&data, (zbx_am_source_stats_t **)view.values, sources_num);
@@ -2487,7 +2523,7 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	manager.dbstatus = zbx_db_connect(ZBX_DB_CONNECT_ONCE);

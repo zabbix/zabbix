@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -77,7 +77,8 @@ function getMessageSettings() {
 		$messages['triggers.severities'] = $defSeverities;
 	}
 	else {
-		$messages['triggers.severities'] = unserialize($messages['triggers.severities']);
+		$selected = json_decode($messages['triggers.severities'], true) ?: [];
+		$messages['triggers.severities'] = array_fill_keys($selected, 1);
 	}
 
 	return $messages;
@@ -88,9 +89,10 @@ function updateMessageSettings($messages) {
 		$messages['enabled'] = 0;
 	}
 	if (isset($messages['triggers.severities'])) {
-		$messages['triggers.severities'] = serialize(array_filter($messages['triggers.severities'], function($v) {
+		$selected = array_filter($messages['triggers.severities'], function($v) {
 			return $v == 1;
-		}));
+		});
+		$messages['triggers.severities'] = json_encode(array_keys($selected));
 	}
 
 	$dbProfiles = DBselect(

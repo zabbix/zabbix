@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -477,7 +477,8 @@ class testPageHostInterfaces extends CWebTest {
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
 			// Open interface popup. Unstable test on Jenkins, requires hoverMouse.
 			$interface->hoverMouse()->waitUntilClickable()->click();
-			$overlay = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
+				->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.
 			$this->assertSame(['Interface', 'Status', 'Error'], $interface_table->getHeadersText());
@@ -491,7 +492,8 @@ class testPageHostInterfaces extends CWebTest {
 					'Error' => $interface_details['Error']
 				]);
 				$this->assertEquals($interface_details['Status']['color'], $row->getColumn('Status')
-						->query('xpath:.//span[contains(@class, "status")]')->one()->getCSSValue('background-color'));
+						->query('xpath:.//span[contains(@class, "status")]')->one()->getCSSValue('background-color')
+				);
 			}
 
 			$overlay->close();

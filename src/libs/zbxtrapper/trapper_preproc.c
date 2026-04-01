@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,6 +18,7 @@
 #include "zbxpreprocbase.h"
 #include "zbxtime.h"
 #include "zbxvariant.h"
+#include "zbxdbhigh.h"
 #include "zbx_item_constants.h"
 
 /******************************************************************************
@@ -301,10 +302,23 @@ int	zbx_trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const str
 		if (0 == single)
 		{
 			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
-			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
-					value_type, &preproc_error))
+			if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				break;
+				if (FAIL == zbx_variant_to_value_type(&result->value, value_type, &preproc_error))
+					break;
+
+				/* for json value types check if the converted variant string is valid json */
+				if (ITEM_VALUE_TYPE_JSON == value_type)
+				{
+					if (ZBX_HISTORY_JSON_VALUE_LEN < strlen(result->value.data.str))
+					{
+						preproc_error = zbx_strdup(NULL, "JSON is too large.");
+						break;
+					}
+
+					if (FAIL == zbx_json_validate_ext(result->value.data.str, &preproc_error))
+						break;
+				}
 			}
 		}
 	}

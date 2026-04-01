@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,8 +80,6 @@
 				template: '#variable-row-tmpl',
 				rows: variables
 			});
-
-			this.#initTextareaFlexible($variables);
 		}
 
 		#initHeaders(headers) {
@@ -105,17 +103,6 @@
 						}
 					});
 				});
-
-			this.#initTextareaFlexible($headers);
-		}
-
-		#initTextareaFlexible($element) {
-			$element
-				.on('afteradd.dynamicRows', (e) => {
-					jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', e.target).textareaFlexible();
-				})
-				.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>')
-				.textareaFlexible();
 		}
 
 		#initSteps(steps) {

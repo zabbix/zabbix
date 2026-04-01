@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -63,16 +63,7 @@ $form_grid
 		)
 	])
 	->addItem([
-		new CLabel(_('Filter'), 'filter_type'),
-		new CFormField(
-			(new CRadioButtonList('filter_type', TAG_FILTER_ALL))
-				->addValue(_('All tags'), TAG_FILTER_ALL)
-				->addValue(_('Tag list'), TAG_FILTER_LIST)
-				->setModern(true)
-		)
-	])
-	->addItem([
-		(new CLabel(_('Tags'), 'tag_filters'))->setAsteriskMark(),
+		(new CLabel(_('Tags'), 'tag_filters')),
 		(new CFormField(
 			(new CDiv($new_tag_filter_table))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 		))
@@ -81,15 +72,13 @@ $form_grid
 
 $tag_filter_row_template = (new CTemplateTag('tag-filter-row-template'))->addItem(
 	(new CRow([
-		(new CTextBox('new_tag_filter[#{rowid}][tag]', '#{tag}', false,
-			DB::getFieldLength('tag_filter', 'tag')
-		))
+		(new CTextAreaFlexible('new_tag_filter[#{rowid}][tag]', '#{tag}'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setMaxlength(DB::getFieldLength('tag_filter', 'tag'))
 			->setAttribute('placeholder', _('tag')),
-		(new CTextBox('new_tag_filter[#{rowid}][value]', '#{value}', false,
-			DB::getFieldLength('tag_filter', 'value')
-		))
+		(new CTextAreaFlexible('new_tag_filter[#{rowid}][value]', '#{value}'))
 			->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+			->setMaxlength(DB::getFieldLength('tag_filter', 'value'))
 			->setAttribute('placeholder', _('value')),
 		(new CButtonLink(_('Remove')))->addClass('js-remove-table-row')
 	]))->addClass('form_row')
@@ -106,8 +95,7 @@ $form
 				'groupid' => $data['groupid'] ?: 0
 			]).');
 		'))->setOnDocumentReady()
-	)
-	->setAttribute('autofocus', 'autofocus');
+	);
 
 $output = [
 	'header' => $data['title'],

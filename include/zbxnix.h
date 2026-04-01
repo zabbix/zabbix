@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,7 +48,19 @@ void	zbx_set_exiting_with_fail(void);
 void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
-int	zbx_init_thread_signal_handler(void);
+int	ZBX_IS_NORMAL_EXIT(void);
+int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret);
+
+void	zbx_set_is_running(int (*is_running_func)(void *args), void *args);
+
+#define ZBX_THREAD_FAILURE	((void *)EXIT_FAILURE)
+
+#define ZBX_INIT_THREAD_OR_RETURN(jmp_ret)			\
+		zbx_init_thread_signal_handler(&jmp_ret);	\
+		if (0 != sigsetjmp(jmp_ret, 1))			\
+		{						\
+			return ZBX_THREAD_FAILURE;		\
+		}
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_config_str_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,

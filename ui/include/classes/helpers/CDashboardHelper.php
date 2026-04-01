@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -691,7 +691,7 @@ class CDashboardHelper {
 
 		$widget_last_type = CProfile::get('web.dashboard.last_widget_type');
 
-		if (!array_key_exists($widget_last_type, $known_widgets)) {
+		if ($widget_last_type === null || !array_key_exists($widget_last_type, $known_widgets)) {
 			$current_types = [];
 			$deprecated_types = [];
 

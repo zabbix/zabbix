@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,12 +14,13 @@
 
 #include "dbconfig_server.h"
 
+#include "zbxcommon.h"
+#include "zbxregexp.h"
+#include "zbxsupervisor_client.h"
 #include "../dbconfigworker/dbconfigworker.h"
 
 #include "zbxtimekeeper.h"
-#include "zbxnix.h"
 #include "zbxself.h"
-#include "zbxlog.h"
 #include "zbxcachehistory.h"
 #include "zbxrtc.h"
 #include "zbxtime.h"
@@ -29,6 +30,24 @@
 #include "zbxcacheconfig.h"
 #include "zbxdb.h"
 #include "zbxipcservice.h"
+#include "zbxthreads.h"
+#include "zbxprof.h"
+
+static void	dbconfig_prof_enable(const unsigned char *data)
+{
+	pid_t	pid;
+	int	proc_type, proc_num, scope;
+	char	*error = NULL;
+
+	if (SUCCEED != zbx_rtc_get_command_target((const char *)data, &pid, &proc_type, &proc_num, &scope, &error))
+	{
+		THIS_SHOULD_NEVER_HAPPEN_MSG("cannot get rtc target: %s", error);
+		zbx_free(error);
+		return;
+	}
+
+	zbx_prof_enable(scope);
+}
 
 /******************************************************************************
  *                                                                            *
@@ -37,94 +56,115 @@
  * Comments: never returns                                                    *
  *                                                                            *
  ******************************************************************************/
-ZBX_THREAD_ENTRY(dbconfig_thread, args)
+void	*zbx_dbconfig_thread(void *args)
 {
 	double				sec = 0.0;
-	int				sleeptime, server_num = ((zbx_thread_args_t *)args)->info.server_num,
-					process_num = ((zbx_thread_args_t *)args)->info.process_num, nextcheck = 0,
+	int				sleeptime = 1, nextcheck = 0,
 					secrets_reload = 0, cache_reload = 0;
 	zbx_ipc_async_socket_t		rtc;
-	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD};
+	zbx_supervisor_unit_args_t	*unit_args = (zbx_supervisor_unit_args_t *)args;
+	const zbx_thread_info_t		*info = &unit_args->args.info;
+	unsigned char			process_type = info->process_type;
+	int				server_num = info->server_num;
+	int				process_num = info->process_num;
+	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_CONFIG_CACHE_RELOAD, ZBX_RTC_SECRETS_RELOAD,
+							ZBX_RTC_PROF_ENABLE, ZBX_RTC_PROF_DISABLE};
+	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)unit_args->args.args;
 
-	zbx_thread_dbconfig_args	*dbconfig_args_in = (zbx_thread_dbconfig_args *)
-					(((zbx_thread_args_t *)args)->args);
+	zbx_supervisor_update_activity("%s starting", unit_args->name);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
-			server_num, get_process_type_string(process_type), process_num);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, ARRSIZE(rtc_msgs), dbconfig_args_in->config_timeout,
 			&rtc);
 
-	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
+	zbx_supervisor_update_activity("%s [connecting to the database]", unit_args->name);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
 	sec = zbx_time();
-	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
+	zbx_supervisor_update_activity("%s [syncing configuration]", unit_args->name);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "starting initial configuration cache synchronization");
+
 	zbx_dc_sync_configuration(ZBX_DBSYNC_INIT, ZBX_SYNCED_NEW_CONFIG_NO, NULL, dbconfig_args_in->config_vault,
 			dbconfig_args_in->proxyconfig_frequency);
 	zbx_dc_sync_kvs_paths(NULL, dbconfig_args_in->config_vault, dbconfig_args_in->config_source_ip,
 			dbconfig_args_in->config_ssl_ca_location, dbconfig_args_in->config_ssl_cert_location,
 			dbconfig_args_in->config_ssl_key_location);
-	zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-			get_process_type_string(process_type), (sec = zbx_time() - sec),
-			dbconfig_args_in->config_confsyncer_frequency);
+	zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
+			unit_args->name, (sec = zbx_time() - sec), dbconfig_args_in->config_confsyncer_frequency);
 
-	zbx_rtc_notify_finished_sync(dbconfig_args_in->config_timeout, ZBX_RTC_CONFIG_SYNC_NOTIFY,
-			get_process_type_string(process_type), &rtc);
+
+	/* update maintenance states */
+	zbx_dc_update_maintenances(MAINTENANCE_TIMER_PENDING);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "finished initial configuration cache synchronization");
 
 	nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
 
-	while (ZBX_IS_RUNNING())
+	zbx_supervisor_set_process_running(server_num);
+
+	while (UNIT_RUNNING == *unit_args->runstate)
 	{
 		zbx_uint32_t	rtc_cmd;
 		unsigned char	*rtc_data;
 
-		sleeptime = nextcheck - (int)time(NULL);
-
 		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, sleeptime) && 0 != rtc_cmd)
 		{
-			if (ZBX_RTC_CONFIG_CACHE_RELOAD == rtc_cmd)
+			switch (rtc_cmd)
 			{
-				if (0 == cache_reload)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration cache");
-					cache_reload = 1;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING,
-							"configuration cache reloading is already in progress");
-				}
+				case ZBX_RTC_CONFIG_CACHE_RELOAD:
+					if (0 == cache_reload)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the configuration"
+								" cache");
+						cache_reload = 1;
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING,
+								"configuration cache reloading is already in progress");
+					}
+					break;
+				case ZBX_RTC_SECRETS_RELOAD:
+					if (0 == secrets_reload)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the secrets");
+						secrets_reload = 1;
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING,
+								"configuration cache reloading is already in progress");
+					}
+					break;
+				case ZBX_RTC_PROF_ENABLE:
+					dbconfig_prof_enable(rtc_data);
+					break;
+				case ZBX_RTC_PROF_DISABLE:
+					zbx_prof_disable();
+					break;
+				case ZBX_RTC_SHUTDOWN:
+					goto stop;
 			}
-			else if (ZBX_RTC_SECRETS_RELOAD == rtc_cmd)
-			{
-				if (0 == secrets_reload)
-				{
-					zabbix_log(LOG_LEVEL_WARNING, "forced reloading of the secrets");
-					secrets_reload = 1;
-				}
-				else
-				{
-					zabbix_log(LOG_LEVEL_WARNING,
-							"configuration cache reloading is already in progress");
-				}
-			}
-			else if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				goto stop;
 
 			sleeptime = 0;
+			zbx_free(rtc_data);
 		}
 
-		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
-				get_process_type_string(process_type), sec);
+		sleeptime = time(NULL) < (time_t)nextcheck ? 1 : 0;
+
+		if (0 == secrets_reload && 0 == cache_reload && 0 != sleeptime)
+			continue;
+
+		zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, syncing configuration]",
+				unit_args->name, sec);
 
 		sec = zbx_time();
-		zbx_update_env(get_process_type_string(process_type), sec);
+		zbx_prof_update(get_process_type_string(process_type), sec);
 
 		if (0 == secrets_reload)
 		{
@@ -149,6 +189,7 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 			nextcheck = (int)time(NULL) + dbconfig_args_in->config_confsyncer_frequency;
 
 			zbx_vc_remove_items_by_ids(&deleted_itemids);
+			zbx_hc_remove_items_by_ids(&deleted_itemids);
 			zbx_vector_uint64_destroy(&deleted_itemids);
 			zbx_vector_uint64_destroy(&hostids);
 
@@ -170,16 +211,22 @@ ZBX_THREAD_ENTRY(dbconfig_thread, args)
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
-				get_process_type_string(process_type), sec,
-				dbconfig_args_in->config_confsyncer_frequency);
+		zbx_supervisor_update_activity("%s [synced configuration in " ZBX_FS_DBL " sec, idle %d sec]",
+				unit_args->name, sec, dbconfig_args_in->config_confsyncer_frequency);
 	}
 stop:
+	zbx_deinit_regexp_env();
+
+	zbx_prof_destroy();
+
+	zbx_history_cache_destroy_local_cache();
+
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
 
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	zbx_supervisor_update_activity("%s [terminated]", unit_args->name);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zbx_free(args);
+
+	return NULL;
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -275,7 +275,7 @@ void	__zbx_rwlock_wrlock(const char *filename, int line, zbx_rwlock_t rwlock)
 	if (0 != pthread_rwlock_wrlock(rwlock))
 	{
 		zbx_error("[file:'%s',line:%d] write lock failed: %s", filename, line, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -299,7 +299,7 @@ void	__zbx_rwlock_rdlock(const char *filename, int line, zbx_rwlock_t rwlock)
 	if (0 != pthread_rwlock_rdlock(rwlock))
 	{
 		zbx_error("[file:'%s',line:%d] read lock failed: %s", filename, line, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -323,7 +323,7 @@ void	__zbx_rwlock_unlock(const char *filename, int line, zbx_rwlock_t rwlock)
 	if (0 != pthread_rwlock_unlock(rwlock))
 	{
 		zbx_error("[file:'%s',line:%d] read-write lock unlock failed: %s", filename, line, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -427,7 +427,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 	{
 		zbx_error("[file:'%s',line:%d] lock failed: ZBX_MUTEX_THREAD_DENIED is set for thread with id = %d",
 				filename, line, zbx_get_thread_id());
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	dwWaitResult = WaitForSingleObject(mutex, INFINITE);
@@ -438,11 +438,11 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 			break;
 		case WAIT_ABANDONED:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		default:
 			zbx_error("[file:'%s',line:%d] lock failed: %s",
 				filename, line, zbx_strerror_from_system(GetLastError()));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 #else
 #ifdef	HAVE_PTHREAD_PROCESS_SHARED
@@ -451,8 +451,10 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 
 	if (0 != pthread_mutex_lock(mutex))
 	{
-		zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		long	id = mutex - shared_lock->mutexes;
+
+		zbx_error("[file:'%s',line:%d] mutex:%ld failed: %s", filename, line, id, zbx_strerror(errno));
+		zbx_exit(EXIT_FAILURE);
 	}
 #else
 	sem_lock.sem_num = mutex;
@@ -464,7 +466,7 @@ void	__zbx_mutex_lock(const char *filename, int line, zbx_mutex_t mutex)
 		if (EINTR != errno)
 		{
 			zbx_error("[file:'%s',line:%d] lock failed: %s", filename, line, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -496,7 +498,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s",
 				filename, line, zbx_strerror_from_system(GetLastError()));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #else
 #ifdef	HAVE_PTHREAD_PROCESS_SHARED
@@ -506,7 +508,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 	if (0 != pthread_mutex_unlock(mutex))
 	{
 		zbx_error("[file:'%s',line:%d] unlock failed: %s", filename, line, zbx_strerror(errno));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #else
 	sem_unlock.sem_num = mutex;
@@ -518,7 +520,7 @@ void	__zbx_mutex_unlock(const char *filename, int line, zbx_mutex_t mutex)
 		if (EINTR != errno)
 		{
 			zbx_error("[file:'%s',line:%d] unlock failed: %s", filename, line, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 #endif
@@ -569,7 +571,7 @@ zbx_mutex_name_t	zbx_mutex_create_per_process_name(const zbx_mutex_name_t prefix
 	if (MAX_PATH < size)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	size = size + 1; /* for terminating '\0' */

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2779,7 +2779,7 @@ class testDashboardGraphWidget extends testWidgets {
 			$this->assertFalse($input->isEnabled());
 			$this->assertEquals('', $input->getValue());
 
-			foreach (['maxlength' => 2048, 'placeholder' => 'value'] as $attribute => $value) {
+			foreach (['maxlength' => 255, 'placeholder' => 'value'] as $attribute => $value) {
 				$this->assertEquals($value, $input->getAttribute($attribute));
 			}
 		}
@@ -2906,7 +2906,7 @@ class testDashboardGraphWidget extends testWidgets {
 				$this->assertFalse($this->query('id:lefty_static_units')->one()->isEnabled());
 				break;
 
-			case 'Both';
+			case 'Both':
 				$this->assertEnabledFields($lefty_fields, true);
 				$this->assertEnabledFields($righty_fields, true);
 				$this->assertFalse($this->query('id:righty_static_units')->one()->isEnabled());
@@ -2947,6 +2947,9 @@ class testDashboardGraphWidget extends testWidgets {
 					'Aggregate' => 'Data set'
 				]
 			],
+			'Displaying options' => [
+				'Host names in labels' => 'Show'
+			],
 			'Legend' => [
 				'Show aggregation function' => true
 			]
@@ -2968,7 +2971,7 @@ class testDashboardGraphWidget extends testWidgets {
 
 		// Check hint next to the "Data set label" field.
 		$form->getLabel('Data set label')->query('xpath:./button[@data-hintbox]')->one()->click();
-		$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilPresent()->one();
+		$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilPresent()->one();
 		$this->assertEquals('Also used as legend label for aggregated data sets.', $hint->getText());
 
 		$this->fillForm($input_data, $form);

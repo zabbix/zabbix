@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -498,7 +498,7 @@ class testItemTimeouts extends CIntegrationTest {
 			]
 		]);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_async_check_snmp", true, 90, 1, true);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In async_check_snmp_context", true, 90, 1, true);
 		$tm1 = time();
 
 		$fail_logmsg = ":10987.*timed out, retrying";

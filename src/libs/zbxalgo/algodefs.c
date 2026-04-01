@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -57,7 +57,7 @@ zbx_hash_t	zbx_hash_splittable64(const void *data)
 	value *= UINT64_C(0x94d049bb133111eb);
 	value ^= value >> 31;
 
-	return (zbx_hash_t)value ^ (value >> 32);
+	return value;
 }
 
 zbx_hash_t	zbx_hash_id64(const void *data)

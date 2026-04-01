@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,12 +17,6 @@
 
 #include "pp_cache.h"
 #include "zbxalgo.h"
-
-#ifdef HAVE_NETSNMP
-#	define SNMP_NO_DEBUGGING		/* disabling debugging messages from Net-SNMP library */
-#	include <net-snmp/net-snmp-config.h>
-#	include <net-snmp/net-snmp-includes.h>
-#endif
 
 typedef struct
 {
@@ -96,8 +90,5 @@ void	zbx_snmp_value_cache_clear(zbx_snmp_value_cache_t *cache);
 int	item_preproc_snmp_walk_to_value(zbx_pp_cache_t *cache, zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_snmp_walk_to_json(zbx_variant_t *value, const char *params, char **errmsg);
 int	item_preproc_snmp_get_to_value(zbx_variant_t *value, const char *params, char **errmsg);
-
-void	preproc_init_snmp(void);
-void	preproc_shutdown_snmp(void);
 
 #endif

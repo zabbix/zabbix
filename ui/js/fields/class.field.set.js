@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -158,6 +158,10 @@ class CFieldSet extends CField {
 		return this.getInnerValue(true);
 	}
 
+	updateState() {
+		this.#discoverAllFields();
+	}
+
 	hasErrors() {
 		for (const field of Object.values(this.#fields)) {
 			if (field.hasErrors()) {
@@ -206,14 +210,17 @@ class CFieldSet extends CField {
 	}
 
 	#fieldsSetErrors(errors, force_display_errors) {
-		let missing_field_errors = {};
-
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
 			if (key_full in this.#fields) {
+				// These errors need to be added even if field is not changed, but smaller index one was.
+				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
+					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+				];
+
 				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
-						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
+						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
 
 					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};

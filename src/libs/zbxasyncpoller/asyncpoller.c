@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -310,6 +310,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, zbx_channel_t *channel, st
 	const char *addr, void *data, int timeout, zbx_async_task_process_task_cb_t async_task_process_task_func,
 	zbx_async_task_process_result_cb_t async_task_process_result_func)
 {
+#define ZBX_VECTOR_ARRAY_RESERVE	3
 	zbx_async_task_t	*task;
 
 	task = (zbx_async_task_t *)zbx_malloc(NULL, sizeof(zbx_async_task_t));
@@ -327,6 +328,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, zbx_channel_t *channel, st
 	task->reverse_dns = NULL;
 
 	zbx_vector_address_create(&task->addresses);
+	zbx_vector_address_reserve(&task->addresses, ZBX_VECTOR_ARRAY_RESERVE);
 
 	if (NULL != channel)
 	{
@@ -367,6 +369,7 @@ void	zbx_async_poller_add_task(struct event_base *ev, zbx_channel_t *channel, st
 	evutil_hints.ai_socktype = SOCK_STREAM;
 
 	evdns_getaddrinfo(dnsbase, addr, NULL, &evutil_hints, async_dns_event, task);
+#undef ZBX_VECTOR_ARRAY_RESERVE
 }
 
 zbx_async_task_state_t	zbx_async_poller_get_task_state_for_event(short event)

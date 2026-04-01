@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -295,7 +295,7 @@ class testConnector extends CAPITest {
 					'url' => 'http://localhost/',
 					'item_value_type' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-63.'
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-127.'
 			],
 			'Test connector.create: invalid "item_value_type" (not in range) where "data_type" equals 1' => [
 				'connector' => [
@@ -1664,7 +1664,7 @@ class testConnector extends CAPITest {
 					'connectorid' => 'update_custom_defaults',
 					'item_value_type' => self::INVALID_NUMBER
 				],
-				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-63.'
+				'expected_error' => 'Invalid parameter "/1/item_value_type": value must be one of 1-127.'
 			],
 			'Test connector.update: invalid "item_value_type" (not in range) where "data_type" equals 1' => [
 				'connector' => [

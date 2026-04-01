@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -115,18 +115,6 @@ function getGraphDims($graphid = null) {
 	$graphDims['graphHeight']++;
 
 	return $graphDims;
-}
-
-function getGraphByGraphId($graphId) {
-	$dbGraph = DBfetch(DBselect('SELECT g.* FROM graphs g WHERE g.graphid='.zbx_dbstr($graphId)));
-
-	if ($dbGraph) {
-		return $dbGraph;
-	}
-
-	error(_s('No graph item with graph ID "%1$s".', $graphId));
-
-	return false;
 }
 
 /**
@@ -468,15 +456,10 @@ function get_next_color($palettetype = 0) {
 /**
  * Draws a text on an image. Supports TrueType fonts.
  *
- * @param resource 	$image
- * @param int		$fontsize
- * @param int 		$angle
- * @param int|float $x
- * @param int|float $y
- * @param int		$color		a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
- * @param string	$string
+ * @param int $color  a numeric color identifier from imagecolorallocate() or imagecolorallocatealpha()
  */
-function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
+function imageText(GdImage $image, int $fontsize, int $angle, int|float $x, int|float $y, int $color,
+		string $string): void {
 	$x = (int) $x;
 	$y = (int) $y;
 	$string = strtr($string, ['&' => '&#38;']);
@@ -502,7 +485,6 @@ function imageText($image, $fontsize, $angle, $x, $y, $color, $string) {
 		imagealphablending($imgg, false);
 		imagesavealpha($imgg, true);
 		imagecopy($image, $imgg, $x - $size['height'], $y - $size['width'], 0, 0, $size['height'], $size['width'] + 1);
-		imagedestroy($imgg);
 	}
 }
 

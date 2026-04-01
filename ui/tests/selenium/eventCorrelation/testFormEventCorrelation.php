@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -156,9 +156,9 @@ class testFormEventCorrelation extends CWebTest {
 		// Check mandatory fields.
 		$this->assertEquals(['Name', 'Conditions'], $form->getRequiredLabels());
 
-		// Check input attributes.
+		// Check input and textarea attributes.
 		$field_attributes = [
-			'Name' => ['type' => 'text', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
+			'Name' => ['data-field-type' => 'z-textarea-flexible', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
 			'id:evaltype' => ['value' => 0],
 			'id:formula' => ['type' => 'text', 'value' => '', 'maxlength' => 255, 'placeholder' => 'A or (B and C) ...',
 					'disabled' => 'true'],

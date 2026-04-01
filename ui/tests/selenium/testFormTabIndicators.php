@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1147,7 +1147,7 @@ class testFormTabIndicators extends CWebTest {
 					foreach ($tab['entries'] as $field_value) {
 						$form->query('id:valuemap_add')->one()->click();
 						$valuemap_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
+						$valuemap_form->query('xpath:.//z-textarea-flexible|.//input[@type="text"]')->all()->fill($field_value);
 						$valuemap_form->submit();
 						$valuemap_form->waitUntilNotVisible();
 					}

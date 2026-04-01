@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -87,9 +87,11 @@
 					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
 
 					if (data.submit.success?.action === 'delete') {
-						const url = new URL('host_discovery.php', location.href);
+						const url = new URL('zabbix.php', location.href);
 
+						url.searchParams.set('action', 'graph.prototype.list');
 						url.searchParams.set('context', this.context);
+						url.searchParams.set('parent_discoveryid', this.parent_discoveryid);
 
 						event.setRedirectUrl(url.href);
 					}

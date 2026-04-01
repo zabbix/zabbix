@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,9 +19,11 @@
 
 #include "zbxpreproc.h"
 #include "zbxalgo.h"
+#include "zbxprof.h"
 #include "zbxregexp.h"
 #include "zbxthreads.h"
 #include "zbxnix.h"
+#include "zbxlog.h"
 
 #define PP_WORKER_INIT_NONE	0x00
 #define PP_WORKER_INIT_THREAD	0x01
@@ -103,19 +105,17 @@ static void	*pp_worker_entry(void *args)
 	zbx_pp_worker_t		*worker = (zbx_pp_worker_t *)args;
 	zbx_pp_queue_t		*queue = worker->queue;
 	zbx_pp_task_t		*in;
-	char			*error = NULL, component[MAX_ID_LEN + 1];
-	int			err;
+	char			*error = NULL, component[ZBX_LOG_COMPONENT_NAME_LEN];
+	sigjmp_buf		jmp_ret;
 
-	zbx_snprintf(component, sizeof(component), "%d", worker->id);
+	zbx_snprintf(component, sizeof(component), "preprocessing worker #%d", worker->id);
 	zbx_set_log_component(component, &worker->logger);
+
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zbx_init_regexp_env();
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread started");
 	worker->stop = 0;
 
 	pp_context_init(&worker->execute_ctx);
@@ -163,7 +163,7 @@ static void	*pp_worker_entry(void *args)
 
 		if (SUCCEED != pp_task_queue_wait(queue, &error))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "[%d] %s", worker->id, error);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot wait for preprocessing tasks: %s", error);
 			zbx_free(error);
 			worker->stop = 1;
 		}
@@ -172,12 +172,13 @@ static void	*pp_worker_entry(void *args)
 			pp_task_queue_notify(queue);
 	}
 
+	zbx_prof_destroy();
+
 	pp_task_queue_deregister_worker(queue);
 	pp_task_queue_unlock(queue);
 	zbx_deinit_regexp_env();
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped [%s #%d]",
-			get_process_type_string(ZBX_PROCESS_TYPE_PREPROCESSOR), worker->id);
+	zabbix_log(LOG_LEVEL_INFORMATION, "thread stopped");
 
 	return NULL;
 }

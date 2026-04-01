@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -720,8 +720,11 @@ static void	__snmpidx_mapping_clean(void *data)
 	zbx_free(mapping->index);
 }
 
-static int	zbx_snmp_oid_compare(const zbx_snmp_oid_t **s1, const zbx_snmp_oid_t **s2)
+static int	zbx_snmp_oid_compare(const void *a1, const void *a2)
 {
+	const zbx_snmp_oid_t * const	*s1 = (const zbx_snmp_oid_t *const *)a1;
+	const zbx_snmp_oid_t * const	*s2 = (const zbx_snmp_oid_t *const *)a2;
+
 	return strcmp((*s1)->str_oid, (*s2)->str_oid);
 }
 
@@ -739,7 +742,7 @@ static char	*get_item_community_context(const zbx_dc_item_t *item)
 		return item->snmpv3_contextname;
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 static char	*get_item_security_name(const zbx_dc_item_t *item)
@@ -986,7 +989,11 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	if (STAT_SUCCESS == status)
 	{
 		zbx_snprintf(error, max_error_len, "SNMP error: %s", snmp_errstring(response->errstat));
-		ret = NOTSUPPORTED;
+
+		if (SNMP_ERR_AUTHORIZATIONERROR == response->errstat)
+			ret = NETWORK_ERROR;
+		else
+			ret = NOTSUPPORTED;
 	}
 	else if (STAT_ERROR == status)
 	{
@@ -1033,8 +1040,9 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 		char *snmp_community, char *snmpv3_securityname, char *snmpv3_contextname,
 		unsigned char snmpv3_securitylevel, unsigned char snmpv3_authprotocol, char *snmpv3_authpassphrase,
 		unsigned char snmpv3_privprotocol, char *snmpv3_privpassphrase, unsigned char *securityEngineID,
-		size_t securityEngineIDLen, char *error, size_t max_error_len,
-		int timeout, const char *config_source_ip, zbx_uint64_t itemid)
+		size_t securityEngineIDLen, unsigned char *securityAuthKey, size_t securityAuthKeyLen,
+		unsigned char *securityPrivKey, size_t securityPrivKeyLen, char *error,
+		size_t max_error_len, int timeout, const char *config_source_ip, zbx_uint64_t itemid)
 {
 /* item snmpv3 privacy protocol */
 /* SYNC WITH PHP!               */
@@ -1126,7 +1134,12 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+				if (0 != securityAuthKeyLen)
+				{
+					memcpy(session.securityAuthKey, securityAuthKey, securityAuthKeyLen);
+					session.securityAuthKeyLen = securityAuthKeyLen;
+				}
+				else if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
 						session.securityAuthProtoLen, (u_char *)snmpv3_authpassphrase,
 						strlen(snmpv3_authpassphrase), session.securityAuthKey,
 						&session.securityAuthKeyLen))
@@ -1148,7 +1161,12 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 				session.securityAuthKeyLen = USM_AUTH_KU_LEN;
 
-				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+				if (0 != securityAuthKeyLen)
+				{
+					memcpy(session.securityAuthKey, securityAuthKey, securityAuthKeyLen);
+					session.securityAuthKeyLen = securityAuthKeyLen;
+				}
+				else if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
 						session.securityAuthProtoLen, (u_char *)snmpv3_authpassphrase,
 						strlen(snmpv3_authpassphrase), session.securityAuthKey,
 						&session.securityAuthKeyLen))
@@ -1203,7 +1221,12 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 
 				session.securityPrivKeyLen = USM_PRIV_KU_LEN;
 
-				if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
+				if (0 != securityPrivKeyLen)
+				{
+					memcpy(session.securityPrivKey, securityPrivKey, securityPrivKeyLen);
+					session.securityPrivKeyLen = securityPrivKeyLen;
+				}
+				else if (SNMPERR_SUCCESS != generate_Ku(session.securityAuthProto,
 						session.securityAuthProtoLen, (u_char *)snmpv3_privpassphrase,
 						strlen(snmpv3_privpassphrase), session.securityPrivKey,
 						&session.securityPrivKeyLen))
@@ -2578,7 +2601,7 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
+	zbx_vector_snmp_oid_sort(oids, zbx_snmp_oid_compare);
 
 	for (int i = 1; i < oids->values_num; i++)
 	{
@@ -2638,7 +2661,7 @@ static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oi
 
 	if (1 < oids_out->values_num)
 	{
-		zbx_vector_snmp_oid_sort(oids_out, (zbx_compare_func_t)zbx_snmp_oid_compare);
+		zbx_vector_snmp_oid_sort(oids_out, zbx_snmp_oid_compare);
 		snmp_bulkwalk_remove_matching_oids(oids_out);
 	}
 
@@ -2751,6 +2774,7 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 {
 #define TYPE_STR_HEX_STRING	"Hex-STRING: "
 #define TYPE_STR_STRING		"STRING: "
+#define TYPE_STR_BITS		"BITS: "
 	int	ret;
 	char	*buf;
 	char	quoted_buf[MAX_STRING_LEN];
@@ -2766,6 +2790,12 @@ static int	snmp_quote_string_value(char *buffer, size_t buffer_size, struct vari
 	buf += 3;
 
 	if (0 == var->val_len && 0 == strcmp(buf, "\"\""))
+	{
+		ret = SUCCEED;
+		goto out;
+	}
+
+	if (0 == strncmp(buf, TYPE_STR_BITS, sizeof(TYPE_STR_BITS) - 1))
 	{
 		ret = SUCCEED;
 		goto out;
@@ -2847,6 +2877,7 @@ out:
 	return ret;
 #undef TYPE_STR_HEX_STRING
 #undef TYPE_STR_STRING
+#undef TYPE_STR_BITS
 }
 
 static void	snmp_bulkwalk_trace_variable(zbx_uint64_t itemid, const struct variable_list *var)
@@ -2876,7 +2907,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		ret = zbx_get_snmp_response_error(ssp, interface, status, response, error, max_error_len,
 				(int)*results_offset);
 
-		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s", itemid, error);
+		zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " response error: %s errstat:%ld", itemid, error,
+				response->errstat);
 
 		bulkwalk_context->running = 0;
 		goto out;
@@ -3124,12 +3156,14 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 				&snmp_context->item.interface, snmp_context->snmp_oid_type, snmp_context->item.itemid,
 				error, sizeof(error))))
 		{
+			snmp_context->item.ret = ret;
 			bulkwalk_context->error = zbx_strdup(bulkwalk_context->error, error);
 		}
 	}
 	else
 	{
 		zbx_free(bulkwalk_context->error);
+		snmp_context->item.ret = NOTSUPPORTED;
 		bulkwalk_context->error = zbx_dsprintf(bulkwalk_context->error, "SNMP error: [%d]", stat);
 	}
 out:
@@ -3344,6 +3378,7 @@ static char	*snmp_bulkwalk_get_getrequest_errors(zbx_snmp_context_t *snmp_contex
 static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx_vector_address_t *addresses,
 		const char *reverse_dns, char *dnserr, struct event *timeout_event)
 {
+#define ZBX_SNMP_TIMEOUT_WATERMARK	30
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context = (zbx_snmp_context_t *)data;
 	char			error[MAX_STRING_LEN];
@@ -3382,11 +3417,17 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 			goto stop;
 		}
 
+		const char	*high_timeout_msg = "";
+
+		if (ZBX_SNMP_TIMEOUT_WATERMARK < snmp_context->config_timeout)
+			high_timeout_msg = " (timeout value may be too high)";
+
 		if (0 < snmp_context->retries--)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " cannot receive response from [[%s]:%hu]:"
-					" timed out, retrying", snmp_context->item.itemid,
-					snmp_context->item.interface.addr, snmp_context->item.interface.port);
+					" timed out%s, retrying", snmp_context->item.itemid,
+					snmp_context->item.interface.addr, snmp_context->item.interface.port,
+					high_timeout_msg);
 
 			snmp_sess_timeout(snmp_context->ssp);
 
@@ -3441,9 +3482,9 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		}
 
 		SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
-				"%s: '%s' from [[%s]:%hu]:"
-				" timed out", err_detail, buffer, snmp_context->item.interface.addr,
-				snmp_context->item.interface.port));
+				"%s: '%s' from [[%s]:%hu]: timed out%s", err_detail, buffer,
+				snmp_context->item.interface.addr, snmp_context->item.interface.port,
+				high_timeout_msg));
 
 		goto stop;
 	}
@@ -3534,7 +3575,6 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 
 		if (NULL != bulkwalk_context->error)
 		{
-			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, bulkwalk_context->error);
 			bulkwalk_context->error = NULL;
 			goto stop;
@@ -3591,6 +3631,10 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		unsigned char		*securityEngineID = NULL;
 		size_t			securityEngineIDLen = 0;
 		zbx_snmp_identity_t	*identity_ptr;
+		unsigned char		*securityAuthKey = NULL;
+		size_t			securityAuthKeyLen = 0;
+		unsigned char		*securityPrivKey = NULL;
+		size_t			securityPrivKeyLen = 0;
 
 		if (ZBX_IF_SNMP_VERSION_3 == snmp_context->snmp_version &&
 				NULL != (identity_ptr = zbx_get_snmp_identity(addresses->values[0].ip,
@@ -3598,6 +3642,17 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 		{
 				securityEngineID = identity_ptr->engineid;
 				securityEngineIDLen = identity_ptr->engineid_len;
+				struct usmUser *user = usm_get_user(securityEngineID, securityEngineIDLen,
+						snmp_context->snmpv3_securityname);
+
+				if (NULL != user)
+				{
+					securityPrivKey = user->privKey;
+					securityPrivKeyLen = user->privKeyLen;
+					securityAuthKey = user->authKey;
+					securityAuthKeyLen = user->authKeyLen;
+				}
+
 				snmp_context->probe = 0;
 				zabbix_log(LOG_LEVEL_DEBUG, "itemid:" ZBX_FS_UI64 " EngineID already discovered,"
 						" skipping probe", snmp_context->item.itemid);
@@ -3609,8 +3664,9 @@ static int	async_task_process_task_snmp_cb(short event, void *data, int *fd, zbx
 				snmp_context->snmpv3_contextname, snmp_context->snmpv3_securitylevel,
 				snmp_context->snmpv3_authprotocol, snmp_context->snmpv3_authpassphrase,
 				snmp_context->snmpv3_privprotocol, snmp_context->snmpv3_privpassphrase,
-				securityEngineID, securityEngineIDLen, error, sizeof(error),
-				0, snmp_context->config_source_ip, snmp_context->item.itemid)))
+				securityEngineID, securityEngineIDLen, securityAuthKey, securityAuthKeyLen,
+				securityPrivKey, securityPrivKeyLen, error, sizeof(error), 0,
+				snmp_context->config_source_ip, snmp_context->item.itemid)))
 		{
 			snmp_context->item.ret = NOTSUPPORTED;
 			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
@@ -3675,6 +3731,7 @@ stop:
 	}
 
 	return task_ret;
+#undef ZBX_SNMP_TIMEOUT_WATERMARK
 }
 
 zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t *snmp_context)
@@ -3716,54 +3773,14 @@ void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context)
 	zbx_free(snmp_context);
 }
 
-int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb,
-		void *arg, void *arg_action, struct event_base *base, zbx_channel_t *channel,
-		struct evdns_base *dnsbase, const char *config_source_ip,
-		zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+static void	async_check_snmp_init_context(zbx_snmp_context_t *snmp_context, void *arg, void *arg_action,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
 {
-	int			ret = SUCCEED, pdu_type, is_oid_plain = 0;
-	AGENT_REQUEST		request;
-	zbx_snmp_context_t	*snmp_context;
-	char			error[MAX_STRING_LEN];
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
-			" max_repetitions:%d", __func__, item->itemid, item->key, item->host.host,
-			item->interface.addr, item->timeout, retries, item->snmp_max_repetitions);
-
-	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
-
 	snmp_context->resolve_reverse_dns = resolve_reverse_dns;
 	snmp_context->step = ZABBIX_ASYNC_STEP_DEFAULT;
 	snmp_context->reverse_dns = NULL;
-
 	snmp_context->ssp = NULL;
-	snmp_context->item.interface = item->interface;
-	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
-			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
-	zbx_strlcpy(snmp_context->item.host, item->host.host, sizeof(snmp_context->item.host));
-	snmp_context->item.itemid = item->itemid;
-	snmp_context->item.hostid = item->host.hostid;
-	snmp_context->item.value_type = item->value_type;
-	snmp_context->item.flags = item->flags;
-	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
-	snmp_context->item.preprocessing = item->preprocessing;
-
-	if (item->key != item->key_orig)
-	{
-		snmp_context->item.key = item->key;
-		item->key = NULL;
-	}
-	else
-		snmp_context->item.key = zbx_strdup(NULL, item->key);
-
-	snmp_context->item.version = item->interface.version;
-
 	zbx_init_agent_result(&snmp_context->item.result);
-
-	snmp_context->config_timeout = item->timeout;
-
-	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
 	snmp_context->retries = retries;
 	snmp_context->arg = arg;
 	snmp_context->arg_action = arg_action;
@@ -3771,34 +3788,38 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	snmp_context->results_alloc = 0;
 	snmp_context->results_offset = 0;
 	snmp_context->i = 0;
-
-	snmp_context->snmp_version = item->snmp_version;
-	snmp_context->snmp_community = item->snmp_community;
-	item->snmp_community = NULL;
-	snmp_context->snmpv3_securityname = item->snmpv3_securityname;
-	item->snmpv3_securityname = NULL;
-	snmp_context->snmpv3_contextname = item->snmpv3_contextname;
-	item->snmpv3_contextname = NULL;
-	snmp_context->snmpv3_securitylevel = item->snmpv3_securitylevel;
-	snmp_context->snmpv3_authprotocol = item->snmpv3_authprotocol;
-	snmp_context->snmpv3_authpassphrase = item->snmpv3_authpassphrase;
-	item->snmpv3_authpassphrase = NULL;
-	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
-	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
-	item->snmpv3_privpassphrase = NULL;
 	snmp_context->config_source_ip = config_source_ip;
+	snmp_context->probe_processed = 0;
+}
+
+static int 	async_check_snmp_context(zbx_snmp_context_t *snmp_context, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, struct event_base *base,
+		zbx_channel_t *channel, struct evdns_base *dnsbase, zbx_async_resolve_reverse_dns_t resolve_reverse_dns,
+		char *snmp_oid)
+{
+#define ZBX_VECTOR_ARRAY_RESERVE	3
+	int			ret = SUCCEED, pdu_type, is_oid_plain = 0;
+	AGENT_REQUEST		request;
+	char			error[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s' host:'%s' addr:'%s' timeout:%d retries:%d"
+			" max_repetitions:%d", __func__, snmp_context->item.itemid, snmp_context->item.key,
+			snmp_context->item.host, snmp_context->item.interface.addr, snmp_context->config_timeout,
+			snmp_context->retries, snmp_context->snmp_max_repetitions);
 
 	zbx_vector_bulkwalk_context_create(&snmp_context->bulkwalk_contexts);
+	zbx_vector_bulkwalk_context_reserve(&snmp_context->bulkwalk_contexts, ZBX_VECTOR_ARRAY_RESERVE);
 
 	zbx_init_agent_request(&request);
 	zbx_vector_snmp_oid_create(&snmp_context->param_oids);
+	zbx_vector_snmp_oid_reserve(&snmp_context->param_oids, ZBX_VECTOR_ARRAY_RESERVE);
 
-	if (0 == strncmp(item->snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
+	if (0 == strncmp(snmp_oid, "walk[", ZBX_CONST_STRLEN("walk[")))
 	{
 		snmp_context->snmp_oid_type = ZBX_SNMP_WALK;
-		pdu_type = ZBX_IF_SNMP_VERSION_1 == item->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
+		pdu_type = ZBX_IF_SNMP_VERSION_1 == snmp_context->snmp_version ? SNMP_MSG_GETNEXT : SNMP_MSG_GETBULK;
 	}
-	else if (0 == strncmp(item->snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
+	else if (0 == strncmp(snmp_oid, "get[", ZBX_CONST_STRLEN("get[")))
 	{
 		snmp_context->snmp_oid_type = ZBX_SNMP_GET;
 		pdu_type = SNMP_MSG_GET;
@@ -3817,17 +3838,14 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 		goto out;
 	}
 
-	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
-	snmp_context->probe_processed = 0;
-
-	if (SNMP_MSG_GETBULK == pdu_type && 1 > item->snmp_max_repetitions)
+	if (SNMP_MSG_GETBULK == pdu_type && 1 > snmp_context->snmp_max_repetitions)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid max repetition count: it should be at least 1."));
 		ret = CONFIG_ERROR;
 		goto out;
 	}
 
-	if (0 == is_oid_plain && SUCCEED != zbx_parse_item_key(item->snmp_oid, &request))
+	if (0 == is_oid_plain && SUCCEED != zbx_parse_item_key(snmp_oid, &request))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid SNMP OID: cannot parse parameter."));
 		ret = CONFIG_ERROR;
@@ -3843,7 +3861,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 			goto out;
 		}
 
-		if (SUCCEED != snmp_bulkwalk_parse_param(item->snmp_oid, &snmp_context->param_oids, error,
+		if (SUCCEED != snmp_bulkwalk_parse_param(snmp_oid, &snmp_context->param_oids, error,
 				sizeof(error)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
@@ -3869,17 +3887,132 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result,
 	}
 
 	zbx_async_poller_add_task(base, channel, dnsbase, snmp_context->item.interface.addr, snmp_context,
-			item->timeout, async_task_process_task_snmp_cb, async_task_process_result_snmp_cb);
+			snmp_context->config_timeout, async_task_process_task_snmp_cb,
+			async_task_process_result_snmp_cb);
 
 	ret = SUCCEED;
 out:
-	if (SUCCEED != ret)
-		zbx_async_check_snmp_clean(snmp_context);
-
 	zbx_free_agent_request(&request);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s itemid:" ZBX_FS_UI64, __func__, zbx_result_string(ret),
-			item->itemid);
+		snmp_context->item.itemid);
+
+	return ret;
+#undef ZBX_VECTOR_ARRAY_RESERVE
+}
+
+int	zbx_async_check_snmp(zbx_dc_snmp_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
+		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+{
+	int 			ret;
+	zbx_snmp_context_t	*snmp_context;
+
+	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
+
+	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns, retries);
+
+	snmp_context->item.interface = item->interface;
+	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
+			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
+	zbx_strlcpy(snmp_context->item.host, item->host_host, sizeof(snmp_context->item.host));
+	snmp_context->item.itemid = item->itemid;
+	snmp_context->item.hostid = item->hostid;
+	snmp_context->item.value_type = item->value_type;
+	snmp_context->item.flags = item->flags;
+	snmp_context->item.preprocessing = item->preprocessing;
+
+	snmp_context->item.key_orig = item->key_orig;
+	item->key_orig = NULL;
+	snmp_context->item.key = item->key;
+	item->key = NULL;
+
+	snmp_context->item.version = item->interface.version;
+	snmp_context->config_timeout = item->timeout;
+	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
+	snmp_context->snmp_version = item->snmp_version;
+	snmp_context->snmp_community = item->snmp_community;
+	item->snmp_community = NULL;
+	snmp_context->snmpv3_securityname = item->snmpv3_securityname;
+	item->snmpv3_securityname = NULL;
+	snmp_context->snmpv3_contextname = item->snmpv3_contextname;
+	item->snmpv3_contextname = NULL;
+	snmp_context->snmpv3_securitylevel = item->snmpv3_securitylevel;
+	snmp_context->snmpv3_authprotocol = item->snmpv3_authprotocol;
+	snmp_context->snmpv3_authpassphrase = item->snmpv3_authpassphrase;
+	item->snmpv3_authpassphrase = NULL;
+	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
+	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
+	item->snmpv3_privpassphrase = NULL;
+
+	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
+
+	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
+		dnsbase, resolve_reverse_dns, item->snmp_oid);
+
+	if (SUCCEED != ret)
+		zbx_async_check_snmp_clean(snmp_context);
+
+	return ret;
+}
+
+int	zbx_async_check_snmp_dc_item(zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_async_task_process_result_cb_t async_task_process_result_snmp_cb, void *arg, void *arg_action,
+		struct event_base *base, zbx_channel_t *channel, struct evdns_base *dnsbase,
+		const char *config_source_ip, zbx_async_resolve_reverse_dns_t resolve_reverse_dns, int retries)
+{
+	int 			ret;
+	zbx_snmp_context_t	*snmp_context;
+
+	snmp_context = zbx_malloc(NULL, sizeof(zbx_snmp_context_t));
+
+	async_check_snmp_init_context(snmp_context, arg, arg_action, config_source_ip, resolve_reverse_dns, retries);
+
+	snmp_context->item.interface = item->interface;
+	snmp_context->item.interface.addr = (item->interface.addr == item->interface.dns_orig ?
+			snmp_context->item.interface.dns_orig : snmp_context->item.interface.ip_orig);
+	zbx_strlcpy(snmp_context->item.host, item->host.host, sizeof(snmp_context->item.host));
+	snmp_context->item.itemid = item->itemid;
+	snmp_context->item.hostid = item->host.hostid;
+	snmp_context->item.value_type = item->value_type;
+	snmp_context->item.flags = item->flags;
+	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
+	snmp_context->item.preprocessing = item->preprocessing;
+
+	if (item->key != item->key_orig)
+	{
+		snmp_context->item.key = item->key;
+		item->key = NULL;
+	}
+	else
+		snmp_context->item.key = zbx_strdup(NULL, item->key);
+
+	snmp_context->item.version = item->interface.version;
+	snmp_context->config_timeout = item->timeout;
+	snmp_context->snmp_max_repetitions = item->snmp_max_repetitions;
+	snmp_context->snmp_version = item->snmp_version;
+	snmp_context->snmp_community = item->snmp_community;
+	item->snmp_community = NULL;
+	snmp_context->snmpv3_securityname = item->snmpv3_securityname;
+	item->snmpv3_securityname = NULL;
+	snmp_context->snmpv3_contextname = item->snmpv3_contextname;
+	item->snmpv3_contextname = NULL;
+	snmp_context->snmpv3_securitylevel = item->snmpv3_securitylevel;
+	snmp_context->snmpv3_authprotocol = item->snmpv3_authprotocol;
+	snmp_context->snmpv3_authpassphrase = item->snmpv3_authpassphrase;
+	item->snmpv3_authpassphrase = NULL;
+	snmp_context->snmpv3_privprotocol = item->snmpv3_privprotocol;
+	snmp_context->snmpv3_privpassphrase = item->snmpv3_privpassphrase;
+	item->snmpv3_privpassphrase = NULL;
+
+	snmp_context->probe = ZBX_IF_SNMP_VERSION_3 == item->snmp_version ? 1 : 0;
+
+	ret = async_check_snmp_context(snmp_context, result, async_task_process_result_snmp_cb, base, channel,
+			dnsbase, resolve_reverse_dns, item->snmp_oid);
+
+	if (SUCCEED != ret)
+		zbx_async_check_snmp_clean(snmp_context);
 
 	return ret;
 }
@@ -4189,17 +4322,21 @@ void	zbx_init_library_mt_snmp(const char *progname)
 void	zbx_shutdown_library_mt_snmp(const char *progname)
 {
 	if (1 == snmp_rwlock_init_done)
+		pthread_rwlock_wrlock(&snmp_exec_rwlock);
+
+	zbx_shutdown_snmp(progname);
+
+	if (1 == snmp_rwlock_init_done)
 	{
 		int	err;
 
-		pthread_rwlock_wrlock(&snmp_exec_rwlock);
+		pthread_rwlock_unlock(&snmp_exec_rwlock);
 
 		if (0 != (err = pthread_rwlock_destroy(&snmp_exec_rwlock)))
 			zabbix_log(LOG_LEVEL_WARNING, "cannot destroy snmp execute mutex: %s", zbx_strerror(err));
 		else
 			snmp_rwlock_init_done = 0;
 	}
-	zbx_shutdown_snmp(progname);
 }
 
 static void	process_snmp_result(void *data)
@@ -4282,7 +4419,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 
 		zbx_set_snmp_bulkwalk_options(progname);
 
-		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp(&items[j], &results[j], process_snmp_result,
+		if (SUCCEED == (errcodes[j] = zbx_async_check_snmp_dc_item(&items[j], &results[j], process_snmp_result,
 				&snmp_result, NULL, snmp_result.base, NULL, dnsbase, config_source_ip,
 				ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO, ZBX_SNMP_DEFAULT_NUMBER_OF_RETRIES)))
 		{
@@ -4314,8 +4451,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, error, sizeof(error),
-			config_timeout, config_source_ip, item->itemid)))
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
+			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4338,8 +4475,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, error, sizeof(error),
-			config_timeout, config_source_ip, item->itemid)))
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0, NULL, 0,
+			error, sizeof(error), config_timeout, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;
@@ -4362,8 +4499,8 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 		if (NULL == (ssp = zbx_snmp_open_session(item->snmp_version, ip_addr, item->interface.port,
 			item->snmp_community, item->snmpv3_securityname, item->snmpv3_contextname,
 			item->snmpv3_securitylevel, item->snmpv3_authprotocol, item->snmpv3_authpassphrase,
-			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, error, sizeof(error),
-			config_timeout, config_source_ip, item->itemid)))
+			item->snmpv3_privprotocol, item->snmpv3_privpassphrase, NULL, 0, NULL, 0,  NULL, 0, error,
+			sizeof(error), config_timeout, config_source_ip, item->itemid)))
 		{
 			err = NETWORK_ERROR;
 			goto exit;

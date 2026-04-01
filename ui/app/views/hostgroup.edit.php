@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -71,9 +71,10 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 $form_grid->addItem([
 	(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 	new CFormField(
-		(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
+		(new CTextAreaFlexible('name', $data['name']))
 			->setAttribute('autofocus', 'autofocus')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			->setAriaRequired()
 	)
 ]);

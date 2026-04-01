@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -451,6 +451,14 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->addValue(_('Right'), GRAPH_YAXIS_SIDE_RIGHT)
 									->setModern()
 							)
+						])
+						->addItem([
+							new CLabel(_('Invert values'), $field_name.'['.$row_num.'][invert_values]'),
+							new CFormField([
+								(new CVar($field_name.'['.$row_num.'][invert_values]', '0'))->removeId(),
+								(new CCheckBox($field_name.'['.$row_num.'][invert_values]'))
+									->setChecked((bool) $value['invert_values'])
+							])
 						])
 						->addItem([
 							new CLabel(_('Time shift'), $field_name.'['.$row_num.'][timeshift]'),

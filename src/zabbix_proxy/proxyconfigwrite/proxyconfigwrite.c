@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -704,20 +704,20 @@ static int	proxyconfig_delete_rows(const zbx_table_data_t *td, id_unhash_func_t 
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
-	}
-	else
-	{
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, td->del_ids.values,
-				td->del_ids.values_num);
-	}
 
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-	{
-		*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
-		ret = FAIL;
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		{
+			*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (FAIL == (ret = zbx_db_execute_multiple_query(sql, td->table->recid, &td->del_ids)))
+			*error = zbx_dsprintf(NULL, "cannot remove old objects from table \"%s\"", td->table->table);
+	}
 
 	zbx_free(sql);
 
@@ -843,20 +843,20 @@ static int	proxyconfig_prepare_rows(zbx_table_data_t *td, id_unhash_func_t unhas
 				(const char * const*)ids.values, ids.values_num);
 
 		zbx_vector_str_destroy(&ids);
-	}
-	else
-	{
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, td->table->recid, updateids.values,
-				updateids.values_num);
-	}
 
-	if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-	{
-		*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
-		ret = FAIL;
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+		{
+			*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
+			ret = FAIL;
+		}
+		else
+			ret = SUCCEED;
 	}
 	else
-		ret = SUCCEED;
+	{
+		if (FAIL == (ret = zbx_db_execute_multiple_query(sql, td->table->recid, &updateids)))
+			*error = zbx_dsprintf(NULL, "cannot prepare rows for update in table \"%s\"", td->table->table);
+	}
 
 	zbx_free(sql);
 out:
@@ -968,6 +968,8 @@ static int	proxyconfig_update_rows(zbx_table_data_t *td, id_unhash_func_t unhash
 	if (0 == td->updates.values_num)
 		return SUCCEED;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, td->table->table);
+
 	buf = (char *)zbx_malloc(NULL, buf_alloc);
 
 	for (i = 0; i < td->updates.values_num; i++)
@@ -1049,6 +1051,8 @@ out:
 
 	if (SUCCEED != ret && NULL == *error)
 		*error = zbx_dsprintf(NULL, "cannot update rows in table \"%s\"", td->table->table);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, td->table->table);
 
 	return ret;
 }
