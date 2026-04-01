@@ -488,116 +488,118 @@ class CDataTable {
 			const tags_wrapper = document.createElement('div');
 			tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
 
-			const {subfilter_tags} = {subfilter_tags: null, ...this.getData()};
+			this.getData().then(response => {
+				const {subfilter_tags} = {subfilter_tags: null, ...response};
 
-			tags.forEach((tag) => {
-				let tag_label;
+				tags.forEach((tag) => {
+					let tag_label;
 
-				const subfilter_tag = subfilter_tags != null
-					? Object.keys(subfilter_tags).includes(tag.tag)
-					: false;
-				const subfilter_tag_value = subfilter_tag
-					? Object.keys(subfilter_tags[tag.tag]).includes(tag.value)
-					: false;
+					const subfilter_tag = subfilter_tags != null
+						? Object.keys(subfilter_tags).includes(tag.tag)
+						: false;
+					const subfilter_tag_value = subfilter_tag
+						? Object.keys(subfilter_tags[tag.tag]).includes(tag.value)
+						: false;
 
-				if (subfilter_tags != null && (!subfilter_tag || !subfilter_tag_value)) {
-					tag_label = document.createElement('button');
-					tag_label.classList.add(ZBX_STYLE_BTN_TAG, ZBX_STYLE_TAG);
-					tag_label.setAttribute('type', 'button');
-					tag_label.setAttribute('role', 'button');
-					tag_label.setAttribute('data-key', tag.tag);
-					tag_label.setAttribute('data-value', tag.value);
-					tag_label.setAttribute('onclick',
-						'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'+
+					if (subfilter_tags != null && (!subfilter_tag || !subfilter_tag_value)) {
+						tag_label = document.createElement('button');
+						tag_label.classList.add(ZBX_STYLE_BTN_TAG, ZBX_STYLE_TAG);
+						tag_label.setAttribute('type', 'button');
+						tag_label.setAttribute('role', 'button');
+						tag_label.setAttribute('data-key', tag.tag);
+						tag_label.setAttribute('data-value', tag.value);
+						tag_label.setAttribute('onclick',
+							'view.setSubfilter([`subfilter_tags[${encodeURIComponent(this.dataset.key)}][]`,'+
 							'this.dataset.value'+
-						']);');
-				}
-				else {
-					tag_label = document.createElement('span');
-					tag_label.classList.add(ZBX_STYLE_TAG);
-				}
-
-				tag_label.innerText = `${tag.tag}: ${tag.value}`;
-
-				if (tag.type == ZBX_PROPERTY_INHERITED) {
-					tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
-				}
-
-				const tag_label_hintbox = document.createElement('div');
-
-				if (tag.type == ZBX_PROPERTY_INHERITED) {
-					const inherited_title = document.createElement('div');
-					inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-					inherited_title.innerText = t('Inherited tag');
-
-					tag_label_hintbox.appendChild(inherited_title);
-				}
-
-				if (tag.type == ZBX_PROPERTY_BOTH) {
-					tag_label.classList.add(ZBX_STYLE_TAG_INHERITED_DUPLICATE);
-
-					const hint_titles = {
-						[ZBX_TAG_OBJECT_TEMPLATE]: t('Inherited and template tag'),
-						[ZBX_TAG_OBJECT_HOST]: t('Inherited and host tag'),
-						[ZBX_TAG_OBJECT_HOST_PROTOTYPE]: t('Inherited and host prototype tag'),
-						[ZBX_TAG_OBJECT_ITEM]: t('Inherited and item tag'),
-						[ZBX_TAG_OBJECT_ITEM_PROTOTYPE]: t('Inherited and item prototype tag'),
-						[ZBX_TAG_OBJECT_TRIGGER]: t('Inherited and trigger tag'),
-						[ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE]: t('Inherited and trigger prototype tag'),
-						[ZBX_TAG_OBJECT_HTTPTEST]: t('Inherited and web scenario tag')
-					};
-
-					const inherited_title = document.createElement('div');
-					inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-					inherited_title.innerText = CDataTableColumnTags.object_type
-						? hint_titles[CDataTableColumnTags.object_type]
-						: '';
-
-					tag_label_hintbox.appendChild(inherited_title);
-				}
-
-				const hintbox_contents = document.createTextNode(tag_label.innerText);
-				tag_label_hintbox.appendChild(hintbox_contents);
-
-				tag_label.setAttribute('data-hintbox-contents', tag_label_hintbox.outerHTML);
-				tag_label.setAttribute('data-hintbox', '1');
-				tag_label.setAttribute('data-hintbox-static', '1');
-
-				if (count > 0) {
-					let name = `${tag.tag}: ${tag.value}`;
-
-					if (tag_name_display != TAG_NAME_FULL) {
-						name = tag_name_display == TAG_NAME_SHORTENED
-							? `${tag.tag.substring(0, 3)}: ${tag.value}`
-							: tag.value;
+							']);');
+					}
+					else {
+						tag_label = document.createElement('span');
+						tag_label.classList.add(ZBX_STYLE_TAG);
 					}
 
-					const tag_label_clone = tag_label.cloneNode(true);
-					tag_label_clone.innerText = name;
+					tag_label.innerText = `${tag.tag}: ${tag.value}`;
 
-					tags_wrapper.appendChild(tag_label_clone);
+					if (tag.type == ZBX_PROPERTY_INHERITED) {
+						tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
+					}
+
+					const tag_label_hintbox = document.createElement('div');
+
+					if (tag.type == ZBX_PROPERTY_INHERITED) {
+						const inherited_title = document.createElement('div');
+						inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
+						inherited_title.innerText = t('Inherited tag');
+
+						tag_label_hintbox.appendChild(inherited_title);
+					}
+
+					if (tag.type == ZBX_PROPERTY_BOTH) {
+						tag_label.classList.add(ZBX_STYLE_TAG_INHERITED_DUPLICATE);
+
+						const hint_titles = {
+							[ZBX_TAG_OBJECT_TEMPLATE]: t('Inherited and template tag'),
+							[ZBX_TAG_OBJECT_HOST]: t('Inherited and host tag'),
+							[ZBX_TAG_OBJECT_HOST_PROTOTYPE]: t('Inherited and host prototype tag'),
+							[ZBX_TAG_OBJECT_ITEM]: t('Inherited and item tag'),
+							[ZBX_TAG_OBJECT_ITEM_PROTOTYPE]: t('Inherited and item prototype tag'),
+							[ZBX_TAG_OBJECT_TRIGGER]: t('Inherited and trigger tag'),
+							[ZBX_TAG_OBJECT_TRIGGER_PROTOTYPE]: t('Inherited and trigger prototype tag'),
+							[ZBX_TAG_OBJECT_HTTPTEST]: t('Inherited and web scenario tag')
+						};
+
+						const inherited_title = document.createElement('div');
+						inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
+						inherited_title.innerText = CDataTableColumnTags.object_type
+							? hint_titles[CDataTableColumnTags.object_type]
+							: '';
+
+						tag_label_hintbox.appendChild(inherited_title);
+					}
+
+					const hintbox_contents = document.createTextNode(tag_label.innerText);
+					tag_label_hintbox.appendChild(hintbox_contents);
+
+					tag_label.setAttribute('data-hintbox-contents', tag_label_hintbox.outerHTML);
+					tag_label.setAttribute('data-hintbox', '1');
+					tag_label.setAttribute('data-hintbox-static', '1');
+
+					if (count > 0) {
+						let name = `${tag.tag}: ${tag.value}`;
+
+						if (tag_name_display != TAG_NAME_FULL) {
+							name = tag_name_display == TAG_NAME_SHORTENED
+								? `${tag.tag.substring(0, 3)}: ${tag.value}`
+								: tag.value;
+						}
+
+						const tag_label_clone = tag_label.cloneNode(true);
+						tag_label_clone.innerText = name;
+
+						tags_wrapper.appendChild(tag_label_clone);
+					}
+
+					tag_labels.push(tag_label);
+					count--;
+				});
+
+				if (tags.length > number_of_tags) {
+					const more_tags_hintbox = document.createElement('div');
+
+					for (const tag_label of tag_labels) {
+						more_tags_hintbox.appendChild(tag_label.cloneNode(true));
+					}
+
+					const more_tags = document.createElement('button');
+					more_tags.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
+					more_tags.setAttribute('data-hintbox', '1');
+					more_tags.setAttribute('data-hintbox-contents', more_tags_hintbox.innerHTML);
+					more_tags.setAttribute('data-hintbox-class', `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
+					more_tags.setAttribute('data-hintbox-static', '1');
+
+					tags_wrapper.appendChild(more_tags);
 				}
-
-				tag_labels.push(tag_label);
-				count--;
 			});
-
-			if (tags.length > number_of_tags) {
-				const more_tags_hintbox = document.createElement('div');
-
-				for (const tag_label of tag_labels) {
-					more_tags_hintbox.appendChild(tag_label.cloneNode(true));
-				}
-
-				const more_tags = document.createElement('button');
-				more_tags.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
-				more_tags.setAttribute('data-hintbox', '1');
-				more_tags.setAttribute('data-hintbox-contents', more_tags_hintbox.innerHTML);
-				more_tags.setAttribute('data-hintbox-class', `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
-				more_tags.setAttribute('data-hintbox-static', '1');
-
-				tags_wrapper.appendChild(more_tags);
-			}
 
 			cell_inner.appendChild(tags_wrapper);
 		});
