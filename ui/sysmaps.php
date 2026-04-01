@@ -66,6 +66,7 @@ $fields = [
 	'action' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, IN('"map.export","map.massdelete"'),		null],
 	'add' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
 	'update' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
+	'clone' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
 	'delete' =>					[T_ZBX_STR, O_OPT, P_SYS|P_ACT, null,		null],
 	'cancel' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,			null],
 	// form
@@ -94,6 +95,7 @@ if (hasRequest('sysmapid')) {
 		'selectUserGroups' => ['usrgrpid', 'permission']
 	]);
 	if (empty($sysmap)) {
+		zbx_add_post_js("history.replaceState({}, '');");
 		access_deny();
 	}
 	else {
@@ -120,7 +122,10 @@ require_once dirname(__FILE__).'/include/page_header.php';
 /*
  * Actions
  */
-if (hasRequest('add') || hasRequest('update')) {
+if (hasRequest('clone')) {
+	$_REQUEST['form'] = 'clone';
+}
+elseif (hasRequest('add') || hasRequest('update')) {
 	$map = [
 		'name' => getRequest('name'),
 		'width' => getRequest('width'),
@@ -186,8 +191,8 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		$result = API::Map()->update($map);
 
-		$messageSuccess = _('Network map updated');
-		$messageFailed = _('Cannot update network map');
+		$message_success = _('Network map updated');
+		$message_failed = _('Cannot update network map');
 	}
 	else {
 		if (getRequest('form') === 'clone') {
@@ -218,8 +223,8 @@ if (hasRequest('add') || hasRequest('update')) {
 
 		$result = API::Map()->create($map);
 
-		$messageSuccess = _('Network map added');
-		$messageFailed = _('Cannot add network map');
+		$message_success = _('Network map added');
+		$message_failed = _('Cannot add network map');
 	}
 
 	if ($result) {
@@ -229,9 +234,15 @@ if (hasRequest('add') || hasRequest('update')) {
 	$result = DBend($result);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle($message_success);
+
 		uncheckTableRows();
+
+		$response = new CControllerResponseRedirect(new CUrl('sysmaps.php'));
+		$response->redirect();
 	}
-	show_messages($result, $messageSuccess, $messageFailed);
+
+	show_error_message($message_failed);
 }
 elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 		|| (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
@@ -265,10 +276,10 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 		uncheckTableRows(null, zbx_objectValues($maps, 'sysmapid'));
 	}
 
-	$messageSuccess = _n('Network map deleted', 'Network maps deleted', $sysmap_count);
-	$messageFailed = _n('Cannot delete network map', 'Cannot delete network maps', $sysmap_count);
+	$message_success = _n('Network map deleted', 'Network maps deleted', $sysmap_count);
+	$message_failed = _n('Cannot delete network map', 'Cannot delete network maps', $sysmap_count);
 
-	show_messages($result, $messageSuccess, $messageFailed);
+	show_messages($result, $message_success, $message_failed);
 }
 
 /*
