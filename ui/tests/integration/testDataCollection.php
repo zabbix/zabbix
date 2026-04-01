@@ -602,7 +602,10 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['itemids']));
 
 		$this->reloadConfigurationCacheAndWait(self::COMPONENT_SERVER);
-		$this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
+	
+
+		$result = $this->sendSenderValue('trapper_host', 'trap', 2, self::COMPONENT_SERVER);
+		$t = time();
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'sortfield' => 'clock',
@@ -614,7 +617,7 @@ class testDataCollection extends CIntegrationTest {
 		});
 		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('value', $response['result'][0]);
-		$this->assertEquals(400, $response['result'][0]['value'], json_encode($response));
+		$this->assertEquals(400, $response['result'][0]['value'], json_encode($response)." result:".$result. " time:".$t);
 	}
 
 	/**
