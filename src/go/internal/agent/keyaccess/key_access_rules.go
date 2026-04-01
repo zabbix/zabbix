@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"regexp"
 	"sort"
 
 	"golang.zabbix.com/agent2/pkg/wildcard"
@@ -46,10 +47,22 @@ func (t RuleType) String() string {
 	}
 }
 
+// ruleTypeName returns the config parameter name corresponding to a rule's type and kind.
+func ruleTypeName(permission RuleType, isRegexp bool) string {
+	if isRegexp {
+		if permission == ALLOW {
+			return "AllowKeyRegexp"
+		}
+		return "DenyKeyRegexp"
+	}
+	return permission.String()
+}
+
 // Record key access record
 type Record struct {
 	Pattern    string
 	Permission RuleType
+	IsRegexp   bool
 	Line       int
 }
 
@@ -57,8 +70,10 @@ type Record struct {
 type Rule struct {
 	Pattern    string
 	Permission RuleType
+	IsRegexp   bool
 	Key        string
 	Params     []string
+	Regexp     *regexp.Regexp
 }
 
 var rules []*Rule
@@ -67,6 +82,20 @@ func parse(rec Record) (r *Rule, err error) {
 	r = &Rule{
 		Permission: rec.Permission,
 		Pattern:    rec.Pattern,
+		IsRegexp:   rec.IsRegexp,
+	}
+
+	if rec.IsRegexp {
+		if rec.Pattern == "" {
+			return nil, fmt.Errorf("regular expression pattern must not be empty")
+		}
+		// Wrap in non-capturing group and anchor to enforce full-string matching (RE2 compatible).
+		anchored := "^(?:" + rec.Pattern + ")$"
+		r.Regexp, err = regexp.Compile(anchored)
+		if err != nil {
+			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
+		}
+		return r, nil
 	}
 
 	if r.Key, r.Params, err = itemutil.ParseWildcardKey(rec.Pattern); err != nil {
@@ -92,8 +121,20 @@ func parse(rec Record) (r *Rule, err error) {
 	return r, nil
 }
 
+// findRule searches the existing rule list for a rule matching proto.
+// For regexp rules, matching is by pattern string. For wildcard rules, matching is by parsed key+params.
+// Regexp and wildcard rules are never considered duplicates of each other.
 func findRule(proto *Rule) (rule *Rule, index int) {
 	for j, r := range rules {
+		if proto.IsRegexp != r.IsRegexp {
+			continue
+		}
+		if proto.IsRegexp {
+			if proto.Pattern == r.Pattern {
+				return r, j
+			}
+			continue
+		}
 		if proto.Key != r.Key || len(proto.Params) != len(r.Params) {
 			continue
 		}
@@ -122,7 +163,7 @@ func addRule(rec Record) (err error) {
 			desc = "conflicts"
 		}
 		log.Warningf(`%s access rule "%s" was not added because it %s with another rule defined above`,
-			rec.Permission, rec.Pattern, desc)
+			ruleTypeName(rec.Permission, rec.IsRegexp), rec.Pattern, desc)
 		return
 	}
 	rules = append(rules, rule)
@@ -134,8 +175,12 @@ func GetNumberOfRules() int {
 	return len(rules)
 }
 
-// LoadRules adds key access records to access rule list
-func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
+// LoadRules adds key access records to the access rule list. Records from all four parameters are
+// merged into a single ordered list (sorted by line number) before being evaluated, so AllowKey,
+// DenyKey, AllowKeyRegexp, and DenyKeyRegexp rules interleave naturally in config-file order.
+// Regexp patterns are compiled at load time; an invalid or empty pattern causes an error and the
+// agent will not start.
+func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords interface{}) (err error) {
 	rules = rules[:0]
 	var records []Record
 	sysrunIndex := math.MaxInt32
@@ -155,6 +200,21 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 			}
 		}
 	}
+	// load AllowKeyRegexp/DenyKeyRegexp parameters
+	if node, ok := allowRegexpRecords.(*conf.Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				records = append(records, Record{Pattern: string(value.Value), Permission: ALLOW, IsRegexp: true, Line: value.Line})
+			}
+		}
+	}
+	if node, ok := denyRegexpRecords.(*conf.Node); ok {
+		for _, v := range node.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				records = append(records, Record{Pattern: string(value.Value), Permission: DENY, IsRegexp: true, Line: value.Line})
+			}
+		}
+	}
 
 	sort.SliceStable(records, func(i, j int) bool {
 		return records[i].Line < records[j].Line
@@ -162,7 +222,7 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 
 	for _, r := range records {
 		if err = addRule(r); err != nil {
-			err = fmt.Errorf("\"%s\" %s", r.Pattern, err.Error())
+			err = fmt.Errorf("%s \"%s\" %s", ruleTypeName(r.Permission, r.IsRegexp), r.Pattern, err.Error())
 			return
 		}
 	}
@@ -182,12 +242,13 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 	if rulesNum != 0 {
 		// remove rules after 'full match' rule
 		for i, r := range rules {
-			if len(r.Params) == 0 && r.Key == "*" {
+			if r.IsRegexp == false && len(r.Params) == 0 && r.Key == "*" {
 				if i < sysrunIndex {
 					sysrunIndex = i
 				}
 				for j := i + 1; j < len(rules); j++ {
-					log.Warningf(`removed unreachable %s "%s" rule`, rules[j].Permission, rules[j].Pattern)
+					log.Warningf(`removed unreachable %s "%s" rule`,
+						ruleTypeName(rules[j].Permission, rules[j].IsRegexp), rules[j].Pattern)
 				}
 				rules = rules[:i+1]
 				break
@@ -198,6 +259,9 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 		cutoff := len(rules)
 		for i := len(rules) - 1; i >= 0; i-- {
 			if rules[i].Permission != ALLOW {
+				break
+			}
+			if rules[i].IsRegexp {
 				break
 			}
 			// system.run allow rules are not redundant because of default system.run[*] deny rule
@@ -228,12 +292,19 @@ func LoadRules(allowRecords interface{}, denyRecords interface{}) (err error) {
 }
 
 // CheckRules checks if specified key and parameters are not restricted by defined rules
-func CheckRules(key string, params []string) (result bool) {
+func CheckRules(rawMetric string, key string, params []string) (result bool) {
 	result = true
 
 	emptyParams := len(params) == 1 && len(params[0]) == 0
 
 	for _, r := range rules {
+		if r.IsRegexp {
+			if r.Regexp.MatchString(rawMetric) {
+				return r.Permission == ALLOW
+			}
+			continue
+		}
+
 		numParamsRule := len(r.Params)
 		numParams := len(params)
 

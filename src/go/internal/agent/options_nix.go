@@ -67,8 +67,10 @@ type AgentOptions struct {
 	ForceActiveChecksOnStart int      `conf:"optional,nonempty,range=0:1,default=0"`
 	HeartbeatFrequency       int      `conf:"optional,nonempty,range=0:3600,default=60"`
 
-	AllowKey interface{} `conf:"optional"`
-	DenyKey  interface{} `conf:"optional"`
+	AllowKey       interface{} `conf:"optional"`
+	DenyKey        interface{} `conf:"optional"`
+	AllowKeyRegexp interface{} `conf:"optional"`
+	DenyKeyRegexp  interface{} `conf:"optional"`
 
 	Plugins map[string]any `conf:"optional"`
 }
