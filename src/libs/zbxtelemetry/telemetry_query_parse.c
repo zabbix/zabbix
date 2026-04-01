@@ -19,6 +19,7 @@
 #include "zbxnum.h"
 #include "zbxcommon.h"
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 /******************************************************************************
  *                                                                            *
