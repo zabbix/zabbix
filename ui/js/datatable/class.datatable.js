@@ -2122,36 +2122,37 @@ class CDataTable {
 
 	#renderColumnDataCells(column_config) {
 		const column_index = column_config.getColumnIndex();
-		const response = this.getData();
 
-		for (let row_index = 1; row_index < response.data.length + 1; row_index++) {
-			const [row_config, row_data] = response.data[row_index - 1];
+		this.getData().then(response => {
+			for (let row_index = 1; row_index < response.data.length + 1; row_index++) {
+				const [row_config, row_data] = response.data[row_index - 1];
 
-			if (row_config.renderer) {
-				continue;
+				if (row_config.renderer) {
+					continue;
+				}
+
+				const row = this.#body.querySelector(`.${CDataTable.ZBX_STYLE_ROW}[data-row="${row_index}"]`);
+				const data_cell = this.createDataCell(column_config, row_index);
+
+				const cell = this.#body
+					.querySelector(`.${CDataTable.ZBX_STYLE_CELL}[data-row="${row_index}"][data-col="${column_index}"]`)
+				if (cell) {
+					const attributes = cell.attributes;
+					cell.replaceWith(data_cell);
+
+					Array.from(attributes).forEach(attr => data_cell.setAttribute(attr.nodeName, attr.nodeValue));
+				}
+				else {
+					row?.appendChild(data_cell);
+				}
+
+				if (column_config.isOnlyHeader()) {
+					continue;
+				}
+
+				this.renderDataCellContents(column_config, row, data_cell, row_data);
 			}
-
-			const row = this.#body.querySelector(`.${CDataTable.ZBX_STYLE_ROW}[data-row="${row_index}"]`);
-			const data_cell = this.createDataCell(column_config, row_index);
-
-			const cell = this.#body
-				.querySelector(`.${CDataTable.ZBX_STYLE_CELL}[data-row="${row_index}"][data-col="${column_index}"]`)
-			if (cell) {
-				const attributes = cell.attributes;
-				cell.replaceWith(data_cell);
-
-				Array.from(attributes).forEach(attr => data_cell.setAttribute(attr.nodeName, attr.nodeValue));
-			}
-			else {
-				row?.appendChild(data_cell);
-			}
-
-			if (column_config.isOnlyHeader()) {
-				continue;
-			}
-
-			this.renderDataCellContents(column_config, row, data_cell, row_data);
-		}
+		});
 	}
 
 	#getDataProviderParams(params) {
