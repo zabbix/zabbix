@@ -83,7 +83,8 @@ class CControllerMediatypeTestSend extends CController {
 
 		$ret = true;
 
-		if ($this->mediatype['type'] != MEDIA_TYPE_EXEC && $this->mediatype['type'] != MEDIA_TYPE_WEBHOOK) {
+		if (($this->mediatype['type'] != MEDIA_TYPE_EXEC && $this->mediatype['type'] != MEDIA_TYPE_WEBHOOK)
+				|| ($this->mediatype['type'] == MEDIA_TYPE_PUSH && $this->getInput('subject', '') === '')) {
 			$validator = new CNewValidator(array_map('trim', $this->getInputAll()), [
 				'message' =>	'string|not_empty'
 			]);

@@ -123,7 +123,8 @@ switch ($data['type']) {
 				)
 			])
 			->addItem([
-				(new CLabel(_('Message'), 'message'))->setAsteriskMark(),
+				(new CLabel(_('Message'), 'message'))
+					->setAsteriskMark($data['type'] != MEDIA_TYPE_PUSH),
 				new CFormField(
 					(new CTextArea('message', $data['message'], ['rows' => 10]))
 						->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
