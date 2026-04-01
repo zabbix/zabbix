@@ -611,7 +611,6 @@ class testDataCollection extends CIntegrationTest {
 			'sortorder' => 'DESC',
 			'limit' => 1,
 			'itemids' => [$itemid],
-			'time_from' => $t,
 		], 60, 1);
 		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('value', $response['result'][0]);
