@@ -27,6 +27,11 @@ import (
 	"golang.zabbix.com/sdk/plugin/itemutil"
 )
 
+var (
+	errInvalidRule = errors.New("invalid key access rule")
+	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
+)
+
 // RuleType Access rule permission type
 type RuleType int
 
@@ -53,8 +58,10 @@ func ruleTypeName(permission RuleType, isRegexp bool) string {
 		if permission == ALLOW {
 			return "AllowKeyRegexp"
 		}
+
 		return "DenyKeyRegexp"
 	}
+
 	return permission.String()
 }
 
@@ -87,7 +94,7 @@ func parse(rec Record) (r *Rule, err error) {
 
 	if rec.IsRegexp {
 		if rec.Pattern == "" {
-			return nil, fmt.Errorf("regular expression pattern must not be empty")
+			return nil, errRegexpPatternMustNotBeEmpty
 		}
 		// Wrap in non-capturing group and anchor to enforce full-string matching (RE2 compatible).
 		anchored := "^(?:" + rec.Pattern + ")$"
@@ -95,6 +102,7 @@ func parse(rec Record) (r *Rule, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
 		}
+
 		return r, nil
 	}
 
@@ -133,6 +141,7 @@ func findRule(proto *Rule) (rule *Rule, index int) {
 			if proto.Pattern == r.Pattern {
 				return r, j
 			}
+
 			continue
 		}
 		if proto.Key != r.Key || len(proto.Params) != len(r.Params) {
@@ -187,14 +196,16 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 	if node, ok := allowRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value), Permission: ALLOW, Line: value.Line})
+				records = append(records, Record{Pattern: string(value.Value),
+					Permission: ALLOW, Line: value.Line})
 			}
 		}
 	}
 	if node, ok := denyRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value), Permission: DENY, Line: value.Line})
+				records = append(records, Record{Pattern: string(value.Value),
+					Permission: DENY, Line: value.Line})
 			}
 		}
 	}
@@ -202,14 +213,16 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 	if node, ok := allowRegexpRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value), Permission: ALLOW, IsRegexp: true, Line: value.Line})
+				records = append(records, Record{Pattern: string(value.Value),
+					Permission: ALLOW, IsRegexp: true, Line: value.Line})
 			}
 		}
 	}
 	if node, ok := denyRegexpRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value), Permission: DENY, IsRegexp: true, Line: value.Line})
+				records = append(records, Record{Pattern: string(value.Value),
+					Permission: DENY, IsRegexp: true, Line: value.Line})
 			}
 		}
 	}
@@ -220,7 +233,13 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 
 	for _, r := range records {
 		if err = addRule(r); err != nil {
-			err = fmt.Errorf("%s \"%s\" %s", ruleTypeName(r.Permission, r.IsRegexp), r.Pattern, err.Error())
+			err = fmt.Errorf(
+				"%w: %s %q %s",
+				errInvalidRule,
+				ruleTypeName(r.Permission, r.IsRegexp),
+				r.Pattern,
+				err.Error(),
+			)
 			return
 		}
 	}
@@ -240,7 +259,7 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 	if rulesNum != 0 {
 		// remove rules after 'full match' rule
 		for i, r := range rules {
-			if r.IsRegexp == false && len(r.Params) == 0 && r.Key == "*" {
+			if !r.IsRegexp && len(r.Params) == 0 && r.Key == "*" {
 				if i < sysrunIndex {
 					sysrunIndex = i
 				}
@@ -300,6 +319,7 @@ func CheckRules(rawMetric string, key string, params []string) (result bool) {
 			if r.Regexp.MatchString(rawMetric) {
 				return r.Permission == ALLOW
 			}
+
 			continue
 		}
 
