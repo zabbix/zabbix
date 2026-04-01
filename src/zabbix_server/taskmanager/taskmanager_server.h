@@ -24,13 +24,8 @@ void	zbx_tm_get_remote_tasks(zbx_vector_tm_task_t *tasks, zbx_uint64_t proxyid,
 
 typedef struct
 {
-	int		config_timeout;
-	int		config_startup_time;
-	const char	*config_adapter_url;
-	int		config_adapter_timeout;
-	const char	*config_adapter_ca_file;
-	const char	*config_adapter_cert_file;
-	const char	*config_adapter_key_file;
+	int	config_timeout;
+	int	config_startup_time;
 }
 zbx_thread_taskmanager_args;
 

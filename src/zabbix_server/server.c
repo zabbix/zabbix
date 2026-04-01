@@ -1728,11 +1728,6 @@ static void	start_processes(zbx_socket_t *listen_sock, zbx_proc_startup_t *runle
 		{
 			.config_timeout = zbx_config_timeout,
 			.config_startup_time = config_startup_time,
-			.config_adapter_url = config_adapter_url,
-			.config_adapter_timeout = config_adapter_timeout,
-			.config_adapter_ca_file = zbx_config_tls->ca_file,
-			.config_adapter_cert_file = zbx_config_tls->cert_file,
-			.config_adapter_key_file = zbx_config_tls->key_file
 		};
 
 	zbx_thread_dbconfig_args	dbconfig_args =
