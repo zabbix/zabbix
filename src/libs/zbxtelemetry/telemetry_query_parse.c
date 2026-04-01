@@ -12,10 +12,11 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxtelemetry.h"
+#include "telemetry.h"
 #include "zbxcalc.h"
 #include "zbxjson.h"
 #include "zbxnum.h"
-#include "zbxtelemetry.h"
 #include "zbxcommon.h"
 #include "zbxtime.h"
 
@@ -25,68 +26,6 @@
  *                                                                            *
  ******************************************************************************/
 typedef int (*tq_enum_set_func_t)(const char *str, void *out);
-
-ZBX_VECTOR_IMPL(tq_column, zbx_tq_column_t)
-ZBX_VECTOR_IMPL(tq_aggr_column, zbx_tq_aggr_column_t)
-ZBX_VECTOR_IMPL(tq_condition, zbx_tq_condition_t)
-
-static void	tq_query_init(zbx_tq_query_t *query)
-{
-	query->category		= ZBX_TQ_CATEGORY_UNKNOWN;
-	query->metric_type	= ZBX_TQ_METRIC_TYPE_UNKNOWN;
-	zbx_vector_tq_column_create(&query->columns);
-	zbx_vector_tq_aggr_column_create(&query->aggregated_columns);
-	query->evaltype		= ZBX_TQ_EVAL_TYPE_UNKNOWN;
-	query->formula		= NULL;
-	zbx_vector_tq_condition_create(&query->conditions);
-	query->time_shift	= ZBX_TQ_TIME_INTERVAL_INVALID;
-	query->loopback_limit	= ZBX_TQ_TIME_INTERVAL_INVALID;
-	query->aggregation_size	= ZBX_TQ_TIME_INTERVAL_INVALID;
-}
-
-static void	tq_column_init(zbx_tq_column_t *column)
-{
-	column->name	= NULL;
-	column->key	= NULL;
-}
-
-static void	tq_column_clean(zbx_tq_column_t *column)
-{
-	zbx_free(column->name);
-	zbx_free(column->key);
-}
-
-static void	tq_aggr_column_init(zbx_tq_aggr_column_t *aggr_column)
-{
-	aggr_column->column_name	= NULL;
-	aggr_column->function		= ZBX_TQ_FUNCTION_UNKNOWN;
-	zbx_vector_str_create(&aggr_column->args);
-	aggr_column->alias		= NULL;
-}
-
-static void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column)
-{
-	zbx_free(aggr_column->column_name);
-	zbx_free(aggr_column->alias);
-
-	zbx_vector_str_clear_ext(&aggr_column->args, zbx_str_free);
-	zbx_vector_str_destroy(&aggr_column->args);
-}
-
-static void	tq_condition_init(zbx_tq_condition_t *condition)
-{
-	condition->column_name	= NULL;
-	condition->json_path	= NULL;
-	condition->value	= NULL;
-	condition->operator	= ZBX_TQ_OPERATOR_UNKNOWN;
-}
-
-static void	tq_condition_clean(zbx_tq_condition_t *condition)
-{
-	zbx_free(condition->column_name);
-	zbx_free(condition->json_path);
-	zbx_free(condition->value);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -772,26 +711,4 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ret:%d", __func__, ret);
 
 	return ret;
-}
-
-void	zbx_tq_query_clean(zbx_tq_query_t *query)
-{
-	for (int i = 0; i < query->columns.values_num; i++)
-	{
-		tq_column_clean(&query->columns.values[i]);
-	}
-	zbx_vector_tq_column_destroy(&query->columns);
-
-	for (int i = 0; i < query->aggregated_columns.values_num; i++)
-	{
-		tq_aggr_column_clean(&query->aggregated_columns.values[i]);
-	}
-	zbx_vector_tq_aggr_column_destroy(&query->aggregated_columns);
-
-	zbx_free(query->formula);
-
-	for (int i = 0; i < query->conditions.values_num; i++) {
-		tq_condition_clean(&query->conditions.values[i]);
-	}
-	zbx_vector_tq_condition_destroy(&query->conditions);
 }

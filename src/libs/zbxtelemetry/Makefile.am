@@ -2,4 +2,4 @@
 
 noinst_LIBRARIES = libzbxtelemetry.a
 
-libzbxtelemetry_a_SOURCES = telemetry.c
+libzbxtelemetry_a_SOURCES = telemetry_query.c telemetry_query_parse.c
