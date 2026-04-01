@@ -151,7 +151,7 @@ func (c *ConnManager) housekeeper(ctx context.Context, interval time.Duration) {
 
 // create creates a new connection with given credentials.
 //
-//nolint:gocritic // we'll keep this in until the next refactor.
+//nolint:gocritic,funcorder // we'll keep this in until the next refactor.
 func (c *ConnManager) create(connectionURI uri.URI, connectionTimeout int) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
@@ -191,7 +191,7 @@ func (c *ConnManager) create(connectionURI uri.URI, connectionTimeout int) *MCCo
 
 // get returns a connection with given uri if it exists and also updates lastTimeAccess, otherwise returns nil.
 //
-//nolint:gocritic // we'll keep this in until the next refactor.
+//nolint:gocritic,funcorder // we'll keep this in until the next refactor.
 func (c *ConnManager) get(connectionURI uri.URI, _ int) *MCConn {
 	c.connMutex.Lock()
 	defer c.connMutex.Unlock()
@@ -206,7 +206,7 @@ func (c *ConnManager) get(connectionURI uri.URI, _ int) *MCConn {
 
 // GetConnection returns an existing connection or creates a new one.
 //
-//nolint:gocritic // we'll keep this in until the next refactor.
+//nolint:gocritic,funcorder // we'll keep this in until the next refactor.
 func (c *ConnManager) GetConnection(connectionURI uri.URI, connectionTimeout int) *MCConn {
 	c.Lock()
 	defer c.Unlock()
