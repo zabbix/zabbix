@@ -658,8 +658,6 @@ class CDataTable {
 			.on(CPager.EVENT_SELECT, event => {
 				const {page} = event.detail;
 
-				// this.#element.classList.add(ZBX_STYLE_LOADING);
-
 				this.#page = page;
 
 				this.dispatchEvent(CDataTable.EVENT_INIT);
@@ -922,24 +920,13 @@ class CDataTable {
 			this.#header.scrollTo({left: 0});
 			this.#body.scrollTo({left: 0});
 
-			const sticky_columns = this.#columns.filter(column_config => column_config.isSticky());
-			if (sticky_columns.length > 0) {
-				// First column
-				const first_column_config = sticky_columns.at(0);
-
-				const header_cell = this.#findHeaderCell(first_column_config.getColumnIndex());
-				header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-				header_cell.style.left = '0';
-
-				if (sticky_columns.length > 1) {
-					// Last column
-					const last_column_config = sticky_columns.at(sticky_columns.length - 1);
-
-					const header_cell = this.#findHeaderCell(last_column_config.getColumnIndex());
+			this.#columns
+				.filter(column_config => column_config.isSticky())
+				.forEach(column_config => {
+					const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
 					header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-					header_cell.style.right = '0';
-				}
-			}
+					header_cell.style.left = '0';
+				});
 
 			this.#applyColumnWidths();
 
@@ -975,11 +962,12 @@ class CDataTable {
 		const header_resizer = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
 
 		const element_rect = this.#element.getBoundingClientRect();
+		const table_options_button_rect = this.#findTableOptionsButton().getBoundingClientRect();
 
 		const right_edge = header_cell.getBoundingClientRect().right - element_rect.left;
-		const right_boundary = element_rect.width - 32;
+		const right_boundary = element_rect.width - table_options_button_rect.width;
 		const right_offset = right_edge > right_boundary || this.#element.scrollWidth > element_rect.width
-			? Math.min(32, right_edge - right_boundary)
+			? Math.min(table_options_button_rect.width, right_edge - right_boundary)
 			: 0;
 
 		header_cell.style.paddingRight = `${right_offset}px`;
@@ -1188,9 +1176,11 @@ class CDataTable {
 			this.#setUserConfig(this.#tabfilter_item._index);
 		}
 
-		this.#recalculateColumnSpans();
-		this.#applyColumnWidths();
-		this.#renderHeaderCells();
+		if (!this.#initialized) {
+			this.#recalculateColumnSpans();
+			this.#applyColumnWidths();
+			this.#renderHeaderCells();
+		}
 
 		this.getData({force_load})
 			.then(response => {

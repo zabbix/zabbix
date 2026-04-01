@@ -1,6 +1,6 @@
 :root {
 	--datatable-row-height: 31px;
-	--datatable-compact-row-height: calc(var(--datatable-row-height) - 6px);
+	--datatable-compact-row-height: calc(var(--datatable-row-height) - 9px);
 }
 
 .datatable {
@@ -732,19 +732,13 @@
 				}
 			}
 		}
-
-		.row-spacer {
-			width: 0;
-		}
 	}
 
 	&.compact-view {
 		.cell {
-			height: calc(var(--datatable-compact-row-height) + 1px);
-
 			&.cell-data {
-				height: var(--datatable-compact-row-height);
-				min-height: var(--datatable-compact-row-height);
+				height: calc(var(--datatable-compact-row-height) + 1px);
+				min-height: initial;
 				padding: 2px 8px;
 
 				.cell-inner {
@@ -764,6 +758,13 @@
 					right: 0;
 					padding: 0;
 				}
+			}
+		}
+
+		.datatable-body {
+			.row-spacer {
+				height: calc(var(--datatable-compact-row-height) + 1px);
+				min-height: initial;
 			}
 		}
 	}

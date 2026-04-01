@@ -2212,7 +2212,7 @@ button {
     break-after: page; } }
 :root {
   --datatable-row-height: 31px;
-  --datatable-compact-row-height: calc(var(--datatable-row-height) - 6px); }
+  --datatable-compact-row-height: calc(var(--datatable-row-height) - 9px); }
 
 .datatable {
   position: relative;
@@ -2647,24 +2647,23 @@ button {
       background-clip: content-box; }
       .datatable.datatable-scrollable .datatable-body::-webkit-scrollbar-thumb:hover {
         background-color: #c2c2c2; }
-  .datatable.datatable-scrollable .row-spacer {
-    width: 0; }
-  .datatable.compact-view .cell {
-    height: calc(var(--datatable-compact-row-height) + 1px); }
-    .datatable.compact-view .cell.cell-data {
-      height: var(--datatable-compact-row-height);
-      min-height: var(--datatable-compact-row-height);
-      padding: 2px 8px; }
-      .datatable.compact-view .cell.cell-data .cell-inner {
-        padding: 0; }
-      .datatable.compact-view .cell.cell-data .symptoms {
-        height: calc(var(--datatable-compact-row-height) - 4px); }
-        .datatable.compact-view .cell.cell-data .symptoms .btn-icon {
-          height: calc(var(--datatable-compact-row-height) - 6px); }
-      .datatable.compact-view .cell.cell-data .table-stats {
-        position: absolute;
-        right: 0;
-        padding: 0; }
+  .datatable.compact-view .cell.cell-data {
+    height: calc(var(--datatable-compact-row-height) + 1px);
+    min-height: initial;
+    padding: 2px 8px; }
+    .datatable.compact-view .cell.cell-data .cell-inner {
+      padding: 0; }
+    .datatable.compact-view .cell.cell-data .symptoms {
+      height: calc(var(--datatable-compact-row-height) - 4px); }
+      .datatable.compact-view .cell.cell-data .symptoms .btn-icon {
+        height: calc(var(--datatable-compact-row-height) - 6px); }
+    .datatable.compact-view .cell.cell-data .table-stats {
+      position: absolute;
+      right: 0;
+      padding: 0; }
+  .datatable.compact-view .datatable-body .row-spacer {
+    height: calc(var(--datatable-compact-row-height) + 1px);
+    min-height: initial; }
   .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data a.link-action {
     color: #ffffff; }
   .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data a:hover {
