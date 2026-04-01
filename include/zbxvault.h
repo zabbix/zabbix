@@ -50,6 +50,4 @@ void	zbx_vault_renew_token(const zbx_config_vault_t *config_vault, const char *c
 
 int	zbx_vault_token_from_env_get(char **token, char **error);
 
-int	zbx_vault_approle_from_env_get(zbx_config_vault_t *config_vault, char **error);
-
 #endif

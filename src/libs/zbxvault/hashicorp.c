@@ -132,7 +132,7 @@ int	zbx_vault_get_kvs_hashicorp(const char *vault_url, const char *prefix, const
 		{
 			*error = zbx_dsprintf(*error, "at least one configuration parameter "
 				"(\"VaultToken\" or \"VaultAppRoleID\")"
-				" or corresponding environment variable \"VAULT_TOKEN\" or \"VAULT_TOKEN\" required");
+				" or corresponding environment variable required");
 		}
 		else
 		{

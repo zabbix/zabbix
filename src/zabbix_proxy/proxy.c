@@ -1833,13 +1833,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_vault_approle_from_env_get(&zbx_config_vault, &error))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault approle: %s", error);
-		zbx_free(error);
-		exit(EXIT_FAILURE);
-	}
-
 	if (SUCCEED != zbx_vault_init(&zbx_config_vault, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize vault: %s", error);
