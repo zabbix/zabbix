@@ -531,8 +531,7 @@ class testDataCollection extends CIntegrationTest {
 
 	/**
 	 * Test incremental pre-processing manager cache refresh.
-	 *
-	 * @required-components server
+	 * @suite-components-reuse true
 	 */
 	public function testDataCollection_preprocManagerCacheRefresh() {
 		$response = $this->call('host.create', [
