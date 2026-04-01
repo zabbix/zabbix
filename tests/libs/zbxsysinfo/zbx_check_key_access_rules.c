@@ -88,7 +88,7 @@ static zbx_mock_key_access_rule_type_t	zbx_mock_str_to_key_access_rule_type(cons
 void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t		error;
-	zbx_mock_handle_t		hrules, hrule, hmetrics, hmetric, htmp;
+	zbx_mock_handle_t		hrules, hrule, hmetrics, hmetric, hparam;
 	const char			*type, *pattern, *key, *tmp;
 	int				expected_ret, actual_ret, exit_code = SUCCEED, expect_rule_add_failure = 0;
 	zbx_uint64_t			rules;
@@ -99,11 +99,11 @@ void	zbx_mock_test_entry(void **state)
 	hrules = zbx_mock_get_parameter_handle("in.rules");
 	zbx_init_key_access_rules();
 
-	error = zbx_mock_parameter("in.rule_add_failure", &htmp);
+	error = zbx_mock_parameter("in.rule_add_failure", &hparam);
 
 	if (ZBX_MOCK_SUCCESS == error)
 	{
-		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(htmp, &tmp)))
+		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_string(hparam, &tmp)))
 			fail_msg("Cannot get in.rule_add_failure value: %s", zbx_mock_error_string(error));
 
 		if (0 == strcmp(tmp, "yes"))
