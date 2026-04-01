@@ -424,9 +424,10 @@ class CTrigger extends CTriggerGeneral {
 
 		// only_true
 		if ($options['only_true'] !== null) {
-			$sqlParts['where']['ot'] = '((t.value='.TRIGGER_VALUE_TRUE.')'.
-				' OR ((t.value='.TRIGGER_VALUE_FALSE.')'.
-					' AND (t.lastchange>'.
+			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['where']['ot'] = '((tr.value='.TRIGGER_VALUE_TRUE.')'.
+				' OR ((tr.value='.TRIGGER_VALUE_FALSE.')'.
+					' AND (tr.lastchange>'.
 					(time() - timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD))).
 				'))'.
 			')';
@@ -959,9 +960,9 @@ class CTrigger extends CTriggerGeneral {
 			do {
 				// Fetch all dependency records where "down" trigger IDs are in current iteration trigger IDs.
 				$dbResult = DBselect(
-					'SELECT d.triggerid_down,d.triggerid_up,t.value'.
-					' FROM trigger_depends d,triggers t'.
-					' WHERE d.triggerid_up=t.triggerid'.
+					'SELECT d.triggerid_down,d.triggerid_up,tr.value'.
+					' FROM trigger_depends d,trigger_rtdata tr'.
+					' WHERE d.triggerid_up=tr.triggerid'.
 					' AND '.dbConditionInt('d.triggerid_down', $triggerIds)
 				);
 
