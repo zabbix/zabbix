@@ -587,7 +587,7 @@ class testDataCollection extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']));
 		$this->assertArrayHasKey('value', $response['result'][0]);
 		$this->assertEquals(100, $response['result'][0]['value']);
-		
+
 		$response = $this->call('item.update', [
 			'itemid' => $itemid,
 			'preprocessing' => [[
