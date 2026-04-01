@@ -179,7 +179,7 @@ static zbx_uint64_t	dbconn_get_cached_nextid(zbx_dbconn_t *db, size_t index, zbx
 		{
 			zbx_mutex_unlock(idcache_mutex);
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unknown table: %s", table_name);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		result = zbx_dbconn_select(db, "select max(%s) from %s where %s between " ZBX_FS_UI64 " and "
@@ -232,7 +232,7 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Error getting table: %s", tablename);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	while (FAIL == found)
@@ -266,7 +266,7 @@ static zbx_uint64_t	dbconn_get_nextid(zbx_dbconn_t *db, const char *tablename, z
 					zabbix_log(LOG_LEVEL_CRIT, "maximum number of id's exceeded"
 							" [table:%s, field:%s, id:" ZBX_FS_UI64 "]",
 							table->table, table->recid, ret1);
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 			}
 
@@ -676,7 +676,7 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 			return CUID_LEN - 1;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 }
 #endif
@@ -746,7 +746,7 @@ char	*zbx_db_dyn_escape_field(const char *table_name, const char *field_name, co
 	if (NULL == (table = zbx_db_get_table(table_name)) || NULL == (field = zbx_db_get_field(table, field_name)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid table: \"%s\" field: \"%s\"", table_name, field_name);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return db_dyn_escape_field_len(field, src, ESCAPE_SEQUENCE_ON);
@@ -924,7 +924,7 @@ static void	check_cfg_empty_str(const char *parameter, const char *value)
 	if (NULL != value && 0 == strlen(value))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "configuration parameter \"%s\" is defined but empty", parameter);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -959,7 +959,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid \"DBTLSConnect\" configuration parameter: '%s'",
 				config->db_tls_connect);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != config->db_tls_connect &&
@@ -969,7 +969,7 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSConnect\" value \"%s\" requires \"DBTLSCAFile\", but it"
 				" is not defined", config->db_tls_connect);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if ((NULL != config->db_tls_cert_file || NULL != config->db_tls_key_file) &&
@@ -978,14 +978,14 @@ void	zbx_db_config_validate(zbx_db_config_t *config)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "parameter \"DBTLSKeyFile\" or \"DBTLSCertFile\" is defined, but"
 				" \"DBTLSKeyFile\", \"DBTLSCertFile\" or \"DBTLSCAFile\" is not defined");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (NULL != config->dbsocket && 0 != config->dbport)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Both parameters \"DBPort\" and \"DBSocket\" are defined. Either one of "
 				"them can be defined, or neither.");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 #endif
@@ -1548,9 +1548,9 @@ void	zbx_db_add_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_o
  ******************************************************************************/
 const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
 {
-	static unsigned char	n = 0;
-	static char		buf[4][21];	/* 20 - value size, 1 - '\0' */
-	static const char	null[5] = "null";
+	static ZBX_THREAD_LOCAL unsigned char	n = 0;
+	static ZBX_THREAD_LOCAL char		buf[4][21];	/* 20 - value size, 1 - '\0' */
+	static const char			null[5] = "null";
 
 	if (0 == id)
 		return null;
@@ -1574,8 +1574,8 @@ const char	*zbx_db_sql_id_ins(zbx_uint64_t id)
  ******************************************************************************/
 const char	*zbx_db_sql_id_cmp(zbx_uint64_t id)
 {
-	static char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
-	static const char	is_null[9] = " is null";
+	static ZBX_THREAD_LOCAL char		buf[22];	/* 1 - '=', 20 - value size, 1 - '\0' */
+	static const char			is_null[9] = " is null";
 
 	if (0 == id)
 		return is_null;
