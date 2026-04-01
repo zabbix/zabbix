@@ -458,7 +458,7 @@ class CIntegrationTest extends CAPITest {
 				$i = -1;
 				continue;
 			}
-	
+
 			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
