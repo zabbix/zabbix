@@ -469,7 +469,6 @@ class CTest extends TestCase {
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {
 
-
 			if (self::TRACE_DELAYS) {
 				fwrite(STDERR, sprintf("[%s] onAfterTestSuite backup restore took %.4fs [total: %.4fs]\n",
 					self::$last_test_case_name, self::$backup_time_per_test_file,

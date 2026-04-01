@@ -62,6 +62,9 @@ class CIntegrationTest extends CAPITest {
 	private static $delay_wait_log_line_per_test_file = 0.0;
 	private static $delay_wait_log_line_total = 0.0;
 
+	private static $suite_components_reuse = false;
+	private static $suite_components_running = false;
+
 	/**
 	 * Components required by test suite.
 	 *
@@ -89,9 +92,6 @@ class CIntegrationTest extends CAPITest {
 	 * @var array
 	 */
 	private $case_components = [];
-
-	private static $suite_components_reuse = false;
-	private static $suite_components_running = false;
 
 	/**
 	 * Hosts to be enabled for test case.
@@ -825,6 +825,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param array   $values        item values
 	 * @param string  $component     component name or null for active component
 	 * @param integer $delayOverride
+	 * @param integer $time
 	 *
 	 * @return array    processing result
 	 */
@@ -864,6 +865,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param mixed   $value        item value
 	 * @param string  $component    component name or null for active component
 	 * @param integer $delayOverride
+	 * @param integer $time
 	 *
 	 * @return array    processing result
 	 */
@@ -902,6 +904,7 @@ class CIntegrationTest extends CAPITest {
 	 * @param mixed   $value         item value
 	 * @param string  $component     component name or null for active component
 	 * @param integer $delayOverride
+	 * @param integer $time
 	 *
 	 * @return array    processing result
 	 */
