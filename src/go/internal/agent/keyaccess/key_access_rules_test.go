@@ -60,11 +60,13 @@ func (r *accessRules) addRegexpRule(pattern string, ruleType RuleType) {
 }
 
 func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRules int) {
-	var err error
 
-	if err :=LoadRules(&rules.allowRecords, &rules.denyRecords,
-		&rules.allowRegexpRecords, &rules.denyRegexpRecords); err != nil {
-		t.Errorf("Failed to load rules: %s", err.Error())
+	loadErr := LoadRules(
+		&rules.allowRecords, &rules.denyRecords,
+		&rules.allowRegexpRecords, &rules.denyRegexpRecords,
+	)
+	if loadErr != nil {
+		t.Errorf("Failed to load rules: %s", loadErr.Error())
 	}
 
 	if numRules != GetNumberOfRules() {
@@ -75,9 +77,11 @@ func RunScenarios(t *testing.T, scenarios []scenario, rules accessRules, numRule
 		var key string
 		var params []string
 
-		if key, params, err = itemutil.ParseKey(test.metric); err != nil {
+		key, params, parseErr := itemutil.ParseKey(test.metric)
+		if parseErr != nil {
 			t.Errorf("Failed to parse metric \"%s\"", test.metric)
 		}
+
 		if ok := CheckRules(test.metric, key, params); ok != test.result {
 			t.Errorf("Unexpected result for metric \"%s\": got %v, want %v", test.metric, ok, test.result)
 		}

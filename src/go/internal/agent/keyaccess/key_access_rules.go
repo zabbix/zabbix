@@ -28,9 +28,10 @@ import (
 )
 
 var (
-	errInvalidRule = errors.New("invalid key access rule")
+	errInvalidRule                 = errors.New("invalid key access rule")
 	errRegexpPatternMustNotBeEmpty = errors.New("regular expression pattern must not be empty")
 )
+
 
 // RuleType Access rule permission type
 type RuleType int
@@ -98,6 +99,7 @@ func parse(rec Record) (r *Rule, err error) {
 		}
 		// Wrap in non-capturing group and anchor to enforce full-string matching (RE2 compatible).
 		anchored := "^(?:" + rec.Pattern + ")$"
+
 		r.Regexp, err = regexp.Compile(anchored)
 		if err != nil {
 			return nil, fmt.Errorf("failed to compile regular expression: %w", err)
@@ -137,6 +139,7 @@ func findRule(proto *Rule) (rule *Rule, index int) {
 		if proto.IsRegexp != r.IsRegexp {
 			continue
 		}
+
 		if proto.IsRegexp {
 			if proto.Pattern == r.Pattern {
 				return r, j
@@ -201,6 +204,7 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 			}
 		}
 	}
+
 	if node, ok := denyRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
@@ -218,6 +222,7 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 			}
 		}
 	}
+
 	if node, ok := denyRegexpRecords.(*conf.Node); ok {
 		for _, v := range node.Nodes {
 			if value, ok := v.(*conf.Value); ok {
@@ -278,6 +283,7 @@ func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords 
 			if rules[i].Permission != ALLOW {
 				break
 			}
+
 			if rules[i].IsRegexp {
 				break
 			}
