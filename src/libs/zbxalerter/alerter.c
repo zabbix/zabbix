@@ -507,8 +507,7 @@ static void	alerter_process_webhook(zbx_ipc_socket_t *socket, zbx_ipc_message_t 
 	zbx_free(script_bin);
 }
 
-static void	alerter_process_push(
-		zbx_ipc_socket_t *socket,
+static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		zbx_ipc_message_t *ipc_message,
 		const char *config_adapter_url,
 		int config_adapter_timeout,
@@ -527,6 +526,8 @@ static void	alerter_process_push(
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 #else
+	int			ret = FAIL;
+	char 			alert_error[MAX_STRING_LEN];
 	zbx_uint64_t		alertid;
 	char			*params;
 	long			http_code = 0;
@@ -563,18 +564,24 @@ static void	alerter_process_push(
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		zbx_snprintf(alert_error, sizeof(alert_error), "cannot set cURL option %d: %s.", (int)opt,
+				curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (SUCCEED != zbx_curl_setopt_https(curl, &error))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_https %s", curl_easy_strerror(err));
+		zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_https %s",
+				curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_ssl_version %s", curl_easy_strerror(err));
+		zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_ssl_version %s",
+				curl_easy_strerror(err));
 		goto out;
 	}
 
@@ -583,25 +590,33 @@ static void	alerter_process_push(
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_adapter_key_file)))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		zbx_snprintf(alert_error, sizeof(alert_error), "failed set cURL option %d: %s.", (int)opt,
+				curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed connect to bridge-adapter: %s", curl_easy_strerror(err));
+		zbx_snprintf(alert_error, sizeof(alert_error), "failed connect to bridge-adapter: %s",
+				curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed obtain bridge-adapter response code: %s",
-			curl_easy_strerror(err));
+				curl_easy_strerror(err));
+		zbx_snprintf(alert_error, sizeof(alert_error), "failed obtain bridge-adapter response code: %s",
+				curl_easy_strerror(err));
 		goto out;
 	}
 
 	if (http_code < 200 || http_code >= 300)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed to send notification " ZBX_FS_UI64 ": "
+		zabbix_log(LOG_LEVEL_INFORMATION, "failed to send notification: "
+				"bridge-adapter returned HTTP %ld", http_code);
+		zbx_snprintf(alert_error, sizeof(alert_error), "failed to send notification: "
 				"bridge-adapter returned HTTP %ld", http_code);
 
 		goto out;
@@ -609,8 +624,10 @@ static void	alerter_process_push(
 	else
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "ALERT SUCCESS: %d", http_code);
+		ret = SUCCEED;
 	}
 out:
+	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 	curl_easy_cleanup(curl);
 	zbx_free(params);
 #endif
