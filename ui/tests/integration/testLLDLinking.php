@@ -300,14 +300,14 @@ class testLldLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->setupAutoregToLinkTemplates(self::NUMBER_OF_TEMPLATES_TEST_2, $LLDRuleType);
 		$this->metaDataItemUpdate();
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER)
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->unlinkTemplates();
 		$this->metaDataItemUpdate();
-		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER)
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_AGENT);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
 			'End of zbx_db_copy_template_elements():SUCCEED', true, 120);
