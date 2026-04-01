@@ -29,7 +29,7 @@ class CIntegrationTest extends CAPITest {
 
 	// Default delays (in seconds):
 	const WAIT_ITERATION_DELAY			= 1;
-	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN_MS	= 100;
+	const WAIT_ITERATION_DELAY_FOR_SHUTDOWN		= 1;
 	const CACHE_RELOAD_DELAY			= 3; // Configuration cache reload delay.
 	const USER_PARAM_RELOAD_DELAY			= 3;
 	const HOUSEKEEPER_EXEC_DELAY			= 5;
@@ -445,12 +445,21 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 */
 	private static function checkPidKilled($component) {
+		$usleep_total = 0;
+
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			if (!file_exists(self::getPidPath($component))) {
 				return true;
 			}
 
-			usleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN_MS);
+			if ($usleep_total < 1000000) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$i = -1;
+				continue;
+			}
+	
+			sleep(self::WAIT_ITERATION_DELAY_FOR_SHUTDOWN);
 		}
 
 		return false;
