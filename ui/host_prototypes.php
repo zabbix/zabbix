@@ -134,11 +134,16 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 	$result = DBend($result);
 
 	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Host prototype deleted'));
+
 		uncheckTableRows($discoveryRule['itemid']);
 	}
-	show_messages($result, _('Host prototype deleted'), _('Cannot delete host prototypes'));
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot delete host prototypes'));
+	}
 
-	unset($_REQUEST['hostid'], $_REQUEST['form']);
+	$response = new CControllerResponseRedirect($backurl);
+	$response->redirect();
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	if (hasRequest('group_prototypes')) {
