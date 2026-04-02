@@ -2101,7 +2101,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(4, $response['result'], 'nested rule(s) were not discovered');
+		$this->assertEquals(4, $response['result'], 'nested rule(s) were not discovered: '.json_encode($response));
 
 		$data = [
 			[
