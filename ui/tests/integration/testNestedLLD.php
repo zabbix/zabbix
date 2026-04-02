@@ -1792,7 +1792,7 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendSenderValue($hostname, $rule, $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 120, 1, true);
-		
+
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, $rule, $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
