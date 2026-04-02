@@ -77,7 +77,7 @@ if (array_key_exists('discoveryRule', $data)) {
 	]);
 }
 
-if (!empty($data['templates'])) {
+if (!empty($data['templates']) && $data['form'] !== 'clone') {
 	$item_tab->addItem([
 		new CLabel(_('Parent discovery rules')),
 		new CFormField($data['templates'])
