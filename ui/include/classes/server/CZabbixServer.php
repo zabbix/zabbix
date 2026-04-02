@@ -299,11 +299,14 @@ class CZabbixServer {
 	 * Request server to init mobile device.
 	 *
 	 * @param array  $data
-	 * @param array  $data['uuid']      External device ID.
-	 * @param array  $data['serverid']  Server ID.
+	 * @param string $data['userid']    User ID.
+	 * @param string $data['uuid']      External device ID.
+	 * @param string $data['serverid']  Server ID.
 	 * @param string $sid               User session ID or token.
+	 *
+	 * @return array|bool
 	 */
-	public function initDevice(array $data, string $sid): array|bool {
+	public function initDevice(array $data, string $sid) {
 		return $this->request([
 			'request' => 'device.init',
 			'data' => $data,
@@ -316,10 +319,12 @@ class CZabbixServer {
 	 * Request server to offboard mobile device.
 	 *
 	 * @param array  $data
-	 * @param array  $data['uuid']      External device ID.
-	 * @param string $sid               User session ID or token.
+	 * @param string $data['uuid']  External device ID.
+	 * @param string $sid           User session ID or token.
+	 *
+	 * @return array|bool
 	 */
-	public function offboardDevice(array $data, string $sid): array|bool {
+	public function offboardDevice(array $data, string $sid) {
 		return $this->request([
 			'request' => 'device.offboard',
 			'data' => $data,
