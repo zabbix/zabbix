@@ -98,12 +98,12 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 	zbx_vector_uint64_create(&ids);
 
-	while (SUCCEED == zbx_list_pop(&queue->jobs, (void*)&job))
+	while (SUCCEED == zbx_list_pop(&queue->jobs, (void**)&job))
 	{
 		int		one_task = SUCCEED;
 		zbx_uint64_t	id;
 
-		if (SUCCEED != zbx_list_peek(&job->tasks, (void*)&task))
+		if (SUCCEED != zbx_list_peek(&job->tasks, (void**)&task))
 			break;
 
 		if (SVC_SNMPv3 != GET_DTYPE(task) && SVC_SNMPv2c != GET_DTYPE(task) && SVC_SNMPv1 != GET_DTYPE(task))
@@ -119,7 +119,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 		if (job->tasks.head != job->tasks.tail)				/* if not one snmp task in the list */
 		{
-			(void)zbx_list_pop(&job->tasks, (void*)&task);
+			(void)zbx_list_pop(&job->tasks, (void**)&task);
 			(void)zbx_list_append(&job->tasks, (void*)task, NULL);	/* put task to end of the list */
 			one_task = FAIL;
 		}
@@ -303,69 +303,46 @@ void	discoverer_queue_append_error(zbx_vector_discoverer_drule_error_t *errors, 
 	derror_ptr->error = zbx_dsprintf(derror_ptr->error, "%s\n%s", derror_ptr->error, error);
 }
 
-zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_discoverer_queue_t *queue, zbx_discoverer_task_t *task)
+zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_vector_discoverer_jobs_ptr_t *job_refs,
+		zbx_discoverer_queue_t *queue, zbx_discoverer_task_t *task, zbx_discoverer_task_t *first_task,
+		int log_worker_id)
 {
+#	define	DTYPE_UNDEF	0xFF
 	zbx_discoverer_task_t	*ret_task = NULL;
-	zbx_uint64_t		task_druleid = NULL == task ? 0 :
-					task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.druleid;
-	zbx_list_item_t		*job_current = NULL, *task_current = NULL;
-	zbx_list_iterator_t	job_li;
+	zbx_uint64_t		task_druleid = NULL == task ? 0 : GET_DRULEID(task);
+	zbx_list_iterator_t	li = { .list = NULL };
+	unsigned char		dtype = DTYPE_UNDEF;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() job_refs:%d first [druleid:" ZBX_FS_UI64 " task type:%d dcheck:"
+			ZBX_FS_UI64 "] task druleid:" ZBX_FS_UI64 " dcheck:" ZBX_FS_UI64, log_worker_id, __func__,
+			job_refs->values_num, GET_DRULEID(first_task), GET_DTYPE(first_task), GET_DCHECKID(first_task),
+			task_druleid, 0 == task_druleid ? 0 : GET_DCHECKID(task));
+
+	if (task == first_task)
+		goto out;
 
 	discoverer_queue_lock(queue);
 
-	zbx_list_iterator_init(&queue->jobs, &job_li);
-
-	if (0 != task_druleid)
+	for (int i = 0; i < job_refs->values_num; i++)
 	{
-		do
+		zbx_discoverer_job_t	*job = job_refs->values[i];
+
+		if (0 != task_druleid && FAIL == zbx_list_iterator_isset(&li) && task_druleid != job->druleid)
+			continue;
+
+		zbx_list_iterator_init(&job->tasks, &li);
+
+		while (SUCCEED == zbx_list_iterator_next(&li))
 		{
-			zbx_list_iterator_t	li;
-			zbx_discoverer_job_t	*job;
-
-			(void)zbx_list_iterator_peek(&job_li, (void*)&job);
-
-			if (task_druleid != job->druleid)
-				continue;
-
-			zbx_list_iterator_init(&job->tasks, &li);
-
-			do
-			{
-				(void)zbx_list_iterator_peek(&li, (void*)&ret_task);
-
-				if (0 != discoverer_task_compare(task, ret_task))
-					continue;
-
-				task_current = li.current;
+			if (FAIL == zbx_list_iterator_peek(&li, (void**)&ret_task))
 				break;
+
+			if (DTYPE_UNDEF == dtype && NULL != task && ret_task != task)
+			{
+				ret_task = NULL;
+				continue;
 			}
-			while (SUCCEED == zbx_list_iterator_next(&li));
 
-			if (NULL == task_current)
-				THIS_SHOULD_NEVER_HAPPEN;
-
-			job_current = job_li.current;
-			break;
-		}
-		while (SUCCEED == zbx_list_iterator_next(&job_li));
-	}
-
-
-	zbx_list_iterator_init_with(&queue->jobs, job_current, &job_li);
-
-	do
-	{
-		zbx_list_iterator_t	li;
-		zbx_discoverer_job_t	*job;
-
-		(void)zbx_list_iterator_peek(&job_li, (void*)&job);
-		zbx_list_iterator_init_with(&job->tasks, task_current, &li);
-
-		do
-		{
-			unsigned char	dtype;
-
-			(void)zbx_list_iterator_peek(&li, (void*)&ret_task);
 			dtype = GET_DTYPE(ret_task);
 
 			if (SVC_SNMPv3 != dtype && SVC_SNMPv2c != dtype && SVC_SNMPv1 != dtype)
@@ -377,7 +354,7 @@ zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_discoverer_queue_t *qu
 			if (NULL == task)
 				break;
 
-			if (0 == discoverer_task_compare(task, ret_task))
+			if (task == ret_task)
 			{
 				ret_task = NULL;
 				continue;
@@ -385,15 +362,27 @@ zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_discoverer_queue_t *qu
 
 			break;
 		}
-		while (SUCCEED == zbx_list_iterator_next(&li));
 
-		if (NULL != ret_task)
+		if (DTYPE_UNDEF != dtype && NULL != ret_task)
 			break;
-
 	}
-	while (SUCCEED == zbx_list_iterator_next(&job_li));
 
 	discoverer_queue_unlock(queue);
 
+	if (NULL == ret_task)
+		ret_task = first_task;
+out:
+	if (NULL != ret_task)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() drule:" ZBX_FS_UI64 " task type:%d dcheck:" ZBX_FS_UI64
+				" range count:" ZBX_FS_UI64 " id:" ZBX_FS_UI64 , log_worker_id, __func__,
+				GET_DRULEID(ret_task), GET_DTYPE(ret_task), GET_DCHECKID(ret_task),
+				discoverer_task_check_count_get(ret_task), ret_task->range.id);
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() task is NULL", log_worker_id, __func__);
+
 	return ret_task;
+
+#	undef	DTYPE_UNDEF
 }

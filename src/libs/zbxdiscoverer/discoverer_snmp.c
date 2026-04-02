@@ -167,7 +167,9 @@ static int	snmp_jobs_total_concurrency(zbx_discoverer_manager_t *dmanager)
 			zbx_discoverer_task_t	*task;
 			unsigned char		dtype;
 
-			(void)zbx_list_iterator_peek(&li, (void*)&task);
+			if (FAIL == zbx_list_iterator_peek(&li, (void*)&task))
+				break;
+
 			dtype = GET_DTYPE(task);
 
 			if (SVC_SNMPv3 == dtype || SVC_SNMPv2c == dtype || SVC_SNMPv1 == dtype)
@@ -181,16 +183,22 @@ static int	snmp_jobs_total_concurrency(zbx_discoverer_manager_t *dmanager)
 		if (FAIL == is_snmp)
 			continue;
 
-		if (0 != job->concurrency_max)
+		if (0 != job->concurrency_max && job->concurrency_max < dmanager->queue.checks_per_worker_max)
 			cuncurrent_check_max += job->concurrency_max;
-		else
-			cuncurrent_check_max += DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
 	}
 
 	discoverer_queue_unlock(&dmanager->queue);
 
-	if (DISCOVERER_SNMP_CHECKS_INPROGRESS_MAX < cuncurrent_check_max)
+	zabbix_log(LOG_LEVEL_TRACE, "[%d] %s() cuncurrent_check_max:%d", log_worker_id, __func__,
+			cuncurrent_check_max);
+
+	if (DISCOVERER_SNMP_CHECKS_INPROGRESS_MAX < cuncurrent_check_max || (0 == cuncurrent_check_max &&
+			DISCOVERER_JOB_TASKS_INPROGRESS_MAX == dmanager->queue.checks_per_worker_max))
+	{
 		cuncurrent_check_max = DISCOVERER_SNMP_CHECKS_INPROGRESS_MAX;
+	}
+	else
+		cuncurrent_check_max = dmanager->queue.checks_per_worker_max;
 
 	return cuncurrent_check_max;
 }
@@ -200,8 +208,7 @@ static int	discovery_task_is_finished(const zbx_discoverer_task_t *task, zbx_uin
 	int ret = (0 == discoverer_task_check_count_get(task) ? SUCCEED : FAIL);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() druleid:" ZBX_FS_UI64 " type:%u ret:%s", log_worker_id, __func__,
-			druleid, task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
-			SUCCEED == ret ? "SUCCEED" : "FAIL");
+			druleid, GET_DTYPE(task), SUCCEED == ret ? "SUCCEED" : "FAIL");
 	return ret;
 }
 
@@ -241,11 +248,12 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 	zbx_vector_discoverer_results_ptr_create(&results);
 	druleid = 0;
 
-	while (NULL != (task = discoverer_queue_snmp_task_get(&dmanager->queue, task)))
+	while (NULL != (task = discoverer_queue_snmp_task_get(&dmanager->job_refs, &dmanager->queue, task, first_task,
+			log_worker_id)) && 0 == *stop && SUCCEED == abort)
 	{
-		if (druleid != task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.druleid)
+		if (druleid != GET_DRULEID(task))
 		{
-			druleid = task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.druleid;
+			druleid = GET_DRULEID(task);
 			drule_n++;
 		}
 
@@ -253,9 +261,9 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 		zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() start druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64
 				" state.count:" ZBX_FS_UI64 " checks per ip:%u dchecks:%d type:%u concurrency_max:%d "
 				"checks_per_worker_max:%d drule_n:%d task_n:%d check_n:%d", log_worker_id, __func__,
-				druleid, task->range.id, task->range.state.count, task->range.state.checks_per_ip,
-				task->ds_dchecks.values_num, GET_DTYPE(task), concurrency_max,
-				dmanager->queue.checks_per_worker_max, drule_n, task_n, check_n);
+				druleid, task->range.id, discoverer_task_check_count_get(task),
+				task->range.state.checks_per_ip, task->ds_dchecks.values_num, GET_DTYPE(task),
+				concurrency_max, dmanager->queue.checks_per_worker_max, drule_n, task_n, check_n);
 
 		if (SVC_SNMPv3 == GET_DTYPE(task))
 			is_snmpv3 = SUCCEED;
@@ -300,8 +308,9 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 
 		zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() end druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
 				" first ip:%s last ip:%s abort:%d ret:%d drule_n:%d task_n:%d check_n:%d",
-				log_worker_id, __func__, druleid, GET_DTYPE(task), task->range.state.count, first_ip,
-				ip, abort, ret, drule_n, task_n, check_n);
+				log_worker_id, __func__, druleid, GET_DTYPE(task),
+				discoverer_task_check_count_get(task), first_ip, ip, abort, ret, drule_n, task_n,
+				check_n);
 		*first_ip = '\0';
 	}
 out:

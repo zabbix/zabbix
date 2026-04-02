@@ -513,8 +513,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			ZBX_FS_UI64 " checks per ip:%u dchecks:%d type:%u concurrency_max:%d checks_per_worker_max:%d",
 			log_worker_id, __func__, druleid, task->range.id, task->range.state.count,
 			task->range.state.checks_per_ip, task->ds_dchecks.values_num,
-			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type, concurrency_max,
-			dmanager->queue.checks_per_worker_max);
+			GET_DTYPE(task), concurrency_max, dmanager->queue.checks_per_worker_max);
 
 	if (0 == concurrency_max)
 		concurrency_max = dmanager->queue.checks_per_worker_max;

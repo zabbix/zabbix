@@ -150,6 +150,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_ds_dche
 		task_local.range.state.checks_per_ip = checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
 		task_local.range.state.port = port;
+		task_local.range.state.index_ip = 0;
 		zbx_iprange_first(task_local.range.ipranges->values, task_local.range.state.ipaddress);
 
 		zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
