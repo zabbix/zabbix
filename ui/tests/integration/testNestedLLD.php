@@ -2091,7 +2091,7 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendSenderValue($hostname, 'main_drule', $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendSenderValue($hostname, 'main_drule', $data, null, 0);
+		$result = $this->sendSenderValue($hostname, 'main_drule', $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('discoveryrule.get', [
@@ -2102,7 +2102,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(4, $response['result'], 'nested rule(s) were not discovered: '.json_encode($response));
+		$this->assertEquals(4, $response['result'], 'nested rule(s) were not discovered: '.json_encode($result));
 
 		$data = [
 			[
