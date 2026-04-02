@@ -339,6 +339,13 @@ class CIntegrationTest extends CAPITest {
 		parent::onAfterTestSuite();
 
 		if (self::TRACE_DELAYS) {
+			$sum_per_test_file = self::$delay_call_data_present_per_test_file +
+				self::$delay_wait_log_line_per_test_file +
+				self::$delay_wait_send_per_test_file +
+				self::$delay_reload_config_cache_per_test_file +
+				self::$startup_time_per_test_file +
+				self::$shutdown_time_per_test_file;
+
 			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$delay_call_data_present_per_test_file,
 				self::$delay_call_data_present_total));
@@ -368,6 +375,9 @@ class CIntegrationTest extends CAPITest {
 				self::$last_test_case_name, self::$shutdown_time_per_test_file,
 				self::$shutdown_time_total));
 			self::$shutdown_time_per_test_file = 0.0;
+
+			fwrite(STDERR, sprintf("[%s] sum of delays: %.4fs\n",
+				self::$last_test_case_name, $sum_per_test_file));
 		}
 	}
 
