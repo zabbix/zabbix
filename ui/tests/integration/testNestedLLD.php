@@ -590,7 +590,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceH", "type" => "service", "status" => "nodiscover", "failfilter" => "yes"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$expected_suffix = ['A', 'B', 'E', 'F', 'G'];
@@ -661,7 +661,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceH", "type" => "service", "status" => "nodiscover", "failfilter" => "yes"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$expected_suffix = ['A', 'B', 'E', 'F', 'G', 'H'];
@@ -712,7 +712,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceH", "type" => "service", "status" => "nodiscover", "failfilter" => "yes"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('auditlog.get', [
@@ -747,7 +747,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceX", "type" => "service", "status" => "warning"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->callUntilDataIsPresent('auditlog.get', [
@@ -792,7 +792,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceX", "type" => "service", "status" => "critical"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->callUntilDataIsPresent('auditlog.get', [
@@ -844,7 +844,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceX", "type" => "service", "status" => "warning"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 
@@ -938,7 +938,7 @@ class testNestedLLD extends CIntegrationTest{
 			["name" => "ServiceX", "type" => "service", "status" => "critical"]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_MAIN, self::LLDRULE_MAIN, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$expected_items = [
@@ -978,7 +978,7 @@ class testNestedLLD extends CIntegrationTest{
 			['{#NAME}' => 'itemtypetest']
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('item.get', [
@@ -1082,7 +1082,7 @@ class testNestedLLD extends CIntegrationTest{
 			];
 
 			$response = $this->call('itemprototype.update', array_merge($request, $param));
-			$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+			$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 			$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 			$response = $this->call('item.get', [
@@ -1102,7 +1102,7 @@ class testNestedLLD extends CIntegrationTest{
 			['{#NAME}' => 'itemtypetest']
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('item.get', [
@@ -1118,7 +1118,7 @@ class testNestedLLD extends CIntegrationTest{
 			'key_' => 'itemtype.test.renamed[{#NAME}]'
 		]);
 
-		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('item.get', [
@@ -1136,7 +1136,7 @@ class testNestedLLD extends CIntegrationTest{
 			['{#NAME}' => 'itemtypetest']
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('item.get', [
@@ -1151,7 +1151,7 @@ class testNestedLLD extends CIntegrationTest{
 			['{#NAME}' => 'renamedparam']
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('item.get', [
@@ -1185,7 +1185,7 @@ class testNestedLLD extends CIntegrationTest{
 			]
 		];
 
-		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data);
+		$this->sendSenderValue(self::HOSTNAME_ITEMTYPES, self::LLDRULE_ITEMTYPES, $trapper_data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$expected_items = [
@@ -1539,7 +1539,7 @@ class testNestedLLD extends CIntegrationTest{
 
 	// Check if everything was correctly discovered for 'DB discovery' template
 	private function checkNestedLLDFromTemplate($hostname) {
-		$this->sendSenderValue($hostname, 'main_drule', self::$trapper_data_nested1);
+		$this->sendSenderValue($hostname, 'main_drule', self::$trapper_data_nested1, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -1650,7 +1650,7 @@ class testNestedLLD extends CIntegrationTest{
 				'preproc does not match for rule ' . $discovered_rule['name']);
 		}
 
-		$this->sendSenderValue($hostname, 'main_drule', self::$trapper_data_nested1);
+		$this->sendSenderValue($hostname, 'main_drule', self::$trapper_data_nested1, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -1788,10 +1788,10 @@ class testNestedLLD extends CIntegrationTest{
 	}
 
 	private function sendRuleData($hostname, $rule, $data) {
-		$this->sendSenderValue($hostname, $rule, $data);
+		$this->sendSenderValue($hostname, $rule, $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendSenderValue($hostname, $rule, $data);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
+		$this->sendSenderValue($hostname, $rule, $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 	}
 
@@ -2087,10 +2087,10 @@ class testNestedLLD extends CIntegrationTest{
 			]
 		];
 
-		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->sendSenderValue($hostname, 'main_drule', $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-		$this->sendSenderValue($hostname, 'main_drule', $data);
+		$this->sendSenderValue($hostname, 'main_drule', $data, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
 		$response = $this->call('discoveryrule.get', [
@@ -2460,7 +2460,7 @@ class testNestedLLD extends CIntegrationTest{
 		$this->sendRuleData($hostname, 'main_drule', $data);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		$this->sendSenderValue($hostname, 'item[A,B]', 100);
+		$this->sendSenderValue($hostname, 'item[A,B]', 100, null, 0);
 
 		$expected_tag = [
 			"tag" => "xxx",
@@ -2535,7 +2535,7 @@ class testNestedLLD extends CIntegrationTest{
 		// discovery rule is expected to be created out of discovery prototype with:
 		// 'name' => '1-st level discovery rule',
 		// 'key_' => 'lld_trap[{#L0}]'.
-		$this->sendSenderValue(self::HOSTNAME_TEST_MACRO, self::LLDRULE_KEY_ROOT, $trapper_value);
+		$this->sendSenderValue(self::HOSTNAME_TEST_MACRO, self::LLDRULE_KEY_ROOT, $trapper_value, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 10, 1, true);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
@@ -2568,7 +2568,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		// After sending the trapper value the 2-nd time,
 		// items are expected to be created out of item prototypes.
-		$this->sendSenderValue(self::HOSTNAME_TEST_MACRO, self::LLDRULE_KEY_ROOT, $trapper_value);
+		$this->sendSenderValue(self::HOSTNAME_TEST_MACRO, self::LLDRULE_KEY_ROOT, $trapper_value, null, 0);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 10, 1, true);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_process_discovery_rule', true, 10, 1, true);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
