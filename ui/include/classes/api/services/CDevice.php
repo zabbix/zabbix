@@ -156,7 +156,7 @@ class CDevice extends CApiService {
 		$uuid = generateUuidV7();
 		$server_id = CApiDpopHelper::getServerId(); // todo - replace this mock for Server ID by real method
 
-		$init_device_data = ['serverid' => $server_id, 'uuid' => $uuid];
+		$init_device_data = [$data['userid'], 'serverid' => $server_id, 'uuid' => $uuid];
 
 		$result = $server->initDevice($init_device_data, self::getAuthIdentifier());
 
@@ -179,11 +179,10 @@ class CDevice extends CApiService {
 
 		return [
 			'uuid' => $uuid,
-			'server_id' => $server_id,
 			'enrollment_token' => $enrollment_token,
 			'mobile_enrollment_token' => $result['mobile_enrollment_token'],
-			'bridge_enrollment_key' => $result['bridge_enrollment_key'],
-			'enrollment_url' => $result['enrollment_url']
+			'bridge_adapter_encryption_key' => $result['bridge_adapter_encryption_key'],
+			'bridge_enrollment_url' => $result['enrollment_url']
 		];
 	}
 
