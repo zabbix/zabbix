@@ -1712,19 +1712,92 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 					.message = (char *)(uintptr_t)message
 				};
 
-		char		*value = zbx_strdup(NULL,"{ALERT.MESSAGE}");
+		char	*body = zbx_strdup(NULL, "{ALERT.MESSAGE}");
+		char	*subject = zbx_strdup(NULL, "{ALERT.SUBJECT}");
+		char	*trigger_severity = zbx_strdup(NULL, "{TRIGGER.SEVERITY}");
+		char	*event_id = zbx_strdup(NULL, "{EVENT.ID}");
+		char	*host_id = zbx_strdup(NULL, "{HOST.ID}");
+		char	*trigger_id = zbx_strdup(NULL, "{TRIGGER.ID}");
 
-		substitute_message_macros(&value, NULL, 0, message_type, um_handle_unmasked, &actionid, event, r_event,
+		char    *uuid7 = zbx_gen_uuid7();
+
+		substitute_message_macros(&body, NULL, 0, message_type, um_handle_unmasked, &actionid, event, r_event,
 				&userid, NULL, &alert, service_alarm, service, tz, ack);
 
-		zbx_json_addstring(&json, NULL, value, ZBX_JSON_TYPE_STRING);
+		substitute_message_macros(&subject, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
+				r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
 
-		zbx_json_addstring(&json, "device_id", row[0], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "token", row[1], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "kid", row[2], ZBX_JSON_TYPE_STRING);
-		zbx_json_addstring(&json, "key", row[3], ZBX_JSON_TYPE_STRING);
+		substitute_message_macros(&trigger_severity, NULL, 0, message_type, um_handle_unmasked, &actionid,
+				event, r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
 
-		zbx_free(value);
+		substitute_message_macros(&event_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
+				r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+
+		substitute_message_macros(&host_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
+					r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+
+		substitute_message_macros(&trigger_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
+				r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA: %s, %s, %s, %s", trigger_severity, event_id, host_id,
+				trigger_id);
+
+
+		zbx_json_addobject(&json, NULL);
+		zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "method", "notification", ZBX_JSON_TYPE_STRING);
+
+		zbx_json_addobject(&json, "params");
+
+			zbx_json_addobject(&json, "to");
+			zbx_json_addstring(&json, "token", row[1], ZBX_JSON_TYPE_STRING);
+			zbx_json_addstring(&json, "device_id", row[0], ZBX_JSON_TYPE_STRING);
+			zbx_json_close(&json); /* to */
+
+			zbx_json_addstring(&json, "priority", trigger_severity, ZBX_JSON_TYPE_STRING);
+
+			zbx_json_addobject(&json, "data");
+
+				zbx_json_addobject(&json, "payload");
+					zbx_json_addstring(&json, "specversion", "1", ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&json, "id", "(UUIDv7)", ZBX_JSON_TYPE_STRING);
+					zbx_json_addint64(&json, "time", (int)zbx_time());
+					zbx_json_addstring(&json, "type", "problem.created", ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&json, "source", "<unused>", ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&json, "subject", "<unused>", ZBX_JSON_TYPE_STRING);
+					zbx_json_addstring(&json, "schema", "<unused>", ZBX_JSON_TYPE_STRING);
+
+					zbx_json_addobject(&json, "data");
+						zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
+						zbx_json_addstring(&json, "body", body, ZBX_JSON_TYPE_STRING);
+
+						zbx_json_addstring(&json, "eventid", event_id, ZBX_JSON_TYPE_STRING);
+
+						zbx_json_addarray(&json, "hostids");
+						zbx_json_addstring(&json, NULL, host_id, ZBX_JSON_TYPE_STRING);
+						zbx_json_close(&json); /* hostids */
+
+						zbx_json_addstring(&json, "triggerid", trigger_id,
+								ZBX_JSON_TYPE_STRING);
+						zbx_json_addint64(&json, "userid", userid);
+						zbx_json_addstring(&json, "severity", trigger_severity,
+								ZBX_JSON_TYPE_STRING);
+
+						zbx_json_close(&json); /* payload.data */
+						zbx_json_close(&json); /* payload */
+
+				zbx_json_addstring(&json, "enc_key", row[3], ZBX_JSON_TYPE_STRING);
+
+				zbx_json_close(&json); /* data */
+				zbx_json_close(&json); /* params */
+
+		zbx_json_addstring(&json, "id", uuid7, ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json);
+		zbx_json_close(&json);
+
+		zbx_free(subject);
+		zbx_free(body);
 	}
 
 	zbx_db_free_result(result);
@@ -1732,6 +1805,8 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 	zbx_dc_close_user_macros(um_handle_unmasked);
 
 	*params = zbx_strdup(NULL, json.buffer);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA FINAL PARAMS %s", *params);
 	zbx_json_free(&json);
 }
 
