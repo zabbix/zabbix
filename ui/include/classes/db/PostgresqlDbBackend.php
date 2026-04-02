@@ -328,15 +328,14 @@ class PostgresqlDbBackend extends DbBackend {
 				$closing = strpos($token, ']');
 
 				if ($closing !== false) {
+					/**
+					 * Host includes everything between [ and ]
+					 */
+					$host = substr($token, 1, $closing - 1);
 					// Look for colon after the closing bracket.
 					$colon_pos = strpos($token, ':', $closing + 1);
 
 					if ($colon_pos !== false) {
-						/*
-						 * Host includes everything up to (but not including) the colon, so it keeps any spaces
-						 * between ']' and ':'.
-						 */
-						$host = substr($token, 0, $colon_pos);
 						// Preserves spaces after ':'.
 						$port = substr($token, $colon_pos + 1);
 
@@ -348,7 +347,7 @@ class PostgresqlDbBackend extends DbBackend {
 
 					// Bracketed but no port.
 					return [
-						'host' => $token,
+						'host' => $host,
 						'port' => ''
 					];
 				}

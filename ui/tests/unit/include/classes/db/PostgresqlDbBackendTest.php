@@ -51,7 +51,7 @@ class PostgresqlDbBackendTest extends TestCase {
 			[
 				'[2001:db8::1]  :  443',
 				[
-					['host' => '[2001:db8::1]  ', 'port' => '  443']
+					['host' => '2001:db8::1', 'port' => '  443']
 				]
 			],
 			// Empty tokens, empty hosts, unbracketed IPv6, bracketed IPv6 with port etc.
@@ -65,7 +65,7 @@ class PostgresqlDbBackendTest extends TestCase {
 					['host' => '', 'port' => ''],
 					['host' => '', 'port' => ''],
 					['host' => '::1', 'port' => ''],
-					['host' => '[::1]', 'port' => '8080'],
+					['host' => '::1', 'port' => '8080'],
 					['host' => '0', 'port' => '0'],
 					['host' => '', 'port' => '7'],
 					['host' => '', 'port' => '007'],
@@ -153,7 +153,7 @@ class PostgresqlDbBackendTest extends TestCase {
 					null
 				],
 				[
-					'host' => "host='[::1],example.com'",
+					'host' => "host='::1,example.com'",
 					'port' => "port='5432,80'",
 					'extras' => true,
 					'doPgConnect' => 'fake-resource',
@@ -187,7 +187,7 @@ class PostgresqlDbBackendTest extends TestCase {
 					null
 				],
 				[
-					'host' => "host='[::1],example.com'",
+					'host' => "host='::1,example.com'",
 					'port' => "port='5432,80'",
 					'extras' => true,
 					'doPgConnect' => false,
