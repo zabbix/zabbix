@@ -39,7 +39,7 @@ $url = (new CUrl('graphs.php'))
 	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
 	->setArgument('context', $data['context']);
 
-if(getRequest('form') !== 'create') {
+if (getRequest('form') !== 'create') {
 	$url->setArgument('graphid', $data['graphid']);
 }
 
