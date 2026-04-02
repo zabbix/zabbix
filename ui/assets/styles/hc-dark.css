@@ -8593,7 +8593,7 @@ svg {
     .preprocessing-list .preprocessing-step .step-action {
       height: 34px; }
   .preprocessing-list .preprocessing-list-item .step-parameters {
-    align-items: baseline;
+    align-items: start;
     line-height: 22px; }
   .preprocessing-list .step-parameters {
     flex: 1; }
