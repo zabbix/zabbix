@@ -181,7 +181,104 @@ func addRule(rec Record) (err error) {
 	return
 }
 
-// GetNumberOfRules returns a number of access rules configured
+func appendRecordsFromNode(records *[]Record, node any, permission RuleType, isRegexp bool) {
+	if cfgNode, ok := node.(*conf.Node); ok {
+		for _, v := range cfgNode.Nodes {
+			if value, ok := v.(*conf.Value); ok {
+				*records = append(*records, Record{
+					Pattern:    string(value.Value),
+					Permission: permission,
+					IsRegexp:   isRegexp,
+					Line:       value.Line,
+				})
+			}
+		}
+	}
+}
+
+func addConfiguredRules(records []Record) error {
+	for _, r := range records {
+		if err := addRule(r); err != nil {
+			return fmt.Errorf(
+				"%w: %s %q %s",
+				errInvalidRule,
+				ruleTypeName(r.Permission, r.IsRegexp),
+				r.Pattern,
+				err.Error(),
+			)
+		}
+	}
+
+	return nil
+}
+
+func prepareSystemRunRule() (*Rule, int, int, error) {
+	sysrunIndex := math.MaxInt32
+	rulesNum := len(rules)
+
+	// create system.run[*] deny rule to be appended at the end of rule list unless other
+	// system.run[*] rules are present
+	sysrunRule, err := parse(Record{Pattern: "system.run[*]", Permission: DENY, Line: 0})
+	if err != nil {
+		return nil, sysrunIndex, rulesNum, err
+	}
+
+	if r, i := findRule(sysrunRule); r != nil {
+		sysrunIndex = i
+		rulesNum--
+	}
+
+	return sysrunRule, sysrunIndex, rulesNum, nil
+}
+
+func trimRulesAfterMatchAll(sysrunIndex *int) {
+	for i, r := range rules {
+		if !r.IsRegexp && len(r.Params) == 0 && r.Key == "*" {
+			if i < *sysrunIndex {
+				*sysrunIndex = i
+			}
+
+			for j := i + 1; j < len(rules); j++ {
+				log.Warningf(`removed unreachable %s "%s" rule`,
+					ruleTypeName(rules[j].Permission, rules[j].IsRegexp), rules[j].Pattern)
+			}
+
+			rules = rules[:i+1]
+
+			return
+		}
+	}
+}
+
+func trimTrailingAllowRules(sysrunIndex int) {
+	cutoff := len(rules)
+
+	for i := len(rules) - 1; i >= 0; i-- {
+		if rules[i].Permission != ALLOW {
+			break
+		}
+
+		if rules[i].IsRegexp {
+			break
+		}
+		// system.run allow rules are not redundant because of default system.run[*] deny rule
+		if rules[i].Key != "system.run" {
+			if i != sysrunIndex {
+				log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
+			}
+
+			for j := i; j < len(rules)-1; j++ {
+				rules[j] = rules[j+1]
+			}
+
+			cutoff--
+		}
+	}
+
+	rules = rules[:cutoff]
+}
+
+// GetNumberOfRules returns a number of access rules configured.
 func GetNumberOfRules() int {
 	return len(rules)
 }
@@ -189,115 +286,31 @@ func GetNumberOfRules() int {
 // LoadRules adds key access records to access rule list.
 // LoadRules merges AllowKey/DenyKey/AllowKeyRegexp/DenyKeyRegexp in config order.
 // Regexp patterns are compiled at load time; invalid or empty patterns fail loading.
-func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords interface{}) (err error) {
+func LoadRules(allowRecords, denyRecords, allowRegexpRecords, denyRegexpRecords any) error {
 	rules = rules[:0]
-	var records []Record
-	sysrunIndex := math.MaxInt32
+	records := make([]Record, 0)
 
-	// load AllowKey/DenyKey parameters
-	if node, ok := allowRecords.(*conf.Node); ok {
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value),
-					Permission: ALLOW, Line: value.Line})
-			}
-		}
-	}
-
-	if node, ok := denyRecords.(*conf.Node); ok {
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value),
-					Permission: DENY, Line: value.Line})
-			}
-		}
-	}
-	// load AllowKeyRegexp/DenyKeyRegexp parameters
-	if node, ok := allowRegexpRecords.(*conf.Node); ok {
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value),
-					Permission: ALLOW, IsRegexp: true, Line: value.Line})
-			}
-		}
-	}
-
-	if node, ok := denyRegexpRecords.(*conf.Node); ok {
-		for _, v := range node.Nodes {
-			if value, ok := v.(*conf.Value); ok {
-				records = append(records, Record{Pattern: string(value.Value),
-					Permission: DENY, IsRegexp: true, Line: value.Line})
-			}
-		}
-	}
+	appendRecordsFromNode(&records, allowRecords, ALLOW, false)
+	appendRecordsFromNode(&records, denyRecords, DENY, false)
+	appendRecordsFromNode(&records, allowRegexpRecords, ALLOW, true)
+	appendRecordsFromNode(&records, denyRegexpRecords, DENY, true)
 
 	sort.SliceStable(records, func(i, j int) bool {
 		return records[i].Line < records[j].Line
 	})
 
-	for _, r := range records {
-		if err = addRule(r); err != nil {
-			err = fmt.Errorf(
-				"%w: %s %q %s",
-				errInvalidRule,
-				ruleTypeName(r.Permission, r.IsRegexp),
-				r.Pattern,
-				err.Error(),
-			)
-			return
-		}
+	if err := addConfiguredRules(records); err != nil {
+		return err
 	}
 
-	rulesNum := len(rules)
-	// create system.run[*] deny rule to be appended at the end of rule list unless other
-	// system.run[*] rules are present
-	sysrunRule, err := parse(Record{Pattern: "system.run[*]", Permission: DENY, Line: 0})
+	sysrunRule, sysrunIndex, rulesNum, err := prepareSystemRunRule()
 	if err != nil {
-		return
-	}
-	if r, i := findRule(sysrunRule); r != nil {
-		sysrunIndex = i
-		rulesNum--
+		return err
 	}
 
 	if rulesNum != 0 {
-		// remove rules after 'full match' rule
-		for i, r := range rules {
-			if !r.IsRegexp && len(r.Params) == 0 && r.Key == "*" {
-				if i < sysrunIndex {
-					sysrunIndex = i
-				}
-				for j := i + 1; j < len(rules); j++ {
-					log.Warningf(`removed unreachable %s "%s" rule`,
-						ruleTypeName(rules[j].Permission, rules[j].IsRegexp), rules[j].Pattern)
-				}
-				rules = rules[:i+1]
-				break
-			}
-		}
-
-		// remove trailing 'allow' rules
-		cutoff := len(rules)
-		for i := len(rules) - 1; i >= 0; i-- {
-			if rules[i].Permission != ALLOW {
-				break
-			}
-
-			if rules[i].IsRegexp {
-				break
-			}
-			// system.run allow rules are not redundant because of default system.run[*] deny rule
-			if rules[i].Key != "system.run" {
-				if i != sysrunIndex {
-					log.Warningf(`removed redundant trailing AllowKey "%s" rule`, rules[i].Pattern)
-				}
-				for j := i; j < len(rules)-1; j++ {
-					rules[j] = rules[j+1]
-				}
-				cutoff--
-			}
-		}
-		rules = rules[:cutoff]
+		trimRulesAfterMatchAll(&sysrunIndex)
+		trimTrailingAllowRules(sysrunIndex)
 
 		if len(rules) == 0 {
 			return errors.New("Item key access rules are configured to match all keys," +
