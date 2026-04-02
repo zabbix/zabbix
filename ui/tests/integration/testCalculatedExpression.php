@@ -96,6 +96,14 @@ class testCalculatedExpression extends CIntegrationTest {
 			'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 			'tags'		=> [
 				['tag' => 'env', 'value' => 'prod']
+			],
+			'preprocessing' => [
+				[
+					'type'			=> ZBX_PREPROC_TRIM,
+					'params'		=> ' ',
+					'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+					'error_handler_params'	=> ''
+				]
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -516,7 +524,15 @@ class testCalculatedExpression extends CIntegrationTest {
 				'name'		=> "bucket[$le]",
 				'key_'		=> self::TRAPPER_ITEM_KEY . ".bucket[$le]",
 				'type'		=> ITEM_TYPE_TRAPPER,
-				'value_type'	=> ITEM_VALUE_TYPE_FLOAT
+				'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
+				'preprocessing' => [
+					[
+						'type'			=> ZBX_PREPROC_TRIM,
+						'params'		=> ' ',
+						'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params'	=> ''
+					]
+				]
 			]);
 			$itemid = $response['result']['itemids'][0];
 			$this->assertEquals(1, count($response['result']['itemids']));
@@ -593,7 +609,15 @@ class testCalculatedExpression extends CIntegrationTest {
 				'name'		=> "disk.pused[$fs]",
 				'key_'		=> self::TRAPPER_ITEM_KEY . ".disk.pused[$fs]",
 				'type'		=> ITEM_TYPE_TRAPPER,
-				'value_type'	=> ITEM_VALUE_TYPE_FLOAT
+				'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
+				'preprocessing' => [
+					[
+						'type'			=> ZBX_PREPROC_TRIM,
+						'params'		=> ' ',
+						'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params'	=> ''
+					]
+				]
 			]);
 			$itemid = $response['result']['itemids'][0];
 			$this->assertEquals(1, count($response['result']['itemids']));
