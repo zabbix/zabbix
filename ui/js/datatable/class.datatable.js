@@ -641,7 +641,7 @@ class CDataTable {
 		this.#body = document.createElement('div');
 		this.#body.classList.add(CDataTable.ZBX_STYLE_BODY);
 		this.#body.addEventListener('scroll', () => this.dispatchEvent(CDataTable.EVENT_SCROLL));
-		this.#body.appendChild(this.#createNotDataMessage());
+		this.#body.appendChild(this.#createNoDataMessage());
 
 		this.#footer = this.#templates.footer.evaluateToElement();
 
@@ -898,7 +898,7 @@ class CDataTable {
 			}
 
 			if (!('data' in response) || response.data.length == 0) {
-				const no_data_message = this.#createNotDataMessage({
+				const no_data_message = this.#createNoDataMessage({
 					icon: response.no_data_icon || ZBX_ICON_SEARCH_LARGE,
 					message: response.no_data_message || t('No data found'),
 					description: response.no_data_description
@@ -1605,6 +1605,8 @@ class CDataTable {
 			return;
 		}
 
+		data_cell.innerHTML = '';
+
 		const column_index = column_config.getColumnIndex();
 
 		const cell_inner = document.createElement('div');
@@ -2022,7 +2024,7 @@ class CDataTable {
 		this.#updateTableOptionsButtonPosition();
 	}
 
-	#createNotDataMessage({icon = undefined, message = undefined, description = undefined} = {}) {
+	#createNoDataMessage({icon = undefined, message = undefined, description = undefined} = {}) {
 		const no_data_message = document.createElement('div');
 		no_data_message.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
 
@@ -2120,8 +2122,8 @@ class CDataTable {
 		const column_index = column_config.getColumnIndex();
 
 		this.getData().then(response => {
-			for (let row_index = 1; row_index < response.data.length + 1; row_index++) {
-				const [row_config, row_data] = response.data[row_index - 1];
+			for (let row_index = 0; row_index < response.data.length; row_index++) {
+				const [row_config, row_data] = response.data[row_index];
 
 				if (row_config.renderer) {
 					continue;
