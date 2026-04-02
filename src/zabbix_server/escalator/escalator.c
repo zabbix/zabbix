@@ -45,6 +45,7 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
+#include "zbxcrypto.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
