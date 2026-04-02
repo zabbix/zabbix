@@ -61,7 +61,7 @@ if (!empty($data['itemid'])) {
 
 $item_tab = (new CFormGrid())->setId('itemFormList');
 
-if (!empty($data['templates'])) {
+if (!empty($data['templates']) && $data['form'] !== 'clone') {
 	$item_tab->addItem([
 		new CLabel(_('Parent discovery rules')),
 		new CFormField($data['templates'])
