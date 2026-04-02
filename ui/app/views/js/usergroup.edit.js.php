@@ -122,7 +122,7 @@
 			const mfa_warning_icon = document.getElementById('mfa-warning');
 			const mfaid_value = this.form.findFieldByName('mfaid').getValue();
 
-			if (this.mfa_status == <?= MFA_DISABLED ?> && mfaid_value != 0 && mfaid_value != null) {
+			if (this.mfa_status == <?= MFA_DISABLED ?> && mfaid_value != null) {
 				mfa_warning_icon.style.display = '';
 			}
 			else {
