@@ -1211,6 +1211,8 @@ footer {
     .form-grid fieldset.collapsible.collapsed .fields-group,
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
+    .form-grid fieldset z-textarea-flexible {
+      vertical-align: top; }
   .form-grid > label,
   .form-grid .collapsible > label,
   .form-grid .fields-group > label {
