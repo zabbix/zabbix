@@ -365,8 +365,15 @@ int	zbx_get_value_internal_ext_server(const zbx_dc_item_t *item, const char *par
 
 		if (NULL == param3 || '\0' == *param3 || 0 == strcmp(param3, "pavailable"))
 		{
-			SET_DBL_RESULT(result, (double)(stats.overcommit_limit - stats.overcommit) * 100 /
-					stats.overcommit_limit);
+			double pavailable;
+
+			if (0 != stats.overcommit_limit)
+				pavailable = (double)(stats.overcommit_limit - stats.overcommit) * 100 /
+						stats.overcommit_limit;
+			else
+				pavailable = 0;
+
+			SET_DBL_RESULT(result, pavailable);
 		}
 		else if (0 == strcmp(param3, "available"))
 		{
