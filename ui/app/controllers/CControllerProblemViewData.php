@@ -16,6 +16,9 @@
 
 class CControllerProblemViewData extends CControllerDataTable {
 
+	protected array $allowed_data_fields = ['clock', 'eventid', 'objectid', 'severity', 'recovery', 'status',
+		'info', 'host', 'description', 'duration', 'can_be_closed', 'eventid', 'actions', 'opdata', 'tags'];
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
@@ -24,16 +27,13 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$rows = [];
 		$data = $this->prepareData();
 
-		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $data['options'],
-			$data['column_options']
-		);
+		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $data['options']);
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
 
 		return [
 			'filter_counters' => $this->getFilterCounters(),
-			'fields' => $data['fields'],
-			'columns' => $data['columns'],
+			'data_fields' => $data['data_fields'],
 			'page' => $data['page'],
 			'allowed' => $data['allowed'],
 			'show_three_columns' => $data['show_three_columns'],
@@ -84,10 +84,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 	}
 
 	private static function addProblemRows(array &$rows, array &$data, array $problems, array $filter,
-			array $options, array $column_options, bool $nested = false): void {
+			array $options, bool $nested = false): void {
 
 		foreach ($problems as $problem) {
-			if ($data['sort_field'] == 'clock' && $column_options['show_timeline'] && !$options['compact_view']
+			if ($data['sort_field'] == 'clock' && $options['show_timeline'] && !$options['compact_view']
 					&& $data['last_clock'] != 0) {
 
 				$breakpoint = self::createTimelineBreakpoint($data, $problem);
@@ -192,7 +192,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			if ($options['compact_view'] && $column_options['show_suppressed'] && count($info_icons) > 1) {
+			if ($options['compact_view'] && $options['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {
@@ -240,7 +240,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_rank_change_symptom' => true
 				]));
 
-			if ($trigger['opdata'] != '' && !$options['compact_view'] && $column_options['show_opdata'] == 1) {
+			if ($trigger['opdata'] != '' && !$options['compact_view'] && $options['show_opdata'] == 1) {
 				$description[] = ' (';
 				$description[] = $opdata;
 				$description[] = ')';
@@ -248,7 +248,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$description[] = ($problem['comments'] !== '') ? makeDescriptionIcon($problem['comments']) : null;
 
-			if (!$options['compact_view'] && $column_options['details'] == 1) {
+			if (!$options['compact_view'] && $options['details'] == 1) {
 				$description[] = BR();
 
 				if ($trigger['recovery_mode'] == ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION) {
@@ -285,7 +285,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			}
 
 			if ($problem['cause_eventid'] == 0 && $problem['symptoms']) {
-				self::addProblemRows($rows, $data, $problem['symptoms'], $filter, $options, $column_options, true);
+				self::addProblemRows($rows, $data, $problem['symptoms'], $filter, $options, true);
 
 				if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
 					$rows[] = [['renderer' => 'symptom_limit', 'raw_data' => true], [
@@ -408,7 +408,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			// operational data
 			$opdata = null;
-			if ($data['column_options']['show_opdata'] || $show_opdata_separately) {
+			if ($data['options']['show_opdata'] || $show_opdata_separately) {
 				if ($trigger['opdata'] === '') {
 					if ($show_opdata_separately) {
 						$opdata = CScreenProblem::getLatestValues($trigger['items'], false);
@@ -455,7 +455,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$row[] = ($problem['r_eventid'] != 0) ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
 			$row[] = $value_str;
 			$row[] = implode(', ', $hosts);
-			$row[] = ($data['column_options']['show_opdata'] && $trigger['opdata'] !== '')
+			$row[] = ($data['options']['show_opdata'] && $trigger['opdata'] !== '')
 				? $problem['name'].' ('.$opdata.')'
 				: $problem['name'];
 
@@ -481,12 +481,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 	}
 
 	private function prepareData(): array {
-		$columns = $this->getInput('columns');
-		$fields = $this->extractFields($columns);
+		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
-		$options = $this->getInput('options', []);
-		$column_options = array_merge(...array_column($columns, 'column_options'));
 		$export = $this->getInput('export_file', '');
 
 		$sort_field = $this->getInput('sort_field', CControllerProblem::FILTER_FIELDS_DEFAULT['sort']);
@@ -506,7 +504,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		$data = CScreenProblem::getData(
 			$filter,
-			['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $column_options,
+			['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $options,
 			$limit,
 			true
 		);
@@ -516,7 +514,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$this->paging = $this->paginate($data['problems'], $page, ZBX_SORT_UP);
 		}
 
-		$data = CScreenProblem::makeData($data, $filter, $column_options, true);
+		$data = CScreenProblem::makeData($data, $filter, $options, true);
 
 		if ($data['triggers']) {
 			$triggerids = array_keys($data['triggers']);
@@ -597,7 +595,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_symptoms' => true,
 					'cause_eventid' => $cause_eventid,
 					'show' => $filter['show']
-				], $column_options, ZBX_PROBLEM_SYMPTOM_LIMIT, true);
+				], $options, ZBX_PROBLEM_SYMPTOM_LIMIT, true);
 
 				if ($_symptom_data['problems']) {
 					$_symptom_data = CScreenProblem::sortData($_symptom_data, ZBX_PROBLEM_SYMPTOM_LIMIT, $sort_field,
@@ -615,7 +613,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 					// Filter does not matter.
 					$_symptom_data = CScreenProblem::makeData($_symptom_data, ['show' => $filter['show']],
-						$column_options, true);
+						$options, true);
 
 					$data['users'] += $_symptom_data['users'];
 					$data['correlations'] += $_symptom_data['correlations'];
@@ -716,12 +714,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 				'suppress_problems' => CWebUser::checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
 				'rank_change' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING)
 			],
-			'columns' => $columns,
-			'fields' => $fields,
+			'data_fields' => $data_fields,
 			'filter' => $filter,
 			'page' => $page,
 			'options' => $options,
-			'column_options' => $column_options,
 			'triggers_hosts' => $triggers_hosts,
 			'symptom_data' => $symptom_data,
 			'symptom_cause_eventids' => $symptom_cause_eventids,

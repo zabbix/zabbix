@@ -162,34 +162,37 @@
 				})
 				.setRenderer('hosts', ({column_data, cell_inner}) => {
 					const [templateid, editable_hosts] = column_data;
-					const {allowed_ui_conf_hosts} = this.datatable.getData();
 
-					let items = Object.keys(editable_hosts).length;
+					this.datatable.getData().then(response => {
+						const {allowed_ui_conf_hosts} = response;
 
-					if (allowed_ui_conf_hosts) {
-						const url = new URL('zabbix.php', location.href);
-						url.searchParams.set('action', 'template.list');
-						url.searchParams.set('filter_set', '1');
-						url.searchParams.set('filter_templates[0]', templateid);
-						url.searchParams.set('context', 'template');
+						let items = Object.keys(editable_hosts).length;
 
-						const item_link = document.createElement('a');
-						item_link.setAttribute('href', url.toString());
-						item_link.innerText = <?= json_encode(_('Hosts')); ?>;
+						if (allowed_ui_conf_hosts) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'template.list');
+							url.searchParams.set('filter_set', '1');
+							url.searchParams.set('filter_templates[0]', templateid);
+							url.searchParams.set('context', 'template');
 
-						cell_inner.appendChild(item_link);
-					}
-					else {
-						cell_inner.innerHTML += <?= json_encode(_('Hosts')); ?>;
-					}
+							const item_link = document.createElement('a');
+							item_link.setAttribute('href', url.toString());
+							item_link.innerText = <?= json_encode(_('Hosts')); ?>;
 
-					if (items > 0) {
-						const count = document.createElement('sup');
-						count.innerText = items;
+							cell_inner.appendChild(item_link);
+						}
+						else {
+							cell_inner.innerHTML += <?= json_encode(_('Hosts')); ?>;
+						}
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
-					}
+						if (items > 0) {
+							const count = document.createElement('sup');
+							count.innerText = items;
+
+							cell_inner.innerHTML += ' ';
+							cell_inner.appendChild(count);
+						}
+					});
 				})
 				.setRenderer('items', ({column_data, cell_inner}) => {
 					const [templateid, items] = column_data;
@@ -328,79 +331,85 @@
 				})
 				.setRenderer('linked_templates', ({column_data, cell_inner}) => {
 					const [parent_templates] = column_data;
-					const {max_in_table} = this.datatable.getData();
-					const length = Math.min(max_in_table, parent_templates.length);
 
-					for (let i = 0; i < length; i++) {
-						const template = parent_templates[i];
+					this.datatable.getData().then(response => {
+						const {max_in_table} = response;
+						const length = Math.min(max_in_table, parent_templates.length);
 
-						if (template.editable) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'popup');
-							url.searchParams.set('popup', 'template.edit');
-							url.searchParams.set('templateid', template.templateid);
+						for (let i = 0; i < length; i++) {
+							const template = parent_templates[i];
 
-							const template_link = document.createElement('a');
-							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
-							template_link.setAttribute('href', url.toString());
-							template_link.innerText = template.name;
+							if (template.editable) {
+								const url = new URL('zabbix.php', location.href);
+								url.searchParams.set('action', 'popup');
+								url.searchParams.set('popup', 'template.edit');
+								url.searchParams.set('templateid', template.templateid);
 
-							cell_inner.appendChild(template_link);
+								const template_link = document.createElement('a');
+								template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
+								template_link.setAttribute('href', url.toString());
+								template_link.innerText = template.name;
+
+								cell_inner.appendChild(template_link);
+							}
+							else {
+								const template_link = document.createElement('span');
+								template_link.classList.add(ZBX_STYLE_GREY);
+								template_link.innerText = template.name;
+
+								cell_inner.appendChild(template_link);
+							}
+
+							if (i < length - 1) {
+								cell_inner.innerHTML += ', ';
+							}
 						}
-						else {
-							const template_link = document.createElement('span');
-							template_link.classList.add(ZBX_STYLE_GREY);
-							template_link.innerText = template.name;
 
-							cell_inner.appendChild(template_link);
+						if (parent_templates.length > max_in_table) {
+							cell_inner.innerHTML += ' &hellip;';
 						}
-
-						if (i < length - 1) {
-							cell_inner.innerHTML += ', ';
-						}
-					}
-
-					if (parent_templates.length > max_in_table) {
-						cell_inner.innerHTML += ' &hellip;';
-					}
+					});
 				})
 				.setRenderer('linked_to_templates', ({column_data, cell_inner}) => {
 					const [templates] = column_data;
-					const {max_in_table} = this.datatable.getData();
-					const length = Math.min(max_in_table, templates.length);
 
-					for (let i = 0; i < length; i++) {
-						const template = templates[i];
+					this.datatable.getData().then(response => {
+						const {max_in_table} = response;
+						const length = Math.min(max_in_table, templates.length);
 
-						if (template.editable) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'popup');
-							url.searchParams.set('popup', 'template.edit');
-							url.searchParams.set('templateid', template.templateid);
+						for (let i = 0; i < length; i++) {
+							const template = templates[i];
 
-							const template_link = document.createElement('a');
-							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
-							template_link.setAttribute('href', url.toString());
-							template_link.innerText = template.name;
+							if (template.editable) {
+								const url = new URL('zabbix.php', location.href);
+								url.searchParams.set('action', 'popup');
+								url.searchParams.set('popup', 'template.edit');
+								url.searchParams.set('templateid', template.templateid);
 
-							cell_inner.appendChild(template_link);
+								const template_link = document.createElement('a');
+								template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
+								template_link.setAttribute('href', url.toString());
+								template_link.innerText = template.name;
+
+								cell_inner.appendChild(template_link);
+							}
+							else {
+								const template_link = document.createElement('span');
+								template_link.classList.add(ZBX_STYLE_GREY);
+								template_link.innerText = template.name;
+
+								cell_inner.appendChild(template_link);
+							}
+
+							if (i < length - 1) {
+								cell_inner.innerHTML += ', ';
+							}
 						}
-						else {
-							const template_link = document.createElement('span');
-							template_link.classList.add(ZBX_STYLE_GREY);
-							template_link.innerText = template.name;
 
-							cell_inner.appendChild(template_link);
+						if (templates.length > max_in_table) {
+							cell_inner.innerHTML += ' &hellip;';
 						}
-
-						if (i < length - 1) {
-							cell_inner.innerHTML += ', ';
-						}
-					}
-
-					if (templates.length > max_in_table) {
-						cell_inner.innerHTML += ' &hellip;';
-					}
+					});
 				})
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();

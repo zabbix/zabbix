@@ -16,12 +16,19 @@
 
 class CControllerHostListData extends CControllerDataTable {
 
+	protected array $allowed_data_fields = ['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status',
+		'discoveryData', 'discoveryRule', 'is_discovery_rule_editable', 'maintenanceid', 'maintenance_type',
+		'maintenance_status', 'items', 'triggers', 'graphs', 'discoveryRules', 'httpTests', 'interface', 'monitored_by',
+		'proxyid', 'assigned_proxyid', 'proxy', 'proxy_groupid', 'proxy_group', 'assigned_proxy', 'templates',
+		'parentTemplates', 'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept',
+		'tls_connect', 'info_icons', 'tags'];
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
 	}
 
 	protected function getData(): array {
-		$columns = $this->getInput('columns');
+		$data_fields = $this->getDataFields();
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', (int) CPagerHelper::loadPage('host.list'));
 		$sort_field = $this->getInput('sort_field');
@@ -106,13 +113,11 @@ class CControllerHostListData extends CControllerDataTable {
 
 		$this->paging = $this->paginate($hosts, $page, $sort_order);
 
-		$fields = $this->extractFields($columns);
-
 		$hostids = array_column($hosts, 'hostid');
 		$active_item_count_by_hostid = getEnabledItemTypeCountByHostId(ITEM_TYPE_ZABBIX_ACTIVE, $hostids);
 
 		$hosts = API::Host()->get([
-			'output' => $fields,
+			'output' => $data_fields,
 			'selectParentTemplates' => ['templateid', 'name'],
 			'selectInterfaces' => ['interfaceid', 'main', 'type', 'useip',  'ip', 'dns', 'port', 'available', 'error',
 				'details'
@@ -309,8 +314,7 @@ class CControllerHostListData extends CControllerDataTable {
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
 
 		return [
-			'fields' => $fields,
-			'columns' => $columns,
+			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $host) => [[], $host], $hosts)),
 			'max_in_table' => (int) CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'can_edit_proxies' => CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES),

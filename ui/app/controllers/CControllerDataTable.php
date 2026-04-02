@@ -16,8 +16,8 @@
 
 abstract class CControllerDataTable extends CController {
 
+	protected array $allowed_data_fields = [];
 	protected array $validation_rules = [];
-	protected array $pre_processors = [];
 	protected ?array $paging = null;
 
 	protected function setValidationRules(array $validation_rules): self {
@@ -32,18 +32,6 @@ abstract class CControllerDataTable extends CController {
 		return $this;
 	}
 
-	protected function setPreProcessors(array $pre_processors): self {
-		$this->pre_processors = $pre_processors;
-
-		return $this;
-	}
-
-	protected function addPreProcessors(array $pre_processors): self {
-		$this->pre_processors = array_merge($this->pre_processors, $pre_processors);
-
-		return $this;
-	}
-
 	abstract protected function getData(): array;
 
 	protected function init(): void {
@@ -51,10 +39,10 @@ abstract class CControllerDataTable extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 
 		$this->setValidationRules([
-			'columns' =>			'required|array',
+			'data_fields' =>		'required|array',
+			'options' =>			'array',
 			'filter' =>				'array',
 			'filter_counters' =>	'in 1',
-			'options' =>			'array',
 			'page' =>				'int32',
 			'sort_field' =>			'string',
 			'sort_order' =>			'string',
@@ -128,42 +116,21 @@ abstract class CControllerDataTable extends CController {
 
 		try {
 			$data = array_merge(['rows' => []], $this->getData());
-			$fields = array_flip($data['fields']);
 
-			foreach ($data['rows'] as $row_index => [$row_config, &$row_data]) {
-				$prepared_row_data = [];
-
+			foreach ($data['rows'] as $row_index => [$row_config, $row_data]) {
 				if (array_key_exists('renderer', $row_config) && array_key_exists('raw_data', $row_config)) {
 					$rows[$row_index] = [$row_config, $row_data];
 
 					continue;
 				}
 
-				if ($row_data && $fields) {
-					$row_data = array_intersect_key($row_data, $fields);
-				}
-
-				foreach ($data['columns'] as $column_config) {
-					$column_data = [];
-
-					foreach ($column_config['fields'] as $field) {
-						$column_data[] = $row_data[$field] ?? null;
-					}
-
-					$pre_processor = $column_config['pre_processor'] ?? null;
-					if (array_key_exists($pre_processor, $this->pre_processors)) {
-						$column_data = call_user_func($this->pre_processors[$pre_processor], [
-							'column_config' => $column_config,
-							'column_data' => $column_data,
-							'row_index' => $row_index
-						]);
-					}
-
-					$prepared_row_data[] = $column_data;
-				}
+				$prepared_row_data = array_map(static fn (string $field) => $row_data[$field] ?? null,
+					$data['data_fields']);
 
 				$rows[$row_index] = [$row_config, $prepared_row_data];
 			}
+
+			unset($data['rows']);
 		} catch (Throwable $e) {
 			$this->setResponse(new CControllerResponseData([
 				'main_block' => json_encode([
@@ -181,8 +148,6 @@ abstract class CControllerDataTable extends CController {
 			'limit_exceeded' => false
 		];
 
-		unset($data['fields'], $data['columns'], $data['rows'], $data['meta']);
-
 		$rows = array_map(static fn (array $row) => [$row[0], array_values($row[1])], $rows);
 
 		$data = array_merge($data, ['data' => $rows], $paging);
@@ -192,10 +157,7 @@ abstract class CControllerDataTable extends CController {
 		]));
 	}
 
-	protected function extractFields(array $columns): array {
-		$visible_columns = array_filter($columns, static fn (array $column_config) => $column_config['visible']);
-		$fields = array_merge(...array_column($visible_columns, 'fields'));
-
-		return array_keys(array_flip($fields));
+	protected function getDataFields(): array {
+		return array_values(array_intersect($this->getInput('data_fields'), $this->allowed_data_fields));
 	}
 }

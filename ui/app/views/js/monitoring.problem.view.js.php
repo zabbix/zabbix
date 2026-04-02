@@ -437,7 +437,7 @@
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
 					cell_inner.appendChild(paging_container);
 				})
-				.setRowRenderer('default', ({columns, row, row_index, row_data}) => {
+				.setRowRenderer('default', ({columns, row, row_index, data_fields, row_data}) => {
 					this.datatable.getData().then(response => {
 						const {show_two_columns, show_three_columns} = response;
 						const column_config = this.datatable.getCheckboxColumnConfig();
@@ -452,10 +452,10 @@
 							column_config.setWidth('37px');
 						}
 
-						this.datatable.renderDataCells({columns, row, row_index, row_data});
+						this.datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
 					});
 				})
-				.setRowRenderer('nested_symptom', ({columns, row, row_data, row_index}) => {
+				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data}) => {
 					const column_config = this.datatable.getCheckboxColumnConfig();
 					const column_index = column_config.getColumnIndex();
 					const [, , , cause_eventid, severity] = row_data[column_index];
@@ -463,7 +463,7 @@
 					row.classList.add('nested', 'nested-small', 'hidden');
 					row.setAttribute('data-cause-eventid', cause_eventid);
 
-					this.datatable.renderDataCells({columns, row, row_data, row_index});
+					this.datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
 
 					requestAnimationFrame(() => {
 						const highlight_row = this.datatable.getOption('highlight_row');
@@ -479,7 +479,7 @@
 						}
 					});
 				})
-				.setRowRenderer('symptom_limit', ({columns, row, row_index, row_data}) => {
+				.setRowRenderer('symptom_limit', ({columns, row, row_index, data_fields, row_data}) => {
 					const [cause_eventid, symptom_limit] = row_data;
 
 					row.classList.add(CDataTable.ZBX_STYLE_ROW_DISABLED, 'hidden');
@@ -503,12 +503,12 @@
 						const data_cell = this.datatable.createDataCell(column_config_clone, row_index);
 
 						if (column_config.getId() == 'time') {
-							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, [null]);
+							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields, [null]);
 						}
 						else if (column_config.getColumnIndex() == column_index) {
 							column_config_clone.setRenderer('symptom_limit');
 
-							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, {
+							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields, {
 								[column_config.getColumnIndex()]: [symptom_limit]
 							});
 						}
@@ -518,7 +518,7 @@
 
 					row.append(...data_cells);
 				})
-				.setRowRenderer('breakpoint', ({columns, row, row_index, row_data}) => {
+				.setRowRenderer('breakpoint', ({columns, row, row_index, data_fields, row_data}) => {
 					const compact_view = this.datatable.getOption('compact_view');
 					if (compact_view.checked) {
 						return;
@@ -541,7 +541,7 @@
 						if (i == column_index) {
 							column_config_clone.setRenderer('breakpoint');
 
-							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, {
+							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields, {
 								[column_config_clone.getColumnIndex()]: row_data
 							});
 						}

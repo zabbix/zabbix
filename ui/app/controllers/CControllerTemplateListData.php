@@ -16,12 +16,15 @@
 
 class CControllerTemplateListData extends CControllerDataTable {
 
+	protected array $allowed_data_fields = ['templateid', 'name', 'hosts', 'items', 'triggers', 'graphs', 'dashboards',
+		'discovery', 'web', 'vendor_name', 'vendor_version', 'parentTemplates', 'templates', 'tags'];
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
 
 	protected function getData(): array {
-		$columns = $this->getInput('columns');
+		$data_fields = $this->getDataFields();
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 		$sort_field = $this->getInput('sort_field');
@@ -76,10 +79,8 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 		order_result($templates, $sort_field, $sort_order);
 
-		$fields = $this->extractFields($columns);
-
 		$templates = API::Template()->get([
-			'output' => $fields,
+			'output' => $data_fields,
 			'selectHosts' => ['hostid'],
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentTemplates' => ['templateid', 'name'],
@@ -159,8 +160,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 		CPagerHelper::savePage('template.list', $this->paging['page']);
 
 		return [
-			'fields' => $fields,
-			'columns' => $columns,
+			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $template) => [[], $template], $templates)),
 			'max_in_table' => (int) CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE),
 			'allowed_ui_conf_hosts' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS)

@@ -913,13 +913,15 @@ class CDataTable {
 			const columns = this.#columns.filter(column_config => column_config.isVisible());
 
 			if (columns.length > 0) {
+				const data_fields = response.data_fields;
+
 				for (let row_index = 0; row_index < response.data.length; row_index++) {
 					const [row_config, row_data] = response.data[row_index];
 
 					const row = this.#createRow(row_index);
 
 					const renderer = this.#row_renderers[row_config.renderer] || this.#row_renderers.default;
-					renderer.call(this, {columns, row, row_index, row_config, row_data});
+					renderer.call(this, {columns, row, row_index, row_config, data_fields, row_data});
 
 					this.#body.appendChild(row);
 				}
@@ -1570,7 +1572,7 @@ class CDataTable {
 		return this.#findCells(column_index, row_index, `.${CDataTable.ZBX_STYLE_CELL_DATA}`);
 	}
 
-	renderDataCells({columns, row, row_index, row_data}) {
+	renderDataCells({columns, row, row_index, data_fields, row_data}) {
 		const data_cells = {};
 
 		for (const column_config of columns) {
@@ -1594,11 +1596,11 @@ class CDataTable {
 
 			const column_index = column_config.getColumnIndex();
 
-			this.renderDataCellContents(column_config, row, data_cells[column_index], row_data);
+			this.renderDataCellContents(column_config, row, data_cells[column_index], data_fields, row_data);
 		}
 	}
 
-	renderDataCellContents(column_config, row, data_cell, row_data) {
+	renderDataCellContents(column_config, row, data_cell, data_fields, row_data) {
 		const renderer = column_config.getRenderer();
 
 		if (!this.#renderers[renderer]) {
@@ -1614,13 +1616,20 @@ class CDataTable {
 
 		data_cell.appendChild(cell_inner);
 
-		let column_data = row_data[column_index];
+		console.log(data_fields);
 
-		if (column_config.isDuplicate()) {
-			const original_column_index = this.getColumnConfigById(column_config.getId()).getColumnIndex();
+		const column_fields = column_config.isDuplicate()
+			? this.getColumnConfigById(column_config.getId()).getFields()
+			: column_config.getFields();
+		const column_data = [];
 
-			column_data = row_data[original_column_index];
+		for (const field of column_fields) {
+			const field_index = data_fields.indexOf(field);
+
+			column_data.push(field_index >= 0 ? row_data[field_index] : null);
 		}
+
+		console.log(column_data);
 
 		try {
 			this.#renderers[renderer].call(this, {
@@ -2148,7 +2157,9 @@ class CDataTable {
 					continue;
 				}
 
-				this.renderDataCellContents(column_config, row, data_cell, row_data);
+				const data_fields = response.data_fields;
+
+				this.renderDataCellContents(column_config, row, data_cell, data_fields, row_data);
 			}
 		});
 	}

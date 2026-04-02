@@ -92,11 +92,6 @@ class CDataTableColumn {
 	#order = 0;
 
 	/**
-	 * @type {string|null}
-	 */
-	#pre_processor = null;
-
-	/**
 	 * @type {boolean}
 	 */
 	#renamable = false;
@@ -381,23 +376,6 @@ class CDataTableColumn {
 	}
 
 	/**
-	 * @returns {string|null}
-	 */
-	getPreProcessor() {
-		return this.#pre_processor;
-	}
-
-	/**
-	 * @param {string} pre_processor
-	 * @returns {CDataTableColumn}
-	 */
-	setPreProcessor(pre_processor) {
-		this.#pre_processor = pre_processor;
-
-		return this;
-	}
-
-	/**
 	 * @returns {boolean}
 	 */
 	isRenamable() {
@@ -646,7 +624,6 @@ class CDataTableColumn {
 			name: this.#name,
 			only_header: this.#only_header,
 			order: this.#order,
-			pre_processor: this.#pre_processor,
 			renderer: this.#renderer,
 			resized: this.#resized,
 			resizable: this.#resizable,

@@ -16,18 +16,23 @@
 
 class CControllerLatestViewData extends CControllerDataTable {
 
+	protected array $allowed_data_fields = ['host', 'maintenance', 'maintenanceid', 'maintenance_type',
+		'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval', 'history',
+		'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'itemid', 'is_graph', 'keep_history',
+		'keep_trends', 'item_icons', 'tags'];
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
 	}
 
 	protected function getData(): array {
+		$data_fields = $this->getDataFields();
 		$filter = $this->getInput('filter', []);
-
+		$page = $this->getInput('page', 1);
 		$sort_field = $this->getInput('sort_field', $filter['sort'] ?? 'name');
 		$sort_order = $this->getInput('sort_order', $filter['sortorder'] ?? ZBX_SORT_UP);
 
 		$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($filter);
-
 		if (!$mandatory_filter_set) {
 			return [
 				'fields' => [],
@@ -38,9 +43,6 @@ class CControllerLatestViewData extends CControllerDataTable {
 			];
 		}
 
-		$columns = $this->getInput('columns');
-		$fields = $this->extractFields($columns);
-		$page = $this->getInput('page', 1);
 		$filter = CControllerLatest::sanitizeFilter($filter);
 
 		$data = $this->prepareData($filter, $sort_field, $sort_order);
@@ -249,8 +251,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 		return [
 			'filter_counters' => $this->getFilterCounters(),
-			'fields' => $fields,
-			'columns' => $columns,
+			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $data['items'])),
 			'subfilter' => (new CPartial('monitoring.latest.subfilter', [
 				'subfilters' => $subfilters,

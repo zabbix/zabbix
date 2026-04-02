@@ -2525,8 +2525,6 @@ button {
         padding: 7px 0; }
         .datatable .cell.cell-data .cell-inner + .timeline-axis {
           margin-left: 5px; }
-        .datatable .cell.cell-data .cell-inner .problem-icon-link {
-          display: block; }
         .datatable .cell.cell-data .cell-inner .btn-icon:not(.no-indent):not(:first-child),
         .datatable .cell.cell-data .cell-inner .icon:not(.no-indent):not(:first-child),
         .datatable .cell.cell-data .cell-inner .link-action:not(.no-indent):not(:first-child) {

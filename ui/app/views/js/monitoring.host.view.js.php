@@ -242,35 +242,38 @@
 				})
 				.setRenderer('latest_data', ({column_data, cell_inner}) => {
 					const [hostid, items_count] = column_data;
-					const {allowed_ui_latest_data} = this.datatable.getData();
 
-					if (allowed_ui_latest_data) {
-						const url = new URL('zabbix.php', location.href);
-						url.searchParams.set('action', 'latest.view');
-						url.searchParams.set('hostids[0]', hostid);
-						url.searchParams.set('filter_set', '1');
+					this.datatable.getData().then(response => {
+						const {allowed_ui_latest_data} = response;
 
-						const latest_data_link = document.createElement('a');
-						latest_data_link.setAttribute('href', url.toString());
-						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
+						if (allowed_ui_latest_data) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'latest.view');
+							url.searchParams.set('hostids[0]', hostid);
+							url.searchParams.set('filter_set', '1');
 
-						cell_inner.appendChild(latest_data_link);
-					}
-					else {
-						const latest_data_link = document.createElement('span');
-						latest_data_link.classList.add(ZBX_STYLE_DISABLED);
-						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
+							const latest_data_link = document.createElement('a');
+							latest_data_link.setAttribute('href', url.toString());
+							latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
 
-						cell_inner.appendChild(latest_data_link);
-					}
+							cell_inner.appendChild(latest_data_link);
+						}
+						else {
+							const latest_data_link = document.createElement('span');
+							latest_data_link.classList.add(ZBX_STYLE_DISABLED);
+							latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
 
-					if (items_count > 0) {
-						const count = document.createElement('sup');
-						count.innerText = items_count;
+							cell_inner.appendChild(latest_data_link);
+						}
 
-						cell_inner.innerHTML += ' ';
-						cell_inner.appendChild(count);
-					}
+						if (items_count > 0) {
+							const count = document.createElement('sup');
+							count.innerText = items_count;
+
+							cell_inner.innerHTML += ' ';
+							cell_inner.appendChild(count);
+						}
+					});
 				})
 				.setRenderer('graphs', ({column_data, cell_inner}) => {
 					const [hostid, graphs] = column_data;
@@ -353,7 +356,7 @@
 					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.refreshCounters(this.datatable.getData());
+					this.datatable.getData().then(response => this.refreshCounters(response));
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())

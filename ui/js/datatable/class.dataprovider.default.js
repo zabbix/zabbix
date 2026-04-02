@@ -90,8 +90,8 @@ class CDefaultDataProvider extends CDataProvider {
 			...new Set(columns.flatMap(column => column.isVisible() ? column.getFields() : []))
 		];
 
-		const columns_options = columns.reduce((settings, column) => {
-			return Object.assign(settings, column.getColumnOptions());
+		const columns_options = columns.reduce((options, column) => {
+			return Object.assign(options, column.getColumnOptions());
 		}, {});
 
 		filter = Object.fromEntries(
@@ -134,9 +134,9 @@ class CDefaultDataProvider extends CDataProvider {
 				['Content-Type', 'application/json']
 			],
 			body: JSON.stringify({
-				columns: columns.map(column => column.toObject()),
+				data_fields,
+				options: Object.assign({}, columns_options, options),
 				filter,
-				options,
 				page,
 				sort_field,
 				sort_order,

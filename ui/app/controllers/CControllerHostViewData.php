@@ -16,18 +16,19 @@
 
 class CControllerHostViewData extends CControllerDataTable {
 
+	protected array $allowed_data_fields = ['hostid', 'name', 'status', 'maintenance', 'maintenanceid',
+		'maintenance_type', 'maintenance_status', 'interface', 'availability', 'active_available', 'status',
+		'items_count', 'problems', 'graphs', 'dashboards', 'httpTests', 'tags'];
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_HOSTS);
 	}
 
 	protected function getData(): array {
-		$columns = $this->getInput('columns');
-		$fields = $this->extractFields($columns);
-		$column_options = array_merge(...array_column($columns, 'column_options'));
-
+		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
-
 		$sort_field = $this->getInput('sort_field', $filter['sort'] ?? 'name');
 		$sort_order = $this->getInput('sort_order', $filter['sortorder'] ?? ZBX_SORT_UP);
 
@@ -78,7 +79,7 @@ class CControllerHostViewData extends CControllerDataTable {
 
 		// Get additional data to limited host amount.
 		$hosts = API::Host()->get([
-			'output' => $fields,
+			'output' => $data_fields,
 			'selectInterfaces' => ['interfaceid', 'ip', 'dns', 'port', 'main', 'type', 'useip', 'available', 'error',
 				'details'
 			],
@@ -122,7 +123,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => ($column_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
+			'suppressed' => ($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
 			'symptom' => false
 		]);
 
@@ -274,8 +275,7 @@ class CControllerHostViewData extends CControllerDataTable {
 
 		return [
 			'filter_counters' => $this->getFilterCounters(),
-			'fields' => $fields,
-			'columns' => $columns,
+			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $host) => [[], $host], $hosts)),
 			'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA)
 		];
