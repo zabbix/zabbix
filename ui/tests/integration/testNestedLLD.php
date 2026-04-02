@@ -191,7 +191,7 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'preprocessing' => [
 				[
-					'type' => ZBX_PREPROC_TRIM,
+					'type' => 4,
 					'params' => ' ',
 					'error_handler' => 0,
 					'error_handler_params' => ''
