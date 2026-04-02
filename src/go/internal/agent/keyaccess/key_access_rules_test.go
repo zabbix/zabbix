@@ -530,6 +530,7 @@ func TestEmptyParametersMatch(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
 func TestRegexpHostnameVariants(t *testing.T) {
 	var records accessRules
 
@@ -551,6 +552,7 @@ func TestRegexpHostnameVariants(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
 func TestRegexpServiceStartRestart(t *testing.T) {
 	var records accessRules
 
@@ -573,6 +575,7 @@ func TestRegexpServiceStartRestart(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
 func TestMixedWildcardAndRegexp(t *testing.T) {
 	var records accessRules
 
@@ -591,6 +594,7 @@ func TestMixedWildcardAndRegexp(t *testing.T) {
 	RunScenarios(t, scenarios, records, 3)
 }
 
+//nolint:paralleltest
 func TestRegexpDenyBeforeWildcardAllow(t *testing.T) {
 	var records accessRules
 
@@ -608,6 +612,7 @@ func TestRegexpDenyBeforeWildcardAllow(t *testing.T) {
 	RunScenarios(t, scenarios, records, 3)
 }
 
+//nolint:paralleltest
 func TestRegexpFullStringMatchEnforced(t *testing.T) {
 	var records accessRules
 
@@ -622,6 +627,7 @@ func TestRegexpFullStringMatchEnforced(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
 func TestRegexpInvalidPattern(t *testing.T) {
 	var records accessRules
 
@@ -636,6 +642,7 @@ func TestRegexpInvalidPattern(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest
 func TestRegexpEmptyPattern(t *testing.T) {
 	var records accessRules
 
@@ -650,6 +657,7 @@ func TestRegexpEmptyPattern(t *testing.T) {
 	}
 }
 
+//nolint:paralleltest
 func TestRegexpDuplicatePattern(t *testing.T) {
 	var records accessRules
 
@@ -665,6 +673,7 @@ func TestRegexpDuplicatePattern(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
 func TestRegexpConflictingPattern(t *testing.T) {
 	var records accessRules
 
@@ -681,6 +690,7 @@ func TestRegexpConflictingPattern(t *testing.T) {
 	RunScenarios(t, scenarios, records, 2)
 }
 
+//nolint:paralleltest
 func TestNoTrailingAllowRulesWithRegexp(t *testing.T) {
 	var records accessRules
 
