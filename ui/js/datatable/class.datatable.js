@@ -909,10 +909,19 @@ class CDataTable {
 				this.#footer.classList.remove(ZBX_STYLE_HIDDEN);
 			}
 
-			const other_columns = this.#columns.filter(column_config => column_config.isVisible());
+			const columns = this.#columns.filter(column_config => column_config.isVisible());
 
-			if (other_columns.length > 0) {
-				this.#renderDataCells(response);
+			if (columns.length > 0) {
+				for (let row_index = 0; row_index < response.data.length; row_index++) {
+					const [row_config, row_data] = response.data[row_index];
+
+					const row = this.#createRow(row_index);
+
+					const renderer = this.#row_renderers[row_config.renderer] || this.#row_renderers.default;
+					renderer.call(this, {columns, row, row_index, row_config, row_data});
+
+					this.#body.appendChild(row);
+				}
 
 				for (const [_, option] of Object.entries(this.#options)) {
 					option.onRender(option);
@@ -932,8 +941,7 @@ class CDataTable {
 
 			this.#applyColumnWidths();
 
-			const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
-			visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
+			columns.forEach(column_config => this.#calculateColumnWidth(column_config));
 
 			this.#applyColumnWidths();
 			this.#applyScrollableRows();
@@ -1572,6 +1580,10 @@ class CDataTable {
 			row.appendChild(data_cells[column_index]);
 		}
 
+		if (this.#customizable) {
+			this.#createRowSpacer(row);
+		}
+
 		// This is separately from the loop above on purpose, since row renderer may have an impact on all cells
 		// within the row, which means that the cells should be present BEFORE renderer is executed.
 		for (const column_config of columns) {
@@ -2101,25 +2113,6 @@ class CDataTable {
 				CDataTableOptionsPopup.EVENT_UPDATE,
 				event => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_UPDATE, event.detail)
 			);
-	}
-
-	#renderDataCells(response) {
-		const columns = this.#columns.filter(column_config => column_config.isVisible());
-
-		for (let row_index = 1; row_index < response.data.length + 1; row_index++) {
-			const [row_config, row_data] = response.data[row_index - 1];
-
-			const row = this.#createRow(row_index);
-
-			const renderer = this.#row_renderers[row_config.renderer] || this.#row_renderers.default;
-			renderer.call(this, {columns, row, row_index, row_config, row_data});
-
-			if (this.#customizable) {
-				this.#createRowSpacer(row);
-			}
-
-			this.#body.appendChild(row);
-		}
 	}
 
 	#renderColumnDataCells(column_config) {
