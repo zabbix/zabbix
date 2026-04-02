@@ -197,7 +197,7 @@ class CDevice extends CApiService {
 
 		if (bccomp($data['userid'], self::$userData['userid']) != 0) {
 			$db_users = API::User()->get([
-				'output' => ['userid'],
+				'output' => [],
 				'userids' => $data['userid'],
 				'editable' => true
 			]);
@@ -303,11 +303,11 @@ class CDevice extends CApiService {
 
 	private function validateOnboard(array $data, ?array &$db_device): void {
 		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY, 'fields' => [
-			'enrollment_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'mobile_identity_key' => self::getJwkValidationRules(),
-			'mobile_encryption_key' => self::getJwkValidationRules(),
-			'push_token' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'name' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'enrollment_token' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'mobile_identity_key' =>	self::getJwkValidationRules(),
+			'mobile_encryption_key' =>	self::getJwkValidationRules(),
+			'push_token' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
@@ -335,11 +335,11 @@ class CDevice extends CApiService {
 
 	private static function getJwkValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => [
-			'crv' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'P-256'],
-			'kty' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'EC'],
-			'kid' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'x' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'y' => ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+			'crv' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'P-256'],
+			'kty' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => 'EC'],
+			'kid' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'x' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'y' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY]
 		]];
 	}
 
