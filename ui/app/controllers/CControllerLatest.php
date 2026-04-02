@@ -19,9 +19,6 @@
  */
 abstract class CControllerLatest extends CController {
 
-	// Filter idx prefix.
-	public const FILTER_IDX = 'web.monitoring.latest';
-
 	// Number of tag value rows allowed to be included in subfilter.
 	public const SUBFILTERS_TAG_VALUE_ROWS = 10;
 

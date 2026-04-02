@@ -16,8 +16,6 @@
 
 class CControllerTemplateList extends CController {
 
-	public const FILTER_IDX = 'web.templates';
-
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -62,11 +60,11 @@ class CControllerTemplateList extends CController {
 			$this->deleteProfiles();
 		}
 
-		$sort_field = $this->getInput('sort', CProfile::get(self::FILTER_IDX.'.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get(self::FILTER_IDX.'.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort', CProfile::get('web.templates.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.sortorder', ZBX_SORT_UP));
 
-		CProfile::update(self::FILTER_IDX.'.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update(self::FILTER_IDX.'.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$filter['templates'] = $filter['templates']
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([
@@ -84,13 +82,13 @@ class CControllerTemplateList extends CController {
 			]), ['groupid' => 'id'])
 			: [];
 
-		$storage_idx = self::FILTER_IDX.'.datatable';
+		$storage_idx = 'web.templates.datatable';
 
 		$data = [
 			'action' => $this->getAction(),
-			'active_tab' => CProfile::get(self::FILTER_IDX.'.filter.active', 1),
+			'active_tab' => CProfile::get('web.templates.filter.active', 1),
 			'filter' => $filter,
-			'profileIdx' => self::FILTER_IDX.'.filter',
+			'profileIdx' => 'web.templates.filter',
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
 			'page' => $this->getInput('page', 1),
@@ -145,21 +143,21 @@ class CControllerTemplateList extends CController {
 		else {
 			$filter_tags = [];
 
-			foreach (CProfile::getArray(self::FILTER_IDX.'.filter.tags.tag', []) as $i => $tag) {
+			foreach (CProfile::getArray('web.templates.filter.tags.tag', []) as $i => $tag) {
 				$filter_tags[] = [
 					'tag' => $tag,
-					'value' => CProfile::get(self::FILTER_IDX.'.filter.tags.value', null, $i),
-					'operator' => CProfile::get(self::FILTER_IDX.'.filter.tags.operator', null, $i)
+					'value' => CProfile::get('web.templates.filter.tags.value', null, $i),
+					'operator' => CProfile::get('web.templates.filter.tags.operator', null, $i)
 				];
 			}
 
 			$filter = [
-				'name' => CProfile::get(self::FILTER_IDX.'.filter_name', ''),
-				'vendor_name' => CProfile::get(self::FILTER_IDX.'.filter_vendor_name', ''),
-				'vendor_version' => CProfile::get(self::FILTER_IDX.'.filter_vendor_version', ''),
-				'templates' => CProfile::getArray(self::FILTER_IDX.'.filter_templates', []),
-				'groups' => CProfile::getArray(self::FILTER_IDX.'.filter_groups', []),
-				'evaltype' => CProfile::get(self::FILTER_IDX.'.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+				'name' => CProfile::get('web.templates.filter_name', ''),
+				'vendor_name' => CProfile::get('web.templates.filter_vendor_name', ''),
+				'vendor_version' => CProfile::get('web.templates.filter_vendor_version', ''),
+				'templates' => CProfile::getArray('web.templates.filter_templates', []),
+				'groups' => CProfile::getArray('web.templates.filter_groups', []),
+				'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
 				'tags' => $filter_tags
 			];
 		}
@@ -170,32 +168,32 @@ class CControllerTemplateList extends CController {
 	}
 
 	private function updateProfiles($filter): void {
-		CProfile::update(self::FILTER_IDX.'.filter_name', $filter['name'], PROFILE_TYPE_STR);
-		CProfile::update(self::FILTER_IDX.'.filter_vendor_name', $filter['vendor_name'], PROFILE_TYPE_STR);
-		CProfile::update(self::FILTER_IDX.'.filter_vendor_version', $filter['vendor_version'], PROFILE_TYPE_STR);
-		CProfile::updateArray(self::FILTER_IDX.'.filter_templates', $filter['templates'], PROFILE_TYPE_ID);
-		CProfile::updateArray(self::FILTER_IDX.'.filter_groups', $filter['groups'], PROFILE_TYPE_ID);
-		CProfile::update(self::FILTER_IDX.'.filter.evaltype', $filter['evaltype'], PROFILE_TYPE_INT);
-		CProfile::updateArray(self::FILTER_IDX.'.filter.tags.tag', array_column($filter['tags'], 'tag'),
+		CProfile::update('web.templates.filter_name', $filter['name'], PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_name', $filter['vendor_name'], PROFILE_TYPE_STR);
+		CProfile::update('web.templates.filter_vendor_version', $filter['vendor_version'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.templates.filter_templates', $filter['templates'], PROFILE_TYPE_ID);
+		CProfile::updateArray('web.templates.filter_groups', $filter['groups'], PROFILE_TYPE_ID);
+		CProfile::update('web.templates.filter.evaltype', $filter['evaltype'], PROFILE_TYPE_INT);
+		CProfile::updateArray('web.templates.filter.tags.tag', array_column($filter['tags'], 'tag'),
 			PROFILE_TYPE_STR
 		);
-		CProfile::updateArray(self::FILTER_IDX.'.filter.tags.value', array_column($filter['tags'], 'values'),
+		CProfile::updateArray('web.templates.filter.tags.value', array_column($filter['tags'], 'values'),
 			PROFILE_TYPE_STR
 		);
-		CProfile::updateArray(self::FILTER_IDX.'.filter.tags.operator', array_column($filter['tags'], 'operators'),
+		CProfile::updateArray('web.templates.filter.tags.operator', array_column($filter['tags'], 'operators'),
 			PROFILE_TYPE_INT
 		);
 	}
 
 	private function deleteProfiles(): void {
-		CProfile::delete(self::FILTER_IDX.'.filter_name');
-		CProfile::delete(self::FILTER_IDX.'.filter_vendor_name');
-		CProfile::delete(self::FILTER_IDX.'.filter_vendor_version');
-		CProfile::deleteIdx(self::FILTER_IDX.'.filter_templates');
-		CProfile::deleteIdx(self::FILTER_IDX.'.filter_groups');
-		CProfile::delete(self::FILTER_IDX.'.filter.evaltype');
-		CProfile::deleteIdx(self::FILTER_IDX.'.filter.tags.tag');
-		CProfile::deleteIdx(self::FILTER_IDX.'.filter.tags.value');
-		CProfile::deleteIdx(self::FILTER_IDX.'.filter.tags.operator');
+		CProfile::delete('web.templates.filter_name');
+		CProfile::delete('web.templates.filter_vendor_name');
+		CProfile::delete('web.templates.filter_vendor_version');
+		CProfile::deleteIdx('web.templates.filter_templates');
+		CProfile::deleteIdx('web.templates.filter_groups');
+		CProfile::delete('web.templates.filter.evaltype');
+		CProfile::deleteIdx('web.templates.filter.tags.tag');
+		CProfile::deleteIdx('web.templates.filter.tags.value');
+		CProfile::deleteIdx('web.templates.filter.tags.operator');
 	}
 }

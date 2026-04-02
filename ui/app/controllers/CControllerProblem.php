@@ -19,9 +19,6 @@
  */
 abstract class CControllerProblem extends CController {
 
-	// Filter idx prefix.
-	public const FILTER_IDX = 'web.monitoring.problem';
-
 	// Filter fields default values.
 	public const FILTER_FIELDS_DEFAULT = [
 		'show' => TRIGGERS_OPTION_RECENT_PROBLEM,

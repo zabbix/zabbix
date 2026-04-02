@@ -266,7 +266,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			return $filter_counters;
 		}
 
-		$profile = (new CTabFilterProfile(CControllerLatest::FILTER_IDX, CControllerLatest::FILTER_FIELDS_DEFAULT))
+		$profile = (new CTabFilterProfile('web.monitoring.latest', CControllerLatest::FILTER_FIELDS_DEFAULT))
 			->read();
 
 		$filters = $profile->getTabsWithDefaults();

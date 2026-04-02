@@ -96,7 +96,7 @@ class CDefaultDataProvider extends CDataProvider {
 
 		filter = Object.fromEntries(
 			Object.entries(filter).filter(([key]) => {
-				return !['filter_src', 'filter_view_data', 'filter_show_counter'].includes(key);
+				return !['filter_src', 'filter_view_data', 'filter_show_counter', 'filter_custom_time'].includes(key);
 			})
 		);
 
@@ -122,10 +122,6 @@ class CDefaultDataProvider extends CDataProvider {
 		this.#last_page = page;
 		this.#last_sort_field = sort_field;
 		this.#last_sort_order = sort_order;
-
-		if ('filter_name' in filter) {
-			delete filter['filter_name'];
-		}
 
 		const abort_controller = new AbortController();
 

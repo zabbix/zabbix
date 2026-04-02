@@ -21,8 +21,8 @@ class CControllerTimeSelectorUpdate extends CController {
 
 	public static $profiles = ['web.dashboard.filter', 'web.charts.filter', 'web.httpdetails.filter',
 		'web.problem.filter', 'web.auditlog.filter', 'web.actionlog.filter', 'web.item.graph.filter',
-		'web.toptriggers.filter', 'web.availabilityreport.filter', CControllerHost::FILTER_IDX,
-		CControllerProblem::FILTER_IDX
+		'web.toptriggers.filter', 'web.availabilityreport.filter', 'web.monitoring.hosts',
+		'web.monitoring.problem'
 	];
 
 	public function init() {

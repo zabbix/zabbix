@@ -288,7 +288,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			return $filter_counters;
 		}
 
-		$profile = (new CTabFilterProfile(CControllerHost::FILTER_IDX, CControllerHost::FILTER_FIELDS_DEFAULT))->read();
+		$profile = (new CTabFilterProfile('web.monitoring.hosts', CControllerHost::FILTER_FIELDS_DEFAULT))->read();
 
 		$filters = $profile->getTabsWithDefaults();
 

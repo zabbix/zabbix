@@ -120,7 +120,7 @@ class CControllerLatestView extends CControllerLatest {
 
 	protected function doAction(): void {
 		$filter_tabs = [];
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$profile = (new CTabFilterProfile('web.monitoring.latest', static::FILTER_FIELDS_DEFAULT))->read();
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
@@ -178,7 +178,7 @@ class CControllerLatestView extends CControllerLatest {
 
 		$this->extendData($prepared_data);
 
-		$storage_idx = self::FILTER_IDX.'.datatable';
+		$storage_idx = 'web.monitoring.latest.datatable';
 
 		// display
 		$data = [
@@ -189,7 +189,7 @@ class CControllerLatestView extends CControllerLatest {
 			'filter_view' => 'monitoring.latest.filter',
 			'filter_tabs' => $filter_tabs,
 			'tabfilter_options' => [
-				'idx' => static::FILTER_IDX,
+				'idx' => 'web.monitoring.latest',
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,

@@ -69,7 +69,7 @@ class CControllerProblemView extends CControllerProblem {
 
 	protected function doAction(): void {
 		$filter_tabs = [];
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$profile = (new CTabFilterProfile('web.monitoring.problem', static::FILTER_FIELDS_DEFAULT))->read();
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
@@ -102,16 +102,15 @@ class CControllerProblemView extends CControllerProblem {
 		$timeselector_from = $filter['filter_custom_time'] == 1 ? $filter['from'] : $profile->from;
 		$timeselector_to = $filter['filter_custom_time'] == 1 ? $filter['to'] : $profile->to;
 
-		$storage_idx = static::FILTER_IDX.'.datatable';
+		$storage_idx = 'web.monitoring.problem.datatable';
 
 		$data = [
 			'action' => $this->getAction(),
-			'tabfilter_idx' => static::FILTER_IDX,
 			'filter' => $filter,
 			'filter_view' => 'monitoring.problem.filter',
 			'filter_defaults' => $profile->filter_defaults,
 			'tabfilter_options' => [
-				'idx' => static::FILTER_IDX,
+				'idx' => 'web.monitoring.problem',
 				'selected' => $profile->selected,
 				'support_custom_time' => 1,
 				'expanded' => $profile->expanded,

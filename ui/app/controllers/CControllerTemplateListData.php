@@ -29,8 +29,8 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
-		CProfile::update(CControllerTemplateList::FILTER_IDX.'.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update(CControllerTemplateList::FILTER_IDX.'.sortorder', $sort_order, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.templates.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		$filter['templates'] = $filter['templates']
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([

@@ -16,8 +16,6 @@
 
 class CControllerHostList extends CController {
 
-	public const FILTER_IDX = 'web.hosts';
-
 	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
@@ -186,7 +184,7 @@ class CControllerHostList extends CController {
 			]), ['proxy_groupid' => 'id'])
 			: [];
 
-		$storage_idx = self::FILTER_IDX.'.datatable';
+		$storage_idx = 'web.hosts.datatable';
 
 		$data = [
 			'action' => $this->getAction(),
@@ -196,8 +194,8 @@ class CControllerHostList extends CController {
 			'sort_order' => $sort_order,
 			'proxies_ms' => $proxies_ms,
 			'proxy_groups_ms' => $proxy_groups_ms,
-			'profileIdx' => self::FILTER_IDX . '.filter',
-			'active_tab' => CProfile::get(self::FILTER_IDX . '.filter.active', 1),
+			'profileIdx' => 'web.hosts.filter',
+			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
 			'uncheck' => ($this->getInput('uncheck', 0) == 1),
 			'storage_idx' => $storage_idx,
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),

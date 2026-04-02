@@ -49,7 +49,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			return $filter_counters;
 		}
 
-		$profile = (new CTabFilterProfile(CControllerProblem::FILTER_IDX, CControllerProblem::FILTER_FIELDS_DEFAULT))
+		$profile = (new CTabFilterProfile('web.monitoring.problem', CControllerProblem::FILTER_FIELDS_DEFAULT))
 			->read();
 
 		$filters = $profile->getTabsWithDefaults();

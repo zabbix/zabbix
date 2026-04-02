@@ -79,7 +79,7 @@ class CControllerHostView extends CControllerHost {
 
 	protected function doAction(): void {
 		$filter_tabs = [];
-		$profile = (new CTabFilterProfile(static::FILTER_IDX, static::FILTER_FIELDS_DEFAULT))->read();
+		$profile = (new CTabFilterProfile('web.monitoring.hosts', static::FILTER_FIELDS_DEFAULT))->read();
 
 		if ($this->hasInput('filter_reset')) {
 			$profile->reset();
@@ -100,7 +100,7 @@ class CControllerHostView extends CControllerHost {
 		$filter = $filter_tabs[$profile->selected];
 		$filter = self::sanitizeFilter($filter);
 
-		$storage_idx = self::FILTER_IDX . '.datatable';
+		$storage_idx = 'web.monitoring.hosts.datatable';
 
 		$data = [
 			'refresh_interval' => CWebUser::getRefresh() * 1000,
@@ -116,7 +116,7 @@ class CControllerHostView extends CControllerHost {
 				CProfile::getArray($storage_idx, [])),
 			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 			'tabfilter_options' => [
-				'idx' => static::FILTER_IDX,
+				'idx' => 'web.monitoring.hosts',
 				'selected' => $profile->selected,
 				'support_custom_time' => 0,
 				'expanded' => $profile->expanded,

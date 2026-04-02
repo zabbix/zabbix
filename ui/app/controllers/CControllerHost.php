@@ -19,11 +19,8 @@
  */
 abstract class CControllerHost extends CController {
 
-	// Filter idx prefix.
-	public const FILTER_IDX = 'web.monitoring.hosts';
-
 	// Filter fields default values.
-	public const FILTER_FIELDS_DEFAULT = [
+	public const array FILTER_FIELDS_DEFAULT = [
 		'name' => '',
 		'groupids' => [],
 		'ip' => '',
