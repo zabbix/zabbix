@@ -1616,8 +1616,6 @@ class CDataTable {
 
 		data_cell.appendChild(cell_inner);
 
-		console.log(data_fields);
-
 		const column_fields = column_config.isDuplicate()
 			? this.getColumnConfigById(column_config.getId()).getFields()
 			: column_config.getFields();
@@ -1628,8 +1626,6 @@ class CDataTable {
 
 			column_data.push(field_index >= 0 ? row_data[field_index] : null);
 		}
-
-		console.log(column_data);
 
 		try {
 			this.#renderers[renderer].call(this, {
