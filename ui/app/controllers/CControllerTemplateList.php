@@ -51,14 +51,34 @@ class CControllerTemplateList extends CController {
 	}
 
 	protected function doAction(): void {
-		$filter = $this->getFilter();
-
 		if ($this->hasInput('filter_set')) {
-			$this->updateProfiles($filter);
+			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			$this->deleteProfiles();
 		}
+
+		$filter_tags = [];
+
+		foreach (CProfile::getArray('web.templates.filter.tags.tag', []) as $i => $tag) {
+			$filter_tags[] = [
+				'tag' => $tag,
+				'value' => CProfile::get('web.templates.filter.tags.value', null, $i),
+				'operator' => CProfile::get('web.templates.filter.tags.operator', null, $i)
+			];
+		}
+
+		$filter = [
+			'name' => CProfile::get('web.templates.filter_name', ''),
+			'vendor_name' => CProfile::get('web.templates.filter_vendor_name', ''),
+			'vendor_version' => CProfile::get('web.templates.filter_vendor_version', ''),
+			'templates' => CProfile::getArray('web.templates.filter_templates', []),
+			'groups' => CProfile::getArray('web.templates.filter_groups', []),
+			'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
+			'tags' => $filter_tags
+		];
+
+		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
 		$sort_field = $this->getInput('sort', CProfile::get('web.templates.sort', 'name'));
 		$sort_order = $this->getInput('sortorder', CProfile::get('web.templates.sortorder', ZBX_SORT_UP));
@@ -82,6 +102,10 @@ class CControllerTemplateList extends CController {
 			]), ['groupid' => 'id'])
 			: [];
 
+		if (!$filter['tags']) {
+			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+		}
+
 		$storage_idx = 'web.templates.datatable';
 
 		$data = [
@@ -104,83 +128,40 @@ class CControllerTemplateList extends CController {
 		$this->setResponse($response);
 	}
 
-	private function getFilter(): array {
-		if ($this->hasInput('filter_set')) {
-			$filter_tags = [];
+	private function updateProfiles(): void {
+		$filter_tags = [];
 
-			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
-				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
-					continue;
-				}
-
-				$filter_tags[] = [
-					'tags' => $filter_tag['tag'],
-					'values' => $filter_tag['values'],
-					'operators' => $filter_tag['operators']
-				];
+		foreach ($this->getInput('filter_tags', []) as $filter_tag) {
+			if ($filter_tag['tag'] !== '' || $filter_tag['value'] !== '') {
+				$filter_tags[] = $filter_tag;
 			}
-			$filter = [
-				'name' => $this->getInput('filter_name', ''),
-				'vendor_name' => $this->getInput('filter_vendor_name', ''),
-				'vendor_version' => $this->getInput('filter_vendor_version', ''),
-				'templates' => $this->getInput('filter_templates', []),
-				'groups' => $this->getInput('filter_groups', []),
-				'evaltype' => $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
-				'tags' => $filter_tags
-			];
-		}
-		elseif ($this->hasInput('filter_rst')) {
-			$filter = [
-				'name' => '',
-				'vendor_name' => '',
-				'vendor_version' => '',
-				'templates' => [],
-				'groups' => [],
-				'evaltype' => TAG_EVAL_TYPE_AND_OR,
-				'tags' => []
-			];
-		}
-		else {
-			$filter_tags = [];
-
-			foreach (CProfile::getArray('web.templates.filter.tags.tag', []) as $i => $tag) {
-				$filter_tags[] = [
-					'tag' => $tag,
-					'value' => CProfile::get('web.templates.filter.tags.value', null, $i),
-					'operator' => CProfile::get('web.templates.filter.tags.operator', null, $i)
-				];
-			}
-
-			$filter = [
-				'name' => CProfile::get('web.templates.filter_name', ''),
-				'vendor_name' => CProfile::get('web.templates.filter_vendor_name', ''),
-				'vendor_version' => CProfile::get('web.templates.filter_vendor_version', ''),
-				'templates' => CProfile::getArray('web.templates.filter_templates', []),
-				'groups' => CProfile::getArray('web.templates.filter_groups', []),
-				'evaltype' => CProfile::get('web.templates.filter.evaltype', TAG_EVAL_TYPE_AND_OR),
-				'tags' => $filter_tags
-			];
 		}
 
-		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
-
-		return $filter;
-	}
-
-	private function updateProfiles($filter): void {
-		CProfile::update('web.templates.filter_name', $filter['name'], PROFILE_TYPE_STR);
-		CProfile::update('web.templates.filter_vendor_name', $filter['vendor_name'], PROFILE_TYPE_STR);
-		CProfile::update('web.templates.filter_vendor_version', $filter['vendor_version'], PROFILE_TYPE_STR);
-		CProfile::updateArray('web.templates.filter_templates', $filter['templates'], PROFILE_TYPE_ID);
-		CProfile::updateArray('web.templates.filter_groups', $filter['groups'], PROFILE_TYPE_ID);
-		CProfile::update('web.templates.filter.evaltype', $filter['evaltype'], PROFILE_TYPE_INT);
-		CProfile::updateArray('web.templates.filter.tags.tag', array_column($filter['tags'], 'tag'),
+		CProfile::update('web.templates.filter_name', $this->getInput('filter_name', ''),
 			PROFILE_TYPE_STR
 		);
-		CProfile::updateArray('web.templates.filter.tags.value', array_column($filter['tags'], 'values'),
+		CProfile::update('web.templates.filter_vendor_name', $this->getInput('filter_vendor_name', ''),
 			PROFILE_TYPE_STR
 		);
-		CProfile::updateArray('web.templates.filter.tags.operator', array_column($filter['tags'], 'operators'),
+		CProfile::update('web.templates.filter_vendor_version', $this->getInput('filter_vendor_version', ''),
+			PROFILE_TYPE_STR
+		);
+		CProfile::updateArray('web.templates.filter_templates', $this->getInput('filter_templates', []),
+			PROFILE_TYPE_ID
+		);
+		CProfile::updateArray('web.templates.filter_groups', $this->getInput('filter_groups', []),
+			PROFILE_TYPE_ID
+		);
+		CProfile::update('web.templates.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			PROFILE_TYPE_INT
+		);
+		CProfile::updateArray('web.templates.filter.tags.tag', array_column($filter_tags, 'tag'),
+			PROFILE_TYPE_STR
+		);
+		CProfile::updateArray('web.templates.filter.tags.value', array_column($filter_tags, 'values'),
+			PROFILE_TYPE_STR
+		);
+		CProfile::updateArray('web.templates.filter.tags.operator', array_column($filter_tags, 'operators'),
 			PROFILE_TYPE_INT
 		);
 	}
