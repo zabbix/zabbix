@@ -193,11 +193,17 @@ void	zbx_vps_monitor_stats_ext_get_data(struct zbx_json *json, const void *arg)
 
 	if (0 != stats.values_limit)
 	{
+		double pavailable;
+
+		if (0 != stats.overcommit_limit)
+			pavailable = (double)(stats.overcommit_limit - stats.overcommit) * 100 / stats.overcommit_limit;
+		else
+			pavailable = 0;
+
 		zbx_json_addobject(json, "overcommit");
 		zbx_json_adduint64(json, "limit", stats.overcommit_limit);
 		zbx_json_adduint64(json, "available", stats.overcommit_limit - stats.overcommit);
-		zbx_json_addfloat(json, "pavailable", (double)(stats.overcommit_limit - stats.overcommit) *
-				100 / stats.overcommit_limit);
+		zbx_json_addfloat(json, "pavailable", pavailable);
 		zbx_json_close(json);
 	}
 

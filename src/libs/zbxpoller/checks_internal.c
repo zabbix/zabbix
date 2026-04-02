@@ -1162,8 +1162,15 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 
 		if (NULL == tmp || '\0' == *tmp || 0 == strcmp(tmp, "pavailable"))
 		{
-			SET_DBL_RESULT(result, (double)(stats.overcommit_limit - stats.overcommit) * 100 /
-					stats.overcommit_limit);
+			double pavailable;
+
+			if (0 != stats.overcommit_limit)
+				pavailable = (double)(stats.overcommit_limit - stats.overcommit) * 100 /
+						stats.overcommit_limit;
+			else
+				pavailable = 0;
+
+			SET_DBL_RESULT(result, pavailable);
 		}
 		else if (0 == strcmp(tmp, "available"))
 		{
