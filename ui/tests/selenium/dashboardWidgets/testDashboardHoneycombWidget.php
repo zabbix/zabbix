@@ -65,7 +65,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 	const HOST_CREATE_HONEY = 'Host for honeycomb 1';
 	const HOST_DISPLAY = 'Display';
 	const ITEM_KEY_TEXT = 'text_honey_1';
-	const ITEM_KEY_DISPLAY_TEXT = 'honey_display_text';
+	const ITEM_KEY_DISPLAY_TEXT = 'honey_non_numeric_2';
 
 	public static function prepareHoneycombWidgetData() {
 		CDataHelper::call('hostgroup.create', [
@@ -160,7 +160,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					],
 					[
 						'name' => 'Non-numeric JSON',
-						'key_' => 'honey_display_json',
+						'key_' => 'honey_non_numeric_1',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_JSON
 					],
@@ -172,13 +172,13 @@ class testDashboardHoneycombWidget extends testWidgets {
 					],
 					[
 						'name' => 'Non-numeric CHAR',
-						'key_' => 'honey_display_char',
+						'key_' => 'honey_non_numeric_3',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_STR
 					],
 					[
 						'name' => 'Non-numeric LOG',
-						'key_' => 'honey_display_log',
+						'key_' => 'honey_non_numeric_4',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_LOG
 					]
@@ -282,7 +282,6 @@ class testDashboardHoneycombWidget extends testWidgets {
 			]
 		]);
 		$itemids = $response['itemids'];
-		$create_hostid = $response['hostids'][self::HOST_CREATE_HONEY];
 		$display_hostid = $response['hostids'][self::HOST_DISPLAY];
 		$maintenance_hostid = $response['hostids']['Host for maintenance filter'];
 
@@ -300,7 +299,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 			self::HOST_DISPLAY => [
 				[
 					'name' => 'Non-numeric BINARY',
-					'key_' => 'honey_display_bin',
+					'key_' => 'display_bin',
 					'master_itemid' => $itemids[self::HOST_DISPLAY.':'.self::ITEM_KEY_DISPLAY_TEXT],
 					'type' => ITEM_TYPE_DEPENDENT,
 					'value_type' => ITEM_VALUE_TYPE_BINARY
@@ -314,6 +313,20 @@ class testDashboardHoneycombWidget extends testWidgets {
 		foreach ([100, 200, 300, 400, 500] as $i => $value) {
 			CDataHelper::addItemData($itemids[self::HOST_DISPLAY.':honey_display_'.($i + 1)], $value);
 		}
+
+		$non_numeric_data = [
+			'{"test":"json1","users":{"name1":"test1","name2":"🙂"}}',
+			'Text test 🙂',
+			'Char test 🙂',
+			'Log test 🙂'
+		];
+		// Generate data for non-numeric items.
+		foreach ($non_numeric_data as $i => $value) {
+			CDataHelper::addItemData($itemids[self::HOST_DISPLAY.':honey_non_numeric_'.($i + 1)], $value);
+		}
+
+		// Generate data for binary data type.
+		CDataHelper::addItemData(self::$dependent_items['Non-numeric BINARY'], 'VGVzdCBmb3IgYmluYXJ5IGl0ZW0gdmFsdWUg8J+Zgg==');
 
 		// Items ids that used in filtering scenario.
 		$filtered_items = [
@@ -2036,22 +2049,181 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => '100 {$TEXT} {HOST.NAME}'
 				]
 			],
-			// #13.
+			// #13 Non-numeric value JSON.
 			[
 				[
 					'fields' => [
-						'Name' => 'Only primary label displayed',
-						'Item patterns' => 'Display item 1',
-						'id:show_2' => false,
-						'id:primary_label_type' => 'Text',
-						'id:primary_label' => 'Only primary'
+						'Name' => 'JSON - value',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
 					],
-					'check_label' => 'svg-honeycomb-label-primary',
-					'turned_off_label' => 'svg-honeycomb-label-secondary',
-					'result' => 'Only primary'
+					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
 				]
 			],
-			// #14.
+			// #14 Non-numeric value BINARY.
+			[
+				[
+					'fields' => [
+						'Name' => 'BINARY - value',
+						'Item patterns' => 'Non-numeric BINARY',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'binary value'
+				]
+			],
+			// #15 Non-numeric value TEXT.
+			[
+				[
+					'fields' => [
+						'Name' => 'TEXT value',
+						'Item patterns' => 'Non-numeric TEXT',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'Text test 🙂'
+				]
+			],
+			// #16 Non-numeric value CHAR.
+			[
+				[
+					'fields' => [
+						'Name' => 'CHAR - value',
+						'Item patterns' => 'Non-numeric CHAR',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'Char test 🙂'
+				]
+			],
+			// #17 Non-numeric value LOG.
+			[
+				[
+					'fields' => [
+						'Name' => 'LOG - Value',
+						'Item patterns' => 'Non-numeric LOG',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value'
+					],
+					'result' => 'Log test 🙂'
+				]
+			],
+			// #18 Non-numeric value with units (no units should be displayed).
+			[
+				[
+					'fields' => [
+						'Name' => 'JSON - Value with units',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Value',
+						'id:secondary_label_type' => 'Value',
+						'id:primary_label_units_pos' => 'After value',
+						'id:secondary_label_units_pos' => 'After value',
+						'id:primary_label_units' => 'units not displayed',
+						'id:secondary_label_units' => 'units not displayed'
+					],
+					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
+				]
+			],
+			// #19 Macros with JSON data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros JSON',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_1 {"test": "json1", "u...'
+				]
+			],
+			// #20 Macros with Binary data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros BIN',
+						'Item patterns' => 'Non-numeric BINARY',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display display_bin binary value'
+				]
+			],
+			// #21 Item value macro with regsub to display full value (JSON).
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub JSON',
+						'Item patterns' => 'Non-numeric JSON',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
+						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
+					],
+					'result' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}'
+				]
+			],
+			// #22 Item value macro with regsub to display full value (BIN).
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub BIN',
+						'Item patterns' => 'Non-numeric BINARY',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
+						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
+					],
+					'result' => 'VGVzdCBmb3IgYmluYXJ5IGl0ZW0gdmFsdWUg8J+Zgg=='
+				]
+			],
+			// #23 Macros with Text data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub TEXT',
+						'Item patterns' => 'Non-numeric TEXT',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_2 Text test 🙂'
+				]
+			],
+			// #24 Macros with Char data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub CHAR',
+						'Item patterns' => 'Non-numeric CHAR',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_3 Char test 🙂'
+				]
+			],
+			// #25 Macros with Log data type.
+			[
+				[
+					'fields' => [
+						'Name' => 'Resolved macros with regsub Log',
+						'Item patterns' => 'Non-numeric Log',
+						'id:primary_label_type' => 'Text',
+						'id:secondary_label_type' => 'Text',
+						'id:primary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}',
+						'id:secondary_label' => '{HOST.NAME} {ITEM.KEY} {ITEM.LASTVALUE}'
+					],
+					'result' => 'Display honey_non_numeric_4 Log test 🙂'
+				]
+			],
+			// #26.
 			[
 				[
 					'fields' => [
@@ -2066,7 +2238,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 					'result' => 'Only secondary'
 				]
 			],
-			// #15.
+			// #27.
 			[
 				[
 					'fields' => [
@@ -2120,7 +2292,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		else {
 			foreach (['svg-honeycomb-label-primary', 'svg-honeycomb-label-secondary'] as $selector) {
 				$displayed = $content->query('class', $selector)->one()->getText();
-				$this->assertEquals($displayed, $data['result']);
+				$this->assertEquals($data['result'], $displayed);
 			}
 		}
 
