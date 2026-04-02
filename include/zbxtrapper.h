@@ -58,6 +58,7 @@ typedef struct
 	const char				*config_tls_ca_file;
 	const char				*config_tls_cert_file;
 	const char				*config_tls_key_file;
+	const char				*config_adapter_connect_to;
 }
 zbx_thread_trapper_args;
 

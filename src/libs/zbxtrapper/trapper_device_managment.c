@@ -30,7 +30,7 @@
 
 static int	trapper_device_init(const struct zbx_json_parse *jp, const char *config_adapter_url,
 		const char *config_tls_ca_file, const char *config_tls_cert_file,
-		const char *config_tls_key_file, struct zbx_json *json)
+		const char *config_tls_key_file, const char *config_adapter_connect_to, struct zbx_json *json)
 {
 #define ZBX_ENROLL_URL_LEN		2048
 #define ZBX_BRIDGE_ENCRYPTION_KEY_LEN	256
@@ -52,7 +52,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	CURL				*curl = NULL;
 	CURLcode			err;
 	CURLoption			opt;
-	struct curl_slist		*headers = NULL;
+	struct curl_slist		*headers = NULL, *connect_to = NULL;
 	long				http_code = 0;
 	struct zbx_json			request;
 	struct zbx_json_parse		jp_body, jp_result, jp_bek;
@@ -131,10 +131,30 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls_ca_file)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_tls_cert_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
+	}
+
+	if (NULL != config_adapter_connect_to)
+	{
+		connect_to = curl_slist_append(connect_to, config_adapter_connect_to);
+
+		if (NULL == connect_to)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed to prepare CURLOPT_CONNECT_TO value");
+			goto out;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt,
+				curl_easy_strerror(err));
+			goto out;
+		}
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
@@ -238,7 +258,7 @@ out:
 void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_tls_t *config_tls,
 		const char *config_frontend_allowed_ip, const char *config_adapter_url, const char *config_tls_ca_file,
-		const char *config_tls_cert_file, const char *config_tls_key_file)
+		const char *config_tls_cert_file, const char *config_tls_key_file, const char *config_connect_to)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -259,7 +279,7 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	zbx_json_init(&json, 1024);
 
 	if (SUCCEED == (ret = trapper_device_init(jp, config_adapter_url, config_tls_ca_file, config_tls_cert_file,
-			config_tls_key_file, &json)))
+			config_tls_key_file, config_connect_to, &json)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
@@ -285,7 +305,7 @@ out:
 
 static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *config_adapter_url,
 		const char *config_tls_ca_file, const char *config_tls_cert_file, const char *config_tls_key_file,
-		struct zbx_json *json)
+		const char *config_adapter_connect_to, struct zbx_json *json)
 {
 #if !defined(HAVE_LIBCURL)
 	ZBX_UNUSED(jp);
@@ -303,7 +323,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	CURL				*curl = NULL;
 	CURLcode			err;
 	CURLoption			opt;
-	struct curl_slist		*headers = NULL;
+	struct curl_slist		*headers = NULL, *connect_to = NULL;
 	long				http_code = 0;
 	struct zbx_json			request;
 	struct zbx_json_parse		jp_body, jp_result;
@@ -381,11 +401,31 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_tls_ca_file)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_tls_cert_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_tls_key_file)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s", (int)opt,
 				curl_easy_strerror(err));
 		goto out;
+	}
+
+	if (NULL != config_adapter_connect_to)
+	{
+		connect_to = curl_slist_append(connect_to, config_adapter_connect_to);
+
+		if (NULL == connect_to)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed to prepare CURLOPT_CONNECT_TO value");
+			goto out;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt,
+				curl_easy_strerror(err));
+			goto out;
+		}
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
@@ -457,7 +497,7 @@ out:
 void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_tls_t *config_tls,
 		const char *config_frontend_allowed_ip, const char *config_adapter_url, const char *config_tls_ca_file,
-		const char *config_tls_cert_file, const char *config_tls_key_file)
+		const char *config_tls_cert_file, const char *config_tls_key_file, const char *config_connect_to)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -477,7 +517,7 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 	zbx_json_init(&json, 1024);
 
 	if (SUCCEED == (ret = trapper_device_offboard(jp, config_adapter_url, config_tls_ca_file, config_tls_cert_file,
-			config_tls_key_file, &json)))
+			config_tls_key_file, config_connect_to, &json)))
 	{
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))

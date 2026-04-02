@@ -1215,7 +1215,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
 		const char *config_adapter_url, const char *config_tls_ca_file, const char *config_tls_cert_file,
-		const char *config_tls_key_file, zbx_ipc_async_socket_t *rtc)
+		const char *config_tls_key_file, const char *config_adapter_connect_to, zbx_ipc_async_socket_t *rtc)
 {
 	int	ret = SUCCEED;
 
@@ -1340,7 +1340,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 				zbx_trapper_device_init(sock, &jp, config_comms, config_comms->config_tls,
 						config_frontend_allowed_ip, config_adapter_url,
 						config_tls_ca_file, config_tls_cert_file,
-						config_tls_key_file);
+						config_tls_key_file, config_adapter_connect_to);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_DEVICE_OFFBOARD))
@@ -1350,7 +1350,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 				zbx_trapper_device_offboard(sock, &jp, config_comms, config_comms->config_tls,
 						config_frontend_allowed_ip, config_adapter_url,
 						config_tls_ca_file, config_tls_cert_file,
-						config_tls_key_file);
+						config_tls_key_file, config_adapter_connect_to);
 			}
 		}
 		else if (SUCCEED != trapper_process_request_cb(value, sock, &jp, ts, config_comms, config_vault,
@@ -1450,7 +1450,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		zbx_trapper_process_request_func_t trapper_process_request_cb,
 		zbx_autoreg_update_host_func_t autoreg_update_host_cb, const char *config_frontend_allowed_ip,
 		const char *config_adapter_url, const char *config_tls_ca_file, const char *config_tls_cert_file,
-		const char *config_tls_key_file, zbx_ipc_async_socket_t *rtc)
+		const char *config_tls_key_file, const char *config_adapter_connect_to, zbx_ipc_async_socket_t *rtc)
 {
 	if (FAIL == zbx_tcp_recv_to(sock, config_comms->config_trapper_timeout))
 		return;
@@ -1461,7 +1461,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 			config_enable_global_scripts, zbx_get_value_internal_ext_cb, config_ssh_key_location,
 			config_webdriver_url, trapper_process_request_cb, autoreg_update_host_cb,
 			config_frontend_allowed_ip, config_adapter_url, config_tls_ca_file, config_tls_cert_file,
-			config_tls_key_file, rtc);
+			config_tls_key_file, config_adapter_connect_to, rtc);
 }
 
 ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
@@ -1562,6 +1562,7 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 					trapper_args_in->config_tls_ca_file,
 					trapper_args_in->config_tls_cert_file,
 					trapper_args_in->config_tls_key_file,
+					trapper_args_in->config_adapter_connect_to,
 					&rtc);
 			sec = zbx_time() - sec;
 
