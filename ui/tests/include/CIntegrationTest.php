@@ -447,7 +447,7 @@ class CIntegrationTest extends CAPITest {
 	private static function checkPidKilled($component) {
 		$usleep_total = 0;
 
-		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
+		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
 			if (!file_exists(self::getPidPath($component))) {
 				return true;
 			}
