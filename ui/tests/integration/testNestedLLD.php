@@ -189,14 +189,6 @@ class testNestedLLD extends CIntegrationTest{
 					]
 				]
 			],
-			'preprocessing' => [
-				[
-					'type' => 4,
-					'params' => ' ',
-					'error_handler' => 0,
-					'error_handler_params' => ''
-				]
-			],
 			'overrides' => [
 				[
 					'name' => 'Critical override: disable items, set trigger severity to high',
