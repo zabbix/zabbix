@@ -34,7 +34,7 @@ if ($data['form_refresh'] == 0) {
 $url = (new CUrl('sysmaps.php'))
 	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update');
 
-if(getRequest('form') !== 'create') {
+if (getRequest('form') !== 'create') {
 	$url->setArgument('sysmapid', $data['sysmap']['sysmapid']);
 }
 

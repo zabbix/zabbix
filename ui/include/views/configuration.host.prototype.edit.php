@@ -40,7 +40,7 @@ $url = (new CUrl('host_prototypes.php'))
 	->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
 	->setArgument('context', $data['context']);
 
-if(getRequest('form') !== 'create') {
+if (getRequest('form') !== 'create') {
 	$url->setArgument('hostid', $host_prototype['hostid']);
 }
 
