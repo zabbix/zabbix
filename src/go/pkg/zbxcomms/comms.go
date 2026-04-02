@@ -211,6 +211,14 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 		reservedSize = binary.LittleEndian.Uint32(s[9:13])
 	}
 
+	if reservedSize > maxRecvDataSize {
+		return nil, errs.Errorf(
+			"message size %d exceeds the maximum size %d bytes",
+			reservedSize,
+			maxRecvDataSize,
+		)
+	}
+
 	if int(expectedSize) == total-headerSize {
 		if 0 != (flags & zlibCompress) {
 			return c.uncompress(s[headerSize:total], reservedSize)
