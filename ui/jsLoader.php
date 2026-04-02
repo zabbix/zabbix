@@ -249,7 +249,8 @@ $translate_strings = [
 	'class.widget.misconfigured.js' => [
 		'Please update configuration' => _('Please update configuration'),
 		'Referred widget is unavailable' => _('Referred widget is unavailable'),
-		'Refresh interval' => _('Refresh interval')
+		'Refresh interval' => _('Refresh interval'),
+		'Widget is not fully configured' => _('Widget is not fully configured')
 	],
 	'class.widget-select.popup.js' => [
 		'Cancel' => _('Cancel'),
