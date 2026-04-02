@@ -1713,20 +1713,11 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 					.message = (char *)(uintptr_t)message
 				};
 
-		char	*body = zbx_strdup(NULL, "{ALERT.MESSAGE}");
-		char	*subject = zbx_strdup(NULL, "{ALERT.SUBJECT}");
 		char	*trigger_severity = zbx_strdup(NULL, "{TRIGGER.SEVERITY}");
 		char	*event_id = zbx_strdup(NULL, "{EVENT.ID}");
 		char	*host_id = zbx_strdup(NULL, "{HOST.ID}");
 		char	*trigger_id = zbx_strdup(NULL, "{TRIGGER.ID}");
-
-		char    *uuid7 = zbx_gen_uuid7();
-
-		substitute_message_macros(&body, NULL, 0, message_type, um_handle_unmasked, &actionid, event, r_event,
-				&userid, NULL, &alert, service_alarm, service, tz, ack);
-
-		substitute_message_macros(&subject, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
-				r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+		char	*uuid7 = zbx_gen_uuid7();
 
 		substitute_message_macros(&trigger_severity, NULL, 0, message_type, um_handle_unmasked, &actionid,
 				event, r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
@@ -1771,7 +1762,7 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 
 					zbx_json_addobject(&json, "data");
 						zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
-						zbx_json_addstring(&json, "body", body, ZBX_JSON_TYPE_STRING);
+						zbx_json_addstring(&json, "body", message, ZBX_JSON_TYPE_STRING);
 
 						zbx_json_addstring(&json, "eventid", event_id, ZBX_JSON_TYPE_STRING);
 
@@ -1796,9 +1787,6 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 		zbx_json_addstring(&json, "id", uuid7, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
 		zbx_json_close(&json);
-
-		zbx_free(subject);
-		zbx_free(body);
 	}
 
 	zbx_db_free_result(result);
