@@ -71,9 +71,10 @@ if ($data['groupid'] !== null && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
 $form_grid->addItem([
 	(new CLabel(_('Group name'), 'name'))->setAsteriskMark(),
 	new CFormField(
-		(new CTextBox('name', $data['name'], $data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED))
+		(new CTextAreaFlexible('name', $data['name']))
 			->setAttribute('autofocus', 'autofocus')
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($data['groupid'] != 0 && $data['flags'] == ZBX_FLAG_DISCOVERY_CREATED)
 			->setAriaRequired()
 	)
 ]);

@@ -478,7 +478,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	if (NULL == (poller_config->base = event_base_new()))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize event base");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	poller_config->config_source_ip = poller_args_in->config_comms->config_source_ip;
@@ -500,7 +500,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 			poller_config)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot create async items timer event");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	evtimer_add(poller_config->async_wake_timer, &tv);
@@ -509,7 +509,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 			poller_config)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot create async timer event");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	evtimer_add(poller_config->async_timer, &tv);
@@ -518,7 +518,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 			poller_config)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot create async timer event");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	evtimer_add(poller_config->async_timeout_timer, &tv);
@@ -529,7 +529,7 @@ static void	async_poller_init(zbx_poller_config_t *poller_config, zbx_thread_pol
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize async manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -604,7 +604,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	if (ARES_SUCCESS != status)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialise c-ares library: %s", ares_strerror(status));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	optmask = ARES_OPT_SOCK_STATE_CB|ARES_OPT_TIMEOUT;
@@ -621,7 +621,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	if (ARES_SUCCESS != status)
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set c-ares library options: %s", ares_strerror(status));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 
@@ -634,7 +634,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 		if (NULL == (poller_config->dnsbase = evdns_base_new(poller_config->base, 0)))
 		{
 			zabbix_log(LOG_LEVEL_ERR, "cannot initialize asynchronous DNS library");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (0 != (ret = evdns_base_resolv_conf_parse(poller_config->dnsbase, DNS_OPTIONS_ALL,
@@ -649,7 +649,7 @@ static void	async_poller_dns_init(zbx_poller_config_t *poller_config, zbx_thread
 	if (0 != evdns_base_set_option(poller_config->dnsbase, "timeout:", timeout))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot set timeout to asynchronous DNS library");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_free(timeout);
@@ -762,7 +762,7 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		{
 			zabbix_log(LOG_LEVEL_ERR, "zbx_async_httpagent_create() error: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;
@@ -892,6 +892,6 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

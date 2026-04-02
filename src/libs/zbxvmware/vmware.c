@@ -2608,6 +2608,8 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 
 	page.alloc = ZBX_INIT_UPD_XML_SIZE;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
+	page.data[0] = '\0';
+	page.offset = 0;
 
 	if (SUCCEED != vmware_curl_set_header(easyhandle, service->major_version, &headers, &data->error))
 		goto clean;
@@ -2657,7 +2659,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	if (SUCCEED != zbx_hashset_reserve(&data->hvs, hvs.values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < hvs.values_num; i++)

@@ -429,7 +429,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to reporting service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	ppid = getppid();
@@ -467,7 +467,7 @@ ZBX_THREAD_ENTRY(report_writer_thread, args)
 		if (SUCCEED != zbx_ipc_socket_read(&socket, &message))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot read reporter service request");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);

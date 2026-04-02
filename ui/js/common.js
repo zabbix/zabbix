@@ -468,14 +468,7 @@ function closeDialogHandler(event) {
 			switch (overlay.type) {
 				// Close overlay popup.
 				case 'popup':
-					if (overlay.has_custom_cancel) {
-						overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.cancel', {detail: {
-							dialogueid: overlay.dialogueid
-						}}));
-					}
-					else {
-						overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
-					}
+					overlayDialogueDestroy(overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 					break;
 
 				// Close overlay hintbox.
@@ -556,6 +549,120 @@ function reloadPopup(form, action) {
 
 	PopUp(action, parameters, {dialogueid, dialogue_class});
 }
+
+/**
+ * A singleton class instance for maintaining a focus within a specified container.
+ */
+const Focuser = new class {
+
+	#FOCUSABLE_SELECTORS = ['button:not([disabled])', 'input:not([type="hidden"]):not([disabled])',
+		'select:not([disabled])', 'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"]):not([disabled])',
+		'[href]:not([tabindex="-1"])'
+	];
+
+	/**
+	 * @type {Map<HTMLElement, AbortController>}
+	 */
+	#contain_abort_controllers = new Map();
+
+	/**
+	 * Get the first focusable, enabled, and visible element within the container.
+	 *
+	 * @param {HTMLElement|null} container
+	 *
+	 * @returns {HTMLElement|null}
+	 */
+	getFocusableElement(container) {
+		if (!(container instanceof HTMLElement)) {
+			return null;
+		}
+
+		for (const element of container.querySelectorAll(this.#FOCUSABLE_SELECTORS.join(', '))) {
+			if (isVisible(element)) {
+				return element;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Focus and preselect the element, mimicking the autofocus behavior.
+	 *
+	 * @param {HTMLElement|null} element
+	 */
+	focus(element) {
+		if (!(element instanceof HTMLElement)) {
+			return null;
+		}
+
+		element.focus({preventScroll: true});
+
+		if (element instanceof HTMLInputElement && ['text', 'password'].includes(element.type)) {
+			element.select();
+		}
+	}
+
+	/**
+	 * Focus and preselect the first focusable element of the container, mimicking the autofocus behavior.
+	 *
+	 * @param {HTMLElement|null} container
+	 */
+	recoverFocus(container) {
+		this.focus(this.getFocusableElement(container));
+	}
+
+	/**
+	 * Prevent the focus from running away from the specified container.
+	 *
+	 * @param {HTMLElement} container
+	 */
+	containFocus(container) {
+		if (!(container instanceof HTMLElement)) {
+			return null;
+		}
+
+		if (this.#contain_abort_controllers.has(container)) {
+			this.#contain_abort_controllers.get(container).abort();
+			this.#contain_abort_controllers.delete(container);
+		}
+
+		const focusable_elements = [
+			...container.querySelectorAll(this.#FOCUSABLE_SELECTORS.join(', '))
+		].filter(element => isVisible(element));
+
+		if (focusable_elements.length === 0) {
+			return;
+		}
+
+		const abort_controller = new AbortController();
+
+		this.#contain_abort_controllers.set(container, abort_controller);
+
+		if (focusable_elements.length > 1) {
+			focusable_elements[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab' && e.shiftKey) {
+					e.preventDefault();
+					focusable_elements.at(-1).focus();
+				}
+			}, {signal: abort_controller.signal});
+
+			focusable_elements.at(-1).addEventListener('keydown', e => {
+				if (e.key === 'Tab' && !e.shiftKey) {
+					e.preventDefault();
+					focusable_elements[0].focus();
+				}
+			}, {signal: abort_controller.signal});
+		}
+		else {
+			focusable_elements[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab') {
+					e.preventDefault();
+				}
+			}, {signal: abort_controller.signal});
+		}
+	}
+};
 
 /**
  * Pass value to add.popup trigger.
@@ -639,60 +746,6 @@ function addSelectedValues(object, parentid) {
 	});
 
 	jQuery(document).trigger('add.popup', data);
-}
-
-/**
- * Send trigger expression form data to server for validation before adding it to trigger expression field.
- *
- * @param {Overlay} overlay
- */
-function validate_trigger_expression(overlay) {
-	var $form = overlay.$dialogue.find('form'),
-		url = new Curl($form.attr('action'));
-
-	url.setArgument('add', 1);
-
-	overlay.setLoading();
-	overlay.xhr = jQuery.ajax({
-		url: url.getUrl(),
-		data: $form.serialize(),
-		complete: function() {
-			overlay.unsetLoading();
-		},
-		success: function(ret) {
-			overlay.$dialogue.find('.msg-bad, .msg-good').remove();
-
-			if ('error' in ret) {
-				const message_box = makeMessageBox('bad', ret.error.messages, ret.error.title);
-
-				message_box.insertBefore($form);
-
-				return;
-			}
-
-			var form = window.document.forms[ret.dstfrm];
-			var obj = (typeof form !== 'undefined')
-				? jQuery(form).find('#' + ret.dstfld1).get(0)
-				: document.getElementById(ret.dstfld1);
-
-			if ((ret.dstfld1 === 'expr_temp' || ret.dstfld1 === 'recovery_expr_temp')) {
-				jQuery(obj).val(ret.expression);
-			}
-			else {
-				jQuery(obj).val(jQuery(obj).val() + ret.expression);
-			}
-
-			overlayDialogueDestroy(overlay.dialogueid);
-
-			obj.dispatchEvent(new Event('change'));
-
-			if (window.trigger_edit_popup) {
-				window.trigger_edit_popup.form.validateChanges(['expression', 'recovery_expression']);
-			}
-		},
-		dataType: 'json',
-		type: 'POST'
-	});
 }
 
 function redirect(uri, method, needle, invert_needle, allow_empty) {
@@ -840,7 +893,7 @@ function showHideVisible(obj) {
 }
 
 /**
- * Check if element is visible.
+ * Check if an element is visible.
  *
  * @param {Element} element
  *
@@ -1059,6 +1112,16 @@ function objectSetDeepValue(object, path, value) {
 	tmp[path.shift()] = value;
 
 	return object;
+}
+
+/**
+ * Determines whether the user has opened a hintbox or a popup.
+ *
+ * @param {HTMLElement|Document} target
+ * @returns {boolean}
+ */
+function isUserInteracting(target = document) {
+	return target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
 }
 
 // Fix jQuery ui.sortable vertical positioning bug.

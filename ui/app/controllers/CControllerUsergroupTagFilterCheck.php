@@ -90,13 +90,13 @@ class CControllerUsergroupTagFilterCheck extends CController {
 					return false;
 				}
 
-				if (strlen($tag) > DB::getFieldLength('tag_filter', 'tag')) {
+				if (mb_strlen($tag) > DB::getFieldLength('tag_filter', 'tag')) {
 					error(_s('Invalid parameter "%1$s": %2$s.', $tag, _('value is too long')));
 
 					return false;
 				}
 
-				if (strlen($value) > DB::getFieldLength('tag_filter', 'value')) {
+				if (mb_strlen($value) > DB::getFieldLength('tag_filter', 'value')) {
 					error(_s('Invalid parameter "%1$s": %2$s.', $value, _('value is too long')));
 
 					return false;

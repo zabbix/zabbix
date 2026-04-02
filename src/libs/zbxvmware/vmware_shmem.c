@@ -1011,7 +1011,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 		if (SUCCEED != zbx_hashset_reserve(&data->vms_index, hv->vms.values_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		for (int i = 0; i < hv->vms.values_num; i++)
@@ -1181,7 +1181,7 @@ void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_k
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < src->values_num; i++)
