@@ -26,6 +26,7 @@ window.user_device_create_popup = new class {
 	#dialogue;
 	#footer;
 	#overlay;
+	#qr_expires_at_ms = null;
 	#deviceuuid = null;
 
 	init({rules, admin_mode}) {
@@ -65,11 +66,14 @@ window.user_device_create_popup = new class {
 					this.#footer.querySelector('.js-submit').remove();
 					this.#footer.querySelector('.js-cancel').remove();
 					this.#overlay.setProperties({title: <?= json_encode(_('Link a device')) ?>});
-					this.#form_element.querySelector('.js-qr-expires-at').textContent = response.expires_at;
+					this.#form_element.querySelector('.js-qr-expires-at').textContent = response.expires_at_text;
 					this.#form_element.querySelector('.form-grid').style.display = 'none';
 					this.#form_element.querySelector('.qr-code-container').style.display = '';
 					this.#displayQRCode(response.url);
 					this.#deviceuuid = response.uuid;
+					this.#qr_expires_at_ms = response.expires_at * 1000;
+
+					setTimeout(() => this.#checkDeviceStatus(), 2000);
 				});
 			});
 	}
@@ -115,6 +119,29 @@ window.user_device_create_popup = new class {
 			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.#overlay.unsetLoading());
+	}
+
+	#checkDeviceStatus() {
+		const url = zabbixUrl({action: 'user.device.status', uuid: this.#deviceuuid});
+
+		fetch(url, {
+			method: 'GET',
+			headers: {'Content-Type': 'application/json'}
+		})
+			.then((response) => response.json())
+			.then((response) => {
+				if ('success' in response) {
+					this.#deviceuuid = null;
+					overlayDialogueDestroy(this.#overlay.dialogueid);
+
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				}
+			})
+			.finally(() => {
+				if (this.#deviceuuid && new CDate().getTime() < this.#qr_expires_at_ms) {
+					setTimeout(() => this.#checkDeviceStatus(), 1000);
+				}
+			});
 	}
 
 	#removePopupMessages() {

@@ -14,15 +14,15 @@
 **/
 
 
-class CControllerUserDeviceDelete extends CController {
+class CControllerUserDeviceStatus extends CController {
 
 	protected function init(): void {
-		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput() {
 		$fields = [
-			'deviceids' =>	'required|array_db device.deviceid'
+			'uuid' =>	'required|not_empty|db device.uuid',
 		];
 
 		$ret = $this->validateInput($fields);
@@ -42,25 +42,33 @@ class CControllerUserDeviceDelete extends CController {
 
 	protected function checkPermissions() {
 		// TODO: check access
+		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+			return false;
+		}
+
 		return true;
 	}
 
 	protected function doAction() {
-		$deviceids = $this->getInput('deviceids');
+		$device = API::Device()->get([
+			'output' => ['deviceid'],
+			'filter' => ['uuid' => $this->getInput('uuid')]
+		]);
 
-		$result = API::Device()->offboard($deviceids);
+		$output = [];
 
-		if ($result) {
-			$output['success']['title'] = _n('Device unlinked', 'Devices unlinked', count($deviceids));
-			$output['success']['action'] = 'delete';
+		if ($device) {
+			$success = ['title' => _('Device linked')];
 
 			if ($messages = get_and_clear_messages()) {
-				$output['success']['messages'] = array_column($messages, 'message');
+				$success['messages'] = array_column($messages, 'message');
 			}
+
+			$output['success'] = $success;
 		}
 		else {
 			$output['error'] = [
-				'title' => _n('Cannot unlink device', 'Cannot unlink devices', count($deviceids)),
+				'title' => _('Device is not linked'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

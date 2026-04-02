@@ -57,7 +57,7 @@ class CControllerUserDeviceInit extends CController {
 
 	protected function initFakeDevice (): array {
 		return [
-			'expires_at' => time() + 3600,
+			'expires_at' => time() + 300,
 			'uuid' => 'dev-id-123',
 			'server_id' => 'server-id-123',
 			'enrollment_token' => 'BET',
@@ -77,7 +77,8 @@ class CControllerUserDeviceInit extends CController {
 
 		if ($device) {
 			$output = [
-				'expires_at' => zbx_date2str(TIME_FORMAT, $device['expires_at']),
+				'expires_at' => $device['expires_at'],
+				'expires_at_text' => zbx_date2str(TIME_FORMAT, $device['expires_at']),
 				'uuid' => $device['uuid'],
 				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
 					->setArgument('ver', ZABBIX_API_VERSION)

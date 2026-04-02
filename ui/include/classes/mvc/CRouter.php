@@ -394,6 +394,7 @@ class CRouter {
 		'user.device.delete'						=> [CControllerUserDeviceDelete::class,								'layout.json',			null],
 		'user.device.init'							=> [CControllerUserDeviceInit::class,								'layout.json',			null],
 		'user.device.list'							=> [CControllerUserDeviceList::class,								'layout.htmlpage',		'user.device.list'],
+		'user.device.status'						=> [CControllerUserDeviceStatus::class,								'layout.json',			null],
 		'user.edit'									=> [CControllerUserEdit::class,										'layout.htmlpage',		'administration.user.edit'],
 		'user.list'									=> [CControllerUserList::class,										'layout.htmlpage',		'administration.user.list'],
 		'user.token.list'							=> [CControllerUserTokenList::class,								'layout.htmlpage',		'administration.user.token.list'],
