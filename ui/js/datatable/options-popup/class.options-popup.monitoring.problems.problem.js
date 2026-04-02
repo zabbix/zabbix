@@ -14,6 +14,7 @@
 
 
 class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsPopup {
+
 	getFields() {
 		const show_opdata = this.getElement().querySelector('[name="show_opdata"]');
 		const details = this.getElement().querySelector('[name="details"]');

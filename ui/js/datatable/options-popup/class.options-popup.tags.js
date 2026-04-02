@@ -14,7 +14,6 @@
 
 
 class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
-	static  = null;
 
 	getFields() {
 		const number_of_tags = Array.from(this.getElement().querySelectorAll('[name="number_of_tags"]'));

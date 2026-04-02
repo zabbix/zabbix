@@ -14,6 +14,7 @@
 
 
 class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup {
+
 	getFields() {
 		const show_item_key = this.getElement().querySelector('[name="show_item_key"]');
 

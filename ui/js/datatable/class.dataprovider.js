@@ -14,6 +14,7 @@
 
 
 class CDataProvider {
+
 	/**
 	 * @param {Object} params
 	 *

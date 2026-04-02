@@ -14,6 +14,7 @@
 
 
 class CDataTable {
+
 	static EVENT_INIT = 'init';
 	static EVENT_RENDER = 'render';
 	static EVENT_RESET = 'reset';
