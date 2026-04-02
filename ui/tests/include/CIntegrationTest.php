@@ -63,6 +63,8 @@ class CIntegrationTest extends CAPITest {
 	private static $delay_wait_log_line_total = 0.0;
 	private static $delay_wait_send_per_test_file = 0.0;
 	private static $delay_wait_send_total = 0.0;
+	private static $delay_reload_config_cache_per_test_file = 0.0;
+	private static $delay_reload_config_cache_total = 0.0;
 
 	private static $suite_components_reuse = false;
 	private static $suite_components_running = false;
@@ -351,6 +353,11 @@ class CIntegrationTest extends CAPITest {
 				self::$last_test_case_name, self::$delay_wait_send_per_test_file,
 				self::$delay_wait_send_total));
 			self::$delay_wait_send_per_test_file = 0.0;
+
+			fwrite(STDERR, sprintf("[%s] reloadConfigurationCache took: %.4fs [total: %.4fs]\n",
+				self::$last_test_case_name, self::$delay_reload_config_cache_per_test_file,
+				self::$delay_reload_config_cache_total));
+			self::$delay_reload_config_cache_per_test_file = 0.0;
 
 			fwrite(STDERR, sprintf("[%s] waitForStartup took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$startup_time_per_test_file,
@@ -983,6 +990,8 @@ class CIntegrationTest extends CAPITest {
 	 * @param integer $delayOverride
 	 */
 	protected function reloadConfigurationCache($component = null, $delayOverride = null) {
+		$start = microtime(true);
+
 		if ($component === null) {
 			$component = $this->getActiveComponent();
 		}
@@ -999,6 +1008,12 @@ class CIntegrationTest extends CAPITest {
 
 		if ($delay !== 0) {
 			sleep($delay);
+		}
+
+		if (self::TRACE_DELAYS) {
+			$total = microtime(true) - $start;
+			self::$delay_reload_config_cache_per_test_file += $total;
+			self::$delay_reload_config_cache_total += $total;
 		}
 	}
 
