@@ -21,6 +21,7 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+........S. [ZBX-27633] fixed capitalization of the log message (Sasha)
 .........T [ZBX-27662] renamed GLPI media type (mruszczyk)
 ...G...... [ZBX-27542] fixed memory leak in Zabbix Agent 2 scheduler (mkorotkov)
 .D........ [ZBX-27179] fixed incorrect man page for Zabbix agent 2 (dbriedis)
