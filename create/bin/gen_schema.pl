@@ -44,6 +44,7 @@ my %c = (
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_cuid"	=>	"ZBX_TYPE_CUID",
 	"t_json"	=>	"ZBX_TYPE_JSON",
+	"t_uuid"	=>	"ZBX_TYPE_UUID",
 );
 
 $c{"before"} = "/*
@@ -89,6 +90,7 @@ my %mysql = (
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
 	"t_json"	=>	"json",
+	"t_uuid"	=>	"varchar(32)",
 );
 
 my %postgresql = (
@@ -111,6 +113,7 @@ my %postgresql = (
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
 	"t_json"	=>	"jsonb",
+	"t_uuid"	=>	"varchar(32)",
 );
 
 my %sqlite3 = (
@@ -133,6 +136,7 @@ my %sqlite3 = (
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
 	"t_json"	=>	"jsonb",
+	"t_uuid"	=>	"varchar(32)",
 );
 
 sub rtrim($)

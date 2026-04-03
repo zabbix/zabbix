@@ -538,6 +538,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zbx_http_response_t	body = {0}, response_header = {0};
 	char			*payload = NULL, *error = NULL, errbuf[CURL_ERROR_SIZE];
 
+	ZBX_UNUSED(config_adapter_timeout);
+
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 	payload = zbx_strdup(NULL, params);
 
