@@ -256,8 +256,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_MONITORED);
-		if (!(self::$suite_components_reuse && self::$suite_components_running)) {
 
+		if (!(self::$suite_components_reuse && self::$suite_components_running)) {
 			if (!self::$suite_components_reuse) {
 				foreach ($this->case_components as $component) {
 					if (in_array($component, self::$suite_components)) {
@@ -346,6 +346,13 @@ class CIntegrationTest extends CAPITest {
 				self::$startup_time_per_test_file +
 				self::$shutdown_time_per_test_file;
 
+			$sum_total = self::$delay_call_data_present_total +
+				self::$delay_wait_log_line_total +
+				self::$delay_wait_send_total +
+				self::$delay_reload_config_cache_total +
+				self::$startup_time_total +
+				self::$shutdown_time_total;
+
 			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent took: %.4fs [total: %.4fs]\n",
 				self::$last_test_case_name, self::$delay_call_data_present_per_test_file,
 				self::$delay_call_data_present_total));
@@ -376,8 +383,8 @@ class CIntegrationTest extends CAPITest {
 				self::$shutdown_time_total));
 			self::$shutdown_time_per_test_file = 0.0;
 
-			fwrite(STDERR, sprintf("[%s] sum of delays: %.4fs\n",
-				self::$last_test_case_name, $sum_per_test_file));
+			fwrite(STDERR, sprintf("[%s] sum of delays per test file: %.4fs [total %.4fs]\n",
+				self::$last_test_case_name, $sum_per_test_file, $sum_total));
 		}
 	}
 
