@@ -673,7 +673,7 @@ static size_t	get_string_field_size(const zbx_db_field_t *field)
 			return 65535u;
 		case ZBX_TYPE_CUID:
 			return CUID_LEN - 1;
-		case ZBX_TYPE_CUID:
+		case ZBX_TYPE_UUID:
 			return ZBX_UUID_LEN;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
