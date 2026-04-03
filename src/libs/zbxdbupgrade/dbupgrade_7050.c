@@ -855,7 +855,7 @@ static int	DBpatch_7050064(void)
 			{"token_device", "tokenid", 0,
 				{
 					{"tokenid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
-					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_UUID, ZBX_NOTNULL, 0},
 					{0}
 				},
 				NULL
@@ -873,7 +873,7 @@ static int	DBpatch_7050065(void)
 
 static int	DBpatch_7050066(void)
 {
-	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "uuid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token_device", 2, &field);
 }
