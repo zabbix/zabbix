@@ -10274,12 +10274,13 @@ return [
 		]
 	],
 	'device' => [
-		'key' => 'deviceid',
+		'key' => 'uuid',
 		'fields' => [
-			'deviceid' => [
+			'uuid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 32,
+				'default' => ''
 			],
 			'userid' => [
 				'null' => false,
@@ -10287,12 +10288,6 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
-			],
-			'uuid' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
-				'default' => ''
 			],
 			'name' => [
 				'null' => false,
@@ -10352,7 +10347,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'device',
-				'ref_field' => 'deviceid'
+				'ref_field' => 'uuid'
 			],
 			'scope' => [
 				'null' => false,
