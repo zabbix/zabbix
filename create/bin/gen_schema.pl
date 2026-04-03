@@ -263,6 +263,10 @@ sub process_field($)
 		{
 			$length = 0;
 		}
+		elsif ($type eq "ZBX_TYPE_UUID")
+		{
+			$length = 0;
+		}
 		else
 		{
 			$length = 0;

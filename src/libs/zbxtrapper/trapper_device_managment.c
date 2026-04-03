@@ -23,7 +23,6 @@
 #	include "zbxhttp.h"
 #endif
 
-#define ZBX_UUID_LEN			32
 #define ZBX_ERROR_CODE_LEN		32
 #define ZBX_MESSAGE_LEN			256
 #define ZBX_INFO_LEN			512
