@@ -1784,7 +1784,7 @@ const SUBJECT_INTERNAL = "Internal";
 	* @return array
 	*/
 	public function agentConfigurationProvider() {
-		self::$metadata_file = "/tmp/zabbix_agent_metadata_file_" . time() . ".txt";
+		self::$metadata_file = "/tmp/zabbix_agent_metadata_file_" . microtime() . ".txt";
 
 		return [
 			self::COMPONENT_AGENT => [
@@ -3428,7 +3428,7 @@ const SUBJECT_INTERNAL = "Internal";
 			unlink(self::$metadata_file);
 		}
 
-		if (file_put_contents(self::$metadata_file, "\\".time()) === false) {
+		if (file_put_contents(self::$metadata_file, "\\" . microtime()) === false) {
 			throw new Exception('Failed to create metadata_file');
 		}
 

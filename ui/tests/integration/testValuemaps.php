@@ -283,16 +283,17 @@ class testValuemaps extends CIntegrationTest {
 			]);
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertEquals(1, count($response['result']['triggerids']));
-		$triggerid =  $response['result']['triggerids'];
 
-		$this->reloadConfigurationCache();
+			$triggerid =  $response['result']['triggerids'];
 
-		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
+			$this->reloadConfigurationCache();
 
-		['result' => $result] = $this->call('problem.get', [
+			$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
+
+			['result' => $result] = $this->call('problem.get', [
 				'output' => ['name'],
 				'objectids' => $triggerid
-		]);
+			]);
 
 			$result = array_column($result, 'name');
 			$this->assertEquals(' '.$outputData, $result[0]);

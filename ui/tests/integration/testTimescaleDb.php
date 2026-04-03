@@ -137,7 +137,7 @@ class testTimescaleDb extends CIntegrationTest {
 			}
 		}
 
-		$this->sendDataValues('sender', $sender_data , self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $sender_data, self::COMPONENT_SERVER);
 
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_send_response_json():SUCCEED', true, 5);
