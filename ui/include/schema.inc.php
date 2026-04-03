@@ -10344,8 +10344,8 @@ return [
 			],
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20,
+				'type' => DB::FIELD_TYPE_CUID,
+				'length' => 32,
 				'ref_table' => 'device',
 				'ref_field' => 'uuid'
 			],
