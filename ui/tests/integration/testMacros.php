@@ -3437,7 +3437,7 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->stopComponent(self::COMPONENT_AGENT);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Create autoregistration action
 		$response = $this->call('action.create', [
