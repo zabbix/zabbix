@@ -620,7 +620,7 @@
 			<arg line="--verbose"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
-			<redirector output="${basedir}/phpunit_console.log" />
+			<redirector error="${basedir}/phpunit_console.log" />
 		</exec>
 
 		<exec executable="bash">
