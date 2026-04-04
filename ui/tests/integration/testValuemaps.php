@@ -262,48 +262,48 @@ class testValuemaps extends CIntegrationTest {
 	 * @dataProvider getValuemaps
 	 */
 	public function testValuemaps_checkProblemName($inputData, $inputType, $valuemap, $outputData) {
-			$valuemap['hostid'] = self::$hostid;
-			$response = $this->call('valuemap.create', $valuemap);
-			$this->assertArrayHasKey('valuemapids', $response['result']);
-			$this->assertEquals(1, count($response['result']['valuemapids']));
-			$valuemapid = $response['result']['valuemapids'];
+		$valuemap['hostid'] = self::$hostid;
+		$response = $this->call('valuemap.create', $valuemap);
+		$this->assertArrayHasKey('valuemapids', $response['result']);
+		$this->assertEquals(1, count($response['result']['valuemapids']));
+		$valuemapid = $response['result']['valuemapids'];
 
-			$response = $this->call('item.update', [
-					'itemid' => self::$itemid[0],
-					'valuemapid' => $valuemapid[0],
-					'value_type' => $inputType
-			]);
-			$this->assertArrayHasKey('itemids', $response['result']);
-			$this->assertEquals(1, count($response['result']['itemids']));
-			$this->assertEquals(self::$itemid, $response['result']['itemids']);
+		$response = $this->call('item.update', [
+			'itemid' => self::$itemid[0],
+			'valuemapid' => $valuemapid[0],
+			'value_type' => $inputType
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+		$this->assertEquals(self::$itemid, $response['result']['itemids']);
 
-			$response = $this->call('trigger.create', [
-				'description' => ' {ITEM.VALUE}',
-				'expression' => 'last(/'.self::HOST_NAME.'/'.self::ITEM_NAME.')='.$inputData
-			]);
-			$this->assertArrayHasKey('triggerids', $response['result']);
-			$this->assertEquals(1, count($response['result']['triggerids']));
+		$response = $this->call('trigger.create', [
+			'description' => ' {ITEM.VALUE}',
+			'expression' => 'last(/'.self::HOST_NAME.'/'.self::ITEM_NAME.')='.$inputData
+		]);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertEquals(1, count($response['result']['triggerids']));
 
-			$triggerid =  $response['result']['triggerids'];
+		$triggerid =  $response['result']['triggerids'];
 
-			$this->reloadConfigurationCache();
+		$this->reloadConfigurationCache();
 
-			$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
+		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
 
-			['result' => $result] = $this->call('problem.get', [
-				'output' => ['name'],
-				'objectids' => $triggerid
-			]);
+		['result' => $result] = $this->call('problem.get', [
+			'output' => ['name'],
+			'objectids' => $triggerid
+		]);
 
-			$result = array_column($result, 'name');
-			$this->assertEquals(' '.$outputData, $result[0]);
+		$result = array_column($result, 'name');
+		$this->assertEquals(' '.$outputData, $result[0]);
 
-			$response = $this->call('trigger.delete', $triggerid);
-			$this->assertArrayHasKey('triggerids', $response['result']);
-			$this->assertEquals($triggerid, $response['result']['triggerids']);
+		$response = $this->call('trigger.delete', $triggerid);
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertEquals($triggerid, $response['result']['triggerids']);
 
-			$response = $this->call('valuemap.delete', $valuemapid);
-			$this->assertArrayHasKey('valuemapids', $response['result']);
-			$this->assertEquals($valuemapid, $response['result']['valuemapids']);
+		$response = $this->call('valuemap.delete', $valuemapid);
+		$this->assertArrayHasKey('valuemapids', $response['result']);
+		$this->assertEquals($valuemapid, $response['result']['valuemapids']);
 	}
 }
