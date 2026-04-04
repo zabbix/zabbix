@@ -403,7 +403,7 @@ static char	*config_frontend_allowed_ip		= NULL;
 static zbx_config_log_t	log_file_cfg			= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
 
 /* adapter config */
-static char	*config_adapter_url;
+static char	*config_adapter_url = NULL;
 static int	config_adapter_timeout = 10;
 static char	*config_adapter_connect_to = NULL;
 
@@ -1568,6 +1568,9 @@ static void	zbx_db_save_server_status(void)
 			ZBX_JSON_TYPE_INT);
 	zbx_json_addstring(&json, "allow_software_update_check",
 			(1 == config_allow_software_update_check ? "true" : "false"), ZBX_JSON_TYPE_INT);
+
+	zbx_json_addstring(&json, "bridge_adapter_configuration",
+			(NULL != config_adapter_url ? "true" : "false"), ZBX_JSON_TYPE_INT);
 
 	zbx_json_close(&json);
 
