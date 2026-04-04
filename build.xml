@@ -612,7 +612,6 @@
 	<target name="test-integration">
 		<exec executable="bash" dir="${WORKSPACE}" failonerror="off">
 			<env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
-
 			<arg line="-c '
 				phpunit \
 				--log-junit=${basedir}/build/logs/phpunit.xml \
@@ -622,9 +621,9 @@
 				--testdox \
 				--verbose ${phpunit_filter} \
 				ui/tests/integration/IntegrationTests.php \
-				2>&1 | tee ${WORKSPACE}/phpunit_console.log
-				'"/>
-			</exec>
+				2&gt;&amp;1 | tee ${WORKSPACE}/phpunit_console.log
+			'"/>
+		</exec>
 
 		<exec executable="bash">
 			<arg value="-c"/>
