@@ -610,30 +610,28 @@
 	</target>
 
 	<target name="test-integration">
+		<exec executable="phpunit" dir="ui/tests" failonerror="off">
+			<env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
+			<arg line="--log-junit=${basedir}/build/logs/phpunit.xml"/>
+			<arg line="--bootstrap=bootstrap.php"/>
+			<arg line="--do-not-cache-result"/>
+			<arg line="--dont-report-useless-tests"/>
+			<arg line="--testdox"/>
+			<arg line="--verbose"/>
+			<arg line="${phpunit_filter}"/>
+			<arg line="integration/IntegrationTests.php"/>
+		</exec>
 
-<mkdir dir="${basedir}/build/logs"/>
-
-<exec executable="bash" dir="ui/tests" failonerror="off">
-    <env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
-    <arg line="-c '
-        phpunit \
-          --log-junit=${basedir}/build/logs/phpunit.xml \
-          --bootstrap=bootstrap.php \
-          --do-not-cache-result \
-          --dont-report-useless-tests \
-          --testdox \
-          --verbose ${phpunit_filter} \
-          integration/IntegrationTests.php \
-          2&gt;&amp;1 | tee $WORKSPACE/phpunit_console.log
-    '"/>
-</exec>
 		<exec executable="bash">
 			<arg value="-c"/>
 			<arg value="
 				echo '=== Test suite durations (seconds) ===';
 				grep '&lt;testsuite ' ${basedir}/build/logs/phpunit.xml |
 				sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' |
-				sort -nr"/>
+			sort -nr"/>
+			<redirector output="${WORKSPACE}/phpunit_summary.log"
+				error="${WORKSPACE}/phpunit_summary.log"
+				append="false"/>
 		</exec>
 
 	</target>
