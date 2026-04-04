@@ -1,3 +1,5 @@
+PERFORMANCE_RATIO_THRESHOLD=1.5
+
 declare -A BASELINE_TIMES=(
   [Integration]=4268.078995
   [testEscalations]=443.855269
