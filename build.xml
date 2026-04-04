@@ -611,20 +611,22 @@
 
 	<target name="test-integration">
 
-		<exec executable="bash" dir="${basedir}" failonerror="off">
-			<env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
-			<arg line="-c '
-				phpunit \
-				--log-junit=${basedir}/build/logs/phpunit.xml \
-				--bootstrap=bootstrap.php \
-				--do-not-cache-result \
-				--dont-report-useless-tests \
-				--testdox \
-				--verbose ${phpunit_filter} \
-				ui/tests/integration/IntegrationTests.php \
-				2&gt;&amp;1 | tee $WORKSPACE/phpunit_console.log
-			'"/>
-		</exec>
+<mkdir dir="${basedir}/build/logs"/>
+
+<exec executable="bash" dir="ui/tests" failonerror="off">
+    <env key="UBSAN_OPTIONS" value="print_stacktrace=1:suppressions=../tests/ubsan.supp"/>
+    <arg line="-c '
+        phpunit \
+          --log-junit=${basedir}/build/logs/phpunit.xml \
+          --bootstrap=bootstrap.php \
+          --do-not-cache-result \
+          --dont-report-useless-tests \
+          --testdox \
+          --verbose ${phpunit_filter} \
+          integration/IntegrationTests.php \
+          2&gt;&amp;1 | tee $WORKSPACE/phpunit_console.log
+    '"/>
+</exec>
 		<exec executable="bash">
 			<arg value="-c"/>
 			<arg value="
