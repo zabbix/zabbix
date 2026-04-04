@@ -629,8 +629,8 @@
 				grep '&lt;testsuite ' ${basedir}/build/logs/phpunit.xml |
 				sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' |
 			sort -nr"/>
-			<redirector output="${WORKSPACE}/phpunit_summary.log"
-				error="${WORKSPACE}/phpunit_summary.log"
+			<redirector output="${basedir}/phpunit_summary.log"
+				error="${basedir}/phpunit_summary.log"
 				append="false"/>
 		</exec>
 
