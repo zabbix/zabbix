@@ -925,7 +925,7 @@ static int	DBpatch_7050072(void)
 	const zbx_db_table_t	table =
 			{"device_enrollment_token", "deviceid", 0,
 				{
-					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
+					{"deviceid", NULL, NULL, NULL, 0, ZBX_TYPE_UUID, 0, 0},
 					{"token", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"expires_at", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
 					{0}
@@ -938,7 +938,7 @@ static int	DBpatch_7050072(void)
 
 static int	DBpatch_7050073(void)
 {
-	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_ID, ZBX_NOTNULL,
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "uuid", 0, ZBX_TYPE_UUID, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("device_enrollment_token", 1, &field);
