@@ -2323,7 +2323,7 @@ INDEX		|1		|deviceid
 INDEX		|2		|kid
 
 TABLE|device_enrollment_token|deviceid|0
-FIELD		|deviceid	|t_id		|	|NOT NULL	|0|1|device
+FIELD		|deviceid	|t_uuid		|	|NOT NULL	|0|1|device|uuid
 FIELD		|token		|t_varchar(128)	|''	|NOT NULL	|0
 FIELD		|expires_at	|t_time		|'0'	|NOT NULL	|0
 UNIQUE		|1		|token
