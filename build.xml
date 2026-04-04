@@ -623,8 +623,14 @@
 		</exec>
 
 <exec executable="bash" dir="${WORKSPACE}" failonerror="off">
-    <arg value="-c"/>
-    <arg value="echo '=== Test suite durations (seconds) ==='; grep '<testsuite ' ${basedir}/build/logs/phpunit.xml | sed -E 's/.*name=\"([^\"]+)\".*time=\"([^\"]+)\".*/\2 \1/' | sort -nr 2>&1"/>
+    <arg>
+        <![CDATA[
+        echo '=== Test suite durations (seconds) ===';
+        grep '<testsuite ' ${basedir}/build/logs/phpunit.xml |
+        sed -E 's/.*name="([^"]+)".*time="([^"]+)".*/\2 \1/' |
+        sort -nr
+        ]]>
+    </arg>
     <redirector output="${basedir}/phpunit_summary.log" append="false"/>
 </exec>
 
