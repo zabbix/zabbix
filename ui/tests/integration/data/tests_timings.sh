@@ -1,4 +1,5 @@
 declare -A BASELINE_TIMES=(
+  [Integration]=4268.078995
   [testEscalations]=443.855269
   [testProxyHa]=417.823529
   [testNestedLLD]=385.473008

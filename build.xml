@@ -633,7 +633,7 @@
         sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' | 
         sort -nr
     "/>
-    <redirector output="${env.WORKSPACE}/phpunit_summary.log" append="false"/>
+    <redirector output="${env.WORKSPACE}/phpunit_summary.log" append="false" alwaysLog="true"/>
 </exec>
 
 	</target>
