@@ -262,7 +262,6 @@ class testValuemaps extends CIntegrationTest {
 	 * @dataProvider getValuemaps
 	 */
 	public function testValuemaps_checkProblemName($inputData, $inputType, $valuemap, $outputData) {
-		sleep(70);
 		$valuemap['hostid'] = self::$hostid;
 		$response = $this->call('valuemap.create', $valuemap);
 		$this->assertArrayHasKey('valuemapids', $response['result']);
