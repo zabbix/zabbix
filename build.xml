@@ -622,20 +622,18 @@
 			<arg line="integration/IntegrationTests.php"/>
 		</exec>
 
-<property environment="env"/>
+		<property environment="env"/>
 
-<!-- Extract PHPUnit summary -->
-<exec executable="bash" dir="${env.WORKSPACE}" failonerror="off">
-    <arg value="-c"/>
-    <arg value="
-        echo '=== Test suite durations (seconds) ===';
-        grep '&lt;testsuite ' ${basedir}/build/logs/phpunit.xml | 
-        sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' | 
-        sort -nr
-    "/>
-    <redirector output="${env.WORKSPACE}/phpunit_summary.log" append="false" alwaysLog="true"/>
-</exec>
-
+		<exec executable="bash" dir="${env.WORKSPACE}" failonerror="off">
+			<arg value="-c"/>
+			<arg value="
+				echo '=== Test suite durations (seconds) ===';
+				grep '&lt;testsuite ' ${basedir}/build/logs/phpunit.xml |
+				sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' |
+				sort -nr
+				"/>
+			<redirector output="${env.WORKSPACE}/phpunit_summary.log" append="false" alwaysLog="true"/>
+		</exec>
 	</target>
 
 	<target name="build-phpunit" depends="test-phpunit"/>

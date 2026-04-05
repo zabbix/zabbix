@@ -283,7 +283,6 @@ class testValuemaps extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('triggerids', $response['result']);
 		$this->assertEquals(1, count($response['result']['triggerids']));
-
 		$triggerid =  $response['result']['triggerids'];
 
 		$this->reloadConfigurationCache();
