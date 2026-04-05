@@ -178,6 +178,7 @@ class testDiagInfo extends CIntegrationTest {
 	}
 
 	public function testDiagInfo() {
+		sleep(20);
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY.'1', self::TRAPPER_ITEM_NAME);
 
