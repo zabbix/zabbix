@@ -573,7 +573,27 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30, null, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32, null, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35, null, 1);
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
+		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
 		sleep(1);
+		$base_time = time();
+
+		$this->sendSenderValues([
+			[self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10, $base_time - 5],
+			[self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.5]', 25, $base_time - 4],
+			[self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]',   30, $base_time - 3],
+			[self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]',   32, $base_time - 2],
+			[self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35, $base_time - 1],
+		]);
+
+		$this->waitFor(function () use ($itemids) {
+			$history = $this->historyGet($itemids);
+			return count($history) === 5;
+		}, 10);
+
 		$history = $this->historyGet($itemids);
 		$values = $this->extractHistoryValues($history);
 
