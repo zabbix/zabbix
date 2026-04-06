@@ -517,6 +517,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	public function testCalculatedExpression_HistogramQuantile()
 	{
 		$itemids = [];
+		$trapperItemId;
 		// create a histogram bucket item (simulate with a trapper item for test)
 		foreach ([0.1, 0.5, 1, 2, 'Inf'] as $le) {
 			$response = $this->call('item.create', [
@@ -538,6 +539,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			$this->assertEquals(1, count($response['result']['itemids']));
 			self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 			$itemids = array_merge($itemids, [$itemid]);
+			$trapperItemId = $itemid;
 		}
 
 		$formula = 'histogram_quantile(0.25,' .
@@ -573,10 +575,14 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30, null, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32, null, 1);
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35, null, 1);
-		$this->waitFor(function () use ($itemids) {
-			$history = $this->historyGet($itemids);
-			return count($history) === 5;
-		}, 10);
+		for ($i = 0; $i < 30; $i++) {
+			$history = $this->historyGet([$trapperItemId]);
+			if (count($history) === 5) {
+				break;
+			}
+			usleep(100000);
+		}
+
 		$history = $this->historyGet($itemids);
 		$values = $this->extractHistoryValues($history);
 
