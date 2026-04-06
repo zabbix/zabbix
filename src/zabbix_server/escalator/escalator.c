@@ -1679,6 +1679,36 @@ static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_e
 	zbx_json_free(&json);
 }
 
+char	*filter_unknown_hosts(const char *input)
+{
+	char	*token, *saveptr, *copy, *result;
+	size_t	result_size = strlen(input) + 1;
+
+	copy = zbx_strdup(NULL, input);
+	result = malloc(result_size);
+	result[0] = '\0';
+
+	int	first = 1;
+
+	for (token = strtok_r(copy, ",", &saveptr); token != NULL; token = strtok_r(NULL, ",", &saveptr))
+	{
+		while (*token == ' ') token++;
+
+		if (strcmp(token, "*UNKNOWN*") != 0)
+		{
+			if (0 == first)
+				strcat(result, ", ");
+
+			strcat(result, token);
+			first = 0;
+		}
+	}
+
+	free(copy);
+
+	return result;
+}
+
 static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto,
 		const char *subject, const char *message, const zbx_db_acknowledge *ack,
@@ -1698,7 +1728,7 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
 	result = zbx_db_select(
-		"select d.uuidid,d.push_token,dk.kid,dk.key_,dk.scope"
+		"select d.uuid,d.push_token,dk.kid,dk.key_,dk.scope"
 		" from device d "
 		" left join device_key dk"
 			" on dk.deviceid=d.uuid and dk.active=1"
@@ -1715,7 +1745,9 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 
 		char	*trigger_severity = zbx_strdup(NULL, "{TRIGGER.SEVERITY}");
 		char	*event_id = zbx_strdup(NULL, "{EVENT.ID}");
-		char	*host_id = zbx_strdup(NULL, "{HOST.ID}");
+
+		char	*host_ids = zbx_strdup(NULL, "{HOST.ID1}, {HOST.ID2}, {HOST.ID3}, {HOST.ID4}, {HOST.ID5}, "
+				"{HOST.ID6},{HOST.ID7},{HOST.ID8},{HOST.ID9},");
 		char	*trigger_id = zbx_strdup(NULL, "{TRIGGER.ID}");
 		char	*uuid7 = zbx_gen_uuid7();
 
@@ -1725,15 +1757,18 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 		substitute_message_macros(&event_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
 				r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
 
-		substitute_message_macros(&host_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
+		substitute_message_macros(&host_ids, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
 					r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
+
+		char	*filtered_hostids = filter_unknown_hosts(host_ids);
+
 
 		substitute_message_macros(&trigger_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
 				r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
 
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA: %s, %s, %s, %s", trigger_severity, event_id, host_id,
-				trigger_id);
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA: %s, %s, %s, %s", trigger_severity, event_id,
+				filtered_hostids, trigger_id);
 
 
 		zbx_json_addobject(&json, NULL);
@@ -1767,7 +1802,7 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 						zbx_json_addstring(&json, "eventid", event_id, ZBX_JSON_TYPE_STRING);
 
 						zbx_json_addarray(&json, "hostids");
-						zbx_json_addstring(&json, NULL, host_id, ZBX_JSON_TYPE_STRING);
+						zbx_json_addstring(&json, NULL, filtered_hostids, ZBX_JSON_TYPE_STRING);
 						zbx_json_close(&json); /* hostids */
 
 						zbx_json_addstring(&json, "triggerid", trigger_id,
