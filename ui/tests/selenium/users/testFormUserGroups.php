@@ -252,7 +252,9 @@ class testFormUserGroups extends CWebTest {
 					'fields' => [
 						'Group name' => ' '
 					],
-					'error' => 'Invalid parameter "/1/name": cannot be empty.'
+					'inline_errors' => [
+						'xpath://input[@id="name"]' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #1 Already existing user.
@@ -263,7 +265,9 @@ class testFormUserGroups extends CWebTest {
 						'Group name' => 'Zabbix administrators'
 					],
 					'duplicate' => true,
-					'error' => 'User group "Zabbix administrators" already exists.'
+					'inline_errors' => [
+						'xpath://input[@id="name"]' => 'This object already exists.'
+					]
 				]
 			],
 			// #2 Adding the current user to a disabled group.
@@ -275,7 +279,9 @@ class testFormUserGroups extends CWebTest {
 						'Users' => 'Admin',
 						'Enabled' => false
 					],
-					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+					'inline_error' => [
+						'id:userids_' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+					]
 				]
 			],
 			// #3 Adding the current user to a group without GUI access.
@@ -287,7 +293,9 @@ class testFormUserGroups extends CWebTest {
 						'Users' => 'Admin',
 						'Frontend access' => 'Disabled'
 					],
-					'error' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+					'inline_error' => [
+						'id:userids_' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+					]
 				]
 			],
 			// #4 Group with trailing and leading spaces in name.
@@ -332,7 +340,9 @@ class testFormUserGroups extends CWebTest {
 					'fields' => [
 						'Group name' => ''
 					],
-					'error' => 'Incorrect value for field "name": cannot be empty.'
+					'inline_errors' => [
+						'xpath://input[@id="name"]' => 'This object already exists.'
+					]
 				]
 			]
 		];
@@ -404,8 +414,7 @@ class testFormUserGroups extends CWebTest {
 			$form->checkValue($data['fields']);
 		}
 		else {
-			$message = ($update) ? 'Cannot update user group' : 'Cannot add user group';
-			$this->assertMessage(TEST_BAD, $message, $data['error']);
+			$this->assertInlineError($form, $data['inline_errors']);
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM usrgrp'));
 		}
 	}
