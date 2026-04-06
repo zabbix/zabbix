@@ -27,6 +27,7 @@ declare -A BASELINE_TIMES=(
   [testItemRate]=66
   [testUserParametersReload]=47
   [testEventsCauseAndSymptoms]=44
+  [testTimescaleDb]=44
   [testHistoryValueDuplicates]=43
   [testDiagnosticDataTask]=38
   [testSnmpTrapsInHa]=37
