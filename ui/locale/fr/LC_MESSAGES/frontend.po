@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-03-19 20:06+0000\n"
+"PO-Revision-Date: 2026-03-20 21:12+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -9424,7 +9424,7 @@ msgstr "Le champ \"%1$s\" doit être manquant."
 #: include/classes/data/CTriggerConditionFunctionData.php:2400
 #: include/classes/data/CTriggerConditionFunctionData.php:2470
 msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
-msgstr ""
+msgstr "Le champ \"Dernier de\" ne peut pas être vide si le champ \"Décalage temporel\" n'est pas vide."
 
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
@@ -12657,7 +12657,7 @@ msgstr "Adresse e-mail incorrecte pour le type de media avec l'ID \"%1$s\"."
 
 #: app/controllers/CControllerPopupTriggerExprCheck.php:61
 msgid "Invalid function"
-msgstr ""
+msgstr "Fonction invalide"
 
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
@@ -17782,7 +17782,7 @@ msgstr "Pourcentage de temps pendant lequel la machine virtuelle était prête, 
 #: include/classes/graphdraw/CLineGraphDraw.php:1620
 #, c-format
 msgid "Percentile %1$s: %2$s"
-msgstr ""
+msgstr "Pourcentage %1$s : %2$s"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -22302,6 +22302,10 @@ msgstr "L'identifiant client enregistré dans le serveur d'autorisation."
 msgid "The client secret registered within the authorization server."
 msgstr "Le secret client enregistré dans le serveur d'autorisation."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "L'hôte cloné contient des macros définies par l'utilisateur avec le type \"Texte secret\". La valeur et le type de ces macros ont été réinitialisés."
@@ -23698,7 +23702,7 @@ msgstr "Code réponse HTTP inattendu."
 
 #: app/views/mediatype.edit.php:166
 msgid "Unexpected access token update time."
-msgstr ""
+msgstr "Délai de mise à jour du jeton d'accès inattendu."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -28738,11 +28742,11 @@ msgstr "la valeur contient un caractère non échappé à la position %1$d"
 
 #: include/classes/validators/CNumberValidator.php:74
 msgid "value is not a valid floating point number"
-msgstr ""
+msgstr "la valeur n'est pas un nombre à virgule flottante valide"
 
 #: include/classes/validators/CNumberValidator.php:77
 msgid "value is not a valid integer"
-msgstr ""
+msgstr "la valeur n'est pas un entier valide"
 
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107

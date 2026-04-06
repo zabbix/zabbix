@@ -1157,7 +1157,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 	// Returns create data
 	public static function create() {
 		return [
-			// #0
+			// #0.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1168,7 +1168,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' =>true
 				]
 			],
-			// #1
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1179,7 +1179,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #2 Duplicate item
+			// #2 Duplicate item.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1190,7 +1190,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #3 Item name is missing
+			// #3 Item name is missing.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1200,7 +1200,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #4 Item key is missing
+			// #4 Item key is missing.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1210,7 +1210,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #5 Empty timedelay
+			// #5 Empty timedelay.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1234,7 +1234,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #7 Incorrect timedelay
+			// #7 Incorrect timedelay.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1246,7 +1246,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #8 Incorrect timedelay
+			// #8 Incorrect timedelay.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1258,7 +1258,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #9 Empty time flex period
+			// #9 Empty time flex period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1272,7 +1272,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #10 Incorrect flex period
+			// #10 Incorrect flex period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1286,7 +1286,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #11 Incorrect flex period
+			// #11 Incorrect flex period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1300,7 +1300,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #12 Incorrect flex period
+			// #12 Incorrect flex period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1314,7 +1314,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #13 Incorrect flex period
+			// #13 Incorrect flex period.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1328,7 +1328,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #14 Multiple flex periods
+			// #14 Multiple flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1342,7 +1342,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #15 Delay combined with flex periods
+			// #15 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1363,7 +1363,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #16 Delay combined with flex periods
+			// #16 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1380,7 +1380,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #17 Delay combined with flex periods
+			// #17 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1402,7 +1402,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #18 Delay combined with flex periods
+			// #18 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1417,7 +1417,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #19 Delay combined with flex periods
+			// #19 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1433,7 +1433,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #20 Delay combined with flex periods
+			// #20 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1445,7 +1445,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #21 Delay combined with flex periods
+			// #21 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1457,7 +1457,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #22 Delay combined with flex periods
+			// #22 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1472,7 +1472,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #23 Delay combined with flex periods
+			// #23 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1483,7 +1483,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #24 Delay combined with flex periods
+			// #24 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1501,7 +1501,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #25 Delay combined with flex periods
+			// #25 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1519,7 +1519,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #26 Delay combined with flex periods
+			// #26 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1535,7 +1535,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #27 Delay combined with flex periods
+			// #27 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1551,7 +1551,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #28 Delay combined with flex periods
+			// #28 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1575,7 +1575,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #29 Delay combined with flex periods
+			// #29 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1587,7 +1587,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #30 Delay combined with flex periods
+			// #30 Delay combined with flex periods.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1603,7 +1603,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #31 Seven flexfields - save OK
+			// #31 Seven flexfields - save OK.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1622,7 +1622,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #32 History
+			// #32 History.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1634,7 +1634,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #33 History
+			// #33 History.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1646,7 +1646,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #34 History
+			// #34 History.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1658,7 +1658,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #35 History
+			// #35 History.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1670,7 +1670,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #36 Trends
+			// #36 Trends.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1682,7 +1682,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #37 Trends
+			// #37 Trends.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1694,7 +1694,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #38 Trends
+			// #38 Trends.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1706,7 +1706,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #39 Trends
+			// #39 Trends.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1718,7 +1718,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #40
+			// #40.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1728,7 +1728,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #41
+			// #41.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1738,7 +1738,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'dbCheck' => true
 				]
 			],
-			// #42
+			// #42.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1747,7 +1747,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			//#43
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1758,7 +1758,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #44
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1768,7 +1768,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'dbCheck' => true,
 					'remove' => true]
 			],
-			// #45 List of all item types
+			// #45 List of all item types.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1779,7 +1779,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #46 Update and custom intervals are hidden if item key is mqtt.get
+			// #46 Update and custom intervals are hidden if item key is mqtt.get.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1790,7 +1790,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #47
+			// #47.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1801,7 +1801,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #48
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1812,7 +1812,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #49
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1824,7 +1824,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #50
+			// #50.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1835,7 +1835,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #51
+			// #51.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1846,7 +1846,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #52
+			// #52.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1857,7 +1857,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #53
+			// #53.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1869,7 +1869,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #54
+			// #54.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1881,7 +1881,45 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #55
+			// #55.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with IPv6 in allowed hosts field',
+					'key' => 'item-zabbix-trapper-ipv6[{#KEY}]',
+					'allowed_hosts' => '2001:db8:85a3::8a2e:370:7334',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #56.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with invalid delimiter in allowed hosts field',
+					'key' => 'item-zabbix-trapper-incorrect-ip[{#KEY}]',
+					'allowed_hosts' => 'localhost;127.0.0.1',
+					'inline_errors' => [
+						'Allowed hosts' => 'Incorrect address starting from ";127.0.0.1".'
+					]
+				]
+			],
+			// #57.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with empty delimiter in allowed hosts field',
+					'key' => 'item-zabbix-trapper-multiple-spaces-ip[{#KEY}]',
+					'allowed_hosts' => 'localhost    dd',
+					'inline_errors' => [
+						'Allowed hosts' => 'Incorrect address starting from "dd".'
+					]
+				]
+			],
+			// #58.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1892,19 +1930,21 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #56
+			// #59.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
-					'name' => 'Database monitor',
-					'key' => 'item-database-monitor[{#KEY}]',
+					'name' => 'Database monitor with username and password',
+					'key' => 'item-database-monitor-username-password[{#KEY}]',
+					'username' => 'username-test',
+					'password' => 'password-test',
 					'params_ap' => 'SELECT * FROM items',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #57
+			// #60.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1916,7 +1956,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #58
+			// #61.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1928,7 +1968,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #59
+			// #62.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1941,7 +1981,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #60
+			// #63.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1949,12 +1989,13 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'TELNET agent',
 					'key' => 'item-telnet-agent[{#KEY}]',
 					'username' => 'zabbix',
+					'password' => 'zabbix',
 					'params_es' => 'executed script',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #61
+			// #64.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1966,7 +2007,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #62
+			// #65.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1977,7 +2018,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #63
+			// #66.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1989,7 +2030,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #64
+			// #67.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2002,7 +2043,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #65
+			// #68.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2016,7 +2057,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #66
+			// #69.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2029,7 +2070,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #67
+			// #70.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2041,7 +2082,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #68
+			// #71.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2049,11 +2090,12 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'SSH agent error',
 					'key' => 'item-ssh-agent-error[{#KEY}]',
 					'inline_errors' => [
-						'User name' => 'This field cannot be empty.'
+						'User name' => 'This field cannot be empty.',
+						'Executed script' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #69
+			// #72.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2061,23 +2103,65 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'name' => 'TELNET agent error',
 					'key' => 'item-telnet-agent-error[{#KEY}]',
 					'inline_errors' => [
-						'User name' => 'This field cannot be empty.'
+						'User name' => 'This field cannot be empty.',
+						'Executed script' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #70
+			// #73.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'TELNET agent',
+					'name' => 'TELNET agent with empty executed script',
+					'key' => 'item-telnet-agent-empty-script[{#KEY}]',
+					'username' => 'test',
+					'inline_errors' => [
+						'Executed script' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #74.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
 					'name' => 'JMX agent',
 					'key' => 'proto-jmx-agent[{#KEY}]',
+					'username' => 'test_username',
+					'password' => 'test_password',
 					'dbCheck' => true,
 					'formCheck' => true,
 					'remove' => true
 				]
 			],
-			// #71
+			// #75.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent with filled username and empty password',
+					'key' => 'item-jmx-agent-with-empty-password[{#KEY}]',
+					'username' => 'test',
+					'inline_errors' => [
+						'Password' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #76.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent with filled password and empty username',
+					'key' => 'item-jmx-agent-with-empty-username[{#KEY}]',
+					'password' => 'test',
+					'inline_errors' => [
+						'Password' => 'Both username and password should be either present or empty.'
+					]
+				]
+			],
+			// #77.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2090,7 +2174,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					'remove' => true
 				]
 			],
-			// #72
+			// #78.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2102,7 +2186,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #73 Empty SQL query
+			// #79 Empty SQL query.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2114,7 +2198,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #74 Default
+			// #80 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2126,7 +2210,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #75 Default
+			// #81 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2139,7 +2223,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #76 Default
+			// #82 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2152,7 +2236,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 					]
 				]
 			],
-			// #77 Default
+			// #83 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2206,6 +2290,10 @@ class testFormItemPrototype extends CLegacyWebTest {
 
 		if (isset($data['username'])) {
 			$form->getField('User name')->fill($data['username']);
+		}
+
+		if (isset($data['password'])) {
+			$form->getField('Password')->fill($data['password']);
 		}
 
 		if (isset($data['ipmi_sensor'])) {
@@ -2408,6 +2496,18 @@ class testFormItemPrototype extends CLegacyWebTest {
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//z-textarea-flexible[@id='ipmi_sensor']");
 				$this->assertEquals($data['ipmi_sensor'], $ipmiValue);
+			}
+
+			if (isset($data['allowed_hosts'])) {
+				$check_form->checkValue(['Allowed hosts' => $data['allowed_hosts']]);
+			}
+
+			if (isset($data['username'])) {
+				$check_form->checkValue(['User name' => $data['username']]);
+			}
+
+			if (isset($data['password'])) {
+				$check_form->checkValue(['Password' => $data['password']]);
 			}
 
 			$dialog_check->close();
