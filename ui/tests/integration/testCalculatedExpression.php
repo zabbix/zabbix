@@ -567,7 +567,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
 			" data:test.calc.calculated.histogram_quantile", true, 120);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		// send values to the bucket item (simulate histogram bucket values)
 		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10, null, 1);
