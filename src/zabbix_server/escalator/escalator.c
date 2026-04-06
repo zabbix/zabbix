@@ -1679,7 +1679,7 @@ static void	get_mediatype_params_array(const zbx_db_event *event, const zbx_db_e
 	zbx_json_free(&json);
 }
 
-char	*filter_unknown_hosts(const char *input)
+static char	*filter_unknown_hosts(const char *input)
 {
 	char	*token, *saveptr, *copy, *result;
 	size_t	result_size = strlen(input) + 1;
@@ -1724,15 +1724,24 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 		const char *subject, const char *message, const zbx_db_acknowledge *ack,
 		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, char **params, const char *tz)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	struct zbx_json		json;
-	int			message_type;
-	zbx_dc_um_handle_t	*um_handle_unmasked;
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	struct zbx_json			json;
+	int				message_type;
+	zbx_dc_um_handle_t		*um_handle_unmasked;
+	zbx_vector_push_target_t	targets;
+
+	zbx_db_alert	alert = {
+			.sendto = (char *)sendto,
+			.subject = (char *)(uintptr_t)subject,
+			.message = (char *)(uintptr_t)message
+	};
+
+	char	*trigger_severity, *event_id, *event_value, *event_update_action, *host_ids, *trigger_id,
+		*filtered_hostids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_push_target_t targets;
 	zbx_vector_push_target_create(&targets);
 
 	result = zbx_db_select(
@@ -1767,14 +1776,6 @@ static void	get_build_push_params(const zbx_db_event *event, const zbx_db_event 
 
 	um_handle_unmasked = zbx_dc_open_user_macros_secure();
 
-	zbx_db_alert	alert = {
-			.sendto = (char *)sendto,
-			.subject = (char *)(uintptr_t)subject,
-			.message = (char *)(uintptr_t)message
-	};
-
-	char	*trigger_severity, *event_id, *event_value, *event_update_action, *host_ids, *trigger_id,
-		*filtered_hostids;
 
 	trigger_severity = zbx_strdup(NULL, "{TRIGGER.SEVERITY}");
 	event_id = zbx_strdup(NULL, "{EVENT.ID}");
