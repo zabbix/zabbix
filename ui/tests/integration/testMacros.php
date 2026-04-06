@@ -3436,6 +3436,20 @@ const SUBJECT_INTERNAL = "Internal";
 
 		$this->stopComponent(self::COMPONENT_AGENT);
 
+		/* action.delete from prevoius test may take time */
+		for ($i = 0; $i < 30; $i++) {
+			$existing = $this->call('action.get', [
+				'filter' => ['name' => self::ACTION_NAME],
+				'output' => ['actionid']
+			]);
+
+			if (empty($existing['result'])) {
+				break;
+			}
+
+			usleep(100000);
+		}
+
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		// Create autoregistration action
