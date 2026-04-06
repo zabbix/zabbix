@@ -568,17 +568,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		// send values to the bucket item (simulate histogram bucket values)
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10, null, 1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.5]', 25, null, 1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30, null, 1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32, null, 1);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35, null, 1);
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-		self::waitForLogLineToBePresent(self::COMPONENT_SERVER, 'trapper got');
-		sleep(1);
 		$base_time = time();
 
 		$this->sendSenderValues([
