@@ -230,14 +230,60 @@ static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, 
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ *  Return value: escaped and quoted table name                               *
+ *                                                                            *
+ ******************************************************************************/
 static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, tq_db_type_t db_type)
 {
-	// TODO
-	char	*str = NULL;
+	/* TODO: replace with actual table names (or probably macros) */
 
-	str = zbx_strdup(str, "<table_to_select_from>");
+	char	*str;
+	char	*str_esc;
 
-	return str;
+	switch (query->category)
+	{
+		case ZBX_TQ_CATEGORY_APM_TRACES:
+			str = zbx_strdup(NULL, "apm_traces");
+			break;
+
+		case ZBX_TQ_CATEGORY_APM_METRICS:
+			switch (query->metric_type)
+			{
+				case ZBX_TQ_METRIC_TYPE_SUM:
+					str = zbx_strdup(NULL, "apm_metrics_sum");
+					break;
+				case ZBX_TQ_METRIC_TYPE_GAUGE:
+					str = zbx_strdup(NULL, "apm_metrics_gauge");
+					break;
+				case ZBX_TQ_METRIC_TYPE_HISTOGRAM:
+					str = zbx_strdup(NULL, "apm_metrics_histogram");
+					break;
+				case ZBX_TQ_METRIC_TYPE_EXPONENTIAL_HISTOGRAM:
+					str = zbx_strdup(NULL, "apm_metrics_exponentialhistogram");
+					break;
+
+				case ZBX_TQ_CATEGORY_UNKNOWN:
+					THIS_SHOULD_NEVER_HAPPEN;
+					str = zbx_strdup(NULL, "");
+			}
+			break;
+
+		case ZBX_TQ_CATEGORY_APM_LOGS:
+			str = zbx_strdup(NULL, "apm_logs");
+			break;
+
+		case ZBX_TQ_CATEGORY_UNKNOWN:
+			THIS_SHOULD_NEVER_HAPPEN;
+			str = zbx_strdup(NULL, "");
+	}
+
+	str_esc = tq_sql_dyn_escape_name(str, db_type);
+
+	zbx_free(str);
+
+	return str_esc;
 }
 
 static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, tq_db_type_t db_type)
