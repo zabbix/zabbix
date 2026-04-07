@@ -31,8 +31,11 @@ class CControllerHostListData extends CControllerDataTable {
 		$data_fields = $this->getDataFields();
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', (int) CPagerHelper::loadPage('host.list'));
-		$sort_field = $this->getInput('sort_field');
-		$sort_order = $this->getInput('sort_order');
+		$sort_field = $this->getInput('sort_field', 'name');
+		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
+
+		CProfile::update('web.hosts.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 

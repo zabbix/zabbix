@@ -279,9 +279,6 @@ class CDataTable {
 					if (this.#sort_field == sort_field) {
 						icon.classList.add(sort_order == 'ASC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 					}
-					else {
-						icon.classList.add(sort_order == 'DESC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
-					}
 
 					const header_link = document.createElement('a');
 					header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER);

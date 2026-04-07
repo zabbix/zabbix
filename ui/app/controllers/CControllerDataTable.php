@@ -45,7 +45,7 @@ abstract class CControllerDataTable extends CController {
 			'filter_counters' =>	'in 1',
 			'page' =>				'int32',
 			'sort_field' =>			'string',
-			'sort_order' =>			'string',
+			'sort_order' =>			'string|in '.ZBX_SORT_UP.','.ZBX_SORT_DOWN,
 			'export_file' =>		'string'
 		]);
 	}

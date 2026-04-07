@@ -57,56 +57,10 @@ class CControllerHostList extends CController {
 
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.hosts.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
-			CProfile::update('web.hosts.filter_monitored_by',
-				$this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY), PROFILE_TYPE_INT
-			);
-			CProfile::updateArray('web.hosts.filter_templates', $this->getInput('filter_templates', []),
-				PROFILE_TYPE_ID
-			);
-			CProfile::updateArray('web.hosts.filter_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
-			CProfile::updateArray('web.hosts.filter_proxyids', $this->getInput('filter_proxyids', []), PROFILE_TYPE_ID);
-			CProfile::updateArray('web.hosts.filter_proxy_groupids', $this->getInput('filter_proxy_groupids', []),
-				PROFILE_TYPE_ID
-			);
-			CProfile::update('web.hosts.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
-				PROFILE_TYPE_INT
-			);
-
-			$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
-			foreach ($this->getInput('filter_tags', []) as $filter_tag) {
-				if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
-					continue;
-				}
-
-				$filter_tags['tags'][] = $filter_tag['tag'];
-				$filter_tags['values'][] = $filter_tag['value'];
-				$filter_tags['operators'][] = $filter_tag['operator'];
-			}
-
-			CProfile::updateArray('web.hosts.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
-			CProfile::updateArray('web.hosts.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
-			CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+			$this->updateProfiles();
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.hosts.filter_ip');
-			CProfile::delete('web.hosts.filter_dns');
-			CProfile::delete('web.hosts.filter_host');
-			CProfile::delete('web.hosts.filter_port');
-			CProfile::delete('web.hosts.filter_status');
-			CProfile::delete('web.hosts.filter_monitored_by');
-			CProfile::deleteIdx('web.hosts.filter_templates');
-			CProfile::deleteIdx('web.hosts.filter_groups');
-			CProfile::deleteIdx('web.hosts.filter_proxyids');
-			CProfile::deleteIdx('web.hosts.filter_proxy_groupids');
-			CProfile::delete('web.hosts.filter.evaltype');
-			CProfile::deleteIdx('web.hosts.filter.tags.tag');
-			CProfile::deleteIdx('web.hosts.filter.tags.value');
-			CProfile::deleteIdx('web.hosts.filter.tags.operator');
+			$this->deleteProfiles();
 		}
 
 		$filter = [
@@ -206,5 +160,59 @@ class CControllerHostList extends CController {
 		$response->setTitle(_('Configuration of hosts'));
 
 		$this->setResponse($response);
+	}
+
+	private function updateProfiles(): void {
+		CProfile::update('web.hosts.filter_ip', $this->getInput('filter_ip', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_dns', $this->getInput('filter_dns', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_host', $this->getInput('filter_host', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_port', $this->getInput('filter_port', ''), PROFILE_TYPE_STR);
+		CProfile::update('web.hosts.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+		CProfile::update('web.hosts.filter_monitored_by',
+			$this->getInput('filter_monitored_by', ZBX_MONITORED_BY_ANY), PROFILE_TYPE_INT
+		);
+		CProfile::updateArray('web.hosts.filter_templates', $this->getInput('filter_templates', []),
+			PROFILE_TYPE_ID
+		);
+		CProfile::updateArray('web.hosts.filter_groups', $this->getInput('filter_groups', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.hosts.filter_proxyids', $this->getInput('filter_proxyids', []), PROFILE_TYPE_ID);
+		CProfile::updateArray('web.hosts.filter_proxy_groupids', $this->getInput('filter_proxy_groupids', []),
+			PROFILE_TYPE_ID
+		);
+		CProfile::update('web.hosts.filter.evaltype', $this->getInput('filter_evaltype', TAG_EVAL_TYPE_AND_OR),
+			PROFILE_TYPE_INT
+		);
+
+		$filter_tags = ['tags' => [], 'values' => [], 'operators' => []];
+		foreach ($this->getInput('filter_tags', []) as $filter_tag) {
+			if ($filter_tag['tag'] === '' && $filter_tag['value'] === '') {
+				continue;
+			}
+
+			$filter_tags['tags'][] = $filter_tag['tag'];
+			$filter_tags['values'][] = $filter_tag['value'];
+			$filter_tags['operators'][] = $filter_tag['operator'];
+		}
+
+		CProfile::updateArray('web.hosts.filter.tags.tag', $filter_tags['tags'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.hosts.filter.tags.value', $filter_tags['values'], PROFILE_TYPE_STR);
+		CProfile::updateArray('web.hosts.filter.tags.operator', $filter_tags['operators'], PROFILE_TYPE_INT);
+	}
+
+	private function deleteProfiles(): void {
+		CProfile::delete('web.hosts.filter_ip');
+		CProfile::delete('web.hosts.filter_dns');
+		CProfile::delete('web.hosts.filter_host');
+		CProfile::delete('web.hosts.filter_port');
+		CProfile::delete('web.hosts.filter_status');
+		CProfile::delete('web.hosts.filter_monitored_by');
+		CProfile::deleteIdx('web.hosts.filter_templates');
+		CProfile::deleteIdx('web.hosts.filter_groups');
+		CProfile::deleteIdx('web.hosts.filter_proxyids');
+		CProfile::deleteIdx('web.hosts.filter_proxy_groupids');
+		CProfile::delete('web.hosts.filter.evaltype');
+		CProfile::deleteIdx('web.hosts.filter.tags.tag');
+		CProfile::deleteIdx('web.hosts.filter.tags.value');
+		CProfile::deleteIdx('web.hosts.filter.tags.operator');
 	}
 }

@@ -27,8 +27,8 @@ class CControllerTemplateListData extends CControllerDataTable {
 		$data_fields = $this->getDataFields();
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
-		$sort_field = $this->getInput('sort_field');
-		$sort_order = $this->getInput('sort_order');
+		$sort_field = $this->getInput('sort_field', 'name');
+		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
