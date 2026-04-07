@@ -787,6 +787,10 @@ class CDataTable {
 		return this;
 	}
 
+	isCustomizable() {
+		return this.#customizable;
+	}
+
 	setCustomizable(customizable) {
 		this.#customizable = customizable;
 
@@ -1590,7 +1594,7 @@ class CDataTable {
 		}
 
 		if (this.#customizable) {
-			this.#createRowSpacer(row);
+			this.createRowSpacer(row);
 		}
 
 		// This is separately from the loop above on purpose, since row renderer may have an impact on all cells
@@ -1601,12 +1605,13 @@ class CDataTable {
 			}
 
 			const column_index = column_config.getColumnIndex();
+			const column_data = this.#collectColumnData(column_config, data_fields, row_data);
 
-			this.renderDataCellContents(column_config, row, data_cells[column_index], data_fields, row_data);
+			this.renderDataCellContents(column_config, row, data_cells[column_index], data_fields, column_data);
 		}
 	}
 
-	renderDataCellContents(column_config, row, data_cell, data_fields, row_data) {
+	renderDataCellContents(column_config, row, data_cell, data_fields, column_data) {
 		const renderer = column_config.getRenderer();
 
 		if (!this.#renderers[renderer]) {
@@ -1621,17 +1626,6 @@ class CDataTable {
 		cell_inner.classList.add(CDataTable.ZBX_STYLE_CELL_INNER);
 
 		data_cell.appendChild(cell_inner);
-
-		const column_fields = column_config.isDuplicate()
-			? this.getColumnConfigById(column_config.getId()).getFields()
-			: column_config.getFields();
-		const column_data = [];
-
-		for (const field of column_fields) {
-			const field_index = data_fields.indexOf(field);
-
-			column_data.push(field_index >= 0 ? row_data[field_index] : null);
-		}
 
 		try {
 			this.#renderers[renderer].call(this, {
@@ -1909,6 +1903,22 @@ class CDataTable {
 		});
 	}
 
+	#collectColumnData(column_config, data_fields, row_data) {
+		const column_fields = column_config.isDuplicate()
+			? this.getColumnConfigById(column_config.getId()).getFields()
+			: column_config.getFields();
+
+		const column_data = [];
+
+		for (const field of column_fields) {
+			const field_index = data_fields.indexOf(field);
+
+			column_data.push(field_index >= 0 ? row_data[field_index] : null);
+		}
+
+		return column_data;
+	}
+
 	#sortColumns() {
 		this.#columns = this.#columns.sort((left, right) => left.getOrder() - right.getOrder());
 	}
@@ -1933,6 +1943,10 @@ class CDataTable {
 	}
 
 	#scrollBodyToTarget(target) {
+		if (!target) {
+			return;
+		}
+
 		const {right} = target.getBoundingClientRect();
 		const width = this.#body.getBoundingClientRect().width;
 
@@ -2004,7 +2018,7 @@ class CDataTable {
 		this.#findHeaderCells().forEach(header_cell => header_cell.remove());
 
 		if (this.#customizable) {
-			this.#createRowSpacer(this.#header);
+			this.createRowSpacer(this.#header);
 			this.#createTableOptionsButton();
 		}
 
@@ -2051,7 +2065,7 @@ class CDataTable {
 		return no_data_message;
 	}
 
-	#createRowSpacer(target) {
+	createRowSpacer(target) {
 		if (this.#findRowSpacer(target)) {
 			return;
 		}
@@ -2151,8 +2165,9 @@ class CDataTable {
 				}
 
 				const data_fields = response.data_fields;
+				const column_data = this.#collectColumnData(column_config, data_fields, row_data);
 
-				this.renderDataCellContents(column_config, row, data_cell, data_fields, row_data);
+				this.renderDataCellContents(column_config, row, data_cell, data_fields, column_data);
 			}
 		});
 	}

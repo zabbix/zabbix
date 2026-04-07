@@ -508,9 +508,7 @@
 						else if (column_config.getColumnIndex() == column_index) {
 							column_config_clone.setRenderer('symptom_limit');
 
-							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields, {
-								[column_config.getColumnIndex()]: [symptom_limit]
-							});
+							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields, [symptom_limit]);
 						}
 
 						data_cells.push(data_cell);
@@ -541,15 +539,18 @@
 						if (i == column_index) {
 							column_config_clone.setRenderer('breakpoint');
 
-							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields, {
-								[column_config_clone.getColumnIndex()]: row_data
-							});
+							this.datatable.renderDataCellContents(column_config_clone, row, data_cell, data_fields,
+								row_data);
 						}
 
 						data_cells.push(data_cell);
 					}
 
 					row.append(...data_cells);
+
+					if (this.datatable.isCustomizable()) {
+						this.datatable.createRowSpacer(row);
+					}
 				})
 				.setOptionsHandler('time', 'CDataTableOptionsPopupMonitoringProblemsTime')
 				.setOptionsHandler('problem', 'CDataTableOptionsPopupMonitoringProblemsProblem')
