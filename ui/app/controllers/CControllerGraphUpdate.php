@@ -86,7 +86,6 @@ class CControllerGraphUpdate extends CControllerGraphUpdateGeneral {
 					'gitemid' => ['db graphs_items.gitemid'],
 					'itemid' => ['db graphs_items.itemid', 'required'],
 					'sortorder' => ['db graphs_items.sortorder', 'required'],
-					'flags' => ['integer', 'required', 'in' => [ZBX_FLAG_DISCOVERY_NORMAL]],
 					'type' => ['integer', 'required', 'in' => [GRAPH_ITEM_SIMPLE, GRAPH_TYPE_STACKED, GRAPH_ITEM_SUM]],
 					'calc_fnc' => [
 						['db graphs_items.calc_fnc', 'required',

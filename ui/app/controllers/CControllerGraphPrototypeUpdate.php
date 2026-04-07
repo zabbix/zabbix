@@ -87,9 +87,7 @@ class CControllerGraphPrototypeUpdate extends CControllerGraphUpdateGeneral {
 					'gitemid' => ['db graphs_items.gitemid'],
 					'itemid' => ['db graphs_items.itemid', 'required'],
 					'sortorder' => ['db graphs_items.sortorder', 'required'],
-					'flags' => ['integer', 'required',
-						'in' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE]
-					],
+					'flags' => ['integer', 'required'],
 					'type' => ['integer', 'required', 'in' => [GRAPH_ITEM_SIMPLE, GRAPH_TYPE_STACKED, GRAPH_ITEM_SUM]],
 					'calc_fnc' => [
 						['db graphs_items.calc_fnc', 'required',
@@ -113,7 +111,9 @@ class CControllerGraphPrototypeUpdate extends CControllerGraphUpdateGeneral {
 				],
 				'count_values' => [
 					[
-						'field_rules' => ['flags', 'in' => [ZBX_FLAG_DISCOVERY_PROTOTYPE]],
+						'field_rules' => ['flags',
+							'in' => [ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_PROTOTYPE_CREATED]
+						],
 						'min' => 1,
 						'message' => _('At least one item must be a prototype')
 					],
