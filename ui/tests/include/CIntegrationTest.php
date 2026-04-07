@@ -55,21 +55,27 @@ class CIntegrationTest extends CAPITest {
 
 	private static $shutdown_time_per_test_file = 0.0;
 	private static $shutdown_time_total = 0.0;
+	private static $shutdown_time_num_per_test_file = 0;
 	private static $shutdown_time_num = 0;
 	private static $startup_time_per_test_file = 0.0;
 	private static $startup_time_total = 0.0;
+	private static $startup_time_num_per_test_file = 0;
 	private static $startup_time_num = 0;
 	private static $delay_call_data_present_per_test_file = 0.0;
 	private static $delay_call_data_present_total = 0.0;
+	private static $delay_call_data_present_num_per_test_file = 0;
 	private static $delay_call_data_present_num = 0;
 	private static $delay_wait_log_line_per_test_file = 0.0;
 	private static $delay_wait_log_line_total = 0.0;
+	private static $delay_wait_log_line_num_per_test_file = 0;
 	private static $delay_wait_log_line_num = 0;
 	private static $delay_wait_send_per_test_file = 0.0;
 	private static $delay_wait_send_total = 0.0;
+	private static $delay_wait_send_num_per_test_file = 0;
 	private static $delay_wait_send_num = 0;
 	private static $delay_reload_config_cache_per_test_file = 0.0;
 	private static $delay_reload_config_cache_total = 0.0;
+	private static $delay_reload_config_cache_num_per_test_file = 0;
 	private static $delay_reload_config_cache_num = 0;
 
 	private static $suite_components_reuse = false;
@@ -359,6 +365,20 @@ class CIntegrationTest extends CAPITest {
 				self::$startup_time_total +
 				self::$shutdown_time_total;
 
+			$sum_num_per_test_file = self::$delay_call_data_present_num_per_test_file +
+				self::$delay_wait_log_line_num_per_test_file +
+				self::$delay_wait_send_num_per_test_file +
+				self::$delay_reload_config_cache_num_per_test_file +
+				self::$startup_time_num_per_test_file +
+				self::$shutdown_time_num_per_test_file;
+
+			self::$delay_call_data_present_num += self::$delay_call_data_present_num_per_test_file;
+			self::$delay_wait_log_line_num += self::$delay_wait_log_line_num_per_test_file;
+			self::$delay_wait_send_num += self::$delay_wait_send_num_per_test_file;
+			self::$delay_reload_config_cache_num += self::$delay_reload_config_cache_num_per_test_file;
+			self::$startup_time_num += self::$startup_time_num_per_test_file;
+			self::$shutdown_time_num += self::$shutdown_time_num_per_test_file;
+
 			$sum_num = self::$delay_call_data_present_num +
 				self::$delay_wait_log_line_num +
 				self::$delay_wait_send_num +
@@ -366,38 +386,50 @@ class CIntegrationTest extends CAPITest {
 				self::$startup_time_num +
 				self::$shutdown_time_num;
 
-			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent took: %.4fs [total: %.4fs, num: %d]\n",
+			fwrite(STDERR, sprintf("[%s] callUntilDataIsPresent took: %.4fs [total: %.4fs, num: %d, total num: %d]\n",
 				self::$last_test_case_name, self::$delay_call_data_present_per_test_file,
-				self::$delay_call_data_present_total, self::$delay_call_data_present_num));
+				self::$delay_call_data_present_total, self::$delay_call_data_present_num_per_test_file,
+				self::$delay_call_data_present_num));
 			self::$delay_call_data_present_per_test_file = 0.0;
+			self::$delay_call_data_present_num_per_test_file = 0;
 
-			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent took: %.4fs [total: %.4fs, num: %d]\n",
+			fwrite(STDERR, sprintf("[%s] waitForLogLineToBePresent took: %.4fs [total: %.4fs, num: %d, total num: %d]\n",
 				self::$last_test_case_name, self::$delay_wait_log_line_per_test_file,
-				self::$delay_wait_log_line_total, self::$delay_wait_log_line_num));
+				self::$delay_wait_log_line_total, self::$delay_wait_log_line_num_per_test_file,
+				self::$delay_wait_log_line_num));
 			self::$delay_wait_log_line_per_test_file = 0.0;
+			self::$delay_wait_log_line_num_per_test_file = 0;
 
-			fwrite(STDERR, sprintf("[%s] sendDataValues took: %.4fs [total: %.4fs, num: %d]\n",
+			fwrite(STDERR, sprintf("[%s] sendDataValues took: %.4fs [total: %.4fs, num: %d, total num: %d]\n",
 				self::$last_test_case_name, self::$delay_wait_send_per_test_file,
-				self::$delay_wait_send_total, self::$delay_wait_send_num));
+				self::$delay_wait_send_total, self::$delay_wait_send_num_per_test_file,
+				self::$delay_wait_send_num));
 			self::$delay_wait_send_per_test_file = 0.0;
+			self::$delay_wait_send_num_per_test_file = 0;
 
-			fwrite(STDERR, sprintf("[%s] reloadConfigurationCache took: %.4fs [total: %.4fs, num: %d]\n",
+			fwrite(STDERR, sprintf("[%s] reloadConfigurationCache took: %.4fs [total: %.4fs, num: %d, total num: %d]\n",
 				self::$last_test_case_name, self::$delay_reload_config_cache_per_test_file,
-				self::$delay_reload_config_cache_total, self::$delay_reload_config_cache_num));
+				self::$delay_reload_config_cache_total, self::$delay_reload_config_cache_num_per_test_file,
+				self::$delay_reload_config_cache_num));
 			self::$delay_reload_config_cache_per_test_file = 0.0;
+			self::$delay_reload_config_cache_num_per_test_file = 0;
 
-			fwrite(STDERR, sprintf("[%s] waitForStartup took: %.4fs [total: %.4fs, num: %d]\n",
+			fwrite(STDERR, sprintf("[%s] waitForStartup took: %.4fs [total: %.4fs, num: %d, total num: %d]\n",
 				self::$last_test_case_name, self::$startup_time_per_test_file,
-				self::$startup_time_total, self::$startup_time_num));
+				self::$startup_time_total, self::$startup_time_num_per_test_file,
+				self::$startup_time_num));
 			self::$startup_time_per_test_file = 0.0;
+			self::$startup_time_num_per_test_file = 0;
 
-			fwrite(STDERR, sprintf("[%s] waitForShutdown took: %.4fs [total: %.4fs, num: %d]\n",
+			fwrite(STDERR, sprintf("[%s] waitForShutdown took: %.4fs [total: %.4fs, num: %d, total num: %d]\n",
 				self::$last_test_case_name, self::$shutdown_time_per_test_file,
-				self::$shutdown_time_total, self::$shutdown_time_num));
+				self::$shutdown_time_total, self::$shutdown_time_num_per_test_file,
+				self::$shutdown_time_num));
 			self::$shutdown_time_per_test_file = 0.0;
+			self::$shutdown_time_num_per_test_file = 0;
 
-			fwrite(STDERR, sprintf("[%s] sum of delays per test file: %.4fs [total %.4fs, num: %d]\n",
-				self::$last_test_case_name, $sum_per_test_file, $sum_total, $sum_num));
+			fwrite(STDERR, sprintf("[%s] sum of delays per test file: %.4fs num: %d [total %.4fs, total num: %d]\n",
+				self::$last_test_case_name, $sum_per_test_file, $sum_num_per_test_file, $sum_total, $sum_num));
 		}
 	}
 
@@ -465,7 +497,7 @@ class CIntegrationTest extends CAPITest {
 					$total = microtime(true) - $start;
 					self::$startup_time_per_test_file += $total;
 					self::$startup_time_total += $total;
-					self::$startup_time_num++;
+					self::$startup_time_num_per_test_file++;
 				}
 
 				return;
@@ -478,7 +510,7 @@ class CIntegrationTest extends CAPITest {
 			$total = microtime(true) - $start;
 			self::$startup_time_per_test_file += $total;
 			self::$startup_time_total += $total;
-			self::$startup_time_num++;
+			self::$startup_time_num_per_test_file++;
 		}
 
 		throw new Exception('Failed to wait for component "'.$component.'" to start. Waited '.(time() - $saved_time).' seconds..');
@@ -548,7 +580,7 @@ class CIntegrationTest extends CAPITest {
 				$total = microtime(true) - $start;
 				self::$shutdown_time_per_test_file += $total;
 				self::$shutdown_time_total += $total;
-				self::$shutdown_time_num++;
+				self::$shutdown_time_num_per_test_file++;
 			}
 
 			return;
@@ -563,7 +595,7 @@ class CIntegrationTest extends CAPITest {
 			$total = microtime(true) - $start;
 			self::$shutdown_time_per_test_file += $total;
 			self::$shutdown_time_total += $total;
-			self::$shutdown_time_num++;
+			self::$shutdown_time_num_per_test_file++;
 		}
 
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
@@ -908,7 +940,7 @@ class CIntegrationTest extends CAPITest {
 			$total = microtime(true) - $start;
 			self::$delay_wait_send_per_test_file += $total;
 			self::$delay_wait_send_total += $total;
-			self::$delay_wait_send_num++;
+			self::$delay_wait_send_num_per_test_file++;
 		}
 		return $result;
 	}
@@ -1049,7 +1081,7 @@ class CIntegrationTest extends CAPITest {
 			$total = microtime(true) - $start;
 			self::$delay_reload_config_cache_per_test_file += $total;
 			self::$delay_reload_config_cache_total += $total;
-			self::$delay_reload_config_cache_num++;
+			self::$delay_reload_config_cache_num_per_test_file++;
 		}
 	}
 
@@ -1127,7 +1159,7 @@ class CIntegrationTest extends CAPITest {
 						$total = microtime(true) - $start;
 						self::$delay_call_data_present_per_test_file += $total;
 						self::$delay_call_data_present_total += $total;
-						self::$delay_call_data_present_num++;
+						self::$delay_call_data_present_num_per_test_file++;
 					}
 
 					return $response;
@@ -1150,7 +1182,7 @@ class CIntegrationTest extends CAPITest {
 			$total = microtime(true) - $start;
 			self::$delay_call_data_present_per_test_file += $total;
 			self::$delay_call_data_present_total += $total;
-			self::$delay_call_data_present_num++;
+			self::$delay_call_data_present_num_per_test_file++;
 		}
 
 		if ($exception !== null) {
@@ -1259,7 +1291,7 @@ class CIntegrationTest extends CAPITest {
 					$total = microtime(true) - $start;
 					self::$delay_wait_log_line_per_test_file += $total;
 					self::$delay_wait_log_line_total += $total;
-					self::$delay_wait_log_line_num++;
+					self::$delay_wait_log_line_num_per_test_file++;
 				}
 				return true;
 			}
@@ -1302,7 +1334,7 @@ class CIntegrationTest extends CAPITest {
 			$total = microtime(true) - $start;
 			self::$delay_wait_log_line_per_test_file += $total;
 			self::$delay_wait_log_line_total += $total;
-			self::$delay_wait_log_line_num++;
+			self::$delay_wait_log_line_num_per_test_file++;
 		}
 
 		throw new Exception($error_msg);
