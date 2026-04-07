@@ -1347,7 +1347,7 @@ class CDataTable {
 		const {handle} = event.detail;
 
 		if (this.#options_popup?.isOpen(handle)) {
-			this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_CLOSE, {handle});
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			return;
 		}
@@ -1362,8 +1362,10 @@ class CDataTable {
 			return;
 		}
 
-		this.#options_popup = this.#createColumnOptionsPopup(handler, column_config, header_cell, handle);
-		this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_OPEN);
+		requestAnimationFrame(() => {
+			this.#options_popup = this.#createColumnOptionsPopup(handler, column_config, header_cell, handle);
+			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_OPEN);
+		});
 	}
 
 	onColumnOptionsPopupOpen(event) {
@@ -1420,15 +1422,17 @@ class CDataTable {
 		}
 
 		if (this.#options_popup?.isOpen(handle)) {
-			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
+			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			return;
 		}
 
 		this.#options_popup_updated = true;
 
-		this.#options_popup = this.#createOptionsPopup(handler, column_config, header_cell, handle);
-		this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_OPEN);
+		requestAnimationFrame(() => {
+			this.#options_popup = this.#createOptionsPopup(handler, column_config, header_cell, handle);
+			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_OPEN);
+		});
 	}
 
 	onOptionsPopupOpen() {
@@ -1436,7 +1440,8 @@ class CDataTable {
 			return;
 		}
 
-		this.#options_popup.getHandle().classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
+		const handle = this.#options_popup.getHandle();
+		handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 		this.#element.appendChild(this.#options_popup.getElement());
 

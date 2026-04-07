@@ -304,8 +304,8 @@ class CDataTableOptionsPopup {
 
 		this.#column_config.setColumnOptions(this.#data);
 
-		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE,  {column_index});
-		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {column_index});
+		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE, {handle: this.#handle});
 	}
 
 	onClose() {
