@@ -80,12 +80,19 @@ class CFormValidator {
 					throw new Exception('[RULES ERROR] For numeric keys, rule value should be a string: (Path: '.$rule_path.', Key: '.$key.')');
 				}
 
-				if (in_array($value, ['required', 'not_empty', 'allow_macro'], true)) {
+				if (in_array($value, ['required', 'not_empty'], true)) {
 					if (array_key_exists($value, $result)) {
 						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
 					}
 
 					$result[$value] = true;
+				}
+				else if ($value === 'allow_macro') {
+					if (array_key_exists($value, $result)) {
+						throw new Exception('[RULES ERROR] Option "'.$value.'" is specified multiple times (Path: '.$rule_path.')');
+					}
+
+					$result['allow_macro'] = ['usermacros' => true, 'lldmacros' => false];
 				}
 				elseif (in_array($value, ['id', 'integer', 'float', 'string', 'object', 'objects', 'array', 'file'],
 						true)) {
@@ -269,7 +276,21 @@ class CFormValidator {
 						break;
 
 					case 'allow_macro':
-						$result[$key] = true;
+						$allowed_macros = ['usermacros' => true, 'lldmacros' => false];
+
+						if (is_array($value)) {
+							foreach ($value as $macrotype => $enabled) {
+								if (!array_key_exists($macrotype, $allowed_macros)) {
+									throw new Exception('[RULES ERROR] Rule "'.$key.'" should contain valid macro type ('.
+										implode(',', array_keys($allowed_macros)).') (Path: '.$rule_path.')');
+								}
+								else {
+									$allowed_macros[$macrotype] = $enabled;
+								}
+							}
+						}
+
+						$result[$key] = $allowed_macros;
 						break;
 
 					case 'api_uniq':
@@ -366,7 +387,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('allow_macro', $result) && $result['type'] !== 'string') {
-			throw new Exception('[RULES ERROR] Rule "length" is supported only by type "string" (Path: '.$rule_path.')');
+			throw new Exception('[RULES ERROR] Rule "allow_macro" is supported only by type "string" (Path: '.$rule_path.')');
 		}
 
 		if (array_key_exists('when', $result)) {
@@ -1186,7 +1207,7 @@ class CFormValidator {
 		}
 
 		if (array_key_exists('allow_macro', $rules) && $value_check !== ''
-				&& (new CUserMacroParser)->parse($value_check) == CParser::PARSE_SUCCESS) {
+				&& self::validateMacro($rules['allow_macro'], $value)) {
 			return true;
 		}
 
@@ -1196,7 +1217,7 @@ class CFormValidator {
 			return false;
 		}
 
-		if (array_key_exists('regex', $rules) && !preg_match($rules['regex'], $value)) {
+		if (array_key_exists('regex', $rules) && $value !== '' && !preg_match($rules['regex'], $value)) {
 			$error = self::getMessage($rules, 'regex', _('This value does not match pattern.'));
 
 			return false;
@@ -2348,5 +2369,37 @@ class CFormValidator {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Validates if string is a macro or a macro function.
+	 *
+	 * @param array		$macro_rules
+	 * @param bool		$macro_rules['usermacros']
+	 * @param bool		$macro_rules['lldmacros']
+	 * @param string	$value
+	 *
+	 * @return bool
+	 */
+	public static function validateMacro(array $macro_rules, string $value): bool {
+		$macro_parsers = [];
+
+		if ($macro_rules['usermacros']) {
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+
+		if ($macro_rules['lldmacros']) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
+		}
+
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }
