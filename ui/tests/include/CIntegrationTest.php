@@ -56,12 +56,12 @@ class CIntegrationTest extends CAPITest {
 	private static $stats = [];
 
 	private const STAT_LABELS = [
-		'call_data_present'   => 'callUntilDataIsPresent',
-		'wait_log_line'       => 'waitForLogLineToBePresent',
-		'wait_send'           => 'sendDataValues',
-		'reload_config_cache' => 'reloadConfigurationCache',
-		'startup'             => 'waitForStartup',
-		'shutdown'            => 'waitForShutdown',
+		'call_data_present'	=> 'callUntilDataIsPresent',
+		'wait_log_line'		=> 'waitForLogLineToBePresent',
+		'wait_send'		=> 'sendDataValues',
+		'reload_config_cache'	=> 'reloadConfigurationCache',
+		'startup'		=> 'waitForStartup',
+		'shutdown'		=> 'waitForShutdown',
 	];
 
 	private static $suite_components_reuse = false;
