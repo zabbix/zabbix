@@ -74,7 +74,7 @@ if ($data['is_discovered_prototype']) {
 	$host_tab->addRow(_('Discovered by'), (new CLink($data['source_link_data']['name'], $discovered_url)));
 }
 
-if ($data['templates']) {
+if ($data['templates'] && getRequest('form') !== 'clone') {
 	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
 }
 
