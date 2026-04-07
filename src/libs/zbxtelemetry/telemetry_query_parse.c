@@ -638,7 +638,7 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	{
 		const zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
 
-		if (NULL == aggr_col->column_name)
+		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && NULL == aggr_col->column_name)
 			return ret_errf(FAIL, error, max_error_len,
 					"column name is not set for aggregated column #%d", i);
 		if (NULL == aggr_col->alias)
