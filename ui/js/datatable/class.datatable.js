@@ -1440,10 +1440,8 @@ class CDataTable {
 
 		this.#element.appendChild(this.#options_popup.getElement());
 
-		requestAnimationFrame(() => {
-			this.#options_popup.position();
-			this.#options_popup.getElement().focus();
-		});
+		this.#options_popup.position();
+		this.#options_popup.getElement().focus();
 	}
 
 	onOptionsPopupClose() {
