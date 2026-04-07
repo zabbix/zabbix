@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-03-13 14:06+0000\n"
+"PO-Revision-Date: 2026-04-01 14:12+0000\n"
 "Last-Translator: Daniel Nylander <zabbix@danielnylander.se>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: sv_SE\n"
@@ -4861,7 +4861,7 @@ msgstr "Ändra problemets rangordning"
 #: app/views/popup.acknowledge.edit.php:72
 #: include/classes/helpers/CRoleHelper.php:544
 msgid "Change severity"
-msgstr "Ändra svårighetsgrad"
+msgstr "Ändra allvarlighetsgrad"
 
 #: include/classes/html/CMacroValue.php:168
 msgid "Change type"
@@ -6512,7 +6512,7 @@ msgstr "Data"
 #: include/classes/helpers/CMenuHelper.php:215
 #: include/classes/helpers/CRoleHelper.php:347
 msgid "Data collection"
-msgstr "Insamling av uppgifter"
+msgstr "Uppgiftsinsamling"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:2241
 #: include/classes/graphdraw/CPieGraphDraw.php:793
@@ -18280,7 +18280,7 @@ msgstr "Problem"
 
 #: widgets/problemsbysv/Widget.php:32
 msgid "Problems by severity"
-msgstr "Problem efter svårighetsgrad"
+msgstr "Problem efter allvarlighetsgrad"
 
 #: include/classes/data/CItemData.php:1257
 msgid "Process CPU utilization percentage. Returns float"
@@ -20661,21 +20661,21 @@ msgstr "Allvarlighetsgrad ändrad"
 
 #: include/actions.inc.php:1687 include/classes/screens/CScreenProblem.php:1246
 msgid "Severity changes"
-msgstr "Förändringar i svårighetsgrad"
+msgstr "Förändringar i allvarlighetsgrad"
 
 #: include/actions.inc.php:1716
 msgctxt "screen reader"
 msgid "Severity decreased"
-msgstr "Minskad svårighetsgrad"
+msgstr "Minskad allvarlighetsgrad"
 
 #: jsLoader.php:161
 msgid "Severity filter"
-msgstr "Filter för svårighetsgrad"
+msgstr "Filter för allvarlighetsgrad"
 
 #: include/actions.inc.php:1721
 msgctxt "screen reader"
 msgid "Severity increased"
-msgstr "Ökad svårighetsgrad"
+msgstr "Ökad allvarlighetsgrad"
 
 #: include/views/js/monitoring.sysmaps.js.php:360
 #: include/views/js/monitoring.sysmaps.js.php:523
@@ -22301,6 +22301,10 @@ msgstr "Klientidentifieraren som registrerats i auktoriseringsservern."
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "Klientens hemlighet som registrerats i auktoriseringsservern."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."

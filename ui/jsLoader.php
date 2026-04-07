@@ -279,7 +279,6 @@ $translate_strings = [
 	'functions.js' => [
 		'Close' => _('Close'),
 		'Details' => _('Details'),
-		'Info message' => _('Info message'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
