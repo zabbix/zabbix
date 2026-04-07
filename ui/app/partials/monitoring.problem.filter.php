@@ -36,7 +36,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'groupids_',
 					'with_hosts' => true,
 					'enrich_parent_groups' => true
@@ -59,7 +59,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'hosts',
 					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'hostids_'
 				]
 			]
@@ -80,7 +80,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'triggers',
 					'srcfld1' => 'triggerid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'triggerids_',
 					'monitored_hosts' => true,
 					'with_monitored_triggers' => true
@@ -323,7 +323,7 @@ $template = (new CDiv())
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
 $template = (new CForm('get'))
-	->setName('zbx_filter')
+	->setName(CFilter::FORM_NAME)
 	->addItem([
 		$template,
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
@@ -545,7 +545,7 @@ if (array_key_exists('render_html', $data)) {
 				parameters: {
 					srctbl: 'host_groups',
 					srcfld1: 'groupid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'groupids_' + data.uniqid,
 					multiselect: 1,
 					with_hosts: 1,
@@ -569,7 +569,7 @@ if (array_key_exists('render_html', $data)) {
 					multiselect: 1,
 					srctbl: 'hosts',
 					srcfld1: 'hostid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'hostids_' + data.uniqid,
 				}
 			}
@@ -589,7 +589,7 @@ if (array_key_exists('render_html', $data)) {
 				parameters: {
 					srctbl: 'triggers',
 					srcfld1: 'triggerid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'triggerids_' + data.uniqid,
 					multiselect: 1,
 					monitored_hosts: 1,
