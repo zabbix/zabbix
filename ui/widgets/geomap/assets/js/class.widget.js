@@ -263,8 +263,8 @@ class CWidgetGeoMap extends CWidget {
 				collision: 'fit'
 			});
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._markers.on('click keypress', (e) => {
@@ -307,8 +307,8 @@ class CWidgetGeoMap extends CWidget {
 				collision: 'fit'
 			});
 
-			Overlay.prototype.recoverFocus.call({'$dialogue': node.hintBoxItem});
-			Overlay.prototype.containFocus.call({'$dialogue': node.hintBoxItem});
+			Focuser.recoverFocus(node.hintBoxItem[0]);
+			Focuser.containFocus(node.hintBoxItem[0]);
 		});
 
 		this._map.getContainer().addEventListener('cluster.dblclick', (e) => {
