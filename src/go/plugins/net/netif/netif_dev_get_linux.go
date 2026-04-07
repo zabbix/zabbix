@@ -50,25 +50,25 @@ type ifStatsOut struct {
 }
 
 type ifConfigData struct {
-	Name      string `json:"name"`
-	Alias     string `json:"ifalias"`
-	Mac       string `json:"mac"`
-	Type      string `json:"type"`
-	Speed     uint64 `json:"speed"`
-	Duplex    string `json:"duplex"`
-	AdmState  string `json:"administrative_state"`
-	OperState string `json:"operational_state"`
-	Carrier   uint64 `json:"carrier"`
+	Name      *string `json:"name"`
+	Alias     *string `json:"ifalias,omitempty"`
+	Mac       *string `json:"mac,omitempty"`
+	Type      *string `json:"type"`
+	Speed     *uint64 `json:"speed,omitempty"`
+	Duplex    *string `json:"duplex,omitempty"`
+	AdmState  *string `json:"administrative_state,omitempty"`
+	OperState *string `json:"operational_state,omitempty"`
+	Carrier   *uint64 `json:"carrier,omitempty"`
 }
 
 type ifValuesData struct {
-	Name           string `json:"name"`
-	Alias          string `json:"ifalias"`
-	Mac            string `json:"mac"`
-	Carrier        uint64 `json:"carrier"`
-	CarrierChanges uint64 `json:"carrier_changes"`
-	CarrierUpCnt   uint64 `json:"carrier_up_count"`
-	CarrierDnCnt   uint64 `json:"carrier_down_count"`
+	Name           *string `json:"name"`
+	Alias          *string `json:"ifalias,omitempty"`
+	Mac            *string `json:"mac,omitempty"`
+	Carrier        *uint64 `json:"carrier,omitempty"`
+	CarrierChanges *uint64 `json:"carrier_changes,omitempty"`
+	CarrierUpCnt   *uint64 `json:"carrier_up_count,omitempty"`
+	CarrierDnCnt   *uint64 `json:"carrier_down_count,omitempty"`
 
 	StatsIn  ifStatsIn  `json:"in"`
 	StatsOut ifStatsOut `json:"out"`
@@ -79,7 +79,7 @@ type netIfResult struct {
 	Values []ifValuesData `json:"values"`
 }
 
-func (p *Plugin) sysClassNetStrGet(ifName, filename string) string {
+func (p *Plugin) sysClassNetStrGet(ifName, filename string) *string {
 	path := filepath.Join(p.sysClassNetDirpath, ifName, filename)
 
 	// G304: path is composed of a hardcoded base dir, kernel-supplied interface name, and hardcoded filename;
@@ -87,25 +87,30 @@ func (p *Plugin) sysClassNetStrGet(ifName, filename string) string {
 	//nolint:gosec
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return ""
+		return nil
 	}
 
-	return strings.TrimSpace(string(data))
+	result := strings.TrimSpace(string(data))
+	if result == "" {
+		return nil
+	}
+
+	return &result
 }
 
-func (p *Plugin) sysClassNetUintGet(ifName, filename string) uint64 {
+func (p *Plugin) sysClassNetUintGet(ifName, filename string) *uint64 {
 	s := p.sysClassNetStrGet(ifName, filename)
 
-	if s == "" {
-		return 0
+	if s == nil {
+		return nil
 	}
 
-	val, err := strconv.ParseUint(s, 10, 64)
+	val, err := strconv.ParseUint(*s, 10, 64)
 	if err != nil {
-		return 0
+		return nil
 	}
 
-	return val
+	return &val
 }
 
 // ifTypeGet returns the network interface type for the given interface name.
@@ -118,61 +123,60 @@ func (p *Plugin) sysClassNetUintGet(ifName, filename string) uint64 {
 //
 // Presence of /sys/class/net/<name>/device/virtfn* symlinks indicates that
 // <name> is a Single Root Input/Output Virtualization (SR-IOV) virtual interface.
-func (p *Plugin) ifTypeGet(ifName string) string {
+func (p *Plugin) ifTypeGet(ifName string) *string {
+	strPtr := func(s string) *string { return &s }
+
 	const (
 		loopback = "loopback"
 		virtual  = "virtual"
 		physical = "physical"
 	)
 
-	if p.sysClassNetUintGet(ifName, "type") == unix.ARPHRD_LOOPBACK {
-		return loopback
+	t := p.sysClassNetUintGet(ifName, "type")
+	if t != nil && *t == unix.ARPHRD_LOOPBACK {
+		return strPtr(loopback)
 	}
 
 	devPath := filepath.Join(p.sysClassNetDirpath, ifName, "device")
 
 	_, err := os.Lstat(devPath)
 	if err != nil {
-		return virtual
+		return strPtr(virtual)
 	}
 
 	entries, err := os.ReadDir(devPath)
 	if err != nil {
-		return virtual
+		return strPtr(virtual)
 	}
 
 	for _, entry := range entries {
 		if strings.HasPrefix(entry.Name(), "virtfn") {
-			return virtual
+			return strPtr(virtual)
 		}
 	}
 
-	return physical
+	return strPtr(physical)
 }
 
-func (p *Plugin) ifAdminStateGet(ifName string) string {
-	const (
-		unknown = "unknown"
-		up      = "up"
-		down    = "down"
-	)
-
+func (p *Plugin) ifAdminStateGet(ifName string) *string {
 	s := p.sysClassNetStrGet(ifName, "flags")
-	if s == "" {
-		return unknown
+	if s == nil {
+		return nil
 	}
 
-	flags, err := strconv.ParseUint(s, 0, 64)
+	flags, err := strconv.ParseUint(*s, 0, 64)
 	if err != nil {
 		/* should never happen */
-		return unknown
+		return nil
 	}
+
+	result := "down"
 
 	if (flags & unix.IFF_UP) != 0 {
-		return up
+		result = "up"
 	}
 
-	return down
+	return &result
 }
 
 // ifRowScan scans one line from /proc/net/dev representing network interface.
@@ -264,7 +268,7 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 	carrier := p.sysClassNetUintGet(ifName, "carrier")
 
 	config := ifConfigData{
-		Name:      ifName,
+		Name:      &ifName,
 		Alias:     alias,
 		Mac:       mac,
 		Type:      p.ifTypeGet(ifName),
@@ -276,7 +280,7 @@ func (p *Plugin) getInterfaceMetrics(ifName string, stats []uint64) (*ifConfigDa
 	}
 
 	values := ifValuesData{
-		Name:           ifName,
+		Name:           &ifName,
 		Alias:          alias,
 		Mac:            mac,
 		Carrier:        carrier,

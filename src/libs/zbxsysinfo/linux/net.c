@@ -1200,7 +1200,6 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 #define JSON_KEY_ADMIN_STATE	"administrative_state"
 	FILE	*f;
 	char	buf[MAX_STRING_LEN];
-	int	found = 0;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/flags", if_name);
 
@@ -1216,16 +1215,12 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
 
 			if (0 == errno && endptr != buf)
 			{
-				found = 1;
 				zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, ((0 != (flags & IFF_UP)) ? "up" : "down"),
 						ZBX_JSON_TYPE_STRING);
 			}
 		}
 		zbx_fclose(f);
 	}
-
-	if (0 == found)
-		zbx_json_addstring(j, JSON_KEY_ADMIN_STATE, "unknown", ZBX_JSON_TYPE_STRING);
 #undef JSON_KEY_ADMIN_STATE
 }
 
@@ -1315,7 +1310,6 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 {
 	FILE	*f;
 	char	buf[MAX_STRING_LEN];
-	int	found = 0;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/%s", if_name, filename);
 
@@ -1329,7 +1323,6 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 
 			if (SUCCEED == zbx_is_uint64(buf, &speed))
 			{
-				found = 1;
 				zbx_json_adduint64(j1, key, speed);
 
 				if (NULL != j2)
@@ -1339,13 +1332,6 @@ static void	sys_class_net_uint_add(const char *if_name, const char *filename, co
 
 		zbx_fclose(f);
 	}
-
-	if (0 == found)
-	{
-		zbx_json_adduint64(j1, key, 0);
-		if (NULL != j2)
-			zbx_json_adduint64(j2, key, 0);
-	}
 }
 
 static void	sys_class_net_str_add(const char *if_name, const char *filename, const char *key,
@@ -1353,7 +1339,6 @@ static void	sys_class_net_str_add(const char *if_name, const char *filename, con
 {
 	FILE	*f;
 	char	buf[MAX_STRING_LEN];
-	int	found = 0;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/%s", if_name, filename);
 
@@ -1363,19 +1348,11 @@ static void	sys_class_net_str_add(const char *if_name, const char *filename, con
 		{
 			zbx_rtrim(buf, "\n");
 
-			found = 1;
 			zbx_json_addstring(j1, key, buf, ZBX_JSON_TYPE_STRING);
 			if (NULL != j2)
 				zbx_json_addstring(j2, key, buf, ZBX_JSON_TYPE_STRING);
 		}
 		zbx_fclose(f);
-	}
-
-	if (0 == found)
-	{
-		zbx_json_addstring(j1, key, "", ZBX_JSON_TYPE_STRING);
-		if (NULL != j2)
-			zbx_json_addstring(j2, key, "", ZBX_JSON_TYPE_STRING);
 	}
 }
 
