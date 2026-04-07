@@ -44,8 +44,8 @@ static char	*tq_sql_dyn_escape_string(const char *src, tq_db_type_t db_type)
 
 static char	*tq_sql_dyn_escape_like_pattern(const char *src, tq_db_type_t db_type)
 {
-	// FIXME: placeholder
-	// TODO: escape %
+	/* FIXME: placeholder   */
+	/* TODO: escape % and _ */
 
 	return tq_sql_dyn_escape_string(src, db_type);
 }
@@ -83,17 +83,17 @@ static char	*tq_sql_dyn_escape_name(const char *src, tq_db_type_t db_type)
 
 static char	*tq_sql_dyn_get_json_extract(const char *field, const char *path, tq_db_type_t db_type)
 {
-	char	*str = NULL;
+	char	*str;
 	char	*field_esc = tq_sql_dyn_escape_name(field, db_type);
 	char	*path_esc = tq_sql_dyn_escape_string(path, db_type);
 
 	switch (db_type)
 	{
 		case TQ_SQL_DB_TYPE_POSTGRESQL:
-			str = zbx_dsprintf(str, "(jsonb_path_query_first(%s, %s) #>> '{}')", field_esc, path_esc);
+			str = zbx_dsprintf(NULL, "(jsonb_path_query_first(%s, %s) #>> '{}')", field_esc, path_esc);
 			break;
 		case TQ_SQL_DB_TYPE_MYSQL:
-			str = zbx_dsprintf(str, "UNIMPLEMENTED");
+			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
 			break;
 	}
 
@@ -115,7 +115,7 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, tq_db
 
 		if (NULL == col->key)
 		{
-			char	*name_esc = tq_sql_dyn_escape_string(col->name, db_type);
+			char	*name_esc = tq_sql_dyn_escape_name(col->name, db_type);
 			zbx_snprintf_alloc(&str, &alloc, &offset, "%s", name_esc);
 			zbx_free(name_esc);
 		}
@@ -144,12 +144,82 @@ static char	*tq_sql_dyn_get_columns_to_select(const zbx_tq_query_t *query, tq_db
 	return str;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Comments: fraction must be a valid string representation of a double       *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_get_percentile(const char *field, const char *fraction, tq_db_type_t db_type)
+{
+	char	*str;
+	char	*field_esc = tq_sql_dyn_escape_name(field, db_type);
+
+	switch (db_type)
+	{
+		case TQ_SQL_DB_TYPE_POSTGRESQL:
+			str = zbx_dsprintf(NULL, "percentile_cont(%s) WITHIN GROUP (ORDER BY %s)", fraction, field_esc);
+			break;
+		case TQ_SQL_DB_TYPE_MYSQL:
+			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+			break;
+	}
+
+	zbx_free(field_esc);
+
+	return str;
+}
+
 static char	*tq_sql_dyn_get_aggr_columns_to_select(const zbx_tq_query_t *query, tq_db_type_t db_type)
 {
-	// TODO
 	char	*str = NULL;
+	size_t	alloc = 0;
+	size_t	offset = 0;
 
-	str = zbx_strdup(str, "<aggr_columns_to_select>");
+	for (int i = 0; i < query->aggregated_columns.values_num; i++)
+	{
+		const zbx_tq_aggr_column_t	*aggr_col = &query->aggregated_columns.values[i];
+		char				*col_name_esc = NULL;
+
+		if (ZBX_TQ_FUNCTION_COUNT != aggr_col->function && ZBX_TQ_FUNCTION_PERCENTILE != aggr_col->function)
+			col_name_esc = tq_sql_dyn_escape_name(aggr_col->column_name, db_type);
+
+		switch (aggr_col->function)
+		{
+			case ZBX_TQ_FUNCTION_COUNT:
+				zbx_snprintf_alloc(&str, &alloc, &offset, "COUNT(*)");
+				break;
+			case ZBX_TQ_FUNCTION_MIN:
+				zbx_snprintf_alloc(&str, &alloc, &offset, "MIN(%s)", col_name_esc);
+				break;
+			case ZBX_TQ_FUNCTION_MAX:
+				zbx_snprintf_alloc(&str, &alloc, &offset, "MAX(%s)", col_name_esc);
+				break;
+			case ZBX_TQ_FUNCTION_AVG:
+				zbx_snprintf_alloc(&str, &alloc, &offset, "AVG(%s)", col_name_esc);
+				break;
+			case ZBX_TQ_FUNCTION_SUM:
+				zbx_snprintf_alloc(&str, &alloc, &offset, "SUM(%s)", col_name_esc);
+				break;
+			case ZBX_TQ_FUNCTION_PERCENTILE:
+			{
+				char	*percentile_expr = tq_sql_dyn_get_percentile(aggr_col->column_name,
+						aggr_col->args.values[0], db_type);
+
+				zbx_snprintf_alloc(&str, &alloc, &offset, "%s", percentile_expr);
+
+				zbx_free(percentile_expr);
+				break;
+			}
+
+			case ZBX_TQ_FUNCTION_UNKNOWN:
+				THIS_SHOULD_NEVER_HAPPEN;
+		}
+
+		if (query->aggregated_columns.values_num - 1 != i)
+			zbx_snprintf_alloc(&str, &alloc, &offset, ",");
+
+		zbx_free(col_name_esc);
+	}
 
 	if (str == NULL)
 	{
