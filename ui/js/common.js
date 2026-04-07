@@ -551,6 +551,120 @@ function reloadPopup(form, action) {
 }
 
 /**
+ * A singleton class instance for maintaining a focus within a specified container.
+ */
+const Focuser = new class {
+
+	#FOCUSABLE_SELECTORS = ['button:not([disabled])', 'input:not([type="hidden"]):not([disabled])',
+		'select:not([disabled])', 'textarea:not([disabled])', '[tabindex]:not([tabindex="-1"]):not([disabled])',
+		'[href]:not([tabindex="-1"])'
+	];
+
+	/**
+	 * @type {Map<HTMLElement, AbortController>}
+	 */
+	#contain_abort_controllers = new Map();
+
+	/**
+	 * Get the first focusable, enabled, and visible element within the container.
+	 *
+	 * @param {HTMLElement|null} container
+	 *
+	 * @returns {HTMLElement|null}
+	 */
+	getFocusableElement(container) {
+		if (!(container instanceof HTMLElement)) {
+			return null;
+		}
+
+		for (const element of container.querySelectorAll(this.#FOCUSABLE_SELECTORS.join(', '))) {
+			if (isVisible(element)) {
+				return element;
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Focus and preselect the element, mimicking the autofocus behavior.
+	 *
+	 * @param {HTMLElement|null} element
+	 */
+	focus(element) {
+		if (!(element instanceof HTMLElement)) {
+			return null;
+		}
+
+		element.focus({preventScroll: true});
+
+		if (element instanceof HTMLInputElement && ['text', 'password'].includes(element.type)) {
+			element.select();
+		}
+	}
+
+	/**
+	 * Focus and preselect the first focusable element of the container, mimicking the autofocus behavior.
+	 *
+	 * @param {HTMLElement|null} container
+	 */
+	recoverFocus(container) {
+		this.focus(this.getFocusableElement(container));
+	}
+
+	/**
+	 * Prevent the focus from running away from the specified container.
+	 *
+	 * @param {HTMLElement} container
+	 */
+	containFocus(container) {
+		if (!(container instanceof HTMLElement)) {
+			return null;
+		}
+
+		if (this.#contain_abort_controllers.has(container)) {
+			this.#contain_abort_controllers.get(container).abort();
+			this.#contain_abort_controllers.delete(container);
+		}
+
+		const focusable_elements = [
+			...container.querySelectorAll(this.#FOCUSABLE_SELECTORS.join(', '))
+		].filter(element => isVisible(element));
+
+		if (focusable_elements.length === 0) {
+			return;
+		}
+
+		const abort_controller = new AbortController();
+
+		this.#contain_abort_controllers.set(container, abort_controller);
+
+		if (focusable_elements.length > 1) {
+			focusable_elements[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab' && e.shiftKey) {
+					e.preventDefault();
+					focusable_elements.at(-1).focus();
+				}
+			}, {signal: abort_controller.signal});
+
+			focusable_elements.at(-1).addEventListener('keydown', e => {
+				if (e.key === 'Tab' && !e.shiftKey) {
+					e.preventDefault();
+					focusable_elements[0].focus();
+				}
+			}, {signal: abort_controller.signal});
+		}
+		else {
+			focusable_elements[0].addEventListener('keydown', e => {
+				if (e.key === 'Tab') {
+					e.preventDefault();
+				}
+			}, {signal: abort_controller.signal});
+		}
+	}
+};
+
+/**
  * Pass value to add.popup trigger.
  *
  * @param {string} object			refers to destination object
@@ -779,7 +893,7 @@ function showHideVisible(obj) {
 }
 
 /**
- * Check if element is visible.
+ * Check if an element is visible.
  *
  * @param {Element} element
  *
@@ -1000,12 +1114,22 @@ function objectSetDeepValue(object, path, value) {
 	return object;
 }
 
+/**
+ * Determines whether the user has opened a hintbox or a popup.
+ *
+ * @param {HTMLElement|Document} target
+ * @returns {boolean}
+ */
+function isUserInteracting(target = document) {
+	return target.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
+}
+
 // Fix jQuery ui.sortable vertical positioning bug.
 $.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
 	_getParentOffset: function () {
 		this.offsetParent = this.helper.offsetParent();
 
-		const pos = this.offsetParent.offset();
+		let pos = this.offsetParent.offset();
 
 		if (this.scrollParent[0] !== this.document[0]
 				&& $.contains(this.scrollParent[0], this.offsetParent[0])) {
@@ -1024,3 +1148,25 @@ $.widget("ui.sortable", $.extend({}, $.ui.sortable.prototype, {
 		};
 	}
 }));
+
+// Publish an event for back/forward navigation.
+// Use the Navigation Timing API as a fallback (in case the browser bypasses the bfcache).
+window.addEventListener('pageshow', event => {
+	if (!event.persisted) {
+		if (!PerformanceObserver.supportedEntryTypes.includes('navigation')) {
+			return;
+		}
+
+		const entries = performance.getEntriesByType('navigation').filter(entry => entry.type === 'back_forward');
+		if (entries.length === 0) {
+			return;
+		}
+	}
+
+	ZABBIX.EventHub.publish(new CEventHubEvent({
+		descriptor: {
+			context: EVENT_CONTEXT_PAGE_NAVIGATION,
+			event: EVENT_BACK_FORWARD
+		}
+	}))
+});
