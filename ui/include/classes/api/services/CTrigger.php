@@ -265,13 +265,11 @@ class CTrigger extends CTriggerGeneral {
 
 		// lastChangeSince
 		if ($options['lastChangeSince'] !== null) {
-			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['where']['lastchangesince'] = 'tr.lastchange>'.zbx_dbstr($options['lastChangeSince']);
 		}
 
 		// lastChangeTill
 		if ($options['lastChangeTill'] !== null) {
-			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['where']['lastchangetill'] = 'tr.lastchange<'.zbx_dbstr($options['lastChangeTill']);
 		}
 
@@ -360,6 +358,12 @@ class CTrigger extends CTriggerGeneral {
 		}
 
 		if (is_array($options['filter'])) {
+			if (array_key_exists('value', $options['filter']) && $options['filter']['value'] !== null) {
+				$this->dbFilter('trigger_rtdata tr', ['filter' => ['value' => $options['filter']['value']]] + $options,
+					$sqlParts
+				);
+			}
+
 			if (array_key_exists('state', $options['filter']) && $options['filter']['state'] !== null) {
 				$this->dbFilter('trigger_rtdata tr', ['filter' => ['state' => $options['filter']['state']]] + $options,
 					$sqlParts
@@ -424,7 +428,6 @@ class CTrigger extends CTriggerGeneral {
 
 		// only_true
 		if ($options['only_true'] !== null) {
-			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['where']['ot'] = '((tr.value='.TRIGGER_VALUE_TRUE.')'.
 				' OR ((tr.value='.TRIGGER_VALUE_FALSE.')'.
 					' AND (tr.lastchange>'.
@@ -753,14 +756,18 @@ class CTrigger extends CTriggerGeneral {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if ((!$options['countOutput'] && array_filter([
+					$this->outputIsRequested('value', $options['output']),
 					$this->outputIsRequested('state', $options['output']),
 					$this->outputIsRequested('lastchange', $options['output']),
 					$this->outputIsRequested('error', $options['output'])
 				]))
 			|| (is_array($options['filter'])
-				&& array_intersect_key($options['filter'], array_flip(['state', 'lastchange', 'error'])))
-			|| (is_array($options['search']) && array_key_exists('error', $options['search']))) {
-			$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
+					&& array_intersect_key($options['filter'], array_flip(['value', 'state', 'lastchange', 'error'])))
+			|| (is_array($options['search']) && array_key_exists('error', $options['search']))
+			|| $this->outputIsRequested('lastChangeSince', $options['output'])
+			|| $this->outputIsRequested('lastChangeTill', $options['output'])
+			|| $this->outputIsRequested('only_true', $options['output'])) {
+			$sql_parts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
 		}
 
 		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
