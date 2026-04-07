@@ -15,20 +15,23 @@
 #include "checks_telemetry.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
-#include "zbxstr.h"
+#include "zbxdb.h"
 #include "zbxtelemetry.h"
 
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	/* FIXME: placeholder */
 
-	zbx_tq_query_t query;
+	int	ret = NOTSUPPORTED;
+	zbx_tq_query_t	query;
+
 	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query format."));
-		return NOTSUPPORTED;
+		goto out;
 	}
 
+	/*
 	char *out_str = strdup("Parsed:\n");
 	out_str = zbx_strdcatf(out_str, "category: %d,\n", (int)query.category);
 	out_str = zbx_strdcatf(out_str, "metric_type: %d,\n", (int)query.metric_type);
@@ -64,8 +67,36 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	out_str = zbx_strdcatf(out_str, "aggregation_size: %d\n", query.aggregation_size);
 
 	SET_TEXT_RESULT(result, out_str);
+	*/
 
+	char	*sql = NULL;
+	zbx_tq_sql_generate_postgresql(&query, &sql);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
+
+	zbx_db_result_t res = zbx_db_select(
+			"select itemid, hostid, type, query_fields from items where hostid = 10786;");
+	if (NULL == res || (zbx_db_result_t)ZBX_DB_DOWN == res)
+		goto clean;
+
+	zbx_db_row_t row;
+	while (NULL != (row = zbx_db_fetch(res)))
+	{
+		for (int i = 0; i < 4; i++)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION,"MYTEST %s(): [%d]: '%s'", __func__, i, row[i]);
+		}
+	}
+
+	SET_TEXT_RESULT(result, zbx_strdup(NULL, "all good"));
+
+	zbx_db_free_result(res);
+
+	ret = SUCCEED;
+
+clean:
 	zbx_tq_query_clean(&query);
-
-	return SUCCEED;
+	zbx_free(sql);
+out:
+	return ret;
 }

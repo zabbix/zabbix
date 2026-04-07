@@ -117,4 +117,6 @@ zbx_tq_query_t;
 int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, char **sql);
+
 #endif
