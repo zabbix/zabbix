@@ -1168,11 +1168,19 @@ class CDataTable {
 	}
 
 	getData(params = {}) {
-		return this.#data_provider.getData(this.#getDataProviderParams({force_load: false, ...params}));
+		params = this.#getDataProviderParams({check_changes: false, force_load: false, ...params});
+
+		return this.#data_provider.getData(params);
 	}
 
 	onInit(event) {
-		const {loading, force_load, reset} = {loading: true, force_load: false, reset: false, ...event.detail};
+		const {loading, check_changes, force_load, reset} = {
+			loading: true,
+			check_changes: true,
+			force_load: false,
+			reset: false,
+			...event.detail
+		};
 
 		if (loading) {
 			this.#element.classList.add(ZBX_STYLE_LOADING);
@@ -1195,7 +1203,7 @@ class CDataTable {
 			this.#renderHeaderCells();
 		}
 
-		this.getData({force_load})
+		this.getData({check_changes, force_load})
 			.then(response => {
 				if ('error' in response && response.error) {
 					CMessageHelper.error(this.#element, [response.error], t('Unexpected server error.'));
@@ -2180,6 +2188,7 @@ class CDataTable {
 			page: this.#pager.getPage(),
 			sort_field: this.#sort_field,
 			sort_order: this.#sort_order,
+			check_changes: true,
 			force_load: false,
 			...params
 		};

@@ -81,11 +81,12 @@ class CDefaultDataProvider extends CDataProvider {
 	 * @param {number} page
 	 * @param {string} sort_field
 	 * @param {string} sort_order
+	 * @param {boolean} check_changes
 	 * @param {boolean} force_load
 	 * @param {string}  export_file
 	 * @returns {Promise<any>}
 	 */
-	getData({columns, filter, options, page, sort_field, sort_order, force_load, export_file}) {
+	getData({columns, filter, options, page, sort_field, sort_order, check_changes, force_load, export_file}) {
 		const data_fields = [
 			...new Set(columns.flatMap(column => column.isVisible() ? column.getFields() : []))
 		];
@@ -101,6 +102,10 @@ class CDefaultDataProvider extends CDataProvider {
 		);
 
 		if (this.#last_response !== null && !force_load) {
+			if (!check_changes) {
+				return Promise.resolve(this.#last_response);
+			}
+
 			const fields_set_changed = !data_fields.every(field => this.#last_data_fields.includes(field));
 			const filter_changed = !deepCompare(this.#last_filter, filter);
 			const options_changed = !deepCompare(this.#last_options, options);
