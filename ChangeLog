@@ -38,6 +38,7 @@ Bug fixes:
 ...G...... [ZBX-26276] fixed issue with failed Oracle connections causing memory leak in Zabbix agent 2 (opucka)
 ...G...... [ZBX-27329] fixed net.tcp.service key not working for Zabbix agent 2 (esneiders)
 ..F....... [ZBX-26485] fixed validation for "reconnect" and "autologin" parameters in "index.php" file (averza)
+...G...... [ZBX-27642] added user parameter input disinfection that could lead to arbitrary file read for docker.containers.discovery, docker.container_info, and docker.container_stats (opucka)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.43
@@ -105,6 +106,7 @@ A......... [ZBX-27060] fixed scope of information available via user.get (jfreib
 A.F....... [ZBX-27062] updated LDAP bind password to reset on LDAP host change (aluchko)
 ..F....... [ZBX-27063] fixed permission check for Problems view refresh (gberzina)
 A......... [ZBX-27567] prevented low-privilege users from modifying entities via configuration.import (agriscenko)
+.......PS. [ZBX-27638] prohibited to modify or override global system JavaScript objects via user script for preprocessing subsystem and zabbix_js (MVekslers)
 
 --------------------------------------------------------------------------------
 Changes for 6.0.40
