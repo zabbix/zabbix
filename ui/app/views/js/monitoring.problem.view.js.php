@@ -735,6 +735,12 @@
 		},
 
 		refresh() {
+			if (isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			const filter_params = this.active_filter.getFilterParamsObject();
 
 			if ('inventory' in filter_params) {

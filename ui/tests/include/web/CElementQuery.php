@@ -45,6 +45,7 @@ require_once __DIR__.'/elements/CInputGroupElement.php';
 require_once __DIR__.'/elements/CHostInterfaceElement.php';
 require_once __DIR__.'/elements/CFilterElement.php';
 require_once __DIR__.'/elements/CFieldsetElement.php';
+require_once __DIR__.'/elements/CTextareaFlexibleElement.php';
 
 require_once __DIR__.'/IWaitable.php';
 require_once __DIR__.'/WaitableTrait.php';
@@ -582,8 +583,7 @@ class CElementQuery implements IWaitable {
 			'CElement'					=> [
 				// TODO: change after DEV-1630 (1) is resolved.
 				'/input[@name][not(@type) or @type="text" or @type="password"][not(@style) or not(contains(@style,"display: none"))]',
-				'/textarea[@name]',
-				'/z-textarea-flexible[@name]'
+				'/textarea[@name]'
 			],
 			'CListElement'				=> '/select[@name]',
 			'CDropdownElement'			=> '/z-select[@name]',
@@ -615,7 +615,8 @@ class CElementQuery implements IWaitable {
 			],
 			'CMultilineElement'			=> '/div[contains(@class, "multilineinput-control")]',
 			'CInputGroupElement'		=> '/div[contains(@class, "macro-input-group")]',
-			'CFieldsetElement'			=> '/fieldset'
+			'CFieldsetElement'			=> '/fieldset',
+			'CTextareaFlexibleElement'	=> '/z-textarea-flexible[@name]'
 		];
 
 		if ($class !== null) {

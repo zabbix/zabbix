@@ -69,7 +69,7 @@ $html_page = (new CHtmlPage())
 								'srctbl' => 'users',
 								'srcfld1' => 'userid',
 								'srcfld2' => 'fullname',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'context' => 'audit',
 								'dstfld1' => 'filter_userids_'
 							]

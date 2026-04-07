@@ -393,6 +393,12 @@
 		},
 
 		refresh() {
+			if (isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			const filter_params = this.active_filter.getFilterParamsObject();
 
 			this.datatable.setFilter({...this.filter_defaults, ...filter_params})
