@@ -21,7 +21,7 @@
 #include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
-@include "zbxcacheconfig.h"
+#include "zbxcacheconfig.h"
 
 typedef struct
 {
