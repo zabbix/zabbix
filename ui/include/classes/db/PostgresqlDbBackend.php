@@ -329,7 +329,7 @@ class PostgresqlDbBackend extends DbBackend {
 
 				if ($closing !== false) {
 					/**
-					 * Host includes everything between [ and ]
+					 * Host includes everything between '[' and ']'.
 					 */
 					$host = substr($token, 1, $closing - 1);
 					// Look for colon after the closing bracket.
