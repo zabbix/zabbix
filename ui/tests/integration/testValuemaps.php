@@ -285,7 +285,7 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['triggerids']));
 		$triggerid =  $response['result']['triggerids'];
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
 
