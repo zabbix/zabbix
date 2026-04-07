@@ -20,7 +20,7 @@
 abstract class CControllerHost extends CController {
 
 	// Filter fields default values.
-	public const array FILTER_FIELDS_DEFAULT = [
+	public const FILTER_FIELDS_DEFAULT = [
 		'name' => '',
 		'groupids' => [],
 		'ip' => '',
