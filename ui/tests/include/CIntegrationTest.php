@@ -61,7 +61,7 @@ class CIntegrationTest extends CAPITest {
 		'wait_send'		=> 'sendDataValues',
 		'reload_config_cache'	=> 'reloadConfigurationCache',
 		'startup'		=> 'waitForStartup',
-		'shutdown'		=> 'waitForShutdown',
+		'shutdown'		=> 'waitForShutdown'
 	];
 
 	private static $suite_components_reuse = false;
@@ -316,8 +316,10 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	private static function recordDelay(string $key, float $elapsed): void {
-		self::$stats[$key]['file_time'] = (isset(self::$stats[$key]['file_time']) ? self::$stats[$key]['file_time'] : 0.0) + $elapsed;
-		self::$stats[$key]['file_num'] = (isset(self::$stats[$key]['file_num']) ? self::$stats[$key]['file_num'] : 0) + 1;
+		self::$stats[$key]['file_time'] = (isset(self::$stats[$key]['file_time']) ?
+			self::$stats[$key]['file_time'] : 0.0) + $elapsed;
+		self::$stats[$key]['file_num'] = (isset(self::$stats[$key]['file_num']) ?
+			self::$stats[$key]['file_num'] : 0) + 1;
 	}
 
 	/**
@@ -350,7 +352,8 @@ class CIntegrationTest extends CAPITest {
 			foreach (self::STAT_LABELS as $key => $label) {
 				$file_time = isset(self::$stats[$key]['file_time']) ? self::$stats[$key]['file_time'] : 0.0;
 				$file_num = isset(self::$stats[$key]['file_num']) ? self::$stats[$key]['file_num'] : 0;
-				$total_time = (isset(self::$stats[$key]['total_time']) ? self::$stats[$key]['total_time'] : 0.0) + $file_time;
+				$total_time = (isset(self::$stats[$key]['total_time']) ? self::$stats[$key]['total_time'] : 0.0) +
+					$file_time;
 				$total_num = (isset(self::$stats[$key]['total_num']) ? self::$stats[$key]['total_num'] : 0) + $file_num;
 
 				self::$stats[$key]['total_time'] = $total_time;
@@ -1014,7 +1017,8 @@ class CIntegrationTest extends CAPITest {
 	 */
 	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
 		$this->reloadConfigurationCache($component, $delayOverride);
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'finished forced reloading of the configuration cache');
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'finished forced reloading of the configuration cache');
 	}
 
 	/**
