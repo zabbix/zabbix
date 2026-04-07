@@ -40,6 +40,7 @@ int	zbx_vault_get_kvs_cyberark(const char *vault_url, const char *prefix, const 
 	ZBX_UNUSED(path);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(kvs);
+	ZBX_UNUSED(vault_ret);
 
 	*error = zbx_dsprintf(*error, "missing cURL library");
 	return FAIL;
