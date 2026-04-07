@@ -63,7 +63,7 @@ if ($host_prototype['hostid'] != 0) {
 
 $host_tab = new CFormList('hostlist');
 
-if ($data['templates']) {
+if ($data['templates'] && getRequest('form') !== 'clone') {
 	$host_tab->addRow(_('Parent discovery rules'), $data['templates']);
 }
 

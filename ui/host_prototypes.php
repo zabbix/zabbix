@@ -356,7 +356,7 @@ if (hasRequest('form')) {
 		'discovery_rule' => $discoveryRule,
 		'host_prototype' => [
 			'hostid' => $hostid,
-			'templateid' => ($hostid == 0) ? 0 : $hostPrototype['templateid'],
+			'templateid' => $hostid == 0 || getRequest('form') === 'clone' ? 0 : $hostPrototype['templateid'],
 			'host' => getRequest('host'),
 			'name' => getRequest('name'),
 			'status' => getRequest('status', HOST_STATUS_NOT_MONITORED),
