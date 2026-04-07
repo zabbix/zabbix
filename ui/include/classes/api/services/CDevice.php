@@ -153,7 +153,7 @@ class CDevice extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$uuid = generateUuidV7();
+		$uuid = CUuidV7::generate();
 		$server_id = CApiDpopHelper::getServerId(); // todo - replace this mock for Server ID by real method
 
 		$init_device_data = [$data['userid'], 'serverid' => $server_id, 'uuid' => $uuid];

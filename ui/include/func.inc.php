@@ -2464,47 +2464,6 @@ function generateUuidV4($seed = '') {
 }
 
 /**
- * Generate UUID version 7 (non-monotonic when resolving multiple IDs within 1 millisecond).
- *
- * @param bool $canonical_format  Switch the output format to canonical (with hyphens).
- */
-function generateUuidV7(bool $canonical_format = false): string {
-	// 48 bit
-	$unix_timestamp = (int) floor(microtime(true) * 1000);
-
-	// 32 bit leftmost bits
-	$left_time_part = ($unix_timestamp >> 16) & 0xffffffff;
-
-	// 16 bit rightmost bits
-	$right_time_part = $unix_timestamp & 0xffff;
-
-	// 6 bytes time part
-	$time_data = pack('Nn', $left_time_part, $right_time_part);
-
-	$data = $time_data.random_bytes(10);
-
-	// Set version: 7th byte to 0111 (0111xxxx)
-	$data[6] = chr(ord($data[6]) & 0x0f | 0x70);
-
-	// Set variant: 9th byte to 10 (10xxxxxx)
-	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
-
-	$hex_data = bin2hex($data);
-
-	if (!$canonical_format) {
-		return $hex_data;
-	}
-
-	return implode('-', [
-		substr($hex_data, 0, 8),
-		substr($hex_data, 8, 4),
-		substr($hex_data, 12, 4),
-		substr($hex_data, 16, 4),
-		substr($hex_data, 20, 12),
-	]);
-}
-
-/**
  * Function returns predefined Leaflet Tile providers with parameters.
  *
  * @return array
