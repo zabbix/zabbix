@@ -148,7 +148,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #0.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Zabbix agent' => '15s'
 					],
@@ -160,7 +159,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #1.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Simple check' => '15s'
 					],
@@ -172,7 +170,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #2.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'SNMP agent' => '15s'
 					],
@@ -184,7 +181,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #3.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'External check' => '15s'
 					],
@@ -196,7 +192,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #4.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Database monitor' => '15s'
 					],
@@ -208,7 +203,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #5.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'HTTP agent' => '15s'
 					],
@@ -220,7 +214,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #6.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'SSH agent' => '15s'
 					],
@@ -232,7 +225,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #7.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'TELNET agent' => '15s'
 					],
@@ -244,7 +236,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #8.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Script' => '15s'
 					],
@@ -256,7 +247,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #9.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Browser' => '15s'
 					],
@@ -268,7 +258,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #10.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Communication' => '15s'
 					],
@@ -280,7 +269,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #11.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Connection' => '15s'
 					],
@@ -292,7 +280,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #12.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Media type test' => '15s'
 					],
@@ -304,7 +291,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #13.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Script execution' => '15s'
 					],
@@ -316,7 +302,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #14.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Item test' => '15s'
 					],
@@ -328,7 +313,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #15.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Scheduled report test' => '15s'
 					],
@@ -340,7 +324,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #16 Update values for all item timeouts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Zabbix agent' => '33s',
 						'Simple check' => '33s',
@@ -370,7 +353,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #17 Update values for all network timeouts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Communication' => '29s',
 						'Connection' => '29s',
@@ -392,7 +374,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #18 Update values for all timeouts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Zabbix agent' => '22s',
 						'Simple check' => '22s',
@@ -434,7 +415,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #19 Update values for all timeouts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Zabbix agent' => '33',
 						'Simple check' => '33',
@@ -476,7 +456,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #20 Update values with macros for all item timeouts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Zabbix agent' => '{$MACROS}',
 						'Simple check' => '{$MACROS}',
@@ -506,7 +485,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #21 Update all available timeouts with minutes type.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Zabbix agent' => '10m',
 						'Simple check' => '10m',
@@ -1910,7 +1888,6 @@ class testFormAdministrationGeneralTimeouts extends testFormAdministrationGenera
 			// #124.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'trim' => true,
 					'fields' => [
 						'Zabbix agent' => '   15s   ',

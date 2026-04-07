@@ -178,7 +178,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #0 Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Frontend URL' => 'a',
 						'Group for discovered hosts' => 'Hypervisors',
@@ -219,7 +218,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #1 Minimal valid values. In period fields minimal valid time in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Frontend URL' => 'zabbix.php',
 						'Default host inventory mode' => 'Automatic',
@@ -249,7 +247,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #2 In period fields minimal valid time in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1m'
@@ -262,7 +259,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #3 In period fields minimal valid time in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '1h'
@@ -275,7 +271,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #4 Maximal valid values in seconds with "s".
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Authorization.
 						'Login attempts' => 32,
@@ -316,7 +311,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #5 In period fields maximal valid values in seconds without "s".
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '3600'
@@ -329,7 +323,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #6 In period fields maximal valid values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Authorization.
 						'Login blocking interval' => '60m'
@@ -342,7 +335,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #7 Symbol trimming in Login attempts.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Login attempts' => '3M'
 					],
@@ -594,7 +586,6 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 			// #25 Trimming spaces.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'trim' => true,
 					'fields' => [
 						'Frontend URL' => '    zabbix.php    ',

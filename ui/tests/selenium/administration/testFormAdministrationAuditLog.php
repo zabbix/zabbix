@@ -123,7 +123,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #0.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => false
@@ -139,7 +138,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #1.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
@@ -155,7 +153,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #2.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => false,
@@ -173,7 +170,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #3.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -190,7 +186,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #4.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -208,7 +203,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #5.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -224,7 +218,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #6.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -242,7 +235,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #7.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -259,7 +251,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #8.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -277,7 +268,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #9.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -294,7 +284,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #10.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => false,
@@ -312,7 +301,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #11.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -329,7 +317,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #12.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -347,7 +334,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #13.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => true,
@@ -365,7 +351,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #14.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -382,7 +367,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #15.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -399,7 +383,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #16.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -416,7 +399,6 @@ class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 			// #17.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Log system actions' => false,

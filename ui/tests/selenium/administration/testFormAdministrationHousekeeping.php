@@ -166,7 +166,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #0 Unchecked checkboxes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => false,
@@ -195,7 +194,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #1 Valid zero values without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
@@ -215,7 +213,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #2 Valid zero values with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
@@ -235,7 +232,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #3 Valid zero values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
@@ -255,7 +251,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #4 Valid zero values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
@@ -275,7 +270,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #5 Valid zero values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
@@ -295,7 +289,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #6 Valid zero values in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
@@ -315,7 +308,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #7 Minimal valid values in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -362,7 +354,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #8 Minimal valid values in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -405,7 +396,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #9 Minimal valid values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -448,7 +438,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #10 Minimal valid values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -491,7 +480,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #11 Minimal valid values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -529,7 +517,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #12 Maximal valid values in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -572,7 +559,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #13 Maximal valid values in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -615,7 +601,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #14 Maximal valid values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -658,7 +643,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #15 Maximal valid values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -701,7 +685,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #16 Maximal valid values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -744,7 +727,6 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 			// #17 Maximal valid values in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,

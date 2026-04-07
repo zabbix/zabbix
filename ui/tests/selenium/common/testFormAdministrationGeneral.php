@@ -182,13 +182,13 @@ class testFormAdministrationGeneral extends CWebTest {
 		$this->page->waitUntilReady();
 
 		// TODO: Uncomment if-else and remove switch after DEV-4632 is fixed.
-		// if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+		// if (($expected) === TEST_BAD) {
 		// 	$this->assertInlineError($form, $data['inline_errors']);
 		// }
 		// else {
 		// 	$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		// }
-		switch ($data['expected']) {
+		switch ($expected) {
 			case TEST_GOOD:
 				$this->assertMessage(TEST_GOOD, 'Configuration updated');
 				break;

@@ -118,7 +118,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #0 Minimal valid values. In period fields minimal valid time in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Default language' => 'English (en_US)',
 						'Default time zone' => 'UTC',
@@ -152,7 +151,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #1 In period fields minimal valid time in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Working time' => '1-5,09:00-18:00;5-7,12:00-16:00',
 						'Max history display period' => '86400',
@@ -170,7 +168,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #2 In period fields minimal valid time in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '1440m',
 						'Time filter default period' => '1m',
@@ -186,7 +183,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #3 In period fields minimal valid time in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '24h',
 						'Max period for time selector' => '8760h'
@@ -200,7 +196,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #4 In period fields minimal valid time in days.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '1d',
 						'Max period for time selector' => '365d'
@@ -214,7 +209,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #5 In period fields minimal valid time in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max period for time selector' => '53w'
 					],
@@ -226,7 +220,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #6 In period fields minimal valid time in Months.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max period for time selector' => '13M'
 					],
@@ -238,7 +231,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #7 In period fields minimal valid time in years.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max period for time selector' => '1y'
 					],
@@ -250,7 +242,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #8 In period fields maximal valid time in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '604800s',
 						'Time filter default period' => '315360000s',
@@ -266,7 +257,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #9 In period fields maximal valid time in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Default time zone' => 'System',
 						'Default theme' => 'High-contrast dark',
@@ -286,7 +276,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #10 In period fields maximal valid time in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '10080m',
 						'Time filter default period' => '5256000m',
@@ -302,7 +291,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #11 In period fields maximal valid time in days.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '7d',
 						'Time filter default period' => '3650d',
@@ -318,7 +306,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #12 In period fields maximal valid time in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Max history display period' => '1w',
 						'Time filter default period' => '521w',
@@ -334,7 +321,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #13 In period fields maximal valid time in Months.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Time filter default period' => '121M',
 						'Max period for time selector' => '121M'
@@ -348,7 +334,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #14 Maximal valid values. In period fields time in years.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Default time zone' => 'Pacific/Kiritimati',
 						'Default theme' => 'High-contrast light',
@@ -918,7 +903,6 @@ class testFormAdministrationGeneralGUI extends testFormAdministrationGeneral {
 			// #50 Trimming spaces.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'trim' => true,
 					'fields' => [
 						'Limit for search and filter results' => ' 50  ',
