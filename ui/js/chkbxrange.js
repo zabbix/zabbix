@@ -206,7 +206,7 @@ var chkbxRange = {
 
 		ZABBIX.EventHub.subscribe({
 			require: {
-				context: CONTEXT_PAGE_NAVIGATION,
+				context: EVENT_CONTEXT_PAGE_NAVIGATION,
 				event: EVENT_BACK_FORWARD
 			},
 			callback: () => this.handleBackForwardNavigation(search_params, checkboxes, object_ids, selected_ids)

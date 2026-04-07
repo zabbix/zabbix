@@ -257,5 +257,5 @@ const WRAPPER_PADDING_RIGHT = 10;
 const GRAPH_TYPE_SVG_GRAPH = 0;
 const GRAPH_TYPE_SCATTER_PLOT = 1;
 
-const CONTEXT_PAGE_NAVIGATION = 'navigation';
+const EVENT_CONTEXT_PAGE_NAVIGATION = 'page_navigation';
 const EVENT_BACK_FORWARD = 'back_forward';
