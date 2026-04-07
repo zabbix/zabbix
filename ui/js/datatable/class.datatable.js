@@ -649,7 +649,7 @@ class CDataTable {
 		this.#applyColumnWidths();
 		this.#renderHeaderCells();
 
-		this.#element.classList.add(CDataTable.ZBX_STYLE_DATATABLE);
+		this.#element.classList.add(CDataTable.ZBX_STYLE_DATATABLE, CDataTable.ZBX_STYLE_SCROLLABLE);
 		this.#element.innerHTML = '';
 		this.#element.append(this.#header, this.#body, this.#footer);
 
@@ -944,7 +944,6 @@ class CDataTable {
 			columns.forEach(column_config => this.#calculateColumnWidth(column_config));
 
 			this.#applyColumnWidths();
-			this.#applyScrollableRows();
 			this.#applyLastColumnPadding();
 			this.#updateTableOptionsButtonPosition();
 
@@ -1266,7 +1265,6 @@ class CDataTable {
 		visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
 
 		this.#applyColumnWidths();
-		this.#applyScrollableRows();
 		this.#applyLastColumnPadding();
 	}
 
@@ -1906,15 +1904,6 @@ class CDataTable {
 			row_index: header_cell.getAttribute('data-row'),
 			cell: header_cell
 		});
-	}
-
-	#applyScrollableRows() {
-		const rows_rect = this.#body.getBoundingClientRect();
-		const rows_width = Math.round(rows_rect.width);
-		const rows_height = Math.round(rows_rect.height);
-		const action = this.#body.scrollWidth > rows_width || this.#body.scrollHeight > rows_height ? 'add' : 'remove';
-
-		this.#element.classList[action](CDataTable.ZBX_STYLE_SCROLLABLE);
 	}
 
 	#sortColumns() {
