@@ -257,8 +257,16 @@ window.graph_edit_popup = new class {
 				}
 				else {
 					if (this.graph_type == <?= GRAPH_TYPE_NORMAL ?>) {
-						src.setArgument('percent_left', $('#percent_left').val());
-						src.setArgument('percent_right', $('#percent_right').val());
+						src.setArgument('percent_left',
+							$('#visible_percent_left').is(':checked') && $('#percent_left').val()
+								? $('#percent_left').val()
+								: 0
+						);
+						src.setArgument('percent_right',
+							$('#visible_percent_right').is(':checked') && $('#percent_right').val()
+								? $('#percent_right').val()
+								: 0
+						);
 					}
 
 					src.setArgument('ymin_type', $('#ymin_type').val());
