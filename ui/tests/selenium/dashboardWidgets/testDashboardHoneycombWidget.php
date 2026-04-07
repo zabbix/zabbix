@@ -121,7 +121,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'key_' => 'json_honey_1',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_JSON
-					],
+					]
 				]
 			],
 			[
