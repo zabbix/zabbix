@@ -625,7 +625,7 @@ class CTabFilterItem extends CBaseComponent {
 				case 3:
 					// name[0][property]
 					if (!(parts[0] in result)) {
-						result[parts[0]] = {};
+						result[parts[0]] = [];
 					}
 
 					if (!(parts[1] in result[parts[0]])) {
