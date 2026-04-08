@@ -84,11 +84,9 @@ window.oauth_edit_popup = new class {
 								this.form_element.querySelector('[name="authorization_mode"][value="manual"]').click();
 								this.form_element.querySelector('[name="code"]').focus();
 
-								return Promise.reject({title: null, messages: [this.messages.authorization_error]});
+								throw {error: {title: null, messages: [this.messages.authorization_error]}};
 							}
 
-							return Promise.reject(error);
-						}).catch(error => {
 							throw {error};
 						})
 					)
