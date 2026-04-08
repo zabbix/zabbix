@@ -559,7 +559,7 @@ static int	tq_validate_formula(const char *formula, int condition_count, char *e
 	double	dummy_value;
 
 	char	*p = formula_copy;
-	while (*p)
+	while ('\0' != *p)
 	{
 		if (FAIL == tq_validate_formula_char(*p))
 			goto out;
