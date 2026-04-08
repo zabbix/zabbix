@@ -821,9 +821,9 @@ static int	DBpatch_7050060(void)
 static int	DBpatch_7050061(void)
 {
 	const zbx_db_table_t	table =
-			{"device", "uuid", 0,
+			{"device", "deviceid", 0,
 				{
-					{"uuid", "", NULL, NULL, 0, ZBX_TYPE_UUID_V7, ZBX_NOTNULL, 0},
+					{"deviceid", "", NULL, NULL, 0, ZBX_TYPE_UUID_V7, ZBX_NOTNULL, 0},
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 					{"name", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
 					{"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0},
@@ -873,7 +873,7 @@ static int	DBpatch_7050065(void)
 
 static int	DBpatch_7050066(void)
 {
-	const zbx_db_field_t	field = {"deviceid", NULL, "device", "uuid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, 0, 0, 0};
 
 	return DBadd_foreign_key("token_device", 2, &field);
 }
@@ -904,7 +904,7 @@ static int	DBpatch_7050068(void)
 
 static int	DBpatch_7050069(void)
 {
-	const zbx_db_field_t	field = {"deviceid", NULL, "device", "uuid", 0, ZBX_TYPE_UUID_V7, ZBX_NOTNULL,
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_UUID_V7, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("device_key", 1, &field);
@@ -938,7 +938,7 @@ static int	DBpatch_7050072(void)
 
 static int	DBpatch_7050073(void)
 {
-	const zbx_db_field_t	field = {"deviceid", NULL, "device", "uuid", 0, ZBX_TYPE_UUID_V7, ZBX_NOTNULL,
+	const zbx_db_field_t	field = {"deviceid", NULL, "device", "deviceid", 0, ZBX_TYPE_UUID_V7, ZBX_NOTNULL,
 			ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("device_enrollment_token", 1, &field);
