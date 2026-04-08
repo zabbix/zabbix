@@ -37,7 +37,7 @@ zabbix_export:
         4. Set the password of the user that you created in step 1 in the `Password` host wizard configuration field.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: 'Templates/Server hardware'
       items:
