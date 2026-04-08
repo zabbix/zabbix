@@ -236,79 +236,59 @@ window.graph_edit_popup = new class {
 
 			if ($panel.attr('id') === 'graph-preview-tab') {
 				const $preview_chart = $('#preview-chart');
-				const src = new Curl('chart3.php');
+				let url = 'chart3.php';
 
 				if ($preview_chart.find('.is-loading').length) {
 					return false;
 				}
 
-				src.setArgument('period', '3600');
-				src.setArgument('name', $('#name').val());
-				src.setArgument('width', $('#width').val());
-				src.setArgument('height', $('#height').val());
-				src.setArgument('graphtype', $('#graphtype').val());
-				src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
-				src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
+				const fields = this.form.getAllValues();
+				const parameters = {
+					period: 3600,
+					name: fields.name,
+					width: fields.width,
+					height: fields.height,
+					graphtype: fields.graphtype,
+					show_legend: fields.show_legend,
+					resolve_macros: this.context === 'template' ? 0 : 1
+				};
 
 				if (this.graph_type == <?= GRAPH_TYPE_PIE ?>
 						|| this.graph_type == <?= GRAPH_TYPE_EXPLODED ?>) {
-					src.setPath('chart7.php');
-					src.setArgument('graph3d', $('#show_3d').is(':checked') ? 1 : 0);
+					url = 'chart7.php';
+					parameters.graph3d = fields.show_3d;
 				}
 				else {
 					if (this.graph_type == <?= GRAPH_TYPE_NORMAL ?>) {
-						src.setArgument('percent_left',
-							$('#visible_percent_left').is(':checked') && $('#percent_left').val()
-								? $('#percent_left').val()
-								: 0
-						);
-						src.setArgument('percent_right',
-							$('#visible_percent_right').is(':checked') && $('#percent_right').val()
-								? $('#percent_right').val()
-								: 0
-						);
+						parameters.percent_left = fields.percent_left ? fields.percent_left : 0;
+						parameters.percent_right = fields.percent_right ? fields.percent_right : 0;
 					}
 
-					src.setArgument('ymin_type', $('#ymin_type').val());
-					src.setArgument('ymax_type', $('#ymax_type').val());
-					src.setArgument('yaxismin', $('#yaxismin').val());
-					src.setArgument('yaxismax', $('#yaxismax').val());
+					parameters.ymin_type = fields.ymin_type;
+					parameters.ymax_type = fields.ymax_type;
+					parameters.yaxismin = fields.yaxismin ? fields.yaxismin : 0;
+					parameters.yaxismax = fields.yaxismax ? fields.yaxismax : 0;
 
-					if ($('#ymin_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
-						const ymin_item_data = $('#ymin_itemid').multiSelect('getData');
-
-						if (ymin_item_data.length) {
-							src.setArgument('ymin_itemid', ymin_item_data[0]['id']);
-						}
+					if (fields.ymin_itemid && fields.ymin_type == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+						parameters.ymin_itemid = fields.ymin_itemid;
 					}
 
-					if ($('#ymax_type').val() == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
-						const ymax_item_data = $('#ymax_itemid').multiSelect('getData');
-
-						if (ymax_item_data.length) {
-							src.setArgument('ymax_itemid', ymax_item_data[0]['id']);
-						}
+					if (fields.ymax_itemid && fields.ymax_type == <?= GRAPH_YAXIS_TYPE_ITEM_VALUE ?>) {
+						parameters.ymax_itemid = fields.ymax_itemid;
 					}
 
-					src.setArgument('showworkperiod', $('#show_work_period').is(':checked') ? 1 : 0);
-					src.setArgument('showtriggers', $('#show_triggers').is(':checked') ? 1 : 0);
+					parameters.showworkperiod = fields.show_work_period;
+					parameters.showtriggers = fields.show_triggers;
 				}
 
-				$('#items-table tbody tr.graph-item').each((i, node) => {
+				Object.keys(fields.items).forEach(i => {
 					const short_fmt = [];
 
-					$(node).find('*[name]').each((_, input) => {
-						if (!$.isEmptyObject(input) && input.name != null) {
-							const regex = /items\[\d+\]\[([a-zA-Z0-9\-\_\.]+)\]/;
-							const name = input.name.match(regex);
-
-							if (input.name !== 'remove') {
-								short_fmt.push((name[1]).substr(0, 2) + ':' + input.value);
-							}
-						}
+					Object.keys(fields.items[i]).forEach(name => {
+						short_fmt.push( `${name.substring(0, 2)}:${fields.items[i][name]}`);
 					});
 
-					src.setArgument('i[' + i + ']', short_fmt.join(','));
+					parameters[`i[${i}]`] = short_fmt.join(',');
 				});
 
 				const $image = $('img', $preview_chart);
@@ -321,7 +301,7 @@ window.graph_edit_popup = new class {
 					.addClass('is-loading'));
 
 				$('<img>')
-					.attr('src', src.getUrl())
+					.attr('src', `${url}?${objectToSearchParams(parameters)}`)
 					.on('load', function() {
 						$preview_chart.html($(this));
 					});
