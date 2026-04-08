@@ -32,10 +32,12 @@ class DB {
 	const FIELD_TYPE_TEXT = 0x0040;
 	const FIELD_TYPE_CUID = 0x0080;
 	const FIELD_TYPE_JSON = 0x0100;
+	const FIELD_TYPE_UUID_V7 = 0x0200;
 
-	const SUPPORTED_FILTER_TYPES = self::FIELD_TYPE_INT | self::FIELD_TYPE_CHAR | self::FIELD_TYPE_ID |
-		self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID;
-	const SUPPORTED_SEARCH_TYPES = self::FIELD_TYPE_CHAR | self::FIELD_TYPE_TEXT | self::FIELD_TYPE_CUID;
+	const SUPPORTED_FILTER_TYPES = self::FIELD_TYPE_INT | self::FIELD_TYPE_CHAR | self::FIELD_TYPE_ID
+		| self::FIELD_TYPE_FLOAT | self::FIELD_TYPE_UINT | self::FIELD_TYPE_CUID | self::FIELD_TYPE_UUID_V7;
+	const SUPPORTED_SEARCH_TYPES = self::FIELD_TYPE_CHAR | self::FIELD_TYPE_TEXT | self::FIELD_TYPE_CUID
+		| self::FIELD_TYPE_UUID_V7;
 
 	/**
 	 * Maximum number of IDs per SQL request.
@@ -349,7 +351,8 @@ class DB {
 				}
 			}
 			else {
-				if ($tableSchema['fields'][$field]['type'] & (self::FIELD_TYPE_CUID | self::FIELD_TYPE_CHAR)) {
+				if ($tableSchema['fields'][$field]['type']
+						& (self::FIELD_TYPE_CHAR | self::FIELD_TYPE_CUID | self::FIELD_TYPE_UUID_V7)) {
 					$length = mb_strlen($values[$field]);
 
 					if ($length > $tableSchema['fields'][$field]['length']) {
@@ -500,6 +503,11 @@ class DB {
 			}
 			elseif ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_CUID) {
 				$id = CCuid::generate();
+				$resultids[$key] = $id;
+				$row = [$table_schema['key'] => $id] + $row;
+			}
+			elseif ($table_schema['fields'][$table_schema['key']]['type'] & self::FIELD_TYPE_UUID_V7) {
+				$id = CUuidV7::generate();
 				$resultids[$key] = $id;
 				$row = [$table_schema['key'] => $id] + $row;
 			}
