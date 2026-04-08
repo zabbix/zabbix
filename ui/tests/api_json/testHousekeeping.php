@@ -16,10 +16,11 @@
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
 
+define('TEST_GOOD', 0);
+define('TEST_BAD', 1);
+
 /**
  * @backup settings
- * @onBefore prepareTestData
- * @onAfter  cleanTestData
  */
 class testHousekeeping extends CAPITest {
 
@@ -46,30 +47,6 @@ class testHousekeeping extends CAPITest {
 		'compress_older' => '788400000'
 	];
 
-	protected static $userids = [];
-
-	public static function prepareTestData(): void {
-		$result = CDataHelper::call('user.create', [
-			[
-				'username' => 'hk_user',
-				'passwd' => 'zabbix12345',
-				'roleid' => 1,
-				'usrgrps' => [['usrgrpid' => 7]]
-			],
-			[
-				'username' => 'hk_admin',
-				'passwd' => 'zabbix12345',
-				'roleid' => 2,
-				'usrgrps' => [['usrgrpid' => 7]]
-			]
-		]);
-		self::$userids = $result['userids'];
-	}
-
-	public static function cleanTestData(): void {
-		CDataHelper::call('user.delete', self::$userids);
-	}
-
 	/**
 	 * Update every parameter to default.
 	 */
@@ -80,153 +57,240 @@ class testHousekeeping extends CAPITest {
 
 	/**
 	 * Verify that housekeeping.get returns all expected fields.
+	 *
+	 * @depends testHousekeeping_Update
 	 */
 	public function testHousekeeping_Get() {
+		// Extend output returns all fields.
 		$response = $this->call('housekeeping.get', ['output' => 'extend']);
-		$this->assertArrayHasKey('result', $response);
 		$this->assertEquals(self::$default_params, array_intersect_key($response['result'], self::$default_params));
-		$this->assertArrayHasKey('db_extension', $response['result']);
+		$this->assertEquals('', $response['result']['db_extension']);
+
+		// Limited output returns only requested fields.
+		$response = $this->call('housekeeping.get', ['output' => ['hk_events_mode', 'hk_history']]);
+		$this->assertEquals('1', $response['result']['hk_events_mode']);
+		$this->assertEquals('69d', $response['result']['hk_history']);
+		$this->assertArrayNotHasKey('hk_trends', $response['result']);
+		$this->assertArrayNotHasKey('compress_older', $response['result']);
+		$this->assertArrayNotHasKey('db_extension', $response['result']);
 	}
 
 	/**
 	 * Update with empty parameters.
 	 */
 	public function testHousekeeping_UpdateEmpty() {
+		$sql = 'SELECT * FROM settings';
+		$old_hash = CDBHelper::getHash($sql);
 		$updatedFields = $this->call('housekeeping.update', [])['result'];
 		$this->assertEquals([], $updatedFields);
+		$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 	}
 
 	/**
-	 * Partial update.
-	 */
-	public function testHousekeeping_PartialUpdate() {
-		$this->call('housekeeping.update', self::$default_params);
-		$this->call('housekeeping.update', ['hk_audit_mode' => '0']);
-		$after = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
-		$this->assertEquals('0', $after['hk_audit_mode']);
-
-		foreach (self::$default_params as $key => $value) {
-			if ($key === 'hk_audit_mode') {continue;}
-			$this->assertEquals($value, $after[$key], 'Unexpected change in field: '.$key);
-		}
-	}
-
-	/**
-	 * Verify boundary values.
-	 */
-	public function testHousekeeping_BoundaryValues() {
-		// compress_older minimum valid value (604800 seconds = 7 days).
-		$this->call('housekeeping.update', ['compress_older' => '604800']);
-		$result = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
-		$this->assertEquals('604800', $result['compress_older']);
-
-		// compress_older maximum valid value (788400000 seconds).
-		$this->call('housekeeping.update', ['compress_older' => '788400000']);
-		$result = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
-		$this->assertEquals('788400000', $result['compress_older']);
-
-		// compress_older below minimum boundary.
-		$this->call(
-			'housekeeping.update',
-			['compress_older' => '604799'],
-			'Invalid parameter "/compress_older": value must be one of 604800-788400000.'
-		);
-
-		// compress_older above maximum boundary.
-		$this->call(
-			'housekeeping.update',
-			['compress_older' => '788400001'],
-			'Invalid parameter "/compress_older": value must be one of 604800-788400000.'
-		);
-
-		// hk_events_trigger minimum valid value (86400 seconds = 1 day).
-		$this->call('housekeeping.update', ['hk_events_trigger' => '1d']);
-		$result = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
-		$this->assertEquals('1d', $result['hk_events_trigger']);
-
-		// hk_events_trigger maximum valid value (788400000 seconds = 9125 days).
-		$this->call('housekeeping.update', ['hk_events_trigger' => '9125d']);
-		$result = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
-		$this->assertEquals('9125d', $result['hk_events_trigger']);
-
-		// All time-period fields must reject values below minimum (86400 seconds = 1 day).
-		$time_fields = [
-			'hk_events_trigger', 'hk_events_service', 'hk_events_internal',
-			'hk_events_discovery', 'hk_events_autoreg', 'hk_services',
-			'hk_audit', 'hk_sessions'
-		];
-
-		foreach ($time_fields as $field) {
-			$this->call(
-				'housekeeping.update',
-				[$field => '0d'],
-				'Invalid parameter "/'.$field.'": value must be one of 86400-788400000.'
-			);
-		}
-
-		// All time-period fields must reject values above maximum (788400000 seconds = 9125 days).
-		foreach ($time_fields as $field) {
-			$this->call(
-				'housekeeping.update',
-				[$field => '9126d'],
-				'Invalid parameter "/'.$field.'": value must be one of 86400-788400000.'
-			);
-		}
-	}
-
-	/**
-	 * Validate that invalid parameter values are rejected by the API.
+	 * Update housekeeping parameters with valid and invalid values.
 	 *
-	 * @dataProvider invalidParamsProvider
+	 * @dataProvider updateParamsProvider
 	 */
-	public function testHousekeeping_Validation(string $field, $value): void {
-		$this->call('housekeeping.update', [$field => $value], true);
+	public function testHousekeeping_UpdateParams($data) {
+		$this->call('housekeeping.update', $data['params'],
+			($data['expected'] === TEST_BAD) ? $data['error'] ?? true : null
+		);
+
+		if ($data['expected'] === TEST_GOOD) {
+			$update_output = $this->call('housekeeping.get', ['output' => 'extend'])['result'];
+			foreach ($data['params'] as $key => $value) {
+				$this->assertEquals($value, $update_output[$key], 'Field mismatch: '.$key);
+			}
+		}
 	}
 
-	public function invalidParamsProvider(): array {
+	public function updateParamsProvider() {
 		return [
+			// Partial update.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['hk_audit_mode' => '0']
+				]
+			],
+			// Parameter compress_older minimum valid value (604800 seconds = 7 days).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['compress_older' => '604800']
+				]
+			],
+			// Parameter compress_older maximum valid value (788400000 seconds).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['compress_older' => '788400000']
+				]
+			],
+			// Parameter hk_events_trigger minimum valid value (86400 seconds = 1 day).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['hk_events_trigger' => '1d']
+				]
+			],
+			// Parameter hk_events_trigger maximum valid value (788400000 seconds = 9125 days).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['hk_events_trigger' => '9125d']
+				]
+			],
+			// hk_history accepts 0 and minimum valid value (3600 seconds = 1 hour).
+			[['expected' => TEST_GOOD, 'params' => ['hk_history' => '0']]],
+			[['expected' => TEST_GOOD, 'params' => ['hk_history' => '1h']]],
+			// hk_trends accepts 0 and minimum valid value (86400 seconds = 1 day).
+			[['expected' => TEST_GOOD, 'params' => ['hk_trends' => '0']]],
+			[['expected' => TEST_GOOD, 'params' => ['hk_trends' => '1d']]],
+			// History storage period can be updated even when history is disabled.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['hk_history_mode' => '0', 'hk_history' => '90d']
+				]
+			],
+			// Trends storage period can be updated even when trends is disabled.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'params' => ['hk_trends_mode' => '0', 'hk_trends' => '90d']
+				]
+			],
+			// Parameter compress_older below minimum boundary.
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['compress_older' => '604799'],
+					'error' => 'Invalid parameter "/compress_older": value must be one of 604800-788400000.'
+				]
+			],
+			// Parameter compress_older above maximum boundary.
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['compress_older' => '788400001'],
+					'error' => 'Invalid parameter "/compress_older": value must be one of 604800-788400000.'
+				]
+			],
+			// Parameter hk_events_trigger below minimum boundary.
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['hk_events_trigger' => '0d'],
+					'error' => 'Invalid parameter "/hk_events_trigger": value must be one of 86400-788400000.'
+				]
+			],
+			// Parameter hk_events_trigger above maximum boundary.
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['hk_events_trigger' => '9126d'],
+					'error' => 'Invalid parameter "/hk_events_trigger": value must be one of 86400-788400000.'
+				]
+			],
+			// hk_history below minimum boundary (min is 3600 seconds = 1 hour).
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['hk_history' => '3599s'],
+					'error' => 'Invalid parameter "/hk_history": value must be one of 0, 3600-788400000.'
+				]
+			],
+			// hk_history above maximum boundary.
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['hk_history' => '9126d'],
+					'error' => 'Invalid parameter "/hk_history": value must be one of 0, 3600-788400000.'
+				]
+			],
+			// hk_trends below minimum boundary (min is 86400 seconds = 1 day).
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['hk_trends' => '3600s'],
+					'error' => 'Invalid parameter "/hk_trends": value must be one of 0, 86400-788400000.'
+				]
+			],
+			// hk_trends above maximum boundary.
+			[
+				[
+					'expected' => TEST_BAD,
+					'params' => ['hk_trends' => '9126d'],
+					'error' => 'Invalid parameter "/hk_trends": value must be one of 0, 86400-788400000.'
+				]
+			],
 			// Binary-flag fields must reject values outside {0, 1}.
-			['hk_events_mode', '2'],
-			['hk_services_mode', '2'],
-			['hk_audit_mode', '2'],
-			['hk_sessions_mode', '2'],
-			['hk_history_mode', '2'],
-			['hk_history_global', '2'],
-			['hk_trends_mode', '2'],
-			['hk_trends_global', '2'],
-			['compression_status', '2'],
-
+			[['expected' => TEST_BAD, 'params' => ['hk_events_mode' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_services_mode' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_audit_mode' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_sessions_mode' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_history_mode' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_history_global' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_trends_mode' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_trends_global' => '2']]],
+			[['expected' => TEST_BAD, 'params' => ['compression_status' => '2']]],
 			// Mode field must reject a non-numeric string value.
-			['hk_events_mode', 'wrong_type'],
-
+			[['expected' => TEST_BAD, 'params' => ['hk_events_mode' => 'wrong_type']]],
 			// Unknown parameter must be rejected.
-			['non_existing_param', '123'],
-
+			[['expected' => TEST_BAD, 'params' => ['non_existing_param' => '123']]],
 			// Non-numeric strings for time-period fields.
-			['hk_events_trigger', 'abc'],
-			['hk_events_service', 'wrong'],
-			['hk_events_internal', 'text'],
-			['hk_events_discovery', 'test'],
-			['hk_events_autoreg', 'abc'],
-			['hk_services', 'wrong'],
-			['hk_audit', 'text'],
-			['hk_sessions', 'test'],
-			['hk_history', 'text'],
-			['hk_trends', '!!'],
-
-			// Unsupported time unit suffix.
-			['hk_events_internal', '10x'],
-			['hk_audit', '1y'],
-
-			// Negative values.
-			['hk_events_service', '-1d'],
-			['hk_sessions', '-5d'],
-
-			// Raw integer without a unit suffix (where a suffix is required).
-			['hk_events_autoreg', '999'],
-
-			// compress_older: negative value.
-			['compress_older', '-100']
+			[['expected' => TEST_BAD, 'params' => ['hk_events_trigger' => 'abc']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_service' => 'wrong']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_internal' => 'text']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_discovery' => 'test']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_autoreg' => 'abc']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_services' => 'wrong']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_audit' => 'text']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_sessions' => 'test']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_history' => 'text']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_trends' => '!!']]],
+			// Unsupported time unit suffix for all time-period fields.
+			[['expected' => TEST_BAD, 'params' => ['hk_events_trigger' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_service' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_internal' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_discovery' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_autoreg' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_services' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_audit' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_sessions' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_history' => '10x']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_trends' => '10x']]],
+			// Negative values for all time-period fields.
+			[['expected' => TEST_BAD, 'params' => ['hk_events_trigger' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_service' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_internal' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_discovery' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_autoreg' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_services' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_audit' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_sessions' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_history' => '-1d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_trends' => '-1d']]],
+			// Out of range values for all time-period fields (below minimum 86400 = 1d).
+			[['expected' => TEST_BAD, 'params' => ['hk_events_service' => '0d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_internal' => '0d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_discovery' => '0d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_autoreg' => '0d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_services' => '0d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_audit' => '0d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_sessions' => '0d']]],
+			// Out of range values for all time-period fields (above maximum 788400000 = 9125d).
+			[['expected' => TEST_BAD, 'params' => ['hk_events_trigger' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_service' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_internal' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_discovery' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_events_autoreg' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_services' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_audit' => '9126d']]],
+			[['expected' => TEST_BAD, 'params' => ['hk_sessions' => '9126d']]],
+			// Parameter compress_older: negative value.
+			[['expected' => TEST_BAD, 'params' => ['compress_older' => '-100']]]
 		];
 	}
 
@@ -234,24 +298,19 @@ class testHousekeeping extends CAPITest {
 	 * Verify permissions for housekeeping API methods.
 	 */
 	public function testHousekeeping_Permissions() {
-		// A user must be allowed to get housekeeping settings.
-		$this->authorize('hk_user', 'zabbix12345');
-		$response = $this->call('housekeeping.get', ['output' => 'extend']);
-		$this->assertArrayHasKey('result', $response);
+		foreach (['user-zabbix', 'admin-zabbix'] as $user) {
+			// Both user and admin must be allowed to get housekeeping settings.
+			$this->authorize($user, 'zabbix');
+			$response = $this->call('housekeeping.get', ['output' => 'extend']);
+			$this->assertArrayHasKey('result', $response);
 
-		// A user must NOT be allowed to update housekeeping settings.
-		$this->call('housekeeping.update', ['hk_events_mode' => '1'],
-			'No permissions to call "housekeeping.update".'
-		);
+			// Both user and admin must NOT be allowed to update housekeeping settings.
+			$this->call('housekeeping.update', ['hk_events_mode' => '1'],
+				'No permissions to call "housekeeping.update".'
+			);
 
-		// An admin must be allowed to get housekeeping settings.
-		$this->authorize('hk_admin', 'zabbix12345');
-		$response = $this->call('housekeeping.get', ['output' => 'extend']);
-		$this->assertArrayHasKey('result', $response);
-
-		// An admin must NOT be allowed to update housekeeping settings.
-		$this->call('housekeeping.update', ['hk_events_mode' => '1'],
-			'No permissions to call "housekeeping.update".'
-		);
+			// Restore super admin session for next iteration.
+			$this->authorize('Admin', 'zabbix');
+		}
 	}
 }
