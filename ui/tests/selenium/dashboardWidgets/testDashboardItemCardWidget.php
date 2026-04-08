@@ -1922,7 +1922,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					'Type of information' => 'JSON',
 					'Latest data' => [
-						'column' => '100d',
+						'column' => '3M 10d',
 						'center-column' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
 						'right-column' => 'History'
 					],
@@ -1964,7 +1964,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					'Type of information' => 'Binary',
 					'Latest data' => [
-						'column' => '100d',
+						'column' => '3M 10d',
 						'center-column' => 'binary value',
 						'right-column' => ''
 					],
