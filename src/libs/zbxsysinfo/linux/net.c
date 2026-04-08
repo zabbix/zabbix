@@ -1228,7 +1228,7 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
  *                                                                            *
  * Purpose: adds network interface type to JSON                               *
  *                                                                            *
- * Parameters: ifname - [IN] network interface name                           *
+ * Parameters: if_name - [IN] network interface name                          *
  *             j      - [IN/OUT] JSON object                                  *
  *                                                                            *
  * Comments:                                                                  *
@@ -1246,7 +1246,7 @@ static void	if_admin_state_add(const char *if_name, struct zbx_json *j)
  *          virtualization SR-IOV virtual interface.                          *
  *                                                                            *
  ******************************************************************************/
-static void	if_type_add(const char *ifname, struct zbx_json *j)
+static void	if_type_add(const char *if_name, struct zbx_json *j)
 {
 #define ARPHRD_LOOPBACK	772
 #define JSON_KEY_TYPE	"type"
@@ -1256,7 +1256,7 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 	int		type = 0;
 	zbx_stat_t	st;
 
-	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/type", ifname);
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/type", if_name);
 
 	if (NULL != (f = fopen(buf, "r")))
 	{
@@ -1271,7 +1271,7 @@ static void	if_type_add(const char *ifname, struct zbx_json *j)
 		return;
 	}
 
-	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/device", ifname);
+	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/device", if_name);
 
 	if (0 == lstat(buf, &st))
 	{
