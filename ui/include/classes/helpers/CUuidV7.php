@@ -19,7 +19,7 @@
  */
 class CUuidV7 {
 
-	public static function generate(bool $canonical_format = false): string {
+	public static function generate(): string {
 		$data = self::getTimePart().random_bytes(10);
 
 		// Set version: 7th byte to 0111 (0111xxxx)
@@ -28,7 +28,7 @@ class CUuidV7 {
 		// Set variant: 9th byte to 10 (10xxxxxx)
 		$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
-		return self::format($data, $canonical_format);
+		return bin2hex($data);
 	}
 
 	private static function getTimePart(): string {
@@ -45,29 +45,10 @@ class CUuidV7 {
 		return pack('Nn', $left_time_part, $right_time_part);
 	}
 
-	private static function format(string $data, bool $canonical_format): string {
-		$hex_data = bin2hex($data);
-
-		if (!$canonical_format) {
-			return $hex_data;
-		}
-
-		return implode('-', [
-			substr($hex_data, 0, 8),
-			substr($hex_data, 8, 4),
-			substr($hex_data, 12, 4),
-			substr($hex_data, 16, 4),
-			substr($hex_data, 20, 12),
-		]);
-	}
-
 	public static function isUuidV7(string $uuid): bool {
-		$uuid = strtolower(str_replace('-', '', $uuid));
+		$uuid = strtolower($uuid);
 
-		if (strlen($uuid) != 32 || !ctype_xdigit($uuid)) {
-			return false;
-		}
-
-		return $uuid[12] === '7' && in_array($uuid[16], ['8','9','a','b']);
+		return strlen($uuid) == 32 && ctype_xdigit($uuid) && $uuid[12] === '7'
+			&& in_array($uuid[16], ['8', '9', 'a', 'b']);
 	}
 }
