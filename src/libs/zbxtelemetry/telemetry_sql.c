@@ -12,10 +12,15 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "telemetry.h"
 #include "zbxcommon.h"
 #include "zbxdb.h"
 #include "zbxjson.h"
+#include "zbxstr.h"
 #include "zbxtelemetry.h"
+
+ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
+ZBX_PTR_VECTOR_IMPL(tq_condition_ptr, zbx_tq_condition_t *)
 
 typedef enum tq_db_type
 {
@@ -24,6 +29,11 @@ typedef enum tq_db_type
 }
 tq_db_type_t;
 
+/******************************************************************************
+ *                                                                            *
+ * Return value: escaped and quoted string to be used as a string literal     *
+ *                                                                            *
+ ******************************************************************************/
 static char	*tq_sql_dyn_escape_string(const char *src, tq_db_type_t db_type)
 {
 	// FIXME: placeholder, zbx_db_dyn_escape_string should not be used, must be implemented for each db separately
@@ -42,17 +52,9 @@ static char	*tq_sql_dyn_escape_string(const char *src, tq_db_type_t db_type)
 	return dst;
 }
 
-static char	*tq_sql_dyn_escape_like_pattern(const char *src, tq_db_type_t db_type)
-{
-	/* FIXME: placeholder   */
-	/* TODO: escape % and _ */
-
-	return tq_sql_dyn_escape_string(src, db_type);
-}
-
 /******************************************************************************
  *                                                                            *
- * Return value: escaped string to be used as column or table name            *
+ * Return value: escaped and quoted string to be used as column or table name *
  *                                                                            *
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_name(const char *src, tq_db_type_t db_type)
@@ -79,6 +81,17 @@ static char	*tq_sql_dyn_escape_name(const char *src, tq_db_type_t db_type)
 	*(dst + 1 + src_strlen + 1) = '\0';
 
 	return dst;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Return value: escaped and UNQUOTED string to use in a LIKE pattern         *
+ *                                                                            *
+ ******************************************************************************/
+static char	*tq_sql_dyn_escape_like_pattern(const char *src, tq_db_type_t db_type)
+{
+	/* FIXME: placeholder */
+	return zbx_db_dyn_escape_like_pattern(src);
 }
 
 static char	*tq_sql_dyn_get_json_extract(const char *field, const char *path, tq_db_type_t db_type)
@@ -286,17 +299,276 @@ static char	*tq_sql_dyn_get_table_to_select_from(const zbx_tq_query_t *query, tq
 	return str_esc;
 }
 
-static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, tq_db_type_t db_type)
+static char	*tq_sql_dyn_get_condition_operand(const zbx_tq_condition_t *cond, tq_db_type_t db_type)
 {
-	// TODO
-	char	*str = NULL;
+	if (NULL == cond->json_path)
+		return tq_sql_dyn_escape_name(cond->column_name, db_type);
 
-	str = zbx_strdup(str, "<conditions>");
+	return tq_sql_dyn_get_json_extract(cond->column_name, cond->json_path, db_type);
+}
 
-	if (str == NULL)
-		str = zbx_strdup(NULL, "");
+static char	*tq_sql_dyn_get_condition_contains(const zbx_tq_condition_t *cond, tq_db_type_t db_type)
+{
+	char	*str;
+	char	*operand = tq_sql_dyn_get_condition_operand(cond, db_type);
+	char	*value_esc = tq_sql_dyn_escape_like_pattern(cond->value, db_type);
+
+	switch (db_type)
+	{
+		case TQ_SQL_DB_TYPE_POSTGRESQL:
+			str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", operand, value_esc);
+			break;
+		case TQ_SQL_DB_TYPE_MYSQL:
+			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+			break;
+	}
+
+	zbx_free(operand);
+	zbx_free(value_esc);
 
 	return str;
+}
+
+static char	*tq_sql_dyn_get_condition(const zbx_tq_condition_t *cond, tq_db_type_t db_type)
+{
+	if (ZBX_TQ_OPERATOR_UNKNOWN == cond->operator)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	if (ZBX_TQ_OPERATOR_EQUAL == cond->operator || ZBX_TQ_OPERATOR_NOT_EQUAL == cond->operator)
+	{
+		char	*str;
+		char	*operand = tq_sql_dyn_get_condition_operand(cond, db_type);
+		char	*value_esc = tq_sql_dyn_escape_string(cond->value, db_type);
+
+		if (ZBX_TQ_OPERATOR_EQUAL == cond->operator)
+			str = zbx_dsprintf(NULL, "%s = %s", operand, value_esc);
+		else
+			str = zbx_dsprintf(NULL, "%s <> %s", operand, value_esc);
+
+		zbx_free(operand);
+		zbx_free(value_esc);
+
+		return	str;
+	}
+
+	if (ZBX_TQ_OPERATOR_CONTAINS == cond->operator)
+		return tq_sql_dyn_get_condition_contains(cond, db_type);
+	else
+	{
+		char	*contains_str = tq_sql_dyn_get_condition_contains(cond, db_type);
+		char	*str = zbx_dsprintf(NULL, "(NOT %s)", contains_str);
+
+		zbx_free(contains_str);
+
+		return str;
+	}
+}
+
+static char	*tq_sql_dyn_get_conditions_simple(const zbx_tq_query_t *query, tq_db_type_t db_type)
+{
+	char	*str = NULL;
+	size_t	alloc = 0;
+	size_t	offset = 0;
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = &query->conditions.values[i];
+
+		char	*cond_str = tq_sql_dyn_get_condition(cond, db_type);
+
+		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
+
+		if (query->conditions.values_num - 1 != i)
+			zbx_snprintf_alloc(&str, &alloc, &offset, " %s ",
+					(query->evaltype == ZBX_TQ_EVAL_TYPE_AND ? "AND" : "OR"));
+
+		zbx_free(cond_str);
+	}
+
+	if (str == NULL)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		str = zbx_strdup(NULL, "");
+	}
+
+	return str;
+}
+
+static int	tq_condition_ptr_compare_by_column_and_path(const void *a, const void *b)
+{
+	const zbx_tq_condition_t	*cond_a = *(const zbx_tq_condition_t * const *)a;
+	const zbx_tq_condition_t	*cond_b = *(const zbx_tq_condition_t * const *)b;
+
+	int	column_name_cmp_res = strcmp(cond_a->column_name, cond_b->column_name);
+
+	if (0 != column_name_cmp_res)
+		return column_name_cmp_res;
+
+	if (NULL == cond_a->json_path || NULL == cond_b->json_path)
+	{
+		if (cond_a->json_path != cond_b->json_path)
+			THIS_SHOULD_NEVER_HAPPEN;
+
+		return column_name_cmp_res;
+	}
+
+	return strcmp(cond_a->json_path, cond_b->json_path);
+}
+
+static char	*tq_sql_dyn_get_conditions_and_or(const zbx_tq_query_t *query, tq_db_type_t db_type)
+{
+	char				*str = NULL;
+	size_t				alloc = 0;
+	size_t				offset = 0;
+	zbx_vector_tq_condition_ptr_t	conditions_sorted;
+
+	if (0 == query->conditions.values_num)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		return zbx_strdup(NULL, "");
+	}
+
+	zbx_vector_tq_condition_ptr_create(&conditions_sorted);
+
+	for (int i = 0; i < query->conditions.values_num; i++)
+		zbx_vector_tq_condition_ptr_append(&conditions_sorted, &query->conditions.values[i]);
+
+	zbx_vector_tq_condition_ptr_sort(&conditions_sorted, tq_condition_ptr_compare_by_column_and_path);
+
+	zbx_snprintf_alloc(&str, &alloc, &offset, "(");
+
+	for (int i = 0; i < conditions_sorted.values_num; i++)
+	{
+		const zbx_tq_condition_t	*cond = conditions_sorted.values[i];
+		char				*cond_str = tq_sql_dyn_get_condition(cond, db_type);
+
+		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
+
+		if (conditions_sorted.values_num - 1 == i)
+			zbx_snprintf_alloc(&str, &alloc, &offset, ")");
+		else if (0 != strcmp(cond->column_name, conditions_sorted.values[i + 1]->column_name))
+			zbx_snprintf_alloc(&str, &alloc, &offset, ")AND(");
+		else
+			zbx_snprintf_alloc(&str, &alloc, &offset, " OR ");
+
+		zbx_free(cond_str);
+	}
+
+	zbx_vector_tq_condition_ptr_destroy(&conditions_sorted);
+
+	return str;
+}
+
+static char	*tq_sql_dyn_get_conditions_expression(const zbx_tq_query_t *query, tq_db_type_t db_type)
+{
+	char		*str = NULL;
+	size_t		alloc = 0;
+	size_t		offset = 0;
+	const char	*p = query->formula;
+
+	while ('\0' != *p)
+	{
+		if (' ' == *p)
+		{
+			if (query->formula == p || ' ' != *(p - 1))
+				zbx_strcpy_alloc(&str, &alloc, &offset, " ");
+			p++;
+			continue;
+		}
+
+		if ('(' == *p || ')' == *p)
+		{
+			zbx_strncpy_alloc(&str, &alloc, &offset, p, 1);
+			p++;
+			continue;
+		}
+
+		if (islower(*p))
+		{
+			if (0 == strncmp(p, "and", ZBX_CONST_STRLEN("and")))
+			{
+				zbx_strcpy_alloc(&str, &alloc, &offset, "AND");
+				p += ZBX_CONST_STRLEN("and");
+			}
+			else if (0 == strncmp(p, "or", ZBX_CONST_STRLEN("or")))
+			{
+				zbx_strcpy_alloc(&str, &alloc, &offset, "OR");
+				p += ZBX_CONST_STRLEN("or");
+			}
+			else if (0 == strncmp(p, "not", ZBX_CONST_STRLEN("not")))
+			{
+				zbx_strcpy_alloc(&str, &alloc, &offset, "NOT");
+				p += ZBX_CONST_STRLEN("not");
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				zbx_free(str);
+				alloc = 0;
+				offset = 0;
+				break;
+			}
+			continue;
+		}
+
+		if (!isupper(*p))
+		{
+			THIS_SHOULD_NEVER_HAPPEN;
+			zbx_free(str);
+			alloc = 0;
+			offset = 0;
+			break;
+		}
+
+		int	len = 1;
+
+		while (isupper(p[len]))
+			len++;
+
+		int	cond_idx = tq_formula_constant_to_condition_idx(p, len);
+		char	*cond_str = tq_sql_dyn_get_condition(&query->conditions.values[cond_idx], db_type);
+
+		zbx_snprintf_alloc(&str, &alloc, &offset, "%s", cond_str);
+
+		zbx_free(cond_str);
+
+		p += len;
+	}
+
+	if (str == NULL)
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		str = zbx_strdup(NULL, "");
+	}
+
+	return str;
+}
+
+static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, tq_db_type_t db_type)
+{
+	if (0 == query->conditions.values_num)
+		return zbx_strdup(NULL, "");
+
+	switch (query->evaltype)
+	{
+		case ZBX_TQ_EVAL_TYPE_AND:
+		case ZBX_TQ_EVAL_TYPE_OR:
+			return tq_sql_dyn_get_conditions_simple(query, db_type);
+
+		case ZBX_TQ_EVAL_TYPE_AND_OR:
+			return tq_sql_dyn_get_conditions_and_or(query, db_type);
+
+		case ZBX_TQ_EVAL_TYPE_EXPRESSION:
+			return tq_sql_dyn_get_conditions_expression(query, db_type);
+
+		case ZBX_TQ_EVAL_TYPE_UNKNOWN:
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+			return zbx_strdup(NULL, "");
+	}
 }
 
 /* TODO: move to another file? */
