@@ -44,7 +44,7 @@ my %c = (
 	"t_varchar"	=>	"ZBX_TYPE_CHAR",
 	"t_cuid"	=>	"ZBX_TYPE_CUID",
 	"t_json"	=>	"ZBX_TYPE_JSON",
-	"t_uuid"	=>	"ZBX_TYPE_UUID",
+	"t_uuid_v7"	=>	"ZBX_TYPE_UUID_V7",
 );
 
 $c{"before"} = "/*
@@ -90,7 +90,7 @@ my %mysql = (
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
 	"t_json"	=>	"json",
-	"t_uuid"	=>	"varchar(32)",
+	"t_uuid_v7"	=>	"varchar(32)",
 );
 
 my %postgresql = (
@@ -113,7 +113,7 @@ my %postgresql = (
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
 	"t_json"	=>	"jsonb",
-	"t_uuid"	=>	"varchar(32)",
+	"t_uuid_v7"	=>	"varchar(32)",
 );
 
 my %sqlite3 = (
@@ -136,7 +136,7 @@ my %sqlite3 = (
 	"t_varchar"	=>	"varchar",
 	"t_cuid"	=>	"varchar(25)",
 	"t_json"	=>	"jsonb",
-	"t_uuid"	=>	"varchar(32)",
+	"t_uuid_v7"	=>	"varchar(32)",
 );
 
 sub rtrim($)
@@ -263,7 +263,7 @@ sub process_field($)
 		{
 			$length = 0;
 		}
-		elsif ($type eq "ZBX_TYPE_UUID")
+		elsif ($type eq "ZBX_TYPE_UUID_V7")
 		{
 			$length = 0;
 		}

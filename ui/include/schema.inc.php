@@ -10276,10 +10276,10 @@ return [
 	'device' => [
 		'key' => 'uuid',
 		'fields' => [
-			'uuid' => [
+			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CUID,
-				'length' => 32,
+				'type' => t_uuid_v7,
+				'length' => 10,
 				'default' => ''
 			],
 			'userid' => [
@@ -10323,14 +10323,14 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'token',
-				'ref_field' => 'tokenid'
+				'ref_field' => 'RESTRICT'
 			],
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CUID,
-				'length' => 32,
+				'type' => t_uuid_v7,
+				'length' => 20,
 				'ref_table' => 'device',
-				'ref_field' => 'uuid'
+				'ref_field' => 'deviceid'
 			]
 		]
 	],
@@ -10344,10 +10344,10 @@ return [
 			],
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CUID,
-				'length' => 32,
+				'type' => t_uuid_v7,
+				'length' => 20,
 				'ref_table' => 'device',
-				'ref_field' => 'uuid'
+				'ref_field' => 'deviceid'
 			],
 			'scope' => [
 				'null' => false,
@@ -10380,10 +10380,10 @@ return [
 		'fields' => [
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CUID,
-				'length' => 32,
+				'type' => t_uuid_v7,
+				'length' => 10,
 				'ref_table' => 'device',
-				'ref_field' => 'uuid'
+				'ref_field' => 'deviceid'
 			],
 			'token' => [
 				'null' => false,

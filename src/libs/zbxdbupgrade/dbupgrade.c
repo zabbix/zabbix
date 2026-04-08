@@ -106,7 +106,7 @@ static void	DBfield_type_string(char **sql, size_t *sql_alloc, size_t *sql_offse
 		case ZBX_TYPE_SERIAL:
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ZBX_TYPE_SERIAL_STR);
 			break;
-		case ZBX_TYPE_UUID:
+		case ZBX_TYPE_UUID_V7:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "%s(%d)", ZBX_TYPE_CHAR_STR, ZBX_UUID_LEN);
 			break;
 		default:
@@ -130,7 +130,7 @@ static void	DBfield_type_suffix_string(char **sql, size_t *sql_alloc, size_t *sq
 		case ZBX_TYPE_BLOB:
 		case ZBX_TYPE_JSON:
 		case ZBX_TYPE_CUID:
-		case ZBX_TYPE_UUID:
+		case ZBX_TYPE_UUID_V7:
 			return;
 		case ZBX_TYPE_SERIAL:
 			zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " %s", ZBX_TYPE_SERIAL_SUFFIX_STR);
