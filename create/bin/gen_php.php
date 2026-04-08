@@ -89,7 +89,7 @@ function parse_schema($path) {
 						$type = 'DB::FIELD_TYPE_JSON';
 						$length = 128*1048576;
 						break;
-					case 't_uuid_V7':
+					case 't_uuid_v7':
 						$type = 'DB::FIELD_TYPE_CUID';
 						$length = 32;
 						break;
