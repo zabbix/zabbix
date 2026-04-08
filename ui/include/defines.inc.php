@@ -1605,7 +1605,7 @@ define('API_JSONRPC_PARAMS',		38);
 define('API_JSONRPC_ID',			39);
 define('API_DATE',					40);
 define('API_NUMERIC_RANGES',		41);
-define('API_UUID',					42);
+define('API_UUID_V4',				42);
 define('API_VAULT_SECRET',			43);
 define('API_CUID',					45);
 define('API_IP_RANGES',				46);

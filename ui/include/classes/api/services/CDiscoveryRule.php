@@ -386,7 +386,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 			'host_status' =>			['type' => API_ANY],
 			'flags' =>					['type' => API_ANY],
 			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID],
+											['if' => ['field' => 'host_status', 'in' => implode(',', [HOST_STATUS_TEMPLATE])], 'type' => API_UUID_V4],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>					['type' => API_ANY],
@@ -594,7 +594,7 @@ class CDiscoveryRule extends CDiscoveryRuleGeneral {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
 			'host_status' =>			['type' => API_ANY],
 			'uuid' =>					['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
+											['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID_V4],
 											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('items', 'uuid'), 'unset' => true]
 			]],
 			'itemid' =>					['type' => API_ANY],

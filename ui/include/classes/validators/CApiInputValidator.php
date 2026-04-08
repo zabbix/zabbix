@@ -220,8 +220,8 @@ class CApiInputValidator {
 			case API_NUMERIC_RANGES:
 				return self::validateNumericRanges($rule, $data, $path, $error);
 
-			case API_UUID:
-				return self::validateUuid($rule, $data, $path, $error);
+			case API_UUID_V4:
+				return self::validateUuidV4($rule, $data, $path, $error);
 
 			case API_CUIDS:
 				return self::validateCuids($rule, $data, $path, $error);
@@ -341,7 +341,7 @@ class CApiInputValidator {
 			case API_JSONRPC_ID:
 			case API_DATE:
 			case API_NUMERIC_RANGES:
-			case API_UUID:
+			case API_UUID_V4:
 			case API_CUID:
 			case API_VAULT_SECRET:
 			case API_IMAGE:
@@ -3118,7 +3118,7 @@ class CApiInputValidator {
 	 *
 	 * @return bool
 	 */
-	private static function validateUuid(array $rule, &$data, string $path, string &$error): bool {
+	private static function validateUuidV4(array $rule, &$data, string $path, string &$error): bool {
 		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
 			return false;
 		}
