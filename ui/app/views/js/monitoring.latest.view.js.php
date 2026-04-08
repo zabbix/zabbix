@@ -455,7 +455,7 @@
 		},
 
 		refreshCounters(response) {
-			if (this.layout_mode != <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
