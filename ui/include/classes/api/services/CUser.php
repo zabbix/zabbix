@@ -3026,35 +3026,29 @@ class CUser extends CApiService {
 		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_SCHEME_DPOP, $time);
 
 		$resource = DBselect(
-			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
-			' FROM token_device td,device d,device_key dk'.
-			' WHERE td.deviceid=d.deviceid'.
-				' AND d.deviceid=dk.deviceid'.
+			'SELECT dk.deviceid,dk.key_,dk.kid,dk.scope'.
+			' FROM token_device td,device_key dk'.
+			' WHERE td.deviceid=dk.deviceid'.
 				' AND '.dbConditionId('td.tokenid', [$db_token['tokenid']]).
-				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]),
-			2
+				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]).
+			' ORDER BY dk.device_keyid DESC'
 		);
 
 		$keys_per_scope = [];
-		$uuid = '';
+		$deviceid = '';
 
 		while ($db_device_key = DBfetch($resource)) {
-			$keys_per_scope[$db_device_key['scope']] = [
-				'kid' => $db_device_key['kid'],
-				'key' => $db_device_key['key_']
-			];
+			$keys_per_scope[$db_device_key['scope']][$db_device_key['kid']] = $db_device_key['key_'];
 
-			$uuid = $db_device_key['uuid'];
+			$deviceid = $db_device_key['deviceid'];
 		}
 
-		if (!($keys_per_scope && count($keys_per_scope) == 2)) {
+		if (!$keys_per_scope || count($keys_per_scope) < 2) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$mobile_identity_key = $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY];
-
-		if (!CApiDpopHelper::verifyDpopSignature($params['signature'], $mobile_identity_key['key'],
-				$mobile_identity_key['kid'], $params['token'], $params['requested_api_method'], $time)) {
+		if (!CApiDpopHelper::verifyDpopSignature($params['signature'], $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY],
+				$params['token'], $params['requested_api_method'], $time)) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
@@ -3069,8 +3063,11 @@ class CUser extends CApiService {
 			'where' => ['tokenid' => $db_token['tokenid']]
 		]);
 
-		self::$userData = $db_user + ['token' => $params['token']] + ['uuid' => $uuid] +
-			$keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY];
+		$mobile_encryption_kid = array_key_first($keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY]);
+		$mobile_encryption_key = $keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY][$mobile_encryption_kid];
+
+		self::$userData = $db_user + ['token' => $params['token']] + ['deviceid' => $deviceid] +
+			['kid' => $mobile_encryption_kid, 'key' => $mobile_encryption_key];
 
 		unset($db_user['ugsetid']);
 

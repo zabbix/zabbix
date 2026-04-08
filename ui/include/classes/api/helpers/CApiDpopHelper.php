@@ -27,9 +27,22 @@ class CApiDpopHelper {
 
 	private const SIGNATURE_ALGORITHM = 'ES256';
 
-	public static function verifyDpopSignature(string $signature, string $encoded_jwk, string $kid,
-			string $access_token, string $requested_api_method, int $check_time): bool {
-		$jwk = json_decode($encoded_jwk, true);
+	public static function verifyDpopSignature(string $signature, array $kid_keys, string $access_token,
+			string $requested_api_method, int $check_time): bool {
+		[$encoded_header, $encoded_payload] = explode('.', $signature);
+
+		// header check section
+		$header = json_decode(JWT::urlsafeB64Decode($encoded_header), true);
+
+		if (!is_array($header) || !$header) {
+			return false;
+		}
+
+		if (!self::checkKid($header, $kid_keys)) {
+			return false;
+		}
+
+		$jwk = json_decode($kid_keys[$header['kid']], true);
 
 		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
 
@@ -40,19 +53,6 @@ class CApiDpopHelper {
 			JWT::decode($signature, $key);
 		}
 		catch (Exception $e) {
-			return false;
-		}
-
-		[$encoded_header, $encoded_payload] = explode('.', $signature);
-
-		// header check section
-		$header = json_decode(JWT::urlsafeB64Decode($encoded_header), true);
-
-		if (!is_array($header) || !$header) {
-			return false;
-		}
-
-		if (!self::checkKid($header, $kid)) {
 			return false;
 		}
 
@@ -78,13 +78,13 @@ class CApiDpopHelper {
 		return true;
 	}
 
-	private static function checkKid(array $header, string $kid): bool {
-		return array_key_exists('kid', $header) && hash_equals($kid, $header['kid']);
+	private static function checkKid(array $header, array $kid_keys): bool {
+		return array_key_exists('kid', $header) && array_key_exists($header['kid'], $kid_keys);
 	}
 
 	private static function checkHtu(array $payload, string $requested_api_method): bool {
 		// todo - use method get server_id
-		$expected_htu = 'urn:zbx:'.self::getDeviceFeatureFlag().':'.$requested_api_method;
+		$expected_htu = 'urn:zbx:'.self::getServerId().':'.$requested_api_method;
 
 		return array_key_exists('htu', $payload) && hash_equals($expected_htu, $payload['htu']);
 	}
