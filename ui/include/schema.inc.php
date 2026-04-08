@@ -10323,7 +10323,7 @@ return [
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'token',
-				'ref_field' => 'RESTRICT'
+				'ref_field' => 'tokenid'
 			],
 			'deviceid' => [
 				'null' => false,
