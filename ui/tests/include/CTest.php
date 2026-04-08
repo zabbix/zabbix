@@ -52,7 +52,7 @@ use PHPUnit\Framework\TestCase;
 
 class CTest extends TestCase {
 
-	protected bool $trace_delays = false;
+	protected static bool $trace_delays = false;
 
 	// Table that should be backed up at the test suite level.
 	protected static $suite_backup = null;
@@ -302,7 +302,7 @@ class CTest extends TestCase {
 				$start = microtime(true);
 				CDBHelper::restoreTables();
 
-				if ($trace_delays) {
+				if (static::$trace_delays) {
 					$caseDuration = microtime(true) - $start;
 					self::$backup_time_per_test_file += $caseDuration;
 					self::$backup_time_total += $caseDuration;
@@ -429,7 +429,7 @@ class CTest extends TestCase {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
 
-			if ($trace_delays) {
+			if (static::$trace_delays) {
 				$caseDuration = microtime(true) - $start;
 				self::$backup_time_per_test_file += $caseDuration;
 				self::$backup_time_total += $caseDuration;
@@ -469,7 +469,7 @@ class CTest extends TestCase {
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {
 
-			if ($trace_delays) {
+			if (static::$trace_delays) {
 				fwrite(STDERR, sprintf("[%s] onAfterTestSuite backup restore took %.4fs [total: %.4fs]\n",
 					self::$last_test_case_name, self::$backup_time_per_test_file,
 					self::$backup_time_total));
@@ -488,7 +488,7 @@ class CTest extends TestCase {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
 
-			if ($trace_delays) {
+			if (static::$trace_delays) {
 				$caseDuration = microtime(true) - $start;
 				self::$backup_time_per_test_file += $caseDuration;
 				self::$backup_time_total += $caseDuration;
@@ -502,7 +502,7 @@ class CTest extends TestCase {
 			$start = microtime(true);
 			CDBHelper::restoreTables();
 
-			if ($trace_delays) {
+			if (static::$trace_delays) {
 				$caseDuration = microtime(true) - $start;
 				self::$backup_time_per_test_file += $caseDuration;
 				self::$backup_time_total += $caseDuration;
@@ -511,7 +511,7 @@ class CTest extends TestCase {
 			self::$suite_backup = null;
 		}
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			fwrite(STDERR, sprintf("[%s] onAfterTestSuite backup restore took %.4fs [total %.4fs]\n",
 				self::$last_test_case_name, self::$backup_time_per_test_file,
 				self::$backup_time_total));

@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/helpers/CLogHelper.php';
  */
 class CIntegrationTest extends CAPITest {
 
-	protected bool $trace_delays = false;
+	protected static bool $trace_delays = false;
 
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
@@ -345,7 +345,7 @@ class CIntegrationTest extends CAPITest {
 
 		parent::onAfterTestSuite();
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			$sum_file_time = 0.0;
 			$sum_file_num = 0;
 			$sum_total_time = 0.0;
@@ -437,7 +437,7 @@ class CIntegrationTest extends CAPITest {
 						break;
 				}
 
-				if ($trace_delays) {
+				if (static::$trace_delays) {
 					self::recordDelay('startup', microtime(true) - $start);
 				}
 
@@ -447,7 +447,7 @@ class CIntegrationTest extends CAPITest {
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			self::recordDelay('startup', microtime(true) - $start);
 		}
 
@@ -514,7 +514,7 @@ class CIntegrationTest extends CAPITest {
 
 		if (!$failed_pids) {
 
-			if ($trace_delays) {
+			if (static::$trace_delays) {
 				self::recordDelay('shutdown', microtime(true) - $start);
 			}
 
@@ -526,7 +526,7 @@ class CIntegrationTest extends CAPITest {
 			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
 			: '';
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			self::recordDelay('shutdown', microtime(true) - $start);
 		}
 
@@ -868,7 +868,7 @@ class CIntegrationTest extends CAPITest {
 		if ($delay > 0) {
 			sleep($delay);
 		}
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			self::recordDelay('wait_send', microtime(true) - $start);
 		}
 		return $result;
@@ -1006,7 +1006,7 @@ class CIntegrationTest extends CAPITest {
 			sleep($delay);
 		}
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			self::recordDelay('reload_config_cache', microtime(true) - $start);
 		}
 	}
@@ -1082,7 +1082,7 @@ class CIntegrationTest extends CAPITest {
 				if (is_array($response['result']) && count($response['result']) > 0
 					&& ($callback === null || call_user_func($callback, $response))) {
 
-					if ($trace_delays) {
+					if (static::$trace_delays) {
 						self::recordDelay('call_data_present', microtime(true) - $start);
 					}
 
@@ -1102,7 +1102,7 @@ class CIntegrationTest extends CAPITest {
 			sleep($delay);
 		}
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			self::recordDelay('call_data_present', microtime(true) - $start);
 		}
 
@@ -1208,7 +1208,7 @@ class CIntegrationTest extends CAPITest {
 
 		for ($r = 0; $r < $iterations; $r++) {
 			if (self::isLogLinePresent($component, $lines, $incremental, $match_regex)) {
-				if ($trace_delays) {
+				if (static::$trace_delays) {
 					self::recordDelay('wait_log_line', microtime(true) - $start);
 				}
 				return true;
@@ -1248,7 +1248,7 @@ class CIntegrationTest extends CAPITest {
 			}
 		}
 
-		if ($trace_delays) {
+		if (static::$trace_delays) {
 			self::recordDelay('wait_log_line', microtime(true) - $start);
 		}
 
