@@ -28,8 +28,8 @@ $html_page = (new CHtmlPage())
 
 $url = (new CUrl('host_discovery_prototypes.php'))
 	->setArgument('form', getRequest('form') === 'create' ? 'create' : 'update')
-	->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-	->setArgument('context', $data['context']);
+	->setArgument('context', $data['context'])
+	->setArgument('parent_discoveryid', $data['parent_discoveryid']);
 
 if (getRequest('form') !== 'create') {
 	$url->setArgument('itemid', $data['itemid']);

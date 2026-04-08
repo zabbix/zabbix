@@ -95,8 +95,8 @@ foreach ($this->data['hostPrototypes'] as $hostPrototype) {
 		(new CUrl('host_prototypes.php'))
 			->setArgument('form', 'update')
 			->setArgument('parent_discoveryid', $data['discovery_rule']['itemid'])
-			->setArgument('hostid', $hostPrototype['hostid'])
 			->setArgument('context', $data['context'])
+			->setArgument('hostid', $hostPrototype['hostid'])
 	);
 
 	// template list

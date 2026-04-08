@@ -158,9 +158,9 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 	$name[] = new CLink($httpTest['name'],
 		(new CUrl('httpconf.php'))
 			->setArgument('form', 'update')
+			->setArgument('context', $data['context'])
 			->setArgument('hostid', $httpTest['hostid'])
 			->setArgument('httptestid', $httpTestId)
-			->setArgument('context', $data['context'])
 	);
 
 	if ($data['context'] === 'host') {
