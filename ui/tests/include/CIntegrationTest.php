@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/helpers/CLogHelper.php';
  */
 class CIntegrationTest extends CAPITest {
 
-	protected static bool $trace_delays = false;
+	protected static bool $trace_delays = true;
 
 	// Default iteration count for wait operations.
 	const WAIT_ITERATIONS			= 60;
