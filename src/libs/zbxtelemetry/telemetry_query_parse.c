@@ -542,20 +542,6 @@ static int	tq_validate_formula_char(char c)
 	return (isalpha(c) || '(' == c || ')' == c || ' ' == c) ? SUCCEED : FAIL;
 }
 
-static int	tq_formula_constant_to_condition_idx(const char *p, int len)
-{
-	int res = 0;
-	int mult = 1;
-
-	for (int i = len - 1; i >= 0; i--)
-	{
-		res += (p[i] - 'A') * mult;
-		mult *= ('Z' - 'A') + 1;
-	}
-
-	return res;
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: validates that:                                                   *

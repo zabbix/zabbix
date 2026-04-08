@@ -27,4 +27,6 @@ void	tq_aggr_column_clean(zbx_tq_aggr_column_t *aggr_column);
 void	tq_condition_init(zbx_tq_condition_t *condition);
 void	tq_condition_clean(zbx_tq_condition_t *condition);
 
+int	tq_formula_constant_to_condition_idx(const char *p, int len);
+
 #endif

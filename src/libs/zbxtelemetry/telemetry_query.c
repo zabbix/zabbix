@@ -99,3 +99,17 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query)
 	}
 	zbx_vector_tq_condition_destroy(&query->conditions);
 }
+
+int	tq_formula_constant_to_condition_idx(const char *p, int len)
+{
+	int res = 0;
+	int mult = 1;
+
+	for (int i = len - 1; i >= 0; i--)
+	{
+		res += (p[i] - 'A') * mult;
+		mult *= ('Z' - 'A') + 1;
+	}
+
+	return res;
+}
