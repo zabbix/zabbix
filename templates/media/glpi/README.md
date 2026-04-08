@@ -1,14 +1,14 @@
 ![](images/logo.png?raw=true)
-# GLPi webhook
+# GLPI webhook
 
 ## Overview
 
-This guide describes how to integrate your Zabbix installation with your GLPi installation using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
+This guide describes how to integrate your Zabbix installation with your GLPI installation using the Zabbix webhook feature, providing instructions on setting up a media type, user, and action in Zabbix.
 
 The webhook supports both legacy REST API (V1) and RESTful API (V2).
-This webhook creates tickets in the GLPi Assistance section. Created tickets have the following urgency mapping:
+This webhook creates tickets in the GLPI Assistance section. Created tickets have the following urgency mapping:
 
-|Severity in Zabbix|Urgency in GLPi|
+|Severity in Zabbix|Urgency in GLPI|
 |-|-|
 0 - Not classified| Very low|
 1 - Information| Very low|
@@ -17,13 +17,13 @@ This webhook creates tickets in the GLPi Assistance section. Created tickets hav
 4 - High| High|
 5 - Disaster| Very high|
 
-- When a problem is updated in Zabbix, the webhook updates the ticket's title and urgency in GLPi and adds a followup entry with the update comment.
+- When a problem is updated in Zabbix, the webhook updates the ticket's title and urgency in GLPI and adds a followup entry with the update comment.
 - When a problem is resolved in Zabbix, the webhook updates the ticket's title and adds a followup entry with resolution details.
 - Created tickets have the status "New" and resolved tickets - "Solved".
 - Due to the specifics of the webhook, the number of retries is, by default, set to 1. We recommend not changing this setting; should a transaction error occur, additional duplicate objects (tickets, followups) may be created during the retry.
 
 ## Tested on
-- GLPi 10.0.18, 10.0.24, 11.0.5, 11.0.6
+- GLPI 10.0.18, 10.0.24, 11.0.5, 11.0.6
 
 ## Requirements
 
@@ -41,22 +41,22 @@ The configurable parameters are intended to be changed according to the webhook 
 |----|-----|-----------|
 |zabbix_url|\{$ZABBIX\.URL\}|Current Zabbix URL.|
 |glpi_legacy_api|false|Boolean value (true/false) to set API version: `false` (default) enables Modern API v2 with OAuth2 Bearer token authentication, `true` enables Legacy API v1 with Session-Token authentication.|
-|glpi_app_token||GLPi application token (optional; specify if the token is set in the API client settings).|
-|glpi_user_token|\<PLACE GLPI USER TOKEN\>|GLPi user token.|
-|glpi_client_id|\<PLACE GLPI CLIENT ID\>|GLPi client ID.|
-|glpi_client_secret|\<PLACE GLPI CLIENT SECRET\>|GLPi client secret.|
-|glpi_username|\<PLACE GLPI USERNAME\>|GLPi username.|
-|glpi_password|\<PLACE GLPI USER PASSWORD\>|GLPi user password.|
-|glpi_url|\<PLACE GLPI URL\>|URL of GLPi installation.|
-|glpi_urgency_autoregistration|Low|String value of GLPi urgency to assign to autoregistration event tickets.|
-|glpi_urgency_discovery|Low|String value of GLPi urgency to assign to discovery event tickets.|
-|glpi_urgency_internal|Low|String value of GLPi urgency to assign to internal event tickets.|
-|severity_not_classified|Very low|GLPi urgency to assign to tickets when event has Zabbix severity "Not classified".|
-|severity_information|Very low|GLPi urgency to assign to tickets when event has Zabbix severity "Information".|
-|severity_warning|Low|GLPi urgency to assign to tickets when event has Zabbix severity "Warning".|
-|severity_average|Medium|GLPi urgency to assign to tickets when event has Zabbix severity "Average".|
-|severity_high|High|GLPi urgency to assign to tickets when event has Zabbix severity "High".|
-|severity_disaster|Very high|GLPi urgency to assign to tickets when event has Zabbix severity "Disaster".|
+|glpi_app_token||GLPI application token (optional; specify if the token is set in the API client settings).|
+|glpi_user_token|\<PLACE GLPI USER TOKEN\>|GLPI user token.|
+|glpi_client_id|\<PLACE GLPI CLIENT ID\>|GLPI client ID.|
+|glpi_client_secret|\<PLACE GLPI CLIENT SECRET\>|GLPI client secret.|
+|glpi_username|\<PLACE GLPI USERNAME\>|GLPI username.|
+|glpi_password|\<PLACE GLPI USER PASSWORD\>|GLPI user password.|
+|glpi_url|\<PLACE GLPI URL\>|URL of GLPI installation.|
+|glpi_urgency_autoregistration|Low|String value of GLPI urgency to assign to autoregistration event tickets.|
+|glpi_urgency_discovery|Low|String value of GLPI urgency to assign to discovery event tickets.|
+|glpi_urgency_internal|Low|String value of GLPI urgency to assign to internal event tickets.|
+|severity_not_classified|Very low|GLPI urgency to assign to tickets when event has Zabbix severity "Not classified".|
+|severity_information|Very low|GLPI urgency to assign to tickets when event has Zabbix severity "Information".|
+|severity_warning|Low|GLPI urgency to assign to tickets when event has Zabbix severity "Warning".|
+|severity_average|Medium|GLPI urgency to assign to tickets when event has Zabbix severity "Average".|
+|severity_high|High|GLPI urgency to assign to tickets when event has Zabbix severity "High".|
+|severity_disaster|Very high|GLPI urgency to assign to tickets when event has Zabbix severity "Disaster".|
 
 ### Internal parameters
 
@@ -75,16 +75,16 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 |alert_message|\{ALERT\.MESSAGE\}|'Default message' value from action configuration.|
 |event_id|\{EVENT\.ID\}|Numeric ID of the event that triggered an action.|
 |trigger_id|\{TRIGGER\.ID\}|Numeric ID of the trigger of this action.|
-|glpi_problem_id|\{EVENT\.TAGS\.\_\_zbx\_glpi\_problem\_id\}|GLPi problem ID.|
+|glpi_problem_id|\{EVENT\.TAGS\.\_\_zbx\_glpi\_problem\_id\}|GLPI problem ID.|
 
 > Please be aware that each webhook supports an HTTP proxy. To use this feature, add a new media type parameter with the name `http_proxy` and set its value to the proxy URL.
 
 ## Service setup
 
-### RESTful API (V2) with OAuth2 - recommended configuration for GLPi 11+:
+### RESTful API (V2) with OAuth2 - recommended configuration for GLPI 11+:
 
-1. Enable access to the GLPi API:
-  - In the GLPi web interface, go to *Setup* > *General* > *API*.
+1. Enable access to the GLPI API:
+  - In the GLPI web interface, go to *Setup* > *General* > *API*.
   - Switch the toggle to activate *Enable API* and click the *Save* button.
 
 [![](images/thumb.1.png?raw=true)](images/1.png)
@@ -118,12 +118,12 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 [![](images/thumb.7.png?raw=true)](images/7.png)
 
-> GLPi 11+ continues to support REST API (V1) without requiring OAuth2/V2. Note that V1 is not recommended for new integrations.
+> GLPI 11+ continues to support REST API (V1) without requiring OAuth2/V2. Note that V1 is not recommended for new integrations.
 
-### REST API (V1) - legacy configuration for GLPi 10:
+### REST API (V1) - legacy configuration for GLPI 10:
 
-1. Enable access to the GLPi REST API:
-  - In the GLPi web interface, go to *Setup* > *General* > *API*.
+1. Enable access to the GLPI REST API:
+  - In the GLPI web interface, go to *Setup* > *General* > *API*.
   - Set the *Enable Rest API* and *Enable login with external token* options to *Yes* and click the *Save* button.
 
 [![](images/thumb.legacy_1.png?raw=true)](images/legacy_1.png)
@@ -163,7 +163,7 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 
 ## Zabbix configuration
 
-1. Before you can start using the GLPi webhook, you need to set the global macro `{$ZABBIX.URL}`:
+1. Before you can start using the GLPI webhook, you need to set the global macro `{$ZABBIX.URL}`:
   - In the Zabbix web interface, go to *Administration* > *Macros* in the top-left drop-down menu.
   - Set up the global macro `{$ZABBIX.URL}` which will contain the URL to the Zabbix frontend. The URL should be either an IP address, a fully qualified domain name, or a localhost.
   - Specifying a protocol is mandatory, whereas the port is optional. Depending on the web server configuration, you might also need to append `/zabbix` to the end of the URL. Good examples:
@@ -181,9 +181,9 @@ Internal parameters are reserved for predefined macros that are not meant to be 
 2. Import the media type:
   - In the *Alerts* > *Media types* section, import the [`media_glpi.yaml`](media_glpi.yaml) file.
 
-3. It is also possible to set GLPi ticket urgency by parameters. Predefined parameter values are already in place; note that they use the default GLPi urgency.
+3. It is also possible to set GLPI ticket urgency by parameters. Predefined parameter values are already in place; note that they use the default GLPI urgency.
 
-**Please adjust these values to suit your GLPi environment.**
+**Please adjust these values to suit your GLPI environment.**
 
 The following parameters apply to Zabbix events that support severities:
   - `severity_not_classified` - for Zabbix severity "Not Classified"
@@ -198,21 +198,21 @@ And the following for Zabbix events that do not have severities:
   - `glpi_urgency_discovery` - for Zabbix discovery events
   - `glpi_urgency_autoregistration` - for Zabbix autoregistration events
 
-4. Open the imported GLPi media type and set the following webhook parameters:
-  - `glpi_url` - the frontend URL of your GLPi installation, without any path suffix (e.g. http://glpi.example.com:8080).
+4. Open the imported GLPI media type and set the following webhook parameters:
+  - `glpi_url` - the frontend URL of your GLPI installation, without any path suffix (e.g. http://glpi.example.com:8080).
   - `glpi_legacy_api` - determine whether you are using RESTful API V2 with OAuth2 authorization (default, parameter value `false`) or legacy API (parameter value `true`).
 
   If using RESTful API V2 with OAuth2, set the required parameters:
   - `glpi_client_id` - the client ID that was generated during the creation of the OAuth client.
   - `glpi_client_secret` - the client secret that was generated during the creation of the OAuth client.
-  - `glpi_username` - GLPi username created for the webhook.
-  - `glpi_password` - password for the GLPi webhook user.
+  - `glpi_username` - GLPI username created for the webhook.
+  - `glpi_password` - password for the GLPI webhook user.
 
 [![](images/thumb.9.png?raw=true)](images/9.png)
 
   If using legacy API, set the parameters:
   - `glpi_app_token` - if you've opted to use an application token during the creation of API client, specify it here; otherwise leave it empty.
-  - `glpi_user_token` - the user token that was generated during the creation of the GLPi user.
+  - `glpi_user_token` - the user token that was generated during the creation of the GLPI user.
 
 [![](images/thumb.10.png?raw=true)](images/10.png)
 
@@ -220,14 +220,14 @@ And the following for Zabbix events that do not have severities:
 
 6. Create a Zabbix user and add media:
   - To create a new user,  go to the *Users* > *Users* section and click the *Create user* button in the top-right corner. In the *User* tab, fill in all the required fields (marked with red asterisks).
-  - In the *Media* tab, click *Add* and select *GLPi* from the *Type* drop-down list. Though the *Send to* field is not used in the GLPi webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
-  - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to GLPi.
+  - In the *Media* tab, click *Add* and select *GLPI* from the *Type* drop-down list. Though the *Send to* field is not used in the GLPI webhook, it cannot be left empty. To comply with frontend requirements, enter any symbol in the field.
+  - Make sure this user has access to all the hosts for which you would like problem notifications to be sent to GLPI.
 
 [![](images/thumb.11.png?raw=true)](images/11.png)
 
-7. Done! You can now start using this media type in actions and create ticket items in GLPi.
+7. Done! You can now start using this media type in actions and create ticket items in GLPI.
 
-For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [GLPi](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
+For more information, please see [Zabbix](https://www.zabbix.com/documentation/8.0/manual/config/notifications) and [GLPI](https://glpi-user-documentation.readthedocs.io/fr/latest/) documentation.
 
 ## Feedback
 
