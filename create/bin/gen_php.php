@@ -43,7 +43,7 @@ function parse_schema($path) {
 				$ref_table = isset($str[6]) ? trim($str[6]) : null;
 				$ref_field = isset($str[7]) ? trim($str[7]) : null;
 
-				preg_match('/(?<type>[a-z_]+)(?:\((?<length>[0-9]+)\))?/', $type, $type_data);
+				preg_match('/(?<type>[a-z_7]+)(?:\((?<length>[0-9]+)\))?/', $type, $type_data);
 				switch ($type_data['type']) {
 					case 't_integer':
 					case 't_nanosec':
