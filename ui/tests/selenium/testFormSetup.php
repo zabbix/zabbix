@@ -20,6 +20,8 @@ require_once __DIR__.'/behaviors/CTableBehavior.php';
 /**
  * @backup sessions
  *
+ * @onBefore deleteConfFile
+ *
  * @backupConfig
  */
 class testFormSetup extends CWebTest {
@@ -34,6 +36,10 @@ class testFormSetup extends CWebTest {
 			CMessageBehavior::class,
 			CTableBehavior::class
 		];
+	}
+
+	protected function deleteConfFile() {
+		unlink(__DIR__.'/../../conf/zabbix.conf.php');
 	}
 
 	/**
