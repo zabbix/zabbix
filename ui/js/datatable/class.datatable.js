@@ -960,13 +960,17 @@ class CDataTable {
 			setTimeout(() => {
 				this.#options_popup?.position();
 
-				const selector = `.${CDataTable.ZBX_STYLE_BODY}`;
-				const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
-				const thead_selector = `.${CDataTable.ZBX_STYLE_HEADER} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
-
-				chkbxRange.init({selector, row_selector, thead_selector});
+				this.initCheckBoxRange();
 			});
 		});
+	}
+
+	initCheckBoxRange() {
+		const selector = `.${CDataTable.ZBX_STYLE_BODY}`;
+		const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
+		const thead_selector = `.${CDataTable.ZBX_STYLE_HEADER} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
+
+		chkbxRange.init({selector, row_selector, thead_selector});
 	}
 
 	#applyLastColumnPadding() {
@@ -2222,6 +2226,14 @@ class CDataTable {
 				this.#updateUserProfile(JSON.stringify({}), [idx2]);
 			});
 		}
+
+		ZABBIX.EventHub.subscribe({
+			require: {
+				context: EVENT_CONTEXT_OVERLAY,
+				event: EVENT_UNMOUNT
+			},
+			callback: () => this.initCheckBoxRange()
+		});
 	}
 
 	#updateUserProfile(value, idx2) {

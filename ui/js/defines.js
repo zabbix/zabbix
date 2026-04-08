@@ -342,3 +342,6 @@ const GRAPH_HINTBOX_TYPE_SCATTER_PLOT = 1;
 
 const EVENT_CONTEXT_PAGE_NAVIGATION = 'page_navigation';
 const EVENT_BACK_FORWARD = 'back_forward';
+
+const EVENT_CONTEXT_OVERLAY = 'overlay';
+const EVENT_UNMOUNT = 'unmount';

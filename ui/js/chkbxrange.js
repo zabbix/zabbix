@@ -28,7 +28,7 @@ var chkbxRange = {
 	row_selector:				null,
 	thead_selector:				null,
 
-	init: function({selector = 'main .list-table tbody', row_selector = 'tr', thead_selector = 'thead'} = {}) {
+	init: function({selector = '.list-table tbody', row_selector = 'tr', thead_selector = 'thead'} = {}) {
 		this.selector = selector;
 		this.row_selector = row_selector;
 		this.thead_selector = thead_selector;
