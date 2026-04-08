@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [8.0.0alpha2])
+AC_INIT([Zabbix], [8.0.0beta1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -198,7 +198,7 @@ dnl ISO C Standard Library
 dnl
 AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
                   inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
-                  stdint.h stdio.h stdlib.h string.h time.h                  \
+                  stdint.h stdio.h stdlib.h string.h time.h setjmp.h         \
 ])
 
 dnl POSIX C Standard Library
@@ -210,6 +210,9 @@ AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
                   pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
                   utmpx.h libgen.h                                           \
 ])
+
+dnl atomics
+AC_CHECK_HEADERS([stdatomic.h])
 
 dnl X/Open and SUS
 AC_CHECK_HEADERS([sys/timeb.h])
@@ -2066,15 +2069,11 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
-		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcomms/libzbxagent2comms.a \
-		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		\${abs_top_builddir}/src/libs/zbxprof/libzbxprof.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
@@ -2083,16 +2082,12 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
-		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libzbxagent2specsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
-		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
-		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2244,9 +2239,12 @@ AC_CONFIG_FILES([
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
+	src/libs/zbxsupervisor/Makefile
+    src/libs/zbxsupervisor_client/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmp/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxvmware/Makefile
@@ -2310,7 +2308,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/audit/Makefile
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
