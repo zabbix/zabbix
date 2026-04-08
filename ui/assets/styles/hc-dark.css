@@ -2390,6 +2390,8 @@ button {
     border-bottom: 1px solid #444444; }
     .datatable .cell:not(.cell-bg) {
       color: #ffffff; }
+    .datatable .cell:first-of-type {
+      grid-column-start: 1; }
     .datatable .cell .cell-inner {
       width: 100%;
       overflow: hidden;

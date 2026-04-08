@@ -298,6 +298,10 @@
 			color: $font-color;
 		}
 
+		&:first-of-type {
+			grid-column-start: 1;
+		}
+
 		.cell-inner {
 			width: 100%;
 			overflow: hidden;
