@@ -89,10 +89,10 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	zbx_vector_push_target_create(&targets);
 
 	result = zbx_db_select(
-		"select d.uuid,d.push_token,dk.kid,dk.key_,dk.scope"
+		"select d.deviceid,d.push_token,dk.kid,dk.key_,dk.scope"
 		" from device d "
 		" left join device_key dk"
-			" on dk.deviceid=d.uuid and dk.active=1"
+			" on dk.deviceid=d.deviceid and dk.active=1"
 				" where d.userid=" ZBX_FS_UI64 " and d.status=1", userid);
 
 
