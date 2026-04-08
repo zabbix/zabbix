@@ -30,7 +30,7 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
-	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'activated_at', 'lastaccess'];
+	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'name', 'activated_at', 'lastaccess'];
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
