@@ -130,7 +130,7 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision)
 	if (0 != (err = pthread_mutex_init(&cache->lock, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot initialize proxy group manager cache mutex: %s", zbx_strerror(err));
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	cache->startup_time = (int)time(NULL);
@@ -1175,7 +1175,7 @@ void	pg_cache_update_proxy_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 			if (ZBX_PG_PROXY_STATE_UNKNOWN == state || proxy->state == state)
 				continue;
 
-			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" changed state from %s to %s",
+			zabbix_log(LOG_LEVEL_WARNING, "proxy \"%s\" changed state from %s to %s",
 					proxy->name, proxy_state_str[proxy->state], proxy_state_str[state]);
 
 			proxy->state = state;
@@ -1295,7 +1295,7 @@ void	pg_cache_update_group_state(zbx_pg_cache_t *cache, zbx_dc_um_handle_t *um_h
 
 		if (state != group->state)
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "Proxy group \"%s\" changed state from %s to %s",
+			zabbix_log(LOG_LEVEL_WARNING, "proxy group \"%s\" changed state from %s to %s",
 					group->name, group_state_str[group->state], group_state_str[state]);
 
 			group->state = state;

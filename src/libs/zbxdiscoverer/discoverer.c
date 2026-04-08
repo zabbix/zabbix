@@ -18,6 +18,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
 #include "zbxdiscovery.h"
+#include "zbxregexp.h"
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
@@ -794,6 +795,11 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 
 				dcheck->timeout = tmt_simple;
 			}
+		}
+
+		for (i = 0; i < drule->dchecks.values_num; i++)
+		{
+			zbx_dc_dcheck_t	*dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
 
 			if (0 != dcheck->uniq)
 			{
@@ -1225,14 +1231,13 @@ int	dcheck_is_async(zbx_ds_dcheck_t *ds_dcheck)
 
 static void	*discoverer_worker_entry(void *net_check_worker)
 {
-	int			err;
 	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_queue_t	*queue = worker->queue;
+	sigjmp_buf		jmp_ret;
 
 	log_worker_id = worker->worker_id;
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
@@ -1354,6 +1359,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			worker->stop = 1;
 		}
 	}
+
+	zbx_deinit_regexp_env();
 
 	discoverer_queue_deregister_worker(queue);
 	discoverer_queue_unlock(queue);
@@ -1669,7 +1676,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start discoverer service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == discoverer_manager_init(&dmanager, discoverer_args_in, info, &error))
@@ -1677,7 +1684,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		zabbix_log(LOG_LEVEL_ERR, "Cannot initialize discovery manager: %s", error);
 		zbx_free(error);
 		zbx_ipc_service_close(&ipc_service);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_DISCOVERYMANAGER, 0, rtc_msgs, ARRSIZE(rtc_msgs),
@@ -1883,5 +1890,5 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(info->process_type), info->process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }

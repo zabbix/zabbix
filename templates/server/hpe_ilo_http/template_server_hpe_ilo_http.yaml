@@ -1201,6 +1201,8 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.StatusIndicator
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: Unknown
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -2162,7 +2164,8 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.Status.HealthRollup
+                    - '$.Status["Health","HealthRollup"].first()'
+                  error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
                     - |

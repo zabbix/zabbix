@@ -126,11 +126,12 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "proxy group manager";
 		case ZBX_PROCESS_TYPE_BROWSERPOLLER:
 			return "browser poller";
-			break;
+		case ZBX_PROCESS_TYPE_SUPERVISOR:
+			return "supervisor";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 int	get_process_type_by_name(const char *proc_type_str)
@@ -185,6 +186,8 @@ const char	*zbx_item_value_type_string(zbx_item_value_type_t value_type)
 			return "Text";
 		case ITEM_VALUE_TYPE_BIN:
 			return "Binary";
+		case ITEM_VALUE_TYPE_JSON:
+			return "JSON";
 		case ITEM_VALUE_TYPE_NONE:
 			return "None";
 		default:

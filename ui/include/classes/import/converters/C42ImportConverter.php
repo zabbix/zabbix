@@ -91,7 +91,7 @@ class C42ImportConverter extends CConverter {
 	 * @return array
 	 */
 	protected function convertFormat(array $data) {
-		$schema = (new C44XmlValidator('xml'))->getSchema();
+		$schema = (new C44ImportValidator('xml'))->getSchema();
 
 		foreach ($schema['rules'] as $tag => $tag_rules) {
 			if (!array_key_exists($tag, $data)) {

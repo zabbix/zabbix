@@ -227,7 +227,8 @@ static int	async_task_process_task_telnet_cb(short event, void *data, int *fd, z
 
 			if (SUCCEED != zbx_socket_connect(&telnet_context->s, SOCK_STREAM,
 					telnet_context->config_source_ip, addresses->values[0].ip,
-					telnet_context->item.interface.port, telnet_context->config_timeout))
+					telnet_context->item.interface.port, telnet_context->config_timeout,
+					ZBX_DNS_FAILOVER_DISABLED, &event_new))
 			{
 				telnet_context->item.ret = NETWORK_ERROR;
 				SET_MSG_RESULT(&telnet_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"

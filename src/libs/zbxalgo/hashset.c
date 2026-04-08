@@ -420,7 +420,7 @@ void	zbx_hashset_iter_remove(zbx_hashset_iter_t *iter)
 	if (ITER_START == iter->slot || ITER_FINISH == iter->slot || NULL == iter->entry)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "removing a hashset entry through a bad iterator");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (iter->hashset->slots[iter->slot] == iter->entry)
@@ -496,11 +496,13 @@ const void	*zbx_hashset_const_iter_next(zbx_hashset_const_iter_t *iter)
  *********************************************************************************/
 void	zbx_hashset_copy(zbx_hashset_t *dst, const zbx_hashset_t *src, size_t size)
 {
-	ZBX_HASHSET_ENTRY_T	*entry, **ref;
+	ZBX_HASHSET_ENTRY_T	*entry, **ref, **tmp = dst->slots;
+
+	zbx_hashset_clear(dst);
 
 	*dst = *src;
 
-	dst->slots = (ZBX_HASHSET_ENTRY_T **)dst->mem_malloc_func(NULL, (size_t)dst->num_slots *
+	dst->slots = (ZBX_HASHSET_ENTRY_T **)dst->mem_realloc_func(tmp, (size_t)dst->num_slots *
 			sizeof(ZBX_HASHSET_ENTRY_T *));
 	memset(dst->slots, 0, (size_t)dst->num_slots * sizeof(ZBX_HASHSET_ENTRY_T *));
 

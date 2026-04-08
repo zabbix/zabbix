@@ -15,8 +15,7 @@
 
 
 class CLineGraphDraw extends CGraphDraw {
-	const GRAPH_WIDTH_MIN = 20;
-	const GRAPH_HEIGHT_MIN = 20;
+
 	const LEGEND_OFFSET_Y = 90;
 
 	private $cell_height_min;
@@ -454,6 +453,10 @@ class CLineGraphDraw extends CGraphDraw {
 				continue;
 			}
 
+			if (!array_key_exists($item['itemid'], $results)) {
+				continue;
+			}
+
 			$delay = $item['source'] === 'trends' ? max($item['delay'], ZBX_MAX_TREND_DIFF) : $item['delay'];
 			$period = $time_to - $time_from;
 
@@ -836,12 +839,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->shiftXleft + 3, $this->shiftY - 5,
 				$this->shiftXleft, $this->shiftY - 10
 			];
-			if (PHP_VERSION_ID >= 80100) {
-				imagefilledpolygon($this->im, $points, $this->getColor('White'));
-			}
-			else {
-				imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
-			}
+
+			imagefilledpolygon($this->im, $points, $this->getColor('White'));
 
 			/* draw left axis triangle */
 			zbx_imageline($this->im, $this->shiftXleft - 3, $this->shiftY - 5, $this->shiftXleft + 3, $this->shiftY - 5,
@@ -877,12 +876,8 @@ class CLineGraphDraw extends CGraphDraw {
 				$this->sizeX + $this->shiftXleft + 3, $this->shiftY - 5,
 				$this->sizeX + $this->shiftXleft, $this->shiftY - 10
 			];
-			if (PHP_VERSION_ID >= 80100) {
-				imagefilledpolygon($this->im, $points, $this->getColor('White'));
-			}
-			else {
-				imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
-			}
+
+			imagefilledpolygon($this->im, $points, $this->getColor('White'));
 
 			/* draw right axis triangle */
 			zbx_imageline($this->im, $this->sizeX + $this->shiftXleft - 3, $this->shiftY - 5,
@@ -917,12 +912,8 @@ class CLineGraphDraw extends CGraphDraw {
 			$this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY + 4,
 			$this->sizeX + $this->shiftXleft + 10, $this->sizeY + $this->shiftY + 1
 		];
-		if (PHP_VERSION_ID >= 80100) {
-			imagefilledpolygon($this->im, $points, $this->getColor('White'));
-		}
-		else {
-			imagefilledpolygon($this->im, $points, 3, $this->getColor('White'));
-		}
+
+		imagefilledpolygon($this->im, $points, $this->getColor('White'));
 
 		/* draw X axis triangle */
 		zbx_imageline($this->im, $this->sizeX + $this->shiftXleft + 5, $this->sizeY + $this->shiftY - 2,
@@ -1626,7 +1617,9 @@ class CLineGraphDraw extends CGraphDraw {
 						: '-';
 					$side_str = ($side == GRAPH_YAXIS_SIDE_LEFT) ? _('left') : _('right');
 					$legend->addCell($rowNum, [
-						'text' => $percentile['percent'].'th percentile: '.$convertedUnit.' ('.$side_str.')',
+						'text' => _s('Percentile %1$s: %2$s', $percentile['percent'],
+							$convertedUnit.' ('.$side_str.')'
+						),
 						ITEM_CONVERT_NO_UNITS
 					]);
 					$color = ($side == GRAPH_YAXIS_SIDE_LEFT)
@@ -1638,24 +1631,16 @@ class CLineGraphDraw extends CGraphDraw {
 						$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 						$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
 					];
-					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $points, $this->getColor($color));
-					}
-					else {
-						imagefilledpolygon($this->im, $points, 3, $this->getColor($color));
-					}
+
+					imagefilledpolygon($this->im, $points, $this->getColor($color));
 
 					$points = [
 						$leftXShift + 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 						$leftXShift - 5, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y,
 						$leftXShift, $this->sizeY + $this->shiftY + 14 * $rowNum + self::LEGEND_OFFSET_Y - 10
 					];
-					if (PHP_VERSION_ID >= 80100) {
-						imagepolygon($this->im, $points, $this->getColor('Black No Alpha'));
-					}
-					else {
-						imagepolygon($this->im, $points, 3, $this->getColor('Black No Alpha'));
-					}
+
+					imagepolygon($this->im, $points, $this->getColor('Black No Alpha'));
 
 					$rowNum++;
 				}
@@ -1858,12 +1843,7 @@ class CLineGraphDraw extends CGraphDraw {
 				$style = $drawtype == DRAWTYPE_BOLD_LINE ? LINE_TYPE_BOLD : LINE_TYPE_NORMAL;
 
 				if ($calc_fnc == CALC_FNC_ALL) {
-					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $a, $minmax_color);
-					}
-					else {
-						imagefilledpolygon($this->im, $a, 4, $minmax_color);
-					}
+					imagefilledpolygon($this->im, $a, $minmax_color);
 
 					if (!$y1x || !$y2x) {
 						zbx_imagealine($this->im, $x1, $y1max, $x2, $y2max, $max_color, $style);
@@ -1907,12 +1887,7 @@ class CLineGraphDraw extends CGraphDraw {
 					$a[6] = $x2;
 					$a[7] = $y2;
 
-					if (PHP_VERSION_ID >= 80100) {
-						imagefilledpolygon($this->im, $a, $avg_color);
-					}
-					else {
-						imagefilledpolygon($this->im, $a, 4, $avg_color);
-					}
+					imagefilledpolygon($this->im, $a, $avg_color);
 				}
 				else {
 					imageLine($this->im, $x1, $y1, $x2, $y2, $avg_color); // draw the initial line

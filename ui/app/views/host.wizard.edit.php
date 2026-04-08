@@ -409,7 +409,7 @@ function stepInstallAgent($agent_script_data): array {
 									(new CTag('h6', true, [_('Verify Zabbix server, proxy, or cluster address')]))
 										->addClass(ZBX_STYLE_ORDERED_LIST_COUNTER),
 									(new CFormField([
-										new CTextBox('agent_script_server_host'),
+										new CTextAreaFlexible('agent_script_server_host'),
 										(new CDiv(
 											_('Enter the IP/DNS address and port of your Zabbix server, proxy, or cluster configuration.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT)
@@ -463,9 +463,9 @@ function stepInstallAgent($agent_script_data): array {
 									]))->addClass(ZBX_STYLE_FORMATED_GROUP),
 									(new CFormField([
 										new CLabel(_('Pre-shared key identity')),
-										(new CTextBox('tls_psk_identity', '', false,
-											DB::getFieldLength('hosts', 'tls_psk_identity')
-										))->setAriaRequired(),
+										(new CTextAreaFlexible('tls_psk_identity', ''))
+											->setMaxlength(DB::getFieldLength('hosts', 'tls_psk_identity'))
+											->setAriaRequired(),
 										(new CDiv(
 											_('Enter a unique name that Zabbix components will use to recognize the pre-shared key.')
 										))->addClass(ZBX_STYLE_FORM_FIELDS_HINT),
@@ -537,7 +537,7 @@ function stepInstallAgent($agent_script_data): array {
 							(new CListItem(
 								(new CDiv())
 									->addClass(ZBX_STYLE_GRID_COLUMN_FIRST)
-									->addclass('js-install-agent-readme')
+									->addClass('js-install-agent-readme')
 							))
 								->addClass(ZBX_STYLE_ORDERED_LIST_ITEM)
 								->addClass(ZBX_STYLE_GRID_COLUMNS)

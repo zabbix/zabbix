@@ -29,8 +29,10 @@ $fields = [
 	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,		null,		null],
 	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,		null,		null],
 	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,		null,		null],
-	'width' =>			[T_ZBX_INT,			O_OPT, P_NZERO,	BETWEEN(20, 65535),	null],
-	'height' =>			[T_ZBX_INT,			O_OPT, P_NZERO,	'{} > 0',	null],
+	'width' =>			[T_ZBX_INT,			O_OPT, P_NZERO,
+		BETWEEN(CGraphDraw::GRAPH_WIDTH_MIN, CGraphDraw::GRAPH_WIDTH_MAX),		null],
+	'height' =>			[T_ZBX_INT,			O_OPT, P_NZERO,
+		BETWEEN(CGraphDraw::GRAPH_HEIGHT_MIN, CGraphDraw::GRAPH_HEIGHT_MAX),	null],
 	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),	null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
@@ -107,9 +109,7 @@ $resolve_macros = (bool) getRequest('resolve_macros', 0);
 
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
-	if ($db_items[$gItem['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
-	}
+	$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
 }
 
 $hostName = '';

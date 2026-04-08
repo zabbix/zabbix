@@ -294,8 +294,8 @@ class testPageSearch extends CWebTest {
 		$this->assertFalse($search_button->isClickable());
 
 		$search_field->fill($this->search_string);
-		$search_button->waitUntilClickable()->click();
-		$this->page->assertHeader('Search: ' . $this->search_string);
+		$search_button->waitUntilClickable()->click()->waitUntilStalled();
+		$this->page->assertHeader('Search: '.$this->search_string);
 	}
 
 	/**

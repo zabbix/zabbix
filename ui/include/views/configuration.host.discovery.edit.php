@@ -73,8 +73,9 @@ $item_tab
 	// Append name field to form list.
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
-		new CFormField((new CTextBox('name', $data['name'], $readonly))
+		new CFormField((new CTextAreaFlexible('name', $data['name']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($readonly)
 			->setAriaRequired()
 			->setAttribute('autofocus', 'autofocus')
 		)
@@ -93,9 +94,10 @@ $item_tab
 	// Append key to form list.
 	->addItem([
 		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
-		new CFormField((new CTextBox('key', $data['key'], $readonly,
-				DB::getFieldLength('item_discovery', 'key_')))
+		new CFormField((new CTextAreaFlexible('key', $data['key']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('item_discovery', 'key_'))
+			->setReadonly($readonly)
 			->setAriaRequired()
 		)
 	])
@@ -105,8 +107,10 @@ $item_tab
 			->setAsteriskMark()
 			->setId('js-item-url-label'),
 		(new CFormField([
-			(new CTextBox('url', $data['url'], $readonly, DB::getFieldLength('items', 'url')))
+			(new CTextAreaFlexible('url', $data['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'url'))
+				->setReadonly($readonly)
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CButton('httpcheck_parseurl', _('Parse')))
@@ -192,15 +196,17 @@ $item_tab
 				new CTemplateTag('query-field-row-tmpl',
 					(new CRow([
 						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $readonly))
+						(new CTextAreaFlexible('query_fields[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setAttribute('placeholder', _('name'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+							->setReadonly($readonly),
 						RARR(),
-						(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $readonly))
+						(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setAttribute('placeholder', _('value'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+							->setReadonly($readonly),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
@@ -336,15 +342,18 @@ $item_tab
 				new CTemplateTag('item-header-row-tmpl',
 					(new CRow([
 						(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('headers[#{rowNum}][name]', '#{name}', $readonly))
+						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setAttribute('placeholder', _('name'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+							->setReadonly($readonly),
 						RARR(),
-						(new CTextBox('headers[#{rowNum}][value]', '#{value}', $readonly, 2000))
+						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setAttribute('placeholder', _('value'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+							->setMaxlength(2000)
+							->setReadonly($readonly),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
@@ -560,8 +569,10 @@ $item_tab
 		], 'snmp_oid'))
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
-		(new CFormField((new CTextBox('snmp_oid', $data['snmp_oid'], $readonly, 512))
+		(new CFormField((new CTextAreaFlexible('snmp_oid', $data['snmp_oid']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('items', 'snmp_oid'))
+			->setReadonly($readonly)
 			->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 			->setAriaRequired()
 		))->setId('js-item-snmp-oid-field')
@@ -570,8 +581,10 @@ $item_tab
 $item_tab
 	->addItem([
 		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
-		(new CFormField((new CTextBox('ipmi_sensor', $data['ipmi_sensor'], $readonly, 128))
+		(new CFormField((new CTextAreaFlexible('ipmi_sensor', $data['ipmi_sensor']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(128)
+			->setReadonly($readonly)
 		))->setId('js-item-impi-sensor-field')
 	])
 	// Append authentication method to form list.
@@ -816,8 +829,9 @@ $item_tab
 	])
 	->addItem([
 		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
-		(new CFormField((new CTextBox('trapper_hosts', $data['trapper_hosts'], $data['discovered_lld']))
+		(new CFormField((new CTextAreaFlexible('trapper_hosts', $data['trapper_hosts'], $data['discovered_lld']))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setReadonly($data['discovered_lld'])
 		))->setId('js-item-trapper-hosts-field')
 	])
 	->addItem([
@@ -889,10 +903,12 @@ foreach ($data['conditions'] as $i => $condition) {
 	];
 
 	// macro
-	$macro = (new CTextBox('conditions['.$i.'][macro]', $condition['macro'], $data['discovered_lld'], 64))
+	$macro = (new CTextAreaFlexible('conditions['.$i.'][macro]', $condition['macro']))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 		->addClass(ZBX_STYLE_UPPERCASE)
 		->addClass('macro')
+		->setMaxlength(DB::getFieldLength('item_condition', 'macro'))
+		->setReadonly($data['discovered_lld'])
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $condition['formulaid']);
 
@@ -907,9 +923,11 @@ foreach ($data['conditions'] as $i => $condition) {
 		->setReadonly($data['discovered_lld']);
 
 	// value
-	$value = (new CTextBox('conditions['.$i.'][value]', $condition['value'], $data['discovered_lld'], 255))
+	$value = (new CTextAreaFlexible('conditions['.$i.'][value]', $condition['value']))
 		->addClass('js-value')
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setMaxlength(DB::getFieldLength('item_condition', 'value'))
+		->setReadonly($data['discovered_lld'])
 		->setAttribute('placeholder', _('regular expression'));
 
 	if ($condition['operator'] == CONDITION_OPERATOR_EXISTS
@@ -975,20 +993,18 @@ elseif ($data['form_refresh'] == 0) {
 }
 
 foreach ($lld_macro_paths as $i => $lld_macro_path) {
-	$lld_macro = (new CTextAreaFlexible('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro'], [
-		'readonly' => $readonly,
-		'maxlength' => DB::getFieldLength('lld_macro_path', 'lld_macro')
-	]))
+	$lld_macro = (new CTextAreaFlexible('lld_macro_paths['.$i.'][lld_macro]', $lld_macro_path['lld_macro']))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'))
 		->addClass(ZBX_STYLE_UPPERCASE)
+		->setReadonly($readonly)
 		->setAttribute('placeholder', '{#MACRO}')
 		->disableSpellcheck();
 
-	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path'], [
-		'readonly' => $readonly,
-		'maxlength' => DB::getFieldLength('lld_macro_path', 'path')
-	]))
+	$path = (new CTextAreaFlexible('lld_macro_paths['.$i.'][path]', $lld_macro_path['path']))
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setMaxlength(DB::getFieldLength('lld_macro_path', 'path'))
+		->setReadonly($readonly)
 		->setAttribute('placeholder', _('$.path.to.node'))
 		->disableSpellcheck();
 

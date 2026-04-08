@@ -110,8 +110,6 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'query_fields'));
-
-		this.#initTextareaFlexible($query_fields);
 	}
 
 	#initPostFields(post_fields) {
@@ -129,8 +127,6 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'post_fields'));
-
-		this.#initTextareaFlexible($post_fields);
 	}
 
 	#initVariables(variables) {
@@ -140,8 +136,6 @@ window.webscenario_step_edit_popup = new class {
 			template: '#step-variable-row-tmpl',
 			rows: variables
 		});
-
-		this.#initTextareaFlexible($variables);
 	}
 
 	#initHeaders(headers) {
@@ -159,16 +153,6 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('tableupdate.dynamicRows', (e) => this.#updateSortOrder(e.target, 'headers'));
-
-		this.#initTextareaFlexible($headers);
-	}
-
-	#initTextareaFlexible($table) {
-		$table
-			.on('afteradd.dynamicRows', () => {
-				jQuery('.form_row:last .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
-			})
-			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
 	}
 
 	#togglePostType(e) {
@@ -319,8 +303,6 @@ window.webscenario_step_edit_popup = new class {
 			}
 
 			$post_fields.data('dynamicRows').enableSorting();
-
-			jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $post_fields).textareaFlexible();
 		}
 	}
 

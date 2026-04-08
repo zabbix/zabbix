@@ -225,7 +225,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => ''
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'This field cannot be empty.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -236,7 +236,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => 'test'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'Invalid period.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -247,7 +247,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => '1-8,11:11-22:22'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'Invalid period.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -258,7 +258,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => '6-5, 11:11-22:22'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'Invalid period.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -269,7 +269,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => '0-1, 00:00-11:11'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'Invalid period.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -280,7 +280,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => '1-7, 22:22-22:21'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'Invalid period.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -291,7 +291,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => '1-7, 00:00-24:01'
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'Invalid period.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -302,7 +302,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 					'fields' => [
 						'When active' => ' '
 					],
-					'message' => 'Incorrect value for field "period": a time period is expected.',
+					'message' => ['When active' => 'This field cannot be empty.'],
 					'media' => 'MS Teams Workflow'
 				]
 			],
@@ -446,7 +446,7 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$media_form->submit();
 
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, null, $data['message']);
+			$this->assertInlineError($media_form, $data['message']);
 			$dialog->close();
 		}
 		$dialog->ensureNotPresent();
@@ -1308,9 +1308,10 @@ class testFormUserLdapMediaJit extends CWebTest {
 		$table->query('link:'.self::LDAP_SERVER_NAME)->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$media_table = $dialog->query('id:ldap-media-type-mapping-table')->asTable()->one();
-		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click();
+		$media_table->findRow('Name', self::MEDIA_MAPPING_REMOVE, true)->query('button:Remove')->one()->click()->waitUntilNotPresent();
 		$dialog->query('button:Update')->one()->click();
 		$form->submit()->waitUntilStalled();
+		$this->assertMessage(TEST_GOOD, 'Authentication settings updated');
 		$this->page->waitUntilReady();
 
 		// Check that media is not present for LDAP provisioned user.
