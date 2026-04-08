@@ -539,7 +539,7 @@ out:
 
 static int	tq_validate_formula_char(char c)
 {
-	return (isalpha(c) || c == '(' || c == ')' || c == ' ') ? SUCCEED : FAIL;
+	return (isalpha(c) || '(' == c || ')' == c || ' ' == c) ? SUCCEED : FAIL;
 }
 
 static int	tq_formula_constant_to_condition_idx(const char *p, int len)
