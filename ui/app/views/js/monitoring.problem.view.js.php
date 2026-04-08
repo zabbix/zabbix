@@ -745,14 +745,18 @@
 			const filter_params = this.active_filter.getFilterParamsObject();
 
 			if ('inventory' in filter_params) {
-				const inventory = Array.from(filter_params.inventory).filter(inv => inv.value != '');
+				const inventory = Array.from(Object.values(filter_params.inventory))
+					.filter(inv => inv.value != '');
+
 				if (inventory.length == 0) {
 					delete filter_params.inventory;
 				}
 			}
 
 			if ('tags' in filter_params) {
-				const tags = Array.from(filter_params.tags).filter(tag => tag.tag != '' && tag.value != '');
+				const tags = Array.from(Object.values(filter_params.tags))
+					.filter(tag => tag.tag != '' && tag.value != '');
+
 				if (tags.length == 0) {
 					delete filter_params.tags;
 				}

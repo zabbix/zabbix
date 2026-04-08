@@ -771,9 +771,9 @@ class CDataTable {
 		this.updateUserConfig();
 	}
 
-	setSelectable(form_name, checkboxid, selectable = []) {
+	setSelectable(form_name, checkbox_id, selectable = []) {
 		this.#form_name = form_name;
-		this.#checkbox_id = checkboxid;
+		this.#checkbox_id = checkbox_id;
 		this.#selectable = selectable;
 
 		return this;
@@ -1664,7 +1664,7 @@ class CDataTable {
 					.setResizable(false)
 					.setShowInCustomizeTable(false)
 					.setSticky(true)
-					.setWidth('37px')
+					.setWidth('33px')
 			);
 		}
 
