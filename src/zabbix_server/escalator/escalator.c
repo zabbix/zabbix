@@ -1812,8 +1812,23 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		}
 		else if (MEDIA_TYPE_PUSH == type)
 		{
+			zbx_vector_str_t	params;
+
+			zbx_vector_str_create(&params);
+
 			get_build_push_params(event, r_event, actionid, userid, mediatypeid, row[1], subject,
 					message, ack, service_alarm, service, &params, tz);
+
+			for (int i = 0; i < params.values_num; i++)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
+						now, mediatypeid, row[1], subject, message, status, perror, esc_step,
+						(int)ALERT_TYPE_MESSAGE, ackid, params.values[i], p_eventid);
+			}
+
+			zbx_vector_str_clear_ext(&params, zbx_str_free);
+			zbx_vector_str_destroy(&params);
+			continue;
 		}
 		else
 		{

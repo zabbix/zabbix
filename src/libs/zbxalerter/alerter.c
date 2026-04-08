@@ -543,6 +543,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 	payload = zbx_strdup(NULL, params);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER STRATAX: %s", payload);
+
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER failed initialize cURL library");
