@@ -218,8 +218,8 @@ foreach ($data['graphs'] as $graph) {
 	$url = (new CUrl('graphs.php'))
 		->setArgument('form', 'update')
 		->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-		->setArgument('graphid', $graphid)
-		->setArgument('context', $data['context']);
+		->setArgument('context', $data['context'])
+		->setArgument('graphid', $graphid);
 
 	if ($data['parent_discoveryid'] === null) {
 		$url->setArgument('filter_hostids', [$data['hostid']]);
