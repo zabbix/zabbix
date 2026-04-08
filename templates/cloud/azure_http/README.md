@@ -5,7 +5,7 @@
 
 - This template is designed to monitor Microsoft Azure by HTTP.
 - It works without any external scripts and uses the script item.
-- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces and Container Apps.
+- Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
 
 ## Included Monitoring Templates
 
@@ -249,7 +249,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Azure Container App discovery|<p>The list of Azure Container Apps provided by the subscription.</p>|Script|azure.container_app.discovery<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `ERROR`</p><p>⛔️Custom on fail: Set error to: `Errors in discovery script. Check logs for more info.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Azure Container App discovery|<p>The list of Azure Container apps provided by the subscription.</p>|Script|azure.container_app.discovery<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `ERROR`</p><p>⛔️Custom on fail: Set error to: `Errors in discovery script. Check logs for more info.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 # Azure VM Scale Set by HTTP
 
@@ -1651,7 +1651,7 @@ This template has been tested on:
 |{$AZURE.RESOURCE.ID}|<p>Microsoft Azure container app resource ID.</p>||
 |{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
 |{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
-|{$AZURE.CONTAINER_APP.JVM.METRICS}|<p>Enable java virtual machine metrics collection. Useful for container apps with java development stack.</p>|`false`|
+|{$AZURE.CONTAINER_APP.JVM.METRICS}|<p>Enable Java virtual machine metric collection. Useful for container apps with Java development stack.</p>|`false`|
 |{$AZURE.CONTAINER_APP.CPU.WARN}|<p>Warning threshold for CPU utilization.</p>|`75`|
 |{$AZURE.CONTAINER_APP.CPU.CRIT}|<p>Critical threshold for CPU utilization.</p>|`90`|
 |{$AZURE.CONTAINER_APP.MEMORY.WARN}|<p>Warning threshold for memory utilization.</p>|`75`|
@@ -1660,9 +1660,9 @@ This template has been tested on:
 |{$AZURE.CONTAINER_APP.GPU.CRIT}|<p>Critical threshold for GPU utilization.</p>|`90`|
 |{$AZURE.CONTAINER_APP.REBOOT.WARN}|<p>Threshold for amount of reboots per minute for a replica.</p>|`1`|
 |{$AZURE.CONTAINER_APP.RESPONSE.WARN}|<p>Threshold for average response time threshold, in milliseconds.</p>|`5000`|
-|{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}|<p>Threshold for amount of java garbage collectors.</p>|`10`|
-|{$AZURE.CONTAINER_APP.GC.DURATION.WARN}|<p>Threshold for duration of java garbage collectors, in milliseconds.</p>|`500`|
-|{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}|<p>Threshold for amount of threads in java virtual machine.</p>|`500`|
+|{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}|<p>Threshold for amount of Java garbage collectors.</p>|`10`|
+|{$AZURE.CONTAINER_APP.GC.DURATION.WARN}|<p>Threshold for duration of Java garbage collectors, in milliseconds.</p>|`500`|
+|{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}|<p>Threshold for amount of threads in Java virtual machine.</p>|`500`|
 
 ### Items
 
@@ -1671,26 +1671,26 @@ This template has been tested on:
 |Get data|<p>Gathers data of the Azure container app.</p>|Script|azure.container_app.data.get|
 |Get data, errors|<p>A list of errors from API requests.</p>|Dependent item|azure.container_app.data.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Set value to: ``</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Provisioning state|<p>The provisioning state of the container app.</p><p>0 - Unknown</p><p>1 - In progress</p><p>2 - Succeeded</p><p>3 - Failed</p><p>4 - Canceled</p><p>5 - Deleting</p>|Dependent item|azure.container_app.provisioning.state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.provisioningState`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Running status|<p>The running status of the container app.</p><p>0 - Unknown - Container App state is unknown.</p><p>1 - Progressing - Container App is transitioning between Stopped and Running states.</p><p>2 - Running - Container App is in Running state.</p><p>3 - Stopped - Container App is in Stopped state.</p><p>4 - Suspended - Container App Job is in Suspended state.</p><p>5 - Ready - Container App Job is in Ready state.</p>|Dependent item|azure.container_app.running.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.runningStatus`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Running status|<p>The current state of the container app.</p><p>0 - Unknown</p><p>1 - Progressing (container app is transitioning between Stopped and Running)</p><p>2 - Running</p><p>3 - Stopped</p><p>4 - Suspended</p><p>5 - Ready</p>|Dependent item|azure.container_app.running.status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.overview.properties.runningStatus`</p><p>⛔️Custom on fail: Set value to: `Unknown`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Cores: Usage|<p>CPU consumed by the container app, in cores.</p>|Dependent item|azure.container_app.cores.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.UsageNanoCores`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1e-09`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Memory: Used|<p>Container App working set memory used in bytes.</p>|Dependent item|azure.container_app.memory.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.WorkingSetBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Network: Transmit, rate|<p>Network transmitted bytes.</p>|Dependent item|azure.container_app.bytes.tx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Network: Receive, rate|<p>Network received bytes.</p>|Dependent item|azure.container_app.bytes.rx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory: Used|<p>Container app working set memory used, in bytes.</p>|Dependent item|azure.container_app.memory.bytes<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.WorkingSetBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network: Transmitted bytes|<p>Bytes transmitted by the container app.</p>|Dependent item|azure.container_app.bytes.tx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Network: Received bytes|<p>Bytes received by the container app.</p>|Dependent item|azure.container_app.bytes.rx<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RxBytes`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Requests: Processed|<p>Requests processed.</p>|Dependent item|azure.container_app.requests.processed<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Requests`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replica: Restarts|<p>The number of times the replica has restarted since last check.</p>|Dependent item|azure.container_app.restart.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Requests`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li>Simple change</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replica: Count|<p>Number of replicas count of container app.</p>|Dependent item|azure.container_app.replica.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Replicas`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|GPU: Utilization|<p>GPU utilization indicates the percent of time over the past sample period during which one or more kernels were executing on the GPU.</p>|Dependent item|azure.container_app.utilization.gpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.GpuUtilizationPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replica: Restarts|<p>The number of times the replica has restarted since the last check.</p>|Dependent item|azure.container_app.restart.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.RestartCount`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li>Simple change</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replica: Count|<p>Number of replicas.</p>|Dependent item|azure.container_app.replica.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.Replicas`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|GPU: Utilization|<p>GPU utilization, in percent.</p>|Dependent item|azure.container_app.utilization.gpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.GpuUtilizationPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Cores: Reserved, for revisions|<p>Number of reserved cores for container app revisions.</p>|Dependent item|azure.container_app.cores.reserved.revisions<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CoresQuotaUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Cores: Reserved, total|<p>Number of total reserved cores for the container app.</p>|Dependent item|azure.container_app.cores.reserved.total<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.TotalCoresQuotaUsed`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Connection timeouts|<p>Total connection timeouts.</p>|Dependent item|azure.container_app.connection.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyConnectTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Requests: Retries|<p>Total request retries.</p>|Dependent item|azure.container_app.requests.retries<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestRetries`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Requests: Timed out|<p>Total request that timed out waiting for a response.</p>|Dependent item|azure.container_app.requests.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Requests: Timed out|<p>Total requests that timed out waiting for a response.</p>|Dependent item|azure.container_app.requests.timeouts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestTimeouts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Requests: Pending|<p>Total requests pending a connection pool connection.</p>|Dependent item|azure.container_app.requests.pending<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyRequestsPendingConnectionPool`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Ejected hosts|<p>Number of currently ejected hosts.</p>|Dependent item|azure.container_app.ejection.hosts<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectedHosts`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Ejection, aborted|<p>Number of ejections aborted due to the max ejection %.</p>|Dependent item|azure.container_app.ejection.aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectionsAborted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Ejections, aborted|<p>Number of ejections aborted due to the max ejection %.</p>|Dependent item|azure.container_app.ejection.aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResiliencyEjectionsAborted`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Response time|<p>Average response time per status code.</p>|Dependent item|azure.container_app.response.time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.ResponseTime`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|CPU: Utilization|<p>Percentage of CPU limit used in percentage points.</p>|Dependent item|azure.container_app.utilization.cpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CpuPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Memory: Utilization|<p>Percentage of memory limit used, in percentage points.</p>|Dependent item|azure.container_app.utilization.memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.MemoryPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|CPU: Utilization|<p>CPU utilization, in percent.</p>|Dependent item|azure.container_app.utilization.cpu<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CpuPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Memory: Utilization|<p>Memory utilization, in percent.</p>|Dependent item|azure.container_app.utilization.memory<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.MemoryPercentage`</p></li><li><p>Matches regular expression: `^\d+$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
@@ -1698,27 +1698,27 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Azure container Apps: There are errors in requests to API|<p>Zabbix has received errors in response to API requests.</p>|`length(last(/Azure Container Apps by HTTP/azure.container_app.data.errors))>0`|Average||
 |Azure container Apps: Azure container app failed|<p>The resource failed.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=3`|High||
-|Azure container Apps: Azure container app is canceled|<p>The resource is in a canceled state.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=4`|Average||
-|Azure container Apps: Azure container app has been deleted|<p>The resource deleting process is happening.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5`|High||
-|Azure container Apps: Azure container app is in unknown state|<p>The resource state is unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5`|Warning||
+|Azure container Apps: Azure container app is canceled|<p>The resource is in the Canceled state.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=4`|Average||
+|Azure container Apps: Azure container app is being deleted|<p>The resource deletion process is happening.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5`|High||
+|Azure container Apps: Azure container app is in unknown state|<p>The resource state is Unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=0`|Warning||
 |Azure container Apps: Azure container app stopped|<p>The resource stopped.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=3`|High||
-|Azure container Apps: Azure container app suspended|<p>The resource suspended.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=4`|Average||
+|Azure container Apps: Azure container app suspended|<p>The resource is suspended.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=4`|Average||
 |Azure container Apps: Azure container app progressing|<p>The resource is transitioning between Stopped and Running states.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=1`|Warning||
-|Azure container Apps: Azure container app status is unknown|<p>The status of the resource is unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=0`|Warning||
-|Azure container Apps: Replica reboots too often||`avg(/Azure Container Apps by HTTP/azure.container_app.restart.count,3m)>{$AZURE.CONTAINER_APP.REBOOT.WARN}`|Warning||
-|Azure container Apps: GPU utilization is high||`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: GPU utilization is critical</li></ul>|
-|Azure container Apps: GPU utilization is critical||`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}`|Average||
-|Azure container Apps: Container response time is too high||`max(/Azure Container Apps by HTTP/azure.container_app.response.time,3m)>{$AZURE.CONTAINER_APP.RESPONSE.WARN}`|Warning||
-|Azure container Apps: CPU utilization is high||`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: CPU utilization is critical</li></ul>|
-|Azure container Apps: CPU utilization is critical||`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}`|Average||
-|Azure container Apps: Memory utilization is high||`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: Memory utilization is critical</li></ul>|
-|Azure container Apps: Memory utilization is critical||`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}`|Average||
+|Azure container Apps: Azure container app status is unknown|<p>The status of the resource is Unknown.</p>|`last(/Azure Container Apps by HTTP/azure.container_app.running.status)=0`|Warning||
+|Azure container Apps: Replica reboots too often|<p>A container app replica is restarting repeatedly within a defined time window.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.restart.count,3m)>{$AZURE.CONTAINER_APP.REBOOT.WARN}`|Warning||
+|Azure container Apps: GPU utilization is high|<p>GPU usage has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: GPU utilization is critical</li></ul>|
+|Azure container Apps: GPU utilization is critical|<p>GPU usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}`|Average||
+|Azure container Apps: Container response time is too high|<p>The average response time of the container app has exceeded the acceptable limit.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.response.time,3m)>{$AZURE.CONTAINER_APP.RESPONSE.WARN}`|Warning||
+|Azure container Apps: CPU utilization is high|<p>CPU usage has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: CPU utilization is critical</li></ul>|
+|Azure container Apps: CPU utilization is critical|<p>CPU usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}`|Average||
+|Azure container Apps: Memory utilization is high|<p>Memory consumption has exceeded the warning threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.WARN}`|Warning|**Depends on**:<br><ul><li>Azure container Apps: Memory utilization is critical</li></ul>|
+|Azure container Apps: Memory utilization is critical|<p>Memory usage has reached a critical threshold.</p>|`max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}`|Average||
 
 ### LLD rule Java metrics discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Java metrics discovery|<p>Java metrics discovery based on `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.</p>|Script|azure.container_app.jvm_metrics.discovery|
+|Java metrics discovery|<p>Java metric discovery based on the `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.</p>|Script|azure.container_app.jvm_metrics.discovery|
 
 ### Item prototypes for Java metrics discovery
 
@@ -1741,9 +1741,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Azure container Apps: Garbage collector action count is high||`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.actions[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}`|Warning||
-|Azure container Apps: Garbage collector is high||`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.duration[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.DURATION.WARN}`|Warning||
-|Azure container Apps: JVM thread amount is high||`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.thread.count[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}`|Warning||
+|Azure container Apps: Garbage collector action count is high|<p>Garbage collection is running too frequently.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.actions[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}`|Warning||
+|Azure container Apps: Garbage collector duration is high|<p>Garbage collection duration has exceeded the warning threshold.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.duration[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.DURATION.WARN}`|Warning||
+|Azure container Apps: JVM thread amount is high|<p>Active JVM thread count has exceeded the warning threshold.</p>|`avg(/Azure Container Apps by HTTP/azure.container_app.jvm.thread.count[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}`|Warning||
 
 ## Feedback
 

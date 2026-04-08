@@ -1272,7 +1272,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces and Container Apps.
+        Currently the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
@@ -1290,7 +1290,7 @@ zabbix_export:
         
         - This template is designed to monitor Microsoft Azure by HTTP.
         - It works without any external scripts and uses the script item.
-        - Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces and Container Apps.
+        - Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
         
         ## Setup
         
@@ -1881,7 +1881,7 @@ zabbix_export:
               - macro: '{#NAME}'
                 value: '{$AZURE.CONT_APP.NAME.NOT.MATCHES}'
                 operator: NOT_MATCHES_REGEX
-          description: 'The list of Azure Container Apps provided by the subscription.'
+          description: 'The list of Azure Container apps provided by the subscription.'
           host_prototypes:
             - uuid: 85e290a094a747fe99d7c24eec434152
               host: 'Azure Container App {#NAME}'
@@ -4670,11 +4670,11 @@ zabbix_export:
         - name: Templates/Cloud
       items:
         - uuid: f4d62937e2a54dea9e530966f9169be0
-          name: 'Network: Receive, rate'
+          name: 'Network: Received bytes'
           type: DEPENDENT
           key: azure.container_app.bytes.rx
-          units: Bps
-          description: 'Network received bytes.'
+          units: B
+          description: 'Bytes received by the container app.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -4692,11 +4692,11 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: e4d471cc223d4e29a5b06ad38b218652
-          name: 'Network: Transmit, rate'
+          name: 'Network: Transmitted bytes'
           type: DEPENDENT
           key: azure.container_app.bytes.tx
-          units: Bps
-          description: 'Network transmitted bytes.'
+          units: B
+          description: 'Bytes transmitted by the container app.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5009,7 +5009,7 @@ zabbix_export:
             - tag: component
               value: raw
         - uuid: 95c7f10655774f54bf482b297cd31c3f
-          name: 'Ejection, aborted'
+          name: 'Ejections, aborted'
           type: DEPENDENT
           key: azure.container_app.ejection.aborted
           units: '!%'
@@ -5050,7 +5050,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.container_app.memory.bytes
           units: B
-          description: 'Container App working set memory used in bytes.'
+          description: 'Container app working set memory used, in bytes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5120,10 +5120,10 @@ zabbix_export:
                   value: availability
             - uuid: a50545a31c8f4c0592ac46cba7b066cd
               expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5'
-              name: 'Azure container Apps: Azure container app has been deleted'
+              name: 'Azure container Apps: Azure container app is being deleted'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'The resource deleting process is happening.'
+              description: 'The resource deletion process is happening.'
               tags:
                 - tag: scope
                   value: availability
@@ -5132,16 +5132,16 @@ zabbix_export:
               name: 'Azure container Apps: Azure container app is canceled'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The resource is in a canceled state.'
+              description: 'The resource is in the Canceled state.'
               tags:
                 - tag: scope
                   value: availability
             - uuid: b0e1ba543911427b87fa6b5bc774e941
-              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5'
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=0'
               name: 'Azure container Apps: Azure container app is in unknown state'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The resource state is unknown.'
+              description: 'The resource state is Unknown.'
               tags:
                 - tag: scope
                   value: availability
@@ -5149,7 +5149,7 @@ zabbix_export:
           name: 'Replica: Count'
           type: DEPENDENT
           key: azure.container_app.replica.count
-          description: 'Number of replicas count of container app.'
+          description: 'Number of replicas.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5233,7 +5233,7 @@ zabbix_export:
           name: 'Requests: Timed out'
           type: DEPENDENT
           key: azure.container_app.requests.timeouts
-          description: 'Total request that timed out waiting for a response.'
+          description: 'Total requests that timed out waiting for a response.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5280,6 +5280,7 @@ zabbix_export:
               event_name: 'Azure container Apps: Container response time is too high (over {$AZURE.CONTAINER_APP.RESPONSE.WARN} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: WARNING
+              description: 'The average response time of the container app has exceeded the acceptable limit.'
               tags:
                 - tag: scope
                   value: availability
@@ -5289,11 +5290,11 @@ zabbix_export:
           name: 'Replica: Restarts'
           type: DEPENDENT
           key: azure.container_app.restart.count
-          description: 'The number of times the replica has restarted since last check.'
+          description: 'The number of times the replica has restarted since the last check.'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.metrics.Requests
+                - $.metrics.RestartCount
             - type: MATCHES_REGEX
               parameters:
                 - ^\d+$
@@ -5314,6 +5315,7 @@ zabbix_export:
               event_name: 'Azure container Apps: Replica reboot rate is too high (average {$AZURE.CONTAINER_APP.REBOOT.WARN} times for 3m)'
               opdata: 'Last minute reboots: {ITEM.LASTVALUE}'
               priority: WARNING
+              description: 'A container app replica is restarting repeatedly within a defined time window.'
               tags:
                 - tag: scope
                   value: availability
@@ -5324,13 +5326,13 @@ zabbix_export:
           type: DEPENDENT
           key: azure.container_app.running.status
           description: |
-            The running status of the container app.
-            0 - Unknown - Container App state is unknown.
-            1 - Progressing - Container App is transitioning between Stopped and Running states.
-            2 - Running - Container App is in Running state.
-            3 - Stopped - Container App is in Stopped state.
-            4 - Suspended - Container App Job is in Suspended state.
-            5 - Ready - Container App Job is in Ready state.
+            The current state of the container app.
+            0 - Unknown
+            1 - Progressing (container app is transitioning between Stopped and Running)
+            2 - Running
+            3 - Stopped
+            4 - Suspended
+            5 - Ready
           valuemap:
             name: 'Azure container app running status'
           preprocessing:
@@ -5375,7 +5377,7 @@ zabbix_export:
               name: 'Azure container Apps: Azure container app status is unknown'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'The status of the resource is unknown.'
+              description: 'The status of the resource is Unknown.'
               tags:
                 - tag: scope
                   value: availability
@@ -5393,7 +5395,7 @@ zabbix_export:
               name: 'Azure container Apps: Azure container app suspended'
               opdata: 'Current state: {ITEM.LASTVALUE1}'
               priority: AVERAGE
-              description: 'The resource suspended.'
+              description: 'The resource is suspended.'
               tags:
                 - tag: scope
                   value: availability
@@ -5402,7 +5404,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.container_app.utilization.cpu
           units: '!%'
-          description: 'Percentage of CPU limit used in percentage points.'
+          description: 'CPU utilization, in percent.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5426,6 +5428,7 @@ zabbix_export:
               event_name: 'Azure container Apps: CPU utilization is critical (over {$AZURE.CONTAINER_APP.CPU.CRIT} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: AVERAGE
+              description: 'CPU usage has reached a critical threshold.'
               tags:
                 - tag: scope
                   value: capacity
@@ -5435,6 +5438,7 @@ zabbix_export:
               event_name: 'Azure container Apps: CPU utilization is high (over {$AZURE.CONTAINER_APP.CPU.WARN} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: WARNING
+              description: 'CPU usage has exceeded the warning threshold.'
               dependencies:
                 - name: 'Azure container Apps: CPU utilization is critical'
                   expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}'
@@ -5445,7 +5449,7 @@ zabbix_export:
           name: 'GPU: Utilization'
           type: DEPENDENT
           key: azure.container_app.utilization.gpu
-          description: 'GPU utilization indicates the percent of time over the past sample period during which one or more kernels were executing on the GPU.'
+          description: 'GPU utilization, in percent.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5469,6 +5473,7 @@ zabbix_export:
               event_name: 'Azure container Apps: GPU utilization is critical (over {$AZURE.CONTAINER_APP.GPU.CRIT} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: AVERAGE
+              description: 'GPU usage has reached a critical threshold.'
               tags:
                 - tag: scope
                   value: capacity
@@ -5478,6 +5483,7 @@ zabbix_export:
               event_name: 'Azure container Apps: GPU utilization is high (over {$AZURE.CONTAINER_APP.GPU.WARN} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: WARNING
+              description: 'GPU usage has exceeded the warning threshold.'
               dependencies:
                 - name: 'Azure container Apps: GPU utilization is critical'
                   expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}'
@@ -5489,7 +5495,7 @@ zabbix_export:
           type: DEPENDENT
           key: azure.container_app.utilization.memory
           units: '!%'
-          description: 'Percentage of memory limit used, in percentage points.'
+          description: 'Memory utilization, in percent.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -5513,6 +5519,7 @@ zabbix_export:
               event_name: 'Azure container Apps: Memory utilization is critical (over {$AZURE.CONTAINER_APP.MEMORY.CRIT} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: AVERAGE
+              description: 'Memory usage has reached a critical threshold.'
               tags:
                 - tag: scope
                   value: capacity
@@ -5522,6 +5529,7 @@ zabbix_export:
               event_name: 'Azure container Apps: Memory utilization is high (over {$AZURE.CONTAINER_APP.MEMORY.WARN} for 3m)'
               opdata: 'Current value: {ITEM.LASTVALUE}'
               priority: WARNING
+              description: 'Memory consumption has exceeded the warning threshold.'
               dependencies:
                 - name: 'Azure container Apps: Memory utilization is critical'
                   expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}'
@@ -5537,7 +5545,7 @@ zabbix_export:
           params: |
             var obj = JSON.parse(value);
             return JSON.stringify(obj.jvm_metrics === 'true' ? [{'{#SINGLETON}': ''}] : []);
-          description: 'Java metrics discovery based on `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.'
+          description: 'Java metric discovery based on the `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.'
           item_prototypes:
             - uuid: ee0e19b55ac44a2abea7d475695e3641
               name: 'JVM: Buffers: Count{#SINGLETON}'
@@ -5632,6 +5640,7 @@ zabbix_export:
                   event_name: 'Azure container Apps: Too many garbage collector action per minute (average {$AZURE.CONTAINER_APP.GC.ACTIONS.WARN} for 3m)'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: WARNING
+                  description: 'Garbage collection is running too frequently.'
                   tags:
                     - tag: scope
                       value: performance
@@ -5664,10 +5673,11 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 604c77c4b09a48bb845495bd884498d3
                   expression: 'avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.duration[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.DURATION.WARN}'
-                  name: 'Azure container Apps: Garbage collector is high'
+                  name: 'Azure container Apps: Garbage collector duration is high'
                   event_name: 'Azure container Apps: Garbage collector duration is high (average {$AZURE.CONTAINER_APP.GC.DURATION.WARN} for 3m)'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: WARNING
+                  description: 'Garbage collection duration has exceeded the warning threshold.'
                   tags:
                     - tag: scope
                       value: performance
@@ -5843,6 +5853,7 @@ zabbix_export:
                   event_name: 'Azure container Apps: JVM thread amount is high (average {$AZURE.CONTAINER_APP.THREAD.COUNT.WARN} for 3m)'
                   opdata: 'Current value: {ITEM.LASTVALUE}'
                   priority: WARNING
+                  description: 'Active JVM thread count has exceeded the warning threshold.'
                   tags:
                     - tag: scope
                       value: performance
@@ -5887,23 +5898,23 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}'
           value: '10'
-          description: 'Threshold for amount of java garbage collectors.'
+          description: 'Threshold for amount of Java garbage collectors.'
           config:
             type: TEXT
             priority: '17'
             section_name: Thresholds
             label: 'Java garbage collectors limit'
-            description: 'Threshold for amount of java garbage collectors. No less than 0.'
+            description: 'Threshold for amount of Java garbage collectors. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.CONTAINER_APP.GC.DURATION.WARN}'
           value: '500'
-          description: 'Threshold for duration of java garbage collectors, in milliseconds.'
+          description: 'Threshold for duration of Java garbage collectors, in milliseconds.'
           config:
             type: TEXT
             priority: '18'
             section_name: Thresholds
             label: 'Java garbage collector duration limit'
-            description: 'Threshold for duration of java garbage collectors, in ms. No less than 0.'
+            description: 'Threshold for duration of Java garbage collectors, in ms. No less than 0.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.CONTAINER_APP.GPU.CRIT}'
           value: '90'
@@ -5927,11 +5938,11 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.CONTAINER_APP.JVM.METRICS}'
           value: 'false'
-          description: 'Enable java virtual machine metrics collection. Useful for container apps with java development stack.'
+          description: 'Enable Java virtual machine metric collection. Useful for container apps with Java development stack.'
           config:
             type: LIST
             priority: '8'
-            label: 'Get java metrics'
+            label: 'Get Java metrics'
             description: 'Enable JVM metrics collection.'
             options:
               - value: 'false'
@@ -5980,7 +5991,7 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}'
           value: '500'
-          description: 'Threshold for amount of threads in java virtual machine.'
+          description: 'Threshold for amount of threads in Java virtual machine.'
           config:
             type: TEXT
             priority: '19'
