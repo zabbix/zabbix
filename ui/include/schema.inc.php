@@ -10274,7 +10274,7 @@ return [
 		]
 	],
 	'device' => [
-		'key' => 'uuid',
+		'key' => 'deviceid',
 		'fields' => [
 			'deviceid' => [
 				'null' => false,
