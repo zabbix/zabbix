@@ -19,8 +19,6 @@ require_once __DIR__.'/../common/testWidgets.php';
 /**
  * @backup dashboard
  *
- * @dataSource AllItemValueTypes
- *
  * @onBefore prepareItemCardWidgetData
  */
 class testDashboardItemCardWidget extends testWidgets {
@@ -407,7 +405,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			[
 				'name' => 'Item with JSON datatype',
 				'value' => '{"test":"json1","users":{"name1":"test1","name2":"🙂"}}',
-				'time' => time() - 86400 // -1 day.
+				'time' => time() - 8640000 // -100 days.
 			]
 		];
 
@@ -416,7 +414,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		// Add metrics to binary item.
-		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'QmluYXJ5IGl0ZW0gdGVzdCDwn5mC', time() - 864000);
+		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'QmluYXJ5IGl0ZW0gdGVzdCDwn5mC', time() - 8640000);
 
 		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 				'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'
@@ -1924,7 +1922,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					'Type of information' => 'JSON',
 					'Latest data' => [
-						'column' => '1d',
+						'column' => '100d',
 						'center-column' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
 						'right-column' => 'History'
 					],
@@ -1966,7 +1964,7 @@ class testDashboardItemCardWidget extends testWidgets {
 					],
 					'Type of information' => 'Binary',
 					'Latest data' => [
-						'column' => '10d',
+						'column' => '100d',
 						'center-column' => 'binary value',
 						'right-column' => ''
 					],
