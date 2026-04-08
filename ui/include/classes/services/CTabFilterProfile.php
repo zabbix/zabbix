@@ -347,16 +347,8 @@ class CTabFilterProfile {
 	 * Reset default filter profile.
 	 */
 	public function reset(): CTabFilterProfile {
-		if ($this->selected >= 0) {
-			if ($this->selected == 0) {
-				$this->setTabFilter($this->selected, ['filter_name' => '']);
-			}
-			else {
-				$tabfilter = $this->getTabFilter($this->selected);
-
-				$this->setTabFilter($this->selected, ['filter_name' => $tabfilter['filter_name']]);
-			}
-
+		if ($this->selected == 0) {
+			$this->setTabFilter($this->selected, ['filter_name' => '']);
 			$this->update();
 		}
 
