@@ -308,9 +308,6 @@ class testHousekeeping extends CAPITest {
 			$this->call('housekeeping.update', ['hk_events_mode' => '1'],
 				'No permissions to call "housekeeping.update".'
 			);
-
-			// Restore super admin session for next iteration.
-			$this->authorize('Admin', 'zabbix');
 		}
 	}
 }
