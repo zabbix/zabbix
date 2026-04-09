@@ -40,6 +40,7 @@ class testFormSetup extends CWebTest {
 
 	protected function deleteConfFile() {
 		unlink(__DIR__.'/../../conf/zabbix.conf.php');
+	}
 
 	/*protected function assignAllRightsToConfigFile () {
 		shell_exec('sudo chmod 777 '.__DIR__.'/../../conf/zabbix.conf.php');
