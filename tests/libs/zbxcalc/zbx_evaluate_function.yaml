@@ -1523,7 +1523,7 @@ in:
   params: '5m,1.7e+30'
 out:
   return: SUCCEED
-  value: 1.79e+308
+  value: 1.7976931348623158e+308
 ---
 test case: Evaluate timeleft(#3,wait infinite)
 in:
@@ -1542,7 +1542,7 @@ in:
   params: '#3,-1'
 out:
   return: SUCCEED
-  value: 1.79e+308
+  value: 1.7976931348623158e+308
 ---
 test case: Evaluate timeleft(5m,65)
 in:
@@ -4549,7 +4549,7 @@ out:
       params: '#2,3000w,"exponential"'
     out:
       return: SUCCEED
-      value: 1.79e+308
+      value: 1.7976931348623158e+308
 ---
 test case: Evaluate timeleft(5m,65,power)
 in:

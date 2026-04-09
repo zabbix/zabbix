@@ -1113,7 +1113,7 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (ZBX_IS_NAN(result))
+	else if (0 != isnan(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
@@ -1192,7 +1192,7 @@ out:
 	{
 		result = DBL_MAX;
 	}
-	else if (isnan(result))
+	else if (0 != isnan(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
