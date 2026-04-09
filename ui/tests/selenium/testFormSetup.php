@@ -50,7 +50,6 @@ class testFormSetup extends CWebTest {
 	 * @backup settings
 	 */
 	public function testFormSetup_welcomeSectionLayout() {
-var_dump(scandir(__DIR__.'/../../conf'));
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
 		// Check Welcome section.
@@ -267,8 +266,9 @@ var_dump(scandir(__DIR__.'/../../conf'));
 
 	/**
 	 * @backup settings
+	 *
+	 * @onAfter deleteConfFile
 	 */
-	//@onAfter assignAllRightsToConfigFile
 	public function testFormSetup_settingsSection() {
 		// Open the Pre-installation summary section.
 		$this->openSpecifiedSection('Settings');
@@ -390,7 +390,9 @@ var_dump(scandir(__DIR__.'/../../conf'));
 		$this->assertScreenshotExcept($this->query('xpath://form')->one(), $skip_fields, 'PreInstall_'.$db_parameters['Database type']);
 	}
 
-	//@onAfter assignAllRightsToConfigFile
+	/**
+	 * @onAfter deleteConfFile
+	 */
 	public function testFormSetup_installSection() {
 		$this->openSpecifiedSection('Install');
 		$this->checkPageTextElements('Install', 'Configuration file "conf/zabbix.conf.php" created.');
