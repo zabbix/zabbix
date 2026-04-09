@@ -124,12 +124,6 @@ class testFormSetup extends CWebTest {
 			'User' => 'zabbix',
 			'Password' => ''
 		];
-		$hints = [
-			'TLS text' => 'Connection will not be encrypted because it uses a socket file (on Unix) or shared '.
-					'memory (Windows).',
-			'Database host' => "Enter one or more values as host:port or [host]:port (IPv6), separated by commas.\n".
-					'If no port is specified, the "Database port" value is used.'
-		];
 
 		$fields['Database host'] = ($db_parameters['Database type'] === 'PostgreSQL') ?
 				'localhost' : $db_parameters['Database host'];
@@ -154,7 +148,9 @@ class testFormSetup extends CWebTest {
 					$this->assertFalse($form->query('xpath://label[text()="Database schema"]')->one(false)->isDisplayed());
 					// Check TLS fields if such should be displayed.
 					if ($db_parameters['Database host'] === 'localhost') {
-						$this->assertEquals($hints['TLS text'], $form->query('id:tls_encryption_hint')->one()->getText());
+						$tls_text = 'Connection will not be encrypted because it uses a socket file (on Unix) or shared '.
+								'memory (Windows).';
+						$this->assertEquals($tls_text, $form->query('id:tls_encryption_hint')->one()->getText());
 					}
 					else {
 						$form->getField('Database host')->fill($db_parameters['Database host']);
@@ -169,9 +165,12 @@ class testFormSetup extends CWebTest {
 					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
 
 					// Check hint for database host field.
+					$hint_text = "Enter one or more values as host:port or [host]:port (IPv6), separated by commas.\n".
+							'If no port is specified, the "Database port" value is used.';
+
 					$form->getLabel('Database host')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 					$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
-					$this->assertEquals($hints['Database host'], $hint->getText());
+					$this->assertEquals($hint_text, $hint->getText());
 					$hint->close();
 
 					$this->checkTlsFieldsLayout();
