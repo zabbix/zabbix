@@ -486,7 +486,7 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 	char			*sql = NULL;
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_trend_state_t	state;
-	double			avg, num, num2, avg2;
+	double			avg, num, num2, avg2, max_val, scaled_avg, scaled_avg2;
 
 	zbx_recalc_time_period(&start, ZBX_RECALC_TIME_PERIOD_TRENDS);
 
@@ -516,7 +516,17 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 		{
 			avg2 = atof(row[0]);
 			num2 = atof(row[1]);
-			avg = avg / (num + num2) * num + avg2 / (num + num2) * num2;
+
+			max_val = fmax(fabs(avg), fabs(avg2));
+
+			if (max_val == 0.0) {
+				avg = 0.0;
+			} else {
+				scaled_avg = avg / max_val;
+				scaled_avg2 = avg2 / max_val;
+
+				avg = (scaled_avg * num + scaled_avg2 * num2) / (num + num2) * max_val;
+			}
 			num += num2;
 		}
 

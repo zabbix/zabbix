@@ -34,13 +34,8 @@ class testCalculatedExpression extends CIntegrationTest {
 	const TRAPPER_ITEM_KEY = 'test.calc.trapper';
 	const CALCULATED_ITEM_KEY = 'test.calc.calculated';
 
-	/* According to our 'Upgrading to numeric values of extended range' docs supported limits are */
-	/* -1.79E+308 and 1.79E+308, NOT -1.7976931348623157e308 and 1.7976931348623157e308.          */
 	const DBL_MAX = '1.7976931348623157e308';
 	const DBL_MIN = '-1.7976931348623157e308';
-
-	const ZBX_DBL_MAX = '1.79e308';
-	const ZBX_DBL_MIN = '-1.79e308';
 
 	/**
 	 * Component configuration provider.
@@ -134,22 +129,22 @@ class testCalculatedExpression extends CIntegrationTest {
 	private function sendNotSupportedExtremeValues($sendMax, $sendMin, $itemkey)
 	{
 		for ($i = 1; $i <= $sendMax; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX + 1e-10);
 		}
 
 		for ($i = 1; $i <= $sendMin; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN) - 1e-10;
 		}
 	}
 
 	private function sendSupportedExtremeValues($sendMax, $sendMin, $itemkey)
 	{
 		for ($i = 1; $i <= $sendMax; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::ZBX_DBL_MAX);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX);
 		}
 
 		for ($i = 1; $i <= $sendMin; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::ZBX_DBL_MIN);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN);
 		}
 	}
 
@@ -251,16 +246,16 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MaxOfLast4()
@@ -313,15 +308,15 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				(float)self::ZBX_DBL_MIN,
-				(float)self::ZBX_DBL_MIN,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX
+				(float)self::DBL_MIN,
+				(float)self::DBL_MIN,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_MinOfLast3()
@@ -376,16 +371,16 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				(float)self::ZBX_DBL_MIN,
-				(float)self::ZBX_DBL_MIN,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX
+				(float)self::DBL_MIN,
+				(float)self::DBL_MIN,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::ZBX_DBL_MIN, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MIN, $this->getItemLastValue($itemid));
 	}
 
 	public function testCalculatedExpression_LastValue()
@@ -437,14 +432,14 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->assertSame(
 			[
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX,
-				(float)self::ZBX_DBL_MAX
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX,
+				(float)self::DBL_MAX
 			],
 			array_map('floatval', $values)
 		);
 
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
 
 	}
 
@@ -480,7 +475,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		);
 
 		// timeleft of course cannot reach -1, so test that it is cropped just below DBL_MAX
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $this->getItemLastValue($timeleft_itemid));
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 
 
 		// forecast
@@ -526,7 +521,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		}
 
 		// test that expected exponential value will be so large it is cropped just below DBL_MAX
-		$this->assertEquals((float)self::ZBX_DBL_MAX, $res['result'][0]['value']);
+		$this->assertEquals((float)self::DBL_MAX, $res['result'][0]['value']);
 	}
 
 	public function testCalculatedExpression_ArithmeticAndScaling()

@@ -165,8 +165,7 @@ int	zbx_double_compare(double a, double b)
 
 int	zbx_validate_value_dbl(double value)
 {
-	/* ZBX_DBL_MAX is slightly smaller than DBL_MAX, since we need some safety margin for calculations */
-	if (0 != isnan(value) || -ZBX_DBL_MAX > value || ZBX_DBL_MAX < value)
+	if (0 != isnan(value) || 0 != isinf(value))
 		return FAIL;
 
 	return SUCCEED;

@@ -17,8 +17,6 @@
 
 #include "zbxcommon.h"
 
-#define ZBX_DBL_MAX	1.79e+308
-
 #define zbx_is_ushort(str, value) \
 	zbx_is_uint_n_range(str, ZBX_SIZE_T_MAX, value, sizeof(unsigned short), 0x0, 0xFFFF)
 

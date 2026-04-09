@@ -1112,20 +1112,20 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (ZBX_DBL_MAX < result)
-	{
-		result = ZBX_DBL_MAX;
-	}
-	else if (-ZBX_DBL_MAX > result)
-	{
-		result = -ZBX_DBL_MAX;
-	}
-	else if (isnan(result))
+	else if (ZBX_IS_NAN(result))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "numerical error");
 		result = ZBX_MATH_ERROR;
 	}
-
+	/* these checks are needed in case of +/- infinity */
+	else if (DBL_MAX < result)
+	{
+		result = DBL_MAX;
+	}
+	else if (-DBL_MAX > result)
+	{
+		result = -DBL_MAX;
+	}
 	return result;
 }
 
@@ -1136,7 +1136,7 @@ double	zbx_timeleft(double *t, double *x, int n, double now, double threshold, z
 	int		res;
 
 	if (1 == n)
-		return (x[0] == threshold ? 0.0 : ZBX_DBL_MAX);
+		return (x[0] == threshold ? 0.0 : DBL_MAX);
 
 	zbx_matrix_struct_alloc(&coefficients);
 
@@ -1186,9 +1186,9 @@ out:
 	{
 		result = ZBX_MATH_ERROR;
 	}
-	else if (0.0 > result || ZBX_DBL_MAX < result)
+	else if (0.0 > result || DBL_MAX < result)
 	{
-		result = ZBX_DBL_MAX;
+		result = DBL_MAX;
 	}
 	else if (isnan(result))
 	{
