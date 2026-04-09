@@ -7,10 +7,115 @@
 	position: relative;
 	border: 1px solid $ui-border-color;
 
+	&::before {
+		content: '';
+	}
+
 	&.is-loading {
 		&::before {
 			z-index: 20;
-			background-color: rgba($ui-bg-color, 0.5);
+			background-color: rgba($ui-bg-color, .5);
+		}
+	}
+
+	&.datatable-resizing {
+		user-select: none;
+		pointer-events: none;
+
+		.cell-resizing {
+			.cell-header-resizer {
+				border-right-color: $datatable-resizer-border-color;
+			}
+		}
+	}
+
+	&.compact-view {
+		.cell {
+			&.cell-data {
+				height: calc(var(--datatable-compact-row-height) + 1px);
+				min-height: initial;
+				padding: 2px 8px;
+
+				.cell-inner {
+					padding: 0;
+				}
+
+				.symptoms {
+					height: calc(var(--datatable-compact-row-height) - 4px);
+
+					.btn-icon {
+						height: calc(var(--datatable-compact-row-height) - 6px);
+					}
+				}
+
+				.table-stats {
+					position: absolute;
+					right: 0;
+					padding: 0;
+				}
+			}
+		}
+
+		.datatable-body {
+			.row-spacer {
+				height: calc(var(--datatable-compact-row-height) + 1px);
+				min-height: initial;
+			}
+		}
+	}
+
+	&.has-highlighted-rows {
+		.rows {
+			.row {
+				&:not(.row-disabled) {
+					.cell {
+						&.cell-data {
+							a {
+								&.link-action {
+									color: $font-color;
+								}
+
+								&:hover {
+									color: $btn-alt-color;
+								}
+							}
+
+							.btn-icon {
+								background-color: $ui-bg-color;
+							}
+						}
+					}
+
+					&:not(.row-selected) {
+						&:hover {
+							.cell {
+								&.cell-data {
+									a:not(.link-action) {
+										color: $btn-alt-color;
+									}
+
+									&:not(.cell-bg) {
+										background-color: $ui-hover-bg-color;
+										border-bottom-color: $ui-border-color;
+									}
+								}
+							}
+						}
+
+						&:not(:hover) {
+							.cell {
+								&.cell-data {
+									color: $font-color;
+
+									a {
+										color: $font-color;
+									}
+								}
+							}
+						}
+					}
+				}
+			}
 		}
 	}
 
@@ -80,22 +185,14 @@
 		max-height: 90vh;
 		padding: 10px;
 		overflow-y: auto;
-		user-select: none;
 		outline: none;
+		user-select: none;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
 		box-shadow: 0 4px 20px 0 $action-shadow-color;
 
 		&:focus {
 			outline: none;
-		}
-
-		@if $ui-transitions {
-			.radio-list-control {
-				label {
-					transition: none;
-				}
-			}
 		}
 
 		.datatable-options-popup-links {
@@ -148,23 +245,6 @@
 			border: 1px solid transparent;
 			border-radius: 0;
 
-			.zi-context {
-				margin-top: -2px;
-				pointer-events: none;
-
-				&:before {
-					font-size: 12px;
-				}
-			}
-
-			.zi-filters {
-				pointer-events: none;
-
-				&:before {
-					font-size: 14px;
-				}
-			}
-
 			&:hover,
 			&:focus,
 			&.datatable-options-link-opened {
@@ -172,6 +252,23 @@
 				background-color: $ui-hover-bg-color;
 				border-color: $btn-alt-color;
 				box-shadow: none;
+			}
+
+			.zi-context {
+				margin-top: -2px;
+				pointer-events: none;
+
+				&::before {
+					font-size: 12px;
+				}
+			}
+
+			.zi-filters {
+				pointer-events: none;
+
+				&::before {
+					font-size: 14px;
+				}
 			}
 		}
 
@@ -195,8 +292,15 @@
 		display: grid;
 		align-items: center;
 		width: 100%;
-		overflow: hidden;
+		overflow-x: auto;
+		overflow-y: hidden;
+		-ms-overflow-style: none;
+		scrollbar-width: none;
 		background-color: $ui-bg-color;
+
+		&::-webkit-scrollbar {
+			display: none;
+		}
 
 		&.no-data-message {
 			padding: 100px 0;
@@ -204,6 +308,20 @@
 
 		.row {
 			display: contents;
+
+			&:not(.row-disabled):hover {
+				.cell {
+					&.cell-data {
+						&:not(.cell-bg) {
+							background-color: $ui-hover-bg-color;
+						}
+					}
+				}
+
+				.row-spacer {
+					background-color: $ui-hover-bg-color;
+				}
+			}
 
 			&.nested {
 				&:not(.row-selected) {
@@ -221,38 +339,57 @@
 				}
 			}
 
+			&.row-selected {
+				.cell {
+					&:not(.cell-bg) {
+						background-color: $lighter-yellow;
+						border-bottom-color: rgba(31, 44, 51, .1);
+					}
+				}
+			}
+
 			.table-stats {
 				&.table-stats-small {
 					font-size: 11px;
 				}
 			}
+		}
+	}
 
-			&.row-selected {
-				.cell {
-					&:not(.cell-bg) {
-						background-color: $lighter-yellow;
-						border-bottom-color: rgba(31, 44, 51, 0.1);
-					}
-				}
+	.datatable-scrollbar {
+		position: sticky;
+		bottom: calc(var(--datatable-row-height) + 1px);
+		z-index: 11;
+		box-sizing: border-box;
+		height: 17px;
+		padding: 4px;
+		margin: -1px 0 1px;
+		overflow: hidden;
+		user-select: none;
+		background-color: $ui-bg-color;
+		border-top: 1px solid $ui-border-color;
+
+		&.datatable-scrollbar-dragging {
+			.datatable-scrollbar-thumb {
+				background-color: $datatable-scrollbar-thumb-hover-bg-color;
 			}
+		}
 
-			&:not(.row-disabled):hover {
-				.cell {
-					&.cell-data {
-						&:not(.cell-bg) {
-							background-color: $ui-hover-bg-color;
-						}
-					}
-				}
+		.datatable-scrollbar-thumb {
+			height: 8px;
+			cursor: pointer;
+			touch-action: none;
+			background-color: $datatable-scrollbar-thumb-bg-color;
+			border-radius: 5px;
 
-				.row-spacer {
-					background-color: $ui-hover-bg-color;
-				}
+			&:hover {
+				background-color: $datatable-scrollbar-thumb-hover-bg-color;
 			}
 		}
 	}
 
 	.datatable-footer {
+		z-index: 10;
 		display: grid;
 		grid-template-columns: 1fr auto 1fr;
 		align-items: center;
@@ -265,7 +402,6 @@
 		&.datatable-footer-sticky {
 			position: sticky;
 			bottom: 0;
-			z-index: 10;
 		}
 
 		&.table-paging {
@@ -288,9 +424,9 @@
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;
-		height: 100%;
 		min-width: 0;
 		min-height: calc(var(--datatable-row-height) + 1px);
+		height: 100%;
 		text-align: left;
 		border-bottom: 1px solid $ui-border-color;
 
@@ -300,6 +436,293 @@
 
 		&:first-of-type {
 			grid-column-start: 1;
+		}
+
+		&.cell-header {
+			position: sticky;
+			top: 0;
+			z-index: 1;
+			box-sizing: border-box;
+			display: flex;
+			justify-content: space-between;
+			height: calc(var(--datatable-row-height) + 1px);
+			color: $font-alt-color;
+			outline: none;
+			user-select: none;
+			background-color: $ui-bg-color;
+			border-right: 1px solid $ui-border-color;
+
+			&:last-child {
+				border-top-right-radius: 2px;
+
+				.header-link {
+					border-top-right-radius: 2px;
+				}
+			}
+
+			&:nth-last-child(1 of .cell-header) {
+				margin-right: -1px;
+			}
+
+			&:focus {
+				outline: none;
+			}
+
+			&.cell-header-link {
+				padding: 0;
+
+				.cell-inner {
+					padding: 0 8px;
+				}
+
+				.header-link {
+					box-sizing: border-box;
+					display: flex;
+					align-items: center;
+					gap: 3px;
+					width: 100%;
+					height: var(--datatable-row-height);
+					padding: 0 8px;
+					color: $link-color;
+					text-decoration: none;
+					border: none;
+
+					&:hover,
+					&:focus {
+						background-color: $ui-hover-bg-color;
+					}
+
+					.name {
+						overflow: hidden;
+						text-overflow: ellipsis;
+						white-space: nowrap;
+						pointer-events: none;
+					}
+
+					.arrow-up {
+						flex-shrink: 0;
+						pointer-events: none;
+						border-bottom-color: $font-alt-color;
+					}
+
+					.arrow-down {
+						flex-shrink: 0;
+						pointer-events: none;
+						border-top-color: $font-alt-color;
+					}
+
+					&.header-link-sorted {
+						.arrow-up {
+							border-bottom-color: $font-alt-color;
+						}
+
+						.arrow-down {
+							border-top-color: $font-alt-color;
+						}
+					}
+				}
+			}
+
+			&.cell-sticky {
+				&:first-child {
+					border-right: 1px solid $ui-border-color;
+
+					& + .cell-header {
+						border-left: none;
+					}
+				}
+			}
+
+			.cell-inner {
+				flex-grow: 1;
+				padding: 0 8px;
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+			}
+
+			.cell-header-resizer {
+				position: absolute;
+				top: -1px;
+				right: 0;
+				z-index: 20;
+				width: 10px;
+				height: calc(var(--datatable-row-height) + 1px);
+				cursor: col-resize;
+				user-select: none;
+				border-right: 3px solid transparent;
+
+				&:hover {
+					border-right-color: $datatable-resizer-border-color;
+				}
+			}
+		}
+
+		&.cell-sticky {
+			position: sticky;
+			z-index: 4;
+		}
+
+		&.cell-data {
+			align-items: flex-start;
+			padding: 0 8px;
+
+			&.cell-sticky {
+				&:not(.cell-bg-hover) {
+					background-color: $ui-bg-color;
+				}
+			}
+
+			&.cell-error {
+				color: $red;
+			}
+
+			&.warning-bg {
+				border-bottom-color: var(--severity-color-warning-bg);
+			}
+
+			&.average-bg {
+				border-bottom-color: var(--severity-color-average-bg);
+			}
+
+			&.high-bg {
+				border-bottom-color: var(--severity-color-high-bg);
+			}
+
+			&.disaster-bg {
+				border-bottom-color: var(--severity-color-disaster-bg);
+			}
+
+			&:first-child {
+				border-right: 1px solid transparent;
+			}
+
+			.cell-inner {
+				box-sizing: border-box;
+				display: block;
+				padding: 7px 0;
+
+				& + .timeline-axis {
+					margin-left: 5px;
+				}
+
+				.btn-icon:not(.no-indent):not(:first-child),
+				.icon:not(.no-indent):not(:first-child),
+				.link-action:not(.no-indent):not(:first-child) {
+					margin-left: 5px;
+				}
+			}
+
+			.btn-icon {
+				min-width: 18px;
+				height: 18px;
+			}
+
+			.symptoms {
+				display: flex;
+				justify-content: flex-start;
+				align-items: center;
+				flex-shrink: 0;
+				gap: 3px;
+				height: var(--datatable-row-height);
+
+				.symptoms-left {
+					min-width: 28px;
+					max-width: 3ch;
+					text-align: center;
+				}
+
+				.symptoms-right {
+					width: 18px;
+				}
+			}
+
+			.timeline-date,
+			.timeline-axis,
+			.timeline-td {
+				border-bottom-color: transparent;
+			}
+
+			.timeline-date {
+				@extend %overflow-ellipsis;
+				text-align: right;
+			}
+
+			.timeline-axis,
+			.timeline-th,
+			.timeline-td {
+				position: relative;
+				width: 6px;
+				height: 100%;
+				padding: 0;
+			}
+
+			.timeline-axis {
+				&::before {
+					position: absolute;
+					top: 0;
+					right: 0;
+					bottom: -1px;
+					width: 2px;
+					content: '';
+					background-color: $timeline-color;
+				}
+			}
+
+			.timeline-dot,
+			.timeline-dot-big {
+				&::after {
+					position: absolute;
+					right: -3px;
+					width: 4px;
+					height: 4px;
+					content: '';
+					border-radius: 50%;
+				}
+			}
+
+			.timeline-dot {
+				&::after {
+					top: 11px;
+					background-color: $btn-bg-color;
+					border: 2px solid $ui-bg-color;
+				}
+			}
+
+			.timeline-dot-big {
+				&::after {
+					top: 11px;
+					background-color: $ui-bg-color;
+					border: 2px solid $btn-bg-color;
+				}
+			}
+		}
+
+		&.cell-checkbox {
+			justify-content: flex-start;
+			padding: 0 8px;
+
+			.cell-inner {
+				width: 23px;
+				text-overflow: initial;
+			}
+
+			.checkbox-radio {
+				margin: 0;
+
+				& + label {
+					display: inline-block;
+					height: 16px;
+
+					span {
+						margin: 0;
+					}
+				}
+			}
+		}
+
+		&.cell-timeline {
+			padding-right: 0;
 		}
 
 		.cell-inner {
@@ -381,297 +804,6 @@
 				}
 			}
 		}
-
-		&.cell-header {
-			position: sticky;
-			top: 0;
-			z-index: 1;
-			box-sizing: border-box;
-			display: flex;
-			justify-content: space-between;
-			height: calc(var(--datatable-row-height) + 1px);
-			color: $font-alt-color;
-			user-select: none;
-			background-color: $ui-bg-color;
-			border-right: 1px solid $ui-border-color;
-
-			&:nth-last-child(1 of .cell-header) {
-				margin-right: -1px;
-			}
-
-			&:focus {
-				outline: none;
-			}
-
-			.cell-inner {
-				flex-grow: 1;
-				padding: 0 8px;
-				text-overflow: ellipsis;
-				white-space: nowrap;
-			}
-
-			&.cell-header-link {
-				padding: 0;
-
-				.cell-inner {
-					padding: 0 8px;
-				}
-
-				.header-link {
-					box-sizing: border-box;
-					display: flex;
-					align-items: center;
-					gap: 3px;
-					width: 100%;
-					height: var(--datatable-row-height);
-					padding: 0 8px;
-					color: $link-color;
-					text-decoration: none;
-					border: none;
-
-					.name {
-						overflow: hidden;
-						text-overflow: ellipsis;
-						white-space: nowrap;
-						pointer-events: none;
-					}
-
-					&:hover,
-					&:focus {
-						background-color: $ui-hover-bg-color;
-					}
-
-					.arrow-up {
-						flex-shrink: 0;
-						pointer-events: none;
-						border-bottom-color: $font-alt-color;
-					}
-
-					.arrow-down {
-						flex-shrink: 0;
-						pointer-events: none;
-						border-top-color: $font-alt-color;
-					}
-
-					&.header-link-sorted {
-						.arrow-up {
-							border-bottom-color: $font-alt-color;
-						}
-
-						.arrow-down {
-							border-top-color: $font-alt-color;
-						}
-					}
-				}
-			}
-
-			.cell-header-resizer {
-				position: absolute;
-				top: -1px;
-				right: 0;
-				z-index: 20;
-				width: 10px;
-				height: calc(var(--datatable-row-height) + 1px);
-				cursor: col-resize;
-				user-select: none;
-				border-right: 3px solid transparent;
-
-				&:hover {
-					border-right-color: $datatable-resizer-border-color;
-				}
-			}
-
-			&:last-child {
-				border-top-right-radius: 2px;
-
-				.header-link {
-					border-top-right-radius: 2px;
-				}
-			}
-
-			&.cell-sticky {
-				&:first-child {
-					border-right: 1px solid $ui-border-color;
-
-					& + .cell-header {
-						border-left: none;
-					}
-				}
-			}
-		}
-
-		&.cell-sticky {
-			position: sticky;
-			z-index: 4;
-		}
-
-		&.cell-data {
-			align-items: flex-start;
-			padding: 0 8px;
-
-			@if $ui-transitions {
-				a {
-					transition: color $ui-transition-duration ease-out;
-				}
-			}
-
-			.cell-inner {
-				box-sizing: border-box;
-				display: block;
-				padding: 7px 0;
-
-				& + .timeline-axis {
-					margin-left: 5px;
-				}
-
-				.btn-icon:not(.no-indent):not(:first-child),
-				.icon:not(.no-indent):not(:first-child),
-				.link-action:not(.no-indent):not(:first-child) {
-					margin-left: 5px;
-				}
-			}
-
-			&.cell-sticky {
-				&:not(.cell-bg-hover) {
-					background-color: $ui-bg-color;
-				}
-			}
-
-			&.cell-error {
-				color: $red;
-			}
-
-			.btn-icon {
-				min-width: 18px;
-				height: 18px;
-			}
-
-			.symptoms {
-				display: flex;
-				justify-content: flex-start;
-				align-items: center;
-				flex-shrink: 0;
-				gap: 3px;
-				height: var(--datatable-row-height);
-
-				.symptoms-left {
-					min-width: 28px;
-					max-width: 3ch;
-					text-align: center;
-				}
-
-				.symptoms-right {
-					width: 18px;
-				}
-			}
-
-			.timeline-date,
-			.timeline-axis,
-			.timeline-td {
-				border-bottom-color: transparent;
-			}
-
-			.timeline-date {
-				@extend %overflow-ellipsis;
-				text-align: right;
-			}
-
-			.timeline-axis,
-			.timeline-th,
-			.timeline-td {
-				position: relative;
-				width: 6px;
-				height: 100%;
-				padding: 0;
-			}
-
-			.timeline-axis {
-				&::before {
-					position: absolute;
-					top: 0;
-					right: 0;
-					bottom: -1px;
-					content: '';
-					width: 2px;
-					background-color: $timeline-color;
-				}
-			}
-
-			.timeline-dot,
-			.timeline-dot-big {
-				&::after {
-					position: absolute;
-					right: -3px;
-					content: '';
-					width: 4px;
-					height: 4px;
-					border-radius: 50%;
-				}
-			}
-
-			.timeline-dot {
-				&::after {
-					top: 11px;
-					background-color: $btn-bg-color;
-					border: 2px solid $ui-bg-color;
-				}
-			}
-
-			.timeline-dot-big {
-				&::after {
-					top: 11px;
-					background-color: $ui-bg-color;
-					border: 2px solid $btn-bg-color;
-				}
-			}
-
-			&.warning-bg {
-				border-bottom-color: var(--severity-color-warning-bg);
-			}
-
-			&.average-bg {
-				border-bottom-color: var(--severity-color-average-bg);
-			}
-
-			&.high-bg {
-				border-bottom-color: var(--severity-color-high-bg);
-			}
-
-			&.disaster-bg {
-				border-bottom-color: var(--severity-color-disaster-bg);
-			}
-
-			&:first-child {
-				border-right: 1px solid transparent;
-			}
-		}
-
-		&.cell-checkbox {
-			justify-content: flex-start;
-			padding: 0 8px;
-
-			.cell-inner {
-				width: 23px;
-				text-overflow: initial;
-			}
-
-			.checkbox-radio {
-				margin: 0;
-
-				& + label {
-					display: inline-block;
-					height: 16px;
-
-					span {
-						margin: 0;
-					}
-				}
-			}
-		}
-
-		&.cell-timeline {
-			padding-right: 0;
-		}
 	}
 
 	.row-spacer {
@@ -688,139 +820,5 @@
 		padding: 100px 0;
 		background-color: $ui-bg-color;
 		border-top: none;
-	}
-
-	&.datatable-resizing {
-		user-select: none;
-		pointer-events: none;
-
-		.cell-resizing {
-			.cell-header-resizer {
-				border-right-color: $datatable-resizer-border-color;
-			}
-		}
-	}
-
-	&.datatable-scrollable {
-		.datatable-body {
-			overflow-x: auto;
-
-			&::-webkit-scrollbar {
-				width: 10px;
-				height: 10px;
-				background: $ui-bg-color;
-			}
-
-			&::-webkit-scrollbar-track {
-				background: $ui-bg-color;
-			}
-
-			&::-webkit-scrollbar-thumb {
-				box-sizing: border-box;
-				border: 2px solid transparent;
-				border-radius: 5px;
-				cursor: pointer;
-				background-color: $datatable-scrollbar-thumb-bg-color;
-				background-clip: content-box;
-
-				@if $ui-transitions {
-					transition: background-color $ui-transition-duration ease;
-				}
-
-				&:hover {
-					background-color: $datatable-scrollbar-thumb-hover-bg-color;
-				}
-			}
-		}
-	}
-
-	&.compact-view {
-		.cell {
-			&.cell-data {
-				height: calc(var(--datatable-compact-row-height) + 1px);
-				min-height: initial;
-				padding: 2px 8px;
-
-				.cell-inner {
-					padding: 0;
-				}
-
-				.symptoms {
-					height: calc(var(--datatable-compact-row-height) - 4px);
-
-					.btn-icon {
-						height: calc(var(--datatable-compact-row-height) - 6px);
-					}
-				}
-
-				.table-stats {
-					position: absolute;
-					right: 0;
-					padding: 0;
-				}
-			}
-		}
-
-		.datatable-body {
-			.row-spacer {
-				height: calc(var(--datatable-compact-row-height) + 1px);
-				min-height: initial;
-			}
-		}
-	}
-
-	&.has-highlighted-rows {
-		.rows {
-			.row {
-				&:not(.row-disabled) {
-					.cell {
-						&.cell-data {
-							a {
-								&.link-action {
-									color: $font-color;
-								}
-
-								&:hover {
-									color: $btn-alt-color;
-								}
-							}
-
-							.btn-icon {
-								background-color: $ui-bg-color;
-							}
-						}
-					}
-
-					&:not(.row-selected) {
-						&:not(:hover) {
-							.cell {
-								&.cell-data {
-									color: $font-color;
-
-									a {
-										color: $font-color;
-									}
-								}
-							}
-						}
-
-						&:hover {
-							.cell {
-								&.cell-data {
-									a:not(.link-action) {
-										color: $btn-alt-color;
-									}
-
-									&:not(.cell-bg) {
-										background-color: $ui-hover-bg-color;
-										border-bottom-color: $ui-border-color;
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
 	}
 }

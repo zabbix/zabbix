@@ -54,6 +54,10 @@ class CDataTable {
 	static ZBX_STYLE_OPTIONS_LINK_OPENED = 'datatable-options-link-opened';
 	static ZBX_STYLE_OPTIONS_BUTTON = 'datatable-options-button';
 
+	static ZBX_STYLE_SCROLLBAR = 'datatable-scrollbar';
+	static ZBX_STYLE_SCROLLBAR_DRAGGING = 'datatable-scrollbar-dragging';
+	static ZBX_STYLE_SCROLLBAR_THUMB = 'datatable-scrollbar-thumb';
+
 	static ZBX_STYLE_CELL = 'cell';
 	static ZBX_STYLE_CELL_BG = 'cell-bg';
 	static ZBX_STYLE_CELL_BG_HOVER = 'cell-bg-hover';
@@ -159,6 +163,44 @@ class CDataTable {
 	#resize_click_count = 0;
 
 	/**
+	 * Flag indicating whether a scroll-drag operation is currently active.
+	 * Used to lock or unlock pointer movement logic for the custom scrollbar.
+	 *
+	 * @type {boolean}
+	 */
+	#scrolling = false;
+
+	/**
+	 * The initial horizontal coordinate (pageX) when the scroll drag started.
+	 * Used as a reference point to calculate the drag distance relative to the thumb.
+	 *
+	 * @type {number}
+	 */
+	#scroll_page_x = 0;
+
+	/**
+	 * The reference to the custom scrollbar track element.
+	 *
+	 * @type {HTMLElement|null}
+	 */
+	#scrollbar = null;
+
+	/**
+	 * The reference to the draggable scrollbar thumb element.
+	 *
+	 * @type {HTMLElement|null}
+	 */
+	#scrollbar_thumb = null;
+
+	/**
+	 * Observer instance that monitors changes in the body dimensions.
+	 * Ensures the scrollbar thumb size is recalculated when the content layout changes.
+	 *
+	 * @type {ResizeObserver|null}
+	 */
+	#body_resize_observer = null;
+
+	/**
 	 * Holds an opened instance of the context popup.
 	 *
 	 * @type {CDataTableOptionsPopup|CDataTableOptionsPopupTableOptions|null}
@@ -194,7 +236,7 @@ class CDataTable {
 
 	#filter = {};
 
-	#tabfilter_item = { _index: 1 };
+	#tabfilter_item = { _index: 0 };
 
 	#pager = null;
 
@@ -289,8 +331,8 @@ class CDataTable {
 
 					header_link.setAttribute('href', 'javascript:void(0);');
 					header_link.append(label, icon);
-					header_link.addEventListener('click', event => {
-						event.preventDefault();
+					header_link.addEventListener('click', e => {
+						e.preventDefault();
 
 						this.dispatchEvent(CDataTable.EVENT_DATA_SORT, {sort_field, sort_order});
 					});
@@ -315,8 +357,8 @@ class CDataTable {
 					context_handle.setAttribute('type', 'button');
 					context_handle.setAttribute('role', 'button');
 					context_handle.appendChild(icon);
-					context_handle.addEventListener('click', event => {
-						event.preventDefault();
+					context_handle.addEventListener('click', e => {
+						e.preventDefault();
 
 						this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP, {handle: context_handle});
 					});
@@ -619,6 +661,11 @@ class CDataTable {
 						<span class="${ZBX_ICON_FILTERS}"></span>
 					</button>
 				</div>
+			`),
+			scrollbar: new Template(`
+				<div class="${CDataTable.ZBX_STYLE_SCROLLBAR}">
+					<div class="${CDataTable.ZBX_STYLE_SCROLLBAR_THUMB}"></div>
+				</div>
 			`)
 		}
 	}
@@ -659,16 +706,16 @@ class CDataTable {
 
 		this.#pager = new CPager(this.#footer);
 		this.#pager
-			.on(CPager.EVENT_SELECT, event => {
-				const {page} = event.detail;
+			.on(CPager.EVENT_SELECT, e => {
+				const {page} = e.detail;
 
 				this.#page = page;
 
 				this.dispatchEvent(CDataTable.EVENT_INIT);
-				this.dispatchEvent(CPager.EVENT_SELECT, event.detail);
+				this.dispatchEvent(CPager.EVENT_SELECT, e.detail);
 			})
-			.on(CPager.EVENT_STATE_CHANGE, event => {
-				this.dispatchEvent(CPager.EVENT_STATE_CHANGE, event.detail);
+			.on(CPager.EVENT_STATE_CHANGE, e => {
+				this.dispatchEvent(CPager.EVENT_STATE_CHANGE, e.detail);
 			});
 
 		this.#bindEvents();
@@ -676,6 +723,14 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_INIT);
 
 		return this;
+	}
+
+	initCheckBoxRange() {
+		const selector = `.${CDataTable.ZBX_STYLE_BODY}`;
+		const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
+		const thead_selector = `.${CDataTable.ZBX_STYLE_HEADER} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
+
+		chkbxRange.init({selector, row_selector, thead_selector});
 	}
 
 	setRowRenderer(name, callback) {
@@ -953,7 +1008,7 @@ class CDataTable {
 
 			this.#applyColumnWidths();
 			this.#applyLastColumnPadding();
-			this.#updateTableOptionsButtonPosition();
+			this.#handleScrollbar();
 
 			this.#pager.update(response);
 
@@ -965,38 +1020,8 @@ class CDataTable {
 		});
 	}
 
-	initCheckBoxRange() {
-		const selector = `.${CDataTable.ZBX_STYLE_BODY}`;
-		const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
-		const thead_selector = `.${CDataTable.ZBX_STYLE_HEADER} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
-
-		chkbxRange.init({selector, row_selector, thead_selector});
-	}
-
-	#applyLastColumnPadding() {
-		if (!this.#customizable) {
-			return;
-		}
-
-		const column_config = this.#columns.filter(column_config => column_config.isVisible()).at(-1);
-		const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
-		const header_resizer = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
-
-		const element_rect = this.#element.getBoundingClientRect();
-		const table_options_button_rect = this.#findTableOptionsButton().getBoundingClientRect();
-
-		const right_edge = header_cell.getBoundingClientRect().right - element_rect.left;
-		const right_boundary = element_rect.width - table_options_button_rect.width;
-		const right_offset = right_edge > right_boundary || this.#element.scrollWidth > element_rect.width
-			? Math.min(table_options_button_rect.width, right_edge - right_boundary)
-			: 0;
-
-		header_cell.style.paddingRight = `${right_offset}px`;
-		header_resizer.style.right = `${right_offset}px`;
-	}
-
-	onColumnToggle(event) {
-		const {column_index, visible} = event.detail;
+	onColumnToggle(e) {
+		const {column_index, visible} = e.detail;
 
 		const column_config = this.getColumnConfig(column_index);
 		if (!column_config || !column_config.isTogglable()) {
@@ -1024,8 +1049,8 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
-	onColumnsSort(event) {
-		const {items, index, index_to} = event.detail;
+	onColumnsSort(e) {
+		const {items, index, index_to} = e.detail;
 
 		const [offset, start, end] = index > index_to
 			? [1, index_to + 1, index]
@@ -1057,8 +1082,8 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 	}
 
-	onColumnDuplicate(event) {
-		let {column_index, user_column_config} = {user_column_config: {}, ...event.detail};
+	onColumnDuplicate(e) {
+		let {column_index, user_column_config} = {user_column_config: {}, ...e.detail};
 
 		const column_config = this.getColumnConfig(column_index);
 		if (!column_config) {
@@ -1091,8 +1116,8 @@ class CDataTable {
 		});
 	}
 
-	onColumnDelete(event) {
-		const {column_index} = event.detail;
+	onColumnDelete(e) {
+		const {column_index} = e.detail;
 
 		const column_config = this.getColumnConfig(column_index);
 		if (!column_config) {
@@ -1122,8 +1147,8 @@ class CDataTable {
 		}
 	}
 
-	onColumnRename(event) {
-		const {column_index, name} = event.detail;
+	onColumnRename(e) {
+		const {column_index, name} = e.detail;
 
 		const column_config = this.getColumnConfig(column_index);
 		if (!column_config || (!column_config.isDuplicate() && !column_config.isRenamable())) {
@@ -1136,8 +1161,8 @@ class CDataTable {
 		cell_inner.innerText = name;
 	}
 
-	onColumnReset(event) {
-		const {column_index} = event.detail;
+	onColumnReset(e) {
+		const {column_index} = e.detail;
 
 		const column_config = this.getColumnConfig(column_index);
 		if (!column_config) {
@@ -1181,13 +1206,13 @@ class CDataTable {
 		return this.#data_provider.getData(params);
 	}
 
-	onInit(event) {
+	onInit(e) {
 		const {loading, check_changes, force_load, reset} = {
 			loading: true,
 			check_changes: true,
 			force_load: false,
 			reset: false,
-			...event.detail
+			...e.detail
 		};
 
 		if (loading) {
@@ -1198,7 +1223,7 @@ class CDataTable {
 			onSuccess: () => {},
 			onError: () => {},
 			onFinally: () => {},
-			...event.detail
+			...e.detail
 		};
 
 		if (!reset) {
@@ -1236,15 +1261,15 @@ class CDataTable {
 		this.#initialized = true;
 	}
 
-	onResizeMouseMove = event => {
-		this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE, {event});
+	onResizeMouseMove = e => {
+		this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE, {event: e});
 	}
 
-	onResizeMouseUp = event => {
-		this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_END, {event});
+	onResizeMouseUp = e => {
+		this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_END, {event: e});
 	}
 
-	onColumnResize(event) {
+	onColumnResize(e) {
 		if (!this.#resizing) {
 			return;
 		}
@@ -1254,7 +1279,7 @@ class CDataTable {
 			return;
 		}
 
-		const {clientX} = event.detail.event;
+		const {clientX} = e.detail.event;
 		const delta_x = clientX - this.#resize_start_x;
 		const total_width = this.#element.getBoundingClientRect().width;
 		const delta_percent = (delta_x / total_width) * 100;
@@ -1278,10 +1303,11 @@ class CDataTable {
 
 		this.#applyColumnWidths();
 		this.#applyLastColumnPadding();
+		this.#handleScrollbar();
 	}
 
-	onColumnResizeStart(event) {
-		const {x, column_index, id} = event.detail;
+	onColumnResizeStart(e) {
+		const {x, column_index, id} = e.detail;
 
 		this.#resize_click_count++;
 
@@ -1340,8 +1366,8 @@ class CDataTable {
 		window.removeEventListener('mouseup', this.onResizeMouseUp);
 	}
 
-	onDataSort(event) {
-		const {sort_field, sort_order} = event.detail;
+	onDataSort(e) {
+		const {sort_field, sort_order} = e.detail;
 
 		const state = new CState();
 		state.setParams({ sort: sort_field, sortorder: sort_order });
@@ -1355,8 +1381,8 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_INIT);
 	}
 
-	onColumnOptionsPopup(event) {
-		const {handle} = event.detail;
+	onColumnOptionsPopup(e) {
+		const {handle} = e.detail;
 
 		if (this.#options_popup?.isOpen(handle)) {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
@@ -1380,12 +1406,12 @@ class CDataTable {
 		});
 	}
 
-	onColumnOptionsPopupOpen(event) {
+	onColumnOptionsPopupOpen(e) {
 		if (!this.#options_popup) {
 			return;
 		}
 
-		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_OPEN, event.detail);
+		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_OPEN, e.detail);
 	}
 
 	onColumnOptionsPopupClose() {
@@ -1401,12 +1427,12 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_CLOSE);
 	}
 
-	onColumnOptionsPopupUpdate(event) {
+	onColumnOptionsPopupUpdate(e) {
 		if (!this.#options_popup) {
 			return;
 		}
 
-		const {column_index, column_options} = event.detail;
+		const {column_index, column_options} = e.detail;
 		const column_config = this.getColumnConfig(column_index);
 
 		if (!deepCompare(column_config.getColumnOptions(), column_options)) {
@@ -1423,11 +1449,11 @@ class CDataTable {
 			});
 		}
 
-		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, event.detail);
+		this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail);
 	}
 
-	onOptionsPopup(event) {
-		const {handler, column_config, header_cell, handle} = event.detail;
+	onOptionsPopup(e) {
+		const {handler, column_config, header_cell, handle} = e.detail;
 
 		if (column_config.getId() != CDataTableColumn.TABLE_OPTIONS) {
 			this.#scrollBodyToTarget(header_cell);
@@ -1473,12 +1499,12 @@ class CDataTable {
 		this.#options_popup_updated = false;
 	}
 
-	onOptionsPopupUpdate(event) {
+	onOptionsPopupUpdate(e) {
 		if (!this.#options_popup) {
 			return;
 		}
 
-		const {save = false} = event.detail;
+		const {save = false} = e.detail;
 
 		if (save) {
 			this.dispatchEvent(CDataTable.EVENT_SAVE);
@@ -1486,6 +1512,9 @@ class CDataTable {
 	}
 
 	onScroll() {
+		this.#header.scrollLeft = this.#body.scrollLeft;
+
+		this.#updateScrollbarThumbPosition();
 		this.#updateTableOptionsButtonPosition();
 
 		if (this.#options_popup_updated) {
@@ -1495,8 +1524,6 @@ class CDataTable {
 		}
 
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
-
-		this.#header.scrollLeft = this.#body.scrollLeft;
 	}
 
 	on(event, callback, options = undefined) {
@@ -1584,6 +1611,14 @@ class CDataTable {
 		}
 
 		return data_cell;
+	}
+
+	createRowSpacer(target) {
+		if (this.#findRowSpacer(target)) {
+			return;
+		}
+
+		target.appendChild(this.#templates.row_spacer.evaluateToElement());
 	}
 
 	findDataCells(column_index = null, row_index = null) {
@@ -1785,36 +1820,6 @@ class CDataTable {
 		}
 	}
 
-	/**
-	 * Recalculates column spans based on visibility and span settings.
-	 */
-	#recalculateColumnSpans() {
-		this.#columns.forEach(column_config => {
-			const defaults = column_config.getDefaults();
-
-			column_config.merge({span: defaults.getSpan(), only_header: defaults.isOnlyHeader()});
-		});
-
-		let remaining_span = 0;
-
-		this.#columns
-			.filter(column_config => column_config.isVisible())
-			.forEach(column_config => {
-				if (remaining_span > 0) {
-					column_config.setOnlyHeader(true);
-
-					remaining_span--;
-				}
-				else {
-					column_config.setOnlyHeader(false);
-
-					if (column_config.getSpan() > 1) {
-						remaining_span = column_config.getSpan() - 1;
-					}
-				}
-			});
-	}
-
 	#createRow(row_index) {
 		const row = document.createElement('div');
 		row.classList.add(CDataTable.ZBX_STYLE_ROW);
@@ -1950,22 +1955,6 @@ class CDataTable {
 			.merge(user_column_config);
 	}
 
-	#scrollBodyToTarget(target) {
-		if (!target) {
-			return;
-		}
-
-		const {right} = target.getBoundingClientRect();
-		const width = this.#body.getBoundingClientRect().width;
-
-		if (right > width) {
-			const left = this.#body.scrollLeft + right - width;
-
-			this.#header.scrollTo({left});
-			this.#body.scrollTo({left});
-		}
-	}
-
 	#calculateColumnWidth(column_config) {
 		if (column_config.isResized() || !column_config.isResizable()) {
 			return;
@@ -2012,14 +2001,6 @@ class CDataTable {
 		}
 
 		this.#header.style.gridTemplateColumns = this.#body.style.gridTemplateColumns = column_widths.join(' ');
-	}
-
-	#findRowSpacer(target) {
-		return target.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SPACER}`);
-	}
-
-	#findTableOptionsButton() {
-		return this.#header.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_BUTTON}`);
 	}
 
 	#renderHeaderCells() {
@@ -2073,14 +2054,6 @@ class CDataTable {
 		return no_data_message;
 	}
 
-	createRowSpacer(target) {
-		if (this.#findRowSpacer(target)) {
-			return;
-		}
-
-		target.appendChild(this.#templates.row_spacer.evaluateToElement());
-	}
-
 	#createTableOptionsButton() {
 		if (this.#findTableOptionsButton()) {
 			return;
@@ -2089,8 +2062,8 @@ class CDataTable {
 		const header_cell = this.#templates.table_options_button.evaluateToElement();
 
 		const handle = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_LINK}`);
-		handle.addEventListener('click', event => {
-			event.preventDefault();
+		handle.addEventListener('click', e => {
+			e.preventDefault();
 
 			const handler = this.#options_handlers[CDataTableColumn.TABLE_OPTIONS];
 			const column_config = new CDataTableColumn(CDataTableColumn.TABLE_OPTIONS, '')
@@ -2116,14 +2089,14 @@ class CDataTable {
 		return new (eval(handler))(this, column_config, header_cell, handle)
 			.on(
 				CDataTableOptionsPopup.EVENT_OPEN,
-				event => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_OPEN, event.detail)
+				e => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_OPEN, e.detail)
 			)
 			.on(
 				CDataTableOptionsPopup.EVENT_CLOSE,
-				event => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, event.detail)
+				e => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, e.detail)
 			).on(
 				CDataTableOptionsPopup.EVENT_UPDATE,
-				event => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, event.detail)
+				e => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_UPDATE, e.detail)
 			);
 	}
 
@@ -2131,14 +2104,14 @@ class CDataTable {
 		return new (eval(handler))(this, column_config, header_cell, handle)
 			.on(
 				CDataTableOptionsPopup.EVENT_OPEN,
-				event => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_OPEN, event.detail)
+				e => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_OPEN, e.detail)
 			)
 			.on(
 				CDataTableOptionsPopup.EVENT_CLOSE,
-				event => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_CLOSE, event.detail)
+				e => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_CLOSE, e.detail)
 			).on(
 				CDataTableOptionsPopup.EVENT_UPDATE,
-				event => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_UPDATE, event.detail)
+				e => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_UPDATE, e.detail)
 			);
 	}
 
@@ -2212,16 +2185,16 @@ class CDataTable {
 		document.querySelector('.wrapper').addEventListener('scroll', () => this.#options_popup?.position());
 
 		if (this.#tabfilter_item._parent) {
-			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, event => {
-				const {item} = event.detail;
+			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, e => {
+				const {item} = e.detail;
 
 				this.#user_configs[item._index] = this.getConfig();
 
 				this.#updateUserProfile(JSON.stringify({}), [item._index]);
 			});
 
-			this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, event => {
-				const {idx2} = event.detail;
+			this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, e => {
+				const {idx2} = e.detail;
 
 				this.#updateUserProfile(JSON.stringify({}), [idx2]);
 			});
@@ -2236,19 +2209,55 @@ class CDataTable {
 		});
 	}
 
-	#updateUserProfile(value, idx2) {
-		if (!this.#storage_idx) {
-			return;
-		}
+	#bindScrollbarEvents() {
+		this.#body_resize_observer = new ResizeObserver(() => {
+			this.#resizeScrollbarThumb();
+			this.#updateScrollbarThumbPosition();
+		});
+		this.#body_resize_observer.observe(this.#body);
 
-		/* global updateUserProfile */
-		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR);
+		this.#scrollbar_thumb.addEventListener('pointerdown', e => {
+			this.#scrolling = true;
+			this.#scroll_page_x = e.pageX;
+
+			this.#scrollbar.classList.add(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
+		});
+
+		document.addEventListener('pointermove', e => {
+			if (!this.#scrolling) {
+				return;
+			}
+
+			const delta = e.pageX - this.#scroll_page_x;
+
+			this.#scroll_page_x = e.pageX;
+
+			requestAnimationFrame(() => {
+				const left = this.#body.scrollLeft + (delta / (this.#body.clientWidth / this.#body.scrollWidth));
+
+				this.#header.scrollTo({left});
+				this.#body.scrollTo({left});
+			});
+		});
+
+		for (const type of ['pointerup', 'pointercancel']) {
+			document.addEventListener(type, () => {
+				if (!this.#scrolling) {
+					return;
+				}
+
+				this.#scrolling = false;
+				this.#scroll_page_x = 0;
+
+				this.#scrollbar.classList.remove(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
+			});
+		}
 	}
 
 	#bindColumnResizeEvent(column_config, resizer) {
-		resizer.addEventListener('mousedown', event => {
+		resizer.addEventListener('mousedown', e => {
 			this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_START, {
-				x: event.clientX,
+				x: e.clientX,
 				column_index: column_config.getColumnIndex(),
 				id: column_config.getId()
 			});
@@ -2260,6 +2269,15 @@ class CDataTable {
 				clearTimeout(this.#resize_click_timeout);
 			}, CDataTable.RESIZE_CLICK_COUNT_RESET_DELAY);
 		});
+	}
+
+	#updateUserProfile(value, idx2) {
+		if (!this.#storage_idx) {
+			return;
+		}
+
+		/* global updateUserProfile */
+		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR);
 	}
 
 	#findHeaderCell(column_index) {
@@ -2308,6 +2326,130 @@ class CDataTable {
 		}
 
 		return this.#body.querySelectorAll(selector);
+	}
+
+	#findRowSpacer(target) {
+		return target.querySelector(`.${CDataTable.ZBX_STYLE_ROW_SPACER}`);
+	}
+
+	#findTableOptionsButton() {
+		return this.#header.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_BUTTON}`);
+	}
+
+	/**
+	 * Recalculates column spans based on visibility and span settings.
+	 */
+	#recalculateColumnSpans() {
+		this.#columns.forEach(column_config => {
+			const defaults = column_config.getDefaults();
+
+			column_config.merge({span: defaults.getSpan(), only_header: defaults.isOnlyHeader()});
+		});
+
+		let remaining_span = 0;
+
+		this.#columns
+			.filter(column_config => column_config.isVisible())
+			.forEach(column_config => {
+				if (remaining_span > 0) {
+					column_config.setOnlyHeader(true);
+
+					remaining_span--;
+				}
+				else {
+					column_config.setOnlyHeader(false);
+
+					if (column_config.getSpan() > 1) {
+						remaining_span = column_config.getSpan() - 1;
+					}
+				}
+			});
+	}
+
+	#resizeScrollbarThumb() {
+		const thumb_width = this.#getScrollbarThumbWidth();
+
+		this.#scrollbar_thumb.style.width = `${thumb_width}px`;
+	}
+
+	#updateScrollbarThumbPosition() {
+		if (!this.#scrollbar || !this.#scrollbar_thumb) {
+			return;
+		}
+
+		const thumb_width = this.#getScrollbarThumbWidth();
+		const max_scroll = this.#body.scrollWidth - this.#body.offsetWidth + 10;
+		const max_thumb_travel = this.#scrollbar.offsetWidth - thumb_width;
+		const thumb_position = (this.#body.scrollLeft / max_scroll) * max_thumb_travel;
+
+		this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
+	}
+
+	#handleScrollbar() {
+		if (this.#body.scrollWidth == this.#body.clientWidth) {
+			this.#body_resize_observer?.disconnect();
+			this.#body_resize_observer = null;
+
+			this.#scrollbar?.remove();
+			this.#scrollbar = null;
+
+			return;
+		}
+
+		if (this.#scrollbar) {
+			this.#scrollbar_thumb.style.width = `${this.#getScrollbarThumbWidth()}px`;
+
+			return;
+		}
+
+		this.#scrollbar = this.#templates.scrollbar.evaluateToElement();
+		this.#scrollbar_thumb = this.#scrollbar.querySelector(`.${CDataTable.ZBX_STYLE_SCROLLBAR_THUMB}`);
+
+		this.#bindScrollbarEvents();
+
+		this.#element.insertBefore(this.#scrollbar, this.#footer);
+	}
+
+	#getScrollbarThumbWidth() {
+		return Math.max(20, (this.#body.offsetWidth / this.#body.scrollWidth) * this.#scrollbar.offsetWidth);
+	}
+
+	#applyLastColumnPadding() {
+		if (!this.#customizable) {
+			return;
+		}
+
+		const column_config = this.#columns.filter(column_config => column_config.isVisible()).at(-1);
+		const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
+		const header_resizer = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
+
+		const element_rect = this.#element.getBoundingClientRect();
+		const table_options_button_rect = this.#findTableOptionsButton().getBoundingClientRect();
+
+		const right_edge = header_cell.getBoundingClientRect().right - element_rect.left;
+		const right_boundary = element_rect.width - table_options_button_rect.width;
+		const right_offset = right_edge > right_boundary || this.#element.scrollWidth > element_rect.width
+			? Math.min(table_options_button_rect.width, right_edge - right_boundary)
+			: 0;
+
+		header_cell.style.paddingRight = `${right_offset}px`;
+		header_resizer.style.right = `${right_offset}px`;
+	}
+
+	#scrollBodyToTarget(target) {
+		if (!target) {
+			return;
+		}
+
+		const {right} = target.getBoundingClientRect();
+		const width = this.#body.getBoundingClientRect().width;
+
+		if (right > width) {
+			const left = this.#body.scrollLeft + right - width;
+
+			this.#header.scrollTo({left});
+			this.#body.scrollTo({left});
+		}
 	}
 
 	#convertPixelsToPercent(pixels) {

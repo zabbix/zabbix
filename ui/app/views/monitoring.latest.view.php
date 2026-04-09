@@ -87,9 +87,7 @@ $html_page
 			->setName('items')
 			->addItem(new CVar('action', HISTORY_BATCH_GRAPH))
 			->addItem([
-				(new CDiv((new CDiv())->addClass(ZBX_STYLE_NO_DATA_MESSAGE)))
-					->setId('latest')
-					->addClass(ZBX_STYLE_DATATABLE),
+				(new CDataTable())->setId('latest'),
 				(new CActionButtonList('graphtype', 'itemids', [
 					GRAPH_TYPE_STACKED => [
 						'name' => _('Display stacked graph'),

@@ -84,9 +84,7 @@ $html_page
 			->setId('problem_form')
 			->setName('problem')
 			->addItem([
-				(new CDiv((new CDiv())->addClass(ZBX_STYLE_NO_DATA_MESSAGE)))
-					->setId('problems')
-					->addClass(ZBX_STYLE_DATATABLE),
+				(new CDataTable())->setId('problems'),
 				(new CActionButtonList('action', 'eventids', [
 					'acknowledge.edit' => [
 						'content' => (new CSimpleButton(_('Mass update')))
