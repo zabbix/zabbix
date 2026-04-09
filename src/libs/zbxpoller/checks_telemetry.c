@@ -15,7 +15,6 @@
 #include "checks_telemetry.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
-#include "zbxdb.h"
 #include "zbxtelemetry.h"
 
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
@@ -25,20 +24,11 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	int		ret = NOTSUPPORTED;
 	zbx_tq_query_t	query;
 	time_t		now = time(NULL);
-	int		update_interval;
 	time_t		lasttimestamp;
 	char		*sql = NULL;
+	char 		*out_str;
 
-	update_interval = 60 * 60 * 8; /* FIXME: placeholder */
 	lasttimestamp = 0; /* FIXME: placeholder */
-
-	/*
-	if (SUCCEED != zbx_interval_preproc(item->delay, &update_interval, NULL, NULL))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid update interval."));
-		goto out;
-	}
-	*/
 
 	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
 	{
@@ -46,11 +36,11 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_tq_sql_generate_clickhouse(&query, update_interval, now, lasttimestamp, &sql);
+	zbx_tq_sql_generate_clickhouse(&query, now, lasttimestamp, &sql);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
 
-	char *out_str = strdup("Parsed:\n");
+	out_str = strdup("Parsed:\n");
 	out_str = zbx_strdcatf(out_str, "category: %d,\n", (int)query.category);
 	out_str = zbx_strdcatf(out_str, "metric_type: %d,\n", (int)query.metric_type);
 	out_str = zbx_strdcatf(out_str, "columns:\n");
@@ -84,11 +74,9 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	out_str = zbx_strdcatf(out_str, "loopback_limit: %d\n", query.loopback_limit);
 	out_str = zbx_strdcatf(out_str, "aggregation_size: %d\n", query.aggregation_size);
 
-	out_str = zbx_strdcatf(out_str, "\nSQL: '%s'\n", sql);
+	out_str = zbx_strdcatf(out_str, "\nlasttimestamp: " ZBX_FS_TIME_T "\n", lasttimestamp);
 
-	out_str = zbx_strdcatf(out_str, "\nOther:\n");
-	out_str = zbx_strdcatf(out_str, "update_interval: %d\n", update_interval);
-	out_str = zbx_strdcatf(out_str, "lasttimestamp: " ZBX_FS_TIME_T "\n", lasttimestamp);
+	out_str = zbx_strdcatf(out_str, "\nSQL: '%s'\n", sql);
 
 	SET_TEXT_RESULT(result, out_str);
 

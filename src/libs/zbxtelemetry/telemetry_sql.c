@@ -37,10 +37,9 @@ tq_db_type_t;
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_string(const char *src, tq_db_type_t db_type)
 {
-	// FIXME: placeholder, zbx_db_dyn_escape_string should not be used, must be implemented for each db separately
-	// char	*src_esc = zbx_db_dyn_escape_string(src);
+	/* TODO: escape the escape sequences inside the string */
 
-	char	*src_esc = zbx_strdup(NULL, src); // FIXME: placeholder
+	char	*src_esc = zbx_strdup(NULL, src); /* FIXME: placeholder */
 
 	size_t	src_esc_strlen = strlen(src_esc);
 	char	*dst = zbx_malloc(NULL, src_esc_strlen + 2 + 1);
@@ -585,28 +584,30 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, tq_db_type_t
 	}
 }
 
-/* TODO: move to another file? */
-static void	tq_sql_get_timestamp_filter_bounds(const zbx_tq_query_t *query, int update_interval, time_t now,
-		time_t lasttimestamp, time_t *out_lower, time_t *out_upper)
+static void	tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		time_t *out_lower, time_t *out_upper)
 {
 	time_t	now_shifted = now - query->time_shift;
 
-	if (query->aggregation_size > update_interval || update_interval > query->loopback_limit)
+	if (lasttimestamp > now_shifted)
+		lasttimestamp = now_shifted;
+
+	if (query->aggregation_size > now_shifted - lasttimestamp)
 	{
 		*out_lower = now_shifted - query->aggregation_size;
 		*out_upper = now_shifted;
 	}
-	else /* query->aggregation_size <= update_interval || update_interval <= query->loopback_limit */
+	else
 	{
-		time_t	start = start = MAX(lasttimestamp, now_shifted - query->loopback_limit);
+		time_t	start = MAX(lasttimestamp, now_shifted - (time_t)query->loopback_limit);
 
 		*out_lower = start;
-		*out_upper = ((now_shifted - start) / query->aggregation_size) * query->aggregation_size;
+		*out_upper = start + ((now_shifted - start) / (time_t)query->aggregation_size) *
+				(time_t)query->aggregation_size;
 	}
 }
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int update_interval, time_t now,
-		time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);
@@ -622,8 +623,8 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int update_inte
 	char	*conditions		= tq_sql_dyn_get_conditions(query, TQ_SQL_DB_TYPE_POSTGRESQL);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	tq_sql_get_timestamp_filter_bounds(query, update_interval, now, lasttimestamp, &timestamp_filter_lower_bound,
-			&timestamp_filter_upper_bound);
+	tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
+		&timestamp_filter_upper_bound);
 
 	/* select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");
@@ -666,8 +667,7 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int update_inte
 }
 
 /* TODO: probably combine with postgresql */
-void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int update_interval, time_t now,
-		time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);
@@ -683,7 +683,7 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, int update_inte
 	char	*conditions		= tq_sql_dyn_get_conditions(query, TQ_SQL_DB_TYPE_CLICKHOUSE);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	tq_sql_get_timestamp_filter_bounds(query, update_interval, now, lasttimestamp, &timestamp_filter_lower_bound,
+	tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
 			&timestamp_filter_upper_bound);
 
 	/* select */
