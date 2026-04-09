@@ -446,7 +446,7 @@ class CMediatype extends CApiService {
 	 * @return array
 	 */
 	public function update(array $mediatypes): array {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN || !CFeatureFlagHelper::getSupportedMediaTypes()) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS,
 				_s('No permissions to call "%1$s.%2$s".', 'mediatype', __FUNCTION__)
 			);
