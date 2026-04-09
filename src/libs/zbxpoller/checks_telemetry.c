@@ -46,7 +46,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_tq_sql_generate_postgresql(&query, update_interval, now, lasttimestamp, &sql);
+	zbx_tq_sql_generate_clickhouse(&query, update_interval, now, lasttimestamp, &sql);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
 
@@ -94,7 +94,6 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 
 	ret = SUCCEED;
 
-clean:
 	zbx_tq_query_clean(&query);
 	zbx_free(sql);
 out:
