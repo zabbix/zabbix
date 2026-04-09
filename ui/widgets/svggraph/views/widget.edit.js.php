@@ -964,7 +964,7 @@ window.widget_svggraph_form = new class {
 				};
 
 				if (dataset.itemids !== undefined) {
-					for (const [item_index, itemid] of dataset.itemids.entries()) {
+					for (const [item_index, itemid] of Object.entries(dataset.itemids)) {
 						if (itemid === '0') {
 							const resolved_itemid = this.#resolveWidget(dataset.references[item_index]);
 

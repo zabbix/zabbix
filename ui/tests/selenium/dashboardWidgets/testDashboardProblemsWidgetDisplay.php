@@ -786,7 +786,12 @@ class testDashboardProblemsWidgetDisplay extends testWidgets {
 		// Change time for actual value, because it cannot be used in data provider.
 		foreach ($data['result'] as &$row) {
 			if (CTestArrayHelper::get($row, 'Time')) {
-				$row['Time'] = date('H:i:s', self::$time);
+				// When the problem was created before midnight and the test runs after midnight,
+				// the widget displays the full date+time (Y-m-d H:i:s) instead of just the time (H:i:s).
+				// Use the appropriate format to match what the widget actually shows.
+				$row['Time'] = (date('Y-m-d', self::$time) !== date('Y-m-d'))
+					? date('Y-m-d H:i:s', self::$time)
+					: date('H:i:s', self::$time);
 			}
 			unset($row);
 		}
