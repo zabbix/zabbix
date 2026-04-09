@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-02-11 18:19+0000\n"
+"PO-Revision-Date: 2026-03-23 18:54+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -2247,7 +2247,7 @@ msgstr "Ambdues paraules de pas han d'ésser iguals."
 #: app/controllers/CControllerItemPrototypeUpdate.php:267
 #: app/controllers/CControllerItemUpdate.php:264
 msgid "Both username and password should be either present or empty."
-msgstr ""
+msgstr "Tant el nom d'usuari com la contrasenya haurien d'estar presents o buits"
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -12256,7 +12256,7 @@ msgstr "El mètode \"%2$s\" de l'api no és pas vàlid per a la funció d'usuari
 #: app/controllers/CControllerItemPrototypeUpdate.php:186
 #: app/controllers/CControllerItemUpdate.php:183
 msgid "Invalid HTTP status code or range."
-msgstr ""
+msgstr "Codi o rang d'estat HTTP no vàlids."
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12346,6 +12346,11 @@ msgstr "L'adreça electrònica \"%1$s\" no és vàlida."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adreça electrònica no vàlida per al tipus de suport amb l'identificador \"%1$s\"."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr "Nom del grup d'equips no vàlid."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12728,6 +12733,11 @@ msgstr "Cadena no vàlida."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Etiqueta no vàlida \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr "Nom del grup de plantilles no vàlid."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -21210,7 +21220,7 @@ msgstr "Suec (sv_SE)"
 
 #: index_sso.php:346
 msgid "Switch SSO user"
-msgstr ""
+msgstr "Canviar usuari SSO"
 
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -23217,6 +23227,10 @@ msgstr "Desfer el reconeixement del problema."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Codi d'estat de resposta HTTP inesperat."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr "Temps d'actualització del token d'accés no esperat."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25452,7 +25466,7 @@ msgstr "No teniu pas permís per realitzar aquesta operació."
 
 #: index_sso.php:337
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr ""
+msgstr "Heu estat autoritzat mitjançant l'inici de sessió únic (SSO), però no s'ha pogut iniciar la sessió a Zabbix."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
