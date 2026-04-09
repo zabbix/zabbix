@@ -157,7 +157,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"timeout_ssh_agent",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_telnet_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
 	{"timeout_zabbix_agent",	ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"3s"},
-	{"timeout_device_init_offboard",ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"30s"},
+	{"device_link_timeout",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER | ZBX_PROXY,	"30s"},
 	{"uri_valid_schemes",		ZBX_SETTING_TYPE_STR, 		0,	"http,https,ftp,file,mailto,tel,ssh"},
 	{"url",				ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"validate_uri_schemes",	ZBX_SETTING_TYPE_INT, 		0,			"1"},
