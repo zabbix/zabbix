@@ -50,7 +50,7 @@ class testFormSetup extends CWebTest {
 	 * @backup settings
 	 */
 	public function testFormSetup_welcomeSectionLayout() {
-var_dump(scandir('/../../conf/'));
+var_dump(scandir(__DIR__.'/../../conf'));
 		$this->page->login()->open('setup.php')->waitUntilReady();
 
 		// Check Welcome section.
