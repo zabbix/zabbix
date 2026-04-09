@@ -82,7 +82,6 @@ class CControllerGraphCreate extends CControllerGraphUpdateGeneral {
 			],
 			'items' => ['objects', 'required', 'not_empty',
 				'fields' => [
-					'gitemid' => ['db graphs_items.gitemid'],
 					'itemid' => ['db graphs_items.itemid', 'required'],
 					'sortorder' => ['db graphs_items.sortorder', 'required'],
 					'type' => ['integer', 'required', 'in' => [GRAPH_ITEM_SIMPLE, GRAPH_TYPE_STACKED, GRAPH_ITEM_SUM]],

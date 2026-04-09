@@ -83,7 +83,6 @@ class CControllerGraphPrototypeCreate extends CControllerGraphUpdateGeneral {
 			],
 			'items' => ['objects', 'required', 'not_empty',
 				'fields' => [
-					'gitemid' => ['db graphs_items.gitemid'],
 					'itemid' => ['db graphs_items.itemid', 'required'],
 					'sortorder' => ['db graphs_items.sortorder', 'required'],
 					'flags' => ['integer', 'required'],
