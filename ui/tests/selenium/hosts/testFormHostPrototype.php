@@ -53,8 +53,8 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementValue('host', $name);
 		$this->zbxTestAssertElementValue('name', $visible_name);
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/z-textarea-flexible[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/z-textarea-flexible[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_1" and text()="IP"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//label[@for="interfaces_1_useip_0" and text()="DNS"]/../input[@readonly]');
 		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-port")]/input[@type="text"][@readonly]');
@@ -122,7 +122,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$count = $rows->count() - 1;
 		for ($i = 0; $i < $count; $i += 2) {
 			$macro = [];
-			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/textarea')->one()->getValue();
+			$macro['macro'] = $rows->get($i)->query('xpath:./td[1]/z-textarea-flexible/textarea')->one()->getValue();
 			$macro['value'] = $this->getValueField($macro['macro'])->getValue();
 			$macro['description'] = $rows->get($i + 1)->query('tag:textarea')->one()->getValue();
 			$macro['type'] = ($this->getValueField($macro['macro'])->getInputType() === 'Secret text') ? '1' : '0';
@@ -189,7 +189,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Host name' => 'Host prototype with existen visible {#NAME}',
+						'Host name' => 'Host prototype with existing visible {#NAME}',
 						'Host groups' => 'Discovered hosts',
 						'Visible name' => 'Host prototype visible name'
 					],
@@ -342,7 +342,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 			[
 				[
 					'fields' => [
-						'Host name' => 'Host prototype with existen visible {#NAME}',
+						'Host name' => 'Host prototype with existing visible {#NAME}',
 						'Visible name' => 'Host prototype visible name'
 					],
 					'inline_errors' => [
@@ -520,10 +520,11 @@ class testFormHostPrototype extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=host.prototype.list&parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestContentControlButtonClickTextWait('Create host prototype');
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
 		$this->zbxTestInputTypeWait('host', $data['name']);
 
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestInputType('name', $data['visible_name']);
+			$form->fill(['Visible name' => $data['visible_name']]);
 		}
 
 		if (array_key_exists('checkbox', $data)) {
@@ -925,7 +926,7 @@ class testFormHostPrototype extends CLegacyWebTest {
 		// Change name and visible name.
 		$this->zbxTestInputTypeOverwrite('host', $data['name']);
 		if (array_key_exists('visible_name', $data)) {
-			$this->zbxTestInputType('name', $data['visible_name']);
+			$dialog->query('id:name')->one()->fill($data['visible_name']);
 		}
 		// Change status.
 		if (array_key_exists('checkbox', $data)) {

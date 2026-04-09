@@ -69,10 +69,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel([_('Tile URL'), $hintbox_tile_url], 'geomaps_tile_url'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('geomaps_tile_url', $data['geomaps_tile_url'], false,
-				CSettingsSchema::getFieldLength('geomaps_tile_url'))
-			)
+			(new CTextAreaFlexible('geomaps_tile_url', $data['geomaps_tile_url']))
 				->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				->setMaxlength(CSettingsSchema::getFieldLength('geomaps_tile_url'))
 				->setReadonly($data['geomaps_tile_provider'] !== '')
 				->setAriaRequired()
 		)

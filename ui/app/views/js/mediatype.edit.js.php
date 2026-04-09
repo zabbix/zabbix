@@ -21,13 +21,16 @@
 
 window.mediatype_edit_popup = new class {
 
-	init({mediatype, message_templates, smtp_server_default, smtp_email_default, oauth_defaults_by_provider}) {
+	init({rules, clone_rules, mediatype, message_templates, smtp_server_default, smtp_email_default,
+			oauth_defaults_by_provider}) {
 		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
-		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.form = new CForm(this.form_element, rules);
+		this.clone_rules = clone_rules;
 		this.mediatypeid = mediatype.mediatypeid;
 		this.mediatype = mediatype;
-		this.row_num = 0;
+		this.row_nums = {exec: 0, webhook: 0};
 		this.message_template_list = {};
 		this.message_templates = Object.fromEntries(message_templates.map((obj, index) => [index, { ...obj }]));
 		this.smtp_server_default = smtp_server_default;
@@ -39,35 +42,33 @@ window.mediatype_edit_popup = new class {
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.#loadView(mediatype);
-		this.#initActions();
-		this.form.style.display = '';
+		this.#initEvents();
+		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 
-		this.form.querySelector('#type').dispatchEvent(new CustomEvent('change', {detail: {init: true}}));
+		this.form_element.querySelector('#type').dispatchEvent(new CustomEvent('change', {detail: {init: true}}));
 	}
 
-	#initActions() {
+	#initEvents() {
 		for (const parameter of this.mediatype.parameters_webhook) {
 			this.#addWebhookParam(parameter);
 		}
 
 		for (const parameter of this.mediatype.parameters_exec) {
 			this.#addExecParam(parameter);
-			this.row_num++;
 		}
 
 		this.#populateMessageTemplates(this.mediatype['message_templates']);
 
-		this.form.querySelector('#message-templates').addEventListener('click', (event) =>
+		this.form_element.querySelector('#message-templates').addEventListener('click', (event) =>
 			this.#editMessageTemplate(event)
 		);
 
-		this.form.querySelector('.element-table-add').addEventListener('click', () => {
+		this.form_element.querySelector('.element-table-add').addEventListener('click', () => {
 			this.#addExecParam();
-			this.row_num++;
 		});
 
-		this.form.querySelector('.webhook-param-add').addEventListener('click', () => this.#addWebhookParam());
+		this.form_element.querySelector('.webhook-param-add').addEventListener('click', () => this.#addWebhookParam());
 
 		this.dialogue.addEventListener('click', (e) => {
 			if (e.target.classList.contains('js-remove')) {
@@ -80,45 +81,59 @@ window.mediatype_edit_popup = new class {
 			}
 		});
 
-		if (this.form.querySelector('#chPass_btn') !== null) {
-			this.form.querySelector('#chPass_btn').addEventListener('click', () => this.#toggleChangePasswordButton());
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-clone')
+			?.addEventListener('click', () => this.#clone());
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-delete')
+			?.addEventListener('click', () => this.#delete());
+
+		if (this.form_element.querySelector('#chPass_btn') !== null) {
+			this.form_element.querySelector('#chPass_btn').addEventListener('click', () => this.#toggleChangePasswordButton());
 		}
 
-		const event_menu = this.form.querySelector('#show_event_menu');
+		const event_menu = this.form_element.querySelector('#show_event_menu');
 
 		event_menu.onchange = () => {
-			const event_menu_name = this.form.querySelector('#event_menu_name');
-			const event_menu_url = this.form.querySelector('#event_menu_url');
+			const event_menu_name = this.form_element.querySelector('#event_menu_name');
+			const event_menu_url = this.form_element.querySelector('#event_menu_url');
 
 			if (event_menu.checked) {
+				event_menu_name.classList.remove('js-inactive');
+				event_menu_url.classList.remove('js-inactive');
 				event_menu_name.disabled = false;
 				event_menu_url.disabled = false;
 			}
 			else {
+				event_menu_name.classList.add('js-inactive');
+				event_menu_url.classList.add('js-inactive');
 				event_menu_name.disabled = true;
 				event_menu_url.disabled = true;
 			}
 		}
 
-		this.form.querySelector('#js-oauth-configure').addEventListener('click', () => {
-			const oauth_fields = ['redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url',
-				'tokens_status'
-			];
-			const fields = getFormFields(this.form);
+		this.form_element.querySelector('#js-oauth-configure').addEventListener('click', () => {
+			const oauth_fields = ['redirection_url', 'client_id', 'client_secret', 'authorization_url', 'token_url'];
+			const fields = this.form.getAllValues();
 			let oauth = Object.fromEntries(
 				Object.entries(fields).filter(([key]) => oauth_fields.includes(key))
 			);
+
+			if (!Object.keys(oauth).length) {
+				oauth = {...this.oauth_defaults_by_provider[fields.provider], client_secret: ''};
+			}
+
+			oauth.tokens_status = fields.tokens_status;
+
 			let data = {
-				update: 'tokens_status' in fields ? 1 : 0,
+				update: 'client_id' in fields ? 1 : 0,
 				advanced_form: fields.provider == <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?> ? 1 : 0
 			};
 
 			if ('mediatypeid' in fields) {
 				data.mediatypeid = fields.mediatypeid;
-			}
-
-			if (!Object.keys(oauth).length) {
-				oauth = {...this.oauth_defaults_by_provider[fields.provider], client_secret: ''};
 			}
 
 			const overlay = PopUp('oauth.edit', {...data, ...oauth}, {dialogue_class: 'modal-popup-generic'});
@@ -127,59 +142,66 @@ window.mediatype_edit_popup = new class {
 		});
 	}
 
-	clone({title, buttons}) {
+	#clone() {
 		this.mediatypeid = null;
+		document.getElementById('mediatypeid').remove();
 		this.#setOAuth();
+
+		const title = <?= json_encode(_('New media type')) ?>;
+		const buttons = [
+			{
+				title: <?= json_encode(_('Add')) ?>,
+				class: 'js-submit',
+				keepOpen: true,
+				isSubmit: true
+			},
+			{
+				title: <?= json_encode(_('Cancel')) ?>,
+				class: ZBX_STYLE_BTN_ALT,
+				cancel: true,
+				action: ''
+			}
+		];
 
 		this.#toggleChangePasswordButton();
 		this.overlay.setProperties({title, buttons});
+
+		this.overlay.$dialogue.$footer[0].querySelector('.js-submit')
+			.addEventListener('click', () => this.#submit());
+
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
 		this.overlay.containFocus();
+		this.form.reload(this.clone_rules);
 	}
 
-	delete() {
-		const curl = new Curl('zabbix.php');
+	#delete() {
+		if (window.confirm(<?= json_encode(_('Delete media type?')) ?>)) {
+			this.#removePopupMessages();
+			const curl = new Curl('zabbix.php');
 
-		curl.setArgument('action', 'mediatype.delete');
-		curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
+			curl.setArgument('action', 'mediatype.delete');
+			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('mediatype')) ?>);
 
-		this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+			this.#post(curl.getUrl(), {mediatypeids: [this.mediatypeid]}, (response) => {
+				overlayDialogueDestroy(this.overlay.dialogueid);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+			});
+		}
+		else {
+			this.overlay.unsetLoading();
+		}
 	}
 
-	submit() {
-		const fields = getFormFields(this.form);
+	#submit() {
+		this.#removePopupMessages();
+		const fields = this.form.getAllValues();
 
-		// Trim all string type fields.
-		for (let key in fields) {
-			if (typeof fields[key] === 'string' && key !== 'passwd') {
-				fields[key] = fields[key].trim();
-			}
-		}
+		switch (fields.maxsessions_type) {
+			case 'custom':
+				break;
 
-		// Trim all string values within the 'parameters_webhook' object.
-		if (typeof fields.parameters_webhook !== 'undefined') {
-			fields.parameters_webhook.name = fields.parameters_webhook.name.map((name) => name.trim());
-			fields.parameters_webhook.value = fields.parameters_webhook.value.map((value) => value.trim());
-		}
-
-		// Trim all string values within the 'parameters_exec' object.
-		if (typeof fields.parameters_exec !== 'undefined') {
-			Object.keys(fields.parameters_exec).forEach((key) =>
-				Object.values(key).forEach((parameter) =>
-					fields.parameters_exec[parameter].value = fields.parameters_exec[parameter].value.trim()
-				)
-			)
-		}
-
-		// Set maxsessions value.
-		const maxsessions_type = this.form.querySelector('input[name="maxsessions_type"]:checked').value;
-
-		switch (maxsessions_type) {
 			case 'one':
 			default:
 				fields.maxsessions = 1;
@@ -188,21 +210,28 @@ window.mediatype_edit_popup = new class {
 			case 'unlimited':
 				fields.maxsessions = 0;
 				break;
-
-			case 'custom':
-				fields.maxsessions = this.form.querySelector('#maxsessions').value;
-				break;
 		}
 
-		const curl = new Curl('zabbix.php');
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.overlay.unsetLoading();
+					return;
+				}
 
-		curl.setArgument('action', this.mediatypeid === null ? 'mediatype.create' : 'mediatype.update');
+				const curl = new Curl('zabbix.php');
+				const action = document.getElementById('mediatypeid') !== null
+					? 'mediatype.update'
+					: 'mediatype.create';
 
-		this.#post(curl.getUrl(), fields, (response) => {
-			overlayDialogueDestroy(this.overlay.dialogueid);
+				curl.setArgument('action', action);
 
-			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
-		});
+				this.#post(curl.getUrl(), fields, (response) => {
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
+				});
+			});
 	}
 
 	/**
@@ -211,7 +240,11 @@ window.mediatype_edit_popup = new class {
 	 * @param {object} oauth  Key value pair of OAuth fields and oauth status message.
 	 */
 	#setOAuth(oauth = {}) {
-		const status_container = this.form.querySelector('#js-oauth-status');
+		const status_container = this.form_element.querySelector('#js-oauth-status');
+
+		if (!('tokens_status' in oauth)) {
+			oauth.tokens_status = 0;
+		}
 
 		status_container.innerText = '';
 		status_container.style.display = 'none';
@@ -226,15 +259,26 @@ window.mediatype_edit_popup = new class {
 			delete oauth.message;
 		}
 
-		for (const [name, value] of Object.entries(oauth)) {
-			const input = document.createElement('input');
+		const oauth_fields = ['tokens_status', 'redirection_url', 'client_id', 'client_secret', 'authorization_url',
+			'token_url', 'access_token', 'access_token_updated', 'access_expires_in', 'refresh_token'
+		];
 
-			input.name = name;
-			input.type = 'hidden';
-			input.value = value;
+		oauth_fields.forEach((field) => {
+			if (field in oauth) {
+				const input = document.createElement('input');
 
-			status_container.append(input);
-		}
+				input.name = field;
+				input.type = 'hidden';
+				input.value = oauth[field];
+				input.setAttribute('data-field-type', 'hidden');
+				input.setAttribute('data-error-container', 'oauth-error-container');
+
+				status_container.append(input);
+			}
+		});
+
+		this.form.discoverAllFields();
+		document.getElementById('oauth-error-container').innerHTML = '';
 	}
 
 	/**
@@ -256,30 +300,16 @@ window.mediatype_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				return success_callback(response);
 			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
-
-				let title, messages;
-
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
-
-				const message_box = makeMessageBox('bad', messages, title)[0];
-
-				this.form.parentNode.insertBefore(message_box, this.form);
-			})
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}
 
@@ -289,11 +319,14 @@ window.mediatype_edit_popup = new class {
 	 * @param {object} parameter  An object containing the webhook parameter data.
 	 */
 	#addWebhookParam(parameter = {}) {
-		const template = new Template(this.form.querySelector('#webhook_params_template').innerHTML);
+		parameter.row_num = this.row_nums.webhook;
+		const template = new Template(this.form_element.querySelector('#webhook_params_template').innerHTML);
 
-		this.form
+		this.form_element
 			.querySelector('#parameters_table tbody')
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
+
+		this.row_nums.webhook++;
 	}
 
 	/**
@@ -302,13 +335,15 @@ window.mediatype_edit_popup = new class {
 	 * @param {object} parameter  An object containing the script parameter data.
 	 */
 	#addExecParam(parameter = {}) {
-		parameter.row_num = this.row_num;
+		parameter.row_num = this.row_nums.exec;
 
-		const template = new Template(this.form.querySelector('#exec_params_template').innerHTML);
+		const template = new Template(this.form_element.querySelector('#exec_params_template').innerHTML);
 
-		this.form
+		this.form_element
 			.querySelector('#exec_params_table tbody')
 			.insertAdjacentHTML('beforeend', template.evaluate(parameter));
+
+		this.row_nums.exec++;
 	}
 
 	/**
@@ -322,9 +357,9 @@ window.mediatype_edit_popup = new class {
 		if (event.target.hasAttribute('data-action')) {
 			const btn = event.target;
 			const parameters = {
-				type: this.form.querySelector('#type').value,
-				message_format: this.form.querySelector('input[name="message_format"]:checked').value,
-				message_types: [...this.form.querySelectorAll('tr[data-message-type]')].map((tr) =>
+				type: this.form_element.querySelector('#type').value,
+				message_format: this.form_element.querySelector('input[name="message_format"]:checked').value,
+				message_types: [...this.form_element.querySelectorAll('tr[data-message-type]')].map((tr) =>
 					tr.dataset.messageType
 				)
 			};
@@ -369,10 +404,10 @@ window.mediatype_edit_popup = new class {
 	 *                           If not provided, the new row is appended at the end of the table.
 	 */
 	#addMessageTemplateRow(input, row = null) {
-		const template = new Template(this.form.querySelector('#message-templates-row-tmpl').innerHTML);
+		const template = new Template(this.form_element.querySelector('#message-templates-row-tmpl').innerHTML);
 
 		if (row === null) {
-			this.form
+			this.form_element
 				.querySelector('#message-templates tbody')
 				.insertAdjacentHTML('beforeend', template.evaluate(input));
 		}
@@ -441,7 +476,7 @@ window.mediatype_edit_popup = new class {
 		const limit_reached = (
 			Object.keys(this.message_template_list).length == Object.keys(this.message_templates).length
 		);
-		const add_button = this.form.querySelector('#message-templates-footer .btn-link');
+		const add_button = this.form_element.querySelector('#message-templates-footer .btn-link');
 
 		add_button.disabled = limit_reached;
 		add_button.textContent = limit_reached
@@ -453,11 +488,12 @@ window.mediatype_edit_popup = new class {
 	 * Toggles the visibility and state of the change password button and password input field.
 	 */
 	#toggleChangePasswordButton() {
-		if (this.form.querySelector('#chPass_btn') !== null) {
-			this.form.querySelector('#chPass_btn').style.display = 'none';
-			this.form.querySelector('#passwd').style.display = 'block';
-			this.form.querySelector('#passwd').disabled = false;
-			this.form.querySelector('#passwd').focus();
+		if (this.form_element.querySelector('#chPass_btn') !== null) {
+			this.form_element.querySelector('#chPass_btn').style.display = 'none';
+			this.form_element.querySelector('#passwd').style.display = 'block';
+			this.form_element.querySelector('#passwd').classList.remove('js-inactive');
+			this.form_element.querySelector('#passwd').disabled = false;
+			this.form_element.querySelector('#passwd').focus();
 		}
 	}
 
@@ -472,17 +508,17 @@ window.mediatype_edit_popup = new class {
 		this.authentication = mediatype.smtp_authentication;
 
 		// Load type fields.
-		this.form.querySelector('#type').onchange = (e) => {
+		this.form_element.querySelector('#type').onchange = (e) => {
 			this.#hideFormFields('all');
 			this.#loadTypeFields(e);
 
-			this.form.querySelector('#smtp_authentication').dispatchEvent(new Event('change'));
-			this.form.querySelector('#smtp_security').dispatchEvent(new Event('change'));
+			this.form_element.querySelector('#smtp_authentication').dispatchEvent(new Event('change'));
+			this.form_element.querySelector('#smtp_security').dispatchEvent(new Event('change'));
 		};
 
-		const max_sessions = this.form.querySelector('#maxsessions_type');
+		const max_sessions = this.form_element.querySelector('#maxsessions_type');
 
-		this.max_session_checked = this.form.querySelector('input[name="maxsessions_type"]:checked').value;
+		this.max_session_checked = this.form_element.querySelector('input[name="maxsessions_type"]:checked').value;
 
 		max_sessions.onchange = (e) => this.#toggleMaxSessionField(e);
 	}
@@ -493,7 +529,7 @@ window.mediatype_edit_popup = new class {
 	 * @param {number} media_type  Selected media type.
 	 */
 	#setMaxSessionsType(media_type) {
-		const maxsessions_type = this.form.querySelectorAll(`#maxsessions_type input[type='radio']`);
+		const maxsessions_type = this.form_element.querySelectorAll(`#maxsessions_type input[type='radio']`);
 
 		maxsessions_type.forEach((radio) => {
 			radio.checked = (radio.value === 'one');
@@ -511,13 +547,15 @@ window.mediatype_edit_popup = new class {
 			? this.max_session_checked
 			: event.target.value;
 
-		const maxsessions = this.form.querySelector('#maxsessions');
+		const maxsessions = this.form_element.querySelector('#maxsessions');
 
 		if (concurrent_sessions === 'one' || concurrent_sessions === 'unlimited') {
 			maxsessions.style.display = 'none';
+			maxsessions.disabled = true;
 		}
 		else {
 			maxsessions.style.display = '';
+			maxsessions.disabled = false;
 			maxsessions.focus();
 		}
 	}
@@ -539,7 +577,7 @@ window.mediatype_edit_popup = new class {
 				show_fields = ['#email-provider-label', '#email-provider-field'];
 
 				// Load provider fields.
-				const provider = this.form.querySelector('#provider');
+				const provider = this.form_element.querySelector('#provider');
 
 				provider.onchange = (e) => {
 					const change = typeof e.detail === 'undefined' ? true : e.detail.change;
@@ -547,8 +585,8 @@ window.mediatype_edit_popup = new class {
 					this.#loadProviderFields(change, parseInt(provider.value));
 				};
 
-				const smtp_server = this.form.querySelector('#smtp_server');
-				const smtp_email = this.form.querySelector('#smtp_email');
+				const smtp_server = this.form_element.querySelector('#smtp_server');
+				const smtp_email = this.form_element.querySelector('#smtp_email');
 
 				smtp_server.value = this.mediatype.smtp_server === '' ? this.smtp_server_default : smtp_server.value;
 				smtp_email.value = this.mediatype.smtp_email === '' ? this.smtp_email_default : smtp_email.value;
@@ -561,7 +599,7 @@ window.mediatype_edit_popup = new class {
 			case <?= MEDIA_TYPE_SMS ?>:
 				show_fields = ['#gsm_modem_label', '#gsm_modem_field'];
 
-				const gsm_modem = this.form.querySelector('#gsm_modem');
+				const gsm_modem = this.form_element.querySelector('#gsm_modem');
 
 				gsm_modem.value = this.mediatype.gsm_modem === '' ? '/dev/ttyS0' : gsm_modem.value;
 				this.mediatype.gsm_modem = gsm_modem.value;
@@ -588,8 +626,8 @@ window.mediatype_edit_popup = new class {
 			this.#setMaxSessionsType(this.type);
 		}
 
-		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
-		this.form.querySelector('#maxsessions_type').dispatchEvent(new Event('change'));
+		this.#showAndEnableFormElements(show_fields);
+		this.form_element.querySelector('#maxsessions_type').dispatchEvent(new Event('change'));
 	}
 
 	/**
@@ -606,23 +644,25 @@ window.mediatype_edit_popup = new class {
 		if (change) {
 			const providers = this.mediatype.providers;
 
-			this.form.querySelector('#smtp_username').value = '';
-			this.form.querySelector('#smtp_verify_host').checked = providers[provider]['smtp_verify_host'];
-			this.form.querySelector('#smtp_verify_peer').checked = providers[provider]['smtp_verify_peer'];
-			this.form.querySelector('#smtp_port').value = providers[provider]['smtp_port'];
-			this.form.querySelector('#smtp_email').value = providers[provider]['smtp_email'];
-			this.form.querySelector('#smtp_server').value = providers[provider]['smtp_server'];
-			this.form.querySelector(`input[name=smtp_security][value='${providers[provider]['smtp_security']}']`)
+			this.form_element.querySelector('#smtp_username').value = '';
+			this.form_element.querySelector('#smtp_verify_host').checked = providers[provider]['smtp_verify_host'];
+			this.form_element.querySelector('#smtp_verify_peer').checked = providers[provider]['smtp_verify_peer'];
+			this.form_element.querySelector('#smtp_port').value = providers[provider]['smtp_port'];
+			this.form_element.querySelector('#smtp_email').value = providers[provider]['smtp_email'];
+			this.form_element.querySelector('#smtp_server').value = providers[provider]['smtp_server'];
+			this.form_element.querySelector(`input[name=smtp_security][value='${providers[provider]['smtp_security']}']`)
 				.checked = true;
-			this.form.querySelector(`input[name=message_format][value='${providers[provider]['message_format']}']`)
+			this.form_element.querySelector(`input[name=message_format][value='${providers[provider]['message_format']}']`)
 				.checked = true;
-			this.form.querySelector(
+			this.form_element.querySelector(
 				`input[name=smtp_authentication][value='${providers[provider]['smtp_authentication']}']`
 			).checked = true;
 			this.#setOAuth();
+
+			this.form.validateChanges(['smtp_username', 'smtp_port', 'smtp_email', 'smtp_server']);
 		}
 
-		const authentication = this.form.querySelector('#smtp_authentication');
+		const authentication = this.form_element.querySelector('#smtp_authentication');
 
 		authentication.onchange = () => this.#loadAuthenticationFields(provider);
 
@@ -637,7 +677,7 @@ window.mediatype_edit_popup = new class {
 					'#message_format_label', '#message_format_field'
 				];
 
-				const smtp_security = this.form.querySelector('#smtp_security');
+				const smtp_security = this.form_element.querySelector('#smtp_security');
 
 				smtp_security.onchange = () => this.#loadSmtpSecurityFields();
 				this.#loadSmtpSecurityFields();
@@ -659,35 +699,65 @@ window.mediatype_edit_popup = new class {
 				break;
 		}
 
-		show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+		this.#showAndEnableFormElements(show_fields);
+	}
+
+	#hideAndDisableFormElements(hide_fields) {
+		hide_fields.forEach((field) => {
+			const element = this.form_element.querySelector(field);
+
+			if (element) {
+				element.style.display = 'none';
+
+				if (element.classList.contains('form-field')) {
+					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, textarea')
+						.forEach((input) => {
+							input.disabled = true;
+					});
+				}
+			}
+		});
+	}
+
+	#showAndEnableFormElements(show_fields) {
+		show_fields.forEach((field) => {
+			const element = this.form_element.querySelector(field);
+
+			if (element) {
+				element.style.display = '';
+
+				if (element.classList.contains('form-field')) {
+					element.querySelectorAll('.multilineinput-control, input:not(.js-inactive), select, textarea')
+						.forEach((input) => {
+							input.disabled = false;
+					});
+				}
+			}
+		});
 	}
 
 	/**
 	 * Compiles necessary fields for popup based on smtp_security value.
 	 */
 	#loadSmtpSecurityFields() {
-		const smtp_security = this.form.querySelector('input[name="smtp_security"]:checked').value;
+		const smtp_security = this.form_element.querySelector('input[name="smtp_security"]:checked').value;
 
 		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
 			switch (parseInt(smtp_security)) {
 				case <?= SMTP_SECURITY_NONE ?>:
-					this.form.querySelector('#smtp_verify_peer').checked = false;
-					this.form.querySelector('#smtp_verify_host').checked = false;
+					this.form_element.querySelector('#smtp_verify_peer').checked = false;
+					this.form_element.querySelector('#smtp_verify_host').checked = false;
 
-					const hide_fields = ['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
+					this.#hideAndDisableFormElements(['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
 						'#verify-host-field'
-					];
-
-					hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
+					]);
 					break;
 
 				case <?= SMTP_SECURITY_STARTTLS ?>:
 				case <?= SMTP_SECURITY_SSL ?>:
-					const show_fields = ['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
+					this.#showAndEnableFormElements(['#verify-peer-label', '#verify-peer-field', '#verify-host-label',
 						'#verify-host-field'
-					];
-
-					show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+					]);
 					break;
 			}
 		}
@@ -699,19 +769,19 @@ window.mediatype_edit_popup = new class {
 	 * @param {number} provider  Media type provider.
 	 */
 	#loadAuthenticationFields(provider) {
-		const authentication = this.form.querySelector('input[name="smtp_authentication"]:checked').value;
-		const passwd_label = this.form.querySelector('#passwd_label');
-		const passwd = this.form.querySelector('#passwd');
-		const smtp_auth_1 = this.form.querySelector('label[for="smtp_authentication_1"]');
-		const smtp_none = this.form.querySelector('[name="smtp_authentication"][value="<?= SMTP_AUTHENTICATION_NONE ?>"]');
-		const smtp_oauth = this.form.querySelector('[name="smtp_authentication"][value="<?= SMTP_AUTHENTICATION_OAUTH ?>"]');
+		const authentication = this.form_element.querySelector('input[name="smtp_authentication"]:checked').value;
+		const passwd_label = this.form_element.querySelector('#passwd_label');
+		const passwd = this.form_element.querySelector('#passwd');
+		const smtp_auth_1 = this.form_element.querySelector('label[for="smtp_authentication_1"]');
+		const smtp_none = this.form_element.querySelector('[name="smtp_authentication"][value="<?= SMTP_AUTHENTICATION_NONE ?>"]');
+		const smtp_oauth = this.form_element.querySelector('[name="smtp_authentication"][value="<?= SMTP_AUTHENTICATION_OAUTH ?>"]');
 
 		passwd_label.setAttribute('class', '<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 		passwd.setAttribute('aria-required', 'true');
 
 		if (this.type == <?= MEDIA_TYPE_EMAIL ?>) {
-			smtp_oauth.removeAttribute('disabled');
-			smtp_none.removeAttribute('disabled');
+			smtp_oauth.classList.remove('js-inactive');
+			smtp_none.classList.remove('js-inactive');
 
 			switch (parseInt(provider)) {
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_SMTP ?>:
@@ -721,35 +791,26 @@ window.mediatype_edit_popup = new class {
 
 					switch (parseInt(authentication)) {
 						case <?= SMTP_AUTHENTICATION_NONE ?>:
-							this.form.querySelector('#passwd').value = '';
-							this.form.querySelector('#smtp_username').value = '';
+							this.form_element.querySelector('#passwd').value = '';
+							this.form_element.querySelector('#smtp_username').value = '';
 
-							const hide_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field', '#oauth-token-label', '#oauth-token-field'
-							];
-
-							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
+							this.#hideAndDisableFormElements(['#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field', '#oauth-token-label', '#oauth-token-field'
+							]);
 							break;
 
 						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
-							const show_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field'
-							];
-
-							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
-
-							['#oauth-token-label', '#oauth-token-field'].forEach(
-								(field) => this.form.querySelector(field).style.display = 'none'
-							);
+							this.#showAndEnableFormElements(['#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							]);
+							this.#hideAndDisableFormElements(['#oauth-token-label', '#oauth-token-field']);
 							break;
 
 						case <?= SMTP_AUTHENTICATION_OAUTH ?>:
-							['#smtp-username-label', '#smtp-username-field', '#passwd_label', '#passwd_field'].forEach(
-								(field) => this.form.querySelector(field).style.display = 'none'
-							);
-							['#oauth-token-label', '#oauth-token-field'].forEach(
-								(field) => this.form.querySelector(field).style.display = ''
-							);
+							this.#hideAndDisableFormElements(['#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							]);
+							this.#showAndEnableFormElements(['#oauth-token-label', '#oauth-token-field']);
 
 							break;
 					}
@@ -758,28 +819,22 @@ window.mediatype_edit_popup = new class {
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL ?>:
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365 ?>:
 					smtp_none.setAttribute('disabled', 'disabled');
+					smtp_none.classList.add('js-inactive');
 
 					switch (parseInt(authentication)) {
 						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
-							const show_fields = ['#passwd_label', '#passwd_field'];
-
-							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
-
-							['#oauth-token-label', '#oauth-token-field'].forEach(
-								(field) => this.form.querySelector(field).style.display = 'none'
-							);
+							this.#showAndEnableFormElements(['#passwd_label', '#passwd_field']);
+							this.#hideAndDisableFormElements(['#oauth-token-label', '#oauth-token-field']);
 							break;
 
 						case <?= SMTP_AUTHENTICATION_OAUTH ?>:
-							['#smtp-username-label', '#smtp-username-field', '#passwd_label', '#passwd_field'].forEach(
-								(field) => this.form.querySelector(field).style.display = 'none'
-							);
-							['#oauth-token-label', '#oauth-token-field'].forEach(
-								(field) => this.form.querySelector(field).style.display = ''
-							);
-
+							this.#hideAndDisableFormElements(['#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							]);
+							this.#showAndEnableFormElements(['#oauth-token-label', '#oauth-token-field']);
 							break;
 					}
+					break;
 
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_GMAIL_RELAY ?>:
 				case <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>:
@@ -787,39 +842,32 @@ window.mediatype_edit_popup = new class {
 
 					if (parseInt(provider) == <?= CMediatypeHelper::EMAIL_PROVIDER_OFFICE365_RELAY ?>) {
 						smtp_oauth.setAttribute('disabled', 'disabled');
+						smtp_oauth.classList.add('js-inactive');
 					}
 
-					['#oauth-token-label', '#oauth-token-field'].forEach(
-						(field) => this.form.querySelector(field).style.display = 'none'
-					);
+					this.#hideAndDisableFormElements(['#oauth-token-label', '#oauth-token-field']);
 
 					switch (parseInt(authentication)) {
 						case <?= SMTP_AUTHENTICATION_NONE ?>:
-							this.form.querySelector('#passwd').value = '';
+							this.form_element.querySelector('#passwd').value = '';
 
-							const hide_fields = ['#smtp-username-label', '#smtp-username-field', '#passwd_label',
-								'#passwd_field'
-							];
-
-							hide_fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
+							this.#hideAndDisableFormElements(['#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							]);
 							break;
 
 						case <?= SMTP_AUTHENTICATION_PASSWORD ?>:
-							const show_fields = ['#passwd_label', '#passwd_field'];
-
-							show_fields.forEach((field) => this.form.querySelector(field).style.display = '');
+							this.#showAndEnableFormElements(['#passwd_label', '#passwd_field']);
 							break;
 
 						case <?= SMTP_AUTHENTICATION_OAUTH ?>:
-							['#smtp-username-label', '#smtp-username-field', '#passwd_label', '#passwd_field'].forEach(
-								(field) => this.form.querySelector(field).style.display = 'none'
-							);
-							['#oauth-token-label', '#oauth-token-field'].forEach(
-								(field) => this.form.querySelector(field).style.display = ''
-							);
-
+							this.#hideAndDisableFormElements(['#smtp-username-label', '#smtp-username-field',
+								'#passwd_label', '#passwd_field'
+							]);
+							this.#showAndEnableFormElements(['#oauth-token-label', '#oauth-token-field']);
 							break;
 					}
+					break;
 			}
 		}
 	}
@@ -856,6 +904,30 @@ window.mediatype_edit_popup = new class {
 			];
 		}
 
-		fields.forEach((field) => this.form.querySelector(field).style.display = 'none');
+		this.#hideAndDisableFormElements(fields);
 	}
-}
+
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
+	}
+};

@@ -32,8 +32,9 @@ $service_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('services', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('services', 'name'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -68,13 +69,12 @@ $service_tab = (new CFormGrid())
 				(new CTemplateTag('problem-tag-row-tmpl'))
 					->addItem([
 						(new CRow([
-							(new CTextBox('problem_tags[#{rowNum}][tag]', '#{tag}', false,
-								DB::getFieldLength('service_problem_tag', 'tag')
-							))
+							(new CTextAreaFlexible('problem_tags[#{rowNum}][tag]', '#{tag}'))
 								->addClass('js-problem-tag-input')
 								->addClass('js-problem-tag-tag')
 								->setAttribute('placeholder', _('tag'))
 								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setMaxlength(DB::getFieldLength('service_problem_tag', 'tag'))
 								->setErrorContainer('problem_tags_#{rowNum}_error_container'),
 							(new CSelect('problem_tags[#{rowNum}][operator]'))
 								->addClass('js-problem-tag-input')
@@ -83,12 +83,11 @@ $service_tab = (new CFormGrid())
 									ZBX_SERVICE_PROBLEM_TAG_OPERATOR_LIKE => _('Contains')
 								]))
 								->setValue(ZBX_SERVICE_PROBLEM_TAG_OPERATOR_EQUAL),
-							(new CTextBox('problem_tags[#{rowNum}][value]', '#{value}', false,
-								DB::getFieldLength('service_problem_tag', 'value')
-							))
+							(new CTextAreaFlexible('problem_tags[#{rowNum}][value]', '#{value}'))
 								->addClass('js-problem-tag-input')
 								->setAttribute('placeholder', _('value'))
-								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH),
+								->setWidth(ZBX_TEXTAREA_FILTER_SMALL_WIDTH)
+								->setMaxlength(DB::getFieldLength('service_problem_tag', 'value')),
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						]))->addClass('form_row'),
 						(new CRow([
@@ -284,9 +283,7 @@ $tags_tab = (new CFormGrid())
 						->addClass('tags-table')
 						->setHeader((new CRowHeader([_('Name'), _('Value'), '']))->addClass(ZBX_STYLE_GREY)),
 					(new CTemplateTag('tag-row-tmpl'))->addItem(
-						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['add_post_js' => false,
-							'has_inline_validation' => true
-						])
+						renderTagTableRow('#{rowNum}', ['tag' => '', 'value' => ''], ['has_inline_validation' => true ])
 					)
 				])
 		))
@@ -341,7 +338,7 @@ $child_services_filter = (new CList())
 
 $child_service_row = (new CTemplateTag('child-service-tmpl'))->addItem([
 	(new CRow([
-		(new CCol('#{*name}'))
+		(new CCol('#{name}'))
 			->addClass(ZBX_STYLE_WORDWRAP)
 			->addStyle('max-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;'),
 		(new CCol('#{*problem_tags_html}'))->addClass(ZBX_STYLE_WORDWRAP)->addClass(ZBX_STYLE_TAGS_WRAPPER),

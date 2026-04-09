@@ -159,7 +159,7 @@ foreach ($data['items'] as $item) {
 
 	// Trends
 	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG, ITEM_VALUE_TYPE_TEXT,
-			ITEM_VALUE_TYPE_BINARY])) {
+			ITEM_VALUE_TYPE_BINARY, ITEM_VALUE_TYPE_JSON])) {
 		$item['trends'] = '';
 	}
 
@@ -345,7 +345,8 @@ $confirm_messages = [
 		'field_switches' => CItemData::filterSwitchingConfiguration(),
 		'form_name' => $form->getName(),
 		'hostid' => $data['hostid'],
-		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')]
+		'token' => [CSRF_TOKEN_NAME => CCsrfTokenHelper::get('item')],
+		'filter_values' => $data['filter_values']
 	]).');
 '))
 	->setOnDocumentReady()

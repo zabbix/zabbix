@@ -21,107 +21,98 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 
 	protected $role = [];
 
-	protected function checkInput(): bool {
-		$fields = [
-			'roleid' => 									'fatal|required|db users.roleid',
-			'name' => 										'required|db role.name|not_empty',
-			'type' => 										'required|in '.implode(',', [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN, USER_TYPE_SUPER_ADMIN]),
-			'ui_monitoring_dashboard' => 					'in 0,1',
-			'ui_monitoring_problems' => 					'in 0,1',
-			'ui_monitoring_hosts' => 						'in 0,1',
-			'ui_monitoring_latest_data' => 					'in 0,1',
-			'ui_monitoring_maps' => 						'in 0,1',
-			'ui_monitoring_discovery' => 					'in 0,1',
-			'ui_services_services' => 						'in 0,1',
-			'ui_services_sla' => 							'in 0,1',
-			'ui_services_sla_report' => 					'in 0,1',
-			'ui_inventory_overview' => 						'in 0,1',
-			'ui_inventory_hosts' => 						'in 0,1',
-			'ui_reports_system_info' => 					'in 0,1',
-			'ui_reports_scheduled_reports' => 				'in 0,1',
-			'ui_reports_availability_report' => 			'in 0,1',
-			'ui_reports_top_triggers' => 					'in 0,1',
-			'ui_reports_audit' => 							'in 0,1',
-			'ui_reports_action_log' => 						'in 0,1',
-			'ui_reports_notifications' => 					'in 0,1',
-			'ui_configuration_template_groups' => 			'in 0,1',
-			'ui_configuration_host_groups' => 				'in 0,1',
-			'ui_configuration_templates' => 				'in 0,1',
-			'ui_configuration_hosts' => 					'in 0,1',
-			'ui_configuration_maintenance' => 				'in 0,1',
-			'ui_configuration_trigger_actions' => 			'in 0,1',
-			'ui_configuration_service_actions' => 			'in 0,1',
-			'ui_configuration_discovery_actions' => 		'in 0,1',
-			'ui_configuration_autoregistration_actions' => 	'in 0,1',
-			'ui_configuration_internal_actions' => 			'in 0,1',
-			'ui_configuration_event_correlation' => 		'in 0,1',
-			'ui_configuration_discovery' => 				'in 0,1',
-			'ui_administration_general' => 					'in 0,1',
-			'ui_administration_audit_log' => 				'in 0,1',
-			'ui_administration_housekeeping' => 			'in 0,1',
-			'ui_administration_proxy_groups' => 			'in 0,1',
-			'ui_administration_proxies' => 					'in 0,1',
-			'ui_administration_macros' => 					'in 0,1',
-			'ui_administration_authentication' => 			'in 0,1',
-			'ui_administration_user_groups' => 				'in 0,1',
-			'ui_administration_user_roles' => 				'in 0,1',
-			'ui_administration_users' => 					'in 0,1',
-			'ui_administration_api_tokens' => 				'in 0,1',
-			'ui_administration_media_types' => 				'in 0,1',
-			'ui_administration_scripts' => 					'in 0,1',
-			'ui_administration_queue' => 					'in 0,1',
-			'actions_edit_dashboards' => 					'in 0,1',
-			'actions_edit_maps' => 							'in 0,1',
-			'actions_edit_maintenance' => 					'in 0,1',
-			'actions_acknowledge_problems' => 				'in 0,1',
-			'actions_close_problems' => 					'in 0,1',
-			'actions_change_severity' => 					'in 0,1',
-			'actions_suppress_problems' => 					'in 0,1',
-			'actions_add_problem_comments' => 				'in 0,1',
-			'actions_execute_scripts' => 					'in 0,1',
-			'actions_manage_api_tokens' => 					'in 0,1',
-			'actions_manage_scheduled_reports' => 			'in 0,1',
-			'actions_manage_sla' => 						'in 0,1',
-			'actions_invoke_execute_now' =>					'in 0,1',
-			'actions_change_problem_ranking' =>				'in 0,1',
-			'actions_edit_own_media' =>						'in 0,1',
-			'actions_edit_user_media' =>					'in 0,1',
-			'ui_default_access' => 							'in 0,1',
-			'modules_default_access' => 					'in 0,1',
-			'actions_default_access' => 					'in 0,1',
-			'modules' => 									'array',
-			'api_access' => 								'in 0,1',
-			'api_mode' => 									'in '.implode(',', [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]),
-			'api_methods' => 								'array',
-			'service_read_access' => 						'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
-			'service_read_list' => 							'array_db services.serviceid',
-			'service_read_tag_tag' => 						'string',
-			'service_read_tag_value' => 					'string',
-			'service_write_access' => 						'in '.implode(',', [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL, CRoleHelper::SERVICES_ACCESS_LIST]),
-			'service_write_list' => 						'array_db services.serviceid',
-			'service_write_tag_tag' => 						'string',
-			'service_write_tag_value' => 					'string',
-			'form_refresh' => 								'int32'
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	public static function getValidationRules(): array {
+		$api_uniq = [
+			['role.get', ['name' => '{name}'], 'roleid']
 		];
 
-		$ret = $this->validateInput($fields);
-		$result = $this->getValidationResult();
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'roleid' => ['db role.roleid', 'required'],
+			'name' => ['db role.name', 'required', 'not_empty'],
+			'type' => ['db role.type', 'required', 'in' => [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN,
+				USER_TYPE_SUPER_ADMIN
+			]],
+			'ui' => ['array', 'required', 'not_empty',
+				'field' => ['string', 'in' => CRoleHelper::getUiElementsByUserType(USER_TYPE_SUPER_ADMIN)],
+				'messages' => ['not_empty' => _('At least one UI element must be checked.')]
+			],
+			'ui_default_access' => ['boolean'],
+			'modules' => ['array', 'required', 'field' => ['boolean']],
+			'modules_default_access' => ['boolean'],
+			'actions' => ['array', 'required',
+				'field' => ['string', 'in' => CRoleHelper::getActionsByUserType(USER_TYPE_SUPER_ADMIN)]
+			],
+			'actions_default_access' => ['boolean'],
+			'api_access' => ['boolean'],
+			'api_mode' => ['integer', 'required', 'when' => ['api_access', 'in' => [1]],
+				'in' => [ZBX_ROLE_RULE_API_MODE_DENY, ZBX_ROLE_RULE_API_MODE_ALLOW]
+			],
+			'api_methods' => ['array'],
+			'service_read_access' => ['integer',
+				'in' => [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL,
+					CRoleHelper::SERVICES_ACCESS_LIST
+				]
+			],
+			'service_read_list' => ['array',
+				'field' => ['db role_rule.value_serviceid'],
+				'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+			],
+			'service_read_tag_value' => ['string',
+				'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+			],
+			'service_read_tag_tag' => [
+				['string', 'when' => ['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
+				['string', 'required', 'not_empty',
+					'when' => [
+						['service_read_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
+						['service_read_tag_value', 'not_empty']
+					]
+				]
+			],
+			'service_write_access' => ['integer',
+				'in' => [CRoleHelper::SERVICES_ACCESS_NONE, CRoleHelper::SERVICES_ACCESS_ALL,
+					CRoleHelper::SERVICES_ACCESS_LIST
+				]
+			],
+			'service_write_list' => ['array',
+				'field' => ['db role_rule.value_serviceid'],
+				'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+			],
+			'service_write_tag_value' => ['string',
+				'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]
+			],
+			'service_write_tag_tag' => [
+				['string', 'when' => ['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]]],
+				['string', 'required', 'not_empty',
+					'when' => [
+						['service_write_access', 'in' => [CRoleHelper::SERVICES_ACCESS_LIST]],
+						['service_write_tag_value', 'not_empty']
+					]
+				]
+			],
+			'form_refresh' => ['integer']
+		]];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			switch ($result) {
-				case self::VALIDATION_ERROR:
-					$response = new CControllerResponseRedirect(
-						(new CUrl('zabbix.php'))->setArgument('action', 'userrole.edit')
-					);
-					$response->setFormData($this->getInputAll());
-					CMessageHelper::setErrorTitle(_('Cannot update user role'));
-					$this->setResponse($response);
-					break;
+			$form_errors = $this->getValidationError();
 
-				case self::VALIDATION_FATAL_ERROR:
-					$this->setResponse(new CControllerResponseFatal());
-					break;
-			}
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Cannot update user role'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;
@@ -169,25 +160,22 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 
 		$result = API::Role()->update($role);
 
+		$output = [];
+
 		if ($result) {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'userrole.list')
-					->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
-			);
-			$response->setFormData(['uncheck' => '1']);
-			CMessageHelper::setSuccessTitle(_('User role updated'));
+			$output['success']['title'] = _('User role updated');
+			$output['success']['redirect'] = (new CUrl('zabbix.php'))
+				->setArgument('action', 'userrole.list')
+				->setArgument('page', CPagerHelper::loadPage('userrole.list', null))
+				->getUrl();
 		}
 		else {
-			$response = new CControllerResponseRedirect(
-				(new CUrl('zabbix.php'))
-					->setArgument('action', 'userrole.edit')
-					->setArgument('roleid', $this->getInput('roleid'))
-			);
-			CMessageHelper::setErrorTitle(_('Cannot update user role'));
-			$response->setFormData($this->getInputAll());
+			$output['error'] = [
+				'title' => _('Cannot update user role'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			];
 		}
 
-		$this->setResponse($response);
+		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 }

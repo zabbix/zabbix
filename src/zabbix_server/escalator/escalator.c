@@ -45,6 +45,9 @@
 #include "zbxrtc.h"
 #include "zbx_rtc_constants.h"
 #include "zbxserialize.h"
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
+#endif
 
 #define CONFIG_ESCALATOR_FREQUENCY	3
 
@@ -172,7 +175,7 @@ static void	notify_alerter(zbx_alerter_notify_mode_t mode)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -3747,9 +3750,11 @@ ZBX_THREAD_ENTRY(escalator_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot open IPC connection to alert manager: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
-
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(escalator_args_in->zbx_config_tls, escalator_args_in->zbx_get_program_type_cb_arg,
 			zbx_dc_get_psk_by_identity);

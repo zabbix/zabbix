@@ -252,7 +252,7 @@ static void	ipmi_poller_send_request(zbx_ipmi_poller_t *poller, zbx_ipmi_request
 			request->message.size))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot send data to IPMI poller");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	poller->request = request;
@@ -389,11 +389,12 @@ static zbx_ipmi_poller_t	*ipmi_manager_register_poller(zbx_ipmi_manager_t *manag
 		if (manager->next_poller_index == manager->pollers.values_num)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		poller = manager->pollers.values[manager->next_poller_index++];
 		poller->client = client;
+		zbx_ipc_client_addref(poller->client);
 
 		zbx_hashset_insert(&manager->pollers_client, &poller, sizeof(zbx_ipmi_poller_t *));
 	}
@@ -420,7 +421,7 @@ static zbx_ipmi_poller_t	*ipmi_manager_get_poller_by_client(zbx_ipmi_manager_t *
 	if (NULL == poller)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return *poller;
@@ -851,7 +852,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 				SET_TEXT_RESULT(&result, value);
 				value = NULL;
 				zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, flags,
-						ZBX_ITEM_REQUIRES_PREPROCESSING_YES, &result, &ts, state, NULL);
+						ZBX_ITEM_PREPROCESSING_REGULAR, &result, &ts, state, NULL);
 				zbx_free_agent_result(&result);
 			}
 			break;
@@ -861,7 +862,7 @@ static void	ipmi_manager_process_value_result(zbx_ipmi_manager_t *manager, zbx_i
 		case CONFIG_ERROR:
 			state = ITEM_STATE_NOTSUPPORTED;
 			zbx_preprocess_item_value(itemid, ITEM_VALUE_TYPE_TEXT, flags,
-					ZBX_ITEM_REQUIRES_PREPROCESSING_YES, NULL, &ts, state, value);
+					ZBX_ITEM_PREPROCESSING_REGULAR, NULL, &ts, state, value);
 			break;
 		default:
 			/* don't change item's state when network related error occurs */
@@ -911,7 +912,7 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start IPMI service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	ipmi_manager_init(&ipmi_manager, ipmi_manager_args_in->get_config_forks);

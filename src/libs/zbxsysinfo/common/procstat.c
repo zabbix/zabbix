@@ -287,7 +287,7 @@ static int	procstat_alloc(void *base, size_t size)
 	if (FAIL == procstat_dshm_has_enough_space(header, size))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	offset = header->size_allocated;
@@ -343,7 +343,7 @@ static void	procstat_reattach(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot validate process data collector reference: %s", errmsg);
 		zbx_free(errmsg);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -500,7 +500,7 @@ static void	procstat_add(const char *procname, const char *username, const char 
 			zbx_free(errmsg);
 			zbx_dshm_unlock(&(get_collector())->procstat);
 
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		/* header initialised in procstat_copy_data() which is called back from zbx_dshm_realloc() */
@@ -571,7 +571,7 @@ static void	procstat_try_compress(void *base)
 			zbx_free(errmsg);
 			zbx_dshm_unlock(&(get_collector())->procstat);
 
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 }
@@ -925,7 +925,7 @@ void	zbx_procstat_init(void)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize process data collector: %s", errmsg);
 		zbx_free(errmsg);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	procstat_ref.shmid = ZBX_NONEXISTENT_SHMID;

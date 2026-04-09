@@ -18,6 +18,12 @@
 		"out": [
 			{
 				"type": "_timeperiod"
+			},
+			{
+				"type": "_itemid"
+			},
+			{
+				"type": "_itemids"
 			}
 		]
 	},

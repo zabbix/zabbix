@@ -847,10 +847,10 @@ function zbx_array_diff(array $primary, array $secondary, $field) {
 	$fields2 = zbx_objectValues($secondary, $field);
 
 	$first = array_diff($fields1, $fields2);
-	$first = zbx_toHash($first);
+	$first = zbx_toHash($first, '');
 
 	$second = array_diff($fields2, $fields1);
-	$second = zbx_toHash($second);
+	$second = zbx_toHash($second, '');
 
 	$result = [
 		'first' => [],
@@ -1029,10 +1029,11 @@ function zbx_value2array(&$values) {
 }
 
 // object or array of objects to hash
-function zbx_toHash($value, $field = null) {
+function zbx_toHash(mixed $value, string $field): ?array {
 	if (is_null($value)) {
 		return $value;
 	}
+
 	$result = [];
 
 	if (!is_array($value)) {
@@ -1765,7 +1766,6 @@ function show_messages($good = null, $okmsg = null, $errmsg = null) {
 			}
 
 			imageOut($canvas);
-			imagedestroy($canvas);
 			break;
 
 		default:
@@ -1949,21 +1949,17 @@ function parse_period($str) {
 		return null;
 	}
 
-	foreach ($time_periods_parser->getPeriods() as $period) {
-		if (!preg_match('/^([1-7])-([1-7]),([0-9]{1,2}):([0-9]{1,2})-([0-9]{1,2}):([0-9]{1,2})$/', $period, $matches)) {
-			return null;
-		}
+	foreach ($time_periods_parser->getPeriodsParts() as $period_parts) {
+		$start_day = (int) $period_parts['wd_from'];
+		$end_day = (int) $period_parts['wd_till'];
 
-		for ($i = $matches[1]; $i <= $matches[2]; $i++) {
-			if (!isset($out[$i])) {
-				$out[$i] = [];
-			}
-			array_push($out[$i], [
-				'start_h' => $matches[3],
-				'start_m' => $matches[4],
-				'end_h' => $matches[5],
-				'end_m' => $matches[6]
-			]);
+		for ($day = $start_day; $day <= $end_day; $day++) {
+			$out[$day][] = [
+				'start_h' => $period_parts['h_from'],
+				'start_m' => $period_parts['m_from'],
+				'end_h' => $period_parts['h_till'],
+				'end_m' => $period_parts['m_till']
+			];
 		}
 	}
 

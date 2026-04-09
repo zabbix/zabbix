@@ -261,7 +261,8 @@ static int	set_object_names(void)
 	names_loc += wcslen(names_loc) + 1;
 	names_loc += wcslen(names_loc) + 1;
 
-	objects = zbx_malloc(NULL, (++sz) * sizeof(wchar_t));
+	sz++; /* according to Microsoft docs should be incremented by 1 for Windows XP */
+	objects = zbx_malloc(NULL, (sz) * sizeof(wchar_t));
 
 	if (ERROR_SUCCESS != (pdh_status = PdhEnumObjects(NULL, NULL, objects, &sz, PERF_DETAIL_WIZARD, FALSE)))
 	{

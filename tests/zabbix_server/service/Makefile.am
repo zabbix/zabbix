@@ -22,6 +22,7 @@ COMMON_LIBS = \
 	$(top_builddir)/src/libs/zbxinterface/libzbxinterface.a \
 	$(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
+	$(top_srcdir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
@@ -62,6 +63,7 @@ COMMON_LIBS = \
 	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \

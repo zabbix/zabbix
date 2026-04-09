@@ -53,7 +53,7 @@ static const zbx_db_config_t	*db_config = NULL;
 static zbx_db_query_mask_t	db_log_masked_values = ZBX_DB_DONT_MASK_QUERIES;
 
 #if defined(HAVE_POSTGRESQL)
-static 	ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
+static ZBX_THREAD_LOCAL char	ZBX_PG_ESCAPE_BACKSLASH = 1;
 #elif defined(HAVE_SQLITE3)
 static zbx_mutex_t		db_sqlite_access = ZBX_MUTEX_NULL;
 #endif
@@ -376,7 +376,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 #if defined(HAVE_MYSQL)
 	int		err_no = 0;
 #elif defined(HAVE_POSTGRESQL)
-#	define ZBX_DB_MAX_PARAMS	9
+#	define ZBX_DB_MAX_PARAMS	11
 
 	int		rc;
 	char		*cport = NULL;
@@ -405,7 +405,7 @@ static int	dbconn_open(zbx_dbconn_t *db)
 	if (NULL == (db->conn = mysql_init(NULL)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot allocate or initialize MYSQL database connection object");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (1 == db->autoincrement)
@@ -636,10 +636,19 @@ static int	dbconn_open(zbx_dbconn_t *db)
 		values[i++] = db->config->dbpassword;
 	}
 
-	if (0 != db->config->dbport)
+	if (NULL != db->config->dbports)
 	{
 		keywords[i] = "port";
-		values[i++] = cport = zbx_dsprintf(cport, "%u", db->config->dbport);
+		values[i++] = db->config->dbports;
+
+		if (NULL != strchr(db->config->dbports, ','))
+		{
+			keywords[i] = "target_session_attrs";
+			values[i++] = "read-write";
+
+			keywords[i] = "connect_timeout";
+			values[i++] = "3";
+		}
 	}
 
 	keywords[i] = NULL;
@@ -866,9 +875,15 @@ static int	dbconn_vexecute(zbx_dbconn_t *db, const char *fmt, va_list args)
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
-			db_replace_nonprintable_chars(sql, &sql_printable));
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+	{
+		char		buf_sql_trunc[MAX_BUFFER_LEN + 1];
+		const char	*sql_trunc = zbx_truncate_value(sql, MAX_BUFFER_LEN, buf_sql_trunc,
+				sizeof(buf_sql_trunc));
 
+		zabbix_log(LOG_LEVEL_DEBUG, "query [txnlev:%d] [%s]", db->txn_level,
+				db_replace_nonprintable_chars(sql_trunc, &sql_printable));
+	}
 #if defined(HAVE_MYSQL)
 	if (NULL == db->conn)
 	{

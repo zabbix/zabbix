@@ -16,6 +16,18 @@
 
 #include "zbxcommon.h"
 
+static int	mock_log_level = LOG_LEVEL_TRACE;
+
+int	zbx_mock_get_log_level_impl(void)
+{
+	return mock_log_level;
+}
+
+void	zbx_mock_set_log_level(int level)
+{
+	mock_log_level = level;
+}
+
 void	zbx_mock_log_impl(int level, const char *fmt, va_list args)
 {
 	fprintf(stdout, "[ LOG (");

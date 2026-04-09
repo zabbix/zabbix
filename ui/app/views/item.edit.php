@@ -31,7 +31,8 @@ $value_types = [
 	ITEM_VALUE_TYPE_STR => _('Character'),
 	ITEM_VALUE_TYPE_LOG => _('Log'),
 	ITEM_VALUE_TYPE_TEXT => _('Text'),
-	ITEM_VALUE_TYPE_BINARY => _('Binary')
+	ITEM_VALUE_TYPE_BINARY => _('Binary'),
+	ITEM_VALUE_TYPE_JSON => _('JSON')
 ];
 $type_with_key_select = [
 	ITEM_TYPE_ZABBIX, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_DB_MONITOR,

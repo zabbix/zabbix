@@ -29,8 +29,10 @@ $fields = [
 	'to' =>				[T_ZBX_RANGE_TIME,	O_OPT, P_SYS,	null,		null],
 	'profileIdx' =>		[T_ZBX_STR,			O_OPT, null,	null,		null],
 	'profileIdx2' =>	[T_ZBX_STR,			O_OPT, null,	null,		null],
-	'width' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_WIDTH_MIN, 65535),	null],
-	'height' =>			[T_ZBX_INT,			O_OPT, null,	BETWEEN(CLineGraphDraw::GRAPH_HEIGHT_MIN, 65535),	null],
+	'width' =>			[T_ZBX_INT,			O_OPT, P_NZERO,
+		BETWEEN(CGraphDraw::GRAPH_WIDTH_MIN, CGraphDraw::GRAPH_WIDTH_MAX),		null],
+	'height' =>			[T_ZBX_INT,			O_OPT, P_NZERO,
+		BETWEEN(CGraphDraw::GRAPH_HEIGHT_MIN, CGraphDraw::GRAPH_HEIGHT_MAX),	null],
 	'outer' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'batch' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
@@ -128,13 +130,11 @@ if (getRequest('widget_view') === '1') {
 }
 
 foreach ($items as $item) {
-	if ($item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($item + [
-			'color' => rgb2hex(get_next_color(1)),
-			'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
-			'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
-		]);
-	}
+	$graph->addItem($item + [
+		'color' => rgb2hex(get_next_color(1)),
+		'yaxisside' => GRAPH_YAXIS_SIDE_DEFAULT,
+		'calc_fnc' => (getRequest('batch')) ? CALC_FNC_AVG : CALC_FNC_ALL
+	]);
 }
 
 $min_dimensions = $graph->getMinDimensions();

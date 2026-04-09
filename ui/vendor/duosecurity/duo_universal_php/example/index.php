@@ -21,7 +21,7 @@ try {
         $config['api_hostname'],
         $config['redirect_uri'],
         true,
-        $config['http_proxy'],
+        $config['http_proxy'] ?? null,
     );
 } catch (DuoException $e) {
     throw new ErrorException("*** Duo config error. Verify the values in duo.conf are correct ***\n" . $e->getMessage());

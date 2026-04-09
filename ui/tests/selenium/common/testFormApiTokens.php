@@ -135,7 +135,7 @@ class testFormApiTokens extends CWebTest {
 		// Check the hintbox text in the Auth token field.
 		$auth_token->query('xpath:./button[@data-hintbox]')->one()->click();
 		$this->assertEquals('Make sure to copy the auth token as you won\'t be able to view it after the page is closed.',
-				$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible()->getText()
+				$this->query('xpath://div[contains(@class, "hintbox-static")]')->one()->waitUntilVisible()->getText()
 		);
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 		$dialog->close();
@@ -188,9 +188,7 @@ class testFormApiTokens extends CWebTest {
 		}
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, ($action === 'create') ? 'Cannot add API token' : 'Cannot update API token',
-					$data['error_details']
-			);
+			$this->assertInlineError($form, $data['error']);
 
 			// Check that DB hash is not changed.
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
@@ -214,7 +212,8 @@ class testFormApiTokens extends CWebTest {
 				// Check warning in case if token is already expired.
 				if (CTestArrayHelper::get($data, 'already_expired')) {
 					$form->getField('Expires at:')->query('xpath:./button[@data-hintbox]')->one()->click();
-					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one()->waitUntilVisible()->getText();
+					$hintbox_text = $this->query('xpath://div[@class="overlay-dialogue hintbox wordbreak hintbox-position-fixed hintbox-static"]')
+						->one()->waitUntilVisible()->getText();
 					$this->assertEquals('The token has expired. Please update the expiry date to use the token.', $hintbox_text);
 				}
 
@@ -232,6 +231,7 @@ class testFormApiTokens extends CWebTest {
 				$auth_token = $form->getField('Auth token:');
 				$this->checkAuthToken($auth_token, $original_token);
 				$dialog->close();
+				$this->page->waitUntilReady();
 			}
 			else {
 				$dialog->ensureNotPresent();

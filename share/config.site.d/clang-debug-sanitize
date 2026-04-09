@@ -7,7 +7,7 @@ fi
 
 if [ -z "$CFLAGS" ]
 then
-	CFLAGS="-std=gnu99"
+	CFLAGS="-std=gnu11"
 	CFLAGS+=" -O0 -ggdb3"
 	CFLAGS+=" -Wall"
 	CFLAGS+=" -Wextra"
@@ -40,6 +40,7 @@ then
 	CFLAGS+=" -Wcast-function-type"
 	CFLAGS+=" -fstrict-aliasing"
 	CFLAGS+=" -Wpedantic"
+	CFLAGS+=" -Werror=vla"
 
 	# flags for clang
 	CFLAGS+=" -Wno-uninitialized"

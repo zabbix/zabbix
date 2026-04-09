@@ -16,6 +16,8 @@
 #define ZABBIX_DBCONFIG_H
 
 #include "zbxcacheconfig.h"
+
+#include "zbxcommon.h"
 #include "vps_monitor.h"
 #include "zbxalgo.h"
 #include "zbxversion.h"
@@ -23,6 +25,7 @@
 #include "zbx_trigger_constants.h"
 #include "zbx_host_constants.h"
 #include "zbxmutexs.h"
+#include "zbxtypes.h"
 
 #define ZBX_MAINTENANCE_IDLE		0
 #define ZBX_MAINTENANCE_RUNNING		1
@@ -72,6 +75,8 @@ typedef struct
 }
 ZBX_DC_TRIGGER;
 
+ZBX_PTR_VECTOR_DECL(trigger_ptr, ZBX_DC_TRIGGER *)
+
 /* specifies if trigger expression/recovery expression has timer functions */
 /* (date, time, now, dayofweek or dayofmonth)                              */
 #define ZBX_TRIGGER_TIMER_DEFAULT		0x00
@@ -101,6 +106,8 @@ typedef struct
 	unsigned char	type;
 }
 ZBX_DC_FUNCTION;
+
+ZBX_PTR_VECTOR_DECL(dc_function_ptr, ZBX_DC_FUNCTION *)
 
 typedef struct
 {
@@ -1210,5 +1217,9 @@ void		dbconfig_shmem_free_func(void *ptr);
 void		*dbconfig_shmem_realloc_func(void *old, size_t size);
 void		*dbconfig_shmem_malloc_func(void *old, size_t size);
 zbx_uint64_t	dbconfig_used_size(void);
+
+void	dc_config_set_config_revision(zbx_uint64_t revision);
+zbx_uint64_t	dc_config_get_config_revision(void);
+void	dc_config_get_revision(zbx_dc_revision_t *revision);
 
 #endif

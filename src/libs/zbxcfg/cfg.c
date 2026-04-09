@@ -746,7 +746,7 @@ error:
 	zbx_free(envvar_value);
 
 	if (0 == noexit)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 
 	return FAIL;
 #undef ZBX_MAX_INCLUDE_LEVEL

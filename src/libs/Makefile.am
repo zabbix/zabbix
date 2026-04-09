@@ -73,7 +73,10 @@ DIST_SUBDIRS = \
 	zbxserialize \
 	zbxservice \
 	zbxshmem \
+	zbxsnmp \
 	zbxsnmptrapper \
+	zbxsupervisor \
+	zbxsupervisor_client \
 	zbxsysinfo \
 	zbxstats \
 	zbxstr \
@@ -89,7 +92,8 @@ DIST_SUBDIRS = \
 	zbxversion \
 	zbxvmware \
 	zbxprof \
-	zbxxml
+	zbxxml \
+	zbxresolver
 
 if SERVER
 SERVER_SUBDIRS = \
@@ -145,7 +149,10 @@ SERVER_SUBDIRS = \
 	zbxserialize \
 	zbxservice \
 	zbxshmem \
+	zbxsnmp \
 	zbxsnmptrapper \
+	zbxsupervisor \
+	zbxsupervisor_client \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -213,7 +220,10 @@ PROXY_SUBDIRS = \
 	zbxserialize \
 	zbxscripts \
 	zbxshmem \
+	zbxsnmp \
 	zbxsnmptrapper \
+	zbxsupervisor \
+	zbxsupervisor_client \
 	zbxstats \
 	zbxstr \
 	zbxtagfilter \
@@ -269,6 +279,7 @@ SUBDIRS = \
 	zbxversion \
 	zbxxml \
 	zbxagentget \
+	zbxresolver \
 	$(PROXY_SUBDIRS) \
 	$(SERVER_SUBDIRS) \
 	$(AGENT_SUBDIRS)

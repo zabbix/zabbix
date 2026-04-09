@@ -33,8 +33,9 @@ $template_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('template_name', $data['template_name'], false, DB::getFieldLength('hosts', 'host')))
+			(new CTextAreaFlexible('template_name', $data['template_name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'host'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -42,8 +43,9 @@ $template_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Visible name'), 'visiblename'),
 		new CFormField(
-			(new CTextBox('visiblename', $data['visible_name'], false, DB::getFieldLength('hosts', 'name')))
+			(new CTextAreaFlexible('visiblename', $data['visible_name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'name'))
 		)
 	]);
 
@@ -196,7 +198,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setErrorLabel(_('Macro'))
 						->addClass('macro')
@@ -210,7 +212,7 @@ if (!$data['readonly']) {
 						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -237,7 +239,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setErrorLabel(_('Macro'))
 						->addClass('macro')
@@ -274,7 +276,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 						->setAttribute('placeholder', _('description'))

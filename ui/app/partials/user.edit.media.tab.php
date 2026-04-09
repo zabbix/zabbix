@@ -28,6 +28,8 @@ $media_form_list = new CFormList('userMediaFormList');
 $media_table_info = (new CTable())
 	->setId('media-table')
 	->setAttribute('style', 'width: 100%;')
+	->setAttribute('data-field-type', 'set')
+	->setAttribute('data-field-name', 'medias')
 	->setHeader([_('Type'), _('Send to'), _('When active'), _('Use if severity'), _('Status'), _('Actions')]);
 
 $media_add_button = (new CButtonLink(_('Add')))
@@ -74,13 +76,22 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 				->setEnabled($data['can_edit_media'])
 				->addClass('js-remove'),
 			(new CDiv([
-				new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'),
-				new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'),
-				new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'),
-				new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto}'),
-				new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'),
-				new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'),
-				new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}')
+				(new CInput('hidden', 'medias[#{row_index}][mediaid]', '#{mediaid}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][mediatypeid]', '#{mediatypeid}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][mediatype_type]', '#{mediatype_type}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][period]', '#{period}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][sendto]', '#{sendto}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][severity]', '#{severity}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][active]', '#{active}'))
+					->setAttribute('data-field-type', 'hidden'),
+				(new CInput('hidden', 'medias[#{row_index}][provisioned]', '#{provisioned}'))
+					->setAttribute('data-field-type', 'hidden')
 			]))
 		]))
 	]))->setAttribute('data-row_index', '#{row_index}')
@@ -88,7 +99,7 @@ $media_table_info_template = new CTemplateTag('media-row-tmpl',
 );
 
 (new CScriptTag('media_tab.init('.json_encode([
-	'userid' => $data['userid'],
+	'userid' => $data['userid'] ? $data['userid'] : 0,
 	'medias' => $data['medias']
 ]).');'))
 	->setOnDocumentReady()

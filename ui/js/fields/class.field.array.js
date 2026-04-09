@@ -65,6 +65,10 @@ class CFieldArray extends CField {
 		return this.getInnerValue(true);
 	}
 
+	updateState() {
+		this.#discoverAllFields();
+	}
+
 	#detectFieldChanges = () => {
 		this.#discoverAllFields();
 

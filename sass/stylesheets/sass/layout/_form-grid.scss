@@ -318,4 +318,9 @@
 			vertical-align: text-bottom;
 		}
 	}
+
+	&.form-subgrid {
+		grid-template-columns: subgrid;
+		grid-column: 1 / -1;
+	}
 }

@@ -46,6 +46,7 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_srcdir)/src/libs/zbxcommshigh/libzbxcommshigh.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxicmpping/libzbxicmpping.a \
 	$(top_srcdir)/src/libs/zbxdbupgrade/libzbxdbupgrade.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
@@ -55,6 +56,7 @@ EVALUATE_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
 	$(top_srcdir)/src/libs/zbxeval/libzbxeval.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \

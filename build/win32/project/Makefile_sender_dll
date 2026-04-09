@@ -52,6 +52,7 @@ OBJS = \
 	..\..\..\src\libs\zbxexpr\macro.o \
 	..\..\..\src\libs\zbxexpr\token.o \
 	..\..\..\src\libs\zbxcommshigh\commshigh.o \
+	..\..\..\src\libs\zbxresolver\resolver.o \
 	..\..\..\src\libs\zbxcomms\comms.o \
 	..\..\..\src\libs\zbxcompress\compress.o \
 	..\..\..\src\libs\zbxcfg\cfg.o \
@@ -79,6 +80,7 @@ OBJS = \
 LIBS = ws2_32.lib psapi.lib pdh.lib Wldap32.lib advapi32.lib uuid.lib Iphlpapi.lib shlwapi.lib
 
 !INCLUDE Makefile_pcre.inc
+!INCLUDE Makefile_ares.inc
 !INCLUDE Makefile_targets.inc
 
 # zabbix_sender dynamic link library support

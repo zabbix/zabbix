@@ -1231,7 +1231,7 @@ class testDashboardItemCardWidget extends testWidgets {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Selected more than 731 day for graph filter.',
+						'Name' => 'Selected more than 2 years for graph filter.',
 						'Item' => 'Item for item card widget'
 					],
 					'Show' => [
@@ -1241,8 +1241,9 @@ class testDashboardItemCardWidget extends testWidgets {
 						'id:sparkline_time_period_from' => 'now-1000d',
 						'id:sparkline_time_period_to' => 'now'
 					],
+					'days_count' => true,
 					'error_message' => [
-						'Maximum time period to display is 731 days.'
+						'Maximum time period to display is {days} days.'
 					]
 				]
 			],
@@ -1858,7 +1859,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		if (array_key_exists('Error text', $data)) {
 			$item_selector->query('class:zi-i-negative')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($data['Error text'], $hint->getText());
 			$hint->close();
 			$this->assertEquals($data['Error text'], $widget->query('class:section-error')->one()->getText());
@@ -1866,7 +1867,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 		if (array_key_exists('Warning', $data)) {
 			$widget->query('class:item-name')->query('class:zi-i-warning')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($data['Warning'], $hint->getText());
 			$hint->close();
 		}
@@ -1971,7 +1972,7 @@ class testDashboardItemCardWidget extends testWidgets {
 
 			// Check table pop-up with trigger data.
 			$widget->query('class:section-triggers')->query('class:link-action')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$table = $hint->query('class:list-table')->asTable()->one();
 
 			$this->assertEquals(['Severity', 'Name', 'Expression', 'Status'], $table->getHeadersText());
@@ -2447,6 +2448,11 @@ class testDashboardItemCardWidget extends testWidgets {
 	 */
 	protected function checkWidgetForm($data, $action, $dashboard) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
+			// If required, define max days count in error since it depends on leap year presence in desired period.
+			if (CTestArrayHelper::get($data, 'days_count')) {
+				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
+			}
+
 			$this->assertMessage(TEST_BAD, null, $data['error_message']);
 			COverlayDialogElement::find()->one()->close();
 			$dashboard->save();

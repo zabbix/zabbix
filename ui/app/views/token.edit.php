@@ -19,11 +19,7 @@
  * @var array $data
  */
 
-$url = (new CUrl('zabbix.php'))
-	->setArgument('action', ($data['tokenid'] == 0) ? 'token.create' : 'token.update')
-	->getUrl();
-
-$token_form = (new CForm('post', $url))
+$token_form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('token')))->removeId())
 	->setId('token_form')
 	->setName('token')
@@ -103,6 +99,7 @@ $token_from_grid->addItem([
 		new CLabel(_('Enabled'), 'status'),
 		new CFormField(
 			(new CCheckBox('status', ZBX_AUTH_TOKEN_ENABLED))->setChecked($data['status'] == ZBX_AUTH_TOKEN_ENABLED)
+				->setUncheckedValue(ZBX_AUTH_TOKEN_DISABLED)
 		)
 	]);
 
@@ -114,26 +111,22 @@ if ($data['tokenid'] != 0) {
 	$buttons = [
 		[
 			'title' => _('Update'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'token_edit_popup.submit();'
+			'isSubmit' => true
 		],
 		[
 			'title' => _('Regenerate'),
-			'confirmation' => _('Regenerate selected API token? Previously generated token will become invalid.'),
-			'class' => 'btn-alt',
+			'class' => ZBX_STYLE_BTN_ALT.' js-regenerate',
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'token_edit_popup.regenerate();'
+			'isSubmit' => false
 		],
 		[
 			'title' => _('Delete'),
 			'confirmation' => _('Delete selected API token?'),
-			'class' => 'btn-alt',
+			'class' => ZBX_STYLE_BTN_ALT.' js-delete',
 			'keepOpen' => true,
-			'isSubmit' => false,
-			'action' => 'token_edit_popup.delete('.json_encode($data['tokenid']).');'
+			'isSubmit' => false
 		]
 	];
 }
@@ -141,27 +134,21 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'token_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
-
-$token_form->addItem(
-	(new CScriptTag(
-		'token_edit_popup.init('.json_encode([
-			'admin_mode' => $data['admin_mode']
-		]).');'
-	))->setOnDocumentReady()
-);
 
 $output = [
 	'header' =>($data['tokenid'] == 0) ? _('New API token') : ('API token'),
 	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TOKEN_EDIT),
 	'body' => $token_form->toString(),
-	'script_inline' => getPagePostJs().$this->readJsFile('token.edit.js.php'),
+	'script_inline' => getPagePostJs().$this->readJsFile('token.edit.js.php').'token_edit_popup.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'admin_mode' => $data['admin_mode']
+	]).');',
 	'buttons' => $buttons,
 	'dialogue_class' => 'modal-popup-generic'
 ];

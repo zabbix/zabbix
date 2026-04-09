@@ -54,7 +54,8 @@ switch ($condition_type) {
 
 		$new_condition_tag = (new CTextAreaFlexible('tag'))
 			->setId('tag')
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setMaxlength(DB::getFieldLength('corr_condition_tagvalue', 'tag'));
 
 		$form_grid
 			->addItem([
@@ -144,11 +145,13 @@ switch ($condition_type) {
 
 		$new_condition_tag = (new CTextAreaFlexible('tag'))
 			->setId('tag')
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setMaxlength(DB::getFieldLength('corr_condition_tagvalue', 'tag'));
 
 		$new_condition_value = (new CTextAreaFlexible('value'))
 			->setId('value')
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH);
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setMaxlength(DB::getFieldLength('corr_condition_tagvalue', 'value'));
 
 		$form_grid
 			->addItem([

@@ -80,7 +80,7 @@ if ($data['params']['type'] != MEDIA_TYPE_SMS) {
 	$form_grid->addItem([
 		new CLabel(_('Subject'), 'subject'),
 		new CFormField(
-			(new CTextBox('subject', $data['params']['subject']))
+			(new CTextAreaFlexible('subject', $data['params']['subject']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAttribute('maxlength', DB::getFieldLength('media_type_message', 'subject'))
 		)
@@ -100,6 +100,7 @@ $form
 	->addItem((new CInput('submit', 'submit'))->addStyle('display: none;'))
 	->addItem(
 		(new CScriptTag('mediatype_message_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
 			'message_templates' => CMediatypeHelper::getAllMessageTemplates()
 		]).');'))->setOnDocumentReady()
 	);
@@ -110,9 +111,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['params']['old_message_type'] == -1 ? _('Add') : _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'mediatype_message_popup.submit();'
+			'isSubmit' => true
 		]
 	],
 	'script_inline' => getPagePostJs().$this->readJsFile('mediatype.message.edit.js.php')

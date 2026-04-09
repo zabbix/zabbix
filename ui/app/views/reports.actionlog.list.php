@@ -52,7 +52,7 @@ $filter = (new CFilter())
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_userids_'
 						]
 					]
@@ -69,7 +69,7 @@ $filter = (new CFilter())
 							'srctbl' => 'actions',
 							'srcfld1' => 'actionid',
 							'srcfld2' => 'name',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_actionids_'
 						]
 					]
@@ -86,7 +86,7 @@ $filter = (new CFilter())
 							'srctbl' => 'media_types',
 							'srcfld1' => 'mediatypeid',
 							'srcfld2' => 'name',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_mediatypeids_'
 						]
 					]

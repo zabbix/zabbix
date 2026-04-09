@@ -512,12 +512,14 @@ class testItemTest extends CWebTest {
 						'Key' => 'test.item.preproc.no.custom.error'
 					],
 					'preprocessing' => [
-						['type' => 'Regular expression',
-						'parameter_1' => '1',
-						'parameter_2' => '2',
-						'on_fail' => true,
-						'error_handler' => 'Set error to',
-						'error_handler_params' => '']
+						[
+							'type' => 'Regular expression',
+							'parameter_1' => '1',
+							'parameter_2' => '2',
+							'on_fail' => true,
+							'error_handler' => 'Set error to',
+							'error_handler_params' => ''
+						]
 					],
 					'inline_errors' => [
 						'id:preprocessing_0_error_handler_params' => 'Error message: This field cannot be empty.'
@@ -1168,8 +1170,8 @@ class testItemTest extends CWebTest {
 						 * (0)macro (1)=> (2)value
 						 */
 						$macros['actual'][] = [
-							'macro' => $columns[0]->getText(),
-							'value' => $columns[2]->getText()
+							'macro' => $columns[0]->query('tag:z-textarea-flexible')->one()->getValue(),
+							'value' => $columns[2]->query('tag:z-textarea-flexible')->one()->getValue()
 						];
 					}
 					foreach ($macros as &$array) {

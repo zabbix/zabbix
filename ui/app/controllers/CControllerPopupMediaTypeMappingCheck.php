@@ -18,31 +18,42 @@ class CControllerPopupMediaTypeMappingCheck extends CController {
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'userdirectory_mediaid' => 	'id',
-			'mediatypeid' =>			'required|db media_type.mediatypeid',
-			'name' =>					'required|string|not_empty',
-			'attribute' =>				'required|string|not_empty',
-			'period' =>					'required|time_periods',
-			'severity' =>				'array',
-			'active' =>					'in '.implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])
-		];
+	public static function getValidationRules(): array {
+		return ['object', 'fields' => [
+			'userdirectory_mediaid' => ['db userdirectory_media.userdirectory_mediaid'],
+			'mediatypeid' => ['db media_type.mediatypeid', 'required'],
+			'name' => ['db userdirectory_media.name', 'required', 'not_empty'],
+			'attribute' => ['db userdirectory_media.attribute', 'required', 'not_empty'],
+			'period' => ['db userdirectory_media.period', 'required', 'not_empty',
+				'use' => [CTimePeriodParser::class, ['usermacros' => true]],
+				'messages' => ['use' => _('Invalid period.')]
+			],
+			'severity' => ['array', 'field' => ['integer',
+				'in' => range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT-1)
+			]],
+			'active' => ['db userdirectory_media.active', 'required',
+				'in' => [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]
+			]
+		]];
+	}
 
-		$ret = $this->validateInput($fields);
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
-			$this->setResponse(
-				new CControllerResponseData(['main_block' => json_encode([
-					'error' => [
-						'title' => _('Invalid media type mapping configuration.'),
-						'messages' => array_column(get_and_clear_messages(), 'message')
-					]
-				])])
-			);
+			$form_errors = $this->getValidationError();
+			$response = $form_errors
+				? ['form_errors' => $form_errors]
+				: ['error' => [
+					'title' => _('Invalid media type mapping configuration.'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]];
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;

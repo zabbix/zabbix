@@ -27,6 +27,7 @@ final class CHistFunctionData {
 
 	/**
 	 * Known history functions along with definition of parameters.
+	 * If updated, must be aligned with CTriggerConditionFunctionData.
 	 *
 	 * @var array
 	 */

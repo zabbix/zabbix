@@ -20,7 +20,6 @@
 #include "zbxserialize.h"
 #include "zbxnum.h"
 #include "zbxeval.h"
-#include "zbxexpr.h"
 
 #define ZBX_EVAL_STATIC_BUFFER_SIZE	4096
 

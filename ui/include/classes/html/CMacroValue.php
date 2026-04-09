@@ -190,9 +190,7 @@ class CMacroValue extends CDiv {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_TEXT;
 			$dropdown_btn_class = ZBX_ICON_TEXT;
 
-			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value, [
-				'add_post_js' => $this->add_post_js
-			]))
+			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value))
 				->setErrorContainer($this->error_container_id)
 				->setErrorLabel($this->error_label)
 				->setMaxlength($this->maxlength)
@@ -205,9 +203,7 @@ class CMacroValue extends CDiv {
 			$wrapper_class = self::ZBX_STYLE_MACRO_INPUT_GROUP.' '.self::ZBX_STYLE_MACRO_VALUE_VAULT;
 			$dropdown_btn_class = ZBX_ICON_LOCK;
 
-			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value, [
-				'add_post_js' => $this->add_post_js
-			]))
+			$elements[] = (new CTextAreaFlexible($this->name.'[value]', $this->value))
 				->setErrorContainer($this->error_container_id)
 				->setErrorLabel($this->error_label)
 				->setMaxlength($this->maxlength)

@@ -27,6 +27,7 @@ class CControllerPopupLdapEdit extends CController {
 		$fields = [
 			'row_index' =>						'required|int32',
 			'userdirectoryid' =>				'db userdirectory.userdirectoryid',
+			'existing_names' =>					'array',
 			'name' =>							'db userdirectory.name',
 			'host' =>							'db userdirectory_ldap.host',
 			'port' =>							'db userdirectory_ldap.port|ge '.ZBX_MIN_PORT_NUMBER.'|le '.ZBX_MAX_PORT_NUMBER,
@@ -109,8 +110,13 @@ class CControllerPopupLdapEdit extends CController {
 			'group_configuration' => $this->getInput('group_configuration', self::LDAP_MEMBER_OF),
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
-			]
+			],
+			'existing_names' => $this->getInput('existing_names', [])
 		];
+
+		$data['js_validation_rules'] = (new CFormValidator(
+			CControllerPopupLdapCheck::getValidationRules($this->getInput('existing_names', []))
+		))->getRules();
 
 		if ($this->hasInput('bind_password')) {
 			$data['bind_password'] = $this->getInput('bind_password');

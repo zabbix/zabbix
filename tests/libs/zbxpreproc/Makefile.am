@@ -14,12 +14,14 @@ COMMON_SRC_FILES = \
 JSON_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
+	$(top_srcdir)/src/libs/zbxsupervisor_client/libzbxsupervisor_client.a \
 	$(top_srcdir)/src/libs/zbxpreprocbase/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxescalations/libzbxescalations.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
 	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
 	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
+	$(top_srcdir)/src/libs/zbxsnmp/libzbxsnmp.a \
 	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
 	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
@@ -54,6 +56,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
 	$(top_srcdir)/src/libs/zbxjson/libzbxjson.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
+	$(top_builddir)/src/libs/zbxresolver/libzbxresolver.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxregexp/libzbxregexp.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \

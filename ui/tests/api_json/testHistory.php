@@ -151,6 +151,41 @@ class testHistory extends CAPITest {
 				'expected_result' => '3',
 				'expected_error' => false
 			],
+			// Get value of a certain length of value of item of value_type == ITEM_VALUE_TYPE_BIN ('history' => 5).
+			[
+				'api_request' => [
+					'history' => 5,
+					'maxValueSize' => 1,
+					'itemids' => ['158741']
+				],
+				'expected_result' => [
+					[
+						'itemid' => '158741',
+						'clock' => '1549351002',
+						'value' => base64_encode('a'),
+						'ns' => '164888032'
+					]
+				],
+				'expected_error' => false
+			],
+			// Get value of a certain length of value of item of value_type == ITEM_VALUE_TYPE_JSON ('history' => 6).
+			// JSON formatting differs: PostgreSQL (JSONB), MySQL (LONGTEXT).
+			[
+				'api_request' => [
+					'history' => 6,
+					'maxValueSize' => 6,
+					'itemids' => ['158742']
+				],
+				'expected_result' => [
+					[
+						'itemid' => '158742',
+						'clock' => '1549351003',
+						'value' => '{"name',
+						'ns' => '354370019'
+					]
+				],
+				'expected_error' => false
+			],
 			// Get number of history records filtering records by itemid.
 			[
 				'api_request' => [
@@ -179,6 +214,9 @@ class testHistory extends CAPITest {
 				'api_request' => [
 					'countOutput' => true,
 					'history' => 1,
+					'filter' => [
+						'itemid' => ['133760']
+					],
 					'search' => [
 						'value' => '1'
 					]
@@ -275,6 +313,7 @@ class testHistory extends CAPITest {
 	}
 
 	public static function history_clear_data() {
+		$json_itemid = 158742;
 		$binary_itemid = 158739;
 
 		return [
@@ -287,6 +326,13 @@ class testHistory extends CAPITest {
 				'api_request' => [$binary_itemid],
 				'expected_result' => [
 					'itemids' => [$binary_itemid]
+				],
+				'expected_error' => false
+			],
+			[
+				'api_request' => [$json_itemid],
+				'expected_result' => [
+					'itemids' => [$json_itemid]
 				],
 				'expected_error' => false
 			]

@@ -19,10 +19,9 @@
  */
 class CSvgGraphMetricsLine extends CSvgGroup {
 
-	private $metric_paths;
-	private $metric;
-
-	private $options;
+	private array $metric_paths;
+	private array $metric;
+	private array $options;
 
 	public function __construct(array $metric_paths, array $metric) {
 		parent::__construct();
@@ -126,6 +125,9 @@ class CSvgGraphMetricsLine extends CSvgGroup {
 	public function toString($destroy = true): string {
 		$this
 			->setAttribute('data-set', $this->options['type'] == SVG_GRAPH_TYPE_LINE ? 'line' : 'staircase')
+			->setAttribute('data-itemid', $this->metric['itemid'])
+			->setAttribute('data-itemids', $this->metric['itemids'])
+			->setAttribute('data-ds', $this->metric['data_set'])
 			->setAttribute('data-metric', $this->metric['name'])
 			->setAttribute('data-color', $this->options['color'])
 			->draw();

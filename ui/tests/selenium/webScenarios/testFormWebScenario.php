@@ -164,10 +164,10 @@ class testFormWebScenario extends CWebTest {
 			'Agent' => ['value' => 'Zabbix'],
 			'id:agent_other' => ['visible' => false, 'maxlength' => 255],
 			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
-			'xpath:(//table[@id="variables"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(//table[@id="variables"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
-			'xpath:(//table[@id="headers"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
-			'xpath:(//table[@id="headers"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(//table[@id="variables"]//z-textarea-flexible)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@id="variables"]//z-textarea-flexible)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(//table[@id="headers"]//z-textarea-flexible)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@id="headers"]//z-textarea-flexible)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Enabled' => ['value' => true]
 		];
 
@@ -236,7 +236,7 @@ class testFormWebScenario extends CWebTest {
 
 			// Fill in some data in first row and check that Remove buttons and draggable icon became enabled.
 			foreach(['Name', 'Value'] as $column) {
-				$row->getColumn($column)->query('xpath:./textarea')->one()->fill('zabbix');
+				$row->getColumn($column)->query('xpath:./z-textarea-flexible')->one()->fill('zabbix');
 			}
 			$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 

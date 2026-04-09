@@ -95,6 +95,9 @@ class CControllerMediatypeMessageEdit extends CController {
 			]
 		];
 
+		$output['js_validation_rules'] = (new CFormValidator(CControllerMediatypeMessageCheck::getValidationRules()))
+			->getRules();
+
 		$this->setResponse(new CControllerResponseData($output));
 	}
 }

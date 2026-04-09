@@ -73,6 +73,17 @@ function getDatasetTab(CWidgetFormView $form, array $fields): array {
 function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 	$source = $form->registerField(new CWidgetFieldRadioButtonListView($fields['source']));
 
+	$labels_in_hostnames = null;
+
+	if (array_key_exists('show_hostnames', $fields)) {
+		$show_hostnames = $form->registerField(new CWidgetFieldRadioButtonListView($fields['show_hostnames']));
+
+		$labels_in_hostnames = [
+			$show_hostnames->getLabel(),
+			new CFormField($show_hostnames->getView())
+		];
+	}
+
 	return (new CDiv())
 		->addClass(ZBX_STYLE_GRID_COLUMNS)
 		->addItem(
@@ -81,6 +92,9 @@ function getDisplayOptionsTab(CWidgetFormView $form, array $fields): CDiv {
 					$source->getLabel(),
 					new CFormField($source->getView())
 				])
+		)
+		->addItem(
+			(new CFormGrid())->addItem($labels_in_hostnames)
 		);
 }
 

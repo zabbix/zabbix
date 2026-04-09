@@ -29,10 +29,6 @@ class CItemTypeHttpAgent extends CItemType {
 		'delay', 'allow_traps', 'trapper_hosts'
 	];
 
-	const POSTS_JSON_MACROS_N = ['{HOST.IP}', '{HOST.CONN}', '{HOST.DNS}', '{HOST.PORT}', '{HOST.HOST}', '{HOST.NAME}',
-		'{ITEM.ID}', '{ITEM.KEY}', '{ITEM.KEY.ORIG}'
-	];
-
 	/**
 	 * @inheritDoc
 	 */

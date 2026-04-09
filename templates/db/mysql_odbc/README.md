@@ -12,9 +12,7 @@ Zabbix version: 8.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- MySQL 5.7, 8.0, 9.4
-- Percona 8.4
-- MariaDB 10.6, 11.8
+- MySQL 5.7, 8.0, 8.4.7, 9.4
 
 ## Configuration
 
@@ -29,17 +27,15 @@ CREATE USER 'zbx_monitor'@'%' IDENTIFIED BY '<password>';
 GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW ON *.* TO 'zbx_monitor'@'%';
 ```
 
-For more information, please see MySQL documentation https://dev.mysql.com/doc/refman/8.0/en/grant.html.
+For more information, please see MySQL documentation: https://dev.mysql.com/doc/refman/8.0/en/grant.html.
 
-**NOTE:** In order to collect replication metrics, MariaDB Enterprise Server 10.5.8-5 and above and MariaDB Community Server 10.5.9 and above require the `SLAVE MONITOR` privilege to be set for the monitoring user:
+2. Set the username and password in the host macros `{$MYSQL.USER}` and `{$MYSQL.PASSWORD}` if they are not already specified in the `odbc.ini` configuration file for ODBC monitoring.
 
-```text
-GRANT REPLICATION CLIENT,PROCESS,SHOW DATABASES,SHOW VIEW,SLAVE MONITOR ON *.* TO 'zbx_monitor'@'%';
-```
-
-For more information please read the MariaDB documentation https://mariadb.com/docs/server/ref/mdb/privileges/SLAVE_MONITOR/.
-
-2. Set the username and password in the host macros `{$MYSQL.USER}` and `{$MYSQL.PASSWORD}`.
+Optionally, it is possible to customize the template:
+- The discovery of tables is disabled by default. To enable table discovery, change the value of the macro `{$MYSQL.TABLE.NAMES.MATCHES}` to the name of a single table, or use a regex string to include multiple tables.
+- You can also add an additional context macro `{$MYSQL.TABLE.NAMES.MATCHES:<dbname>}` for specific databases to precisely control which tables should be discovered.
+- To exclude certain tables from discovery, change the value of the macro `{$MYSQL.TABLE.NAMES.NOT_MATCHES}` to the name of a single table, or use a regex string to exclude multiple tables.
+- You can also add an additional context macro `{$MYSQL.TABLE.NAMES.NOT_MATCHES:<dbname>}` for specific databases to precisely control which tables should be excluded.
 
 
 ### Macros used
@@ -52,13 +48,26 @@ For more information please read the MariaDB documentation https://mariadb.com/d
 |{$MYSQL.ABORTED_CONN.MAX.WARN}|<p>Number of failed attempts to connect to the MySQL server for trigger expressions.</p>|`3`|
 |{$MYSQL.REPL_LAG.MAX.WARN}|<p>Amount of time the slave is behind the master for trigger expressions.</p>|`30m`|
 |{$MYSQL.SLOW_QUERIES.MAX.WARN}|<p>Number of slow queries for trigger expressions.</p>|`3`|
-|{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percentage for trigger expressions.</p>|`50`|
+|{$MYSQL.FULLSCAN.RATIO.WARN}|<p>Warning threshold for full table scan ratio.</p>|`0.1`|
+|{$MYSQL.FULLSCAN.SELECT_RATE.MIN.WARN}|<p>The minimum `SELECT` statement rate (per second) for trigger expressions.</p>|`5`|
+|{$MYSQL.BUFF_UTIL.MIN.WARN}|<p>The minimum buffer pool utilization in percent for trigger expressions.</p>|`50`|
 |{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created in memory per second for trigger expressions.</p>|`30`|
 |{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}|<p>The maximum number of temporary tables created on a disk per second for trigger expressions.</p>|`10`|
 |{$MYSQL.CREATED_TMP_FILES.MAX.WARN}|<p>The maximum number of temporary files created on a disk per second for trigger expressions.</p>|`10`|
 |{$MYSQL.INNODB_LOG_FILES}|<p>Number of physical files in the InnoDB redo log for calculating `innodb_log_file_size`.</p>|`2`|
 |{$MYSQL.DBNAME.MATCHES}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$MYSQL.DBNAME.NOT_MATCHES}|<p>Filter to exclude discovered databases.</p>|`information_schema`|
+|{$MYSQL.TABLE.NAMES.MATCHES}|<p>Filter of discoverable tables. Use a context to change the filter of discoverable tables for a specific database.</p>|`CHANGE_IF_NEEDED`|
+|{$MYSQL.TABLE.NAMES.NOT_MATCHES}|<p>Filter to exclude discovered tables. Use a context to change the filter to exclude discovered tables for a specific database.</p>|`CHANGE_IF_NEEDED`|
+|{$MYSQL.TOTALSIZE.GROWTH.MAX.WARN}|<p>The warning threshold of the total table size growth for trigger expressions.</p>|`300M`|
+|{$MYSQL.TOTALSIZE.GROWTH.MAX.CRIT}|<p>The critical threshold of the total table size growth for trigger expressions.</p>|`1G`|
+|{$MYSQL.FRAGMENTATION.WARN}|<p>The free ratio threshold for warning fragmentation trigger expressions.</p>|`0.3`|
+|{$MYSQL.FRAGMENTATION.CRIT}|<p>The free ratio threshold for critical fragmentation trigger expressions.</p>|`0.6`|
+|{$MYSQL.DATA_FREE.MIN.WARN}|<p>The minimum `Data_free` value for warning fragmentation trigger expressions.</p>|`1G`|
+|{$MYSQL.DATA_FREE.MIN.CRIT}|<p>The minimum `Data_free` value for critical fragmentation trigger expressions.</p>|`5G`|
+|{$MYSQL.TABLE_SIZE.MIN.WARN}|<p>The minimum table size for warning fragmentation trigger expressions.</p>|`3G`|
+|{$MYSQL.TABLE_SIZE.MIN.CRIT}|<p>The minimum table size for critical fragmentation trigger expressions.</p>|`10G`|
+|{$MYSQL.REPLICA.STATUS.MIN.VER}|<p>Minimum MySQL version for `SHOW REPLICA STATUS` (`SHOW SLAVE STATUS` deprecated).</p>|`8.0.22`|
 
 ### Items
 
@@ -66,8 +75,7 @@ For more information please read the MariaDB documentation https://mariadb.com/d
 |----|-----------|----|-----------------------|
 |Get status variables|<p>Gets server global status information.</p>|Database monitor|db.odbc.get[get_status_variables,"{$MYSQL.DSN}"]|
 |Get database|<p>Used for scanning databases in DBMS.</p>|Database monitor|db.odbc.get[get_database,"{$MYSQL.DSN}"]|
-|Get replication|<p>Gets replication status information.</p>|Database monitor|db.odbc.get[get_replication,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `deprecated`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Status|<p>MySQL server status.</p>|Database monitor|db.odbc.select[ping,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
+|Status|<p>MySQL server status.</p>|Database monitor|db.odbc.select[ping,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Version|<p>MySQL server version.</p>|Database monitor|db.odbc.select[version,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Uptime|<p>Number of seconds that the server has been up.</p>|Dependent item|mysql.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Uptime')].Value.first()`</p></li></ul>|
 |Aborted clients per second|<p>Number of connections that were aborted because the client died without closing the connection properly.</p>|Dependent item|mysql.aborted_clients.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Aborted_clients')].Value.first()`</p></li><li>Change per second</li></ul>|
@@ -95,94 +103,142 @@ For more information please read the MariaDB documentation https://mariadb.com/d
 |InnoDB buffer pool read requests per second|<p>Number of logical read requests per second.</p>|Dependent item|mysql.innodb_buffer_pool_read_requests.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
 |InnoDB buffer pool reads|<p>Number of logical reads that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.</p>|Dependent item|mysql.innodb_buffer_pool_reads<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
 |InnoDB buffer pool reads per second|<p>Number of logical reads per second that InnoDB could not satisfy from the buffer pool and had to read directly from the disk.</p>|Dependent item|mysql.innodb_buffer_pool_reads.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li>Change per second</li></ul>|
+|InnoDB log waits per second|<p>Number of InnoDB log waits per second. An increase in this per-second value indicates that threads are increasingly waiting for redo log writes, which typically points to disk subsystem performance issues or an `innodb_log_file_size` that is too small.</p>|Dependent item|mysql.innodb_log_waits.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_log_waits')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB row lock time|<p>The total time spent in acquiring row locks for InnoDB tables, in milliseconds.</p>|Dependent item|mysql.innodb_row_lock_time<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_row_lock_time')].Value.first()`</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|InnoDB row lock wait time avg|<p>Average time spent waiting for row locks in InnoDB, in milliseconds.</p>|Dependent item|mysql.innodb_row_lock_time_avg<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB row lock time max|<p>The maximum time to acquire a row lock for InnoDB tables, in milliseconds.</p>|Dependent item|mysql.innodb_row_lock_time_max<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Custom multiplier: `0.001`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |InnoDB row lock waits|<p>Number of times operations on InnoDB tables had to wait for a row lock.</p>|Dependent item|mysql.innodb_row_lock_waits<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_row_lock_waits')].Value.first()`</p></li></ul>|
+|InnoDB row lock current waits|<p>Current number of active row lock waits in InnoDB.</p>|Dependent item|mysql.innodb_row_lock_current_waits<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li></ul>|
+|InnoDB rows deleted per second|<p>Number of rows deleted from InnoDB tables per second.</p>|Dependent item|mysql.innodb_rows_deleted.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_deleted')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|InnoDB rows inserted per second|<p>Number of rows inserted into InnoDB tables per second.</p>|Dependent item|mysql.innodb_rows_inserted.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_inserted')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|InnoDB rows read per second|<p>Number of rows read from InnoDB tables per second.</p>|Dependent item|mysql.innodb_rows_read.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_read')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|InnoDB rows update per second|<p>Number of rows updated in InnoDB tables per second.</p>|Dependent item|mysql.innodb_rows_updated.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_rows_updated')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |Slow queries per second|<p>Number of queries that have taken more than `long_query_time` seconds.</p>|Dependent item|mysql.slow_queries.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Slow_queries')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Bytes received|<p>Number of bytes received from all clients.</p>|Dependent item|mysql.bytes_received.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Bytes_received')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Bytes sent|<p>Number of bytes sent to all clients.</p>|Dependent item|mysql.bytes_sent.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Bytes_sent')].Value.first()`</p></li><li>Change per second</li></ul>|
-|Command Delete per second|<p>The `Com_delete` counter variable indicates the number of times the `DELETE` statement has been executed.</p>|Dependent item|mysql.com_delete.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_delete')].Value.first()`</p></li><li>Change per second</li></ul>|
-|Command Insert per second|<p>The `Com_insert` counter variable indicates the number of times the `INSERT` statement has been executed.</p>|Dependent item|mysql.com_insert.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_insert')].Value.first()`</p></li><li>Change per second</li></ul>|
-|Command Select per second|<p>The `Com_select` counter variable indicates the number of times the `SELECT` statement has been executed.</p>|Dependent item|mysql.com_select.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_select')].Value.first()`</p></li><li>Change per second</li></ul>|
-|Command Update per second|<p>The `Com_update` counter variable indicates the number of times the `UPDATE` statement has been executed.</p>|Dependent item|mysql.com_update.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_update')].Value.first()`</p></li><li>Change per second</li></ul>|
+|Command delete per second|<p>The `Com_delete` counter variable indicates the number of times the `DELETE` statement has been executed.</p>|Dependent item|mysql.com_delete.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_delete')].Value.first()`</p></li><li>Change per second</li></ul>|
+|Command insert per second|<p>The `Com_insert` counter variable indicates the number of times the `INSERT` statement has been executed.</p>|Dependent item|mysql.com_insert.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_insert')].Value.first()`</p></li><li>Change per second</li></ul>|
+|Command select per second|<p>The `Com_select` counter variable indicates the number of times the `SELECT` statement has been executed.</p>|Dependent item|mysql.com_select.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_select')].Value.first()`</p></li><li>Change per second</li></ul>|
+|Command update per second|<p>The `Com_update` counter variable indicates the number of times the `UPDATE` statement has been executed.</p>|Dependent item|mysql.com_update.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Com_update')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Queries per second|<p>Number of statements executed by the server. This variable includes statements executed within stored programs, unlike the `Questions` variable.</p>|Dependent item|mysql.queries.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Queries')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Questions per second|<p>Number of statements executed by the server. This includes only statements sent to the server by clients and not statements executed within stored programs, unlike the `Queries` variable.</p>|Dependent item|mysql.questions.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Questions')].Value.first()`</p></li><li>Change per second</li></ul>|
 |Binlog cache disk use|<p>Number of transactions that used a temporary disk cache because they could not fit in the regular binary log cache, being larger than `binlog_cache_size`.</p>|Dependent item|mysql.binlog_cache_disk_use<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Binlog_cache_disk_use')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Innodb buffer pool wait free|<p>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the numbers of wait for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.</p>|Dependent item|mysql.innodb_buffer_pool_wait_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Innodb number open files|<p>Number of open files held by InnoDB. InnoDB only.</p>|Dependent item|mysql.innodb_num_open_files<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_num_open_files')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Select scan per second|<p>The number of `SELECT` queries that required a full table scan. A high value indicates a lack of or improper use of indexes.</p>|Dependent item|mysql.select_scan.rate<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Select_scan')].Value.first()`</p></li><li>Change per second</li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Full table scan ratio|<p>The ratio of `SELECT` statements executed as full table scans to all `SELECT` statements.</p>|Calculated|mysql.full_scans.ratio<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|InnoDB buffer pool wait free|<p>Number of times InnoDB waited for a free page before reading or creating a page. Normally, writes to the InnoDB buffer pool happen in the background. When no clean pages are available, dirty pages are flushed first in order to free some up. This counts the number of waits for this operation to finish. If this value is not small, look at the increasing `innodb_buffer_pool_size`.</p>|Dependent item|mysql.innodb_buffer_pool_wait_free<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|InnoDB number open files|<p>Number of open files held by InnoDB. InnoDB only.</p>|Dependent item|mysql.innodb_num_open_files<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_num_open_files')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Open table definitions|<p>Number of cached table definitions.</p>|Dependent item|mysql.open_table_definitions<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 |Open tables|<p>Number of tables that are open.</p>|Dependent item|mysql.open_tables<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Open_tables')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Innodb log written|<p>Number of bytes written to the InnoDB log.</p>|Dependent item|mysql.innodb_os_log_written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_os_log_written')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Calculated value of innodb_log_file_size|<p>`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$MYSQL.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of the each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p>|Calculated|mysql.innodb_log_file_size<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|InnoDB log written|<p>Number of bytes written to the InnoDB log.</p>|Dependent item|mysql.innodb_os_log_written<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Innodb_os_log_written')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Calculated value of innodb_log_file_size|<p>`Innodb_log_file_size` is calculated as: (`innodb_os_log_written`-`innodb_os_log_written`(time shift -1h))/`{$MYSQL.INNODB_LOG_FILES}`. `Innodb_log_file_size` is the size in bytes of each InnoDB redo log file in the log group. The combined size can be no more than 512 GB. Larger values mean less disk I/O due to less flushing checkpoint activity, but also slower recovery from a crash.</p>|Calculated|mysql.innodb_log_file_size<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MySQL: Service is down|<p>MySQL is down.</p>|`last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0`|High||
+|MySQL: Service is unreachable|<p>MySQL is unreachable.</p>|`last(/MySQL by ODBC/db.odbc.select[ping,"{$MYSQL.DSN}"])=0`|High||
 |MySQL: Version has changed|<p>The MySQL version has changed. Acknowledge to close the problem manually.</p>|`last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"],#1)<>last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"],#2) and length(last(/MySQL by ODBC/db.odbc.select[version,"{$MYSQL.DSN}"]))>0`|Info|**Manual close**: Yes|
 |MySQL: Service has been restarted|<p>MySQL uptime is less than 10 minutes.</p>|`last(/MySQL by ODBC/mysql.uptime)<10m`|Info||
-|MySQL: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MySQL by ODBC/mysql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>MySQL: Service is down</li></ul>|
-|MySQL: Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server is more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by ODBC/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}`|Average|**Depends on**:<br><ul><li>MySQL: Refused connections</li></ul>|
+|MySQL: Failed to fetch info data|<p>Zabbix has not received any data for items for the last 30 minutes.</p>|`nodata(/MySQL by ODBC/mysql.uptime,30m)=1`|Info|**Depends on**:<br><ul><li>MySQL: Service is unreachable</li></ul>|
+|MySQL: Server has aborted connections|<p>The number of failed attempts to connect to the MySQL server has been more than `{$MYSQL.ABORTED_CONN.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by ODBC/mysql.aborted_connects.rate,5m)>{$MYSQL.ABORTED_CONN.MAX.WARN}`|Average|**Depends on**:<br><ul><li>MySQL: Refused connections</li></ul>|
 |MySQL: Refused connections|<p>Number of refused connections due to the `max_connections` limit being reached.</p>|`last(/MySQL by ODBC/mysql.connection_errors_max_connections.rate)>0`|Average||
-|MySQL: Buffer pool utilization is too low|<p>The buffer pool utilization is less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p>|`max(/MySQL by ODBC/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN}`|Warning||
+|MySQL: Buffer pool utilization is too low|<p>The buffer pool utilization has been less than `{$MYSQL.BUFF_UTIL.MIN.WARN}`% in the last 5 minutes with server uptime over 1 hour. This means that there is a lot of unused RAM allocated for the buffer pool, which you can easily reallocate at the moment.</p>|`max(/MySQL by ODBC/mysql.buffer_pool_utilization,5m)<{$MYSQL.BUFF_UTIL.MIN.WARN} and last(/MySQL by ODBC/mysql.uptime)>3600`|Warning||
 |MySQL: Number of temporary files created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by ODBC/mysql.created_tmp_files.rate,5m)>{$MYSQL.CREATED_TMP_FILES.MAX.WARN}`|Warning||
 |MySQL: Number of on-disk temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by ODBC/mysql.created_tmp_disk_tables.rate,5m)>{$MYSQL.CREATED_TMP_DISK_TABLES.MAX.WARN}`|Warning||
 |MySQL: Number of internal temporary tables created per second is high|<p>The application using the database may be in need of query optimization.</p>|`min(/MySQL by ODBC/mysql.created_tmp_tables.rate,5m)>{$MYSQL.CREATED_TMP_TABLES.MAX.WARN}`|Warning||
-|MySQL: Server has slow queries|<p>The number of slow queries is more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by ODBC/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}`|Warning||
+|MySQL: Server has slow queries|<p>The number of slow queries has been more than `{$MYSQL.SLOW_QUERIES.MAX.WARN}` in the last 5 minutes.</p>|`min(/MySQL by ODBC/mysql.slow_queries.rate,5m)>{$MYSQL.SLOW_QUERIES.MAX.WARN}`|Warning||
+|MySQL: High rate of full table scans|<p>The rate of `SELECT` statements exceeds `{$MYSQL.FULLSCAN.SELECT_RATE.MIN.WARN}` per second and the full table scan ratio has been above `{$MYSQL.FULLSCAN.RATIO.WARN}` for the last 5 minutes.</p>|`avg(/MySQL by ODBC/mysql.full_scans.ratio,5m)>{$MYSQL.FULLSCAN.RATIO.WARN} and avg(/MySQL by ODBC/mysql.com_select.rate,5m)>{$MYSQL.FULLSCAN.SELECT_RATE.MIN.WARN}`|Warning||
 
 ### LLD rule Database discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database discovery|<p>Used for the discovery of the databases.</p>|Dependent item|mysql.database.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Database discovery|<p>Used for the discovery of databases.</p>|Dependent item|mysql.database.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Database discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Size of database {#DATABASE}|<p>Database size.</p>|Database monitor|db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Database [{#DATABASE}]: Size|<p>Database size.</p>|Database monitor|db.odbc.select[{#DATABASE}_size,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### LLD rule Database [{#DATABASE}]: Enable table discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Database [{#DATABASE}]: Enable table discovery|<p>Used to enable table discovery.</p>|Script|mysql.table.enable.discovery[{#DATABASE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+
+### Item prototypes for Database [{#DATABASE}]: Enable table discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Database [{#DATABASE}]: Get tables|<p>Database table discovery.</p>|Database monitor|db.odbc.get[{#SINGLETON}{#DATABASE}_tables,"{$MYSQL.DSN}"]|
+
+### LLD rule Database [{#DATABASE}]: Table discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Database [{#DATABASE}]: Table discovery|<p>Used for the discovery of tables of the databases.</p>|Dependent item|mysql.tables.discovery[{#SINGLETON}{#DATABASE}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+
+### Item prototypes for Database [{#DATABASE}]: Table discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Get data|<p>Database table data.</p>|Database monitor|db.odbc.get[{#SINGLETON}{#DATABASE}/{#TABLE_NAME}.data,"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Data length|<p>The size of the data in the table.</p>|Dependent item|mysql.table.data_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DATA_LENGTH`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Index length|<p>The size occupied by the table's indexes.</p>|Dependent item|mysql.table.index_length[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.INDEX_LENGTH`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Total size|<p>The sum of `DATA_LENGTH` and `INDEX_LENGTH` represents the total size of the table.</p>|Calculated|mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Data free|<p>The amount of unused but allocated space.</p>|Dependent item|mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.DATA_FREE`</p></li><li><p>Custom multiplier: `1`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Free ratio|<p>The fraction of allocated table space that is currently unused (`DATA_FREE` / (`DATA_LENGTH` + `INDEX_LENGTH`)).</p><p>High values indicate potential table fragmentation or inefficient space usage.</p>|Calculated|mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Table [{#DATABASE}/{#TABLE_NAME}]: Rows|<p>The approximate number of rows in the table. For InnoDB, the `TABLE_ROWS` value is approximate and may differ from the actual count.</p>|Dependent item|mysql.table.rows[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.TABLE_ROWS`</p></li><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Database [{#DATABASE}]: Table discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is too high|<p>Total table size growth is too high.</p>|`(last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"])-min(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"],5m))>{$MYSQL.TOTALSIZE.GROWTH.MAX.CRIT}`|High||
+|MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is high|<p>Total table size growth is high.</p>|`(last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"])-min(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"],5m))>{$MYSQL.TOTALSIZE.GROWTH.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Total size growth is too high</li></ul>|
+|MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space very high|<p>Free table space is very high (fragmentation critical).</p>|`last(/MySQL by ODBC/mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.FRAGMENTATION.CRIT} and last(/MySQL by ODBC/mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.DATA_FREE.MIN.CRIT} and last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.TABLE_SIZE.MIN.CRIT}`|High||
+|MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space high|<p>Free table space is high (fragmentation warning).</p>|`last(/MySQL by ODBC/mysql.table.free_ratio[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.FRAGMENTATION.WARN} and last(/MySQL by ODBC/mysql.table.data_free[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.DATA_FREE.MIN.WARN} and last(/MySQL by ODBC/mysql.table.total_size[{#SINGLETON}{#DATABASE}/{#TABLE_NAME},"{$MYSQL.DSN}"]) > {$MYSQL.TABLE_SIZE.MIN.WARN}`|Warning|**Depends on**:<br><ul><li>MySQL: Table [{#DATABASE}/{#TABLE_NAME}]: Free space very high</li></ul>|
 
 ### LLD rule Replication discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>Discovery of the replication.</p>|Dependent item|mysql.replication.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Replication discovery|<p>Discovery of the replication.</p>|Dependent item|mysql.replication.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication {#REPLICA.NAME} status|<p>Gets status information on the essential parameters of the {#REPLICA.KEY} threads.</p>|Database monitor|db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Replication {#REPLICA.NAME} SQL Running State|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Replication Seconds Behind {#SOURCE.NAME}|<p>The number of seconds the {#REPLICA.KEY} SQL thread has been behind processing the {#SOURCE.KEY} binary log. A high number (or an increasing one) can indicate that the {#REPLICA.KEY} is unable to handle events from the {#SOURCE.KEY} in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_Master`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication {#REPLICA.NAME} IO Running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|mysql.slave_io_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_IO_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Replication {#REPLICA.NAME} SQL Running|<p>Whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#REPLICA.KEY}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Slave_SQL_Running`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication {#REPLICA.KEY} status|<p>Gets status information on the essential parameters of the `{#REPLICA.KEY}` threads.</p>|Database monitor|db.odbc.get["get_{#REPLICA.KEY}_status","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 
-### Trigger prototypes for Replication discovery
+### LLD rule Replication [{#REPLICA.KEY}]: Replica discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Replication [{#REPLICA.KEY}]: Replica discovery|<p>Discovery of the replication.</p>|Dependent item|mysql.replication.discovery["{#REPLICA.KEY}_discovery","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+
+### Item prototypes for Replication [{#REPLICA.KEY}]: Replica discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Replication: Get data|<p>Gets status information on the essential parameters of the `{#REPLICA.KEY}` threads.</p>|Database monitor|db.odbc.get["{#REPLICA.KEY}/{#REPLICA.NAME}_get_data","{$MYSQL.DSN}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Replication: {#SOURCE.NAME} Host|<p>Describes the hostname or IP address of the MySQL primary (source/master) server that the replica uses.</p>|Dependent item|mysql.master_host["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#SOURCE.NAME}_Host`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication: SQL running state|<p>Shows the state of the SQL driver threads.</p>|Dependent item|mysql.slave_sql_running_state["{#REPLICA.KEY}.{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_SQL_Running_State`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication: Seconds behind {#SOURCE.NAME}|<p>The number of seconds the `{#REPLICA.KEY}` SQL thread has been behind processing the `{#SOURCE.KEY}` binary log. A high number (or an increasing one) can indicate that the `{#REPLICA.KEY}` is unable to handle events from the `{#SOURCE.KEY}` in a timely fashion.</p>|Dependent item|mysql.seconds_behind_master["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Seconds_Behind_{#SOURCE.NAME}`</p></li><li><p>Matches regular expression: `\d+`</p><p>⛔️Custom on fail: Set error to: `Replication is not performed.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication: {#REPLICA.NAME} IO running|<p>Indicates whether the I/O thread for reading the `{#SOURCE.KEY}` binary log is running. Normally, you want this to be `Yes` unless you have not yet started a replication or have explicitly stopped it with `stop {#REPLICA.KEY}`.</p>|Dependent item|mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_IO_Running`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication: {#REPLICA.NAME} SQL running|<p>Indicates whether the SQL thread for executing events in the relay log is running.</p><p>As with the I/O thread, this should normally be `Yes`.</p>|Dependent item|mysql.slave_sql_running["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.{#REPLICA.NAME}_SQL_Running`</p></li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Replication: {#REPLICA.NAME} Last IO error|<p>Describes the last I/O error message reported by the replica I/O thread that caused replication to stop or behave incorrectly.</p>|Dependent item|mysql.slave_io_error["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Last_IO_Error`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Replication: {#REPLICA.NAME} Last SQL error|<p>Describes the last SQL error message reported by the replica SQL thread that caused replication to stop or behave incorrectly.</p>|Dependent item|mysql.slave_sql_error["{#REPLICA.KEY}/{#REPLICA.NAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Last_SQL_Error`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+
+### Trigger prototypes for Replication [{#REPLICA.KEY}]: Replica discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by ODBC/mysql.seconds_behind_master["{#REPLICA.KEY}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
-|MySQL: The {#REPLICA.KEY} I/O thread is not running|<p>Whether the I/O thread for reading the {#SOURCE.KEY}'s binary log is running.</p>|`count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"eq","No")=1`|Average||
-|MySQL: The {#REPLICA.KEY} I/O thread is not connected to a replication {#SOURCE.KEY}|<p>Whether the {#REPLICA.KEY} I/O thread is connected to the {#SOURCE.KEY}.</p>|`count(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}"],#1,"ne","Yes")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
-|MySQL: The SQL thread is not running|<p>Whether the SQL thread for executing events in the relay log is running.</p>|`count(/MySQL by ODBC/mysql.slave_sql_running["{#REPLICA.KEY}"],#1,"eq","No")=1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
-
-### LLD rule MariaDB discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|MariaDB discovery|<p>Used for additional metrics if MariaDB is used.</p>|Dependent item|mysql.extra_metric.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-
-### Item prototypes for MariaDB discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Binlog commits|<p>Total number of transactions committed to the binary log.</p>|Dependent item|mysql.binlog_commits[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Binlog_commits')].Value.first()`</p></li></ul>|
-|Binlog group commits|<p>Total number of group commits done to the binary log.</p>|Dependent item|mysql.binlog_group_commits[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Binlog_group_commits')].Value.first()`</p></li></ul>|
-|Master GTID wait count|<p>The number of times `MASTER_GTID_WAIT` called.</p>|Dependent item|mysql.master_gtid_wait_count[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Master GTID wait time|<p>Total number of time spent in `MASTER_GTID_WAIT`.</p>|Dependent item|mysql.master_gtid_wait_time[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$[?(@.Variable_name=='Master_gtid_wait_time')].Value.first()`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|Master GTID wait timeouts|<p>Number of timeouts occurring in `MASTER_GTID_WAIT`.</p>|Dependent item|mysql.master_gtid_wait_timeouts[{#SINGLETON}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|MySQL: Replication lag is too high|<p>Replication delay is too long.</p>|`min(/MySQL by ODBC/mysql.seconds_behind_master["{#REPLICA.KEY}/{#REPLICA.NAME}"],5m)>{$MYSQL.REPL_LAG.MAX.WARN}`|Warning||
+|MySQL: The {#REPLICA.KEY} I/O thread is not running|<p>Indicates whether the I/O thread for reading the `{#SOURCE.KEY}` binary log is running.</p>|`last(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0`|Average||
+|MySQL: The {#REPLICA.KEY} I/O thread is not connected to a replication {#SOURCE.KEY}|<p>Indicates whether the `{#REPLICA.KEY}` I/O thread is connected to the `{#SOURCE.KEY}`.</p>|`last(/MySQL by ODBC/mysql.slave_io_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])<>1`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
+|MySQL: The SQL thread is not running|<p>Indicates whether the SQL thread for executing events in the relay log is running.</p>|`last(/MySQL by ODBC/mysql.slave_sql_running["{#REPLICA.KEY}/{#REPLICA.NAME}"])=0`|Warning|**Depends on**:<br><ul><li>MySQL: The {#REPLICA.KEY} I/O thread is not running</li></ul>|
 
 ## Feedback
 

@@ -2,6 +2,7 @@
     "name": "duosecurity/duo_universal_php",
     "description": "A PHP implementation of the Duo Universal SDK.",
     "homepage": "https://duo.com/",
+    "license": "BSD-3-Clause",
     "support": {
         "email": "support@duosecurity.com"
     },
@@ -16,7 +17,7 @@
         }
     },
     "require": {
-        "php": ">=7.3",
+        "php": ">=7.4",
         "ext-curl": "*",
         "ext-json": "*",
         "firebase/php-jwt": "^6.0"

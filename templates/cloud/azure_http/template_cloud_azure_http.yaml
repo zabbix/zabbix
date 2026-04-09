@@ -1304,7 +1304,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Cloud
       items:
@@ -1421,7 +1421,8 @@ zabbix_export:
             		{"method": "Microsoft.Compute/virtualMachineScaleSets", "version": "2024-03-01"},
             		{"method": "Microsoft.Sql/managedInstances", "version": "2024-05-01-preview"},
             		{"method": "Microsoft.DataProtection/backupVaults", "version": "2025-01-01"},
-            		{"method": "Microsoft.RecoveryServices/vaults", "version": "2025-02-28-preview"}
+            		{"method": "Microsoft.RecoveryServices/vaults", "version": "2025-02-28-preview"},
+            		{"method": "Microsoft.OperationalInsights/workspaces", "version": "2025-07-01"}
             	];
             	data['errors'] = {},
             	data['resources'] = {};
@@ -1467,6 +1468,25 @@ zabbix_export:
             							mssql_dbs.value.forEach(function (value) {
             								raw_data.value.push(value);
             							});
+            						}
+            					}
+            				}
+            				else if (types[i].method === "Microsoft.OperationalInsights/workspaces") {
+            					workspace_list = Azure.request('https://management.azure.com/subscriptions/' + encodeURIComponent(Azure.params.subscription_id) + '/providers/' + types[i].method + '?api-version=' + types[i].version);
+            					if ('nextLink' in workspace_list) {
+            						workspace_list = Azure.nextlink(workspace_list);
+            					}
+            
+            					if ('value' in workspace_list && workspace_list.value.length > 0) {
+            						for (j in workspace_list.value) {
+            							try {
+            								answer = Azure.request('https://management.azure.com/' + encodeURIComponent(workspace_list.value[j].id) + '/providers/Microsoft.SecurityInsights/onboardingStates?api-version=2025-09-01');
+            							}
+            							catch (error) {
+            								continue;
+            							}
+            
+            							raw_data.value.push(workspace_list.value[j]);
             						}
             					}
             				}
@@ -3753,6 +3773,68 @@ zabbix_export:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 6h
+        - uuid: a568b6231c2346a0b6376a4e9ac9ad3a
+          name: 'Azure Workspace discovery'
+          type: DEPENDENT
+          key: azure.workspace.discovery
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
+              - macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#LOCATION}'
+                value: '{$AZURE.WORKSPACE.LOCATION.MATCHES}'
+              - macro: '{#LOCATION}'
+                value: '{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#NAME}'
+                value: '{$AZURE.WORKSPACE.NAME.MATCHES}'
+              - macro: '{#NAME}'
+                value: '{$AZURE.WORKSPACE.NAME.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#TYPE}'
+                value: ^Microsoft.OperationalInsights/workspaces$
+          description: 'The list of Azure workspaces provided by the subscription.'
+          host_prototypes:
+            - uuid: adfc06e7becd410c837fbbf8fddfb510
+              host: 'Azure workspace {#NAME}'
+              name: 'Azure workspace {#NAME}'
+              group_links:
+                - group:
+                    name: Applications
+              templates:
+                - name: 'Azure Sentinel by HTTP'
+              macros:
+                - macro: '{$AZURE.RESOURCE.ID}'
+                  value: '{#ID}'
+              tags:
+                - tag: location
+                  value: '{#LOCATION}'
+                - tag: resource-group
+                  value: '{#GROUP}'
+          master_item:
+            key: azure.get.resources
+          lld_macro_paths:
+            - lld_macro: '{#GROUP}'
+              path: $.resourceGroup
+            - lld_macro: '{#ID}'
+              path: $.id
+            - lld_macro: '{#LOCATION}'
+              path: $.location
+            - lld_macro: '{#NAME}'
+              path: $.name
+            - lld_macro: '{#TYPE}'
+              path: $.type
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.resources.value
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
       tags:
         - tag: class
           value: cloud
@@ -4202,6 +4284,42 @@ zabbix_export:
             section_name: Filters
             label: 'Exclude virtual machines filter'
             description: 'Regex string to exclude discovered virtual machines by name.'
+        - macro: '{$AZURE.WORKSPACE.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in workspace discovery rule.'
+          config:
+            type: TEXT
+            priority: '51'
+            section_name: Filters
+            label: 'Include VM scale set location filter'
+            description: 'Regex string to include discovered workspace locations by name.'
+        - macro: '{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in workspace discovery rule.'
+          config:
+            type: TEXT
+            priority: '52'
+            section_name: Filters
+            label: 'Exclude VM scale set location filter'
+            description: 'Regex string to exclude discovered workspace locations by name.'
+        - macro: '{$AZURE.WORKSPACE.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in workspace discovery rule.'
+          config:
+            type: TEXT
+            priority: '49'
+            section_name: Filters
+            label: 'Include VM scale set filter'
+            description: 'Regex string to include discovered workspace by name.'
+        - macro: '{$AZURE.WORKSPACE.NAME.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in workspace discovery rule.'
+          config:
+            type: TEXT
+            priority: '50'
+            section_name: Filters
+            label: 'Exclude VM scale set filter'
+            description: 'Regex string to exclude discovered workspace by name.'
       dashboards:
         - uuid: d30c78be41fe421cb98cedd7683a11f0
           name: 'Overview Azure Storage accounts'
@@ -14250,6 +14368,1688 @@ zabbix_export:
               newvalue: Unavailable
             - value: '3'
               newvalue: Unknown
+    - uuid: fbc8443b2bd846faaf946f336b92e842
+      template: 'Azure Sentinel by HTTP'
+      name: 'Azure Sentinel by HTTP'
+      description: |
+        This template is designed to monitor Microsoft Azure Sentinel by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Give the created principal the "Microsoft Sentinel Reader" role via the Azure command-line interface (Azure CLI).
+            `az role assignment create --assignee "zabbix" --role "Microsoft Sentinel Reader" --scope /subscriptions/<subscription_id>`
+          3. Link the template to a host.
+          4. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/.
+        
+        Generated by official Zabbix template tool "Templator"
+      wizard_ready: 'YES'
+      readme: |
+        ## Overview
+        
+        This template is designed to monitor Microsoft Azure Sentinel by HTTP.
+        It works without any external scripts and uses the script item.
+        
+        ## Setup
+        
+        1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+        
+              `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+        
+        > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+        
+        2. Give created principal "Microsoft Sentinel Reader" role via the Azure command-line interface (Azure CLI).
+        
+              `az role assignment create --assignee "zabbix" --role "Microsoft Sentinel Reader" --scope /subscriptions/<subscription_id>`
+        
+        
+        3. Link the template to a host.
+        4. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`, `Azure workspace`, and `Period`.
+      vendor:
+        name: Zabbix
+        version: 8.0-0
+      groups:
+        - name: Templates/Cloud
+      items:
+        - uuid: b7c8d616e02f410f9a92d897d56b64a7
+          name: 'Alert rules: Microsoft security incident creation'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.creation
+          description: 'The number of Microsoft security incident creation alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.kind == "MicrosoftSecurityIncidentCreation")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: bdbb44285ac74cad87f95a5b0f4bc07d
+          name: 'Alert rules: Disabled'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.disabled
+          description: 'The number of disabled alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.properties.enabled == "false")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: 0ae4bd3c2e2e48589b1e5f58e173a890
+          name: 'Alert rules: Enabled'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.enabled
+          description: 'The number of enabled alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.properties.enabled == "true")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: 2eaf3c28e2d94b488ee0b8a2256077e0
+          name: 'Alert rules: Fusion'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.fusion
+          description: 'The number of fusion alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.kind == "Fusion")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: 497b0f7993a44e2b9ee56a6e16993561
+          name: 'Alert rules: High severity'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.high
+          description: 'The number of high-severity alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.properties.severity == "High")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: 52f4ac19b8f345e5911092911a052596
+          name: 'Alert rules: Informational severity'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.info
+          description: 'The number of informational severity alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.properties.severity == "Informational")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: d30b8f4e517e4d03a3ad4b2593337859
+          name: 'Alert rules: Low severity'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.low
+          description: 'The number of low-severity alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.properties.severity == "Low")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: ccfccfab068a49b48d1f9d562d30f123
+          name: 'Alert rules: Medium severity'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.medium
+          description: 'The number of medium-severity alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.properties.severity == "Medium")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: fa8fc8d34eeb4b2b984db1813f2eee9d
+          name: 'Alert rules: Scheduled'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.scheduled
+          description: 'The number of scheduled alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.alertRules[?(@.kind == "Scheduled")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+        - uuid: 7db797b87f674de0ab05b0b78d0985e5
+          name: 'Alert rules: Total number'
+          type: DEPENDENT
+          key: azure.sentinel.alert_rules.total
+          description: 'The number of alert rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.alertRules.length()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: alert-rules
+            - tag: component
+              value: security
+          triggers:
+            - uuid: d4465fc2a6e845cf86883321411f49b9
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)<>0'
+              name: 'Azure Sentinel: Alert rule total has changed.'
+              event_name: 'Azure Sentinel: The number of alert rules has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              opdata: 'Current number: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The number of alert rules has changed.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: ab38afaeab6a4831969a4654f6654deb
+          name: 'Automation rules: Add incident task'
+          type: DEPENDENT
+          key: azure.sentinel.automation_rules.add_incident
+          description: 'The number of automation rules that add a task to an incident object.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.automationRules.[?(@.properties.actions.actionType == "AddIncidentTask")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: automation-rules
+            - tag: component
+              value: security
+        - uuid: 317df9556f62404bb852f7de224de8ed
+          name: 'Automation rules: On alerts'
+          type: DEPENDENT
+          key: azure.sentinel.automation_rules.alerts
+          description: 'The number of automation rules that are triggered on alerts.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.automationRules.[?(@.properties.triggeringLogic.triggersOn == "Alerts")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: automation-rules
+            - tag: component
+              value: security
+        - uuid: 6b30213cac2e4d39917042ae2a17d27f
+          name: 'Automation rules: On incidents'
+          type: DEPENDENT
+          key: azure.sentinel.automation_rules.incidents
+          description: 'The number of automation rules that are triggered on incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.automationRules.[?(@.properties.triggeringLogic.triggersOn == "Incidents")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: automation-rules
+            - tag: component
+              value: security
+        - uuid: 106d3241aea54ed2a4a2894a46c449e3
+          name: 'Automation rules: Modify properties'
+          type: DEPENDENT
+          key: azure.sentinel.automation_rules.modify
+          description: 'The number of automation rules that modify an object''s properties.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.automationRules.[?(@.properties.actions.actionType == "ModifyProperties")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: automation-rules
+            - tag: component
+              value: security
+        - uuid: 4e00c3064a4f4517b2e8c0908abac69b
+          name: 'Automation rules: Run playbook'
+          type: DEPENDENT
+          key: azure.sentinel.automation_rules.playbook
+          description: 'The number of automation rules that run a playbook on an object.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.automationRules.[?(@.properties.actions.actionType == "RunPlaybook")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: automation-rules
+            - tag: component
+              value: security
+        - uuid: 8a51949a86974699bad84a865e1fe982
+          name: 'Automation rules: Total'
+          type: DEPENDENT
+          key: azure.sentinel.automation_rules.total
+          description: 'The total number of automation rules.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.automationRules.length()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: automation-rules
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 09b5d6f0daff4b93bf3b025feac01cad
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.automation_rules.total)<>0'
+              name: 'Azure Sentinel: Automation rule total has changed.'
+              event_name: 'Azure Sentinel: The number of automation rules has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              opdata: 'Current number: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The number of automation rules has changed.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 3830108041be45f689b74140105d64fb
+          name: 'Get data'
+          type: SCRIPT
+          key: azure.sentinel.data.get
+          delay: '{$AZURE.SENTINEL.INTERVAL}'
+          history: '0'
+          value_type: TEXT
+          params: |
+            var Azure = {
+            	params: {},
+            	token: null,
+            
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id', 'period'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            
+            		Azure.params = params;
+            	},
+            
+            	login: function () {
+            		var response, login = new HttpRequest();
+            
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			login.setProxy(Azure.params.proxy);
+            		}
+            
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' + encodeURIComponent(Azure.params.password)
+            		);
+            
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
+            
+            		Azure.token = response['access_token'];
+            	},
+            
+            	request: function (url) {
+            		var response, request = new HttpRequest();
+            
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			request.setProxy(Azure.params.proxy);
+            		}
+            
+            		if (!Azure.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Azure.token);
+            		Zabbix.log(4, '[ Azure Sentinel ] request url: ' + url);
+            
+            		response = request.get(url);
+            
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
+            
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            			data = data[step];
+            		}
+            
+            		return data;
+            	},
+            
+            	toUtcIso: function (date) {
+            		var year = date.getFullYear(),
+            			month = (date.getMonth() + 1),
+            			day = date.getDate(),
+            			hours = date.getHours(),
+            			minutes = date.getMinutes(),
+            			seconds = date.getSeconds(),
+            
+            		month = month < 10 ? '0' + month : month;
+            		day = day < 10 ? '0' + day : day;
+            		hours = hours < 10 ? '0' + hours : hours;
+            		minutes = minutes < 10 ? '0' + minutes : minutes;
+            		seconds = seconds < 10 ? '0' + seconds : seconds;
+            
+            		formatted_date = year + '-' + month + '-' + day + 'T' + hours + ':' + minutes + ':' + seconds + 'Z';
+            
+            		return formatted_date
+            	},
+            
+            	getMetricsData: function () {
+            		var startDate = new Date();
+            
+            		startDate.setDate(startDate.getDate() - Azure.params.period);
+            		startDate = new Date(startDate.getTime() + startDate.getTimezoneOffset() * 60000);
+            		startDate = Azure.toUtcIso(startDate);
+            
+            		var data = {},
+            			endpoints = [
+            				{"entity": "incidents", "filter": "properties/lastModifiedTimeUtc ge " + startDate},
+            				{"entity": "dataConnectors", "filter": ""},
+            				{"entity": "alertRules", "filter": "properties/lastModifiedTimeUtc ge " + startDate},
+            				{"entity": "automationRules", "filter": "properties/lastModifiedTimeUtc ge " + startDate},
+            				{"entity": "watchlists", "filter": ""}
+            			];
+            
+            		data.metrics = {};
+            
+            		endpoints.forEach(function (endpoint) {
+            			var filter = (endpoint.filter === "") ? "" : '&$filter=',
+            				url = 'https://management.azure.com' +
+            				Azure.params.resource_id +
+            				'/providers/Microsoft.SecurityInsights/' +
+            				endpoint.entity +
+            				'?api-version=2025-09-01' +
+            				filter +
+            				encodeURIComponent(endpoint.filter);
+            
+            			data.metrics[endpoint.entity] = Azure.getField(Azure.request(url), 'value');
+            		});
+            
+            		return data;
+            	}
+            };
+            
+            try {
+            	Azure.setParams(JSON.parse(value));
+            	Azure.login();
+            	return JSON.stringify(Azure.getMetricsData());
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Azure Sentinel ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
+            }
+          description: 'Gathers data from Azure Sentinel.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            - name: app_id
+              value: '{$AZURE.APP.ID}'
+            - name: password
+              value: '{$AZURE.PASSWORD}'
+            - name: period
+              value: '{$AZURE.SENTINEL.PERIOD}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
+            - name: resource_id
+              value: '{$AZURE.RESOURCE.ID}'
+            - name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION.ID}'
+            - name: tenant_id
+              value: '{$AZURE.TENANT.ID}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 50c6c14b401f44bd8f5da39fda1ed75e
+          name: 'Data connectors: Disabled'
+          type: DEPENDENT
+          key: azure.sentinel.data_connectors.disabled
+          description: 'The number of disabled data connectors.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.dataConnectors.[?(@.properties.dataTypes..state == "Disabled")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: data-connectors
+            - tag: component
+              value: security
+        - uuid: 647d9cb27c524613829e231192fd210b
+          name: 'Data connectors: Enabled'
+          type: DEPENDENT
+          key: azure.sentinel.data_connectors.enabled
+          description: 'The number of enabled data connectors.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.dataConnectors.[?(@.properties.dataTypes..state == "Enabled")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: data-connectors
+            - tag: component
+              value: security
+        - uuid: f70712d9fce04a5083e8455b8f1d0c9e
+          name: 'Data connectors: Total'
+          type: DEPENDENT
+          key: azure.sentinel.data_connectors.total
+          description: 'The total number of data connectors.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.dataConnectors.length()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: data-connectors
+            - tag: component
+              value: security
+          triggers:
+            - uuid: 85201a2e3b4a48a980c02be2939d0e3e
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)<>0'
+              name: 'Azure Sentinel: Data connector total has changed.'
+              event_name: 'Azure Sentinel: The number of data connectors has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              opdata: 'Current number: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The number of data connectors has changed.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 15ddd25ac72d42209579a0292e61e972
+          name: 'Incidents: Active'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.active
+          description: 'The number of active incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.status == "Active")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: 19bae8a23edd46deb06be5f9441f06b9
+          name: 'Incidents: Closed'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.closed
+          description: 'The number of closed incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.status == "Closed")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: 634db4c5d7ae4557a0080d87c0f4e51f
+          name: 'Incidents: High severity'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.high
+          description: 'The number of high-severity incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.severity == "High")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: d1e20c4e18c64949bbcd251f6ed571d3
+          name: 'Incidents: Informational severity'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.info
+          description: 'The number of informational severity incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.severity == "Informational")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: 81d9c958794a4431997cccf31dd8ba24
+          name: 'Incidents: Low severity'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.low
+          description: 'The number of low-severity incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.severity == "Low")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: f5672de7b77843149ab8bc1405476512
+          name: 'Incidents: Medium severity'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.medium
+          description: 'The number of medium-severity incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.severity == "Medium")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: 52433db78cf240b79e1bc33662340166
+          name: 'Incidents: New'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.new
+          description: 'The number of new incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.incidents[?(@.properties.status == "New")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: 6b8f2e4895b6449aa3ab009503820645
+          name: 'Incidents: Total number'
+          type: DEPENDENT
+          key: azure.sentinel.incidents.total
+          description: 'The total number of incidents.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.incidents.length()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: incidents
+            - tag: component
+              value: security
+        - uuid: 5d292c4cbeb84ae0ad6a90b79874f464
+          name: 'Watchlists: Canceled'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.canceled
+          description: 'The number of canceled watchlists.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "Canceled")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+        - uuid: 802f3bb70c4a4faea036f8a1aa31dbe6
+          name: 'Watchlists: Deleting'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.deleting
+          description: 'The number of watchlists being deleted.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "Deleting")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+        - uuid: 34e3927f7b2549b6bd7cf606d47fc8f0
+          name: 'Watchlists: Failed'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.failed
+          description: 'The number of failed watchlists.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "Failed")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+        - uuid: 52fe31df3d8245e780a612ea1f5cdd30
+          name: 'Watchlists: New'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.new
+          description: 'The number of new watchlists.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "New")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+        - uuid: d228fcaa4e9f42bfa55586ae96a59874
+          name: 'Watchlists: In progress'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.progress
+          description: 'The number of watchlists in progress.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "InProgress")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+        - uuid: 6d16ab796bab488897aca9b30c687e65
+          name: 'Watchlists: Succeeded'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.succeeded
+          description: 'The number of succeeded watchlists.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "Succeeded")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+        - uuid: 504de002251e4acf9559c2323165d329
+          name: 'Watchlists: Total'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.total
+          description: 'The total number of watchlists.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.watchlists.length()
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+          triggers:
+            - uuid: 103a16f32d514d85ba9f847931bf694a
+              expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)<>0'
+              name: 'Azure Sentinel: Watchlist total has changed.'
+              event_name: 'Azure Sentinel: The number of watchlists has changed from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+              opdata: 'Current number: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The number of watchlists has changed.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
+        - uuid: 2850a1b56d5545f6a7c173a94b80b6d8
+          name: 'Watchlists: Uploading'
+          type: DEPENDENT
+          key: azure.sentinel.watchlist.uploading
+          description: 'The number of watchlists being uploaded.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.metrics.watchlists.[?(@.properties.provisioningState == "Uploading")].length()'
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.sentinel.data.get
+          tags:
+            - tag: component
+              value: security
+            - tag: component
+              value: watchlists
+      tags:
+        - tag: class
+          value: cloud
+        - tag: subclass
+          value: security
+        - tag: target
+          value: azure
+        - tag: target
+          value: sentinel
+      macros:
+        - macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
+          config:
+            type: TEXT
+            priority: '3'
+            label: 'Azure App ID'
+            description: 'Microsoft Azure App ID.'
+            required: 'YES'
+        - macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 15s
+          description: 'API response timeout.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Other
+            label: 'API timeout'
+            description: 'API response timeout, in seconds.'
+        - macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+          config:
+            type: TEXT
+            priority: '4'
+            label: 'Azure password'
+            description: 'Microsoft Azure password.'
+            required: 'YES'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Other
+            label: 'HTTP proxy'
+            description: 'HTTP proxy to use for requests.'
+        - macro: '{$AZURE.RESOURCE.ID}'
+          description: 'Microsoft Azure scale set ID.'
+          config:
+            type: TEXT
+            priority: '5'
+            label: 'Azure scale set ID'
+            description: 'Microsoft Azure scale set ID.'
+            required: 'YES'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW}'
+          value: '1'
+          description: 'The threshold for new incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. Can be used with context if needed (check the context values in relevant items).'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:high}'
+          value: '1'
+          description: 'The threshold for new high-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new high-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:info}'
+          value: '10'
+          description: 'The threshold for new informational severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new informational severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:low}'
+          value: '5'
+          description: 'The threshold for new low-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new low-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INCIDENTS.NEW:medium}'
+          value: '1'
+          description: 'The threshold for new medium-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Thresholds
+            label: 'Incidents threshold'
+            description: 'The threshold for new medium-severity incidents during the interval defined in the `{$AZURE.SENTINEL.INTERVAL}` macro. No less than 1.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SENTINEL.INTERVAL}'
+          value: 10m
+          description: 'The update interval for the script items that retrieve data from the API.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Other
+            label: 'Data update interval'
+            description: 'The update interval for the script items that retrieve data from the API.'
+            required: 'YES'
+        - macro: '{$AZURE.SENTINEL.PERIOD}'
+          value: '30'
+          description: 'The number of days during which to retrieve modified entities (incidents, alert rules, automation rules).'
+          config:
+            type: TEXT
+            priority: '8'
+            label: Period
+            description: 'Number of days over which to retrieve modified entities. No less than 0.'
+            required: 'YES'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.SUBSCRIPTION.ID}'
+          description: 'Microsoft Azure subscription ID.'
+          config:
+            type: TEXT
+            priority: '1'
+            label: 'Azure subscription ID'
+            description: 'Microsoft Azure subscription ID.'
+            required: 'YES'
+        - macro: '{$AZURE.TENANT.ID}'
+          description: 'Microsoft Azure tenant ID.'
+          config:
+            type: TEXT
+            priority: '2'
+            label: 'Azure tenant ID'
+            description: 'Microsoft Azure tenant ID.'
+            required: 'YES'
+      dashboards:
+        - uuid: 4ef5f12b11514942a2f5f1e8a4fe0512
+          name: Overview
+          pages:
+            - widgets:
+                - type: piechart
+                  name: 'Incidents by severity'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.info
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.low
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFA059
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.medium
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.3.color.0
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.3.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.3.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.high
+                    - type: INTEGER
+                      name: ds.3.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Alert rules by status'
+                  'y': '4'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.disabled
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.enabled
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Automation rules by solution'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.add_incident
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.playbook
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.modify
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Alert rules by severity'
+                  x: '12'
+                  'y': '4'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: INFO
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.info
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: LOW
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.low
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFA059
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.medium
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.3.color.0
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.3.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.3.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.high
+                    - type: INTEGER
+                      name: ds.3.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '4'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Incidents by status'
+                  x: '18'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.new
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.closed
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.incidents.active
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Automation rules by type'
+                  x: '18'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.incidents
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: FFBF59
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.automation_rules.alerts
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Alert rules by type'
+                  x: '24'
+                  'y': '4'
+                  width: '12'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: BF00FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.fusion
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.creation
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.alert_rules.scheduled
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: problemsbysv
+                  x: '36'
+                  width: '36'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: INIKB
+                - type: toptriggers
+                  x: '36'
+                  'y': '2'
+                  width: '36'
+                  height: '6'
+                - type: piechart
+                  name: 'Watchlists by state'
+                  x: '36'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.1
+                      value: 7499FF
+                    - type: STRING
+                      name: ds.0.color.2
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_aggregation
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.0.data_set_label
+                      value: Incoming
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.new
+                    - type: ITEM
+                      name: ds.0.itemids.1
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.uploading
+                    - type: ITEM
+                      name: ds.0.itemids.2
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.progress
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.1
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.type.2
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: E97659
+                    - type: STRING
+                      name: ds.1.color.1
+                      value: E97659
+                    - type: STRING
+                      name: ds.1.color.2
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.1.dataset_aggregation
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.data_set_label
+                      value: Outgoing
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.canceled
+                    - type: ITEM
+                      name: ds.1.itemids.1
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.failed
+                    - type: ITEM
+                      name: ds.1.itemids.2
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.deleting
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type.1
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.type.2
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.2.dataset_aggregation
+                      value: '5'
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: STRING
+                      name: ds.2.data_set_label
+                      value: Succeeded
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.watchlist.succeeded
+                    - type: INTEGER
+                      name: ds.2.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_aggregation
+                      value: '1'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
+                - type: piechart
+                  name: 'Data connectors by status'
+                  x: '54'
+                  'y': '8'
+                  width: '18'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: E45959
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.data_connectors.disabled
+                    - type: INTEGER
+                      name: ds.0.type.0
+                      value: '0'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Sentinel by HTTP'
+                        key: azure.sentinel.data_connectors.enabled
+                    - type: INTEGER
+                      name: ds.1.type.0
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_value
+                      value: '1'
     - uuid: a93f57ccc68e442da79bf4a20fe46570
       template: 'Azure SQL Managed Instance by HTTP'
       name: 'Azure SQL Managed Instance by HTTP'
@@ -18793,6 +20593,138 @@ zabbix_export:
               newvalue: Unavailable
             - value: '3'
               newvalue: Unknown
+  triggers:
+    - uuid: f4b2492d4a154c74b79509bc6b08752e
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.disabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)=0'
+      name: 'Azure Sentinel: Alert rule was disabled.'
+      event_name: 'Azure Sentinel: The number of disabled alert rules has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of disabled alert rules has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 303a3693df714946819ee182a5b51acc
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.enabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.alert_rules.total)=0'
+      name: 'Azure Sentinel: Alert rule was enabled.'
+      event_name: 'Azure Sentinel: The number of enabled alert rules has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of enabled alert rules has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 015e4e55aab6437ab04f0551664d59cc
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.disabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)=0'
+      name: 'Azure Sentinel: Data connector was disabled.'
+      event_name: 'Azure Sentinel: The number of disabled data connectors has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of disabled data connectors has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 98d63b4c52e3417aa2796bc2fcdad5c7
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.enabled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.data_connectors.total)=0'
+      name: 'Azure Sentinel: Data connector was enabled.'
+      event_name: 'Azure Sentinel: The number of enabled data connectors has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of enabled data connectors has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: fe60cca0faa14160bf0d94dc67833a0a
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.high)>={$AZURE.SENTINEL.INCIDENTS.NEW:high} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: High-severity incident total has increased.'
+      event_name: 'Azure Sentinel: The number of high-severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: HIGH
+      description: 'The number of high-severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 57ff21dd46f142b0ab1f6ab728f290de
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.active)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)=0'
+      name: 'Azure Sentinel: Incident become active.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: INFO
+      description: 'The number of active incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 617eb0510ee64147ab0805b5c9d751f1
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.info)>={$AZURE.SENTINEL.INCIDENTS.NEW:info} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: Informational severity incident total has increased.'
+      event_name: 'Azure Sentinel: The number of informational severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: INFO
+      description: 'The number of informational severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: da793fc1259e444c9bdd01c8230ea42e
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.low)>={$AZURE.SENTINEL.INCIDENTS.NEW:low} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: Low-severity incident total has increased.'
+      event_name: 'Azure Sentinel: The number of low-severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of low-severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: c7e38512100b4ee0aab6e59c83a8f0a7
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.medium)>={$AZURE.SENTINEL.INCIDENTS.NEW:medium} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: Medium-severity incident total has increased.'
+      event_name: 'Azure Sentinel: The number of medium-severity incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: AVERAGE
+      description: 'The number of medium-severity incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: b308b2240dc8462f815dee6034200672
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.incidents.new)>={$AZURE.SENTINEL.INCIDENTS.NEW} and change(/Azure Sentinel by HTTP/azure.sentinel.incidents.total)>0'
+      name: 'Azure Sentinel: New incident total has increased.'
+      event_name: 'Azure Sentinel: The number of new incidents has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: INFO
+      description: 'The number of new incidents has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: e2f4997866724c8887cbb8e6f8e10c97
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.failed)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0'
+      name: 'Azure Sentinel: Watchlist has failed.'
+      event_name: 'Azure Sentinel: The number of failed watchlists has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of failed watchlists has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
+    - uuid: 545d4d35d9024c00b830df762ee84c2a
+      expression: 'change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.canceled)>0 and change(/Azure Sentinel by HTTP/azure.sentinel.watchlist.total)=0'
+      name: 'Azure Sentinel: Watchlist was disabled.'
+      event_name: 'Azure Sentinel: The number of cancelled watchlists has increased from {ITEM.LASTVALUE2} to {ITEM.LASTVALUE1}.'
+      opdata: 'Current number: {ITEM.LASTVALUE1}'
+      priority: WARNING
+      description: 'The number of canceled watchlists has increased.'
+      manual_close: 'YES'
+      tags:
+        - tag: scope
+          value: notice
   graphs:
     - uuid: 73faeee0b6934fb4983c035b60782ca7
       name: 'Average CPU percentage'

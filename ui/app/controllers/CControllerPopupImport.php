@@ -19,7 +19,7 @@ class CControllerPopupImport extends CController {
 	protected function checkInput() {
 		$fields = [
 			'import' => 'in 1',
-			'rules_preset' => 'required|in host,template,mediatype,map',
+			'rules_preset' => 'required|in host,template,mediatype,map,dashboard',
 			'rules' => 'array'
 		];
 
@@ -51,11 +51,19 @@ class CControllerPopupImport extends CController {
 
 			case 'mediatype':
 				return $user_type === USER_TYPE_SUPER_ADMIN;
+
+			case 'dashboard':
+				return $this->checkAccess(CRoleHelper::UI_MONITORING_DASHBOARD)
+					&& $this->checkAccess(CRoleHelper::ACTIONS_EDIT_DASHBOARDS);
 		}
 	}
 
 	protected function doAction() {
 		$user_type = $this->getUserType();
+
+		$return_missing_objects = false;
+		$missing_objects_warning_title = '';
+		$missing_objects_warning_foot_note = '';
 
 		// Adjust defaults for given rule preset, if specified.
 		switch ($this->getInput('rules_preset')) {
@@ -121,6 +129,17 @@ class CControllerPopupImport extends CController {
 					];
 				}
 				break;
+
+			case 'dashboard':
+				$return_missing_objects = true;
+				$missing_objects_warning_title = _('References to missing objects were ignored:');
+				$missing_objects_warning_foot_note = _('Check and reconfigure widgets.');
+
+				$rules = [
+					'dashboards' => ['updateExisting' => true, 'createMissing' => true]
+				];
+
+				break;
 		}
 
 		if ($this->hasInput('import')) {
@@ -146,6 +165,7 @@ class CControllerPopupImport extends CController {
 					$result = API::Configuration()->import([
 						'format' => CImportReaderFactory::fileExt2ImportFormat($file->getExtension()),
 						'source' => $file->getContent(),
+						'returnMissingObjects' => $return_missing_objects,
 						'rules' => $request_rules
 					]);
 				}
@@ -161,6 +181,14 @@ class CControllerPopupImport extends CController {
 
 				if ($messages = get_and_clear_messages()) {
 					$output['success']['messages'] = array_column($messages, 'message');
+				}
+
+				if ($return_missing_objects && $result['missingObjects']) {
+					$output['success']['messages'][] = implode("\n", [
+						$missing_objects_warning_title,
+						CImportHelper::missingObjectsToString($result['missingObjects']),
+						$missing_objects_warning_foot_note
+					]);
 				}
 			}
 			else {
@@ -178,6 +206,7 @@ class CControllerPopupImport extends CController {
 				'rules' => $rules,
 				'rules_preset' => $this->getInput('rules_preset'),
 				'advanced_config' => in_array($this->getInput('rules_preset'), ['host', 'template']),
+				'submit_compare' => in_array($this->getInput('rules_preset'), ['template', 'dashboard']),
 				'user' => [
 					'debug_mode' => $this->getDebugMode()
 				]

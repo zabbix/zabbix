@@ -44,6 +44,7 @@ typedef struct
 	zbx_uint64_t	history_log_counter;	/* the number of processed log values */
 	zbx_uint64_t	history_text_counter;	/* the number of processed text values */
 	zbx_uint64_t	history_bin_counter;	/* the number of processed bin values */
+	zbx_uint64_t	history_json_counter;	/* the number of processed json values */
 	zbx_uint64_t	notsupported_counter;	/* the number of processed not supported items */
 }
 zbx_dc_stats_t;
@@ -87,6 +88,7 @@ zbx_wcache_info_t;
 #define ZBX_STATS_HISTORY_INDEX_PUSED	20
 #define ZBX_STATS_HISTORY_INDEX_PFREE	21
 #define ZBX_STATS_HISTORY_BIN_COUNTER	22
+#define ZBX_STATS_HISTORY_JSON_COUNTER	23
 
 /* 'zbx_pp_value_opt_t' element 'flags' values */
 #define ZBX_PP_VALUE_OPT_NONE		0x0000	/* 'zbx_pp_value_opt_t' has no data */
@@ -167,6 +169,7 @@ void	zbx_dc_add_history(zbx_uint64_t itemid, unsigned char item_value_type, unsi
 void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, unsigned char item_flags,
 		zbx_variant_t *value, zbx_timespec_t ts, const zbx_pp_value_opt_t *value_opt);
 size_t	zbx_dc_flush_history(void);
+void	zbx_history_cache_destroy_local_cache(void);
 void	zbx_hc_pop_items(zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_get_item_values(zbx_dc_history_t *history, zbx_vector_hc_item_ptr_t *history_items);
 void	zbx_hc_push_items(zbx_vector_hc_item_ptr_t *history_items);

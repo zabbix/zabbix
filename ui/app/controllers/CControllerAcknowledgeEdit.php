@@ -94,7 +94,9 @@ class CControllerAcknowledgeEdit extends CController {
 			'allowed_add_comments' => $this->checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 			'allowed_suppress' => $this->checkAccess(CRoleHelper::ACTIONS_SUPPRESS_PROBLEMS),
 			'allowed_change_problem_ranking' => $this->checkAccess(CRoleHelper::ACTIONS_CHANGE_PROBLEM_RANKING),
-			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d')
+			'suppress_until_problem' => CProfile::get('web.problem_suppress_action_time_until', 'now+1d'),
+			'js_validation_rules' => (new CFormValidator(CControllerPopupAcknowledgeCreate::getValidationRules()))
+				->getRules()
 		];
 
 		// Select events.
@@ -114,14 +116,14 @@ class CControllerAcknowledgeEdit extends CController {
 
 		// Show action list if only one event is requested.
 		if (count($events) == 1) {
-			$history = getEventUpdates(reset($events));
-			$data['history'] = $history['data'];
+			$event = reset($events);
+			$data['history'] = $event['acknowledges'];
 			$data['users'] = API::User()->get([
 				'output' => ['username', 'name', 'surname'],
-				'userids' => array_keys($history['userids']),
+				'userids' => array_column($event['acknowledges'], 'userid', 'userid'),
 				'preservekeys' => true
 			]);
-			$data['problem_name'] = reset($events)['name'];
+			$data['problem_name'] = $event['name'];
 		}
 		else {
 			$data['problem_name'] = _s('%1$d problems selected.', count($events));

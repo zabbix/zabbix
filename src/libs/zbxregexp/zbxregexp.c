@@ -413,7 +413,8 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 				err_tmp = decode_pcre2_match_error(r);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() pcre2_match() returned error %d '%s' while matching"
-					" against subject string '%s'", __func__, r, err_tmp, string);
+					" against subject string '%s'", __func__, r, ZBX_NULL2EMPTY_STR(err_tmp),
+					string);
 
 			if (NULL != err_msg)
 				*err_msg = err_tmp;

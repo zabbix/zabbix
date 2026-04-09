@@ -55,8 +55,8 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		short		revents;
 	};
 #endif
-	static void		*handle;
-	static CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
+	static ZBX_THREAD_LOCAL void		*handle;
+	static ZBX_THREAD_LOCAL CURLMcode	(*fptr)(CURLM *, struct curl_waitfd *, unsigned int, int, int *) = NULL;
 
 	if (NULL == fptr)
 	{
@@ -66,7 +66,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 			zabbix_log(LOG_LEVEL_CRIT, "zbx_curl_multi_wait() should never be called when using"
 					" cURL library < 7.28.0 (using version %s)", libcurl_version_str());
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #if (defined(_WINDOWS) || defined(STATIC_LINKING)) && LIBCURL_VERSION_NUM >= 0x071c00
 		else
@@ -75,7 +75,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		/* use *(void **)(&fptr) to silence the "-pedantic" warning */
@@ -83,7 +83,7 @@ CURLMcode	zbx_curl_multi_wait(CURLM *multi_handle, int timeout_ms, int *numfds)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_multi_wait(): %s", dlerror());
 			dlclose(handle);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #endif
 	}
@@ -139,8 +139,9 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		void		*anchor;
 	};
 #endif
-	static void		*handle;
-	static CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int, struct curl_header **) = NULL;
+	static ZBX_THREAD_LOCAL void		*handle;
+	static ZBX_THREAD_LOCAL CURLHcode	(*fptr)(CURL *, const char *, size_t, unsigned int, int,
+			struct curl_header **) = NULL;
 
 	struct curl_header	*type;
 	unsigned int		origin;
@@ -158,7 +159,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		if (NULL == (handle = dlopen(NULL, RTLD_LAZY | RTLD_NOLOAD)))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot dlopen() Zabbix binary: %s", dlerror());
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		/* use *(void **)(&fptr) to silence the "-pedantic" warning */
@@ -166,7 +167,7 @@ const char	*zbx_curl_content_type(CURL *easyhandle)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "cannot find cURL function curl_easy_header(): %s", dlerror());
 			dlclose(handle);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #endif
 	}

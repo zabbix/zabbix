@@ -79,7 +79,7 @@ $html_page = (new CHtmlPage())
 								'parameters' => [
 									'srctbl' => 'roles',
 									'srcfld1' => 'roleid',
-									'dstfrm' => 'zbx_filter',
+									'dstfrm' => CFilter::FORM_NAME,
 									'dstfld1' => 'filter_roles_'
 								]
 							]
@@ -97,7 +97,7 @@ $html_page = (new CHtmlPage())
 								'parameters' => [
 									'srctbl' => 'usrgrp',
 									'srcfld1' => 'usrgrpid',
-									'dstfrm' => 'zbx_filter',
+									'dstfrm' => CFilter::FORM_NAME,
 									'dstfld1' => 'filter_usrgrpids_'
 								]
 							]

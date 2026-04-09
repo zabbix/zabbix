@@ -578,7 +578,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			],
@@ -591,7 +591,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			]
@@ -697,7 +697,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => '*'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			],
@@ -707,7 +707,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						'Required status codes' => 'test'
 					],
 					'inline_errors' => [
-						'Required status codes' => 'Invalid range expression.'
+						'Required status codes' => 'Invalid HTTP status code or range.'
 					]
 				]
 			]

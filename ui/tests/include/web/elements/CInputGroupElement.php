@@ -32,8 +32,7 @@ class CInputGroupElement extends CElement {
 	 * @return string
 	 */
 	public function getValue() {
-		return $this->query('xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]')
-				->one()->getValue();
+		return $this->query('xpath:.//z-textarea-flexible|.//input[@type="password"]')->one()->getValue();
 	}
 
 	/**
@@ -98,7 +97,7 @@ class CInputGroupElement extends CElement {
 	 */
 	public function fill($input) {
 		if (!is_array($input)) {
-			$xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]';
+			$xpath = 'xpath:.//z-textarea-flexible|.//input[@type="password"]';
 			$this->query($xpath)->one()->fill($input);
 
 			return $this;
@@ -110,7 +109,7 @@ class CInputGroupElement extends CElement {
 				$change_button->click();
 			}
 
-			$xpath = 'xpath:.//textarea[contains(@class, "textarea-flexible")]|.//input[@type="password"]';
+			$xpath = 'xpath:.//z-textarea-flexible|.//input[@type="password"]';
 			$this->query($xpath)->one()->fill($input['text']);
 		}
 

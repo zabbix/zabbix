@@ -34,7 +34,7 @@ static int	graph_flag_to_resource_type(int flag)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "unexpected audit graph flag detected: ->%d<-", flag);
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 #define GR_OR_GRP(s) (ZBX_AUDIT_RESOURCE_GRAPH == resource_type) ? "graph."#s : "graphprototype."#s

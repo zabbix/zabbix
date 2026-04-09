@@ -28,8 +28,9 @@ $html_page = (new CHtmlPage())
 
 $from_list = (new CFormList())
 	->addRow(new CLabel(_('Frontend URL'), 'url'),
-		(new CTextBox('url', $data['url'], false, CSettingsSchema::getFieldLength('url')))
+		(new CTextAreaFlexible('url', $data['url']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setMaxlength(CSettingsSchema::getFieldLength('url'))
 			->setAttribute('placeholder', _('Example: https://localhost/zabbix/ui/'))
 			->setAttribute('autofocus', 'autofocus')
 	)

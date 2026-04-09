@@ -1480,20 +1480,21 @@ class CMacrosResolverGeneral {
 						'webitems' => true,
 						'filter' => [
 							'host' => $host,
-							'key_' => array_keys($keys)
+							'key_' => array_keys($keys),
+							'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+								ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_TEXT]
 						]
 					]);
 
 					foreach ($db_items as $db_item) {
+						if ($db_item['lastclock'] == 0) {
+							continue;
+						}
+
 						foreach ($keys[$db_item['key_']] as $macro_data) {
-							if ($db_item['lastclock'] && $db_item['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-									? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
-									: formatHistoryValue($db_item['lastvalue'], $db_item);
-							}
-							else {
-								$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
-							}
+							$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+								? CMacroFunction::calcMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
+								: formatHistoryValue($db_item['lastvalue'], $db_item);
 						}
 					}
 				}
@@ -1503,7 +1504,8 @@ class CMacrosResolverGeneral {
 						'webitems' => true,
 						'filter' => [
 							'host' => $host,
-							'key_' => array_keys($keys)
+							'key_' => array_keys($keys),
+							'value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
 						]
 					]);
 
@@ -1512,15 +1514,14 @@ class CMacrosResolverGeneral {
 							foreach ($sec_nums as $sec_num => $_macros) {
 								$value = getItemFunctionalValue($db_item, $function, $sec_num);
 
+								if ($value === null) {
+									continue;
+								}
+
 								foreach ($_macros as $macro_data) {
-									if ($value !== null) {
-										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
-											? CMacroFunction::calcMacrofunc($value, $macro_data['macrofunc'])
-											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
-									}
-									else {
-										$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
-									}
+									$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+										? CMacroFunction::calcMacrofunc($value, $macro_data['macrofunc'])
+										: convertUnits(['value' => $value, 'units' => $db_item['units']]);
 								}
 							}
 						}
