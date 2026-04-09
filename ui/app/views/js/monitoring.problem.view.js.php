@@ -82,6 +82,11 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
+			if (!filter.filter_custom_time) {
+				filter.from = this.global_timerange.from;
+				filter.to = this.global_timerange.to;
+			}
+
 			this.datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
@@ -612,6 +617,17 @@
 					this.datatable.setTabFilterItem(this.active_filter);
 				}
 
+				this.scheduleRefresh();
+				this.refresh();
+			});
+
+			$.subscribe('timeselector.rangeupdate', (e, data) => {
+				if (data.idx === 'web.monitoring.problem') {
+					this.global_timerange.from = data.from;
+					this.global_timerange.to = data.to;
+				}
+
+				this.scheduleRefresh();
 				this.refresh();
 			});
 		},
@@ -737,14 +753,21 @@
 
 		refresh() {
 			if (isUserInteracting()) {
-				this.scheduleRefresh();
-
 				return;
 			}
 
-			const filter_params = this.active_filter.getFilterParamsObject();
+			const filter = {
+				...this.filter_defaults,
+				...this.datatable.getFilter(),
+				...this.active_filter.getFilterParamsObject()
+			};
 
-			this.datatable.setFilter({...this.filter_defaults, ...filter_params})
+			if (!filter.filter_custom_time) {
+				filter.from = this.global_timerange.from;
+				filter.to = this.global_timerange.to;
+			}
+
+			this.datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					onSuccess: response => this.onDataDone(response)
 				});

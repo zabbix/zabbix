@@ -601,8 +601,14 @@ class CTabFilterItem extends CBaseComponent {
 	 * @returns {Object}
 	 */
 	getFilterParamsObject() {
+		let filter_params = this.getFilterParams();
+		if (!filter_params) {
+			return {};
+		}
+
+		filter_params = Object.fromEntries(filter_params);
+
 		let result = {},
-			filter_params = Object.fromEntries(this.getFilterParams()),
 			parts;
 
 		for (const name of Object.keys(filter_params)) {

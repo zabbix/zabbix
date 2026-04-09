@@ -508,8 +508,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		if ($filter['show'] == TRIGGERS_OPTION_ALL) {
 			$timeline = getTimeSelectorPeriod([
-				'profileidx' => true,
-				'profileidx2' => true
+				'profileIdx' => 'web.monitoring.problem',
+				'from' => $filter['from'],
+				'to' => $filter['to']
 			]);
 
 			$filter['from'] = $timeline['from_ts'];

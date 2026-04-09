@@ -80,6 +80,7 @@
 					this.datatable.setTabFilterItem(this.active_filter);
 				}
 
+				this.scheduleRefresh();
 				this.refresh();
 			});
 
@@ -441,14 +442,16 @@
 
 		refresh() {
 			if (isUserInteracting()) {
-				this.scheduleRefresh();
-
 				return;
 			}
 
-			const filter_params = this.active_filter.getFilterParamsObject();
+			const filter = {
+				...this.filter_defaults,
+				...this.datatable.getFilter(),
+				...this.active_filter.getFilterParamsObject()
+			};
 
-			this.datatable.setFilter({...this.filter_defaults, ...filter_params})
+			this.datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					onSuccess: response => this.onDataDone(response)
 				});
