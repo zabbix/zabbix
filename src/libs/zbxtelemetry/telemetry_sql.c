@@ -572,14 +572,27 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, tq_db_type_t
 }
 
 /* TODO: move to another file? */
-static void	tq_sql_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t *out_lower, time_t *out_upper)
+static void	tq_sql_get_timestamp_filter_bounds(const zbx_tq_query_t *query, int update_interval, time_t now,
+		time_t lasttimestamp, time_t *out_lower, time_t *out_upper)
 {
-	// TODO
-	*out_lower = 42;
-	*out_upper = 1042;
+	time_t	now_shifted = now - query->time_shift;
+
+	if (query->aggregation_size > update_interval || update_interval > query->loopback_limit)
+	{
+		*out_lower = now_shifted - query->aggregation_size;
+		*out_upper = now_shifted;
+	}
+	else /* query->aggregation_size <= update_interval || update_interval <= query->loopback_limit */
+	{
+		time_t	start = start = MAX(lasttimestamp, now_shifted - query->loopback_limit);
+
+		*out_lower = start;
+		*out_upper = ((now_shifted - start) / query->aggregation_size) * query->aggregation_size;
+	}
 }
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, char **sql)
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, int update_interval, time_t now,
+		time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);
@@ -589,13 +602,14 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, char **sql)
 
 	*sql = NULL;
 
-	char	*columns_to_select 	= tq_sql_dyn_get_columns_to_select(query, TQ_SQL_DB_TYPE_POSTGRESQL);
-	char	*aggr_columns_to_select = tq_sql_dyn_get_aggr_columns_to_select(query, TQ_SQL_DB_TYPE_POSTGRESQL);
-	char	*table_to_select_from 	= tq_sql_dyn_get_table_to_select_from(query, TQ_SQL_DB_TYPE_POSTGRESQL);
-	char	*conditions 		= tq_sql_dyn_get_conditions(query, TQ_SQL_DB_TYPE_POSTGRESQL);
+	char	*columns_to_select	= tq_sql_dyn_get_columns_to_select(query, TQ_SQL_DB_TYPE_POSTGRESQL);
+	char	*aggr_columns_to_select	= tq_sql_dyn_get_aggr_columns_to_select(query, TQ_SQL_DB_TYPE_POSTGRESQL);
+	char	*table_to_select_from	= tq_sql_dyn_get_table_to_select_from(query, TQ_SQL_DB_TYPE_POSTGRESQL);
+	char	*conditions		= tq_sql_dyn_get_conditions(query, TQ_SQL_DB_TYPE_POSTGRESQL);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	tq_sql_get_timestamp_filter_bounds(query, &timestamp_filter_lower_bound, &timestamp_filter_upper_bound);
+	tq_sql_get_timestamp_filter_bounds(query, update_interval, now, lasttimestamp, &timestamp_filter_lower_bound,
+			&timestamp_filter_upper_bound);
 
 	/* select */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "SELECT ");

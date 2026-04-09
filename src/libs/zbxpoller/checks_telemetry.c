@@ -22,8 +22,22 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	/* FIXME: placeholder */
 
-	int	ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED;
 	zbx_tq_query_t	query;
+	time_t		now = time(NULL);
+	int		update_interval;
+	time_t		lasttimestamp;
+
+	update_interval = 60 * 60 * 8; /* FIXME: placeholder */
+	lasttimestamp = 0; /* FIXME: placeholder */
+
+	/*
+	if (SUCCEED != zbx_interval_preproc(item->delay, &update_interval, NULL, NULL))
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid update interval."));
+		goto out;
+	}
+	*/
 
 	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
 	{
@@ -70,7 +84,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	*/
 
 	char	*sql = NULL;
-	zbx_tq_sql_generate_postgresql(&query, &sql);
+	zbx_tq_sql_generate_postgresql(&query, update_interval, now, lasttimestamp, &sql);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
 
