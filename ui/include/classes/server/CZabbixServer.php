@@ -300,7 +300,7 @@ class CZabbixServer {
 	 *
 	 * @param array  $data
 	 * @param string $data['userid']    User ID.
-	 * @param string $data['uuid']      External device ID.
+	 * @param string $data['deviceid']  Device ID.
 	 * @param string $data['serverid']  Server ID.
 	 * @param string $sid               User session ID or token.
 	 *
@@ -319,8 +319,9 @@ class CZabbixServer {
 	 * Request server to offboard mobile device.
 	 *
 	 * @param array  $data
-	 * @param string $data['uuid']  External device ID.
-	 * @param string $sid           User session ID or token.
+	 * @param array  $data['deviceid']  Device IDs.
+	 * @param string $data['serverid']  Server ID.
+	 * @param string $sid               User session ID or token.
 	 *
 	 * @return array|bool
 	 */

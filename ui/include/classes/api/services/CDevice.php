@@ -368,37 +368,39 @@ class CDevice extends CApiService {
 	}
 
 	/**
-	 * @param array $deviceids
+	 * @param array  $data
 	 *
 	 * @return array
 	 */
-	public function delete(array $deviceids): array {
-		$this->validateDelete($deviceids, $db_devices);
+	public function offboard(array $data): array {
+		$this->validateOffboard($data, $db_devices);
 
-		self::deleteForce($db_devices);
+		self::offboardForce($db_devices);
 
-		return ['deviceids' => $deviceids];
+		return $data;
 	}
 
-	private function validateDelete(array $deviceids, ?array &$db_devices): void {
-		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
+	private function validateOffboard(array $data, ?array &$db_devices): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'deviceid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $deviceids, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
 		$db_devices = $this->get([
 			'output' => ['deviceid', 'name'],
-			'deviceids' => $deviceids,
+			'deviceids' => $data['deviceid'],
 			'preservekeys' => true
 		]);
 
-		if (count($db_devices) != count($deviceids)) {
+		if (!$db_devices) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 	}
 
-	public static function deleteForce(array $db_devices): void {
+	public static function offboardForce(array $db_devices): void {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
 		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
@@ -409,13 +411,15 @@ class CDevice extends CApiService {
 		$deviceids = array_keys($db_devices);
 
 		$offboard_device_data = [
-			'deviceids' => $deviceids,
+			'deviceid' => $deviceids[0],
 			'serverid' => CApiDpopHelper::getServerId() // todo - replace this mock for Server ID by real method
 		];
 
 		$result = $server->offboardDevice($offboard_device_data, self::getAuthIdentifier());
 
-		// todo - handle errors, then do below for success deviceids
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
+		}
 
 		$db_device_tokens = DB::select('token_device', [
 			'output' => ['tokenid'],
