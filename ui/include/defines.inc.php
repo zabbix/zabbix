@@ -1574,6 +1574,7 @@ define('API_UINTS64',				14);
 define('API_CUIDS',					44);
 define('API_USER_MACROS',			52);
 define('API_FILTER_VALUES',			59);
+define('API_UUIDS_V7',				75);
 
 // any type
 define('API_ANY',					61);
@@ -1631,6 +1632,7 @@ define('API_NUMBER',				71);
 define('API_SELEMENTID',			72);
 define('API_SSL_CERTIFICATE',		73);
 define('API_SSL_PRIVATE_KEY',		74);
+define('API_UUID_V7',				76);
 
 // flags
 define('API_REQUIRED',					0x00001);

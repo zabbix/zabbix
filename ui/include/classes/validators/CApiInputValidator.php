@@ -276,6 +276,12 @@ class CApiInputValidator {
 
 			case API_SSL_PRIVATE_KEY:
 				return self::validateSslPrivateKey($rule, $data, $path, $error);
+
+			case API_UUIDS_V7:
+				return self::validateUuidsV7($rule, $data, $path, $error);
+
+			case API_UUID_V7:
+				return self::validateUuidV7($rule, $data, $path, $error);
 		}
 
 		// This message can be untranslated because warn about incorrect validation rules at a development stage.
@@ -360,6 +366,7 @@ class CApiInputValidator {
 			case API_SELEMENTID:
 			case API_SSL_CERTIFICATE:
 			case API_SSL_PRIVATE_KEY:
+			case API_UUID_V7:
 				return true;
 
 			case API_OBJECT:
@@ -370,6 +377,7 @@ class CApiInputValidator {
 			case API_INTS32:
 			case API_CUIDS:
 			case API_USER_MACROS:
+			case API_UUIDS_V7:
 				return self::validateStringsUniqueness($rule, $data, $path, $error);
 
 			case API_OBJECTS:
@@ -4353,5 +4361,70 @@ class CApiInputValidator {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Array of UUIDv7 validator.
+	 *
+	 * @param array       $rule
+	 * @param int         $rule['flags']  (optional) API_ALLOW_NULL, API_NORMALIZE
+	 * @param mixed       $data
+	 * @param string      $path
+	 * @param string|null $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUuidsV7(array $rule, &$data, string $path, ?string &$error): bool {
+		$flags = array_key_exists('flags', $rule) ? $rule['flags'] : 0x00;
+
+		if (($flags & API_ALLOW_NULL) && $data === null) {
+			return true;
+		}
+
+		if (($flags & API_NORMALIZE) && self::validateUuidV7([], $data, '', $e)) {
+			$data = [$data];
+		}
+		unset($e);
+
+		if (!is_array($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('an array is expected'));
+			return false;
+		}
+
+		$data = array_values($data);
+
+		foreach ($data as $index => &$value) {
+			$subpath = ($path === '/' ? $path : $path.'/').($index + 1);
+
+			if (!self::validateUuidV7([], $value, $subpath, $error)) {
+				return false;
+			}
+		}
+		unset($value);
+
+		return true;
+	}
+
+	/**
+	 * UUIDv7 validator.
+	 *
+	 * @param array       $rule
+	 * @param mixed       $data
+	 * @param string      $path
+	 * @param string|null $error
+	 *
+	 * @return bool
+	 */
+	private static function validateUuidV7(array $rule, &$data, string $path, ?string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
+		if (!CUuidV7::isUuidV7($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv7 is expected'));
+			return false;
+		}
+
+		return true;
 	}
 }
