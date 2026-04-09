@@ -1526,6 +1526,42 @@ class CDataTable {
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
+	onScrollbarPointerDown = e => {
+		this.#scrolling = true;
+		this.#scroll_page_x = e.pageX;
+
+		this.#scrollbar.classList.add(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
+	}
+
+	onScrollbarPointerMove = e => {
+		if (!this.#scrolling) {
+			return;
+		}
+
+		const delta = e.pageX - this.#scroll_page_x;
+
+		this.#scroll_page_x = e.pageX;
+
+		const left = Math.max(0, Math.min(
+			this.#body.scrollLeft + (delta / (this.#body.clientWidth / this.#body.scrollWidth)),
+			this.#body.scrollWidth - this.#body.clientWidth
+		));
+
+		this.#header.scrollTo({left});
+		this.#body.scrollTo({left});
+	}
+
+	onScrollbarPointerUp = () => {
+		if (!this.#scrolling) {
+			return;
+		}
+
+		this.#scrolling = false;
+		this.#scroll_page_x = 0;
+
+		this.#scrollbar.classList.remove(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
+	}
+
 	on(event, callback, options = undefined) {
 		this.#element.addEventListener(event, callback.bind(this), options);
 
@@ -2216,41 +2252,22 @@ class CDataTable {
 		});
 		this.#body_resize_observer.observe(this.#body);
 
-		this.#scrollbar_thumb.addEventListener('pointerdown', e => {
-			this.#scrolling = true;
-			this.#scroll_page_x = e.pageX;
+		this.#scrollbar_thumb.addEventListener('pointerdown', this.onScrollbarPointerDown);
 
-			this.#scrollbar.classList.add(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
-		});
-
-		document.addEventListener('pointermove', e => {
-			if (!this.#scrolling) {
-				return;
-			}
-
-			const delta = e.pageX - this.#scroll_page_x;
-
-			this.#scroll_page_x = e.pageX;
-
-			requestAnimationFrame(() => {
-				const left = this.#body.scrollLeft + (delta / (this.#body.clientWidth / this.#body.scrollWidth));
-
-				this.#header.scrollTo({left});
-				this.#body.scrollTo({left});
-			});
-		});
+		document.addEventListener('pointermove', this.onScrollbarPointerMove);
 
 		for (const type of ['pointerup', 'pointercancel']) {
-			document.addEventListener(type, () => {
-				if (!this.#scrolling) {
-					return;
-				}
+			document.addEventListener(type, this.onScrollbarPointerUp);
+		}
+	}
 
-				this.#scrolling = false;
-				this.#scroll_page_x = 0;
+	#unbindScrollbarEvents() {
+		this.#scrollbar_thumb.removeEventListener('pointerdown', this.onScrollbarPointerDown);
 
-				this.#scrollbar.classList.remove(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
-			});
+		document.removeEventListener('pointermove', this.onScrollbarPointerMove);
+
+		for (const type of ['pointerup', 'pointercancel']) {
+			document.removeEventListener(type, this.onScrollbarPointerUp);
 		}
 	}
 
@@ -2390,8 +2407,12 @@ class CDataTable {
 			this.#body_resize_observer?.disconnect();
 			this.#body_resize_observer = null;
 
-			this.#scrollbar?.remove();
-			this.#scrollbar = null;
+			if (this.#scrollbar) {
+				this.#unbindScrollbarEvents();
+
+				this.#scrollbar.remove();
+				this.#scrollbar = null;
+			}
 
 			return;
 		}
