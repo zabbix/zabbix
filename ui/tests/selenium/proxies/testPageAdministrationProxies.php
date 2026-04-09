@@ -715,31 +715,76 @@ class testPageAdministrationProxies extends CWebTest {
 	}
 
 	/**
-	* Function uses previously created data to check that host-links to enabled and disabled hosts in the Hosts column
-	* have correct coloring after host configuration form was visited.
-	*/
+	 * Function uses previously created data to check that host-links to enabled and disabled hosts in the Hosts column
+	 * have correct coloring for multiple themes after host configuration form was visited.
+	 *
+	 * @onAfter resetUserTheme
+	 */
 	public function testPageAdministrationProxies_VisitedHostColor() {
-		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
-
-		// Check host name and color for enabled and disabled hosts.
-		$hosts = [
-			'active_proxy2' => ['host_name' => 'enabled_host2', 'host_color' => 'rgba(2, 117, 184, 1)'],
-			'active_proxy4' => ['host_name' => 'disabled_host6', 'host_color' => 'rgba(227, 55, 52, 1)']
+		// Check enabled and disabled host-link color for multiple themes.
+		$themes = [
+			'blue-theme' => [
+				'enabled' => 'rgba(2, 117, 184, 1)',
+				'disabled' => 'rgba(227, 55, 52, 1)'
+			],
+			'dark-theme' => [
+				'enabled' => 'rgba(71, 150, 196, 1)',
+				'disabled' => 'rgba(228, 89, 89, 1)'
+			],
+			'hc-light' => [
+				'enabled' => 'rgba(85, 85, 85, 1)',
+				'disabled' => 'rgba(153, 0, 0, 1)'
+			],
+			'hc-dark' => [
+				'enabled' => 'rgba(248, 248, 248, 1)',
+				'disabled' => 'rgba(255, 80, 80, 1)'
+			]
 		];
 
-		foreach ($hosts as $proxy => $host_parameters) {
-			$host_link = $table->findRow('Name', $proxy)->query('link', $host_parameters['host_name'])->one();
+		// Check enabled and disabled host names those are monitored by proxy.
+		$hosts = [
+			'active_proxy2' => ['host_name' => 'enabled_host2'],
+			'active_proxy4' => ['host_name' => 'disabled_host6']
+		];
 
-			// Check host-link text color.
-			$this->assertEquals($host_parameters['host_color'], $host_link->getCSSValue('color'));
-			// Open and close host-link dialog form.
-			$host_link->waitUntilClickable()->click();
-			COverlayDialogElement::find()->waitUntilReady()->one()->close();
-			$this->page->refresh()->waitUntilReady();
+		foreach ($themes as $theme => $host_status) {
+			CDataHelper::call('user.update', [
+				[
+					'userid' => 1,
+					'theme' => $theme
+				]
+			]);
 
-			// Check visited host-link text color.
-			$this->assertEquals($host_parameters['host_color'], $host_link->getCSSValue('color'));
+			$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+			$table = $this->query('class:list-table')->asTable()->one();
+
+			foreach ($hosts as $proxy => $host_parameter) {
+				$host_link = $table->findRow('Name', $proxy)->query('link', $host_parameter['host_name'])->one();
+				$color = ($proxy === 'active_proxy2') ? $host_status['enabled'] : $host_status['disabled'];
+
+				// Check host-link text color.
+				$this->assertEquals($color, $host_link->getCSSValue('color'));
+
+				// Open and close host-link dialog form.
+				$host_link->waitUntilClickable()->click();
+				COverlayDialogElement::find()->waitUntilReady()->one()->close();
+				$this->page->refresh()->waitUntilReady();
+
+				// Check visited host-link text color.
+				$this->assertEquals($color, $host_link->getCSSValue('color'));
+			}
 		}
+	}
+
+	/**
+	 * Restore users the default theme after test.
+	 */
+	public function resetUserTheme() {
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'theme' => 'default'
+			]
+		]);
 	}
 }
