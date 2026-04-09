@@ -1009,6 +1009,7 @@ class CDataTable {
 			this.#applyColumnWidths();
 			this.#applyLastColumnPadding();
 			this.#handleScrollbar();
+			this.#updateScrollbarThumbPosition();
 
 			this.#pager.update(response);
 
@@ -2384,9 +2385,11 @@ class CDataTable {
 	}
 
 	#resizeScrollbarThumb() {
-		const thumb_width = this.#getScrollbarThumbWidth();
+		setTimeout(() => {
+			const thumb_width = this.#getScrollbarThumbWidth();
 
-		this.#scrollbar_thumb.style.width = `${thumb_width}px`;
+			this.#scrollbar_thumb.style.width = `${thumb_width}px`;
+		});
 	}
 
 	#updateScrollbarThumbPosition() {
@@ -2421,7 +2424,7 @@ class CDataTable {
 		}
 
 		if (this.#scrollbar) {
-			this.#scrollbar_thumb.style.width = `${this.#getScrollbarThumbWidth()}px`;
+			this.#resizeScrollbarThumb();
 
 			return;
 		}
