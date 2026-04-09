@@ -2277,8 +2277,7 @@ button {
         align-items: center;
         gap: 5px;
         height: 25px;
-        padding: 5px;
-        cursor: grab; }
+        padding: 5px; }
         .datatable .datatable-options .datatable-options-list .datatable-options-list-item:hover {
           background-color: #f4f4f4; }
         .datatable .datatable-options .datatable-options-list .datatable-options-list-item .checkbox-radio {
@@ -2290,6 +2289,11 @@ button {
           display: inline-block;
           width: 140px;
           vertical-align: middle;
+          cursor: pointer; }
+      .datatable .datatable-options .datatable-options-list.sortable .datatable-options-list-item {
+        cursor: grab; }
+        .datatable .datatable-options .datatable-options-list.sortable .datatable-options-list-item label,
+        .datatable .datatable-options .datatable-options-list.sortable .datatable-options-list-item .datatable-options-list-item-label {
           cursor: grab; }
   .datatable .datatable-options-popup {
     position: absolute;

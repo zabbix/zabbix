@@ -109,7 +109,7 @@ class CDataTableColumn {
 	/**
 	 * @type {boolean}
 	 */
-	#show_in_customize_table = true;
+	#show_in_table_options = true;
 
 	/**
 	 * @type {boolean}
@@ -429,16 +429,16 @@ class CDataTableColumn {
 	/**
 	 * @returns {boolean}
 	 */
-	isShowInCustomizeTable() {
-		return this.#show_in_customize_table;
+	isShowInTableOptions() {
+		return this.#show_in_table_options;
 	}
 
 	/**
-	 * @param {boolean} show_in_customize_table
+	 * @param {boolean} show_in_table_options
 	 * @returns {CDataTableColumn}
 	 */
-	setShowInCustomizeTable(show_in_customize_table) {
-		this.#show_in_customize_table = show_in_customize_table;
+	setShowInTableOptions(show_in_table_options) {
+		this.#show_in_table_options = show_in_table_options;
 
 		return this;
 	}
@@ -627,7 +627,7 @@ class CDataTableColumn {
 			renderer: this.#renderer,
 			resized: this.#resized,
 			resizable: this.#resizable,
-			show_in_customize_table: this.#show_in_customize_table,
+			show_in_table_options: this.#show_in_table_options,
 			sortable: this.#sortable,
 			sort_field: this.#sort_field,
 			span: this.#span,

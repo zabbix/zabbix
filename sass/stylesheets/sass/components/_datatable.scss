@@ -144,7 +144,6 @@
 				gap: 5px;
 				height: 25px;
 				padding: 5px;
-				cursor: grab;
 
 				&:hover {
 					background-color: $ui-hover-bg-color;
@@ -166,7 +165,18 @@
 					display: inline-block;
 					width: 140px;
 					vertical-align: middle;
+					cursor: pointer;
+				}
+			}
+
+			&.sortable {
+				.datatable-options-list-item {
 					cursor: grab;
+
+					label,
+					.datatable-options-list-item-label {
+						cursor: grab;
+					}
 				}
 			}
 		}

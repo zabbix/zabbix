@@ -93,7 +93,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		template.append(popup_header, this.#sortable, reset);
 
 		this.getDataTable().getColumns()
-			.filter(column_config => column_config.isShowInCustomizeTable())
+			.filter(column_config => column_config.isShowInTableOptions())
 			.forEach(column_config => {
 				const OPTIONS_table_item = this.#createSortableItem(column_config);
 

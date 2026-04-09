@@ -1734,7 +1734,7 @@ class CDataTable {
 					.setFields(this.#selectable)
 					.setRenderer(CDataTableColumn.CHECKBOX)
 					.setResizable(false)
-					.setShowInCustomizeTable(false)
+					.setShowInTableOptions(false)
 					.setSticky(true)
 					.setWidth('33px')
 			);
