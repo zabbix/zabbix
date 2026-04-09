@@ -52,7 +52,7 @@ class CControllerUserDeviceCreate extends CController {
 				? []
 				: [['userid' => CWebUser::$data['userid'], 'name' => getUserFullname(CWebUser::$data)]],
 			'js_validation_rules' => (new CFormValidator(CControllerUserDeviceInit::getValidationRules()))->getRules(),
-			'user' => ['debug_mode' => $this->getDebugMode()],
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);

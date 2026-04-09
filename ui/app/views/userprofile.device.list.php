@@ -88,7 +88,7 @@ $confirm_messages = [
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'confirm_messages' => $confirm_messages,
+		'confirm_messages' => $confirm_messages
 	]).');
 '))
 	->setOnDocumentReady()

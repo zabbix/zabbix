@@ -22,7 +22,7 @@ class CControllerUserDeviceStatus extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'uuid' =>	'required|not_empty|db device.uuid',
+			'uuid' =>	'required|not_empty|db device.uuid'
 		];
 
 		$ret = $this->validateInput($fields);
