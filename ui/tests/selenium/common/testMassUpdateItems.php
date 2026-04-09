@@ -1765,6 +1765,9 @@ class testMassUpdateItems extends CWebTest{
 
 				// It is necessary because of unexpected viewport shift.
 				$this->page->updateViewport();
+				// TODO: unstable screenshots on Jenkins. Added border radius 0 for checkboxes.
+				$this->page->getDriver()->executeScript('document.querySelectorAll(\'.checkbox-radio[type="checkbox"]'.
+						'+ label span\').forEach(function (e){ e.style.borderRadius = 0; });');
 				$this->assertScreenshot($form->query('id:preprocessing')->waitUntilPresent()->one(),
 						'Item mass update preprocessing'.$prototypes
 				);
