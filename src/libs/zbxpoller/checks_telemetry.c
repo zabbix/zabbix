@@ -27,6 +27,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	time_t		now = time(NULL);
 	int		update_interval;
 	time_t		lasttimestamp;
+	char		*sql = NULL;
 
 	update_interval = 60 * 60 * 8; /* FIXME: placeholder */
 	lasttimestamp = 0; /* FIXME: placeholder */
@@ -45,7 +46,10 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	/*
+	zbx_tq_sql_generate_postgresql(&query, update_interval, now, lasttimestamp, &sql);
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
+
 	char *out_str = strdup("Parsed:\n");
 	out_str = zbx_strdcatf(out_str, "category: %d,\n", (int)query.category);
 	out_str = zbx_strdcatf(out_str, "metric_type: %d,\n", (int)query.metric_type);
@@ -80,31 +84,13 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	out_str = zbx_strdcatf(out_str, "loopback_limit: %d\n", query.loopback_limit);
 	out_str = zbx_strdcatf(out_str, "aggregation_size: %d\n", query.aggregation_size);
 
+	out_str = zbx_strdcatf(out_str, "\nSQL: '%s'\n", sql);
+
+	out_str = zbx_strdcatf(out_str, "\nOther:\n");
+	out_str = zbx_strdcatf(out_str, "update_interval: %d\n", update_interval);
+	out_str = zbx_strdcatf(out_str, "lasttimestamp: " ZBX_FS_TIME_T "\n", lasttimestamp);
+
 	SET_TEXT_RESULT(result, out_str);
-	*/
-
-	char	*sql = NULL;
-	zbx_tq_sql_generate_postgresql(&query, update_interval, now, lasttimestamp, &sql);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
-
-	zbx_db_result_t res = zbx_db_select(
-			"select itemid, hostid, type, query_fields from items where hostid = 10786;");
-	if (NULL == res || (zbx_db_result_t)ZBX_DB_DOWN == res)
-		goto clean;
-
-	zbx_db_row_t row;
-	while (NULL != (row = zbx_db_fetch(res)))
-	{
-		for (int i = 0; i < 4; i++)
-		{
-			zabbix_log(LOG_LEVEL_INFORMATION,"MYTEST %s(): [%d]: '%s'", __func__, i, row[i]);
-		}
-	}
-
-	SET_TEXT_RESULT(result, zbx_strdup(NULL, "all good"));
-
-	zbx_db_free_result(res);
 
 	ret = SUCCEED;
 
