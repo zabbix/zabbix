@@ -155,12 +155,7 @@ class CDevice extends CApiService {
 
 		$uuid = CUuidV7::generate();
 
-		$init_device_data = [
-			'userid' => $data['userid'],
-			'deviceid' => $uuid
-		];
-
-		$result = $server->initDevice($init_device_data, self::getAuthIdentifier());
+		$result = $server->initDevice(['userid' => $data['userid'], 'deviceid' => $uuid], self::getAuthIdentifier());
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
@@ -374,7 +369,34 @@ class CDevice extends CApiService {
 	public function offboard(array $data): array {
 		$this->validateOffboard($data, $db_devices);
 
-		self::offboardForce($db_devices);
+		global $ZBX_SERVER, $ZBX_SERVER_PORT;
+
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+
+		$deviceids = array_keys($db_devices);
+
+		$result = $server->offboardDevice(['deviceid' => $deviceids[0]], self::getAuthIdentifier());
+
+		if ($result === false) {
+			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
+		}
+
+		$db_device_tokens = DB::select('token_device', [
+			'output' => [],
+			'filter' => ['deviceid' => $deviceids],
+			'preservekeys' => true
+		]);
+
+		$tokenids = array_keys($db_device_tokens);
+
+		DB::delete('token_device', ['tokenid' => $tokenids]);
+		DB::delete('token', ['tokenid' => $tokenids]);
+		DB::delete('device', ['deviceid' => $deviceids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 
 		return $data;
 	}
@@ -397,40 +419,5 @@ class CDevice extends CApiService {
 		if (!$db_devices) {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
-	}
-
-	public static function offboardForce(array $db_devices): void {
-		global $ZBX_SERVER, $ZBX_SERVER_PORT;
-
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-		);
-
-		$deviceids = array_keys($db_devices);
-
-		$offboard_device_data = [
-			'deviceid' => $deviceids[0]
-		];
-
-		$result = $server->offboardDevice($offboard_device_data, self::getAuthIdentifier());
-
-		if ($result === false) {
-			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
-		}
-
-		$db_device_tokens = DB::select('token_device', [
-			'output' => ['tokenid'],
-			'filter' => ['deviceid' => $deviceids],
-			'preservekeys' => true
-		]);
-
-		$tokenids = array_keys($db_device_tokens);
-
-		DB::delete('token_device', ['tokenid' => $tokenids]);
-		DB::delete('token', ['tokenid' => $tokenids]);
-		DB::delete('device', ['deviceid' => $deviceids]);
-
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 	}
 }

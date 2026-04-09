@@ -46,9 +46,12 @@ class CUuidV7 {
 	}
 
 	public static function isUuidV7(string $uuid): bool {
-		$uuid = strtolower($uuid);
+		if (strlen($uuid) != 32 || !ctype_xdigit($uuid)) {
+			return false;
+		}
 
-		return strlen($uuid) == 32 && ctype_xdigit($uuid) && $uuid[12] === '7'
-			&& in_array($uuid[16], ['8', '9', 'a', 'b']);
+		$binary = hex2bin($uuid);
+
+		return $binary !== false && (ord($binary[6]) & 0xf0) == 0x70 && (ord($binary[8]) & 0xc0) == 0x80;
 	}
 }

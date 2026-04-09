@@ -2037,16 +2037,6 @@ class CUser extends CApiService {
 			'where' => ['userid' => $userids]
 		]);
 
-		$db_devices = DB::select('device', [
-			'output' => ['deviceid', 'uuid', 'name'],
-			'filter' => ['userid' => $userids],
-			'preservekeys' => true
-		]);
-
-		if ($db_devices) {
-			CDevice::offboardForce($db_devices);
-		}
-
 		$db_tokens = DB::select('token', [
 			'output' => ['tokenid', 'name'],
 			'filter' => ['userid' => $userids],
