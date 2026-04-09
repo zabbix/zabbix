@@ -129,11 +129,11 @@ class testCalculatedExpression extends CIntegrationTest {
 	private function sendNotSupportedExtremeValues($sendMax, $sendMin, $itemkey)
 	{
 		for ($i = 1; $i <= $sendMax; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX + 1e-10);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX + INF);
 		}
 
 		for ($i = 1; $i <= $sendMin; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN) - 1e-10;
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN) - INF;
 		}
 	}
 
