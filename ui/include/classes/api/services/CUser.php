@@ -3016,7 +3016,7 @@ class CUser extends CApiService {
 		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_SCHEME_DPOP, $time);
 
 		$resource = DBselect(
-			'SELECT dk.deviceid,dk.key_,dk.kid,dk.scope'.
+			'SELECT td.deviceid,dk.key_,dk.kid,dk.scope'.
 			' FROM token_device td,device_key dk'.
 			' WHERE td.deviceid=dk.deviceid'.
 				' AND '.dbConditionId('td.tokenid', [$db_token['tokenid']]).

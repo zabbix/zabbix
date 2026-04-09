@@ -23,7 +23,7 @@ class CDevice extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'init' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'onboard' => [],
-		'delete' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
+		'offboard' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
 	protected $tableName = 'device';
@@ -279,7 +279,7 @@ class CDevice extends CApiService {
 			'deviceid' => $db_device['deviceid']
 		];
 
-		DB::insertBatch('token_device', [$ins_device_token]);
+		DB::insertBatch('token_device', [$ins_device_token], false);
 
 		$device = [
 			'deviceid' => $db_device['deviceid'],
