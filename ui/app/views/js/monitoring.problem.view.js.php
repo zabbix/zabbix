@@ -756,19 +756,19 @@
 				return;
 			}
 
-			const filter = {
-				...this.filter_defaults,
-				...this.datatable.getFilter(),
-				...this.active_filter.getFilterParamsObject()
-			};
+			const search_params = new URLSearchParams(location.search.substring(1));
+			const current_filter = searchParamsToObject(search_params);
+			const filter = {...this.filter_defaults, ...current_filter};
 
-			if (!filter.filter_custom_time) {
+			if (filter.filter_custom_time == 0) {
 				filter.from = this.global_timerange.from;
 				filter.to = this.global_timerange.to;
 			}
 
 			this.datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
+					check_changes: false,
+					force_load: true,
 					onSuccess: response => this.onDataDone(response)
 				});
 		},

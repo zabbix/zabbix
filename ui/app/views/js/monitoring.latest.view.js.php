@@ -208,7 +208,7 @@
 					new CDataTableColumn('actions', '')
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
 						.setRenderer('actions')
-						.setShowInCustomizeTable(false)
+						.setShowInTableOptions(false)
 						.setWidth('max-content'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
@@ -445,14 +445,14 @@
 				return;
 			}
 
-			const filter = {
-				...this.filter_defaults,
-				...this.datatable.getFilter(),
-				...this.active_filter.getFilterParamsObject()
-			};
+			const search_params = new URLSearchParams(location.search.substring(1));
+			const current_filter = searchParamsToObject(search_params);
+			const filter = {...this.filter_defaults, ...current_filter};
 
 			this.datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
+					check_changes: false,
+					force_load: true,
 					onSuccess: response => this.onDataDone(response)
 				});
 		},
