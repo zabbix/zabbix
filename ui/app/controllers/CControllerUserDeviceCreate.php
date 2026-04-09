@@ -41,8 +41,17 @@ class CControllerUserDeviceCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		// TODO: check access
-		return true;
+		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+			return false;
+		}
+
+		if ($this->getInput('admin_mode', 0) === '1') {
+			return ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
+			);
+		}
+
+		return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN);
 	}
 
 	protected function doAction() {

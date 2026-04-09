@@ -22,7 +22,7 @@ class CControllerUserDeviceStatus extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'uuid' =>	'required|not_empty|db device.uuid'
+			'deviceid' =>	'required|not_empty|db device.deviceid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -41,8 +41,12 @@ class CControllerUserDeviceStatus extends CController {
 	}
 
 	protected function checkPermissions() {
-		// TODO: check access
 		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+			return false;
+		}
+
+		if (!CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+				|| !CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
 			return false;
 		}
 
@@ -52,7 +56,7 @@ class CControllerUserDeviceStatus extends CController {
 	protected function doAction() {
 		$device = API::Device()->get([
 			'output' => ['deviceid'],
-			'filter' => ['uuid' => $this->getInput('uuid')]
+			'deviceids' => [$this->getInput('deviceid')]
 		]);
 
 		$output = [];

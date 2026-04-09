@@ -26,7 +26,11 @@ $html_page = (new CHtmlPage())
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_DEVICE_LIST))
 	->setControls((new CList([
 		(new CTag('nav', true,
-			(new CList())->addItem((new CSimpleButton(_('Link a device')))->addClass('js-create-device'))
+			(new CList())->addItem(
+				(new CSimpleButton(_('Link a device')))
+					->addClass('js-create-device')
+					->setEnabled(CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN))
+			)
 		))->setAttribute('aria-label', _('Content controls'))
 	])));
 

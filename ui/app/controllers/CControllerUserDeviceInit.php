@@ -51,19 +51,35 @@ class CControllerUserDeviceInit extends CController {
 	}
 
 	protected function checkPermissions() {
-		// TODO: check access
-		return true;
+		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+			return false;
+		}
+
+		if ($this->getInput('admin_mode', 0) == 1) {
+			return ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
+			);
+		}
+
+		return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN);
 	}
 
 	protected function initFakeDevice (): array {
 		return [
-			'expires_at' => time() + 300,
-			'uuid' => 'dev-id-123',
-			'server_id' => 'server-id-123',
-			'enrollment_token' => 'BET',
-			'mobile_enrollment_token' => 'MET',
-			'bridge_enrollment_key' => ['b' => 'b', 'e' => 'e', 'k' => 'k'],
-			'enrollment_url' => 'URL'
+			'enrollment_token_expires_at' => time() + 300,
+			'deviceid' => '018f9c6a7c1b7f3a9b2d5c4f8e6a1d90',
+			'server_id' => '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90',
+			'enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
+			'mobile_enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
+			'bridge_enrollment_key' => [
+				'kty' => 'EC',
+				'crv' => 'P-256',
+				'x' => 'V4D0HUpQ7fqiXLyLw4CivPSUAL3tbbyH_bFeRaBT7NY',
+				'y' => 'kZdlarx9bsd7g28If2wNobwRYoBJFvaBDuI2pTyyIKs',
+				'kid' => 'serverKid',
+				'alg' => '1'
+			],
+			'enrollment_url' => '165.22.83.177:8443'
 		];
 	}
 
@@ -77,9 +93,9 @@ class CControllerUserDeviceInit extends CController {
 
 		if ($device) {
 			$output = [
-				'expires_at' => $device['expires_at'],
-				'expires_at_text' => zbx_date2str(TIME_FORMAT, $device['expires_at']),
-				'uuid' => $device['uuid'],
+				'expires_at' => $device['enrollment_token_expires_at'],
+				'expires_at_text' => zbx_date2str(TIME_FORMAT, $device['enrollment_token_expires_at']),
+				'deviceid' => $device['deviceid'],
 				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
 					->setArgument('ver', ZABBIX_API_VERSION)
 					->setArgument('sid', $device['server_id'])
@@ -99,6 +115,5 @@ class CControllerUserDeviceInit extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
-
 	}
 }
