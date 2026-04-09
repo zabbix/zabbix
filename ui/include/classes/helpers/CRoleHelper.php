@@ -507,6 +507,10 @@ class CRoleHelper {
 						self::UI_ADMINISTRATION_API_TOKENS => _('API tokens'),
 						self::UI_ADMINISTRATION_AUTHENTICATION => _('Authentication')
 					];
+
+					if (CTemporaryMobileFeatureHelper::isEnabled()) {
+						$labels[self::UI_ADMINISTRATION_LINKED_DEVICES] = _('Linked devices');
+					}
 				}
 
 				return $labels;
@@ -575,6 +579,21 @@ class CRoleHelper {
 
 		if ($user_type === USER_TYPE_SUPER_ADMIN) {
 			$labels += [self::ACTIONS_EDIT_USER_MEDIA => _('Create and edit user media')];
+		}
+
+		return $labels;
+	}
+
+	public static function getDevicesActionsLabels(int $user_type): array {
+		$default_labels = [
+			self::DEVICES_ACTIONS_MANAGE_OWN => _('Manage own devices'),
+			self::DEVICES_ACTIONS_MANAGE_USER => _('Manage user devices')
+		];
+
+		$labels = [];
+
+		foreach (self::getDeviceActionsByUserType($user_type) as $action) {
+			$labels[$action] = $default_labels[$action];
 		}
 
 		return $labels;

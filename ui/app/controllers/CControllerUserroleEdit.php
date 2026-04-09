@@ -109,6 +109,12 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'super_admin_role_clone' =>						'in 1'
 		];
 
+		if (CTemporaryMobileFeatureHelper::isEnabled()) {
+			$fields['ui_administration_linked_devices'] = 'in 0,1';
+			$fields['devices_actions'] = 'array';
+			$fields['devices_actions_default_access'] = 'in 0,1';
+		}
+
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
@@ -344,13 +350,25 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 		}
 
+		if (CTemporaryMobileFeatureHelper::isEnabled()) {
+			// Devices actions section.
+			foreach (CRoleHelper::getDeviceActionsByUserType((int) $data['type']) as $label) {
+				$input_name = str_replace('.', '_', $label);
+
+				if ($this->hasInput($input_name)) {
+					$data['rules']['devices.actions'][$label] = $this->getInput($input_name);
+				}
+			}
+		}
+
 		return $data;
 	}
 
 	private function getLabels(array $db_modules): array {
 		$labels = [
 			'sections' => CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN),
-			'actions' => CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN)
+			'actions' => CRoleHelper::getActionsLabels(USER_TYPE_SUPER_ADMIN),
+			'devices_actions' => CRoleHelper::getDevicesActionsLabels(USER_TYPE_SUPER_ADMIN)
 		];
 
 		foreach (array_keys(CRoleHelper::getUiSectionsLabels(USER_TYPE_SUPER_ADMIN)) as $section) {
@@ -392,7 +410,10 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'api.access' => true,
 			'api.mode' => 'api.mode',
 			'actions' => array_fill_keys(CRoleHelper::getActionsByUserType($user_type), true),
-			'actions.default_access' => true
+			'actions.default_access' => true,
+			'devices.access' => ZBX_ROLE_RULE_ENABLED,
+			'devices.actions' => array_fill_keys(CRoleHelper::getDeviceActionsByUserType($user_type), false),
+			'devices.actions.default_access' => ZBX_ROLE_RULE_ENABLED,
 		];
 	}
 
@@ -404,10 +425,13 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'output' => ['roleid'],
 			'selectRules' => ['ui', 'ui.default_access', 'modules', 'modules.default_access', 'api', 'api.access',
 				'api.mode', 'actions', 'actions.default_access', 'services.read.mode', 'services.read.list',
-				'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag'
+				'services.read.tag', 'services.write.mode', 'services.write.list', 'services.write.tag',
+				'devices.access', 'devices.actions', 'devices.actions.default_access'
 			],
 			'roleids' => $roleid
 		]);
+
+		error_log(json_encode($roles[0]['rules']['devices.actions']));
 
 		return $this->getRules($roles[0]['rules']);
 	}
@@ -470,6 +494,13 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$rules['api.access'] = $input['api.access'];
 		$rules['api.mode'] = $input['api.mode'];
 		$rules['actions.default_access'] = $input['actions.default_access'];
+
+		$rules['devices.access'] = $input['devices.access'];
+		$rules['devices.actions.default_access'] = $input['devices.actions.default_access'];
+
+		foreach ($input['devices.actions'] as $rule) {
+			$rules['devices.actions']['devices.actions.'.$rule['name']] = $rule['status'];
+		}
 
 		return $rules;
 	}

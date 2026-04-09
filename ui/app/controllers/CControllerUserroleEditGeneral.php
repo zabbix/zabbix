@@ -28,7 +28,8 @@ abstract class CControllerUserroleEditGeneral extends CController {
 			$this->getServiceSectionRules(),
 			$this->getModuleSectionRules(),
 			$this->getApiSectionRules(),
-			$this->getActionSectionRules($user_type)
+			$this->getActionSectionRules($user_type),
+			$this->getDevicesActionSectionRules($user_type)
 		);
 	}
 
@@ -136,6 +137,29 @@ abstract class CControllerUserroleEditGeneral extends CController {
 				CRoleHelper::getActionsByUserType($user_type)
 			),
 			'actions.default_access' => $this->getInput('actions_default_access')
+		];
+	}
+
+	private function getDevicesActionSectionRules(int $user_type): array {
+		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+			return [];
+		}
+
+		$device_action_rules = array_flip($this->getInput('devices_actions', []));
+		$enabled = $this->getInput('devices_access') ? 1 : 0;
+
+		return [
+			'devices.access' => $enabled,
+			'devices.actions' => array_map(
+				function (string $rule) use ($device_action_rules, $enabled): array {
+					return [
+						'name' => str_replace('devices.actions.', '', $rule),
+						'status' => $enabled && array_key_exists($rule, $device_action_rules) ? 1 : 0
+					];
+				},
+				CRoleHelper::getDeviceActionsByUserType($user_type)
+			),
+			'devices.actions.default_access' => $this->getInput('devices_actions_default_access')
 		];
 	}
 }
