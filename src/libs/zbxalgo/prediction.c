@@ -1108,6 +1108,7 @@ double	zbx_forecast(double *t, double *x, int n, double now, double time, zbx_fi
 	}
 out:
 	zbx_matrix_free(coefficients);
+
 	if (SUCCEED != res)
 	{
 		result = ZBX_MATH_ERROR;
@@ -1126,6 +1127,7 @@ out:
 	{
 		result = -DBL_MAX;
 	}
+
 	return result;
 }
 
