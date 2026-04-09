@@ -30,7 +30,12 @@ class CControllerTemplateListData extends CControllerDataTable {
 		$sort_field = $this->getInput('sort_field', 'name');
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
 
-		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+		if ($filter['tags']) {
+			$filter['tags'] = array_filter(array_filter($filter['tags']),
+				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+
+			CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+		}
 
 		CProfile::update('web.templates.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.templates.sortorder', $sort_order, PROFILE_TYPE_STR);

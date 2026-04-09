@@ -45,6 +45,11 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 		$filter = CControllerLatest::sanitizeFilter($filter);
 
+		if ($filter['tags']) {
+			$filter['tags'] = array_filter(array_filter($filter['tags']),
+				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+		}
+
 		$data = $this->prepareData($filter, $sort_field, $sort_order);
 
 		$data['items'] = CMacrosResolverHelper::resolveItemKeys($data['items']);

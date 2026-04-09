@@ -492,6 +492,20 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
+		if ($filter['inventory']) {
+			$filter['inventory'] = array_filter(array_filter($filter['inventory']),
+				static fn (array $inv) => $inv['value'] !== '');
+		}
+
+		if ($filter['tags']) {
+			$filter['tags'] = array_filter(array_filter($filter['tags']),
+				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+		}
+
+		if (array_key_exists('severities', $filter) && empty($filter['severities'])) {
+			unset($filter['severities']);
+		}
+
 		if ($filter['show'] == TRIGGERS_OPTION_ALL) {
 			$timeline = getTimeSelectorPeriod([
 				'profileidx' => true,

@@ -35,9 +35,8 @@ class CControllerHostViewData extends CControllerDataTable {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter($filter['tags'], function (array $tag) {
-				return !($tag['tag'] === '' && $tag['value'] === '');
-			});
+			$filter['tags'] = array_filter(array_filter($filter['tags']),
+				static fn (array $tag) => $tag['tag'] != '' && $tag['value'] != '');
 		}
 
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;

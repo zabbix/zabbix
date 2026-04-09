@@ -744,30 +744,6 @@
 
 			const filter_params = this.active_filter.getFilterParamsObject();
 
-			if ('inventory' in filter_params) {
-				const inventory = Array.from(Object.values(filter_params.inventory))
-					.filter(inv => inv.value != '');
-
-				if (inventory.length == 0) {
-					delete filter_params.inventory;
-				}
-			}
-
-			if ('tags' in filter_params) {
-				const tags = Array.from(Object.values(filter_params.tags))
-					.filter(tag => tag.tag != '' && tag.value != '');
-
-				if (tags.length == 0) {
-					delete filter_params.tags;
-				}
-			}
-
-			if ('severities' in filter_params) {
-				if (filter_params.severities.length == 0) {
-					delete filter_params.severities;
-				}
-			}
-
 			this.datatable.setFilter({...this.filter_defaults, ...filter_params})
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					onSuccess: response => this.onDataDone(response)

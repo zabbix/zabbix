@@ -37,7 +37,12 @@ class CControllerHostListData extends CControllerDataTable {
 		CProfile::update('web.hosts.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.hosts.sortorder', $sort_order, PROFILE_TYPE_STR);
 
-		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+		if ($filter['tags']) {
+			$filter['tags'] = array_values(array_filter($filter['tags'],
+				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != ''));
+
+			CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+		}
 
 		$filter['groups'] = $filter['groups']
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([

@@ -141,6 +141,10 @@ $filter_tags_table->addRow(
 $right_column = (new CFormGrid())
 	->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 	->addItem([
+		new CLabel(_('Tags')),
+		new CFormField($filter_tags_table)
+	])
+	->addItem([
 		new CLabel(_('State'), 'state_#{uniqid}'),
 		new CFormField(
 			(new CRadioButtonList('state', (int) $data['state']))

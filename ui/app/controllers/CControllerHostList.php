@@ -138,6 +138,10 @@ class CControllerHostList extends CController {
 			]), ['proxy_groupid' => 'id'])
 			: [];
 
+		if (!$filter['tags']) {
+			$filter['tags'] = [['tag' => '', 'value' => '', 'operator' => TAG_OPERATOR_LIKE]];
+		}
+
 		$storage_idx = 'web.hosts.datatable';
 
 		$data = [
