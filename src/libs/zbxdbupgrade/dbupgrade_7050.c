@@ -762,6 +762,37 @@ static int	DBpatch_7050052(void)
 	return ret;
 }
 
+static int	DBpatch_7050053(void)
+{
+	const zbx_db_field_t	field = {"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBdrop_not_null("acknowledges", &field);
+}
+
+static int	DBpatch_7050054(void)
+{
+	const zbx_db_field_t	field = {"maintenanceid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("acknowledges", &field);
+}
+
+static int	DBpatch_7050055(void)
+{
+	return DBdrop_foreign_key("acknowledges", 1);
+}
+
+static int	DBpatch_7050056(void)
+{
+	return DBdrop_foreign_key("acknowledges", 2);
+}
+
+static int	DBpatch_7050057(void)
+{
+	const zbx_db_field_t	field = {"eventid", NULL, "events", "eventid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
+
+	return DBadd_foreign_key("acknowledges", 1, &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -821,5 +852,10 @@ DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
 DBPATCH_ADD(7050051, 0, 1)
 DBPATCH_ADD(7050052, 0, 1)
+DBPATCH_ADD(7050053, 0, 1)
+DBPATCH_ADD(7050054, 0, 1)
+DBPATCH_ADD(7050055, 0, 1)
+DBPATCH_ADD(7050056, 0, 1)
+DBPATCH_ADD(7050057, 0, 1)
 
 DBPATCH_END()
