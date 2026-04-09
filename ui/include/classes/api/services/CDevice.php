@@ -74,7 +74,7 @@ class CDevice extends CApiService {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// Filters.
-			'deviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'deviceids' =>				['type' => API_UUIDS_V7, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
@@ -382,7 +382,7 @@ class CDevice extends CApiService {
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'deviceid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'deviceid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
