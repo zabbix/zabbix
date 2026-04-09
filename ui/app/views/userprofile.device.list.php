@@ -39,7 +39,7 @@ $deviceTable = (new CTableInfo())
 			(new CCheckBox('all_items'))->onClick("checkAll('".$deviceForm->getName()."', 'all_items', 'g_deviceid');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
-		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Device ID'), 'deviceid', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
 		_('Action')
@@ -50,7 +50,7 @@ foreach ($data['devices'] as $device) {
 	$deviceTable->addRow([
 		(new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid'])),
 		$device['name'],
-		$device['uuid'],
+		$device['deviceid'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
 		(new CButton('', _('Unlink')))

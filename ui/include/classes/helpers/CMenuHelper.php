@@ -316,8 +316,8 @@ class CMenuHelper {
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
 				: null,
-			// TODO: access check
-			CTemporaryMobileFeatureHelper::isEnabled()
+			CTemporaryMobileFeatureHelper::isEnabled() &&
+				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
 				? (new CMenuItem(_('Linked devices')))
 					->setAction('user.device.list')
 				: null
@@ -476,8 +476,7 @@ class CMenuHelper {
 				);
 			}
 
-			// TODO: permission check
-			if (CTemporaryMobileFeatureHelper::isEnabled()) {
+			if (CTemporaryMobileFeatureHelper::isEnabled() && CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)) {
 				$submenu->add(
 					(new CMenuItem(_('Linked devices')))
 						->setAction('userprofile.device.list')
