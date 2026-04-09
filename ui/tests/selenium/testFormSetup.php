@@ -42,10 +42,6 @@ class testFormSetup extends CWebTest {
 		unlink(__DIR__.'/../../conf/zabbix.conf.php');
 	}
 
-	/*protected function assignAllRightsToConfigFile () {
-		shell_exec('sudo chmod 777 '.__DIR__.'/../../conf/zabbix.conf.php');
-	}*/
-
 	/**
 	 * @backup settings
 	 */
@@ -57,7 +53,7 @@ class testFormSetup extends CWebTest {
 		$this->checkSections('Welcome');
 		$form = $this->query('xpath://form')->asForm()->one();
 		$language_field = $form->getField('Default language');
-		$this->assertEquals('English (en_US)', $language_field->getValue()); //kapec???
+		$this->assertEquals('English (en_US)', $language_field->getValue());
 		$hint_text = 'You are not able to choose some of the languages, because locales for them are not installed '.
 				'on the web server.';
 		$this->assertEquals($hint_text, $this->query('xpath://button[@data-hintbox]')->one()
