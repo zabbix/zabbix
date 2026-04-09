@@ -2403,7 +2403,10 @@ class CDataTable {
 	}
 
 	#handleScrollbar() {
-		if (this.#body.scrollWidth == this.#body.clientWidth) {
+		const total_column_width = Array.from(this.#findHeaderCells())
+			.reduce((width, header_cell) => width + header_cell.getBoundingClientRect().width, 0);
+
+		if (total_column_width <= this.#body.clientWidth) {
 			this.#body_resize_observer?.disconnect();
 			this.#body_resize_observer = null;
 
