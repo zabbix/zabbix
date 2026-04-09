@@ -678,11 +678,8 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 	if (TQ_TIME_INTERVAL_INVALID == query->aggregation_size)
 		return ret_errf(FAIL, error, max_error_len, "aggregation size is not set");
 
-	if (0 > query->aggregation_size || 0 > query->loopback_limit || 0 > query->time_shift)
-	{
-		THIS_SHOULD_NEVER_HAPPEN;
-		return FAIL;
-	}
+	if (0 == query->aggregation_size)
+		return ret_errf(FAIL, error, max_error_len, "aggregation cannot be 0");
 
 	if (query->aggregation_size > query->loopback_limit)
 		return ret_errf(FAIL, error, max_error_len, "aggregation size cannot be larger than loopback limit");
