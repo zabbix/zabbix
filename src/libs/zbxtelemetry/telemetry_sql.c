@@ -706,8 +706,8 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 	/* where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"`Timestamp`>to_timestamp(" ZBX_FS_TIME_T ") "
-			"AND `Timestamp`<=to_timestamp(" ZBX_FS_TIME_T ") ",
+			"`Timestamp`>toDateTime(" ZBX_FS_TIME_T ") "
+			"AND `Timestamp`<=toDateTime(" ZBX_FS_TIME_T ") ",
 			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
 	if (query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
