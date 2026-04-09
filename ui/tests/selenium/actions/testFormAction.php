@@ -21,8 +21,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 define('ACTION_GOOD', 0);
 define('ACTION_BAD', 1);
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup actions, profiles
  *
@@ -341,13 +339,15 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestInputTypeByXpath('//textarea[@id="value"]', 'TEST1');
 			$this->query('xpath://div[@data-dialogueid="action-condition"]//button[text()="Add"]')->one()->click()->waitUntilNotVisible();
 			$this->zbxTestAssertVisibleXpath('//*[@id="conditionTable"]//tr[@data-row_index="0"]');
+
 			// Open Condition overlay dialog again and fill second condition.
 			$this->zbxTestClickXpath('//button[text()="Add" and contains(@class, "condition-create")]');
 			$this->zbxTestLaunchOverlayDialog('New condition');
 			$this->zbxTestInputTypeByXpath('//textarea[@id="value"]', 'TEST2');
 			$this->query('xpath://div[@data-dialogueid="action-condition"]//button[text()="Add"]')->one()->click()->waitUntilNotVisible();
+
 			// Wait until overlay is closed and value is added, so that Type of calculation dropdown is clickable.
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('evaltype'));
+			$this->query('id:evaltype')->waitUntilVisible()->one();
 			$this->zbxTestDropdownSelectWait('evaltype', $data['evaltype']);
 			$evaltype = $data['evaltype'];
 		}
@@ -403,7 +403,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->zbxTestDropdownSelectWait('condition_type', $data['new_condition_conditiontype']);
 			COverlayDialogElement::find()->one()->waitUntilReady();
 		}
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
+		$this->query('id:condition-type')->waitUntilVisible()->one();
 		$new_condition_conditiontype = $this->zbxTestGetSelectedLabel('condition_type');
 
 		switch ($eventsource) {
@@ -799,7 +799,7 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestTextPresent('Send message');
 			}
 			else {
-				$this->zbxTestWaitUntilElementPresent(webDriverBy::id('operationtype'));
+				$this->query('id:operationtype')->waitUntilPresent()->one();
 				$this->zbxTestDropdownSelectWait('operation-type-select', $new_operation_operationtype);
 				COverlayDialogElement::find()->one()->waitUntilReady();
 			}
@@ -994,9 +994,8 @@ class testFormAction extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleXpath('//div[contains(@class, "overlay-dialogue modal")]'.
 						'//ul[@id="value" and @class="radio-list-control"]');
 				$this->zbxTestAssertElementPresentXpath('//label[text()="No"]/../input[@checked]');
-				$this->zbxTestClickXpathWait('//div[@data-dialogueid="operation-condition"]//'.
-						'button[contains(@type,"button") and (text()="Add")]');
-				$this->zbxTestWaitUntilElementNotVisible(WebDriverBy::xpath('//div[@data-dialogueid="operation-condition"]'));
+				$this->query('xpath://div[@data-dialogueid="operation-condition"]//'.
+						'button[contains(@type,"button") and (text()="Add")]')->one()->click()->waitUntilNotVisible();
 			}
 		}
 		else {
@@ -1058,9 +1057,11 @@ class testFormAction extends CLegacyWebTest {
 		$this->assertEquals($message_types, $operation_details->query('id:operation-type-select')
 				->asDropdown()->one()->getOptions()->asText());
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
+
 		// Make sure that Custom message is unchecked and that message related fields are not visible.
 		$this->assertFalse($operation_details->getField('Custom message')->getValue());
 		$this->zbxTestTextNotVisible(['Subject','Message']);
+
 		// Set the Custom message option and check Subject and Message fields.
 		$operation_details->getField('Custom message')->set(true);
 		$this->assertEquals(255, $operation_details->getField('id:operation-opmessage-subject')->waitUntilVisible()->getAttribute('maxlength'));
@@ -1509,7 +1510,7 @@ class testFormAction extends CLegacyWebTest {
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@class, "condition-create")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('condition-type'));
+		$this->query('id:condition-type')->waitUntilVisible()->one();
 		$this->zbxTestDropdownSelectWait('condition_type', 'Tag name');
 		$this->zbxTestInputTypeWait('value', 'zabbix');
 		$condition_form->submit();
@@ -1538,7 +1539,7 @@ class testFormAction extends CLegacyWebTest {
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
 
 		$this->zbxTestClickXpathWait('//table[@id="op-table"]//button[text()="Add"]');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
+		$this->query('xpath://div[@class="overlay-dialogue-footer"]//button[text()="Add"]')->waitUntilVisible()->one();
 		$operation_form->getField('Operation')->select('Reboot');
 
 		// add target current host
@@ -1563,7 +1564,7 @@ class testFormAction extends CLegacyWebTest {
 			$this->query('xpath://tr[@id="'.$row.'"]')->waitUntilVisible();
 		}
 
-		$this->zbxTestWaitUntilElementClickable(WebDriverBy::className('js-add'));
+		$this->query('class:js-add')->waitUntilClickable()->one();
 		$this->zbxTestAssertElementText("//tr[@id='operations_0']//td[@class='wordbreak']",
 			"Send message to users: Admin (Zabbix Administrator) via SMS ".
 			"Send message to user groups: Enabled debug mode, Zabbix administrators via SMS");
@@ -1573,7 +1574,7 @@ class testFormAction extends CLegacyWebTest {
 			"Run script \"Reboot\" on host groups: Zabbix servers");
 
 		$this->zbxTestClickXpathWait('//table[@id="op-table"]//button[text()="Add"]');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]'));
+		$this->query('xpath://div[@class="overlay-dialogue-footer"]//button[text()="Add"]')->waitUntilVisible()->one();
 		$this->zbxTestInputTypeOverwrite('operation_esc_step_to', '2');
 		$this->zbxTestDropdownSelectWait('operation-type-select', 'Reboot');
 		$this->zbxTestCheckboxSelect('operation-command-chst');

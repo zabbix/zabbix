@@ -423,11 +423,13 @@ class testPageHosts extends CLegacyWebTest {
 	 */
 	public function testPageHosts_FilterMonitoredBy($data) {
 		$this->page->login()->open(self::HOST_LIST_PAGE)->waitUntilReady();
+		$table = $this->getTable();
 
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->fill($data['filter']);
 		$filter->submit();
+		$table ->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		$this->assertTableStats(count($data['expected']));

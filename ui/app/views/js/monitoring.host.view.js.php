@@ -139,6 +139,12 @@
 		},
 
 		refresh() {
+			if (isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			this.setLoading();
 
 			const params = this.refresh_url.getArgumentsObject();

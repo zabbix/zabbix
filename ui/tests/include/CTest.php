@@ -49,6 +49,11 @@ define('STRING_32', substr(STRING_6000, 0, 32));
  */
 use PHPUnit\Framework\TestCase;
 
+/**
+ * Php unit built-in exception class.
+ */
+use PHPUnit\Framework\Warning;
+
 class CTest extends TestCase {
 
 	// Table that should be backed up at the test suite level.
@@ -422,7 +427,7 @@ class CTest extends TestCase {
 		DBclose();
 
 		if (defined('PHPUNIT_REPORT_WARNINGS') && PHPUNIT_REPORT_WARNINGS && self::$warnings) {
-			throw new PHPUnit_Framework_Warning(implode("\n", self::$warnings));
+			throw new Warning(implode("\n", self::$warnings));
 		}
 
 		if ($errors !== '' && $errors !== false) {
