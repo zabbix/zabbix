@@ -157,8 +157,7 @@ class CDevice extends CApiService {
 
 		$init_device_data = [
 			'userid' => $data['userid'],
-			'deviceid' => $uuid,
-			'serverid' => CApiDpopHelper::getServerId() // todo - replace this mock for Server ID by real method
+			'deviceid' => $uuid
 		];
 
 		$result = $server->initDevice($init_device_data, self::getAuthIdentifier());
@@ -411,8 +410,7 @@ class CDevice extends CApiService {
 		$deviceids = array_keys($db_devices);
 
 		$offboard_device_data = [
-			'deviceid' => $deviceids[0],
-			'serverid' => CApiDpopHelper::getServerId() // todo - replace this mock for Server ID by real method
+			'deviceid' => $deviceids[0]
 		];
 
 		$result = $server->offboardDevice($offboard_device_data, self::getAuthIdentifier());
