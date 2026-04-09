@@ -156,6 +156,19 @@ class CConfiguration extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$count = API::MediaType()->get([
+			'countOutput' => true,
+			'mediatypeids' => $params['options']['mediaTypes'],
+			'filter' => [
+				'type' => CFeatureFlagHelper::getSupportedMediaTypes()
+			],
+			'editable' => true
+		]);
+
+		if ($count != count($params['options']['mediaTypes'])) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		if ($params['format'] === CExportWriterFactory::XML) {
 			$lib_xml = (new CFrontendSetup())->checkPhpLibxml();
 
