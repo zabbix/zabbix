@@ -107,6 +107,8 @@ typedef struct
 }
 ZBX_DC_FUNCTION;
 
+ZBX_PTR_VECTOR_DECL(dc_function_ptr, ZBX_DC_FUNCTION *)
+
 typedef struct
 {
 	zbx_hashset_t	dep_itemids;

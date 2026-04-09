@@ -926,8 +926,7 @@ class CWidgetBase {
 	 * @returns {boolean}
 	 */
 	isUserInteracting() {
-		return this._target
-			.querySelectorAll('[data-expanded="true"], [aria-expanded="true"][aria-haspopup="true"]').length > 0;
+		return isUserInteracting(this._target);
 	}
 
 	/**
