@@ -1738,6 +1738,8 @@ class CWidgetBase {
 		if (this._is_editable) {
 			this._button_edit = document.createElement('button');
 			this._button_edit.type = 'button';
+			this._button_edit.setAttribute("data-hintbox", '1');
+			this._button_edit.setAttribute("data-hintbox-contents", t('Edit'));
 			this._button_edit.setAttribute('aria-label', t('Edit widget settings'));
 			this._button_edit.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_COG_FILLED, 'js-widget-edit');
 

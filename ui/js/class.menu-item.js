@@ -31,7 +31,7 @@ class CMenuItem extends CBaseComponent {
 
 		if (this.hasClass('has-submenu')) {
 			this._submenu = new CMenu(this._target.querySelector('.submenu'), ++level);
-			this._submenu._target.id = this._target.id+"-submenu";
+			this._submenu._target.id = `${this._target.id}-submenu`;
 			this._toggle.setAttribute('aria-controls', this._submenu._target.id);
 		}
 
