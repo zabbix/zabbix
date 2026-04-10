@@ -2503,7 +2503,7 @@ button {
     .datatable .datatable-footer.table-paging {
       border: solid #303030;
       border-width: 1px 0 0; }
-      .datatable .datatable-footer.table-paging #selected_count {
+      .datatable .datatable-footer.table-paging .js-selected-count {
         justify-self: start; }
       .datatable .datatable-footer.table-paging .table-stats {
         position: static;
