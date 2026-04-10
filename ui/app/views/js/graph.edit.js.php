@@ -249,7 +249,7 @@ window.graph_edit_popup = new class {
 					width: fields.width,
 					height: fields.height,
 					graphtype: fields.graphtype,
-					show_legend: fields.show_legend,
+					legend: fields.show_legend,
 					resolve_macros: this.context === 'template' ? 0 : 1
 				};
 
