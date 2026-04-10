@@ -77,7 +77,7 @@ typedef struct
 	const char	*config_adapter_ca_file;
 	const char	*config_adapter_cert_file;
 	const char	*config_adapter_key_file;
-	const char	*config_adapter_connect_to
+	const char	*config_adapter_connect_to;
 }
 zbx_thread_alerter_args;
 
