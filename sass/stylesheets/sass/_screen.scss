@@ -3642,7 +3642,7 @@ svg {
 	}
 
 	.btn-undo {
-		display: none;
+		display: flex;
 		align-items: start;
 		height: auto;
 		color: $icon-color;
@@ -3664,6 +3664,10 @@ svg {
 
 		&.is-focused {
 			border-color: $form-focus-border-color;
+		}
+
+		&[hidden] {
+			display: none;
 		}
 	}
 
