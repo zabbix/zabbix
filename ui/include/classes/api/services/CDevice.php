@@ -153,7 +153,7 @@ class CDevice extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$uuid = CUuidV7::generate();
+		$uuid = generateUuidV7();
 
 		$result = $server->initDevice(['userid' => $data['userid'], 'deviceid' => $uuid], self::getAuthIdentifier());
 

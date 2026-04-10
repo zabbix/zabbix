@@ -2463,6 +2463,30 @@ function generateUuidV4($seed = '') {
 	return bin2hex($data);
 }
 
+function generateUuidV7(): string {
+	// 48 bit
+	$unix_timestamp = (int) floor(microtime(true) * 1000);
+
+	// 32 bit leftmost bits
+	$left_time_part = ($unix_timestamp >> 16) & 0xffffffff;
+
+	// 16 bit rightmost bits
+	$right_time_part = $unix_timestamp & 0xffff;
+
+	// 6 bytes time part
+	$time_part = pack('Nn', $left_time_part, $right_time_part);
+
+	$data = $time_part.random_bytes(10);
+
+	// Set version: 7th byte to 0111 (0111xxxx)
+	$data[6] = chr(ord($data[6]) & 0x0f | 0x70);
+
+	// Set variant: 9th byte to 10 (10xxxxxx)
+	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
+
+	return bin2hex($data);
+}
+
 /**
  * Function returns predefined Leaflet Tile providers with parameters.
  *

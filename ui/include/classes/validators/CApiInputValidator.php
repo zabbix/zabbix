@@ -3159,12 +3159,11 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateUuidV7(array $rule, &$data, string $path, string &$error): bool {
-		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
-			return false;
-		}
+		$uuid_v7_validator = new CUuidV7Validator();
 
-		if (!CUuidV7::isUuidV7($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, _('UUIDv7 is expected'));
+		if (!$uuid_v7_validator->validate($data)) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $uuid_v7_validator->getError());
+
 			return false;
 		}
 
