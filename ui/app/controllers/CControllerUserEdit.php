@@ -85,6 +85,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 	}
 
 	protected function doAction(): void {
+		global $ZBX_FEATURE_FLAGS;
+
 		$db_defaults = DB::getDefaults('users');
 
 		$data = [
@@ -256,7 +258,7 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			$data['templategroups_rights'] = collapseGroupRights(getTemplateGroupsRights($user_groups));
 		}
 
-		$data['modules_config_enabled'] = CFeatureFlagHelper::isFlagModulesEnabled();
+		$data['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
 
 		if ($data['modules_config_enabled']) {
 			$data['modules'] = [];

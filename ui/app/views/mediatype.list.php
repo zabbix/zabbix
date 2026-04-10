@@ -29,7 +29,7 @@ $html_page = (new CHtmlPage())
 			->addItem(
 				(new CSimpleButton(_('Create media type')))
 					->setId('js-create')
-					->setEnabled((bool) CFeatureFlagHelper::getSupportedMediaTypes())
+					->setEnabled((bool) CMediatypeHelper::getSupportedMediaTypes())
 			)
 			->addItem(
 				(new CSimpleButton(_('Import')))
@@ -42,7 +42,7 @@ $html_page = (new CHtmlPage())
 							dialogue_class: "modal-popup-generic"
 						});'
 					)
-					->setEnabled((bool) CFeatureFlagHelper::getSupportedMediaTypes())
+					->setEnabled((bool) CMediatypeHelper::getSupportedMediaTypes())
 			)
 		))->setAttribute('aria-label', _('Content controls'))
 	)
@@ -183,7 +183,7 @@ foreach ($data['mediatypes'] as $media_type) {
 		}
 	}
 
-	if (in_array($media_type['typeid'], CFeatureFlagHelper::getSupportedMediaTypes())) {
+	if (in_array($media_type['typeid'], CMediatypeHelper::getSupportedMediaTypes())) {
 		$status = (MEDIA_TYPE_STATUS_ACTIVE == $media_type['status'])
 			? (new CLink(_('Enabled')))
 				->addClass(ZBX_STYLE_GREEN)
@@ -221,7 +221,7 @@ foreach ($data['mediatypes'] as $media_type) {
 
 	$checkbox = new CCheckBox('mediatypeids['.$media_type['mediatypeid'].']', $media_type['mediatypeid']);
 
-	if (in_array($media_type['typeid'], CFeatureFlagHelper::getSupportedMediaTypes())) {
+	if (in_array($media_type['typeid'], CMediatypeHelper::getSupportedMediaTypes())) {
 		$name = new CLink($media_type['name'], $media_type_url);
 	}
 	else {

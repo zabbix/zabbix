@@ -51,7 +51,7 @@ $mediatype_form_grid = (new CFormGrid())
 				->addOptions(CSelect::createOptionsFromArray(
 					array_intersect_key(
 						CMediatypeHelper::getMediaTypes(),
-						array_flip(CFeatureFlagHelper::getSupportedMediaTypes())
+						array_flip(CMediatypeHelper::getSupportedMediaTypes())
 					)))
 				->setValue($data['type'])
 		))->setId('type-field')

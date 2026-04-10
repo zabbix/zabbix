@@ -23,10 +23,12 @@ abstract class CControllerUserroleEditGeneral extends CController {
 	 * @throws APIException
 	 */
 	protected function getRulesInput(int $user_type): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		return array_merge(
 			$this->getUiSectionRules($user_type),
 			$this->getServiceSectionRules(),
-			CFeatureFlagHelper::isFlagModulesEnabled() ? $this->getModuleSectionRules() : [],
+			$ZBX_FEATURE_FLAGS['modules_config_enabled'] ? $this->getModuleSectionRules() : [],
 			$this->getApiSectionRules(),
 			$this->getActionSectionRules($user_type)
 		);

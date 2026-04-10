@@ -194,12 +194,30 @@ class CConfigFile {
 		}
 
 		if (isset($ALLOW_HTTP_AUTH)) {
-			$ZBX_FEATURE_FLAGS[CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG] = $ALLOW_HTTP_AUTH;
+			$ZBX_FEATURE_FLAGS['http_auth_enabled'] = $ALLOW_HTTP_AUTH;
 			$this->config['ALLOW_HTTP_AUTH'] = $ALLOW_HTTP_AUTH;
 		}
 
-		if (isset($ZBX_FEATURE_FLAGS) && is_array($ZBX_FEATURE_FLAGS)) {
-			$this->config['ZBX_FEATURE_FLAGS'] = $this->getFeatureFlags($ZBX_FEATURE_FLAGS);
+		if (isset($ZBX_FEATURE_FLAGS['http_auth_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['http_auth_enabled'] = $ZBX_FEATURE_FLAGS['http_auth_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['modules_config_enabled'])) {
+			$this->config['ZBX_FEATURE_FLAGS']['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
+		}
+
+		if (isset($ZBX_FEATURE_FLAGS['media_type_denylist'])) {
+			if (!is_array($ZBX_FEATURE_FLAGS['media_type_denylist'])) {
+				self::exception(_s('Incorrect configuration %1$s: %2$s.',
+					'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
+					_('an array is expected')
+				));
+			}
+			else {
+				$this->config['ZBX_FEATURE_FLAGS']['media_type_denylist'] = $this->getMediaTypeDenylist(
+					$ZBX_FEATURE_FLAGS['media_type_denylist']
+				);
+			}
 		}
 
 		if (isset($ZBX_SERVER_TLS) && is_array($ZBX_SERVER_TLS)) {
@@ -235,7 +253,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ZBX_SERVER_TLS;
+			$ZBX_SERVER_TLS, $ZBX_FEATURE_FLAGS;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -244,6 +262,7 @@ class CConfigFile {
 		$IMAGE_FORMAT_DEFAULT = $this->config['IMAGE_FORMAT_DEFAULT'];
 		$HISTORY = $this->config['HISTORY'];
 		$SSO = $this->config['SSO'];
+		$ZBX_FEATURE_FLAGS = $this->config['ZBX_FEATURE_FLAGS'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
 	}
 
@@ -366,22 +385,13 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	}
 
 	/**
-	 * Validate and return $ZBX_FEATURE_FLAGS configuration.
+	 * Validate and return $ZBX_FEATURE_FLAGS['media_type_denylist'] configuration.
 	 *
-	 * @param array $ZBX_FEATURE_FLAGS  Array from configuration file.
+	 * @param array $media_type_denylist  Array from configuration file.
 	 *
 	 * @throws Exception
 	 */
-	protected function getFeatureFlags(array $ZBX_FEATURE_FLAGS): array {
-		$flags = [
-			CFeatureFlagHelper::HTTP_AUTH_FEATURE_FLAG => true,
-			CFeatureFlagHelper::MODULE_FEATURE_FLAG => true,
-			CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG => []
-		];
-
-		$flags = array_replace($flags, $ZBX_FEATURE_FLAGS);
-
-		$media_types = $flags[CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG];
+	protected function getMediaTypeDenylist(array $media_type_denylist): array {
 		$type_flag = [
 			MEDIA_TYPE_EMAIL => 'email',
 			MEDIA_TYPE_EXEC => 'script',
@@ -389,25 +399,14 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			MEDIA_TYPE_WEBHOOK => 'webhook'
 		];
 
-		$error = null;
-
-		if (!is_array($media_types)) {
-			$error = _('an array is expected');
-		}
-		elseif (array_diff($media_types, $type_flag)) {
-			$error = _s('value must be one of %1$s', implode(',', $type_flag));
-		}
-
-		if ($error !== null) {
+		if (array_diff($media_type_denylist, $type_flag)) {
 			self::exception(_s('Incorrect configuration %1$s: %2$s.',
 				'$ZBX_FEATURE_FLAGS[\'media_type_denylist\']',
-				$error
+				_s('value must be one of %1$s', implode(',', $type_flag))
 			));
 		}
 
-		$flags[CFeatureFlagHelper::MEDIATYPES_FEATURE_FLAG] = array_keys(array_intersect($type_flag, $media_types));
-
-		return $flags;
+		return array_keys(array_intersect($type_flag, $media_type_denylist));
 	}
 
 	protected function setDefaults() {

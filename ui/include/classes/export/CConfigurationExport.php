@@ -1621,7 +1621,7 @@ class CConfigurationExport {
 			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,
 			'filter' => [
-				'type' => CFeatureFlagHelper::getSupportedMediaTypes()
+				'type' => CMediatypeHelper::getSupportedMediaTypes()
 			],
 			'preservekeys' => true
 		]);

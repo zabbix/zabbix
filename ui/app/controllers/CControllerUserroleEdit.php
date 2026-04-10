@@ -26,6 +26,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	}
 
 	protected function checkInput(): bool {
+		global $ZBX_FEATURE_FLAGS;
+
 		$fields = [
 			'roleid' => 									'db users.roleid',
 			'name' => 										'db role.name',
@@ -109,7 +111,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'super_admin_role_clone' =>						'in 1'
 		];
 
-		if (!CFeatureFlagHelper::isFlagModulesEnabled()) {
+		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
 			unset($fields['fields']['modules'], $fields['fields']['modules_default_access']);
 		}
 
@@ -151,6 +153,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	 * @throws APIException
 	 */
 	protected function doAction(): void {
+		global $ZBX_FEATURE_FLAGS;
+
 		$db_defaults = DB::getDefaults('role');
 
 		if ($this->hasInput('super_admin_role_clone')) {
@@ -220,7 +224,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			}
 		}
 
-		$data['rules']['modules_config_enabled'] = CFeatureFlagHelper::isFlagModulesEnabled();
+		$data['rules']['modules_config_enabled'] = $ZBX_FEATURE_FLAGS['modules_config_enabled'];
 
 		$db_modules = $data['rules']['modules_config_enabled']
 			? API::Module()->get([
@@ -409,12 +413,14 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	 * @throws APIException
 	 */
 	private function getRulesByRoleid(string $roleid): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		$select_rules = ['ui', 'ui.default_access', 'api', 'api.access', 'api.mode', 'actions',
 			'actions.default_access', 'services.read.mode', 'services.read.list', 'services.read.tag',
 			'services.write.mode', 'services.write.list', 'services.write.tag'
 		];
 
-		if (CFeatureFlagHelper::isFlagModulesEnabled()) {
+		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
 			$select_rules = array_merge($select_rules, ['modules', 'modules.default_access']);
 		}
 
@@ -428,6 +434,8 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 	}
 
 	private function getRules(array $input): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		$rules = [];
 
 		foreach ($input['ui'] as $rule) {
@@ -460,7 +468,7 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 		$rules['service_write_list'] = $input['services.write.list'];
 		$rules['service_write_tag'] = $input['services.write.tag'];
 
-		if (CFeatureFlagHelper::isFlagModulesEnabled()) {
+		if ($ZBX_FEATURE_FLAGS['modules_config_enabled']) {
 			foreach ($input['modules'] as $rule) {
 				$rules['modules'][$rule['moduleid']] = $rule['status'];
 			}

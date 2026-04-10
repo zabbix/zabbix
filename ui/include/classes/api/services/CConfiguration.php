@@ -160,7 +160,7 @@ class CConfiguration extends CApiService {
 			'countOutput' => true,
 			'mediatypeids' => $params['options']['mediaTypes'],
 			'filter' => [
-				'type' => CFeatureFlagHelper::getSupportedMediaTypes()
+				'type' => CMediatypeHelper::getSupportedMediaTypes()
 			],
 			'editable' => true
 		]);

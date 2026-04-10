@@ -25,6 +25,8 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 	}
 
 	public static function getValidationRules(): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		$api_uniq = [
 			['role.get', ['name' => '{name}']]
 		];
@@ -95,7 +97,7 @@ class CControllerUserroleCreate extends CControllerUserroleEditGeneral {
 			'form_refresh' => ['integer']
 		]];
 
-		if (!CFeatureFlagHelper::isFlagModulesEnabled()) {
+		if (!$ZBX_FEATURE_FLAGS['modules_config_enabled']) {
 			unset($rules['fields']['modules'], $rules['fields']['modules_default_access']);
 		}
 

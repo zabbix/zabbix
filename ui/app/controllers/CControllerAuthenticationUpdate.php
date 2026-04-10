@@ -17,6 +17,8 @@
 class CControllerAuthenticationUpdate extends CController {
 
 	public static function getValidationRules(): array {
+		global $ZBX_FEATURE_FLAGS;
+
 		$rules = ['object', 'fields' => [
 			'passwd_min_length' => ['setting passwd_min_length', 'required', 'min' => 1, 'max' => 70],
 			'passwd_check_rules' => ['array', 'field' => ['setting passwd_check_rules',
@@ -394,7 +396,7 @@ class CControllerAuthenticationUpdate extends CController {
 			];
 		}
 
-		if (CFeatureFlagHelper::isFlagHttpAuthEnabled()) {
+		if ($ZBX_FEATURE_FLAGS['http_auth_enabled']) {
 			$rules['fields'] += [
 				'http_auth_enabled' => ['setting http_auth_enabled',
 					'in' => [ZBX_AUTH_HTTP_DISABLED, ZBX_AUTH_HTTP_ENABLED]
@@ -637,6 +639,8 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	private function processGeneralAuthenticationSettings(int $ldap_userdirectoryid, int $mfaid): bool {
+		global $ZBX_FEATURE_FLAGS;
+
 		$auth_params = [
 			CAuthenticationHelper::AUTHENTICATION_TYPE,
 			CAuthenticationHelper::DISABLED_USER_GROUPID,
@@ -666,7 +670,7 @@ class CControllerAuthenticationUpdate extends CController {
 			'mfaid' => $mfaid
 		];
 
-		if (CFeatureFlagHelper::isFlagHttpAuthEnabled()) {
+		if ($ZBX_FEATURE_FLAGS['http_auth_enabled']) {
 			$auth_params = array_merge($auth_params, [
 				CAuthenticationHelper::HTTP_AUTH_ENABLED,
 				CAuthenticationHelper::HTTP_LOGIN_FORM,

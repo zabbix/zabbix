@@ -20,10 +20,10 @@
 class CModule extends CApiService {
 
 	public const ACCESS_RULES = [
-		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG],
-		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG],
-		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG],
-		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => CFeatureFlagHelper::MODULE_FEATURE_FLAG]
+		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER, 'feature_flag' => 'modules_config_enabled'],
+		'create' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => 'modules_config_enabled'],
+		'update' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => 'modules_config_enabled'],
+		'delete' => ['min_user_type' => USER_TYPE_SUPER_ADMIN, 'feature_flag' => 'modules_config_enabled']
 	];
 
 	protected $tableName = 'module';

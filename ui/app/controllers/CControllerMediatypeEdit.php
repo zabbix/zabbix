@@ -46,8 +46,10 @@ class CControllerMediatypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		global $ZBX_FEATURE_FLAGS;
+
 		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)
-				|| !CFeatureFlagHelper::getSupportedMediaTypes()) {
+				|| !CMediatypeHelper::getSupportedMediaTypes()) {
 			return false;
 		}
 
