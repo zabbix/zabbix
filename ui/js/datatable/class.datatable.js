@@ -662,7 +662,7 @@ class CDataTable {
 			`),
 			table_options_button: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_OPTIONS_BUTTON} ${ZBX_STYLE_HIDDEN}" tabindex="-1">
-					<button class="${CDataTable.ZBX_STYLE_OPTIONS_LINK}" type="button" role="button">
+					<button class="${CDataTable.ZBX_STYLE_OPTIONS_LINK}" type="button" role="button" title="${t('Customize table')}">
 						<span class="${ZBX_ICON_FILTERS}"></span>
 					</button>
 				</div>

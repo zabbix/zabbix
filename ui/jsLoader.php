@@ -255,7 +255,8 @@ $translate_strings = [
 		'Are you sure you want to delete %1$s? This action cannot be undone.' =>
 			_('Are you sure you want to delete %1$s? This action cannot be undone.'),
 		'duplicate' => _('duplicate'),
-		'selected' => _('selected')
+		'selected' => _('selected'),
+		'Customize table' => _('Customize table')
 	],
 	'class.options-popup.js' => [
 		'Column name' => _('Column name'),
