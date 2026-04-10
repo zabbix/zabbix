@@ -22,7 +22,7 @@
 window.mediatype_edit_popup = new class {
 
 	init({rules, clone_rules, mediatype, message_templates, smtp_server_default, smtp_email_default,
-			oauth_defaults_by_provider, media_types_enabled}) {
+			oauth_defaults_by_provider}) {
 		this.overlay = overlays_stack.getById('mediatype.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
@@ -36,7 +36,6 @@ window.mediatype_edit_popup = new class {
 		this.smtp_server_default = smtp_server_default;
 		this.smtp_email_default = smtp_email_default;
 		this.oauth_defaults_by_provider = oauth_defaults_by_provider;
-		this.media_types_enabled = media_types_enabled;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', 'mediatype.list');
@@ -566,7 +565,6 @@ window.mediatype_edit_popup = new class {
 			this.#loadTypeFields(e);
 			this.#toggleAddButton();
 
-			this.form_element.querySelector('#status').disabled = !this.media_types_enabled[e.target.value];
 			this.form_element.querySelector('#smtp_authentication').dispatchEvent(new Event('change'));
 			this.form_element.querySelector('#smtp_security').dispatchEvent(new Event('change'));
 		};

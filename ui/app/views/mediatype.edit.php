@@ -635,8 +635,7 @@ $output = [
 			'message_templates' => CMediatypeHelper::getAllMessageTemplates(),
 			'smtp_server_default' => $email_defaults['smtp_server'],
 			'smtp_email_default' =>  $email_defaults['smtp_email'],
-			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider(),
-			'media_types_enabled' => CMediatypeHelper::getMediaTypesEnabled()
+			'oauth_defaults_by_provider' => CMediatypeHelper::getOauthDefaultsByProvider()
 		]).');'
 	,
 	'dialogue_class' => 'modal-popup-static'

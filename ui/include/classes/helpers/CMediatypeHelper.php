@@ -142,16 +142,6 @@ class CMediatypeHelper {
 		return $types[$type];
 	}
 
-	public static function getMediaTypesEnabled(): array {
-		return [
-			MEDIA_TYPE_EMAIL => true,
-			MEDIA_TYPE_EXEC => true,
-			MEDIA_TYPE_SMS => true,
-			MEDIA_TYPE_WEBHOOK => true,
-			MEDIA_TYPE_PUSH => CTemporaryMobileFeatureHelper::isConfigured()
-		];
-	}
-
 	/**
 	 * Returns an array of message templates.
 	 */
