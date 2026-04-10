@@ -1497,6 +1497,12 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 				trapper_args_in->config_stats_allowed_ip);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
+		{
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				goto out;
+		}
+
 		if (TIMEOUT_ERROR == ret)
 			continue;
 
@@ -1511,15 +1517,6 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
-
-			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
-			{
-				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				{
-					zbx_tcp_unaccept(&s);
-					goto out;
-				}
-			}
 
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
@@ -1549,13 +1546,16 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 		}
 	}
 out:
+	zbx_tcp_unaccept(&s);
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d stopped [%s #%d]", get_program_type_string(info->program_type),
+			server_num, get_process_type_string(process_type), process_num);
+
+	zbx_exit(SUCCEED == ZBX_IS_NORMAL_EXIT() ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #undef POLL_TIMEOUT
 }

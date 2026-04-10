@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-02-13 22:27+0000\n"
+"PO-Revision-Date: 2026-03-20 21:12+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -490,7 +490,7 @@ msgstr "Une virgule est attendue dans la valeur."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:89
 msgid "A message or at least one operation is required."
-msgstr ""
+msgstr "Un message ou au moins une opération est requis."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
@@ -1800,7 +1800,7 @@ msgstr "Au moins un niveau de chiffrement doit être sélectionné."
 #: app/controllers/CControllerSlaCreate.php:53
 #: app/controllers/CControllerSlaUpdate.php:54
 msgid "At least one entry should be selected."
-msgstr ""
+msgstr "Au moins une entrée doit être sélectionnée."
 
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
@@ -2317,7 +2317,7 @@ msgstr "Les deux mots de passe doivent être égaux."
 #: app/controllers/CControllerItemPrototypeUpdate.php:257
 #: app/controllers/CControllerItemUpdate.php:256
 msgid "Both username and password should be either present or empty."
-msgstr ""
+msgstr "Le nom d'utilisateur et le mot de passe doivent être présents ou vides."
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -3520,7 +3520,7 @@ msgstr "Impossible de trouver le groupe d'hôtes « %1$s » pour le prototype 
 #: include/classes/import/importers/CDashboardImporterGeneral.php:57
 #, c-format
 msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "Impossible de trouver le groupe d'hôtes « %1$s » utilisé dans le tableau de bord « %2$s »."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4908,11 +4908,11 @@ msgstr "La vérification existe déjà."
 
 #: app/controllers/CControllerPopupImportCompare.php:121
 msgid "Check and reconfigure widgets after the import is completed."
-msgstr ""
+msgstr "Vérifiez et reconfigurez les widgets une fois l'importation terminée."
 
 #: app/controllers/CControllerPopupImport.php:136
 msgid "Check and reconfigure widgets."
-msgstr ""
+msgstr "Vérifiez et reconfigurez les widgets."
 
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
@@ -8261,7 +8261,7 @@ msgstr "Durée"
 
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
 msgid "Duration must be no less than a minute."
-msgstr ""
+msgstr "La durée doit être d'au moins une minute."
 
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
@@ -8996,7 +8996,7 @@ msgstr "Temps d'arrêt exclu"
 #: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
 #, c-format
 msgid "Excluded downtime must not extend beyond %1$s."
-msgstr ""
+msgstr "La période d'indisponibilité exclue ne doit pas dépasser %1$s."
 
 #: app/controllers/CControllerSlaCreate.php:74
 #: app/controllers/CControllerSlaUpdate.php:75
@@ -9365,6 +9365,66 @@ msgstr "Le champ \"%1$s\" n'est pas une chaîne de caractères."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Le champ \"%1$s\" doit être manquant."
+
+#: include/classes/data/CTriggerConditionFunctionData.php:275
+#: include/classes/data/CTriggerConditionFunctionData.php:298
+#: include/classes/data/CTriggerConditionFunctionData.php:321
+#: include/classes/data/CTriggerConditionFunctionData.php:344
+#: include/classes/data/CTriggerConditionFunctionData.php:367
+#: include/classes/data/CTriggerConditionFunctionData.php:441
+#: include/classes/data/CTriggerConditionFunctionData.php:466
+#: include/classes/data/CTriggerConditionFunctionData.php:490
+#: include/classes/data/CTriggerConditionFunctionData.php:513
+#: include/classes/data/CTriggerConditionFunctionData.php:537
+#: include/classes/data/CTriggerConditionFunctionData.php:560
+#: include/classes/data/CTriggerConditionFunctionData.php:584
+#: include/classes/data/CTriggerConditionFunctionData.php:608
+#: include/classes/data/CTriggerConditionFunctionData.php:632
+#: include/classes/data/CTriggerConditionFunctionData.php:655
+#: include/classes/data/CTriggerConditionFunctionData.php:678
+#: include/classes/data/CTriggerConditionFunctionData.php:732
+#: include/classes/data/CTriggerConditionFunctionData.php:755
+#: include/classes/data/CTriggerConditionFunctionData.php:779
+#: include/classes/data/CTriggerConditionFunctionData.php:802
+#: include/classes/data/CTriggerConditionFunctionData.php:825
+#: include/classes/data/CTriggerConditionFunctionData.php:905
+#: include/classes/data/CTriggerConditionFunctionData.php:929
+#: include/classes/data/CTriggerConditionFunctionData.php:952
+#: include/classes/data/CTriggerConditionFunctionData.php:975
+#: include/classes/data/CTriggerConditionFunctionData.php:1043
+#: include/classes/data/CTriggerConditionFunctionData.php:1115
+#: include/classes/data/CTriggerConditionFunctionData.php:1139
+#: include/classes/data/CTriggerConditionFunctionData.php:1165
+#: include/classes/data/CTriggerConditionFunctionData.php:1213
+#: include/classes/data/CTriggerConditionFunctionData.php:1236
+#: include/classes/data/CTriggerConditionFunctionData.php:1259
+#: include/classes/data/CTriggerConditionFunctionData.php:1283
+#: include/classes/data/CTriggerConditionFunctionData.php:1306
+#: include/classes/data/CTriggerConditionFunctionData.php:1329
+#: include/classes/data/CTriggerConditionFunctionData.php:1352
+#: include/classes/data/CTriggerConditionFunctionData.php:1376
+#: include/classes/data/CTriggerConditionFunctionData.php:1399
+#: include/classes/data/CTriggerConditionFunctionData.php:1423
+#: include/classes/data/CTriggerConditionFunctionData.php:1446
+#: include/classes/data/CTriggerConditionFunctionData.php:1543
+#: include/classes/data/CTriggerConditionFunctionData.php:1618
+#: include/classes/data/CTriggerConditionFunctionData.php:1742
+#: include/classes/data/CTriggerConditionFunctionData.php:1766
+#: include/classes/data/CTriggerConditionFunctionData.php:1808
+#: include/classes/data/CTriggerConditionFunctionData.php:1832
+#: include/classes/data/CTriggerConditionFunctionData.php:1857
+#: include/classes/data/CTriggerConditionFunctionData.php:1881
+#: include/classes/data/CTriggerConditionFunctionData.php:1905
+#: include/classes/data/CTriggerConditionFunctionData.php:1929
+#: include/classes/data/CTriggerConditionFunctionData.php:1952
+#: include/classes/data/CTriggerConditionFunctionData.php:1975
+#: include/classes/data/CTriggerConditionFunctionData.php:2021
+#: include/classes/data/CTriggerConditionFunctionData.php:2163
+#: include/classes/data/CTriggerConditionFunctionData.php:2376
+#: include/classes/data/CTriggerConditionFunctionData.php:2400
+#: include/classes/data/CTriggerConditionFunctionData.php:2470
+msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
+msgstr "Le champ \"Dernier de\" ne peut pas être vide si le champ \"Décalage temporel\" n'est pas vide."
 
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
@@ -10237,7 +10297,7 @@ msgstr "Caché"
 #: widgets/scatterplot/includes/WidgetForm.php:176
 #: widgets/svggraph/includes/WidgetForm.php:268
 msgid "Hide"
-msgstr ""
+msgstr "Cacher"
 
 #: jsLoader.php:395
 msgid "Hide debug"
@@ -10704,7 +10764,7 @@ msgstr "Nom de l'hôte"
 #: widgets/scatterplot/includes/WidgetForm.php:173
 #: widgets/svggraph/includes/WidgetForm.php:265
 msgid "Host names in labels"
-msgstr ""
+msgstr "Noms d'hôte dans les étiquettes"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -12495,7 +12555,7 @@ msgstr "Méthode API \"%2$s\" non valide pour le rôle utilisateur \"%1$s\"."
 #: app/controllers/CControllerItemPrototypeUpdate.php:176
 #: app/controllers/CControllerItemUpdate.php:175
 msgid "Invalid HTTP status code or range."
-msgstr ""
+msgstr "Code retour HTTP ou plage invalide."
 
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
@@ -12594,6 +12654,10 @@ msgstr "Adresse de courrier électronique non valide \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adresse e-mail incorrecte pour le type de media avec l'ID \"%1$s\"."
+
+#: app/controllers/CControllerPopupTriggerExprCheck.php:61
+msgid "Invalid function"
+msgstr "Fonction invalide"
 
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
@@ -13030,6 +13094,13 @@ msgstr "Champs d'inventaire"
 msgid "Inventory mode"
 msgstr "Mode d'inventaire"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr "Inverser les valeurs"
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "Invoquer \"Exécuter maintenant\" sur les hôtes en lecture seule"
@@ -13075,7 +13146,7 @@ msgstr "Élément"
 #: app/controllers/CControllerPopupTriggerExpr.php:1472
 #, c-format
 msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
-msgstr ""
+msgstr "L'élément « %1$s » ne peut pas être utilisé dans le déclencheur : type de données non pris en charge."
 
 #: items.php:667
 msgid "Item added"
@@ -13485,7 +13556,7 @@ msgstr "LDAP n'est pas configuré"
 
 #: app/controllers/CControllerAuthenticationUpdate.php:34
 msgid "LDAP is not configured."
-msgstr ""
+msgstr "LDAP n'est pas configuré."
 
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
@@ -14645,7 +14716,7 @@ msgstr "Type de média ajouté"
 #: app/controllers/CControllerAuthenticationUpdate.php:296
 #: app/controllers/CControllerPopupLdapCheck.php:116
 msgid "Media type and attribute is not unique."
-msgstr ""
+msgstr "Le type de média et l'attribut ne sont pas uniques."
 
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
@@ -15429,7 +15500,7 @@ msgstr "ID du nom"
 #: app/controllers/CControllerPopupLdapCheck.php:30
 #: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
 msgid "Name already exists."
-msgstr ""
+msgstr "Le nom existe déjà."
 
 #: app/controllers/CControllerOauthCheck.php:36
 #: app/controllers/CControllerOauthCheck.php:44
@@ -15987,7 +16058,7 @@ msgstr "Aucune autorisation pour appeler \"%1$s.%2$s\"."
 
 #: include/classes/api/services/CConfiguration.php:337
 msgid "No permissions to import dashboards."
-msgstr ""
+msgstr "Aucune autorisation pour importer des tableaux de bord."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16922,7 +16993,7 @@ msgstr "Ouvrir le journal"
 #: include/classes/validators/CSslCertificateValidator.php:28
 #: include/classes/validators/CSslPrivateKeyValidator.php:28
 msgid "OpenSSL extension is not available"
-msgstr ""
+msgstr "L'extension OpenSSL n'est pas disponible"
 
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
@@ -17706,6 +17777,12 @@ msgstr "Pourcentage de proxys en ligne. Renvoie un nombre flottant."
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "Pourcentage de temps pendant lequel la machine virtuelle était prête, mais n'a pas pu être planifiée pour s'exécuter sur le CPU physique, \"url\" - URL du service VMware, \"uuid\" - Identifiant unique global de la machine virtuelle VMware, \"instance\" - instance de CPU"
+
+#: include/classes/graph/CSvgGraph.php:1764
+#: include/classes/graphdraw/CLineGraphDraw.php:1620
+#, c-format
+msgid "Percentile %1$s: %2$s"
+msgstr "Pourcentage %1$s : %2$s"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -18693,11 +18770,11 @@ msgstr "Attribut de référence"
 
 #: app/controllers/CControllerPopupImport.php:135
 msgid "References to missing objects were ignored:"
-msgstr ""
+msgstr "Les références aux objets manquants ont été ignorées :"
 
 #: app/controllers/CControllerPopupImportCompare.php:120
 msgid "References to missing objects will be ignored:"
-msgstr ""
+msgstr "Les références aux objets manquants seront ignorées :"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -21582,6 +21659,10 @@ msgstr "Taille de l'espace de swap en octets ou en pourcentage du total. Retourn
 msgid "Swedish (sv_SE)"
 msgstr "Suédois (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr "Changer d'utilisateur SSO"
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Changer de méthode d'authentification va réinitialiser toutes les sessions sauf celle-ci ! Continuer ?"
@@ -21747,7 +21828,7 @@ msgstr "Filtre de tag"
 #: app/controllers/CControllerConnectorCreate.php:120
 #: app/controllers/CControllerConnectorUpdate.php:121
 msgid "Tag filter name, operator and value combination is not unique."
-msgstr ""
+msgstr "La combinaison nom du filtre de tag, de l'opérateur et de la valeur n'est pas unique."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -22221,6 +22302,10 @@ msgstr "L'identifiant client enregistré dans le serveur d'autorisation."
 msgid "The client secret registered within the authorization server."
 msgstr "Le secret client enregistré dans le serveur d'autorisation."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "L'hôte cloné contient des macros définies par l'utilisateur avec le type \"Texte secret\". La valeur et le type de ces macros ont été réinitialisés."
@@ -22500,7 +22585,7 @@ msgstr "Cette valeur ne peut pas être l'une des %1$s."
 #: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
 #, c-format
 msgid "This value cannot have more than %1$s decimal places."
-msgstr ""
+msgstr "Cette valeur ne peut pas avoir plus de %1$s décimales."
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -23614,6 +23699,10 @@ msgstr "Annuler l'acquittement du problème."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Code réponse HTTP inattendu."
+
+#: app/views/mediatype.edit.php:166
+msgid "Unexpected access token update time."
+msgstr "Délai de mise à jour du jeton d'accès inattendu."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25878,6 +25967,10 @@ msgstr "Vous ne pouvez pas changer les modèles pour la sélection actuelle."
 msgid "You do not have permission to perform this operation."
 msgstr "Vous n'avez pas la permission d'effectuer cette opération."
 
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr "Vous avez été autorisé via l'authentification unique (SSO), mais la connexion à Zabbix a échoué."
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "Vous n'avez pas la permission d'accéder à cette page."
@@ -26797,7 +26890,7 @@ msgstr "couleur"
 #: include/classes/validators/CTimeRangesValidator.php:33
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
 msgid "comma separated list of time periods is expected"
-msgstr ""
+msgstr "une liste de périodes séparées par des virgules est attendue"
 
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
@@ -27397,6 +27490,10 @@ msgstr "heure invalide"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "période de stockage des tendances invalide"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr "inversé"
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
@@ -28001,7 +28098,7 @@ msgstr "percentile () - Pourcentage P d'une période T"
 #: include/classes/validators/CTimeRangesValidator.php:56
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
 msgid "periods must be unique"
-msgstr ""
+msgstr "les périodes doivent être uniques"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
@@ -28226,7 +28323,7 @@ msgstr "sqrt() - Racine carrée d'une valeur"
 #: include/classes/validators/CTimeRangesValidator.php:44
 #: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
 msgid "start time must be less than end time"
-msgstr ""
+msgstr "l'heure de démarrage doit être antérieure à l'heure de fin"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28545,7 +28642,7 @@ msgstr "fonction \"%1$s\" inconnue"
 
 #: include/classes/api/services/CMap.php:1999
 msgid "unsupported data type"
-msgstr ""
+msgstr "type de données non supporté"
 
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
@@ -28642,6 +28739,14 @@ msgstr "la valeur %1$s existe déjà"
 #, c-format
 msgid "value contains unescaped character at position %1$d"
 msgstr "la valeur contient un caractère non échappé à la position %1$d"
+
+#: include/classes/validators/CNumberValidator.php:74
+msgid "value is not a valid floating point number"
+msgstr "la valeur n'est pas un nombre à virgule flottante valide"
+
+#: include/classes/validators/CNumberValidator.php:77
+msgid "value is not a valid integer"
+msgstr "la valeur n'est pas un entier valide"
 
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
