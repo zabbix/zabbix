@@ -643,7 +643,7 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 
 	if (SUCCEED != zbx_odbc_fetch(query_result, &row, &fetch_error))
 	{
-		*error = zbx_dsprintf(*error, "SQL fetch failed: %s", fetch_error);
+		*error = zbx_dsprintf(*error, "Cannot fetch row: %s", fetch_error);
 		goto out;
 	}
 
