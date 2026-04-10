@@ -389,6 +389,8 @@
 				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.unscheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.scheduleRefresh())
 				.init(user_configs);
 		},
 
