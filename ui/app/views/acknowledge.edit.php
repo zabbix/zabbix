@@ -89,14 +89,14 @@ $form_list
 					->addClass('js-operation-checkbox')
 					->setChecked($data['suppress_problem'])
 					->setEnabled($data['allowed_suppress'] && $data['problem_can_be_suppressed'])
-			))->addClass('align-top'),
+			))->addClass(ZBX_STYLE_ALIGN_TOP),
 			(new CListItem(
 				(new CRadioButtonList('suppress_time_option', ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE))
 					->addValue(_('Indefinitely'), ZBX_PROBLEM_SUPPRESS_TIME_INDEFINITE)
 					->addValue(_('Until'), ZBX_PROBLEM_SUPPRESS_TIME_DEFINITE)
 					->setEnabled(false)
 					->setModern(true)
-			))->addClass('align-top'),
+			))->addClass(ZBX_STYLE_ALIGN_TOP),
 			(new CDateSelector('suppress_until_problem', $data['suppress_until_problem']))
 				->setDateFormat(ZBX_FULL_DATE_TIME)
 				->setPlaceholder(_($data['suppress_until_problem']))
