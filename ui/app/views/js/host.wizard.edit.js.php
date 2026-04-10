@@ -740,7 +740,7 @@ window.host_wizard_edit = new class {
 				$undo_button.on('click', () => this.#data.macros[row_index].value = undefined);
 
 				if (macro.value === undefined) {
-					$undo_button.hide();
+					$undo_button.attr('hidden', true);
 				}
 			}
 		});

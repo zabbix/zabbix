@@ -227,7 +227,7 @@ class HostMacrosManager {
 					$('#macros_' + num + '_value', $row)
 						.closest('.macro-input-group')
 						.find('.btn-undo')
-						.hide();
+						.attr('hidden', false);
 					$('#macros_' + num + '_description')
 						.val(original_descr)
 						.prop('readonly', true)
