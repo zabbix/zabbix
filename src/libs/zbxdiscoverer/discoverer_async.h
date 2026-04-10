@@ -18,7 +18,6 @@
 #include <event2/dns.h>
 #include "discoverer_int.h"
 #include "discoverer_job.h"
-#include "discoverer_snmp.h"
 
 typedef struct
 {
@@ -40,13 +39,9 @@ typedef struct
 discovery_async_result_t;
 
 void	process_http_result(void *data);
-int	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager, discovery_poller_config_t *poller_config);
 int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error);
 int	discovery_pending_checks_count_decrease(zbx_discoverer_queue_t *queue, int worker_max,
 		zbx_uint64_t total, zbx_uint64_t dec_counter);
-int	discovery_net_check_result_flush(zbx_discoverer_manager_t *dmanager,
-		zbx_vector_discoverer_results_ptr_t *results, int force);
-void	discovery_async_poller_destroy(discovery_poller_config_t *poller_config);
 
 #endif /* ZABBIX_DISCOVERER_ASYNC_H */

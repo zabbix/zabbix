@@ -19,15 +19,12 @@
 #include "zbxtimekeeper.h"
 
 #define DISCOVERER_JOB_TASKS_INPROGRESS_MAX	1000
-#define DISCOVERER_SNMP_CHECKS_INPROGRESS_MAX	10000
 
 #define DISCOVERER_WORKER_INIT_NONE	0x00
 #define DISCOVERER_WORKER_INIT_THREAD	0x01
 
 #define GET_DTYPE(t)		t->ds_dchecks.values[0]->dcheck.type
-#define GET_DRULEID(t)		t->ds_dchecks.values[0]->dcheck.druleid
-#define GET_DCHECKID(t)		t->ds_dchecks.values[0]->dcheck.dcheckid
-#define TASK_IP2STR(t, ip_str)	zbx_iprange_ip2str(t->range.ipranges->values[0].type, \
+#define TASK_IP2STR(t, ip_str)	zbx_iprange_ip2str(t->range.ipranges->values[t->range.state.index_ip].type, \
 					t->range.state.ipaddress, ip_str, sizeof(ip_str))
 
 typedef struct
@@ -88,19 +85,15 @@ typedef struct
 	time_t					now;
 	zbx_uint64_t				unique_dcheckid;
 	unsigned int				processed_checks_per_ip;
-	unsigned int				max_checks_per_ip;
-#	define ZBX_DISCOVERER_RESULT_CHECK_INIT	0x00
-#	define ZBX_DISCOVERER_RESULT_CHECK_LAST	0x01
-#	define ZBX_DISCOVERER_RESULT_JOB_FINISH	0x02
-	unsigned char				status;
 }
 zbx_discoverer_results_t;
 
 ZBX_PTR_VECTOR_DECL(discoverer_results_ptr, zbx_discoverer_results_t*)
 
-zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_discoverer_task_t *task);
+zbx_discoverer_results_t	*discoverer_result_create(zbx_uint64_t druleid, const zbx_uint64_t unique_dcheckid);
 int				discoverer_results_partrange_merge(zbx_hashset_t *hr_dst,
-					zbx_vector_discoverer_results_ptr_t *vr_src, int force);
+					zbx_vector_discoverer_results_ptr_t *vr_src, zbx_discoverer_task_t *task,
+					int force);
 void				results_free(zbx_discoverer_results_t *result);
 zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port, const zbx_uint64_t dcheckid);
 void				dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges);

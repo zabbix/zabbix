@@ -107,7 +107,7 @@ static zbx_ds_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_ds_
 static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_ds_dcheck_t *ds_dcheck,
 		zbx_vector_iprange_t *ipranges, zbx_hashset_t *tasks)
 {
-	zbx_discoverer_task_t	task_local = {0}, *task;
+	zbx_discoverer_task_t	task_local, *task;
 	int			port = ZBX_PORTRANGE_INIT_PORT;
 	unsigned int		checks_count = 0;
 
@@ -124,6 +124,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_ds_dche
 	else
 		checks_count = 1;
 
+	task_local.range.id = 0;
 	zbx_vector_ds_dcheck_ptr_create(&task_local.ds_dchecks);
 	zbx_vector_ds_dcheck_ptr_append(&task_local.ds_dchecks, ds_dcheck);
 

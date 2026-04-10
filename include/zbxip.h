@@ -55,7 +55,7 @@ typedef struct
 	unsigned char	type;
 
 	/* 1 if the range was defined with network mask, 0 otherwise */
-	unsigned char	mask;
+	unsigned char   mask;
 }
 zbx_iprange_t;
 
