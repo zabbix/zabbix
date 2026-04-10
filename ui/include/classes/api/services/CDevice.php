@@ -187,7 +187,7 @@ class CDevice extends CApiService {
 			'userid' => $data['userid']
 		];
 
-		self::addAuditLog(CAudit::ACTION_INIT, CAudit::RESOURCE_DEVICE, [$device]);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DEVICE, [$device]);
 
 		return [
 			'deviceid' => $uuid,
@@ -290,7 +290,7 @@ class CDevice extends CApiService {
 			$db_device['deviceid'] => array_intersect_key($db_device, array_flip(['deviceid', 'name']))
 		];
 
-		self::addAuditLog(CAudit::ACTION_ONBOARD, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
 
 		return ['token' => $token_data['token']];
 	}

@@ -191,9 +191,7 @@ class CControllerAuditLogList extends CController {
 			CAudit::ACTION_EXECUTE => _('Execute'),
 			CAudit::ACTION_HISTORY_CLEAR => _('History clear'),
 			CAudit::ACTION_CONFIG_REFRESH => _('Configuration refresh'),
-			CAudit::ACTION_PUSH => _('Push'),
-			CAudit::ACTION_INIT => _('Init'),
-			CAudit::ACTION_ONBOARD => _('Onboard')
+			CAudit::ACTION_PUSH => _('Push')
 		];
 	}
 
@@ -297,7 +295,7 @@ class CControllerAuditLogList extends CController {
 			}
 
 			if (!in_array($auditlog['action'], [CAudit::ACTION_ADD, CAudit::ACTION_UPDATE, CAudit::ACTION_EXECUTE,
-					CAudit::ACTION_PUSH, CAudit::ACTION_INIT, CAudit::ACTION_ONBOARD])) {
+					CAudit::ACTION_PUSH])) {
 				continue;
 			}
 
