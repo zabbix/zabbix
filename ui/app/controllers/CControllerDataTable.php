@@ -68,9 +68,8 @@ abstract class CControllerDataTable extends CController {
 		$num_rows = count($rows);
 		$rows_per_page = (int) CWebUser::$data['rows_per_page'];
 
-		$offset_up = 0;
 		$offset_down = 0;
-		$limit_exceeded = ($num_rows > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
+		$limit_exceeded = $num_rows > CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		if ($limit_exceeded) {
 			$offset_down = $num_rows - CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
@@ -82,7 +81,7 @@ abstract class CControllerDataTable extends CController {
 
 		$start = ($page - 1) * $rows_per_page;
 		$end = min($num_rows, $start + $rows_per_page);
-		$offset = ($sort_order == ZBX_SORT_DOWN) ? $offset_down : $offset_up;
+		$offset = $sort_order == ZBX_SORT_DOWN ? $offset_down : 0;
 
 		// Trim given rows for the current page.
 		$rows = array_slice($rows, $start + $offset, $end - $start, true);
