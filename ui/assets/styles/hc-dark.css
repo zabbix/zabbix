@@ -10163,3 +10163,11 @@ td.inactive-bg {
 
 .filter-container.tabfilter-container .tabfilter-item-label.focused {
   box-shadow: 0 0 0 2px #ffffff; }
+
+.datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data {
+  background-color: #222222 !important; }
+.datatable .cell.cell-data.warning-bg, .datatable .cell.cell-data.average-bg, .datatable .cell.cell-data.high-bg, .datatable .cell.cell-data.disaster-bg {
+  border-bottom-color: #444444;
+  padding-left: 42px; }
+  .datatable .cell.cell-data.warning-bg .cell-inner, .datatable .cell.cell-data.average-bg .cell-inner, .datatable .cell.cell-data.high-bg .cell-inner, .datatable .cell.cell-data.disaster-bg .cell-inner {
+    color: #ffffff; }
