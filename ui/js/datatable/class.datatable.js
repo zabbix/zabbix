@@ -99,6 +99,11 @@ class CDataTable {
 	/**
 	 * @type {number}
 	 */
+	static SCROLLBAR_THUMB_MIN_WIDTH = 20;
+
+	/**
+	 * @type {number}
+	 */
 	static SCROLLBAR_HORIZONTAL_PADDING = 8;
 
 	/**
@@ -2445,7 +2450,10 @@ class CDataTable {
 	}
 
 	#getScrollbarThumbWidth() {
-		return Math.max(20, (this.#body.clientWidth / this.#body.scrollWidth) * this.#scrollbar.clientWidth);
+		const thumb_width = (this.#body.clientWidth / this.#body.scrollWidth) * this.#scrollbar.clientWidth
+			- CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
+
+		return Math.max(CDataTable.SCROLLBAR_THUMB_MIN_WIDTH, thumb_width);
 	}
 
 	#applyLastColumnPadding() {
