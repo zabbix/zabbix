@@ -10278,8 +10278,8 @@ return [
 		'fields' => [
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UUID_V7,
-				'length' => 32,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 				'default' => ''
 			],
 			'userid' => [
@@ -10288,6 +10288,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'users',
 				'ref_field' => 'userid'
+			],
+			'uuid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => ''
 			],
 			'name' => [
 				'null' => false,
@@ -10327,8 +10333,8 @@ return [
 			],
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UUID_V7,
-				'length' => 32,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 				'ref_table' => 'device',
 				'ref_field' => 'deviceid'
 			]
@@ -10344,8 +10350,8 @@ return [
 			],
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UUID_V7,
-				'length' => 32,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 				'ref_table' => 'device',
 				'ref_field' => 'deviceid'
 			],
@@ -10380,8 +10386,8 @@ return [
 		'fields' => [
 			'deviceid' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UUID_V7,
-				'length' => 32,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
 				'ref_table' => 'device',
 				'ref_field' => 'deviceid'
 			],
