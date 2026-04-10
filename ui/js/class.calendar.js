@@ -580,7 +580,6 @@ calendar.prototype = {
 
 		//  year
 		this.clndr_year_div = document.createElement('div');
-		this.clndr_year_div.setAttribute('role', 'presentation');
 		this.clndr_year_div.className = 'calendar-year';
 		header.appendChild(this.clndr_year_div);
 
@@ -597,12 +596,9 @@ calendar.prototype = {
 		this.clndr_year_div.appendChild(this.clndr_yeardown);
 
 		this.clndr_year = document.createTextNode('');
-
 		this.clndr_year_wrap = document.createElement('span');
 		this.clndr_year_wrap.appendChild(this.clndr_year);
-		this.clndr_year_wrap.setAttribute('aria-live', 'assertive');
-		this.clndr_year_wrap.setAttribute('id', 'current-year'+this.id);
-		this.clndr_year_wrap.setAttribute('aria-atomic', 'true');
+		this.clndr_year_wrap.setAttribute('id', `current-year${this.id}`);
 		this.clndr_year_div.appendChild(this.clndr_year_wrap);
 		this.clndr_year_div.setAttribute('aria-labelledby', this.clndr_year_wrap.id);
 
@@ -616,7 +612,6 @@ calendar.prototype = {
 		// month
 		this.clndr_month_div = document.createElement('div');
 		this.clndr_month_div.className = 'calendar-month';
-		this.clndr_month_div.setAttribute('role', 'presentation');
 		header.appendChild(this.clndr_month_div);
 
 		var arrow_left = document.createElement('span');
@@ -633,10 +628,8 @@ calendar.prototype = {
 
 		this.clndr_month = document.createTextNode('');
 		this.clndr_month_wrap = document.createElement('span');
-		this.clndr_month_wrap.setAttribute('aria-live', 'assertive');
-		this.clndr_month_wrap.setAttribute('aria-atomic', 'true');
-		this.clndr_month_wrap.setAttribute('id', 'current-month'+this.id);
 		this.clndr_month_wrap.appendChild(this.clndr_month);
+		this.clndr_month_wrap.setAttribute('id', `current-month${this.id}`);
 		this.clndr_month_div.appendChild(this.clndr_month_wrap);
 		this.clndr_month_div.setAttribute('aria-labelledby', this.clndr_month_wrap.id);
 
