@@ -97,6 +97,11 @@ class CDataTable {
 	static COLUMN_TOGGLE_INITIAL_MIN_WIDTH = 150;
 
 	/**
+	 * @type {number}
+	 */
+	static SCROLLBAR_HORIZONTAL_PADDING = 8;
+
+	/**
 	 * Flag to determine when a component is initialized, to disallow any further modifications.
 	 *
 	 * @type {boolean}
@@ -664,7 +669,7 @@ class CDataTable {
 			`),
 			scrollbar: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_SCROLLBAR}">
-					<div class="${CDataTable.ZBX_STYLE_SCROLLBAR_THUMB}"></div>
+					<div class="${CDataTable.ZBX_STYLE_SCROLLBAR_THUMB} ${ZBX_STYLE_HIDDEN}"></div>
 				</div>
 			`)
 		}
@@ -1305,6 +1310,7 @@ class CDataTable {
 		this.#applyColumnWidths();
 		this.#applyLastColumnPadding();
 		this.#handleScrollbar();
+		this.#updateScrollbarThumbPosition();
 	}
 
 	onColumnResizeStart(e) {
@@ -2389,6 +2395,7 @@ class CDataTable {
 			const thumb_width = this.#getScrollbarThumbWidth();
 
 			this.#scrollbar_thumb.style.width = `${thumb_width}px`;
+			this.#scrollbar_thumb.classList.remove(ZBX_STYLE_HIDDEN);
 		});
 	}
 
@@ -2397,10 +2404,10 @@ class CDataTable {
 			return;
 		}
 
-		const thumb_width = this.#getScrollbarThumbWidth();
-		const max_scroll = this.#body.scrollWidth - this.#body.offsetWidth + 10;
-		const max_thumb_travel = this.#scrollbar.offsetWidth - thumb_width;
-		const thumb_position = (this.#body.scrollLeft / max_scroll) * max_thumb_travel;
+		const thumb_width = this.#scrollbar_thumb.getBoundingClientRect().width;
+		const max_thumb_travel = this.#scrollbar.clientWidth - thumb_width - CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
+		const scroll_ratio = this.#body.scrollLeft / (this.#body.scrollWidth - this.#body.clientWidth);
+		const thumb_position = scroll_ratio * max_thumb_travel;
 
 		this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
 	}
@@ -2438,7 +2445,7 @@ class CDataTable {
 	}
 
 	#getScrollbarThumbWidth() {
-		return Math.max(20, (this.#body.offsetWidth / this.#body.scrollWidth) * this.#scrollbar.offsetWidth);
+		return Math.max(20, (this.#body.clientWidth / this.#body.scrollWidth) * this.#scrollbar.clientWidth);
 	}
 
 	#applyLastColumnPadding() {
