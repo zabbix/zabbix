@@ -182,7 +182,14 @@
 
 					const name_link = document.createElement('a');
 					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
-					name_link.setAttribute('href', url.toString());
+					name_link.setAttribute('data-menu-popup', JSON.stringify({
+						type: 'host',
+						data: {hostid}
+					}));
+					name_link.setAttribute('aria-expanded', 'false');
+					name_link.setAttribute('aria-haspopup', 'true');
+					name_link.setAttribute('role', 'button');
+					name_link.setAttribute('href', 'javascript:void(0);');
 					name_link.innerText = name;
 
 					cell_inner.appendChild(name_link);
