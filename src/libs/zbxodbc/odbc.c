@@ -552,11 +552,11 @@ void	zbx_odbc_query_result_free(zbx_odbc_query_result_t *query_result)
  *           result is needed for longer.                                     *
  *                                                                            *
  ******************************************************************************/
-static int zbx_odbc_fetch(zbx_odbc_query_result_t *query_result, const char *const **row, char **error)
+static int	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result, const char *const **row, char **error)
 {
 	SQLRETURN	rc;
 	SQLSMALLINT	i;
-	int 		ret = SUCCEED;
+	int		ret = SUCCEED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -797,6 +797,8 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 out:
 	zbx_vector_str_clear_ext(&names, zbx_str_free);
 	zbx_vector_str_destroy(&names);
+
+	zbx_free(fetch_error);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
