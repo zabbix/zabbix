@@ -199,16 +199,19 @@ $form_grid = (new CFormGrid())
 						->setAriaRequired()
 				)
 			])
-			->addItem([
-				(new CLabel(_('Device link'), 'device_link_timeout'))->setAsteriskMark(),
-				new CFormField(
-					(new CTextBox('device_link_timeout', $data['device_link_timeout'], false,
-						CSettingsSchema::getFieldLength('device_link_timeout')
-					))
-						->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
-						->setAriaRequired()
-				)
-			])
+			->addItem(array_key_exists('device_link_timeout', $data)
+				? [
+					(new CLabel(_('Device link'), 'device_link_timeout'))->setAsteriskMark(),
+					new CFormField(
+						(new CTextBox('device_link_timeout', $data['device_link_timeout'], false,
+							CSettingsSchema::getFieldLength('device_link_timeout')
+						))
+							->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+							->setAriaRequired()
+					)
+				]
+				: null
+			)
 	)
 	->addItem(
 		new CFormActions(new CSubmit('update', _('Update')), [new CButton('reset-defaults', _('Reset defaults'))])
@@ -225,27 +228,32 @@ $form->addItem(
 	->addItem($form)
 	->show();
 
+$default_timeouts = [
+	'timeout_zabbix_agent' => CSettingsSchema::getDefault('timeout_zabbix_agent'),
+	'timeout_simple_check' => CSettingsSchema::getDefault('timeout_simple_check'),
+	'timeout_snmp_agent' => CSettingsSchema::getDefault('timeout_snmp_agent'),
+	'timeout_external_check' => CSettingsSchema::getDefault('timeout_external_check'),
+	'timeout_db_monitor' => CSettingsSchema::getDefault('timeout_db_monitor'),
+	'timeout_http_agent' => CSettingsSchema::getDefault('timeout_http_agent'),
+	'timeout_ssh_agent' => CSettingsSchema::getDefault('timeout_ssh_agent'),
+	'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
+	'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
+	'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
+	'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
+	'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
+	'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
+	'script_timeout' => CSettingsSchema::getDefault('script_timeout'),
+	'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
+	'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
+];
+
+if (array_key_exists('device_link_timeout', $data)) {
+	$default_timeouts['device_link_timeout'] = CSettingsSchema::getDefault('device_link_timeout');
+}
+
 (new CScriptTag('
 	view.init('.json_encode([
-		'default_timeouts' => [
-			'timeout_zabbix_agent' => CSettingsSchema::getDefault('timeout_zabbix_agent'),
-			'timeout_simple_check' => CSettingsSchema::getDefault('timeout_simple_check'),
-			'timeout_snmp_agent' => CSettingsSchema::getDefault('timeout_snmp_agent'),
-			'timeout_external_check' => CSettingsSchema::getDefault('timeout_external_check'),
-			'timeout_db_monitor' => CSettingsSchema::getDefault('timeout_db_monitor'),
-			'timeout_http_agent' => CSettingsSchema::getDefault('timeout_http_agent'),
-			'timeout_ssh_agent' => CSettingsSchema::getDefault('timeout_ssh_agent'),
-			'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
-			'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
-			'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
-			'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
-			'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
-			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
-			'script_timeout' => CSettingsSchema::getDefault('script_timeout'),
-			'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
-			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout'),
-			'device_link_timeout' => CSettingsSchema::getDefault('device_link_timeout')
-		]
+		'default_timeouts' => $default_timeouts
 	]).');
 '))
 	->setOnDocumentReady()

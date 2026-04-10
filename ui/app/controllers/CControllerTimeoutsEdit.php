@@ -103,11 +103,14 @@ class CControllerTimeoutsEdit extends CController {
 			)),
 			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
-			)),
-			'device_link_timeout' => $this->getInput('device_link_timeout', CSettingsHelper::get(
-				CSettingsHelper::DEVICE_LINK_TIMEOUT
 			))
 		];
+
+		if (CApiDpopHelper::getDeviceFeatureFlag()) {
+			$data['device_link_timeout'] = $this->getInput('device_link_timeout', CSettingsHelper::get(
+				CSettingsHelper::DEVICE_LINK_TIMEOUT
+			));
+		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of timeouts'));

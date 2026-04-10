@@ -40,17 +40,12 @@
 		#submit(event) {
 			event.preventDefault();
 
-			const fields_to_trim = ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
-				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout',
-				'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'report_test_timeout',
-				'device_link_timeout'
-			];
-
-			for (const id of fields_to_trim) {
+			for (const id of Object.keys(this.#default_timeouts)) {
 				const field = document.getElementById(id);
 
-				field.value = field.value.trim();
+				if (field !== null) {
+					field.value = field.value.trim();
+				}
 			}
 
 			this.#form.submit();
