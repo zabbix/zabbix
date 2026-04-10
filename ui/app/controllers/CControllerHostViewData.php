@@ -48,7 +48,9 @@ class CControllerHostViewData extends CControllerDataTable {
 			'inheritedTags' => true,
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ?: null,
-			'withProblemsSuppressed' => null,
+			'withProblemsSuppressed' => $filter['severities']
+				? (($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				: null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
 				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
