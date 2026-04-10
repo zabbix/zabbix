@@ -160,6 +160,7 @@ class CMacroValue extends CDiv {
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass(ZBX_ICON_ARROW_BACK)
 			->addClass(self::ZBX_STYLE_BTN_UNDO)
+			->setAttribute('hidden', '')
 			->setAttribute('title', _('Revert changes'));
 
 		return $this;

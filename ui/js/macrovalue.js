@@ -76,7 +76,7 @@
 		$('.btn-dropdown-container button', $container)
 			.removeClass([ZBX_ICON_TEXT, ZBX_ICON_LOCK])
 			.addClass(['btn-alt', 'btn-dropdown-toggle', ZBX_ICON_EYE_OFF]);
-		$this.hide();
+		$this.attr('hidden', true);
 	}
 
 	function getCurrentValueType($container) {
@@ -152,12 +152,7 @@
 			);
 
 			if (!$curr_control.data('is-activated')) {
-				const btn_undo = $('.btn-undo', $container)[0];
-
-				if (btn_undo) {
-					btn_undo.style.display = 'flex';
-				}
-
+				$('.btn-undo', $container).attr('hidden', false);
 				$curr_control.data('is-activated', true);
 			}
 
