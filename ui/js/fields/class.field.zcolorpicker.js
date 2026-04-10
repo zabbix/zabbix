@@ -14,6 +14,7 @@
 
 
 class CFieldZColorPicker extends CField {
+
 	#hidden_input;
 
 	init() {
