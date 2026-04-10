@@ -30,7 +30,7 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
-	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'name', 'activated_at', 'lastaccess'];
+	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'activated_at', 'lastaccess'];
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
@@ -74,7 +74,7 @@ class CDevice extends CApiService {
 	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// Filters.
-			'deviceids' =>				['type' => API_UUIDS_V7, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'deviceids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'roleids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'userids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'usrgrpids' =>				['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
