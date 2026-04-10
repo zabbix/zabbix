@@ -120,7 +120,8 @@ class testFormUserGroups extends CWebTest {
 			'Users' => '',
 			'Frontend access' => 'System default',
 			'LDAP Server' => 'Default',
-			'Multi-factor authentication' => 'Default',
+			'id:mfa_status' => true,
+			'name:mfaid' => 'Default',
 			'Enabled' => true,
 			'Debug mode' => false
 		];
@@ -132,30 +133,31 @@ class testFormUserGroups extends CWebTest {
 		$dropdowns = [
 			'Frontend access' => ['System default', 'Internal', 'LDAP', 'Disabled'],
 			'LDAP Server' => ['Default'],
-			'Multi-factor authentication' => ['User groups DUO', 'User groups TOTP','Disabled', 'Default']
+			'name:mfaid' => ['Default', 'User groups DUO', 'User groups TOTP']
 		];
 
 		foreach ($dropdowns as $field => $options) {
 			$this->assertEquals($options, $form->getField($field)->getOptions()->asText());
 		}
 
-		foreach ([MFA_ENABLED, MFA_DISABLED] as $mfa_status) {
+		foreach ([MFA_DISABLED => false, MFA_ENABLED => true] as $mfa_status => $enabled) {
+			// Disable or Enable MFA and reload the page.
+			CDataHelper::call('authentication.update', ['mfa_status' => $mfa_status]);
+			$this->page->refresh()->waitUntilReady();
+			$form->invalidate();
+
+			// Check MFA field checkbox status and multiselect.
+			$form->checkValue(['id:mfa_status' => $mfa_status, 'name:mfaid' => 'Default']);
+			$this->assertTrue($form->getField('name:mfaid')->isEnabled($enabled));
+
 			if ($mfa_status) {
 				// Check that warning icon is not visible if MFA is enabled.
+				$form->checkValue(['id:mfa_status' => true, 'name:mfaid' => 'Default']);
 				$this->assertFalse($form->query('id:mfa-warning')->one()->isDisplayed(), 'Warning icon should not be visible.');
 			}
 			else {
-				// Disable MFA and reload the page.
-				CDataHelper::call('authentication.update', ['mfa_status' => $mfa_status]);
-				$this->page->refresh()->waitUntilReady();
-				$form->invalidate();
-
-				// Check that, when MFA is disabled, the default value on MFA field is "Disabled".
-				$mfa_field = $form->getField('Multi-factor authentication');
-				$this->assertEquals('Disabled', $mfa_field->getValue());
-
 				// Change the value of the MFA field, and the appeared warning icon and its hint.
-				$mfa_field->fill('Default');
+				$form->fill(['id:mfa_status' => true]);
 				$warning_icon = $form->query('id:mfa-warning')->waitUntilVisible()->one();
 				$warning_icon->click();
 				$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
@@ -253,7 +255,7 @@ class testFormUserGroups extends CWebTest {
 						'Group name' => ' '
 					],
 					'inline_errors' => [
-						'xpath://input[@id="name"]' => 'This field cannot be empty.'
+						'Group name' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -266,7 +268,7 @@ class testFormUserGroups extends CWebTest {
 					],
 					'duplicate' => true,
 					'inline_errors' => [
-						'xpath://input[@id="name"]' => 'This object already exists.'
+						'Group name' => 'This object already exists.'
 					]
 				]
 			],
@@ -279,8 +281,8 @@ class testFormUserGroups extends CWebTest {
 						'Users' => 'Admin',
 						'Enabled' => false
 					],
-					'inline_error' => [
-						'id:userids_' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+					'inline_errors' => [
+						'Users' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 					]
 				]
 			],
@@ -293,8 +295,8 @@ class testFormUserGroups extends CWebTest {
 						'Users' => 'Admin',
 						'Frontend access' => 'Disabled'
 					],
-					'inline_error' => [
-						'id:userids_' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
+					'inline_errors' => [
+						'Users' => 'User cannot add oneself to a disabled group or a group with disabled GUI access.'
 					]
 				]
 			],
@@ -307,11 +309,14 @@ class testFormUserGroups extends CWebTest {
 					'trim_name' => true
 				]
 			],
-			// #5 Group with XSS in name.
+			// #5 Group with XSS in name and select MFA.
 			[
 				[
 					'fields' => [
-						'Group name' => '<body onload=alert(\'User group\')>;'
+						'Group name' => '<body onload=alert(\'User group\')>;',
+						// Added 'true' for update test case.
+						'id:mfa_status' => true,
+						'name:mfaid' => 'User groups TOTP'
 					]
 				]
 			],
@@ -322,9 +327,10 @@ class testFormUserGroups extends CWebTest {
 						'Group name' => 'User group %#$@^%$&%^🙈😂😱*&^(*_))}{|" with symbols',
 						'Users' => 'test-user',
 						'Frontend access' => 'LDAP',
+						'id:mfa_status' => false,
 						'Enabled' => false,
-						'Debug mode' => true,
-						'Multi-factor authentication' => 'User groups TOTP'
+						'Debug mode' => true
+
 					]
 				]
 			]
@@ -341,7 +347,7 @@ class testFormUserGroups extends CWebTest {
 						'Group name' => ''
 					],
 					'inline_errors' => [
-						'xpath://input[@id="name"]' => 'This object already exists.'
+						'Group name' => 'This field cannot be empty.'
 					]
 				]
 			]
