@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-16 21:08+0000\n"
+"PO-Revision-Date: 2026-03-23 20:30+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -2242,6 +2242,13 @@ msgstr "Les champs « tls_psk_identity » et « tls_psk » doivent être sp�
 #: app/controllers/CControllerUserUpdateGeneral.php:105
 msgid "Both passwords must be equal."
 msgstr "Les deux mots de passe doivent être égaux."
+
+#: app/controllers/CControllerItemCreate.php:264
+#: app/controllers/CControllerItemPrototypeCreate.php:279
+#: app/controllers/CControllerItemPrototypeUpdate.php:267
+#: app/controllers/CControllerItemUpdate.php:264
+msgid "Both username and password should be either present or empty."
+msgstr "Le nom d'utilisateur et le mot de passe doivent être présents ou vides."
 
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
@@ -12245,6 +12252,13 @@ msgstr "Intervalle et stockage"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Méthode API \"%2$s\" non valide pour le rôle utilisateur \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:183
+#: app/controllers/CControllerItemPrototypeCreate.php:198
+#: app/controllers/CControllerItemPrototypeUpdate.php:186
+#: app/controllers/CControllerItemUpdate.php:183
+msgid "Invalid HTTP status code or range."
+msgstr "Code retour HTTP ou plage invalide."
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12333,6 +12347,11 @@ msgstr "Adresse de courrier électronique non valide \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adresse e-mail incorrecte pour le type de media avec l'ID \"%1$s\"."
+
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr "Nom de groupe d'hôte non valide."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
@@ -12715,6 +12734,11 @@ msgstr "Chaîne non valide."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Tag \"%1$s\" invalide : %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr "Nom de groupe de modèles non valide."
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -21195,6 +21219,10 @@ msgstr "Taille de l'espace de swap en octets ou en pourcentage du total. Retourn
 msgid "Swedish (sv_SE)"
 msgstr "Suédois (sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr "Changer d'utilisateur SSO"
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Changer de méthode d'authentification va réinitialiser toutes les sessions sauf celle-ci ! Continuer ?"
@@ -23200,6 +23228,10 @@ msgstr "Annuler l'acquittement du problème."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Code réponse HTTP inattendu."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr "Délai de mise à jour du jeton d'accès inattendu."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25433,6 +25465,10 @@ msgstr "Vous ne pouvez pas changer les modèles pour la sélection actuelle."
 msgid "You do not have permission to perform this operation."
 msgstr "Vous n'avez pas la permission d'effectuer cette opération."
 
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr "Vous avez été autorisé via l'authentification unique (SSO), mais la connexion à Zabbix a échoué."
+
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
 msgstr "Vous n'avez pas la permission d'accéder à cette page."
@@ -26841,7 +26877,7 @@ msgstr "type de données invalide"
 #: include/classes/validators/CAbsoluteTimeValidator.php:45
 #: include/classes/validators/CAbsoluteTimeValidator.php:53
 msgid "invalid date"
-msgstr ""
+msgstr "date invalide"
 
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
@@ -28245,7 +28281,7 @@ msgstr "la valeur doit être comprise entre « %1$s » et « %2$s », et ne 
 #: include/classes/validators/CTimeUnitValidator.php:84
 #, c-format
 msgid "value must be between %1$s and %2$s"
-msgstr ""
+msgstr "la valeur doit être comprise entre %1$s et %2$s"
 
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
@@ -28267,12 +28303,12 @@ msgstr "la valeur doit être supérieure à \"%1$s\""
 #: include/classes/validators/CAbsoluteTimeValidator.php:59
 #, c-format
 msgid "value must be greater than or equal to %1$s"
-msgstr ""
+msgstr "la valeur doit être supérieure ou égale à %1$s"
 
 #: include/classes/validators/CAbsoluteTimeValidator.php:64
 #, c-format
 msgid "value must be less than or equal to %1$s"
-msgstr ""
+msgstr "la valeur ne doit pas être inférieure ou égale à %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220
