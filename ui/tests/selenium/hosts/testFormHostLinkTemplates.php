@@ -14,6 +14,7 @@
 **/
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * @backup hosts
@@ -28,10 +29,13 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	protected static $hostid;
 
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CDatatableBehavior::class
+		];
 	}
 
-	public static function prepareHostData() {
+	public function prepareHostData() {
 		self::$hostid = CDataHelper::call('host.create', [
 			[
 				'host' => 'Template linkage test host',
@@ -39,6 +43,19 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 				'groups' => ['groupid' => 4] // Zabbix servers.
 			]
 		])['hostids'][0];
+
+		// Change the width of datatable columns so that the whole host name would be visible clickable.
+		$layout = '{"columns":[{"id":"name","resized":true,"width":"33%"},{"id":"items","resized":true,"width":"5.5%"},'.
+				'{"id":"triggers","resized":true,"width":"6.9%"},{"id":"graphs","resized":true,"width":"6.3%"},'.
+				'{"id":"discovery","resized":true,"width":"7.6%"},{"id":"web","resized":true,"width":"5%"},'.
+				'{"id":"interface","resized":true,"width":"9.6%"},{"id":"proxy","resized":true,"width":"5.6%"},'.
+				'{"id":"templates","resized":true,"width":"7.8%"},{"id":"status","resized":true,"width":"6.1%"},'.
+				'{"id":"availability","resized":true,"width":"12.3%"},{"id":"encryption","resized":true,"width":"11%"},'.
+				'{"id":"info","resized":true,"width":"4.7%"},{"id":"tags","resized":true,"width":"7.7%"},{"id":"tagvalue"}],'.
+				'"options":{}}';
+
+		$this->updateDatatableLayout($layout, 'web.hosts.datatable');
+
 	}
 
 	public function testFormHostLinkTemplates_Layout() {
@@ -59,8 +76,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateLink() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
+		$this->page->waitUntilReady();
 
+		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$dialog->fill(['Templates' => self::LINKED_TEMPLATE]);
 

@@ -26,15 +26,12 @@ require_once __DIR__.'/../common/testFormFilter.php';
 class testFormFilterLatestData extends testFormFilter {
 
 	public $url = 'zabbix.php?action=latest.view';
+	public $table_selector = 'id:latest';
 
 	protected static $users = [
 		'user-delete',
 		'user-update'
 	];
-
-	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
-	}
 
 	/**
 	 * Add user for updating.
@@ -123,7 +120,7 @@ class testFormFilterLatestData extends testFormFilter {
 					'error_message' => 'Incorrect value for field "filter_name": cannot be empty.'
 				]
 			],
-			// Dataprovider with 1 space instead of name.
+			// Data provider with 1 space instead of name.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -133,7 +130,7 @@ class testFormFilterLatestData extends testFormFilter {
 					'error_message' => 'Incorrect value for field "filter_name": cannot be empty.'
 				]
 			],
-			// Dataprovider with default name
+			// Data provider with default name
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -168,12 +165,11 @@ class testFormFilterLatestData extends testFormFilter {
 					]
 				]
 			],
-			// Dataprovider with symbols instead of name.
+			// Data provider with symbols instead of name.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'filter_form' => [
-						'Show details' => true,
 						'Name' => '_item'
 					],
 					'filter' => [
@@ -182,7 +178,7 @@ class testFormFilterLatestData extends testFormFilter {
 					]
 				]
 			],
-			// Dataprovider with name as cyrillic.
+			// Data provider with name as cyrillic.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -194,7 +190,7 @@ class testFormFilterLatestData extends testFormFilter {
 					]
 				]
 			],
-			// Two dataproviders with same name and options.
+			// Two data providers with same name and options.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -222,26 +218,37 @@ class testFormFilterLatestData extends testFormFilter {
 	 * @dataProvider getCheckCreatedFilterData
 	 */
 	public function testFormFilterLatestData_CheckCreatedFilter($data) {
-		$this->createFilter($data, 'filter-create', 'zabbix', $this->getTableSelector());
-		$this->checkFilters($data, $this->getTableSelector());
+		$this->createFilter($data, 'filter-create', 'zabbix', $this->table_selector);
+		$this->checkFilters($data, $this->table_selector);
 	}
 
 	public static function getCheckRememberedFilterData() {
 		return [
 			[
 				[
-					'Host groups' => ['Zabbix servers'],
-					'Hosts' => ['ЗАББИКС Сервер'],
-					'Name' => 'Free',
-					'Show tags' => '1'
+					'filter' => [
+						'Host groups' => ['Zabbix servers'],
+						'Hosts' => ['ЗАББИКС Сервер'],
+						'Name' => 'Free'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => '1'
+						]
+					]
 				]
 			],
 			[
 				[
-					'Name' => 'Total',
-					'Tag display priority' => 'Alfa, Beta',
-					'id:tag_name_format_0' => 'Shortened',
-					'Show details' => true
+					'filter' => [
+						'Name' => 'Total'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Tag display priority' => 'Alfa, Beta',
+							'Tag name display' => 'Shortened'
+						]
+					]
 				]
 			]
 		];
@@ -253,7 +260,7 @@ class testFormFilterLatestData extends testFormFilter {
 	 * @dataProvider getCheckRememberedFilterData
 	 */
 	public function testFormFilterLatestData_CheckRememberedFilter($data) {
-		$this->checkRememberedFilters($data, $this->getTableSelector());
+		$this->checkRememberedFilters($data, $this->table_selector);
 	}
 
 
@@ -268,7 +275,7 @@ class testFormFilterLatestData extends testFormFilter {
 	 * Updating filter form.
 	 */
 	public function testFormFilterLatestData_UpdateForm() {
-		$this->updateFilterForm('latest-filter-update', 'Update_filter_passw0rd', $this->getTableSelector());
+		$this->updateFilterForm('latest-filter-update', 'Update_filter_passw0rd', $this->table_selector);
 	}
 
 	/**

@@ -262,18 +262,27 @@ class CElement extends CBaseElement implements IWaitable {
 	public function getText() {
 		try {
 			if (!$this->isVisible()) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+				return $this->getAllText();
 			}
 		}
 		catch (StaleElementReferenceException $exception) {
 			$this->reload();
 
 			if (!$this->isVisible()) {
-				return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
+				return $this->getAllText();
 			}
 		}
 
 		return parent::getText();
+	}
+
+	/**
+	 * Get text of element including text of non-visible parts of the element.
+	 *
+	 * @return string
+	 */
+	public function getAllText() {
+		return CElementQuery::getDriver()->executeScript('return arguments[0].textContent;', [$this]);
 	}
 
 	/**
@@ -738,6 +747,10 @@ class CElement extends CBaseElement implements IWaitable {
 
 			if (in_array('fields-group', $class)) {
 				return $this->asElement($options);
+			}
+
+			if (in_array('datatable', $class)) {
+				return $this->asDatatableGroup($options);
 			}
 		}
 
