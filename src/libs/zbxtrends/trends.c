@@ -512,6 +512,7 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 		avg = atof(row[0]);
 		num = atof(row[1]);
 
+zabbix_log(LOG_LEVEL_INFORMATION, "BADGER0 AVG: %f", avg);
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			avg2 = atof(row[0]);
@@ -526,10 +527,11 @@ static zbx_trend_state_t	trends_eval_avg(const char *table, zbx_uint64_t itemid,
 				scaled_avg2 = avg2 / max_val;
 
 				avg = (scaled_avg * num + scaled_avg2 * num2) / (num + num2) * max_val;
+
+zabbix_log(LOG_LEVEL_INFORMATION, "BADGER AVG: %f", avg);
 			}
 			num += num2;
 		}
-
 		*value = avg;
 		state = ZBX_TREND_STATE_NORMAL;
 	}
