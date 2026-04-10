@@ -226,8 +226,10 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 	if (0 == log_worker_id)
 		log_worker_id = worker_id;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() first druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " type:%u",
-			log_worker_id, __func__, druleid, first_task->range.id, GET_DTYPE(first_task));
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() job_refs:%d first druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64
+			" type:%u state.count:" ZBX_FS_UI64, log_worker_id, __func__, dmanager->job_refs.values_num,
+			druleid, first_task->range.id, GET_DTYPE(first_task),
+			discoverer_task_check_count_get(first_task));
 
 	*first_ip = *ip = '\0';
 #ifndef HAVE_NETSNMP
@@ -248,8 +250,8 @@ int	discovery_jobs_check_snmp(zbx_uint64_t druleid, zbx_discoverer_task_t *first
 	zbx_vector_discoverer_results_ptr_create(&results);
 	druleid = 0;
 
-	while (NULL != (task = discoverer_queue_snmp_task_get(&dmanager->job_refs, &dmanager->queue, task, first_task,
-			log_worker_id)) && 0 == *stop && SUCCEED == abort)
+	while (NULL != (task = discoverer_queue_snmp_task_get(&dmanager->queue, task, first_task, log_worker_id)) &&
+			0 == *stop && SUCCEED == abort)
 	{
 		if (druleid != GET_DRULEID(task))
 		{

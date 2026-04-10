@@ -24,10 +24,10 @@
 #define DISCOVERER_WORKER_INIT_NONE	0x00
 #define DISCOVERER_WORKER_INIT_THREAD	0x01
 
-#define GET_DTYPE(t)		t->ds_dchecks.values[t->range.state.index_dcheck]->dcheck.type
-#define GET_DRULEID(t)		t->ds_dchecks.values[t->range.state.index_dcheck]->dcheck.druleid
-#define GET_DCHECKID(t)		t->ds_dchecks.values[t->range.state.index_dcheck]->dcheck.dcheckid
-#define TASK_IP2STR(t, ip_str)	zbx_iprange_ip2str(t->range.ipranges->values[t->range.state.index_ip].type, \
+#define GET_DTYPE(t)		t->ds_dchecks.values[0]->dcheck.type
+#define GET_DRULEID(t)		t->ds_dchecks.values[0]->dcheck.druleid
+#define GET_DCHECKID(t)		t->ds_dchecks.values[0]->dcheck.dcheckid
+#define TASK_IP2STR(t, ip_str)	zbx_iprange_ip2str(t->range.ipranges->values[0].type, \
 					t->range.state.ipaddress, ip_str, sizeof(ip_str))
 
 typedef struct

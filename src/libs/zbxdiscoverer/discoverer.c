@@ -587,10 +587,10 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 		result_tmp = (zbx_discoverer_results_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_results_t));
 		memcpy(result_tmp, result, sizeof(zbx_discoverer_results_t));
 
-		if (0 == (result_tmp->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
-			zbx_vector_discoverer_results_ptr_append(&results, result_tmp);
-		else
+		if (0 != (result_tmp->status & ZBX_DISCOVERER_RESULT_CHECK_LAST))
 			zbx_vector_discoverer_results_ptr_append(&results_lastip, result_tmp);
+		else
+			zbx_vector_discoverer_results_ptr_append(&results, result_tmp);
 
 		zbx_hashset_iter_remove(&iter);
 	}

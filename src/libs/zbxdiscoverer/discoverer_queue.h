@@ -48,7 +48,6 @@ void	discoverer_queue_append_error(zbx_vector_discoverer_drule_error_t *errors, 
 		const char *error);
 
 zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue);
-zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_vector_discoverer_jobs_ptr_t *job_refs,
-				zbx_discoverer_queue_t *queue, zbx_discoverer_task_t *task,
+zbx_discoverer_task_t	*discoverer_queue_snmp_task_get(zbx_discoverer_queue_t *queue, zbx_discoverer_task_t *task,
 				zbx_discoverer_task_t *first_task, int log_worker_id);
 #endif
