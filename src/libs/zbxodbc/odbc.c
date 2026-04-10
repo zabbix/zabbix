@@ -637,7 +637,7 @@ int	zbx_odbc_query_result_to_string(zbx_odbc_query_result_t *query_result, char 
 {
 	const char	*const *row;
 	int		ret = FAIL;
-	char 		*fetch_error = NULL;
+	char		*fetch_error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -696,7 +696,7 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 	struct zbx_json		json;
 	zbx_vector_str_t	names;
 	int			ret = FAIL, i, j;
-	int 			fetch_ret = SUCCEED;
+	int			fetch_ret = SUCCEED;
 	char			*fetch_error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -791,7 +791,7 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 		ret = SUCCEED;
 	}
 	else
-		*error = zbx_dsprintf(*error, "SQL fetch failed: %s", fetch_error);
+		*error = zbx_dsprintf(*error, "Cannot fetch row: %s", fetch_error);
 
 	zbx_json_free(&json);
 out:
