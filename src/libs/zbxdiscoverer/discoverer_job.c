@@ -172,8 +172,7 @@ static zbx_discoverer_task_t	*discoverer_task_split_get(zbx_discoverer_task_t *t
 	zbx_task_range_t	range;
 	int			ret;
 
-	if (SVC_SNMPv3 == GET_DTYPE(task) || SVC_SNMPv2c == GET_DTYPE(task) || SVC_SNMPv1 == GET_DTYPE(task) ||
-			0 != job->concurrency_max)
+	if (0 != job->concurrency_max)
 	{
 		return task;	/* only one worker of given type is allowed on the drule (not per process) */
 	}

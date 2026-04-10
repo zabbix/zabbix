@@ -93,50 +93,8 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
 zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 {
 	zbx_discoverer_job_t	*job = NULL;
-	zbx_discoverer_task_t	*task;
-	zbx_vector_uint64_t	ids;
 
-	zbx_vector_uint64_create(&ids);
-
-	while (SUCCEED == zbx_list_pop(&queue->jobs, (void**)&job))
-	{
-		int		one_task = SUCCEED;
-		zbx_uint64_t	id;
-
-		if (SUCCEED != zbx_list_peek(&job->tasks, (void**)&task))
-			break;
-
-		if (SVC_SNMPv3 != GET_DTYPE(task) && SVC_SNMPv2c != GET_DTYPE(task) && SVC_SNMPv1 != GET_DTYPE(task))
-			break;
-
-		if (0 != queue->snmp_allowed_workers)
-		{
-			queue->snmp_allowed_workers--;
-			break;
-		}
-
-		id = task->ds_dchecks.values[0]->dcheck.dcheckid;
-
-		if (job->tasks.head != job->tasks.tail)				/* if not one snmp task in the list */
-		{
-			(void)zbx_list_pop(&job->tasks, (void**)&task);
-			(void)zbx_list_append(&job->tasks, (void*)task, NULL);	/* put task to end of the list */
-			one_task = FAIL;
-		}
-
-		discoverer_queue_push(queue, job);				/* put job to end of the list */
-		job = NULL;
-
-		if (queue->jobs.head == queue->jobs.tail && SUCCEED == one_task) /* just one snmp job in the list */
-			break;
-
-		if (FAIL != zbx_vector_uint64_search(&ids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
-			break;
-
-		zbx_vector_uint64_append(&ids, id);
-	}
-
-	zbx_vector_uint64_destroy(&ids);
+	zbx_list_pop(&queue->jobs, (void**)&job);
 
 	return job;
 }
@@ -242,14 +200,13 @@ int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmp_allowed_workers, int checks_per_worker_max,
+int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int checks_per_worker_max,
 		char **error)
 {
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
 	queue->pending_checks_count = 0;
-	queue->snmp_allowed_workers = snmp_allowed_workers;
 	queue->checks_per_worker_max = checks_per_worker_max;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 	zbx_vector_discoverer_drule_error_create(&queue->errors);
