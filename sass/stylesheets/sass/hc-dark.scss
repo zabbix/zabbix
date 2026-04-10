@@ -1181,4 +1181,21 @@ td.inactive-bg {
 			}
 		}
 	}
+
+	&.compact-view {
+		.cell {
+			&.cell-data {
+				&.warning-bg,
+				&.average-bg,
+				&.high-bg,
+				&.disaster-bg {
+					&:before {
+						font-size: 22px;
+						padding-top: 0;
+						padding-bottom: 0;
+					}
+				}
+			}
+		}
+	}
 }

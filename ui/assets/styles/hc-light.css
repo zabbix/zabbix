@@ -10152,3 +10152,7 @@ td.inactive-bg {
   padding-left: 42px; }
   .datatable .cell.cell-data.warning-bg .cell-inner, .datatable .cell.cell-data.average-bg .cell-inner, .datatable .cell.cell-data.high-bg .cell-inner, .datatable .cell.cell-data.disaster-bg .cell-inner {
     color: #000000; }
+.datatable.compact-view .cell.cell-data.warning-bg:before, .datatable.compact-view .cell.cell-data.average-bg:before, .datatable.compact-view .cell.cell-data.high-bg:before, .datatable.compact-view .cell.cell-data.disaster-bg:before {
+  font-size: 22px;
+  padding-top: 0;
+  padding-bottom: 0; }
