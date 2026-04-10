@@ -20,7 +20,7 @@ class CControllerUserDeviceDelete extends CController {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'deviceids' =>	'required|array_db device.deviceid'
 		];
@@ -40,29 +40,66 @@ class CControllerUserDeviceDelete extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
-		// TODO: check access
-		return true;
+	protected function checkPermissions(): bool {
+		if ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)) {
+			return true;
+		}
+
+		if ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+			$num_devices = API::Device()->get([
+				'deviceids' => $this->getInput('deviceids'),
+				'userids' => [CWebUser::$data['userid']],
+				'countOutput' => true
+			]);
+
+			return $num_devices == count($this->getInput('deviceids'));
+		}
+
+		return false;
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$deviceids = $this->getInput('deviceids');
 
-		$result = API::Device()->offboard($deviceids);
+		$failed_messages = [];
+		$success_messages = [];
+		$failed_deviceids = [];
+		$success_deviceids = [];
 
-		if ($result) {
-			$output['success']['title'] = _n('Device unlinked', 'Devices unlinked', count($deviceids));
-			$output['success']['action'] = 'delete';
+		foreach ($deviceids as $deviceid) {
+			$result = API::Device()->offboard(['deviceid' => $deviceid]);
+			$messages = array_column(get_and_clear_messages(), 'message');
 
-			if ($messages = get_and_clear_messages()) {
-				$output['success']['messages'] = array_column($messages, 'message');
+			if ($result) {
+				$success_messages = array_unique(array_merge($success_messages, $messages));
+				$success_deviceids[] = $deviceid;
+			}
+			else {
+				$failed_messages = array_unique(array_merge($failed_messages, $messages));
+				$failed_deviceids[] = $deviceid;
 			}
 		}
-		else {
+
+		if (count($success_deviceids) == 0) {
 			$output['error'] = [
-				'title' => _n('Cannot unlink device', 'Cannot unlink devices', count($deviceids)),
-				'messages' => array_column(get_and_clear_messages(), 'message')
+				'title' => _n('Cannot unlink device', 'Cannot unlink devices', count($failed_deviceids)),
+				'messages' => $failed_messages
 			];
+		}
+		else {
+			$output['success'] = [
+				'title' => _n('Device unlinked', 'Devices unlinked', count($success_deviceids)),
+				'action' => 'delete',
+				'messages' => $success_messages
+			];
+
+			if (count($failed_deviceids) > 0) {
+				$output['success']['error_messages'] = array_merge(
+					[_n('Cannot unlink device', 'Cannot unlink devices', count($failed_deviceids))],
+					$failed_messages
+				);
+			}
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

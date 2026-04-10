@@ -39,31 +39,37 @@ $deviceForm = (new CForm())
 
 $deviceTable = (new CTableInfo())
 	->setHeader([
-		(new CColHeader(
-			(new CCheckBox('all_items'))->onClick("checkAll('".$deviceForm->getName()."', 'all_items', 'g_deviceid');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH),
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
+			? (new CColHeader(
+			(new CCheckBox('all_items'))
+				->onClick("checkAll('".$deviceForm->getName()."', 'all_items', 'g_deviceid');")
+		))->addClass(ZBX_STYLE_CELL_WIDTH)
+			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Device ID'), 'deviceid', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
-		_('Action')
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN] ? _('Action') : null
 	])
 	->setPageNavigation($data['paging']);
 
 foreach ($data['devices'] as $device) {
 	$deviceTable->addRow([
-		(new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid'])),
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
+			? (new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid']))
+			: null,
 		$device['name'],
 		$device['deviceid'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
-		(new CButton('', _('Unlink')))
-			->addClass(ZBX_STYLE_BTN_LINK)
-			->removeId()
-			// TODO: permission check
-			->setEnabled(true)
-			->setAttribute('data-deviceid', $device['deviceid'])
-			->addClass('js-device-delete')
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
+			? (new CButton('', _('Unlink')))
+				->addClass(ZBX_STYLE_BTN_LINK)
+				->removeId()
+				->setEnabled(true)
+				->setAttribute('data-deviceid', $device['deviceid'])
+				->addClass('js-device-delete')
+			: null
 	]);
 }
 
@@ -73,6 +79,7 @@ $buttons = [
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-device')
 			->addClass('js-no-chkbxrange')
+			->setEnabled($data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN])
 	]
 ];
 

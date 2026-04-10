@@ -196,7 +196,11 @@ class CControllerUserDeviceList extends CController {
 			'profileIdx' => $this->getProfilePrefix(),
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
-			'url' => $view_url->getUrl()
+			'url' => $view_url->getUrl(),
+			'has_access' => [
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER =>
+					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+			]
 		];
 
 		$response = new CControllerResponseData($data);

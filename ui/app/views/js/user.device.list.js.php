@@ -90,11 +90,14 @@ const view = new class {
 					postMessageDetails('error', response.error.messages);
 				}
 				else if ('success' in response) {
-					chkbxRange.clearSelectedOnFilterChange();
 					postMessageOk(response.success.title);
 
 					if ('messages' in response.success) {
 						postMessageDetails('success', response.success.messages);
+					}
+
+					if ('error_messages' in response.success) {
+						postMessageDetails('error', response.success.error_messages);
 					}
 				}
 
