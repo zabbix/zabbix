@@ -162,23 +162,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		goto out;
 	}
 
-
-if (NULL != jp_body.start && NULL != jp_body.end && jp_body.end >= jp_body.start)
-{
-	size_t	len;
-	char	*tmp;
-
-	len = (size_t)(jp_body.end - jp_body.start + 1);
-	tmp = (char *)zbx_malloc(NULL, len + 1);
-
-	memcpy(tmp, jp_body.start, len);
-	tmp[len] = '\0';
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "device.init data object: %s", tmp);
-
-	zbx_free(tmp);
-}
-
 	if (FAIL == zbx_json_value_by_name(&jp_body, "deviceid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "missing deviceid in device.init request");
