@@ -15,7 +15,6 @@
 #include "zbxdbhigh.h"
 
 void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
-		zbx_uint64_t actionid, zbx_uint64_t userid, zbx_uint64_t mediatypeid, const char *sendto,
-		const char *subject, const char *message, const zbx_db_acknowledge *ack,
-		const zbx_service_alarm_t *service_alarm, const zbx_db_service *service, zbx_vector_str_t *params,
-		const char *tz);
+		zbx_uint64_t actionid, zbx_uint64_t userid, const char *sendto, const char *subject,
+		const char *message, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
+		const zbx_db_service *service, zbx_vector_str_t *params, const char *tz);
