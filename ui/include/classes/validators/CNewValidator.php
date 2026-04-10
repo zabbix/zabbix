@@ -437,10 +437,6 @@ class CNewValidator {
 			return self::is_id($value);
 		}
 
-		if ($field_schema['type'] & DB::FIELD_TYPE_UUID_V7) {
-			return (mb_strlen($value) <= $field_schema['length']);
-		}
-
 		if ($field_schema['type'] & DB::FIELD_TYPE_INT) {
 			return self::is_int32($value);
 		}
