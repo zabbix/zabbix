@@ -203,6 +203,22 @@ class CDataTable {
 	#scrollbar_thumb = null;
 
 	/**
+	 * Flag indicating whether a scrollbar thumb width update is currently scheduled.
+	 * Used as a guard to prevent multiple redundant calls when the scroll position changes rapidly.
+	 *
+	 * @type {boolean}
+	 */
+	#scrollbar_thumb_width_updating = false;
+
+	/**
+	 * Flag indicating whether a scrollbar thumb position update is currently scheduled.
+	 * Used as a guard to prevent multiple redundant calls when the scroll position changes rapidly.
+	 *
+	 * @type {boolean}
+	 */
+	#scrollbar_thumb_position_updating = false;
+
+	/**
 	 * Observer instance that monitors changes in the body dimensions.
 	 * Ensures the scrollbar thumb size is recalculated when the content layout changes.
 	 *
@@ -1526,7 +1542,10 @@ class CDataTable {
 	onScroll() {
 		this.#header.scrollLeft = this.#body.scrollLeft;
 
-		this.#updateScrollbarThumbPosition();
+		if (!this.#resizing) {
+			this.#updateScrollbarThumbPosition();
+		}
+
 		this.#updateTableOptionsButtonPosition();
 
 		if (this.#options_popup_updated) {
@@ -2260,7 +2279,10 @@ class CDataTable {
 	#bindScrollbarEvents() {
 		this.#body_resize_observer = new ResizeObserver(() => {
 			this.#resizeScrollbarThumb();
-			this.#updateScrollbarThumbPosition();
+
+			if (!this.#resizing) {
+				// this.#updateScrollbarThumbPosition();
+			}
 		});
 		this.#body_resize_observer.observe(this.#body);
 
@@ -2396,25 +2418,39 @@ class CDataTable {
 	}
 
 	#resizeScrollbarThumb() {
-		setTimeout(() => {
+		if (this.#scrollbar_thumb_width_updating) {
+			return;
+		}
+
+		this.#scrollbar_thumb_width_updating = true;
+
+		requestAnimationFrame(() => {
 			const thumb_width = this.#getScrollbarThumbWidth();
 
 			this.#scrollbar_thumb.style.width = `${thumb_width}px`;
 			this.#scrollbar_thumb.classList.remove(ZBX_STYLE_HIDDEN);
+
+			this.#scrollbar_thumb_width_updating = false;
 		});
 	}
 
 	#updateScrollbarThumbPosition() {
-		if (!this.#scrollbar || !this.#scrollbar_thumb) {
+		if (this.#scrollbar_thumb_position_updating || !this.#scrollbar || !this.#scrollbar_thumb) {
 			return;
 		}
 
-		const thumb_width = this.#scrollbar_thumb.getBoundingClientRect().width;
-		const max_thumb_travel = this.#scrollbar.clientWidth - thumb_width - CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
-		const scroll_ratio = this.#body.scrollLeft / (this.#body.scrollWidth - this.#body.clientWidth);
-		const thumb_position = scroll_ratio * max_thumb_travel;
+		this.#scrollbar_thumb_position_updating = true;
 
-		this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
+		requestAnimationFrame(() => {
+			const thumb_width = this.#scrollbar_thumb.getBoundingClientRect().width;
+			const max_thumb_travel = this.#scrollbar.clientWidth - thumb_width - CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
+			const scroll_ratio = this.#body.scrollLeft / (this.#body.scrollWidth - this.#body.clientWidth);
+			const thumb_position = scroll_ratio * max_thumb_travel;
+
+			this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
+
+			this.#scrollbar_thumb_position_updating = false;
+		});
 	}
 
 	#handleScrollbar() {

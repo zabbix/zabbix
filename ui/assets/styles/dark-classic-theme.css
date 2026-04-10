@@ -2484,7 +2484,8 @@ button {
       cursor: pointer;
       touch-action: none;
       background-color: #4a4a4a;
-      border-radius: 5px; }
+      border-radius: 5px;
+      will-change: transform; }
       .datatable .datatable-scrollbar .datatable-scrollbar-thumb:hover {
         background-color: #515151; }
   .datatable .datatable-footer {

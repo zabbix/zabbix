@@ -391,6 +391,7 @@
 			touch-action: none;
 			background-color: $datatable-scrollbar-thumb-bg-color;
 			border-radius: 5px;
+			will-change: transform;
 
 			&:hover {
 				background-color: $datatable-scrollbar-thumb-hover-bg-color;
