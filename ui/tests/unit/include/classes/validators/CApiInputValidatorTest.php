@@ -5592,68 +5592,68 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			[
 				['type' => API_UUID_V4],
 				null,
-				'/uuid',
-				'Invalid parameter "/uuid": a character string is expected.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": a character string is expected.'
 			],
 			[
 				['type' => API_UUID_V4],
 				[],
-				'/uuid',
-				'Invalid parameter "/uuid": a character string is expected.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": a character string is expected.'
 			],
 			[
 				['type' => API_UUID_V4],
 				'',
-				'/uuid',
-				'Invalid parameter "/uuid": cannot be empty.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": cannot be empty.'
 			],
 			[
 				['type' => API_UUID_V4],
 				1,
-				'/uuid',
-				'Invalid parameter "/uuid": a character string is expected.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": a character string is expected.'
 			],
 			[
 				['type' => API_UUID_V4],
 				true,
-				'/uuid',
-				'Invalid parameter "/uuid": a character string is expected.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": a character string is expected.'
 			],
 			[
 				['type' => API_UUID_V4],
 				'23',
-				'/uuid',
-				'Invalid parameter "/uuid": must be 32 characters long.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": must be 32 characters long.'
 			],
 			[
 				['type' => API_UUID_V4],
 				'1234567890123456789012345678901234567890',
-				'/uuid',
-				'Invalid parameter "/uuid": must be 32 characters long.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": must be 32 characters long.'
 			],
 			[
 				['type' => API_UUID_V4],
 				'12345678901234567890123456789012',
-				'/uuid',
-				'Invalid parameter "/uuid": UUIDv4 is expected.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": UUIDv4 is expected.'
 			],
 			[
 				['type' => API_UUID_V4],
 				'2fdcb2e2995040b2bba202067f730136',
-				'/uuid',
+				'/uuid_v4',
 				'2fdcb2e2995040b2bba202067f730136'
 			],
 			[
 				['type' => API_UUID_V4],
 				'2fdcb2e2-9950-40b2-bba2-02067f730136',
-				'/uuid',
-				'Invalid parameter "/uuid": must be 32 characters long.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": must be 32 characters long.'
 			],
 			[
 				['type' => API_UUID_V4],
 				'2fdcb2e2995080b2bba202067f730136',
-				'/uuid',
-				'Invalid parameter "/uuid": UUIDv4 is expected.'
+				'/uuid_v4',
+				'Invalid parameter "/uuid_v4": UUIDv4 is expected.'
 			],
 			[
 				['type' => API_CUIDS],
