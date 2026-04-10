@@ -93,9 +93,17 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 	zbx_free(task);
 }
 
-zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
+zbx_uint64_t	discoverer_task_check_count_get(const zbx_discoverer_task_t *task)
 {
 	return task->range.state.count;
+}
+
+int	discoverer_task_is_lastip(const zbx_discoverer_task_t *task)
+{
+	zbx_task_range_t	range = {.state = task->range.state};
+
+	return FAIL == zbx_iprange_uniq_iter(task->range.ipranges->values, task->range.ipranges->values_num,
+			&range.state.index_ip, range.state.ipaddress) ? SUCCEED : FAIL;
 }
 
 static zbx_discoverer_task_t	*discoverer_task_clone(zbx_discoverer_task_t *task)
