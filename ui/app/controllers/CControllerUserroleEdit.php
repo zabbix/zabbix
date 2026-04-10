@@ -240,7 +240,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 
 		$data['disabled_moduleids'] = array_column($disabled_modules, 'moduleid', 'moduleid');
 
-
 		$data['labels'] = $this->getLabels($db_modules);
 
 		$data['rules']['service_read_list'] = API::Service()->get([
