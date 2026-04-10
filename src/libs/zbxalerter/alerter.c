@@ -513,7 +513,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		int config_adapter_timeout,
 		const char *config_adapter_ca_file,
 		const char *config_adapter_cert_file,
-		const char *config_adapter_key_file)
+		const char *config_adapter_key_file,
+		const char *config_adapter_connect_to)
 {
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(socket);
@@ -534,7 +535,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	CURL			*curl = NULL;
 	CURLcode		err;
 	CURLoption		opt;
-	struct curl_slist	*headers = NULL;
+	struct curl_slist	*headers = NULL, *connect_to = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
 	char			*payload = NULL, *error = NULL, errbuf[CURL_ERROR_SIZE];
 
@@ -559,6 +560,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	}
 
 	headers = curl_slist_append(headers, "Content-Type:application/json");
+	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
@@ -573,30 +575,57 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		goto out;
 	}
 
-	if (SUCCEED != zbx_curl_setopt_https(curl, &error))
+	if (NULL != config_adapter_ca_file && NULL != config_adapter_cert_file && NULL != config_adapter_key_file)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_https %s", curl_easy_strerror(err));
-		zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_https %s",
-				curl_easy_strerror(err));
-		goto out;
+		if (SUCCEED != zbx_curl_setopt_https(curl, &error))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_https %s", curl_easy_strerror(err));
+			zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_https %s",
+					curl_easy_strerror(err));
+			goto out;
+		}
+
+		if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_ssl_version %s",
+					curl_easy_strerror(err));
+			zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_ssl_version %s",
+					curl_easy_strerror(err));
+			goto out;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_adapter_ca_file)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT,
+				config_adapter_cert_file)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY,
+				config_adapter_key_file)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
+				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			zbx_snprintf(alert_error, sizeof(alert_error), "failed set cURL option %d: %s.", (int)opt,
+					curl_easy_strerror(err));
+			goto out;
+		}
 	}
 
-	if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error))
+	if (NULL != config_adapter_connect_to)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_ssl_version %s", curl_easy_strerror(err));
-		zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_ssl_version %s",
-				curl_easy_strerror(err));
-		goto out;
-	}
+		connect_to = curl_slist_append(connect_to, config_adapter_connect_to);
 
-	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CAINFO, config_adapter_ca_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLCERT, config_adapter_cert_file)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSLKEY, config_adapter_key_file)))
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		zbx_snprintf(alert_error, sizeof(alert_error), "failed set cURL option %d: %s.", (int)opt,
+		if (NULL == connect_to)
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed to prepare CURLOPT_CONNECT_TO value");
+			goto out;
+		}
+
+		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
+		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
-		goto out;
+			goto out;
+		}
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
@@ -744,7 +773,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 						alerter_args_in->config_adapter_timeout,
 						alerter_args_in->config_adapter_ca_file,
 						alerter_args_in->config_adapter_cert_file,
-						alerter_args_in->config_adapter_key_file);
+						alerter_args_in->config_adapter_key_file,
+						alerter_args_in->config_adapter_connect_to);
 				break;
 			case ZBX_RTC_SHUTDOWN:
 				zbx_set_exiting_with_succeed();
