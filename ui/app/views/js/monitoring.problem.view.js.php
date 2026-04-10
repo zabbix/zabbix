@@ -94,7 +94,7 @@
 							show_timeline: '1'
 						})
 						.setOptionsPopupHandler('time')
-						.setFields(['clock', 'eventid', 'objectid'])
+						.setFields(['time', 'eventid', 'objectid'])
 						.setRenderer('time')
 						.setSortField('clock')
 						.setSortable(true),

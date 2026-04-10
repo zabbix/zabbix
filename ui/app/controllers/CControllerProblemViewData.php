@@ -16,7 +16,7 @@
 
 class CControllerProblemViewData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['clock', 'eventid', 'objectid', 'severity', 'recovery', 'status',
+	protected array $allowed_data_fields = ['time', 'eventid', 'objectid', 'severity', 'recovery', 'status',
 		'info', 'host', 'description', 'duration', 'can_be_closed', 'eventid', 'actions', 'opdata', 'tags'];
 
 	protected function checkPermissions(): bool {
@@ -99,7 +99,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$clock = $problem['clock'];
 
-			$problem['clock'] = zbx_date2str(
+			$problem['time'] = zbx_date2str(
 				($clock >= $data['today'])
 					? TIME_FORMAT_SECONDS
 					: DATE_TIME_FORMAT_SECONDS,
