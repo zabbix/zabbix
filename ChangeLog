@@ -1,6 +1,8 @@
 Changes for 8.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-9751] added inline validation for General (GUI, timeout, trigger, other), auditlog and housekeeping settings pages (gberzina)
+.......PS. [ZBXNEXT-6492] added DBHost configuration option to support PostgreSQL connection to first read-write database from list. (sboidenko)
 A.F....... [ZBXNEXT-10121] added support for PHP 8.5 (talbergs)
 A.......S. [ZBXNEXT-10553] updated maximum supported TimescaleDB version to 2.26 (mprihodko)
 A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprihodko)
@@ -21,6 +23,8 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+..F....... [ZBX-26459] fixed host macros view to avoid displaying both macro types when switching quickly (gberzina)
+..F....... [ZBX-27597] fixed form state not being reset when using back/forward navigation (gklavins)
 ........S. [ZBX-27633] fixed capitalization of the log message (Sasha)
 .........T [ZBX-27662] renamed GLPI media type (mruszczyk)
 ...G...... [ZBX-27542] fixed memory leak in Zabbix Agent 2 scheduler (mkorotkov)
