@@ -204,7 +204,13 @@ var chkbxRange = {
 
 		const search_params = this.getSearchParams();
 
-		this.handleBackForwardNavigation(search_params, checkboxes, object_ids, selected_ids);
+		ZABBIX.EventHub.subscribe({
+			require: {
+				context: EVENT_CONTEXT_PAGE_NAVIGATION,
+				event: EVENT_BACK_FORWARD
+			},
+			callback: () => this.handleBackForwardNavigation(search_params, checkboxes, object_ids, selected_ids)
+		});
 
 		this.saveSearchParams(object, search_params);
 		this.saveSelectedIds(object, selected_ids);
@@ -219,15 +225,6 @@ var chkbxRange = {
 	 * @param {string[]} 							selected_ids	currently selected object IDs.
 	 */
 	handleBackForwardNavigation: function(search_params, checkboxes, object_ids, selected_ids) {
-		if (!PerformanceObserver.supportedEntryTypes.includes('navigation')) {
-			return;
-		}
-
-		const entries = performance.getEntriesByType('navigation').filter(entry => entry.type === 'back_forward');
-		if (entries.length === 0) {
-			return;
-		}
-
 		if (this.hasSearchParamChanged(this.getPreviousSearchParams(), search_params, 'page')) {
 			return;
 		}
