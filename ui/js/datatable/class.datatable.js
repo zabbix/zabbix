@@ -2279,10 +2279,7 @@ class CDataTable {
 	#bindScrollbarEvents() {
 		this.#body_resize_observer = new ResizeObserver(() => {
 			this.#resizeScrollbarThumb();
-
-			if (!this.#resizing) {
-				// this.#updateScrollbarThumbPosition();
-			}
+			this.#updateScrollbarThumbPosition();
 		});
 		this.#body_resize_observer.observe(this.#body);
 
@@ -2418,7 +2415,7 @@ class CDataTable {
 	}
 
 	#resizeScrollbarThumb() {
-		if (this.#scrollbar_thumb_width_updating) {
+		if (this.#scrollbar_thumb_width_updating || !this.#scrollbar || !this.#scrollbar_thumb) {
 			return;
 		}
 
