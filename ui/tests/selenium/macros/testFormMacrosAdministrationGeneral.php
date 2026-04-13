@@ -108,10 +108,11 @@ class testFormMacrosAdministrationGeneral extends testFormMacros {
 	}
 
 	private function saveGlobalMacros($confirmation = false) {
-		$this->zbxTestClick('update');
+		$button = $this->query('button:Update')->one()->click();
 		if ($confirmation) {
 			$this->zbxTestAcceptAlert();
 		}
+		$button->waitUntilStalled();
 
 		$this->page->waitUntilReady();
 		$this->zbxTestCheckHeader('Macros');
