@@ -269,7 +269,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			$values
 		);
 
-		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEqualsWithDelta((float)self::DBL_MAX, $this->getItemLastValue($itemid), 1e292);
 	}
 
 	public function testCalculatedExpression_AvgOfLast5()
