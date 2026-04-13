@@ -189,7 +189,7 @@ class CDevice extends CApiService {
 			'userid' => $data['userid']
 		];
 
-//		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DEVICE, [$device]);
+		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DEVICE, [$device]);
 
 		return [
 			'uuid' => $uuid,
@@ -292,7 +292,7 @@ class CDevice extends CApiService {
 			$db_device['deviceid'] => array_intersect_key($db_device, array_flip(['deviceid', 'name']))
 		];
 
-//		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
 
 		return ['token' => $token_data['token']];
 	}
@@ -382,7 +382,7 @@ class CDevice extends CApiService {
 
 		$result = $server->offboardDevice(['deviceid' => $deviceids[0]], self::getAuthIdentifier());
 
-		if (false && $result === false) {
+		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
 		}
 
@@ -398,7 +398,7 @@ class CDevice extends CApiService {
 		DB::delete('token', ['tokenid' => $tokenids]);
 		DB::delete('device', ['deviceid' => $deviceids]);
 
-//		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 
 		return $data;
 	}
