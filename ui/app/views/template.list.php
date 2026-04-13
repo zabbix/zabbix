@@ -120,6 +120,8 @@ $filter = (new CFilter())
 
 $html_page->addItem($filter);
 
+$csrf_token = CCsrfTokenHelper::get('template');
+
 $form = (new CForm())
 	->setName('templates');
 
@@ -205,7 +207,8 @@ $html_page
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs']
+		'user_configs' => $data['user_configs'],
+		'csrf_token' => $csrf_token,
 	]).');
 '))
 	->setOnDocumentReady()

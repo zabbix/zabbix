@@ -35,7 +35,6 @@ abstract class CControllerDataTable extends CController {
 	abstract protected function getData(): array;
 
 	protected function init(): void {
-		$this->disableCsrfValidation();
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 
 		$this->setValidationRules([
@@ -56,7 +55,9 @@ abstract class CControllerDataTable extends CController {
 		if (!$ret) {
 			$this->setResponse(
 				new CControllerResponseData(['main_block' => json_encode([
-					'error' => _('Invalid request')
+					'error' => [
+						'messages' => _('Invalid request')
+					]
 				])])
 			);
 		}
@@ -130,10 +131,12 @@ abstract class CControllerDataTable extends CController {
 			}
 
 			unset($data['rows']);
-		} catch (Throwable $e) {
+		} catch (Throwable) {
 			$this->setResponse(new CControllerResponseData([
 				'main_block' => json_encode([
-					'error' => $e->getMessage()
+					'error' => [
+						'title' => _('Invalid request')
+					]
 				])
 			]));
 

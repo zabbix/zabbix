@@ -61,6 +61,8 @@ foreach ($data['filter_tabs'] as $tab) {
 // Set javascript options for tab filter initialization in monitoring.host.view.js.php file.
 $data['filter_options'] = $filter->options;
 
+$csrf_token = CCsrfTokenHelper::get('host');
+
 $html_page
 	->addItem($filter)
 	->addItem(
@@ -130,7 +132,8 @@ $html_page
 		'sort_field' => $data['sort_field'],
 		'sort_order' => $data['sort_order'],
 		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs']
+		'user_configs' => $data['user_configs'],
+		'csrf_token' => $csrf_token
 	]).');
 '))
 	->setOnDocumentReady()

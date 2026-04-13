@@ -26,7 +26,11 @@
 
 <script>
 	const view = new class {
-		init({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#csrf_token = null;
+
+		init({filter, page, sort_field, sort_order, storage_idx, user_configs, csrf_token}) {
+			this.#csrf_token = csrf_token;
+
 			this.#initActions();
 			this.#initFilter();
 			this.#initPopupListeners();
@@ -90,6 +94,7 @@
 		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'template.list.data');
+			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 

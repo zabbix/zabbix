@@ -75,16 +75,15 @@ class CDefaultDataProvider extends CDataProvider {
 	}
 
 	/**
-	 * @param {array|CDataTableColumn[]} columns
-	 * @param {Object} filter
-	 * @param {Object} options
-	 * @param {number} page
-	 * @param {string} sort_field
-	 * @param {string} sort_order
-	 * @param {boolean} check_changes
-	 * @param {boolean} force_load
-	 * @param {string}  export_file
-	 * @returns {Promise<any>}
+	 * @param {CDataTableColumn[]} columns        Column configurations
+	 * @param {Object}             filter         Filters
+	 * @param {Object}             options        Table and column options
+	 * @param {number}             page           The current page
+	 * @param {string}             sort_field     Sort field
+	 * @param {string}             sort_order     Sort order (ASC/DESC)
+	 * @param {boolean}            check_changes  Check against cached state to prevent redundant requests
+	 * @param {boolean}            force_load     Bypasses all checks and guarantees a new request
+	 * @param {string}             export_file    If provided, triggers file generation server-side
 	 */
 	getData({columns, filter, options, page, sort_field, sort_order, check_changes, force_load, export_file}) {
 		const data_fields = [

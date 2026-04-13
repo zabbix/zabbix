@@ -132,7 +132,7 @@ class CControllerProblemView extends CControllerProblem {
 			'page' => $this->getInput('page', 1),
 			'severities' => CSeverityHelper::getSeverities(),
 			'storage_idx' => $storage_idx,
-			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, []))
 		];
 

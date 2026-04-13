@@ -20,17 +20,18 @@
 
 ?>
 <script>
-	const view = {
-		layout_mode: null,
-		refresh_interval: null,
-		refresh_interval_id: null,
-		filter_defaults: {},
-		filter: null,
-		active_filter: null,
-		applied_filter_groupids: [],
-		datatable: null,
-		_refresh_message_box: null,
-		_popup_message_box: null,
+	const view = new class {
+		#layout_mode = null;
+		#refresh_interval = null;
+		#refresh_interval_id = null;
+		#filter_defaults = {};
+		#filter = null;
+		#active_filter = null;
+		#applied_filter_groupids = [];
+		#datatable = null;
+		#csrf_token = null;
+		#refresh_message_box = null;
+		#popup_message_box = null;
 
 		init({
 			layout_mode,
@@ -43,55 +44,57 @@
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs
+			user_configs,
+			csrf_token
 		}) {
-			this.layout_mode = layout_mode;
-			this.refresh_interval = refresh_interval;
-			this.filter_defaults = filter_defaults;
-			this.applied_filter_groupids = applied_filter_groupids;
+			this.#layout_mode = layout_mode;
+			this.#refresh_interval = refresh_interval;
+			this.#filter_defaults = filter_defaults;
+			this.#applied_filter_groupids = applied_filter_groupids;
+			this.#csrf_token = csrf_token;
 
-			this.initTabFilter(filter_options);
-			this.initEvents();
-			this.initPopupListeners();
-			this.initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+			this.#initTabFilter(filter_options);
+			this.#initEvents();
+			this.#initPopupListeners();
+			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
 
-			if (this.refresh_interval != 0) {
-				this.scheduleRefresh();
+			if (this.#refresh_interval != 0) {
+				this.#scheduleRefresh();
 			}
-		},
+		}
 
-		initTabFilter(filter_options) {
+		#initTabFilter(filter_options) {
 			/** @type {HTMLElement} */
 			const filter = document.getElementById('monitoring_hosts_filter');
 
-			this.filter = new CTabFilter(filter, filter_options);
-			this.active_filter = this.filter._active_item;
+			this.#filter = new CTabFilter(filter, filter_options);
+			this.#active_filter = this.#filter._active_item;
 
-			this.filter.on(TABFILTER_EVENT_URLSET, () => {
-				if (this.active_filter !== this.filter._active_item) {
-					this.active_filter = this.filter._active_item;
+			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
+				if (this.#active_filter !== this.#filter._active_item) {
+					this.#active_filter = this.#filter._active_item;
 
-					this.datatable.setTabFilterItem(this.active_filter);
+					this.#datatable.setTabFilterItem(this.#active_filter);
 				}
 
-				this.scheduleRefresh();
-				this.refresh();
+				this.#scheduleRefresh();
+				this.#refresh();
 			});
-		},
+		}
 
-		initEvents() {
+		#initEvents() {
 			document.querySelector('.js-create-host')?.addEventListener('click', () => {
-				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.#applied_filter_groupids});
 			});
-		},
+		}
 
-		initPopupListeners() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_OPEN
 				},
-				callback: () => this.unscheduleRefresh()
+				callback: () => this.#unscheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -99,7 +102,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL
 				},
-				callback: () => this.scheduleRefresh()
+				callback: () => this.#scheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -111,23 +114,24 @@
 					event.preventDefault();
 
 					if ('success' in data.submit) {
-						this._addPopupMessage(
+						this.#addPopupMessage(
 							makeMessageBox('good', data.submit.success.messages, data.submit.success.title)
 						);
 					}
 
-					this.refresh();
+					this.#refresh();
 				}
 			});
-		},
+		}
 
-		initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'host.view.data');
+			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('hosts'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'status', 'maintenance', 'maintenanceid', 'maintenance_type',
@@ -169,7 +173,7 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
-				.setTabFilterItem(this.active_filter)
+				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer('name', ({column_data, cell_inner}) => {
@@ -246,7 +250,7 @@
 				.setRenderer('latest_data', ({column_data, cell_inner}) => {
 					const [hostid, items_count] = column_data;
 
-					this.datatable.getData().then(response => {
+					this.#datatable.getData().then(response => {
 						const {allowed_ui_latest_data} = response;
 
 						if (allowed_ui_latest_data) {
@@ -352,100 +356,100 @@
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
-				.on(CPager.EVENT_SELECT, () => this.scheduleRefresh())
+				.on(CPager.EVENT_SELECT, () => this.#scheduleRefresh())
 				.on(CPager.EVENT_STATE_CHANGE, event => {
 					const {page} = event.detail;
 
 					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.datatable.getData().then(response => this.refreshCounters(response));
+					this.#datatable.getData().then(response => this.#refreshCounters(response));
 				})
-				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
 				.init(user_configs);
-		},
+		}
 
-		_addRefreshMessage(messages) {
-			this._removeRefreshMessage();
+		#addRefreshMessage(messages) {
+			this.#removeRefreshMessage();
 
-			this._refresh_message_box = $($.parseHTML(messages));
-			addMessage(this._refresh_message_box);
-		},
+			this.#refresh_message_box = $($.parseHTML(messages));
+			addMessage(this.#refresh_message_box);
+		}
 
-		_removeRefreshMessage() {
-			if (this._refresh_message_box !== null) {
-				this._refresh_message_box.remove();
-				this._refresh_message_box = null;
+		#removeRefreshMessage() {
+			if (this.#refresh_message_box !== null) {
+				this.#refresh_message_box.remove();
+				this.#refresh_message_box = null;
 			}
-		},
+		}
 
-		_addPopupMessage(message_box) {
-			this._removePopupMessage();
+		#addPopupMessage(message_box) {
+			this.#removePopupMessage();
 
-			this._popup_message_box = message_box;
-			addMessage(this._popup_message_box);
-		},
+			this.#popup_message_box = message_box;
+			addMessage(this.#popup_message_box);
+		}
 
-		_removePopupMessage() {
-			if (this._popup_message_box !== null) {
-				this._popup_message_box.remove();
-				this._popup_message_box = null;
+		#removePopupMessage() {
+			if (this.#popup_message_box !== null) {
+				this.#popup_message_box.remove();
+				this.#popup_message_box = null;
 			}
-		},
+		}
 
-		refresh() {
+		#refresh() {
 			if (isUserInteracting()) {
 				return;
 			}
 
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.filter_defaults, ...current_filter};
+			const filter = {...this.#filter_defaults, ...current_filter};
 
-			this.datatable.setFilter(filter)
+			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.onDataDone(response)
+					onSuccess: response => this.#onDataDone(response)
 				});
-		},
+		}
 
-		refreshCounters(response) {
-			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+		#refreshCounters(response) {
+			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
 			if ('filter_counters' in response) {
-				this.filter.updateCounters(response.filter_counters);
+				this.#filter.updateCounters(response.filter_counters);
 			}
-		},
+		}
 
-		onDataDone(response) {
-			this._removeRefreshMessage();
+		#onDataDone(response) {
+			this.#removeRefreshMessage();
 
 			if ('groupids' in response) {
-				this.applied_filter_groupids = response.groupids;
+				this.#applied_filter_groupids = response.groupids;
 			}
 
-			this.refreshCounters(response);
+			this.#refreshCounters(response);
 
 			if ('messages' in response) {
-				this._addRefreshMessage(response.messages);
+				this.#addRefreshMessage(response.messages);
 			}
-		},
+		}
 
-		scheduleRefresh() {
-			this.unscheduleRefresh();
-			this.refresh_interval_id = setInterval(() => this.refresh(), this.refresh_interval);
-		},
+		#scheduleRefresh() {
+			this.#unscheduleRefresh();
+			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+		}
 
-		unscheduleRefresh() {
-			clearInterval(this.refresh_interval_id);
-			this.refresh_interval_id = null;
-		},
+		#unscheduleRefresh() {
+			clearInterval(this.#refresh_interval_id);
+			this.#refresh_interval_id = null;
+		}
 	};
 </script>

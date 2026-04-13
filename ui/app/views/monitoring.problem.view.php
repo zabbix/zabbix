@@ -77,6 +77,8 @@ $allowed = [
 $mass_update_enabled = $allowed['add_comments'] || $allowed['change_severity'] || $allowed['acknowledge']
 	|| $allowed['close'] || $allowed['suppress_problems'] || $allowed['rank_change'];
 
+$csrf_token = CCsrfTokenHelper::get('problem');
+
 $html_page
 	->addItem($filter)
 	->addItem(
@@ -181,7 +183,8 @@ $html_page
 		'sort_order' => $data['sortorder'],
 		'storage_idx' => $data['storage_idx'],
 		'user_configs' => $data['user_configs'],
-		'severities' => $data['severities']
+		'severities' => $data['severities'],
+		'csrf_token' => $csrf_token
 	]).');
 '))
 	->setOnDocumentReady()

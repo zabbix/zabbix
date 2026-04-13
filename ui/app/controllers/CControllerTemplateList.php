@@ -118,9 +118,9 @@ class CControllerTemplateList extends CController {
 			'page' => $this->getInput('page', 1),
 			'uncheck' => $this->getInput('uncheck', 0) == 1,
 			'storage_idx' => $storage_idx,
-			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, [])
-			),
+			)
 		];
 
 		$response = new CControllerResponseData($data);

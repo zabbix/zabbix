@@ -30,29 +30,20 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 </script>
 
 <script>
-	const view = {
-		applied_filter_groupids: [],
-		datatable: null,
+	const view = new class {
+		#applied_filter_groupids = [];
+		#datatable = null;
+		#csrf_token = null;
 
-		/**
-		 * @param {array}  applied_filter_groupids
-		 * @param {string} csrf_token
-		 * @param {number} page
-		 * @param {Object} filter
-		 * @param {string} sort_field
-		 * @param {string} sort_order
-		 * @param {string} storage_idx
-		 * @param {array}  user_configs
-		 */
-		init({applied_filter_groupids, csrf_token, filter, page, sort_field, sort_order, storage_idx, user_configs}) {
-			this.applied_filter_groupids = applied_filter_groupids;
-			this.csrf_token = csrf_token;
+		init({applied_filter_groupids, filter, page, sort_field, sort_order, storage_idx, user_configs, csrf_token}) {
+			this.#applied_filter_groupids = applied_filter_groupids;
+			this.#csrf_token = csrf_token;
 
-			this.initFilter();
-			this.initEvents();
-			this.initPopupListeners();
-			this.initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
-		},
+			this.#initFilter();
+			this.#initEvents();
+			this.#initPopupListeners();
+			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+		}
 
 		enable(target, parameters, callback) {
 			const url_params = objectToSearchParams({action: 'host.enable'});
@@ -66,7 +57,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					target.classList.remove(ZBX_STYLE_LOADING);
 					target.blur();
 				});
-		},
+		}
 
 		disable(target, parameters, callback) {
 			const url_params = objectToSearchParams({action: 'host.disable'});
@@ -80,7 +71,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					target.classList.remove(ZBX_STYLE_LOADING);
 					target.blur();
 				});
-		},
+		}
 
 		postAction(url, data) {
 			return fetch(url, {
@@ -88,7 +79,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				headers: {'Content-Type': 'application/json'},
 				body: JSON.stringify({
 					...data,
-					[CSRF_TOKEN_NAME]: this.csrf_token
+					[CSRF_TOKEN_NAME]: this.#csrf_token
 				})
 			})
 				.then(response => response.json())
@@ -101,7 +92,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					throw error;
 				});
-		},
+		}
 
 		reload(result) {
 			if ('error' in result) {
@@ -124,9 +115,9 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 			}
 
 			location.href = location.href;
-		},
+		}
 
-		initFilter() {
+		#initFilter() {
 			$('#filter-tags')
 				.dynamicRows({template: '#filter-tag-row-tmpl'})
 				.on('afteradd.dynamicRows', function () {
@@ -160,15 +151,15 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					);
 				})
 				.trigger('change');
-		},
+		}
 
-		initEvents() {
+		#initEvents() {
 			document.querySelector('.js-host-wizard').addEventListener('click', () => {
 				ZABBIX.PopupManager.open('host.wizard.edit');
 			});
 
 			document.querySelector('.js-create-host').addEventListener('click', () => {
-				ZABBIX.PopupManager.open('host.edit', {groupids: this.applied_filter_groupids});
+				ZABBIX.PopupManager.open('host.edit', {groupids: this.#applied_filter_groupids});
 			});
 
 			const form = document.forms['hosts'];
@@ -199,7 +190,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 			form.querySelector('.js-massupdate-host').addEventListener('click', e => {
 				openMassupdatePopup('popup.massupdate.host', {
-					[CSRF_TOKEN_NAME]: this.csrf_token
+					[CSRF_TOKEN_NAME]: this.#csrf_token
 				}, {
 					dialogue_class: 'modal-popup-static',
 					trigger_element: e.target
@@ -209,9 +200,9 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 			form.querySelector('.js-massdelete-host').addEventListener('click', e => {
 				this.massDeleteHosts(e.target);
 			});
-		},
+		}
 
-		initPopupListeners() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,
@@ -238,15 +229,16 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					}
 				}
 			});
-		},
+		}
 
-		initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'host.list.data');
+			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			this.datatable = new CDataTable(document.getElementById('hosts'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('hosts'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setFields(['hostid', 'name', 'discovery', 'flags', 'maintenance', 'status', 'discoveryData',
@@ -517,15 +509,15 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 						const parameters = {hostids: [hostid]};
 						const callback = response => {
-							this.datatable.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+							this.#datatable.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
 
 							if (response.error) {
 								const title = response.error.title ?? '';
-								CMessageHelper.error(this.datatable.getElement(), response.error.messages, title);
+								CMessageHelper.error(this.#datatable.getElement(), response.error.messages, title);
 							}
 							else {
 								const title = response.success.title ?? '';
-								CMessageHelper.success(this.datatable.getElement(), response.success.messages, title);
+								CMessageHelper.success(this.#datatable.getElement(), response.success.messages, title);
 							}
 						};
 
@@ -565,7 +557,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						return;
 					}
 
-					this.datatable.getData().then(response => {
+					this.#datatable.getData().then(response => {
 						const {can_edit_proxies, can_edit_proxy_groups} = response;
 
 						const proxy_url = new URL('zabbix.php', location.href);
@@ -631,7 +623,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.setRenderer('templates', ({column_data, cell_inner}) => {
 					const [templates] = column_data;
 
-					this.datatable.getData().then(response => {
+					this.#datatable.getData().then(response => {
 						const {max_in_table} = response;
 						const max_in_table_exceeded = templates.length > max_in_table;
 						const visible_templates = Object.values(templates).slice(0, max_in_table);
@@ -800,7 +792,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					new CState().setParams({page});
 				})
 				.init(user_configs);
-		},
+		}
 
 		massDeleteHosts(button) {
 			const confirm_text = Object.keys(chkbxRange.getSelectedIds()).length > 1
@@ -815,7 +807,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 			const url = new URL('zabbix.php', location.href);
 			url.searchParams.set('action', 'host.massdelete');
-			url.searchParams.set(CSRF_TOKEN_NAME, this.csrf_token);
+			url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			fetch(url.toString(), {
 				method: 'POST',

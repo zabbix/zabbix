@@ -20,17 +20,19 @@
 ?>
 
 <script>
-	const view = {
-		layout_mode: null,
-		refresh_interval: null,
-		refresh_interval_id: null,
-		filter_defaults: {},
-		filter: null,
-		active_filter: null,
-		checkbox_object: null,
-		datatable: null,
-		_refresh_message_box: null,
-		_popup_message_box: null,
+	const view = new class {
+		#layout_mode = null;
+		#refresh_interval = null;
+		#refresh_interval_id = null;
+		#filter_defaults = {};
+		#filter = null;
+		#filter_set = null;
+		#active_filter = null;
+		#checkbox_object = null;
+		#datatable = null;
+		#csrf_token = null;
+		#refresh_message_box = null;
+		#popup_message_box = null;
 
 		init({
 			layout_mode,
@@ -44,61 +46,63 @@
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs
+			user_configs,
+			csrf_token
 		}) {
-			this.layout_mode = layout_mode;
-			this.refresh_interval = refresh_interval;
-			this.filter_defaults = filter_defaults;
-			this.checkbox_object = checkbox_object;
-			this.filter_set = filter_set;
+			this.#layout_mode = layout_mode;
+			this.#refresh_interval = refresh_interval;
+			this.#filter_defaults = filter_defaults;
+			this.#checkbox_object = checkbox_object;
+			this.#filter_set = filter_set;
+			this.#csrf_token = csrf_token;
 
-			this.initTabFilter(filter_options);
-			this.initExpandableSubfilter();
-			this.initListActions();
-			this.initPopupListeners();
-			this.initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
+			this.#initTabFilter(filter_options);
+			this.#initExpandableSubfilter();
+			this.#initListActions();
+			this.#initPopupListeners();
+			this.#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs});
 
-			if (this.refresh_interval != 0 && this.filter_set) {
-				this.scheduleRefresh();
+			if (this.#refresh_interval != 0 && this.#filter_set) {
+				this.#scheduleRefresh();
 			}
-		},
+		}
 
-		initTabFilter(filter_options) {
+		#initTabFilter(filter_options) {
 			/** @type {HTMLElement} */
 			const filter = document.getElementById('monitoring_latest_filter');
 
-			this.filter = new CTabFilter(filter, filter_options);
-			this.active_filter = this.filter._active_item;
+			this.#filter = new CTabFilter(filter, filter_options);
+			this.#active_filter = this.#filter._active_item;
 
-			this.filter.on(TABFILTER_EVENT_URLSET, () => {
+			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.active_filter !== this.filter._active_item) {
-					this.active_filter = this.filter._active_item;
+				if (this.#active_filter !== this.#filter._active_item) {
+					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
-					this.datatable.setTabFilterItem(this.active_filter);
+					this.#datatable.setTabFilterItem(this.#active_filter);
 				}
 
-				this.scheduleRefresh();
-				this.refresh();
+				this.#scheduleRefresh();
+				this.#refresh();
 			});
 
 			// Tags must be activated also using the enter button on keyboard.
-			document.addEventListener('keydown', (event) => {
-				if (event.which == 13 && event.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
-					view.setSubfilter([`subfilter_tags[${encodeURIComponent(event.target.dataset.key)}][]`,
-						event.target.dataset.value
+			document.addEventListener('keydown', e => {
+				if (e.which == 13 && e.target.classList.contains('<?= ZBX_STYLE_BTN_TAG ?>')) {
+					this.setSubfilter([`subfilter_tags[${encodeURIComponent(e.target.dataset.key)}][]`,
+						e.target.dataset.value
 					]);
 				}
 			});
-		},
+		}
 
-		initExpandableSubfilter() {
+		#initExpandableSubfilter() {
 			document.querySelectorAll('.expandable-subfilter').forEach((element) => {
 				const subfilter = new CExpandableSubfilter(element);
 				subfilter.on(EXPANDABLE_SUBFILTER_EVENT_EXPAND, (e) => {
-					this.filter.setExpandedSubfilters(e.detail.name);
+					this.#filter.setExpandedSubfilters(e.detail.name);
 				});
 			});
 
@@ -109,27 +113,27 @@
 						element.classList.remove('display-none');
 					});
 
-					this.filter.setExpandedSubfilters(expand_tags.dataset['name']);
+					this.#filter.setExpandedSubfilters(expand_tags.dataset['name']);
 					expand_tags.remove();
 				});
 			}
-		},
+		}
 
-		initListActions() {
-			let form = this.getCurrentForm().get(0);
+		#initListActions() {
+			let form = this.#getCurrentForm().get(0);
 
 			form.querySelector('.js-massexecute-item').addEventListener('click', e => {
-				this.executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
+				this.#executeNow(e.target, {itemids: Object.keys(chkbxRange.getSelectedIds())});
 			});
-		},
+		}
 
-		initPopupListeners() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_OPEN
 				},
-				callback: () => this.unscheduleRefresh()
+				callback: () => this.#unscheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -137,7 +141,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL
 				},
-				callback: () => this.scheduleRefresh()
+				callback: () => this.#scheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -149,26 +153,27 @@
 					event.preventDefault();
 
 					if ('success' in data.submit) {
-						this._addPopupMessage(
+						this.#addPopupMessage(
 							makeMessageBox('good', data.submit.success.messages, data.submit.success.title)
 						);
 					}
 
 					uncheckTableRows('latest');
-					this.refresh();
+					this.#refresh();
 				}
 			});
-		},
+		}
 
-		initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
+		#initDataTable({filter, page, sort_field, sort_order, storage_idx, user_configs}) {
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'latest.view.data');
+			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
 			CDataTableColumnTags.object_type = ZBX_TAG_OBJECT_ITEM;
 
-			this.datatable = new CDataTable(document.getElementById('latest'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('latest'), data_provider)
 				.setColumns([
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
@@ -220,7 +225,7 @@
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
-				.setTabFilterItem(this.active_filter)
+				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
 				.setRenderer('host', ({column_data, cell_inner}) => {
@@ -377,28 +382,28 @@
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
-				.on(CPager.EVENT_SELECT, () => this.scheduleRefresh())
+				.on(CPager.EVENT_SELECT, () => this.#scheduleRefresh())
 				.on(CPager.EVENT_STATE_CHANGE, event => {
 					const {page} = event.detail;
 
 					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.datatable.getData().then(response => this.refreshCounters(response));
+					this.#datatable.getData().then(response => this.#refreshCounters(response));
 				})
-				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
 				.init(user_configs);
-		},
+		}
 
-		getCurrentForm() {
+		#getCurrentForm() {
 			return $('form[name=items]');
-		},
+		}
 
-		getCurrentSubfilter() {
+		#getCurrentSubfilter() {
 			const latest_data_subfilter = document.getElementById('latest-data-subfilter');
 
 			if (latest_data_subfilter) {
@@ -412,75 +417,75 @@
 
 				return document.querySelector('.tabfilter-content-container').appendChild(table);
 			}
-		},
+		}
 
-		_addRefreshMessage(messages) {
-			this._removeRefreshMessage();
+		#addRefreshMessage(messages) {
+			this.#removeRefreshMessage();
 
-			this._refresh_message_box = $($.parseHTML(messages));
-			addMessage(this._refresh_message_box);
-		},
+			this.#refresh_message_box = $($.parseHTML(messages));
+			addMessage(this.#refresh_message_box);
+		}
 
-		_removeRefreshMessage() {
-			if (this._refresh_message_box !== null) {
-				this._refresh_message_box.remove();
-				this._refresh_message_box = null;
+		#removeRefreshMessage() {
+			if (this.#refresh_message_box !== null) {
+				this.#refresh_message_box.remove();
+				this.#refresh_message_box = null;
 			}
-		},
+		}
 
-		_addPopupMessage(message_box) {
-			this._removePopupMessage();
+		#addPopupMessage(message_box) {
+			this.#removePopupMessage();
 
-			this._popup_message_box = message_box;
-			addMessage(this._popup_message_box);
-		},
+			this.#popup_message_box = message_box;
+			addMessage(this.#popup_message_box);
+		}
 
-		_removePopupMessage() {
-			if (this._popup_message_box !== null) {
-				this._popup_message_box.remove();
-				this._popup_message_box = null;
+		#removePopupMessage() {
+			if (this.#popup_message_box !== null) {
+				this.#popup_message_box.remove();
+				this.#popup_message_box = null;
 			}
-		},
+		}
 
-		refresh() {
+		#refresh() {
 			if (isUserInteracting()) {
 				return;
 			}
 
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.filter_defaults, ...current_filter};
+			const filter = {...this.#filter_defaults, ...current_filter};
 
-			this.datatable.setFilter(filter)
+			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.onDataDone(response)
+					onSuccess: response => this.#onDataDone(response)
 				});
-		},
+		}
 
-		refreshCounters(response) {
-			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+		#refreshCounters(response) {
+			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
 			if ('filter_counters' in response) {
-				this.filter.updateCounters(response.filter_counters);
+				this.#filter.updateCounters(response.filter_counters);
 			}
-		},
+		}
 
-		doRefresh(subfilter = null) {
+		#doRefresh(subfilter = null) {
 			const colapsed_tabfilter = document.querySelector('.tabfilter-collapsed');
 
 			if (subfilter !== null) {
-				this.getCurrentSubfilter().innerHTML = subfilter;
+				this.#getCurrentSubfilter().innerHTML = subfilter;
 
 				if (colapsed_tabfilter !== null) {
 					colapsed_tabfilter.classList.remove('display-none');
 				}
 			}
 			else {
-				this.getCurrentSubfilter().remove();
+				this.#getCurrentSubfilter().remove();
 
 				if (colapsed_tabfilter !== null) {
 					colapsed_tabfilter.classList.add('display-none');
@@ -488,34 +493,34 @@
 			}
 
 			chkbxRange.init();
-			this.initListActions();
-		},
+			this.#initListActions();
+		}
 
-		onDataDone(response) {
-			this._removeRefreshMessage();
+		#onDataDone(response) {
+			this.#removeRefreshMessage();
 
-			this.doRefresh(response.subfilter || null);
+			this.#doRefresh(response.subfilter || null);
 
 			if ('messages' in response) {
-				this._addRefreshMessage(response.messages);
+				this.#addRefreshMessage(response.messages);
 			}
 
-			this.refreshCounters(response);
+			this.#refreshCounters(response);
 
-			this.initExpandableSubfilter();
-		},
+			this.#initExpandableSubfilter();
+		}
 
-		scheduleRefresh() {
-			this.unscheduleRefresh();
-			this.refresh_interval_id = setInterval(() => this.refresh(), this.refresh_interval);
-		},
+		#scheduleRefresh() {
+			this.#unscheduleRefresh();
+			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
+		}
 
-		unscheduleRefresh() {
-			clearInterval(this.refresh_interval_id);
-			this.refresh_interval_id = null;
-		},
+		#unscheduleRefresh() {
+			clearInterval(this.#refresh_interval_id);
+			this.#refresh_interval_id = null;
+		}
 
-		executeNow(button, data) {
+		#executeNow(button, data) {
 			if (button instanceof Element) {
 				button.classList.add('is-loading');
 			}
@@ -539,20 +544,20 @@
 					 * in postMessageOk case. Instead show message directly that comes from controller.
 					 */
 					if ('error' in response) {
-						CMessageHelper.error(this.datatable.getElement(), [response.error.messages],
+						CMessageHelper.error(this.#datatable.getElement(), [response.error.messages],
 							response.error.title, {show_close_box: true, show_details: true});
 					}
 					else if ('success' in response) {
 						clear_checkboxes = true;
 
-						CMessageHelper.success(this.datatable.getElement(), [], response.success.title,
+						CMessageHelper.success(this.#datatable.getElement(), [], response.success.title,
 							{show_close_box: true, show_details: false});
 					}
 				})
 				.catch(() => {
 					const title = <?= json_encode(_('Unexpected server error.')); ?>;
 
-					CMessageHelper.error(this.datatable.getElement(), [], title);
+					CMessageHelper.error(this.#datatable.getElement(), [], title);
 				})
 				.finally(() => {
 					if (!(button instanceof Element)) {
@@ -562,21 +567,21 @@
 					if (clear_checkboxes) {
 						const uncheckids = Object.keys(chkbxRange.getSelectedIds());
 						uncheckTableRows('latest', []);
-						chkbxRange.checkObjects(this.checkbox_object, uncheckids, false);
-						chkbxRange.update(this.checkbox_object);
+						chkbxRange.checkObjects(this.#checkbox_object, uncheckids, false);
+						chkbxRange.update(this.#checkbox_object);
 					}
 
 					button.classList.remove('is-loading');
 					button.blur();
 				});
-		},
+		}
 
 		setSubfilter(field) {
-			this.filter.setSubfilter(field[0], field[1]);
-		},
+			this.#filter.setSubfilter(field[0], field[1]);
+		}
 
 		unsetSubfilter(field) {
-			this.filter.unsetSubfilter(field[0], field[1]);
+			this.#filter.unsetSubfilter(field[0], field[1]);
 		}
 	};
 </script>

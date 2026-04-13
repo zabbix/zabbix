@@ -380,7 +380,6 @@ class CDataTable {
 					const context_handle = document.createElement('button');
 					context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK);
 					context_handle.setAttribute('type', 'button');
-					context_handle.setAttribute('role', 'button');
 					context_handle.appendChild(icon);
 					context_handle.addEventListener('click', e => {
 						e.preventDefault();
@@ -994,6 +993,13 @@ class CDataTable {
 			if ('error' in response) {
 				this.#applyColumnWidths();
 
+				const no_data_message = this.#createNoDataMessage({
+					icon: ZBX_ICON_SEARCH_LARGE,
+					message: t('No data found')
+				});
+
+				this.#body.appendChild(no_data_message);
+
 				return;
 			}
 
@@ -1276,8 +1282,11 @@ class CDataTable {
 
 		this.getData({check_changes, force_load})
 			.then(response => {
-				if ('error' in response && response.error) {
-					CMessageHelper.error(this.#element, [response.error], t('Unexpected server error.'));
+				if ('error' in response) {
+					const title = response.error.title || t('Unexpected server error.');
+					const messages = response.error.messages || [];
+
+					CMessageHelper.error(this.#element, messages, title);
 				}
 
 				return response;

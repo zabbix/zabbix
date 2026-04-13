@@ -112,7 +112,7 @@ class CControllerHostView extends CControllerHost {
 			'sort_field' => $filter['sort'],
 			'sort_order' => $filter['sortorder'],
 			'storage_idx' => $storage_idx,
-			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, [])),
 			'can_create_hosts' => $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS),
 			'tabfilter_options' => [

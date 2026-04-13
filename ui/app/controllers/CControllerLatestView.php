@@ -204,7 +204,7 @@ class CControllerLatestView extends CControllerLatest {
 			'paging' => $paging,
 			'uncheck' => $this->hasInput('filter_reset'),
 			'storage_idx' => $storage_idx,
-			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true),
+			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 				CProfile::getArray($storage_idx, []))
 		] + $prepared_data;
 

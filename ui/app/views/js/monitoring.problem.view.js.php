@@ -19,16 +19,17 @@
  */
 ?>
 <script>
-	const view = {
-		layout_mode: null,
-		refresh_interval: null,
-		refresh_interval_id: null,
-		filter_defaults: null,
-		filter: null,
-		active_filter: null,
-		global_timerange: null,
-		opened_eventids: [],
-		datatable: null,
+	const view = new class {
+		#layout_mode = null;
+		#refresh_interval = null;
+		#refresh_interval_id = null;
+		#filter_defaults = null;
+		#filter = null;
+		#active_filter = null;
+		#global_timerange = null;
+		#opened_eventids = [];
+		#datatable = null;
+		#csrf_token = null;
 
 		init({
 			layout_mode,
@@ -41,11 +42,13 @@
 			sort_order,
 			storage_idx,
 			user_configs,
-			severities
+			severities,
+			csrf_token
 		}) {
-			this.layout_mode = layout_mode;
-			this.refresh_interval = refresh_interval;
-			this.filter_defaults = filter_defaults;
+			this.#layout_mode = layout_mode;
+			this.#refresh_interval = refresh_interval;
+			this.#filter_defaults = filter_defaults;
+			this.#csrf_token = csrf_token;
 
 			this.initFilter(filter_options);
 			this.initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities});
@@ -55,7 +58,7 @@
 			this.initEvents();
 			this.initPopupListeners();
 
-			if (this.refresh_interval != 0) {
+			if (this.#refresh_interval != 0) {
 				this.scheduleRefresh();
 			}
 
@@ -74,20 +77,21 @@
 
 			// Activate blinking.
 			jqBlink.blink();
-		},
+		}
 
 		initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities}) {
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'problem.view.data');
+			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
 			if (!filter.filter_custom_time) {
-				filter.from = this.global_timerange.from;
-				filter.to = this.global_timerange.to;
+				filter.from = this.#global_timerange.from;
+				filter.to = this.#global_timerange.to;
 			}
 
-			this.datatable = new CDataTable(document.getElementById('problems'), data_provider)
+			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
 						.setColumnOptions({
@@ -138,29 +142,29 @@
 				])
 				.setOption('compact_view', <?= json_encode(_('Compact view')); ?>, {
 					onRender: option => {
-						this.datatable.getElement().classList.toggle('compact-view', option.checked);
+						this.#datatable.getElement().classList.toggle('compact-view', option.checked);
 					},
 					onChange: (event, option) => {
-						this.datatable.updateOption(option.id, { checked: event.target.checked });
+						this.#datatable.updateOption(option.id, { checked: event.target.checked });
 
-						this.datatable.dispatchEvent(CDataTable.EVENT_INIT);
-						this.datatable.dispatchEvent(CDataTable.EVENT_SAVE);
+						this.#datatable.dispatchEvent(CDataTable.EVENT_INIT);
+						this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
 				})
 				.setOption('highlight_row', <?= json_encode(_('Highlight whole row')); ?>, {
 					onRender: option => {
-						this.datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
+						this.#datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
 					onChange: (event, option) => {
-						this.datatable.updateOption(option.id, { checked: event.target.checked });
+						this.#datatable.updateOption(option.id, { checked: event.target.checked });
 
-						this.datatable.dispatchEvent(CDataTable.EVENT_RENDER);
-						this.datatable.dispatchEvent(CDataTable.EVENT_SAVE);
+						this.#datatable.dispatchEvent(CDataTable.EVENT_RENDER);
+						this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
 					}
 				})
 				.setPage(page)
 				.setFilter(filter)
-				.setTabFilterItem(this.active_filter)
+				.setTabFilterItem(this.#active_filter)
 				.setSelectable('problem', 'eventids', ['eventid', 'nested', 'symptom_count', 'cause_eventid',
 					'severity'])
 				.setSortField(sort_field)
@@ -198,9 +202,9 @@
 						cell_inner.append(checkbox, label);
 					}
 
-					const filter = this.datatable.getFilter();
+					const filter = this.#datatable.getFilter();
 					const show_symptoms = filter.show_symptoms == 1;
-					this.datatable.getData().then(response => {
+					this.#datatable.getData().then(response => {
 						const {show_two_columns, show_three_columns} = response;
 
 						if (show_two_columns || show_three_columns) {
@@ -248,13 +252,13 @@
 					});
 
 					requestAnimationFrame(() => {
-						const highlight_row = this.datatable.getOption('highlight_row');
+						const highlight_row = this.#datatable.getOption('highlight_row');
 
 						if (highlight_row.checked) {
 							const severity_data = severities.find(data => data.value == severity);
 
 							if (severity_data) {
-								this.datatable
+								this.#datatable
 									.findDataCells({row_index})
 									.forEach(data_cell => {
 										data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG_HOVER,
@@ -284,11 +288,11 @@
 						cell_inner.append(timeline);
 					}
 
-					const compact_view = this.datatable.getOption('compact_view');
+					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
 
 					if (column_options.show_timeline == 1 && !compact_view.checked
-							&& this.datatable.getSortField() == 'clock') {
+							&& this.#datatable.getSortField() == 'clock') {
 
 						const axis = document.createElement('div');
 						axis.classList.add('timeline-axis', 'timeline-dot');
@@ -313,7 +317,7 @@
 
 					cell_inner.appendChild(timeline);
 
-					const compact_view = this.datatable.getOption('compact_view');
+					const compact_view = this.#datatable.getOption('compact_view');
 					const column_options = column.getColumnOptions();
 
 					if (column_options.show_timeline == 1 && !compact_view.checked) {
@@ -400,7 +404,7 @@
 						return;
 					}
 
-					this.datatable.getData().then(response => {
+					this.#datatable.getData().then(response => {
 						const {allowed} = response;
 						if (!allowed) {
 							return;
@@ -446,9 +450,9 @@
 					cell_inner.appendChild(paging_container);
 				})
 				.setRowRenderer('default', ({columns, row, row_index, data_fields, row_data}) => {
-					this.datatable.getData().then(response => {
+					this.#datatable.getData().then(response => {
 						const {show_two_columns, show_three_columns} = response;
-						const column = this.datatable.getCheckboxColumnConfig();
+						const column = this.#datatable.getCheckboxColumnConfig();
 
 						if (show_three_columns) {
 							column.setWidth('93px');
@@ -460,27 +464,27 @@
 							column.setWidth('37px');
 						}
 
-						this.datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
+						this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
 					});
 				})
 				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data}) => {
-					const column = this.datatable.getCheckboxColumnConfig();
+					const column = this.#datatable.getCheckboxColumnConfig();
 					const column_index = column.getColumnIndex();
 					const [, , , cause_eventid, severity] = row_data[column_index];
 
 					row.classList.add('nested', 'nested-small', 'hidden');
 					row.setAttribute('data-cause-eventid', cause_eventid);
 
-					this.datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
+					this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
 
 					requestAnimationFrame(() => {
-						const highlight_row = this.datatable.getOption('highlight_row');
+						const highlight_row = this.#datatable.getOption('highlight_row');
 
 						if (highlight_row.checked) {
 							const severity_data = severities.find(data => data.value == severity);
 
 							if (severity_data) {
-								this.datatable
+								this.#datatable
 									.findDataCells({row_index})
 									.forEach(data_cell => {
 										data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG,
@@ -511,15 +515,15 @@
 							column_clone.setSpan(1);
 						}
 
-						const data_cell = this.datatable.createDataCell(column_clone);
+						const data_cell = this.#datatable.createDataCell(column_clone);
 
 						if (column.getId() == 'time') {
-							this.datatable.renderDataCellContents(column_clone, row, data_cell, data_fields, [null]);
+							this.#datatable.renderDataCellContents(column_clone, row, data_cell, data_fields, [null]);
 						}
 						else if (column.getColumnIndex() == column_index) {
 							column_clone.setRenderer('symptom_limit');
 
-							this.datatable.renderDataCellContents(column_clone, row, data_cell, data_fields,
+							this.#datatable.renderDataCellContents(column_clone, row, data_cell, data_fields,
 								[symptom_limit]);
 						}
 
@@ -529,7 +533,7 @@
 					row.append(...data_cells);
 				})
 				.setRowRenderer('breakpoint', ({columns, row, data_fields, row_data}) => {
-					const compact_view = this.datatable.getOption('compact_view');
+					const compact_view = this.#datatable.getOption('compact_view');
 					if (compact_view.checked) {
 						return;
 					}
@@ -546,12 +550,12 @@
 
 					for (let i = 0; i < visible_columns.length; i++) {
 						const column_clone = visible_columns[i].clone();
-						const data_cell = this.datatable.createDataCell(column_clone);
+						const data_cell = this.#datatable.createDataCell(column_clone);
 
 						if (i == column_index) {
 							column_clone.setRenderer('breakpoint');
 
-							this.datatable.renderDataCellContents(column_clone, row, data_cell, data_fields, row_data);
+							this.#datatable.renderDataCellContents(column_clone, row, data_cell, data_fields, row_data);
 						}
 
 						data_cells.push(data_cell.target);
@@ -559,8 +563,8 @@
 
 					row.append(...data_cells);
 
-					if (this.datatable.isCustomizable()) {
-						this.datatable.createRowSpacer(row);
+					if (this.#datatable.isCustomizable()) {
+						this.#datatable.createRowSpacer(row);
 					}
 				})
 				.setOptionsHandler('time', 'CDataTableOptionsPopupMonitoringProblemsTime')
@@ -585,7 +589,7 @@
 					requestAnimationFrame(() => this.initExpandables());
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
-					this.datatable.getData().then(response => this.refreshCounters(response));
+					this.#datatable.getData().then(response => this.refreshCounters(response));
 
 					requestAnimationFrame(() => this.initExpandables());
 				})
@@ -595,7 +599,7 @@
 				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.unscheduleRefresh())
 				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.scheduleRefresh())
 				.init(user_configs);
-		},
+		}
 
 		/**
 		 * @param {{ timeselector: object }} filter_options
@@ -604,10 +608,10 @@
 			/** @type {HTMLElement} */
 			const filter = document.getElementById('monitoring_problem_filter');
 
-			this.filter = new CTabFilter(filter, filter_options);
-			this.active_filter = this.filter._active_item;
+			this.#filter = new CTabFilter(filter, filter_options);
+			this.#active_filter = this.#filter._active_item;
 
-			this.global_timerange = {
+			this.#global_timerange = {
 				from: filter_options.timeselector.from,
 				to: filter_options.timeselector.to
 			};
@@ -615,14 +619,14 @@
 			/**
 			 * Update on filter changes.
 			 */
-			this.filter.on(TABFILTER_EVENT_URLSET, () => {
+			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.active_filter !== this.filter._active_item) {
-					this.active_filter = this.filter._active_item;
+				if (this.#active_filter !== this.#filter._active_item) {
+					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
-					this.datatable.setTabFilterItem(this.active_filter);
+					this.#datatable.setTabFilterItem(this.#active_filter);
 				}
 
 				this.scheduleRefresh();
@@ -631,17 +635,17 @@
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
 				if (data.idx === 'web.monitoring.problem') {
-					this.global_timerange.from = data.from;
-					this.global_timerange.to = data.to;
+					this.#global_timerange.from = data.from;
+					this.#global_timerange.to = data.to;
 				}
 
 				this.scheduleRefresh();
 				this.refresh();
 			});
-		},
+		}
 
 		initExpandables() {
-			const table = this.datatable.getElement();
+			const table = this.#datatable.getElement();
 			const expandable_buttons = table.querySelectorAll('button[data-action="show_symptoms"]');
 
 			expandable_buttons.forEach(btn => {
@@ -654,7 +658,7 @@
 				});
 
 				// Check if cause events were opened. If so, after (not full) refresh open them again.
-				if (this.opened_eventids.includes(btn.dataset.eventid)) {
+				if (this.#opened_eventids.includes(btn.dataset.eventid)) {
 					const rows = table.querySelectorAll(
 						`.${CDataTable.ZBX_STYLE_ROW}[data-cause-eventid="${btn.dataset.eventid}"]`);
 
@@ -665,7 +669,7 @@
 					btn.title = <?= json_encode(_('Collapse')); ?>;
 				}
 			});
-		},
+		}
 
 		initEvents() {
 			document.addEventListener('click', e => {
@@ -673,11 +677,11 @@
 					this.massupdate({eventids: Object.keys(chkbxRange.getSelectedIds())});
 				}
 			});
-		},
+		}
 
 		massupdate({eventids}) {
 			ZABBIX.PopupManager.open('acknowledge.edit', {eventids}, {supports_standalone: true});
-		},
+		}
 
 		initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
@@ -705,7 +709,7 @@
 					event.preventDefault();
 
 					if ('success' in data.submit) {
-						CMessageHelper.success(this.datatable.getElement(), data.submit.success.messages,
+						CMessageHelper.success(this.#datatable.getElement(), data.submit.success.messages,
 							data.submit.success.title);
 					}
 
@@ -715,13 +719,13 @@
 					this.refresh();
 				}
 			});
-		},
+		}
 
 		showSymptoms(btn) {
 			// Prevent multiple clicking by first disabling button.
 			btn.disabled = true;
 
-			const table = this.datatable.getElement();
+			const table = this.#datatable.getElement();
 			let rows = table.querySelectorAll(
 				`.${CDataTable.ZBX_STYLE_ROW}[data-cause-eventid="${btn.dataset.eventid}"]`);
 
@@ -731,7 +735,7 @@
 				btn.classList.add(ZBX_ICON_CHEVRON_UP);
 				btn.title = <?= json_encode(_('Collapse')); ?>;
 
-				this.opened_eventids.push(btn.dataset.eventid);
+				this.#opened_eventids.push(btn.dataset.eventid);
 
 				[...rows].forEach((row) => row.classList.remove('hidden'));
 			}
@@ -740,24 +744,24 @@
 				btn.classList.add(ZBX_ICON_CHEVRON_DOWN, ZBX_STYLE_COLLAPSED);
 				btn.title = <?= json_encode(_('Expand')); ?>;
 
-				this.opened_eventids = this.opened_eventids.filter((id) => id !== btn.dataset.eventid);
+				this.#opened_eventids = this.#opened_eventids.filter((id) => id !== btn.dataset.eventid);
 
 				[...rows].forEach((row) => row.classList.add('hidden'));
 			}
 
 			// When complete enable button again.
 			btn.disabled = false;
-		},
+		}
 
 		getCurrentDebugBlock() {
 			return document.querySelector('.wrapper > .debug-output');
-		},
+		}
 
 		refreshDebug(debug) {
 			this.getCurrentDebugBlock().replaceWith(
 				new DOMParser().parseFromString(debug, 'text/html').body.firstElementChild
 			);
-		},
+		}
 
 		refresh() {
 			if (isUserInteracting()) {
@@ -766,44 +770,44 @@
 
 			const search_params = new URLSearchParams(location.search.substring(1));
 			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.filter_defaults, ...current_filter};
+			const filter = {...this.#filter_defaults, ...current_filter};
 
 			if (filter.filter_custom_time == 0) {
-				filter.from = this.global_timerange.from;
-				filter.to = this.global_timerange.to;
+				filter.from = this.#global_timerange.from;
+				filter.to = this.#global_timerange.to;
 			}
 
-			this.datatable.setFilter(filter)
+			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
 					onSuccess: response => this.onDataDone(response)
 				});
-		},
+		}
 
 		refreshCounters(response) {
-			if (this.layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
+			if (this.#layout_mode == <?= ZBX_LAYOUT_KIOSKMODE ?>) {
 				return;
 			}
 
 			if ('filter_counters' in response) {
-				this.filter.updateCounters(response.filter_counters);
+				this.#filter.updateCounters(response.filter_counters);
 			}
-		},
+		}
 
 		scheduleRefresh() {
 			this.unscheduleRefresh();
-			this.refresh_interval_id = setInterval(() => this.refresh(), this.refresh_interval);
-		},
+			this.#refresh_interval_id = setInterval(() => this.refresh(), this.#refresh_interval);
+		}
 
 		unscheduleRefresh() {
-			clearInterval(this.refresh_interval_id);
-			this.refresh_interval_id = null;
-		},
+			clearInterval(this.#refresh_interval_id);
+			this.#refresh_interval_id = null;
+		}
 
 		onDataDone(response) {
 			if ('messages' in response) {
-				CMessageHelper.success(this.datatable.getElement(), [], response.messages, {show_close_box: true});
+				CMessageHelper.success(this.#datatable.getElement(), [], response.messages, {show_close_box: true});
 			}
 
 			this.refreshCounters(response);
