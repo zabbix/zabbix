@@ -171,9 +171,9 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp_body, "deviceid", device_id, sizeof(device_id), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "missing deviceid in device.init request");
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing uuid in device.init request");
 		goto out;
 	}
 
@@ -494,9 +494,9 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp_body, "deviceid", device_id, sizeof(device_id), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "missing deviceid in device.init request");
+		zabbix_log(LOG_LEVEL_INFORMATION, "missing uuid in device.init request");
 		goto out;
 	}
 
@@ -700,7 +700,7 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 		goto out;
 	}
 
-	if (FAIL == zbx_json_value_by_name(&jp_data, "deviceid", deviceid, sizeof(deviceid), NULL))
+	if (FAIL == zbx_json_value_by_name(&jp_data, "uuid", deviceid, sizeof(deviceid), NULL))
 	{
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
