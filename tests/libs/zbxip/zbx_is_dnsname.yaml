@@ -95,7 +95,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "17. Punny code"
+test case: "17. Punycode"
 in:
   string: "xn--bcher-kva.com"
 out:
