@@ -355,7 +355,7 @@ var chkbxRange = {
 			});
 
 		// Replace the selected count text.
-		const selected_count_span = document.querySelector('.js-selected-count');
+		const selected_count_span = document.querySelector(`.${ZBX_STYLE_SELECTED_ITEM_COUNT}`);
 		selected_count_span.innerHTML = selected_count + ' ' + selected_count_span.innerHTML.split(' ')[1];
 
 		document.querySelectorAll('#action_buttons button').forEach((button) => {

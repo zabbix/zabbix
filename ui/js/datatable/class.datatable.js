@@ -674,7 +674,7 @@ class CDataTable {
 		this.#templates = {
 			footer: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_FOOTER} ${ZBX_STYLE_HIDDEN}">
-					<div class="js-selected-count"></div>
+					<div class="${ZBX_STYLE_SELECTED_ITEM_COUNT}"></div>
 				</div>
 			`),
 			cell: new Template(`
@@ -727,7 +727,7 @@ class CDataTable {
 		this.#footer = this.#templates.footer.evaluateToElement();
 
 		if (this.#selectable) {
-			this.#footer.querySelector('.js-selected-count').innerText = `0 ${t('selected')}`;
+			this.#footer.querySelector(`.${ZBX_STYLE_SELECTED_ITEM_COUNT}`).innerText = `0 ${t('selected')}`;
 		}
 
 		if (this.#sticky_footer) {

@@ -134,6 +134,8 @@ const ZBX_STYLE_RED = 'red';
 const ZBX_STYLE_ORANGE = 'orange';
 const ZBX_STYLE_REL_CONTAINER = 'rel-container';
 
+const ZBX_STYLE_SELECTED_ITEM_COUNT = 'selected-item-count';
+
 const ZBX_STYLE_HINTBOX_WRAP = 'hintbox-wrap';
 
 const ZBX_ICON_ALERT_WITH_CONTENT = 'zi-alert-with-content';
