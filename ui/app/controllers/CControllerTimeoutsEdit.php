@@ -21,89 +21,45 @@ class CControllerTimeoutsEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'timeout_zabbix_agent' =>		'setting timeout_zabbix_agent',
-			'timeout_simple_check' =>		'setting timeout_simple_check',
-			'timeout_snmp_agent' =>			'setting timeout_snmp_agent',
-			'timeout_external_check' =>		'setting timeout_external_check',
-			'timeout_db_monitor' =>			'setting timeout_db_monitor',
-			'timeout_http_agent' =>			'setting timeout_http_agent',
-			'timeout_ssh_agent' =>			'setting timeout_ssh_agent',
-			'timeout_telnet_agent' =>		'setting timeout_telnet_agent',
-			'timeout_script' =>				'setting timeout_script',
-			'timeout_browser' =>			'setting timeout_browser',
-			'socket_timeout' =>				'setting socket_timeout',
-			'connect_timeout' =>			'setting connect_timeout',
-			'media_type_test_timeout' =>	'setting media_type_test_timeout',
-			'script_timeout' =>				'setting script_timeout',
-			'item_test_timeout' =>			'setting item_test_timeout',
-			'report_test_timeout' =>		'setting report_test_timeout'
-		];
-
-		$ret = $this->validateInput($fields);
-
-		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
-		}
-
-		return $ret;
+		return true;
 	}
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_GENERAL);
 	}
 
-	protected function doAction(): void {
-		$data = [
-			'timeout_zabbix_agent' => $this->getInput('timeout_zabbix_agent', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_ZABBIX_AGENT
-			)),
-			'timeout_simple_check' => $this->getInput('timeout_simple_check', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_SIMPLE_CHECK
-			)),
-			'timeout_snmp_agent' => $this->getInput('timeout_snmp_agent', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_SNMP_AGENT
-			)),
-			'timeout_external_check' => $this->getInput('timeout_external_check', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_EXTERNAL_CHECK
-			)),
-			'timeout_db_monitor' => $this->getInput('timeout_db_monitor', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_DB_MONITOR
-			)),
-			'timeout_http_agent' => $this->getInput('timeout_http_agent', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_HTTP_AGENT
-			)),
-			'timeout_ssh_agent' => $this->getInput('timeout_ssh_agent', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_SSH_AGENT
-			)),
-			'timeout_telnet_agent' => $this->getInput('timeout_telnet_agent', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_TELNET_AGENT
-			)),
-			'timeout_script' => $this->getInput('timeout_script', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_SCRIPT
-			)),
-			'timeout_browser' => $this->getInput('timeout_browser', CSettingsHelper::get(
-				CSettingsHelper::TIMEOUT_BROWSER
-			)),
-			'socket_timeout' => $this->getInput('socket_timeout', CSettingsHelper::get(
-				CSettingsHelper::SOCKET_TIMEOUT
-			)),
-			'connect_timeout' => $this->getInput('connect_timeout', CSettingsHelper::get(
-				CSettingsHelper::CONNECT_TIMEOUT
-			)),
-			'media_type_test_timeout' => $this->getInput('media_type_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::MEDIA_TYPE_TEST_TIMEOUT
-			)),
-			'script_timeout' => $this->getInput('script_timeout', CSettingsHelper::get(
-				CSettingsHelper::SCRIPT_TIMEOUT
-			)),
-			'item_test_timeout' => $this->getInput('item_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::ITEM_TEST_TIMEOUT
-			)),
-			'report_test_timeout' => $this->getInput('report_test_timeout', CSettingsHelper::get(
-				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
-			))
+	private function getDefaultValues(): array {
+		return [
+			'timeout_zabbix_agent' => CSettingsSchema::getDefault('timeout_zabbix_agent'),
+			'timeout_simple_check' => CSettingsSchema::getDefault('timeout_simple_check'),
+			'timeout_snmp_agent' => CSettingsSchema::getDefault('timeout_snmp_agent'),
+			'timeout_external_check' => CSettingsSchema::getDefault('timeout_external_check'),
+			'timeout_db_monitor' => CSettingsSchema::getDefault('timeout_db_monitor'),
+			'timeout_http_agent' => CSettingsSchema::getDefault('timeout_http_agent'),
+			'timeout_ssh_agent' => CSettingsSchema::getDefault('timeout_ssh_agent'),
+			'timeout_telnet_agent' => CSettingsSchema::getDefault('timeout_telnet_agent'),
+			'timeout_script' => CSettingsSchema::getDefault('timeout_script'),
+			'timeout_browser' => CSettingsSchema::getDefault('timeout_browser'),
+			'socket_timeout' => CSettingsSchema::getDefault('socket_timeout'),
+			'connect_timeout' => CSettingsSchema::getDefault('connect_timeout'),
+			'media_type_test_timeout' => CSettingsSchema::getDefault('media_type_test_timeout'),
+			'script_timeout' => CSettingsSchema::getDefault('script_timeout'),
+			'item_test_timeout' => CSettingsSchema::getDefault('item_test_timeout'),
+			'report_test_timeout' => CSettingsSchema::getDefault('report_test_timeout')
 		];
+	}
+
+	protected function doAction(): void {
+		$default_values = $this->getDefaultValues();
+		$data = [];
+
+		foreach ($default_values as $key => $default_value) {
+			$data[$key] = CSettingsHelper::get($key);
+		}
+
+		$data['js_validation_rules'] = (new CFormValidator(CControllerTimeoutsUpdate::getValidationRules()))
+			->getRules();
+		$data['default_values'] = $default_values;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of timeouts'));

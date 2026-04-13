@@ -74,7 +74,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_groups_',
 								'with_hosts' => true,
 								'editable' => true,
@@ -96,7 +96,7 @@ $filter = (new CFilter())
 								'srctbl' => 'templates',
 								'srcfld1' => 'hostid',
 								'srcfld2' => 'host',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_templates_'
 							]
 						]
@@ -162,7 +162,7 @@ $filter = (new CFilter())
 								'srctbl' => 'proxies',
 								'srcfld1' => 'proxyid',
 								'srcfld2' => 'name',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_proxyids_'
 							]
 						]
@@ -181,7 +181,7 @@ $filter = (new CFilter())
 								'srctbl' => 'proxy_groups',
 								'srcfld1' => 'proxy_groupid',
 								'srcfld2' => 'name',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_proxy_groupids_'
 							]
 						]

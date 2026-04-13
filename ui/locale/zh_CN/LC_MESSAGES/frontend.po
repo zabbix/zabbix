@@ -22130,6 +22130,10 @@ msgstr "在授权服务器中注册的客户端标识符"
 msgid "The client secret registered within the authorization server."
 msgstr "在授权服务器中注册的客户端密钥"
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "克隆的主机包含用户定义的“秘密文本”类型的宏。这些宏的值和类型已重置。"

@@ -39,7 +39,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'host_groups',
 								'srcfld1' => 'groupid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_groups_',
 								'editable' => 1
 							]

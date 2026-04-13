@@ -783,16 +783,21 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['boolean', 'required']
+					'value' => ['boolean', 'in' => [1]]
 				]],
 				['type' => 'object', 'fields' => [
 					'value' => [[
 						'type' => 'integer',
-						'in' => [1],
-						'required' => true,
-						'messages' => ['in' => 'Must be selected.']
+						'in' => [1]
 					]]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['boolean', 'in' => [1, 2]]
+				]],
+				null,
+				'[RULES ERROR] Invalid value for rule "in" for type "boolean" (Path: /value)'
 			],
 			[
 				['object', 'fields' => [
@@ -1107,6 +1112,14 @@ class CFormValidatorTest extends TestCase {
 							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
 						]]
 					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'color' => ['string', 'rgb']
+				]],
+				['type' => 'object', 'fields' => [
+					'color' => [['type' => 'string', 'regex' => '/^[0-9a-f]{6}$/i']]
 				]]
 			]
 		];
@@ -3237,6 +3250,35 @@ class CFormValidatorTest extends TestCase {
 				CFormValidator::ERROR,
 				['/value' => [
 					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00FFBF'],
+				['value' => '00FFBF'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00ffbf'],
+				['value' => '00ffbf'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00f'],
+				['value' => '00f'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
 				]]
 			]
 		];
