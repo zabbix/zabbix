@@ -89,10 +89,10 @@ else {
 					if (array_key_exists('thresholds', $column_config) && array_key_exists('value', $column)
 							&& ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
 								|| $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE)
-					) {
+							) {
 						$is_numeric_data = in_array($column['item']['value_type'],
-								[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
-							) || CAggFunctionData::isNumericResult($column_config['aggregate_function']);
+							[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+						) || CAggFunctionData::isNumericResult($column_config['aggregate_function']);
 
 						if ($is_numeric_data) {
 							foreach ($column_config['thresholds'] as $threshold) {
