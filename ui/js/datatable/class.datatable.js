@@ -2051,6 +2051,10 @@ class CDataTable {
 			data_width = CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH;
 		}
 
+		if (!data_width) {
+			data_width = column.getHeaderCell().target.clientWidth;
+		}
+
 		let offset = 0;
 		// Width 'max-content' may cause text overflow, hence we need to add 1px
 		if (column.getWidth() == 'max-content') {

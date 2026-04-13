@@ -50,16 +50,16 @@
 			this.#filter_defaults = filter_defaults;
 			this.#csrf_token = csrf_token;
 
-			this.initFilter(filter_options);
-			this.initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities});
+			this.#initFilter(filter_options);
+			this.#initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities});
 
-			$.subscribe('event.rank_change', () => view.refresh());
+			$.subscribe('event.rank_change', () => this.#refresh());
 
-			this.initEvents();
-			this.initPopupListeners();
+			this.#initEvents();
+			this.#initPopupListeners();
 
 			if (this.#refresh_interval != 0) {
-				this.scheduleRefresh();
+				this.#scheduleRefresh();
 			}
 
 			$(document).on({
@@ -79,7 +79,7 @@
 			jqBlink.blink();
 		}
 
-		initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities}) {
+		#initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities}) {
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'problem.view.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -101,17 +101,22 @@
 						.setFields(['time', 'eventid', 'objectid'])
 						.setRenderer('time')
 						.setSortField('clock')
-						.setSortable(true),
+						.setSortable(true)
+						.setWidth('170px'),
 					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
 						.setFields(['severity'])
 						.setRenderer('severity')
-						.setSortable(true),
+						.setSortable(true)
+						.setWidth('6%'),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
-						.setFields(['recovery']),
+						.setFields(['recovery'])
+						.setWidth('5%'),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
-						.setFields(['status']),
+						.setFields(['status'])
+						.setWidth('6%'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
-						.setFields(['info']),
+						.setFields(['info'])
+						.setWidth('4%'),
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host'])
 						.setRenderer('host')
@@ -579,32 +584,32 @@
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
-				.on(CPager.EVENT_SELECT, () => this.scheduleRefresh())
+				.on(CPager.EVENT_SELECT, () => this.#scheduleRefresh())
 				.on(CPager.EVENT_STATE_CHANGE, event => {
 					const {page} = event.detail;
 
 					new CState().setParams({page});
 				})
 				.on(CDataTable.EVENT_INIT, () => {
-					requestAnimationFrame(() => this.initExpandables());
+					requestAnimationFrame(() => this.#initExpandables());
 				})
 				.on(CDataTable.EVENT_RENDER, () => {
 					this.#datatable.getData().then(response => this.refreshCounters(response));
 
-					requestAnimationFrame(() => this.initExpandables());
+					requestAnimationFrame(() => this.#initExpandables());
 				})
-				.on(CDataTable.EVENT_DATA_SORT, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.scheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.unscheduleRefresh())
-				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.scheduleRefresh())
+				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())
+				.on(CDataTable.EVENT_OPTIONS_POPUP_CLOSE, () => this.#scheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_START, () => this.#unscheduleRefresh())
+				.on(CDataTable.EVENT_COLUMN_RESIZE_END, () => this.#scheduleRefresh())
 				.init(user_configs);
 		}
 
 		/**
 		 * @param {{ timeselector: object }} filter_options
 		 */
-		initFilter(filter_options) {
+		#initFilter(filter_options) {
 			/** @type {HTMLElement} */
 			const filter = document.getElementById('monitoring_problem_filter');
 
@@ -629,8 +634,8 @@
 					this.#datatable.setTabFilterItem(this.#active_filter);
 				}
 
-				this.scheduleRefresh();
-				this.refresh();
+				this.#scheduleRefresh();
+				this.#refresh();
 			});
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -639,12 +644,12 @@
 					this.#global_timerange.to = data.to;
 				}
 
-				this.scheduleRefresh();
-				this.refresh();
+				this.#scheduleRefresh();
+				this.#refresh();
 			});
 		}
 
-		initExpandables() {
+		#initExpandables() {
 			const table = this.#datatable.getElement();
 			const expandable_buttons = table.querySelectorAll('button[data-action="show_symptoms"]');
 
@@ -652,7 +657,7 @@
 				['click','keydown'].forEach((type) => {
 					btn.addEventListener(type, (e) => {
 						if (e.type === 'click' || e.which === 13) {
-							this.showSymptoms(btn);
+							this.#showSymptoms(btn);
 						}
 					});
 				});
@@ -671,25 +676,25 @@
 			});
 		}
 
-		initEvents() {
+		#initEvents() {
 			document.addEventListener('click', e => {
 				if (e.target.classList.contains('js-massupdate-problem')) {
-					this.massupdate({eventids: Object.keys(chkbxRange.getSelectedIds())});
+					this.#massupdate({eventids: Object.keys(chkbxRange.getSelectedIds())});
 				}
 			});
 		}
 
-		massupdate({eventids}) {
+		#massupdate({eventids}) {
 			ZABBIX.PopupManager.open('acknowledge.edit', {eventids}, {supports_standalone: true});
 		}
 
-		initPopupListeners() {
+		#initPopupListeners() {
 			ZABBIX.EventHub.subscribe({
 				require: {
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_OPEN
 				},
-				callback: () => this.unscheduleRefresh()
+				callback: () => this.#unscheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -697,7 +702,7 @@
 					context: CPopupManager.EVENT_CONTEXT,
 					event: CPopupManagerEvent.EVENT_CANCEL
 				},
-				callback: () => this.scheduleRefresh()
+				callback: () => this.#scheduleRefresh()
 			});
 
 			ZABBIX.EventHub.subscribe({
@@ -716,12 +721,12 @@
 					chkbxRange.checkObjectAll('eventids', false);
 					chkbxRange.update('eventids');
 
-					this.refresh();
+					this.#refresh();
 				}
 			});
 		}
 
-		showSymptoms(btn) {
+		#showSymptoms(btn) {
 			// Prevent multiple clicking by first disabling button.
 			btn.disabled = true;
 
@@ -763,7 +768,7 @@
 			);
 		}
 
-		refresh() {
+		#refresh() {
 			if (isUserInteracting()) {
 				return;
 			}
@@ -781,7 +786,7 @@
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
-					onSuccess: response => this.onDataDone(response)
+					onSuccess: response => this.#onDataDone(response)
 				});
 		}
 
@@ -795,17 +800,17 @@
 			}
 		}
 
-		scheduleRefresh() {
-			this.unscheduleRefresh();
-			this.#refresh_interval_id = setInterval(() => this.refresh(), this.#refresh_interval);
+		#scheduleRefresh() {
+			this.#unscheduleRefresh();
+			this.#refresh_interval_id = setInterval(() => this.#refresh(), this.#refresh_interval);
 		}
 
-		unscheduleRefresh() {
+		#unscheduleRefresh() {
 			clearInterval(this.#refresh_interval_id);
 			this.#refresh_interval_id = null;
 		}
 
-		onDataDone(response) {
+		#onDataDone(response) {
 			if ('messages' in response) {
 				CMessageHelper.success(this.#datatable.getElement(), [], response.messages, {show_close_box: true});
 			}

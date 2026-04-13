@@ -178,7 +178,8 @@
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('host')
-						.setSortable(true),
+						.setSortable(true)
+						.setWidth('17%'),
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setColumnOptions({
 							show_item_key: filter.show_item_key == 1
@@ -187,7 +188,8 @@
 						.setFields(['itemid', 'description_expanded', 'name', 'key_expanded'])
 						.setRenderer('name')
 						.setSortable(true)
-						.setTogglable(false),
+						.setTogglable(false)
+						.setWidth('40%'),
 					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
 						.setVisible(false),
@@ -203,21 +205,23 @@
 						.setVisible(false),
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
 						.setFields(['last_check'])
-						.setWidth('max-content'),
+						.setWidth('14%'),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value']),
+						.setFields(['last_value'])
+						.setWidth('14%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
-						.setFields(['change']),
+						.setFields(['change'])
+						.setWidth('10%'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('actions', '')
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
 						.setRenderer('actions')
 						.setShowInTableOptions(false)
-						.setWidth('max-content'),
+						.setWidth('6%'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
-						.setWidth('max-content')
+						.setWidth('45px')
 				])
 				.setPage(page)
 				.setFilter(filter)
