@@ -160,6 +160,7 @@ class CActionButtonList extends CObject {
 	public function getSelectedCountElement() {
 		if (!$this->selected_count_element) {
 			$this->selected_count_element = (new CSpan('0 '._('selected')))
+				->setId('selected_count')
 				->addClass(ZBX_STYLE_SELECTED_ITEM_COUNT);
 		}
 
