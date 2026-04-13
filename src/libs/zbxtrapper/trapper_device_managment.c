@@ -39,43 +39,52 @@
  ******************************************************************************/
 static int	device_check_permissions(const zbx_user_t *user, zbx_uint64_t target_userid)
 {
-	int			ret = FAIL;
-	int			manage_own = 0, manage_user = 0;
+#define ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS	"devices.actions.default_access"
+#define ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN	"devices.actions.manage_own"
+#define ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER	"devices.actions.manage_user"
+#define ROLE_PERM_ALLOW					1
+
+	int			ret = FAIL, default_access = 0;
+	const char		*required_rule;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() caller_userid:" ZBX_FS_UI64 " target_userid:" ZBX_FS_UI64,
 			__func__, user->userid, target_userid);
 
+	required_rule = (user->userid == target_userid ? ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN :
+			ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER);
+
 	result = zbx_db_select(
 			"select name,value_int"
 			" from role_rule"
 			" where roleid=" ZBX_FS_UI64
-				" and name in ('devices.actions.manage_own', 'devices.actions.manage_user')",
-			user->roleid);
+				" and (name='%s' or name='%s')",
+			user->roleid, required_rule, ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS);
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
-		if (0 == strcmp(row[0], "devices.actions.manage_own"))
-			manage_own = atoi(row[1]);
-		else if (0 == strcmp(row[0], "devices.actions.manage_user"))
-			manage_user = atoi(row[1]);
+		if (0 == strcmp(required_rule, row[0]))
+		{
+			ret = (ROLE_PERM_ALLOW == atoi(row[1]) ? SUCCEED : FAIL);
+			goto out;
+		}
+		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS, row[0]))
+			default_access = atoi(row[1]);
+		else
+			THIS_SHOULD_NEVER_HAPPEN;
 	}
 
+	ret = (ROLE_PERM_ALLOW == default_access ? SUCCEED : FAIL);
+out:
 	zbx_db_free_result(result);
 
-	if (user->userid == target_userid)
-	{
-		if (0 != manage_own)
-			ret = SUCCEED;
-	}
-	else
-	{
-		if (0 != manage_user)
-			ret = SUCCEED;
-	}
-out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+#undef ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS
+#undef ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN
+#undef ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER
+#undef ROLE_PERM_ALLOW
 
 	return ret;
 }
