@@ -37,6 +37,7 @@
 #include "zbxstr.h"
 #include "zbx_scripts_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxsupervisor_client.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -585,6 +586,8 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 	zbx_rtc_subscribe(process_type, process_num, rtc_msgs, rtc_msgs_num,
 			taskmanager_args_in->config_comms->config_timeout, &rtc);
+
+	zbx_supervisor_set_process_running(server_num);
 
 	while (ZBX_IS_RUNNING())
 	{

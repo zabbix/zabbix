@@ -232,6 +232,8 @@ window.host_wizard_edit = new class {
 	#form_update_locked = false;
 	#pending_form_update = false;
 
+	#confirm_dialogue_close = false;
+
 	async init({templates, linked_templates, wizard_show_welcome, source_host, agent_script_server_host, csrf_token}) {
 		this.#templates = templates.reduce((templates_map, template) => {
 			return templates_map.set(template.templateid, template);
@@ -261,25 +263,37 @@ window.host_wizard_edit = new class {
 			}
 		});
 
-		this.#dialogue.addEventListener('dialogue.cancel', () => {
-			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
-				overlayDialogueDestroy(this.#overlay.dialogueid);
+		this.#dialogue.addEventListener('dialogue.close', e => {
+			if (!this.#confirm_dialogue_close) {
+				return;
+			}
 
-				this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
-					redirect_latest: false
-				}}));
+			// Bypass the popup manager.
+			e.stopImmediatePropagation();
+
+			if (this.#getCurrentStep() === this.STEP_COMPLETE) {
+				// Allow closing the dialogue gracefully before the submission.
+				setTimeout(() => {
+					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: {
+						redirect_latest: false
+					}}));
+				});
+
+				return;
+			}
+
+			// Do not close the dialogue.
+			e.preventDefault();
+
+			if (this.#show_cancel_screen) {
+				this.#show_cancel_screen = false;
+
+				this.#gotoStep(this.#current_step);
 			}
 			else {
-				if (this.#show_cancel_screen) {
-					this.#show_cancel_screen = false;
+				this.#show_cancel_screen = true;
 
-					this.#gotoStep(this.#current_step);
-				}
-				else {
-					this.#show_cancel_screen = true;
-
-					this.#renderCancelScreen();
-				}
+				this.#renderCancelScreen();
 			}
 		});
 
@@ -301,6 +315,8 @@ window.host_wizard_edit = new class {
 
 			if (target.classList.contains('js-cancel')) {
 				if (this.#data.selected_template === null) {
+					this.#confirm_dialogue_close = false;
+
 					overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 				}
 
@@ -316,6 +332,8 @@ window.host_wizard_edit = new class {
 			}
 
 			if (target.classList.contains('js-cancel-yes')) {
+				this.#confirm_dialogue_close = false;
+
 				overlayDialogueDestroy(this.#overlay.dialogueid, Overlay.prototype.CLOSE_BY_USER);
 			}
 		});
@@ -346,6 +364,8 @@ window.host_wizard_edit = new class {
 
 							ZABBIX.PopupManager.setReturnUrl(return_url.href);
 						}
+
+						this.#confirm_dialogue_close = false;
 
 						overlayDialogueDestroy(this.#overlay.dialogueid);
 
@@ -1221,7 +1241,8 @@ window.host_wizard_edit = new class {
 
 				if ((step_init || path === 'selected_template') && this.#getSelectedTemplate()) {
 					this.#updateProgress();
-					this.#overlay.has_custom_cancel = true;
+
+					this.#confirm_dialogue_close = true;
 				}
 
 				if (path === 'show_info_by_template') {
@@ -1246,7 +1267,11 @@ window.host_wizard_edit = new class {
 					);
 				}
 
-				this.#dialogue.querySelector('.js-groups-description').hidden = this.#data.host === null;
+				const groups_description = this.#dialogue.querySelector('.js-groups-description');
+
+				if (groups_description) {
+					groups_description.hidden = this.#data.host === null;
+				}
 
 				break;
 

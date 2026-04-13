@@ -260,7 +260,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			running = 0;
 	}
 
-
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);
 	if (SUCCEED != zbx_db_trigger_queue_locked())
@@ -300,6 +299,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 
 	zbx_free(stats);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
