@@ -111,7 +111,7 @@ $deviceTable = (new CTableInfo())
 			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
-		make_sorting_header(_('Device ID'), 'deviceid', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('User'), 'user_fullname', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('User role'), 'user_role', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
@@ -126,7 +126,7 @@ foreach ($data['devices'] as $device) {
 			? (new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid']))
 			: null,
 		$device['name'],
-		$device['deviceid'],
+		$device['uuid'],
 		$device['user_fullname'],
 		$device['user_role'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),

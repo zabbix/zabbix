@@ -27,7 +27,7 @@ class CControllerUserDeviceList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_roleids' =>			'array_db role.roleid',
 			'filter_usrgrpids' =>		'array_db users_groups.usrgrpid',
-			'sort' =>					'in name,deviceid,activated_at,lastaccess,user_fullname,user_role',
+			'sort' =>					'in name,uuid,activated_at,lastaccess,user_fullname,user_role',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
 		];

@@ -22,7 +22,7 @@ class CControllerUserProfileDeviceList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>					'in name,deviceid,activated_at,lastaccess',
+			'sort' =>					'in name,uuid,activated_at,lastaccess',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
 		];
