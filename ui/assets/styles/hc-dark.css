@@ -9934,9 +9934,6 @@ z-select .list:focus, input[type="text"]:focus, input[type="password"]:focus, in
   .list-table.compact-view td.na-bg::before, .list-table.compact-view td.normal-bg::before, .list-table.compact-view td.info-bg::before, .list-table.compact-view td.warning-bg::before, .list-table.compact-view td.average-bg::before, .list-table.compact-view td.high-bg::before, .list-table.compact-view td.disaster-bg::before, .list-table.has-highlighted-rows td.na-bg::before, .list-table.has-highlighted-rows td.normal-bg::before, .list-table.has-highlighted-rows td.info-bg::before, .list-table.has-highlighted-rows td.warning-bg::before, .list-table.has-highlighted-rows td.average-bg::before, .list-table.has-highlighted-rows td.high-bg::before, .list-table.has-highlighted-rows td.disaster-bg::before {
     box-shadow: inset 0 -1px 0 0 #333333; }
 
-.filter-highlight-row-cb {
-  display: none; }
-
 .status-container .status-na-bg,
 .status-container .status-info-bg,
 .status-container .status-warning-bg,
@@ -10175,3 +10172,7 @@ td.inactive-bg {
   font-size: 22px;
   padding-top: 0;
   padding-bottom: 0; }
+.datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).warning-bg, .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).average-bg, .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).high-bg, .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).disaster-bg {
+  padding-left: 8px; }
+  .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).warning-bg:before, .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).average-bg:before, .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).high-bg:before, .datatable.has-highlighted-rows .cell.cell-data:not(.cell-bg).disaster-bg:before {
+    display: none; }

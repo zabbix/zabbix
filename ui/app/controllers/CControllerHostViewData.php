@@ -49,7 +49,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'groupids' => $groupids,
 			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? (($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				? ($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
 				: null,
 			'search' => [
 				'name' => ($filter['name'] === '') ? null : $filter['name'],
@@ -124,7 +124,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'object' => EVENT_OBJECT_TRIGGER,
 			'objectids' => array_keys($triggers),
-			'suppressed' => ($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false,
+			'suppressed' => $options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false,
 			'symptom' => false
 		]);
 
@@ -165,7 +165,7 @@ class CControllerHostViewData extends CControllerDataTable {
 
 			// Add active checks interface if host have items with type ITEM_TYPE_ZABBIX_ACTIVE (7).
 			if (array_key_exists($host['hostid'], $active_item_count_by_hostid)
-				&& $active_item_count_by_hostid[$host['hostid']] > 0) {
+					&& $active_item_count_by_hostid[$host['hostid']] > 0) {
 				$host['interfaces'][] = [
 					'type' => INTERFACE_TYPE_AGENT_ACTIVE,
 					'available' => $host['active_available'],
@@ -252,7 +252,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			// Fill the severity icons by problem count and style and calculate the total number of problems.
 			foreach ($host['problem_count'] as $severity => $count) {
 				if (($count > 0 && $filter['severities'] && in_array($severity, $filter['severities']))
-					|| (!$filter['severities'] && $count > 0)) {
+						|| (!$filter['severities'] && $count > 0)) {
 					$total_problem_count += $count;
 
 					$problems->addItem((new CSpan($count))

@@ -33,15 +33,15 @@ if ($data['error'] !== null) {
 else {
 	$header = [];
 
-	foreach ($data['configuration'] as $column_config) {
-		if (shouldUseDoubleColumnHeader($column_config)) {
+	foreach ($data['configuration'] as $column) {
+		if (shouldUseDoubleColumnHeader($column)) {
 			$header[] = (new CColHeader(
-				(new CSpan($column_config['name']))
-					->setTitle($column_config['name'])
+				(new CSpan($column['name']))
+					->setTitle($column['name'])
 			))->setColSpan(2);
 		}
 		else {
-			$header[] = new CColHeader($column_config['name']);
+			$header[] = new CColHeader($column['name']);
 		}
 	}
 
@@ -52,19 +52,19 @@ else {
 		$is_empty_row = true;
 
 		foreach ($columns as $i => $column) {
-			$column_config = $data['configuration'][$i];
+			$column = $data['configuration'][$i];
 
 			if ($column === null) {
-				$row[] = shouldUseDoubleColumnHeader($column_config) ? (new CCol(''))->setColSpan(2) : '';
+				$row[] = shouldUseDoubleColumnHeader($column) ? (new CCol(''))->setColSpan(2) : '';
 
 				continue;
 			}
 
 			$is_empty_row = false;
-			$color = $column_config['base_color'];
+			$color = $column['base_color'];
 
 			// Create each column's cell display according to configuration and value type.
-			switch ($column_config['data']) {
+			switch ($column['data']) {
 				case CWidgetFieldColumnsList::DATA_HOST_NAME:
 					$row[] = (new CCol(
 						(new CLinkAction($column['value']))->setMenuPopup(CMenuPopupHelper::getHost($column['hostid']))
@@ -86,16 +86,16 @@ else {
 					break;
 
 				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-					if (array_key_exists('thresholds', $column_config) && array_key_exists('value', $column)
-							&& ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
-								|| $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE)
+					if (array_key_exists('thresholds', $column) && array_key_exists('value', $column)
+							&& ($column['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
+								|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE)
 							) {
 						$is_numeric_data = in_array($column['item']['value_type'],
 							[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
-						) || CAggFunctionData::isNumericResult($column_config['aggregate_function']);
+						) || CAggFunctionData::isNumericResult($column['aggregate_function']);
 
 						if ($is_numeric_data) {
-							foreach ($column_config['thresholds'] as $threshold) {
+							foreach ($column['thresholds'] as $threshold) {
 								$threshold_value = $column['is_binary_units']
 									? $threshold['threshold_binary']
 									: $threshold['threshold'];
@@ -109,16 +109,16 @@ else {
 						}
 					}
 
-					$formatted_value = getFormattedValue($column, $column_config);
+					$formatted_value = getFormattedValue($column, $column);
 
 					$hintbox_value = $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
 						? (new CTrim($column['value'], ZBX_HINTBOX_CONTENT_LIMIT)) : $column['value'];
 
-					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+					if ($column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
-								&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
+								&& $column['aggregate_function'] != AGGREGATE_COUNT) {
 							$row[] = (new CCol(
-								createBinaryShowButton($column_config['name'], $column_config['show_thumbnail'])
+								createBinaryShowButton($column['name'], $column['show_thumbnail'])
 							))
 								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 								->setAttribute('data-itemid', $column['item']['itemid'])
@@ -126,12 +126,12 @@ else {
 								->setColSpan(2);
 						}
 						else {
-							$value = $column_config['aggregate_function'] == AGGREGATE_COUNT
+							$value = $column['aggregate_function'] == AGGREGATE_COUNT
 								? $column['value']
 								: base64_encode($column['value']);
 
 							$row[] = (new CCol(
-								createNonBinaryShowButton($column_config['name'])
+								createNonBinaryShowButton($column['name'])
 							))
 								->setAttribute('bgcolor', $color !== '' ? '#'.$color : null)
 								->setHint(
@@ -140,14 +140,14 @@ else {
 								->setColSpan(2);
 						}
 					}
-					elseif ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
-						if (array_key_exists('highlights', $column_config)) {
+					elseif ($column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
+						if (array_key_exists('highlights', $column)) {
 							$value_to_check = $column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
 								|| $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
 									? $column['value']
 									: $formatted_value;
 
-							foreach ($column_config['highlights'] as $highlight) {
+							foreach ($column['highlights'] as $highlight) {
 								if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
 										$value_to_check)) {
 									$color = $highlight['color'];
@@ -158,25 +158,25 @@ else {
 
 						$row[] = createTextColumn($formatted_value, $hintbox_value, $color, true);
 					}
-					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+					elseif ($column['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
 						$row[] = createTextColumn($formatted_value, $hintbox_value, $color);
 					}
-					elseif ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
+					elseif ($column['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE) {
 						$row[] = new CCol((new CSparkline())
 							->setHeight(20)
-							->setColor('#'.$column_config['sparkline']['color'])
-							->setLineWidth($column_config['sparkline']['width'])
-							->setFill($column_config['sparkline']['fill'])
+							->setColor('#'.$column['sparkline']['color'])
+							->setLineWidth($column['sparkline']['width'])
+							->setFill($column['sparkline']['fill'])
 							->setValue($column['sparkline_value'] ?? [])
-							->setTimePeriodFrom($column_config['sparkline']['time_period']['from_ts'])
-							->setTimePeriodTo($column_config['sparkline']['time_period']['to_ts'])
+							->setTimePeriodFrom($column['sparkline']['time_period']['from_ts'])
+							->setTimePeriodTo($column['sparkline']['time_period']['to_ts'])
 						);
 						$row[] = createTextColumn($formatted_value, $hintbox_value ?? '', $color)
 							->addStyle('width: 0;')
 							->addClass(ZBX_STYLE_NOWRAP);
 					}
 					else {
-						$bar_gauge = createBarGauge($column, $column_config, $color);
+						$bar_gauge = createBarGauge($column, $column, $color);
 
 						$row[] = new CCol($bar_gauge);
 						$row[] = (new CCol())
@@ -204,22 +204,22 @@ else {
 	->addItem($table)
 	->show();
 
-function shouldUseDoubleColumnHeader(array $column_config): bool {
-	return $column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
-		&& ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
-			|| ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
-				&& $column_config['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS));
+function shouldUseDoubleColumnHeader(array $column): bool {
+	return $column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+		&& ($column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY
+			|| ($column['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_NUMERIC
+				&& $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS));
 }
 
-function getFormattedValue(array $column, array $column_config): string {
+function getFormattedValue(array $column, array $column): string {
 	if (!array_key_exists('value', $column)) {
 		return '';
 	}
 
 	if (in_array($column['item']['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
-		return formatAggregatedHistoryValue($column['value'], $column['item'], $column_config['aggregate_function'],
+		return formatAggregatedHistoryValue($column['value'], $column['item'], $column['aggregate_function'],
 			false, true, [
-				'decimals' => $column_config['decimal_places'],
+				'decimals' => $column['decimal_places'],
 				'decimals_exact' => true,
 				'small_scientific' => false,
 				'zero_as_zero' => false
@@ -228,10 +228,10 @@ function getFormattedValue(array $column, array $column_config): string {
 	}
 
 	if ($column['item']['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		return formatAggregatedHistoryValue($column['value'], $column['item'], $column_config['aggregate_function']);
+		return formatAggregatedHistoryValue($column['value'], $column['item'], $column['aggregate_function']);
 	}
 
-	if ($column_config['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
+	if ($column['display_value_as'] != CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 		return substr($column['value'], 0, Widget::TEXT_MAX_LENGTH).
 			(strlen($column['value']) > Widget::TEXT_MAX_LENGTH ? '...' : '');
 	}
@@ -268,19 +268,19 @@ function createTextColumn(string $formatted_value, string|CTrim $hint_value, str
 		);
 }
 
-function createBarGauge(array $column, array $column_config, string $color): CBarGauge {
+function createBarGauge(array $column, array $column, string $color): CBarGauge {
 	$bar_gauge = (new CBarGauge())
 		->setValue($column['value'])
 		->setAttribute('fill', $color !== '' ? '#'.$color : Widget::DEFAULT_FILL)
-		->setAttribute('min', $column['is_binary_units'] ? $column_config['min_binary'] : $column_config['min'])
-		->setAttribute('max', $column['is_binary_units'] ? $column_config['max_binary'] : $column_config['max']);
+		->setAttribute('min', $column['is_binary_units'] ? $column['min_binary'] : $column['min'])
+		->setAttribute('max', $column['is_binary_units'] ? $column['max_binary'] : $column['max']);
 
-	if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
+	if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
 		$bar_gauge->setAttribute('solid', 1);
 	}
 
-	if (array_key_exists('thresholds', $column_config)) {
-		foreach ($column_config['thresholds'] as $threshold) {
+	if (array_key_exists('thresholds', $column)) {
+		foreach ($column['thresholds'] as $threshold) {
 			$threshold_value = $column['is_binary_units'] ? $threshold['threshold_binary'] : $threshold['threshold'];
 
 			$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);

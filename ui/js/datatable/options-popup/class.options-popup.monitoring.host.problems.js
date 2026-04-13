@@ -26,48 +26,55 @@ class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopu
 	}
 
 	getFieldData() {
-		const show_suppressed = this.getField('show_suppressed').checked ? '1' : '0';
+		const show_suppressed = this.getField('show_suppressed').checked ? 1 : 0;
 
 		return {show_suppressed};
 	}
 
 	getDefaultData() {
 		return {
-			show_suppressed: '0'
+			show_suppressed: 0
 		}
 	}
 
 	getValidatedData(data) {
 		const defaults = this.getDefaultData();
 
-		data = {...defaults, ...data};
+		for (const key in Object.keys(data)) {
+			if (!defaults.hasOwnProperty(key)) {
+				delete data[key];
 
-		if (typeof data.show_suppressed !== 'boolean') {
-			data.show_suppressed = defaults.show_suppressed;
+				continue;
+			}
+
+			if (data[key] < 0 || data[key] > 1) {
+				data[key] = defaults[key];
+			}
 		}
 
-		return data;
+		return {...defaults, ...data};
 	}
 
 	onInit() {
 		super.onInit();
 
 		const column_options = this.getColumnConfig().getColumnOptions();
-		const {show_suppressed} = column_options;
 
 		const input = this.getField('show_suppressed');
-		input.checked = show_suppressed == 1;
-		input.addEventListener('input', event => {
-			event.stopPropagation();
+		input.checked = column_options.show_suppressed == 1;
+		input.addEventListener('input', e => {
+			e.stopPropagation();
 
 			const column_options = {
 				...this.getColumnConfig().getColumnOptions(),
-				show_suppressed: event.target.checked ? '1' : '0'
+				show_suppressed: e.target.checked ? 1 : 0
 			};
 
 			this.getColumnConfig().setColumnOptions(column_options);
 
-			this.getDataTable().dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+			this.getDataTable().updateUserConfig();
+
+			this.getDataTable().dispatchEvent(CDataTable.EVENT_INIT);
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_SAVE);
 		});
 	}

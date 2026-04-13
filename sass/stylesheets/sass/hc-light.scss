@@ -725,11 +725,6 @@ textarea.has-error {
 	}
 }
 
-// Checkbox disabling.
-.filter-highlight-row-cb {
-	display: none;
-}
-
 // Severity statuses.
 
 .status-container {
@@ -1101,6 +1096,25 @@ td.inactive-bg {
 						font-size: 22px;
 						padding-top: 0;
 						padding-bottom: 0;
+					}
+				}
+			}
+		}
+	}
+
+	&.has-highlighted-rows {
+		.cell {
+			&.cell-data {
+				&:not(.cell-bg) {
+					&.warning-bg,
+					&.average-bg,
+					&.high-bg,
+					&.disaster-bg {
+						padding-left: 8px;
+
+						&:before {
+							display: none;
+						}
 					}
 				}
 			}

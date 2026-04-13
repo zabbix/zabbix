@@ -28,9 +28,9 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 	}
 
 	getFieldData() {
-		const show_opdata = this.getField('show_opdata').checked ? '1' : '0';
-		const details = this.getField('details').checked ? '1' : '0';
-		const show_suppressed = this.getField('show_suppressed').checked ? '1' : '0';
+		const show_opdata = this.getField('show_opdata').checked ? 1 : 0;
+		const details = this.getField('details').checked ? 1 : 0;
+		const show_suppressed = this.getField('show_suppressed').checked ? 1 : 0;
 
 		return {show_opdata, details, show_suppressed};
 	}
@@ -75,14 +75,14 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 				input.disabled = compact_view.checked;
 			}
 
-			input.addEventListener('input', event => event.stopPropagation());
+			input.addEventListener('input', e => e.stopPropagation());
 
-			input.addEventListener('change', event => {
-				event.stopPropagation();
+			input.addEventListener('change', e => {
+				e.stopPropagation();
 
 				const column_options = {
 					...this.getColumnConfig().getColumnOptions(),
-					[field]: event.target.checked ? '1' : '0'
+					[field]: e.target.checked ? 1 : 0
 				};
 
 				this.getColumnConfig().setColumnOptions(column_options);

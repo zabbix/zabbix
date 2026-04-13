@@ -275,7 +275,7 @@
 						}
 					}
 				})
-				.setRenderer('name', ({column_config, column_data, cell_inner}) => {
+				.setRenderer('name', ({column, column_data, cell_inner}) => {
 					const [itemid, description_expanded, name, key_expanded] = column_data;
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
@@ -316,7 +316,7 @@
 
 					cell_inner.appendChild(action_container);
 
-					const {show_item_key} = column_config.getColumnOptions();
+					const {show_item_key} = column.getColumnOptions();
 
 					if (show_item_key) {
 						const item_key = document.createElement('span');

@@ -93,9 +93,9 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		template.append(popup_header, this.#sortable, reset);
 
 		this.getDataTable().getColumns()
-			.filter(column_config => column_config.isShowInTableOptions())
-			.forEach(column_config => {
-				const OPTIONS_table_item = this.#createSortableItem(column_config);
+			.filter(column => column.isShowInTableOptions())
+			.forEach(column => {
+				const OPTIONS_table_item = this.#createSortableItem(column);
 
 				this.#sortable.appendChild(OPTIONS_table_item);
 			});
@@ -125,8 +125,8 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 			});
 	}
 
-	#createSortableItem(column_config) {
-		const column_index = column_config.getColumnIndex();
+	#createSortableItem(column) {
+		const column_index = column.getColumnIndex();
 		const id = `col-${column_index.toString()}`;
 
 		const icon = document.createElement('div');
@@ -137,8 +137,8 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		input.setAttribute('id', id);
 		input.setAttribute('type', 'checkbox');
 		input.setAttribute('data-field-type', 'checkbox');
-		input.checked = column_config.isVisible();
-		input.disabled = !column_config.isTogglable();
+		input.checked = column.isVisible();
+		input.disabled = !column.isTogglable();
 		input.value = '1';
 		input.addEventListener('change', (event) => {
 			const visible = event.target.checked;
@@ -148,7 +148,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 		const label = document.createElement('div');
 		label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
-		label.innerText = column_config.getName();
+		label.innerText = column.getName();
 
 		const input_label = document.createElement('label');
 		input_label.setAttribute('for', id);

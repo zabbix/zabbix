@@ -27,6 +27,16 @@ class CDataTableColumn {
 	#column_index = null;
 
 	/**
+	 * @type {Object}
+	 */
+	#header_cell = null;
+
+	/**
+	 * @type {Object[]}
+	 */
+	#data_cells = [];
+
+	/**
 	 * @type {string}
 	 */
 	#options_popup_handle_icon = ZBX_ICON_CONTEXT;
@@ -164,6 +174,40 @@ class CDataTableColumn {
 	 */
 	setColumnIndex(column_index) {
 		this.#column_index = column_index;
+
+		return this;
+	}
+
+	/**
+	 * @returns {Object}
+	 */
+	getHeaderCell() {
+		return this.#header_cell;
+	}
+
+	/**
+	 * @param {Object} header_cell
+	 * @returns {CDataTableColumn}
+	 */
+	setHeaderCell(header_cell) {
+		this.#header_cell = header_cell;
+
+		return this;
+	}
+
+	/**
+	 * @returns {Object[]}
+	 */
+	getDataCells() {
+		return this.#data_cells;
+	}
+
+	/**
+	 * @param {Object[]} data_cells
+	 * @returns {CDataTableColumn}
+	 */
+	setDataCells(data_cells) {
+		this.#data_cells = data_cells;
 
 		return this;
 	}

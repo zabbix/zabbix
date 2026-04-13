@@ -36,7 +36,7 @@ class CDataTableOptionsPopup {
 	/**
 	 * @type {CDataTableColumn}
 	 */
-	#column_config;
+	#column;
 
 	/**
 	 * @type {string}
@@ -89,14 +89,14 @@ class CDataTableOptionsPopup {
 
 	/**
 	 * @param {CDataTable}       datatable
-	 * @param {CDataTableColumn} column_config
+	 * @param {CDataTableColumn} column
 	 * @param {HTMLElement}      header_cell
 	 * @param {HTMLElement}      handle
 	 */
-	constructor(datatable, column_config, header_cell, handle) {
+	constructor(datatable, column, header_cell, handle) {
 		this.#datatable = datatable;
-		this.#column_config = column_config;
-		this.#column_name = column_config.getName();
+		this.#column = column;
+		this.#column_name = column.getName();
 		this.#header_cell = header_cell;
 		this.#handle = handle;
 		this.#offset_top = this.#datatable.getElement().getBoundingClientRect().top;
@@ -118,7 +118,7 @@ class CDataTableOptionsPopup {
 	 * @returns {CDataTableColumn}
 	 */
 	getColumnConfig() {
-		return this.#column_config;
+		return this.#column;
 	}
 
 	/**
@@ -204,7 +204,7 @@ class CDataTableOptionsPopup {
 	}
 
 	onInit() {
-		const column_options = this.#column_config.getColumnOptions();
+		const column_options = this.#column.getColumnOptions();
 
 		this.#fields = this.getFields();
 		this.#data = this.getValidatedData(column_options);
@@ -226,9 +226,9 @@ class CDataTableOptionsPopup {
 			Array.from(this.#template.children).forEach(child => this.#element.appendChild(child));
 		}
 
-		const column_index = this.#column_config.getColumnIndex();
+		const column_index = this.#column.getColumnIndex();
 
-		if (this.#column_config.isDuplicate() || this.#column_config.isDuplicatable()) {
+		if (this.#column.isDuplicate() || this.#column.isDuplicatable()) {
 			const duplicate_link = this.#addContextLink(t('Duplicate column'), event => {
 				event.preventDefault();
 
@@ -238,7 +238,7 @@ class CDataTableOptionsPopup {
 			context_links.push(duplicate_link);
 		}
 
-		if (this.#column_config.isDuplicate() || this.#column_config.isRenamable()) {
+		if (this.#column.isDuplicate() || this.#column.isRenamable()) {
 			const form_label = document.createElement('label');
 			form_label.classList.add(ZBX_STYLE_FORM_LABEL);
 			form_label.setAttribute('for', `column_name_${column_index}`);
@@ -249,7 +249,7 @@ class CDataTableOptionsPopup {
 			form_input.setAttribute('type', 'text');
 			form_input.setAttribute('maxlength', CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH.toString());
 			form_input.setAttribute('data-field-type', 'text-box');
-			form_input.value = this.#column_config.getName();
+			form_input.value = this.#column.getName();
 			form_input.addEventListener('input', event => {
 				const name = event.target.value.substring(0, CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH);
 
@@ -262,7 +262,7 @@ class CDataTableOptionsPopup {
 
 			this.#element.prepend(form_label, form_field);
 
-			if (this.#column_config.isDuplicate()) {
+			if (this.#column.isDuplicate()) {
 				const delete_link = this.#addContextLink(t('Delete column'), event => {
 					event.preventDefault();
 
@@ -295,14 +295,14 @@ class CDataTableOptionsPopup {
 	}
 
 	onReset() {
-		const column_index = this.#column_config.getColumnIndex();
+		const column_index = this.#column.getColumnIndex();
 
 		this.#datatable.dispatchEvent(CDataTable.EVENT_COLUMN_RENAME, {
 			column_index,
 			name: this.#column_name
 		});
 
-		this.#column_config.setColumnOptions(this.#data);
+		this.#column.setColumnOptions(this.#data);
 
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE, {column_index});
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE, {handle: this.#handle});
@@ -318,9 +318,9 @@ class CDataTableOptionsPopup {
 	onUpdate() {}
 
 	onSave() {
-		const column_index = this.#column_config.getColumnIndex();
-		const name = this.#column_config.getName();
-		const column_options = this.#column_config.getColumnOptions();
+		const column_index = this.#column.getColumnIndex();
+		const name = this.#column.getName();
+		const column_options = this.#column.getColumnOptions();
 
 		const save = this.#column_name != name || !deepCompare(this.#data, column_options);
 

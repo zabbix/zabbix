@@ -329,9 +329,9 @@ class CDataTable {
 		this.#data_provider = data_provider;
 
 		this.#header_renderers = {
-			default: ({column_config, cell}) => {
-				if (column_config.isSortable()) {
-					const sort_field = column_config.getSortField() || column_config.getId();
+			default: ({column, cell}) => {
+				if (column.isSortable()) {
+					const sort_field = column.getSortField() || column.getId();
 
 					let sort_order = this.#sort_order;
 					if (this.#sort_field == sort_field) {
@@ -340,7 +340,7 @@ class CDataTable {
 
 					const label = document.createElement('span');
 					label.classList.add('name');
-					label.innerText = column_config.getName();
+					label.innerText = column.getName();
 
 					const icon = document.createElement('span');
 
@@ -366,17 +366,16 @@ class CDataTable {
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_HEADER_LINK);
 					cell.appendChild(header_link);
 				}
-				else if (column_config.getId() != this.#checkbox_id) {
-					const cell_inner = document.createElement('span');
-					cell_inner.classList.add(CDataTable.ZBX_STYLE_CELL_INNER);
-					cell_inner.innerText = column_config.getName();
+				else if (column.getId() != this.#checkbox_id) {
+					const cell_inner = this.#templates.cell_inner_span.evaluateToElement();
+					cell_inner.innerText = column.getName();
 
 					cell.appendChild(cell_inner);
 				}
 
-				if (column_config.getOptionsPopupHandler()) {
+				if (column.getOptionsPopupHandler()) {
 					const icon = document.createElement('span');
-					icon.classList.add(column_config.getOptionsPopupHandleIcon());
+					icon.classList.add(column.getOptionsPopupHandleIcon());
 
 					const context_handle = document.createElement('button');
 					context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK);
@@ -386,13 +385,13 @@ class CDataTable {
 					context_handle.addEventListener('click', e => {
 						e.preventDefault();
 
-						this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP, {handle: context_handle});
+						this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP, {column, handle: context_handle});
 					});
 					context_handle.addEventListener('mousedown', () => {
 						cell.classList.add(CDataTable.ZBX_STYLE_CELL_FOCUSED);
 					});
 
-					if (this.#options_popup?.getColumnConfig().getColumnIndex() == column_config.getColumnIndex()) {
+					if (this.#options_popup?.getColumnConfig().getColumnIndex() == column.getColumnIndex()) {
 						context_handle.classList.add(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
 
 						this.#options_popup.setHandle(context_handle);
@@ -401,8 +400,8 @@ class CDataTable {
 					cell.appendChild(context_handle);
 				}
 			},
-			[CDataTableColumn.CHECKBOX]: ({column_config, cell}) => {
-				const id = column_config.getId();
+			[CDataTableColumn.CHECKBOX]: ({column, cell}) => {
+				const id = column.getId();
 				const checkbox_id = `all_${this.#form_name}`;
 
 				const checkbox = document.createElement('input');
@@ -436,20 +435,20 @@ class CDataTable {
 			cell_inner.innerText = column_data.toString();
 		});
 
-		this.setRenderer(CDataTableColumn.CHECKBOX, ({column_config, column_data, cell, cell_inner}) => {
+		this.setRenderer(CDataTableColumn.CHECKBOX, ({column, column_data, cell, cell_inner}) => {
 			const [object_id, data_actions] = column_data;
 
 			if (!object_id) {
 				return;
 			}
 
-			const input_id = `${column_config.getId()}_${object_id}`;
+			const input_id = `${column.getId()}_${object_id}`;
 
 			const checkbox = document.createElement('input');
 			checkbox.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
 			checkbox.setAttribute('type', 'checkbox');
 			checkbox.setAttribute('id', input_id);
-			checkbox.setAttribute('name', `${column_config.getId()}[${object_id}]`);
+			checkbox.setAttribute('name', `${column.getId()}[${object_id}]`);
 			checkbox.setAttribute('data-field-type', 'checkbox');
 			checkbox.value = object_id.toString();
 
@@ -466,8 +465,8 @@ class CDataTable {
 			cell_inner.append(checkbox, label);
 		});
 
-		this.setRenderer('tagvalue', ({column_config, column_data, cell_inner}) => {
-			const column_options = column_config.getColumnOptions();
+		this.setRenderer('tagvalue', ({column, column_data, cell_inner}) => {
+			const column_options = column.getColumnOptions();
 
 			let [tags] = column_data;
 
@@ -513,7 +512,7 @@ class CDataTable {
 			cell_inner.appendChild(tags_wrapper);
 		});
 
-		this.setRenderer('tags', ({column_config, column_data, cell_inner}) => {
+		this.setRenderer('tags', ({column, column_data, cell_inner}) => {
 			let [tags] = column_data;
 
 			if (!tags) {
@@ -522,7 +521,7 @@ class CDataTable {
 
 			let tag_display_priorities = new Set();
 
-			const column_options = column_config.getColumnOptions();
+			const column_options = column.getColumnOptions();
 			const tag_display_priority = column_options['tag_display_priority'] || '';
 			const number_of_tags = column_options['number_of_tags'] || SHOW_TAGS_3;
 			const tag_name_display = column_options['tag_name_display'] || TAG_NAME_FULL;
@@ -678,6 +677,18 @@ class CDataTable {
 					<div class="js-selected-count"></div>
 				</div>
 			`),
+			cell: new Template(`
+				<div class="${CDataTable.ZBX_STYLE_CELL}"></div>
+			`),
+			cell_inner: new Template(`
+				<div class="${CDataTable.ZBX_STYLE_CELL_INNER}"></div>
+			`),
+			cell_inner_span: new Template(`
+				<span class="${CDataTable.ZBX_STYLE_CELL_INNER}"></span>
+			`),
+			row: new Template(`
+				<div class="${CDataTable.ZBX_STYLE_ROW}"></div>
+			`),
 			row_spacer: new Template(`
 				<div class="${CDataTable.ZBX_STYLE_ROW_SPACER}"></div>
 			`),
@@ -805,9 +816,12 @@ class CDataTable {
 		return this.#columns;
 	}
 
+	getVisibleColumns() {
+		return this.#columns.filter(column => column.isVisible());
+	}
+
 	getColumnConfigById(id, duplicate = false) {
-		return this.#columns
-			.find(column_config => column_config.getId() == id && column_config.isDuplicate() == duplicate);
+		return this.#columns.find(column => column.getId() == id && column.isDuplicate() == duplicate);
 	}
 
 	getCheckboxColumnConfig() {
@@ -996,7 +1010,7 @@ class CDataTable {
 				this.#footer.classList.remove(ZBX_STYLE_HIDDEN);
 			}
 
-			const columns = this.#columns.filter(column_config => column_config.isVisible());
+			const columns = this.getVisibleColumns();
 
 			if (columns.length > 0) {
 				const data_fields = response.data_fields;
@@ -1004,7 +1018,7 @@ class CDataTable {
 				for (let row_index = 0; row_index < response.data.length; row_index++) {
 					const [row_config, row_data] = response.data[row_index];
 
-					const row = this.#createRow(row_index);
+					const row = this.#templates.row.evaluateToElement();
 
 					const renderer = this.#row_renderers[row_config.renderer] || this.#row_renderers.default;
 					renderer.call(this, {columns, row, row_index, row_config, data_fields, row_data});
@@ -1021,16 +1035,16 @@ class CDataTable {
 			this.#body.scrollTo({left: 0});
 
 			this.#columns
-				.filter(column_config => column_config.isSticky())
-				.forEach(column_config => {
-					const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
-					header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
-					header_cell.style.left = '0';
+				.filter(column => column.isSticky())
+				.forEach(column => {
+					const header_cell = column.getHeaderCell();
+					header_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
+					header_cell.target.style.left = '0';
 				});
 
 			this.#applyColumnWidths();
 
-			columns.forEach(column_config => this.#calculateColumnWidth(column_config));
+			columns.forEach(column => this.#calculateColumnWidth(column));
 
 			this.#applyColumnWidths();
 			this.#applyLastColumnPadding();
@@ -1050,16 +1064,16 @@ class CDataTable {
 	onColumnToggle(e) {
 		const {column_index, visible} = e.detail;
 
-		const column_config = this.getColumnConfig(column_index);
-		if (!column_config || !column_config.isTogglable()) {
+		const column = this.getColumnConfig(column_index);
+		if (!column || !column.isTogglable()) {
 			return;
 		}
 
-		if (column_config.getWidth() == 'auto') {
-			column_config.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
+		if (column.getWidth() == 'auto') {
+			column.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
 		}
 
-		column_config.setVisible(visible);
+		column.setVisible(visible);
 
 		this.updateUserConfig();
 
@@ -1067,9 +1081,7 @@ class CDataTable {
 
 		this.dispatchEvent(CDataTable.EVENT_INIT, {
 			onSuccess: () => requestAnimationFrame(() => {
-				const header_cell = this.#findHeaderCell(column_index);
-
-				this.#scrollBodyToTarget(header_cell);
+				this.#scrollBodyToTarget(column.getHeaderCell().target);
 			})
 		});
 
@@ -1089,16 +1101,16 @@ class CDataTable {
 		const highest_order = this.getColumnConfig(parseInt(items[end].getAttribute('data-col'))).getOrder();
 
 		const columns = this.#columns.filter(
-			column_config => column_config.getId() != this.#checkbox_id
-				&& column_config.getOrder() >= lowest_order
-				&& column_config.getOrder() <= highest_order
+			column => column.getId() != this.#checkbox_id
+				&& column.getOrder() >= lowest_order
+				&& column.getOrder() <= highest_order
 		);
 
-		const column_config = this.getColumnConfig(column_index);
-		column_config.setOrder(columns.at(offset < 0 ? columns.length - 1 : 0).getOrder());
+		const column = this.getColumnConfig(column_index);
+		column.setOrder(columns.at(offset < 0 ? columns.length - 1 : 0).getOrder());
 
-		for (const column_config of columns) {
-			column_config.setOrder(column_config.getOrder() + offset);
+		for (const column of columns) {
+			column.setOrder(column.getOrder() + offset);
 		}
 
 		this.#sortColumns();
@@ -1110,19 +1122,19 @@ class CDataTable {
 	}
 
 	onColumnDuplicate(e) {
-		let {column_index, user_column_config} = {user_column_config: {}, ...e.detail};
+		let {column_index, user_column} = {user_column: {}, ...e.detail};
 
-		const column_config = this.getColumnConfig(column_index);
-		if (!column_config) {
+		const column = this.getColumnConfig(column_index);
+		if (!column) {
 			return null;
 		}
 
-		const duplicate_column_config = this.#duplicateColumnConfig(column_config, user_column_config);
-		duplicate_column_config.setColumnIndex(this.#columns.length);
+		const duplicate_column = this.#duplicateColumnConfig(column, user_column);
+		duplicate_column.setColumnIndex(this.#columns.length);
 
-		const start = this.#columns.indexOf(column_config) + 1;
+		const start = this.#columns.indexOf(column) + 1;
 
-		this.#columns.splice(start, 0, duplicate_column_config);
+		this.#columns.splice(start, 0, duplicate_column);
 
 		for (let i = start; i < this.#columns.length; i++) {
 			this.#columns[i].setOrder(i + 1);
@@ -1134,10 +1146,9 @@ class CDataTable {
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
 
 		requestAnimationFrame(() => {
-			const column_index = duplicate_column_config.getColumnIndex();
-			const header_cell = this.#findHeaderCell(column_index);
+			const header_cell = duplicate_column.getHeaderCell();
 
-			this.#scrollBodyToTarget(header_cell);
+			this.#scrollBodyToTarget(header_cell.target);
 
 			header_cell.focus();
 		});
@@ -1146,25 +1157,25 @@ class CDataTable {
 	onColumnDelete(e) {
 		const {column_index} = e.detail;
 
-		const column_config = this.getColumnConfig(column_index);
-		if (!column_config) {
+		const column = this.getColumnConfig(column_index);
+		if (!column) {
 			return;
 		}
 
 		const message = sprintf(t('Are you sure you want to delete %1$s? This action cannot be undone.'),
-			column_config.getName());
+			column.getName());
 
 		if (!confirm(message)) {
 			return;
 		}
 
-		const order = column_config.getOrder();
+		const order = column.getOrder();
 
 		this.#columns
-			.filter(column_config => column_config.getOrder() > order)
-			.forEach(column_config => column_config.setOrder(order - 1));
+			.filter(column => column.getOrder() > order)
+			.forEach(column => column.setOrder(order - 1));
 
-		const index = this.#columns.indexOf(column_config);
+		const index = this.#columns.indexOf(column);
 		this.#columns.splice(index, 1);
 
 		if (this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE)
@@ -1177,37 +1188,37 @@ class CDataTable {
 	onColumnRename(e) {
 		const {column_index, name} = e.detail;
 
-		const column_config = this.getColumnConfig(column_index);
-		if (!column_config || (!column_config.isDuplicate() && !column_config.isRenamable())) {
+		const column = this.getColumnConfig(column_index);
+		if (!column || (!column.isDuplicate() && !column.isRenamable())) {
 			return;
 		}
 
-		column_config.setName(name);
+		column.setName(name);
 
-		const cell_inner = this.#findHeaderCell(column_index).querySelector(`.${CDataTable.ZBX_STYLE_CELL_INNER}`);
+		const cell_inner = column.getHeaderCell().target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_INNER}`);
 		cell_inner.innerText = name;
 	}
 
 	onColumnReset(e) {
 		const {column_index} = e.detail;
 
-		const column_config = this.getColumnConfig(column_index);
-		if (!column_config) {
+		const column = this.getColumnConfig(column_index);
+		if (!column) {
 			return;
 		}
 
-		const defaults = column_config.getDefaults();
+		const defaults = column.getDefaults();
 
-		column_config.setResized(false);
+		column.setResized(false);
 
 		if (defaults.getWidth() == 'auto') {
-			column_config.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
+			column.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
 		}
 		else {
-			column_config.setWidth(defaults.getWidth());
+			column.setWidth(defaults.getWidth());
 
 			this.#applyColumnWidths();
-			this.#calculateColumnWidth(column_config);
+			this.#calculateColumnWidth(column);
 		}
 
 		this.#applyColumnWidths();
@@ -1301,8 +1312,8 @@ class CDataTable {
 			return;
 		}
 
-		const column_config = this.getColumnConfig(this.#resize_column_index);
-		if (!column_config) {
+		const column = this.getColumnConfig(this.#resize_column_index);
+		if (!column) {
 			return;
 		}
 
@@ -1312,10 +1323,10 @@ class CDataTable {
 		const delta_percent = (delta_x / total_width) * 100;
 
 		let min_width = CDataTable.RESIZE_MIN_WIDTH;
-		if (column_config.getOptionsPopupHandler()) {
+		if (column.getOptionsPopupHandler()) {
 			min_width *= 2;
 		}
-		if (column_config.isSortable()) {
+		if (column.isSortable()) {
 			min_width += 10;
 		}
 
@@ -1323,10 +1334,9 @@ class CDataTable {
 
 		let width = parseFloat(Math.max(min_width_percent, this.#resize_start_width + delta_percent).toFixed(4));
 
-		column_config.setWidth(`${width}%`);
+		column.setWidth(`${width}%`);
 
-		const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
-		visible_columns.forEach(column_config => this.#calculateColumnWidth(column_config));
+		this.getVisibleColumns().forEach(column => this.#calculateColumnWidth(column));
 
 		this.#applyColumnWidths();
 		this.#applyLastColumnPadding();
@@ -1343,21 +1353,21 @@ class CDataTable {
 			return this.dispatchEvent(CDataTable.EVENT_COLUMN_RESET, {column_index, id});
 		}
 
-		const column_config = this.getColumnConfig(column_index);
-		column_config.setResized(false);
+		const column = this.getColumnConfig(column_index);
+		column.setResized(false);
 
-		this.#calculateColumnWidth(column_config);
+		this.#calculateColumnWidth(column);
 
 		this.#resizing = true;
 		this.#resize_column_index = column_index;
 		this.#resize_start_x = x;
-		this.#resize_start_width = parseFloat(this.#getWidthWithoutUnit(column_config.getWidth()));
+		this.#resize_start_width = parseFloat(this.#getWidthWithoutUnit(column.getWidth()));
 
 		this.#element.classList.add(CDataTable.ZBX_STYLE_RESIZING);
 
 		document.querySelector('.sidebar').style.pointerEvents = 'none';
 
-		this.#findHeaderCell(column_index).classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING);
+		column.getHeaderCell().target.classList.add(CDataTable.ZBX_STYLE_CELL_RESIZING);
 
 		window.addEventListener('mousemove', this.onResizeMouseMove);
 		window.addEventListener('mouseup', this.onResizeMouseUp);
@@ -1368,16 +1378,14 @@ class CDataTable {
 			return;
 		}
 
-		const column_config = this.getColumnConfig(this.#resize_column_index);
-		if (!column_config) {
+		const column = this.getColumnConfig(this.#resize_column_index);
+		if (!column) {
 			return;
 		}
 
-		column_config.setResized(true);
+		column.setResized(true);
 
-		const column_index = column_config.getColumnIndex();
-
-		this.#findHeaderCell(column_index).classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING);
+		column.getHeaderCell().target.classList.remove(CDataTable.ZBX_STYLE_CELL_RESIZING);
 
 		this.#resizing = false;
 		this.#resize_column_index = -1;
@@ -1410,7 +1418,7 @@ class CDataTable {
 	}
 
 	onColumnOptionsPopup(e) {
-		const {handle} = e.detail;
+		const {column, handle} = e.detail;
 
 		if (this.#options_popup?.isOpen(handle)) {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
@@ -1418,18 +1426,17 @@ class CDataTable {
 			return;
 		}
 
-		const header_cell = this.#findClosestHeaderCell(handle);
-		const column_index = parseInt(header_cell.getAttribute('data-col'));
-		const column_config = this.getColumnConfig(column_index);
-		const column_options_handler = column_config.getOptionsPopupHandler();
+		const column_options_handler = column.getOptionsPopupHandler();
 
 		const handler = this.#options_handlers[column_options_handler];
 		if (!handler) {
 			return;
 		}
 
+		const header_cell = column.getHeaderCell();
+
 		requestAnimationFrame(() => {
-			this.#options_popup = this.#createColumnOptionsPopup(handler, column_config, header_cell, handle);
+			this.#options_popup = this.#createColumnOptionsPopup(handler, column, header_cell, handle);
 			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_OPEN);
 		});
 	}
@@ -1461,19 +1468,19 @@ class CDataTable {
 		}
 
 		const {column_index, column_options} = e.detail;
-		const column_config = this.getColumnConfig(column_index);
+		const column = this.getColumnConfig(column_index);
 
-		if (!deepCompare(column_config.getColumnOptions(), column_options)) {
-			column_config.setColumnOptions(column_options);
+		if (!deepCompare(column.getColumnOptions(), column_options)) {
+			column.setColumnOptions(column_options);
 
-			this.#renderColumnDataCells(column_config);
+			this.#renderColumnDataCells(column);
 
 			this.#options_popup_updated = true;
 
 			requestAnimationFrame(() => {
-				const header_cell = this.#findHeaderCell(column_index);
+				const header_cell = column.getHeaderCell();
 
-				this.#scrollBodyToTarget(header_cell);
+				this.#scrollBodyToTarget(header_cell.target);
 			});
 		}
 
@@ -1481,9 +1488,9 @@ class CDataTable {
 	}
 
 	onOptionsPopup(e) {
-		const {handler, column_config, header_cell, handle} = e.detail;
+		const {handler, column, header_cell, handle} = e.detail;
 
-		if (column_config.getId() != CDataTableColumn.TABLE_OPTIONS) {
+		if (column.getId() != CDataTableColumn.TABLE_OPTIONS) {
 			this.#scrollBodyToTarget(header_cell);
 		}
 
@@ -1496,7 +1503,7 @@ class CDataTable {
 		this.#options_popup_updated = true;
 
 		requestAnimationFrame(() => {
-			this.#options_popup = this.#createOptionsPopup(handler, column_config, header_cell, handle);
+			this.#options_popup = this.#createOptionsPopup(handler, column, header_cell, handle);
 			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_OPEN);
 		});
 	}
@@ -1632,7 +1639,7 @@ class CDataTable {
 	}
 
 	getConfig() {
-		const columns = this.#columns.filter(column_config => column_config.getId() != this.#checkbox_id);
+		const columns = this.#columns.filter(column => column.getId() != this.#checkbox_id);
 
 		const options = Object.entries(this.#options).reduce((options, [id, option]) => {
 			options[id] = option.checked ? '1' : '0';
@@ -1641,7 +1648,7 @@ class CDataTable {
 		}, {});
 
 		return {
-			columns: columns.map(column_config => column_config.diff()),
+			columns: columns.map(column => column.diff()),
 			options,
 		};
 	}
@@ -1660,24 +1667,28 @@ class CDataTable {
 	 * @returns {CDataTableColumn|undefined}
 	 */
 	getColumnConfig(column_index) {
-		return this.#columns.find(column_config => column_config.getColumnIndex() == column_index);
+		return this.#columns.find(column => column.getColumnIndex() == column_index);
 	}
 
-	createDataCell(column_config, row_index) {
-		const data_cell = this.#createCell(column_config, row_index);
+	/**
+	 * @param {CDataTableColumn} column
+	 * @returns {Object}
+	 */
+	createDataCell(column) {
+		const data_cell = this.#templates.cell.evaluateToElement();
 		data_cell.classList.add(CDataTable.ZBX_STYLE_CELL_DATA);
 
-		if (column_config.getSpan() > 1) {
-			data_cell.style.gridColumn = `span ${column_config.getSpan()}`;
+		if (column.getSpan() > 1) {
+			data_cell.style.gridColumn = `span ${column.getSpan()}`;
 		}
 
-		this.#makeCellSticky(column_config, data_cell);
+		this.#makeCellSticky(column, data_cell);
 
-		if (column_config.isOnlyHeader() || !column_config.isVisible()) {
+		if (column.isOnlyHeader() || !column.isVisible()) {
 			data_cell.classList.add(ZBX_STYLE_HIDDEN);
 		}
 
-		return data_cell;
+		return {target: data_cell};
 	}
 
 	createRowSpacer(target) {
@@ -1688,19 +1699,39 @@ class CDataTable {
 		target.appendChild(this.#templates.row_spacer.evaluateToElement());
 	}
 
-	findDataCells(column_index = null, row_index = null) {
-		return this.#findCells(column_index, row_index, `.${CDataTable.ZBX_STYLE_CELL_DATA}`);
+	/**
+	 * @param {number|null} column_index
+	 * @param {number|null} row_index
+	 * @returns {Object[]}
+	 */
+	findDataCells({column_index = null, row_index = null} = {}) {
+		const data_cells = [];
+
+		this.#columns.forEach(column => {
+			if (column_index && column.getColumnIndex() != column_index) {
+				return;
+			}
+
+			if (row_index) {
+				data_cells.push(column.getDataCells().at(row_index));
+			}
+			else {
+				column.getDataCells().forEach(data_cell => data_cells.push(data_cell));
+			}
+		})
+
+		return data_cells.filter(Boolean);
 	}
 
 	renderDataCells({columns, row, row_index, data_fields, row_data}) {
-		const data_cells = {};
+		for (const column of columns) {
+			const data_cell = this.createDataCell(column);
 
-		for (const column_config of columns) {
-			const column_index = column_config.getColumnIndex();
+			const data_cells = column.getDataCells();
+			data_cells[row_index] = data_cell;
+			column.setDataCells(data_cells);
 
-			data_cells[column_index] = this.createDataCell(column_config, row_index);
-
-			row.appendChild(data_cells[column_index]);
+			row.appendChild(data_cell.target);
 		}
 
 		if (this.#customizable) {
@@ -1709,49 +1740,44 @@ class CDataTable {
 
 		// This is separately from the loop above on purpose, since row renderer may have an impact on all cells
 		// within the row, which means that the cells should be present BEFORE renderer is executed.
-		for (const column_config of columns) {
-			if (column_config.isOnlyHeader()) {
+		for (const column of columns) {
+			if (column.isOnlyHeader()) {
 				continue;
 			}
 
-			const column_index = column_config.getColumnIndex();
-			const column_data = this.#collectColumnData(column_config, data_fields, row_data);
+			const column_data = this.#collectColumnData(column, data_fields, row_data);
+			const data_cells = column.getDataCells();
 
-			this.renderDataCellContents(column_config, row, data_cells[column_index], data_fields, column_data);
+			this.renderDataCellContents(column, row, data_cells[row_index], data_fields, column_data);
 		}
 	}
 
-	renderDataCellContents(column_config, row, data_cell, data_fields, column_data) {
-		const renderer = column_config.getRenderer();
+	renderDataCellContents(column, row, data_cell, data_fields, column_data) {
+		const renderer = column.getRenderer();
 
 		if (!this.#renderers[renderer]) {
 			return;
 		}
 
-		data_cell.innerHTML = '';
+		const cell_inner = this.#templates.cell_inner.evaluateToElement();
 
-		const column_index = column_config.getColumnIndex();
-
-		const cell_inner = document.createElement('div');
-		cell_inner.classList.add(CDataTable.ZBX_STYLE_CELL_INNER);
-
-		data_cell.appendChild(cell_inner);
+		data_cell.target.innerHTML = '';
+		data_cell.target.appendChild(cell_inner);
 
 		try {
 			this.#renderers[renderer].call(this, {
-				column_config,
-				column_index,
 				datatable: this,
+				column,
 				row,
-				row_index: data_cell.getAttribute('data-row'),
+				row_index: column.getDataCells().indexOf(data_cell),
 				column_data: column_data || [],
-				cell: data_cell,
+				cell: data_cell.target,
 				cell_inner
 			});
 		} catch (error) {
 			console.error(error);
 
-			data_cell.classList.add(CDataTable.ZBX_STYLE_CELL_ERROR);
+			data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_ERROR);
 
 			cell_inner.innerHTML = error.message;
 		}
@@ -1772,8 +1798,8 @@ class CDataTable {
 
 		const orders = new Set();
 
-		this.#columns.forEach((column_config, column_index) => {
-			const order = column_config.getOrder();
+		this.#columns.forEach((column, column_index) => {
+			const order = column.getOrder();
 
 			if (!order || orders.has(order)) {
 				let next_order = order + 1;
@@ -1782,27 +1808,27 @@ class CDataTable {
 					next_order++;
 				}
 
-				column_config.setOrder(next_order);
+				column.setOrder(next_order);
 				orders.add(next_order);
 			}
 			else {
 				orders.add(order);
 			}
 
-			column_config.setColumnIndex(column_index)
-				.setDefaults(column_config.clone());
+			column.setColumnIndex(column_index)
+				.setDefaults(column.clone());
 		});
 
 		this.#sortColumns();
 	}
 
 	#resetColumns() {
-		this.#columns = this.#columns.filter(column_config => {
-			if (!column_config.isDuplicate()) {
-				column_config.merge(column_config.getDefaults().toObject());
+		this.#columns = this.#columns.filter(column => {
+			if (!column.isDuplicate()) {
+				column.merge(column.getDefaults().toObject());
 			}
 
-			return !column_config.isDuplicate();
+			return !column.isDuplicate();
 		});
 
 		this.#sortColumns();
@@ -1830,36 +1856,36 @@ class CDataTable {
 		}
 
 		if (user_config.columns) {
-			const user_columns = user_config.columns.filter(user_column_config => 'id' in user_column_config);
+			const user_columns = user_config.columns.filter(user_column => 'id' in user_column);
 
 			// Merge original columns
-			user_columns.filter(user_column_config => !user_column_config?.duplicate)
-				.forEach(user_column_config => {
-					const column_config = this.getColumnConfigById(user_column_config.id);
-					if (!column_config) {
+			user_columns.filter(user_column => !user_column?.duplicate)
+				.forEach(user_column => {
+					const column = this.getColumnConfigById(user_column.id);
+					if (!column) {
 						return;
 					}
 
-					column_config.merge(user_column_config);
+					column.merge(user_column);
 				});
 
 			// Handle duplicated columns
-			user_columns.forEach(user_column_config => {
-				const column_config = this.getColumnConfigById(user_column_config.id);
-				if (!column_config) {
+			user_columns.forEach(user_column => {
+				const column = this.getColumnConfigById(user_column.id);
+				if (!column) {
 					return;
 				}
 
-				if (!user_column_config.duplicate) {
-					column_config.merge(user_column_config);
+				if (!user_column.duplicate) {
+					column.merge(user_column);
 
 					return;
 				}
 
-				const duplicate_column_config = this.#duplicateColumnConfig(column_config, user_column_config);
-				duplicate_column_config.setColumnIndex(this.#columns.length);
+				const duplicate_column = this.#duplicateColumnConfig(column, user_column);
+				duplicate_column.setColumnIndex(this.#columns.length);
 
-				this.#columns.splice(this.#columns.indexOf(column_config) + 1, 0, duplicate_column_config);
+				this.#columns.splice(this.#columns.indexOf(column) + 1, 0, duplicate_column);
 			});
 
 			this.#columns.sort((a, b) => {
@@ -1873,7 +1899,7 @@ class CDataTable {
 				return order_a - order_b;
 			});
 
-			this.#columns.forEach((column_config, column_index) => column_config.setOrder(column_index + 1));
+			this.#columns.forEach((column, column_index) => column.setOrder(column_index + 1));
 		}
 
 		if (user_config.options) {
@@ -1887,39 +1913,20 @@ class CDataTable {
 		}
 	}
 
-	#createRow(row_index) {
-		const row = document.createElement('div');
-		row.classList.add(CDataTable.ZBX_STYLE_ROW);
-		row.setAttribute('data-row', row_index.toString());
+	#createHeaderCell(column) {
+		let column_options_handler = column.getOptionsPopupHandler();
 
-		return row;
-	}
-
-	#createCell(column_config, row_index) {
-		const cell = document.createElement('div');
-		cell.classList.add(CDataTable.ZBX_STYLE_CELL);
-		cell.setAttribute('data-row', row_index.toString());
-		cell.setAttribute('data-col', column_config.getColumnIndex().toString());
-
-		return cell;
-	}
-
-	#createHeaderCell(data) {
-		const {column_config, row_index} = data;
-
-		let column_options_handler = column_config.getOptionsPopupHandler();
-
-		if (column_config.isDuplicate()) {
-			const duplicate_column_config = this.#columns.find(duplicate_column_config => {
-				return duplicate_column_config.getId() == column_config.getId() && duplicate_column_config.isDuplicate();
+		if (column.isDuplicate()) {
+			const duplicate_column = this.#columns.find(duplicate_column => {
+				return duplicate_column.getId() == column.getId() && duplicate_column.isDuplicate();
 			});
 
-			if (duplicate_column_config) {
-				column_options_handler = duplicate_column_config.getOptionsPopupHandler();
+			if (duplicate_column) {
+				column_options_handler = duplicate_column.getOptionsPopupHandler();
 			}
 		}
 
-		const header_cell = this.#createCell(column_config, row_index);
+		const header_cell = this.#templates.cell.evaluateToElement();
 		header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_HEADER);
 		header_cell.setAttribute('tabindex', '-1');
 
@@ -1927,30 +1934,30 @@ class CDataTable {
 			header_cell.classList.add(CDataTable.ZBX_STYLE_CELL_CONTEXT);
 		}
 
-		if (column_config.isVisible()) {
-			this.#renderHeaderCellContents(column_config, row_index, header_cell);
+		if (column.isVisible()) {
+			this.#renderHeaderCellContents(column, header_cell);
 		}
 		else {
 			header_cell.classList.add(ZBX_STYLE_HIDDEN);
 		}
 
-		this.#makeCellSticky(column_config, header_cell);
+		this.#makeCellSticky(column, header_cell);
 
-		return header_cell;
+		return {target: header_cell};
 	}
 
-	#makeCellSticky(column_config, cell) {
-		if (!column_config.isSticky()) {
+	#makeCellSticky(column, cell) {
+		if (!column.isSticky()) {
 			return;
 		}
 
-		const visible_columns = this.#columns.filter(column_config => column_config.isVisible());
+		const visible_columns = this.getVisibleColumns()
 		if (!visible_columns.length) {
 			return;
 		}
 
-		const is_first = visible_columns.at(0).getId() == column_config.getId();
-		const is_last = visible_columns[visible_columns.length - 1]?.getId() == column_config.getId();
+		const is_first = visible_columns.at(0).getId() == column.getId();
+		const is_last = visible_columns[visible_columns.length - 1]?.getId() == column.getId();
 
 		if (is_first || is_last) {
 			cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
@@ -1958,35 +1965,34 @@ class CDataTable {
 		}
 	}
 
-	#renderHeaderCellContents(column_config, row_index, header_cell) {
+	#renderHeaderCellContents(column, header_cell) {
 		header_cell.innerHTML = '';
 
-		if (this.#resizable && column_config.isResizable()) {
+		if (this.#resizable && column.isResizable()) {
 			const resize_handle = document.createElement('div');
 			resize_handle.classList.add(CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER);
 
-			this.#bindColumnResizeEvent(column_config, resize_handle);
+			this.#bindColumnResizeEvent(column, resize_handle);
 
 			header_cell.appendChild(resize_handle);
 		}
 
 		let header_renderer = 'default';
-		if (column_config.getId() == this.#checkbox_id) {
-			header_renderer = column_config.getRenderer();
+		if (column.getId() == this.#checkbox_id) {
+			header_renderer = column.getRenderer();
 		}
 
 		this.#header_renderers[header_renderer].call(this, {
-			column_config,
+			column,
 			datatable: this,
-			row_index: header_cell.getAttribute('data-row'),
 			cell: header_cell
 		});
 	}
 
-	#collectColumnData(column_config, data_fields, row_data) {
-		const column_fields = column_config.isDuplicate()
-			? this.getColumnConfigById(column_config.getId()).getFields()
-			: column_config.getFields();
+	#collectColumnData(column, data_fields, row_data) {
+		const column_fields = column.isDuplicate()
+			? this.getColumnConfigById(column.getId()).getFields()
+			: column.getFields();
 
 		const column_data = [];
 
@@ -2003,15 +2009,15 @@ class CDataTable {
 		this.#columns = this.#columns.sort((left, right) => left.getOrder() - right.getOrder());
 	}
 
-	#duplicateColumnConfig(column_config, user_column_config = {}) {
-		const id = column_config.getId();
-		const name = this.#columns.find(column_config => column_config.getId() === id).getName();
+	#duplicateColumnConfig(column, user_column = {}) {
+		const id = column.getId();
+		const name = this.#columns.find(column => column.getId() === id).getName();
 
 		const duplicate_count = this.#columns
-			.filter(column_config => column_config.getName().replace(/\s*\(\d+\)$/g, '') === name)
+			.filter(column => column.getName().replace(/\s*\(\d+\)$/g, '') === name)
 			.length;
 
-		const defaults = column_config.clone()
+		const defaults = column.clone()
 			.setDuplicate(false)
 			.setName(`${name} (${duplicate_count})`)
 			.setSpan(1);
@@ -2019,48 +2025,46 @@ class CDataTable {
 		return defaults.clone()
 			.setDuplicate(true)
 			.setDefaults(defaults)
-			.merge(user_column_config);
+			.merge(user_column);
 	}
 
-	#calculateColumnWidth(column_config) {
-		if (column_config.isResized() || !column_config.isResizable()) {
+	#calculateColumnWidth(column) {
+		if (column.isResized() || !column.isResizable()) {
 			return;
 		}
 
 		let header_width = 0;
 
-		const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
+		const header_cell = column.getHeaderCell();
 		if (header_cell) {
-			header_width = header_cell.getBoundingClientRect().width;
+			header_width = header_cell.target.getBoundingClientRect().width;
 		}
 
 		let data_width = 0;
 
-		const data_cell = this.#findDataCell(column_config.getColumnIndex());
+		const data_cell = column.getDataCells().at(0);
 		if (data_cell) {
-			data_width = data_cell.getBoundingClientRect().width;
+			data_width = data_cell.target.getBoundingClientRect().width;
 
-			if (column_config.getWidth() == 'auto') {
+			if (column.getWidth() == 'auto') {
 				data_width = Math.min(data_width, CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH);
 			}
 		}
 
 		let offset = 0;
 		// Width 'max-content' may cause text overflow, hence we need to add 1px
-		if (column_config.getWidth() == 'max-content') {
+		if (column.getWidth() == 'max-content') {
 			offset++;
 		}
 
 		const width = parseFloat(this.#convertPixelsToPercent(Math.max(header_width, data_width) + offset));
 
-		column_config.setResized(true).setWidth(`${width}%`);
+		column.setResized(true).setWidth(`${width}%`);
 	}
 
 	#applyColumnWidths(column_widths = []) {
 		if (column_widths.length == 0) {
-			const visible_columns = this.getColumns().filter(column_config => column_config.isVisible());
-
-			column_widths = visible_columns.map(column_config => column_config.getWidth());
+			column_widths = this.getVisibleColumns().map(column => column.getWidth());
 		}
 
 		if (this.#customizable) {
@@ -2071,25 +2075,28 @@ class CDataTable {
 	}
 
 	#renderHeaderCells() {
-		this.#findHeaderCells().forEach(header_cell => header_cell.remove());
+		this.#columns.filter(column => column.getHeaderCell())
+			.forEach(column => column.getHeaderCell().target.remove());
 
 		if (this.#customizable) {
 			this.createRowSpacer(this.#header);
 			this.#createTableOptionsButton();
 		}
 
-		const columns = this.#columns.filter(column_config => column_config.isVisible());
+		const columns = this.getVisibleColumns();
 
-		for (const column_config of columns) {
-			const header_cell = this.#createHeaderCell({column_config, row_index: 0});
+		for (const column of columns) {
+			const header_cell = this.#createHeaderCell(column);
+
+			column.setHeaderCell(header_cell);
 
 			if (this.#customizable) {
 				const row_spacer = this.#findRowSpacer(this.#header);
 
-				this.#header.insertBefore(header_cell, row_spacer);
+				this.#header.insertBefore(header_cell.target, row_spacer);
 			}
 			else {
-				this.#header.appendChild(header_cell);
+				this.#header.appendChild(header_cell.target);
 			}
 		}
 
@@ -2133,10 +2140,10 @@ class CDataTable {
 			e.preventDefault();
 
 			const handler = this.#options_handlers[CDataTableColumn.TABLE_OPTIONS];
-			const column_config = new CDataTableColumn(CDataTableColumn.TABLE_OPTIONS, '')
+			const column = new CDataTableColumn(CDataTableColumn.TABLE_OPTIONS, '')
 				.setOptionsPopupHandler(CDataTableColumn.TABLE_OPTIONS);
 
-			this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP, {handler, column_config, header_cell, handle});
+			this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP, {handler, column, header_cell, handle});
 		});
 
 		this.#header.appendChild(header_cell);
@@ -2152,8 +2159,8 @@ class CDataTable {
 		table_options.classList.remove(ZBX_STYLE_HIDDEN);
 	}
 
-	#createOptionsPopup(handler, column_config, header_cell, handle) {
-		return new (eval(handler))(this, column_config, header_cell, handle)
+	#createOptionsPopup(handler, column, header_cell, handle) {
+		return new (eval(handler))(this, column, header_cell, handle)
 			.on(
 				CDataTableOptionsPopup.EVENT_OPEN,
 				e => this.dispatchEvent(CDataTable.EVENT_OPTIONS_POPUP_OPEN, e.detail)
@@ -2167,8 +2174,8 @@ class CDataTable {
 			);
 	}
 
-	#createColumnOptionsPopup(handler, column_config, header_cell, handle) {
-		return new (eval(handler))(this, column_config, header_cell, handle)
+	#createColumnOptionsPopup(handler, column, header_cell, handle) {
+		return new (eval(handler))(this, column, header_cell, handle)
 			.on(
 				CDataTableOptionsPopup.EVENT_OPEN,
 				e => this.dispatchEvent(CDataTable.EVENT_COLUMN_OPTIONS_POPUP_OPEN, e.detail)
@@ -2182,50 +2189,32 @@ class CDataTable {
 			);
 	}
 
-	#renderColumnDataCells(column_config) {
-		const column_index = column_config.getColumnIndex();
-
+	#renderColumnDataCells(column) {
 		this.getData().then(response => {
-			for (let row_index = 0; row_index < response.data.length; row_index++) {
+			const data_fields = response.data_fields;
+
+			column.getDataCells().forEach(data_cell => {
+				const row_index = column.getDataCells().indexOf(data_cell);
 				const [row_config, row_data] = response.data[row_index];
 
-				if (row_config.renderer) {
-					continue;
+				if (row_config.renderer || column.isOnlyHeader()) {
+					return;
 				}
 
-				const row = this.#body.querySelector(`.${CDataTable.ZBX_STYLE_ROW}[data-row="${row_index}"]`);
-				const data_cell = this.createDataCell(column_config, row_index);
+				const row = data_cell.target.closest(`.${CDataTable.ZBX_STYLE_ROW}`);
+				const column_data = this.#collectColumnData(column, data_fields, row_data);
 
-				const cell = this.#body
-					.querySelector(`.${CDataTable.ZBX_STYLE_CELL}[data-row="${row_index}"][data-col="${column_index}"]`)
-				if (cell) {
-					const attributes = cell.attributes;
-					cell.replaceWith(data_cell);
-
-					Array.from(attributes).forEach(attr => data_cell.setAttribute(attr.nodeName, attr.nodeValue));
-				}
-				else {
-					row?.appendChild(data_cell);
-				}
-
-				if (column_config.isOnlyHeader()) {
-					continue;
-				}
-
-				const data_fields = response.data_fields;
-				const column_data = this.#collectColumnData(column_config, data_fields, row_data);
-
-				this.renderDataCellContents(column_config, row, data_cell, data_fields, column_data);
-			}
+				this.renderDataCellContents(column, row, data_cell, data_fields, column_data);
+			});
 		});
 	}
 
 	#getDataProviderParams(params) {
-		const columns = this.#columns.filter(column_config => !column_config.isDuplicate());
+		const columns = this.#columns.filter(column => !column.isDuplicate());
 
 		let column_options = {};
-		for (const column_config of columns) {
-			column_options = Object.assign(column_options, column_config.getColumnOptions());
+		for (const column of columns) {
+			column_options = Object.assign(column_options, column.getColumnOptions());
 		}
 
 		const options = Object.fromEntries(
@@ -2302,12 +2291,12 @@ class CDataTable {
 		}
 	}
 
-	#bindColumnResizeEvent(column_config, resizer) {
+	#bindColumnResizeEvent(column, resizer) {
 		resizer.addEventListener('mousedown', e => {
 			this.dispatchEvent(CDataTable.EVENT_COLUMN_RESIZE_START, {
 				x: e.clientX,
-				column_index: column_config.getColumnIndex(),
-				id: column_config.getId()
+				column_index: column.getColumnIndex(),
+				id: column.getId()
 			});
 
 			clearTimeout(this.#resize_click_timeout);
@@ -2328,52 +2317,8 @@ class CDataTable {
 		return updateUserProfile(this.#storage_idx, value, idx2, PROFILE_TYPE_STR);
 	}
 
-	#findHeaderCell(column_index) {
-		return this.#findHeaderCells(column_index).item(0);
-	}
-
-	#findDataCell(column_index) {
-		return this.#findDataCells(column_index).item(0);
-	}
-
 	#findClosestHeaderCell(element) {
 		return element.closest(`.${CDataTable.ZBX_STYLE_CELL_HEADER}`);
-	}
-
-	#findCells(column_index = null, row_index = null, selector = `.${CDataTable.ZBX_STYLE_CELL}`) {
-		if (column_index) {
-			selector += `[data-col="${column_index.toString()}"]`;
-		}
-
-		if (row_index) {
-			selector += `[data-row="${row_index.toString()}"]`;
-		}
-
-		return this.#body.querySelectorAll(selector);
-	}
-
-	#findHeaderCells(column_index = null) {
-		let selector = `.${CDataTable.ZBX_STYLE_CELL_HEADER}`;
-
-		if (column_index) {
-			selector += `[data-col="${column_index.toString()}"]`;
-		}
-
-		return this.#header.querySelectorAll(selector);
-	}
-
-	#findDataCells(column_index = null, row_index = null) {
-		let selector = `.${CDataTable.ZBX_STYLE_CELL_DATA}`;
-
-		if (column_index) {
-			selector += `[data-col="${column_index.toString()}"]`;
-		}
-
-		if (row_index) {
-			selector += `[data-row="${row_index.toString()}"]`;
-		}
-
-		return this.#body.querySelectorAll(selector);
 	}
 
 	#findRowSpacer(target) {
@@ -2388,71 +2333,76 @@ class CDataTable {
 	 * Recalculates column spans based on visibility and span settings.
 	 */
 	#recalculateColumnSpans() {
-		this.#columns.forEach(column_config => {
-			const defaults = column_config.getDefaults();
+		this.#columns.forEach(column => {
+			const defaults = column.getDefaults();
 
-			column_config.merge({span: defaults.getSpan(), only_header: defaults.isOnlyHeader()});
+			column.merge({span: defaults.getSpan(), only_header: defaults.isOnlyHeader()});
 		});
 
 		let remaining_span = 0;
 
-		this.#columns
-			.filter(column_config => column_config.isVisible())
-			.forEach(column_config => {
-				if (remaining_span > 0) {
-					column_config.setOnlyHeader(true);
+		this.getVisibleColumns().forEach(column => {
+			if (remaining_span > 0) {
+				column.setOnlyHeader(true);
 
-					remaining_span--;
-				}
-				else {
-					column_config.setOnlyHeader(false);
+				remaining_span--;
+			}
+			else {
+				column.setOnlyHeader(false);
 
-					if (column_config.getSpan() > 1) {
-						remaining_span = column_config.getSpan() - 1;
-					}
+				if (column.getSpan() > 1) {
+					remaining_span = column.getSpan() - 1;
 				}
-			});
+			}
+		});
 	}
 
 	#resizeScrollbarThumb() {
-		if (this.#scrollbar_thumb_width_updating || !this.#scrollbar || !this.#scrollbar_thumb) {
+		if (this.#scrollbar_thumb_width_updating) {
 			return;
 		}
 
 		this.#scrollbar_thumb_width_updating = true;
 
 		requestAnimationFrame(() => {
-			const thumb_width = this.#getScrollbarThumbWidth();
+			if (this.#scrollbar && this.#scrollbar_thumb) {
+				const thumb_width = this.#getScrollbarThumbWidth();
 
-			this.#scrollbar_thumb.style.width = `${thumb_width}px`;
-			this.#scrollbar_thumb.classList.remove(ZBX_STYLE_HIDDEN);
+				this.#scrollbar_thumb.style.width = `${thumb_width}px`;
+				this.#scrollbar_thumb.classList.remove(ZBX_STYLE_HIDDEN);
+			}
 
 			this.#scrollbar_thumb_width_updating = false;
 		});
 	}
 
 	#updateScrollbarThumbPosition() {
-		if (this.#scrollbar_thumb_position_updating || !this.#scrollbar || !this.#scrollbar_thumb) {
+		if (this.#scrollbar_thumb_position_updating) {
 			return;
 		}
 
 		this.#scrollbar_thumb_position_updating = true;
 
 		requestAnimationFrame(() => {
-			const thumb_width = this.#scrollbar_thumb.getBoundingClientRect().width;
-			const max_thumb_travel = this.#scrollbar.clientWidth - thumb_width - CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
-			const scroll_ratio = this.#body.scrollLeft / (this.#body.scrollWidth - this.#body.clientWidth);
-			const thumb_position = scroll_ratio * max_thumb_travel;
+			if (this.#scrollbar && this.#scrollbar_thumb) {
+				const thumb_width = this.#scrollbar_thumb.getBoundingClientRect().width;
+				const max_thumb_travel = this.#scrollbar.clientWidth - thumb_width - CDataTable.SCROLLBAR_HORIZONTAL_PADDING;
+				const scroll_ratio = this.#body.scrollLeft / (this.#body.scrollWidth - this.#body.clientWidth);
+				const thumb_position = scroll_ratio * max_thumb_travel;
 
-			this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
+				this.#scrollbar_thumb.style.transform = `translateX(${thumb_position}px)`;
+			}
 
 			this.#scrollbar_thumb_position_updating = false;
 		});
 	}
 
 	#handleScrollbar() {
-		const total_column_width = Array.from(this.#findHeaderCells())
-			.reduce((width, header_cell) => width + header_cell.getBoundingClientRect().width, 0);
+		const total_column_width = this.#columns
+			.filter(column => column.getHeaderCell())
+			.reduce((width, column) => {
+				return width + column.getHeaderCell().target.getBoundingClientRect().width;
+			}, 0);
 
 		if (total_column_width <= this.#body.clientWidth) {
 			this.#body_resize_observer?.disconnect();
@@ -2494,20 +2444,21 @@ class CDataTable {
 			return;
 		}
 
-		const column_config = this.#columns.filter(column_config => column_config.isVisible()).at(-1);
-		const header_cell = this.#findHeaderCell(column_config.getColumnIndex());
-		const header_resizer = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
+		const column = this.getVisibleColumns().at(-1);
+
+		const header_cell = column.getHeaderCell();
+		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
 
 		const element_rect = this.#element.getBoundingClientRect();
 		const table_options_button_rect = this.#findTableOptionsButton().getBoundingClientRect();
 
-		const right_edge = header_cell.getBoundingClientRect().right - element_rect.left;
+		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
 		const right_boundary = element_rect.width - table_options_button_rect.width;
 		const right_offset = right_edge > right_boundary || this.#element.scrollWidth > element_rect.width
 			? Math.min(table_options_button_rect.width, right_edge - right_boundary)
 			: 0;
 
-		header_cell.style.paddingRight = `${right_offset}px`;
+		header_cell.target.style.paddingRight = `${right_offset}px`;
 		header_resizer.style.right = `${right_offset}px`;
 	}
 

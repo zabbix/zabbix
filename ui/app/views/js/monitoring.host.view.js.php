@@ -175,11 +175,6 @@
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [hostid, name, status, maintenance] = column_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'popup');
-					url.searchParams.set('popup', 'host.edit');
-					url.searchParams.set('hostid', hostid);
-
 					const name_link = document.createElement('a');
 					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
 					name_link.setAttribute('data-menu-popup', JSON.stringify({
