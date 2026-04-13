@@ -2444,7 +2444,7 @@ button {
     .datatable .datatable-footer.table-paging {
       border: solid #444444;
       border-width: 1px 0 0; }
-      .datatable .datatable-footer.table-paging .js-selected-count {
+      .datatable .datatable-footer.table-paging .selected-item-count {
         justify-self: start; }
       .datatable .datatable-footer.table-paging .table-stats {
         position: static;
@@ -2563,13 +2563,17 @@ button {
       .datatable .cell.cell-data .cell-inner {
         box-sizing: border-box;
         display: block;
-        padding: 7px 0; }
+        padding: 7px 0;
+        min-height: var(--datatable-row-height);
+        height: 100%; }
         .datatable .cell.cell-data .cell-inner + .timeline-axis {
           margin-left: 5px; }
         .datatable .cell.cell-data .cell-inner .btn-icon:not(.no-indent):not(:first-child),
         .datatable .cell.cell-data .cell-inner .icon:not(.no-indent):not(:first-child),
         .datatable .cell.cell-data .cell-inner .link-action:not(.no-indent):not(:first-child) {
           margin-left: 5px; }
+        .datatable .cell.cell-data .cell-inner .problem-icon-link {
+          vertical-align: middle; }
       .datatable .cell.cell-data .btn-icon {
         min-width: 18px;
         height: 18px; }
@@ -2661,12 +2665,9 @@ button {
         display: flex;
         align-items: center;
         flex-wrap: nowrap;
-        height: 16px; }
+        height: 18px; }
         .datatable .cell .cell-inner .tags-wrapper .tag {
-          min-width: 24px;
-          height: 16px;
-          padding: 0 3px;
-          line-height: 1.2; }
+          min-width: 24px; }
           .datatable .cell .cell-inner .tags-wrapper .tag.tag-inherited {
             min-width: 35px; }
       .datatable .cell .cell-inner .status-container {

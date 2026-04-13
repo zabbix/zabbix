@@ -419,7 +419,7 @@
 			border: solid $ui-border-color;
 			border-width: 1px 0 0;
 
-			.js-selected-count {
+			.selected-item-count {
 				justify-self: start;
 			}
 
@@ -612,6 +612,8 @@
 				box-sizing: border-box;
 				display: block;
 				padding: 7px 0;
+				min-height: var(--datatable-row-height);
+				height: 100%;
 
 				& + .timeline-axis {
 					margin-left: 5px;
@@ -621,6 +623,10 @@
 				.icon:not(.no-indent):not(:first-child),
 				.link-action:not(.no-indent):not(:first-child) {
 					margin-left: 5px;
+				}
+
+				.problem-icon-link {
+					vertical-align: middle;
 				}
 			}
 
@@ -776,13 +782,10 @@
 				display: flex;
 				align-items: center;
 				flex-wrap: nowrap;
-				height: 16px;
+				height: 18px;
 
 				.tag {
 					min-width: 24px;
-					height: 16px;
-					padding: 0 3px;
-					line-height: 1.2;
 
 					&.tag-inherited {
 						min-width: 35px;
