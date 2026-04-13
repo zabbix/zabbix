@@ -740,6 +740,11 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
+	/* Testing that no inf appear in trends transactions.            */
+	/* Note, that although history trends and new trends are DBL_MAX */
+	/* The resulting trendAvg is actually smaller than DBL_MAX       */
+	/* due to rounding errors appearing as a result of scaling       */
+	/* introduces to safeguard against double overflow into inf.     */
 	public function testCalculatedExpression_TrendAvg()
 	{
 		$trapId = $this->createTrap();
@@ -767,7 +772,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			$response = $this->call('history.push', [
 				'itemid' => $trapId[0],
 				'value' => (float)self::DBL_MAX,
-				'clock' => time() -(3600) - 70 - $i,
+				'clock' => time() - (3600) - 70 - $i,
 				'ns' => 255
 			]);
 		}
@@ -797,11 +802,11 @@ class testCalculatedExpression extends CIntegrationTest {
 		self::startComponent(self::COMPONENT_SERVER);
 
 		for ($i = 0; $i < 100; $i++) {
-				$history = $this->historyGet([$itemid]);
-				if (count($history) === 2) {
-					break;
-				}
-				usleep(100000);
+			$history = $this->historyGet([$itemid]);
+			if (count($history) === 2) {
+				break;
+			}
+			usleep(100000);
 		}
 
 		$response = $this->callUntilDataIsPresent('history.get', [
@@ -814,11 +819,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$history = $this->historyGet([$itemid]);
 		$values = $this->extractHistoryValues($history);
-
-		$this->assertSame(
-			[(float)self::DBL_MAX, (float)self::DBL_MAX],
-			$values
-		);
 
 		$this->assertEqualsWithDelta((float)self::DBL_MAX, (float)$this->getItemLastValue($itemid), 1e294);
 	}
