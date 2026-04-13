@@ -27,7 +27,7 @@ window.user_device_create_popup = new class {
 	#footer;
 	#overlay;
 	#qr_expires_at_ms = null;
-	#deviceid = null;
+	#device_uuid = null;
 
 	init({rules, admin_mode}) {
 		this.#overlay = overlays_stack.getById('user.device.create');
@@ -70,7 +70,7 @@ window.user_device_create_popup = new class {
 					this.#form_element.querySelector('.form-grid').style.display = 'none';
 					this.#form_element.querySelector('.qr-code-container').style.display = '';
 					this.#displayQRCode(response.url);
-					this.#deviceid = response.deviceid;
+					this.#device_uuid = response.uuid;
 					this.#qr_expires_at_ms = response.expires_at * 1000;
 
 					setTimeout(() => this.#checkDeviceStatus(), 2000);
@@ -122,7 +122,7 @@ window.user_device_create_popup = new class {
 	}
 
 	#checkDeviceStatus() {
-		const url = zabbixUrl({action: 'user.device.status', deviceid: this.#deviceid});
+		const url = zabbixUrl({action: 'user.device.status', uuid: this.#device_uuid});
 
 		fetch(url, {
 			method: 'GET',
@@ -131,14 +131,14 @@ window.user_device_create_popup = new class {
 			.then((response) => response.json())
 			.then((response) => {
 				if ('success' in response) {
-					this.#deviceid = null;
+					this.#device_uuid = null;
 					overlayDialogueDestroy(this.#overlay.dialogueid);
 
 					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
 			})
 			.finally(() => {
-				if (this.#deviceid && new CDate().getTime() < this.#qr_expires_at_ms) {
+				if (this.#device_uuid && new CDate().getTime() < this.#qr_expires_at_ms) {
 					setTimeout(() => this.#checkDeviceStatus(), 1000);
 				}
 			});

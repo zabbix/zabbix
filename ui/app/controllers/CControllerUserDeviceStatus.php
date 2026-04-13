@@ -22,7 +22,7 @@ class CControllerUserDeviceStatus extends CController {
 
 	protected function checkInput() {
 		$fields = [
-			'deviceid' =>	'required|not_empty|db device.deviceid'
+			'uuid' =>	'required|not_empty|db device.uuid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -56,7 +56,7 @@ class CControllerUserDeviceStatus extends CController {
 	protected function doAction() {
 		$device = API::Device()->get([
 			'output' => ['deviceid'],
-			'deviceids' => [$this->getInput('deviceid')]
+			'filter' => ['uuid' => $this->getInput('uuid')]
 		]);
 
 		$output = [];

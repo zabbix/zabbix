@@ -67,7 +67,7 @@ class CControllerUserDeviceInit extends CController {
 	protected function initFakeDevice (): array {
 		return [
 			'enrollment_token_expires_at' => time() + 300,
-			'deviceid' => '018f9c6a7c1b7f3a9b2d5c4f8e6a1d90',
+			'uuid' => '018f9c6a7c1b7f3a9b2d5c4f8e6a1d90',
 			'server_id' => '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90',
 			'enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
 			'mobile_enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
@@ -95,7 +95,7 @@ class CControllerUserDeviceInit extends CController {
 			$output = [
 				'expires_at' => $device['enrollment_token_expires_at'],
 				'expires_at_text' => zbx_date2str(TIME_FORMAT, $device['enrollment_token_expires_at']),
-				'deviceid' => $device['deviceid'],
+				'uuid' => $device['uuid'],
 				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
 					->setArgument('ver', ZABBIX_API_VERSION)
 					->setArgument('sid', $device['server_id'])
