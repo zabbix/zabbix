@@ -414,7 +414,7 @@ class testDashboardItemCardWidget extends testWidgets {
 		}
 
 		// Add metrics to binary item.
-		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'QmluYXJ5IGl0ZW0gdGVzdCDwn5mC', time() - 8640000);
+		CDataHelper::addItemData(self::$depend_items['Dependent item 2'], 'Binary test', time() - 8640000);
 
 		$trigger_names = ['Not classified trigger', 'Information trigger', 'Warning trigger', 'Average trigger',
 				'High trigger', 'Disaster trigger', 'Disaster trigger', 'Trigger 1', 'Trigger 2'
@@ -2115,7 +2115,8 @@ class testDashboardItemCardWidget extends testWidgets {
 						$button = $widget->query('class:section-latest-data')->query('class', $section)
 								->query('button:Show')->one();
 						$this->assertTrue($button->isClickable());
-						$button->click()->waitUntilReady();
+						$button->click();
+						$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilVisible();
 						$this->assertEquals($value, $button->getAttribute('data-hintbox-contents'));
 					}
 					else {

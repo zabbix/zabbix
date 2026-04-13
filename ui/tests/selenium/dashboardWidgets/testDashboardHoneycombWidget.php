@@ -326,7 +326,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		// Generate data for binary data type.
-		CDataHelper::addItemData(self::$dependent_items['Non-numeric BINARY'], 'VGVzdCBmb3IgYmluYXJ5IGl0ZW0gdmFsdWUg8J+Zgg==');
+		CDataHelper::addItemData(self::$dependent_items['Non-numeric BINARY'], 'Test for binary item value 🙂');
 
 		// Items ids that used in filtering scenario.
 		$filtered_items = [
@@ -2178,7 +2178,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 						'id:primary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}',
 						'id:secondary_label' => '{{ITEM.LASTVALUE}.regsub("(.*)", \1)}'
 					],
-					'result' => 'VGVzdCBmb3IgYmluYXJ5IGl0ZW0gdmFsdWUg8J+Zgg=='
+					'result' => 'Test for binary item value 🙂'
 				]
 			],
 			// #23 Macros with Text data type.

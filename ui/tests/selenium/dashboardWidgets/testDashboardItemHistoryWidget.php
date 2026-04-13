@@ -2868,10 +2868,14 @@ class testDashboardItemHistoryWidget extends testWidgets {
 		// Check Show button and value in case of Binary data type.
 		foreach ($data['item_data'] as $params) {
 			if (array_key_exists('binary', $params)) {
-				$button = $widget->query('xpath:.//button[@class="btn-link js-show-binary"]')->one();
+				$button = $this->query('xpath:.//button[@class="btn-link js-show-binary"]')->one();
 				$this->assertTrue($button->isClickable());
-				$button->click()->waitUntilReady();
-				$this->assertEquals($params['encoded_value'], $button->getAttribute('data-hintbox-contents'));
+				$button->click();
+				$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilVisible();
+				$this->assertEquals($params['encoded_value'],
+						$this->query('xpath:.//div[@class="hintbox-container dashboard-widget-itemhistory-hintbox nowrap"]')
+						->one()->getText()
+				);
 			}
 		}
 
