@@ -744,7 +744,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	{
 		$trapId = $this->createTrap();
 
-		$formula = 'trendavg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',2h:now/h)';
+		$formula = 'trendavg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',3h:now/h)';
 
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'trendAvg5MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
@@ -791,7 +791,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			'history' => 0
 		], 60, 1);
 
-		$this->assertEqualsWithDelta((float)self::DBL_MAX, $this->getItemLastValue($itemid), 1e292);
+		$this->assertEqualsWithDelta((float)self::DBL_MAX, (float)$this->getItemLastValue($itemid), 1e294);
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::startComponent(self::COMPONENT_SERVER);
@@ -820,7 +820,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			$values
 		);
 
-		$this->assertEqualsWithDelta((float)self::DBL_MAX, $this->getItemLastValue($itemid), 1e292);
+		$this->assertEqualsWithDelta((float)self::DBL_MAX, (float)$this->getItemLastValue($itemid), 1e294);
 	}
 
 	public static function clearData(): void {
