@@ -12,9 +12,10 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxtelemetry.h"
+#include "telemetry.h"
 #include "zbxhttp.h"
 #include "zbxstr.h"
-#include "zbxtelemetry.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
 
@@ -31,7 +32,7 @@ static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now,
 	char			*http_error = NULL;
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201,202,203,204";
 
-	zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
+	tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
 	zbx_http_context_create(&context);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);

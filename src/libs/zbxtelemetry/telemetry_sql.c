@@ -17,7 +17,6 @@
 #include "zbxdb.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
-#include "zbxtelemetry.h"
 
 ZBX_PTR_VECTOR_DECL(tq_condition_ptr, zbx_tq_condition_t *)
 ZBX_PTR_VECTOR_IMPL(tq_condition_ptr, zbx_tq_condition_t *)
@@ -607,7 +606,7 @@ static void	tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t n
 	}
 }
 
-void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);
@@ -666,7 +665,7 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	zbx_free(conditions);
 }
 
-void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);
