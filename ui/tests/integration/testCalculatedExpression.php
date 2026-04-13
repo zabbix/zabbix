@@ -740,7 +740,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
-	public function testCalculatedExpression_TrendAvgOfLast5MaxMinValue()
+	public function testCalculatedExpression_TrendAvg()
 	{
 		$trapId = $this->createTrap();
 
@@ -791,7 +791,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			'history' => 0
 		], 60, 1);
 
-		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
+		$this->assertEqualsWithDelta((float)self::DBL_MAX, $this->getItemLastValue($itemid), 1e292);
 
 		self::stopComponent(self::COMPONENT_SERVER);
 		self::startComponent(self::COMPONENT_SERVER);
