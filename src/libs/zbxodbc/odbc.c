@@ -609,7 +609,7 @@ static int	zbx_odbc_fetch(zbx_odbc_query_result_t *query_result, const char *con
 	}
 
 	*row = (const char *const *)query_result->row;
-	out:
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
@@ -695,8 +695,7 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 	const char		*const *row;
 	struct zbx_json		json;
 	zbx_vector_str_t	names;
-	int			ret = FAIL, i, j;
-	int			fetch_ret = SUCCEED;
+	int			ret = FAIL, i, j, fetch_ret = SUCCEED;
 	char			*fetch_error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -757,13 +756,8 @@ static int	odbc_query_result_to_json(zbx_odbc_query_result_t *query_result, int 
 
 	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	while (1)
+	while (SUCCEED == (fetch_ret = zbx_odbc_fetch(query_result, &row, &fetch_error)) && NULL != row)
 	{
-		fetch_ret = zbx_odbc_fetch(query_result, &row, &fetch_error);
-
-		if (SUCCEED != fetch_ret || NULL == row)
-			break;
-
 		zbx_json_addobject(&json, NULL);
 
 		for (i = 0; i < query_result->col_num; i++)
@@ -799,7 +793,6 @@ out:
 	zbx_vector_str_destroy(&names);
 
 	zbx_free(fetch_error);
-
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
