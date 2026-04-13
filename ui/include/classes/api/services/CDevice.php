@@ -155,7 +155,7 @@ class CDevice extends CApiService {
 
 		$uuid = generateUuidV7();
 
-		$result = $server->initDevice(['userid' => $data['userid'], 'deviceid' => $uuid], self::getAuthIdentifier());
+		$result = $server->initDevice($data + ['uuid' => $uuid], self::getAuthIdentifier());
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
@@ -380,7 +380,7 @@ class CDevice extends CApiService {
 
 		$deviceids = array_keys($db_devices);
 
-		$result = $server->offboardDevice(['deviceid' => $deviceids[0]], self::getAuthIdentifier());
+		$result = $server->offboardDevice($data, self::getAuthIdentifier());
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
@@ -400,7 +400,7 @@ class CDevice extends CApiService {
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 
-		return $data;
+		return ['deviceid' => $deviceids[0]];
 	}
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
