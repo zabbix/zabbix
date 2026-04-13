@@ -16,14 +16,16 @@
 class CFieldMenuPath extends CFieldTextBox {
 
 	getValueTrimmed() {
-		if (!this._allow_trim) {
-			return super.getValue();
+		const value = this.getValue();
+
+		if (value === null || !this._allow_trim) {
+			return value;
 		}
 
-		return this.#splitPath(super.getValueTrimmed()).join('/');
+		return this.#normalizePath(value);
 	}
 
-	#splitPath(path) {
+	#normalizePath(path) {
 		let path_items = [];
 		let path_item = '';
 		let escaped = false;
@@ -33,7 +35,9 @@ class CFieldMenuPath extends CFieldTextBox {
 
 			if (escaped) {
 				// Take character after '\' literally.
-				path_item += '\\'+char;
+				path_item += (char === '/' || char === '\\')
+					? '\\' + char
+					: char;
 				escaped = false;
 			}
 			else if (char === '\\') {
@@ -53,18 +57,14 @@ class CFieldMenuPath extends CFieldTextBox {
 		path_items.push(path_item);
 		path_items = path_items.map(item => item.trim());
 
-		if (path_items.length == 2 && path_items.join('') === '') {
-			return [''];
+		if (path_items[0] === '') {
+			path_items.shift();
 		}
 
-		if (path_items[0] === '' && path_items[1] !== '') {
-			path_items = path_items.slice(1);
+		if (path_items.at(-1) === '') {
+			path_items.pop();
 		}
 
-		if (path_items[path_items.length - 1] === '' && path_items[path_items.length - 2] !== '') {
-			path_items = path_items.slice(0, -1);
-		}
-
-		return path_items;
+		return path_items.join('/');
 	}
 }

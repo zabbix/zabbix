@@ -16,6 +16,8 @@
 
 class CMenuPathValidator extends CValidator {
 
+	protected bool $strict = false;
+
 	public function validate($value): bool {
 		// If empty is allowed there is only root folder, return early.
 		if ($value === '/') {
@@ -29,9 +31,10 @@ class CMenuPathValidator extends CValidator {
 		// folder1/{empty}/name or folder1/folder2/{empty}
 		foreach ($folders as $num => $folder) {
 			// Allow the trailing slash.
-			if ($folder === '' && $num != ($count - 1) && $num != 0) {
-				$this->setError(_('directory cannot be empty'));
+			$is_edge = $num != ($count - 1) && $num != 0;
 
+			if ($folder === '' && ($this->strict || $is_edge)) {
+				$this->setError(_('directory cannot be empty'));
 				return false;
 			}
 		}

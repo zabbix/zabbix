@@ -70,7 +70,7 @@ class CControllerScriptUpdate extends CController {
 			],
 			'menu_path' => ['db scripts.menu_path',
 				'when' => ['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
-				'use' => [CMenuPathValidator::class]
+				'use' => [CMenuPathValidator::class, ['strict' => true]]
 			],
 			'authtype' => ['db scripts.authtype', 'required',
 				'in' => [ITEM_AUTHTYPE_PASSWORD, ITEM_AUTHTYPE_PUBLICKEY],
