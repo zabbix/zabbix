@@ -221,7 +221,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		// last 5 are dbl max values that are maximum possible supported in zabbix
 		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 		$history = $this->historyGet($trapId);
@@ -325,7 +324,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		// supported
 		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
 
@@ -378,8 +376,6 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
-		// max supported
-
 		$this->sendSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 
 		$history = $this->historyGet($trapId);
@@ -429,7 +425,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 
-		// timeleft of course cannot reach -1, so test that it is cropped just below DBL_MAX
+		// timeleft of course cannot reach -1, so test that it is cropped to DBL_MAX
 		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 
 
@@ -475,7 +471,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			sleep(1);
 		}
 
-		// test that expected exponential value will be so large it is cropped just below DBL_MAX
+		// test that expected exponential value will be so large it is cropped to DBL_MAX
 		$this->assertEquals((float)self::DBL_MAX, $res['result'][0]['value']);
 	}
 
@@ -756,6 +752,7 @@ class testCalculatedExpression extends CIntegrationTest {
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 
+		/* There seems to be no way to calculate historical trends. */
 		$this->assertTrue(DBexecute(
 			'INSERT INTO trends (itemid, clock, num, value_min, value_avg, value_max)
 				VALUES (' .

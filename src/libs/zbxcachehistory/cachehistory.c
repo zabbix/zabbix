@@ -526,7 +526,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int num)
 {
 	zbx_history_value_t	value_min, value_avg, value_max;
-	double	max_val, scaled_avg, scaled_avg2;
+	double			max_val, scaled_avg, scaled_avg2;
 
 	value_min.dbl = atof(row[2]);
 	value_avg.dbl = atof(row[3]);
@@ -540,7 +540,7 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int nu
 
 	max_val = fmax(fabs(trend->value_avg.dbl), fabs(value_avg.dbl));
 
-	if (max_val == 0.0)
+	if (0.0 == max_val)
 	{
 		trend->value_avg.dbl = 0.0;
 	}
