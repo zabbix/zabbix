@@ -518,6 +518,9 @@ zabbix_log(LOG_LEVEL_INFORMATION, "BADGER0 AVG: %f", avg);
 			avg2 = atof(row[0]);
 			num2 = atof(row[1]);
 			avg = avg / (num + num2) * num + avg2 / (num + num2) * num2;
+
+
+zabbix_log(LOG_LEVEL_INFORMATION, "BADGER0 RES AVG: %f", avg);
 			/*
 			max_val = fmax(fabs(avg), fabs(avg2));
 
