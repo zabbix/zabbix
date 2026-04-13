@@ -268,6 +268,55 @@ static void	process_trigger_tag(zbx_dc_um_handle_t	*um_handle, zbx_db_event* eve
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: Adjust the severity level based on an input adjustment value.     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *    severity   - [IN] The current severity level (unsigned char).           *
+ *                 Represents the starting severity to be adjusted.           *
+ *                                                                            *
+ *    adjustment - [IN] Adjustment string (const char *):                     *
+ *                 - Can be "+num" or "-num" to adjust the current severity   *
+ *                   up or down by the specified amount.                      *
+ *                 - Can be "num" to directly set the severity to the value.  *
+ *                 - If invalid, the current severity is returned unchanged.  *
+ *                                                                            *
+ * Behavior:                                                                  *
+ *    - Parses the adjustment string as a signed integer.                     *
+ *    - If the input is valid:                                                *
+ *        - Adjusts the severity by the parsed value (relative for "+num"/    *
+ *          "-num", or absolute for "num").                                   *
+ *        - Ensures the resulting severity is clamped within the range:       *
+ *          [TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_DISASTER].     *
+ *    - If the input is invalid or NULL, the severity remains unchanged.      *
+ *                                                                            *
+ * Return value:                                                              *
+ *    The new severity level after adjustment.                                *
+ *                                                                            *
+ ******************************************************************************/
+static unsigned char zbx_adjust_severity(unsigned char severity, const char *adjustment)
+{
+	if (adjustment == NULL || adjustment[0] == '\0')
+		return severity;
+
+	char *endptr;
+	long value = strtol(adjustment, &endptr, 10);
+
+	if (*endptr == '\0') {
+		long adjusted_value = (adjustment[0] == '+' || adjustment[0] == '-') ? (long)severity + value : value;
+
+		if (adjusted_value < TRIGGER_SEVERITY_NOT_CLASSIFIED)
+			adjusted_value = TRIGGER_SEVERITY_NOT_CLASSIFIED;
+		else if (adjusted_value > TRIGGER_SEVERITY_DISASTER)
+			adjusted_value = TRIGGER_SEVERITY_DISASTER;
+
+		severity = (unsigned char)adjusted_value;
+	}
+
+	return severity;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: resolves macros in item tags                                      *
  *                                                                            *
  * Parameters: p            - [IN] macro resolver data structure              *
@@ -476,6 +525,23 @@ zbx_db_event	*zbx_add_event(unsigned char source, unsigned char object, zbx_uint
 		{
 			process_item_tag(event, item_tags.values[i], um_handle);
 			zbx_free_item_tag(item_tags.values[i]);
+		}
+
+		/* Adjust severity based on the value of the DYNAMIC_SEVERITY tag*/
+		if (TRIGGER_VALUE_PROBLEM == value)
+		{
+			for (int i = 0; i < event->tags.values_num; i++)
+			{
+				const zbx_tag_t *tag = event->tags.values[i];
+				if (strcmp(tag->tag, "DYNAMIC_SEVERITY")==0)
+				{
+					unsigned char new_priority;
+					new_priority = zbx_adjust_severity(trigger_priority, tag->value);
+					event->severity = new_priority;
+					zabbix_log(LOG_LEVEL_DEBUG, "Adjusting severity: tag:%s value:%s new priority:%d", tag->tag, tag->value, new_priority);
+					break;
+				}
+			}
 		}
 
 		zbx_vector_item_tag_destroy(&item_tags);
