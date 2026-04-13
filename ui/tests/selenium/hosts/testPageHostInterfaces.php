@@ -19,6 +19,8 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 /**
  * @backup hosts
  *
+ * @dataSource HostAvailabilityWidget
+ *
  * @onBefore prepareInterfacesData
  */
 class testPageHostInterfaces extends CWebTest {
@@ -463,8 +465,7 @@ class testPageHostInterfaces extends CWebTest {
 			$availability = $this->query('xpath://div[@class="status-container"]')->waitUntilPresent()->one();
 		}
 		else {
-			$table = $this->query('xpath://form[@name='.zbx_dbstr($selector).']/table[@class="list-table"]')
-					->waitUntilReady()->asTable()->one();
+			$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 			$availability = $table->findRow('Name', $data['host'])->getColumn('Availability');
 		}
 
@@ -475,8 +476,8 @@ class testPageHostInterfaces extends CWebTest {
 			$host_interfaces[] = $interface_name;
 			// Check interface color in availability column.
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
-			// Open interface popup. Unstable test on Jenkins, requires hoverMouse.
-			$interface->hoverMouse()->waitUntilClickable()->click();
+			// Open interface popup.
+			$interface->scrollIntoView(50)->waitUntilClickable()->click();
 			$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()
 				->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();

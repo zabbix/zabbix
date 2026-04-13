@@ -78,7 +78,8 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->query('button:Reset')->one()->click();
 		$this->page->waitUntilReady();
 
-		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->click();
+		// Additional 20px scrolling needed because host name is behindthe horizontal scrollbar.
+		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 		$dialog->fill(['Templates' => self::LINKED_TEMPLATE]);
 
@@ -96,8 +97,10 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		// Unlink a template from a host from host properties page
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
+		$this->page->waitUntilReady();
 
+		// Additional 20px scrolling needed because host name is behindthe horizontal scrollbar.
+		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		// Clicks button named "Unlink" next to a template by name.
@@ -112,7 +115,10 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		// this should be a separate test
 		// should check that items, triggers and graphs are not linked to the template anymore
-		$this->zbxTestClickXpathWait("//a[contains(@href,'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D=".self::$hostid."')]");
+		$items_link = 'xpath://a[contains(@href,"zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
+				self::$hostid.'&context=host")]';
+		$this->query($items_link)->one()->scrollIntoView(50)->click();
+
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
 		// using "host navigation bar" at the top of entity list
@@ -125,13 +131,15 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateLinkUpdate() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
+		$this->page->waitUntilReady();
 
-		$form = $this->query('name:host-form')->waitUntilReady()->asForm()->one();
-		$form->fill(['Templates' => self::LINKED_TEMPLATE]);
+		// Additional 20px scrolling needed because host name is behindthe horizontal scrollbar.
+		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->scrollIntoView(50)->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$dialog->fill(['Templates' => self::LINKED_TEMPLATE]);
 
 		$this->zbxTestTextPresent(self::LINKED_TEMPLATE);
-		$form->submit();
+		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 		$this->zbxTestTextPresent(self::HOST_VISIBLE_NAME);
@@ -144,8 +152,10 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		// Unlink and clear a template from a host from host properties page
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
+		$this->page->waitUntilReady();
 
+		// Additional 20px scrolling needed because host name is behindthe horizontal scrollbar.
+		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
 
 		// Clicks button named "Unlink and clear" next to a template by name.
@@ -158,7 +168,9 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
 
-		$this->zbxTestClickXpathWait("//a[contains(@href,'zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D=".self::$hostid."')]");
+		$items_locator = 'xpath://a[contains(@href,"zabbix.php?action=item.list&filter_set=1&filter_hostids%5B0%5D='.
+				self::$hostid.'&context=host")]';
+		$this->query($items_locator)->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		$this->zbxTestTextNotPresent(self::LINKED_TEMPLATE.':');
 
@@ -247,7 +259,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 				$host_link->asPopupButton()->select('Host');
 			}
 			else {
-				$host_link->click();
+				$host_link->scrollIntoView(50)->click();
 			}
 		}
 		else {
@@ -256,7 +268,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 				$this->page->waitUntilReady();
 			}
 
-			$this->query('link', self::TEMPLATE)->waitUntilVisible()->one()->click();
+			$this->query('link', self::TEMPLATE)->waitUntilVisible()->one()->scrollIntoView(50)->click();
 		}
 	}
 }

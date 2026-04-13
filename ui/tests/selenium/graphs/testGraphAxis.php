@@ -164,7 +164,7 @@ class testGraphAxis extends CWebTest {
 		// Go to Graphs and set time period.
 		$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
 		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
-		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->one()->click();
+		$table->findRow('Name', 'Dynamic widgets H2')->getColumn('Graphs')->query('tag:a')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();
 		$this->query('id:from')->one()->fill($data['start_period']);
@@ -173,7 +173,7 @@ class testGraphAxis extends CWebTest {
 		$this->page->waitUntilReady();
 		// TODO: This sleep is added here because of DEV-1908.
 		sleep(1);
-//		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
+		$this->assertScreenshot($this->waitUntilGraphIsLoaded(), $data['name']);
 	}
 
 	/**

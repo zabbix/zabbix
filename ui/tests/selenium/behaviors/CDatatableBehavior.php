@@ -205,7 +205,7 @@ class CDatatableBehavior extends CTableBehavior {
 //	}
 
 	public function filterFromHeader($header_filter, $selector = self::COMMON_SELECTOR) {
-		$table = $this->getTable($selector);
+		$table = $this->getDatatable($selector);
 
 		foreach ($header_filter as $column => $select_data) {
 			$table->getHeaderByText($column)->query('tag:button')->one()->click();
