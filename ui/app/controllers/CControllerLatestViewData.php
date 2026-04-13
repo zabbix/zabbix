@@ -258,6 +258,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			'filter_counters' => $this->getFilterCounters(),
 			'data_fields' => $data_fields,
 			'rows' => array_values(array_map(static fn (array $item) => [[], $item], $data['items'])),
+			'subfilter_tags' => array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
 			'subfilter' => (new CPartial('monitoring.latest.subfilter', [
 				'subfilters' => $subfilters,
 				'subfilters_expanded' => array_flip($filter['subfilters_expanded'] ?? [])
