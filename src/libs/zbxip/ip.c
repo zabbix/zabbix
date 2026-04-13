@@ -29,50 +29,58 @@
  ******************************************************************************/
 int	zbx_is_dnsname(const char *host)
 {
-#define STATE_DASH	1
+#define STATE_HYPHEN	1
 #define STATE_DOT	2
 	const char	*p = host;
 	int		state = 0;
 	int		len = 1;
 
-	/* DNS name should start with [0-9A-Za-z] */
+	/* Requirements and limits for host names are defined in RFC 1035, */
+	/* with clarifications in RFC 1123, RFC 2181. */
+
+	/* Host name should start with [0-9A-Za-z] */
 	if ('\0' == *p || 0x80 == (0x80 & *p) || 0 == isalnum(*p++))\
 		return FAIL;
 
 	while ('\0' != *p)
 	{
-		if (0 == (0x80 & *p) && 0 != isalnum(*p))
+		if (0 != (0x80 & *p))
+			return FAIL;
+
+		if (0 != isalnum(*p))
 		{
 			state = 0;
 			len++;
 		}
 		else if ('-' == *p)
 		{
-			/* Labels should not start with dash. */
+			/* Labels should not start with hyphen. */
 			if (STATE_DOT == state)
 				return FAIL;
-			state = STATE_DASH;
+
+			state = STATE_HYPHEN;
 			len++;
 		}
 		else if ('.' == *p)
 		{
-			/* Labels should not end with dash. */
-			if (STATE_DASH == state)
+			/* Labels should not end with hyphen. */
+			if (STATE_HYPHEN == state)
 				return FAIL;
+
 			/* Empty labels are not allowed. */
 			if (0 == len)
 				return FAIL;
+
 			state = STATE_DOT;
 			len = 0;
 		}
 		else
-		{
 			return FAIL;
-		}
 
 		/* Label should not exceed 63 characters */
 		if (63 < len)
 			return FAIL;
+
 		p++;
 	}
 
@@ -82,7 +90,7 @@ int	zbx_is_dnsname(const char *host)
 		return FAIL;
 
 	return 0 == state ? SUCCEED : FAIL;
-#undef STATE_DASH
+#undef STATE_HYPHEN
 #undef STATE_DOT
 }
 
