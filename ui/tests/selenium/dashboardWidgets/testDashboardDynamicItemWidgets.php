@@ -357,6 +357,7 @@ class testDashboardDynamicItemWidgets extends CWebTest {
 			$widget = $widgets->get($key);
 			$widget->waitUntilReady();
 			$widget_content = $widget->getContent();
+			$widget->getHeader()->waitUntilTextPresent($expected['header']);
 			$this->assertEquals($expected['header'], $widget->getHeaderText());
 
 			// Check widget empty content, because the host doesn't match dynamic option criteria.

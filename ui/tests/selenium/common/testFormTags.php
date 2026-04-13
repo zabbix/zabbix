@@ -538,7 +538,7 @@ class testFormTags extends CWebTest {
 	 * @param string    $sql         selected table from db
 	 * @param string    $old_hash    db hash before changes
 	 */
-	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
+	protected function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 
 			if ($object === 'service') {
@@ -792,7 +792,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger, item or prototype
 	 * @param string   $form     object configuration form
 	 */
-	private function checkTagFields($data, $object, $form) {
+	protected function checkTagFields($data, $object, $form) {
 		switch ($object) {
 			case 'item':
 			case 'item prototype':
@@ -1151,6 +1151,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilStalled();
 			$this->page->waitUntilReady();
 		}
 		else {
@@ -1252,11 +1253,12 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function getInheritedTags() {
+	protected function getInheritedTags() {
 		$inherited_tags = [];
 
 		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
 		$headers = $tags_table->getHeadersText();
+
 		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
 			return $row->getColumn('Name')->children()->one()->detect()->isEnabled() === false;
@@ -1264,8 +1266,9 @@ class testFormTags extends CWebTest {
 
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
-			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
-			$this->assertFalse($row->getColumn('')->children()->one()->detect()->isEnabled());
+			foreach (['Value', ''] as $column) {
+				$this->assertFalse($row->getColumn($column)->children()->one()->isEnabled());
+			}
 
 			$values = [];
 			// Get disabled row values.
@@ -1286,7 +1289,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareAllTags($tags, $parent_tags) {
+	protected function prepareAllTags($tags, $parent_tags) {
 		// Prepare all tags data (inherited form host and/or template, and element tags).
 		$all_tags = array_merge($parent_tags, $tags);
 		// Sort reference tags array by field "tag".

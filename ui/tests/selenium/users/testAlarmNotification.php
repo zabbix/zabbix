@@ -20,8 +20,6 @@ require_once __DIR__ . '/../../include/CWebTest.php';
  * @backup profiles
  *
  * @onBefore prepareAlarmData
- *
- * @onAfterEach closeAndAcknowledgeEvents
  */
 class testAlarmNotification extends CWebTest {
 
@@ -219,6 +217,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check Alarm notification overlay dialog layout.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter openResetedPage
 	 */
 	public function testAlarmNotification_Layout() {
@@ -312,6 +311,7 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
 	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
@@ -440,6 +440,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that correct problems displayed in alarm notification overlay.
+	 *
+	 * @onAfter closeAndAcknowledgeEvents
 	 *
 	 * @dataProvider getDisplayedProblemsData
 	 */
@@ -604,6 +606,7 @@ class testAlarmNotification extends CWebTest {
 	 * Check notification display after changing user Frontend notification settings.
 	 *
 	 * @onBefore resetTriggerSeverities
+	 * @onAfter closeAndAcknowledgeEvents
 	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
@@ -656,9 +659,6 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Delete the events so they don't appear in the next test case.
-	 *
-	 * TODO: test fails on Jenkins with error "Failed to write session data".
-	 * Adding DB::delete in onAfter instead of at the end of the test might help.
 	 */
 	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
