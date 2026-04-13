@@ -344,6 +344,7 @@ class ZBase {
 			$this->root_dir.'/include/classes/sysmaps',
 			$this->root_dir.'/include/classes/helpers',
 			$this->root_dir.'/include/classes/helpers/trigger',
+			$this->root_dir.'/include/classes/history',
 			$this->root_dir.'/include/classes/macros',
 			$this->root_dir.'/include/classes/html',
 			$this->root_dir.'/include/classes/html/svg',
@@ -508,28 +509,34 @@ class ZBase {
 	 */
 	protected function initHistoryManager(): void {
 		$storages = CSettingsHelper::getDbVersionStatus();
-		$instance = Manager::History();
-		$value_type_name_ttl = [];
+		$history_manager = Manager::History();
+		$value_type_ttl = [];
 
 		foreach ($storages as $storage) {
 			if (!array_key_exists('provider', $storage)) {
 				if (array_key_exists('history_pk', $storage) && $storage['history_pk'] == 1) {
-					$instance->setPrimaryKeysEnabled();
+					$history_manager->setPrimaryKeysEnabled();
 				}
-			}
-			elseif (array_key_exists('value_types', $storage)) {
-				foreach ($storage['value_types'] as $value_type) {
-					if (!array_key_exists('ttl', $value_type)) {
-						continue;
-					}
 
-					$value_type_name_ttl[$value_type['type']] = $value_type['ttl'];
+				continue;
+			}
+
+			if (!array_key_exists('value_types', $storage)) {
+				continue;
+			}
+
+			foreach ($storage['value_types'] as $storage_value_type) {
+				if (!array_key_exists('ttl', $storage_value_type)) {
+					continue;
 				}
+
+				$value_type = array_search($storage_value_type['type'], CConfigFile::VALUE_TYPE_CONFIG_NAME);
+				$value_type_ttl[$value_type] = $storage_value_type['ttl'];
 			}
 		}
 
 		if (array_key_exists('HISTORY_PROVIDERS', $this->config)) {
-			$instance->setStorageProviders($this->config['HISTORY_PROVIDERS'], $value_type_name_ttl);
+			$history_manager->setStorageProviders($this->config['HISTORY_PROVIDERS'], $value_type_ttl);
 		}
 	}
 

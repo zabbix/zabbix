@@ -285,7 +285,7 @@ class CTrend extends CApiService {
 
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
-			$storage = Manager::History()->getStorageForValueType($type);
+			$storage = Manager::History()->getStorageConfigByValueType($type);
 			$endpoint = CElasticsearchHelper::getRequestUrl($storage);
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 

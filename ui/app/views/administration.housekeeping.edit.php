@@ -156,7 +156,7 @@ foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage
 	}
 
 	$house_keeper_tab->addRow(
-		(new CTag('p', true, match($storage) {
+		(new CTag('p', true, match ($storage) {
 			ZBX_HISTORY_SOURCE_CLICKHOUSE => _s('%1$s data storage period', _('ClickHouse')),
 			ZBX_HISTORY_SOURCE_ELASTIC => _s('%1$s data storage period', _('Elasticsearch'))
 		}))->addClass('input-section-header')

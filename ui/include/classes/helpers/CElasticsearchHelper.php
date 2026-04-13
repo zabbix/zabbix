@@ -25,6 +25,15 @@ class CElasticsearchHelper {
 	private static $scroll_id;
 	private static $scrolls;
 
+	public const VALUE_TYPE_TABLE = [
+		ITEM_VALUE_TYPE_LOG => 'log',
+		ITEM_VALUE_TYPE_TEXT => 'text',
+		ITEM_VALUE_TYPE_STR => 'str',
+		ITEM_VALUE_TYPE_FLOAT => 'dbl',
+		ITEM_VALUE_TYPE_UINT64 => 'uint',
+		ITEM_VALUE_TYPE_JSON => 'json'
+	];
+
 	/**
 	 * Get Elasticsearch URL.
 	 *
@@ -33,7 +42,7 @@ class CElasticsearchHelper {
 	public static function getRequestUrl(array $storage, string $action = '_search'): string {
 		$segments = [
 			rtrim($storage['url'], '/'),
-			$storage['value_type'].'*',
+			self::VALUE_TYPE_TABLE[$storage['value_type']].'*',
 			$action
 		];
 

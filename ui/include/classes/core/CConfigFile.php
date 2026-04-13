@@ -22,6 +22,23 @@ class CConfigFile {
 
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
+	/**
+	 * Mapping between ITEM_VALUE_TYPE_* constants and strings representing constant within configuration array.
+	 * ITEM_VALUE_TYPE_BINARY is not supported.
+	 */
+	public const VALUE_TYPE_CONFIG_NAME = [
+		ITEM_VALUE_TYPE_FLOAT => 'dbl',
+		ITEM_VALUE_TYPE_STR => 'str',
+		ITEM_VALUE_TYPE_LOG => 'log',
+		ITEM_VALUE_TYPE_UINT64 => 'uint',
+		ITEM_VALUE_TYPE_TEXT => 'text',
+		ITEM_VALUE_TYPE_JSON => 'json'
+	];
+
+	public const SUPPORTED_SOURCE = [
+		ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
+	];
+
 	private static $supported_db_types = [
 		ZBX_DB_MYSQL => true,
 		ZBX_DB_POSTGRESQL => true
@@ -181,17 +198,31 @@ class CConfigFile {
 		}
 
 		if (isset($HISTORY) && isset($HISTORY_PROVIDERS)) {
-			self::exception('Can not use both $HISTORY_PROVIDERS and $HISTORY at the same time.');
+			self::exception(_s('Cannot use both %1$s and %2$s at the same time.', '$HISTORY_PROVIDERS', '$HISTORY'));
 		}
 
 		if (isset($HISTORY)) {
-			$HISTORY_PROVIDERS = self::getHistoryLegacyFormat($HISTORY);
-			self::validateHistoryProviders('$HISTORY', $HISTORY_PROVIDERS);
+			trigger_error('Configuration $HISTORY is depreacated.', E_USER_DEPRECATED);
+
+			if (!is_array($HISTORY)
+				|| !array_key_exists('url', $HISTORY)
+				|| is_array($HISTORY['url']) == is_array($HISTORY['types'] ?? null)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', '$HISTORY',
+					_('incorrect format'))
+				);
+			}
+
+			$HISTORY_PROVIDERS = $this->getHistoryProvidersDeprecated($HISTORY);
 		}
 
 		if (isset($HISTORY_PROVIDERS)) {
-			self::validateHistoryProviders('$HISTORY_PROVIDERS', $HISTORY_PROVIDERS);
-			$this->config['HISTORY_PROVIDERS'] = $HISTORY_PROVIDERS;
+			if (!is_array($HISTORY_PROVIDERS)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', '$HISTORY_PROVIDERS',
+					_('incorrect format'))
+				);
+			}
+
+			$this->config['HISTORY_PROVIDERS'] = $this->getHistoryProviders($HISTORY_PROVIDERS);
 		}
 
 		if (isset($SSO)) {
@@ -408,84 +439,76 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	}
 
 	/**
-	 * Get history provider configuration from $HISTORY legacy variable.
+	 * Get history storage configuration.
 	 *
-	 * @param mixed $history  Value of $HISTORY variable.
-	 * @return array of providers configuration compatible with $HISTORY_PROVIDERS configuration.
-	 *
-	 * @throws ConfigFileException
+	 * @param array $HISTORY_PROVIDERS
 	 */
-	protected static function getHistoryLegacyFormat($history): array {
+	protected function getHistoryProviders(array $HISTORY_PROVIDERS): array {
 		$providers = [];
 
-		if (!is_array($history) || !array_key_exists('url', $history)) {
-			self::exception(_s('Unsupported format of %1$s.', '$HISTORY'));
-		}
-
-		if (is_string($history['url']) && array_key_exists('types', $history) && is_array($history['types'])) {
-			$providers[] = [
-				'types' => $history['types'],
-				'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
-				'url' => $history['url']
-			];
-		}
-		elseif (is_array($history['url']) && !array_key_exists('types', $history)) {
-			foreach ($history['url'] as $type => $url) {
-				$providers[] = [
-					'types' => [$type],
-					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
-					'url' => $url
-				];
+		foreach ($HISTORY_PROVIDERS as $provider) {
+			if (!array_key_exists('provider', $provider) || !in_array($provider['provider'], self::SUPPORTED_SOURCE)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', 'provider',
+					_s('value must be one of %1$s', implode(',', self::SUPPORTED_SOURCE))
+				));
 			}
-		}
-		else {
-			self::exception(_s('Unsupported format of %1$s.', '$HISTORY'));
+
+			if (array_diff($provider['types'], self::VALUE_TYPE_CONFIG_NAME)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', 'types',
+					_s('value must be one of %1$s', implode(',', self::VALUE_TYPE_CONFIG_NAME))
+				));
+			}
+
+			/**
+			 * TODO validation:
+			 *  - check already used types by other providers
+			 *  - db is required for clickhouse
+			 *  - username and password are not supported by elasticsearch
+			 */
+			if (!array_key_exists('url', $provider)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', 'url',
+					_s('the parameter "%1$s" is missing', 'url')
+				));
+			}
+
+			$provider['types'] = array_keys(array_intersect(self::VALUE_TYPE_CONFIG_NAME, $provider['types']));
+			$providers[] = $provider;
 		}
 
 		return $providers;
 	}
 
 	/**
-	 * Validate history storage configuration.
+	 * Get history storage configuration from deprecated format.
+	 * Return array of providers configurations in format compatible with $HISTORY_PROVIDERS configuration.
 	 *
-	 * @param string $variable           Configuration variable name: $HISTORY, $HISTORY_PROVIDERS
-	 * @param mixed  $storage_providers  Varaible value.
-	 *
-	 * @throws ConfigFileException
+	 * @param array $HISTORY
+	 * @see self::getHistoryProviders()
 	 */
-	protected static function validateHistoryProviders(string $variable, $storage_providers): void {
-		if (!is_array($storage_providers) || !$storage_providers) {
-			self::exception(_s('Unsupported format of %1$s.', $variable));
+	protected function getHistoryProvidersDeprecated(array $HISTORY): array {
+		if (!is_array($HISTORY['url'])) {
+			return [[
+				'types' => (array) $HISTORY['types'],
+				'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+				'url' => (string) $HISTORY['url']
+			]];
 		}
 
-		$invalid_providers = array_diff(array_column($storage_providers, 'provider'), [
-			ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC
-		]);
+		$providers = [];
 
-		if ($invalid_providers) {
-			self::exception(_s('Unsupported history storage provider %1$s.', reset($invalid_providers)));
-		}
-
-		$registered_type = [];
-
-		foreach ($storage_providers as $storage_provider) {
-			$types_provider = array_fill_keys($storage_provider['types'], $storage_provider['provider']);
-			$already_registered = array_intersect_key($types_provider, $registered_type);
-			$registered_type += $types_provider;
-
-			if ($already_registered) {
-				$provider = reset($already_registered);
-				$type = key($already_registered);
-				self::exception(_s('Duplicate value type %1$s configured for history provider %2$s.', $type, $provider));
+		foreach ($HISTORY['url'] as $type_name => $url) {
+			if (array_key_exists($url, $providers)) {
+				$providers[$url]['types'][] = $type_name;
+			}
+			else {
+				$providers[$url] = [
+					'types' => [$type_name],
+					'provider' => ZBX_HISTORY_SOURCE_ELASTIC,
+					'url' => $url
+				];
 			}
 		}
 
-		$invalid_types = array_diff_key($registered_type, array_flip(CHistoryManager::VALUE_TYPE_NAME));
-
-		if ($invalid_types) {
-			$provider = reset($invalid_types);
-			$type = key($invalid_types);
-			self::exception(_s('Unsupported value type %1$s for history provider %2$s.', $type, $provider));
-		}
+		return array_values($providers);
 	}
 }

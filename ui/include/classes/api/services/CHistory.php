@@ -29,8 +29,6 @@ class CHistory extends CApiService {
 	protected $tableAlias = 'h';
 	protected $sortColumns = ['itemid', 'clock', 'ns'];
 
-	private string $history_source = ZBX_HISTORY_SOURCE_SQL;
-
 	public function __construct() {
 		// considering the quirky nature of the history API,
 		// the parent::__construct() method should not be called.
@@ -149,27 +147,32 @@ class CHistory extends CApiService {
 			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
 		}
 
-		$storage = Manager::History()->getStorageForValueType($options['history']);
-		$provider = $storage !== null ? $storage['provider'] : ZBX_HISTORY_SOURCE_SQL;
-		$this->history_source = $provider;
+		$storage = Manager::History()->getStorageProviderInstance($options['history']);
 
-		switch ($this->history_source) {
-			case ZBX_HISTORY_SOURCE_ELASTIC:
-				$result = $this->getFromElasticsearch($options, $storage);
-				break;
+		if ($storage !== null) {
+			$result = $storage->select($options);
 
-			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-				$result = $this->getFromClickhouse($options, $storage);
-				break;
+			if ($storage->getErrorCode() !== null) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
+			}
+		}
+		else {
+			$storage_config = Manager::History()->getStorageConfigByValueType($options['history']);
 
-			default:
-				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
-					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
-				}
+			switch ($storage_config['provider'] ?? ZBX_HISTORY_SOURCE_SQL) {
+				case ZBX_HISTORY_SOURCE_ELASTIC:
+					$result = $this->getFromElasticsearch($options, $storage_config);
+					break;
 
-				$result = $this->getFromSql($options);
-				break;
+				default:
+					if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+						$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+						$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
+					}
+
+					$result = $this->getFromSql($options);
+					break;
+			}
 		}
 
 		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
@@ -329,138 +332,7 @@ class CHistory extends CApiService {
 
 		$endpoint = CElasticsearchHelper::getRequestUrl($storage);
 
-		if ($endpoint) {
-			// TBD: remove if condition
-			return CElasticsearchHelper::query('POST', $endpoint, $query);
-		}
-
-		return null;
-	}
-
-	/**
-	 * Clickhouse specific implementation of get.
-	 *
-	 * @see CHistory::get
-	 */
-	private function getFromClickhouse($options, array $storage): array {
-		$sql_parts = [
-			'select'	=> [],
-			'from'		=> $this->tableName.' h',
-			'where'		=> [],
-			'group'		=> [],
-			'order'		=> []
-		];
-
-		if ($options['itemids'] !== null) {
-			$sql_parts['where']['itemid'] = dbConditionId('h.itemid', $options['itemids']);
-		}
-
-		if ($options['time_from'] !== null) {
-			$sql_parts['where']['clock_from'] = 'h.clock_ns>=toDateTime64('.$options['time_from'].',9)';
-		}
-
-		if ($options['time_till'] !== null) {
-			$sql_parts['where']['clock_till'] = 'h.clock_ns<=toDateTime64('.$options['time_till'].',9)';
-		}
-
-		if ($options['filter'] !== null) {
-			$this->dbFilterClickhouse($sql_parts['from'], $options, $sql_parts);
-		}
-
-		if ($options['search'] !== null) {
-			zbx_db_search($sql_parts['from'], $options, $sql_parts);
-		}
-
-		$table = $this->tableName();
-		$alias = $this->tableAlias();
-		$sql_parts = $this->applyQueryOutputOptionsClickhouse($table, $alias, $options, $sql_parts);
-		$sql_parts = $this->applyQuerySortOptions($table, $alias, $options, $sql_parts);
-
-		$query = self::createSelectQueryFromParts($sql_parts);
-
-		// limit
-		if ($options['limit'] !== null) {
-			$query .= ' LIMIT '.$options['limit'];
-		}
-
-		$result = CClickhouseHelper::query($query, $storage);
-
-		return $result ?: [];
-	}
-
-	/**
-	 * Add ClickHouse specific filter condition to $sql_parts.
-	 * Modifies original $sql_parts array.
-	 *
-	 * @param string $table
-	 * @param array  $options
-	 * @param array  $sql_parts
-	 */
-	private function dbFilterClickhouse(string $table, array $options, array &$sql_parts) {
-		$clock_fields = array_intersect_key($options['filter'], array_flip(['clock', 'ns']));
-
-		if (!$clock_fields) {
-			return $this->dbFilter($table, $options, $sql_parts);
-		}
-
-		$sql_parts['where']['filter'] = '';
-		$options['filter'] = array_diff_key($options['filter'], $clock_fields);
-
-		if (array_key_exists('clock', $clock_fields)) {
-			$sql_parts['where']['filter'] = dbConditionInt('toUnixTimestamp(h.clock_ns)',
-				$clock_fields['clock']
-			);
-		}
-
-		if (array_key_exists('ns', $clock_fields)) {
-			$operation = ($options['searchByAny'] === null || $options['searchByAny'] === false) ? ' AND ' : ' OR ';
-			$sql_parts['where']['filter'] .= $sql_parts['where']['filter'] !== '' ? $operation : '';
-			$sql_parts['where']['filter'] .= dbConditionInt('toUnixTimestamp64Nano(h.clock_ns)%1000000000',
-				$clock_fields['ns']
-			);
-		}
-
-		return $this->dbFilter($table, $options, $sql_parts);
-	}
-
-	/**
-	 * Apply ClickHouse specific output changes to $sql_parts.
-	 *
-	 * @param string $table
-	 * @param string $alias
-	 * @param array  $options
-	 * @param array  $sql_parts
-	 *
-	 * @return array modified $sql_parts.
-	 */
-	private function applyQueryOutputOptionsClickhouse(string $table, string $alias, array $options,
-			array $sql_parts): array {
-		$output = array_diff($options['output'], ['clock', 'ns']);
-		// TODO: test countOutput, groupBy and group $options
-		$sql_parts = $this->applyQueryOutputOptions($table, $alias, ['output' => $output] + $options, $sql_parts);
-
-		if (in_array('clock', $options['output'])) {
-			$sql_parts['select'][] = 'toUnixTimestamp('.$this->fieldId('clock_ns', $alias).') AS clock';
-		}
-
-		if (in_array('ns', $options['output'])) {
-			$sql_parts['select'][] = 'toUnixTimestamp64Nano('.$this->fieldId('clock_ns', $alias).')%1000000000 AS ns';
-		}
-
-		return $sql_parts;
-	}
-
-	// TODO: order by ns will work incorrectly.
-	protected function applyQuerySortField($sortfield, $sortorder, $alias, array $sqlParts) {
-		if ($this->history_source === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
-			$sortfield = match ($sortfield) {
-				'clock',
-				'ns' => 'clock_ns',
-				default => $sortfield
-			};
-		}
-
-		return parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
+		return CElasticsearchHelper::query('POST', $endpoint, $query);
 	}
 
 	/**
