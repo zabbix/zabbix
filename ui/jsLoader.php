@@ -251,7 +251,8 @@ $translate_strings = [
 	'class.widget.misconfigured.js' => [
 		'Please update configuration' => _('Please update configuration'),
 		'Referred widget is unavailable' => _('Referred widget is unavailable'),
-		'Refresh interval' => _('Refresh interval')
+		'Refresh interval' => _('Refresh interval'),
+		'Widget is not fully configured' => _('Widget is not fully configured')
 	],
 	'class.widget-select.popup.js' => [
 		'Cancel' => _('Cancel'),
@@ -279,13 +280,14 @@ $translate_strings = [
 	'functions.js' => [
 		'Close' => _('Close'),
 		'Details' => _('Details'),
+		'Error message' => _('Error message'),
+		'Info message' => _('Info message'),
 		'S_YEAR_SHORT' => _x('y', 'year short'),
 		'S_MONTH_SHORT' => _x('M', 'month short'),
 		'S_DAY_SHORT' => _x('d', 'day short'),
 		'S_HOUR_SHORT' => _x('h', 'hour short'),
 		'S_MINUTE_SHORT' => _x('m', 'minute short'),
 		'Success message' => _('Success message'),
-		'Error message' => _('Error message'),
 		'Warning message' => _('Warning message')
 	],
 	'inputsecret.js' => [
