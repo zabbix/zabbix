@@ -606,7 +606,14 @@ class CSetupWizard extends CForm {
 					->setValue($DB['TYPE'])
 					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 			)
-			->addRow(_('Database host'),
+			->addRow(new CLabel([
+					_('Database host'),
+					makeHelpIcon([
+						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
+						BR(),
+						_('If no port is specified, the "Database port" value is used.')
+					])
+				], 'server'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', $config->config['DB']['SERVER'])))
 					->setAttribute('placeholder', $config->config['DB']['SERVER'])
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
