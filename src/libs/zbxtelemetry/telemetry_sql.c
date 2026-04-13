@@ -666,7 +666,6 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	zbx_free(conditions);
 }
 
-/* TODO: probably combine with postgresql */
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
@@ -717,8 +716,11 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 			(query_has_columns ? "," : ""), columns_to_select);
 
 	/* order by */
-	zbx_snprintf_alloc(sql, &alloc, &offset, "ORDER BY rounded_time%s%s;",
+	zbx_snprintf_alloc(sql, &alloc, &offset, "ORDER BY rounded_time%s%s ",
 			(query_has_columns ? "," : ""), columns_to_select);
+
+	/* format */
+	zbx_snprintf_alloc(sql, &alloc, &offset, "FORMAT JSONCompactEachRow;");
 
 	zbx_free(columns_to_select);
 	zbx_free(aggr_columns_to_select);

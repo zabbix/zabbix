@@ -25,8 +25,30 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	zbx_tq_query_t	query;
 	time_t		now = time(NULL);
 	time_t		lasttimestamp;
-	char		*sql = NULL;
-	char 		*out_str;
+	char		*send_out = NULL;
+	char		*send_error = NULL;
+
+	/* FIXME: placeholder */
+	const zbx_tq_conn_params_clickhouse_t	conn_params =
+	{
+		.url			= "http://127.0.0.1:8123",
+		.http_proxy		= NULL,
+		.timeout		= 5,
+		.max_attempts		= 1,
+		.ssl_cert_file		= NULL,
+		.ssl_key_file		= NULL,
+		.ssl_key_password	= "",
+		.verify_peer		= 0,
+		.verify_host		= 0,
+		.authtype		= HTTPTEST_AUTH_BASIC,
+		.username		= "default",
+		.password		= "",
+		.token			= NULL,
+	};
+	const char *config_source_ip		= NULL;
+	const char *config_ssl_ca_location	= NULL;
+	const char *config_ssl_cert_location	= NULL;
+	const char *config_ssl_key_location	= NULL;
 
 	lasttimestamp = 0; /* FIXME: placeholder */
 
@@ -36,54 +58,24 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	zbx_tq_sql_generate_clickhouse(&query, now, lasttimestamp, &sql);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST %s(): '%s'", __func__, sql);
-
-	out_str = strdup("Parsed:\n");
-	out_str = zbx_strdcatf(out_str, "category: %d,\n", (int)query.category);
-	out_str = zbx_strdcatf(out_str, "metric_type: %d,\n", (int)query.metric_type);
-	out_str = zbx_strdcatf(out_str, "columns:\n");
-	for (int i = 0; i < query.columns.values_num; i++) {
-		out_str = zbx_strdcatf(out_str, "-- name: '%s', key: '%s'\n",
-				ZBX_NULL2STR(query.columns.values[i].name),
-				ZBX_NULL2STR(query.columns.values[i].key));
+	if (SUCCEED != zbx_tq_send_query_clickhouse(&query, now, lasttimestamp, &conn_params, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &send_out,
+			&send_error))
+	{
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Query failed: '%s'", send_error));
+		send_error = NULL;
+		goto clean;
 	}
-	out_str = zbx_strdcatf(out_str, "aggregated_columns:\n");
-	for (int i = 0; i < query.aggregated_columns.values_num; i++) {
-		const zbx_tq_aggr_column_t	*aggr_col = &query.aggregated_columns.values[i];
-		out_str = zbx_strdcatf(out_str, "-- column_name: '%s', function: %d, args: {",
-				ZBX_NULL2STR(aggr_col->column_name), (int)aggr_col->function);
-		for (int j = 0; j < aggr_col->args.values_num; j++) {
-			out_str = zbx_strdcatf(out_str, "'%s'%s", aggr_col->args.values[j],
-					(j == aggr_col->args.values_num - 1) ? "" : ", ");
-		}
-		out_str = zbx_strdcatf(out_str, "}, alias: '%s'\n", aggr_col->alias);
-	}
-	out_str = zbx_strdcatf(out_str, "evaltype: %d\n", (int)query.evaltype);
-	out_str = zbx_strdcatf(out_str, "formula: %s\n", query.formula);
-	out_str = zbx_strdcatf(out_str, "conditions:\n");
-	for (int i = 0; i < query.conditions.values_num; i++) {
-		out_str = zbx_strdcatf(out_str, "-- column_name: '%s', json_path: '%s', value: '%s', operator: %d\n",
-				ZBX_NULL2STR(query.conditions.values[i].column_name),
-				ZBX_NULL2STR(query.conditions.values[i].json_path),
-				ZBX_NULL2STR(query.conditions.values[i].value),
-				(int)query.conditions.values[i].operator);
-	}
-	out_str = zbx_strdcatf(out_str, "time_shift: %d\n", query.time_shift);
-	out_str = zbx_strdcatf(out_str, "loopback_limit: %d\n", query.loopback_limit);
-	out_str = zbx_strdcatf(out_str, "aggregation_size: %d\n", query.aggregation_size);
 
-	out_str = zbx_strdcatf(out_str, "\nlasttimestamp: " ZBX_FS_TIME_T "\n", lasttimestamp);
-
-	out_str = zbx_strdcatf(out_str, "\nSQL: '%s'\n", sql);
-
-	SET_TEXT_RESULT(result, out_str);
+	SET_TEXT_RESULT(result, send_out);
+	send_out = NULL;
 
 	ret = SUCCEED;
 
+clean:
 	zbx_tq_query_clean(&query);
-	zbx_free(sql);
+	zbx_free(send_out);
+	zbx_free(send_error);
 out:
 	return ret;
 }
