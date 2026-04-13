@@ -12484,6 +12484,11 @@ msgstr "Neplatná emailová adresa \"%1$s\"."
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná emailová adresa pro typ médií s ID \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "Neplatný vstup"
@@ -12865,6 +12870,11 @@ msgstr "Neplatný řetězec."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Neplatná značka \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -22013,6 +22023,10 @@ msgstr "Identifikátor klienta registrovaný v rámci autorizačního serveru."
 msgid "The client secret registered within the authorization server."
 msgstr "Tajný klíč klienta registrovaný na autorizačním serveru."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Klonovaný hostitel obsahuje uživatelem definovaná makra typu \"Secret text\". Hodnota a typ těchto maker byly resetovány."
@@ -23405,6 +23419,10 @@ msgstr "Vrátit zpět odsouhlasení problému."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Neočekávaný stavový kód odpovědi HTTP."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format

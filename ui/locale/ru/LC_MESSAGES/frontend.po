@@ -12484,6 +12484,11 @@ msgstr "Ошибочный email адрес \"%1$s\"."
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ошибочный email адрес у способа оповещения с ID \"%1$s\"."
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "Ошибочный ввод"
@@ -12865,6 +12870,11 @@ msgstr "Ошибочная строка."
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "Ошибочный тег \"%1$s\": %2$s."
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -22013,6 +22023,10 @@ msgstr "Идентификатор клиента (client identifier), заре�
 msgid "The client secret registered within the authorization server."
 msgstr "Секрет клиента (client secret), зарегистрированный на сервере авторизации."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Склонированный узел сети содержит пользовательские макросы с типом \"Скрытый текст\". Значения и тип этих макросов сброшены."
@@ -23405,6 +23419,10 @@ msgstr "Отмена подтверждения проблемы."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Неожиданный код статуса HTTP-ответа."
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
