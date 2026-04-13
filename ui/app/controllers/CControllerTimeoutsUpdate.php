@@ -109,6 +109,8 @@ class CControllerTimeoutsUpdate extends CController {
 	protected function doAction(): void {
 		$result = API::Settings()->update($this->getInputAll());
 
+		$output = [];
+
 		if ($result) {
 			$output['success'] = [
 				'title' => _('Configuration updated')
