@@ -16,6 +16,8 @@
 
 class CControllerUserDeviceDelete extends CController {
 
+	private $devices;
+
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
@@ -41,43 +43,43 @@ class CControllerUserDeviceDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
-				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)) {
-			return true;
+		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN) ||
+				!($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES))) {
+			return false;
 		}
 
-		if ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-			$num_devices = API::Device()->get([
-				'deviceids' => $this->getInput('deviceids'),
-				'userids' => [CWebUser::$data['userid']],
-				'countOutput' => true
-			]);
+		$filter = [
+			'deviceids' => $this->getInput('deviceids'),
+			'output' => ['deviceid', 'uuid']
+		];
 
-			return $num_devices == count($this->getInput('deviceids'));
+		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			$filter['userids'] = [CWebUser::$data['userid']];
 		}
 
-		return false;
+		$this->devices = API::Device()->get($filter);
+
+		return count($this->devices) == count($this->getInput('deviceids'));
 	}
 
 	protected function doAction(): void {
-		$deviceids = $this->getInput('deviceids');
-
 		$failed_messages = [];
 		$success_messages = [];
 		$failed_deviceids = [];
 		$success_deviceids = [];
 
-		foreach ($deviceids as $deviceid) {
-			$result = API::Device()->offboard(['deviceid' => $deviceid]);
+		foreach ($this->devices as $db_device) {
+			$result = API::Device()->offboard(['uuid' => $db_device['uuid']]);
 			$messages = array_column(get_and_clear_messages(), 'message');
 
 			if ($result) {
 				$success_messages = array_unique(array_merge($success_messages, $messages));
-				$success_deviceids[] = $deviceid;
+				$success_deviceids[] = $db_device['deviceid'];
 			}
 			else {
 				$failed_messages = array_unique(array_merge($failed_messages, $messages));
-				$failed_deviceids[] = $deviceid;
+				$failed_deviceids[] = $db_device['deviceid'];
 			}
 		}
 
