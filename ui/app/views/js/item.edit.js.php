@@ -104,7 +104,7 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 
 		this.form.discoverAllFields();
-		this.initial_form_fields = this.form.getAllValues();
+		this.initial_form_fields = this.#getFormFields();
 		this.form_element.style.display = '';
 		this.overlay.recoverFocus();
 	}
@@ -358,7 +358,7 @@ window.item_edit_form = new class {
 	}
 
 	#isConfirmed() {
-		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.form.getAllValues())
+		return JSON.stringify(this.initial_form_fields) === JSON.stringify(this.#getFormFields())
 			|| window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>);
 	}
 
@@ -379,7 +379,7 @@ window.item_edit_form = new class {
 	}
 
 	create() {
-		const fields = this.form.getAllValues();
+		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.create);
@@ -395,7 +395,7 @@ window.item_edit_form = new class {
 	}
 
 	update() {
-		const fields = this.form.getAllValues();
+		const fields = this.#getFormFields();
 		const curl = new Curl('zabbix.php');
 
 		curl.setArgument('action', this.actions.update);
@@ -518,6 +518,32 @@ window.item_edit_form = new class {
 		});
 	}
 
+	#getFormFields() {
+		const values = this.form.getAllValues();
+
+		if (values.delay === undefined) {
+			values.delay = '';
+		}
+
+		const delay_flex = [];
+		for (let key in values.delay_flex) {
+			let { schedule, period, type, delay } = values.delay_flex[key];
+			type = parseInt(type);
+
+			if (type == <?= ITEM_DELAY_FLEXIBLE ?> && delay === '' && period === '') {
+				continue;
+			}
+
+			if (type == <?= ITEM_DELAY_SCHEDULING ?> && schedule === '') {
+				continue;
+			}
+
+			delay_flex.push(values.delay_flex[key]);
+		}
+
+		return {...values, ...{delay_flex}};
+	}
+
 	#post(url, data, keep_open = false) {
 		if (this.form_element[CSRF_TOKEN_NAME]) {
 			data[CSRF_TOKEN_NAME] = this.form_element[CSRF_TOKEN_NAME].value;
@@ -612,7 +638,7 @@ window.item_edit_form = new class {
 	}
 
 	#updateTagsList(show_inherited_tags) {
-		const fields = this.form.getAllValues();
+		const fields = this.#getFormFields();
 		const data = {
 			tags: fields.tags,
 			show_inherited_tags,
