@@ -189,89 +189,6 @@ class testCalculatedExpression extends CIntegrationTest {
 		return $values;
 	}
 
-	public function testCalculatedExpression_TrendAvgOfLast5MaxMinValue()
-	{
-		$trapId = $this->createTrap();
-
-		$formula = 'trendavg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',2h:now/h)';
-
-		$itemid = $this->createCalculatedItemWithFormula($formula, 'trendAvg5MaxValue');
-		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
-
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
-		$this->assertTrue(DBexecute(
-			'INSERT INTO trends (itemid, clock, num, value_min, value_avg, value_max)
-				VALUES (' .
-				(int)$trapId[0] . ',' .
-				(time() - (3600 * 2)) . ',' .
-				'1,' .
-				(float)self::DBL_MAX . ',' .
-				(float)self::DBL_MAX . ',' .
-				(float)self::DBL_MAX .
-				')'
-		));
-
-		for ($i = 0; $i <= 3; $i++) {
-			$response = $this->call('history.push', [
-				'itemid' => $trapId[0],
-				'value' => (float)self::DBL_MAX,
-				'clock' => time() -(3600) - 70 - $i,
-				'ns' => 255
-			]);
-		}
-
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 1,
-			'itemids' => $trapId,
-			'history' => 0
-		], 60, 1);
-
-		self::stopComponent(self::COMPONENT_SERVER);
-		self::startComponent(self::COMPONENT_SERVER);
-
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 1,
-			'itemids' => [$itemid],
-			'history' => 0
-		], 60, 1);
-
-		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
-
-		self::stopComponent(self::COMPONENT_SERVER);
-		self::startComponent(self::COMPONENT_SERVER);
-
-		for ($i = 0; $i < 100; $i++) {
-				$history = $this->historyGet([$itemid]);
-				if (count($history) === 2) {
-					break;
-				}
-				usleep(100000);
-		}
-
-		$response = $this->callUntilDataIsPresent('history.get', [
-			'sortfield' => 'clock',
-			'sortorder' => 'DESC',
-			'limit' => 2,
-			'itemids' => [$itemid],
-			'history' => 0
-		], 60, 1);
-
-		$history = $this->historyGet([$itemid]);
-		$values = $this->extractHistoryValues($history);
-
-		$this->assertSame(
-			[(float)self::DBL_MAX, (float)self::DBL_MAX],
-			$values
-		);
-
-		$this->assertEqualsWithDelta((float)self::DBL_MAX, $this->getItemLastValue($itemid), 1e292);
-	}
-
 	public function testCalculatedExpression_AvgOfLast5()
 	{
 		$trapId = $this->createTrap();
@@ -821,6 +738,89 @@ class testCalculatedExpression extends CIntegrationTest {
 		/* We have 4 items: [90, 96, 97, 80]. The formula counts how many have last value greater than 95. */
 		/* So expected result is 2. */
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
+	}
+
+	public function testCalculatedExpression_TrendAvgOfLast5MaxMinValue()
+	{
+		$trapId = $this->createTrap();
+
+		$formula = 'trendavg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',2h:now/h)';
+
+		$itemid = $this->createCalculatedItemWithFormula($formula, 'trendAvg5MaxValue');
+		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
+
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+
+		$this->assertTrue(DBexecute(
+			'INSERT INTO trends (itemid, clock, num, value_min, value_avg, value_max)
+				VALUES (' .
+				(int)$trapId[0] . ',' .
+				(time() - (3600 * 2)) . ',' .
+				'1,' .
+				(float)self::DBL_MAX . ',' .
+				(float)self::DBL_MAX . ',' .
+				(float)self::DBL_MAX .
+				')'
+		));
+
+		for ($i = 0; $i <= 3; $i++) {
+			$response = $this->call('history.push', [
+				'itemid' => $trapId[0],
+				'value' => (float)self::DBL_MAX,
+				'clock' => time() -(3600) - 70 - $i,
+				'ns' => 255
+			]);
+		}
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => $trapId,
+			'history' => 0
+		], 60, 1);
+
+		self::stopComponent(self::COMPONENT_SERVER);
+		self::startComponent(self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 1,
+			'itemids' => [$itemid],
+			'history' => 0
+		], 60, 1);
+
+		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($itemid));
+
+		self::stopComponent(self::COMPONENT_SERVER);
+		self::startComponent(self::COMPONENT_SERVER);
+
+		for ($i = 0; $i < 100; $i++) {
+				$history = $this->historyGet([$itemid]);
+				if (count($history) === 2) {
+					break;
+				}
+				usleep(100000);
+		}
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 2,
+			'itemids' => [$itemid],
+			'history' => 0
+		], 60, 1);
+
+		$history = $this->historyGet([$itemid]);
+		$values = $this->extractHistoryValues($history);
+
+		$this->assertSame(
+			[(float)self::DBL_MAX, (float)self::DBL_MAX],
+			$values
+		);
+
+		$this->assertEqualsWithDelta((float)self::DBL_MAX, $this->getItemLastValue($itemid), 1e292);
 	}
 
 	public static function clearData(): void {
