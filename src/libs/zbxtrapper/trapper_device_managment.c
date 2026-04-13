@@ -601,6 +601,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_INFORMATION, "failed connect to bridge-adapter: %s",
 				curl_easy_strerror(err));
+		zbx_json_addstring(json, "info", " Could not connect to bridge-adapter", ZBX_JSON_TYPE_STRING);
 		goto out;
 	}
 
