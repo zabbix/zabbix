@@ -473,6 +473,7 @@
 
 			&:nth-last-child(1 of .cell-header) {
 				margin-right: -1px;
+				z-index: 0;
 			}
 
 			&:focus {
@@ -720,7 +721,7 @@
 			padding: 0 8px;
 
 			.cell-inner {
-				width: 23px;
+				min-width: 23px;
 				text-overflow: initial;
 			}
 

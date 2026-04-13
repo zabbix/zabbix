@@ -2481,7 +2481,8 @@ button {
         .datatable .cell.cell-header:last-child .header-link {
           border-top-right-radius: 2px; }
       .datatable .cell.cell-header:nth-last-child(1 of .cell-header) {
-        margin-right: -1px; }
+        margin-right: -1px;
+        z-index: 0; }
       .datatable .cell.cell-header:focus {
         outline: none; }
       .datatable .cell.cell-header.cell-header-link {
@@ -2631,7 +2632,7 @@ button {
       justify-content: flex-start;
       padding: 0 8px; }
       .datatable .cell.cell-checkbox .cell-inner {
-        width: 23px;
+        min-width: 23px;
         text-overflow: initial; }
       .datatable .cell.cell-checkbox .checkbox-radio {
         margin: 0; }

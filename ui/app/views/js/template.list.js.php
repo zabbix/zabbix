@@ -111,29 +111,38 @@
 						.setTogglable(false),
 					new CDataTableColumn('hosts', <?= json_encode(_('Hosts')); ?>)
 						.setFields(['templateid', 'hosts'])
-						.setRenderer('hosts'),
+						.setRenderer('hosts')
+						.setWidth('4%'),
 					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['templateid', 'items'])
-						.setRenderer('items'),
+						.setRenderer('items')
+						.setWidth('4%'),
 					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['templateid', 'triggers'])
-						.setRenderer('triggers'),
+						.setRenderer('triggers')
+						.setWidth('4%'),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['templateid', 'graphs'])
-						.setRenderer('graphs'),
+						.setRenderer('graphs')
+						.setWidth('4%'),
 					new CDataTableColumn('dashboards', <?= json_encode(_('Dashboards')); ?>)
 						.setFields(['templateid', 'dashboards'])
-						.setRenderer('dashboards'),
+						.setRenderer('dashboards')
+						.setWidth('4%'),
 					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['templateid', 'discovery'])
-						.setRenderer('discovery'),
+						.setRenderer('discovery')
+						.setWidth('4%'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['templateid', 'web'])
-						.setRenderer('web'),
+						.setRenderer('web')
+						.setWidth('4%'),
 					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
-						.setFields(['vendor_name']),
+						.setFields(['vendor_name'])
+						.setWidth('4%'),
 					new CDataTableColumn('version', <?= json_encode(_('Version')); ?>)
-						.setFields(['vendor_version']),
+						.setFields(['vendor_version'])
+						.setWidth('4%'),
 					new CDataTableColumn('linked_templates', <?= json_encode(_('Linked templates')); ?>)
 						.setFields(['parentTemplates'])
 						.setRenderer('linked_templates'),

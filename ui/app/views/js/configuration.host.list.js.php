@@ -249,26 +249,33 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setTogglable(false),
 					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['hostid', 'items'])
-						.setRenderer('items'),
+						.setRenderer('items')
+						.setWidth('4%'),
 					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['hostid', 'triggers'])
-						.setRenderer('triggers'),
+						.setRenderer('triggers')
+						.setWidth('4%'),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
-						.setRenderer('graphs'),
+						.setRenderer('graphs')
+						.setWidth('4%'),
 					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['hostid', 'discoveryRules'])
-						.setRenderer('discovery'),
+						.setRenderer('discovery')
+						.setWidth('4%'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
-						.setRenderer('web'),
+						.setRenderer('web')
+						.setWidth('3%'),
 					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
-						.setFields(['interface']),
+						.setFields(['interface'])
+						.setWidth('6%'),
 					new CDataTableColumn('proxy', <?= json_encode(_('Proxy')); ?>)
 						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
 							'proxy_group', 'assigned_proxy'])
 						.setRenderer('proxy')
-						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>),
+						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>)
+						.setWidth('minmax(3%, auto)'),
 					new CDataTableColumn('templates', <?= json_encode(_('Templates')); ?>)
 						.setFields(['templates', 'parentTemplates'])
 						.setRenderer('templates'),
@@ -276,7 +283,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setFields(['hostid', 'status', 'disabled_by_lld', 'disable_source', 'flags',
 							'maintenance_status', 'discoveryData'])
 						.setRenderer('status')
-						.setSortable(true),
+						.setSortable(true)
+						.setWidth('4%'),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
 						.setFields(['availability', 'active_available'])
 						.setRenderer('availability'),
@@ -285,7 +293,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setRenderer('encryption'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info_icons'])
-						.setRenderer('info'),
+						.setRenderer('info')
+						.setWidth('3%'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
 				])
@@ -297,6 +306,54 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
+				.setRenderer(CDataTableColumn.CHECKBOX, ({column, column_data, cell, cell_inner}) => {
+					/*
+
+					<button type="button"
+					class="btn-icon zi-more"
+					data-menu-popup="{&quot;type&quot;:&quot;host&quot;,&quot;data&quot;:{&quot;hostid&quot;:&quot;99015&quot;}}" aria-expanded="false"
+					aria-haspopup="true"></button>
+
+					 */
+					const [object_id, data_actions] = column_data;
+
+					if (!object_id) {
+						return;
+					}
+
+					const input_id = `${column.getId()}_${object_id}`;
+
+					const checkbox = document.createElement('input');
+					checkbox.classList.add(ZBX_STYLE_CHECKBOX_RADIO);
+					checkbox.setAttribute('type', 'checkbox');
+					checkbox.setAttribute('id', input_id);
+					checkbox.setAttribute('name', `${column.getId()}[${object_id}]`);
+					checkbox.setAttribute('data-field-type', 'checkbox');
+					checkbox.value = object_id.toString();
+
+					if (data_actions) {
+						checkbox.setAttribute('data-actions', Object.keys(data_actions).join(' '));
+					}
+
+					const label = document.createElement('label');
+					label.setAttribute('for', input_id);
+					label.appendChild(document.createElement('span'));
+
+					cell.classList.add(CDataTable.ZBX_STYLE_CELL_CHECKBOX);
+
+					const button = document.createElement('button');
+					button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
+					button.setAttribute('data-menu-popup', JSON.stringify({
+						type: 'host',
+						data: {hostid: object_id}
+					}));
+					button.setAttribute('aria-expanded', 'false');
+					button.setAttribute('aria-haspopup', 'true');
+
+					cell_inner.append(checkbox, label, button);
+
+					column.setWidth('58px');
+				})
 				.setRenderer('name', ({column_data, cell_inner}) => {
 					const [hostid, name, discovery, flags, maintenance, status] = column_data;
 

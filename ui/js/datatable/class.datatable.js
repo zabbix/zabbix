@@ -1032,7 +1032,7 @@ class CDataTable {
 					this.#body.appendChild(row);
 				}
 
-				for (const [_, option] of Object.entries(this.#options)) {
+				for (const [, option] of Object.entries(this.#options)) {
 					option.onRender(option);
 				}
 			}
@@ -1050,12 +1050,14 @@ class CDataTable {
 
 			this.#applyColumnWidths();
 
-			columns.forEach(column => this.#calculateColumnWidth(column));
+			requestAnimationFrame(() => {
+				columns.forEach(column => this.#calculateColumnWidth(column));
 
-			this.#applyColumnWidths();
-			this.#applyLastColumnPadding();
-			this.#handleScrollbar();
-			this.#updateScrollbarThumbPosition();
+				this.#applyColumnWidths();
+				this.#applyLastColumnPadding();
+				this.#handleScrollbar();
+				this.#updateScrollbarThumbPosition();
+			});
 
 			this.#pager.update(response);
 
@@ -2042,22 +2044,11 @@ class CDataTable {
 			return;
 		}
 
-		let header_width = 0;
+		let data_width = column.getDataCells()
+			.reduce((width, data_cell) => Math.max(width, data_cell.target.clientWidth), 0);
 
-		const header_cell = column.getHeaderCell();
-		if (header_cell) {
-			header_width = header_cell.target.getBoundingClientRect().width;
-		}
-
-		let data_width = 0;
-
-		const data_cell = column.getDataCells().at(0);
-		if (data_cell) {
-			data_width = data_cell.target.getBoundingClientRect().width;
-
-			if (column.getWidth() == 'auto') {
-				data_width = Math.min(data_width, CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH);
-			}
+		if (column.getWidth() == 'auto' && data_width < CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH) {
+			data_width = CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH;
 		}
 
 		let offset = 0;
@@ -2066,7 +2057,7 @@ class CDataTable {
 			offset++;
 		}
 
-		const width = parseFloat(this.#convertPixelsToPercent(Math.max(header_width, data_width) + offset));
+		const width = parseFloat(this.#convertPixelsToPercent(data_width + offset));
 
 		column.setResized(true).setWidth(`${width}%`);
 	}
@@ -2409,9 +2400,7 @@ class CDataTable {
 	#handleScrollbar() {
 		const total_column_width = this.#columns
 			.filter(column => column.getHeaderCell())
-			.reduce((width, column) => {
-				return width + column.getHeaderCell().target.getBoundingClientRect().width;
-			}, 0);
+			.reduce((width, column) => width + column.getHeaderCell().target.clientWidth, 0);
 
 		if (total_column_width <= this.#body.clientWidth) {
 			this.#body_resize_observer?.disconnect();
