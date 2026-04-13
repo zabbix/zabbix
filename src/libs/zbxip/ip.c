@@ -136,7 +136,7 @@ int	zbx_is_ip4(const char *ip)
 	if (3 == dots && 1 <= digits && 3 >= digits && 255 >= octet)
 		res = SUCCEED;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
 
 	return res;
 }
@@ -196,7 +196,7 @@ int	zbx_is_ip6(const char *ip)
 	else
 		res = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): ip:'%s' %s", __func__, ip, zbx_result_string(res));
 
 	return res;
 }
