@@ -87,8 +87,8 @@ else {
 
 				case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
 					if (array_key_exists('thresholds', $column_config) && array_key_exists('value', $column)
-						&& ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
-							|| $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE)
+							&& ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
+								|| $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_SPARKLINE)
 					) {
 						$is_numeric_data = in_array($column['item']['value_type'],
 								[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
@@ -116,7 +116,7 @@ else {
 
 					if ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_BINARY) {
 						if ($column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
-							&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
+								&& $column_config['aggregate_function'] != AGGREGATE_COUNT) {
 							$row[] = (new CCol(
 								createBinaryShowButton($column_config['name'], $column_config['show_thumbnail'])
 							))
@@ -143,13 +143,13 @@ else {
 					elseif ($column_config['display_value_as'] == CWidgetFieldColumnsList::DISPLAY_VALUE_AS_TEXT) {
 						if (array_key_exists('highlights', $column_config)) {
 							$value_to_check = $column['item']['value_type'] == ITEM_VALUE_TYPE_BINARY
-							|| $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
-								? $column['value']
-								: $formatted_value;
+								|| $column['item']['value_type'] == ITEM_VALUE_TYPE_JSON
+									? $column['value']
+									: $formatted_value;
 
 							foreach ($column_config['highlights'] as $highlight) {
 								if (@preg_match('/'.CRegexHelper::handleSlashEscaping($highlight['pattern']).'/',
-									$value_to_check)) {
+										$value_to_check)) {
 									$color = $highlight['color'];
 									break;
 								}
