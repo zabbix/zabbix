@@ -70,7 +70,6 @@ class CClickHouseStorage {
 			'http' => [
 				'header'  => [
 					'Authorization: Basic '.base64_encode($config['username'].':'.$config['password']),
-					'Content-Type: text/plain',
 					'X-ClickHouse-Format: JSON'
 				],
 				'user_agent' => 'Zabbix API '.ZABBIX_API_VERSION,
@@ -337,7 +336,7 @@ class CClickHouseStorage {
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$_time_from = $this->getTtlLimitedTimestamp($value_type, $time_from);
 			$_time_to = $this->getTtlLimitedTimestamp($value_type, $time_to);
-			$seconds = $_time_from - $_time_to;
+			$seconds = $_time_to - $_time_from;
 
 			$values = $this->query(
 				'SELECT itemid,count,avg,min,max,toUnixTimestamp(ts) AS clock'.($width === null ? '' : ',i').
@@ -346,7 +345,7 @@ class CClickHouseStorage {
 						'max(clock_ns) as ts'.
 						($width === null
 							? ''
-							: ',round({width:UInt64}*(toUnixTimestamp(clock_ns)-{time_lte:UInt64})/{seconds:UInt64}) AS i'
+							: ',round({width:UInt64}*({time_lte:UInt64}-toUnixTimestamp(clock_ns))/{seconds:UInt64}) AS i'
 						).
 					' FROM '.self::VALUE_TYPE_TABLE[$value_type].
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
@@ -433,6 +432,68 @@ class CClickHouseStorage {
 	}
 
 	/**
+	 * Build query multipart form data context array to query ClickHouse.
+	 *
+	 * @param array  $stream_context  Base configuration for returned stream context
+	 * @param string $query           ClickHouse query
+	 * @param array  $param           ClickHouse query parameters
+	 */
+	protected function buildMultipartFormData(array $stream_context, string $query, array $param = []): array {
+		$content = [];
+		$boundary = uniqid();
+		$stream_context['http']['header'][] = 'Content-Type: multipart/form-data; boundary='.$boundary;
+		$boundary = '--'.$boundary;
+
+		array_push($content, $boundary, 'Content-Disposition: form-data; name="query"', '', $query);
+
+		foreach ($param as $column_type => $columns_values) {
+			foreach ($columns_values as $column => $value) {
+				$form_value = null;
+
+				switch ($column_type) {
+					case 'Int32':
+					case 'Int64':
+					case 'UInt64':
+						if (is_array($value)) {
+							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit($v));
+							$form_value = $value ? '['.implode(',', $value).']' : null;
+						}
+						elseif (is_int($value) || is_float($value) || ctype_digit($value)) {
+							$form_value = $value;
+						}
+
+						break;
+					case 'String':
+						if (is_array($value)) {
+							$value = array_map(
+								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
+								$value
+							);
+							$form_value = $value ? '['.implode(',', $value).']' : null;
+						}
+						else {
+							$form_value = $value;
+						}
+						break;
+				}
+
+				if ($form_value === null) {
+					continue;
+				}
+
+				array_push($content, $boundary, 'Content-Disposition: form-data; name="param_'.$column.'"', '', $form_value);
+			}
+		}
+
+		array_push($content, $boundary.'--', '');
+
+		$stream_context['http']['content'] = implode("\r\n", $content);
+		$stream_context['http']['header'][] = 'Content-Length: '.strlen($stream_context['http']['content']);
+
+		return $stream_context;
+	}
+
+	/**
 	 * Get result of HTTP query to ClickHouse.
 	 *
 	 * @param string $query  Query string.
@@ -440,9 +501,8 @@ class CClickHouseStorage {
 	 */
 	protected function query(string $query, array $param = []): ?array {
 		$result = null;
-		$stream_context = $this->request_context_data;
-		$stream_context['http']['content'] = $this->resolveQueryParams($query, $param);
 		$time_start = microtime(true);
+		$stream_context = $this->buildMultipartFormData($this->request_context_data, $query, $param);
 
 		try {
 			$this->error_code = null;
@@ -471,56 +531,6 @@ class CClickHouseStorage {
 		);
 
 		return $result === null ? null : $result['data'];
-	}
-
-	/**
-	 * Resolve, manually, ClickHouse prepared statement parameters in query.
-	 * At the moment ClickHouse support of parameters resolving only work when they are sent as URL parameters or as multipart form data.
-	 * Because of URL length limits such functionality for big list of parameters is useless.
-	 *
-	 * @param string $sql     SQL query string with parameters placeholders to be resolved
-	 * @param array  $params  Array of column values grouped by column data type - Int32,Int64,Uint64,String,JSON
-	 */
-	protected function resolveQueryParams(string $sql, array $params): string {
-		$replace_pairs = [];
-
-		foreach ($params as $column_type => $columns_values) {
-			foreach ($columns_values as $column => $value) {
-				$key = '{'.$column.':'.(is_array($value) ? 'Array('.$column_type.')' : $column_type).'}';
-
-				switch ($column_type) {
-					case 'Int32':
-					case 'Int64':
-					case 'UInt64':
-						if (is_array($value)) {
-							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit($v));
-							$escaped = '['.implode(',', $value).']';
-						}
-						elseif (is_int($value) || is_float($value) || ctype_digit($value)) {
-							$escaped = $value;
-						}
-
-						$replace_pairs[$key] = $escaped;
-						break;
-
-					case 'String':
-						if (is_array($value)) {
-							$escaped = '['.implode(',', array_map(
-								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
-								$value
-							)).']';
-						}
-						else {
-							$escaped = '\''.addcslashes($value, '\\\'').'\'';
-						}
-
-						$replace_pairs[$key] = $escaped;
-						break;
-				}
-			}
-		}
-
-		return strtr($sql, $replace_pairs);
 	}
 
 	/**
