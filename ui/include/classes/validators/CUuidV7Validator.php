@@ -28,13 +28,13 @@ class CUuidV7Validator extends CValidator {
 	 */
 	public function validate($value) {
 		if (strlen($value) != self::LENGTH) {
-			$this->setError(_s('Incorrect length of value, a "%1$s" is expected.', self::LENGTH));
+			$this->setError(_s('must be %1$s characters long', self::LENGTH));
 
 			return false;
 		}
 
 		if (!ctype_xdigit($value)) {
-			$this->setError(_('Incorrect characters used for UUID.'));
+			$this->setError(_('must contain only hexadecimal characters'));
 
 			return false;
 		}
@@ -42,7 +42,7 @@ class CUuidV7Validator extends CValidator {
 		$binary = hex2bin($value);
 
 		if ((ord($binary[6]) & 0xf0) != 0x70 || (ord($binary[8]) & 0xc0) != 0x80) {
-			$this->setError(_('Incorrect version used for UUIDv7.'));
+			$this->setError(_('a UUIDv7 is expected'));
 
 			return false;
 		}

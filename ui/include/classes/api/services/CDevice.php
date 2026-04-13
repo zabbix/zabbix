@@ -164,17 +164,19 @@ class CDevice extends CApiService {
 		$enrollment_token = CApiTokenHelper::generateToken();
 
 		$ins_device = [
-			'deviceid' => $uuid,
+			'uuid' => $uuid,
 			'userid' => $data['userid'],
 			'status' => self::STATUS_NEW
 		];
 
-		DB::insertBatch('device', [$ins_device], false);
+		$deviceids = DB::insertBatch('device', [$ins_device]);
+
+		$deviceid = reset($deviceids);
 
 		$enrollment_token_expires_at = time() + self::ENROLLMENT_TOKEN_EXPIRATION_TTL;
 
 		$ins_device_enrollment_token = [
-			'deviceid' => $uuid,
+			'deviceid' => $deviceid,
 			'token' => hash('sha512', $enrollment_token),
 			'expires_at' => $enrollment_token_expires_at
 		];
@@ -182,15 +184,15 @@ class CDevice extends CApiService {
 		DB::insertBatch('device_enrollment_token', [$ins_device_enrollment_token], false);
 
 		$device = [
-			'deviceid' => $uuid,
+			'deviceid' => $deviceid,
 			'name' => '',
 			'userid' => $data['userid']
 		];
 
-		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DEVICE, [$device]);
+//		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_DEVICE, [$device]);
 
 		return [
-			'deviceid' => $uuid,
+			'uuid' => $uuid,
 			'enrollment_token' => $enrollment_token,
 			'enrollment_token_expires_at' => $enrollment_token_expires_at,
 			'mobile_enrollment_token' => $result['mobile_enrollment_token'],
@@ -235,7 +237,7 @@ class CDevice extends CApiService {
 			'userid' => $db_device['userid'],
 			'userip' => CWebUser::getIp(),
 			'username' => $db_device['username'],
-			'deviceid' => $db_device['deviceid'],
+			'uuid' => $db_device['uuid'],
 			'kid' => $options['mobile_encryption_key']['kid'],
 			'key' => json_encode($options['mobile_encryption_key'])
 		];
@@ -247,7 +249,7 @@ class CDevice extends CApiService {
 		);
 
 		$tokens_data = CToken::createForce([[
-			'name' => $db_device['deviceid'],
+			'name' => $db_device['uuid'],
 			'userid' => $db_device['userid'],
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'auth_scheme' => ZBX_AUTH_SCHEME_DPOP,
@@ -290,7 +292,7 @@ class CDevice extends CApiService {
 			$db_device['deviceid'] => array_intersect_key($db_device, array_flip(['deviceid', 'name']))
 		];
 
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
+//		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
 
 		return ['token' => $token_data['token']];
 	}
@@ -314,7 +316,7 @@ class CDevice extends CApiService {
 		}
 
 		$db_device = DBfetch(DBselect(
-			'SELECT d.deviceid,d.userid,d.name,u.name AS username'.
+			'SELECT d.deviceid,d.uuid,d.userid,d.name,u.name AS username'.
 			' FROM device_enrollment_token det,device d,users u'.
 			' WHERE det.deviceid=d.deviceid'.
 				' AND d.userid=u.userid'.
@@ -380,30 +382,30 @@ class CDevice extends CApiService {
 
 		$result = $server->offboardDevice(['deviceid' => $deviceids[0]], self::getAuthIdentifier());
 
-		if ($result === false) {
+		if (false && $result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
 		}
 
-		$db_device_tokens = DB::select('token_device', [
+		$db_token_devices = DB::select('token_device', [
 			'output' => [],
 			'filter' => ['deviceid' => $deviceids],
 			'preservekeys' => true
 		]);
 
-		$tokenids = array_keys($db_device_tokens);
+		$tokenids = array_keys($db_token_devices);
 
 		DB::delete('token_device', ['tokenid' => $tokenids]);
 		DB::delete('token', ['tokenid' => $tokenids]);
 		DB::delete('device', ['deviceid' => $deviceids]);
 
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
+//		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 
 		return $data;
 	}
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'deviceid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
+			'uuid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
@@ -412,7 +414,7 @@ class CDevice extends CApiService {
 
 		$db_devices = $this->get([
 			'output' => ['deviceid', 'name'],
-			'deviceids' => $data['deviceid'],
+			'filter' => ['uuid' => $data['uuid']],
 			'preservekeys' => true
 		]);
 

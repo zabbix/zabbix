@@ -97,8 +97,8 @@ class CJsonRpc {
 
 		$user_data = $this->apiClient->getUserData();
 
-		if ($request->isHpkeHeadersRequested() && $user_data !== null && array_key_exists('deviceid', $user_data)) {
-			$response->headers[] = 'X-Recipient-ID: '.$user_data['deviceid'];
+		if ($request->isHpkeHeadersRequested() && $user_data !== null && array_key_exists('uuid', $user_data)) {
+			$response->headers[] = 'X-Recipient-ID: '.$user_data['uuid'];
 			$response->headers[] = 'X-HPKE-Recipient-KID: '.$user_data['kid'];
 			$response->headers[] = 'X-HPKE-Recipient-Pub: '.$user_data['key'];
 		}

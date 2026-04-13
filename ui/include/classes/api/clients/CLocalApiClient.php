@@ -83,7 +83,8 @@ class CLocalApiClient extends CApiClient {
 		}
 
 		// check the mobile device feature flag
-		if ($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP && !CApiDpopHelper::getDeviceFeatureFlag()) {
+		if (($auth['type'] == CJsonRpc::AUTH_TYPE_DPOP || $api === 'device')
+				&& !CApiDpopHelper::getDeviceFeatureFlag()) {
 			$response->errorCode = ZBX_API_ERROR_PERMISSIONS;
 			$response->errorMessage = _s('No permissions to call "%1$s.%2$s".', $requestApi, $requestMethod);
 

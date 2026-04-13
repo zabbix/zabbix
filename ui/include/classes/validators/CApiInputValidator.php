@@ -3159,6 +3159,10 @@ class CApiInputValidator {
 	 * @return bool
 	 */
 	private static function validateUuidV7(array $rule, &$data, string $path, string &$error): bool {
+		if (self::checkStringUtf8(API_NOT_EMPTY, $data, $path, $error) === false) {
+			return false;
+		}
+
 		$uuid_v7_validator = new CUuidV7Validator();
 
 		if (!$uuid_v7_validator->validate($data)) {
