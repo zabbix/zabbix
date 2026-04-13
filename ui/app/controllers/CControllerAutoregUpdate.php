@@ -26,7 +26,7 @@ class CControllerAutoregUpdate extends CController {
 			'tls_in_psk' => ['boolean'],
 			'tls_in_none' => [
 				['boolean'],
-				['boolean', 'required', 'when' => ['tls_in_psk', false],
+				['boolean', 'in' => [1], 'when' => ['tls_in_psk', false],
 					'messages' => ['in' => _('At least one encryption level must be selected.')]
 				]
 			],

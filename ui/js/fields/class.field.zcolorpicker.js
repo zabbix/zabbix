@@ -1,4 +1,3 @@
-<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -14,19 +13,35 @@
 **/
 
 
-/**
- * @var CView $this
- */
-?>
+class CFieldZColorPicker extends CField {
 
-<script type="text/javascript">
-	$(() => {
-		$('#filter-view-as').on('change', () => {
-			document.forms['filter_view_as'].submit();
-		});
+	#hidden_input;
 
-		$('#filter-task').on('change', () => {
-			document.forms['<?= CFilter::FORM_NAME; ?>'].submit();
-		});
-	});
-</script>
+	init() {
+		this.#hidden_input = this._field.querySelector('input[type="hidden"]');
+		super.init();
+
+		this._field.addEventListener('change', () => this.onBlur());
+	}
+
+	getName() {
+		return this.#hidden_input.getAttribute('name');
+	}
+
+	getValue() {
+		if (this.isDisabled()) {
+			return null;
+		}
+
+		return this.#hidden_input.value;
+	}
+
+	isDisabled () {
+		return this.#hidden_input.disabled;
+	}
+
+	focusErrorField() {
+		super.focusErrorField();
+		this._field.focus();
+	}
+}
