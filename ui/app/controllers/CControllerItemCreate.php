@@ -284,8 +284,7 @@ class CControllerItemCreate extends CControllerItem {
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
-				'delay' => [
-					'string', 'required',
+				'delay' => ['string', 'required',
 					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
