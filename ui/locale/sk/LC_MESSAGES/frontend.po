@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-12-03 10:01+0000\n"
+"PO-Revision-Date: 2026-04-09 09:05+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -20062,7 +20062,7 @@ msgstr "Švédsky (sv_SE)"
 
 #: index_sso.php:346
 msgid "Switch SSO user"
-msgstr ""
+msgstr "Prepnúť používateľa SSO"
 
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
@@ -24032,7 +24032,7 @@ msgstr "Nemáte oprávnenie na vykonanie tejto operácie."
 
 #: index_sso.php:337
 msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
-msgstr ""
+msgstr "Boli ste autorizovaný pomocou Single sign-on (SSO), avšak prihlásenie do Zabbx-u zlyhalo."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
