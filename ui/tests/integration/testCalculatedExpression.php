@@ -448,7 +448,6 @@ class testCalculatedExpression extends CIntegrationTest {
 			[
 				$his4,
 				$his5
-
 			],
 			array_map('floatval', $values)
 		);
