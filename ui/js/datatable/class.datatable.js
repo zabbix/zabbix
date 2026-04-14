@@ -465,13 +465,13 @@ class CDataTable {
 		this.setRowRenderer('default', this.renderDataCells);
 
 		this.setCellRenderer(CDataTableColumn.RENDERER_HTML, ({cell_data, cell_inner}) => {
-			for (const data of cell_data) {
+			for (const data of cell_data.filter(Boolean)) {
 				cell_inner.innerHTML += data instanceof HTMLElement ? this.sanitizeHtml(input.outerHTML) : data;
 			}
 		});
 
 		this.setCellRenderer(CDataTableColumn.RENDERER_TRUSTED_HTML, ({cell_data, cell_inner}) => {
-			cell_inner.append(...cell_data);
+			cell_inner.append(...cell_data.filter(Boolean));
 		});
 
 		this.setCellRenderer(CDataTableColumn.RENDERER_TEXT, ({cell_data, cell_inner}) => {
