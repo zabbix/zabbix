@@ -21,6 +21,7 @@ class CDataTableColumnTags extends CDataTableColumn {
 		this.setOptionsPopupHandler('tags')
 			.setFields(['tags'])
 			.setRenderer('tags')
-			.setDuplicatable(true);
+			.setDuplicatable(true)
+			.setWidth('auto');
 	}
 }

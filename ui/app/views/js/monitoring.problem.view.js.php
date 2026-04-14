@@ -106,17 +106,13 @@
 					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
 						.setFields(['severity'])
 						.setRenderer('severity')
-						.setSortable(true)
-						.setWidth('6%'),
+						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
-						.setFields(['recovery'])
-						.setWidth('5%'),
+						.setFields(['recovery']),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
-						.setFields(['status'])
-						.setWidth('6%'),
+						.setFields(['status']),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
-						.setFields(['info'])
-						.setWidth('4%'),
+						.setFields(['info']),
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host'])
 						.setRenderer('host')
@@ -131,7 +127,8 @@
 						.setFields(['description'])
 						.setSortField('name')
 						.setSortable(true)
-						.setTogglable(false),
+						.setTogglable(false)
+						.setWidth('auto'),
 					new CDataTableColumn('duration', <?= json_encode(_('Duration')); ?>)
 						.setFields(['duration']),
 					new CDataTableColumn('update', <?= json_encode(_('Update')); ?>)
@@ -180,7 +177,9 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row_index, cell, cell_inner, response}) => {
+				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row, row_index, cell, cell_inner,
+						response}) => {
+
 					const [eventid, nested, symptom_count, cause_eventid, severity] = cell_data;
 
 					if (!eventid) {
@@ -262,14 +261,17 @@
 
 						if (highlight_row.checked) {
 							const severity_data = severities.find(data => data.value == severity);
+							if (!severity_data) {
+								return;
+							}
 
-							if (severity_data) {
-								this.#datatable
-									.findDataCells({row_index})
-									.forEach(data_cell => {
-										data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG_HOVER,
-											severity_data.style);
-									});
+							for (const data_cell of this.#datatable.findDataCells({row_index})) {
+								data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG_HOVER, severity_data.style);
+							}
+
+							const row_spacer = this.#datatable.findRowSpacer(row);
+							if (row_spacer) {
+								row_spacer.classList.add(severity_data.style);
 							}
 						}
 					});

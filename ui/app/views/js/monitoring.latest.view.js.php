@@ -171,15 +171,12 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			CDataTableColumnTags.object_type = ZBX_TAG_OBJECT_ITEM;
-
 			this.#datatable = new CDataTable(document.getElementById('latest'), data_provider)
 				.setColumns([
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
 						.setFields(['host', 'maintenance', 'maintenanceid', 'maintenance_type', 'maintenance_status'])
 						.setRenderer('host')
-						.setSortable(true)
-						.setWidth('17%'),
+						.setSortable(true),
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)
 						.setColumnOptions({
 							show_item_key: filter.show_item_key == 1
@@ -189,7 +186,7 @@
 						.setRenderer('name')
 						.setSortable(true)
 						.setTogglable(false)
-						.setWidth('40%'),
+						.setWidth('auto'),
 					new CDataTableColumn('interval', <?= json_encode(_('Interval')); ?>)
 						.setFields(['interval'])
 						.setVisible(false),
@@ -204,24 +201,22 @@
 						.setRenderer('type')
 						.setVisible(false),
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
-						.setFields(['last_check'])
-						.setWidth('14%'),
+						.setFields(['last_check']),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value'])
-						.setWidth('14%'),
+						.setFields(['last_value']),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
-						.setFields(['change'])
-						.setWidth('10%'),
-					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
+						.setFields(['change']),
+					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
+						.setColumnOptions({
+							object_type: ZBX_TAG_OBJECT_ITEM
+						}),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
-					new CDataTableColumn('actions', '')
+					new CDataTableColumn('actions', <?= json_encode(_('Actions')); ?>)
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
 						.setRenderer('actions')
-						.setShowInTableOptions(false)
-						.setWidth('6%'),
+						.setShowInTableOptions(false),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
-						.setWidth('45px')
 				])
 				.setPage(page)
 				.setFilter(filter)

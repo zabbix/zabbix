@@ -19,6 +19,7 @@ class CDataTableColumn {
 	static TABLE_OPTIONS = 'table_options';
 
 	static RENDERER_HTML = 'html';
+	static RENDERER_TRUSTED_HTML = 'trusted_html';
 	static RENDERER_TEXT = 'text';
 
 	/**
@@ -154,7 +155,7 @@ class CDataTableColumn {
 	/**
 	 * @type {string|number|undefined}
 	 */
-	#width = 'auto';
+	#width = 'max-content';
 
 	constructor(id, name) {
 		this.#id = id;

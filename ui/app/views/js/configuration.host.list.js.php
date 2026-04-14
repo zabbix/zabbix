@@ -246,45 +246,39 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 							'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
-						.setTogglable(false),
+						.setTogglable(false)
+						.setWidth('auto'),
 					new CDataTableColumn('items', <?= json_encode(_('Items')); ?>)
 						.setFields(['hostid', 'items'])
-						.setRenderer('items')
-						.setWidth('4%'),
+						.setRenderer('items'),
 					new CDataTableColumn('triggers', <?= json_encode(_('Triggers')); ?>)
 						.setFields(['hostid', 'triggers'])
-						.setRenderer('triggers')
-						.setWidth('4%'),
+						.setRenderer('triggers'),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
-						.setRenderer('graphs')
-						.setWidth('4%'),
+						.setRenderer('graphs'),
 					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
 						.setFields(['hostid', 'discoveryRules'])
-						.setRenderer('discovery')
-						.setWidth('4%'),
+						.setRenderer('discovery'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
-						.setRenderer('web')
-						.setWidth('3%'),
+						.setRenderer('web'),
 					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
-						.setFields(['interface'])
-						.setWidth('6%'),
+						.setFields(['interface']),
 					new CDataTableColumn('proxy', <?= json_encode(_('Proxy')); ?>)
 						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
 							'proxy_group', 'assigned_proxy'])
 						.setRenderer('proxy')
-						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>)
-						.setWidth('minmax(3%, auto)'),
+						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>),
 					new CDataTableColumn('templates', <?= json_encode(_('Templates')); ?>)
 						.setFields(['templates', 'parentTemplates'])
-						.setRenderer('templates'),
+						.setRenderer('templates')
+						.setWidth('auto'),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['hostid', 'status', 'disabled_by_lld', 'disable_source', 'flags',
 							'maintenance_status', 'discoveryData'])
 						.setRenderer('status')
-						.setSortable(true)
-						.setWidth('4%'),
+						.setSortable(true),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
 						.setFields(['availability', 'active_available'])
 						.setRenderer('availability'),
@@ -293,8 +287,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						.setRenderer('encryption'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info_icons'])
-						.setRenderer('info')
-						.setWidth('3%'),
+						.setRenderer('info'),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>),
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>)
 				])

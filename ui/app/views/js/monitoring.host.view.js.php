@@ -138,10 +138,10 @@
 							'maintenance_status'])
 						.setRenderer('name')
 						.setSortable(true)
-						.setTogglable(false),
+						.setTogglable(false)
+						.setWidth('auto'),
 					new CDataTableColumn('interface', <?= json_encode(_('Interface')); ?>)
-						.setFields(['interface'])
-						.setWidth('6%'),
+						.setFields(['interface']),
 					new CDataTableColumn('availability', <?= json_encode(_('Availability')); ?>)
 						.setFields(['availability', 'active_available'])
 						.setRenderer('availability'),
@@ -149,31 +149,25 @@
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['status'])
-						.setRenderer('status')
-						.setWidth('4%'),
+						.setRenderer('status'),
 					new CDataTableColumn('latest_data', <?= json_encode(_('Latest data')); ?>)
 						.setFields(['hostid', 'items_count'])
-						.setRenderer('latest_data')
-						.setWidth('6%'),
+						.setRenderer('latest_data'),
 					new CDataTableColumn('problems', <?= json_encode(_('Problems')); ?>)
 						.setColumnOptions({
 							show_suppressed: false
 						})
 						.setOptionsPopupHandler('problems')
-						.setFields(['problems'])
-						.setWidth('6%'),
+						.setFields(['problems']),
 					new CDataTableColumn('graphs', <?= json_encode(_('Graphs')); ?>)
 						.setFields(['hostid', 'graphs'])
-						.setRenderer('graphs')
-						.setWidth('5%'),
+						.setRenderer('graphs'),
 					new CDataTableColumn('dashboards', <?= json_encode(_('Dashboards')); ?>)
 						.setFields(['hostid', 'dashboards'])
-						.setRenderer('dashboards')
-						.setWidth('5%'),
+						.setRenderer('dashboards'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
 						.setFields(['hostid', 'httpTests'])
 						.setRenderer('web')
-						.setWidth('5%')
 				])
 				.setPage(page)
 				.setFilter(filter)

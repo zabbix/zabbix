@@ -2461,7 +2461,6 @@ button {
     .datatable .cell.cell-header {
       position: sticky;
       top: 0;
-      z-index: 1;
       box-sizing: border-box;
       display: flex;
       justify-content: space-between;
@@ -2476,8 +2475,7 @@ button {
         .datatable .cell.cell-header:last-child .header-link {
           border-top-right-radius: 2px; }
       .datatable .cell.cell-header:nth-last-child(1 of .cell-header) {
-        margin-right: -1px;
-        z-index: 0; }
+        margin-right: -1px; }
       .datatable .cell.cell-header:focus {
         outline: none; }
       .datatable .cell.cell-header.cell-header-link {
@@ -2546,6 +2544,10 @@ button {
         background-color: #000000; }
       .datatable .cell.cell-data.cell-error {
         color: #ff5050; }
+      .datatable .cell.cell-data.na-bg {
+        border-bottom-color: var(--severity-color-na-bg); }
+      .datatable .cell.cell-data.info-bg {
+        border-bottom-color: var(--severity-color-info-bg); }
       .datatable .cell.cell-data.warning-bg {
         border-bottom-color: var(--severity-color-warning-bg); }
       .datatable .cell.cell-data.average-bg {
@@ -2692,6 +2694,24 @@ button {
     min-height: var(--datatable-row-height);
     background-color: #000000;
     border-bottom: 1px solid #444444; }
+    .datatable .row-spacer.na-bg {
+      background-color: var(--severity-color-na-bg);
+      border-bottom-color: var(--severity-color-na-bg); }
+    .datatable .row-spacer.info-bg {
+      background-color: var(--severity-color-info-bg);
+      border-bottom-color: var(--severity-color-info-bg); }
+    .datatable .row-spacer.warning-bg {
+      background-color: var(--severity-color-warning-bg);
+      border-bottom-color: var(--severity-color-warning-bg); }
+    .datatable .row-spacer.average-bg {
+      background-color: var(--severity-color-average-bg);
+      border-bottom-color: var(--severity-color-average-bg); }
+    .datatable .row-spacer.high-bg {
+      background-color: var(--severity-color-high-bg);
+      border-bottom-color: var(--severity-color-high-bg); }
+    .datatable .row-spacer.disaster-bg {
+      background-color: var(--severity-color-disaster-bg);
+      border-bottom-color: var(--severity-color-disaster-bg); }
   .datatable .no-data-message {
     box-sizing: border-box;
     padding: 100px 0;
@@ -2703,8 +2723,10 @@ button {
 .datatable-resizing .datatable {
   user-select: none;
   pointer-events: none; }
-  .datatable-resizing .datatable .cell-resizing .cell-header-resizer {
-    border-right-color: #0275b8; }
+  .datatable-resizing .datatable .cell-resizing {
+    z-index: 1; }
+    .datatable-resizing .datatable .cell-resizing .cell-header-resizer {
+      border-right-color: #0275b8; }
 
 .diff {
   padding: 4px;

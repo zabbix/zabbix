@@ -32,6 +32,11 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$sort_field = $this->getInput('sort_field', $filter['sort'] ?? 'name');
 		$sort_order = $this->getInput('sort_order', $filter['sortorder'] ?? ZBX_SORT_UP);
 
+		if ($filter['tags']) {
+			$filter['tags'] = array_filter(array_filter($filter['tags']),
+				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+		}
+
 		$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($filter);
 		if (!$mandatory_filter_set) {
 			return [
@@ -44,11 +49,6 @@ class CControllerLatestViewData extends CControllerDataTable {
 		}
 
 		$filter = CControllerLatest::sanitizeFilter($filter);
-
-		if ($filter['tags']) {
-			$filter['tags'] = array_filter(array_filter($filter['tags']),
-				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
-		}
 
 		$data = $this->prepareData($filter, $sort_field, $sort_order);
 

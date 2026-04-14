@@ -441,7 +441,7 @@
 		&.cell-header {
 			position: sticky;
 			top: 0;
-			z-index: 1;
+			//z-index: 1;
 			box-sizing: border-box;
 			display: flex;
 			justify-content: space-between;
@@ -462,7 +462,7 @@
 
 			&:nth-last-child(1 of .cell-header) {
 				margin-right: -1px;
-				z-index: 0;
+				//z-index: 0;
 			}
 
 			&:focus {
@@ -576,6 +576,14 @@
 
 			&.cell-error {
 				color: $red;
+			}
+
+			&.na-bg {
+				border-bottom-color: var(--severity-color-na-bg);
+			}
+
+			&.info-bg {
+				border-bottom-color: var(--severity-color-info-bg);
 			}
 
 			&.warning-bg {
@@ -821,6 +829,36 @@
 		min-height: var(--datatable-row-height);
 		background-color: $ui-bg-color;
 		border-bottom: 1px solid $ui-border-color;
+
+		&.na-bg {
+			background-color: var(--severity-color-na-bg);
+			border-bottom-color: var(--severity-color-na-bg);
+		}
+
+		&.info-bg {
+			background-color: var(--severity-color-info-bg);
+			border-bottom-color: var(--severity-color-info-bg);
+		}
+
+		&.warning-bg {
+			background-color: var(--severity-color-warning-bg);
+			border-bottom-color: var(--severity-color-warning-bg);
+		}
+
+		&.average-bg {
+			background-color: var(--severity-color-average-bg);
+			border-bottom-color: var(--severity-color-average-bg);
+		}
+
+		&.high-bg {
+			background-color: var(--severity-color-high-bg);
+			border-bottom-color: var(--severity-color-high-bg);
+		}
+
+		&.disaster-bg {
+			background-color: var(--severity-color-disaster-bg);
+			border-bottom-color: var(--severity-color-disaster-bg);
+		}
 	}
 
 	.no-data-message {
@@ -841,6 +879,8 @@
 		pointer-events: none;
 
 		.cell-resizing {
+			z-index: 1;
+
 			.cell-header-resizer {
 				border-right-color: $datatable-resizer-border-color;
 			}
