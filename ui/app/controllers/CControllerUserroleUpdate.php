@@ -102,8 +102,7 @@ class CControllerUserroleUpdate extends CControllerUserroleEditGeneral {
 			$rules['fields'] += [
 				'devices_access' => ['boolean'],
 				'devices_actions' => ['array', 'required',
-					'field' => ['string', 'in' => CRoleHelper::getDeviceActionsByUserType(USER_TYPE_SUPER_ADMIN)],
-					'when' => ['devices_access', 'in' => [1]]
+					'field' => ['string', 'in' => CRoleHelper::getDeviceActionsByUserType(USER_TYPE_SUPER_ADMIN)]
 				],
 				'devices_actions_default_access' => ['boolean']
 			];

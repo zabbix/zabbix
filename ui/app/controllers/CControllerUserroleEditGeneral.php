@@ -146,15 +146,14 @@ abstract class CControllerUserroleEditGeneral extends CController {
 		}
 
 		$device_action_rules = array_flip($this->getInput('devices_actions', []));
-		$enabled = $this->getInput('devices_access') ? 1 : 0;
 
 		return [
-			'devices.access' => $enabled,
+			'devices.access' => $this->getInput('devices_access') ? 1: 0,
 			'devices.actions' => array_map(
-				function (string $rule) use ($device_action_rules, $enabled): array {
+				function (string $rule) use ($device_action_rules): array {
 					return [
 						'name' => str_replace('devices.actions.', '', $rule),
-						'status' => $enabled && array_key_exists($rule, $device_action_rules) ? 1 : 0
+						'status' => array_key_exists($rule, $device_action_rules) ? 1 : 0
 					];
 				},
 				CRoleHelper::getDeviceActionsByUserType($user_type)

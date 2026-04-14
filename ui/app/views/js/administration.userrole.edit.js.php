@@ -85,6 +85,8 @@
 
 			this.form_element
 				.querySelector('.form-actions .js-clone')?.addEventListener('click', () => this.clone(rules_create));
+
+			this.updateAccessUiElementsFieldsGroup(this.form.findFieldByName('type').getValue());
 		}
 
 		updateAccessUiElementsFieldsGroup(user_type) {
@@ -158,8 +160,7 @@
 
 			if (this.form.findFieldByName('devices_access')?.getValue() == 0) {
 				const devices_actions = [
-					<?= json_encode(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN) ?>,
-					<?= json_encode(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER) ?>
+					<?= json_encode(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN) ?>
 				];
 
 				devices_actions.forEach((action) => {
@@ -168,8 +169,7 @@
 			}
 
 			const chcked_overwrite = <?= json_encode([
-				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN => false,
-				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER => false,
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN => false
 			], JSON_FORCE_OBJECT) ?>;
 
 
