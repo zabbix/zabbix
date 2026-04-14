@@ -220,9 +220,12 @@ static void	db_remove_expired_event_suppress_data(time_t now)
 
 		for (int i = 0; i < event_maintenance.values_num; i++)
 		{
-			zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event_maintenance.values[i].first,
-					(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
-					event_maintenance.values[i].second);
+			if (0 != event_maintenance.values[i].second)
+			{
+				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), event_maintenance.values[i].first,
+						(int)now, ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
+						event_maintenance.values[i].second);
+			}
 		}
 
 		zbx_db_insert_autoincrement(&db_insert, "acknowledgeid");
