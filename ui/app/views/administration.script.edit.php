@@ -468,7 +468,8 @@ $output = [
 		'script_edit_popup.init('.json_encode([
 			'script' => $data['form'],
 			'rules' => $data['js_validation_rules'],
-			'clone_rules' => $data['js_clone_validation_rules']
+			'clone_rules' => $data['js_clone_validation_rules'],
+			'csrf_token' => CCsrfTokenHelper::get('script')
 		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];

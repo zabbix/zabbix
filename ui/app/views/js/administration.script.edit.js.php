@@ -21,13 +21,14 @@
 
 window.script_edit_popup = new class {
 
-	init({rules, clone_rules, script}) {
+	init({rules, clone_rules, script, csrf_token}) {
 		this.overlay = overlays_stack.getById('script.edit');
 		this.dialogue = this.overlay.$dialogue[0];
 		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 		this.script = script;
+		this.csrf_token = csrf_token;
 		this.scriptid = script.scriptid;
 		this.saved_scope_value = script.scope;
 		this.saved_menu_path_value = '';
@@ -352,7 +353,7 @@ window.script_edit_popup = new class {
 			const curl = new Curl('zabbix.php');
 
 			curl.setArgument('action', 'script.delete');
-			curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('script')) ?>);
+			curl.setArgument(CSRF_TOKEN_NAME, this.csrf_token);
 
 			this.#post(curl.getUrl(), {scriptids: [this.scriptid]}, (response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);

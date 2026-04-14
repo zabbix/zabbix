@@ -259,7 +259,7 @@ class CControllerScriptCreate extends CController {
 			case ZBX_SCRIPT_TYPE_WEBHOOK:
 				$script['command'] = $this->getInput('script', '');
 				$script['timeout'] = $this->getInput('timeout', DB::getDefault('scripts', 'timeout'));
-				$script['parameters'] = $this->processParameters($this->getInput('parameters', []));
+				$script['parameters'] = $this->removeEmptyParameters($this->getInput('parameters', []));
 				break;
 
 			case ZBX_SCRIPT_TYPE_URL:
@@ -290,9 +290,9 @@ class CControllerScriptCreate extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}
 
-	protected function processParameters(array $parameters): array {
-		return array_filter($parameters, function (array $parameter): bool {
-			return ($parameter['name'] !== '' || $parameter['value'] !== '');
-		});
+	protected function removeEmptyParameters(array $parameters): array {
+		return array_filter($parameters,
+			static fn ($parameter) => $parameter['name'] !== '' || $parameter['value'] !== ''
+		);
 	}
 }
