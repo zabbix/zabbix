@@ -306,17 +306,12 @@ class CControllerItemPrototypeCreate extends CControllerItemPrototype {
 				],
 				'period' => [
 					[
-						'string', 'required', 'not_empty',
-						'use' => [CTimePeriodParser::class, ['usermacros' => true, 'lldmacros' => true]],
-						'messages' => ['use' => _('Invalid period.')],
-						'when' => [['type', 'in' => [ITEM_DELAY_FLEXIBLE]], ['delay', 'not_empty']]
-					],
-					[
 						'string', 'required',
 						'use' => [CTimePeriodParser::class, ['usermacros' => true, 'lldmacros' => true]],
 						'messages' => ['use' => _('Invalid period.')],
 						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
-					]
+					],
+					['string', 'required', 'not_empty', 'when' => ['delay', 'not_empty']]
 				]
 			]],
 			'delay' => [

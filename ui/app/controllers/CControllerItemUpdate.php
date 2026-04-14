@@ -285,26 +285,19 @@ class CControllerItemUpdate extends CControllerItem {
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
 				'delay' => [
-					[
-						'string', 'required',
-						'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
-						'messages' => ['use' => _('Invalid interval.')],
-						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
-					]
+					'string', 'required',
+					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
+					'messages' => ['use' => _('Invalid interval.')],
+					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				],
 				'period' => [
 					[
-						'string', 'required', 'not_empty',
-						'use' => [CTimePeriodParser::class, ['usermacros' => true]],
-						'messages' => ['use' => _('Invalid period.')],
-						'when' => [['type', 'in' => [ITEM_DELAY_FLEXIBLE]], ['delay', 'not_empty']]
-					],
-					[
 						'string', 'required',
 						'use' => [CTimePeriodParser::class, ['usermacros' => true]],
 						'messages' => ['use' => _('Invalid period.')],
 						'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
-					]
+					],
+					['string', 'required', 'not_empty', 'when' => ['delay', 'not_empty']]
 				]
 			]],
 			'delay' => [
