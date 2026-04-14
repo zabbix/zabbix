@@ -43,7 +43,7 @@ window.item_edit_form = new class {
 
 	init({
 		rules, actions, field_switches, form_data, host, interface_types, inherited_timeouts, readonly,
-		testable_item_types, type_with_key_select, value_type_keys, source, return_url, value_type_ttl
+		testable_item_types, type_with_key_select, value_type_keys, source, return_url, ttl_value_types
 	}) {
 		this.actions = actions;
 		this.form_data = form_data;
@@ -58,7 +58,7 @@ window.item_edit_form = new class {
 		this.type_with_key_select = type_with_key_select;
 		this.value_type_keys = value_type_keys;
 		this.last_inferred_type = null;
-		this.value_type_ttl = source === 'item' ? value_type_ttl : [];
+		this.ttl_value_types = source === 'item' ? ttl_value_types : [];
 
 		for (const type in interface_types) {
 			if (interface_types[type] == INTERFACE_TYPE_OPT) {
@@ -793,7 +793,7 @@ window.item_edit_form = new class {
 	#updateHistoryModeVisibility() {
 		const mode_field = [].filter.call(this.field.history_mode, e => e.matches(':checked')).pop(),
 			disabled = mode_field.value == ITEM_STORAGE_OFF && (!mode_field.readOnly || this.field.history.readOnly),
-			custom_ttl = this.value_type_ttl.includes(parseInt(this.field.value_type.value, 10));
+			custom_ttl = this.ttl_value_types.includes(parseInt(this.field.value_type.value, 10));
 
 		this.field.history.toggleAttribute('disabled', disabled);
 		this.field.history.classList.toggle(ZBX_STYLE_DISPLAY_NONE, disabled);

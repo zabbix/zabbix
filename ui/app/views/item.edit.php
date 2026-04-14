@@ -165,8 +165,8 @@ $tabs = (new CTabView(['id' => $tabsid]))
 			'source' => 'item',
 			'types' => $data['types'],
 			'value_types' => $value_types,
-			'type_with_key_select' => $type_with_key_select,
-			'value_type_ttl' => $data['value_type_ttl']
+			'ttl_value_types' => $data['ttl_value_types'],
+			'type_with_key_select' => $type_with_key_select
 		])
 	)
 	->addTab('tags-tab', _('Tags'),
@@ -217,8 +217,8 @@ $form
 			'testable_item_types' => $data['testable_item_types'],
 			'type_with_key_select' => $type_with_key_select,
 			'value_type_keys' => $data['value_type_keys'],
-			'return_url' => $return_url,
-			'value_type_ttl' => array_keys(array_filter($data['value_type_ttl'], fn($ttl) => $ttl !== null))
+			'ttl_value_types' => $data['ttl_value_types'],
+			'return_url' => $return_url
 		]).');'))->setOnDocumentReady()
 	);
 $output = [

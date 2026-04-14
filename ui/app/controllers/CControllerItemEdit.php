@@ -152,6 +152,14 @@ class CControllerItemEdit extends CControllerItem {
 			$item['discoveryData']['lldruleid'] = $parent_lld['itemid'];
 		}
 
+		$ttl_value_types = [];
+
+		foreach (Manager::History()->getValueTypesStorageTtls() as $value_type => $storage) {
+			if (array_key_exists('value_ttl', $storage)) {
+				$ttl_value_types[] = $value_type;
+			}
+		}
+
 		$data = [
 			'js_test_validation_rules' => (new CFormValidator(
 				CControllerPopupItemTestSend::getValidationRules(allow_lld_macro: false)
@@ -180,13 +188,8 @@ class CControllerItemEdit extends CControllerItem {
 				'hk_trends_global' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL),
 				'hk_trends' => CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)
 			],
-			'user' => ['debug_mode' => $this->getDebugMode()],
-			'value_type_ttl' => array_map(
-				fn ($v) => array_key_exists('value_ttl', $v)
-					? array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0]
-					: null,
-				Manager::History()->getValueTypesStorageTtls()
-			)
+			'ttl_value_types' => $ttl_value_types,
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
 		$response = new CControllerResponseData($data);
