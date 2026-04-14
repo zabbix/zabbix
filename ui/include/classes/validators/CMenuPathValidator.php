@@ -19,21 +19,20 @@ class CMenuPathValidator extends CValidator {
 	protected bool $strict = false;
 
 	public function validate($value): bool {
-		// If empty is allowed there is only root folder, return early.
-		if ($value === '/') {
-			return true;
-		}
-
 		$folders = splitPath($value);
 		$folders = array_map('trim', $folders);
 		$count = count($folders);
 
+		if ($count == 1 && $folders[0] === '') {
+			return true;
+		}
+
 		// folder1/{empty}/name or folder1/folder2/{empty}
 		foreach ($folders as $num => $folder) {
 			// Allow the trailing slash.
-			$is_edge = $num != ($count - 1) && $num != 0;
+			$is_not_edge = $num != ($count - 1) && $num != 0;
 
-			if ($folder === '' && ($this->strict || $is_edge)) {
+			if ($folder === '' && ($this->strict || $is_not_edge)) {
 				$this->setError(_('directory cannot be empty'));
 				return false;
 			}
