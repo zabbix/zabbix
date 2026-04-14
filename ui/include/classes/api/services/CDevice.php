@@ -48,6 +48,13 @@ class CDevice extends CApiService {
 	public function get(array $options = []) {
 		self::validateGet($options);
 
+		if ((self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+					&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN))
+				|| (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+					&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER))) {
+			return $options['countOutput'] ? '0' : [];
+		}
+
 		$resource = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
 
 		$db_devices = [];
@@ -103,8 +110,12 @@ class CDevice extends CApiService {
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN
+				|| !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
 			$sql_parts['where']['userid'] = 'd.userid='.self::$userData['userid'];
+		}
+		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+			$sql_parts['where']['userid'] = 'd.userid!='.self::$userData['userid'];
 		}
 
 		$sql_parts['where'][] = 'd.status='.self::STATUS_ENABLED;
@@ -202,6 +213,16 @@ class CDevice extends CApiService {
 	}
 
 	private function validateInit(array &$data): void {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
+			}
+		}
+		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'userid' =>	['type' => API_ID, 'default' => self::$userData['userid']]
 		]];
@@ -210,17 +231,34 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (bccomp($data['userid'], self::$userData['userid']) != 0) {
-			$db_users = API::User()->get([
-				'output' => [],
-				'userids' => $data['userid'],
-				'editable' => true
-			]);
-
-			if (!$db_users) {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (bccomp($data['userid'], self::$userData['userid']) != 0) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
+			}
+		}
+		else {
+			if (bccomp($data['userid'], self::$userData['userid']) == 0) {
+				if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
+				}
+			}
+			else {
+				if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
+				}
+
+				$db_users = API::User()->get([
+					'output' => [],
+					'userids' => $data['userid']
+				]);
+
+				if (!$db_users) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS,
+						_('No permissions to referred object or it does not exist!')
+					);
+				}
 			}
 		}
 	}
@@ -404,6 +442,16 @@ class CDevice extends CApiService {
 	}
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
+			}
+		}
+		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
+		}
+
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'uuid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
 		]];
