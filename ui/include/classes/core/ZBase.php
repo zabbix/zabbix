@@ -508,6 +508,8 @@ class ZBase {
 	 * Initialize HistoryManager instance.
 	 */
 	protected function initHistoryManager(): void {
+		global $HISTORY_PROVIDERS;
+
 		$storages = CSettingsHelper::getDbVersionStatus();
 		$history_manager = Manager::History();
 		$value_type_ttl = [];
@@ -535,8 +537,8 @@ class ZBase {
 			}
 		}
 
-		if (array_key_exists('HISTORY_PROVIDERS', $this->config)) {
-			$history_manager->setStorageProviders($this->config['HISTORY_PROVIDERS'], $value_type_ttl);
+		if ($HISTORY_PROVIDERS !== null) {
+			$history_manager->setStorageProviders($HISTORY_PROVIDERS, $value_type_ttl);
 		}
 	}
 
