@@ -2737,14 +2737,14 @@ class testDashboardItemHistoryWidget extends testWidgets {
 							'Timestamp' => date('Y-m-d H:i:s', strtotime('now')),
 							'Name' => 'JSON',
 							'Value' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"},'.
-								'" widgets": {"name1": true, "name2": false, "name3": null}}'
+								' "widgets": {"name1": true, "name2": false, "name3": null}}'
 						]
 					],
 					'item_data' => [
 						[
 							'itemid' => 'dependent',
-							'values' => '{"test":"json1","users":{"name1":"test1","name2":"🙂"},'.
-								'"widgets":{"name1":true,"name2":false,"name3":null}}',
+							'values' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"},'.
+								' "widgets": {"name1": true, "name2": false, "name3": null}}',
 							'time' => strtotime('Now')
 						]
 					]

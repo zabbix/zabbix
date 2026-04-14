@@ -315,7 +315,7 @@ class testDashboardHoneycombWidget extends testWidgets {
 		}
 
 		$non_numeric_data = [
-			'{"test":"json1","users":{"name1":"test1","name2":"🙂"}}',
+			'{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
 			'Text test 🙂',
 			'Char test 🙂',
 			'Log test 🙂'

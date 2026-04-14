@@ -404,7 +404,7 @@ class testDashboardItemCardWidget extends testWidgets {
 			],
 			[
 				'name' => 'Item with JSON datatype',
-				'value' => '{"test":"json1","users":{"name1":"test1","name2":"🙂"}}',
+				'value' => '{"test": "json1", "users": {"name1": "test1", "name2": "🙂"}}',
 				'time' => time() - 8640000 // -100 days.
 			]
 		];
