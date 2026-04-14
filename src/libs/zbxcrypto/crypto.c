@@ -140,7 +140,7 @@ char	*zbx_create_token(zbx_uint64_t seed)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates UUID version 4 as string of 32 symbols                 *
+ * Purpose: generates UUID version 4 as string of 32 symbols                  *
  *                                                                            *
  * Parameters: seed - [IN] string for seed calculation                        *
  *                                                                            *
@@ -180,9 +180,16 @@ char	*zbx_gen_uuid4(const char *seed)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: calculates UUID version 7 as string of 32 symbols                 *
+ * Purpose: generates UUID version 7 as string of 32 symbols                  *
  *                                                                            *
  * Return value: uuid string                                                  *
+ *                                                                            *
+ * Comments: Current implementation is minimal, developed for generating      *
+ *           server ID.                                                       *
+ *           DO NOT use it for generation of multiple identifiers where       *
+ *           cryptographically secure randomness and monotonic time-based     *
+ *           ordering is required                                             *
+ *           (see https://www.rfc-editor.org/rfc/rfc9562).                    *
  *                                                                            *
  ******************************************************************************/
 char	*zbx_gen_uuid7(void)
@@ -198,7 +205,7 @@ char	*zbx_gen_uuid7(void)
 
 	zbx_timespec(&ts);
 
-	ts_ms = (uint64_t)ts.sec * 1000 + ts.ns / 1000000;
+	ts_ms = (uint64_t)ts.sec * 1000 + (uint64_t)ts.ns / 1000000;
 
 	/* 6 bytes Unix timestamp */
 	uuid7[0] = (ts_ms >> 40) & 0xff;
