@@ -155,6 +155,10 @@ class CDevice extends CApiService {
 	 * @return array
 	 */
 	public function init(array $data = []): array {
+		if (self::$userData['username'] === ZBX_GUEST_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$this->validateInit($data);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -407,6 +411,10 @@ class CDevice extends CApiService {
 	 * @return array
 	 */
 	public function offboard(array $data): array {
+		if (self::$userData['username'] === ZBX_GUEST_USER) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
+		}
+
 		$this->validateOffboard($data, $db_devices);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
