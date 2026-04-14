@@ -140,7 +140,7 @@ $house_keeper_tab = (new CFormList())
 	->addRow(
 		(new CLabel([
 			_('Data storage period'),
-			$data['value_type_ttl']
+			$data['value_type_storage']
 				? makeWarningIcon(
 					_('This setting does not affect Elasticsearch and ClickHouse storage periods.')
 				)
@@ -154,9 +154,9 @@ $house_keeper_tab = (new CFormList())
 	);
 
 foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage) {
-	$storage_value_types = array_filter($data['value_type_ttl'], fn($ttl) => $ttl['provider'] === $storage);
+	$value_type_storage = array_filter($data['value_type_storage'], fn($s) => $s['provider'] === $storage);
 
-	if (!$storage_value_types) {
+	if (!$value_type_storage) {
 		continue;
 	}
 
@@ -167,10 +167,12 @@ foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage
 		}))->addClass('input-section-header')
 	);
 
-	foreach ($storage_value_types as $value_type => $ttl) {
+	foreach ($value_type_storage as $value_type => $storage) {
 		$house_keeper_tab->addRow(
 			new CLabel(itemValueTypeString($value_type)),
-			$ttl['value_ttl_label'] === null ? _('Not available') : $ttl['value_ttl_label']
+			array_key_exists('value_ttl', $storage)
+				? array_slice(getTimeUnitFilters($storage['value_ttl']), -1)[0]
+				: _('Not available')
 		);
 	}
 }

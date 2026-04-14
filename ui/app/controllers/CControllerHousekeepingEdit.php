@@ -55,66 +55,41 @@ class CControllerHousekeepingEdit extends CController {
 		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_HOUSEKEEPING);
 	}
 
-	protected function doAction(): void {
-		$data = [
-			'hk_events_mode' => $this->getInput('hk_events_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_EVENTS_MODE
-			)),
-			'hk_events_trigger' => $this->getInput('hk_events_trigger', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_EVENTS_TRIGGER
-			)),
-			'hk_events_service' => $this->getInput('hk_events_service', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_EVENTS_SERVICE
-			)),
-			'hk_events_internal' => $this->getInput('hk_events_internal', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_EVENTS_INTERNAL
-			)),
-			'hk_events_discovery' => $this->getInput('hk_events_discovery', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_EVENTS_DISCOVERY
-			)),
-			'hk_events_autoreg' => $this->getInput('hk_events_autoreg', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_EVENTS_AUTOREG
-			)),
-			'hk_services_mode' => $this->getInput('hk_services_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_SERVICES_MODE
-			)),
-			'hk_services' => $this->getInput('hk_services', CHousekeepingHelper::get(CHousekeepingHelper::HK_SERVICES)),
-			'hk_sessions_mode' => $this->getInput('hk_sessions_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_SESSIONS_MODE
-			)),
-			'hk_sessions' => $this->getInput('hk_sessions', CHousekeepingHelper::get(CHousekeepingHelper::HK_SESSIONS)),
-			'hk_history_mode' => $this->getInput('hk_history_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_HISTORY_MODE
-			)),
-			'hk_history_global' => $this->getInput('hk_history_global', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_HISTORY_GLOBAL
-			)),
-			'hk_history' => $this->getInput('hk_history', CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY)),
-			'hk_trends_mode' => $this->getInput('hk_trends_mode', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_TRENDS_MODE
-			)),
-			'hk_trends_global' => $this->getInput('hk_trends_global', CHousekeepingHelper::get(
-				CHousekeepingHelper::HK_TRENDS_GLOBAL
-			)),
-			'hk_trends' => $this->getInput('hk_trends', CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS)),
-			'extension_err_code' => ZBX_EXT_ERR_UNDEFINED,
-			'compression_availability' => false,
-			'compression_status' => $this->getInput('compression_status', CHousekeepingHelper::get(
-				CHousekeepingHelper::COMPRESSION_STATUS
-			)),
-			'compress_older' => $this->getInput('compress_older', CHousekeepingHelper::get(
-				CHousekeepingHelper::COMPRESS_OLDER
-			)),
-			'db_extension' => CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION),
-			'value_type_ttl' => array_map(
-				fn($v) => $v + [
-					'value_ttl_label' => array_key_exists('value_ttl', $v)
-						? array_slice(getTimeUnitFilters($v['value_ttl']), -1)[0]
-						: null
-					],
-				Manager::History()->getValueTypesStorageTtls()
-			)
+	private function getDefaultValues(): array {
+		return [
+			'hk_events_mode' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_EVENTS_MODE),
+			'hk_events_trigger' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_EVENTS_TRIGGER),
+			'hk_events_service' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_EVENTS_SERVICE),
+			'hk_events_internal' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_EVENTS_INTERNAL),
+			'hk_events_discovery' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_EVENTS_DISCOVERY),
+			'hk_events_autoreg' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_EVENTS_AUTOREG),
+			'hk_services_mode' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_SERVICES_MODE),
+			'hk_services' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_SERVICES),
+			'hk_sessions_mode' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_SESSIONS_MODE),
+			'hk_sessions' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_SESSIONS),
+			'hk_history_mode' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_HISTORY_MODE),
+			'hk_history_global' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_HISTORY_GLOBAL),
+			'hk_history' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_HISTORY),
+			'hk_trends_mode' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_TRENDS_MODE),
+			'hk_trends_global' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_TRENDS_GLOBAL),
+			'hk_trends' => CSettingsSchema::getDefault(CHousekeepingHelper::HK_TRENDS),
+			'compression_status' => CSettingsSchema::getDefault(CHousekeepingHelper::COMPRESSION_STATUS),
+			'compress_older' => CSettingsSchema::getDefault(CHousekeepingHelper::COMPRESS_OLDER)
 		];
+	}
+
+	protected function doAction(): void {
+		$default_values = $this->getDefaultValues();
+		$data = [];
+
+		foreach (array_keys($default_values) as $key) {
+			$data[$key] = CHousekeepingHelper::get($key);
+		}
+
+		$data['extension_err_code'] = ZBX_EXT_ERR_UNDEFINED;
+		$data['compression_availability'] = false;
+		$data['db_extension'] = CHousekeepingHelper::get(CHousekeepingHelper::DB_EXTENSION);
+		$data['value_type_storage'] = Manager::History()->getValueTypesStorageTtls();
 
 		if ($data['db_extension'] === ZBX_DB_EXTENSION_TIMESCALEDB) {
 			// Temporary state to show checkbox checked and disabled before the real state is detected.
@@ -141,6 +116,11 @@ class CControllerHousekeepingEdit extends CController {
 				}
 			}
 		}
+
+		$data['js_validation_rules'] = (new CFormValidator(CControllerHousekeepingUpdate::getValidationRules()))
+			->getRules();
+
+		$data['default_values'] = $default_values;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of housekeeping'));
