@@ -254,7 +254,8 @@ class CDevice extends CApiService {
 				}
 
 				$db_users = API::User()->get([
-					'output' => [],
+					'output' => ['username'],
+					'selectRole' => ['roleid'],
 					'userids' => $data['userid']
 				]);
 
@@ -262,6 +263,11 @@ class CDevice extends CApiService {
 					self::exception(ZBX_API_ERROR_PERMISSIONS,
 						_('No permissions to referred object or it does not exist!')
 					);
+				}
+
+				if ($db_users[0]['username'] === ZBX_GUEST_USER
+						|| !CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $db_users[0]['role']['roleid'])) {
+					self::exception(ZBX_API_ERROR_PERMISSIONS, _('User is not allowed to use linked devices.'));
 				}
 			}
 		}
