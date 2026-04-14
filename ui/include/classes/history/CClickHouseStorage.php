@@ -345,7 +345,7 @@ class CClickHouseStorage {
 						'max(clock_ns) as ts'.
 						($width === null
 							? ''
-							: ',round({width:UInt64}*({time_lte:UInt64}-toUnixTimestamp(clock_ns))/{seconds:UInt64}) AS i'
+							: ',round({width:UInt64}*(toUnixTimestamp(clock_ns)-{time_gte:UInt64})/{seconds:UInt64}) AS i'
 						).
 					' FROM '.self::VALUE_TYPE_TABLE[$value_type].
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
