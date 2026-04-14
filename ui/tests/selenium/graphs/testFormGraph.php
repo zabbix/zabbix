@@ -206,8 +206,8 @@ class testFormGraph extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Normal graph items in Y axis values',
-						'Width' => 65535,
-						'Height' => 65535,
+						'Width' => 8000,
+						'Height' => 4500,
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 						'Show legend' => false,
 						'Show working time' => false,

@@ -43,7 +43,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'sla',
 								'srcfld1' => 'slaid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_slaid',
 								'enabled_only' => 1
 							]

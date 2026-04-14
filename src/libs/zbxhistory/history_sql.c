@@ -724,7 +724,7 @@ static void	history_sql_write(void *data, unsigned char value_type, const zbx_hi
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_db_insert_ptr_append(&d->db_inserts, db_insert);

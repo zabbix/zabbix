@@ -38,9 +38,11 @@ $overrides_popup_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SU
 $overrides_popup_form_list = (new CFormList())
 	->addRow(
 		(new CLabel(_('Name'), 'override_name'))->setAsteriskMark(),
-		(new CTextBox('name', $options['old_name'], $options['readonly'], DB::getFieldLength('lld_override', 'name')))
+		(new CTextAreaFlexible('name', $options['old_name']))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('lld_override', 'name'))
+			->setReadonly($options['readonly'])
 			->setId('override_name')
 	)
 	->addRow(
@@ -106,11 +108,12 @@ foreach ($options['overrides_filters'] as $i => $overrides_filter) {
 		new CVar('overrides_filters['.$i.'][formulaid]', $overrides_filter['formulaid'])
 	];
 
-	$macro = (new CTextBox('overrides_filters['.$i.'][macro]', $overrides_filter['macro'], $options['readonly'],
-			DB::getFieldLength('lld_override_condition', 'macro')))
+	$macro = (new CTextAreaFlexible('overrides_filters['.$i.'][macro]', $overrides_filter['macro']))
 		->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+		->setMaxlength(DB::getFieldLength('lld_override_condition', 'macro'))
 		->addClass(ZBX_STYLE_UPPERCASE)
 		->addClass('macro')
+		->setReadonly($options['readonly'])
 		->setAttribute('placeholder', '{#MACRO}')
 		->setAttribute('data-formulaid', $overrides_filter['formulaid']);
 
@@ -123,10 +126,11 @@ foreach ($options['overrides_filters'] as $i => $overrides_filter) {
 		$operator_select->setReadonly();
 	}
 
-	$value = (new CTextBox('overrides_filters['.$i.'][value]', $overrides_filter['value'],$options['readonly'],
-			DB::getFieldLength('lld_override_condition', 'value')))
+	$value = (new CTextAreaFlexible('overrides_filters['.$i.'][value]', $overrides_filter['value']))
 		->addClass('js-value')
 		->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		->setMaxlength(DB::getFieldLength('lld_override_condition', 'value'))
+		->setReadonly($options['readonly'])
 		->setAttribute('placeholder', _('regular expression'));
 
 	if ($overrides_filter['operator'] == CONDITION_OPERATOR_EXISTS
@@ -143,9 +147,11 @@ foreach ($options['overrides_filters'] as $i => $overrides_filter) {
 
 	$row = [
 		$formulaid,
-		$macro,
+		(new CCol($macro))->addClass(ZBX_STYLE_ALIGN_TOP),
 		$operator_select,
-		(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),
+		(new CCol(
+			(new CDiv($value))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CCol($delete_button_cell))->addClass(ZBX_STYLE_NOWRAP)
 	];
 

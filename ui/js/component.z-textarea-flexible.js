@@ -26,6 +26,9 @@ class ZTextareaFlexible extends HTMLElement {
 	 */
 	#internals;
 
+	/** @type {string} */
+	#name;
+
 	/** @type {HTMLTextAreaElement} */
 	#textarea;
 
@@ -41,6 +44,9 @@ class ZTextareaFlexible extends HTMLElement {
 	/** @type {number | null} */
 	#animation_frame_id = null;
 
+	/** @type {boolean} */
+	#is_spellcheck_allowed = false;
+
 	constructor() {
 		super();
 
@@ -53,6 +59,7 @@ class ZTextareaFlexible extends HTMLElement {
 			'autofocus',
 			'disabled',
 			'maxlength',
+			'name',
 			'placeholder',
 			'readonly',
 			'singleline',
@@ -109,7 +116,12 @@ class ZTextareaFlexible extends HTMLElement {
 	#applyAttribute(name, value) {
 		switch (name) {
 			case 'autofocus':
-				this.#textarea.autofocus = value !== null;
+				if (value !== null) {
+					this.#textarea.setAttribute('autofocus', 'autofocus');
+				}
+				else {
+					this.#textarea.removeAttribute('autofocus');
+				}
 				break;
 
 			case 'disabled':
@@ -127,8 +139,16 @@ class ZTextareaFlexible extends HTMLElement {
 				}
 				break;
 
+			case 'name':
+				this.#name = value;
+				break;
+
 			case 'placeholder':
-				this.#textarea.placeholder = value ?? '';
+				this.#textarea.placeholder = this.#singleline
+					? (value ?? '').replace(/[\r\n]+/g, ' ')
+					: value ?? '';
+
+				this.#updateHeight();
 				break;
 
 			case 'readonly':
@@ -142,6 +162,7 @@ class ZTextareaFlexible extends HTMLElement {
 
 			case 'spellcheck':
 				this.#textarea.spellcheck = value !== 'false';
+				this.#is_spellcheck_allowed = this.#textarea.spellcheck;
 				break;
 
 			case 'value':
@@ -177,7 +198,14 @@ class ZTextareaFlexible extends HTMLElement {
 			const styles = getComputedStyle(this.#textarea);
 
 			this.#textarea.style.height = '0';
-			this.#textarea.style.height = `${this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2}px`;
+
+			const paddingTop = parseFloat(styles.paddingTop) || 0;
+			const paddingBottom = parseFloat(styles.paddingBottom) || 0;
+			const lineHeight = parseFloat(styles.lineHeight);
+			const baseHeight = lineHeight + paddingTop + paddingBottom + parseInt(styles.borderWidth) * 2;
+			const scrollHeight = this.#textarea.scrollHeight + parseInt(styles.borderWidth) * 2;
+
+			this.#textarea.style.height = `${Math.max(baseHeight, scrollHeight)}px`;
 			this.#is_resize_locked = false;
 		});
 	}
@@ -185,15 +213,15 @@ class ZTextareaFlexible extends HTMLElement {
 	#addEventListeners() {
 		this.#textarea.addEventListener('input', this.#inputHandler);
 		this.#textarea.addEventListener('keydown', this.#keydownHandler);
-		this.#textarea.addEventListener('blur', this.#reemitFocus);
-		this.#textarea.addEventListener('focus', this.#reemitFocus);
+		this.#textarea.addEventListener('blur', this.#blurHandler);
+		this.#textarea.addEventListener('focus', this.#focusHandler);
 	}
 
 	#removeEventListeners() {
 		this.#textarea.removeEventListener('input', this.#inputHandler);
 		this.#textarea.removeEventListener('keydown', this.#keydownHandler);
-		this.#textarea.removeEventListener('blur', this.#reemitFocus);
-		this.#textarea.removeEventListener('focus', this.#reemitFocus);
+		this.#textarea.removeEventListener('blur', this.#blurHandler);
+		this.#textarea.removeEventListener('focus', this.#focusHandler);
 	}
 
 	#inputHandler = (e) => {
@@ -201,13 +229,23 @@ class ZTextareaFlexible extends HTMLElement {
 	}
 
 	#keydownHandler = (e) => {
-		if (e.key === 'Enter' && this.#singleline) {
+		if (e.key === 'Enter' && this.#singleline && !this.#textarea.readOnly) {
 			e.preventDefault();
 			this.closest('form')?.requestSubmit();
 		}
 	}
 
-	#reemitFocus = (e) => {
+	#blurHandler = (e) => {
+		this.#textarea.spellcheck = false;
+
+		this.dispatchEvent(new FocusEvent(e.type));
+	}
+
+	#focusHandler = (e) => {
+		if (this.#is_spellcheck_allowed) {
+			this.#textarea.spellcheck = true;
+		}
+
 		this.dispatchEvent(new FocusEvent(e.type));
 	}
 
@@ -235,6 +273,14 @@ class ZTextareaFlexible extends HTMLElement {
 		this.setAttribute('maxlength', maxlength);
 	}
 
+	get name() {
+		return this.#name;
+	}
+
+	set name(name) {
+		this.setAttribute('name', name);
+	}
+
 	get placeholder() {
 		return this.#textarea.placeholder;
 	}
@@ -243,11 +289,11 @@ class ZTextareaFlexible extends HTMLElement {
 		this.setAttribute('placeholder', placeholder);
 	}
 
-	get readonly() {
+	get readOnly() {
 		return this.#textarea.readOnly;
 	}
 
-	set readonly(readonly) {
+	set readOnly(readonly) {
 		this.toggleAttribute('readonly', readonly);
 	}
 

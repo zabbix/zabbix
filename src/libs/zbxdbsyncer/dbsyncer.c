@@ -124,7 +124,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			server_num, (process_name = get_process_type_string(process_type)), process_num);
 
 	zbx_hc_acquire();
-
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 
 #define STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
@@ -260,7 +259,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 			running = 0;
 	}
 
-
 	/* database APIs might not handle signals correctly and hang, block signals to avoid hanging */
 	zbx_block_signals(&orig_mask);
 	if (SUCCEED != zbx_db_trigger_queue_locked())
@@ -300,6 +298,6 @@ ZBX_THREAD_ENTRY(zbx_dbsyncer_thread, args)
 	zbx_free(stats);
 	zbx_curl_cleanup();
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

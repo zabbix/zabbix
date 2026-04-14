@@ -35,8 +35,9 @@ $mediatype_form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('name', $data['name'], false, DB::getFieldLength('media_type', 'name')))
+			(new CTextAreaFlexible('name', $data['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media_type', 'name'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		))->setId('name-field')
@@ -156,17 +157,28 @@ $oauth_status = [
 ];
 
 if ($data['mediatypeid'] && $data['smtp_authentication'] == SMTP_AUTHENTICATION_OAUTH) {
+	$time = time();
+
 	// Do not show "Configured ago" label for imported media types without defined tokens.
-	if ($data['access_token_updated'] > 0) {
+	if ($data['access_token_updated'] >= 0 && $data['access_token_updated'] <= $time) {
 		$oauth_status[] = italic(_s('Configured %1$s ago', zbx_date2age($data['access_token_updated'])));
 	}
 
+	$access_token_error = _('Unexpected access token update time.');
+
 	if (!($data['tokens_status'] & OAUTH_REFRESH_TOKEN_VALID)) {
+		$refresh_token_error = _('Refresh token is invalid or outdated.');
+
 		if ($oauth_status) {
 			$oauth_status[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 		}
 
-		$oauth_status[] = makeErrorIcon(_('Refresh token is invalid or outdated.'));
+		$oauth_status[] = $data['access_token_updated'] > $time
+			? makeErrorIcon((new CList([$refresh_token_error, $access_token_error]))->addClass(ZBX_STYLE_LIST_DASHED))
+			: makeErrorIcon($refresh_token_error);
+	}
+	elseif ($data['access_token_updated'] > $time) {
+		$oauth_status[] = makeErrorIcon($access_token_error);
 	}
 
 	// Add input elements after icon to prevent left margin because icon will be not first child.
@@ -416,10 +428,9 @@ $mediatype_form_grid
 			->setId('webhook_event_menu_url_label')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('event_menu_url', $data['event_menu_url'], false,
-				DB::getFieldLength('media_type', 'event_menu_url')
-			))
+			(new CTextAreaFlexible('event_menu_url', $data['event_menu_url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media_type', 'event_menu_url'))
 				->setEnabled($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW)
 				->addClass($data['show_event_menu'] == ZBX_EVENT_MENU_SHOW ? '' : 'js-inactive')
 				->setAriaRequired()

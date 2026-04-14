@@ -146,15 +146,15 @@ window.valuemap_edit_popup = {
 
 		this.table.querySelectorAll('tr').forEach((row) => {
 			const select = row.querySelector('z-select[name$="[type]"]');
-			const input = row.querySelector('input[name$="[value]"]');
+			const textarea = row.querySelector('z-textarea-flexible[name$="[value]"]');
 
 			if (select) {
 				select.getOptionByValue(<?= VALUEMAP_MAPPING_TYPE_DEFAULT ?>).disabled = (default_select
 					&& select !== default_select
 				);
-				input.classList.toggle('visibility-hidden', (select === default_select));
-				input.disabled = (select === default_select);
-				input.setAttribute('placeholder', this.type_placeholder[select.value] || '');
+				textarea.classList.toggle('visibility-hidden', select === default_select);
+				textarea.disabled = select === default_select;
+				textarea.placeholder = this.type_placeholder[select.value] || '';
 			}
 		});
 	},

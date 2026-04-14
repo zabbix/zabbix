@@ -120,13 +120,15 @@ class testWidgets extends CWebTest {
 
 		// Find the table where items will be expected.
 		$table = $items_dialog->query(self::TABLE_SELECTOR)->asTable()->one()->waitUntilVisible();
-		$button = $items_dialog->query('button:Select')->one();
 
 		// Fill the host name and check the table.
 		$items_dialog->query('class:multiselect-control')->asMultiselect()->one()->fill(self::HOST_ALL_ITEMS);
-		$button->waitUntilStalled();
 		$table->waitUntilReloaded();
-		$items_dialog->query('button:Select')->waitUntilClickable();
+		/* TODO: unstable test on Jenkins.
+		 * multiselect->fill() clears existing value first which reloads table, then types new value which reloads
+		 * it again. Need wait condition bound to final filtered result instead of reload event.
+		 */
+		$table->query('link', $item_types[0])->waitUntilVisible();
 		$this->assertTableDataColumn($item_types, 'Name', self::TABLE_SELECTOR);
 
 		// Close all dialogs.

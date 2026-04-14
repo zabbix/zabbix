@@ -28,8 +28,9 @@ $html_page = (new CHtmlPage())
 
 $from_list = (new CFormList())
 	->addRow(new CLabel(_('Frontend URL'), 'url'),
-		(new CTextBox('url', $data['url'], false, CSettingsSchema::getFieldLength('url')))
+		(new CTextAreaFlexible('url', $data['url']))
 			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setMaxlength(CSettingsSchema::getFieldLength('url'))
 			->setAttribute('placeholder', _('Example: https://localhost/zabbix/ui/'))
 			->setAttribute('autofocus', 'autofocus')
 	)
@@ -182,17 +183,13 @@ $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('miscconfig')))->removeId())
 	->setId('miscconfig-form')
 	->setName('otherForm')
-	->setAction((new CUrl('zabbix.php'))
-		->setArgument('action', 'miscconfig.update')
-		->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addItem(
 		(new CTabView())
 			->addTab('other', _('Other parameters'), $from_list)
 			->setFooter(makeFormFooter(
-				new CSubmit('update', _('Update')),
-				[new CButton('resetDefaults', _('Reset defaults'))]
+				(new CSubmit('', _('Update')))->addClass('js-submit'),
+				[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 			))
 	);
 
@@ -200,21 +197,10 @@ $html_page
 	->addItem($form)
 	->show();
 
-(new CScriptTag('
-	view.init('.json_encode([
-		'default_inventory_mode' => CSettingsSchema::getDefault('default_inventory_mode'),
-		'iframe_sandboxing_enabled' => CSettingsSchema::getDefault('iframe_sandboxing_enabled'),
-		'iframe_sandboxing_exceptions' => CSettingsSchema::getDefault('iframe_sandboxing_exceptions'),
-		'login_attempts' => CSettingsSchema::getDefault('login_attempts'),
-		'login_block' => CSettingsSchema::getDefault('login_block'),
-		'snmptrap_logging' => CSettingsSchema::getDefault('snmptrap_logging'),
-		'uri_valid_schemes' => CSettingsSchema::getDefault('uri_valid_schemes'),
-		'url' => CSettingsSchema::getDefault('url'),
-		'validate_uri_schemes' => CSettingsSchema::getDefault('validate_uri_schemes'),
-		'vault_provider' => CSettingsSchema::getDefault('vault_provider'),
-		'proxy_secrets_provider' => CSettingsSchema::getDefault('proxy_secrets_provider'),
-		'x_frame_options' => CSettingsSchema::getDefault('x_frame_options')
-	]).');
-'))
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+	]).')'))
 	->setOnDocumentReady()
 	->show();
