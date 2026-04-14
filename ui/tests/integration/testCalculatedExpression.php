@@ -396,6 +396,8 @@ class testCalculatedExpression extends CIntegrationTest {
 
 	public function testCalculatedExpression_TimeleftForecastOverflow()
 	{
+		/* test timeleft */
+
 		$trapId = $this->createTrap();
 
 		$formula = 'timeleft(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',#3, -1)';
@@ -425,11 +427,11 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 
-		// timeleft of course cannot reach -1, so test that it is cropped to DBL_MAX
+		/* timeleft of course cannot reach -1, so test that it is cropped to DBL_MAX */
 		$this->assertEquals((float)self::DBL_MAX, $this->getItemLastValue($timeleft_itemid));
 
 
-		// forecast
+		/* test forecast */
 
 		$his4 = 1.79e+10;
 		$his5 = 1.79e+300;
@@ -451,7 +453,7 @@ class testCalculatedExpression extends CIntegrationTest {
 			array_map('floatval', $values)
 		);
 		$formula = 'forecast(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator .
-				',#2, 3000w,"exponential")';
+				',#2,3000w,"exponential")';
 		$forecast_itemid = $this->createCalculatedItemWithFormula($formula, 'forecast_overflow', '10s');
 		self::$itemIds = array_merge(self::$itemIds, [$forecast_itemid]);
 
@@ -459,7 +461,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of evaluate_FORECAST():SUCCEED");
 
 		$res = null;
-		for ($i = 0; $i < 10; $i++)
+		for ($i = 0; $i < 100; $i++)
 		{
 			$res = $this->historyGet($forecast_itemid);
 
@@ -468,10 +470,10 @@ class testCalculatedExpression extends CIntegrationTest {
 				break;
 			}
 
-			sleep(1);
+			usleep(100000);
 		}
 
-		// test that expected exponential value will be so large it is cropped to DBL_MAX
+		/* expected exponential value will be so large it is cropped to DBL_MAX */
 		$this->assertEquals((float)self::DBL_MAX, $res['result'][0]['value']);
 	}
 
@@ -736,13 +738,16 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->assertEquals('2', $this->getItemLastValue($calcItemId));
 	}
 
-	/* Testing that no inf appear in trends transactions.            */
-	/* Note, that although history trends and new trends are DBL_MAX */
-	/* The resulting trendAvg is actually smaller than DBL_MAX       */
-	/* due to rounding errors appearing as a result of scaling       */
-	/* introduces to safeguard against double overflow into inf.     */
 	public function testCalculatedExpression_TrendAvg()
 	{
+		/* Testing that no inf appear in trends transactions when using trendavg() */
+		/* inf value for doubles in DB commands results into failed transactions.  */
+		/* (Jenkins checks fails transactions and turns yellow in that case).      */
+		/* Note, that although history trends and new trends are DBL_MAX the       */
+		/* resulting trendAvg is actually smaller than DBL_MAX due to rounding     */
+		/* errors appearing as a result of scaling introduces to safeguard against */
+		/* double overflow into inf.                                               */
+
 		$trapId = $this->createTrap();
 
 		$formula = 'trendavg(/' . self::HOST_NAME . '/' . self::TRAPPER_ITEM_KEY . self::$iterator . ',3h:now/h)';

@@ -552,7 +552,6 @@ static void	dc_trends_update_float(ZBX_DC_TREND *trend, zbx_db_row_t row, int nu
 		trend->value_avg.dbl = (scaled_avg * trend->num + scaled_avg2 * num) / (trend->num + num) * max_val;
 	}
 
-
 	trend->num += num;
 }
 

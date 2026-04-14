@@ -4534,7 +4534,7 @@ out:
       return: SUCCEED
       value: -1
 ---
-    test case: Evaluate forecast inf (#2,1s)
+    test case: Evaluate forecast inf (#2,3000w)
     in:
       history:
       - itemid: 1
