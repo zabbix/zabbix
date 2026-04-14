@@ -634,7 +634,7 @@ void	tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t 
 			"FLOOR((EXTRACT(EPOCH FROM \"Timestamp\")+%d)/%d)*%d-%d"
 			") AS rounded_time,",
 			query->time_shift, query->aggregation_size, query->aggregation_size, query->time_shift);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "MIN(\"Timestamp\") AS starttime,");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "EXTRACT(EPOCH FROM MIN(\"Timestamp\")) AS starttime,");
 	if (query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
@@ -693,7 +693,7 @@ void	tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t 
 			"Timestamp + INTERVAL %d SECOND, INTERVAL %d SECOND"
 			") - INTERVAL %d SECOND AS rounded_time,",
 			query->time_shift, query->aggregation_size, query->time_shift);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "MIN(`Timestamp`) AS starttime,");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(`Timestamp`)) AS starttime,");
 	if (query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
