@@ -109,7 +109,8 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 	}
 
 	/* timestamp */
-	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) || SUCCEED != zbx_is_uint64(buf, &timestamp))
+	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) ||
+			SUCCEED != zbx_is_uint64(buf, &timestamp))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse timestamp from row \"%s\"", jp->start);
 		goto out;
