@@ -224,7 +224,8 @@ class testFunctions extends CIntegrationTest{
 		$this->sendValues('values1');
 
 		$response = $this->call('trigger.get', [
-			'output' => ['description', 'state', 'value'],
+			'output' => ['description', 'state', 'value', 'error'],
+			'selectFunctions' => 'extend',
 			'hostids' => $this->hostid
 			]);
 
@@ -299,7 +300,7 @@ class testFunctions extends CIntegrationTest{
 			$this->assertArrayHasKey($description, $triggers_expected);
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "[1] State mismatch for trigger: $description");
+			$this->assertEquals($expected['state'], $trigger['state'], "[1] State mismatch for trigger: $description: ".json_encode($trigger));
 			$this->assertEquals($expected['value'], $trigger['value'], "[1] Value mismatch for trigger: $description");
 		}
 	}
@@ -308,7 +309,8 @@ class testFunctions extends CIntegrationTest{
 		$this->sendValues('values2');
 
 		$response = $this->call('trigger.get', [
-			'output' => ['description', 'state', 'value'],
+			'output' => ['description', 'state', 'value', 'error'],
+			'selectFunctions' => 'extend',
 			'hostids' => $this->hostid
 		]);
 
@@ -383,7 +385,7 @@ class testFunctions extends CIntegrationTest{
 			$this->assertArrayHasKey($description, $triggers_expected);
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "[2] State mismatch for trigger: $description");
+			$this->assertEquals($expected['state'], $trigger['state'], "[2] State mismatch for trigger: $description: ".json_encode($trigger));
 			$this->assertEquals($expected['value'], $trigger['value'], "[2] Value mismatch for trigger: $description");
 		}
 	}
@@ -392,7 +394,8 @@ class testFunctions extends CIntegrationTest{
 		$this->sendValues('values3');
 
 		$response = $this->call('trigger.get', [
-			'output' => ['description', 'state', 'value'],
+			'output' => ['description', 'state', 'value', 'error'],
+			'selectFunctions' => 'extend',
 			'hostids' => $this->hostid
 		]);
 
@@ -467,7 +470,7 @@ class testFunctions extends CIntegrationTest{
 			$this->assertArrayHasKey($description, $triggers_expected);
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "[3] State mismatch for trigger: $description");
+			$this->assertEquals($expected['state'], $trigger['state'], "[3] State mismatch for trigger: $description: ".json_encode($trigger));
 			$this->assertEquals($expected['value'], $trigger['value'], "[3] Value mismatch for trigger: $description");
 		}
 	}
