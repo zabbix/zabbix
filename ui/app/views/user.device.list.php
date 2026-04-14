@@ -121,9 +121,15 @@ $deviceTable = (new CTableInfo())
 	->setPageNavigation($data['paging']);
 
 foreach ($data['devices'] as $device) {
+	$can_manage = CWebUser::$data['userid'] == $device['userid']
+		? $data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
+		: $data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER];
+
 	$deviceTable->addRow([
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER]
-			? (new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid']))
+			? $can_manage
+				? (new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid']))
+				: ''
 			: null,
 		$device['name'],
 		$device['uuid'],
@@ -131,7 +137,7 @@ foreach ($data['devices'] as $device) {
 		$device['user_role'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
-		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER]
+		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] && $can_manage
 			? (new CButton('', _('Unlink')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->removeId()

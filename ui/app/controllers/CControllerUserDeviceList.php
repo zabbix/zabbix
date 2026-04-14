@@ -199,7 +199,9 @@ class CControllerUserDeviceList extends CController {
 			'url' => $view_url->getUrl(),
 			'has_access' => [
 				CRoleHelper::DEVICES_ACTIONS_MANAGE_USER =>
-					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER),
+				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN =>
+					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
 			]
 		];
 

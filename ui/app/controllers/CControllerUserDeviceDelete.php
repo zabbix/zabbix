@@ -45,20 +45,27 @@ class CControllerUserDeviceDelete extends CController {
 	protected function checkPermissions(): bool {
 		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN) ||
 				!($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
-				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES))) {
+					&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES))) {
 			return false;
 		}
 
 		$filter = [
 			'deviceids' => $this->getInput('deviceids'),
-			'output' => ['deviceid', 'uuid']
+			'output' => ['deviceid', 'uuid', 'userid']
 		];
 
-		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+				|| !$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)) {
 			$filter['userids'] = [CWebUser::$data['userid']];
 		}
 
 		$this->devices = API::Device()->get($filter);
+
+		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+			$this->devices = array_filter($this->devices, function ($db_device) {
+				return $db_device['userid'] == CWebUser::$data['userid'];
+			});
+		}
 
 		return count($this->devices) == count($this->getInput('deviceids'));
 	}

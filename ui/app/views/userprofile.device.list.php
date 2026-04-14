@@ -43,7 +43,7 @@ $deviceTable = (new CTableInfo())
 			? (new CColHeader(
 			(new CCheckBox('all_items'))
 				->onClick("checkAll('".$deviceForm->getName()."', 'all_items', 'g_deviceid');")
-		))->addClass(ZBX_STYLE_CELL_WIDTH)
+			))->addClass(ZBX_STYLE_CELL_WIDTH)
 			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
