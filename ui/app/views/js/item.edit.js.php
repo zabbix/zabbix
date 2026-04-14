@@ -525,7 +525,7 @@ window.item_edit_form = new class {
 			values.delay = '';
 		}
 
-		const delay_flex = [];
+		const delay_flex = {};
 		for (let key in values.delay_flex) {
 			let { schedule, period, type, delay } = values.delay_flex[key];
 			type = parseInt(type);
@@ -538,7 +538,7 @@ window.item_edit_form = new class {
 				continue;
 			}
 
-			delay_flex.push(values.delay_flex[key]);
+			delay_flex[key] = values.delay_flex[key]
 		}
 
 		return {...values, ...{delay_flex}};
