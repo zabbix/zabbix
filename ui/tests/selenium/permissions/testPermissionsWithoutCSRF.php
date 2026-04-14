@@ -361,7 +361,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=gui.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #29 Autoregistration update.
@@ -376,7 +376,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM housekeeper',
 					'link' => 'zabbix.php?action=housekeeping.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #31 Image update.
@@ -446,7 +446,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=trigdisplay.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #38 API token create.
@@ -475,7 +475,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=miscconfig.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #41 Proxy update.
@@ -736,7 +736,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM module',
 					'link' => 'zabbix.php?action=audit.settings.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #69 Timeout options update.
@@ -744,7 +744,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=timeouts.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			]
 		];
