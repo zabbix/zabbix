@@ -73,7 +73,7 @@ class CControllerCorrelationEdit extends CController {
 				'filter' => [
 					'evaltype' => DB::getDefault('correlation', 'evaltype'),
 					'formula' => DB::getDefault('correlation', 'formula'),
-					'conditions' => [],
+					'conditions' => []
 				],
 				'operations' => [],
 				'description' => DB::getDefault('correlation', 'description'),
