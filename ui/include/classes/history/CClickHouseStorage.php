@@ -577,7 +577,8 @@ class CClickHouseStorage {
 			'searchByAny' => false,
 			'sortfield' => null,
 			'sortorder' => null,
-			'limit' => null
+			'limit' => null,
+			'limit_by' => null
 		];
 
 		$sql_parts = [
@@ -588,7 +589,7 @@ class CClickHouseStorage {
 			// 'group'		=> [],
 			'order'		=> [],
 			'limit'		=> $options['limit'],
-			'limit_by'	=> null,
+			'limit_by'	=> $options['limit_by'],
 			'param'		=> []
 		];
 
