@@ -183,8 +183,8 @@
 				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setRenderer('name', ({column_data, cell_inner}) => {
-					const [hostid, name, status, maintenance] = column_data;
+				.setCellRenderer('name', ({cell_data, cell_inner}) => {
+					const [hostid, name, status, maintenance] = cell_data;
 
 					const name_link = document.createElement('a');
 					name_link.classList.add(ZBX_STYLE_LINK_ACTION);
@@ -233,13 +233,13 @@
 						}
 					}
 				})
-				.setRenderer('availability', ({column_data, cell_inner}) => {
-					const [availability] = column_data;
+				.setCellRenderer('availability', ({cell_data, cell_inner}) => {
+					const [availability] = cell_data;
 
 					cell_inner.innerHTML = availability;
 				})
-				.setRenderer('status', ({column_data, cell_inner}) => {
-					const [status] = column_data;
+				.setCellRenderer('status', ({cell_data, cell_inner}) => {
+					const [status] = cell_data;
 
 					const indicator = document.createElement('span');
 
@@ -254,43 +254,40 @@
 
 					cell_inner.appendChild(indicator);
 				})
-				.setRenderer('latest_data', ({column_data, cell_inner}) => {
-					const [hostid, items_count] = column_data;
+				.setCellRenderer('latest_data', ({cell_data, cell_inner, response}) => {
+					const [hostid, items_count] = cell_data;
+					const {allowed_ui_latest_data} = response;
 
-					this.#datatable.getData().then(response => {
-						const {allowed_ui_latest_data} = response;
+					if (allowed_ui_latest_data) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'latest.view');
+						url.searchParams.set('hostids[0]', hostid);
+						url.searchParams.set('filter_set', '1');
 
-						if (allowed_ui_latest_data) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'latest.view');
-							url.searchParams.set('hostids[0]', hostid);
-							url.searchParams.set('filter_set', '1');
+						const latest_data_link = document.createElement('a');
+						latest_data_link.setAttribute('href', url.toString());
+						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
 
-							const latest_data_link = document.createElement('a');
-							latest_data_link.setAttribute('href', url.toString());
-							latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
+						cell_inner.appendChild(latest_data_link);
+					}
+					else {
+						const latest_data_link = document.createElement('span');
+						latest_data_link.classList.add(ZBX_STYLE_DISABLED);
+						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
 
-							cell_inner.appendChild(latest_data_link);
-						}
-						else {
-							const latest_data_link = document.createElement('span');
-							latest_data_link.classList.add(ZBX_STYLE_DISABLED);
-							latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
+						cell_inner.appendChild(latest_data_link);
+					}
 
-							cell_inner.appendChild(latest_data_link);
-						}
+					if (items_count > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items_count;
 
-						if (items_count > 0) {
-							const count = document.createElement('sup');
-							count.innerText = items_count;
-
-							cell_inner.innerHTML += ' ';
-							cell_inner.appendChild(count);
-						}
-					});
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
 				})
-				.setRenderer('graphs', ({column_data, cell_inner}) => {
-					const [hostid, graphs] = column_data;
+				.setCellRenderer('graphs', ({cell_data, cell_inner}) => {
+					const [hostid, graphs] = cell_data;
 
 					if (graphs > 0) {
 						const url = new URL('zabbix.php', location.href);
@@ -311,8 +308,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('dashboards', ({column_data, cell_inner}) => {
-					const [hostid, dashboards] = column_data;
+				.setCellRenderer('dashboards', ({cell_data, cell_inner}) => {
+					const [hostid, dashboards] = cell_data;
 
 					if (dashboards > 0) {
 						const url = new URL('zabbix.php', location.href);
@@ -332,8 +329,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('web', ({column_data, cell_inner}) => {
-					const [hostid, httpTests] = column_data;
+				.setCellRenderer('web', ({cell_data, cell_inner}) => {
+					const [hostid, httpTests] = cell_data;
 
 					if (httpTests > 0) {
 						const url = new URL('zabbix.php', location.href);
@@ -354,7 +351,7 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setOptionsHandler('problems', 'CDataTableOptionsPopupMonitoringHostProblems')
+				.setOptionsHandler('problems', CDataTableOptionsPopupMonitoringHostProblems)
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();
 

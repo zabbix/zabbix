@@ -2282,11 +2282,6 @@ button {
   .datatable.is-loading::before {
     z-index: 20;
     background-color: rgba(43, 43, 43, 0.5); }
-  .datatable.datatable-resizing {
-    user-select: none;
-    pointer-events: none; }
-    .datatable.datatable-resizing .cell-resizing .cell-header-resizer {
-      border-right-color: #69808d; }
   .datatable.compact-view .cell.cell-data {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial;
@@ -2633,6 +2628,9 @@ button {
         .datatable .cell.cell-data .cell-inner .icon:not(.no-indent):not(:first-child),
         .datatable .cell.cell-data .cell-inner .link-action:not(.no-indent):not(:first-child) {
           margin-left: 5px; }
+        .datatable .cell.cell-data .cell-inner .link-alt {
+          text-overflow: initial;
+          white-space: wrap; }
         .datatable .cell.cell-data .cell-inner .problem-icon-link {
           vertical-align: middle; }
       .datatable .cell.cell-data .btn-icon {
@@ -2725,8 +2723,7 @@ button {
       .datatable .cell .cell-inner .tags-wrapper {
         display: flex;
         align-items: center;
-        flex-wrap: nowrap;
-        height: 18px; }
+        min-height: 18px; }
         .datatable .cell .cell-inner .tags-wrapper .tag {
           min-width: 24px; }
           .datatable .cell .cell-inner .tags-wrapper .tag.tag-inherited {
@@ -2760,6 +2757,14 @@ button {
     padding: 100px 0;
     background-color: #2b2b2b;
     border-top: none; }
+
+.datatable-resizing .sidebar {
+  pointer-events: none; }
+.datatable-resizing .datatable {
+  user-select: none;
+  pointer-events: none; }
+  .datatable-resizing .datatable .cell-resizing .cell-header-resizer {
+    border-right-color: #69808d; }
 
 .diff {
   padding: 4px;

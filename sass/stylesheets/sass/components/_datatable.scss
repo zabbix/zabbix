@@ -18,17 +18,6 @@
 		}
 	}
 
-	&.datatable-resizing {
-		user-select: none;
-		pointer-events: none;
-
-		.cell-resizing {
-			.cell-header-resizer {
-				border-right-color: $datatable-resizer-border-color;
-			}
-		}
-	}
-
 	&.compact-view {
 		.cell {
 			&.cell-data {
@@ -626,6 +615,11 @@
 					margin-left: 5px;
 				}
 
+				.link-alt {
+					text-overflow: initial;
+					white-space: wrap;
+				}
+
 				.problem-icon-link {
 					vertical-align: middle;
 				}
@@ -782,8 +776,7 @@
 			.tags-wrapper {
 				display: flex;
 				align-items: center;
-				flex-wrap: nowrap;
-				height: 18px;
+				min-height: 18px;
 
 				.tag {
 					min-width: 24px;
@@ -835,5 +828,22 @@
 		padding: 100px 0;
 		background-color: $ui-bg-color;
 		border-top: none;
+	}
+}
+
+.datatable-resizing {
+	.sidebar {
+		pointer-events: none;
+	}
+
+	.datatable {
+		user-select: none;
+		pointer-events: none;
+
+		.cell-resizing {
+			.cell-header-resizer {
+				border-right-color: $datatable-resizer-border-color;
+			}
+		}
 	}
 }

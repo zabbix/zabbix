@@ -232,8 +232,8 @@
 				.setTabFilterItem(this.#active_filter)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setRenderer('host', ({column_data, cell_inner}) => {
-					const [host, maintenance] = column_data;
+				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+					const [host, maintenance] = cell_data;
 
 					const host_link = document.createElement('a');
 					host_link.classList.add(ZBX_STYLE_LINK_ACTION);
@@ -284,8 +284,8 @@
 						}
 					}
 				})
-				.setRenderer('name', ({column, column_data, cell_inner}) => {
-					const [itemid, description_expanded, name, key_expanded] = column_data;
+				.setCellRenderer('name', ({column, cell_data, cell_inner}) => {
+					const [itemid, description_expanded, name, key_expanded] = cell_data;
 
 					const url_params = objectToSearchParams({action: 'latest.view', context: 'host'});
 
@@ -335,8 +335,8 @@
 						cell_inner.appendChild(item_key);
 					}
 				})
-				.setRenderer('type', ({column_data, cell_inner}) => {
-					const [type, state] = column_data;
+				.setCellRenderer('type', ({cell_data, cell_inner}) => {
+					const [type, state] = cell_data;
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
 						const type_container = document.createElement('span');
@@ -349,8 +349,8 @@
 						cell_inner.innerText = type;
 					}
 				})
-				.setRenderer('actions', ({column_data, cell_inner}) => {
-					const [itemid, is_graph, keep_history, keep_trends] = column_data;
+				.setCellRenderer('actions', ({cell_data, cell_inner}) => {
+					const [itemid, is_graph, keep_history, keep_trends] = cell_data;
 
 					if (!keep_history && !keep_trends) {
 						return;
@@ -372,12 +372,12 @@
 
 					cell_inner.appendChild(data_link);
 				})
-				.setRenderer('info', ({column_data, cell_inner}) => {
-					const [item_icons] = column_data;
+				.setCellRenderer('info', ({cell_data, cell_inner}) => {
+					const [item_icons] = cell_data;
 
 					cell_inner.appendChild(item_icons);
 				})
-				.setOptionsHandler('name', 'CDataTableOptionsPopupMonitoringLatestName')
+				.setOptionsHandler('name', CDataTableOptionsPopupMonitoringLatestName)
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();
 

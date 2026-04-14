@@ -65,7 +65,11 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 				show_item_key: e.target.checked
 			});
 
-			this.getDataTable().dispatchEvent(CDataTable.EVENT_RENDER);
+			this.getDataTable()
+				.getData()
+				.then(response => {
+					this.getDataTable().dispatchEvent(CDataTable.EVENT_RENDER, {response});
+				});
 		});
 	}
 }

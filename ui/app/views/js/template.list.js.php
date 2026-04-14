@@ -160,8 +160,8 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setRenderer('name', ({column_data, cell_inner}) => {
-					const [templateid, name] = column_data;
+				.setCellRenderer('name', ({cell_data, cell_inner}) => {
+					const [templateid, name] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'popup');
@@ -174,42 +174,39 @@
 
 					cell_inner.appendChild(edit_link);
 				})
-				.setRenderer('hosts', ({column_data, cell_inner}) => {
-					const [templateid, editable_hosts] = column_data;
+				.setCellRenderer('hosts', ({cell_data, cell_inner, response}) => {
+					const [templateid, editable_hosts] = cell_data;
+					const {allowed_ui_conf_hosts} = response;
 
-					this.datatable.getData().then(response => {
-						const {allowed_ui_conf_hosts} = response;
+					let items = Object.keys(editable_hosts).length;
 
-						let items = Object.keys(editable_hosts).length;
+					if (allowed_ui_conf_hosts) {
+						const url = new URL('zabbix.php', location.href);
+						url.searchParams.set('action', 'template.list');
+						url.searchParams.set('filter_set', '1');
+						url.searchParams.set('filter_templates[0]', templateid);
+						url.searchParams.set('context', 'template');
 
-						if (allowed_ui_conf_hosts) {
-							const url = new URL('zabbix.php', location.href);
-							url.searchParams.set('action', 'template.list');
-							url.searchParams.set('filter_set', '1');
-							url.searchParams.set('filter_templates[0]', templateid);
-							url.searchParams.set('context', 'template');
+						const item_link = document.createElement('a');
+						item_link.setAttribute('href', url.toString());
+						item_link.innerText = <?= json_encode(_('Hosts')); ?>;
 
-							const item_link = document.createElement('a');
-							item_link.setAttribute('href', url.toString());
-							item_link.innerText = <?= json_encode(_('Hosts')); ?>;
+						cell_inner.appendChild(item_link);
+					}
+					else {
+						cell_inner.innerHTML += <?= json_encode(_('Hosts')); ?>;
+					}
 
-							cell_inner.appendChild(item_link);
-						}
-						else {
-							cell_inner.innerHTML += <?= json_encode(_('Hosts')); ?>;
-						}
+					if (items > 0) {
+						const count = document.createElement('sup');
+						count.innerText = items;
 
-						if (items > 0) {
-							const count = document.createElement('sup');
-							count.innerText = items;
-
-							cell_inner.innerHTML += ' ';
-							cell_inner.appendChild(count);
-						}
-					});
+						cell_inner.innerHTML += ' ';
+						cell_inner.appendChild(count);
+					}
 				})
-				.setRenderer('items', ({column_data, cell_inner}) => {
-					const [templateid, items] = column_data;
+				.setCellRenderer('items', ({cell_data, cell_inner}) => {
+					const [templateid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'item.list');
@@ -231,8 +228,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('triggers', ({column_data, cell_inner}) => {
-					const [templateid, triggers] = column_data;
+				.setCellRenderer('triggers', ({cell_data, cell_inner}) => {
+					const [templateid, triggers] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'trigger.list');
@@ -254,8 +251,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('graphs', ({column_data, cell_inner}) => {
-					const [templateid, graphs] = column_data;
+				.setCellRenderer('graphs', ({cell_data, cell_inner}) => {
+					const [templateid, graphs] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'graph.list');
@@ -277,8 +274,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('dashboards', ({column_data, cell_inner}) => {
-					const [templateid, dashboards] = column_data;
+				.setCellRenderer('dashboards', ({cell_data, cell_inner}) => {
+					const [templateid, dashboards] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'template.dashboard.list');
@@ -299,8 +296,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('discovery', ({column_data, cell_inner}) => {
-					const [templateid, discovery] = column_data;
+				.setCellRenderer('discovery', ({cell_data, cell_inner}) => {
+					const [templateid, discovery] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'template.dashboard.list');
@@ -321,8 +318,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('web', ({column_data, cell_inner}) => {
-					const [templateid, web] = column_data;
+				.setCellRenderer('web', ({cell_data, cell_inner}) => {
+					const [templateid, web] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'template.dashboard.list');
@@ -343,8 +340,8 @@
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('linked_templates', ({column_data, cell_inner}) => {
-					const [parent_templates] = column_data;
+				.setCellRenderer('linked_templates', ({cell_data, cell_inner}) => {
+					const [parent_templates] = cell_data;
 
 					this.datatable.getData().then(response => {
 						const {max_in_table} = response;
@@ -384,46 +381,43 @@
 						}
 					});
 				})
-				.setRenderer('linked_to_templates', ({column_data, cell_inner}) => {
-					const [templates] = column_data;
+				.setCellRenderer('linked_to_templates', ({cell_data, cell_inner, response}) => {
+					const [templates] = cell_data;
+					const {max_in_table} = response;
+					const length = Math.min(max_in_table, templates.length);
 
-					this.datatable.getData().then(response => {
-						const {max_in_table} = response;
-						const length = Math.min(max_in_table, templates.length);
+					for (let i = 0; i < length; i++) {
+						const template = templates[i];
 
-						for (let i = 0; i < length; i++) {
-							const template = templates[i];
+						if (template.editable) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'popup');
+							url.searchParams.set('popup', 'template.edit');
+							url.searchParams.set('templateid', template.templateid);
 
-							if (template.editable) {
-								const url = new URL('zabbix.php', location.href);
-								url.searchParams.set('action', 'popup');
-								url.searchParams.set('popup', 'template.edit');
-								url.searchParams.set('templateid', template.templateid);
+							const template_link = document.createElement('a');
+							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
+							template_link.setAttribute('href', url.toString());
+							template_link.innerText = template.name;
 
-								const template_link = document.createElement('a');
-								template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
-								template_link.setAttribute('href', url.toString());
-								template_link.innerText = template.name;
+							cell_inner.appendChild(template_link);
+						}
+						else {
+							const template_link = document.createElement('span');
+							template_link.classList.add(ZBX_STYLE_GREY);
+							template_link.innerText = template.name;
 
-								cell_inner.appendChild(template_link);
-							}
-							else {
-								const template_link = document.createElement('span');
-								template_link.classList.add(ZBX_STYLE_GREY);
-								template_link.innerText = template.name;
-
-								cell_inner.appendChild(template_link);
-							}
-
-							if (i < length - 1) {
-								cell_inner.innerHTML += ', ';
-							}
+							cell_inner.appendChild(template_link);
 						}
 
-						if (templates.length > max_in_table) {
-							cell_inner.innerHTML += ' &hellip;';
+						if (i < length - 1) {
+							cell_inner.innerHTML += ', ';
 						}
-					});
+					}
+
+					if (templates.length > max_in_table) {
+						cell_inner.innerHTML += ' &hellip;';
+					}
 				})
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();

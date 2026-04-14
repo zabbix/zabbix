@@ -306,16 +306,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setRenderer(CDataTableColumn.CHECKBOX, ({column, column_data, cell, cell_inner}) => {
-					/*
-
-					<button type="button"
-					class="btn-icon zi-more"
-					data-menu-popup="{&quot;type&quot;:&quot;host&quot;,&quot;data&quot;:{&quot;hostid&quot;:&quot;99015&quot;}}" aria-expanded="false"
-					aria-haspopup="true"></button>
-
-					 */
-					const [object_id, data_actions] = column_data;
+				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, cell, cell_inner}) => {
+					const [object_id, data_actions] = cell_data;
 
 					if (!object_id) {
 						return;
@@ -354,8 +346,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					column.setWidth('58px');
 				})
-				.setRenderer('name', ({column_data, cell_inner}) => {
-					const [hostid, name, discovery, flags, maintenance, status] = column_data;
+				.setCellRenderer('name', ({cell_data, cell_inner}) => {
+					const [hostid, name, discovery, flags, maintenance, status] = cell_data;
 
 					if (flags == ZBX_FLAG_DISCOVERY_CREATED) {
 						if (discovery.rule) {
@@ -436,8 +428,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						}
 					}
 				})
-				.setRenderer('items', ({column_data, cell_inner}) => {
-					const [hostid, items] = column_data;
+				.setCellRenderer('items', ({cell_data, cell_inner}) => {
+					const [hostid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'item.list');
@@ -459,8 +451,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('triggers', ({column_data, cell_inner}) => {
-					const [hostid, items] = column_data;
+				.setCellRenderer('triggers', ({cell_data, cell_inner}) => {
+					const [hostid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'trigger.list');
@@ -482,8 +474,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('graphs', ({column_data, cell_inner}) => {
-					const [hostid, items] = column_data;
+				.setCellRenderer('graphs', ({cell_data, cell_inner}) => {
+					const [hostid, items] = cell_data;
 
 					const url = new URL('zabbix.php', location.href);
 					url.searchParams.set('action', 'graph.list');
@@ -505,8 +497,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('discovery', ({column_data, cell_inner}) => {
-					const [hostid, items] = column_data;
+				.setCellRenderer('discovery', ({cell_data, cell_inner}) => {
+					const [hostid, items] = cell_data;
 
 					const url = new URL('host_discovery.php', location.href);
 					url.searchParams.set('filter_set', '1');
@@ -527,8 +519,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('web', ({column_data, cell_inner}) => {
-					const [hostid, items] = column_data;
+				.setCellRenderer('web', ({cell_data, cell_inner}) => {
+					const [hostid, items] = cell_data;
 
 					const url = new URL('httpconf.php', location.href);
 					url.searchParams.set('filter_set', '1');
@@ -549,8 +541,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.appendChild(count);
 					}
 				})
-				.setRenderer('status', ({column_data, cell_inner}) => {
-					const [hostid, status, disabled_by_lld] = column_data;
+				.setCellRenderer('status', ({cell_data, cell_inner}) => {
+					const [hostid, status, disabled_by_lld] = cell_data;
 					const is_monitored = status == HOST_STATUS_MONITORED;
 
 					const status_link = document.createElement('a');
@@ -601,149 +593,144 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						cell_inner.appendChild(description_icon);
 					}
 				})
-				.setRenderer('availability', ({column_data, cell_inner}) => {
-					const [availability] = column_data;
+				.setCellRenderer('availability', ({cell_data, cell_inner}) => {
+					const [availability] = cell_data;
 
 					cell_inner.innerHTML = availability;
 				})
-				.setRenderer('proxy', ({column_data, cell_inner}) => {
+				.setCellRenderer('proxy', ({cell_data, cell_inner, response}) => {
 					const [monitored_by, proxyid, proxy_groupid, assigned_proxyid, proxy, proxy_group,
-						assigned_proxy] = column_data;
+						assigned_proxy] = cell_data;
 
 					if (!monitored_by) {
 						return;
 					}
 
-					this.#datatable.getData().then(response => {
-						const {can_edit_proxies, can_edit_proxy_groups} = response;
+					const {can_edit_proxies, can_edit_proxy_groups} = response;
 
-						const proxy_url = new URL('zabbix.php', location.href);
-						proxy_url.searchParams.set('action', 'popup');
-						proxy_url.searchParams.set('popup', 'proxy.edit');
+					const proxy_url = new URL('zabbix.php', location.href);
+					proxy_url.searchParams.set('action', 'popup');
+					proxy_url.searchParams.set('popup', 'proxy.edit');
 
-						if (monitored_by == ZBX_MONITORED_BY_PROXY) {
+					if (monitored_by == ZBX_MONITORED_BY_PROXY) {
+						if (can_edit_proxies) {
+							proxy_url.searchParams.set('proxyid', proxyid);
+
+							const proxy_link = document.createElement('a');
+							proxy_link.setAttribute('href', proxy_url.toString());
+							proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
+							proxy_link.classList.add(ZBX_STYLE_GREY);
+							proxy_link.innerText = proxy.name;
+
+							cell_inner.appendChild(proxy_link);
+						}
+						else {
+							cell_inner.innerHTML = proxy.name;
+						}
+					}
+					else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
+						if (can_edit_proxy_groups) {
+							const proxy_group_url = new URL('zabbix.php', location.href);
+							proxy_group_url.searchParams.set('action', 'popup');
+							proxy_group_url.searchParams.set('popup', 'proxygroup.edit');
+							proxy_group_url.searchParams.set('proxy_groupid', proxy_groupid);
+
+							const proxy_group_link = document.createElement('a');
+							proxy_group_link.setAttribute('href', proxy_group_url.toString());
+							proxy_group_link.classList.add(ZBX_STYLE_LINK_ALT);
+							proxy_group_link.classList.add(ZBX_STYLE_GREY);
+							proxy_group_link.innerText = proxy_group.name;
+
+							cell_inner.appendChild(proxy_group_link);
+						}
+						else {
+							cell_inner.innerHTML = proxy_group.name;
+						}
+
+						if (assigned_proxyid != 0) {
+							cell_inner.innerHTML += NAME_DELIMITER;
+
 							if (can_edit_proxies) {
-								proxy_url.searchParams.set('proxyid', proxyid);
+								proxy_url.searchParams.set('proxyid', assigned_proxyid);
 
 								const proxy_link = document.createElement('a');
 								proxy_link.setAttribute('href', proxy_url.toString());
 								proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
 								proxy_link.classList.add(ZBX_STYLE_GREY);
-								proxy_link.innerText = proxy.name;
+								proxy_link.innerText = assigned_proxy.name;
 
 								cell_inner.appendChild(proxy_link);
 							}
 							else {
-								cell_inner.innerHTML = proxy.name;
+								cell_inner.innerHTML += assigned_proxy.name;
 							}
 						}
-						else if (monitored_by == ZBX_MONITORED_BY_PROXY_GROUP) {
-							if (can_edit_proxy_groups) {
-								const proxy_group_url = new URL('zabbix.php', location.href);
-								proxy_group_url.searchParams.set('action', 'popup');
-								proxy_group_url.searchParams.set('popup', 'proxygroup.edit');
-								proxy_group_url.searchParams.set('proxy_groupid', proxy_groupid);
+					}
+				})
+				.setCellRenderer('templates', ({cell_data, cell_inner, response}) => {
+					const [templates] = cell_data;
+					const {max_in_table} = response;
+					const max_in_table_exceeded = templates.length > max_in_table;
+					const visible_templates = Object.values(templates).slice(0, max_in_table);
 
-								const proxy_group_link = document.createElement('a');
-								proxy_group_link.setAttribute('href', proxy_group_url.toString());
-								proxy_group_link.classList.add(ZBX_STYLE_LINK_ALT);
-								proxy_group_link.classList.add(ZBX_STYLE_GREY);
-								proxy_group_link.innerText = proxy_group.name;
+					visible_templates.forEach(({templateid, name, parentTemplates, editable}, i) => {
+						const element = editable ? document.createElement('a') : document.createElement('span');
 
-								cell_inner.appendChild(proxy_group_link);
-							}
-							else {
-								cell_inner.innerHTML = proxy_group.name;
-							}
+						if (editable) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'popup');
+							url.searchParams.set('popup', 'template.edit');
+							url.searchParams.set('templateid', templateid);
 
-							if (assigned_proxyid != 0) {
-								cell_inner.innerHTML += NAME_DELIMITER;
+							element.classList.add(ZBX_STYLE_LINK_ALT);
+							element.setAttribute('href', url.toString());
+						}
 
-								if (can_edit_proxies) {
-									proxy_url.searchParams.set('proxyid', assigned_proxyid);
+						element.classList.add('grey');
+						element.innerText = name;
 
-									const proxy_link = document.createElement('a');
-									proxy_link.setAttribute('href', proxy_url.toString());
-									proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
-									proxy_link.classList.add(ZBX_STYLE_GREY);
-									proxy_link.innerText = assigned_proxy.name;
+						cell_inner.appendChild(element);
 
-									cell_inner.appendChild(proxy_link);
+						if (parentTemplates.length > 0) {
+							cell_inner.innerHTML += ' (';
+
+							parentTemplates.forEach(({templateid, name, editable}, j) => {
+								const element = editable ? document.createElement('a') : document.createElement('span');
+
+								if (editable) {
+									const url = new URL('zabbix.php', location.href);
+									url.searchParams.set('action', 'popup');
+									url.searchParams.set('popup', 'template.edit');
+									url.searchParams.set('templateid', templateid);
+
+									element.classList.add(ZBX_STYLE_LINK_ALT);
+									element.setAttribute('href', url.toString());
 								}
-								else {
-									cell_inner.innerHTML += assigned_proxy.name;
+
+								element.classList.add('grey');
+								element.innerText = name;
+
+								cell_inner.appendChild(element);
+
+								if (j < parentTemplates.length - 1) {
+									cell_inner.innerHTML += ', ';
 								}
-							}
+							});
+
+							cell_inner.innerHTML += ')';
+						}
+
+						if (i < visible_templates.length - 1) {
+							cell_inner.innerHTML += ', ';
 						}
 					});
+
+					if (max_in_table_exceeded) {
+						cell_inner.innerHTML += ' &hellip;';
+					}
 				})
-				.setRenderer('templates', ({column_data, cell_inner}) => {
-					const [templates] = column_data;
-
-					this.#datatable.getData().then(response => {
-						const {max_in_table} = response;
-						const max_in_table_exceeded = templates.length > max_in_table;
-						const visible_templates = Object.values(templates).slice(0, max_in_table);
-
-						visible_templates.forEach(({templateid, name, parentTemplates, editable}, i) => {
-							const element = editable ? document.createElement('a') : document.createElement('span');
-
-							if (editable) {
-								const url = new URL('zabbix.php', location.href);
-								url.searchParams.set('action', 'popup');
-								url.searchParams.set('popup', 'template.edit');
-								url.searchParams.set('templateid', templateid);
-
-								element.classList.add(ZBX_STYLE_LINK_ALT);
-								element.setAttribute('href', url.toString());
-							}
-
-							element.classList.add('grey');
-							element.innerText = name;
-
-							cell_inner.appendChild(element);
-
-							if (parentTemplates.length > 0) {
-								cell_inner.innerHTML += ' (';
-
-								parentTemplates.forEach(({templateid, name, editable}, j) => {
-									const element = editable ? document.createElement('a') : document.createElement('span');
-
-									if (editable) {
-										const url = new URL('zabbix.php', location.href);
-										url.searchParams.set('action', 'popup');
-										url.searchParams.set('popup', 'template.edit');
-										url.searchParams.set('templateid', templateid);
-
-										element.classList.add(ZBX_STYLE_LINK_ALT);
-										element.setAttribute('href', url.toString());
-									}
-
-									element.classList.add('grey');
-									element.innerText = name;
-
-									cell_inner.appendChild(element);
-
-									if (j < parentTemplates.length - 1) {
-										cell_inner.innerHTML += ', ';
-									}
-								});
-
-								cell_inner.innerHTML += ')';
-							}
-
-							if (i < visible_templates.length - 1) {
-								cell_inner.innerHTML += ', ';
-							}
-						});
-
-						if (max_in_table_exceeded) {
-							cell_inner.innerHTML += ' &hellip;';
-						}
-					});
-				})
-				.setRenderer('info', ({column_data, cell_inner}) => {
-					const [info_icons] = column_data;
+				.setCellRenderer('info', ({cell_data, cell_inner}) => {
+					const [info_icons] = cell_data;
 
 					const info = document.createElement('div');
 					info.classList.add(ZBX_STYLE_REL_CONTAINER);
@@ -752,8 +739,8 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					cell_inner.appendChild(info);
 				})
-				.setRenderer('encryption', ({column_data, cell_inner}) => {
-					const [tls_accept, tls_connect] = column_data;
+				.setCellRenderer('encryption', ({cell_data, cell_inner}) => {
+					const [tls_accept, tls_connect] = cell_data;
 
 					if (tls_connect == HOST_ENCRYPTION_NONE
 						&& (tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE

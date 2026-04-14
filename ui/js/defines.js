@@ -35,6 +35,8 @@ const ZBX_STYLE_NO_DATA_MESSAGE = 'no-data-message';
 const ZBX_STYLE_NO_INDENT = 'no-indent';
 const ZBX_STYLE_WORDBREAK = 'wordbreak';
 
+const ZBX_STYLE_LAYOUT_WRAPPER = 'wrapper';
+
 const ZBX_STYLE_BTN = 'btn';
 const ZBX_STYLE_BTN_ALT = 'btn-alt';
 const ZBX_STYLE_BTN_GREY = 'btn-grey';

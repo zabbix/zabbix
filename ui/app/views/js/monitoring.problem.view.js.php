@@ -161,10 +161,13 @@
 						this.#datatable.getElement().classList.toggle('has-highlighted-rows', option.checked);
 					},
 					onChange: (event, option) => {
-						this.#datatable.updateOption(option.id, { checked: event.target.checked });
-
-						this.#datatable.dispatchEvent(CDataTable.EVENT_RENDER);
-						this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
+						this.#datatable
+							.updateOption(option.id, { checked: event.target.checked })
+							.getData()
+							.then(response => {
+								this.#datatable.dispatchEvent(CDataTable.EVENT_RENDER, {response});
+								this.#datatable.dispatchEvent(CDataTable.EVENT_SAVE);
+							});
 					}
 				})
 				.setPage(page)
@@ -177,8 +180,8 @@
 				.setStorageIdx(storage_idx)
 				.setStickyHeader(true)
 				.setStickyFooter(true)
-				.setRenderer(CDataTableColumn.CHECKBOX, ({column, column_data, row_index, cell, cell_inner}) => {
-					const [eventid, nested, symptom_count, cause_eventid, severity] = column_data;
+				.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, row_index, cell, cell_inner, response}) => {
+					const [eventid, nested, symptom_count, cause_eventid, severity] = cell_data;
 
 					if (!eventid) {
 						return;
@@ -209,52 +212,50 @@
 
 					const filter = this.#datatable.getFilter();
 					const show_symptoms = filter.show_symptoms == 1;
-					this.#datatable.getData().then(response => {
-						const {show_two_columns, show_three_columns} = response;
+					const {show_two_columns, show_three_columns} = response;
 
-						if (show_two_columns || show_three_columns) {
-							const symptoms = document.createElement('div');
-							symptoms.classList.add('symptoms');
+					if (show_two_columns || show_three_columns) {
+						const symptoms = document.createElement('div');
+						symptoms.classList.add('symptoms');
 
-							if (cause_eventid == 0) {
-								if (symptom_count > 0) {
-									const symptom_counter = document.createElement('span');
-									symptom_counter.classList.add('entity-count');
-									symptom_counter.innerText = symptom_count;
+						if (cause_eventid == 0) {
+							if (symptom_count > 0) {
+								const symptom_counter = document.createElement('span');
+								symptom_counter.classList.add('entity-count');
+								symptom_counter.innerText = symptom_count;
 
-									const symptoms_left = document.createElement('span');
-									symptoms_left.classList.add('symptoms-left');
-									symptoms_left.appendChild(symptom_counter);
+								const symptoms_left = document.createElement('span');
+								symptoms_left.classList.add('symptoms-left');
+								symptoms_left.appendChild(symptom_counter);
 
-									const show_symptoms_button = document.createElement('button');
-									show_symptoms_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_CHEVRON_DOWN,
-										ZBX_STYLE_COLLAPSED);
-									show_symptoms_button.setAttribute('type', 'button');
-									show_symptoms_button.setAttribute('title', <?= json_encode(_('Expand')); ?>);
-									show_symptoms_button.setAttribute('data-eventid', eventid);
-									show_symptoms_button.setAttribute('data-action', 'show_symptoms');
+								const show_symptoms_button = document.createElement('button');
+								show_symptoms_button.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_CHEVRON_DOWN,
+									ZBX_STYLE_COLLAPSED);
+								show_symptoms_button.setAttribute('type', 'button');
+								show_symptoms_button.setAttribute('title', <?= json_encode(_('Expand')); ?>);
+								show_symptoms_button.setAttribute('data-eventid', eventid);
+								show_symptoms_button.setAttribute('data-action', 'show_symptoms');
 
-									symptoms.append(symptoms_left, show_symptoms_button);
-								}
+								symptoms.append(symptoms_left, show_symptoms_button);
 							}
-							else {
-								if (nested) {
-									symptoms.append(checkbox, label);
-								}
-
-								if (nested || show_symptoms) {
-									const symptom_icon = document.createElement('span');
-									symptom_icon.classList.add('icon', 'zi-arrow-top-right',
-										nested ? 'symptoms-right' : 'symptoms-left');
-									symptom_icon.setAttribute('title', <?= json_encode(_('Symptom')); ?>);
-
-									symptoms.append(symptom_icon);
-								}
-							}
-
-							cell.appendChild(symptoms);
 						}
-					});
+						else {
+							if (nested) {
+								symptoms.append(checkbox, label);
+							}
+
+							if (nested || show_symptoms) {
+								const symptom_icon = document.createElement('span');
+								symptom_icon.classList.add('icon', 'zi-arrow-top-right',
+									nested ? 'symptoms-right' : 'symptoms-left');
+								symptom_icon.setAttribute('title', <?= json_encode(_('Symptom')); ?>);
+
+								symptoms.append(symptom_icon);
+							}
+						}
+
+						cell.appendChild(symptoms);
+					}
 
 					requestAnimationFrame(() => {
 						const highlight_row = this.#datatable.getOption('highlight_row');
@@ -273,8 +274,8 @@
 						}
 					});
 				})
-				.setRenderer('time', ({column, column_data, cell, cell_inner}) => {
-					const [clock, eventid, triggerid] = column_data;
+				.setCellRenderer('time', ({column, cell_data, cell, cell_inner}) => {
+					const [clock, eventid, triggerid] = cell_data;
 
 					if (clock && eventid && triggerid) {
 						const url = new URL('tr_events.php', location.href);
@@ -309,8 +310,8 @@
 						cell.append(axis, td);
 					}
 				})
-				.setRenderer('breakpoint', ({column, column_data, cell, cell_inner}) => {
-					const [breakpoint] = column_data;
+				.setCellRenderer('breakpoint', ({column, cell_data, cell, cell_inner}) => {
+					const [breakpoint] = cell_data;
 
 					const breakpoint_header = document.createElement('h4');
 					breakpoint_header.innerText = breakpoint;
@@ -336,16 +337,16 @@
 						cell.append(axis, td);
 					}
 				})
-				.setRenderer('severity', ({column_data, cell, cell_inner}) => {
-					const [severity] = column_data;
+				.setCellRenderer('severity', ({cell_data, cell, cell_inner}) => {
+					const [severity] = cell_data;
 					const severity_data = severities.find(data => data.value == severity);
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG, severity_data.style);
 
 					cell_inner.innerText = severity_data.label;
 				})
-				.setRenderer('host', ({column_data, cell_inner}) => {
-					const [hosts] = column_data;
+				.setCellRenderer('host', ({cell_data, cell_inner}) => {
+					const [hosts] = cell_data;
 
 					if (!hosts) {
 						return;
@@ -402,46 +403,44 @@
 						}
 					}
 				})
-				.setRenderer('update', ({column_data, cell_inner}) => {
-					const [can_be_closed, eventid] = column_data;
+				.setCellRenderer('update', ({cell_data, cell_inner, response}) => {
+					const [can_be_closed, eventid] = cell_data;
 
 					if (!eventid) {
 						return;
 					}
 
-					this.#datatable.getData().then(response => {
-						const {allowed} = response;
-						if (!allowed) {
-							return;
-						}
+					const {allowed} = response;
+					if (!allowed) {
+						return;
+					}
 
-						let update_link;
+					let update_link;
 
-						if (allowed.add_comments || allowed.change_severity || allowed.acknowledge || can_be_closed
-								|| allowed.suppress_problems || allowed.rank_change) {
+					if (allowed.add_comments || allowed.change_severity || allowed.acknowledge || can_be_closed
+							|| allowed.suppress_problems || allowed.rank_change) {
 
-							const url_params = objectToSearchParams({
-								action: 'popup',
-								popup: 'acknowledge.edit',
-								'eventids[]': eventid
-							});
-							const url = new URL(`zabbix.php?${url_params}`, location.href);
+						const url_params = objectToSearchParams({
+							action: 'popup',
+							popup: 'acknowledge.edit',
+							'eventids[]': eventid
+						});
+						const url = new URL(`zabbix.php?${url_params}`, location.href);
 
-							update_link = document.createElement('a');
-							update_link.classList.add(ZBX_STYLE_LINK_ALT);
-							update_link.setAttribute('href', url.toString());
-						}
-						else {
-							update_link = document.createElement('span');
-						}
+						update_link = document.createElement('a');
+						update_link.classList.add(ZBX_STYLE_LINK_ALT);
+						update_link.setAttribute('href', url.toString());
+					}
+					else {
+						update_link = document.createElement('span');
+					}
 
-						update_link.innerText = <?= json_encode(_('Update')); ?>;
+					update_link.innerText = <?= json_encode(_('Update')); ?>;
 
-						cell_inner.appendChild(update_link);
-					});
+					cell_inner.appendChild(update_link);
 				})
-				.setRenderer('symptom_limit', ({cell, cell_inner, column_data}) => {
-					const [paging] = column_data;
+				.setCellRenderer('symptom_limit', ({cell, cell_inner, cell_data}) => {
+					const [paging] = cell_data;
 
 					const table_stats = document.createElement('div');
 					table_stats.classList.add(ZBX_STYLE_TABLE_STATS, 'table-stats-small');
@@ -454,25 +453,23 @@
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
 					cell_inner.appendChild(paging_container);
 				})
-				.setRowRenderer('default', ({columns, row, row_index, data_fields, row_data}) => {
-					this.#datatable.getData().then(response => {
-						const {show_two_columns, show_three_columns} = response;
-						const column = this.#datatable.getCheckboxColumnConfig();
+				.setRowRenderer('default', ({columns, row, row_index, data_fields, row_data, response}) => {
+					const {show_two_columns, show_three_columns} = response;
+					const column = this.#datatable.getCheckboxColumnConfig();
 
-						if (show_three_columns) {
-							column.setWidth('93px');
-						}
-						else if (show_two_columns) {
-							column.setWidth('72px');
-						}
-						else {
-							column.setWidth('37px');
-						}
+					if (show_three_columns) {
+						column.setWidth('93px');
+					}
+					else if (show_two_columns) {
+						column.setWidth('72px');
+					}
+					else {
+						column.setWidth('37px');
+					}
 
-						this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
-					});
+					this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data, response});
 				})
-				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data}) => {
+				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const column = this.#datatable.getCheckboxColumnConfig();
 					const column_index = column.getColumnIndex();
 					const [, , , cause_eventid, severity] = row_data[column_index];
@@ -480,7 +477,7 @@
 					row.classList.add('nested', 'nested-small', 'hidden');
 					row.setAttribute('data-cause-eventid', cause_eventid);
 
-					this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data});
+					this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data, response});
 
 					requestAnimationFrame(() => {
 						const highlight_row = this.#datatable.getOption('highlight_row');
@@ -499,7 +496,7 @@
 						}
 					});
 				})
-				.setRowRenderer('symptom_limit', ({columns, row, data_fields, row_data}) => {
+				.setRowRenderer('symptom_limit', ({columns, row, row_index, data_fields, row_data}) => {
 					const [cause_eventid, symptom_limit] = row_data;
 
 					row.classList.add(CDataTable.ZBX_STYLE_ROW_DISABLED, 'hidden');
@@ -523,12 +520,13 @@
 						const data_cell = this.#datatable.createDataCell(column_clone);
 
 						if (column.getId() == 'time') {
-							this.#datatable.renderDataCellContents(column_clone, row, data_cell, data_fields, [null]);
+							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
+								[null]);
 						}
 						else if (column.getColumnIndex() == column_index) {
-							column_clone.setRenderer('symptom_limit');
+							column_clone.setCellRenderer('symptom_limit');
 
-							this.#datatable.renderDataCellContents(column_clone, row, data_cell, data_fields,
+							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
 								[symptom_limit]);
 						}
 
@@ -537,7 +535,7 @@
 
 					row.append(...data_cells);
 				})
-				.setRowRenderer('breakpoint', ({columns, row, data_fields, row_data}) => {
+				.setRowRenderer('breakpoint', ({columns, row, row_index, data_fields, row_data}) => {
 					const compact_view = this.#datatable.getOption('compact_view');
 					if (compact_view.checked) {
 						return;
@@ -558,9 +556,10 @@
 						const data_cell = this.#datatable.createDataCell(column_clone);
 
 						if (i == column_index) {
-							column_clone.setRenderer('breakpoint');
+							column_clone.setCellRenderer('breakpoint');
 
-							this.#datatable.renderDataCellContents(column_clone, row, data_cell, data_fields, row_data);
+							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
+								row_data);
 						}
 
 						data_cells.push(data_cell.target);
@@ -572,10 +571,8 @@
 						this.#datatable.createRowSpacer(row);
 					}
 				})
-				.setOptionsHandler('time', 'CDataTableOptionsPopupMonitoringProblemsTime')
-				.setOptionsHandler('problem', 'CDataTableOptionsPopupMonitoringProblemsProblem')
-				.setOptionsHandler('tags', 'CDataTableOptionsPopupTags')
-				.setOptionsHandler('tagvalue', 'CDataTableOptionsPopupTagValue')
+				.setOptionsHandler('time', CDataTableOptionsPopupMonitoringProblemsTime)
+				.setOptionsHandler('problem', CDataTableOptionsPopupMonitoringProblemsProblem)
 				.on(CMessageHelper.EVENT_MESSAGE, event => {
 					event.stopPropagation();
 
