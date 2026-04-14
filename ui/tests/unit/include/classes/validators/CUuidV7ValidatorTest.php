@@ -73,10 +73,10 @@ class CUuidV7ValidatorTest extends TestCase {
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testValidateEmail($uuid, $expected, $error) {
+	public function testValidateUuidV7($uuid, $expected, $error) {
 		$uuid_v7_validator = new CUuidV7Validator();
 		$result = $uuid_v7_validator->validate($uuid);
-		$this->assertSame($result, $expected);
-		$this->assertSame($uuid_v7_validator->getError(), $error);
+		$this->assertSame($expected, $result);
+		$this->assertSame($error, $uuid_v7_validator->getError());
 	}
 }
