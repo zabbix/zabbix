@@ -41,7 +41,7 @@ class CElasticsearchHelper {
 	 */
 	public static function getRequestUrl(array $storage, string $action = '_search'): string {
 		$segments = [
-			rtrim($storage['url'], '/'),
+			$storage['url'],
 			self::VALUE_TYPE_TABLE[$storage['value_type']].'*',
 			$action
 		];
