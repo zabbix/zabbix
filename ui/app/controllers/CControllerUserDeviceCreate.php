@@ -59,7 +59,7 @@ class CControllerUserDeviceCreate extends CController {
 			'admin_mode' => $this->getInput('admin_mode', 0) ? 1 : 0,
 			'ms_user' => $this->getInput('admin_mode', 0)
 				? []
-				: [['userid' => CWebUser::$data['userid'], 'name' => getUserFullname(CWebUser::$data)]],
+				: [['id' => CWebUser::$data['userid'], 'name' => getUserFullname(CWebUser::$data)]],
 			'js_validation_rules' => (new CFormValidator(CControllerUserDeviceInit::getValidationRules()))->getRules(),
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];

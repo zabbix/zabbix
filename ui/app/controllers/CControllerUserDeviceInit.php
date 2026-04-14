@@ -24,9 +24,7 @@ class CControllerUserDeviceInit extends CController {
 	public static function getValidationRules(): array {
 		return ['object', 'fields' => [
 			'admin_mode' => ['boolean'],
-			'userid' => ['db users.userid', 'required',
-				'when' => ['admin_mode', 'in' => [1]]
-			]
+			'userid' => ['db users.userid', 'required']
 		]];
 	}
 
@@ -55,13 +53,12 @@ class CControllerUserDeviceInit extends CController {
 			return false;
 		}
 
-		if ($this->getInput('admin_mode', 0) == 1) {
-			return ($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
-				&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
-			);
+		if (CWebUser::$data['userid'] == $this->getInput('userid')) {
+			return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN);
 		}
 
-		return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN);
+		return $this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES);
 	}
 
 	protected function initFakeDevice (): array {
@@ -84,7 +81,7 @@ class CControllerUserDeviceInit extends CController {
 	}
 
 	protected function doAction() {
-		$userid = $this->getInput('userid', CWebUser::$data['userid']);
+		$userid = $this->getInput('userid');
 
 		// TODO: uncomment and use actual init
 		//$device = API::Device()->init(['userid' => $userid]);
