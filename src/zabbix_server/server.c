@@ -887,7 +887,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_REPORTWRITER] && NULL == zbx_config_webservice_url)
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when "
+		zabbix_log(LOG_LEVEL_CRIT, "\"WebServiceURL\" configuration parameter must be set when"
 				" setting \"StartReportWriters\" configuration parameter");
 	}
 
