@@ -1378,6 +1378,9 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				zbx_free(error);
 			}
 
+			if (SVC_SNMPv3 == dcheck_type)
+				queue->snmp_allowed_workers++;
+
 			if (DISCOVERER_JOB_STATUS_WAITING == job->status)
 			{
 				job->status = DISCOVERER_JOB_STATUS_QUEUED;
@@ -1484,6 +1487,8 @@ static void	discoverer_libs_destroy(void)
 static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread_discoverer_args *args_in,
 		const zbx_thread_info_t *info, char **error)
 {
+#	define SNMP_WORKERS_MAX	1
+
 	int		i, err, ret = FAIL, started_num = 0, checks_per_worker_max;
 	time_t		time_start;
 	struct timespec	poll_delay = {0, 1e8};
@@ -1530,7 +1535,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 		return FAIL;
 	}
 
-	if (SUCCEED != discoverer_queue_init(&manager->queue, checks_per_worker_max, error))
+	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMP_WORKERS_MAX, checks_per_worker_max, error))
 	{
 		pthread_mutex_destroy(&manager->results_lock);
 		return FAIL;
@@ -1596,6 +1601,8 @@ out:
 	}
 
 	return ret;
+
+#	undef SNMP_WORKERS_MAX
 }
 
 static void	discoverer_manager_free(zbx_discoverer_manager_t *manager)
