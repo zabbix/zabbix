@@ -290,8 +290,7 @@ foreach ($data['users'] as $user) {
 	];
 
 	if (CTemporaryMobileFeatureHelper::isEnabled()) {
-		// TODO: data from permissions
-		$row[] = array_key_exists('linked_devices', $user)
+		$row[] = CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $user['roleid'])
 			? (new CSpan(_('Enabled')))->addClass(ZBX_STYLE_GREEN)
 			: (new CSpan(_('Disabled')))->addClass(ZBX_STYLE_ORANGE);
 	}
