@@ -761,17 +761,35 @@ class CTrigger extends CTriggerGeneral {
 					$this->outputIsRequested('lastchange', $options['output']),
 					$this->outputIsRequested('error', $options['output'])
 				]))
-			|| (is_array($options['filter'])
+				|| (is_array($options['filter'])
 					&& array_intersect_key($options['filter'], array_flip(['value', 'state', 'lastchange', 'error'])))
-			|| (is_array($options['search']) && array_key_exists('error', $options['search']))
-			|| $this->outputIsRequested('lastChangeSince', $options['output'])
-			|| $this->outputIsRequested('lastChangeTill', $options['output'])
-			|| $this->outputIsRequested('only_true', $options['output'])) {
+				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
+				|| $this->outputIsRequested('lastChangeSince', $options['output'])
+				|| $this->outputIsRequested('lastChangeTill', $options['output'])
+				|| $this->outputIsRequested('only_true', $options['output'])) {
 			$sql_parts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
 		}
 
 		if (!$options['countOutput'] && $options['expandDescription'] !== null || $options['expandComment'] !== null) {
 			$sql_parts = $this->addQuerySelect($this->fieldId('expression'), $sql_parts);
+		}
+
+		if (!$options['countOutput']) {
+			if ($this->outputIsRequested('value', $options['output'])) {
+				$sql_parts = $this->addQuerySelect('tr.value', $sql_parts);
+			}
+
+			if ($this->outputIsRequested('state', $options['output'])) {
+				$sql_parts = $this->addQuerySelect('tr.state', $sql_parts);
+			}
+
+			if ($this->outputIsRequested('lastchange', $options['output'])) {
+				$sql_parts = $this->addQuerySelect('tr.lastchange', $sql_parts);
+			}
+
+			if ($this->outputIsRequested('error', $options['output'])) {
+				$sql_parts = $this->addQuerySelect('tr.error', $sql_parts);
+			}
 		}
 
 		return $sql_parts;
