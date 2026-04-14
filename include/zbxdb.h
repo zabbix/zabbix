@@ -57,6 +57,9 @@ typedef struct
 	char		*db_tls_ca_file;
 	char		*db_tls_cipher;
 	char		*db_tls_cipher_13;
+#if defined(HAVE_POSTGRESQL)
+	char		*dbports;
+#endif
 	unsigned int	dbport;
 	int		log_slow_queries;
 	int		read_only_recoverable;
