@@ -437,8 +437,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	if (FAIL == device_check_permissions(&user, target_userid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() permission denied for userid:" ZBX_FS_UI64 " target_userid:" ZBX_FS_UI64,
-				__func__, user.userid, target_userid);
+		zabbix_log(LOG_LEVEL_WARNING, "%s() permission denied for userid:" ZBX_FS_UI64 " target_userid:"
+				ZBX_FS_UI64, __func__, user.userid, target_userid);
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
