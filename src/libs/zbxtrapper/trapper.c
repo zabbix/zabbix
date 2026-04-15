@@ -35,8 +35,6 @@
 #include "zbxpoller.h"
 #include "zbxavailability.h"
 #include "zbx_availability_constants.h"
-#include "zbxxml.h"
-#include "zbxcrypto.h"
 #include "zbxtime.h"
 #include "zbxstats.h"
 #include "zbx_host_constants.h"
