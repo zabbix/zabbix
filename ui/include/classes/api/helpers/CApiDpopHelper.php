@@ -146,8 +146,4 @@ class CApiDpopHelper {
 	public static function getServerId(): string {
 		return 'server_id';
 	}
-
-	public static function getDeviceFeatureFlag(): bool {
-		return true;
-	}
 }

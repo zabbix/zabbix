@@ -73,7 +73,7 @@ class CControllerTimeoutsUpdate extends CController {
 			]
 		]];
 
-		if (CApiDpopHelper::getDeviceFeatureFlag()) {
+		if (CTemporaryMobileFeatureHelper::isEnabled()) {
 			$rules['fields']['device_link_timeout'] = ['setting device_link_timeout', 'required', 'not_empty',
 				'use' => [CTimeUnitValidator::class, ['min' => 1, 'max' => 300]]
 			];
