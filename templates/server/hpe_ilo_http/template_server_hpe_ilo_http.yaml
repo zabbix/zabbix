@@ -186,6 +186,9 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
             		var target = name.toLowerCase();
             
             		for (var key in headers) {

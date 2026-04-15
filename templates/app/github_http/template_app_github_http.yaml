@@ -226,8 +226,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -270,6 +270,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -278,7 +282,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -424,8 +428,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -468,6 +472,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -476,7 +484,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -751,8 +759,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -795,6 +803,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -803,7 +815,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -3380,8 +3392,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3424,6 +3436,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -3432,7 +3448,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -3570,8 +3586,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3614,6 +3630,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -3622,7 +3642,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -3862,8 +3882,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3906,6 +3926,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -3914,7 +3938,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -4058,8 +4082,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4102,6 +4126,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -4110,7 +4138,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -4446,8 +4474,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4490,6 +4518,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -4498,7 +4530,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -4647,8 +4679,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4691,6 +4723,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -4699,7 +4735,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -4826,8 +4862,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			var linkHeader = github.getHeader(headers, 'Link');
-            			url = ((linkHeader || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4870,6 +4906,10 @@ zabbix_export:
             	},
             
             	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
             		var target = name.toLowerCase();
             
             		for (var key in headers) {
@@ -4878,7 +4918,7 @@ zabbix_export:
             			}
             		}
             		
-            		return '';
+            		return null;
             	}
             }
             
@@ -5025,8 +5065,8 @@ zabbix_export:
                 
                 			headers = request.getHeaders();
                 
-                			var linkHeader = github.getHeader(headers, 'Link');
-                			url = ((linkHeader || '').match(next_pattern) || [])[1];
+                			var link_header = github.getHeader(headers, 'Link');
+                			url = ((link_header || '').match(next_pattern) || [])[1];
                 
                 			if (pagination_required === 'false') {
                 				url = '';
@@ -5069,6 +5109,10 @@ zabbix_export:
                 	},
                 
                 	getHeader: function (headers, name) {
+                		if (!headers || typeof headers !== 'object') {
+                			return null;
+                		}
+                
                 		var target = name.toLowerCase();
                 
                 		for (var key in headers) {
@@ -5077,7 +5121,7 @@ zabbix_export:
                 			}
                 		}
                 		
-                		return '';
+                		return null;
                 	}
                 }
                 
@@ -5509,8 +5553,8 @@ zabbix_export:
                 
                 			headers = request.getHeaders();
                 
-                			var linkHeader = github.getHeader(headers, 'Link');
-                			url = ((linkHeader || '').match(next_pattern) || [])[1];
+                			var link_header = github.getHeader(headers, 'Link');
+                			url = ((link_header || '').match(next_pattern) || [])[1];
                 
                 			if (pagination_required === 'false') {
                 				url = '';
@@ -5553,6 +5597,10 @@ zabbix_export:
                 	},
                 
                 	getHeader: function (headers, name) {
+                		if (!headers || typeof headers !== 'object') {
+                			return null;
+                		}
+                
                 		var target = name.toLowerCase();
                 
                 		for (var key in headers) {
@@ -5561,7 +5609,7 @@ zabbix_export:
                 			}
                 		}
                 		
-                		return '';
+                		return null;
                 	}
                 }
                 
