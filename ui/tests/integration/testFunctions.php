@@ -472,12 +472,12 @@ class testFunctions extends CIntegrationTest{
 			'Item 30 lastclock() eq {$LASTCLOCK}' => ['state' => 0, 'value' => 0],
 			'Item 31 logtimestamp() eq 0' => ['state' => 1, 'value' => 0],
 			'Item 32 firstclock(5m) eq {$FIRSTCLOCK}' => ['state' => 0, 'value' => 0],
-			'Item 52 trendcount eq 3' => ['state' => 0, 'value' => 0],
-			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 0],
-			'Item 52 trendmax eq 8' => ['state' => 0, 'value' => 0],
-			'Item 52 trendsum eq 14' => ['state' => 0, 'value' => 0],
-			'Item 52 trendavg eq 4.6' => ['state' => 0, 'value' => 0],
-			'Item 53 trendstl eq 0' => ['state' => 0, 'value' => 0],
+			'Item 52 trendcount eq 3' => ['state' => 0, 'value' => 1],
+			'Item 52 trendmin eq 2' => ['state' => 0, 'value' => 1],
+			'Item 52 trendmax eq 8' => ['state' => 0, 'value' => 1],
+			'Item 52 trendsum eq 14' => ['state' => 0, 'value' => 1],
+			'Item 52 trendavg eq 4.6' => ['state' => 0, 'value' => 1],
+			'Item 53 trendstl eq 0' => ['state' => 0, 'value' => 1],
 			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
 			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
 		];
