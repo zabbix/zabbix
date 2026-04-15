@@ -151,7 +151,7 @@ class CControllerLldRulePrototypeList extends CController {
 	}
 
 	protected function getFilter(): array {
-		$filter = $this->getProfiles();
+		$filter = $this->getProfileFilters();
 
 		if ($this->getInput('sort', $filter['sort']) !== $filter['sort']
 				|| $this->getInput('sortorder', $filter['sortorder']) !== $filter['sortorder']) {
@@ -162,7 +162,7 @@ class CControllerLldRulePrototypeList extends CController {
 		return $filter;
 	}
 
-	protected function getProfiles(): array {
+	protected function getProfileFilters(): array {
 		$prefix = $this->getProfilePrefix();
 
 		$filter = [

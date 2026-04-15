@@ -28,7 +28,7 @@ class CControllerLldRuleList extends CController {
 			'filter_hostids'				=> 'array_db hosts.hostid',
 			'filter_name'					=> 'string',
 			'filter_key'					=> 'string',
-			'filter_type'					=> 'in '.implode(',', [-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER]),
+			'filter_type'					=> 'in '.implode(',', [-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT, ITEM_TYPE_BROWSER, ITEM_TYPE_NESTED]),
 			'filter_delay'					=> 'string',
 			'filter_lifetime_type'			=> 'in '.implode(',', [-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]),
 			'filter_lifetime'				=> 'string',
@@ -67,10 +67,10 @@ class CControllerLldRuleList extends CController {
 
 	protected function doAction(): void {
 		if ($this->hasInput('filter_set')) {
-			$this->updateProfiles();
+			$this->updateProfileFilters();
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			$this->deleteProfiles();
+			$this->deleteProfileFilters();
 		}
 
 		$page = $this->getInput('page', 1);
@@ -227,7 +227,7 @@ class CControllerLldRuleList extends CController {
 
 	protected function getFilter(): array {
 		$context = $this->getInput('context');
-		$filter = $this->getProfiles() + [
+		$filter = $this->getProfileFilters() + [
 				'ms_groups' => [],
 				'ms_hosts' => []
 			];
@@ -270,7 +270,7 @@ class CControllerLldRuleList extends CController {
 		return $filter;
 	}
 
-	protected function getProfiles(): array {
+	protected function getProfileFilters(): array {
 		$prefix = $this->getProfilePrefix();
 
 		$filter = [
@@ -294,7 +294,7 @@ class CControllerLldRuleList extends CController {
 		return $filter;
 	}
 
-	protected function updateProfiles(): void {
+	protected function updateProfileFilters(): void {
 		$prefix = $this->getProfilePrefix();
 
 		CProfile::updateArray($prefix.'filter.groupids', $this->getInput('filter_groupids', []), PROFILE_TYPE_ID);
@@ -332,7 +332,7 @@ class CControllerLldRuleList extends CController {
 		}
 	}
 
-	protected function deleteProfiles(): void {
+	protected function deleteProfileFilters(): void {
 		$prefix = $this->getProfilePrefix();
 
 		CProfile::deleteIdx($prefix.'filter.groupids');
