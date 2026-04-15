@@ -44,9 +44,7 @@ $formgrid
 					),
 				(new CTemplateTag('', [
 					(new CRow([
-						(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '#{lld_macro}',
-							['add_post_js' => false]
-						))
+						(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '#{lld_macro}'))
 							->removeId()
 							->setReadonly($readonly)
 							->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'))

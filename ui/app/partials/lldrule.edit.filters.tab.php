@@ -85,25 +85,25 @@ $formgrid
 							new CSpan('#{formulaid}'),
 							new CVar('conditions[#{rowNum}][formulaid]', '#{formulaid}')
 						],
-						(new CTextBox('conditions[#{rowNum}][macro]', '#{macro}', $readonly,
-							DB::getFieldLength('item_condition', 'macro')
-						))
+						(new CTextAreaFlexible('conditions[#{rowNum}][macro]', '#{macro}'))
 							->removeId()
 							->setAttribute('placeholder', '{#MACRO}')
 							->addClass('macro')
 							->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+							->setMaxlength(DB::getFieldLength('item_condition', 'macro'))
+							->setReadonly($readonly)
 							->setErrorContainer('conditions-#{rowNum}-error-container'),
 						(new CSelect('conditions[#{rowNum}][operator]'))
 							->setValue('#{operator}')
 							->addClass('js-operator')
 							->addOptions($operators),
 						(new CDiv(
-							(new CTextBox('conditions[#{rowNum}][value]', '#{value}', $readonly,
-								DB::getFieldLength('item_condition', 'value')
-							))
+							(new CTextAreaFlexible('conditions[#{rowNum}][value]', '#{value}'))
 								->removeId()
 								->setAttribute('placeholder', _('regular expression'))
 								->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+								->setMaxlength(DB::getFieldLength('item_condition', 'value'))
+								->setReadonly($readonly)
 								->addClass('js-value')
 								->setErrorContainer('conditions-#{rowNum}-error-container')
 						))->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH),

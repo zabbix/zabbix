@@ -50,9 +50,11 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $lldrule['name'], $readonly, DB::getFieldLength('items', 'name')))
+			(new CTextAreaFlexible('name', $lldrule['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setReadonly($readonly)
 				->setAriaRequired()
+				->setMaxlength(DB::getFieldLength('items', 'name'))
 				->setAttribute('autofocus', 'autofocus')
 		)
 	])
@@ -69,19 +71,22 @@ $formgrid
 	])
 	->addItem([
 		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
-		(new CFormField(
-			(new CTextBox('key', $lldrule['key'], $readonly, DB::getFieldLength('item_discovery', 'key_')))
-				->setAriaRequired()
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		))
+		new CFormField((new CTextAreaFlexible('key', $lldrule['key']))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('item_discovery', 'key_'))
+			->setReadonly($readonly)
+			->setAriaRequired()
+		)
 	])
 	->addItem([
 		(new CLabel(_('URL'), 'url'))
 			->setAsteriskMark()
 			->setId('js-item-url-label'),
 		(new CFormField([
-			(new CTextBox('url', $lldrule['url'], $readonly, DB::getFieldLength('items', 'url')))
+			(new CTextAreaFlexible('url', $lldrule['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'url'))
+				->setReadonly($readonly)
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
@@ -108,15 +113,17 @@ $formgrid
 					),
 				new CTemplateTag('query-field-row-tmpl', (new CRow([
 					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $readonly))
+					(new CTextAreaFlexible('query_fields[#{rowNum}][name]', '#{name}'))
 						->removeId()
 						->setAttribute('placeholder', _('name'))
-						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+						->setReadonly($readonly),
 					RARR(),
-					(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $readonly))
+					(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}'))
 						->removeId()
 						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+						->setReadonly($readonly),
 					(new CButtonLink(_('Remove')))
 						->addClass('element-table-remove')
 						->setEnabled(!$readonly)
@@ -257,15 +264,18 @@ $formgrid
 			new CTemplateTag('item-header-row-tmpl',
 				(new CRow([
 					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CTextBox('headers[#{rowNum}][name]', '#{name}', $readonly))
+					(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}'))
 						->removeId()
 						->setAttribute('placeholder', _('name'))
-						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+						->setReadonly($readonly),
 					RARR(),
-					(new CTextBox('headers[#{rowNum}][value]', '#{value}', $readonly, 2000))
+					(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}'))
 						->removeId()
 						->setAttribute('placeholder', _('value'))
-						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+						->setMaxlength(2000)
+						->setReadonly($readonly),
 					(new CButtonLink(_('Remove')))
 						->addClass('element-table-remove')
 						->setEnabled(!$readonly)
@@ -476,8 +486,10 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
 		(new CFormField(
-			(new CTextBox('snmp_oid', $lldrule['snmp_oid'], $readonly, DB::getFieldLength('items', 'snmp_oid')))
+			(new CTextAreaFlexible('snmp_oid', $lldrule['snmp_oid']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setReadonly($readonly)
+				->setMaxlength(DB::getFieldLength('items', 'snmp_oid'))
 				->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 				->setAriaRequired()
 		))->setId('js-item-snmp-oid-field')
@@ -485,9 +497,11 @@ $formgrid
 	->addItem([
 		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField(
-			(new CTextBox('ipmi_sensor', $lldrule['ipmi_sensor'], $readonly, DB::getFieldLength('items', 'ipmi_sensor')))
+			(new CTextAreaFlexible('ipmi_sensor', $lldrule['ipmi_sensor']))
 				->setAttribute('data-notrim', '')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'ipmi_sensor'))
+				->setReadonly($readonly)
 		))->setId('js-item-impi-sensor-field')
 	])
 	->addItem([
@@ -727,10 +741,10 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField(
-			(new CTextBox('trapper_hosts', $lldrule['trapper_hosts'], $lldrule['discovered_lld'],
-				DB::getFieldLength('items', 'trapper_hosts')
-			))
+			(new CTextAreaFlexible('trapper_hosts', $lldrule['trapper_hosts']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setReadonly($lldrule['discovered_lld'])
+				->setMaxlength(DB::getFieldLength('items', 'trapper_hosts'))
 		))->setId('js-item-trapper-hosts-field')
 	])
 	->addItem([
