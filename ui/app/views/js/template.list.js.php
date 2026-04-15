@@ -162,7 +162,7 @@
 
 					const edit_link = document.createElement('a');
 					edit_link.setAttribute('href', url.toString())
-					edit_link.innerText = name;
+					edit_link.textContent = name;
 
 					cell_inner.appendChild(edit_link);
 				})
@@ -181,7 +181,7 @@
 
 						const item_link = document.createElement('a');
 						item_link.setAttribute('href', url.toString());
-						item_link.innerText = <?= json_encode(_('Hosts')); ?>;
+						item_link.textContent = <?= json_encode(_('Hosts')); ?>;
 
 						cell_inner.appendChild(item_link);
 					}
@@ -191,7 +191,7 @@
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -208,13 +208,13 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Items')); ?>;
+					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -231,13 +231,13 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Triggers')); ?>;
+					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (triggers > 0) {
 						const count = document.createElement('sup');
-						count.innerText = triggers;
+						count.textContent = triggers;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -254,13 +254,13 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Graphs')); ?>;
+					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (graphs > 0) {
 						const count = document.createElement('sup');
-						count.innerText = graphs;
+						count.textContent = graphs;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -276,13 +276,13 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Dashboards')); ?>;
+					item_link.textContent = <?= json_encode(_('Dashboards')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (dashboards > 0) {
 						const count = document.createElement('sup');
-						count.innerText = dashboards;
+						count.textContent = dashboards;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -298,13 +298,13 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Discovery')); ?>;
+					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (discovery > 0) {
 						const count = document.createElement('sup');
-						count.innerText = discovery;
+						count.textContent = discovery;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -320,13 +320,13 @@
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Web')); ?>;
+					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (web > 0) {
 						const count = document.createElement('sup');
-						count.innerText = web;
+						count.textContent = web;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -351,14 +351,14 @@
 								const template_link = document.createElement('a');
 								template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
 								template_link.setAttribute('href', url.toString());
-								template_link.innerText = template.name;
+								template_link.textContent = template.name;
 
 								cell_inner.appendChild(template_link);
 							}
 							else {
 								const template_link = document.createElement('span');
 								template_link.classList.add(ZBX_STYLE_GREY);
-								template_link.innerText = template.name;
+								template_link.textContent = template.name;
 
 								cell_inner.appendChild(template_link);
 							}
@@ -390,14 +390,14 @@
 							const template_link = document.createElement('a');
 							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
 							template_link.setAttribute('href', url.toString());
-							template_link.innerText = template.name;
+							template_link.textContent = template.name;
 
 							cell_inner.appendChild(template_link);
 						}
 						else {
 							const template_link = document.createElement('span');
 							template_link.classList.add(ZBX_STYLE_GREY);
-							template_link.innerText = template.name;
+							template_link.textContent = template.name;
 
 							cell_inner.appendChild(template_link);
 						}

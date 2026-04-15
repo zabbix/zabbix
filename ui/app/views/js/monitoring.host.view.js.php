@@ -190,7 +190,7 @@
 					name_link.setAttribute('aria-haspopup', 'true');
 					name_link.setAttribute('role', 'button');
 					name_link.setAttribute('href', 'javascript:void(0);');
-					name_link.innerText = name;
+					name_link.textContent = name;
 
 					cell_inner.appendChild(name_link);
 
@@ -239,11 +239,11 @@
 
 					if (status == HOST_STATUS_MONITORED) {
 						indicator.classList.add(ZBX_STYLE_GREEN);
-						indicator.innerText = <?= json_encode(_('Enabled')); ?>;
+						indicator.textContent = <?= json_encode(_('Enabled')); ?>;
 					}
 					else {
 						indicator.classList.add(ZBX_STYLE_RED);
-						indicator.innerText = <?= json_encode(_('Disabled')); ?>;
+						indicator.textContent = <?= json_encode(_('Disabled')); ?>;
 					}
 
 					cell_inner.appendChild(indicator);
@@ -260,21 +260,21 @@
 
 						const latest_data_link = document.createElement('a');
 						latest_data_link.setAttribute('href', url.toString());
-						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
+						latest_data_link.textContent = <?= json_encode(_('Latest data')); ?>;
 
 						cell_inner.appendChild(latest_data_link);
 					}
 					else {
 						const latest_data_link = document.createElement('span');
 						latest_data_link.classList.add(ZBX_STYLE_DISABLED);
-						latest_data_link.innerText = <?= json_encode(_('Latest data')); ?>;
+						latest_data_link.textContent = <?= json_encode(_('Latest data')); ?>;
 
 						cell_inner.appendChild(latest_data_link);
 					}
 
 					if (items_count > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items_count;
+						count.textContent = items_count;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -291,12 +291,12 @@
 
 						const graphs_link = document.createElement('a');
 						graphs_link.setAttribute('href', url.toString());
-						graphs_link.innerText = <?= json_encode(_('Graphs')); ?>;
+						graphs_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
 						cell_inner.appendChild(graphs_link);
 
 						const count = document.createElement('sup');
-						count.innerText = graphs;
+						count.textContent = graphs;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -312,12 +312,12 @@
 
 						const dashboards_link = document.createElement('a');
 						dashboards_link.setAttribute('href', url.toString());
-						dashboards_link.innerText = <?= json_encode(_('Dashboards')); ?>;
+						dashboards_link.textContent = <?= json_encode(_('Dashboards')); ?>;
 
 						cell_inner.appendChild(dashboards_link);
 
 						const count = document.createElement('sup');
-						count.innerText = dashboards;
+						count.textContent = dashboards;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -334,12 +334,12 @@
 
 						const web_link = document.createElement('a');
 						web_link.setAttribute('href', url.toString());
-						web_link.innerText = <?= json_encode(_('Web')); ?>;
+						web_link.textContent = <?= json_encode(_('Web')); ?>;
 
 						cell_inner.appendChild(web_link);
 
 						const count = document.createElement('sup');
-						count.innerText = httpTests;
+						count.textContent = httpTests;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);

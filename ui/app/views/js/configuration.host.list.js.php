@@ -361,7 +361,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 							else {
 								const discovery_rule = document.createElement('span');
 								discovery_rule.classList.add(ZBX_STYLE_ORANGE);
-								discovery_rule.innerText = discovery.rule.name;
+								discovery_rule.textContent = discovery.rule.name;
 
 								cell_inner.appendChild(discovery_rule);
 							}
@@ -369,7 +369,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						else {
 							const discovery_rule = document.createElement('span');
 							discovery_rule.classList.add(ZBX_STYLE_ORANGE);
-							discovery_rule.innerText = <?= json_encode(_('Inaccessible discovery rule')); ?>;
+							discovery_rule.textContent = <?= json_encode(_('Inaccessible discovery rule')); ?>;
 
 							cell_inner.appendChild(discovery_rule);
 						}
@@ -384,7 +384,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const edit_link = document.createElement('a');
 					edit_link.setAttribute('href', url.toString())
-					edit_link.innerText = name;
+					edit_link.textContent = name;
 
 					cell_inner.appendChild(edit_link);
 
@@ -432,13 +432,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Items')); ?>;
+					item_link.textContent = <?= json_encode(_('Items')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -455,13 +455,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Triggers')); ?>;
+					item_link.textContent = <?= json_encode(_('Triggers')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -478,13 +478,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Graphs')); ?>;
+					item_link.textContent = <?= json_encode(_('Graphs')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -500,13 +500,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Discovery')); ?>;
+					item_link.textContent = <?= json_encode(_('Discovery')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -522,13 +522,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 					const item_link = document.createElement('a');
 					item_link.setAttribute('href', url.toString());
-					item_link.innerText = <?= json_encode(_('Web')); ?>;
+					item_link.textContent = <?= json_encode(_('Web')); ?>;
 
 					cell_inner.appendChild(item_link);
 
 					if (items > 0) {
 						const count = document.createElement('sup');
-						count.innerText = items;
+						count.textContent = items;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
@@ -541,7 +541,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					const status_link = document.createElement('a');
 					status_link.classList.add(ZBX_STYLE_LINK_ACTION, is_monitored ? ZBX_STYLE_GREEN : ZBX_STYLE_RED);
 					status_link.setAttribute('href', 'javascript:void(0);');
-					status_link.innerText = is_monitored
+					status_link.textContent = is_monitored
 						? <?= json_encode(_('Enabled')); ?>
 						: <?= json_encode(_('Disabled')); ?>;
 					status_link.addEventListener('click', event => {
@@ -613,7 +613,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 							proxy_link.setAttribute('href', proxy_url.toString());
 							proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
 							proxy_link.classList.add(ZBX_STYLE_GREY);
-							proxy_link.innerText = proxy.name;
+							proxy_link.textContent = proxy.name;
 
 							cell_inner.appendChild(proxy_link);
 						}
@@ -632,7 +632,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 							proxy_group_link.setAttribute('href', proxy_group_url.toString());
 							proxy_group_link.classList.add(ZBX_STYLE_LINK_ALT);
 							proxy_group_link.classList.add(ZBX_STYLE_GREY);
-							proxy_group_link.innerText = proxy_group.name;
+							proxy_group_link.textContent = proxy_group.name;
 
 							cell_inner.appendChild(proxy_group_link);
 						}
@@ -650,7 +650,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 								proxy_link.setAttribute('href', proxy_url.toString());
 								proxy_link.classList.add(ZBX_STYLE_LINK_ALT);
 								proxy_link.classList.add(ZBX_STYLE_GREY);
-								proxy_link.innerText = assigned_proxy.name;
+								proxy_link.textContent = assigned_proxy.name;
 
 								cell_inner.appendChild(proxy_link);
 							}
@@ -680,7 +680,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						}
 
 						element.classList.add('grey');
-						element.innerText = name;
+						element.textContent = name;
 
 						cell_inner.appendChild(element);
 
@@ -701,7 +701,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 								}
 
 								element.classList.add('grey');
-								element.innerText = name;
+								element.textContent = name;
 
 								cell_inner.appendChild(element);
 
@@ -742,7 +742,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 						const none = document.createElement('span');
 						none.classList.add(ZBX_STYLE_STATUS_GREEN);
-						none.innerText = <?= json_encode(_('None')); ?>;
+						none.textContent = <?= json_encode(_('None')); ?>;
 
 						const encryption = document.createElement('div');
 						encryption.classList.add(ZBX_STYLE_STATUS_CONTAINER);
@@ -756,13 +756,13 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 
 						// Incoming encryption.
 						if (tls_connect == HOST_ENCRYPTION_NONE) {
-							in_encryption.innerText = <?= json_encode(_('None')); ?>;
+							in_encryption.textContent = <?= json_encode(_('None')); ?>;
 						}
 						else if (tls_connect == HOST_ENCRYPTION_PSK) {
-							in_encryption.innerText = <?= json_encode(_('PSK')); ?>;
+							in_encryption.textContent = <?= json_encode(_('PSK')); ?>;
 						}
 						else {
-							in_encryption.innerText = <?= json_encode(_('CERT')); ?>;
+							in_encryption.textContent = <?= json_encode(_('CERT')); ?>;
 						}
 
 						in_encryption.classList.add('in');
@@ -771,7 +771,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						out_encryption.classList.add('out');
 
 						const none = document.createElement('span');
-						none.innerText = <?= json_encode(_('None')); ?>;
+						none.textContent = <?= json_encode(_('None')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_NONE) {
 							none.classList.add(ZBX_STYLE_STATUS_GREEN);
@@ -783,7 +783,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						out_encryption.appendChild(none);
 
 						const psk = document.createElement('span');
-						psk.innerText = <?= json_encode(_('PSK')); ?>;
+						psk.textContent = <?= json_encode(_('PSK')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_PSK) == HOST_ENCRYPTION_PSK) {
 							psk.classList.add(ZBX_STYLE_STATUS_GREEN);
@@ -795,7 +795,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 						out_encryption.appendChild(psk);
 
 						const cert = document.createElement('span');
-						cert.innerText = <?= json_encode(_('CERT')); ?>;
+						cert.textContent = <?= json_encode(_('CERT')); ?>;
 
 						if ((tls_accept & HOST_ENCRYPTION_CERTIFICATE) == HOST_ENCRYPTION_CERTIFICATE) {
 							cert.classList.add(ZBX_STYLE_STATUS_GREEN);

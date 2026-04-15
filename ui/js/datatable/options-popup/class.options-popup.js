@@ -242,7 +242,7 @@ class CDataTableOptionsPopup {
 			const form_label = document.createElement('label');
 			form_label.classList.add(ZBX_STYLE_FORM_LABEL);
 			form_label.setAttribute('for', `column_name_${column_index}`);
-			form_label.innerText = t('Column name');
+			form_label.textContent = t('Column name');
 
 			const form_input = document.createElement('input');
 			form_input.classList.add(ZBX_STYLE_FORM_FIELD);
@@ -417,7 +417,7 @@ class CDataTableOptionsPopup {
 	#addContextLink(label, callback) {
 		const context_link = document.createElement('a');
 		context_link.setAttribute('href', 'javascript:void(0);');
-		context_link.innerText = label;
+		context_link.textContent = label;
 		context_link.addEventListener('click', callback);
 
 		const context_link_container = document.createElement('div');

@@ -31,7 +31,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		if (Object.keys(options).length > 0) {
 			const table_options_header = document.createElement('div');
 			table_options_header.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE_HEADER);
-			table_options_header.innerText = t('Table options');
+			table_options_header.textContent = t('Table options');
 
 			const table_options = document.createElement('ul');
 			table_options.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST);
@@ -48,7 +48,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 				const label = document.createElement('div');
 				label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
-				label.innerText = option.name;
+				label.textContent = option.name;
 
 				const input_label = document.createElement('label');
 				input_label.setAttribute('for', option.id);
@@ -66,7 +66,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 		const popup_header = document.createElement('div');
 		popup_header.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_TABLE_HEADER);
-		popup_header.innerText = t('Column list');
+		popup_header.textContent = t('Column list');
 
 		this.#sortable = document.createElement('ul');
 		this.#sortable.classList.add(
@@ -76,7 +76,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 		const reset_button = document.createElement('button');
 		reset_button.classList.add(ZBX_STYLE_BTN_ALT);
-		reset_button.innerText = t('Reset layout');
+		reset_button.textContent = t('Reset layout');
 		reset_button.setAttribute('type', 'button');
 		reset_button.addEventListener('click', () => {
 			const message = t('Your table settings will be reset to default and duplicated columns will be removed.');
@@ -148,7 +148,7 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 
 		const label = document.createElement('div');
 		label.classList.add(CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM_LABEL);
-		label.innerText = column.getName();
+		label.textContent = column.getName();
 
 		const input_label = document.createElement('label');
 		input_label.setAttribute('for', id);

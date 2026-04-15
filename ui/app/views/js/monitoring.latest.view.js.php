@@ -243,7 +243,7 @@
 					host_link.setAttribute('aria-haspopup', 'true');
 					host_link.setAttribute('role', 'button');
 					host_link.setAttribute('href', 'javascript:void(0);');
-					host_link.innerText = host.name;
+					host_link.textContent = host.name;
 
 					cell_inner.appendChild(host_link);
 
@@ -302,7 +302,7 @@
 					name_link.setAttribute('aria-haspopup', 'true');
 					name_link.setAttribute('role', 'button');
 					name_link.setAttribute('href', 'javascript:void(0);');
-					name_link.innerText = name;
+					name_link.textContent = name;
 
 					action_container.appendChild(name_link);
 
@@ -326,7 +326,7 @@
 					if (show_item_key) {
 						const item_key = document.createElement('span');
 						item_key.classList.add(ZBX_STYLE_GREEN);
-						item_key.innerText = key_expanded;
+						item_key.textContent = key_expanded;
 
 						cell_inner.appendChild(item_key);
 					}
@@ -336,13 +336,13 @@
 
 					if (state == ITEM_STATE_NOTSUPPORTED) {
 						const type_container = document.createElement('span');
-						type_container.innerText = type;
+						type_container.textContent = type;
 						type_container.classList.add(ZBX_STYLE_GREY);
 
 						cell_inner.appendChild(type_container);
 					}
 					else {
-						cell_inner.innerText = type;
+						cell_inner.textContent = type;
 					}
 				})
 				.setCellRenderer('actions', ({cell_data, cell_inner}) => {
@@ -357,13 +357,13 @@
 						const search_params = objectToSearchParams({action: 'showgraph', itemids: [itemid]});
 
 						data_link.setAttribute('href', `history.php?${search_params}`);
-						data_link.innerText = <?= json_encode(_('Graph')); ?>;
+						data_link.textContent = <?= json_encode(_('Graph')); ?>;
 					}
 					else {
 						const search_params = objectToSearchParams({action: 'showvalues', 'itemids[]': itemid});
 
 						data_link.setAttribute('href', `history.php?${search_params}`);
-						data_link.innerText = <?= json_encode(_('History')); ?>;
+						data_link.textContent = <?= json_encode(_('History')); ?>;
 					}
 
 					cell_inner.appendChild(data_link);

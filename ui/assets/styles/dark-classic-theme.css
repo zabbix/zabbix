@@ -2591,7 +2591,8 @@ button {
         height: calc(var(--datatable-row-height) + 1px);
         cursor: col-resize;
         user-select: none;
-        border-right: 3px solid transparent; }
+        border-right: 3px solid transparent;
+        touch-action: none; }
         .datatable .cell.cell-header .cell-header-resizer:hover {
           border-right-color: #69808d; }
     .datatable .cell.cell-sticky {

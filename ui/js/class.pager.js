@@ -104,7 +104,7 @@ class CPager {
 				const first = document.createElement('a');
 				first.setAttribute('aria-label', t('Go to first page'));
 				first.setAttribute('href', 'javascript:void(0);');
-				first.innerText = t('First');
+				first.textContent = t('First');
 				first.addEventListener('click', () => this.dispatchEvent(CPager.EVENT_SELECT, {page: 1}));
 
 				nav.appendChild(first);
@@ -126,7 +126,7 @@ class CPager {
 			for (let i = start_page; i <= end_page; i++) {
 				const current = document.createElement('a');
 				current.setAttribute('href', 'javascript:void(0);');
-				current.innerText = i.toString();
+				current.textContent = i.toString();
 				current.addEventListener('click', () => this.dispatchEvent(CPager.EVENT_SELECT, {page: i}));
 
 				if (i == page) {
@@ -158,7 +158,7 @@ class CPager {
 				const last = document.createElement('a');
 				last.setAttribute('aria-label', sprintf(t('Go to last page, %1$s'), num_pages));
 				last.setAttribute('href', 'javascript:void(0);');
-				last.innerText = t('Last');
+				last.textContent = t('Last');
 				last.addEventListener('click', () => this.dispatchEvent(CPager.EVENT_SELECT, {page: num_pages}));
 
 				nav.appendChild(last);
@@ -169,10 +169,10 @@ class CPager {
 		stats.classList.add(ZBX_STYLE_TABLE_STATS);
 
 		if (num_pages == 1) {
-			stats.innerText = sprintf(t('Displaying %1$s of %2$s found'), num_rows, total);
+			stats.textContent = sprintf(t('Displaying %1$s of %2$s found'), num_rows, total);
 		}
 		else {
-			stats.innerText = sprintf(t('Displaying %1$s to %2$s of %3$s found'), start + 1, end, total);
+			stats.textContent = sprintf(t('Displaying %1$s to %2$s of %3$s found'), start + 1, end, total);
 		}
 
 		if (!this.#element.classList.contains(ZBX_STYLE_TABLE_PAGING)) {

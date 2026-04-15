@@ -552,6 +552,7 @@
 				cursor: col-resize;
 				user-select: none;
 				border-right: 3px solid transparent;
+				touch-action: none;
 
 				&:hover {
 					border-right-color: $datatable-resizer-border-color;

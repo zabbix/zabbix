@@ -221,7 +221,7 @@
 							if (symptom_count > 0) {
 								const symptom_counter = document.createElement('span');
 								symptom_counter.classList.add('entity-count');
-								symptom_counter.innerText = symptom_count;
+								symptom_counter.textContent = symptom_count;
 
 								const symptoms_left = document.createElement('span');
 								symptoms_left.classList.add('symptoms-left');
@@ -286,7 +286,7 @@
 
 						const clock_link = document.createElement('a');
 						clock_link.setAttribute('href', url.toString());
-						clock_link.innerText = clock;
+						clock_link.textContent = clock;
 
 						const timeline = document.createElement('div');
 						timeline.classList.add('timeline-date');
@@ -316,7 +316,7 @@
 					const [breakpoint] = cell_data;
 
 					const breakpoint_header = document.createElement('h4');
-					breakpoint_header.innerText = breakpoint;
+					breakpoint_header.textContent = breakpoint;
 
 					const timeline = document.createElement('div');
 					timeline.classList.add('timeline-date');
@@ -345,7 +345,7 @@
 
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_BG, severity_data.style);
 
-					cell_inner.innerText = severity_data.label;
+					cell_inner.textContent = severity_data.label;
 				})
 				.setCellRenderer('host', ({cell_data, cell_inner}) => {
 					const [hosts] = cell_data;
@@ -369,7 +369,7 @@
 						host_link.setAttribute('aria-haspopup', 'true');
 						host_link.setAttribute('role', 'button');
 						host_link.setAttribute('href', 'javascript:void(0)');
-						host_link.innerText = name;
+						host_link.textContent = name;
 
 						cell_inner.appendChild(host_link);
 
@@ -437,7 +437,7 @@
 						update_link = document.createElement('span');
 					}
 
-					update_link.innerText = <?= json_encode(_('Update')); ?>;
+					update_link.textContent = <?= json_encode(_('Update')); ?>;
 
 					cell_inner.appendChild(update_link);
 				})
@@ -446,7 +446,7 @@
 
 					const table_stats = document.createElement('div');
 					table_stats.classList.add(ZBX_STYLE_TABLE_STATS, 'table-stats-small');
-					table_stats.innerText = paging;
+					table_stats.textContent = paging;
 
 					const paging_container = document.createElement('div');
 					paging_container.classList.add(ZBX_STYLE_PAGING_BTN_CONTAINER);
@@ -498,7 +498,7 @@
 						}
 					});
 				})
-				.setRowRenderer('symptom_limit', ({columns, row, row_index, data_fields, row_data}) => {
+				.setRowRenderer('symptom_limit', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const [cause_eventid, symptom_limit] = row_data;
 
 					row.classList.add(CDataTable.ZBX_STYLE_ROW_DISABLED, 'hidden');
@@ -523,13 +523,13 @@
 
 						if (column.getId() == 'time') {
 							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
-								[null]);
+								[null], response);
 						}
 						else if (column.getColumnIndex() == column_index) {
 							column_clone.setRenderer('symptom_limit');
 
 							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
-								[symptom_limit]);
+								[symptom_limit], response);
 						}
 
 						data_cells.push(data_cell.target);
@@ -537,7 +537,7 @@
 
 					row.append(...data_cells);
 				})
-				.setRowRenderer('breakpoint', ({columns, row, row_index, data_fields, row_data}) => {
+				.setRowRenderer('breakpoint', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const compact_view = this.#datatable.getOption('compact_view');
 					if (compact_view.checked) {
 						return;
@@ -561,7 +561,7 @@
 							column_clone.setRenderer('breakpoint');
 
 							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
-								row_data);
+								row_data, response);
 						}
 
 						data_cells.push(data_cell.target);

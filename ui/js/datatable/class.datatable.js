@@ -379,17 +379,17 @@ class CDataTable {
 
 					const label = document.createElement('span');
 					label.classList.add('name');
-					label.innerText = column.getName();
+					label.textContent = column.getName();
 
 					const icon = document.createElement('span');
 
 					const header_link = document.createElement('a');
 					header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER);
 
-					if (this.#sort_field == sort_field) {
-						sort_order = sort_order == 'ASC' ? 'DESC' : 'ASC';
+					if (this.#sort_field === sort_field) {
+						sort_order = sort_order === 'ASC' ? 'DESC' : 'ASC';
 
-						icon.classList.add(sort_order == 'ASC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
+						icon.classList.add(sort_order === 'ASC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 						header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER_SORTED);
 					}
 
@@ -406,7 +406,7 @@ class CDataTable {
 				}
 				else if (column.getId() !== this.#checkbox_id) {
 					const cell_inner = this.#templates.cell_inner_span.evaluateToElement();
-					cell_inner.innerText = column.getName();
+					cell_inner.textContent = column.getName();
 
 					cell.appendChild(cell_inner);
 				}
@@ -465,17 +465,15 @@ class CDataTable {
 		this.setRowRenderer('default', this.renderDataCells);
 
 		this.setCellRenderer(CDataTableColumn.RENDERER_HTML, ({cell_data, cell_inner}) => {
-			for (const data of cell_data.filter(Boolean)) {
-				cell_inner.innerHTML += data instanceof HTMLElement ? this.sanitizeHtml(input.outerHTML) : data;
-			}
+			cell_inner.innerHTML = cell_data.filter(Boolean).join('');
 		});
 
-		this.setCellRenderer(CDataTableColumn.RENDERER_TRUSTED_HTML, ({cell_data, cell_inner}) => {
+		this.setCellRenderer(CDataTableColumn.RENDERER_ELEMENT, ({cell_data, cell_inner}) => {
 			cell_inner.append(...cell_data.filter(Boolean));
 		});
 
 		this.setCellRenderer(CDataTableColumn.RENDERER_TEXT, ({cell_data, cell_inner}) => {
-			cell_inner.innerText = cell_data.toString();
+			cell_inner.textContent = cell_data.filter(Boolean).join('');
 		});
 
 		this.setCellRenderer(CDataTableColumn.CHECKBOX, ({column, cell_data, cell, cell_inner}) => {
@@ -527,7 +525,7 @@ class CDataTable {
 
 			const tag_label = document.createElement('span');
 			tag_label.classList.add(ZBX_STYLE_TAG);
-			tag_label.innerText = tags[0].value;
+			tag_label.textContent = tags[0].value;
 
 			if (tags[0].type == ZBX_PROPERTY_INHERITED) {
 				tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
@@ -538,7 +536,7 @@ class CDataTable {
 			if (tags[0].type == ZBX_PROPERTY_INHERITED) {
 				const inherited_title = document.createElement('div');
 				inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-				inherited_title.innerText = t('Inherited tag');
+				inherited_title.textContent = t('Inherited tag');
 
 				tag_label_hintbox.appendChild(inherited_title);
 			}
@@ -620,25 +618,23 @@ class CDataTable {
 					tag_label.classList.add(ZBX_STYLE_TAG);
 				}
 
-				tag_label.innerText = `${tag.tag}: ${tag.value}`;
-
-				if (tag.type == ZBX_PROPERTY_INHERITED) {
-					tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
-				}
+				tag_label.textContent = `${tag.tag}: ${tag.value}`;
 
 				const tag_label_hintbox = document.createElement('div');
 
-				if (tag.type == ZBX_PROPERTY_INHERITED) {
+				if (tag.type === ZBX_PROPERTY_INHERITED) {
+					tag_label.classList.add(ZBX_STYLE_TAG_INHERITED);
+
 					const inherited_title = document.createElement('div');
 					inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-					inherited_title.innerText = t('Inherited tag');
+					inherited_title.textContent = t('Inherited tag');
 
 					tag_label_hintbox.appendChild(inherited_title);
 				}
 
 				const column_options = column.getColumnOptions();
 
-				if (tag.type == ZBX_PROPERTY_BOTH) {
+				if (tag.type === ZBX_PROPERTY_BOTH) {
 					tag_label.classList.add(ZBX_STYLE_TAG_INHERITED_DUPLICATE);
 
 					const hint_titles = {
@@ -654,14 +650,14 @@ class CDataTable {
 
 					const inherited_title = document.createElement('div');
 					inherited_title.classList.add(ZBX_STYLE_TAG_INHERITED_TITLE);
-					inherited_title.innerText = column_options.object_type
+					inherited_title.textContent = column_options.object_type
 						? hint_titles[column_options.object_type]
 						: '';
 
 					tag_label_hintbox.appendChild(inherited_title);
 				}
 
-				const hintbox_contents = document.createTextNode(tag_label.innerText);
+				const hintbox_contents = document.createTextNode(tag_label.textContent);
 				tag_label_hintbox.appendChild(hintbox_contents);
 
 				tag_label.setAttribute('data-hintbox-contents', tag_label_hintbox.outerHTML);
@@ -678,7 +674,7 @@ class CDataTable {
 					}
 
 					const tag_label_clone = tag_label.cloneNode(true);
-					tag_label_clone.innerText = name;
+					tag_label_clone.textContent = name;
 
 					if (has_subfilters) {
 						tag_label_clone.addEventListener('click', e => {
@@ -764,6 +760,14 @@ class CDataTable {
 
 			this.#scrollbar_thumb = null;
 		}
+
+		this.#save_config_request?.abort?.();
+		this.#save_config_request = null;
+
+		this.#initialized = false;
+		this.#resizing = false;
+		this.#scrolling = false;
+		this.#options_popup = null;
 	}
 
 	init(user_configs) {
@@ -774,6 +778,8 @@ class CDataTable {
 		this.#user_configs = user_configs || [{}];
 
 		this.#initColumns();
+
+		this.#visible_columns = this.getVisibleColumns();
 
 		this.#header = document.createElement('div');
 		this.#header.classList.add(CDataTable.ZBX_STYLE_HEADER);
@@ -790,7 +796,7 @@ class CDataTable {
 		this.#footer = this.#templates.footer.evaluateToElement();
 
 		if (this.#selectable) {
-			this.#footer.querySelector(`.${ZBX_STYLE_SELECTED_ITEM_COUNT}`).innerText = `0 ${t('selected')}`;
+			this.#footer.querySelector(`.${ZBX_STYLE_SELECTED_ITEM_COUNT}`).textContent = `0 ${t('selected')}`;
 		}
 
 		if (this.#sticky_footer) {
@@ -829,23 +835,6 @@ class CDataTable {
 		this.#row_renderers[name] = callback.bind(this);
 
 		return this;
-	}
-
-	sanitizeHtml(input) {
-		const parser = new DOMParser();
-		const doc = parser.parseFromString(String(input), 'text/html');
-
-		for (const script of doc.querySelectorAll('script')) {
-			script.remove();
-		}
-
-		const fragment = document.createDocumentFragment();
-
-		while (doc.body.firstChild) {
-			fragment.appendChild(doc.body.firstChild);
-		}
-
-		return fragment;
 	}
 
 	setCellRenderer(name, renderer) {
@@ -925,7 +914,7 @@ class CDataTable {
 	}
 
 	getOptions() {
-		return this.#options;
+		return {...this.#options};
 	}
 
 	getOption(id) {
@@ -985,7 +974,7 @@ class CDataTable {
 	}
 
 	getFilter() {
-		return this.#filter;
+		return {...this.#filter};
 	}
 
 	setFilter(filter) {
@@ -995,7 +984,7 @@ class CDataTable {
 	}
 
 	getPage() {
-		return this.#pager.getPage();
+		return this.#pager?.getPage() ?? this.#page;
 	}
 
 	setTabFilterItem(tabfilter_item) {
@@ -1216,7 +1205,7 @@ class CDataTable {
 		column.setName(name);
 
 		const cell_inner = column.getHeaderCell().target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_INNER}`);
-		cell_inner.innerText = name;
+		cell_inner.textContent = name;
 	}
 
 	onColumnReset(e) {
@@ -1331,12 +1320,9 @@ class CDataTable {
 	}
 
 	onColumnResize(e) {
-		if (!this.#resizing) {
-			return;
-		}
-
 		const column = this.getColumnConfig(this.#resize_column_index);
-		if (!column) {
+
+		if (!column || !this.#resizing) {
 			return;
 		}
 
@@ -1370,6 +1356,10 @@ class CDataTable {
 		}
 
 		const column = this.getColumnConfig(column_index);
+		if (!column) {
+			return;
+		}
+
 		column.setResized(false);
 
 		this.#calculateColumnWidth(column);
@@ -1608,7 +1598,7 @@ class CDataTable {
 		this.#scrolling = false;
 		this.#scroll_page_x = 0;
 
-		this.#scrollbar.classList.remove(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
+		this.#scrollbar?.classList.remove(CDataTable.ZBX_STYLE_SCROLLBAR_DRAGGING);
 	}
 
 	onPagerSelect = e => {
@@ -1807,7 +1797,7 @@ class CDataTable {
 
 			data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_ERROR);
 
-			cell_inner.innerText = error.message;
+			cell_inner.textContent = error.message;
 		}
 	}
 
@@ -2263,13 +2253,13 @@ class CDataTable {
 		no_data_message.style.gridColumn = '1 / -1';
 
 		if (message) {
-			no_data_message.innerText = message;
+			no_data_message.textContent = message;
 		}
 
 		if (description) {
 			const no_data_description = document.createElement('div');
 			no_data_description.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
-			no_data_description.innerText = description;
+			no_data_description.textContent = description;
 
 			no_data_message.appendChild(no_data_description);
 		}
@@ -2356,7 +2346,7 @@ class CDataTable {
 				const row = data_cell.target.closest(`.${CDataTable.ZBX_STYLE_ROW}`);
 				const cell_data = this.#collectColumnData(column, data_fields, row_data);
 
-				this.renderDataCellContents(column, row, row_index, data_cell, data_fields, cell_data);
+				this.renderDataCellContents(column, row, row_index, data_cell, data_fields, cell_data, response);
 			});
 		});
 	}
@@ -2378,7 +2368,7 @@ class CDataTable {
 			filter: this.#filter,
 			options,
 			column_options,
-			page: this.#pager.getPage(),
+			page: this.getPage(),
 			sort_field: this.#sort_field,
 			sort_order: this.#sort_order,
 			check_changes: true,
@@ -2401,10 +2391,8 @@ class CDataTable {
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
 		if (this.#tabfilter_item._parent) {
-			if (this.#tabfilter_item._parent) {
-				this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, this.onTabfilterNewItem);
-				this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, this.onTabfilterDelete);
-			}
+			this.#tabfilter_item._parent.on(TABFILTER_EVENT_NEWITEM, this.onTabfilterNewItem);
+			this.#tabfilter_item.on(TABFILTERITEM_EVENT_DELETE, this.onTabfilterDelete);
 		}
 
 		this.#subscriptions.push(ZABBIX.EventHub.subscribe({
@@ -2438,11 +2426,11 @@ class CDataTable {
 		}
 
 		ZABBIX.EventHub.unsubscribeAll(this.#subscriptions);
+		this.#subscriptions = [];
 
 		for (const {event, callback, options} of this.#bound_events) {
 			this.#element.removeEventListener(event, callback, options);
 		}
-
 		this.#bound_events = [];
 	}
 
@@ -2464,6 +2452,7 @@ class CDataTable {
 		this.#body_resize_observer = new ResizeObserver(() => {
 			this.#resizeScrollbarThumb();
 			this.#updateScrollbarThumbPosition();
+			this.#visible_columns.forEach(column => this.#calculateColumnWidth(column));
 		});
 		this.#body_resize_observer.observe(this.#body);
 
@@ -2477,7 +2466,7 @@ class CDataTable {
 	}
 
 	#unbindScrollbarEvents() {
-		this.#scrollbar_thumb.removeEventListener('pointerdown', this.onScrollbarPointerDown);
+		this.#scrollbar_thumb?.removeEventListener('pointerdown', this.onScrollbarPointerDown);
 
 		document.removeEventListener('pointermove', this.onScrollbarPointerMove);
 
@@ -2512,11 +2501,17 @@ class CDataTable {
 			this.onResizePointerMove(e);
 		});
 
-		resizer.addEventListener('pointerup', e => {
-			resizer.releasePointerCapture(e.pointerId);
+		for (const type of ['pointerup', 'pointercancel', 'lostpointercapture']) {
+			resizer.addEventListener(type, e => {
+				if (resizer.hasPointerCapture(e.pointerId)) {
+					resizer.releasePointerCapture(e.pointerId);
+				}
 
-			this.onResizePointerUp(e);
-		})
+				resizer.releasePointerCapture(e.pointerId);
+
+				this.onResizePointerUp(e);
+			});
+		}
 	}
 
 	#updateUserProfile(value, idx2) {
@@ -2663,19 +2658,16 @@ class CDataTable {
 		}
 
 		const column = this.getVisibleColumns().at(-1);
-		if (!column) {
-			return;
-		}
-
 		const header_cell = column.getHeaderCell();
-		if (!header_cell) {
+		const table_options_button = this.#findTableOptionsButton();
+
+		if (!column || !header_cell || !table_options_button) {
 			return;
 		}
 
 		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
-
 		const element_rect = this.#element.getBoundingClientRect();
-		const table_options_button_rect = this.#findTableOptionsButton().getBoundingClientRect();
+		const table_options_button_rect = table_options_button.getBoundingClientRect();
 
 		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
 		const right_boundary = element_rect.width - table_options_button_rect.width;
