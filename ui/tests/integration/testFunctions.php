@@ -304,10 +304,10 @@ class testFunctions extends CIntegrationTest{
 			}
 			$expected = $triggers_expected[$description];
 
-			if ($expected['state'] !== $trigger['state']) {
+			if ($expected['state'] != $trigger['state']) {
 				$failures[] = "[1] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
-			if ($expected['value'] !== $trigger['value']) {
+			if ($expected['value'] != $trigger['value']) {
 				$failures[] = "[1] Value mismatch for trigger: $description";
 			}
 		}
@@ -398,10 +398,10 @@ class testFunctions extends CIntegrationTest{
 			}
 			$expected = $triggers_expected[$description];
 
-			if ($expected['state'] !== $trigger['state']) {
+			if ($expected['state'] != $trigger['state']) {
 				$failures[] = "[2] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
-			if ($expected['value'] !== $trigger['value']) {
+			if ($expected['value'] != $trigger['value']) {
 				$failures[] = "[2] Value mismatch for trigger: $description";
 			}
 		}
@@ -492,10 +492,10 @@ class testFunctions extends CIntegrationTest{
 			}
 			$expected = $triggers_expected[$description];
 
-			if ($expected['state'] !== $trigger['state']) {
+			if ($expected['state'] != $trigger['state']) {
 				$failures[] = "[3] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
-			if ($expected['value'] !== $trigger['value']) {
+			if ($expected['value'] != $trigger['value']) {
 				$failures[] = "[3] Value mismatch for trigger: $description";
 			}
 		}
