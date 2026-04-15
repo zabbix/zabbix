@@ -541,6 +541,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 	ZBX_UNUSED(config_adapter_timeout);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 	payload = zbx_strdup(NULL, params);
 
@@ -669,6 +671,8 @@ out:
 	zbx_free(response_header.data);
 	zbx_free(body.data);
 	zbx_free(payload);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 #endif
 }
 
