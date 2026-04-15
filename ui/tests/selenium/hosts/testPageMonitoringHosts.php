@@ -15,7 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CWebTest.php';
-require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
@@ -33,7 +33,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class,
+			CDatatableBehavior::class,
 			[
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:tags_0'
@@ -51,14 +51,14 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$datatable = $this->query('class:datatable')->asDatatable()->waitUntilReady()->one();
 
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Hosts');
 		$this->page->assertHeader('Hosts');
 		$headers = ['Name', 'Interface', 'Availability', 'Tags', 'Status', 'Latest data', 'Problems','Graphs',
 				'Dashboards', 'Web'];
-		$this->assertSame($headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
+		$this->assertSame($headers, $datatable->getHeadersText());
 
 		// Check filter collapse/expand.
 		foreach ([true, false] as $status) {
@@ -79,16 +79,16 @@ class testPageMonitoringHosts extends CWebTest {
 		}
 
 		// Check empty columns because of no data.
-		$row = $table->findRow('Name', 'Available host');
+		$row = $datatable->findRow('Name', 'Available host');
 		foreach (['Graphs', 'Dashboards', 'Web'] as $disabled) {
 			$this->assertEquals('', $row->getColumn($disabled)->getText());
 		}
 
 		// Check that sortable headers are clickable.
-		$this->assertEquals(['Name', 'Status'], $table->getSortableHeaders()->asText());
+		$this->assertEquals(['Name', 'Status'], $datatable->getSortableHeaders()->asText());
 
 		// Check tags on the specific host.
-		$tags = $table->findRow('Name', 'Host for tags filtering - clone')->getColumn('Tags')->query('class:tag')->all();
+		$tags = $datatable->findRow('Name', 'Host for tags filtering - clone')->getColumn('Tags')->query('class:tag')->all();
 		$this->assertEquals(['action: clone', 'tag: host'], $tags->asText());
 
 		foreach ($tags as $tag) {
@@ -401,12 +401,12 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
+		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
-		$table->waitUntilReloaded();
-		$this->assertTableDataColumn($data['expected']);
+		$table->waitUntilReady();
+		$this->assertDatatableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 	}
 
 	public static function getTagsFilterData() {
@@ -840,43 +840,43 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_TagsFilter($data) {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->query('class:list-table')->waitUntilPresent()->one();
+		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setTags($data['tag_options']['tags']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []));
+		$table->waitUntilReady();
+		$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		$this->query('button:Reset')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 	}
 
 	public function testPageMonitoringHosts_ResetButtonCheck() {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
-		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableColumnData('Name');
+		$this->assertDatatableStats($start_rows_count);
+		$start_contents = $this->getDatatableColumnData('Name');
 
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 
 		// Check that filtered count matches expected.
 		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertTableStats(1);
+		$this->assertDatatableStats(1);
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
-		$this->assertTableStats($reset_rows_count);
-		$this->assertEquals($start_contents, $this->getTableColumnData('Name'));
+		$this->assertDatatableStats($reset_rows_count);
+		$this->assertEquals($start_contents, $this->getDatatableColumnData('Name'));
 	}
 
 	// Checking that Show suppressed problems filter works.
@@ -884,14 +884,14 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 		$form->fill(['Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster']]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 		foreach ([true, false] as $show) {
 			$form->query('id:show_suppressed_0')->asCheckbox()->one()->fill($show);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 			$this->assertTrue($table->findRow('Name', 'Host for suppression')->isPresent($show));
 		}
 		$this->query('button:Reset')->one()->click();
@@ -1061,7 +1061,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_HostContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['name']);
+		$row = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 		$row->query('link', $data['name'])->one()->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -1083,7 +1083,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$hosts_names = ['1_Host_to_check_Monitoring_Overview', 'ЗАББИКС Сервер', 'Host for tag permissions', 'Empty host'];
 		foreach ($hosts_names as $host) {
 			$this->page->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
-			$table = $this->query('class:list-table')->asTable()->one();
+			$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 
 			// Get number of problems displayed on icon and it severity level.
 			if ($host !== 'Empty host') {
@@ -1117,7 +1117,7 @@ class testPageMonitoringHosts extends CWebTest {
 
 			// Check that table is empty and No data found displayed.
 			else {
-				$this->assertTableData();
+				$this->assertDatatableData();
 			}
 		}
 	}
@@ -1140,7 +1140,7 @@ class testPageMonitoringHosts extends CWebTest {
 			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
 			$query->one()->click();
 			$this->page->waitUntilReady();
-			$after_listing = $this->getTableColumnData($listing);
+			$after_listing = $this->getDatatableColumnData($listing);
 			$query->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertEquals(array_reverse($after_listing), $this->getTableColumnData($listing));
@@ -1155,8 +1155,8 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @param string $page_header	Page header name
 	 */
 	private function selectLink($host_name, $column, $page_header) {
-		$this->query('class:list-table')->asTable()->one()->findRow('Name', $host_name)->query('link', $column)
-				->waitUntilClickable()->one()->click();
+		$this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $host_name)
+				->query('link', $column)->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		if ($page_header !== null) {
 			$this->page->assertHeader($page_header);
@@ -1218,7 +1218,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_CheckCounters($data) {
 		$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-		$row = $this->query('class:list-table')->asTable()->one()->findRow('Name', $data['host']);
+		$row = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $data['host']);
 
 		foreach ($data['counters'] as $counter) {
 			if ($counter['column'] === 'Problems') {

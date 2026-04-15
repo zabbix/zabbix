@@ -65,46 +65,47 @@ class CDatatableBehavior extends CTableBehavior {
 			$selector = self::COMMON_SELECTOR;
 		}
 
-		$table = $this->test->query($selector)->asDatatable()->one();
+		$datatable = $this->test->query($selector)->asDatatable()->one();
 		if ($this->column_names !== null) {
-			$table->setColumnNames($this->column_names);
+			$datatable->setColumnNames($this->column_names);
 		}
 
-		return $table;
+		return $datatable;
 	}
 
-//	/**
-//	 * Check if values in table rows match data from data provider.
-//	 *
-//	 * @param array   $data        data array to be match with result in table
-//	 * @param string  $selector    table selector
-//	 */
-//	public function assertTableData($data = [], $selector = null) {
-//		$rows = $this->getTable($selector)->getRows();
-//		if (!$data) {
-//			// Check that table contain one row with text "No data found."
-//			$this->test->assertEquals(['No data found'], $rows->asText());
-//
-//			return;
-//		}
-//
-//		$this->test->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
-//		$this->test->assertEquals(array_keys($data), array_keys($rows->asArray()),
-//				'Row indices don\'t not match indices in data provider.'
-//		);
-//
-//		foreach ($this->normalizeData($data) as $i => $values) {
-//			$row = $rows->get($i);
-//
-//			foreach ($values as $name => $value) {
-//				if (($text = $row->getColumnData($name, $value)) === null) {
-//					continue;
-//				}
-//
-//				$this->test->assertEquals($value['text'], $text);
-//			}
-//		}
-//	}
+	/**
+	 * Check if values in table rows match data from data provider.
+	 *
+	 * @param array   $data        data array to be match with result in table
+	 * @param string  $selector    table selector
+	 */
+	public function assertDatatableData($data = [], $selector = null) {
+		$rows = $this->getDatatable($selector)->getRows();
+		if (!$data) {
+			$this->test->assertEquals(0, $rows->count());
+			// Check that table contain one row with text "No data found."
+			$this->test->assertEquals('No data found', $this->test->query('class:datatable-body')->one()->getText());
+
+			return;
+		}
+
+		$this->test->assertEquals(count($data), $rows->count(), 'Rows count does not match results count in data provider.');
+		$this->test->assertEquals(array_keys($data), array_keys($rows->asArray()),
+				'Row indices don\'t not match indices in data provider.'
+		);
+
+		foreach ($this->normalizeData($data) as $i => $values) {
+			$row = $rows->get($i);
+
+			foreach ($values as $name => $value) {
+				if (($text = $row->getColumnData($name, $value)) === null) {
+					continue;
+				}
+
+				$this->test->assertEquals($value['text'], $text);
+			}
+		}
+	}
 
 //	/**
 //	 * Check if values in table rows have data from data provider.
@@ -153,20 +154,20 @@ class CDatatableBehavior extends CTableBehavior {
 //		}
 //	}
 
-//	/**
-//	 * Check if values in table column match data from data provider.
-//	 *
-//	 * @param array   $rows        data array to be match with result in table
-//	 * @param string  $field       table column name
-//	 */
-//	public function assertTableDataColumn($rows = [], $field = 'Name', $selector = self::COMMON_SELECTOR) {
-//		$data = [];
-//		foreach ($rows as $row) {
-//			$data[] = [$field => $row];
-//		}
-//
-//		$this->assertTableData($data, $selector);
-//	}
+	/**
+	 * Check if values in table column match data from data provider.
+	 *
+	 * @param array   $rows        data array to be match with result in table
+	 * @param string  $field       table column name
+	 */
+	public function assertDatatableDataColumn($rows = [], $field = 'Name', $selector = self::COMMON_SELECTOR) {
+		$data = [];
+		foreach ($rows as $row) {
+			$data[] = [$field => $row];
+		}
+
+		$this->assertDatatableData($data, $selector);
+	}
 //
 //	/**
 //	 * Check if values in table column have data from data provider.
@@ -239,43 +240,43 @@ class CDatatableBehavior extends CTableBehavior {
 		}
 	}
 
-//	/**
-//	 * Assert text of displayed rows amount.
-//	 *
-//	 * @param integer|string $count		rows count per page
-//	 * @param integer $total			total rows count
-//	 */
-//	public function assertTableStats($count = null, $total = null) {
-//		if ($count === null || $count === 0) {
-//			$this->test->assertFalse($this->test->query('xpath://div[@class="table-stats"]')->one(false)->isValid(),
-//					'Table rows amount is visible on page');
-//
-//			return;
-//		}
-//
-//		if ($total === null) {
-//			$total = $count;
-//		}
-//
-//		$this->test->assertEquals('Displaying '.$count.' of '.$total.' found',
-//				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
-//		);
-//	}
-//
-//	/**
-//	 * Get data from chosen column.
-//	 *
-//	 * @param string $column    column name, where value should be checked
-//	 * @param string $selector  table selector
-//	 */
-//	public function getTableColumnData($column, $selector = null) {
-//		$table = $this->getTable($selector);
-//		$result = [];
-//		foreach ($table->getRows() as $row) {
-//			$result[] = $row->getColumn($column)->getText();
-//		}
-//		return $result;
-//	}
+	/**
+	 * Assert text of displayed rows amount.
+	 *
+	 * @param integer|string $count		rows count per page
+	 * @param integer $total			total rows count
+	 */
+	public function assertDatatableStats($count = null, $total = null) {
+		if ($count === null || $count === 0) {
+			$this->test->assertFalse($this->test->query('xpath://div[@class="table-stats"]')->one()->isVisible(),
+					'Table rows amount is visible on page');
+
+			return;
+		}
+
+		if ($total === null) {
+			$total = $count;
+		}
+
+		$this->test->assertEquals('Displaying '.$count.' of '.$total.' found',
+				$this->test->query('xpath://div[@class="table-stats"]')->one()->getText()
+		);
+	}
+
+	/**
+	 * Get data from chosen column.
+	 *
+	 * @param string $column    column name, where value should be checked
+	 * @param string $selector  table selector
+	 */
+	public function getDatatableColumnData($column, $selector = null) {
+		$table = $this->getDatatable($selector);
+		$result = [];
+		foreach ($table->getRows() as $row) {
+			$result[] = $row->getColumn($column)->getText();
+		}
+		return $result;
+	}
 
 	/**
 	 * Assert text of selected rows amount.
