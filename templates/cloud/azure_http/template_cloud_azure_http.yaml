@@ -5946,9 +5946,9 @@ zabbix_export:
             description: 'Enable JVM metrics collection.'
             options:
               - value: 'false'
-                text: Enable
-              - value: 'true'
                 text: Disable
+              - value: 'true'
+                text: Enable
         - macro: '{$AZURE.CONTAINER_APP.MEMORY.CRIT}'
           value: '90'
           description: 'Critical threshold for memory utilization.'
