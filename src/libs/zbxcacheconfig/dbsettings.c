@@ -128,6 +128,7 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"script_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"60s"},
 	{"search_limit",		ZBX_SETTING_TYPE_INT, 		0,			"1000"},
 	{"server_check_interval",	ZBX_SETTING_TYPE_INT, 		0,			"10"},
+	{"serverid",			ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
 	{"server_status",		ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"session_key",			ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"severity_color_0",		ZBX_SETTING_TYPE_STR, 		0,			"97AAB3"},
@@ -738,6 +739,7 @@ static void	store_settings(const zbx_setting_value_t *values, int found, zbx_uin
 			revision);
 	store_str_setting(values, "severity_name_5", found, defaults_log_level, &config->config->severity_name[5],
 			revision);
+	store_str_setting(values, "serverid", found, defaults_log_level, &config->config->serverid, revision);
 
 	store_int_setting(values, "snmptrap_logging", defaults_log_level, &config->config->snmptrap_logging, revision);
 
