@@ -52,7 +52,7 @@ $html_page = (new CHtmlPage())
 									'srctbl' => 'users',
 									'srcfld1' => 'userid',
 									'srcfld2' => 'fullname',
-									'dstfrm' => 'zbx_filter',
+									'dstfrm' => CFilter::FORM_NAME,
 									'dstfld1' => 'filter_userids_'
 								]
 							]
@@ -70,7 +70,7 @@ $html_page = (new CHtmlPage())
 								'parameters' => [
 									'srctbl' => 'roles',
 									'srcfld1' => 'roleid',
-									'dstfrm' => 'zbx_filter',
+									'dstfrm' => CFilter::FORM_NAME,
 									'dstfld1' => 'filter_roleids_'
 								]
 							]
@@ -88,7 +88,7 @@ $html_page = (new CHtmlPage())
 								'parameters' => [
 									'srctbl' => 'usrgrp',
 									'srcfld1' => 'usrgrpid',
-									'dstfrm' => 'zbx_filter',
+									'dstfrm' => CFilter::FORM_NAME,
 									'dstfld1' => 'filter_usrgrpids_'
 								]
 							]
