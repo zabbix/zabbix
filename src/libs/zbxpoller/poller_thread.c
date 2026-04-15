@@ -571,6 +571,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_SCRIPT:
 			case ITEM_TYPE_BROWSER:
 			case ITEM_TYPE_HTTPAGENT:
+			case ITEM_TYPE_TELEMETRY_QUERY:
 				ZBX_STRDUP(timeout, items[i].timeout_orig);
 				break;
 		}
@@ -580,6 +581,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 			case ITEM_TYPE_ZABBIX:
 			case ITEM_TYPE_ZABBIX_ACTIVE:
 			case ITEM_TYPE_EXTERNAL:
+			case ITEM_TYPE_TELEMETRY_QUERY:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 

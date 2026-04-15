@@ -33,7 +33,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	{
 		.url			= "http://127.0.0.1:8123",
 		.http_proxy		= NULL,
-		.timeout		= 5,
+		.timeout		= item->timeout,
 		.max_attempts		= 1,
 		.ssl_cert_file		= NULL,
 		.ssl_key_file		= NULL,

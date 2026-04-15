@@ -239,6 +239,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_BROWSER:
 		case ITEM_TYPE_HTTPAGENT:
+		case ITEM_TYPE_TELEMETRY_QUERY:
 			db_string_from_json(&jp_item, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
 					sizeof(item.timeout_orig));
 			break;
