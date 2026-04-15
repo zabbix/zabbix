@@ -203,7 +203,8 @@
 					new CDataTableColumn('last_check', <?= json_encode(_('Last check')); ?>)
 						.setFields(['last_check']),
 					new CDataTableColumn('last_value', <?= json_encode(_('Last value')); ?>)
-						.setFields(['last_value']),
+						.setFields(['last_value'])
+						.setWidth('20%'),
 					new CDataTableColumn('change', <?= json_encode(_('Change')); ?>)
 						.setFields(['change']),
 					new CDataTableColumnTags('tags', <?= json_encode(_('Tags')); ?>)
