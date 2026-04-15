@@ -312,11 +312,9 @@ class testFunctions extends CIntegrationTest{
 			}
 		}
 		$this->assertEmpty($failures, implode("\n", $failures));
-		$this->stopComponent(self::COMPONENT_SERVER);
 	}
 
 	private function processStep2() {
-		$this->startComponent(self::COMPONENT_SERVER);
 		$this->sendValues('values2');
 
 		$response = $this->call('trigger.get', [
