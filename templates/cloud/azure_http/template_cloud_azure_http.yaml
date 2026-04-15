@@ -1304,7 +1304,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-4
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
