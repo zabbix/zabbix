@@ -365,9 +365,9 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					],
 					'trim' => true
 				]
-			]
+			],
 			# 20.
-			/* TODO: uncomment after DEV-4248 done
+			// TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -390,7 +390,6 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			]
-			*/
 		];
 	}
 
