@@ -287,22 +287,31 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendcount eq 2' => ['state' => 0, 'value' => 0], /* last 0 not synced to database yet */
 			'Item 52 trendmin eq 2' => ['state' => 1, 'value' => 0],
 			'Item 52 trendmax eq 4' => ['state' => 0, 'value' => 0], /* max is 8 */
-			'Item 52 trendsum eq 6' => ['state' => 1, 'value' => 0],
+			'Item 52 trendsum eq 6' => ['state' => 0, 'value' => 0], /* 2,4,8 not eq 6 */
 			'Item 52 trendavg eq 3' => ['state' => 0, 'value' => 0], /* incorrect average value without last 0 */
 			'Item 53 trendstl eq 0' => ['state' => 1, 'value' => 0],
 			'Item 54 baselinedev eq 0' => ['state' => 1, 'value' => 0],
 			'Item 55 baselinewma eq 0' => ['state' => 1, 'value' => 0]
 		];
 
+		$failures = [];
 		foreach ($triggers as $trigger) {
 			$description = $trigger['description'];
 
-			$this->assertArrayHasKey($description, $triggers_expected);
+			if (!array_key_exists($description, $triggers_expected)) {
+				$failures[] = "[1] Unexpected trigger: $description";
+				continue;
+			}
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "[1] State mismatch for trigger: $description: ".json_encode($trigger));
-			$this->assertEquals($expected['value'], $trigger['value'], "[1] Value mismatch for trigger: $description");
+			if ($expected['state'] !== $trigger['state']) {
+				$failures[] = "[1] State mismatch for trigger: $description: ".json_encode($trigger);
+			}
+			if ($expected['value'] !== $trigger['value']) {
+				$failures[] = "[1] Value mismatch for trigger: $description";
+			}
 		}
+		$this->assertEmpty($failures, implode("\n", $failures));
 	}
 
 	private function processStep2() {
@@ -379,15 +388,24 @@ class testFunctions extends CIntegrationTest{
 			'Item 55 baselinewma eq 0' => ['state' => 1, 'value' => 0]
 		];
 
+		$failures = [];
 		foreach ($triggers as $trigger) {
 			$description = $trigger['description'];
 
-			$this->assertArrayHasKey($description, $triggers_expected);
+			if (!array_key_exists($description, $triggers_expected)) {
+				$failures[] = "[2] Unexpected trigger: $description";
+				continue;
+			}
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "[2] State mismatch for trigger: $description: ".json_encode($trigger));
-			$this->assertEquals($expected['value'], $trigger['value'], "[2] Value mismatch for trigger: $description");
+			if ($expected['state'] !== $trigger['state']) {
+				$failures[] = "[2] State mismatch for trigger: $description: ".json_encode($trigger);
+			}
+			if ($expected['value'] !== $trigger['value']) {
+				$failures[] = "[2] Value mismatch for trigger: $description";
+			}
 		}
+		$this->assertEmpty($failures, implode("\n", $failures));
 	}
 
 	private function processStep3() {
@@ -464,15 +482,24 @@ class testFunctions extends CIntegrationTest{
 			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
 		];
 
+		$failures = [];
 		foreach ($triggers as $trigger) {
 			$description = $trigger['description'];
 
-			$this->assertArrayHasKey($description, $triggers_expected);
+			if (!array_key_exists($description, $triggers_expected)) {
+				$failures[] = "[3] Unexpected trigger: $description";
+				continue;
+			}
 			$expected = $triggers_expected[$description];
 
-			$this->assertEquals($expected['state'], $trigger['state'], "[3] State mismatch for trigger: $description: ".json_encode($trigger));
-			$this->assertEquals($expected['value'], $trigger['value'], "[3] Value mismatch for trigger: $description");
+			if ($expected['state'] !== $trigger['state']) {
+				$failures[] = "[3] State mismatch for trigger: $description: ".json_encode($trigger);
+			}
+			if ($expected['value'] !== $trigger['value']) {
+				$failures[] = "[3] Value mismatch for trigger: $description";
+			}
 		}
+		$this->assertEmpty($failures, implode("\n", $failures));
 	}
 
 	/**
