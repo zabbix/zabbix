@@ -112,7 +112,12 @@ static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, stru
 		if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
 		{
 			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
-				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			{
+				if (0 == strcmp(*value, ZBX_NOTSUPPORTED))
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, "", ZBX_JSON_TYPE_STRING);
+				else
+					zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+			}
 			else
 				zbx_json_addraw(&j, ZBX_PROTO_TAG_VALUE, "null");
 		}
@@ -322,10 +327,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 
 	zbx_thread_exit(EXIT_SUCCESS);
 #else
-	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
-
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	exit(EXIT_SUCCESS);
 #endif
 #undef POLL_TIMEOUT
 }

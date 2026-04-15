@@ -17,13 +17,14 @@
 	margin-top: 4px;
 	white-space: break-spaces;
 	word-break: break-word;
-	line-height: 17px;
+	line-height: $body-line-height;
 	color: $error;
 }
 
 z-select.has-error button.focusable:active,
 z-select.has-error button.focusable:hover,
 z-select.has-error button.focusable,
+z-textarea-flexible.has-error textarea,
 input[type="text"].has-error,
 input[type="password"].has-error,
 input[type="search"].has-error,
@@ -66,6 +67,22 @@ div[data-field-type="set"] {
 		padding-left: 5px;
 		width: min-content;
 		border: 1px solid $error;
+	}
+}
+
+div[data-field-type="array"] {
+	&.has-error {
+		input[type="checkbox"]:not([readonly]) {
+			+ label span {
+				border: 1px solid $error;
+				color: $white;
+			}
+
+			&:checked + label span::after {
+				border-left-color: $error;
+				border-bottom-color: $error;
+			}
+		}
 	}
 }
 
@@ -125,6 +142,7 @@ div[data-field-type="set"] {
 	.has-error {
 		& + .btn-undo,
 		&:focus + .btn-undo,
+		&:focus-within + .btn-undo,
 		& + .btn-undo:focus {
 			border-color: $error;
 		}
@@ -140,6 +158,14 @@ div[data-field-type="set"] {
 					color: $white;
 				}
 			}
+		}
+	}
+}
+
+z-color-picker {
+	&.has-error {
+		.color-picker-box {
+			border: 1px solid $error;
 		}
 	}
 }

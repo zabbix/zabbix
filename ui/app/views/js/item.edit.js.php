@@ -274,8 +274,8 @@ window.item_edit_form = new class {
 
 						dynamic_rows.addRows(url.pairs);
 						dynamic_rows.removeRows(row => [].filter.call(
-								row.querySelectorAll('[type="text"]'),
-								input => input.value === ''
+								row.querySelectorAll('z-textarea-flexible'),
+								textarea => textarea.value === ''
 							).length == 2
 						);
 					}
@@ -719,7 +719,6 @@ window.item_edit_form = new class {
 				const $tags_table = jQuery(this.tags_table);
 
 				$tags_table.data('dynamicRows').counter = this.tags_table.querySelectorAll('tr.form_row').length;
-				$tags_table.find(`.${ZBX_STYLE_TEXTAREA_FLEXIBLE}`).textareaFlexible();
 			})
 			.catch((message) => {
 				this.form.addGeneralErrors({[t('Unexpected server error.')]: message});

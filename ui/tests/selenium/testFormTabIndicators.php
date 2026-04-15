@@ -929,15 +929,15 @@ class testFormTabIndicators extends CWebTest {
 			[
 				'tab_name' => 'Host permissions',
 				'group_table' => 'hostgroup-right-table',
-				'multiselect' => 'ms_hostgroup_right_groupids_0_',
-				'segmentedradio' => 'hostgroup_right_permission_0',
+				'multiselect' => 'hostgroup_rights_0_groupids_',
+				'segmentedradio' => 'hostgroup_rights_0_permission',
 				'group_name' => 'Discovered hosts'
 			],
 			[
 				'tab_name' => 'Template permissions',
 				'group_table' => 'templategroup-right-table',
-				'multiselect' => 'ms_templategroup_right_groupids_0_',
-				'segmentedradio' => 'templategroup_right_permission_0',
+				'multiselect' => 'templategroup_rights_0_groupids_',
+				'segmentedradio' => 'templategroup_rights_0_permission',
 				'group_name' => 'Templates/Power'
 			]
 		];
@@ -1147,7 +1147,7 @@ class testFormTabIndicators extends CWebTest {
 					foreach ($tab['entries'] as $field_value) {
 						$form->query('id:valuemap_add')->one()->click();
 						$valuemap_form = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
-						$valuemap_form->query('xpath:.//input[@type="text"]')->all()->fill($field_value);
+						$valuemap_form->query('xpath:.//z-textarea-flexible|.//input[@type="text"]')->all()->fill($field_value);
 						$valuemap_form->submit();
 						$valuemap_form->waitUntilNotVisible();
 					}

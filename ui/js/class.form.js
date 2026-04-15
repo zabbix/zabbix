@@ -26,6 +26,8 @@ class CForm {
 		'text-box': CFieldTextBox,
 		'textarea': CFieldTextarea,
 		'z-select': CFieldZSelect,
+		'z-color-picker': CFieldZColorPicker,
+		'z-textarea-flexible': CFieldZTextareaFlexible,
 		'file': CFieldFile
 	};
 	#form = null;
@@ -166,44 +168,29 @@ class CForm {
 	}
 
 	getAllValues() {
-		const fields = {};
+		let result = {};
+		let simple_fields = {};
 
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
 
-			const key_parts = [...key.matchAll(/[^\[\]]+|\[\]/g)];
+			if (field.isDisabled()) {
+				continue;
+			}
 
-			let key_fields = fields;
-
-			for (let i = 0; i < key_parts.length; i++) {
-				const key_part = key_parts[i][0];
-
-				if (i === key_parts.length - 1) {
-					if (typeof field.getExtraFields === 'function') {
-						if (!field.isDisabled()) {
-							for (const [extra_key, values] of Object.entries(field.getExtraFields())) {
-								key_fields[extra_key] = values;
-							}
-						}
-					}
-					else {
-						if (!field.isDisabled()) {
-							key_fields[key_part] = field.getValueTrimmed();
-						}
-					}
-
-					break;
-				}
-
-				if (!(key_part in key_fields)) {
-					key_fields[key_part] = {};
-				}
-
-				key_fields = key_fields[key_part];
+			if (typeof field.getExtraFields === 'function') {
+				simple_fields = {...simple_fields, ...field.getExtraFields()};
+			}
+			else {
+				simple_fields[key] = field.getValueTrimmed();
 			}
 		}
 
-		return fields;
+		for (const [key, value] of Object.entries(simple_fields)) {
+			result = objectSetDeepValue(result, [...key.matchAll(/[^\[\]]+/g)], value);
+		}
+
+		return result;
 	}
 
 	validateChanges(fields, force_display_errors = false) {
@@ -412,7 +399,7 @@ class CForm {
 
 			if (field instanceof CFieldMultiselect) {
 				const affixed_path = '/' + field_name + '_new';
-				const affixed_subfield = new RegExp('^/' + field_name + '_new/');
+				const affixed_subfield = new RegExp(`^/(${field_name}|${field_name}_new)/`);
 
 				for (const error_path in raw_errors) {
 					const affixed = error_path === affixed_path || affixed_subfield.test(error_path);
@@ -424,7 +411,7 @@ class CForm {
 					if (raw_errors[error_path].length) {
 						raw_errors[field_path] = [...raw_errors[field_path], ...raw_errors[error_path]]
 							.filter(({message}) => message.length);
-						raw_errors[error_path] = [];
+						delete raw_errors[error_path];
 					}
 				}
 			}

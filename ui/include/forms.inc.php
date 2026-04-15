@@ -424,14 +424,14 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$step_param_0_value = array_key_exists('params', $step) && array_key_exists(0, $step['params'])
 				? $step['params'][0]
 				: '';
-			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params_0]', $step_param_0_value))
+			$step_param_0 = (new CTextAreaFlexible('preprocessing['.$i.'][params_0]', $step_param_0_value))
 				->setReadonly($readonly);
 
 			// Create a secondary param text box, so it can be hidden if necessary.
 			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
 				? $step['params'][1]
 				: '';
-			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params_1]', $step_param_1_value))
+			$step_param_1 = (new CTextAreaFlexible('preprocessing['.$i.'][params_1]', $step_param_1_value))
 				->setReadonly($readonly);
 		}
 		elseif ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
@@ -439,14 +439,14 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			$step_param_0_value = array_key_exists('params', $step) && array_key_exists(0, $step['params'])
 				? $step['params'][0]
 				: '';
-			$step_param_0 = (new CTextBox('preprocessing['.$i.'][params_0_not_supported]', $step_param_0_value))
+			$step_param_0 = (new CTextAreaFlexible('preprocessing['.$i.'][params_0_not_supported]', $step_param_0_value))
 				->setReadonly($readonly);
 
 			// Create a secondary param text box, so it can be hidden if necessary.
 			$step_param_1_value = (array_key_exists('params', $step) && array_key_exists(1, $step['params']))
 				? $step['params'][1]
 				: '';
-			$step_param_1 = (new CTextBox('preprocessing['.$i.'][params_1_not_supported]', $step_param_1_value))
+			$step_param_1 = (new CTextAreaFlexible('preprocessing['.$i.'][params_1_not_supported]', $step_param_1_value))
 				->setReadonly($readonly);
 		}
 
@@ -662,7 +662,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 						->setAttribute('placeholder', _('pattern'))
 						->setReadonly($readonly)
 						->addClass(
-							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_VISIBILITY_HIDDEN : null
+							$step_param_0_value == ZBX_PREPROC_MATCH_ERROR_ANY ? ZBX_STYLE_DISPLAY_NONE : null
 						)
 				];
 				break;
@@ -822,7 +822,7 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
 			]))
 			->setDisabled($step['error_handler'] == ZBX_PREPROC_FAIL_DEFAULT);
 
-		$error_handler_params = (new CTextBox('preprocessing['.$i.'][error_handler_params]',
+		$error_handler_params = (new CTextAreaFlexible('preprocessing['.$i.'][error_handler_params]',
 			$step['error_handler_params'])
 		)->setErrorContainer("preprocessing-$i-error-container")->setTitle($step['error_handler_params']);
 
@@ -906,7 +906,6 @@ function getItemPreprocessing(array $preprocessing, $readonly, array $types) {
  * @param int        $tag['automatic']                    (optional) Tag automatic flag.
  * @param array      $tag['parent_templates']             (optional) List of templates that tags are inherited from.
  * @param array      $options
- * @param bool       $options['add_post_js']              (optional) Parameter passed to CTextAreaFlexible.
  * @param bool       $options['show_inherited_tags']      (optional) Render row in inherited tag mode. This enables usage of $tag['type'].
  * @param bool       $options['with_automatic']           (optional) Render row with 'automatic' input. This enables usage of $tag['automatic'].
  * @param string     $options['field_name']               (optional) Re-define default field name.
@@ -930,18 +929,20 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		$tag['automatic'] = ZBX_TAG_MANUAL;
 	}
 
-	$textarea_options = array_intersect_key($options, array_flip(['readonly', 'add_post_js']));
+	$textarea_options = array_intersect_key($options, array_flip(['readonly']));
 
 	$tag += [
 		'type' => ZBX_PROPERTY_OWN,
 		'parent_templates' => []
 	];
 
-	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag'], $textarea_options))
+	$tag_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][tag]', $tag['tag']))
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Name') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_WIDTH)
-		->setAttribute('placeholder', _('tag'));
+		->setMaxlength(DB::getFieldLength('host_tag', 'tag'))
+		->setAttribute('placeholder', _('tag'))
+		->setReadonly($textarea_options['readonly']);
 
 	$type_field = $options['show_inherited_tags']
 		? new CVar($options['field_name'].'['.$index.'][type]', $tag['type'])
@@ -951,13 +952,18 @@ function renderTagTableRow($index, array $tag, array $options = []) {
 		? new CVar($options['field_name'].'['.$index.'][automatic]', $tag['automatic'])
 		: null;
 
-	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value'],
-			$textarea_options
-		))
+	$value_field = (new CTextAreaFlexible($options['field_name'].'['.$index.'][value]', $tag['value']))
 		->setErrorContainer($options['has_inline_validation'] ? 'tag_'.$index.'_error_container' : null)
 		->setErrorLabel($options['has_inline_validation'] ? _('Value') : null)
 		->setAdaptiveWidth(ZBX_TEXTAREA_TAG_VALUE_WIDTH)
-		->setAttribute('placeholder', _('value'));
+		->setMaxlength(DB::getFieldLength('host_tag', 'value'))
+		->setAttribute('placeholder', _('value'))
+		->setReadonly($textarea_options['readonly']);
+
+	if (array_key_exists('maxlength', $textarea_options)) {
+		$tag_field->setMaxlength($textarea_options['maxlength']);
+		$value_field->setMaxlength($textarea_options['maxlength']);
+	}
 
 	if ($options['with_automatic'] && $tag['automatic'] == ZBX_TAG_AUTOMATIC) {
 		switch ($options['source']) {

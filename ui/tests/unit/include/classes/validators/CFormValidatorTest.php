@@ -271,8 +271,9 @@ class CFormValidatorTest extends TestCase {
 				['object', 'fields' => [
 					'host' => ['not_empty', 'integer']
 				]],
-				null,
-				'[RULES ERROR] Rule "not_empty" is not compatible with type "integer" (Path: /host)'
+				['type' => 'object', 'fields' => [
+					'host' => [['not_empty' => true, 'type' => 'integer']]
+				]]
 			],
 			[
 				['object', 'fields' => [
@@ -782,16 +783,21 @@ class CFormValidatorTest extends TestCase {
 			],
 			[
 				['object', 'fields' => [
-					'value' => ['boolean', 'required']
+					'value' => ['boolean', 'in' => [1]]
 				]],
 				['type' => 'object', 'fields' => [
 					'value' => [[
 						'type' => 'integer',
-						'in' => [1],
-						'required' => true,
-						'messages' => ['in' => 'Must be selected.']
+						'in' => [1]
 					]]
 				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['boolean', 'in' => [1, 2]]
+				]],
+				null,
+				'[RULES ERROR] Invalid value for rule "in" for type "boolean" (Path: /value)'
 			],
 			[
 				['object', 'fields' => [
@@ -1106,6 +1112,14 @@ class CFormValidatorTest extends TestCase {
 							'message' => 'Must have 3-100 items with field2 equal to 1 or 2.'
 						]]
 					]]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'color' => ['string', 'rgb']
+				]],
+				['type' => 'object', 'fields' => [
+					'color' => [['type' => 'string', 'regex' => '/^[0-9a-f]{6}$/i']]
 				]]
 			]
 		];
@@ -3026,6 +3040,246 @@ class CFormValidatorTest extends TestCase {
 				]],
 				CFormValidator::SUCCESS,
 				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min' => strtotime('2025-02-01')]]
+					]
+				]],
+				['value' => 'zzzz'],
+				['value' => 'zzzz'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]],
+						'messages' => ['use' => 'Must be in the future']
+					]
+				]],
+				['value' => '2025-01-01'],
+				['value' => '2025-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Must be in the future',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, ['min_in_future' => true]]
+					]
+				]],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				['value' => date('Y-m-d', time() + SEC_PER_DAY)],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string',
+						'use' => [CRangeTimeValidator::class, []]
+					]
+				]],
+				['value' => '2040-01-01'],
+				['value' => '2040-01-01'],
+				CFormValidator::ERROR,
+				['/value' => [
+					[
+						'message' => 'Invalid time.',
+						'level' => CFormValidator::ERROR_LEVEL_DELAYED
+					]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.0001],
+				['value' => 5.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 0, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 4.9999],
+				['value' => 4.9999],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '455.01E-2'],
+				['value' => 4.5501],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'max' => 5, 'decimal_limit' => 4,
+						'messages' => ['max' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '4.51E1'],
+				['value' => 45.1],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => 0.0001],
+				['value' => 0.0001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'min' => 1, 'decimal_limit' => 4,
+						'messages' => ['min' => 'Custom message.', 'decimal_limit' => 'Custom message.']
+					]
+				]],
+				['value' => '1.22E-2'],
+				['value' => 0.0122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => 5.00001],
+				['value' => 5.00001],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['float', 'decimal_limit' => 4, 'messages' => ['decimal_limit' => 'Custom message.']]
+				]],
+				['value' => '1.22E-3'],
+				['value' => 0.00122],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'Custom message.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00FFBF'],
+				['value' => '00FFBF'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00ffbf'],
+				['value' => '00ffbf'],
+				CFormValidator::SUCCESS,
+				[]
+			],
+			[
+				['object', 'fields' => [
+					'value' => ['string', 'rgb']
+				]],
+				['value' => '00f'],
+				['value' => '00f'],
+				CFormValidator::ERROR,
+				['/value' => [
+					['message' => 'This value does not match pattern.', 'level' => CFormValidator::ERROR_LEVEL_PRIMARY]
+				]]
 			]
 		];
 	}
@@ -3059,5 +3313,326 @@ class CFormValidatorTest extends TestCase {
 			$this->assertSame($expected_data, $data);
 			$this->assertSame($files, $expected_files);
 		}
+	}
+
+	public function dataProviderFormMacroValidator() {
+		return [
+			// Valid user macros and user macro functions.
+			['{$MACRO}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:/tmp}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:as""d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:as"")d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"as}d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:""}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO: with some spaces }', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:  "more spaces"  }', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"as\"}\"d"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:regex:^/tmp$}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:regex:"^/tmp$"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.trim()}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(abc, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(,)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr(   ,   )}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr( "asd asd," ,  asd asdsd   , asd"asd   )}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr("\n", "*")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp}.tr(abc, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp}.tr("\n", "*")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp:"^/tmp$"}.tr(abc, xyz)}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp:"^/tmp$"}.tr("\n", "*")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO:/tmp:"^/tmp$"}.regrepl("_v1\.0", "_v2.0", "\(final\)", "")}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"{{#FSNAME}.regrepl(\"\\$\",\"\")}"}', true,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.func("}.func(")}', true,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}.func(  a b , "c" , )}', true,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+
+			// Valid LLD macros and LLD macro functions.
+			['{#MACRO}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.trim()}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr(abc, xyz)}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr(, xyz)}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr(,)}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr("\n", "*")}', true,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.func("}.func(")}', true,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.func(  a b , "c" , )}', true,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+
+			// Macro type is not supported.
+			['{#MACRO}', false,
+				['usermacros' => false, 'lldmacros' => false]
+			],
+			['{#MACRO}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO}', false,
+				['usermacros' => false, 'lldmacros' => false]
+			],
+			['{$MACRO}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+
+			// Invalid macro or macro function.
+			['{MACRO}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO:context}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:"context}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:"conte"xt"}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:"}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO: "  }', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO: "}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO: ":}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO}.func()', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO}.max(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{$MACRO:test}.max(2)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{#MACRO', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{#MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{#MACRO}.func()', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{#MACRO}.max(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+
+			// Function names must be lowercase and only letters
+			['{{$MACRO}.MAX(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}.max2(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{$MACRO}.(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.MAX(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.max2(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+			['{{#MACRO}.(2)}', false,
+				['usermacros' => true, 'lldmacros' => true]
+			],
+
+			// No closing brackets, unfinished quotes to function parameters.
+			['{{$MACRO}.tr({{$MACRO}.tr(aa, bb)},cc)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.test("a".b)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{$MACRO}.tr("aaa)\",bbb)}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{$MACRO:"asd{"s"}', false,
+				['usermacros' => true, 'lldmacros' => false]
+			],
+			['{{#MACRO}.tr({{#MACRO}.tr(aa, bb)},cc)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO}.tr("aaa)\",bbb)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#MACRO:"asd{"s"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+
+			// LLD macro can't have context.
+			['{#MACRO:/tmp}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#MACRO:regex:"^/tmp$"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#LOW_SPACE_LIMIT:regex:"^/var/log/.*$"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp}.tr(abc, xyz)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp}.tr("\n", "*")}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp:"^/tmp$"}.tr(abc, xyz)}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp:"^/tmp$"}.tr("\n", "*")}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{{#MACRO:/tmp:"^/tmp$"}.regrepl("_v1\.0", "_v2.0", "\(final\)", "")}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			],
+			['{#MACRO:"{{#FSNAME}.regrepl(\"\\$\",\"\")}"}', false,
+				['usermacros' => false, 'lldmacros' => true]
+			]
+		];
+	}
+
+	/**
+	 * Simulates #isMacro validation done in class.form.validator.js and compares to macro parser validation result.
+	 *
+	 * @dataProvider dataProviderFormMacroValidator
+	 *
+	 * @param string $value
+	 * @param bool $expected_result
+	 * @param array $macro_rules
+	 * @return void
+	 */
+	public function testFormMacroValidator(string $value, bool $expected_result, array $macro_rules): void {
+		$this->assertSame(CFormValidator::validateMacro($macro_rules, $value), $expected_result,
+			"Expected result doesn't match validator result"
+		);
+
+		$macro_name = '[A-Z0-9._]+';
+		$quoted_param = '(?:[ ]*"(?:\\\.|[^"\\\])*"[ ]*)';
+		$unquoted_context = '(?:[ ]*[^"} ][^}]*)';
+		$macro_context = '(?::(?:[ ]*|'.$unquoted_context.'|'.$quoted_param.'))?';
+
+		$macro_regexps = [];
+
+		if ($macro_rules['usermacros']) {
+			$macro_regexps[] = '(?:{\$'.$macro_name.$macro_context.'})';
+		}
+
+		if ($macro_rules['lldmacros']) {
+			$macro_regexps[] = '(?:{#'.$macro_name.'})';
+		}
+
+		if (count($macro_regexps) == 0) {
+			$this->assertSame(false, $expected_result, "Regular expression result doesn't match validator result");
+			return;
+		}
+
+		$macro = '(?:'.implode('|', $macro_regexps).')';
+
+		$regex_result = false;
+
+
+		if (!preg_match('/^'.$macro.'$/', $value)) {
+			$unquoted_param = '(?:[^"][^),]*)';
+			$single_param = '(?:[ ]*|'.$unquoted_param.'|'.$quoted_param.')';
+			$params_regex = '(?:'.$single_param.',)*'.$single_param;
+			$function_regex = '/^{'.$macro.'\.[a-z]+\(('.$params_regex.')\)}$/';
+
+			if (preg_match($function_regex, $value)) {
+				$regex_result = true;
+			}
+		}
+		else {
+			$regex_result = true;
+		}
+
+		$this->assertSame($regex_result, $expected_result, "Regular expression result doesn't match validator result");
 	}
 }

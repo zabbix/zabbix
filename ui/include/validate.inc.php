@@ -456,7 +456,6 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 
 	$ts = [];
-	$ts['now'] = time();
 	$range_time_parser = new CRangeTimeParser();
 
 	foreach (['from' => $from, 'to' => $to] as $field => $value) {
@@ -467,10 +466,7 @@ function validateTimeSelectorPeriod($from, $to) {
 	}
 
 	$period = $ts['to'] - $ts['from'] + 1;
-	$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-	$max_period = 1 + $ts['now'] - $range_time_parser
-		->getDateTime(true)
-		->getTimestamp();
+	$max_period = CTimePeriodHelper::getMaxPeriod();
 
 	if ($period < ZBX_MIN_PERIOD) {
 		error(_n('Minimum time period to display is %1$s minute.',
@@ -479,24 +475,13 @@ function validateTimeSelectorPeriod($from, $to) {
 
 		invalid_url();
 	}
-	elseif ($period > $max_period) {
+	elseif ($period > $max_period + 1) {
 		error(_n('Maximum time period to display is %1$s day.',
 			'Maximum time period to display is %1$s days.', (int) round($max_period / SEC_PER_DAY)
 		));
 
 		invalid_url();
 	}
-}
-
-/**
- * Validate, if unix time in (1970.01.01 00:00:01 - 2038.01.19 00:00:00).
- *
- * @param int $time
- *
- * @return bool
- */
-function validateUnixTime($time) {
-	return (is_numeric($time) && $time > 0 && $time <= 2147464800);
 }
 
 /**
@@ -575,4 +560,29 @@ function validateTimeUnit($value, $min, $max, $allow_zero, &$error, array $optio
 	}
 
 	return true;
+}
+
+/**
+ * Validate PostgreSQL database ports. Parse the input string and then validate ports for each endpoint.
+ *
+ * @param string $input  Input string containing one or more endpoints with optional ports.
+ *
+ * @return string|null   Return the first invalid port or null if all ports are valid or not specified.
+ */
+function validatePostgresqlDbPorts(string $input): ?string {
+	$endpoints = PostgresqlDbBackend::parseEndpoints($input);
+
+	if ($endpoints) {
+		$port_parser = new CPortParser();
+
+		foreach ($endpoints as $endpoint) {
+			$port = trim($endpoint['port']);
+
+			if ($port !== '' && $port_parser->parse($port) != CParser::PARSE_SUCCESS) {
+				return $port;
+			}
+		}
+	}
+
+	return null;
 }
