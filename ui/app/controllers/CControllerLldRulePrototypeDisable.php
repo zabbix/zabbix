@@ -52,7 +52,7 @@ class CControllerLldRulePrototypeDisable extends CController {
 		return $ret;
 	}
 
-	public function doAction() {
+	public function doAction(): void {
 		$output = [];
 		$items = [];
 
