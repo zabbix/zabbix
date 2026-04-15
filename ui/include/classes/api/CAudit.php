@@ -553,7 +553,6 @@ class CAudit {
 		'ceprule.filter.conditions' => 'cep_conditionid',
 		'ceprule.operations' => 'cep_operationid',
 		'ceprule.operations.tags' => 'cep_operation_tagid',
-		'ceprule.window' => 'cep_windowid',
 		'ceprule.window.conditions' => 'cep_window_conditionid',
 		'connector.tags' => 'connector_tagid',
 		'correlation.filter.conditions' => 'corr_conditionid',

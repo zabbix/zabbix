@@ -760,7 +760,7 @@ class CTrigger extends CTriggerGeneral {
 					$this->outputIsRequested('state', $options['output']),
 					$this->outputIsRequested('lastchange', $options['output']),
 					$this->outputIsRequested('error', $options['output'])
-				]))
+			]))
 				|| (is_array($options['filter'])
 					&& array_intersect_key($options['filter'], array_flip(['value', 'state', 'lastchange', 'error'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
