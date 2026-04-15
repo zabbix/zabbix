@@ -9353,7 +9353,7 @@ zabbix_export:
           key: gcp.storage.bucket.metrics.get
           history: 1h
           value_type: TEXT
-          description: 'GCP Cloud Storage bucket raw metrics data.'
+          description: 'GCP Cloud Storage bucket raw metric data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -9418,7 +9418,7 @@ zabbix_export:
               expression: 'nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.metrics.get,30m)=1'
               name: 'GCP Cloud Storage: GCP API is failing (bucket metrics)'
               priority: HIGH
-              description: 'No data received from GCP API for last 30 min. Possible query error or API failure.'
+              description: 'No data received from GCP API for the last 30 minutes. Possible query error or API failure.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -9495,7 +9495,7 @@ zabbix_export:
               expression: 'nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.get,30m)=1'
               name: 'GCP Cloud Storage: GCP API is failing (bucket network traffic)'
               priority: HIGH
-              description: 'No data received from GCP API for last 30 min. Possible query error or API failure.'
+              description: 'No data received from GCP API for the last 30 minutes. Possible query error or API failure.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -9506,6 +9506,7 @@ zabbix_export:
           key: gcp.storage.bucket.network.received_bytes
           value_type: FLOAT
           units: Bps
+          description: 'Incoming network traffic to the bucket.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -9531,6 +9532,7 @@ zabbix_export:
           key: gcp.storage.bucket.network.sent_bytes
           value_type: FLOAT
           units: Bps
+          description: 'Outgoing network traffic from the bucket.'
           preprocessing:
             - type: CHECK_NOT_SUPPORTED
               parameters:
@@ -9717,12 +9719,12 @@ zabbix_export:
             - tag: component
               value: requests
         - uuid: b93d03d2ee2845a3b11b3be025664743
-          name: 'Get bucket api metric'
+          name: 'Get bucket API metric'
           type: HTTP_AGENT
           key: gcp.storage.bucket.requests.get
           history: 1h
           value_type: TEXT
-          description: 'GCP Cloud Storage bucket API raw metrics data.'
+          description: 'GCP Cloud Storage bucket API raw metric data.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -9822,7 +9824,7 @@ zabbix_export:
               expression: 'nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1'
               name: 'GCP Cloud Storage: GCP API is failing (bucket requests)'
               priority: HIGH
-              description: 'No data received from GCP API for last 30 min. Possible query error or API failure.'
+              description: 'No data received from GCP API for the last 30 minutes. Possible query error or API failure.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -9832,6 +9834,7 @@ zabbix_export:
           type: DEPENDENT
           key: gcp.storage.bucket.size
           units: B
+          description: 'GCP Cloud Storage bucket total size.'
           preprocessing:
             - type: JSONPATH
               parameters:

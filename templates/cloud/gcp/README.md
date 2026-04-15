@@ -914,13 +914,13 @@ This template will be automatically connected to discovered entities with all th
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Get bucket storage info|<p>GCP Cloud Storage bucket raw metrics data.</p>|HTTP agent|gcp.storage.bucket.metrics.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Bucket size||Dependent item|gcp.storage.bucket.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..size.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get bucket storage info|<p>GCP Cloud Storage bucket raw metric data.</p>|HTTP agent|gcp.storage.bucket.metrics.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Bucket size|<p>GCP Cloud Storage bucket total size.</p>|Dependent item|gcp.storage.bucket.size<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..size.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Bucket objects total count|<p>Cloud Storage bucket total object count.</p>|Dependent item|gcp.storage.bucket.objects.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..objects.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Get bucket network traffic|<p>GCP Cloud Storage bucket raw traffic data.</p>|HTTP agent|gcp.storage.bucket.network.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Bucket sent bytes||Dependent item|gcp.storage.bucket.network.sent_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..sent.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Bucket received bytes||Dependent item|gcp.storage.bucket.network.received_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..received.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|Get bucket api metric|<p>GCP Cloud Storage bucket API raw metrics data.</p>|HTTP agent|gcp.storage.bucket.requests.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|Bucket sent bytes|<p>Outgoing network traffic from the bucket.</p>|Dependent item|gcp.storage.bucket.network.sent_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..sent.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Bucket received bytes|<p>Incoming network traffic to the bucket.</p>|Dependent item|gcp.storage.bucket.network.received_bytes<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$..received.first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|Get bucket API metric|<p>GCP Cloud Storage bucket API raw metric data.</p>|HTTP agent|gcp.storage.bucket.requests.get<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
 |Successful request count|<p>Number of `2xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.2xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r2xx`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |Client error request count|<p>Number of `4xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.4xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r4xx`</p></li></ul>|
 |Server error request count|<p>Number of `5xx` requests reaching the service.</p>|Dependent item|gcp.storage.bucket.request.5xx<p>**Preprocessing**</p><ul><li><p>Check for not supported value: `any error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>JSON Path: `$.r5xx`</p></li></ul>|
@@ -932,15 +932,15 @@ This template will be automatically connected to discovered entities with all th
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|GCP Cloud Storage: GCP API is failing (bucket metrics)|<p>No data received from GCP API for last 30 min. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.metrics.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: GCP API is failing (bucket metrics)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.metrics.get,30m)=1`|High|**Manual close**: Yes|
 |GCP Cloud Storage: Bucket size is too large|<p>Bucket size exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size,1h)>{$GCS.BUCKET.SIZE.MAX}`|Warning||
 |GCP Cloud Storage: Rapid storage growth detected|<p>Bucket size growth rate exceeds the configured threshold.</p>|`change(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.size)>{$GCS.BUCKET.SIZE.GROWTH.MAX}`|Warning|**Manual close**: Yes|
 |GCP Cloud Storage: Bucket object count is too high|<p>Number of objects in the bucket exceeds the configured limit.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,1h)>{$GCS.OBJECT.COUNT.MAX}`|Warning||
 |GCP Cloud Storage: No objects in bucket|<p>No objects have been stored in the bucket for the last 24 hours.</p>|`max(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.objects.count,24h)=0`|Info|**Manual close**: Yes|
-|GCP Cloud Storage: GCP API is failing (bucket network traffic)|<p>No data received from GCP API for last 30 min. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: GCP API is failing (bucket network traffic)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.get,30m)=1`|High|**Manual close**: Yes|
 |GCP Cloud Storage: High egress traffic|<p>Outgoing network traffic from the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.sent_bytes,5m)>{$GCS.EGRESS.MAX}`|Warning||
 |GCP Cloud Storage: High ingress traffic|<p>Incoming network traffic to the bucket exceeds the threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.network.received_bytes,5m)>{$GCS.INGRESS.MAX}`|Info||
-|GCP Cloud Storage: GCP API is failing (bucket requests)|<p>No data received from GCP API for last 30 min. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1`|High|**Manual close**: Yes|
+|GCP Cloud Storage: GCP API is failing (bucket requests)|<p>No data received from GCP API for the last 30 minutes. Possible query error or API failure.</p>|`nodata(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.requests.get,30m)=1`|High|**Manual close**: Yes|
 |GCP Cloud Storage: High API error rate|<p>GCP Cloud Storage bucket API error rate exceeds the configured threshold.</p>|`min(/GCP Cloud Storage Bucket by HTTP/gcp.storage.bucket.request.error.rate,5m)>{$GCS.API.ERROR.MAX}`|Average||
 
 ## Feedback
