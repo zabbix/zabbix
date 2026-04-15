@@ -22312,6 +22312,10 @@ msgstr ""
 msgid "The client secret registered within the authorization server."
 msgstr ""
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "המארח המשוכפל מכיל תסריטי מאקרו שהוגדרו על ידי המשתמש מסוג „טקסט סודי”. הערך והסוג של תסריטי המאקרו האלה אופסו."

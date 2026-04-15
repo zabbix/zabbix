@@ -72,7 +72,7 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButtonText('Update');
 		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');

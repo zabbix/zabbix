@@ -929,15 +929,15 @@ class testFormTabIndicators extends CWebTest {
 			[
 				'tab_name' => 'Host permissions',
 				'group_table' => 'hostgroup-right-table',
-				'multiselect' => 'ms_hostgroup_right_groupids_0_',
-				'segmentedradio' => 'hostgroup_right_permission_0',
+				'multiselect' => 'hostgroup_rights_0_groupids_',
+				'segmentedradio' => 'hostgroup_rights_0_permission',
 				'group_name' => 'Discovered hosts'
 			],
 			[
 				'tab_name' => 'Template permissions',
 				'group_table' => 'templategroup-right-table',
-				'multiselect' => 'ms_templategroup_right_groupids_0_',
-				'segmentedradio' => 'templategroup_right_permission_0',
+				'multiselect' => 'templategroup_rights_0_groupids_',
+				'segmentedradio' => 'templategroup_rights_0_permission',
 				'group_name' => 'Templates/Power'
 			]
 		];

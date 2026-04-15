@@ -124,6 +124,7 @@ class testFormSetup extends CWebTest {
 			'User' => 'zabbix',
 			'Password' => ''
 		];
+
 		$fields['Database host'] = ($db_parameters['Database type'] === 'PostgreSQL') ?
 				'localhost' : $db_parameters['Database host'];
 		$text = 'Please create database manually, and set the configuration parameters for connection to this database. '.
@@ -162,6 +163,16 @@ class testFormSetup extends CWebTest {
 					// Check that Database Schema and Database TLS encryption fields are visible.
 					$schema_field = $form->getField('Database schema');
 					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
+
+					// Check hint for database host field.
+					$hint_text = "Enter one or more values as host:port or [host]:port (IPv6), separated by commas.\n".
+							'If no port is specified, the "Database port" value is used.';
+
+					$form->getLabel('Database host')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+					$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
+					$this->assertEquals($hint_text, $hint->getText());
+					$hint->close();
+
 					$this->checkTlsFieldsLayout();
 					break;
 			}
