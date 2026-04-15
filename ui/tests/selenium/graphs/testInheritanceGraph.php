@@ -94,9 +94,8 @@ class testInheritanceGraph extends CLegacyWebTest {
 					'addItems' => [
 						['itemName' => 'testInheritanceItem1']
 					],
-					'error_msg' => 'Cannot add graph',
-					'errors'=> [
-						'Graph "testInheritanceGraph4" already exists on the template "Inheritance test template".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			]
@@ -137,10 +136,10 @@ class testInheritanceGraph extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $data['error_msg']);
 				$this->zbxTestCheckTitle('Graph edit');
 				$this->zbxTestTextNotPresent('Graph added');
-				$this->zbxTestTextPresent($data['errors']);
+				$form = $dialog->asForm();
+				$this->assertInlineError($form, $data['inline_errors']);
 				break;
 		}
 	}

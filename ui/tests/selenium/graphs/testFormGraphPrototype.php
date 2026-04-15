@@ -132,12 +132,12 @@ class testFormGraphPrototype extends testFormGraphs {
 							'item' => 'testFormItem'
 						]
 					],
-					'details' => [
-						'Graph prototype "Empty item prototype {#KEY}" must have at least one item prototype.'
+					'inline_errors' => [
+						'class:graph-items' => 'At least one item must be a prototype'
 					]
 				]
 			],
-			[
+			[//#20
 				[
 					'fields' => [
 						'Name' => 'Normal graph prototype without LLD macro'
@@ -163,13 +163,12 @@ class testFormGraphPrototype extends testFormGraphs {
 							'item' => 'testFormItemPrototype1'
 						]
 					],
-					'details' => [
-						'Graph prototype "Duplicated graph prototype" already exists on the LLD rule with '.
-								'key "discovery-rule-form" of the host "Simple form test host".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			],
-			[
+			[//#22
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
@@ -204,14 +203,13 @@ class testFormGraphPrototype extends testFormGraphs {
 								'calc_fnc' => 'last'
 							]
 						]
-					],
-					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph prototype'.
-								' duplicated Graph sum type".'
+					],// nuzhna pomoshj
+					'inline_errors' => [
+						'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],
-			[
+			[//#23
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
@@ -236,10 +234,9 @@ class testFormGraphPrototype extends testFormGraphs {
 								'calc_fnc' => 'avg'
 							]
 						]
-					],
-					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph prototype '.
-								'duplicated Graph sum type mixed".'
+					],// nuzhna pomoshj
+					'inline_errors' => [
+						'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],

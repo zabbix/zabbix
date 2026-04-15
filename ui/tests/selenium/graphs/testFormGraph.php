@@ -117,8 +117,8 @@ class testFormGraph extends testFormGraphs {
 							'item' => 'testFormItem'
 						]
 					],
-					'details' => [
-						'Graph "Duplicated graph" already exists on the host "Simple form test host".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			],
@@ -156,12 +156,14 @@ class testFormGraph extends testFormGraphs {
 								'calc_fnc' => 'last'
 							]
 						]
-					],
-					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph "Exploded graph duplicated Graph sum type".'
+					],// #20 nado dorabotatj
+					'inline_errors' => [
+						// 'id:items_2_name' => 'This field cannot be empty.'
+						'xpath://div[@id="items_2_name"]/..' => 'This field cannot be empty.'
 					]
 				]
 			],
+			// TODO: Move this check to inline validation once DEV-4632 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -182,6 +184,7 @@ class testFormGraph extends testFormGraphs {
 					]
 				]
 			],
+			// TODO: Move this check to inline validation once DEV-4632 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
