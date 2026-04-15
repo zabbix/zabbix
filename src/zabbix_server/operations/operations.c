@@ -110,7 +110,7 @@ static zbx_uint64_t	select_discovered_host(const zbx_db_event *event, zbx_op_hos
 			break;
 		case EVENT_OBJECT_ZABBIX_ACTIVE:
 			sql = zbx_dsprintf(sql,
-					"select h.hostid,h.name"
+					"select h.hostid,h.name,h.status"
 					" from hosts h,autoreg_host a"
 					" where h.host=a.host"
 						" and a.autoreg_hostid=" ZBX_FS_UI64
