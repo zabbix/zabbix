@@ -384,8 +384,8 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendsum eq 6' => ['state' => 0, 'value' => 1],
 			'Item 52 trendavg eq 3' => ['state' => 0, 'value' => 1],
 			'Item 53 trendstl eq 0' => ['state' => 0, 'value' => 1],
-			'Item 54 baselinedev eq 0' => ['state' => 1, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 1, 'value' => 0]
+			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
 		];
 
 		$failures = [];
