@@ -143,10 +143,6 @@ class CHistory extends CApiService {
 
 		$this->tableName = Manager::History()->getTableName($options['history']);
 
-		if ($options['output'] === API_OUTPUT_EXTEND) {
-			$options['output'] = array_keys(DB::getSchema($this->tableName)['fields']);
-		}
-
 		$storage = Manager::History()->getStorageProviderInstance($options['history']);
 
 		if ($storage !== null) {
@@ -157,14 +153,12 @@ class CHistory extends CApiService {
 			}
 		}
 		else {
-			$storage_config = Manager::History()->getStorageConfigByValueType($options['history']);
-
-			switch ($storage_config['provider'] ?? ZBX_HISTORY_SOURCE_SQL) {
+			switch (Manager::History()->getDataSourceType($options['history'])) {
 				case ZBX_HISTORY_SOURCE_ELASTIC:
-					$result = $this->getFromElasticsearch($options, $storage_config);
+					$result = $this->getFromElasticsearch($options);
 					break;
 
-				default:
+				case ZBX_HISTORY_SOURCE_SQL:
 					if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
 						$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
 						$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
@@ -227,14 +221,6 @@ class CHistory extends CApiService {
 		}
 
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName(), $this->tableAlias(), $options, $sql_parts);
-
-		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
-				&& $options['maxValueSize'] !== null && !$options['countOutput']
-				&& $this->outputIsRequested('value', $options['output'])) {
-			$value_index = array_search($this->fieldId('value', $this->tableAlias()), $sql_parts['select']);
-			$sql_parts['select'][$value_index] = dbSubstring('value', 1, $options['maxValueSize']);
-		}
-
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias(), $options, $sql_parts);
 
 		$db_res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
@@ -251,12 +237,25 @@ class CHistory extends CApiService {
 		return $result;
 	}
 
+	protected function applyQueryOutputOptions(string $table_name, string $table_alias, array $options, array $sql_parts) {
+		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
+
+		if (($options['history'] == ITEM_VALUE_TYPE_JSON || $options['history'] == ITEM_VALUE_TYPE_BINARY)
+				&& $options['maxValueSize'] !== null && !$options['countOutput']
+				&& $this->outputIsRequested('value', $options['output'])) {
+			$value_index = array_search($this->fieldId('value', $table_alias), $sql_parts['select']);
+			$sql_parts['select'][$value_index] = dbSubstring('value', 1, $options['maxValueSize']);
+		}
+
+		return $sql_parts;
+	}
+
 	/**
 	 * Elasticsearch specific implementation of get.
 	 *
 	 * @see CHistory::get
 	 */
-	private function getFromElasticsearch($options, array $storage) {
+	private function getFromElasticsearch($options) {
 		$query = [];
 		$schema = DB::getSchema($this->tableName);
 
@@ -330,9 +329,12 @@ class CHistory extends CApiService {
 			];
 		}
 
-		$endpoint = CElasticsearchHelper::getRequestUrl($storage);
+		$endpoints = Manager::History()->getElasticsearchEndpoints($options['history']);
+		if ($endpoints) {
+			return CElasticsearchHelper::query('POST', reset($endpoints), $query);
+		}
 
-		return CElasticsearchHelper::query('POST', $endpoint, $query);
+		return null;
 	}
 
 	/**
@@ -345,7 +347,7 @@ class CHistory extends CApiService {
 	public function clear(array $itemids): array {
 		self::validateClear($itemids, $db_items);
 
-		Manager::History()->deleteHistory($db_items);
+		Manager::History()->deleteHistory(array_column($db_items, 'value_type', 'itemid'));
 
 		self::addAuditLog(CAudit::ACTION_HISTORY_CLEAR, CAudit::RESOURCE_ITEM, $db_items);
 

@@ -63,8 +63,11 @@ class CClickHouseStorage {
 	 */
 	protected array $value_type_ttl = [];
 
+	protected array $value_types = [];
+
 	public function __construct(array $config, array $value_type_ttl) {
-		$this->value_type_ttl = array_intersect_key($value_type_ttl, array_flip($config['types']));
+		$this->value_types = $config['types'];
+		$this->value_type_ttl = array_intersect_key($value_type_ttl, array_flip($this->value_types));
 		$this->url = (new CUrl($config['url']))->setArgument('database', $config['db']);
 		$this->request_context_data = [
 			'http' => [
@@ -116,7 +119,7 @@ class CClickHouseStorage {
 	 * @param int $value_type
 	 */
 	public function isValueTypeSupported(int $value_type): bool {
-		return array_key_exists($value_type, $this->value_type_ttl);
+		return in_array($value_type, $this->value_types);
 	}
 
 	/**
@@ -134,20 +137,25 @@ class CClickHouseStorage {
 	/**
 	 * @see CHistoryManager::deleteHistory
 	 */
-	public function delete(array $value_type_itemids): bool {
-		// TODO: recheck!
-		foreach ($value_type_itemids as $value_type => $itemids) {
+	public function delete(array $itemid_value_type): bool {
+		foreach ($this->value_types as $value_type) {
+			$itemids = array_keys($itemid_value_type, $value_type);
+
+			if (!$itemids) {
+				continue;
+			}
+
 			$table = $this->getTableName($value_type);
 			$result = $this->query(
 				'ALTER TABLE '.$table.' DELETE WHERE itemid IN {itemids:Array(UInt64)}',
 				[
 					'UInt64' => [
-						'itemids' => array_keys($itemids)
+						'itemids' => $itemids
 					]
 				]
 			);
 
-			if ($result === null || !$result) {
+			if ($result === null) {
 				return false;
 			}
 		}
@@ -165,9 +173,9 @@ class CClickHouseStorage {
 			$time_from = $lastn_sec === null ? null : $this->getTtlLimitedTimestamp($value_type, time() - $lastn_sec);
 			$rows = $this->select([
 				'output' => ['itemid'],
+				'itemids' => array_keys($itemids),
 				'history' => $value_type,
 				'time_from' => $time_from,
-				'itemids' => array_keys($itemids),
 				'limit' => 1,
 				'limit_by' => 'itemid'
 			]);
@@ -197,10 +205,10 @@ class CClickHouseStorage {
 
 			$rows = $this->select([
 				'output' => $fields,
-				'history' => $value_type,
-				'time_from' => $time_from,
 				'maxValueSize' => $length,
 				'itemids' => array_keys($itemids),
+				'history' => $value_type,
+				'time_from' => $time_from,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
 				'limit' => $limit,
@@ -234,11 +242,11 @@ class CClickHouseStorage {
 
 		$rows = $this->select([
 			'output' => $fields,
+			'itemids' => [$item['itemid']],
 			'history' => $item['value_type'],
 			'filter' => [
 				'clock' => $clock
-			],
-			'itemids' => [$item['itemid']]
+			]
 		]);
 
 		if ($rows === null) {
@@ -253,9 +261,9 @@ class CClickHouseStorage {
 
 		$rows = $this->select([
 			'output' => $fields,
+			'itemids' => [$item['itemid']],
 			'history' => $item['value_type'],
 			'time_till' => $clock,
-			'itemids' => [$item['itemid']],
 			'sortfield' => 'clock',
 			'sortorder' => ZBX_SORT_DOWN,
 			'limit' => 1
@@ -276,6 +284,7 @@ class CClickHouseStorage {
 		$results = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
+			$table = $this->getTableName($value_type);
 			$values = $this->query(
 				'SELECT itemid,value,toUnixTimestamp(tick) AS tick,toUnixTimestamp(ts) AS clock,'.
 					'toUnixTimestamp64Nano(ts)%1000000000 AS ns'.
@@ -291,7 +300,7 @@ class CClickHouseStorage {
 							AGGREGATE_FIRST	=> 'argMin(value, clock_ns) AS value,min(clock_ns) AS ts',
 							AGGREGATE_LAST	=> 'argMax(value, clock_ns) AS value,max(clock_ns) AS ts'
 						}.
-					' FROM '.self::VALUE_TYPE_TABLE[$value_type].
+					' FROM '.$table.
 					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
 					' WHERE clock_ns BETWEEN toDateTime64({time_gte:UInt64},9) AND toDateTime64({time_lte:UInt64},9)'.
 					' GROUP BY itemid,tick'.
@@ -311,10 +320,9 @@ class CClickHouseStorage {
 				continue;
 			}
 
-			$results += array_fill_keys(
-				array_column($values, 'itemid', 'itemid'),
-				['data' => [], 'source' => 'history']
-			);
+			foreach (array_column($values, 'itemid', 'itemid') as $itemid) {
+				$results[$itemid] = ['data' => [], 'source' => 'history'];
+			}
 
 			foreach ($values as $value) {
 				$results[$value['itemid']]['data'][] = $value;
@@ -334,6 +342,7 @@ class CClickHouseStorage {
 		$results = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
+			$table = $this->getTableName($value_type);
 			$_time_from = $this->getTtlLimitedTimestamp($value_type, $time_from);
 			$_time_to = $this->getTtlLimitedTimestamp($value_type, $time_to);
 			$seconds = $_time_to - $_time_from;
@@ -347,7 +356,7 @@ class CClickHouseStorage {
 							? ''
 							: ',round({width:UInt64}*(toUnixTimestamp(clock_ns)-{time_gte:UInt64})/{seconds:UInt64}) AS i'
 						).
-					' FROM '.self::VALUE_TYPE_TABLE[$value_type].
+					' FROM '.$table.
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
 						' AND clock_ns BETWEEN toDateTime64({time_gte:UInt64},9) AND toDateTime64({time_lte:UInt64},9)'.
 					' GROUP BY itemid'.($width === null ? '' : ',i').
@@ -368,10 +377,9 @@ class CClickHouseStorage {
 				continue;
 			}
 
-			$results += array_fill_keys(
-				array_column($values, 'itemid', 'itemid'),
-				['data' => [], 'source' => 'history']
-			);
+			foreach (array_column($values, 'itemid', 'itemid') as $itemid) {
+				$results[$itemid] = ['data' => [], 'source' => 'history'];
+			}
 
 			foreach ($values as $value) {
 				$results[$value['itemid']]['data'][] = $value;
@@ -389,6 +397,7 @@ class CClickHouseStorage {
 		$result = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
+			$table = $this->getTableName($value_type);
 			$values = $this->query(
 				'SELECT itemid,value,toUnixTimestamp(ts) AS clock'.
 				' FROM ('.
@@ -402,7 +411,7 @@ class CClickHouseStorage {
 							AGGREGATE_FIRST	=> 'argMin(value, clock_ns) AS value,min(clock_ns) AS ts',
 							AGGREGATE_LAST	=> 'argMax(value, clock_ns) AS value,max(clock_ns) AS ts'
 						}.
-					' FROM '.self::VALUE_TYPE_TABLE[$value_type].
+					' FROM '.$table.
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
 						' AND '.($time_to === null
 							? 'clock_ns>=toDateTime64({time_gte:UInt64},9)'
@@ -432,20 +441,16 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Build query multipart form data context array to query ClickHouse.
+	 * Encodes typed parameters into a column-value map.
 	 *
-	 * @param array  $stream_context  Base configuration for returned stream context
-	 * @param string $query           ClickHouse query
-	 * @param array  $param           ClickHouse query parameters
+	 * Supports integer and string types. Arrays are filtered and serialized
+	 * into bracketed lists (e.g. "[1,2]" or "['a','b']").
+	 * Invalid or empty values are skipped.
+	 *
+	 * @param array $param  Array of typed parameters.
+	 * @return array
 	 */
-	protected function buildMultipartFormData(array $stream_context, string $query, array $param = []): array {
-		$content = [];
-		$boundary = uniqid();
-		$stream_context['http']['header'][] = 'Content-Type: multipart/form-data; boundary='.$boundary;
-		$boundary = '--'.$boundary;
-
-		array_push($content, $boundary, 'Content-Disposition: form-data; name="query"', '', $query);
-
+	protected function getEncodedParamMap(array $param): array {
 		foreach ($param as $column_type => $columns_values) {
 			foreach ($columns_values as $column => $value) {
 				$form_value = null;
@@ -481,16 +486,11 @@ class CClickHouseStorage {
 					continue;
 				}
 
-				array_push($content, $boundary, 'Content-Disposition: form-data; name="param_'.$column.'"', '', $form_value);
+				$form_values[$column] = $form_value;
 			}
 		}
 
-		array_push($content, $boundary.'--', '');
-
-		$stream_context['http']['content'] = implode("\r\n", $content);
-		$stream_context['http']['header'][] = 'Content-Length: '.strlen($stream_context['http']['content']);
-
-		return $stream_context;
+		return $form_values;
 	}
 
 	/**
@@ -502,7 +502,30 @@ class CClickHouseStorage {
 	protected function query(string $query, array $param = []): ?array {
 		$result = null;
 		$time_start = microtime(true);
-		$stream_context = $this->buildMultipartFormData($this->request_context_data, $query, $param);
+
+		$form_values = $this->getEncodedParamMap($param);
+		$boundary = bin2hex(random_bytes(16));
+		$content = [
+			'--'.$boundary,
+			'Content-Disposition: form-data; name="query"',
+			'',
+			$query
+		];
+
+		foreach ($form_values as $name => $value) {
+			$content[] = '--'.$boundary;
+			$content[] = 'Content-Disposition: form-data; name="param_'.$name.'"';
+			$content[] = '';
+			$content[] = $value;
+		}
+
+		$content[] = '--'.$boundary.'--';
+		$content[] = '';
+
+		$stream_context = $this->request_context_data;
+		$stream_context['http']['content'] = implode("\r\n", $content);
+		$stream_context['http']['header'][] = 'Content-Type: multipart/form-data; boundary='.$boundary;
+		$stream_context['http']['header'][] = 'Content-Length: '.strlen($stream_context['http']['content']);
 
 		try {
 			$this->error_code = null;
@@ -534,7 +557,7 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Create array with 'query' and 'param' keys from $sql_parts.
+	 * Create query string from $sql_parts.
 	 *
 	 * @param array $sql_parts
 	 */
@@ -562,13 +585,14 @@ class CClickHouseStorage {
 	 * Does not support 'group' options.
 	 *
 	 * @param array $options
-	 * @param int   $options['history']
+	 * @param int   $options['history']  Item value type, required.
 	 */
 	protected function getQueryPartsFromOptions(array $options): array {
-		$options += [
+		$options = array_replace([
+			'itemids' => null,
+			'maxValueSize' => null,
 			'time_from' => null,
 			'time_till' => null,
-			'maxValueSize' => null,
 			'filter' => null,
 			'search' => null,
 			'startSearch' => false,
@@ -579,25 +603,19 @@ class CClickHouseStorage {
 			'sortorder' => null,
 			'limit' => null,
 			'limit_by' => null
-		];
+		], $options);
 
+		$table = $this->getTableName($options['history']);
 		$sql_parts = [
 			'select'	=> [],
-			'from'		=> [self::VALUE_TYPE_TABLE[$options['history']]],
+			'from'		=> [$table],
 			'prewhere'	=> [],
 			'where'		=> [],
-			// 'group'		=> [],
 			'order'		=> [],
 			'limit'		=> $options['limit'],
 			'limit_by'	=> $options['limit_by'],
 			'param'		=> []
 		];
-
-		// TODO: check does it work with searchByAny!
-		if (is_array($options['filter']) && array_key_exists('itemid', $options['filter'])) {
-			$options['itemids'] = array_merge((array) $options['itemids'], (array) $options['filter']['itemid']);
-			unset($options['filter']['itemid']);
-		}
 
 		if ($options['itemids'] !== null) {
 			$sql_parts['param']['UInt64']['pre_itemids'] = array_unique((array) $options['itemids']);
@@ -620,31 +638,27 @@ class CClickHouseStorage {
 			}
 			elseif ($time_from === null) {
 				$sql_parts['param']['UInt64']['pre_time_lte'] = $time_till;
-				$condition = 'clock_ns<=toDateTime64({pre_time_lte:UInt64},9)';
+				$condition = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
 			}
 			else {
 				$sql_parts['param']['UInt64']['pre_time_gte'] = $time_from;
 				$sql_parts['param']['UInt64']['pre_time_lte'] = $time_till;
 				$condition = 'clock_ns BETWEEN toDateTime64({pre_time_gte:UInt64},9)'.
-					' AND '.(
-						(string) $time_from === (string) $time_till
-							? 'addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)'
-							: 'toDateTime64({pre_time_lte:UInt64},9)'
-					);
+					' AND addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
 			}
 
 			$sql_parts['prewhere']['clock'] = $condition;
 		}
 
-		if ($options['filter'] !== null && $options['filter']) {
+		if (is_array($options['filter'])) {
 			$sql_parts = $this->addQueryFilterOptions($sql_parts, $options);
 		}
 
-		if ($options['search'] !== null && $options['search']) {
+		if (is_array($options['search'])) {
 			$sql_parts = $this->addQuerySearchOptions($sql_parts, $options);
 		}
 
-		if ($options['sortfield'] !== null && $options['sortfield']) {
+		if (is_array($options['sortfield'])) {
 			$sql_parts = $this->addQuerySortOptions($sql_parts, $options);
 		}
 
@@ -656,6 +670,7 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
+	 * @param int   $options['history']  Item value type, required.
 	 */
 	protected function addQueryOutputOptions(array $sql_parts, array $options): array {
 		$value = 'value';
@@ -689,6 +704,7 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
+	 * @param int   $options['history']  Item value type, required.
 	 */
 	protected function addQuerySortOptions(array $sql_parts, array $options): array {
 		$sortorder = (array) ($options['sortorder'] ?? ZBX_SORT_UP);
@@ -723,11 +739,9 @@ class CClickHouseStorage {
 	 */
 	protected function addQueryFilterOptions(array $sql_parts, array $options): array {
 		$filter = [];
-		$schema = self::VALUE_TYPE_SCHEMA[$options['history']];
-		// Escaping of clock_ns field is not supported.
-		unset($schema['clock_ns']);
 
-		foreach (array_intersect_key($schema, $options['filter']) as $field => $param_type) {
+		$fields = self::VALUE_TYPE_SCHEMA[$options['history']];
+		foreach (array_intersect_key($fields, $options['filter']) as $field => $param_type) {
 			$sql_parts['param'][$param_type]['filter_'.$field] = $options['filter'][$field];
 			$filter[$field] = is_array($options['filter'][$field])
 				? $field.' IN {filter_'.$field.':Array('.$param_type.')}'
@@ -758,11 +772,7 @@ class CClickHouseStorage {
 				$sql_parts['param']['UInt64']['pre_time_gte'] = $gte;
 				$sql_parts['param']['UInt64']['pre_time_lte'] = $lte;
 				$sql_parts['prewhere']['clock'] = 'clock_ns BETWEEN toDateTime64({pre_time_gte:UInt64},9)'.
-					' AND '.(
-						(string) $gte === (string) $lte
-							? 'addNanoseconds(toDateTime64({pre_time_lte:UInt64}, 9), 999999999)'
-							: 'toDateTime64({pre_time_lte:UInt64},9)'
-					);
+					' AND addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
 			}
 		}
 
@@ -776,21 +786,24 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Add API search options to sql parts.
+	 * Add string search filtering options to query.
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
+	 * @param int   $options['history']
+	 * @param bool  $options['startSearch']
+	 * @param bool  $options['excludeSearch']
+	 * @param bool  $options['searchWildcardsEnabled']
+	 * @param bool  $options['searchByAny']
 	 */
 	protected function addQuerySearchOptions(array $sql_parts, array $options): array {
 		$search = [];
-		$schema = self::VALUE_TYPE_SCHEMA[$options['history']];
+		$fields = self::VALUE_TYPE_SCHEMA[$options['history']];
 		$prefix = $options['startSearch'] ? '' : '%';
 		$operation = $options['excludeSearch'] ? ' NOT ILIKE ' : ' ILIKE ';
-		$pairs = $options['searchWildcardsEnabled']
-			? ['*' => '%', '%' => '\%', '_' => '\_']
-			: ['%' => '\%', '_' => '\_'];
+		$pairs = ($options['searchWildcardsEnabled'] ? ['*' => '%'] : []) + ['%' => '\%', '_' => '\_'];
 
-		foreach (array_intersect_key($schema, $options['search']) as $field => $param_type) {
+		foreach (array_intersect_key($fields, $options['search']) as $field => $param_type) {
 			if ($param_type !== 'String') {
 				continue;
 			}
@@ -829,8 +842,6 @@ class CClickHouseStorage {
 
 	/**
 	 * Get timestamp limited within value type supported TTL range.
-	 * TODO: Check is this method necessary beacuse of TTL there will be no data.
-	 *       If method have to stay then check is it required to apply it to clock set in filter
 	 *
 	 * @param int $value_type
 	 * @param int $timestamp

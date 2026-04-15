@@ -23,7 +23,7 @@ class CConfigFile {
 	const CONFIG_FILE_PATH = '/conf/zabbix.conf.php';
 
 	/**
-	 * Mapping between ITEM_VALUE_TYPE_* constants and strings representing constant within configuration array.
+	 * Mapping between ITEM_VALUE_TYPE_* constants and strings from configuration file when configuring history storage.
 	 * ITEM_VALUE_TYPE_BINARY is not supported.
 	 */
 	public const VALUE_TYPE_CONFIG_NAME = [
@@ -481,10 +481,14 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 				));
 			}
 
-			if ($provider['provider'] === ZBX_HISTORY_SOURCE_CLICKHOUSE && !array_key_exists('db', $provider)) {
-				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/db',
-					_s('the parameter "%1$s" is missing', 'db')
-				));
+			if ($provider['provider'] === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
+				$fields = array_diff(['db', 'username', 'password'], array_keys($provider));
+
+				if ($fields) {
+					self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/db',
+						_s('the parameter "%1$s" is missing', reset($fields))
+					));
+				}
 			}
 
 			$provider['url'] = rtrim($provider['url'], '/');

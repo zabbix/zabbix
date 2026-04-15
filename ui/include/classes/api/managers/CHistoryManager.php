@@ -19,16 +19,22 @@
  */
 class CHistoryManager {
 
-	private bool $primary_keys_enabled = false;
+	/**
+	 * @var bool
+	 */
+	private $primary_keys_enabled = false;
 
 	/**
-	 * @var array $value_type_storage configurations of storage providers by item value_type
-	 * $value_type_storage[]['provider']
+	 * Configuration array of each configured storage providers without class instance, by item value_type.
+	 *
+	 * @var array $value_type_storage
 	 */
 	protected $value_type_storage = [];
 
 	/**
-	 * @var array $storage_providers Storage provider instances array.
+	 * Instances of configured storage providers classes.
+	 *
+	 * @var array $storage_providers
 	 */
 	protected $storage_providers = [];
 
@@ -44,6 +50,8 @@ class CHistoryManager {
 		foreach ($providers as $provider) {
 			if ($provider['provider'] === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
 				$this->storage_providers[] = new CClickHouseStorage($provider, $value_type_ttl);
+
+				continue;
 			}
 
 			$provider_config = array_intersect_key($provider, $supported_props);
@@ -56,21 +64,12 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Get storage configuration for specific value type. Return null when storage is not set.
+	 * Get storage configuration array for specific value type. Return null when storage is not set.
 	 *
 	 * @param int $value_type  Item value type to get storage for.
 	 */
 	public function getStorageConfigByValueType(int $value_type): ?array {
 		return $this->value_type_storage[$value_type] ?? null;
-	}
-
-	/**
-	 * Get storage engine type for item of value type.
-	 *
-	 * @param int $value_type  Item value type to get storage type for.
-	 */
-	public function getStorageTypeForValueType(int $value_type): string {
-		return $this->value_type_storage[$value_type]['provider'] ?? ZBX_HISTORY_SOURCE_SQL;
 	}
 
 	/**
@@ -193,7 +192,7 @@ class CHistoryManager {
 		foreach ($itemids_by_type as $type => $type_itemids) {
 			$type_results = DBfetchColumn(DBselect(
 				'SELECT DISTINCT itemid'.
-				' FROM '.$this->getTableName($type).
+				' FROM '.self::getTableName($type).
 				' WHERE '.dbConditionInt('itemid', $type_itemids).
 					($period !== null ? ' AND clock>'.$period : '')
 			), 'itemid');
@@ -284,11 +283,10 @@ class CHistoryManager {
 			];
 		}
 
-		foreach ($terms as $type => $itemids) {
-			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageConfigByValueType($type));
+		foreach ($this->getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
 			$query['query']['bool']['must'] = array_merge([[
 				'terms' => [
-					'itemid' => $itemids
+					'itemid' => $terms[$type]
 				]
 			]], $filter);
 			$query['aggs']['group_by_itemid']['aggs']['group_by_docs'] = [
@@ -366,14 +364,14 @@ class CHistoryManager {
 		$value_expression = $length === null ? 'h.value' : dbSubstring('value', 1, $length);
 
 		foreach ($items as $item) {
-			$select_fields = DB::getSchema($this->getTableName($item['value_type']))['fields'];
+			$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
 			$select_fields = array_diff(array_keys($select_fields), ['value']);
 			$db_values = DBselect(
 				'SELECT h.'.implode(',h.', $select_fields).','.
 					($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 						? $value_expression
 						: 'h.value').
-				' FROM '.$this->getTableName($item['value_type']).' h'.
+				' FROM '.self::getTableName($item['value_type']).' h'.
 				' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 					$period_condition.
 				' ORDER BY h.clock DESC,h.ns DESC',
@@ -412,7 +410,7 @@ class CHistoryManager {
 
 				$clock_max = DBfetch(DBselect(
 					'SELECT MAX(h.clock)'.
-					' FROM '.$this->getTableName($item['value_type']).' h'.
+					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '')
 				), false);
@@ -422,14 +420,14 @@ class CHistoryManager {
 					continue;
 				}
 
-				$select_fields = DB::getSchema($this->getTableName($item['value_type']))['fields'];
+				$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
 				$select_fields = array_diff(array_keys($select_fields), ['value']);
 				$db_values = DBfetchArray(DBselect(
 					'SELECT h.'.implode(',h.', $select_fields).','.
 						($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 							? $value_expression
 							: 'h.value').
-					' FROM '.$this->getTableName($item['value_type']).' h'.
+					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						' AND h.clock='.zbx_dbstr($clock_max).
 					' ORDER BY h.ns DESC',
@@ -443,7 +441,7 @@ class CHistoryManager {
 		}
 		else {
 			foreach ($items as $item) {
-				$select_fields = DB::getSchema($this->getTableName($item['value_type']))['fields'];
+				$select_fields = DB::getSchema(self::getTableName($item['value_type']))['fields'];
 				$select_fields = array_diff(array_keys($select_fields), ['value']);
 				// Cannot order by h.ns directly here due to performance issues.
 				$values = DBfetchArray(DBselect(
@@ -451,7 +449,7 @@ class CHistoryManager {
 						($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 							? $value_expression
 							: 'h.value').
-					' FROM '.$this->getTableName($item['value_type']).' h'.
+					' FROM '.self::getTableName($item['value_type']).' h'.
 					' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 						($period !== null ? ' AND h.clock>'.$period : '').
 					' ORDER BY h.clock DESC',
@@ -480,7 +478,7 @@ class CHistoryManager {
 							($item['value_type'] == ITEM_VALUE_TYPE_JSON || $item['value_type'] == ITEM_VALUE_TYPE_BINARY
 								? $value_expression
 								: 'h.value').
-						' FROM '.$this->getTableName($item['value_type']).' h'.
+						' FROM '.self::getTableName($item['value_type']).' h'.
 						' WHERE h.itemid='.zbx_dbstr($item['itemid']).
 							' AND h.clock='.$clock.
 						' ORDER BY h.ns DESC',
@@ -526,7 +524,7 @@ class CHistoryManager {
 	 * @return array|null  Item data at specified time of first data before specified time. null if data is not found.
 	 */
 	public function getValueAt(array $item, $clock, $ns) {
-		switch ($this->getStorageTypeForValueType($item['value_type'])) {
+		switch ($this->getDataSourceType($item['value_type'])) {
 			case ZBX_HISTORY_SOURCE_ELASTIC:
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
@@ -594,8 +592,13 @@ class CHistoryManager {
 
 		foreach ($filters as $filter) {
 			$query['query']['bool']['must'] = $filter;
-			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageConfigByValueType($item['value_type']));
-			$result = CElasticsearchHelper::query('POST', $endpoint, $query);
+			$endpoints = $this->getElasticsearchEndpoints($item['value_type']);
+
+			if (count($endpoints) !== 1) {
+				break;
+			}
+
+			$result = CElasticsearchHelper::query('POST', reset($endpoints), $query);
 
 			if (count($result) === 1 && is_array($result[0]) && array_key_exists('value', $result[0])) {
 				return $result[0];
@@ -624,7 +627,7 @@ class CHistoryManager {
 			return null;
 		}
 
-		$history_table = $this->getTableName($item['value_type']);
+		$history_table = self::getTableName($item['value_type']);
 
 		$sql = 'SELECT *'.
 			' FROM '.$history_table.
@@ -671,7 +674,7 @@ class CHistoryManager {
 		}
 
 		$result = null;
-		$table = $this->getTableName($item['value_type']);
+		$table = self::getTableName($item['value_type']);
 
 		$sql = 'SELECT *'.
 				' FROM '.$table.
@@ -760,9 +763,8 @@ class CHistoryManager {
 		$grouped_items = $this->getItemsGroupedByStorage($items);
 
 		$results = [];
-
 		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$results += $this->getAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
+			$results = $this->getAggregationByIntervalFromElasticsearch($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC],
 				$time_from, $time_to, $function, $interval
 			);
 		}
@@ -865,12 +867,11 @@ class CHistoryManager {
 		];
 
 		$results = [];
-		foreach ($terms as $type => $itemids) {
-			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageConfigByValueType($type));
+		foreach ($this->getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
 			$query['query']['bool']['must'] = [
 				[
 					'terms' => [
-						'itemid' => $itemids
+						'itemid' => $terms[$type]
 					]
 				],
 				[
@@ -1236,12 +1237,11 @@ class CHistoryManager {
 
 		$results = [];
 
-		foreach ($terms as $type => $itemids) {
-			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageConfigByValueType($type));
+		foreach ($this->getElasticsearchEndpoints(array_keys($terms)) as $type => $endpoint) {
 			$query['query']['bool']['must'] = [
 				[
 					'terms' => [
-						'itemid' => $itemids
+						'itemid' => $terms[$type]
 					]
 				],
 				[
@@ -1481,15 +1481,14 @@ class CHistoryManager {
 
 		$result = [];
 
-		foreach ($itemids_by_value_type as $value_type => $itemids) {
-			$endpoint = CElasticsearchHelper::getRequestUrl($this->getStorageConfigByValueType($value_type));
+		foreach ($this->getElasticsearchEndpoints(array_keys($itemids_by_value_type)) as $value_type => $endpoint) {
 			$query = [
 				'query' => [
 					'bool' => [
 						'must' => [
 							[
 								'terms' => [
-									'itemid' => array_keys($itemids)
+									'itemid' => array_keys($itemids_by_value_type[$value_type])
 								]
 							],
 							[
@@ -1587,7 +1586,7 @@ class CHistoryManager {
 							break;
 					}
 
-					$sql_from = $this->getTableName($value_type);
+					$sql_from = self::getTableName($value_type);
 				}
 				else {
 					switch ($function) {
@@ -1685,35 +1684,28 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Clear item history and trends by provided item IDs. History is deleted from all storages.
+	 * Clear item history and trends by provided item IDs.
+	 * History is deleted from SQL, Elasticsearch and Clickhouse storages.
 	 *
-	 * @param array $items  Items to delete, each item must contain 'itemid', 'value_type'.
+	 * @param array $items  Key - itemid, value - value_type.
 	 *
 	 * @return bool
 	 */
 	public function deleteHistory(array $items) {
-		$grouped_items = $this->getItemsGroupedByStorage($items);
-		$result = true;
+		$result = $this->deleteHistoryFromSql($items) && $this->deleteHistoryFromElasticsearch(array_keys($items));
 
-		if (array_key_exists(ZBX_HISTORY_SOURCE_ELASTIC, $grouped_items)) {
-			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_ELASTIC]);
-			$result = $this->deleteHistoryFromElasticsearch($items);
+		if (!$result) {
+			return false;
 		}
 
-		if ($result && array_key_exists(ZBX_HISTORY_SOURCE_CLICKHOUSE, $grouped_items)) {
-			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
-				[$storage_provider, $storage_items] = $pair;
-				/** @var CClickHouseStorage $storage_provider */
-				$result = $result && $storage_provider->delete($storage_items);
+		foreach ($this->storage_providers as $provider) {
+			/** @var CClickHouseStorage $provider */
+			if ($provider->delete($items)) {
+				return false;
 			}
 		}
 
-		if ($result && array_key_exists(ZBX_HISTORY_SOURCE_SQL, $grouped_items)) {
-			$items = $this->getItemsGroupedByValueType($grouped_items[ZBX_HISTORY_SOURCE_SQL]);
-			$result = $this->deleteHistoryFromSql($items);
-		}
-
-		return $result;
+		return false;
 	}
 
 	/**
@@ -1721,18 +1713,30 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromElasticsearch(array $value_type_itemids) {
-		$result = true;
-
-		foreach ($value_type_itemids as $value_type => $itemids) {
-			$query = ['history' => $value_type, 'itemid' => array_keys($itemids)];
-
-			if (!CElasticsearchHelper::delete($query, $this->getStorageConfigByValueType($value_type))) {
-				$result = false;
+	private function deleteHistoryFromElasticsearch(array $itemids) {
+		foreach ($this->value_type_storage as $value_type => $storage) {
+			if ($storage['provider'] === ZBX_HISTORY_SOURCE_ELASTIC) {
+				$value_types[] = $value_type;
 			}
 		}
 
-		return $result;
+		if ($value_types) {
+			$query = [
+				'query' => [
+					'terms' => [
+						'itemid' => array_values($itemids)
+					]
+				]
+			];
+
+			foreach ($this->getElasticsearchEndpoints($value_types, '_delete_by_query') as $endpoint) {
+				if (!CElasticsearchHelper::query('POST', $endpoint, $query)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 
 	/**
@@ -1740,36 +1744,32 @@ class CHistoryManager {
 	 *
 	 * @see CHistoryManager::deleteHistory
 	 */
-	private function deleteHistoryFromSql(array $value_type_itemids) {
+	private function deleteHistoryFromSql(array $items) {
 		global $DB;
 
-		$table_value_type = [];
-		foreach (array_keys($value_type_itemids) as $value_type) {
-			$table_value_type[$this->getTableName($value_type)] = $value_type;
+		$item_tables = array_map([self::class, 'getTableName'], array_unique($items));
+		$table_names = array_flip(self::getTableName());
+
+		if (in_array(ITEM_VALUE_TYPE_UINT64, $items)) {
+			$item_tables[] = 'trends_uint';
+			$table_names['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
 		}
 
-		if (in_array(ITEM_VALUE_TYPE_UINT64, $table_value_type)) {
-			$table_value_type['trends_uint'] = ITEM_VALUE_TYPE_UINT64;
+		if (in_array(ITEM_VALUE_TYPE_FLOAT, $items)) {
+			$item_tables[] = 'trends';
+			$table_names['trends'] = ITEM_VALUE_TYPE_FLOAT;
 		}
 
-		if (in_array(ITEM_VALUE_TYPE_FLOAT, $table_value_type)) {
-			$table_value_type['trends'] = ITEM_VALUE_TYPE_FLOAT;
-		}
-
-		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed(array_keys($table_value_type))) {
+		if ($DB['TYPE'] == ZBX_DB_POSTGRESQL && PostgresqlDbBackend::isCompressed($item_tables)) {
 			error(_('Some of the history for this item may be compressed, deletion is not available.'));
 
 			return false;
 		}
 
-		foreach ($table_value_type as $table => $value_type) {
-			if (!array_key_exists($value_type, $value_type_itemids)) {
-				continue;
-			}
+		foreach ($item_tables as $table_name) {
+			$itemids = array_keys(array_intersect($items, [(string) $table_names[$table_name]]));
 
-			$itemids = array_keys($value_type_itemids[$value_type]);
-
-			if (!DBexecute('DELETE FROM '.$table.' WHERE '.dbConditionInt('itemid', $itemids))) {
+			if (!DBexecute('DELETE FROM '.$table_name.' WHERE '.dbConditionInt('itemid', $itemids))) {
 				return false;
 			}
 		}
@@ -1778,13 +1778,61 @@ class CHistoryManager {
 	}
 
 	/**
+	 * Get data source (SQL, Elasticsearch or ClickHouse) type based on value type id.
+	 *
+	 * @param int $value_type  Value type id.
+	 * @return string  Data source type.
+	 */
+	public function getDataSourceType($value_type) {
+		if (array_key_exists($value_type, $this->value_type_storage)) {
+			return $this->value_type_storage[$value_type]['provider'];
+		}
+
+		$storage_provider = $this->getStorageProviderInstance($value_type);
+
+		return $storage_provider === null ? ZBX_HISTORY_SOURCE_SQL : $storage_provider::PROVIDER_TYPE;
+	}
+
+	/**
+	 * Get endpoints for Elasticsearch requests.
+	 *
+	 * @param mixed $value_types  Value type(s).
+	 *
+	 * @return array  Elasticsearch query endpoints.
+	 */
+	public function getElasticsearchEndpoints($value_types, $action = '_search') {
+		if (!is_array($value_types)) {
+			$value_types = [$value_types];
+		}
+
+		$endpoints = [];
+		// Star character in the table name is to allow store history data in multiple date-based indicies.
+		$value_type_index = [
+			ITEM_VALUE_TYPE_LOG => 'log*',
+			ITEM_VALUE_TYPE_TEXT => 'text*',
+			ITEM_VALUE_TYPE_STR => 'str*',
+			ITEM_VALUE_TYPE_FLOAT => 'dbl*',
+			ITEM_VALUE_TYPE_UINT64 => 'uint*',
+			ITEM_VALUE_TYPE_JSON => 'json*'
+		];
+
+		foreach ($this->value_type_storage as $value_type => $storage) {
+			if ($storage['provider'] === ZBX_HISTORY_SOURCE_ELASTIC && in_array($value_type, $value_types)) {
+				$endpoints[$value_type] = $storage['url'].'/'.$value_type_index[$value_type].'/'.$action;
+			}
+		}
+
+		return $endpoints;
+	}
+
+	/**
 	 * Return the name of the table where the data for the given value type is stored.
 	 *
 	 * @param int $value_type  Value type.
 	 *
-	 * @return string  Table name.
+	 * @return string|array  Table name | all tables.
 	 */
-	public function getTableName($value_type): string {
+	public static function getTableName($value_type = null) {
 		$tables = [
 			ITEM_VALUE_TYPE_LOG => 'history_log',
 			ITEM_VALUE_TYPE_TEXT => 'history_text',
@@ -1795,34 +1843,22 @@ class CHistoryManager {
 			ITEM_VALUE_TYPE_JSON => 'history_json'
 		];
 
-		return $tables[$value_type];
+		return ($value_type === null) ? $tables : $tables[$value_type];
 	}
 
 	/**
-	 * Get database columns list available for specific value type.
+	 * Returns the items grouped by the storage type.
 	 *
-	 * @param int $value_type
+	 * @param array $items  An array of items with the 'value_type' property.
+	 * @return array  An array with storage type as a keys and item arrays as a values.
 	 */
-	public function getOutputFields($value_type): array {
-		$table = $this->getTableName($value_type);
-
-		return array_keys(DB::getSchema($table)['fields']);
-	}
-
-	/**
-	 * Get items grouped by the storage type.
-	 *
-	 * @param array $items
-	 * @param int   $items['itemid']
-	 * @param int   $items['value_type']
-	 */
-	private function getItemsGroupedByStorage(array $items): array {
+	private function getItemsGroupedByStorage(array $items) {
 		$grouped_items = [];
 
 		$value_storage = [];
 		foreach ($items as $item) {
 			if (!array_key_exists($item['value_type'], $value_storage)) {
-				$value_storage[$item['value_type']] = $this->getStorageTypeForValueType((int) $item['value_type']);
+				$value_storage[$item['value_type']] = $this->getDataSourceType((int) $item['value_type']);
 			}
 
 			$source = $value_storage[$item['value_type']];
@@ -1833,23 +1869,6 @@ class CHistoryManager {
 	}
 
 	/**
-	 * Get items grouped by value type.
-	 *
-	 * @param array $items
-	 * @param int   $items['itemid']
-	 * @param int   $items['value_type']
-	 */
-	private function getItemsGroupedByValueType(array $items): array {
-		$value_type_itemids = [];
-
-		foreach ($items as $item) {
-			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
-		}
-
-		return $value_type_itemids;
-	}
-
-	/**
 	 * Get iterator returning pairs storage provider and items it supports.
 	 *
 	 * @param array $items
@@ -1857,25 +1876,30 @@ class CHistoryManager {
 	 * @param int   $items['value_type']
 	 */
 	private function getProviderItemPairs(array $items): Iterator {
-		$items = $this->getItemsGroupedByValueType($items);
+		$value_type_itemids = [];
+
+		foreach ($items as $item) {
+			$value_type_itemids[$item['value_type']][$item['itemid']] = true;
+		}
 
 		foreach ($this->storage_providers as $storage_provider) {
+			/** @var CClickHouseStorage $storage_provider */
 			$provider_items = [];
 
-			foreach (array_keys($items) as $value_type) {
+			foreach (array_keys($value_type_itemids) as $value_type) {
 				if (!$storage_provider->isValueTypeSupported($value_type)) {
 					continue;
 				}
 
-				$provider_items[$value_type] = $items[$value_type];
-				unset($items[$value_type]);
+				$provider_items[$value_type] = $value_type_itemids[$value_type];
+				unset($value_type_itemids[$value_type]);
 			}
 
 			if ($provider_items) {
 				yield [$storage_provider, $provider_items];
 			}
 
-			if (!$items) {
+			if (!$value_type_itemids) {
 				break;
 			}
 		}

@@ -25,47 +25,6 @@ class CElasticsearchHelper {
 	private static $scroll_id;
 	private static $scrolls;
 
-	public const VALUE_TYPE_TABLE = [
-		ITEM_VALUE_TYPE_LOG => 'log',
-		ITEM_VALUE_TYPE_TEXT => 'text',
-		ITEM_VALUE_TYPE_STR => 'str',
-		ITEM_VALUE_TYPE_FLOAT => 'dbl',
-		ITEM_VALUE_TYPE_UINT64 => 'uint',
-		ITEM_VALUE_TYPE_JSON => 'json'
-	];
-
-	/**
-	 * Get Elasticsearch URL.
-	 *
-	 * @param array $storage. Array with elastic provider configuration.
-	 */
-	public static function getRequestUrl(array $storage, string $action = '_search'): string {
-		$segments = [
-			$storage['url'],
-			self::VALUE_TYPE_TABLE[$storage['value_type']].'*',
-			$action
-		];
-
-		return implode('/', $segments);
-	}
-
-	/**
-	 * @param array $options['itemids']
-	 */
-	public static function delete(array $options, array $storage): bool {
-		$endpoint = self::getRequestUrl($storage);
-		$query = [
-			'query' => [
-				'terms' => [
-					'itemid' => $options['itemids']
-				]
-			]
-		];
-		$result = self::query('POST', $endpoint, $query);
-
-		return (bool) $result;
-	}
-
 	/**
 	 * Perform request to Elasticsearch.
 	 *

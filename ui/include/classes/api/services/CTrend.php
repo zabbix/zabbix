@@ -64,13 +64,8 @@ class CTrend extends CApiService {
 				'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]]
 			]);
 
-			$value_types = array_map(
-				fn($value_type) => Manager::History()->getStorageTypeForValueType($value_type),
-				array_column($items, 'value_type', 'value_type')
-			);
-
 			foreach ($items as $item) {
-				$history_source = $value_types[$item['value_type']];
+				$history_source = Manager::History()->getDataSourceType($item['value_type']);
 				$storage_items[$history_source][$item['value_type']][$item['itemid']] = true;
 			}
 		}
@@ -265,8 +260,7 @@ class CTrend extends CApiService {
 			$result = 0;
 		}
 
-		// TBD: trends and elastic search?
-		foreach ($value_types as $type) {
+		foreach (Manager::History()->getElasticsearchEndpoints($value_types) as $type => $endpoint) {
 			if (!array_key_exists($type, $options['itemids'])) {
 				continue;
 			}
@@ -285,8 +279,6 @@ class CTrend extends CApiService {
 
 			$query['aggs']['group_by_itemid']['terms']['size'] = count($itemids);
 
-			$storage = Manager::History()->getStorageConfigByValueType($type);
-			$endpoint = CElasticsearchHelper::getRequestUrl($storage);
 			$data = CElasticsearchHelper::query('POST', $endpoint, $query);
 
 			foreach ($data['group_by_itemid']['buckets'] as $item) {

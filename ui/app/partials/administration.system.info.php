@@ -203,7 +203,6 @@ if ($data['user_type'] == USER_TYPE_SUPER_ADMIN) {
 
 	// Check DB version.
 	foreach ($data['system_info']['dbversion_status'] as $dbversion) {
-		// TODO: ASK: Show configured storage providers in "System information" ?
 		if (array_key_exists('provider', $dbversion)) {
 			continue;
 		}
