@@ -349,12 +349,12 @@ window.script_edit_popup = new class {
 	#delete() {
 		if (window.confirm(<?= json_encode(_('Delete script?')) ?>)) {
 			this.#clearMessages();
-			const url = zabbixUrl({
+			const url_params = {
 				action: 'script.delete',
 				[CSRF_TOKEN_NAME]: <?= json_encode(CCsrfTokenHelper::get('script')) ?>
-			});
+			};
 
-			this.#post(url, {scriptids: [this.scriptid]}, (response) => {
+			this.#post(zabbixUrl(url_params), {scriptids: [this.scriptid]}, (response) => {
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
 				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
@@ -368,9 +368,6 @@ window.script_edit_popup = new class {
 	#submit() {
 		this.#clearMessages();
 		const fields = this.form.getAllValues();
-		const url = zabbixUrl({
-			action: this.scriptid === null ? 'script.create' : 'script.update'
-		});
 
 		this.form.validateSubmit(fields)
 			.then((result) => {
@@ -380,7 +377,9 @@ window.script_edit_popup = new class {
 					return;
 				}
 
-				this.#post(url, fields, (response) => {
+				const action = this.scriptid === null ? 'script.create' : 'script.update';
+
+				this.#post(zabbixUrl({action}), fields, (response) => {
 					overlayDialogueDestroy(this.overlay.dialogueid);
 
 					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
