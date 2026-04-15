@@ -71,6 +71,7 @@ class testFormFilter extends CWebTest {
 				// Checking that hosts/problems amount displayed near name in filter tab.
 				if (array_key_exists('Show number of records', $data['filter'])) {
 					$filter->selectTab();
+					$table->waitUntilReady();
 					$this->assertEquals($filtered_rows_count,
 							$filter->getTabDataCounter(CTestArrayHelper::get($data, 'tab', $data['filter']['Name']))
 					);
