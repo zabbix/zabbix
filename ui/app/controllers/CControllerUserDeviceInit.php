@@ -68,7 +68,7 @@ class CControllerUserDeviceInit extends CController {
 			'server_id' => '018f9c6a-7c1b-7f3a-9b2d-5c4f8e6a1d90',
 			'enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
 			'mobile_enrollment_token' => 'BD0qfl9qmxw_CkWfEaK1DJg0PH3hilZ3mtp8NvHiklFZ9ijGbhx0lD0KNsVVkT3bg8EjbUMoW8bfE2Jio8mU0o',
-			'bridge_enrollment_key' => [
+			'bridge_adapter_encryption_key' => [
 				'kty' => 'EC',
 				'crv' => 'P-256',
 				'x' => 'V4D0HUpQ7fqiXLyLw4CivPSUAL3tbbyH_bFeRaBT7NY',
@@ -76,7 +76,7 @@ class CControllerUserDeviceInit extends CController {
 				'kid' => 'serverKid',
 				'alg' => '1'
 			],
-			'enrollment_url' => '165.22.83.177:8443'
+			'bridge_enrollment_url' => '165.22.83.177:8443'
 		];
 	}
 
@@ -98,10 +98,10 @@ class CControllerUserDeviceInit extends CController {
 					->setArgument('sid', $device['server_id'])
 					->setArgument('name', APP::getConfigValue('ZBX_SERVER_NAME', 'Zabbix'))
 					->setArgument('did', $device['uuid'])
-					->setArgument('url', $device['enrollment_url'])
+					->setArgument('url', $device['bridge_enrollment_url'])
 					->setArgument('met', $device['mobile_enrollment_token'])
 					->setArgument('zet', $device['enrollment_token'])
-					->setArgument('bek', base64_encode(json_encode($device['bridge_enrollment_key'])))
+					->setArgument('bek', base64_encode(json_encode($device['bridge_adapter_encryption_key'])))
 					->getUrl()
 			];
 		}
