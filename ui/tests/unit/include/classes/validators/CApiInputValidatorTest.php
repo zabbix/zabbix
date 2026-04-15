@@ -5656,6 +5656,78 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				'Invalid parameter "/uuid_v4": UUIDv4 is expected.'
 			],
 			[
+				['type' => API_UUID_V7],
+				'019d6e13a1b47c8e8f12ab34cd56ef78',
+				'/uuid_v7',
+				'019d6e13a1b47c8e8f12ab34cd56ef78'
+			],
+			[
+				['type' => API_UUID_V7],
+				null,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				true,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				1,
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				[],
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a character string is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": cannot be empty.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'23',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 32 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'1234567890123456789012345678901234567890',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 32 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e10-e3dc-72ea-8021-fefb3dae1e6f',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must be 32 characters long.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'12345678901234567890123456789012',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13a1b47c8exf12ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": must contain only hexadecimal characters.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13a1b40c8e8f12ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
 				['type' => API_CUIDS],
 				[],
 				'/',
