@@ -290,8 +290,8 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendsum eq 6' => ['state' => 0, 'value' => 0], /* 2,4,8 not eq 6 */
 			'Item 52 trendavg eq 3' => ['state' => 0, 'value' => 0], /* incorrect average value without last 0 */
 			'Item 53 trendstl eq 0' => ['state' => 1, 'value' => 0],
-			'Item 54 baselinedev eq 0' => ['state' => 1, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 1, 'value' => 0]
+			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
 		];
 
 		$failures = [];
@@ -304,10 +304,10 @@ class testFunctions extends CIntegrationTest{
 			}
 			$expected = $triggers_expected[$description];
 
-			if ($expected['state'] != $trigger['state']) {
+			if ($expected['state'] !== $trigger['state']) {
 				$failures[] = "[1] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
-			if ($expected['value'] != $trigger['value']) {
+			if ($expected['value'] !== $trigger['value']) {
 				$failures[] = "[1] Value mismatch for trigger: $description";
 			}
 		}
@@ -384,8 +384,8 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendsum eq 6' => ['state' => 0, 'value' => 1],
 			'Item 52 trendavg eq 3' => ['state' => 0, 'value' => 1],
 			'Item 53 trendstl eq 0' => ['state' => 0, 'value' => 1],
-			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
+			'Item 54 baselinedev eq 0' => ['state' => 1, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => 1, 'value' => 0]
 		];
 
 		$failures = [];
@@ -398,10 +398,10 @@ class testFunctions extends CIntegrationTest{
 			}
 			$expected = $triggers_expected[$description];
 
-			if ($expected['state'] != $trigger['state']) {
+			if ($expected['state'] !== $trigger['state']) {
 				$failures[] = "[2] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
-			if ($expected['value'] != $trigger['value']) {
+			if ($expected['value'] !== $trigger['value']) {
 				$failures[] = "[2] Value mismatch for trigger: $description";
 			}
 		}
@@ -492,10 +492,10 @@ class testFunctions extends CIntegrationTest{
 			}
 			$expected = $triggers_expected[$description];
 
-			if ($expected['state'] != $trigger['state']) {
+			if ($expected['state'] !== $trigger['state']) {
 				$failures[] = "[3] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
-			if ($expected['value'] != $trigger['value']) {
+			if ($expected['value'] !== $trigger['value']) {
 				$failures[] = "[3] Value mismatch for trigger: $description";
 			}
 		}
