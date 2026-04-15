@@ -287,11 +287,11 @@ class testFunctions extends CIntegrationTest{
 			'Item 52 trendcount eq 2' => ['state' => 0, 'value' => 0], /* last 0 not synced to database yet */
 			'Item 52 trendmin eq 2' => ['state' => 1, 'value' => 0],
 			'Item 52 trendmax eq 4' => ['state' => 0, 'value' => 0], /* max is 8 */
-			'Item 52 trendsum eq 6' => ['state' => 0, 'value' => 0], /* 2,4,8 not eq 6 */
+			'Item 52 trendsum eq 6' => ['state' => 1, 'value' => 0],
 			'Item 52 trendavg eq 3' => ['state' => 0, 'value' => 0], /* incorrect average value without last 0 */
 			'Item 53 trendstl eq 0' => ['state' => 1, 'value' => 0],
-			'Item 54 baselinedev eq 0' => ['state' => 0, 'value' => 0],
-			'Item 55 baselinewma eq 0' => ['state' => 0, 'value' => 0]
+			'Item 54 baselinedev eq 0' => ['state' => 1, 'value' => 0],
+			'Item 55 baselinewma eq 0' => ['state' => 1, 'value' => 0]
 		];
 
 		$failures = [];
@@ -312,9 +312,11 @@ class testFunctions extends CIntegrationTest{
 			}
 		}
 		$this->assertEmpty($failures, implode("\n", $failures));
+		$this->stopComponent(self::COMPONENT_SERVER);
 	}
 
 	private function processStep2() {
+		$this->startComponent(self::COMPONENT_SERVER);
 		$this->sendValues('values2');
 
 		$response = $this->call('trigger.get', [
