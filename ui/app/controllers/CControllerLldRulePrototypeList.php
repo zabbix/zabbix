@@ -107,6 +107,13 @@ class CControllerLldRulePrototypeList extends CController {
 			'allowed_ui_conf_templates' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
 		];
 
+		if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
+			$data['source_link_data'] = [
+				'parent_itemid' => $this->parent_discovery['discoveryData']['parent_itemid'],
+				'name' => $this->parent_discovery['name']
+			];
+		}
+
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of discovery rules'));
 		$this->setResponse($response);
@@ -139,13 +146,6 @@ class CControllerLldRulePrototypeList extends CController {
 		}
 
 		$discoveries = expandItemNamesWithMasterItems($discoveries, 'items');
-
-		if ($this->parent_discovery['flags'] & ZBX_FLAG_DISCOVERY_CREATED) {
-			$data['source_link_data'] = [
-				'parent_itemid' => $this->parent_discovery['discoveryData']['parent_itemid'],
-				'name' => $this->parent_discovery['name']
-			];
-		}
 
 		return $discoveries;
 	}
