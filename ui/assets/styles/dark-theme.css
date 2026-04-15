@@ -1216,8 +1216,6 @@ footer {
     .form-grid fieldset.collapsible.collapsed .fields-group,
     .form-grid fieldset.collapsible.collapsed .form-field {
       display: none !important; }
-    .form-grid fieldset z-textarea-flexible {
-      vertical-align: top; }
   .form-grid > label,
   .form-grid .collapsible > label,
   .form-grid .fields-group > label {
@@ -4687,7 +4685,8 @@ z-sparkline {
     left: 0; }
 
 z-textarea-flexible {
-  display: inline-grid; }
+  display: inline-grid;
+  vertical-align: top; }
   z-textarea-flexible textarea {
     display: block !important;
     width: 100%;
