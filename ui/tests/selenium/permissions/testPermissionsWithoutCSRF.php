@@ -334,6 +334,12 @@ class testPermissionsWithoutCSRF extends CWebTest {
 						'id:name' => 'CSRF validation event correlation',
 						'id:operations_0' => true
 					],
+					'secondary_dialog' => [
+						'field' => 'id:condition_table',
+						'fill' => [
+							'Tag' => 'CSRF test tag'
+						]
+					],
 					'dialog_actions' => [
 						[
 							'click' => 'class:js-condition-add',
