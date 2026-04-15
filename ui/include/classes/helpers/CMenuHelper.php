@@ -316,7 +316,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Authentication')))
 					->setAction('authentication.edit')
 				: null,
-			CTemporaryMobileFeatureHelper::isEnabled() &&
+			!CWebUser::isGuest() && CTemporaryMobileFeatureHelper::isEnabled() &&
 				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
 				? (new CMenuItem(_('Linked devices')))
 					->setAction('user.device.list')

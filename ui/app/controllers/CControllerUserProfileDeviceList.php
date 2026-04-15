@@ -37,9 +37,8 @@ class CControllerUserProfileDeviceList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!CTemporaryMobileFeatureHelper::isEnabled()
-				|| !CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)
-				|| CWebUser::isGuest()) {
+		if (CWebUser::isGuest() || !CTemporaryMobileFeatureHelper::isEnabled()
+				|| !CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)) {
 			return false;
 		}
 

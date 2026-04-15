@@ -41,7 +41,7 @@ class CControllerUserDeviceCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		if (!CTemporaryMobileFeatureHelper::isEnabled()) {
+		if (CWebUser::isGuest() || !CTemporaryMobileFeatureHelper::isEnabled()) {
 			return false;
 		}
 
