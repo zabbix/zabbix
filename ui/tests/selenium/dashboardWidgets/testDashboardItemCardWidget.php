@@ -2116,7 +2116,7 @@ class testDashboardItemCardWidget extends testWidgets {
 								->query('button:Show')->one();
 						$this->assertTrue($button->isClickable());
 						$button->click();
-						$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilVisible();
+						$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilReady();
 						$this->assertEquals($value, $button->getAttribute('data-hintbox-contents'));
 					}
 					else {
