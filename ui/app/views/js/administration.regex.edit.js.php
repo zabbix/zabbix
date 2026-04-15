@@ -72,10 +72,6 @@
 			if (delete_btn) {
 				delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
 			}
-
-			document.querySelectorAll('z-select').forEach(zselect => {
-				zselect.setAttribute('width', zselect._listWidth());
-			});
 		}
 
 		submit() {
