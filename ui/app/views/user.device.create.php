@@ -45,7 +45,8 @@ $form_grid = (new CFormGrid())
 						'srcfld1' => 'userid',
 						'srcfld2' => 'fullname',
 						'dstfrm' => $form->getName(),
-						'dstfld1' => 'userid'
+						'dstfld1' => 'userid',
+						'has_devices_access' => 1
 					]
 				]
 			]))

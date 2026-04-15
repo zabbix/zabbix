@@ -477,6 +477,19 @@ switch ($data['method']) {
 					$options['filter']['userdirectoryid'] = 0;
 				}
 
+				if (array_key_exists('has_devices_access', $data) && $data['has_devices_access']) {
+					$roles = API::Role()->get([
+						'output' => ['roleid'],
+						'selectRules' => [CRoleHelper::DEVICES_ACCESS]
+					]);
+
+					$roles = array_filter($roles, static fn($role) =>
+						$role['rules'][CRoleHelper::DEVICES_ACCESS] == 1
+					);
+
+					$options['filter']['roleid'] = array_column($roles, 'roleid');
+				}
+
 				$users = API::User()->get($options);
 
 				if (array_key_exists('context', $data) && stripos('system', $data['search']) !== false) {

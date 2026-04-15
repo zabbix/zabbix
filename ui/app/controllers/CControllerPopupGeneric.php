@@ -606,7 +606,8 @@ class CControllerPopupGeneric extends CController {
 			'host_pattern_multiple' =>				'in 1',
 			'hide_host_filter' =>					'in 1',
 			'resolve_macros' =>						'in 1',
-			'exclude_provisioned' =>				'in 1'
+			'exclude_provisioned' =>				'in 1',
+			'has_devices_access' =>					'in 1'
 		];
 
 		// Set destination and source field validation roles.
@@ -1285,6 +1286,19 @@ class CControllerPopupGeneric extends CController {
 
 				if ($this->hasInput('exclude_provisioned')) {
 					$options['filter']['userdirectoryid'] = 0;
+				}
+
+				if ($this->hasInput('has_devices_access')) {
+					$roles = API::Role()->get([
+						'output' => ['roleid'],
+						'selectRules' => [CRoleHelper::DEVICES_ACCESS]
+					]);
+
+					$roles = array_filter($roles, static fn($role) =>
+						$role['rules'][CRoleHelper::DEVICES_ACCESS] == 1
+					);
+
+					$options['filter']['roleid'] = array_column($roles, 'roleid');
 				}
 
 				$records = API::User()->get($options);
