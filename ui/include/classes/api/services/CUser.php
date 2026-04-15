@@ -4036,4 +4036,120 @@ class CUser extends CApiService {
 
 		return ['userids' => $userids];
 	}
+
+	public static function provisionPushMedia(string $userid, string $uuid): void {
+		$db_media_types = DB::select('media_type', [
+			'output' => [],
+			'filter' => [
+				'type' => [MEDIA_TYPE_PUSH],
+				'status' => [MEDIA_TYPE_STATUS_ACTIVE]
+			],
+			'sortfield' => ['name'],
+			'sortorder' => [ZBX_SORT_UP],
+			'preservekeys' => true
+		]);
+
+		if (!$db_media_types) {
+			return;
+		}
+
+		$db_user_medias = DB::select('media', [
+			'output' => ['mediaid', 'mediatypeid', 'sendto'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$db_user_media_types = DB::select('media_type', [
+			'output' => ['type'],
+			'filter' => ['mediatypeid' => array_column($db_user_medias, 'mediatypeid')],
+			'preservekeys' => true
+		]);
+
+		foreach ($db_user_medias as $db_media) {
+			if ($db_user_media_types[$db_media['mediatypeid']] == MEDIA_TYPE_PUSH
+				&& ($db_media['sendto'] === '*' || $db_media['sendto'] === $uuid)) {
+				return;
+			}
+		}
+
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'username'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$users = [];
+
+		foreach ($db_users as &$db_user) {
+			$user = $db_user;
+			$user['medias'] = array_values($db_user_medias);
+			$user['medias'][] = [
+				'mediatypeid' => key($db_media_types),
+				'sendto' => $uuid,
+				'status' => MEDIA_STATUS_ACTIVE
+			];
+
+			foreach ($user['medias'] as &$media) {
+				$media['sendto'] = explode("\n", $media['sendto']);
+			}
+			unset($media);
+
+			$users[] = $user;
+
+			$db_user['medias'] = $db_user_medias;
+		}
+		unset($db_user, $user);
+
+		self::updateMedias($users, $db_users);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+	}
+
+	public static function deprovisionPushMedia(string $userid, string $uuid): void {
+		$db_user_medias = DB::select('media', [
+			'output' => ['mediaid', 'mediatypeid', 'sendto'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$db_user_media_types = DB::select('media_type', [
+			'output' => ['mediatypeid', 'type'],
+			'filter' => ['mediatypeid' => array_column($db_user_medias, 'mediatypeid')],
+			'preservekeys' => true
+		]);
+
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'username'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
+		$users = [];
+
+		foreach ($db_users as &$db_user) {
+			$user = $db_user;
+			$user['medias'] = array_values($db_user_medias);
+
+			foreach ($user['medias'] as $key => &$user_media) {
+				if ($db_user_media_types[$user_media['mediatypeid']]['type'] == MEDIA_TYPE_PUSH
+					&& $user_media['sendto'] === $uuid) {
+					unset($user['medias'][$key]);
+
+					continue;
+				}
+
+				$user_media['sendto'] = explode("\n", $user_media['sendto']);
+			}
+			unset($user_media);
+
+			$users[] = $user;
+
+			$db_user['medias'] = $db_user_medias;
+		}
+		unset($db_user, $user);
+
+		self::updateMedias($users, $db_users);
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+	}
 }

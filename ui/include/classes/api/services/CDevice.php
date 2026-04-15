@@ -331,6 +331,8 @@ class CDevice extends CApiService {
 
 		DB::insertBatch('token_device', [$ins_device_token], false);
 
+		CUser::provisionPushMedia($db_device['userid'], $db_device['uuid']);
+
 		$device = [
 			'deviceid' => $db_device['deviceid'],
 			'name' => $options['name']
@@ -430,17 +432,19 @@ class CDevice extends CApiService {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::DEVICE_LINK_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
 
-		$deviceids = array_keys($db_devices);
-
 		$result = $server->offboardDevice($data, self::getAuthIdentifier());
 
 		if ($result === false) {
 			self::exception(ZBX_API_ERROR_INTERNAL, $server->getError());
 		}
 
+		$device = reset($db_devices);
+
+		CUser::deprovisionPushMedia($device['userid'], $device['uuid']);
+
 		$db_token_devices = DB::select('token_device', [
 			'output' => [],
-			'filter' => ['deviceid' => $deviceids],
+			'filter' => ['deviceid' => $device['deviceid']],
 			'preservekeys' => true
 		]);
 
@@ -448,11 +452,11 @@ class CDevice extends CApiService {
 
 		DB::delete('token_device', ['tokenid' => $tokenids]);
 		DB::delete('token', ['tokenid' => $tokenids]);
-		DB::delete('device', ['deviceid' => $deviceids]);
+		DB::delete('device', ['deviceid' => $device['deviceid']]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_DEVICE, $db_devices);
 
-		return ['deviceid' => $deviceids[0]];
+		return ['deviceid' => $device['deviceid']];
 	}
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
@@ -475,7 +479,7 @@ class CDevice extends CApiService {
 		}
 
 		$db_devices = $this->get([
-			'output' => ['deviceid', 'name'],
+			'output' => ['deviceid', 'userid', 'uuid', 'name'],
 			'filter' => ['uuid' => $data['uuid']],
 			'preservekeys' => true
 		]);
