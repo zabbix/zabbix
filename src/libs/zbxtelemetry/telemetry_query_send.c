@@ -61,13 +61,11 @@ static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now,
 
 	if (SUCCEED == ret)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST2: %s(): '%s'", __func__, ZBX_NULL2STR(http_out));
 		*out = http_out;
 		http_out = NULL;
 	}
 	else
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST3: %s(): '%s'", __func__, ZBX_NULL2STR(http_error));
 		*error = http_error;
 		http_error = NULL;
 	}

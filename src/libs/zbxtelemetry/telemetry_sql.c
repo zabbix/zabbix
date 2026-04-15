@@ -29,6 +29,65 @@ typedef enum tq_db_type
 }
 tq_db_type_t;
 
+static int	tq_sql_is_escape_sequence_clickhoouse(char c)
+{
+	if ('\'' == c || '\\' == c || '"' == c)
+		return SUCCEED;
+	return FAIL;
+}
+
+static size_t	tq_sql_dyn_escape_string_unquoted_size_clickhouse(const char *s)
+{
+	size_t	csize, len = 1;
+
+	if (NULL == s)
+		return len;
+
+	while ('\0' != *s)
+	{
+		csize = zbx_utf8_char_len(s);
+
+		/* process non-UTF-8 characters as single byte characters */
+		if (0 == csize)
+			csize = 1;
+
+		if (SUCCEED == tq_sql_is_escape_sequence_clickhoouse(*s))
+			len++;
+
+		s += csize;
+		len += csize;
+	}
+
+	return len;
+}
+
+static char	*tq_sql_dyn_escape_string_unquoted_clickhouse(const char *src)
+{
+	size_t		len = tq_sql_dyn_escape_string_unquoted_size_clickhouse(src);
+	char		*dst = zbx_malloc(NULL, len);
+	const char	*s;
+	char		*d;
+
+	for (s = src, d = dst; NULL != s && '\0' != *s; s++)
+	{
+		if (SUCCEED == tq_sql_is_escape_sequence_clickhoouse(*s))
+			*d++ = '\\';
+
+		*d++ = *s;
+	}
+	*d = '\0';
+
+	return dst;
+}
+
+static char	*tq_sql_dyn_escape_string_unquoted(const char *src, tq_db_type_t db_type)
+{
+	if (TQ_SQL_DB_TYPE_CLICKHOUSE == db_type)
+		return tq_sql_dyn_escape_string_unquoted_clickhouse(src);
+
+	return zbx_db_dyn_escape_string(src);
+}
+
 /******************************************************************************
  *                                                                            *
  * Return value: escaped and quoted string to be used as a string literal     *
@@ -36,10 +95,7 @@ tq_db_type_t;
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_string(const char *src, tq_db_type_t db_type)
 {
-	/* TODO: escape the escape sequences inside the string */
-
-	char	*src_esc = zbx_strdup(NULL, src); /* FIXME: placeholder */
-
+	char	*src_esc = tq_sql_dyn_escape_string_unquoted(src, db_type);
 	size_t	src_esc_strlen = strlen(src_esc);
 	char	*dst = zbx_malloc(NULL, src_esc_strlen + 2 + 1);
 	char	quote_char = '\'';
@@ -61,28 +117,29 @@ static char	*tq_sql_dyn_escape_string(const char *src, tq_db_type_t db_type)
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_name(const char *src, tq_db_type_t db_type)
 {
-	// TODO: escape the escape sequences inside the string
-
-	size_t	src_strlen = strlen(src);
-	char	*dst = zbx_malloc(NULL, src_strlen + 2 + 1);
+	char	*src_esc = tq_sql_dyn_escape_string_unquoted(src, db_type);
+	size_t	src_esc_strlen = strlen(src_esc);
+	char	*dst = zbx_malloc(NULL, src_esc_strlen + 2 + 1);
 	char	quote_char;
 
 	switch (db_type)
 	{
 		case TQ_SQL_DB_TYPE_POSTGRESQL:
+		case TQ_SQL_DB_TYPE_CLICKHOUSE:
 			quote_char = '"';
 			break;
 
 		case TQ_SQL_DB_TYPE_MYSQL:
-		case TQ_SQL_DB_TYPE_CLICKHOUSE:
 			quote_char = '`';
 			break;
 	}
 
 	*dst = quote_char;
-	zbx_strlcpy(dst + 1, src, src_strlen + 1);
-	*(dst + 1 + src_strlen) = quote_char;
-	*(dst + 1 + src_strlen + 1) = '\0';
+	zbx_strlcpy(dst + 1, src_esc, src_esc_strlen + 1);
+	*(dst + 1 + src_esc_strlen) = quote_char;
+	*(dst + 1 + src_esc_strlen + 1) = '\0';
+
+	zbx_free(src_esc);
 
 	return dst;
 }
@@ -94,8 +151,33 @@ static char	*tq_sql_dyn_escape_name(const char *src, tq_db_type_t db_type)
  ******************************************************************************/
 static char	*tq_sql_dyn_escape_like_pattern(const char *src, tq_db_type_t db_type)
 {
-	/* FIXME: placeholder (the _, % escaping is fine probably but escaping other characters should be changed) */
-	return zbx_db_dyn_escape_like_pattern(src);
+	if (TQ_SQL_DB_TYPE_POSTGRESQL == db_type || TQ_SQL_DB_TYPE_MYSQL == db_type)
+		return zbx_db_dyn_escape_like_pattern(src);
+
+	char	*tmp = tq_sql_dyn_escape_string_unquoted(src, db_type);
+	size_t	len = strlen(tmp) + 1;
+
+	for (const char *p = tmp; '\0' != *p; p++)
+	{
+		if ('_' == *p || '%' == *p)
+			len++;
+	}
+
+	char	*dst = zbx_malloc(NULL, len);
+	char	*d = dst;
+
+	for (const char	*t = tmp; '\0' != *t; t++)
+	{
+		if ('_' == *t || '%' == *t)
+			*d++ = '\\';
+
+		*d++ = *t;
+	}
+	*d = '\0';
+
+	zbx_free(tmp);
+
+	return dst;
 }
 
 static char	*tq_sql_dyn_get_json_extract(const char *field, const char *path, tq_db_type_t db_type)
@@ -328,12 +410,16 @@ static char	*tq_sql_dyn_get_condition_contains(const zbx_tq_condition_t *cond, t
 	switch (db_type)
 	{
 		case TQ_SQL_DB_TYPE_POSTGRESQL:
-		case TQ_SQL_DB_TYPE_CLICKHOUSE:
-			str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", operand, value_esc);
+			str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%' ESCAPE '%c'", operand, value_esc,
+					ZBX_SQL_LIKE_ESCAPE_CHAR);
 			break;
 
 		case TQ_SQL_DB_TYPE_MYSQL:
 			str = zbx_dsprintf(NULL, "UNIMPLEMENTED");
+			break;
+
+		case TQ_SQL_DB_TYPE_CLICKHOUSE:
+			str = zbx_dsprintf(NULL, "%s LIKE '%%%s%%'", operand, value_esc);
 			break;
 	}
 
@@ -695,7 +781,7 @@ void	tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t 
 			"Timestamp + INTERVAL %d SECOND, INTERVAL %d SECOND"
 			") - INTERVAL %d SECOND AS rounded_time,",
 			query->time_shift, query->aggregation_size, query->time_shift);
-	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(`Timestamp`)) AS starttime,");
+	zbx_snprintf_alloc(sql, &alloc, &offset, "toUnixTimestamp(MIN(\"Timestamp\")) AS starttime,");
 	if (query_has_columns)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "%s,", columns_to_select);
 	zbx_snprintf_alloc(sql, &alloc, &offset, "%s ", aggr_columns_to_select);
@@ -706,8 +792,8 @@ void	tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t 
 	/* where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"`Timestamp`>toDateTime(" ZBX_FS_TIME_T ") "
-			"AND `Timestamp`<=toDateTime(" ZBX_FS_TIME_T ") ",
+			"\"Timestamp\">toDateTime(" ZBX_FS_TIME_T ") "
+			"AND \"Timestamp\"<=toDateTime(" ZBX_FS_TIME_T ") ",
 			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
 	if (query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
