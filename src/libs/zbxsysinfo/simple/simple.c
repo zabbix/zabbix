@@ -495,8 +495,15 @@ int	zbx_check_service_default_addr(AGENT_REQUEST *request, const char *default_a
 	{
 		if (0 == strcmp(service, "ntp"))
 		{
+			if (FAIL == zbx_is_ip(ip) && FAIL == zbx_is_dnsname(ip))
+			{
+				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
+				return SYSINFO_RET_FAIL;
+			}
+
 			if (NULL == port_str || '\0' == *port_str)
 				port = ZBX_DEFAULT_NTP_PORT;
+
 			ret = check_ntp(ip, port, request->timeout, &value_int);
 		}
 		else
