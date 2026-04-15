@@ -526,7 +526,7 @@
 								[null]);
 						}
 						else if (column.getColumnIndex() == column_index) {
-							column_clone.setCellRenderer('symptom_limit');
+							column_clone.setRenderer('symptom_limit');
 
 							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
 								[symptom_limit]);
@@ -558,7 +558,7 @@
 						const data_cell = this.#datatable.createDataCell(column_clone);
 
 						if (i == column_index) {
-							column_clone.setCellRenderer('breakpoint');
+							column_clone.setRenderer('breakpoint');
 
 							this.#datatable.renderDataCellContents(column_clone, row, row_index, data_cell, data_fields,
 								row_data);
