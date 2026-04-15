@@ -363,20 +363,20 @@ zabbix_export:
           value: '1762430300'
   triggers:
     - uuid: 3b3c6effd9fb4eabad6f15b3e7ed4764
-      expression: 'trendavg(/Integration function test/item[52], 1d:now/d) = 3 and last(/Integration function test/item[51]) > 0'
-      name: 'Item 52 trendavg eq 3'
+      expression: 'truncate(trendavg(/Integration function test/item[52], 1d:now/d),1) = 4.6 and last(/Integration function test/item[51]) > 0'
+      name: 'Item 52 trendavg eq 4.6'
     - uuid: 664744152d8b45db819952e7bf726b1b
-      expression: 'trendcount(/Integration function test/item[52], 1d:now/d) = 2 and last(/Integration function test/item[51]) > 0'
-      name: 'Item 52 trendcount eq 2'
+      expression: 'trendcount(/Integration function test/item[52], 1d:now/d) = 3 and last(/Integration function test/item[51]) > 0'
+      name: 'Item 52 trendcount eq 3'
     - uuid: d89548c1cddf413abf26400700d34d7f
-      expression: 'trendmax(/Integration function test/item[52], 1d:now/d) = 4 and last(/Integration function test/item[51]) > 0'
-      name: 'Item 52 trendmax eq 4'
+      expression: 'trendmax(/Integration function test/item[52], 1d:now/d) = 8 and last(/Integration function test/item[51]) > 0'
+      name: 'Item 52 trendmax eq 8'
     - uuid: e34ca85193af4c94a6b039817bc3fdcd
       expression: 'trendmin(/Integration function test/item[52], 1d:now/d) = 2 and last(/Integration function test/item[51]) > 0'
       name: 'Item 52 trendmin eq 2'
     - uuid: ba83d0b896e142bbb3207dfa9ae1bfb1
-      expression: 'trendsum(/Integration function test/item[52], 1d:now/d) = 6 and last(/Integration function test/item[51]) > 0'
-      name: 'Item 52 trendsum eq 6'
+      expression: 'trendsum(/Integration function test/item[52], 1d:now/d) = 14 and last(/Integration function test/item[51]) > 0'
+      name: 'Item 52 trendsum eq 14'
     - uuid: e404504183eb4cf889d4410639ce40d3
       expression: 'trendstl(/Integration function test/item[53], 1d:now/d, 1h, 2h) = 0 and last(/Integration function test/item[51]) > 0'
       name: 'Item 53 trendstl eq 0'
