@@ -2871,11 +2871,9 @@ class testDashboardItemHistoryWidget extends testWidgets {
 				$button = $this->query('xpath:.//button[@class="btn-link js-show-binary"]')->one();
 				$this->assertTrue($button->isClickable());
 				$button->click();
-				$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilVisible();
-				$this->assertEquals($params['encoded_value'],
-						$this->query('xpath:.//div[@class="hintbox-container dashboard-widget-itemhistory-hintbox nowrap"]')
-						->one()->getText()
-				);
+				$bin_xpath = 'xpath:.//div[@class="hintbox-container dashboard-widget-itemhistory-hintbox nowrap"]';
+				$this->query($bin_xpath)->waitUntilVisible();
+				$this->assertEquals($params['encoded_value'], $this->query($bin_xpath)->one()->getText());
 			}
 		}
 
