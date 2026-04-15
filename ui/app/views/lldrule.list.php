@@ -69,13 +69,13 @@ $filter_column1 = (new CFormGrid())
 			'data' => $data['filter']['ms_groups'],
 			'popup' => [
 				'parameters' => [
-						'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
-						'srcfld1' => 'groupid',
-						'dstfrm' => 'zbx_filter',
-						'dstfld1' => 'filter_groupids_',
-						'editable' => true,
-						'enrich_parent_groups' => true
-					] + $hg_ms_params
+					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
+					'srcfld1' => 'groupid',
+					'dstfrm' => CFilter::FORM_NAME,
+					'dstfld1' => 'filter_groupids_',
+					'editable' => true,
+					'enrich_parent_groups' => true
+				] + $hg_ms_params
 			]
 		]))->setWidth(ZBX_TEXTAREA_FILTER_STANDARD_WIDTH)
 	])
@@ -93,7 +93,7 @@ $filter_column1 = (new CFormGrid())
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'filter_hostids_',
 					'editable' => true
 				]

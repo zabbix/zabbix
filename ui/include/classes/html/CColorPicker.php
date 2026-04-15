@@ -39,6 +39,8 @@ class CColorPicker extends CTag {
 		if ($palette_field_name !== null) {
 			$this->setAttribute('palette-field-name', $palette_field_name);
 		}
+
+		$this->setAttribute('data-field-type', 'z-color-picker');
 	}
 
 	public function setColor(?string $color = null): self {

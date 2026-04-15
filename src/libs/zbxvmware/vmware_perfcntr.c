@@ -153,7 +153,7 @@ void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_vmware_cou
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < src->values_num; i++)
@@ -468,6 +468,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 		if (NULL != group && NULL != key && NULL != rollup && NULL != counterid && NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			memset(counter, 0, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s]", group, key, rollup);
 			ZBX_STR2UINT64(counter->id, counterid);
 			STR2UNIT(counter->unit, unit);
@@ -488,6 +489,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 				NULL != unit)
 		{
 			counter = (zbx_vmware_counter_t *)zbx_malloc(NULL, sizeof(zbx_vmware_counter_t));
+			memset(counter, 0, sizeof(zbx_vmware_counter_t));
 			counter->path = zbx_dsprintf(NULL, "%s/%s[%s,%s]", group, key, rollup, stats);
 			ZBX_STR2UINT64(counter->id, counterid);
 			STR2UNIT(counter->unit, unit);
@@ -1350,7 +1352,10 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	}
 
 	page.alloc = INIT_PERF_XML_SIZE;
+	page.offset = 0;
 	page.data = (char *)zbx_malloc(NULL, page.alloc);
+	page.data[0] = '\0';
+
 	headers = curl_slist_append(headers, ZBX_XML_HEADER1_V4);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER2);
 	headers = curl_slist_append(headers, ZBX_XML_HEADER3);
@@ -1526,7 +1531,7 @@ out:
 				" up to " ZBX_FS_UI64 " bytes of free VMwareCache memory. Available " ZBX_FS_UI64
 				" bytes. Increase value of VMwareCacheSize", perf_data_sz,
 				vmware_shmem_get_vmware_mem()->free_size);
-		exit(EXIT_SUCCESS);
+		zbx_exit(EXIT_SUCCESS);
 	}
 	else
 	{

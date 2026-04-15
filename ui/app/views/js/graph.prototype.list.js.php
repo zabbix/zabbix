@@ -84,18 +84,18 @@
 					event: CPopupManagerEvent.EVENT_SUBMIT
 				},
 				callback: ({data, event}) => {
-					uncheckTableRows('graphs_' + this.checkbox_hash, [], false);
-
+					uncheckTableRows(`graph_prototypes_${this.checkbox_hash}`, [], false);
 
 					if (data.submit?.redirect_url) {
 						const url = new URL(data.submit.redirect_url, location.href);
 						event.setRedirectUrl(url.href);
 					}
-						else if (data.submit.success?.action === 'delete') {
+					else if (data.submit.success?.action === 'delete') {
 						const url = new URL('zabbix.php', location.href);
 
-						url.searchParams.set('action', 'lldrule.list');
+						url.searchParams.set('action', 'graph.prototype.list');
 						url.searchParams.set('context', this.context);
+						url.searchParams.set('parent_discoveryid', this.parent_discoveryid);
 
 						event.setRedirectUrl(url.href);
 					}
@@ -169,7 +169,7 @@
 
 						postMessageDetails('error', response.error.messages);
 
-						uncheckTableRows('graph_prototypes', response.keepids ?? []);
+						uncheckTableRows(`graph_prototypes_${this.checkbox_hash}`, response.keepids ?? []);
 					}
 					else if ('success' in response) {
 						postMessageOk(response.success.title);
@@ -178,7 +178,7 @@
 							postMessageDetails('success', response.success.messages);
 						}
 
-						uncheckTableRows('graph_prototypes');
+						uncheckTableRows(`graph_prototypes_${this.checkbox_hash}`);
 					}
 
 					location.href = location.href;
