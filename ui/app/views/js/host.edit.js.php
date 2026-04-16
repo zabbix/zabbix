@@ -109,13 +109,13 @@ window.host_edit_popup = {
 	 * Sets up visible name placeholder synchronization.
 	 */
 	initHostTab(host_interfaces, host_is_discovered) {
+		const update_visible_name_placeholder = placeholder => {
+			this.form_element.querySelector('#visiblename').placeholder = placeholder;
+		};
 		const host_field = this.form_element.querySelector('#host');
 
-		['input', 'paste'].forEach((event_type) => {
-			host_field.addEventListener(event_type, (e) => this.setVisibleNamePlaceholder(e.target.value));
-		});
-
-		this.setVisibleNamePlaceholder(host_field.value);
+		host_field.addEventListener('input', e => update_visible_name_placeholder(e.target.value));
+		update_visible_name_placeholder(host_field.value);
 		this.initHostInterfaces(host_interfaces, host_is_discovered);
 
 		const $groups_ms = $('#groups_');
@@ -135,15 +135,6 @@ window.host_edit_popup = {
 		jQuery('#proxy_groupid').on('change', () => this.updateMonitoredBy());
 
 		this.updateMonitoredBy();
-	},
-
-	/**
-	 * Updates visible name placeholder.
-	 *
-	 * @param {string} placeholder  Text to display as default host alias.
-	 */
-	setVisibleNamePlaceholder(placeholder) {
-		this.form_element.querySelector('#visiblename').placeholder = placeholder;
 	},
 
 	initHostInterfaces(host_interfaces, host_is_discovered) {
@@ -346,8 +337,11 @@ window.host_edit_popup = {
 	 * Set up of macros functionality.
 	 */
 	initMacrosTab() {
+		const container = $('#macros_container .table-forms-td-right');
+		const show_inherited_macros_element = document.getElementById('show_inherited_macros');
+
 		this.macros_manager = new HostMacrosManager({
-			container: $('#macros_container .table-forms-td-right'),
+			container: container,
 			load_callback: () => {
 				this.form.discoverAllFields();
 
@@ -361,6 +355,14 @@ window.host_edit_popup = {
 				this.form.validateChanges(fields, true);
 			}
 		});
+
+		container
+			.bind('loader.start', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.setAttribute('readonly', 'readonly'))
+			)
+			.bind('loader.stop', () => show_inherited_macros_element.querySelectorAll('input')
+				.forEach(radio_input => radio_input.removeAttribute('readonly'))
+			);
 
 		$('#host-tabs', this.form_element).on('tabscreate tabsactivate', (e, ui) => {
 			const panel = (e.type === 'tabscreate') ? ui.panel : ui.newPanel;
@@ -399,7 +401,7 @@ window.host_edit_popup = {
 			}
 		});
 
-		this.form_element.querySelector('#show_inherited_macros').onchange = (e) => {
+		show_inherited_macros_element.onchange = (e) => {
 			this.macros_manager.load(e.target.value == 1, this.getAllTemplates());
 		};
 	},

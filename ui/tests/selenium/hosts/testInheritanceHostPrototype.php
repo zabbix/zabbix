@@ -66,10 +66,10 @@ class testInheritanceHostPrototype extends CLegacyWebTest {
 		// Check layout at Host tab.
 		$this->zbxTestAssertElementPresentXpath('//label[text()="Parent discovery rules"]/../..//'.
 				'a[contains(@href, "&hostid='.$host_prototype.'") and contains(@href, "&parent_discoveryid='.$discovery_id.'")]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="name"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//input[@id="host"][@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/input[@readonly]');
-		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/input[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="name"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//z-textarea-flexible[@id="host"][@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-ip")]/z-textarea-flexible[@readonly]');
+		$this->zbxTestAssertElementPresentXpath('//div[contains(@class,"interface-cell-dns")]/z-textarea-flexible[@readonly]');
 		$interface = CDBHelper::getValue('SELECT interfaceid'.
 				' FROM interface'.
 				' WHERE hostid IN ('.

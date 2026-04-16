@@ -32,8 +32,9 @@ $form
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('name', $data['name'], false, DB::getFieldLength('userdirectory', 'name')))
+				(new CTextAreaFlexible('name', $data['name']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('userdirectory', 'name'))
 					->setAriaRequired()
 					->setAttribute('autofocus', 'autofocus')
 			)
@@ -41,8 +42,9 @@ $form
 		->addItem([
 			(new CLabel(_('Host'), 'host'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('host', $data['host'], false, DB::getFieldLength('userdirectory_ldap', 'host')))
+				(new CTextAreaFlexible('host', $data['host']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('userdirectory_ldap', 'host'))
 					->setAriaRequired()
 			)
 		])
@@ -57,26 +59,27 @@ $form
 		->addItem([
 			(new CLabel(_('Base DN'), 'base_dn'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('base_dn', $data['base_dn'], false, DB::getFieldLength('userdirectory_ldap', 'base_dn')))
+				(new CTextAreaFlexible('base_dn', $data['base_dn']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('userdirectory_ldap', 'base_dn'))
 					->setAriaRequired()
 			)
 		])
 		->addItem([
 			(new CLabel(_('Search attribute'), 'search_attribute'))->setAsteriskMark(),
 			new CFormField(
-				(new CTextBox('search_attribute', $data['search_attribute'], false,
-					DB::getFieldLength('userdirectory_ldap', 'search_attribute')
-				))
+				(new CTextAreaFlexible('search_attribute', $data['search_attribute']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('userdirectory_ldap', 'search_attribute'))
 					->setAriaRequired()
 			)
 		])
 		->addItem([
 			new CLabel(_('Bind DN'), 'bind_dn'),
 			new CFormField(
-				(new CTextBox('bind_dn', $data['bind_dn'], false, DB::getFieldLength('userdirectory_ldap', 'bind_dn')))
+				(new CTextAreaFlexible('bind_dn', $data['bind_dn']))
 					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+					->setMaxlength(DB::getFieldLength('userdirectory_ldap', 'bind_dn'))
 			)
 		])
 		->addItem([
@@ -375,11 +378,10 @@ $form
 				->addItem([
 					new CLabel(_('Search filter'), 'search_filter'),
 					new CFormField(
-						(new CTextBox('search_filter', $data['search_filter'], false,
-							DB::getFieldLength('userdirectory_ldap', 'search_filter')
-						))
+						(new CTextAreaFlexible('search_filter', $data['search_filter']))
 							->setAttribute('placeholder', CLdap::DEFAULT_FILTER_USER)
 							->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+							->setMaxlength(DB::getFieldLength('userdirectory_ldap', 'search_filter'))
 					)
 				])
 		)

@@ -274,8 +274,8 @@ window.item_edit_form = new class {
 
 						dynamic_rows.addRows(url.pairs);
 						dynamic_rows.removeRows(row => [].filter.call(
-								row.querySelectorAll('[type="text"]'),
-								input => input.value === ''
+								row.querySelectorAll('z-textarea-flexible'),
+								textarea => textarea.value === ''
 							).length == 2
 						);
 					}

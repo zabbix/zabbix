@@ -168,6 +168,11 @@
 		margin-top: 10px;
 	}
 
+	.field-inline {
+		display: flex;
+		align-items: baseline;
+	}
+
 	.form-field {
 		$offsets: (
 				1: 2,
