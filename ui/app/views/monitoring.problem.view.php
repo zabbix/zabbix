@@ -101,7 +101,7 @@ $html_page
 	->show();
 
 (new CTemplateTag('time'))
-	->addItem([
+	->addItem(
 		new CFormField(
 			(new CCheckBox('show_timeline'))
 				->setLabel(_('Show timeline'))
@@ -109,7 +109,7 @@ $html_page
 				->setUncheckedValue(1)
 				->addClass('form-label')
 		)
-	])
+	)
 	->show();
 
 (new CTemplateTag('problem'))
@@ -135,8 +135,7 @@ $html_page
 
 (new CTemplateTag('tags'))
 	->addItem([
-		(new CLabel(_('Number of tags'), 'number_of_tags'))
-			->addClass('form-label'),
+		(new CLabel(_('Number of tags'), 'number_of_tags'))->addClass('form-label'),
 		new CFormField(
 			(new CRadioButtonList('number_of_tags'))
 				->setValues([
@@ -146,8 +145,7 @@ $html_page
 				])
 				->setModern()
 		),
-		(new CLabel(_('Tag name display'), 'tag_name_display'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag name display'), 'tag_name_display'))->addClass('form-label'),
 		new CFormField(
 			(new CRadioButtonList('tag_name_display'))
 				->setValues([
@@ -157,16 +155,14 @@ $html_page
 				])
 				->setModern()
 		),
-		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag display priority'), 'tag_display_priority'))->addClass('form-label'),
 		new CFormField(new CTextBox('tag_display_priority'))
 	])
 	->show();
 
 (new CTemplateTag('tagvalue'))
 	->addItem([
-		(new CLabel(_('Tag name'), 'tag_name'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag name'), 'tag_name'))->addClass('form-label'),
 		new CFormField(new CTextBox('tag_name'))
 	])
 	->show();

@@ -112,19 +112,18 @@ $html_page
 	->show();
 
 (new CTemplateTag('name'))
-	->addItem([
+	->addItem(
 		new CFormField(
 			(new CCheckBox('show_item_key'))
 				->setLabel(_('Show item key'))
 				->setLabelPosition(CCheckBox::LABEL_POSITION_RIGHT)
 		)
-	])
+	)
 	->show();
 
 (new CTemplateTag('tags'))
 	->addItem([
-		(new CLabel(_('Number of tags'), 'number_of_tags'))
-			->addClass('form-label'),
+		(new CLabel(_('Number of tags'), 'number_of_tags'))->addClass('form-label'),
 		new CFormField(
 			(new CRadioButtonList('number_of_tags'))
 				->setValues([
@@ -132,10 +131,9 @@ $html_page
 					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
 					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3]
 				])
-				->setModern(),
+				->setModern()
 		),
-		(new CLabel(_('Tag name display'), 'tag_name_display'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag name display'), 'tag_name_display'))->addClass('form-label'),
 		new CFormField(
 			(new CRadioButtonList('tag_name_display'))
 				->setValues([
@@ -143,18 +141,16 @@ $html_page
 					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
 					['name' => _('None'), 'value' => TAG_NAME_NONE]
 				])
-				->setModern(),
+				->setModern()
 		),
-		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag display priority'), 'tag_display_priority'))->addClass('form-label'),
 		new CFormField(new CTextBox('tag_display_priority'))
 	])
 	->show();
 
 (new CTemplateTag('tagvalue'))
 	->addItem([
-		(new CLabel(_('Tag name'), 'tag_name'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag name'), 'tag_name'))->addClass('form-label'),
 		new CFormField(new CTextBox('tag_name'))
 	])
 	->show();

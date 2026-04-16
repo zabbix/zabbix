@@ -73,46 +73,46 @@ $filter = (new CFilter())
 					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 				)
 			])
-		->addItem([
-			(new CLabel(_('Linked templates'), 'filter_templates__ms')),
-			new CFormField(
-				(new CMultiSelect([
-					'name' => 'filter_templates[]',
-					'object_name' => 'templates',
-					'data' => $data['filter']['templates'],
-					'popup' => [
-						'parameters' => [
-							'srctbl' => 'templates',
-							'srcfld1' => 'hostid',
-							'srcfld2' => 'host',
-							'dstfrm' => CFilter::FORM_NAME,
-							'dstfld1' => 'filter_templates_'
+			->addItem([
+				(new CLabel(_('Linked templates'), 'filter_templates__ms')),
+				new CFormField(
+					(new CMultiSelect([
+						'name' => 'filter_templates[]',
+						'object_name' => 'templates',
+						'data' => $data['filter']['templates'],
+						'popup' => [
+							'parameters' => [
+								'srctbl' => 'templates',
+								'srcfld1' => 'hostid',
+								'srcfld2' => 'host',
+								'dstfrm' => CFilter::FORM_NAME,
+								'dstfld1' => 'filter_templates_'
+							]
 						]
-					]
-				]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Name'), 'filter_name'),
-			new CFormField((new CTextBox('filter_name', $data['filter']['name']))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
-		])
-		->addItem([
-			new CLabel(_('Vendor'), 'filter_vendor_name'),
-			new CFormField(
-				(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
-					DB::getFieldLength('hosts', 'vendor_name')
-				))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-		])
-		->addItem([
-			new CLabel(_('Version'), 'filter_vendor_version'),
-			new CFormField(
-				(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
-					DB::getFieldLength('hosts', 'vendor_version'))
-				)->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			)
-		]),
-
+					]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Name'), 'filter_name'),
+				new CFormField((new CTextBox('filter_name', $data['filter']['name']))
+					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH))
+			])
+			->addItem([
+				new CLabel(_('Vendor'), 'filter_vendor_name'),
+				new CFormField(
+					(new CTextBox('filter_vendor_name', $data['filter']['vendor_name'], false,
+						DB::getFieldLength('hosts', 'vendor_name')
+					))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			])
+			->addItem([
+				new CLabel(_('Version'), 'filter_vendor_version'),
+				new CFormField(
+					(new CTextBox('filter_vendor_version', $data['filter']['vendor_version'], false,
+						DB::getFieldLength('hosts', 'vendor_version')
+					))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				)
+			]),
 		(new CFormGrid())
 			->addClass(CFormGrid::ZBX_STYLE_FORM_GRID_LABEL_WIDTH_TRUE)
 			->addItem([new CLabel(_('Tags')), new CFormField($filter_tags_table)])
@@ -154,8 +154,7 @@ $form->addItem([
 				->addClass('js-massdelete-clear')
 				->addClass('js-no-chkbxrange')
 		]
-	], 'templates'))
-		->setAddSelectedCountElement(false)
+	], 'templates'))->setAddSelectedCountElement(false)
 ]);
 
 $html_page
@@ -164,8 +163,7 @@ $html_page
 
 (new CTemplateTag('tags'))
 	->addItem([
-		(new CLabel(_('Number of tags'), 'number_of_tags'))
-			->addClass('form-label'),
+		(new CLabel(_('Number of tags'), 'number_of_tags'))->addClass('form-label'),
 		new CFormField(
 			(new CRadioButtonList('number_of_tags'))
 				->setValues([
@@ -173,10 +171,9 @@ $html_page
 					['name' => SHOW_TAGS_2, 'value' => SHOW_TAGS_2],
 					['name' => SHOW_TAGS_3, 'value' => SHOW_TAGS_3]
 				])
-				->setModern(),
+				->setModern()
 		),
-		(new CLabel(_('Tag name display'), 'tag_name_display'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag name display'), 'tag_name_display'))->addClass('form-label'),
 		new CFormField(
 			(new CRadioButtonList('tag_name_display'))
 				->setValues([
@@ -184,18 +181,16 @@ $html_page
 					['name' => _('Shortened'), 'value' => TAG_NAME_SHORTENED],
 					['name' => _('None'), 'value' => TAG_NAME_NONE]
 				])
-				->setModern(),
+				->setModern()
 		),
-		(new CLabel(_('Tag display priority'), 'tag_display_priority'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag display priority'), 'tag_display_priority'))->addClass('form-label'),
 		new CFormField(new CTextBox('tag_display_priority'))
 	])
 	->show();
 
 (new CTemplateTag('tagvalue'))
 	->addItem([
-		(new CLabel(_('Tag name'), 'tag_name'))
-			->addClass('form-label'),
+		(new CLabel(_('Tag name'), 'tag_name'))->addClass('form-label'),
 		new CFormField(new CTextBox('tag_name'))
 	])
 	->show();
