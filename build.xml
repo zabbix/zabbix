@@ -622,17 +622,15 @@
 			<arg line="integration/IntegrationTests.php"/>
 		</exec>
 
-		<property environment="env"/>
-
-		<exec executable="bash" dir="${env.WORKSPACE}" failonerror="off">
+		<exec executable="bash" failonerror="off">
 			<arg value="-c"/>
 			<arg value="
 				echo '=== Test suite durations (seconds) ===';
-				grep '&lt;testsuite ' ${basedir}/build/logs/phpunit.xml |
+				grep '&lt;testsuite .*file=' ${basedir}/build/logs/phpunit.xml |
 				sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' |
 				sort -nr
-				"/>
-			<redirector output="${env.WORKSPACE}/phpunit_summary.log" append="false" alwaysLog="true"/>
+			"/>
+			<redirector output="phpunit_summary.log" append="false" alwaysLog="true"/>
 		</exec>
 	</target>
 
