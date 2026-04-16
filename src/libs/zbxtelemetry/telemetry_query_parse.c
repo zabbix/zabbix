@@ -37,15 +37,21 @@ typedef int (*tq_enum_set_func_t)(const char *str, void *out);
 static int	tq_read_string(const char *p, char **out) {
 	size_t		out_alloc = 0;
 	zbx_json_type_t	type;
+	const char	*p_new = p;
 
 	if (NULL != *out)
 		return FAIL;
 
-	if (NULL == (p = zbx_json_decodevalue_dyn(p, out, &out_alloc, &type)) || ZBX_JSON_TYPE_STRING != type)
+	if (NULL == (p_new = zbx_json_decodevalue_dyn(p, out, &out_alloc, &type)) || ZBX_JSON_TYPE_STRING != type)
 	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to read string at '%s'", __func__, p);
+		p = p_new;
 		zbx_free(*out);
+
 		return FAIL;
 	}
+
+	p = p_new;
 
 	return SUCCEED;
 }
@@ -59,18 +65,30 @@ static int	tq_read_string(const char *p, char **out) {
 static int	tq_read_enum(const char *p, char *buf, size_t buf_size, tq_enum_set_func_t set_func, void *out,
 		int val, int val_unknown)
 {
+	int		ret = FAIL;
 	zbx_json_type_t	type;
+	const char	*p_new = p;
 
 	if (val != val_unknown)
-		return FAIL;
+		goto out;
 
-	if (NULL == (p = zbx_json_decodevalue(p, buf, buf_size, &type)) || ZBX_JSON_TYPE_STRING != type)
-		return FAIL;
+	if (NULL == (p_new = zbx_json_decodevalue(p, buf, buf_size, &type)) || ZBX_JSON_TYPE_STRING != type)
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): failed to read string at '%s'", __func__, p);
+		goto out;
+	}
 
 	if (set_func(buf, out) == val_unknown)
-		return FAIL;
+	{
+		zabbix_log(LOG_LEVEL_ERR, "%s(): invalid value '%s' at '%s'", __func__, buf, p);
+		goto out;
+	}
 
-	return SUCCEED;
+	ret = SUCCEED;
+out:
+	p = p_new;
+
+	return ret;
 }
 
 #define TQ_SET_FUNC_DEF(__set_func_name, __match_func, __type)	\
@@ -268,8 +286,9 @@ static int	tq_parse_aggr_col(struct zbx_json_parse *jp, zbx_tq_aggr_column_t *ag
 		}
 		else if (0 == strcmp(buf, "function"))
 		{
-			tq_read_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function, aggr_col->function,
-				ZBX_TQ_FUNCTION_UNKNOWN);
+			if (FAIL == tq_read_enum(p, buf, buf_size, tq_set_function_type, &aggr_col->function,
+				aggr_col->function, ZBX_TQ_FUNCTION_UNKNOWN))
+				goto out;
 		}
 		else if (0 == strcmp(buf, "args"))
 		{
