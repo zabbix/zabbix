@@ -106,8 +106,7 @@ $form
 				'groupid' => $data['groupid'] ?: 0
 			]).');
 		'))->setOnDocumentReady()
-	)
-	->setAttribute('autofocus', 'autofocus');
+	);
 
 $output = [
 	'header' => $data['title'],

@@ -12215,6 +12215,11 @@ msgstr "无效 email 地址 \"%1$s\"。"
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "媒介类型 ID: \"%1$s\" 的 email 地址无效。"
 
+#: app/controllers/CControllerHostCreate.php:126
+#: app/controllers/CControllerHostUpdate.php:130
+msgid "Invalid host group name."
+msgstr ""
+
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
 msgstr "无效输入"
@@ -12596,6 +12601,11 @@ msgstr "无效的字符串"
 #, c-format
 msgid "Invalid tag \"%1$s\": %2$s."
 msgstr "标签无效 \"%1$s\": %2$s。"
+
+#: app/controllers/CControllerTemplateCreate.php:45
+#: app/controllers/CControllerTemplateUpdate.php:45
+msgid "Invalid template group name."
+msgstr ""
 
 #: include/classes/validators/CActionCondValidator.php:103
 msgid "Invalid time period."
@@ -21040,6 +21050,10 @@ msgstr "交换分区空间大小，字节或从总百分比。从字节返回整
 msgid "Swedish (sv_SE)"
 msgstr "瑞士(sv_SE)"
 
+#: index_sso.php:346
+msgid "Switch SSO user"
+msgstr ""
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "切换认证方法将重设除了此会话之外的所有会话!继续吗?"
@@ -21661,6 +21675,10 @@ msgstr "在授权服务器中注册的客户端标识符"
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "在授权服务器中注册的客户端密钥"
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -23030,6 +23048,10 @@ msgstr "撤消问题确认。"
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "意外的HTTP响应状态码"
+
+#: app/views/mediatype.edit.php:158
+msgid "Unexpected access token update time."
+msgstr ""
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25252,6 +25274,10 @@ msgstr "当前所选不能切换模板。"
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "您没有权限来完成此操作."
+
+#: index_sso.php:337
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr ""
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."

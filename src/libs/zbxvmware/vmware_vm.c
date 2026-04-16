@@ -69,7 +69,7 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 
 #undef ZBX_VMPROPMAP
 
-#define ZBX_XPATH_GET_OBJECT_NAME(object, id)				\
+#define ZBX_XPATH_GET_OBJECT_NAME(object, id)								\
 		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"				\
 		ZBX_XPATH_PROP_NAME_NODE("name")
 
@@ -222,7 +222,10 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 		zbx_json_free(&json_data);
 	}
 	else
+	{
+		val = zbx_strdup(val, "[]");
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() empty list of guest ips for mac:%s", __func__, mac_addr);
+	}
 
 	zbx_vector_str_clear_ext(&ips, zbx_str_free);
 	zbx_vector_str_destroy(&ips);
@@ -243,7 +246,8 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
  *********************************************************************************/
 static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xmlNode *guestnet_node)
 {
-	char	**props;
+	char		**props, *backing_type, *xpath = NULL;
+	xmlNode 	*backing_node;
 
 	props = (char **)zbx_malloc(NULL, sizeof(char *) * ZBX_VMWARE_DEV_PROPS_NUM);
 
@@ -261,6 +265,39 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xml
 			ZBX_XNN("backing") ZBX_XPATH_LN2("port", "portKey"));
 	props[ZBX_VMWARE_DEV_PROPS_IFIPS] = vmware_vm_get_nic_device_ips(details, guestnet_node,
 			props[ZBX_VMWARE_DEV_PROPS_IFMAC]);
+	props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK] = zbx_xml_node_read_value(details, node,
+			ZBX_XNN("backing") ZBX_XPATH_LN("network"));
+
+	if (NULL == (backing_node = zbx_xml_node_get(details, node, ZBX_XNN("backing"))) ||
+			NULL == (backing_type = zbx_xml_node_read_prop(backing_node, "type")))
+	{
+		props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME] = NULL;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() backing node is absent", __func__);
+		return props;
+	}
+
+	if (0 == strcmp(backing_type, "VirtualEthernetCardDistributedVirtualPortBackingInfo") &&
+			NULL != props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP])
+	{
+		xpath = zbx_dsprintf(NULL, ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_DVPG, "%s"),
+			props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP]);
+	}
+	else if (NULL != props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK])
+	{
+		xpath = zbx_dsprintf(NULL, ZBX_XPATH_GET_OBJECT_NAME(ZBX_VMWARE_SOAP_NETWORK, "%s"),
+			props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]);
+	}
+
+	if (NULL == xpath)
+	{
+		props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME] = NULL;
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() backing name was skipped for type:%s", __func__, backing_type);
+	}
+	else
+		props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME] = zbx_xml_doc_read_value(details, xpath);
+
+	zbx_free(backing_type);
+	zbx_free(xpath);
 
 	return props;
 }
@@ -289,7 +326,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 	xpathCtx = xmlXPathNewContext(details);
 
 	if (NULL == (xpathObj = xmlXPathEvalExpression((const xmlChar *)ZBX_XPATH_VM_HARDWARE("device")
-			"[*[local-name()='macAddress']]", xpathCtx)))
+			"[*[local-name()='macAddress' or local-name()='wakeOnLanEnabled']]", xpathCtx)))
 	{
 		goto clean;
 	}
@@ -640,8 +677,17 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 					"<ns0:pathSet>name</ns0:pathSet>"		\
 					"<ns0:pathSet>parent</ns0:pathSet>"		\
 				"</ns0:propSet>"					\
+				"<ns0:propSet>"						\
+					"<ns0:type>Network</ns0:type>"			\
+					"<ns0:pathSet>name</ns0:pathSet>"		\
+				"</ns0:propSet>"					\
+				"<ns0:propSet>"						\
+					"<ns0:type>DistributedVirtualPortgroup</ns0:type>"\
+					"<ns0:pathSet>name</ns0:pathSet>"		\
+				"</ns0:propSet>"					\
 				"<ns0:objectSet>"					\
 					"<ns0:obj type=\"VirtualMachine\">%s</ns0:obj>"	\
+					"<ns0:skip>false</ns0:skip>"			\
 					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"\
 						"<ns0:name>vm</ns0:name>"		\
 						"<ns0:type>VirtualMachine</ns0:type>"	\
@@ -659,6 +705,12 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 						"<ns0:selectSet>"			\
 							"<ns0:name>fl</ns0:name>"	\
 						"</ns0:selectSet>"			\
+					"</ns0:selectSet>"				\
+					"<ns0:selectSet xsi:type=\"ns0:TraversalSpec\">"\
+						"<ns0:name>vmToNetwork</ns0:name>"	\
+						"<ns0:type>VirtualMachine</ns0:type>"	\
+						"<ns0:path>network</ns0:path>"		\
+						"<ns0:skip>false</ns0:skip>"		\
 					"</ns0:selectSet>"				\
 				"</ns0:objectSet>"					\
 			"</ns0:specSet>"						\
