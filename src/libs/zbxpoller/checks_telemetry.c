@@ -19,8 +19,6 @@
 
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
-	/* FIXME: placeholder */
-
 	int		ret = NOTSUPPORTED;
 	zbx_tq_query_t	query;
 	time_t		now = time(NULL);
@@ -28,7 +26,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	char		*send_out = NULL;
 	char		*send_error = NULL;
 
-	/* FIXME: placeholder */
+	/* FIXME: placeholder, db type and connection parameters should be gotten from the global config */
 	const zbx_tq_conn_params_clickhouse_t	conn_params =
 	{
 		.url			= "http://127.0.0.1:8123",
@@ -50,11 +48,12 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	const char *config_ssl_cert_location	= NULL;
 	const char *config_ssl_key_location	= NULL;
 
-	lasttimestamp = 0; /* FIXME: placeholder */
+	/* when testing the item, the time range being queried is restricted only by the loopback limit */
+	lasttimestamp = 0;
 
 	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
 	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query format."));
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query format"));
 		goto out;
 	}
 

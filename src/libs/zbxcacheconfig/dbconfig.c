@@ -2725,6 +2725,7 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 {
 	const char	*global_timeout;
 
+	/* TODO: add ITEM_TYPE_TELEMETRY_QUERY */
 	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:

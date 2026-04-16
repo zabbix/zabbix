@@ -576,6 +576,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				break;
 		}
 
+		/* TODO: likely remove macro expansion for telemetry query from here when poller is added */
 		switch (items[i].type)
 		{
 			case ITEM_TYPE_ZABBIX:
