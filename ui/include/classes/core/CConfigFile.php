@@ -202,7 +202,7 @@ class CConfigFile {
 		}
 
 		if (isset($HISTORY)) {
-			trigger_error('Configuration $HISTORY is depreacated.', E_USER_DEPRECATED);
+			trigger_error('Configuration $HISTORY is deprecated.', E_USER_DEPRECATED);
 
 			if (is_array($HISTORY)
 					&& array_key_exists('types', $HISTORY) && is_array($HISTORY['types'])

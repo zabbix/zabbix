@@ -1781,6 +1781,7 @@ class CHistoryManager {
 	 * Get data source (SQL, Elasticsearch or ClickHouse) type based on value type id.
 	 *
 	 * @param int $value_type  Value type id.
+	 *
 	 * @return string  Data source type.
 	 */
 	public function getDataSourceType($value_type) {
@@ -1850,6 +1851,7 @@ class CHistoryManager {
 	 * Returns the items grouped by the storage type.
 	 *
 	 * @param array $items  An array of items with the 'value_type' property.
+	 *
 	 * @return array  An array with storage type as a keys and item arrays as a values.
 	 */
 	private function getItemsGroupedByStorage(array $items) {
