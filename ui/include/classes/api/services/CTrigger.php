@@ -755,7 +755,6 @@ class CTrigger extends CTriggerGeneral {
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
-		$trigger_rtdata_parameters = ['lastChangeSince', 'lastChangeTill', 'only_true'];
 		if ((!$options['countOutput'] && array_filter([
 					$this->outputIsRequested('value', $options['output']),
 					$this->outputIsRequested('state', $options['output']),
@@ -765,7 +764,7 @@ class CTrigger extends CTriggerGeneral {
 				|| (is_array($options['filter'])
 					&& array_intersect_key($options['filter'], array_flip(['value', 'state', 'lastchange', 'error'])))
 				|| (is_array($options['search']) && array_key_exists('error', $options['search']))
-				|| array_intersect_key($options, array_flip($trigger_rtdata_parameters))) {
+				|| array_intersect_key($options, array_flip(['lastChangeSince', 'lastChangeTill', 'only_true']))) {
 			$sql_parts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 		}
 
