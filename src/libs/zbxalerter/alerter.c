@@ -524,6 +524,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	ZBX_UNUSED(config_adapter_ca_file);
 	ZBX_UNUSED(config_adapter_cert_file);
 	ZBX_UNUSED(config_adapter_key_file);
+	ZBX_UNUSED(config_adapter_connect_to);
 
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 #else

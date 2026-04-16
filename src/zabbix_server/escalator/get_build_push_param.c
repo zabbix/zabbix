@@ -75,6 +75,8 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	zbx_dc_um_handle_t		*um_handle_unmasked;
 	zbx_vector_push_target_t	targets;
 	char				*subject_dyn = NULL;
+	zbx_config_t			cfg;
+	const char			*server_id;
 
 	zbx_db_alert	alert = {
 			.sendto = (char *)sendto,
@@ -82,8 +84,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 			.message = (char *)(uintptr_t)message
 	};
 
-	char	*trigger_severity, *event_id, *event_value, *event_update_action, *host_ids, *trigger_id,
-		*filtered_hostids;
+	char	*trigger_severity, *event_id, *event_value, *event_update_action, *host_ids, *trigger_id;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -153,10 +154,14 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA: %s, %s, %s, %s", trigger_severity, event_id, event_value,
 			trigger_id);
 
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
+	server_id = cfg.serverid;
+
 	for (int i = 0; i < targets.values_num; i++)
 	{
 		struct zbx_json		json;
 		zbx_push_target_t	*t = targets.values[i];
+		char			*message_uuid7, *uuid7id;
 
 		zbx_json_init(&json, 1024);
 		zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
@@ -166,16 +171,16 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_addobject(&json, "to");
 		zbx_json_addstring(&json, "push_token", t->token, ZBX_JSON_TYPE_STRING);
-		/*server id TODO*/
+		zbx_json_addstring(&json, "server_id", server_id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "device_id", t->device_id, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json); /* to */
 
 		zbx_json_addobject(&json, "payload");
 		zbx_json_addstring(&json, "specversion", "1", ZBX_JSON_TYPE_STRING);
 
-		char	*messsage_uuid7= zbx_gen_uuid7();
+		message_uuid7 = zbx_gen_uuid7();
 
-		zbx_json_addstring(&json, "id", messsage_uuid7, ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json, "id", message_uuid7, ZBX_JSON_TYPE_STRING);
 		zbx_json_addint64(&json, "time", event->clock);
 
 		if (0 == strcmp(event_value, "0"))
@@ -217,15 +222,16 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_close(&json); /* params */
 
-		char	*uuid7id = zbx_gen_uuid7();
+		uuid7id = zbx_gen_uuid7();
 
 		zbx_json_addstring(&json, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json);
 
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA FINAL PARAMS %s", json.buffer);
-
 		zbx_vector_str_append(params, zbx_strdup(NULL, json.buffer));
+		zbx_free(message_uuid7);
+		zbx_free(uuid7id);
+		zbx_json_free(&json);
 	}
 
 	zbx_db_free_result(result);
@@ -244,4 +250,3 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
-

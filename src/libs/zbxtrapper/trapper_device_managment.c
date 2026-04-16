@@ -12,10 +12,12 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "trapper_device_managment.h"
+#include "zbxtrapper.h"
+
 #include "zbxcommon.h"
 #include "zbxjson.h"
 #include "zbxcomms.h"
-#include "zbxtrapper.h"
 #include "zbxcommshigh.h"
 #include "zbxcrypto.h"
 
@@ -143,6 +145,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	ZBX_UNUSED(config_tls_ca_file);
 	ZBX_UNUSED(config_tls_cert_file);
 	ZBX_UNUSED(config_tls_key_file);
+	ZBX_UNUSED(config_adapter_connect_to);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(json);
 
@@ -160,9 +163,8 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	struct zbx_json_parse		jp_body, jp_result, jp_bek;
 	char				*payload = NULL, *error_curl = NULL, *bek_raw = NULL, errbuf[CURL_ERROR_SIZE],
 					device_id[ZBX_UUID_LEN], met[ZBX_ENROLL_TOKE_LEN],
-					bek[ZBX_BRIDGE_ENCRYPTION_KEY_LEN], enroll_url[ZBX_ENROLL_URL_LEN],
-					code[ZBX_ERROR_CODE_LEN], message[ZBX_MESSAGE_LEN], error_data[ZBX_MESSAGE_LEN],
-					*uuid7id;
+					enroll_url[ZBX_ENROLL_URL_LEN], code[ZBX_ERROR_CODE_LEN],
+					message[ZBX_MESSAGE_LEN], error_data[ZBX_MESSAGE_LEN], *uuid7id;
 	int				ret = FAIL;
 	size_t				bek_len;
 	zbx_config_t			cfg;
@@ -480,6 +482,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	ZBX_UNUSED(config_tls_ca_file);
 	ZBX_UNUSED(config_tls_cert_file);
 	ZBX_UNUSED(config_tls_key_file);
+	ZBX_UNUSED(config_adapter_connect_to);
 	ZBX_UNUSED(error);
 	ZBX_UNUSED(json);
 
