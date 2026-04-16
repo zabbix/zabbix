@@ -105,7 +105,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$host = $hosts_on_page[$item['hostid']];
 
 			$data_actions = [];
-			$is_graph = ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64);
+			$is_graph = $item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64;
 			if ($is_graph) {
 				$data_actions['graph'] = true;
 			}
@@ -128,11 +128,11 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 			// Row history data preparation.
 			$last_history = array_key_exists($item['itemid'], $history)
-				? ((count($history[$item['itemid']]) > 0) ? $history[$item['itemid']][0] : null)
+				? (count($history[$item['itemid']]) > 0 ? $history[$item['itemid']][0] : null)
 				: null;
 
 			if ($last_history) {
-				$prev_history = (count($history[$item['itemid']]) > 1) ? $history[$item['itemid']][1] : null;
+				$prev_history = count($history[$item['itemid']]) > 1 ? $history[$item['itemid']][1] : null;
 
 				$last_check = (new CSpan(zbx_date2age($last_history['clock'])))
 					->addClass(ZBX_STYLE_CURSOR_POINTER)
@@ -170,7 +170,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 						// The change must be calculated as uptime for the 'unixtime'.
 						$change .= convertUnits([
 							'value' => $history_diff,
-							'units' => ($item['units'] === 'unixtime') ? 'uptime' : $item['units']
+							'units' => $item['units'] === 'unixtime' ? 'uptime' : $item['units']
 						]);
 					}
 				}
@@ -359,7 +359,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 			// If user role checkbox 'Invoke "Execute now" on read-only hosts' is OFF, get only read-write items.
 			if (!$this->hasInput('filter_counters') && $this->getUserType() < USER_TYPE_SUPER_ADMIN
-				&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
+					&& !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW)) {
 				$items_rw = API::Item()->get([
 					'output' => [],
 					'itemids' => array_keys($items),

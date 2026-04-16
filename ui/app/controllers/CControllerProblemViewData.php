@@ -99,13 +99,11 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$clock = $problem['clock'];
 
-			$problem['time'] = zbx_date2str(
-				($clock >= $data['today'])
-					? TIME_FORMAT_SECONDS
-					: DATE_TIME_FORMAT_SECONDS,
-				$clock);
+			$problem['time'] = zbx_date2str($clock >= $data['today'] ? TIME_FORMAT_SECONDS : DATE_TIME_FORMAT_SECONDS,
+				$clock
+			);
 
-			$problem['recovery'] = ($problem['r_eventid'] != 0)
+			$problem['recovery'] = $problem['r_eventid'] != 0
 				? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock'])
 				: '';
 
@@ -119,16 +117,15 @@ class CControllerProblemViewData extends CControllerDataTable {
 			}
 			else {
 				$in_closing = hasEventCloseAction($problem['acknowledges']);
-				$can_be_closed = ($trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
-					&& $data['allowed']['close'] && !$in_closing
-				);
+				$can_be_closed = $trigger['manual_close'] == ZBX_TRIGGER_MANUAL_CLOSE_ALLOWED
+					&& $data['allowed']['close'] && !$in_closing;
 				$value = $in_closing ? TRIGGER_VALUE_FALSE : TRIGGER_VALUE_TRUE;
 				$value_clock = $in_closing ? time() : $clock;
 			}
 
 			$status = getEventStatusString($in_closing, $problem);
 
-			$is_acknowledged = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED);
+			$is_acknowledged = $problem['acknowledged'] == EVENT_ACKNOWLEDGED;
 			$cell_status = new CSpan($status);
 
 			if (isEventUpdating($in_closing, $problem)) {
@@ -166,8 +163,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			if (array_key_exists('suppression_data', $problem)) {
 				if (count($problem['suppression_data']) == 1
-					&& $problem['suppression_data'][0]['maintenanceid'] == 0
-					&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
+						&& $problem['suppression_data'][0]['maintenanceid'] == 0
+						&& isEventRecentlyUnsuppressed($problem['acknowledges'], $unsuppression_action)) {
 					// Show blinking button if the last manual suppression was recently revoked.
 					$user_unsuppressed = array_key_exists($unsuppression_action['userid'], $data['users'])
 						? getUserFullname($data['users'][$unsuppression_action['userid']])
@@ -204,8 +201,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$opdata = null;
 			if ($trigger['opdata'] === '') {
-				$opdata = (new CDiv(CScreenProblem::getLatestValues($trigger['items'])))
-					->addClass('latest-values');
+				$opdata = (new CDiv(
+					CScreenProblem::getLatestValues($trigger['items'])
+				))->addClass('latest-values');
 			}
 			else {
 				$opdata = (new CSpan(CMacrosResolverHelper::resolveTriggerOpdata(
@@ -263,17 +261,20 @@ class CControllerProblemViewData extends CControllerDataTable {
 			}
 
 			$problem['description'] = $options['compact_view']
-				? (new CDiv($description))->addClass(ZBX_STYLE_ACTION_CONTAINER)->toString()
+				? (new CDiv($description))
+					->addClass(ZBX_STYLE_ACTION_CONTAINER)
+					->toString()
 				: (new CObject($description))->toString();
 
 			$problem['duration'] = ($problem['r_eventid'] != 0)
 				? zbx_date2age($clock, $problem['r_clock'])
 				: zbx_date2age($clock);
 
-			$problem['can_be_closed'] =  $can_be_closed;
+			$problem['can_be_closed'] = $can_be_closed;
 
 			$problem['actions'] = (string) makeEventActionsIcons($problem['eventid'], $data['actions'], $data['users'],
-				$is_acknowledged);
+				$is_acknowledged
+			);
 
 			$problem['nested'] = $nested;
 
@@ -288,8 +289,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				self::addProblemRows($rows, $data, $problem['symptoms'], $filter, $options, true);
 
 				if ($problem['symptom_count'] > ZBX_PROBLEM_SYMPTOM_LIMIT) {
-					$rows[] = [['renderer' => 'symptom_limit', 'raw_data' => true], [
-						$problem['eventid'],
+					$rows[] = [['renderer' => 'symptom_limit', 'raw_data' => true], [$problem['eventid'],
 						_s('Displaying %1$s of %2$s found', ZBX_PROBLEM_SYMPTOM_LIMIT, $problem['symptom_count'])
 					]];
 				}
@@ -353,8 +353,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		$data = $this->prepareData();
 
-		$visible_columns = array_filter($data['columns'],
-			static fn (array $column) => $column['visible'] ?? false);
+		$visible_columns = array_filter($data['columns'], static fn (array $column) => $column['visible'] ?? false);
 
 		$show_opdata_separately = in_array('opdata', array_column($visible_columns, 'id'));
 
@@ -452,7 +451,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 			$row[] = CSeverityHelper::getName((int) $problem['severity']);
 			$row[] = zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['clock']);
-			$row[] = ($problem['r_eventid'] != 0) ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
+			$row[] = $problem['r_eventid'] != 0 ? zbx_date2str(DATE_TIME_FORMAT_SECONDS, $problem['r_clock']) : '';
 			$row[] = $value_str;
 			$row[] = implode(', ', $hosts);
 			$row[] = ($data['options']['show_opdata'] && $trigger['opdata'] !== '')
@@ -467,10 +466,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 				$row[] = $opdata;
 			}
 
-			$row[] = ($problem['r_eventid'] != 0)
+			$row[] = $problem['r_eventid'] != 0
 				? zbx_date2age($problem['clock'], $problem['r_clock'])
 				: zbx_date2age($problem['clock']);
-			$row[] = ($problem['acknowledged'] == EVENT_ACKNOWLEDGED) ? _('Yes') : _('No');
+			$row[] = $problem['acknowledged'] == EVENT_ACKNOWLEDGED ? _('Yes') : _('No');
 			$row[] = implode(', ', $actions_performed);
 			$row[] = implode(', ', $tags[$problem['eventid']]);
 
@@ -498,10 +497,10 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
+			$filter['tags'] = array_filter($filter['tags'],	static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
-		if (array_key_exists('severities', $filter) && empty($filter['severities'])) {
+		if (array_key_exists('severities', $filter) && !$filter['severities']) {
 			unset($filter['severities']);
 		}
 
@@ -516,10 +515,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$filter['to'] = $timeline['to_ts'];
 		}
 
-		$data = CScreenProblem::getData(
-			$filter,
-			['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $options,
-			$limit,
+		$data = CScreenProblem::getData($filter, ['show_opdata' => OPERATIONAL_DATA_SHOW_SEPARATELY] + $options, $limit,
 			true
 		);
 		$data = CScreenProblem::sortData($data, $limit, $sort_field, $sort_order);
@@ -571,8 +567,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 					$symptom_events = $filter['show'] == TRIGGERS_OPTION_ALL
 						? API::Event()->get($event_options)
 						: API::Problem()->get($event_options + [
-								'recent' => $filter['show'] == TRIGGERS_OPTION_RECENT_PROBLEM
-							]);
+							'recent' => $filter['show'] == TRIGGERS_OPTION_RECENT_PROBLEM
+						]);
 
 					if ($symptom_events) {
 						$enabled_triggers = API::Trigger()->get([
@@ -626,8 +622,9 @@ class CControllerProblemViewData extends CControllerDataTable {
 					);
 
 					// Filter does not matter.
-					$_symptom_data = CScreenProblem::makeData($_symptom_data, ['show' => $filter['show']],
-						$options, true);
+					$_symptom_data = CScreenProblem::makeData($_symptom_data, ['show' => $filter['show']], $options,
+						true
+					);
 
 					$data['users'] += $_symptom_data['users'];
 					$data['correlations'] += $_symptom_data['correlations'];

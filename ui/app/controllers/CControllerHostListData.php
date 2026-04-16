@@ -162,7 +162,8 @@ class CControllerHostListData extends CControllerDataTable {
 				}
 			}
 
-			if (isset($host['maintenanceid']) && $host['status'] == HOST_STATUS_MONITORED
+			if (array_key_exists('maintenanceid', $host) && $host['maintenanceid'] != 0
+					&& $host['status'] == HOST_STATUS_MONITORED
 					&& $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON) {
 				$maintenanceids[$host['maintenanceid']] = true;
 			}

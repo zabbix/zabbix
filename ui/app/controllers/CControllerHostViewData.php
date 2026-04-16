@@ -51,14 +51,14 @@ class CControllerHostViewData extends CControllerDataTable {
 				? ($options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE ? null : false)
 				: null,
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name'],
-				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
-				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+				'name' => $filter['name'] === '' ? null : $filter['name'],
+				'ip' => $filter['ip'] === '' ? null : $filter['ip'],
+				'dns' => $filter['dns'] === '' ? null : $filter['dns']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status'],
-				'port' => ($filter['port'] === '') ? null : $filter['port'],
-				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+				'status' => $filter['status'] == -1 ? null : $filter['status'],
+				'port' => $filter['port'] === '' ? null : $filter['port'],
+				'maintenance_status' => $filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 					? null
 					: HOST_MAINTENANCE_STATUS_OFF
 			],
@@ -214,7 +214,9 @@ class CControllerHostViewData extends CControllerDataTable {
 			if ($host['interfaces']) {
 				foreach (CItemGeneral::INTERFACE_TYPES_BY_PRIORITY as $interface_type) {
 					$host_interfaces = array_filter($host['interfaces'],
-						static fn (array $host_interface) => $host_interface['type'] == $interface_type);
+						static fn (array $host_interface) => $host_interface['type'] == $interface_type
+					);
+
 					if ($host_interfaces) {
 						$host['interface'] = getHostInterface(reset($host_interfaces));
 						break;
@@ -224,7 +226,8 @@ class CControllerHostViewData extends CControllerDataTable {
 
 			$host['maintenance'] = null;
 			if ($host['status'] == HOST_STATUS_MONITORED && $host['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
-					&& isset($host['maintenanceid']) && array_key_exists($host['maintenanceid'], $maintenances)) {
+					&& array_key_exists('maintenanceid', $host) && $host['maintenanceid'] != 0
+					&& array_key_exists($host['maintenanceid'], $maintenances)) {
 				$host['maintenance'] = $maintenances[$host['maintenanceid']] + [
 					'type' => $host['maintenance_type'],
 					'status' => $host['maintenance_status']
@@ -327,23 +330,23 @@ class CControllerHostViewData extends CControllerDataTable {
 
 		return (int) API::Host()->get([
 			'countOutput' => true,
+			'groupids' => $groupids,
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
-			'groupids' => $groupids,
-			'severities' => $filter['severities'] ? $filter['severities'] : null,
+			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
 				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
 				: null,
 			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name'],
-				'ip' => ($filter['ip'] === '') ? null : $filter['ip'],
-				'dns' => ($filter['dns'] === '') ? null : $filter['dns']
+				'name' => $filter['name'] === '' ? null : $filter['name'],
+				'ip' => $filter['ip'] === '' ? null : $filter['ip'],
+				'dns' => $filter['dns'] === '' ? null : $filter['dns']
 			],
 			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status'],
-				'port' => ($filter['port'] === '') ? null : $filter['port'],
-				'maintenance_status' => ($filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON)
+				'status' => $filter['status'] == -1 ? null : $filter['status'],
+				'port' => $filter['port'] === '' ? null : $filter['port'],
+				'maintenance_status' => $filter['maintenance_status'] == HOST_MAINTENANCE_STATUS_ON
 					? null
 					: HOST_MAINTENANCE_STATUS_OFF
 			],
