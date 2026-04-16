@@ -220,9 +220,8 @@ class CApiTagHelper {
 
 		if ($inherited_tags && $table === 'host_tag') {
 			return [
-				'host_tag' => $default_subquery.
-					' UNION ALL'.
-					' SELECT NULL'.
+				'host_tag' =>
+					'SELECT NULL'.
 					' FROM host_template_cache htc'.
 					' JOIN host_tag ON htc.link_hostid=host_tag.hostid'.
 					' WHERE '.$parent_aliases[0].'.hostid=htc.hostid'.
