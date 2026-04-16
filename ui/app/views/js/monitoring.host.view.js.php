@@ -149,7 +149,8 @@
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['status'])
-						.setRenderer('status'),
+						.setRenderer('status')
+						.setSortable(true),
 					new CDataTableColumn('latest_data', <?= json_encode(_('Latest data')); ?>)
 						.setFields(['hostid', 'items_count'])
 						.setRenderer('latest_data'),
