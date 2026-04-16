@@ -497,7 +497,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter($filter['tags'],	static fn(array $tag) => $tag && $tag['tag'] != '');
+			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
 		if (array_key_exists('severities', $filter) && !$filter['severities']) {
