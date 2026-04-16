@@ -1441,7 +1441,7 @@ zbx_uint32_t	zbx_alerter_serialize_push(unsigned char **data, zbx_uint64_t alert
 	ptr = *data;
 
 	ptr += zbx_serialize_value(ptr, alertid);
-	ptr += zbx_serialize_str(ptr, params, params_len);
+	zbx_serialize_str(ptr, params, params_len);
 
 	return data_len;
 }
