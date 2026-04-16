@@ -12,16 +12,36 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_ZBXPREPROC_PP_MOCK_H
-#define ZABBIX_ZBXPREPROC_PP_MOCK_H
 
-#include "zbxtime.h"
+class CFieldZColorPicker extends CField {
 
-int	str_to_preproc_type(const char *str);
+	#hidden_input;
 
-void	mock_pp_read_variant(zbx_mock_handle_t handle, zbx_variant_t *value);
-void	mock_pp_read_value(zbx_mock_handle_t handle, unsigned char *value_type, zbx_variant_t *value,
-		zbx_timespec_t *ts);
-void	mock_pp_read_step(zbx_mock_handle_t hop, zbx_pp_step_t *step);
+	init() {
+		this.#hidden_input = this._field.querySelector('input[type="hidden"]');
+		super.init();
 
-#endif
+		this._field.addEventListener('change', () => this.onBlur());
+	}
+
+	getName() {
+		return this.#hidden_input.getAttribute('name');
+	}
+
+	getValue() {
+		if (this.isDisabled()) {
+			return null;
+		}
+
+		return this.#hidden_input.value;
+	}
+
+	isDisabled () {
+		return this.#hidden_input.disabled;
+	}
+
+	focusErrorField() {
+		super.focusErrorField();
+		this._field.focus();
+	}
+}
