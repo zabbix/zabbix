@@ -212,12 +212,6 @@ class CApiTagHelper {
 			'inherited_tags' => $inherited_tags
 		] = $query_options;
 
-		$default_subquery =
-			'SELECT NULL'.
-			' FROM '.$table.
-			' WHERE '.$parent_aliases[0].'.'.$field.'='.$table.'.'.$field.
-			' AND '.$table.'.tag='.zbx_dbstr($tag);
-
 		if ($inherited_tags && $table === 'host_tag') {
 			return [
 				'host_tag' =>
@@ -228,6 +222,12 @@ class CApiTagHelper {
 						' AND host_tag.tag='.zbx_dbstr($tag)
 			];
 		}
+
+		$default_subquery =
+			'SELECT NULL'.
+			' FROM '.$table.
+			' WHERE '.$parent_aliases[0].'.'.$field.'='.$table.'.'.$field.
+			' AND '.$table.'.tag='.zbx_dbstr($tag);
 
 		if ($inherited_tags && $table === 'item_tag') {
 			return [
