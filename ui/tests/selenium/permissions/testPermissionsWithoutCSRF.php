@@ -511,8 +511,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
-					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7',
-					'return_button' => true
+					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
 				]
 			],
 			// #45 User group create.
@@ -520,7 +519,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM users_groups',
 					'link' => 'zabbix.php?action=usergroup.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF validation User group create'
+					]
 				]
 			],
 			// #46 User update.
