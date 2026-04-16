@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_TRAPPER_DEVICE_MANAGMENT_H
-#define ZABBIX_TRAPPER_DEVICE_MANAGMENT_H
+#ifndef ZABBIX_TRAPPER_DEVICE_MANAGEMENT_H
+#define ZABBIX_TRAPPER_DEVICE_MANAGEMENT_H
 
 #include "zbxcomms.h"
 #include "zbxjson.h"

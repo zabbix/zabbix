@@ -12,7 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#include "trapper_device_managment.h"
+#include "trapper_device_management.h"
 #include "zbxtrapper.h"
 
 #include "zbxcommon.h"

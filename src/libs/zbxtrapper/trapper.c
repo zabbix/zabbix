@@ -20,7 +20,7 @@
 #include "trapper_item_test.h"
 #include "nodecommand.h"
 #include "version.h"
-#include "trapper_device_managment.h"
+#include "trapper_device_management.h"
 
 #include "zbxtimekeeper.h"
 #include "zbxalgo.h"
