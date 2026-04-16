@@ -212,22 +212,23 @@ class CApiTagHelper {
 			'inherited_tags' => $inherited_tags
 		] = $query_options;
 
-		if ($inherited_tags && $table === 'host_tag') {
-			return [
-				'host_tag' =>
-					'SELECT NULL'.
-					' FROM host_template_cache htc'.
-					' JOIN host_tag ON htc.link_hostid=host_tag.hostid'.
-					' WHERE '.$parent_aliases[0].'.hostid=htc.hostid'.
-						' AND host_tag.tag='.zbx_dbstr($tag)
-			];
-		}
-
 		$default_subquery =
 			'SELECT NULL'.
 			' FROM '.$table.
 			' WHERE '.$parent_aliases[0].'.'.$field.'='.$table.'.'.$field.
-				' AND '.$table.'.tag='.zbx_dbstr($tag);
+			' AND '.$table.'.tag='.zbx_dbstr($tag);
+
+		if ($inherited_tags && $table === 'host_tag') {
+			return [
+				'host_tag' => $default_subquery.
+					' UNION ALL'.
+					' SELECT NULL'.
+					' FROM host_template_cache htc'.
+					' JOIN host_tag ON htc.link_hostid=host_tag.hostid'.
+					' WHERE '.$parent_aliases[0].'.hostid=htc.hostid'.
+					' AND host_tag.tag='.zbx_dbstr($tag)
+			];
+		}
 
 		if ($inherited_tags && $table === 'item_tag') {
 			return [
