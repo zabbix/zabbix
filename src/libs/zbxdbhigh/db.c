@@ -760,7 +760,6 @@ int	zbx_db_update_software_update_checkid(void)
 int	zbx_db_check_serverid(void)
 {
 	zbx_db_result_t	result;
-	zbx_db_row_t	row;
 	int		ret = SUCCEED;
 
 	if (NULL == (result = zbx_db_select("select value_str from settings where name='serverid'")))
@@ -769,7 +768,7 @@ int	zbx_db_check_serverid(void)
 		goto out;
 	}
 
-	if (NULL == (row = zbx_db_fetch(result)))
+	if (NULL == zbx_db_fetch(result))
 	{
 		char	*uuid7 = zbx_gen_uuid7();
 
