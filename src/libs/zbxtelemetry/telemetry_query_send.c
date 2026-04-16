@@ -235,7 +235,6 @@ int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t
 
 	ret = SUCCEED;
 out:
-	/* FIXME: placeholder */
 	if (SUCCEED != ret)
 		zabbix_log(LOG_LEVEL_ERR, "%s(): query failed: \"%s\"", __func__, ZBX_NULL2STR(*error));
 
