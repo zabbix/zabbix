@@ -15,13 +15,13 @@
 #include "get_build_push_param.h"
 #include "escalator.h"
 
-#include "zbxstr.h"
 #include "zbxalgo.h"
-#include "zbxtime.h"
 #include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
+#include "zbxnum.h"
+#include "zbxalgo.h"
 
 typedef struct
 {
