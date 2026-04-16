@@ -322,7 +322,7 @@ class CDataTableOptionsPopup {
 		const name = this.#column.getName();
 		const column_options = this.#column.getColumnOptions();
 
-		const save = this.#column_name != name || !deepCompare(this.#data, column_options);
+		const save = this.#column_name !== name || !deepCompare(this.#data, column_options);
 
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_UPDATE, {column_index, column_options, save});
 	}
@@ -380,7 +380,7 @@ class CDataTableOptionsPopup {
 	onClickOutside = event => {
 		const elements = [this.#handle, this.#element];
 
-		if (!event.target.parentElement || event.target == this.#element) {
+		if (!event.target.parentElement || event.target === this.#element) {
 			return;
 		}
 
@@ -398,14 +398,14 @@ class CDataTableOptionsPopup {
 	 * @param {KeyboardEvent} event
 	 */
 	onKeyDown = event => {
-		if (event.key == 'Enter') {
+		if (event.key === 'Enter') {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE);
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			this.position();
 		}
 
-		if (event.key == 'Escape') {
+		if (event.key === 'Escape') {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_RESET);
 		}
 	}
