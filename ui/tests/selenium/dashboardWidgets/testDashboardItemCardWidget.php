@@ -1968,6 +1968,7 @@ class testDashboardItemCardWidget extends testWidgets {
 						'center-column' => 'binary value',
 						'right-column' => ''
 					],
+					'bin_value' => 'QmluYXJ5IHRlc3Q=',
 					'Context menu' => [
 						'VIEW' => [
 							'Latest data' => 'zabbix.php?action=latest.view&hostids%5B%5D={hostid}&'.
@@ -2117,7 +2118,8 @@ class testDashboardItemCardWidget extends testWidgets {
 						$this->assertTrue($button->isClickable());
 						$button->click();
 						$this->query('xpath:.//div[@class="hintbox-draggable-handle"]')->waitUntilReady();
-						$this->assertEquals($value, $button->getAttribute('data-hintbox-contents'));
+						// Check that binary data is displayed in the hintbox.
+						$this->assertEquals($data['bin_value'], $button->getAttribute('data-hintbox-contents'));
 					}
 					else {
 						$section_xpath = ($data['Latest data']['right-column'] === '')
