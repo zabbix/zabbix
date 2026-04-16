@@ -26,6 +26,7 @@
 #include "zbxnum.h"
 #include "zbxstr.h"
 #include "zbxcachehistory.h"
+#include "zbxalgo.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
@@ -731,11 +732,10 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 	zbx_vmware_entity_tags_t	entity_cmp;
 	zbx_vector_vmware_tag_ptr_t	*tags;
 
-	if (NULL != data_tags->error)
+	/* we return data from the cache despite the error */
+	if (NULL != error && NULL != data_tags->error)
 	{
-		if (NULL != error)
-			*error = zbx_strdup(NULL, data_tags->error);
-
+		*error = zbx_strdup(NULL, data_tags->error);
 		return;
 	}
 
@@ -4537,6 +4537,12 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				zbx_json_addstring(&json_data, "ifbackingdevice", ZBX_NULL2EMPTY_STR(
 						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingname", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME]),
+						ZBX_JSON_TYPE_STRING);
+				zbx_json_addstring(&json_data, "ifbackingnetwork", ZBX_NULL2EMPTY_STR(
+						dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]),
+						ZBX_JSON_TYPE_STRING);
 				zbx_json_addstring(&json_data, "ifdvswitch_uuid", ZBX_NULL2EMPTY_STR(
 						dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]),
 						ZBX_JSON_TYPE_STRING);
@@ -4868,6 +4874,12 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFBACKINGDEVICE}",
 			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFBACKINGNAME}",
+			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME]),
+			ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(j, "{#IFBACKINGNETWORK}",
+			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK]),
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);
@@ -6182,6 +6194,11 @@ static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_ptr_t *alarms,
 		zbx_json_addstring(&json_data, "overall_status", alarm->overall_status, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json_data, "acknowledged", (0 == alarm->acknowledged ? "false" : "true"),
 				ZBX_JSON_TYPE_INT);
+		zbx_json_addobject(&json_data, "entity");
+		zbx_json_addstring(&json_data, "id", ZBX_NULL2EMPTY_STR(alarm->entity_id), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "uuid", ZBX_NULL2EMPTY_STR(alarm->entity_uuid), ZBX_JSON_TYPE_STRING);
+		zbx_json_addstring(&json_data, "type", ZBX_NULL2EMPTY_STR(alarm->entity_type), ZBX_JSON_TYPE_STRING);
+		zbx_json_close(&json_data);
 		zbx_json_close(&json_data);
 	}
 
