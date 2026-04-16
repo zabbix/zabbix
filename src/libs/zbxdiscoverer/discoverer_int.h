@@ -32,6 +32,7 @@ typedef struct
 	zbx_uint64_t	druleid;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_uint64_t	count;
+	zbx_uint64_t	revision;
 }
 zbx_discoverer_check_count_t;
 

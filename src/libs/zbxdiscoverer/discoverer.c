@@ -458,7 +458,7 @@ out:
 }
 
 static void	process_results_incompletecheckscount_remove(zbx_discoverer_manager_t *manager,
-		zbx_vector_uint64_t *del_druleids)
+		const zbx_vector_uint64_t *del_druleids)
 {
 	int	i;
 
@@ -477,7 +477,7 @@ static void	process_results_incompletecheckscount_remove(zbx_discoverer_manager_
 	}
 }
 
-static int	process_results_drule_is_lastip(zbx_discoverer_results_t *result, zbx_vector_uint64_t *del_jobs)
+static int	process_results_drule_is_lastip(const zbx_vector_uint64_t *del_jobs, zbx_discoverer_results_t *result)
 {
 	if (ZBX_DISCOVERER_RESULT_CHECK_INIT == result->status ||
 			0 != (result->status & ZBX_DISCOVERER_RESULT_JOB_FINISH))
@@ -526,8 +526,43 @@ static void	process_results_incompleteresult_remove(zbx_discoverer_manager_t *ma
 	}
 }
 
-static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_t *del_druleids,
-		zbx_vector_uint64_t *del_jobs, zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks,
+static void	process_results_del_druleids_update( zbx_hashset_t *incomplete_checks_count,
+		const zbx_vector_uint64_pair_t *revisions, zbx_vector_uint64_t *del_druleids)
+{
+	zbx_hashset_iter_t		iter;
+	zbx_discoverer_check_count_t	*dcc;
+	int				n = 0;
+
+	if (0 == revisions->values_num)
+		return;
+
+	zbx_hashset_iter_reset(incomplete_checks_count, &iter);
+
+	while (NULL != (dcc = (zbx_discoverer_check_count_t *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_pair_t	revision = {.first = dcc->druleid};
+		int			i;
+
+		if (FAIL != (i = zbx_vector_uint64_pair_bsearch(revisions, revision, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				&& revisions->values[i].second == dcc->revision)
+		{
+			continue;
+		}
+
+		if (FAIL == zbx_vector_uint64_bsearch(del_druleids, dcc->druleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		{
+			i = zbx_vector_uint64_nearestindex(del_druleids, dcc->druleid, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+			zbx_vector_uint64_insert(del_druleids, dcc->druleid, i);
+			n++;
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() del_druleids:%d added:%d", __func__, del_druleids->values_num, n);
+}
+
+static int	process_results(zbx_discoverer_manager_t *manager, const zbx_vector_uint64_pair_t *revisions,
+		const zbx_vector_uint64_t *del_jobs, zbx_vector_uint64_t *del_druleids,
+		zbx_hashset_t *incomplete_druleids, zbx_uint64_t *unsaved_checks,
 		zbx_vector_discoverer_drule_error_t *drule_errors, const zbx_events_funcs_t *events_cbs,
 		zbx_discovery_open_func_t discovery_open_cb, zbx_discovery_close_func_t discovery_close_cb,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
@@ -550,6 +585,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 	pthread_mutex_lock(&manager->results_lock);
 
 	/* protection against returning values from removed revision of druleid */
+	process_results_del_druleids_update(&manager->incomplete_checks_count, revisions, del_druleids);
 	process_results_incompletecheckscount_remove(manager, del_druleids);
 
 	zbx_hashset_iter_reset(&manager->results, &iter);
@@ -570,7 +606,7 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 		res_check_total += (zbx_uint64_t)result->services.values_num;
 
-		if (SUCCEED == process_results_drule_is_lastip(result, del_jobs) ||
+		if (SUCCEED == process_results_drule_is_lastip(del_jobs, result) ||
 				DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ||
 				(NULL != (check_count = zbx_hashset_search(&manager->incomplete_checks_count, &cmp)) &&
 				0 != check_count->count))
@@ -1792,7 +1828,7 @@ ZBX_THREAD_ENTRY(zbx_discoverer_thread, args)
 		zbx_vector_uint64_sort(&del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		zbx_vector_uint64_uniq(&del_jobs, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-		more_results = process_results(&dmanager, &del_druleids, &del_jobs, &incomplete_druleids,
+		more_results = process_results(&dmanager, &revisions, &del_jobs, &del_druleids, &incomplete_druleids,
 				&unsaved_checks, &drule_errors, discoverer_args_in->events_cbs,
 				discoverer_args_in->discovery_open_cb, discoverer_args_in->discovery_close_cb,
 				discoverer_args_in->discovery_update_host_cb,
