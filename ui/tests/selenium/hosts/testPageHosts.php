@@ -162,7 +162,7 @@ class testPageHosts extends CLegacyWebTest {
 		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
-		$this->assertTrue($this->query('link', $name)->one()->isValid());
+		$this->assertTrue($this->query('link', $name)->waitUntilPresent()->one()->isValid());
 
 		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));
 		$this->assertEquals($oldHashItems, CDBHelper::getHash($sqlItems));
@@ -878,6 +878,7 @@ class testPageHosts extends CLegacyWebTest {
 		$host_row = $this->query('class:datatable')->asDatatable()->one()->findRow('Name', 'Enabled status');
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
+			$host_row->invalidate();
 			$host_row->getColumn('Status')->click();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
@@ -885,6 +886,8 @@ class testPageHosts extends CLegacyWebTest {
 			$this->assertEquals($id, CDBHelper::getValue('SELECT status FROM hosts WHERE host='.zbx_dbstr('Enabled status')));
 			CMessageElement::find()->one()->close();
 		}
+
+		$this->test->query('tag:h1')->one()->click();
 	}
 
 	public function testPageHosts_Delete() {

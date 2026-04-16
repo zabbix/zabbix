@@ -39,7 +39,8 @@ class testFormItem extends CLegacyWebTest {
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CTableBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -1015,7 +1016,7 @@ class testFormItem extends CLegacyWebTest {
 		// Open hosts page.
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		// Clean Name field first, added for more stable local tests.
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => '']);
 		// Fill Name field with host name.
@@ -1023,7 +1024,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
 		// Find Items link in host row and click it.
-		$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $this->host)
+		$this->query('class:datatable')->asDatatable()->one()->findRow('Name', $this->host)
 				->getColumn('Items')->query('link:Items')->one()->click();
 		$this->zbxTestClickLinkTextWait($name);
 		COverlayDialogElement::find()->one()->waitUntilReady()->getFooter()->query('button:Update')->one()->click();
@@ -2428,7 +2429,7 @@ class testFormItem extends CLegacyWebTest {
 	private function filterEntriesAndOpenItems() {
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 		$form->fill(['Name' => $this->host]);
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
+		$table = $this->query('class:datatable')->asDatatable()->one();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded()->findRow('Name', $this->host)->getColumn('Items')->query('link:Items')->one()->click();
 	}

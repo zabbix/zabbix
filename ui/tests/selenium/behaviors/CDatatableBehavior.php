@@ -65,7 +65,7 @@ class CDatatableBehavior extends CTableBehavior {
 			$selector = self::COMMON_SELECTOR;
 		}
 
-		$datatable = $this->test->query($selector)->asDatatable()->one();
+		$datatable = $this->test->query($selector)->asDatatable()->waitUntilReady()->one();
 		if ($this->column_names !== null) {
 			$datatable->setColumnNames($this->column_names);
 		}

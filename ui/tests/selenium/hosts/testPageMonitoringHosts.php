@@ -92,7 +92,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->assertEquals(['action: clone', 'tag: host'], $tags->asText());
 
 		foreach ($tags as $tag) {
-			$tag->click();
+			$tag->scrollIntoView(50)->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
 			$this->assertEquals($tag->getText(), $hint->getText());
 			$hint->close();
@@ -256,9 +256,7 @@ class testPageMonitoringHosts extends CWebTest {
 						'Status' => 'Disabled',
 						'Host groups' => ['Zabbix server']
 					],
-					'expected' => [
-						'No data found'
-					]
+					'expected' => []
 				]
 			],
 			// #12.
@@ -843,8 +841,10 @@ class testPageMonitoringHosts extends CWebTest {
 		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setTags($data['tag_options']['tags']);
+		$headers = $table->getHeaders();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReady();
+		$headers->waitUntilStalled();
+		$table->waitUntilReady()->invalidate();
 		$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		$this->query('button:Reset')->one()->waitUntilClickable()->click();
 		$table->waitUntilReady();
@@ -889,9 +889,8 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReady();
 		foreach ([true, false] as $show) {
-			$form->query('id:show_suppressed_0')->asCheckbox()->one()->fill($show);
-			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$table->waitUntilReady();
+			$this->filterFromHeader(['Problems' => ['Show suppressed problems' => $show]]);
+			$table->waitUntilReady()->invalidate();
 			$this->assertTrue($table->findRow('Name', 'Host for suppression')->isPresent($show));
 		}
 		$this->query('button:Reset')->one()->click();
@@ -1062,7 +1061,7 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_HostContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
 		$row = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
-		$row->query('link', $data['name'])->one()->click();
+		$row->query('link', $data['name'])->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 		$this->assertEquals(['VIEW', 'CONFIGURATION', 'SCRIPTS'], $popup->getTitles()->asText());
@@ -1101,6 +1100,7 @@ class testPageMonitoringHosts extends CWebTest {
 			}
 
 			// Navigate to Problems page from Hosts.
+			$table->getRow(0)->highlight();
 			$table->getRow(0)->getColumn('Problems')->query('xpath:.//a')->one()->click();
 			$this->page->waitUntilReady();
 			$this->page->assertTitle('Problems');
@@ -1109,8 +1109,9 @@ class testPageMonitoringHosts extends CWebTest {
 			// Count problems of each severity and compare it with problems count from Hosts page.
 			if ($host !== 'Empty host') {
 				foreach ($results as $severity => $count) {
-					$problem_count = $table->query('xpath:.//td[contains(@class, "-bg") and text()="'.$severity.'"]')
-							->all()->count();
+					$problem_count = $table->query('xpath:.//div[contains(@class, "-bg")]/div[text()='
+							.CXPathHelper::escapeQuotes($severity).']'
+					)->all()->count();
 					$this->assertEquals(strval($problem_count), $count);
 				}
 			}
@@ -1137,13 +1138,13 @@ class testPageMonitoringHosts extends CWebTest {
 		// Sort by name and status.
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
 		foreach (['Name', 'Status'] as $listing) {
-			$query = $this->query('xpath://a[@href and text()="'.$listing.'"]');
+			$query = $this->query('xpath://span[text()="'.$listing.'"]/../../a[@href]');
 			$query->one()->click();
 			$this->page->waitUntilReady();
 			$after_listing = $this->getDatatableColumnData($listing);
 			$query->one()->click();
 			$this->page->waitUntilReady();
-			$this->assertEquals(array_reverse($after_listing), $this->getTableColumnData($listing));
+			$this->assertEquals(array_reverse($after_listing), $this->getDatatableColumnData($listing));
 		}
 	}
 
@@ -1156,7 +1157,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	private function selectLink($host_name, $column, $page_header) {
 		$this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $host_name)
-				->query('link', $column)->waitUntilClickable()->one()->click();
+				->query('link', $column)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		if ($page_header !== null) {
 			$this->page->assertHeader($page_header);
