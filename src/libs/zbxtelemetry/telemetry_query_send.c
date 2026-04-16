@@ -36,8 +36,7 @@ static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now,
 	tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
 	zbx_http_context_create(&context);
 
-	/* FIXME: placeholder */
-	zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST1 %s(): '%s'", __func__, sql);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): generated SQL: '%s'", __func__, sql);
 
 	if (SUCCEED == zbx_http_request_prepare(&context, HTTP_REQUEST_POST, conn_params->url, query_fields, headers,
 			sql, ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, conn_params->timeout, conn_params->max_attempts,
@@ -78,8 +77,6 @@ static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now,
 
 	return ret;
 }
-
-/* TODO: maybe add upper limit on result size? */
 
 static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, struct zbx_json *j)
 {
@@ -215,8 +212,6 @@ static int	tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, c
 	return ret;
 }
 
-/* TODO: maybe add upper limit on response size? */
-
 int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
@@ -229,18 +224,20 @@ int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
 		goto out;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): Clickhouse response: '%s'", __func__, ZBX_NULL2STR(resp));
+
 	if (SUCCEED != tq_clickhouse_resp_to_json(query, resp, out)) {
 		*error = zbx_strdup(NULL, "Failed to parse Clickhouse response");
 		goto out;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s(): resulting json: '%s'", __func__, ZBX_NULL2STR(*out));
+
 	ret = SUCCEED;
 out:
 	/* FIXME: placeholder */
-	if (SUCCEED == ret)
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST4: %s(): '%s'", __func__, ZBX_NULL2STR(*out));
-	else
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST5: %s(): '%s'", __func__, ZBX_NULL2STR(*error));
+	if (SUCCEED != ret)
+		zabbix_log(LOG_LEVEL_ERR, "%s(): query failed: \"%s\"", __func__, ZBX_NULL2STR(*error));
 
 	zbx_free(resp);
 
