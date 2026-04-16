@@ -238,6 +238,13 @@ class testEscalations extends CIntegrationTest {
 	public function testEscalations_checkScenario1() {
 		$this->clearLog(self::COMPONENT_SERVER);
 		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 3);
+
+		$response = $this->callUntilDataIsPresent('alert.get', [
+			'actionids' => [self::$trigger_actionid]
+		], 5, 2);
+		
 		// Create maintenance period
 		self::$maint_start_tm = time();
 		$maint_end_tm = self::$maint_start_tm + 60 * 2;
@@ -261,11 +268,6 @@ class testEscalations extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of zbx_dc_update_maintenances()', true);
 
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_NAME, 3);
-
-		$response = $this->callUntilDataIsPresent('alert.get', [
-			'actionids' => [self::$trigger_actionid]
-		], 5, 2);
 		$this->assertArrayHasKey(0, $response['result']);
 		$this->assertEquals(0, $response['result'][0]['p_eventid']);
 
