@@ -408,7 +408,7 @@ FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|userdirectoryid|t_id		|NULL	|NULL		|0			|2|userdirectory	|	|RESTRICT
 FIELD		|mfa_status	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|mfaid		|t_id	|	|NULL	|0	|3|mfa	|	|RESTRICT
+FIELD		|mfaid		|t_id	|	|NULL	|0 |3|mfa	|	|RESTRICT
 UNIQUE		|1		|name
 INDEX		|2		|userdirectoryid
 INDEX		|3		|mfaid
@@ -1098,8 +1098,8 @@ FIELD		|ns		|t_nanosec	|'0'	|NOT NULL	|0
 FIELD		|name		|t_varchar(2048)|''	|NOT NULL	|0
 FIELD		|severity	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|flags		|t_integer|'0'|NOT NULL|0
-INDEX		|1	|source,object,objectid,clock
-INDEX		|2	|source,object,clock
+INDEX		|1		|source,object,objectid,clock
+INDEX		|2		|source,object,clock
 
 TABLE|event_symptom|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events	|eventid|
@@ -2268,7 +2268,7 @@ FIELD		|mfaid			|t_id			|	|NOT NULL	|0	|1|mfa	|mfaid
 FIELD		|userid			|t_id			|	|NOT NULL	|0	|2|users|userid
 FIELD		|totp_secret	|t_varchar(32)	|''	|NULL		|0
 FIELD		|status			|t_integer		|'0'|NOT NULL	|0
-FIELD		|used_codes		|t_varchar(32)	|''	|NOT NULL	|0
+FIELD		|used_codes		|t_varchar(32)	|'' |NOT NULL	|0
 INDEX		|1			|mfaid
 INDEX		|2			|userid
 
@@ -2294,11 +2294,12 @@ FIELD		|value		|t_text		|''	|NOT NULL	|0
 INDEX		|1		|itemid
 
 TABLE|trigger_rtdata|triggerid|ZBX_TEMPLATE
-FIELD|triggerid	|t_id			|	|NOT NULL|0|1|triggers
-FIELD|value		|t_integer		|'0'|NOT NULL|ZBX_NODATA
-FIELD|state		|t_integer		|'0'|NOT NULL|ZBX_NODATA
-FIELD|lastchange|t_integer		|'0'|NOT NULL|ZBX_NODATA
-FIELD|error		|t_varchar(2048)|''	|NOT NULL|ZBX_NODATA
+FIELD		|triggerid	|t_id		|	|NOT NULL	|0			|1|triggers
+FIELD		|value		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|lastchange	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
+FIELD		|error		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
+INDEX		|1		|value,lastchange
 
 TABLE|cep_rule|cep_ruleid|ZBX_DATA
 FIELD	|cep_ruleid		|t_id	|		|NOT NULL	|0
@@ -2365,8 +2366,8 @@ INDEX	|2	|groupid
 INDEX	|3	|hostid
 
 TABLE|cep_group_event|cep_groupid,eventid|ZBX_DATA
-FIELD	|cep_groupid	|t_id	|	|NOT NULL	|0|1|cep_group	|cep_groupid
-FIELD	|eventid		|t_id	|	|NULL		|0|2|events		|eventid
+FIELD	|cep_groupid	|t_id	|	|NOT NULL		|0|1|cep_group	|cep_groupid
+FIELD	|eventid		|t_id	|	|NOT NULL		|0|2|events		|eventid
 INDEX	|1	|eventid
 
 TABLE|cep_operation|cep_operationid|ZBX_DATA
@@ -2396,7 +2397,7 @@ INDEX	|1	|cep_operationid
 CHANGELOG	|28
 
 TABLE|dbversion|dbversionid|
-FIELD	|dbversionid|t_id		|	|NOT NULL|0
-FIELD	|mandatory	|t_integer	|'0'|NOT NULL|
-FIELD	|optional	|t_integer	|'0'|NOT NULL|
+FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
+FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
+FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
 ROW		|1		|7050067	|7050067
