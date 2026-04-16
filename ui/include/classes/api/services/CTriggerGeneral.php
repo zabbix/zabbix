@@ -1726,10 +1726,11 @@ abstract class CTriggerGeneral extends CApiService {
 				$new_functions[] = $trigger_function;
 			}
 
-			$ins_trigger_rtdata[] = ['triggerid' => $new_trigger['triggerid']];
-
 			if ($this instanceof CTriggerPrototype) {
 				$new_trigger['flags'] = ZBX_FLAG_DISCOVERY_PROTOTYPE;
+			}
+			else {
+				$ins_trigger_rtdata[] = ['triggerid' => $new_trigger['triggerid']];
 			}
 
 			if (array_key_exists('tags', $new_trigger)) {
