@@ -31,10 +31,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter(array_filter($filter['tags']),
-				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
-
-			CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
 		CProfile::update('web.templates.sort', $sort_field, PROFILE_TYPE_STR);
@@ -161,6 +158,12 @@ class CControllerTemplateListData extends CControllerDataTable {
 		unset($template);
 
 		CTagHelper::mergeOwnAndInheritedTags($templates, true);
+
+		foreach ($templates as &$template) {
+			CArrayHelper::sort($template['tags'], ['tag', 'value']);
+			$template['tags'] = CTagHelper::getTagsList($template, ['filter_tags' => $filter['tags']]);
+		}
+		unset($template);
 
 		CPagerHelper::savePage('template.list', $this->paging['page']);
 

@@ -98,10 +98,6 @@
 
 			const data_provider = new CDefaultDataProvider(data_provider_url.toString());
 
-			if ('tags' in filter) {
-				filter.tags = filter.tags.filter(tag => tag.tag && tag.value);
-			}
-
 			this.datatable = new CDataTable(document.getElementById('templates'), data_provider)
 				.setColumns([
 					new CDataTableColumn('name', <?= json_encode(_('Name')); ?>)

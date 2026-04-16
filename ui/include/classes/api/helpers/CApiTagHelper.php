@@ -226,7 +226,7 @@ class CApiTagHelper {
 					' FROM host_template_cache htc'.
 					' JOIN host_tag ON htc.link_hostid=host_tag.hostid'.
 					' WHERE '.$parent_aliases[0].'.hostid=htc.hostid'.
-					' AND host_tag.tag='.zbx_dbstr($tag)
+						' AND host_tag.tag='.zbx_dbstr($tag)
 			];
 		}
 

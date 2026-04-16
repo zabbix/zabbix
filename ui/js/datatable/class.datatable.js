@@ -567,11 +567,14 @@ class CDataTable {
 			const number_of_tags = column_options['number_of_tags'] || SHOW_TAGS_3;
 			const tag_name_display = column_options['tag_name_display'] || TAG_NAME_FULL;
 
-			tag_display_priority
+			const priority_tags = tag_display_priority
 				.split(',')
-				.map((priority) => priority.trim())
-				.filter(Boolean)
-				.forEach((priority) => tag_display_priorities.add(priority));
+				.map(priority => priority.trim())
+				.filter(Boolean);
+
+			for (const priority_tag of priority_tags) {
+				tag_display_priorities.add(priority_tag);
+			}
 
 			if (tag_display_priorities.size > 0) {
 				tag_display_priorities = [...tag_display_priorities];
@@ -595,7 +598,7 @@ class CDataTable {
 			const tags_wrapper = document.createElement('div');
 			tags_wrapper.classList.add(ZBX_STYLE_TAGS_WRAPPER);
 
-			tags.forEach((tag) => {
+			for (const tag of tags) {
 				let tag_label;
 
 				const subfilter_tag = subfilter_tags != null
@@ -689,7 +692,7 @@ class CDataTable {
 
 				tag_labels.push(tag_label);
 				count--;
-			});
+			}
 
 			if (tags.length > number_of_tags) {
 				const more_tags_hintbox = document.createElement('div');
@@ -1184,7 +1187,11 @@ class CDataTable {
 		this.#columns.splice(index, 1);
 
 		this.#sortColumns();
-		this.#columns.forEach((column, index) => column.setOrder(index + 1));
+
+		for (const column of this.#columns) {
+			const index = this.#columns.indexOf(column);
+			column.setOrder(index + 1);
+		}
 
 		this.getData().then(response => {
 			this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
@@ -1338,7 +1345,9 @@ class CDataTable {
 
 		column.setWidth(`${width}%`);
 
-		this.#visible_columns.forEach(column => this.#calculateColumnWidth(column));
+		for (const visible_column of this.#visible_columns) {
+			this.#calculateColumnWidth(visible_column);
+		}
 
 		this.#applyColumnWidths();
 		this.#applyLastColumnPadding();
@@ -1723,18 +1732,20 @@ class CDataTable {
 	findDataCells({column_index = null, row_index = null} = {}) {
 		const data_cells = [];
 
-		this.#columns.forEach(column => {
+		for (const column of this.#columns) {
 			if (column_index !== null && column.getColumnIndex() !== column_index) {
-				return;
+				continue;
 			}
 
 			if (row_index !== null) {
 				data_cells.push(column.getDataCells().at(row_index));
 			}
 			else {
-				column.getDataCells().forEach(data_cell => data_cells.push(data_cell));
+				for (const data_cell of column.getDataCells()) {
+					data_cells.push(data_cell);
+				}
 			}
-		})
+		}
 
 		return data_cells.filter(Boolean);
 	}
@@ -1816,7 +1827,8 @@ class CDataTable {
 
 		const orders = new Set();
 
-		this.#columns.forEach((column, column_index) => {
+		for (const column of this.#columns) {
+			const column_index = this.#columns.indexOf(column);
 			const order = column.getOrder();
 
 			if (!order || orders.has(order)) {
@@ -1835,7 +1847,7 @@ class CDataTable {
 
 			column.setColumnIndex(column_index)
 				.setDefaults(column.clone());
-		});
+		}
 
 		this.#sortColumns();
 	}
@@ -1870,7 +1882,9 @@ class CDataTable {
 		const options = Object.entries(this.#options);
 		const force_load = options.some(([_, option]) => option.isChanged());
 
-		options.forEach(([_, option]) => option.onReset());
+		for (const [, option] of options) {
+			option.onReset();
+		}
 
 		return force_load;
 	}
@@ -1891,34 +1905,33 @@ class CDataTable {
 			const user_columns = user_config.columns.filter(user_column => 'id' in user_column);
 
 			// Merge original columns
-			user_columns.filter(user_column => !user_column?.duplicate)
-				.forEach(user_column => {
-					const column = this.getColumnConfigById(user_column.id);
-					if (!column) {
-						return;
-					}
-
-					column.merge(user_column);
-				});
-
-			// Handle duplicated columns
-			user_columns.forEach(user_column => {
+			for (const user_column of user_columns.filter(user_column => !user_column?.duplicate)) {
 				const column = this.getColumnConfigById(user_column.id);
 				if (!column) {
-					return;
+					continue;
+				}
+
+				column.merge(user_column);
+			}
+
+			// Handle duplicated columns
+			for (const user_column of user_columns) {
+				const column = this.getColumnConfigById(user_column.id);
+				if (!column) {
+					continue;
 				}
 
 				if (!user_column.duplicate) {
 					column.merge(user_column);
 
-					return;
+					continue;
 				}
 
 				const duplicate_column = this.#duplicateColumnConfig(column, user_column);
 				duplicate_column.setColumnIndex(this.#columns.length);
 
 				this.#columns.splice(this.#columns.indexOf(column) + 1, 0, duplicate_column);
-			});
+			}
 
 			this.#columns.sort((a, b) => {
 				if (a.getOrder() && b.getOrder()) {
@@ -1931,7 +1944,10 @@ class CDataTable {
 				return order_a - order_b;
 			});
 
-			this.#columns.forEach((column, column_index) => column.setOrder(column_index + 1));
+			for (const column of this.#columns) {
+				const column_index = this.#columns.indexOf(column);
+				column.setOrder(column_index + 1);
+			}
 		}
 
 		if (user_config.options) {
@@ -2001,7 +2017,10 @@ class CDataTable {
 		this.#element.classList.remove(ZBX_STYLE_LOADING);
 
 		this.#body.innerHTML = '';
-		this.#columns.forEach(column => column.setDataCells([]));
+
+		for (const column of this.#columns) {
+			column.setDataCells([]);
+		}
 	}
 
 	/**
@@ -2078,7 +2097,9 @@ class CDataTable {
 	}
 
 	#afterRender(response) {
-		this.#visible_columns.forEach(column => this.#calculateColumnWidth(column));
+		for (const visible_column of this.#visible_columns) {
+			this.#calculateColumnWidth(visible_column);
+		}
 
 		this.#applyColumnWidths();
 		this.#applyLastColumnPadding();
@@ -2336,18 +2357,18 @@ class CDataTable {
 		this.getData().then(response => {
 			const data_fields = response.data_fields;
 
-			column.getDataCells().forEach((data_cell, row_index) => {
+			for (const [row_index, data_cell] of column.getDataCells().entries()) {
 				const [row_config, row_data] = response.data[row_index];
 
 				if (row_config.renderer || column.isOnlyHeader()) {
-					return;
+					continue;
 				}
 
 				const row = data_cell.target.closest(`.${CDataTable.ZBX_STYLE_ROW}`);
 				const cell_data = this.#collectColumnData(column, data_fields, row_data);
 
 				this.renderDataCellContents(column, row, row_index, data_cell, data_fields, cell_data, response);
-			});
+			}
 		});
 	}
 
@@ -2380,7 +2401,9 @@ class CDataTable {
 	onWrapperScroll = () => this.#options_popup?.position();
 
 	#bindEvents() {
-		Object.entries(this.#events).forEach(([name, callback]) => this.on(name, callback));
+		for (const [name, callback] of Object.entries(this.#events)) {
+			this.on(name, callback);
+		}
 
 		if (this.#pager) {
 			this.#pager
@@ -2452,7 +2475,10 @@ class CDataTable {
 		this.#body_resize_observer = new ResizeObserver(() => {
 			this.#resizeScrollbarThumb();
 			this.#updateScrollbarThumbPosition();
-			this.#visible_columns.forEach(column => this.#calculateColumnWidth(column));
+
+			for (const column of this.#visible_columns) {
+				this.#calculateColumnWidth(column);
+			}
 		});
 		this.#body_resize_observer.observe(this.#body);
 
@@ -2539,15 +2565,15 @@ class CDataTable {
 	 * Recalculates column spans based on visibility and span settings.
 	 */
 	#recalculateColumnSpans() {
-		this.#columns.forEach(column => {
+		for (const column of this.#columns) {
 			const defaults = column.getDefaults();
 
 			column.merge({span: defaults.getSpan(), only_header: defaults.isOnlyHeader()});
-		});
+		}
 
 		let remaining_span = 0;
 
-		this.getVisibleColumns().forEach(column => {
+		for (const column of this.getVisibleColumns()) {
 			if (remaining_span > 0) {
 				column.setOnlyHeader(true);
 
@@ -2560,7 +2586,7 @@ class CDataTable {
 					remaining_span = column.getSpan() - 1;
 				}
 			}
-		});
+		}
 	}
 
 	#resizeScrollbarThumb() {

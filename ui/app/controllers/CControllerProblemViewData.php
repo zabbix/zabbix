@@ -493,13 +493,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 
 		if ($filter['inventory']) {
-			$filter['inventory'] = array_filter(array_filter($filter['inventory']),
-				static fn (array $inv) => $inv['value'] !== '');
+			$filter['inventory'] = array_filter($filter['inventory'],
+				static fn(array $inv) => $inv['value'] != '');
 		}
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter(array_filter($filter['tags']),
-				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
 		if (array_key_exists('severities', $filter) && empty($filter['severities'])) {
@@ -710,6 +709,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 				unset($host);
 			}
 			unset($hosts);
+
+			foreach ($data['problems'] as &$problem) {
+				CArrayHelper::sort($problem['tags'], ['tag', 'value']);
+				$problem['tags'] = CTagHelper::getTagsList($problem, ['filter_tags' => $filter['tags']]);
+			}
+			unset($problem);
 		}
 		else {
 			$triggers_hosts = [];

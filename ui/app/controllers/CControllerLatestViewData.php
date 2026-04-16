@@ -33,8 +33,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 		$sort_order = $this->getInput('sort_order', $filter['sortorder'] ?? ZBX_SORT_UP);
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter(array_filter($filter['tags']),
-				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
 		$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($filter);
@@ -248,7 +247,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['change'] = $change;
 
 			CArrayHelper::sort($item['tags'], ['tag', 'value']);
-			$item['tags'] = array_values($item['tags']);
+			$item['tags'] = CTagHelper::getTagsList($item, ['filter_tags' => $filter['tags']]);
 
 			$item['item_icons'] = (string) makeInformationList($item_icons);
 		}

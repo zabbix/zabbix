@@ -35,8 +35,7 @@ class CControllerHostViewData extends CControllerDataTable {
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_filter(array_filter($filter['tags']),
-				static fn (array $tag) => $tag['tag'] != '' && $tag['value'] != '');
+			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
@@ -195,6 +194,9 @@ class CControllerHostViewData extends CControllerDataTable {
 					? count($host_problems[$host['hostid']][$severity])
 					: 0;
 			}
+
+			CArrayHelper::sort($host['tags'], ['tag', 'value']);
+			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
 		}
 		unset($host);
 

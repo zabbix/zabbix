@@ -158,10 +158,10 @@ class CControllerTemplateList extends CController {
 		CProfile::updateArray('web.templates.filter.tags.tag', array_column($filter_tags, 'tag'),
 			PROFILE_TYPE_STR
 		);
-		CProfile::updateArray('web.templates.filter.tags.value', array_column($filter_tags, 'values'),
+		CProfile::updateArray('web.templates.filter.tags.value', array_column($filter_tags, 'value'),
 			PROFILE_TYPE_STR
 		);
-		CProfile::updateArray('web.templates.filter.tags.operator', array_column($filter_tags, 'operators'),
+		CProfile::updateArray('web.templates.filter.tags.operator', array_column($filter_tags, 'operator'),
 			PROFILE_TYPE_INT
 		);
 	}

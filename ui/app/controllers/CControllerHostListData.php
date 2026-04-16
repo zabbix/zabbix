@@ -38,10 +38,7 @@ class CControllerHostListData extends CControllerDataTable {
 		CProfile::update('web.hosts.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		if ($filter['tags']) {
-			$filter['tags'] = array_values(array_filter($filter['tags'],
-				static fn(array $tag) => $tag['tag'] != '' && $tag['value'] != ''));
-
-			CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
+			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');
 		}
 
 		$filter['groups'] = $filter['groups']
@@ -307,19 +304,25 @@ class CControllerHostListData extends CControllerDataTable {
 				}
 			}
 
-			$host['proxy'] = !empty($host['proxyid'])
+			$host['proxy'] = array_key_exists('proxyid', $host) && $host['proxyid']
 				? array_merge($proxies[$host['proxyid']], ['proxyid' => $host['proxyid']])
 				: null;
-			$host['proxy_group'] = !empty($host['proxy_groupid'])
+			$host['proxy_group'] = array_key_exists('proxy_groupid', $host) && $host['proxy_groupid']
 				? array_merge($proxy_groups[$host['proxy_groupid']], ['proxy_groupid' => $host['proxy_groupid']])
 				: null;
-			$host['assigned_proxy'] = !empty($host['assigned_proxyid'])
+			$host['assigned_proxy'] = array_key_exists('assigned_proxyid', $host) && $host['assigned_proxyid']
 				? array_merge($proxies[$host['assigned_proxyid']], ['proxyid' => $host['assigned_proxyid']])
 				: null;
 		}
 		unset($host);
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
+
+		foreach ($hosts as &$host) {
+			CArrayHelper::sort($host['tags'], ['tag', 'value']);
+			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
+		}
+		unset($host);
 
 		return [
 			'data_fields' => $data_fields,
