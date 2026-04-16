@@ -156,10 +156,9 @@ class testFormGraph extends testFormGraphs {
 								'calc_fnc' => 'last'
 							]
 						]
-					],// #20 nado dorabotatj
+					],
 					'inline_errors' => [
-						// 'id:items_2_name' => 'This field cannot be empty.'
-						'xpath://div[@id="items_2_name"]/..' => 'This field cannot be empty.'
+						'xpath:.//z-select[@name="items[2][type]"]' => 'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],

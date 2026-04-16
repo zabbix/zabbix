@@ -137,7 +137,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					]
 				]
 			],
-			[//#20
+			[
 				[
 					'fields' => [
 						'Name' => 'Normal graph prototype without LLD macro'
@@ -168,7 +168,7 @@ class testFormGraphPrototype extends testFormGraphs {
 					]
 				]
 			],
-			[//#22
+			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
@@ -203,13 +203,13 @@ class testFormGraphPrototype extends testFormGraphs {
 								'calc_fnc' => 'last'
 							]
 						]
-					],// nuzhna pomoshj
+					],
 					'inline_errors' => [
-						'Cannot add more than one item with type "Graph sum"'
+						'xpath:.//z-select[@name="items[2][type]"]' => 'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],
-			[//#23
+			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
@@ -234,9 +234,9 @@ class testFormGraphPrototype extends testFormGraphs {
 								'calc_fnc' => 'avg'
 							]
 						]
-					],// nuzhna pomoshj
+					],
 					'inline_errors' => [
-						'Cannot add more than one item with type "Graph sum"'
+						'xpath:.//z-select[@name="items[1][type]"]' => 'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],

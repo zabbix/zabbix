@@ -141,10 +141,6 @@ class testInheritanceGraphPrototype extends CLegacyWebTest {
 
 			case TEST_BAD:
 				$this->zbxTestCheckTitle('Graph prototype edit');
-				// $message = CMessageElement::find()->waitUntilVisible()->one();
-				// $this->assertTrue($message->isBad());
-				//$this->assertEquals('Cannot add graph prototype', $message->getTitle());
-				//$this->assertTrue($message->hasLine($data['errors']));
 				$this->zbxTestTextNotPresent('Graph prototype added');
 				$form = $dialog->asForm();
 				$this->assertInlineError($form, $data['inline_errors']);

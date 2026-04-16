@@ -254,7 +254,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'secondary_dialog' => [
 						'field' => 'id:items-table',
 						'fill' => [
-							'id:item_401178' => true
+							'id:all_records' => true
 						]
 					]
 				]
