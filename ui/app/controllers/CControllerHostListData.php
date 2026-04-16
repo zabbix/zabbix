@@ -61,17 +61,15 @@ class CControllerHostListData extends CControllerDataTable {
 		$filter['templates'] = $filter['templates']
 			? CArrayHelper::renameObjectsKeys(API::Template()->get([
 				'output' => ['templateid', 'name'],
-				'templateids' => $filter['templates'],
+				'templateids' => array_column($filter['templates'], 'id'),
 				'preservekeys' => true
 			]), ['templateid' => 'id'])
 			: [];
 
-		switch ($filter['monitored_by']) {
-			case ZBX_MONITORED_BY_ANY:
-				$proxyids = null;
-				$proxy_groupids = null;
-				break;
+		$proxyids = null;
+		$proxy_groupids = null;
 
+		switch ($filter['monitored_by']) {
 			case ZBX_MONITORED_BY_SERVER:
 				$proxyids = 0;
 				$proxy_groupids = 0;
@@ -154,14 +152,16 @@ class CControllerHostListData extends CControllerDataTable {
 			$templateids = array_merge($templateids, array_column($host['parentTemplates'], 'templateid'));
 			$interfaceids = array_merge($interfaceids, array_column($host['interfaces'], 'interfaceid'));
 
-			if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
-				$proxyids[$host['proxyid']] = true;
-			}
-			elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
-				$proxy_groupids[$host['proxy_groupid']] = true;
+			if (array_key_exists('monitored_by', $host)) {
+				if ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY) {
+					$proxyids[$host['proxyid']] = true;
+				}
+				elseif ($host['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP) {
+					$proxy_groupids[$host['proxy_groupid']] = true;
 
-				if ($host['assigned_proxyid'] != 0) {
-					$proxyids[$host['assigned_proxyid']] = true;
+					if ($host['assigned_proxyid'] != 0) {
+						$proxyids[$host['assigned_proxyid']] = true;
+					}
 				}
 			}
 
@@ -307,13 +307,13 @@ class CControllerHostListData extends CControllerDataTable {
 				}
 			}
 
-			$host['proxy'] = $host['proxyid']
+			$host['proxy'] = !empty($host['proxyid'])
 				? array_merge($proxies[$host['proxyid']], ['proxyid' => $host['proxyid']])
 				: null;
-			$host['proxy_group'] = $host['proxy_groupid']
+			$host['proxy_group'] = !empty($host['proxy_groupid'])
 				? array_merge($proxy_groups[$host['proxy_groupid']], ['proxy_groupid' => $host['proxy_groupid']])
 				: null;
-			$host['assigned_proxy'] = $host['assigned_proxyid']
+			$host['assigned_proxy'] = !empty($host['assigned_proxyid'])
 				? array_merge($proxies[$host['assigned_proxyid']], ['proxyid' => $host['assigned_proxyid']])
 				: null;
 		}

@@ -13,16 +13,9 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-
 /**
  * @var CView $this
- * @var array $data
  */
-
-$show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
-		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY
-		|| $data['filter']['monitored_by'] == ZBX_MONITORED_BY_PROXY_GROUP;
-
 ?>
 
 <script type="text/x-jquery-tmpl" id="filter-tag-row-tmpl">
@@ -268,8 +261,7 @@ $show_monitored_by = $data['filter']['monitored_by'] == ZBX_MONITORED_BY_ANY
 					new CDataTableColumn('proxy', <?= json_encode(_('Proxy')); ?>)
 						.setFields(['monitored_by', 'proxyid', 'proxy_groupid', 'assigned_proxyid', 'proxy',
 							'proxy_group', 'assigned_proxy'])
-						.setRenderer('proxy')
-						.setVisible(<?= $show_monitored_by ? 'true' : 'false'; ?>),
+						.setRenderer('proxy'),
 					new CDataTableColumn('templates', <?= json_encode(_('Templates')); ?>)
 						.setFields(['templates', 'parentTemplates'])
 						.setRenderer('templates')
