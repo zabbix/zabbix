@@ -1214,8 +1214,8 @@ function objectSetDeepValue(object, path, value) {
 	while (path.length > 1) {
 		const key = path.shift();
 
-		if (!(key in tmp)) {
-			tmp[key] = {};
+		if (!Object.hasOwn(tmp, key)) {
+			tmp[key] = Object.create(null);
 		}
 
 		if (typeof tmp[key] !== 'object') {
