@@ -244,7 +244,7 @@ class testEscalations extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('alert.get', [
 			'actionids' => [self::$trigger_actionid]
 		], 5, 2);
-		
+
 		// Create maintenance period
 		self::$maint_start_tm = time();
 		$maint_end_tm = self::$maint_start_tm + 60 * 2;
