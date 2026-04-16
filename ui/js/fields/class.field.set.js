@@ -20,7 +20,7 @@ class CFieldSet extends CField {
 	 *
 	 * @type {Object}
 	 */
-	#fields = {};
+	#fields = Object.create(null);
 
 	init() {
 		super.init();
@@ -75,7 +75,7 @@ class CFieldSet extends CField {
 	}
 
 	#discoverAllFields() {
-		const fields = {};
+		const fields = Object.create(null);
 		const fields_rediscovered = [];
 
 		for (const discovered_field of CForm.findAllFields(this._field)) {
@@ -136,8 +136,8 @@ class CFieldSet extends CField {
 	}
 
 	getInnerValue(trim_value) {
-		let result = {};
-		let simple_fields = {};
+		let result = Object.create(null);
+		let simple_fields = Object.create(null);
 
 		for (const field of Object.values(this.#fields)) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
@@ -145,7 +145,9 @@ class CFieldSet extends CField {
 			}
 
 			if (typeof field.getExtraFields === 'function') {
-				simple_fields = {...simple_fields, ...field.getExtraFields()};
+				for (const [field_name, field_value] of Object.entries(field.getExtraFields())) {
+					simple_fields[field_name] = field_value;
+				}
 			}
 			else {
 				simple_fields[field.getName()] = trim_value ? field.getValueTrimmed() : field.getValue();
@@ -189,7 +191,7 @@ class CFieldSet extends CField {
 
 	setErrors(errors, force_display_errors) {
 		if (typeof errors === 'object' && '' in errors) {
-			errors[''].forEach((error) => super.setErrors(error));
+			Object.values(errors['']).forEach((error) => super.setErrors(error));
 			delete errors[''];
 		}
 
@@ -197,9 +199,8 @@ class CFieldSet extends CField {
 	}
 
 	unsetErrors() {
-		const errors = {
-			'': [{message: '', level: -1}]
-		};
+		const errors = Object.create(null);
+		errors[''] = [{message: '', level: -1}];
 
 		for (const field of Object.values(this.#fields)) {
 			errors[field.getName().replace(new RegExp(`^${this.getName()}`), '')] = [{message: '', level: -1}];
@@ -228,7 +229,7 @@ class CFieldSet extends CField {
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
-			if (key_full in this.#fields) {
+			if (Object.hasOwn(this.#fields, key_full)) {
 				// These errors need to be added even if field is not changed, but smaller index one was.
 				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
 					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT

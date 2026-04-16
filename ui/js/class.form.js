@@ -33,13 +33,13 @@ class CForm {
 	#form = null;
 	#rules = null;
 	#validators = [];
-	#fields = {};
+	#fields = Object.create(null);
 	#tabs;
 	#listeners = {};
 	#validate_changes_call = null;
 	#validate_changes_timeout = null;
 	#mousedown_registered = false;
-	#general_errors = {};
+	#general_errors = Object.create(null);
 	#message_box = null;
 	#custom_validation = [];
 	#form_ready = false;
@@ -114,7 +114,7 @@ class CForm {
 	}
 
 	discoverAllFields() {
-		const fields = {};
+		const fields = Object.create(null);
 
 		for (const discovered_field of CForm.findAllFields(this.#form)) {
 			let field_instance = null;
@@ -168,8 +168,8 @@ class CForm {
 	}
 
 	getAllValues() {
-		let result = {};
-		let simple_fields = {};
+		let result = Object.create(null);
+		let simple_fields = Object.create(null);
 
 		for (const [key, field] of Object.entries(this.#fields)) {
 			field.cancelDelayedValidation();
@@ -179,7 +179,9 @@ class CForm {
 			}
 
 			if (typeof field.getExtraFields === 'function') {
-				simple_fields = {...simple_fields, ...field.getExtraFields()};
+				for (const [field_name, field_value] of Object.entries(field.getExtraFields())) {
+					simple_fields[field_name] = field_value;
+				}
 			}
 			else {
 				simple_fields[key] = field.getValueTrimmed();
@@ -212,7 +214,7 @@ class CForm {
 				let data = values;
 
 				for (const part of parts) {
-					if (part in data) {
+					if (Object.hasOwn(data, part)) {
 						data = data[part];
 					}
 					else {
@@ -344,7 +346,7 @@ class CForm {
 		const {field_errors, general_errors} = this.convertRawErrors(raw_errors);
 
 		Object.entries(field_errors).forEach(([key, errors]) => {
-			if (key in this.#fields) {
+			if (Object.hasOwn(this.#fields, key)) {
 				const field = this.#fields[key];
 
 				if (field instanceof CFieldSet) {
@@ -390,7 +392,7 @@ class CForm {
 	 * @returns {Object}
 	 */
 	convertRawErrors(raw_errors) {
-		const field_errors = {};
+		const field_errors = Object.create(null);
 
 		Object.values(this.#fields).forEach((field) => {
 			const field_name = field.getName();
@@ -419,8 +421,8 @@ class CForm {
 			Object.entries(raw_errors).filter(([path]) => {
 				return field_path === path || subfield_path.test(path);
 			}).forEach(([path, errors]) => {
-				if (!(field_name in field_errors)) {
-					field_errors[field_name] = {};
+				if (!Object.hasOwn(field_errors, field_name)) {
+					field_errors[field_name] = Object.create(null);
 				}
 
 				delete raw_errors[path];
@@ -448,9 +450,13 @@ class CForm {
 				}
 				else {
 					if (Array.isArray(field_errors[field_name])) {
-						field_errors[field_name] = field_errors[field_name].length
-							? {'': field_errors[field_name]}
-							: {};
+						const set_errors = Object.create(null);
+
+						if (field_errors[field_name].length) {
+							set_errors[''] = field_errors[field_name];
+						}
+
+						field_errors[field_name] = set_errors;
 					}
 
 					field_errors[field_name][subfield_name] = errors;
