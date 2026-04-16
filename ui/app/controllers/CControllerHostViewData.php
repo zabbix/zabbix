@@ -194,9 +194,6 @@ class CControllerHostViewData extends CControllerDataTable {
 					? count($host_problems[$host['hostid']][$severity])
 					: 0;
 			}
-
-			CArrayHelper::sort($host['tags'], ['tag', 'value']);
-			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
 		}
 		unset($host);
 
@@ -273,6 +270,9 @@ class CControllerHostViewData extends CControllerDataTable {
 			}
 
 			$host['problems'] = $problems->toString();
+
+			CArrayHelper::sort($host['tags'], ['tag', 'value']);
+			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
 		}
 		unset($host);
 
