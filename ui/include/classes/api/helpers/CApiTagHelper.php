@@ -227,7 +227,7 @@ class CApiTagHelper {
 			'SELECT NULL'.
 			' FROM '.$table.
 			' WHERE '.$parent_aliases[0].'.'.$field.'='.$table.'.'.$field.
-			' AND '.$table.'.tag='.zbx_dbstr($tag);
+				' AND '.$table.'.tag='.zbx_dbstr($tag);
 
 		if ($inherited_tags && $table === 'item_tag') {
 			return [
