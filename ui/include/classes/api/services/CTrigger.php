@@ -948,6 +948,11 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['join']['h'] = ['left_table' => 'i', 'table' => 'hosts', 'using' => 'hostid'];
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
+		elseif ($sortfield === 'lastchange') {
+			$sqlParts['select']['lastchange'] = 'tr.lastchange AS lastchange';
+			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['order'][] = 'tr.lastchange '.$sortorder;
+		}
 		else {
 			$sqlParts = parent::applyQuerySortField($sortfield, $sortorder, $alias, $sqlParts);
 		}
