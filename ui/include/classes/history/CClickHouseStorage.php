@@ -302,7 +302,8 @@ class CClickHouseStorage {
 						}.
 					' FROM '.$table.
 					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
-					' WHERE clock_ns BETWEEN toDateTime64({time_gte:UInt64},9) AND toDateTime64({time_lte:UInt64},9)'.
+					' WHERE clock_ns BETWEEN toDateTime64({time_gte:UInt64},9)'.
+						' AND addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
 					' GROUP BY itemid,tick'.
 					' ORDER BY itemid,tick'.
 				')',
@@ -358,7 +359,8 @@ class CClickHouseStorage {
 						).
 					' FROM '.$table.
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
-						' AND clock_ns BETWEEN toDateTime64({time_gte:UInt64},9) AND toDateTime64({time_lte:UInt64},9)'.
+						' AND clock_ns BETWEEN toDateTime64({time_gte:UInt64},9)'.
+							' AND addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
 					' GROUP BY itemid'.($width === null ? '' : ',i').
 					' ORDER BY itemid'.($width === null ? '' : ',i').
 				')',
@@ -415,7 +417,8 @@ class CClickHouseStorage {
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
 						' AND '.($time_to === null
 							? 'clock_ns>=toDateTime64({time_gte:UInt64},9)'
-							: 'clock_ns BETWEEN toDateTime64({time_gte:UInt64},9) AND toDateTime64({time_lte:UInt64},9)'
+							: 'clock_ns BETWEEN toDateTime64({time_gte:UInt64},9)'.
+								' AND addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'
 						).
 					' GROUP BY itemid'.
 				')',
