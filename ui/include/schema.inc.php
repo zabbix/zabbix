@@ -10589,7 +10589,7 @@ return [
 				'ref_field' => 'cep_groupid'
 			],
 			'eventid' => [
-				'null' => true,
+				'null' => false,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'events',
