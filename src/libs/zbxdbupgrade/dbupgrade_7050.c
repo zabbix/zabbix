@@ -967,16 +967,16 @@ static int	DBpatch_7050075(void)
 static int	DBpatch_7050076(void)
 {
 	int		i;
-	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid";
+	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid,value_serviceid";
 	const char	*values[] = {
-			"28,1,0,'devices.access',1,'',NULL,NULL",
-			"29,1,0,'devices.actions.default_access',1,'',NULL,NULL",
-			"30,2,0,'devices.access',0,'',NULL,NULL",
-			"31,2,0,'devices.actions.default_access',0,'',NULL,NULL",
-			"32,3,0,'devices.access',0,'',NULL,NULL",
-			"33,3,0,'devices.actions.default_access',0,'',NULL,NULL",
-			"34,4,0,'devices.access',0,'',NULL,NULL",
-			"35,4,0,'devices.actions.default_access',0,'',NULL,NULL",
+			"1,0,'devices.access',1,'',NULL,NULL",
+			"1,0,'devices.actions.default_access',1,'',NULL,NULL",
+			"2,0,'devices.access',0,'',NULL,NULL",
+			"2,0,'devices.actions.default_access',0,'',NULL,NULL",
+			"3,0,'devices.access',0,'',NULL,NULL",
+			"3,0,'devices.actions.default_access',0,'',NULL,NULL",
+			"4,0,'devices.access',0,'',NULL,NULL",
+			"4,0,'devices.actions.default_access',0,'',NULL,NULL",
 			NULL
 	};
 
@@ -985,8 +985,11 @@ static int	DBpatch_7050076(void)
 
 	for (i = 0; NULL != values[i]; i++)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("insert into role_rule (%s) values (%s)", columns, values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("insert into role_rule (%s) values (" ZBX_FS_UI64 ",%s)", columns,
+				zbx_db_get_maxid("role_rule"), values[i]))
+		{
 			return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -994,18 +997,33 @@ static int	DBpatch_7050076(void)
 
 static int	DBpatch_7050077(void)
 {
-	int		i;
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_uint64_t	media_typeid = zbx_db_get_maxid("media_type");
+
+	if (ZBX_DB_OK > zbx_db_execute("insert into media_type (mediatypeid,type,name,smtp_server,smtp_helo,"
+			"smtp_email,exec_path,gsm_modem,username,passwd,status,smtp_port,smtp_security,"
+			"smtp_verify_peer,smtp_verify_host,smtp_authentication,maxsessions,maxattempts,"
+			"attempt_interval,message_format,script,timeout,process_tags,show_event_menu,"
+			"event_menu_url,event_menu_name,description,provider) values "
+			"(" ZBX_FS_UI64 ",5,'Push notification','','','','','','','',1,25,0,0,0,0,1,3,'10s',1,'',"
+			"'30s',0,0,'','','',0)", media_typeid))
+	{
+		return FAIL;
+	}
+
 	const char	*columns = "mediatype_messageid,mediatypeid,eventsource,recovery,subject,message";
 	const char	*values[] = {
-			"614,102,0,0,"
+			"0,0,"
 				"'{HOST.NAME} - {EVENT.NAME}',"
 				"'Started at {EVENT.TIME} on {EVENT.DATE}&eol;"
 				"Data: {EVENT.OPDATA}'",
-			"615,102,0,1,"
+			"0,1,"
 				"'[RESOLVED] {HOST.NAME} - {EVENT.NAME}',"
 				"'Resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&eol;"
 				"Duration: {EVENT.DURATION}'",
-			"616,102,0,2,"
+			"0,2,"
 				"'[UPDATED] {HOST.NAME} - {EVENT.NAME}',"
 				"'{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} "
 				"{EVENT.UPDATE.TIME}&eol;{EVENT.UPDATE.MESSAGE}'",
@@ -1015,10 +1033,14 @@ static int	DBpatch_7050077(void)
 	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
 		return SUCCEED;
 
-	for (i = 0; NULL != values[i]; i++)
+	for (int i = 0; NULL != values[i]; i++)
 	{
-		if (ZBX_DB_OK > zbx_db_execute("insert into media_type_message (%s) values (%s)", columns, values[i]))
+		if (ZBX_DB_OK > zbx_db_execute("insert into media_type_message (%s) values (" ZBX_FS_UI64 ","
+				ZBX_FS_UI64 ",%s)", columns, zbx_db_get_maxid("media_type_message"), media_typeid,
+				values[i]))
+		{
 			return FAIL;
+		}
 	}
 
 	return SUCCEED;
@@ -1104,8 +1126,6 @@ DBPATCH_ADD(7050070, 0, 1)
 DBPATCH_ADD(7050071, 0, 1)
 DBPATCH_ADD(7050072, 0, 1)
 DBPATCH_ADD(7050073, 0, 1)
-DBPATCH_ADD(7050074, 0, 1)
-DBPATCH_ADD(7050075, 0, 1)
 DBPATCH_ADD(7050074, 0, 1)
 DBPATCH_ADD(7050075, 0, 1)
 DBPATCH_ADD(7050076, 0, 1)
