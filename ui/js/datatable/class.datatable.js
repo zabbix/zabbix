@@ -2698,9 +2698,9 @@ class CDataTable {
 	#handleScrollbar() {
 		const total_column_width = this.#columns
 			.filter(column => column.getHeaderCell())
-			.reduce((width, column) => width + column.getHeaderCell().target.clientWidth, 0);
+			.reduce((width, column) => width + column.getHeaderCell().target.offsetWidth, 0);
 
-		if (total_column_width <= this.#body.clientWidth + 7) {
+		if (total_column_width - 2 <= this.#body.clientWidth) {
 			this.#body_resize_observer?.disconnect();
 			this.#body_resize_observer = null;
 
