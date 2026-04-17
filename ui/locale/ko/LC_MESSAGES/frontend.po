@@ -21674,6 +21674,10 @@ msgstr ""
 msgid "The client secret registered within the authorization server."
 msgstr ""
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "복제된 호스트에는 \"비밀 텍스트\" 유형의 사용자 정의 매크로가 포함되어 있습니다. 이러한 매크로의 값과 유형이 재설정되었습니다."

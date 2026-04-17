@@ -21848,6 +21848,10 @@ msgstr "El identificador de cliente registrado dentro del servidor de autorizaci
 msgid "The client secret registered within the authorization server."
 msgstr "El secreto del cliente registrado dentro del servidor de autorización."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "El equipo clonado contiene macros definidas por el usuario con el tipo \"Texto secreto\". Se restablecieron el valor y el tipo de estas macros."

@@ -50,54 +50,54 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$AZURE.SUBSCRIPTION.ID}|<p>Microsoft Azure subscription ID.</p>||
-|{$AZURE.TENANT.ID}|<p>Microsoft Azure tenant ID.</p>||
-|{$AZURE.APP.ID}|<p>The App ID of Microsoft Azure.</p>||
-|{$AZURE.PASSWORD}|<p>Microsoft Azure password.</p>||
-|{$AZURE.DATA.TIMEOUT}|<p>API response timeout.</p>|`15s`|
-|{$AZURE.PROXY}|<p>Sets the HTTP proxy value. If this macro is empty, then no proxy is used.</p>||
-|{$AZURE.VM.NAME.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.NAME.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VM.LOCATION.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`.*`|
-|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machines discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SCALESET.NAME.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
-|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`.*`|
-|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>This macro is used in virtual machine scale sets discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SQL.INST.NAME.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
-|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`.*`|
-|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure SQL Managed Instance discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VAULT.NAME.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`.*`|
-|{$AZURE.VAULT.NAME.NOT.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.VAULT.LOCATION.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`.*`|
-|{$AZURE.VAULT.LOCATION.NOT.MATCHES}|<p>This macro is used in Azure Vault discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`.*`|
-|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>This macro is used in storage accounts discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SUBSCRIPTION.ID}|<p>Azure Subscription ID used to scope all API requests.</p>||
+|{$AZURE.TENANT.ID}|<p>Azure Tenant (Directory) ID used for authentication.</p>||
+|{$AZURE.APP.ID}|<p>Client (Application) ID of the Azure service principal.</p>||
+|{$AZURE.PASSWORD}|<p>Client secret of the Azure service principal used for API authentication.</p>||
+|{$AZURE.DATA.TIMEOUT}|<p>Maximum time to wait for Azure API responses before request fails.</p>|`15s`|
+|{$AZURE.PROXY}|<p>HTTP proxy used for Azure API requests (leave empty to connect directly).</p>||
+|{$AZURE.VM.NAME.MATCHES}|<p>Regex string to include discovered virtual machines by name.</p>|`.*`|
+|{$AZURE.VM.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machines by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VM.LOCATION.MATCHES}|<p>Regex string to include discovered virtual machine locations by name.</p>|`.*`|
+|{$AZURE.VM.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered virtual machine locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.NAME.MATCHES}|<p>Regex string to include discovered VM scale sets by name.</p>|`.*`|
+|{$AZURE.SCALESET.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered VM scale sets by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SCALESET.LOCATION.MATCHES}|<p>Regex string to include discovered VM scale set locations by name.</p>|`.*`|
+|{$AZURE.SCALESET.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered VM scale set locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.NAME.MATCHES}|<p>Regex string to include discovered Azure SQL managed instances by name.</p>|`.*`|
+|{$AZURE.SQL.INST.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Azure SQL managed instances by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.SQL.INST.LOCATION.MATCHES}|<p>Regex string to include discovered Azure SQL managed instance locations by name.</p>|`.*`|
+|{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Azure SQL managed instance locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VAULT.NAME.MATCHES}|<p>Regex string to include discovered Azure Vaults by name.</p>|`.*`|
+|{$AZURE.VAULT.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Azure Vaults by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.VAULT.LOCATION.MATCHES}|<p>Regex string to include discovered Azure Vault locations by name.</p>|`.*`|
+|{$AZURE.VAULT.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Azure Vault locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.NAME.MATCHES}|<p>Regex string to include discovered storage accounts by name.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered storage accounts by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.STORAGE.ACC.LOCATION.MATCHES}|<p>Regex string to include discovered storage account locations by name.</p>|`.*`|
+|{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered storage account locations by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AZURE.STORAGE.ACC.AVAILABILITY}|<p>The warning threshold of the storage account availability.</p>|`70`|
 |{$AZURE.STORAGE.ACC.BLOB.AVAILABILITY}|<p>The warning threshold of the storage account blob services availability.</p>|`70`|
 |{$AZURE.STORAGE.ACC.TABLE.AVAILABILITY}|<p>The warning threshold of the storage account table services availability.</p>|`70`|
-|{$AZURE.RESOURCE.GROUP.MATCHES}|<p>This macro is used in discovery rules.</p>|`.*`|
-|{$AZURE.RESOURCE.GROUP.NOT.MATCHES}|<p>This macro is used in discovery rules.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`.*`|
-|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in MySQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`.*`|
-|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in PostgreSQL servers discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`.*`|
-|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>This macro is used in Microsoft SQL databases discovery rule.</p>|`^System$`|
-|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
-|{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
-|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`.*`|
-|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>This macro is used in Microsoft Cosmos DB account discovery rule.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.RESOURCE.GROUP.MATCHES}|<p>Regex string to include discovered resource groups by name.</p>|`.*`|
+|{$AZURE.RESOURCE.GROUP.NOT.MATCHES}|<p>Regex string to exclude discovered resource groups by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered MySQL servers by name.</p>|`.*`|
+|{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered MySQL servers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MYSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered MySQL server locations by name.</p>|`.*`|
+|{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered MySQL server locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered PostgreSQL servers by name.</p>|`.*`|
+|{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered PostgreSQL servers by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.PGSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered PostgreSQL server locations by name.</p>|`.*`|
+|{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered PostgreSQL server locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.NAME.MATCHES}|<p>Regex string to include discovered MSSQL databases by name.</p>|`.*`|
+|{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL databases by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.LOCATION.MATCHES}|<p>Regex string to include discovered MSSQL database locations by name.</p>|`.*`|
+|{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL database locations by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}|<p>Regex string to exclude discovered MSSQL database locations by SKU type.</p>|`^System$`|
+|{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}|<p>Regex string to include discovered Cosmos DB accounts by name.</p>|`.*`|
+|{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}|<p>Regex string to exclude discovered Cosmos DB accounts by name.</p>|`CHANGE_IF_NEEDED`|
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}|<p>Regex string to include discovered Cosmos DB account locations by name.</p>|`.*`|
+|{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}|<p>Regex string to exclude discovered Cosmos DB account locations by name.</p>|`CHANGE_IF_NEEDED`|
 
 ### Items
 
