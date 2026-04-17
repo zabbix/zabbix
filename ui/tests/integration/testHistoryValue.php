@@ -43,10 +43,15 @@ class testHistoryValue extends CIntegrationTest {
 
 		$item_defs = [
 			['key_' => 'trapper_float', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
+			['key_' => 'trapper_float_second', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
 			['key_' => 'trapper_uint', 'value_type' => ITEM_VALUE_TYPE_UINT64],
+			['key_' => 'trapper_uint_second', 'value_type' => ITEM_VALUE_TYPE_UINT64],
 			['key_' => 'trapper_str', 'value_type' => ITEM_VALUE_TYPE_STR],
+			['key_' => 'trapper_str_second', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['key_' => 'trapper_text', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['key_' => 'trapper_text_second', 'value_type' => ITEM_VALUE_TYPE_TEXT],
 			['key_' => 'trapper_log', 'value_type' => ITEM_VALUE_TYPE_LOG],
+			['key_' => 'trapper_log_second', 'value_type' => ITEM_VALUE_TYPE_LOG],
 			['key_' => 'trapper_float_range', 'value_type' => ITEM_VALUE_TYPE_FLOAT]
 		];
 
@@ -139,26 +144,49 @@ class testHistoryValue extends CIntegrationTest {
 	public function testHistoryValue_sendBulkAndRetrieve() {
 		$tm = time();
 
+		$tm_val_first = $tm + 10;
+		$tm_val_second = $tm + 11;
+
 		$cases = [
 			'trapper_float' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 4.0, 'clock' => $tm + 10, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 5.0, 'clock' => $tm + 11, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 4.0, 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 5.0, 'clock' => $tm_val_second, 'ns' => 1]
+			],
+			'trapper_float_second' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_float_second', 'value' => 6.0, 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_float_second', 'value' => 7.0, 'clock' => $tm_val_second, 'ns' => 1]
 			],
 			'trapper_uint' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 40, 'clock' => $tm + 10, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 50, 'clock' => $tm + 11, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 40, 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 50, 'clock' => $tm_val_second, 'ns' => 1]
+			],
+			'trapper_uint_second' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint_second', 'value' => 60, 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint_second', 'value' => 70, 'clock' => $tm_val_second, 'ns' => 1]
 			],
 			'trapper_str' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'delta', 'clock' => $tm + 10, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'epsilon', 'clock' => $tm + 11, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'delta', 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'epsilon', 'clock' => $tm_val_second, 'ns' => 1]
+			],
+			'trapper_str_second' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_str_second', 'value' => 'zeta', 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_str_second', 'value' => 'eta', 'clock' => $tm_val_second, 'ns' => 1]
 			],
 			'trapper_text' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_d', 'clock' => $tm + 10, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_e', 'clock' => $tm + 11, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_d', 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_e', 'clock' => $tm_val_second, 'ns' => 1]
+			],
+			'trapper_text_second' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_text_second', 'value' => 'text_f', 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_text_second', 'value' => 'text_g', 'clock' => $tm_val_second, 'ns' => 1]
 			],
 			'trapper_log' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_4', 'clock' => $tm + 10, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_5', 'clock' => $tm + 11, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_4', 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_5', 'clock' => $tm_val_second, 'ns' => 1]
+			],
+			'trapper_log_second' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_log_second', 'value' => 'log_6', 'clock' => $tm_val_first, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_log_second', 'value' => 'log_7', 'clock' => $tm_val_second, 'ns' => 1]
 			]
 		];
 
@@ -169,14 +197,20 @@ class testHistoryValue extends CIntegrationTest {
 			$item = self::$items[$key];
 			$type = $item['value_type'];
 			$by_type[$type]['itemids'][] = $item['itemid'];
-			$by_type[$type]['count'] = ($by_type[$type]['count'] ?? 0) + count($values);
+
+			if (!isset($by_type[$type]['count'])) {
+				$by_type[$type]['count'] = 0;
+			}
+			$by_type[$type]['count'] += count($values);
 		}
 
 		foreach ($by_type as $value_type => $data) {
 			$expected = $data['count'];
 			$this->callUntilDataIsPresent('history.get', [
 				'history' => $value_type,
-				'itemids' => $data['itemids']
+				'itemids' => $data['itemids'],
+				'time_from' => $tm_val_first,
+				'time_till' => $tm_val_second
 			], 5, 5, function($response) use ($expected) {
 				return count($response['result']) === $expected;
 			});
