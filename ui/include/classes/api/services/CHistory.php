@@ -148,6 +148,7 @@ class CHistory extends CApiService {
 
 			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
 				$storage = Manager::History()->getStorageProviderInstance($options['history']);
+				/** @var CClickHouseStorage $storage */
 				$result = $storage->select($options);
 
 				if ($storage->getErrorCode() !== null) {
@@ -258,7 +259,8 @@ class CHistory extends CApiService {
 	 */
 	private function getFromElasticsearch($options) {
 		$query = [];
-		$schema = DB::getSchema($this->tableName);
+		$table = Manager::History()->getTableName($options['history']);
+		$schema = DB::getSchema($table);
 
 		// itemids
 		if ($options['itemids'] !== null) {
@@ -293,7 +295,7 @@ class CHistory extends CApiService {
 
 		// filter
 		if ($options['filter'] !== null) {
-			$query = CElasticsearchHelper::addFilter(DB::getSchema($this->tableName), $query, $options);
+			$query = CElasticsearchHelper::addFilter($schema, $query, $options);
 		}
 
 		// search
