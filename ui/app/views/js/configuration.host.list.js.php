@@ -327,8 +327,6 @@
 					button.setAttribute('aria-haspopup', 'true');
 
 					cell_inner.append(checkbox, label, button);
-
-					column.setWidth('58px');
 				})
 				.setCellRenderer('name', ({cell_data, cell_inner}) => {
 					const [hostid, name, discovery, flags, maintenance, status] = cell_data;
@@ -820,6 +818,10 @@
 					new CState().setParams({page});
 				})
 				.init(user_configs);
+
+			this.#datatable.getCheckboxColumn()
+				.setWidth('58px')
+				.getDefaults().setWidth('58px');
 		}
 
 		massDeleteHosts(button) {

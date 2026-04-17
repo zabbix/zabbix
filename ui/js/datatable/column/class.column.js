@@ -608,6 +608,17 @@ class CDataTableColumn {
 	}
 
 	/**
+	 * @param {string|null} width
+	 * @returns {CDataTableColumn}
+	 */
+	resetWidth(width = null) {
+		this.#resized = false;
+		this.#width = width ?? this.#defaults.getWidth();
+
+		return this;
+	}
+
+	/**
 	 * @returns {CDataTableColumn}
 	 */
 	clone() {
