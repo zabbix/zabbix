@@ -307,7 +307,6 @@ class CDatatableElement extends CTableElement {
 	 */
 	public function waitUntilReady($timeout = null) {
 		$this->waitUntilClassesNotPresent('is-loading');
-		$this->invalidate();
 
 		return $this;
 	}
