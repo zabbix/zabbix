@@ -948,8 +948,7 @@ class CTrigger extends CTriggerGeneral {
 			$sqlParts['order'][] = 'h.name '.$sortorder;
 		}
 		elseif ($sortfield === 'lastchange') {
-			$sqlParts['select']['lastchange'] = 'tr.lastchange AS lastchange';
-			$sqlParts['join']['tr'] = ['table' => 'trigger_rtdata', 'using' => 'triggerid'];
+			$sqlParts['join']['tr'] = ['type' => 'left', 'table' => 'trigger_rtdata', 'using' => 'triggerid'];
 			$sqlParts['order'][] = 'tr.lastchange '.$sortorder;
 		}
 		else {
