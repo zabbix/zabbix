@@ -964,6 +964,66 @@ static int	DBpatch_7050075(void)
 	return SUCCEED;
 }
 
+static int	DBpatch_7050076(void)
+{
+	int		i;
+	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid";
+	const char	*values[] = {
+			"28,1,0,'devices.access',1,'',NULL,NULL",
+			"29,1,0,'devices.actions.default_access',1,'',NULL,NULL",
+			"30,2,0,'devices.access',0,'',NULL,NULL",
+			"31,2,0,'devices.actions.default_access',0,'',NULL,NULL",
+			"32,3,0,'devices.access',0,'',NULL,NULL",
+			"33,3,0,'devices.actions.default_access',0,'',NULL,NULL",
+			"34,4,0,'devices.access',0,'',NULL,NULL",
+			"35,4,0,'devices.actions.default_access',0,'',NULL,NULL",
+			NULL
+	};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("insert into role_rule (%s) values (%s)", columns, values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050077(void)
+{
+	int		i;
+	const char	*columns = "mediatype_messageid,mediatypeid,eventsource,recovery,subject,message";
+	const char	*values[] = {
+			"614,102,0,0,"
+				"'{HOST.NAME} - {EVENT.NAME}',"
+				"'Started at {EVENT.TIME} on {EVENT.DATE}&eol;"
+				"Data: {EVENT.OPDATA}'",
+			"615,102,0,1,"
+				"'[RESOLVED] {HOST.NAME} - {EVENT.NAME}',"
+				"'Resolved at {EVENT.RECOVERY.TIME} on {EVENT.RECOVERY.DATE}&eol;"
+				"Duration: {EVENT.DURATION}'",
+			"616,102,0,2,"
+				"'[UPDATED] {HOST.NAME} - {EVENT.NAME}',"
+				"'{USER.FULLNAME} {EVENT.UPDATE.ACTION} problem at {EVENT.UPDATE.DATE} "
+				"{EVENT.UPDATE.TIME}&eol;{EVENT.UPDATE.MESSAGE}'",
+			NULL
+	};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; NULL != values[i]; i++)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("insert into media_type_message (%s) values (%s)", columns, values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -1046,5 +1106,9 @@ DBPATCH_ADD(7050072, 0, 1)
 DBPATCH_ADD(7050073, 0, 1)
 DBPATCH_ADD(7050074, 0, 1)
 DBPATCH_ADD(7050075, 0, 1)
+DBPATCH_ADD(7050074, 0, 1)
+DBPATCH_ADD(7050075, 0, 1)
+DBPATCH_ADD(7050076, 0, 1)
+DBPATCH_ADD(7050077, 0, 1)
 
 DBPATCH_END()
