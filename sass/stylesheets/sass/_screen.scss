@@ -2036,6 +2036,13 @@ select {
 		}
 	}
 
+	#lldoperation_form {
+		.table-forms-td-right:has(z-textarea-flexible) {
+			display: flex;
+			align-items: flex-start;
+		}
+	}
+
 	.maps-container {
 		max-height: 128px;
 		overflow-y: auto;
@@ -3288,7 +3295,8 @@ svg {
 	}
 
 	input[type=text],
-	select {
+	select,
+	z-textarea-flexible {
 		width: 100%;
 		min-width: 0; // https://stackoverflow.com/a/43361500
 	}
@@ -3342,6 +3350,13 @@ svg {
 		}
 	}
 
+	.preprocessing-list-item {
+		.step-parameters {
+			align-items: baseline;
+			line-height: 22px;
+		}
+	}
+
 	.step-parameters {
 		flex: 1;
 
@@ -3350,7 +3365,8 @@ svg {
 		}
 
 		> input[type=text],
-		z-select {
+		z-select,
+		z-textarea-flexible {
 			&:not(:last-child) {
 				margin-right: 5px;
 			}
@@ -3371,14 +3387,18 @@ svg {
 	}
 
 	.on-fail-options {
+		display: flex;
+		align-items: flex-start;
 		padding-right: $on-fail-width + $action-width + 5px;
-		margin-bottom: 5px;
+		margin-top: 6px;
+		line-height: 24px;
 
 		> label {
+			padding-top: 0;
 			padding-left: 30px;
 		}
 
-		input[type=text] {
+		z-textarea-flexible {
 			flex: 1;
 
 			&:not(:first-child) {
