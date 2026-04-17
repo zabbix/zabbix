@@ -147,6 +147,18 @@ class CClickHouseStorage {
 			'countOutput' => false
 		], $options);
 
+		if ($options['limit'] !== null && !ctype_digit((string) $options['limit'])) {
+			$options['limit'] = null;
+		}
+
+		if (is_array($options['limit_by'])) {
+			[$limit, $by] = $options['limit_by'];
+
+			if (!ctype_digit((string) $limit) || $by !== 'itemid') {
+				$options['limit_by'] = null;
+			}
+		}
+
 		$query_parts = $this->getQueryPartsFromOptions($options);
 		$query = $this->buildQueryFromParts($query_parts);
 
@@ -199,8 +211,7 @@ class CClickHouseStorage {
 				'itemids' => array_keys($itemids),
 				'history' => $value_type,
 				'time_from' => $time_from,
-				'limit' => 1,
-				'limit_by' => 'itemid'
+				'limit_by' => [1, 'itemid']
 			]);
 
 			if ($rows === null) {
@@ -234,8 +245,7 @@ class CClickHouseStorage {
 				'time_from' => $time_from,
 				'sortfield' => 'clock',
 				'sortorder' => ZBX_SORT_DOWN,
-				'limit' => $limit,
-				'limit_by' => 'itemid'
+				'limit_by' => [$limit, 'itemid']
 			]);
 
 			if ($rows === null) {
@@ -600,8 +610,9 @@ class CClickHouseStorage {
 			($sql_parts['prewhere'] ? ' PREWHERE '.implode(' AND ', $sql_parts['prewhere']) : '').
 			($sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '').
 			($sql_parts['order'] ? ' ORDER BY '.implode(',', $sql_parts['order']) : '').
-			(ctype_digit((string) $sql_parts['limit'])
-				? ' LIMIT '.$sql_parts['limit'].($sql_parts['limit_by'] === 'itemid' ? ' BY itemid' : '')
+			($sql_parts['limit'] ? ' LIMIT '.$sql_parts['limit'] : '').
+			($sql_parts['limit_by']
+				? ' LIMIT '.array_shift($sql_parts['limit_by']).' BY '.implode(',', $sql_parts['limit_by'])
 				: ''
 			);
 	}
