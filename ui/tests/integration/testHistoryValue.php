@@ -96,29 +96,29 @@ class testHistoryValue extends CIntegrationTest {
 
 		$cases = [
 			'trapper_float' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 1.5, 'clock' => $tm, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 2.5, 'clock' => $tm + 1, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 3.5, 'clock' => $tm + 2, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 1.5, 'clock' => $tm, 'ns' => 0],
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 2.5, 'clock' => $tm + 1, 'ns' => 500000000],
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 3.5, 'clock' => $tm + 2, 'ns' => 999999999]
 			],
 			'trapper_uint' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 10, 'clock' => $tm, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 20, 'clock' => $tm + 1, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 30, 'clock' => $tm + 2, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 10, 'clock' => $tm, 'ns' => 0],
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 20, 'clock' => $tm + 1, 'ns' => 500000000],
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 30, 'clock' => $tm + 2, 'ns' => 999999999]
 			],
 			'trapper_str' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'alpha', 'clock' => $tm, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'beta', 'clock' => $tm + 1, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'gamma', 'clock' => $tm + 2, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'alpha', 'clock' => $tm, 'ns' => 0],
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'beta', 'clock' => $tm + 1, 'ns' => 500000000],
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'gamma', 'clock' => $tm + 2, 'ns' => 999999999]
 			],
 			'trapper_text' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_a', 'clock' => $tm, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_b', 'clock' => $tm + 1, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_c', 'clock' => $tm + 2, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_a', 'clock' => $tm, 'ns' => 0],
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_b', 'clock' => $tm + 1, 'ns' => 500000000],
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_c', 'clock' => $tm + 2, 'ns' => 999999999]
 			],
 			'trapper_log' => [
-				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_1', 'clock' => $tm, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_2', 'clock' => $tm + 1, 'ns' => 1],
-				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_3', 'clock' => $tm + 2, 'ns' => 1]
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_1', 'clock' => $tm, 'ns' => 0],
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_2', 'clock' => $tm + 1, 'ns' => 500000000],
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_3', 'clock' => $tm + 2, 'ns' => 999999999]
 			]
 		];
 
@@ -126,16 +126,16 @@ class testHistoryValue extends CIntegrationTest {
 			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
 
 			$item = self::$items[$key];
-			$response = $this->callUntilDataIsPresent('history.get', [
+			$this->callUntilDataIsPresent('history.get', [
 				'history' => $item['value_type'],
 				'itemids' => [$item['itemid']],
 				'filter' => [
 					'clock' => array_column($values, 'clock'),
 					'ns' => array_column($values, 'ns')
 				]
-			], 5, 5);
-
-			$this->assertEquals(count($values), count($response['result']));
+			], 5, 5, function($response) use ($values) {
+				return count($response['result']) === count($values);
+			});
 		}
 
 		return true;
