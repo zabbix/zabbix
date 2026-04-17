@@ -1433,7 +1433,8 @@ class CDataTable {
 		this.#sort_field = sort_field;
 		this.#sort_order = sort_order;
 
-		this.#element.style.height = `${this.#element.offsetHeight}px`;
+		this.#lockHeight();
+
 		this.#element.classList.add(ZBX_STYLE_LOADING);
 
 		this.dispatchEvent(CDataTable.EVENT_INIT);
@@ -1632,7 +1633,7 @@ class CDataTable {
 
 		this.#page = page;
 
-		this.#element.style.height = `${this.#element.offsetHeight}px`;
+		this.#lockHeight();
 
 		this.dispatchEvent(CDataTable.EVENT_INIT);
 		this.dispatchEvent(CPager.EVENT_SELECT, e.detail);
@@ -2040,6 +2041,14 @@ class CDataTable {
 		}
 	}
 
+	#lockHeight() {
+		this.#element.style.height = `${this.#element.clientHeight}px`;
+	}
+
+	#unlockHeight() {
+		this.#element.style.height = null;
+	}
+
 	/**
 	 * @param {string|undefined} icon
 	 * @param {string|undefined} message
@@ -2124,7 +2133,8 @@ class CDataTable {
 
 			this.initCheckBoxRange();
 
-			this.#element.style.height = null;
+			this.#unlockHeight();
+
 			this.#element.classList.remove(ZBX_STYLE_LOADING);
 		});
 	}
