@@ -168,9 +168,10 @@ void	zbx_db_get_events_by_eventids(zbx_vector_uint64_t *eventids, zbx_vector_db_
 				triggerids.values_num);
 
 		result = zbx_db_select(
-				"select triggerid,description,expression,priority,comments,url,url_name,recovery_expression,"
-					"recovery_mode,value,opdata,event_name"
-				" from triggers"
+				"select t.triggerid,t.description,t.expression,t.priority,t.comments,t.url,t.url_name,"
+				" t.recovery_expression,t.recovery_mode,rt.value,t.opdata,t.event_name"
+				" from triggers t"
+				" join trigger_rtdata rt on t.triggerid=rt.triggerid"
 				" where%s",
 				sql);
 
