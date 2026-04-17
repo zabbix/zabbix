@@ -59,7 +59,7 @@ func Test_IsDNS(t *testing.T) {
 		{"-end_with_dash", args{"example.com-"}, false},
 		{"-empty_label", args{"example.."}, false},
 		{"+min_label", args{"a.com"}, true},
-		{"+punny_code", args{"xn--bcher-kva.com"}, true},
+		{"+punycode", args{"xn--bcher-kva.com"}, true},
 		{"+localhost", args{"localhost"}, true},
 	}
 
