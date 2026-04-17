@@ -129,9 +129,32 @@ class CClickHouseStorage {
 	 * @param array $options
 	 */
 	public function select(array $options): ?array {
-		$query_parts = $this->getQueryPartsFromOptions($options);
+		$options = array_replace([
+			'itemids' => null,
+			'time_from' => null,
+			'time_till' => null,
+			'filter' => null,
+			'search' => null,
+			'searchByAny' => false,
+			'startSearch' => false,
+			'excludeSearch' => false,
+			'searchWildcardsEnabled' => false,
+			'sortfield' => null,
+			'sortorder' => null,
+			'limit' => null,
+			'limit_by' => null,
+			'maxValueSize' => null,
+			'countOutput' => false
+		], $options);
 
-		return $this->query($this->buildQueryFromParts($query_parts), $query_parts['param']);
+		$query_parts = $this->getQueryPartsFromOptions($options);
+		$query = $this->buildQueryFromParts($query_parts);
+
+		if ($options['countOutput']) {
+			$query = 'SELECT count() AS rowscount FROM ('.$query.')';
+		}
+
+		return $this->query($query, $query_parts['param']);
 	}
 
 	/**
@@ -591,23 +614,6 @@ class CClickHouseStorage {
 	 * @param int   $options['history']  Item value type, required.
 	 */
 	protected function getQueryPartsFromOptions(array $options): array {
-		$options = array_replace([
-			'itemids' => null,
-			'maxValueSize' => null,
-			'time_from' => null,
-			'time_till' => null,
-			'filter' => null,
-			'search' => null,
-			'startSearch' => false,
-			'excludeSearch' => false,
-			'searchWildcardsEnabled' => false,
-			'searchByAny' => false,
-			'sortfield' => null,
-			'sortorder' => null,
-			'limit' => null,
-			'limit_by' => null
-		], $options);
-
 		$table = $this->getTableName($options['history']);
 		$sql_parts = [
 			'select'	=> [],

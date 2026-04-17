@@ -151,6 +151,10 @@ class CHistory extends CApiService {
 			if ($storage->getErrorCode() !== null) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
 			}
+
+			if ($options['countOutput']) {
+				$result = $result[0]['rowscount'];
+			}
 		}
 		else {
 			switch (Manager::History()->getDataSourceType($options['history'])) {
