@@ -56,7 +56,15 @@ class testHistoryValue extends CIntegrationTest {
 				'name' => $def['key_'],
 				'key_' => $def['key_'],
 				'type' => ITEM_TYPE_TRAPPER,
-				'value_type' => $def['value_type']
+				'value_type' => $def['value_type'],
+				'preprocessing' => [
+					[
+						'type' => ZBX_PREPROC_TRIM,
+						'params' => ' ',
+						'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params' => ''
+					]
+				]
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
 			self::$items[$def['key_']] = [
@@ -128,6 +136,55 @@ class testHistoryValue extends CIntegrationTest {
 		return true;
 	}
 
+	public function testHistoryValue_sendBulkAndRetrieve() {
+		$tm = time();
+
+		$cases = [
+			'trapper_float' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 4.0, 'clock' => $tm + 10, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_float', 'value' => 5.0, 'clock' => $tm + 11, 'ns' => 1]
+			],
+			'trapper_uint' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 40, 'clock' => $tm + 10, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_uint', 'value' => 50, 'clock' => $tm + 11, 'ns' => 1]
+			],
+			'trapper_str' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'delta', 'clock' => $tm + 10, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_str', 'value' => 'epsilon', 'clock' => $tm + 11, 'ns' => 1]
+			],
+			'trapper_text' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_d', 'clock' => $tm + 10, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_text', 'value' => 'text_e', 'clock' => $tm + 11, 'ns' => 1]
+			],
+			'trapper_log' => [
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_4', 'clock' => $tm + 10, 'ns' => 1],
+				['host' => self::HOSTNAME, 'key' => 'trapper_log', 'value' => 'log_5', 'clock' => $tm + 11, 'ns' => 1]
+			]
+		];
+
+		$this->sendDataValues('sender', array_merge(...array_values($cases)), self::COMPONENT_SERVER);
+
+		$by_type = [];
+		foreach ($cases as $key => $values) {
+			$item = self::$items[$key];
+			$type = $item['value_type'];
+			$by_type[$type]['itemids'][] = $item['itemid'];
+			$by_type[$type]['count'] = ($by_type[$type]['count'] ?? 0) + count($values);
+		}
+
+		foreach ($by_type as $value_type => $data) {
+			$expected = $data['count'];
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $value_type,
+				'itemids' => $data['itemids']
+			], 5, 5, function($response) use ($expected) {
+				return count($response['result']) === $expected;
+			});
+		}
+
+		return true;
+	}
+
 	public function testHistoryValue_timeRangeCountOutput() {
 		$tm = time();
 
@@ -147,15 +204,14 @@ class testHistoryValue extends CIntegrationTest {
 		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
 
 		$itemid = self::$items['trapper_float_range']['itemid'];
-		$response = $this->callUntilDataIsPresent('history.get', [
+		$this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_FLOAT,
 			'itemids' => [$itemid],
 			'time_from' => $tm + 60,
-			'time_till' => $tm + 480,
-			'countOutput' => true
-		], 5, 5);
-
-		$this->assertEquals(8, $response['result']);
+			'time_till' => $tm + 480
+		], 5, 5, function($response) {
+			return count($response['result']) === 8;
+		});
 
 		return true;
 	}
