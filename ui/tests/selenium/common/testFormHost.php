@@ -2252,7 +2252,6 @@ class testFormHost extends CWebTest {
 		$headers->waitUntilStalled();
 		$table->invalidate();
 
-//		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilPresent();
 		$row = $table->findRow('Name', $host, true);
 		$row->highlight();
 		$column = $row->getColumn('Name');
