@@ -25282,6 +25282,10 @@ msgstr "Конфигурация виджета будет возвращена 
 msgid "Widget is deprecated."
 msgstr "Устаревший виджет."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Виджет слишком маленький для заданного количества колонок и строк."
