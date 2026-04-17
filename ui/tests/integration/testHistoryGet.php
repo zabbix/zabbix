@@ -244,8 +244,7 @@ class testHistoryGet extends CIntegrationTest {
 		$this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_FLOAT,
 			'itemids' => [$itemid],
-			//'time_from' => $tm + 60,
-			'time_from' => $tm + 0,
+			'time_from' => $tm + 60,
 			'time_till' => $tm + 480
 		], 5, 5, function($response) {
 			return count($response['result']) === 8;
