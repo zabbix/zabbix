@@ -2243,17 +2243,15 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('id:hosts')->asDatatable()->waitUntilVisible(25)->one();
+		$table = $this->query('id:hosts')->asDatatable()->waitUntilReady()->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReady();
-		$headers = $table->getHeaders();
-		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);
+
+		$this->query('name:zbx_filter')->asForm()->one()->waitUntilReady()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$headers->waitUntilStalled();
-		$table->invalidate();
+		$table->waitUntilReady()->invalidate();
 
 		$row = $table->findRow('Name', $host, true);
-		$row->highlight();
 		$column = $row->getColumn('Name');
 		$host_link = $column->query('link', $host)->waitUntilPresent();
 
