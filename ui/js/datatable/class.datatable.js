@@ -77,13 +77,6 @@ class CDataTable {
 	static ZBX_STYLE_LINK_HEADER_SORTED = 'header-link-sorted';
 
 	/**
-	 * Minimum width of the resized column in pixels.
-	 *
-	 * @type {number}
-	 */
-	static RESIZE_MIN_WIDTH = 37;
-
-	/**
 	 * Delay in milliseconds before `#resize_click_count` is reset.
 	 * Used to distinguish between single and double-click actions on the column resizer.
 	 *
@@ -92,9 +85,41 @@ class CDataTable {
 	static RESIZE_CLICK_COUNT_RESET_DELAY = 250;
 
 	/**
+	 * Minimum width of the resized column in pixels.
+	 *
+	 * @type {number}
+	 */
+	static RESIZE_MIN_WIDTH = 37;
+
+	/**
+	 * @type {number}
+	 */
+	static COLUMN_INITIAL_MIN_WIDTH = 50;
+
+	/**
 	 * @type {number}
 	 */
 	static COLUMN_TOGGLE_INITIAL_MIN_WIDTH = 150;
+
+	/**
+	 * @type {number}
+	 */
+	static COLUMN_HEADER_PADDING = 8;
+
+	/**
+	 * @type {number}
+	 */
+	static COLUMN_OPTIONS_BUTTON_WIDTH = 31;
+
+	/**
+	 * @type {number}
+	 */
+	static COLUMN_SORTABLE_ARROW_WIDTH = 10;
+
+	/**
+	 * @type {number}
+	 */
+	static TABLE_OPTIONS_BUTTON_WIDTH = 32;
 
 	/**
 	 * @type {number}
@@ -272,6 +297,11 @@ class CDataTable {
 	#sort_field = null;
 
 	#sort_order = null;
+
+	/**
+	 * @type {string}
+	 */
+	#row_spacer_width = 'auto';
 
 	/**
 	 * @type {CDataTableColumn[]}
@@ -902,12 +932,12 @@ class CDataTable {
 		});
 	}
 
-	getColumnConfigById(id, duplicate = false) {
+	getColumnById(id, duplicate = false) {
 		return this.#columns.find(column => column.getId() == id && column.isDuplicate() == duplicate);
 	}
 
-	getCheckboxColumnConfig() {
-		return this.getColumnConfigById(this.#checkbox_id);
+	getCheckboxColumn() {
+		return this.getColumnById(this.#checkbox_id);
 	}
 
 	setColumns(columns) {
@@ -1286,8 +1316,8 @@ class CDataTable {
 
 		if (!this.#initialized) {
 			this.#recalculateColumnSpans();
-			this.#applyColumnWidths();
-			this.#renderHeaderCells();
+			// this.#applyColumnWidths();
+			// this.#renderHeaderCells();
 		}
 
 		this.getData({check_changes, force_load})
@@ -1339,7 +1369,7 @@ class CDataTable {
 		const delta_percent = (delta_x / total_width) * 100;
 
 		const min_width = this.#getColumnMinWidth(column);
-		const min_width_percent = (min_width / total_width) * 100;
+		const min_width_percent = this.#convertPixelsToPercent(min_width);
 
 		let width = parseFloat(Math.max(min_width_percent, this.#resize_start_width + delta_percent).toFixed(4));
 
@@ -1766,7 +1796,7 @@ class CDataTable {
 		}
 
 		// This is separately from the loop above on purpose, since row renderer may have an impact on all cells
-		// within the row, which means that the cells should be present BEFORE renderer is executed.
+		// within a row, which means that cells should be present BEFORE the renderer is executed.
 		for (const column of columns) {
 			if (column.isOnlyHeader()) {
 				continue;
@@ -1774,9 +1804,9 @@ class CDataTable {
 
 			const cell_data = this.#collectColumnData(column, data_fields, row_data);
 			const data_cells = column.getDataCells();
+			const data_cell = data_cells[row_index];
 
-			this.renderDataCellContents(column, row, row_index, data_cells[row_index], data_fields, cell_data,
-				response);
+			this.renderDataCellContents(column, row, row_index, data_cell, data_fields, cell_data, response);
 		}
 	}
 
@@ -1906,7 +1936,7 @@ class CDataTable {
 
 			// Merge original columns
 			for (const user_column of user_columns.filter(user_column => !user_column?.duplicate)) {
-				const column = this.getColumnConfigById(user_column.id);
+				const column = this.getColumnById(user_column.id);
 				if (!column) {
 					continue;
 				}
@@ -1916,7 +1946,7 @@ class CDataTable {
 
 			// Handle duplicated columns
 			for (const user_column of user_columns) {
-				const column = this.getColumnConfigById(user_column.id);
+				const column = this.getColumnById(user_column.id);
 				if (!column) {
 					continue;
 				}
@@ -2063,8 +2093,6 @@ class CDataTable {
 			header_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
 			header_cell.target.style.left = '0';
 		}
-
-		this.#applyColumnWidths();
 	}
 
 	#renderBody(response) {
@@ -2074,7 +2102,7 @@ class CDataTable {
 			return;
 		}
 
-		if (!('data' in response) || response.data.length == 0) {
+		if (!('data' in response) || response.data.length === 0) {
 			this.#renderEmptyState({
 				icon: response.no_data_icon,
 				message: response.no_data_message,
@@ -2097,11 +2125,7 @@ class CDataTable {
 	}
 
 	#afterRender(response) {
-		for (const visible_column of this.#visible_columns) {
-			this.#calculateColumnWidth(visible_column);
-		}
-
-		this.#applyColumnWidths();
+		this.#calculateColumnWidths(response);
 		this.#applyLastColumnPadding();
 		this.#handleScrollbar();
 		this.#updateScrollbarThumbPosition();
@@ -2141,7 +2165,7 @@ class CDataTable {
 
 	#collectColumnData(column, data_fields, row_data) {
 		const column_fields = column.isDuplicate()
-			? this.getColumnConfigById(column.getId()).getFields()
+			? this.getColumnById(column.getId()).getFields()
 			: column.getFields();
 
 		const cell_data = [];
@@ -2179,17 +2203,44 @@ class CDataTable {
 	}
 
 	#getColumnMinWidth(column) {
-		let min_width = CDataTable.RESIZE_MIN_WIDTH;
+		let min_width = CDataTable.COLUMN_INITIAL_MIN_WIDTH;
 
 		if (column.getOptionsPopupHandler()) {
-			min_width *= 2;
+			min_width += CDataTable.COLUMN_OPTIONS_BUTTON_WIDTH + CDataTable.COLUMN_HEADER_PADDING;
 		}
 
 		if (column.isSortable()) {
-			min_width += 10;
+			min_width += CDataTable.COLUMN_SORTABLE_ARROW_WIDTH;
+		}
+
+		if (this.#customizable && this.#visible_columns.at(-1) === column) {
+			min_width += CDataTable.TABLE_OPTIONS_BUTTON_WIDTH;
 		}
 
 		return min_width;
+	}
+
+	#calculateColumnWidths(response) {
+		this.#row_spacer_width = '0px';
+
+		this.#applyColumnWidths();
+
+		for (const column of this.#visible_columns.filter(column => column.getWidth() === 'max-content')) {
+			this.#calculateColumnWidth(column);
+		}
+
+		this.#applyColumnWidths();
+
+		if ('data' in response && response.data.length > 0) {
+			for (const column of this.#visible_columns) {
+				this.#calculateColumnWidth(column);
+			}
+
+			this.#applyColumnWidths();
+		}
+
+		this.#row_spacer_width = 'auto';
+		this.#applyColumnWidths();
 	}
 
 	#calculateColumnWidth(column) {
@@ -2197,36 +2248,20 @@ class CDataTable {
 			return;
 		}
 
-		const header_cell = column.getHeaderCell();
-		if (!header_cell) {
-			return;
-		}
+		const min_width = this.#getColumnMinWidth(column);
+		const header_width = column.getHeaderCell()?.target.getBoundingClientRect().width ?? 0;
+		const data_width = column.getDataCells().at(0)?.target.getBoundingClientRect().width ?? 0;
 
-		let width = Math.max(this.#getColumnMinWidth(column), header_cell.target.clientWidth);
+		let width = Math.max(min_width, header_width, data_width);
 
-		if (column.getWidth() == 'max-content') {
-			const data_width = column.getDataCells()
-				.reduce((width, data_cell) => Math.max(width, data_cell.target.clientWidth), 0);
-
+		if (column.getWidth() === 'max-content') {
 			// Width 'max-content' may cause text overflow, hence we need to add 2px
-			width = Math.max(width, data_width) + 2;
+			width += 2;
 		}
 
 		const percent_width = this.#convertPixelsToPercent(width);
 
 		column.setResized(true).setWidth(`${percent_width}%`);
-	}
-
-	#applyColumnWidths(column_widths = []) {
-		if (column_widths.length == 0) {
-			column_widths = this.#visible_columns.map(column => column.getWidth());
-		}
-
-		if (this.#customizable) {
-			column_widths.push('auto');
-		}
-
-		this.#header.style.gridTemplateColumns = this.#body.style.gridTemplateColumns = column_widths.join(' ');
 	}
 
 	#renderHeaderCells() {
@@ -2263,8 +2298,19 @@ class CDataTable {
 		this.#updateTableOptionsButtonPosition();
 	}
 
+	#applyColumnWidths() {
+		const column_widths = this.#visible_columns.map(column => column.getWidth());
+
+		if (this.#customizable) {
+			column_widths.push(this.#row_spacer_width);
+		}
+
+		this.#header.style.gridTemplateColumns = this.#body.style.gridTemplateColumns = column_widths.join(' ');
+	}
+
 	#createNoDataMessage({icon = undefined, message = undefined, description = undefined} = {}) {
 		const no_data_message = document.createElement('div');
+
 		no_data_message.classList.add(ZBX_STYLE_NO_DATA_MESSAGE);
 
 		if (icon) {
@@ -2279,6 +2325,7 @@ class CDataTable {
 
 		if (description) {
 			const no_data_description = document.createElement('div');
+
 			no_data_description.classList.add(ZBX_STYLE_NO_DATA_DESCRIPTION);
 			no_data_description.textContent = description;
 
@@ -2294,8 +2341,8 @@ class CDataTable {
 		}
 
 		const header_cell = this.#templates.table_options_button.evaluateToElement();
-
 		const handle = header_cell.querySelector(`.${CDataTable.ZBX_STYLE_OPTIONS_LINK}`);
+
 		handle.addEventListener('click', e => {
 			e.preventDefault();
 
@@ -2475,10 +2522,6 @@ class CDataTable {
 		this.#body_resize_observer = new ResizeObserver(() => {
 			this.#resizeScrollbarThumb();
 			this.#updateScrollbarThumbPosition();
-
-			for (const column of this.#visible_columns) {
-				this.#calculateColumnWidth(column);
-			}
 		});
 		this.#body_resize_observer.observe(this.#body);
 
@@ -2641,7 +2684,7 @@ class CDataTable {
 			.filter(column => column.getHeaderCell())
 			.reduce((width, column) => width + column.getHeaderCell().target.clientWidth, 0);
 
-		if (total_column_width <= this.#body.clientWidth) {
+		if (total_column_width <= this.#body.clientWidth + 7) {
 			this.#body_resize_observer?.disconnect();
 			this.#body_resize_observer = null;
 
@@ -2704,7 +2747,7 @@ class CDataTable {
 		header_cell.target.style.paddingRight = `${right_offset}px`;
 
 		if (header_resizer) {
-			header_resizer.style.right = `${right_offset}px`;
+			header_resizer.style.marginRight = `${right_offset}px`;
 		}
 	}
 
@@ -2725,7 +2768,7 @@ class CDataTable {
 	}
 
 	#convertPixelsToPercent(pixels) {
-		return (pixels / (this.#element.getBoundingClientRect().width / 100)).toFixed(4);
+		return ((pixels / this.#body.getBoundingClientRect().width) * 100).toFixed(4);
 	}
 
 	#getWidthWithoutUnit(width) {

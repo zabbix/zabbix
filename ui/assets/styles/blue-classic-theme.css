@@ -2404,7 +2404,8 @@ button {
       user-select: none;
       background-color: transparent;
       border: 1px solid transparent;
-      border-radius: 0; }
+      border-radius: 0;
+      pointer-events: all; }
       .datatable .datatable-header .datatable-options-link:hover, .datatable .datatable-header .datatable-options-link:focus, .datatable .datatable-header .datatable-options-link.datatable-options-link-opened {
         color: #768d99;
         background-color: #e8f5ff;
@@ -2432,15 +2433,18 @@ button {
       user-select: none;
       background-color: #ffffff;
       border-left: 1px solid #dfe4e7; }
+    .datatable .datatable-header .row-spacer {
+      z-index: 1;
+      border-left: 1px solid #dfe4e7; }
   .datatable .datatable-body {
     display: grid;
     align-items: center;
     width: 100%;
     overflow-x: auto;
     overflow-y: hidden;
-    -ms-overflow-style: none;
+    background-color: #ffffff;
     scrollbar-width: none;
-    background-color: #ffffff; }
+    -ms-overflow-style: none; }
     .datatable .datatable-body::-webkit-scrollbar {
       display: none; }
     .datatable .datatable-body.no-data-message {
@@ -2477,10 +2481,10 @@ button {
     .datatable .datatable-scrollbar .datatable-scrollbar-thumb {
       height: 8px;
       cursor: pointer;
-      touch-action: none;
       background-color: #c2c2c2;
       border-radius: 5px;
-      will-change: transform; }
+      will-change: transform;
+      touch-action: none; }
       .datatable .datatable-scrollbar .datatable-scrollbar-thumb:hover {
         background-color: #b5b5b5; }
   .datatable .datatable-footer {
@@ -2509,9 +2513,9 @@ button {
     box-sizing: border-box;
     display: flex;
     align-items: center;
+    height: 100%;
     min-width: 0;
     min-height: calc(var(--datatable-row-height) + 1px);
-    height: 100%;
     text-align: left;
     border-bottom: 1px solid #dfe4e7; }
     .datatable .cell:not(.cell-bg) {
@@ -2529,7 +2533,12 @@ button {
       outline: none;
       user-select: none;
       background-color: #ffffff;
-      border-right: 1px solid #dfe4e7; }
+      border-left: 1px solid #dfe4e7;
+      pointer-events: none; }
+      .datatable .cell.cell-header:first-of-type {
+        border-left: 0; }
+      .datatable .cell.cell-header:hover {
+        z-index: 2; }
       .datatable .cell.cell-header:last-child {
         border-top-right-radius: 2px; }
         .datatable .cell.cell-header:last-child .header-link {
@@ -2552,7 +2561,8 @@ button {
           padding: 0 8px;
           color: #0275b8;
           text-decoration: none;
-          border: none; }
+          border: none;
+          pointer-events: all; }
           .datatable .cell.cell-header.cell-header-link .header-link:hover, .datatable .cell.cell-header.cell-header-link .header-link:focus {
             background-color: #e8f5ff; }
           .datatable .cell.cell-header.cell-header-link .header-link .name {
@@ -2562,12 +2572,12 @@ button {
             pointer-events: none; }
           .datatable .cell.cell-header.cell-header-link .header-link .arrow-up {
             flex-shrink: 0;
-            pointer-events: none;
-            border-bottom-color: #768d99; }
+            border-bottom-color: #768d99;
+            pointer-events: none; }
           .datatable .cell.cell-header.cell-header-link .header-link .arrow-down {
             flex-shrink: 0;
-            pointer-events: none;
-            border-top-color: #768d99; }
+            border-top-color: #768d99;
+            pointer-events: none; }
           .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-up {
             border-bottom-color: #768d99; }
           .datatable .cell.cell-header.cell-header-link .header-link.header-link-sorted .arrow-down {
@@ -2584,17 +2594,23 @@ button {
         white-space: nowrap; }
       .datatable .cell.cell-header .cell-header-resizer {
         position: absolute;
-        top: -1px;
-        right: 0;
+        right: -6px;
         z-index: 20;
-        width: 10px;
+        width: 11px;
         height: calc(var(--datatable-row-height) + 1px);
         cursor: col-resize;
         user-select: none;
-        border-right: 3px solid transparent;
-        touch-action: none; }
-        .datatable .cell.cell-header .cell-header-resizer:hover {
-          border-right-color: #0275b8; }
+        touch-action: none;
+        pointer-events: all; }
+        .datatable .cell.cell-header .cell-header-resizer::after {
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          left: 5px;
+          content: '';
+          border-left: 1px solid transparent; }
+        .datatable .cell.cell-header .cell-header-resizer:hover::after {
+          border-color: #0275b8; }
     .datatable .cell.cell-sticky {
       position: sticky;
       z-index: 4; }
@@ -2622,9 +2638,9 @@ button {
       .datatable .cell.cell-data .cell-inner {
         box-sizing: border-box;
         display: block;
-        padding: 7px 0;
+        height: 100%;
         min-height: var(--datatable-row-height);
-        height: 100%; }
+        padding: 7px 0; }
         .datatable .cell.cell-data .cell-inner + .timeline-axis {
           margin-left: 5px; }
         .datatable .cell.cell-data .cell-inner .btn-icon:not(.no-indent):not(:first-child),
@@ -2632,8 +2648,8 @@ button {
         .datatable .cell.cell-data .cell-inner .link-action:not(.no-indent):not(:first-child) {
           margin-left: 5px; }
         .datatable .cell.cell-data .cell-inner .link-alt {
-          text-overflow: initial;
-          white-space: wrap; }
+          white-space: wrap;
+          text-overflow: initial; }
         .datatable .cell.cell-data .cell-inner .problem-icon-link {
           vertical-align: middle; }
       .datatable .cell.cell-data .btn-icon {
@@ -2716,8 +2732,8 @@ button {
         display: flex;
         width: 100%; }
         .datatable .cell .cell-inner .action-container .link-action {
-          min-width: 1ch;
-          height: 16px; }
+          height: 16px;
+          min-width: 1ch; }
         .datatable .cell .cell-inner .action-container .rel-container {
           display: flex; }
         .datatable .cell .cell-inner .action-container .separator {
@@ -2786,8 +2802,6 @@ button {
   pointer-events: none; }
   .datatable-resizing .datatable .cell-resizing {
     z-index: 1; }
-    .datatable-resizing .datatable .cell-resizing .cell-header-resizer {
-      border-right-color: #0275b8; }
 
 .diff {
   padding: 4px;

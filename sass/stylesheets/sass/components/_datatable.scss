@@ -11,98 +11,74 @@
 		content: '';
 	}
 
-	&.is-loading {
-		&::before {
-			z-index: 20;
-			background-color: rgba($ui-bg-color, .5);
-		}
+	&.is-loading::before {
+		z-index: 20;
+		background-color: rgba($ui-bg-color, .5);
 	}
 
 	&.compact-view {
-		.cell {
-			&.cell-data {
-				height: calc(var(--datatable-compact-row-height) + 1px);
-				min-height: initial;
-				padding: 2px 8px;
+		.cell.cell-data {
+			height: calc(var(--datatable-compact-row-height) + 1px);
+			min-height: initial;
+			padding: 2px 8px;
 
-				.cell-inner {
-					padding: 0;
+			.cell-inner {
+				padding: 0;
+			}
+
+			.symptoms {
+				height: calc(var(--datatable-compact-row-height) - 4px);
+
+				.btn-icon {
+					height: calc(var(--datatable-compact-row-height) - 6px);
 				}
+			}
 
-				.symptoms {
-					height: calc(var(--datatable-compact-row-height) - 4px);
-
-					.btn-icon {
-						height: calc(var(--datatable-compact-row-height) - 6px);
-					}
-				}
-
-				.table-stats {
-					position: absolute;
-					right: 0;
-					padding: 0;
-				}
+			.table-stats {
+				position: absolute;
+				right: 0;
+				padding: 0;
 			}
 		}
 
-		.datatable-body {
-			.row-spacer {
-				height: calc(var(--datatable-compact-row-height) + 1px);
-				min-height: initial;
-			}
+		.datatable-body .row-spacer {
+			height: calc(var(--datatable-compact-row-height) + 1px);
+			min-height: initial;
 		}
 	}
 
-	&.has-highlighted-rows {
-		.rows {
-			.row {
-				&:not(.row-disabled) {
-					.cell {
-						&.cell-data {
-							a {
-								&.link-action {
-									color: $font-color;
-								}
+	&.has-highlighted-rows .rows .row:not(.row-disabled) {
+		.cell.cell-data {
+			a.link-action {
+				color: $font-color;
+			}
 
-								&:hover {
-									color: $btn-alt-color;
-								}
-							}
+			a:hover {
+				color: $btn-alt-color;
+			}
 
-							.btn-icon {
-								background-color: $ui-bg-color;
-							}
-						}
-					}
+			.btn-icon {
+				background-color: $ui-bg-color;
+			}
+		}
 
-					&:not(.row-selected) {
-						&:hover {
-							.cell {
-								&.cell-data {
-									a:not(.link-action) {
-										color: $btn-alt-color;
-									}
+		&:not(.row-selected) {
+			&:hover .cell.cell-data {
+				a:not(.link-action) {
+					color: $btn-alt-color;
+				}
 
-									&:not(.cell-bg) {
-										background-color: $ui-hover-bg-color;
-										border-bottom-color: $ui-border-color;
-									}
-								}
-							}
-						}
+				&:not(.cell-bg) {
+					background-color: $ui-hover-bg-color;
+					border-bottom-color: $ui-border-color;
+				}
+			}
 
-						&:not(:hover) {
-							.cell {
-								&.cell-data {
-									color: $font-color;
+			&:not(:hover) .cell.cell-data {
+				color: $font-color;
 
-									a {
-										color: $font-color;
-									}
-								}
-							}
-						}
-					}
+				a {
+					color: $font-color;
 				}
 			}
 		}
@@ -141,11 +117,9 @@
 				.checkbox-radio {
 					display: none;
 
-					& + label {
-						span {
-							margin-top: -1px;
-							vertical-align: middle;
-						}
+					& + label span {
+						margin-top: -1px;
+						vertical-align: middle;
 					}
 				}
 
@@ -158,14 +132,12 @@
 				}
 			}
 
-			&.sortable {
-				.datatable-options-list-item {
-					cursor: grab;
+			&.sortable .datatable-options-list-item {
+				cursor: grab;
 
-					label,
-					.datatable-options-list-item-label {
-						cursor: grab;
-					}
+				label,
+				.datatable-options-list-item-label {
+					cursor: grab;
 				}
 			}
 		}
@@ -243,6 +215,7 @@
 			background-color: transparent;
 			border: 1px solid transparent;
 			border-radius: 0;
+			pointer-events: all;
 
 			&:hover,
 			&:focus,
@@ -285,6 +258,11 @@
 			background-color: $ui-bg-color;
 			border-left: 1px solid $ui-border-color;
 		}
+
+		.row-spacer {
+			z-index: 1;
+			border-left: 1px solid $ui-border-color;
+		}
 	}
 
 	.datatable-body {
@@ -293,9 +271,9 @@
 		width: 100%;
 		overflow-x: auto;
 		overflow-y: hidden;
-		-ms-overflow-style: none;
-		scrollbar-width: none;
 		background-color: $ui-bg-color;
+		scrollbar-width: none;
+		-ms-overflow-style: none;
 
 		&::-webkit-scrollbar {
 			display: none;
@@ -309,12 +287,8 @@
 			display: contents;
 
 			&:not(.row-disabled):hover {
-				.cell {
-					&.cell-data {
-						&:not(.cell-bg) {
-							background-color: $ui-hover-bg-color;
-						}
-					}
+				.cell.cell-data:not(.cell-bg) {
+					background-color: $ui-hover-bg-color;
 				}
 
 				.row-spacer {
@@ -323,14 +297,8 @@
 			}
 
 			&.nested {
-				&:not(.row-selected) {
-					.cell {
-						&.cell-data {
-							&:not(.cell-bg) {
-								background-color: darken($ui-bg-color, 5%);
-							}
-						}
-					}
+				&:not(.row-selected) .cell.cell-data:not(.cell-bg) {
+					background-color: darken($ui-bg-color, 5%);
 				}
 
 				&.nested-small {
@@ -338,19 +306,13 @@
 				}
 			}
 
-			&.row-selected {
-				.cell {
-					&:not(.cell-bg) {
-						background-color: $lighter-yellow;
-						border-bottom-color: rgba(31, 44, 51, .1);
-					}
-				}
+			&.row-selected .cell:not(.cell-bg) {
+				background-color: $lighter-yellow;
+				border-bottom-color: rgba(31, 44, 51, .1);
 			}
 
-			.table-stats {
-				&.table-stats-small {
-					font-size: 11px;
-				}
+			.table-stats.table-stats-small {
+				font-size: 11px;
 			}
 		}
 	}
@@ -368,19 +330,17 @@
 		background-color: $ui-bg-color;
 		border-top: 1px solid $ui-border-color;
 
-		&.datatable-scrollbar-dragging {
-			.datatable-scrollbar-thumb {
-				background-color: $datatable-scrollbar-thumb-hover-bg-color;
-			}
+		&.datatable-scrollbar-dragging .datatable-scrollbar-thumb {
+			background-color: $datatable-scrollbar-thumb-hover-bg-color;
 		}
 
 		.datatable-scrollbar-thumb {
 			height: 8px;
 			cursor: pointer;
-			touch-action: none;
 			background-color: $datatable-scrollbar-thumb-bg-color;
 			border-radius: 5px;
 			will-change: transform;
+			touch-action: none;
 
 			&:hover {
 				background-color: $datatable-scrollbar-thumb-hover-bg-color;
@@ -424,9 +384,9 @@
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;
+		height: 100%;
 		min-width: 0;
 		min-height: calc(var(--datatable-row-height) + 1px);
-		height: 100%;
 		text-align: left;
 		border-bottom: 1px solid $ui-border-color;
 
@@ -441,7 +401,6 @@
 		&.cell-header {
 			position: sticky;
 			top: 0;
-			//z-index: 1;
 			box-sizing: border-box;
 			display: flex;
 			justify-content: space-between;
@@ -450,7 +409,16 @@
 			outline: none;
 			user-select: none;
 			background-color: $ui-bg-color;
-			border-right: 1px solid $ui-border-color;
+			border-left: 1px solid $ui-border-color;
+			pointer-events: none;
+
+			&:first-of-type {
+				border-left: 0;
+			}
+
+			&:hover {
+				z-index: 2;
+			}
 
 			&:last-child {
 				border-top-right-radius: 2px;
@@ -462,7 +430,6 @@
 
 			&:nth-last-child(1 of .cell-header) {
 				margin-right: -1px;
-				//z-index: 0;
 			}
 
 			&:focus {
@@ -487,6 +454,7 @@
 					color: $link-color;
 					text-decoration: none;
 					border: none;
+					pointer-events: all;
 
 					&:hover,
 					&:focus {
@@ -502,14 +470,14 @@
 
 					.arrow-up {
 						flex-shrink: 0;
-						pointer-events: none;
 						border-bottom-color: $font-alt-color;
+						pointer-events: none;
 					}
 
 					.arrow-down {
 						flex-shrink: 0;
-						pointer-events: none;
 						border-top-color: $font-alt-color;
+						pointer-events: none;
 					}
 
 					&.header-link-sorted {
@@ -524,13 +492,11 @@
 				}
 			}
 
-			&.cell-sticky {
-				&:first-child {
-					border-right: 1px solid $ui-border-color;
+			&.cell-sticky:first-child {
+				border-right: 1px solid $ui-border-color;
 
-					& + .cell-header {
-						border-left: none;
-					}
+				& + .cell-header {
+					border-left: none;
 				}
 			}
 
@@ -544,18 +510,26 @@
 
 			.cell-header-resizer {
 				position: absolute;
-				top: -1px;
-				right: 0;
+				right: -6px;
 				z-index: 20;
-				width: 10px;
+				width: 11px;
 				height: calc(var(--datatable-row-height) + 1px);
 				cursor: col-resize;
 				user-select: none;
-				border-right: 3px solid transparent;
 				touch-action: none;
+				pointer-events: all;
 
-				&:hover {
-					border-right-color: $datatable-resizer-border-color;
+				&::after {
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					left: 5px;
+					content: '';
+					border-left: 1px solid transparent;
+				}
+
+				&:hover::after {
+					border-color: $datatable-resizer-border-color;
 				}
 			}
 		}
@@ -569,10 +543,8 @@
 			align-items: flex-start;
 			padding: 0 8px;
 
-			&.cell-sticky {
-				&:not(.cell-bg-hover) {
-					background-color: $ui-bg-color;
-				}
+			&.cell-sticky:not(.cell-bg-hover) {
+				background-color: $ui-bg-color;
 			}
 
 			&.cell-error {
@@ -610,23 +582,25 @@
 			.cell-inner {
 				box-sizing: border-box;
 				display: block;
-				padding: 7px 0;
-				min-height: var(--datatable-row-height);
 				height: 100%;
+				min-height: var(--datatable-row-height);
+				padding: 7px 0;
 
 				& + .timeline-axis {
 					margin-left: 5px;
 				}
 
-				.btn-icon:not(.no-indent):not(:first-child),
-				.icon:not(.no-indent):not(:first-child),
-				.link-action:not(.no-indent):not(:first-child) {
-					margin-left: 5px;
+				.btn-icon,
+				.icon,
+				.link-action {
+					&:not(.no-indent):not(:first-child) {
+						margin-left: 5px;
+					}
 				}
 
 				.link-alt {
-					text-overflow: initial;
 					white-space: wrap;
+					text-overflow: initial;
 				}
 
 				.problem-icon-link {
@@ -678,16 +652,14 @@
 				padding: 0;
 			}
 
-			.timeline-axis {
-				&::before {
-					position: absolute;
-					top: 0;
-					right: 0;
-					bottom: -1px;
-					width: 2px;
-					content: '';
-					background-color: $timeline-color;
-				}
+			.timeline-axis::before {
+				position: absolute;
+				top: 0;
+				right: 0;
+				bottom: -1px;
+				width: 2px;
+				content: '';
+				background-color: $timeline-color;
 			}
 
 			.timeline-dot,
@@ -702,20 +674,16 @@
 				}
 			}
 
-			.timeline-dot {
-				&::after {
-					top: 11px;
-					background-color: $btn-bg-color;
-					border: 2px solid $ui-bg-color;
-				}
+			.timeline-dot::after {
+				top: 11px;
+				background-color: $btn-bg-color;
+				border: 2px solid $ui-bg-color;
 			}
 
-			.timeline-dot-big {
-				&::after {
-					top: 11px;
-					background-color: $ui-bg-color;
-					border: 2px solid $btn-bg-color;
-				}
+			.timeline-dot-big::after {
+				top: 11px;
+				background-color: $ui-bg-color;
+				border: 2px solid $btn-bg-color;
 			}
 		}
 
@@ -752,11 +720,9 @@
 			text-overflow: ellipsis;
 			white-space: nowrap;
 
-			.btn-icon {
-				&:not(.btn-small) {
-					min-width: 18px;
-					height: 18px;
-				}
+			.btn-icon:not(.btn-small) {
+				min-width: 18px;
+				height: 18px;
 			}
 
 			.link-action {
@@ -768,8 +734,8 @@
 				width: 100%;
 
 				.link-action {
-					min-width: 1ch;
 					height: 16px;
+					min-width: 1ch;
 				}
 
 				.rel-container {
@@ -881,10 +847,6 @@
 
 		.cell-resizing {
 			z-index: 1;
-
-			.cell-header-resizer {
-				border-right-color: $datatable-resizer-border-color;
-			}
 		}
 	}
 }

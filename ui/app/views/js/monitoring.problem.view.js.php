@@ -101,8 +101,7 @@
 						.setFields(['time', 'eventid', 'objectid'])
 						.setRenderer('time')
 						.setSortField('clock')
-						.setSortable(true)
-						.setWidth('170px'),
+						.setSortable(true),
 					new CDataTableColumn('severity', <?= json_encode(_('Severity')); ?>)
 						.setFields(['severity'])
 						.setRenderer('severity')
@@ -457,7 +456,7 @@
 				})
 				.setRowRenderer('default', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const {show_two_columns, show_three_columns} = response;
-					const column = this.#datatable.getCheckboxColumnConfig();
+					const column = this.#datatable.getCheckboxColumn();
 
 					if (show_three_columns) {
 						column.setWidth('93px');
@@ -472,7 +471,7 @@
 					this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data, response});
 				})
 				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data, response}) => {
-					const column = this.#datatable.getCheckboxColumnConfig();
+					const column = this.#datatable.getCheckboxColumn();
 					const column_index = column.getColumnIndex();
 					const [, , , cause_eventid, severity] = row_data[column_index];
 

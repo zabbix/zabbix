@@ -264,8 +264,7 @@
 						.setRenderer('proxy'),
 					new CDataTableColumn('templates', <?= json_encode(_('Templates')); ?>)
 						.setFields(['templates', 'parentTemplates'])
-						.setRenderer('templates')
-						.setWidth('auto'),
+						.setRenderer('templates'),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['hostid', 'status', 'disabled_by_lld', 'disable_source', 'flags',
 							'maintenance_status', 'discoveryData'])

@@ -22,6 +22,6 @@ class CDataTableColumnTags extends CDataTableColumn {
 			.setFields(['tags'])
 			.setRenderer('tags')
 			.setDuplicatable(true)
-			.setWidth('auto');
+			.setWidth('max-content');
 	}
 }

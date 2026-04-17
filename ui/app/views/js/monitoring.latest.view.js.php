@@ -214,8 +214,7 @@
 					new CDataTableColumnTagValue('tagvalue', <?= json_encode(_('Tag value')); ?>),
 					new CDataTableColumn('actions', <?= json_encode(_('Actions')); ?>)
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
-						.setRenderer('actions')
-						.setShowInTableOptions(false),
+						.setRenderer('actions'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['item_icons'])
 				])
