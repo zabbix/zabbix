@@ -45,6 +45,15 @@ class CLogHelper {
 	}
 
 	/**
+	 * Set log offset to the end of file.
+	 *
+	 * @param string $path    log file path
+	 */
+	public static function skipLog($path) {
+		self::$log_offsets[$path] = filesize($path);
+	}
+
+	/**
 	 * Read content of the log.
 	 *
 	 * @param string  $path         log file path

@@ -1023,6 +1023,15 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Set log offset to the end of file.
+	 *
+	 * @param string $component    name of the component
+	 */
+	protected static function skipLog($component) {
+		CLogHelper::skipLog(self::getLogPath($component));
+	}
+
+	/**
 	 * Check if line is present.
 	 *
 	 * @param string       $component     name of the component
