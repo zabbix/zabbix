@@ -46,7 +46,8 @@ class testHistoryValue extends CIntegrationTest {
 			['key_' => 'trapper_uint', 'value_type' => ITEM_VALUE_TYPE_UINT64],
 			['key_' => 'trapper_str', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['key_' => 'trapper_text', 'value_type' => ITEM_VALUE_TYPE_TEXT],
-			['key_' => 'trapper_log', 'value_type' => ITEM_VALUE_TYPE_LOG]
+			['key_' => 'trapper_log', 'value_type' => ITEM_VALUE_TYPE_LOG],
+			['key_' => 'trapper_float_range', 'value_type' => ITEM_VALUE_TYPE_FLOAT]
 		];
 
 		foreach ($item_defs as $def) {
@@ -115,12 +116,46 @@ class testHistoryValue extends CIntegrationTest {
 			$response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $item['value_type'],
 				'itemids' => [$item['itemid']],
-				'sortfield' => 'clock',
-				'sortorder' => 'ASC'
+				'filter' => [
+					'clock' => array_column($values, 'clock'),
+					'ns' => array_column($values, 'ns')
+				]
 			], 5, 5);
 
 			$this->assertEquals(count($values), count($response['result']));
 		}
+
+		return true;
+	}
+
+	public function testHistoryValue_timeRangeCountOutput() {
+		$tm = time();
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 3.45, 'clock' => $tm,        'ns' => 834726191],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 7.82, 'clock' => $tm + 60,   'ns' => 129483557],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 1.09, 'clock' => $tm + 120,  'ns' => 907315224],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 9.67, 'clock' => $tm + 180,  'ns' => 456192873],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 4.23, 'clock' => $tm + 240,  'ns' => 781034662],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 0.58, 'clock' => $tm + 300,  'ns' => 215908347],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 6.71, 'clock' => $tm + 360,  'ns' => 663920115],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 2.36, 'clock' => $tm + 420,  'ns' => 398471256],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 8.90, 'clock' => $tm + 480,  'ns' => 742159803],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 5.14, 'clock' => $tm + 540,  'ns' => 580237419]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+		$itemid = self::$items['trapper_float_range']['itemid'];
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm + 60,
+			'time_till' => $tm + 480,
+			'countOutput' => true
+		], 5, 5);
+
+		$this->assertEquals(8, $response['result']);
 
 		return true;
 	}
