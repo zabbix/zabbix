@@ -157,11 +157,13 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
 
+		$datatable = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
 		$this->query('link', $name)->waitUntilVisible()->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
+		$datatable->waitUntilReady();
 		$this->assertTrue($this->query('link', $name)->waitUntilPresent()->one()->isValid());
 
 		$this->assertEquals($oldHashHosts, CDBHelper::getHash($sqlHosts));

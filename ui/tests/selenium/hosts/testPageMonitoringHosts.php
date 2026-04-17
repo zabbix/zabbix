@@ -838,13 +838,13 @@ class testPageMonitoringHosts extends CWebTest {
 	public function testPageMonitoringHosts_TagsFilter($data) {
 		$this->page->login()->open('zabbix.php?port=10051&action=host.view&groupids%5B%5D=4');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
+		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$form->fill(['id:evaltype_0' => $data['tag_options']['type']]);
 		$this->setTags($data['tag_options']['tags']);
 		$headers = $table->getHeaders();
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$headers->waitUntilStalled();
-		$table->waitUntilReady()->invalidate();
+		$table->waitUntilReady();
 		$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'result', []));
 		$this->query('button:Reset')->one()->waitUntilClickable()->click();
 		$table->waitUntilReady();

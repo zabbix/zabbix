@@ -80,7 +80,7 @@ class CDatatableBehavior extends CTableBehavior {
 	 * @param string  $selector    table selector
 	 */
 	public function assertDatatableData($data = [], $selector = null) {
-		$rows = $this->getDatatable($selector)->getRows();
+		$rows = $this->getDatatable($selector)->waitUntilReady()->getRows();
 		if (!$data) {
 			$this->test->assertEquals(0, $rows->count());
 			// Check that table contain one row with text "No data found."
