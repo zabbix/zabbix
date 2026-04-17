@@ -306,7 +306,7 @@ class CDatatableElement extends CTableElement {
 	 * @inheritdoc
 	 */
 	public function waitUntilReady($timeout = null) {
-		$this->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent($timeout);
+		$this->waitUntilClassesNotPresent('is-loading');
 
 		return $this;
 	}
