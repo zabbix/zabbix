@@ -135,7 +135,7 @@ func vfsDevGetParseModeParam(mode string) (vfsDevGetMode, error) {
 		return modeDeviceStats, nil
 
 	default:
-		return modeNone, errors.New("invalid first parameter")
+		return modeNone, errors.New(errorInvalidFirstParam)
 	}
 }
 

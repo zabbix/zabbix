@@ -40,6 +40,14 @@ const (
 	statTypeOPS
 )
 
+const (
+	errorInvalidFirstParam  = "invalid first parameter"
+	errorInvalidSecondParam = "invalid second parameter"
+	errorInvalidThirdParam  = "invalid third parameter"
+	errorTooManyParams      = "too many parameters"
+	errorInvalidNumParams   = "invalid number of parameters"
+)
+
 var impl Plugin
 
 // Plugin -
@@ -156,7 +164,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		case "avg15":
 			statRange = 60 * 15
 		default:
-			return nil, errors.New("Invalid third parameter.")
+			return nil, errors.New(errorInvalidThirdParam)
 		}
 		fallthrough
 	case 2: // type parameter
@@ -170,7 +178,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		case "operations":
 			statType = statTypeOperations
 		default:
-			return nil, errors.New("Invalid second parameter.")
+			return nil, errors.New(errorInvalidSecondParam)
 		}
 		fallthrough
 	case 1:
@@ -180,12 +188,12 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	case 0:
 	default:
-		return nil, errors.New("Too many parameters.")
+		return nil, errors.New(errorTooManyParams)
 	}
 
 	if statType == statTypeSectors || statType == statTypeOperations {
 		if len(params) > 2 {
-			return nil, errors.New("Invalid number of parameters.")
+			return nil, errors.New(errorInvalidNumParams)
 		}
 		var stats *devStats
 		if stats, err = p.getDeviceStats(devParam); err != nil {
