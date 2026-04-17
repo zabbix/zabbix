@@ -532,14 +532,13 @@ class testFormItem extends CLegacyWebTest {
 				case INTERFACE_TYPE_SNMP :
 				case INTERFACE_TYPE_JMX :
 				case INTERFACE_TYPE_IPMI :
-				case INTERFACE_TYPE_ANY :
 				case INTERFACE_TYPE_OPT :
 					$this->assertTrue($form->query('id:js-item-interface-label')->one()->isDisplayed());
 					$dbInterfaces = DBfetchArray(DBselect(
 						'SELECT type,ip,port'.
 						' FROM interface'.
 						' WHERE hostid='.$hostid.
-							(($interfaceType == INTERFACE_TYPE_ANY || $interfaceType === INTERFACE_TYPE_OPT) ? '' : ' AND type='.$interfaceType)
+							($interfaceType === INTERFACE_TYPE_OPT ? '' : ' AND type='.$interfaceType)
 					));
 					if ($dbInterfaces != null) {
 						foreach ($dbInterfaces as $host_interface) {
@@ -1010,6 +1009,9 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		// Find filter form and filter necessary host.
 		$table = $this->getTable();
+		// Clean Name field first, added for more stable local tests.
+		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => '']);
+		// Fill Name field with host name.
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $this->host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$table->waitUntilReloaded();
@@ -1621,13 +1623,15 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// 43.
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'Simple check',
 					'name' => 'Simple check',
 					'key' => 'item-simple-check',
+					'username' => 'username-test',
+					'password' => 'password-test',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1665,7 +1669,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// 47.
+			// #47.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1704,9 +1708,10 @@ class testFormItem extends CLegacyWebTest {
 			[
 				[
 					'expected' => TEST_GOOD,
-					'type' => 'External check',
-					'name' => 'External check',
-					'key' => 'item-external-check',
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with IPv6 in allowed hosts field',
+					'key' => 'item-zabbix-trapper-ipv6',
+					'allowed_hosts' => '2001:db8:85a3::8a2e:370:7334',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
@@ -1714,16 +1719,55 @@ class testFormItem extends CLegacyWebTest {
 			// #51.
 			[
 				[
+					'expected' => TEST_BAD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with invalid delimiter in allowed hosts field',
+					'key' => 'item-zabbix-trapper-incorrect-ip',
+					'allowed_hosts' => 'localhost;127.0.0.1',
+					'inline_errors' => [
+						'Allowed hosts' => 'Incorrect address starting from ";127.0.0.1".'
+					]
+				]
+			],
+			// #52.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'Zabbix trapper',
+					'name' => 'Zabbix trapper with empty delimiter in allowed hosts field',
+					'key' => 'item-zabbix-trapper-multiple-spaces-ip',
+					'allowed_hosts' => 'localhost    dd',
+					'inline_errors' => [
+						'Allowed hosts' => 'Incorrect address starting from "dd".'
+					]
+				]
+			],
+			// #53.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'type' => 'External check',
+					'name' => 'External check',
+					'key' => 'item-external-check',
+					'dbCheck' => true,
+					'formCheck' => true
+				]
+			],
+			// #54.
+			[
+				[
 					'expected' => TEST_GOOD,
 					'type' => 'Database monitor',
 					'name' => 'Database monitor',
 					'key' => 'item-database-monitor',
+					'username' => 'username-test',
+					'password' => 'password-test',
 					'params_ap' => 'query',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #52.
+			// #55.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1735,7 +1779,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #53 IPMI sensor is optional if item key is ipmi.get.
+			// #56 IPMI sensor is optional if item key is ipmi.get.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1746,7 +1790,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #54.
+			// #57.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1759,7 +1803,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #55.
+			// #58.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1772,7 +1816,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #56.
+			// #59.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1784,7 +1828,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #57.
+			// #60.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1795,7 +1839,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #58.
+			// #61.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1808,7 +1852,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #59.
+			// #62.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1821,7 +1865,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #60.
+			// #63.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1835,7 +1879,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #61.
+			// #64.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1848,7 +1892,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #62.
+			// #65.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1860,7 +1904,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #63.
+			// #66.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1872,7 +1916,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #64.
+			// #67.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1880,34 +1924,65 @@ class testFormItem extends CLegacyWebTest {
 					'name' => 'SSH agent error',
 					'key' => 'item-ssh-agent-error',
 					'inline_errors' => [
-						'User name' => 'This field cannot be empty.'
+						'User name' => 'This field cannot be empty.',
+						'Executed script' => 'This field cannot be empty.'
+
 					]
 				]
 			],
-			// #65.
+			// #68.
 			[
 				[
 					'expected' => TEST_BAD,
 					'type' => 'TELNET agent',
-					'name' => 'TELNET agent error',
-					'key' => 'item-telnet-agent-error',
+					'name' => 'TELNET agent with empty executed script',
+					'key' => 'item-telnet-agent-empty-script',
 					'inline_errors' => [
-						'User name' => 'This field cannot be empty.'
+						'User name' => 'This field cannot be empty.',
+						'Executed script' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #66.
+			// #69.
 			[
 				[
 					'expected' => TEST_GOOD,
 					'type' => 'JMX agent',
-					'name' => 'JMX agent',
-					'key' => 'item-jmx-agent',
+					'name' => 'JMX agent with filled username and password',
+					'key' => 'item-jmx-agent-with-username-password',
+					'username' => 'test_username',
+					'password' => 'test_password',
 					'dbCheck' => true,
 					'formCheck' => true
 				]
 			],
-			// #67.
+			// #70.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent with filled username and empty password',
+					'key' => 'item-jmx-agent-with-empty-password',
+					'username' => 'test',
+					'inline_errors' => [
+						'Password' => 'This field cannot be empty.'
+					]
+				]
+			],
+			// #71.
+			[
+				[
+					'expected' => TEST_BAD,
+					'type' => 'JMX agent',
+					'name' => 'JMX agent with filled password and empty username',
+					'key' => 'item-jmx-agent-with-empty-username',
+					'password' => 'test',
+					'inline_errors' => [
+						'Password' => 'Both username and password should be either present or empty.'
+					]
+				]
+			],
+			// #72.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1919,7 +1994,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #68.
+			// #73.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1931,7 +2006,7 @@ class testFormItem extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
-			// #69.
+			// #75.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1943,7 +2018,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #70 Default.
+			// #76 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1954,7 +2029,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #71 Default.
+			// #77 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1966,7 +2041,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #72 Default.
+			// #78 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1979,7 +2054,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #73 Default.
+			// #79 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1992,7 +2067,7 @@ class testFormItem extends CLegacyWebTest {
 					]
 				]
 			],
-			// #74 Default.
+			// #80 Default.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2041,6 +2116,10 @@ class testFormItem extends CLegacyWebTest {
 
 		if (isset($data['username'])) {
 			$this->zbxTestInputType('username', $data['username']);
+		}
+
+		if (isset($data['password'])) {
+			$form->getField('Password')->fill($data['password']);
 		}
 
 		if (isset($data['ipmi_sensor'])) {
@@ -2107,7 +2186,6 @@ class testFormItem extends CLegacyWebTest {
 				$itemCount ++;
 
 				$add = $form->getFieldContainer('Custom intervals')->query('button:Add')->one();
-				$add->click();
 				// TODO: sometimes inline validation error appears simultaneously and intercepts the "Add" button click.
 				try {
 					$add->click();
@@ -2261,6 +2339,18 @@ class testFormItem extends CLegacyWebTest {
 			if (isset($data['ipmi_sensor'])) {
 				$ipmiValue = $this->zbxTestGetValue("//input[@id='ipmi_sensor']");
 				$this->assertEquals($ipmi_sensor, $ipmiValue);
+			}
+
+			if (isset($data['allowed_hosts'])) {
+				$check_form->checkValue(['Allowed hosts' => $data['allowed_hosts']]);
+			}
+
+			if (isset($data['username'])) {
+				$check_form->checkValue(['User name' => $data['username']]);
+			}
+
+			if (isset($data['password'])) {
+				$check_form->checkValue(['Password' => $data['password']]);
 			}
 
 			$dialog_check->close();

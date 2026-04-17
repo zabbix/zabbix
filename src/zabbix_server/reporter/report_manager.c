@@ -1906,7 +1906,6 @@ static int	rm_schedule_jobs(zbx_rm_t *manager, int now)
 			zabbix_log(LOG_LEVEL_DEBUG, "Cannot process report: %s", error);
 			zbx_free(error);
 		}
-
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() jobs:%d", __func__, jobs_num);
