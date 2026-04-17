@@ -52,7 +52,10 @@ class testHistoryValue extends CIntegrationTest {
 			['key_' => 'trapper_text_second', 'value_type' => ITEM_VALUE_TYPE_TEXT],
 			['key_' => 'trapper_log', 'value_type' => ITEM_VALUE_TYPE_LOG],
 			['key_' => 'trapper_log_second', 'value_type' => ITEM_VALUE_TYPE_LOG],
-			['key_' => 'trapper_float_range', 'value_type' => ITEM_VALUE_TYPE_FLOAT]
+			['key_' => 'trapper_float_range', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
+			['key_' => 'trapper_float_sort', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
+			['key_' => 'trapper_uint_count', 'value_type' => ITEM_VALUE_TYPE_UINT64],
+			['key_' => 'trapper_str_search', 'value_type' => ITEM_VALUE_TYPE_STR]
 		];
 
 		foreach ($item_defs as $def) {
@@ -246,6 +249,171 @@ class testHistoryValue extends CIntegrationTest {
 		], 5, 5, function($response) {
 			return count($response['result']) === 8;
 		});
+
+		return true;
+	}
+
+	public function testHistoryValue_sortAndLimit() {
+		$tm = time();
+		$itemid = self::$items['trapper_float_sort']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 10.0, 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 20.0, 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 30.0, 'clock' => $tm + 2, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 40.0, 'clock' => $tm + 3, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 50.0, 'clock' => $tm + 4, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 4,
+			'sortfield' => 'clock',
+			'sortorder' => 'ASC'
+		], 5, 5, function($response) {
+			return count($response['result']) === 5;
+		});
+
+		$result = $response['result'];
+		for ($i = 0; $i < count($result) - 1; $i++) {
+			$this->assertLessThanOrEqual((int)$result[$i + 1]['clock'], (int)$result[$i]['clock']);
+		}
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 4,
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC'
+		]);
+		$result = $response['result'];
+		for ($i = 0; $i < count($result) - 1; $i++) {
+			$this->assertGreaterThanOrEqual((int)$result[$i + 1]['clock'], (int)$result[$i]['clock']);
+		}
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 4,
+			'sortfield' => 'clock',
+			'sortorder' => 'DESC',
+			'limit' => 2
+		]);
+		$this->assertCount(2, $response['result']);
+		$this->assertEquals($tm + 4, (int)$response['result'][0]['clock']);
+
+		return true;
+	}
+
+	public function testHistoryValue_countOutput() {
+		$tm = time();
+		$itemid = self::$items['trapper_uint_count']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_count', 'value' => 100, 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_count', 'value' => 200, 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_count', 'value' => 300, 'clock' => $tm + 2, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_uint_count', 'value' => 400, 'clock' => $tm + 3, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 3
+		], 5, 5, function($response) {
+			return count($response['result']) === 4;
+		});
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_UINT64,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 3,
+			'countOutput' => true
+		]);
+		$this->assertEquals('4', $response['result']);
+
+		return true;
+	}
+
+	public function testHistoryValue_search() {
+		$tm = time();
+		$itemid = self::$items['trapper_str_search']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'match_alpha', 'clock' => $tm, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'match_beta', 'clock' => $tm + 1, 'ns' => 0],
+			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'other_gamma', 'clock' => $tm + 2, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+		$this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2
+		], 5, 5, function($response) {
+			return count($response['result']) === 3;
+		});
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'match_']
+		]);
+		$this->assertCount(2, $response['result']);
+
+		$response = $this->call('history.get', [
+			'history' => ITEM_VALUE_TYPE_STR,
+			'itemids' => [$itemid],
+			'time_from' => $tm,
+			'time_till' => $tm + 2,
+			'search' => ['value' => 'match_'],
+			'excludeSearch' => true
+		]);
+		$this->assertCount(1, $response['result']);
+		$this->assertEquals('other_gamma', $response['result'][0]['value']);
+
+		return true;
+	}
+
+	public function testHistoryValue_outputFields() {
+		$tm = time();
+		$itemid = self::$items['trapper_float_sort']['itemid'];
+
+		$values = [
+			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 99.9, 'clock' => $tm + 100, 'ns' => 0]
+		];
+
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+		$response = $this->callUntilDataIsPresent('history.get', [
+			'history' => ITEM_VALUE_TYPE_FLOAT,
+			'itemids' => [$itemid],
+			'time_from' => $tm + 100,
+			'time_till' => $tm + 100,
+			'output' => ['itemid', 'value']
+		], 5, 5, function($response) {
+			return count($response['result']) === 1;
+		});
+
+		$record = $response['result'][0];
+		$this->assertArrayHasKey('itemid', $record);
+		$this->assertArrayHasKey('value', $record);
+		$this->assertArrayNotHasKey('clock', $record);
+		$this->assertArrayNotHasKey('ns', $record);
 
 		return true;
 	}
