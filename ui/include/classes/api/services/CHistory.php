@@ -141,36 +141,33 @@ class CHistory extends CApiService {
 			$options['itemids'] = array_keys($items);
 		}
 
-		$this->tableName = Manager::History()->getTableName($options['history']);
+		switch (Manager::History()->getDataSourceType($options['history'])) {
+			case ZBX_HISTORY_SOURCE_ELASTIC:
+				$result = $this->getFromElasticsearch($options);
+				break;
 
-		$storage = Manager::History()->getStorageProviderInstance($options['history']);
+			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+				$storage = Manager::History()->getStorageProviderInstance($options['history']);
+				$result = $storage->select($options);
 
-		if ($storage !== null) {
-			$result = $storage->select($options);
+				if ($storage->getErrorCode() !== null) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
+				}
 
-			if ($storage->getErrorCode() !== null) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
-			}
+				if ($options['countOutput']) {
+					$result = $result[0]['rowscount'];
+				}
+				break;
 
-			if ($options['countOutput']) {
-				$result = $result[0]['rowscount'];
-			}
-		}
-		else {
-			switch (Manager::History()->getDataSourceType($options['history'])) {
-				case ZBX_HISTORY_SOURCE_ELASTIC:
-					$result = $this->getFromElasticsearch($options);
-					break;
+			case ZBX_HISTORY_SOURCE_SQL:
+				if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
+					$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+					$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
+				}
 
-				case ZBX_HISTORY_SOURCE_SQL:
-					if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL) == 1) {
-						$hk_history = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-						$options['time_from'] = max($options['time_from'], time() - $hk_history + 1);
-					}
-
-					$result = $this->getFromSql($options);
-					break;
-			}
+				$this->tableName = Manager::History()->getTableName($options['history']);
+				$result = $this->getFromSql($options);
+				break;
 		}
 
 		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
