@@ -103,14 +103,14 @@ var ItemEditPreprocessingTab = class {
 				this.#updateRow(preprocessing_row);
 			}
 			else if (e.target.classList.contains('preprocessing-step-test')) {
-				this.test(false, false, this.#container,
+				this.test(false, false, e.target,
 					parseInt(e.target.closest('.preprocessing-list-item').dataset.step)
 				)
 			}
 		});
 
-		this.#container.querySelector('#preproc_test_all').addEventListener('click', () =>
-			this.test(true, false, this.#container, -1)
+		this.#container.querySelector('#preproc_test_all').addEventListener('click', (e) =>
+			this.test(true, false, e.target, -1)
 		);
 	}
 
