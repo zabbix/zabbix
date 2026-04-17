@@ -21,6 +21,7 @@ import (
 
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/plugin"
+	"golang.zabbix.com/sdk/zbxerr"
 )
 
 const (
@@ -41,11 +42,10 @@ const (
 )
 
 var (
-	errInvalidFirstParam  = errors.New("invalid first parameter")
-	errInvalidSecondParam = errors.New("invalid second parameter")
-	errInvalidThirdParam  = errors.New("invalid third parameter")
-	errTooManyParams      = errors.New("too many parameters")
-	errInvalidNumParams   = errors.New("invalid number of parameters")
+	errInvalidFirstParam  = errs.New("invalid first parameter")
+	errInvalidSecondParam = errs.New("invalid second parameter")
+	errInvalidThirdParam  = errs.New("invalid third parameter")
+	errInvalidNumParams   = errs.New("invalid number of parameters")
 )
 
 var impl Plugin
@@ -188,7 +188,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 	case 0:
 	default:
-		return nil, errTooManyParams
+		return nil, zbxerr.ErrorTooManyParameters
 	}
 
 	if statType == statTypeSectors || statType == statTypeOperations {
