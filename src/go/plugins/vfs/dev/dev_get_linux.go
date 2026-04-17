@@ -16,6 +16,7 @@ package vfsdev
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"path"
@@ -134,7 +135,7 @@ func vfsDevGetParseModeParam(mode string) (vfsDevGetMode, error) {
 		return modeDeviceStats, nil
 
 	default:
-		return modeNone, errs.Wrapf(zbxerr.ErrorInvalidParams, "invalid first parameter '%s'", mode)
+		return modeNone, errors.New("Invalid first parameter.")
 	}
 }
 
