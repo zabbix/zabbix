@@ -27,7 +27,6 @@
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxcachehistory.h"
-#include "zbxalgo.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1
