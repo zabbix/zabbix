@@ -27,6 +27,7 @@ import (
 	"time"
 
 	"github.com/go-ldap/ldap"
+	"golang.zabbix.com/agent2/pkg/inet"
 	"golang.zabbix.com/agent2/pkg/web"
 	"golang.zabbix.com/sdk/errs"
 	"golang.zabbix.com/sdk/log"
@@ -483,70 +484,6 @@ func (p *Plugin) exportNetServicePerf(params []string, timeout int) float64 {
 	return 0.0
 }
 
-func isAlnum(c byte) bool {
-	return (c >= '0' && c <= '9') ||
-		(c >= 'a' && c <= 'z') ||
-		(c >= 'A' && c <= 'Z')
-}
-
-// isDNS checks if host is valid DNS name (should work the same as zbx_is_dnsname in C)
-//
-//nolint:cyclop,gocyclo // high complexity due to DNS validation, splitting not practical
-func isDNS(host string) bool {
-	n := len(host)
-	if n == 0 || n > 253 {
-		return false
-	}
-
-	// first character must be alphanumeric
-	c := host[0]
-	if !isAlnum(c) {
-		return false
-	}
-
-	labelLen := 1
-	prevDash := false
-
-	for i := 1; i < n; i++ {
-		c = host[i]
-
-		switch {
-		case isAlnum(c):
-			labelLen++
-			prevDash = false
-		case c == '-':
-			// label must not start with dash
-			if labelLen == 0 {
-				return false
-			}
-
-			labelLen++
-			prevDash = true
-		case c == '.':
-			// empty label or label ending with dash
-			if labelLen == 0 || prevDash {
-				return false
-			}
-
-			labelLen = 0
-			prevDash = false
-		default:
-			return false
-		}
-
-		if labelLen > 63 {
-			return false
-		}
-	}
-
-	// last label must not be empty or end with dash
-	if labelLen == 0 || prevDash {
-		return false
-	}
-
-	return true
-}
-
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
@@ -577,7 +514,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		if len(params) >= 2 && params[1] != "" {
-			if net.ParseIP(params[1]) == nil && !isDNS(params[1]) {
+			if net.ParseIP(params[1]) == nil && !inet.IsDNS(params[1]) {
 				return nil, errs.New(errorInvalidSecondParam)
 			}
 		}
