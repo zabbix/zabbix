@@ -52,6 +52,9 @@ static const zbx_setting_entry_t	settings_description_table[] = {
 	{"connect_timeout",		ZBX_SETTING_TYPE_STR, 		0,			"3s"},
 	{"custom_color",		ZBX_SETTING_TYPE_INT, 		0,			"0"},
 	{"db_extension",		ZBX_SETTING_TYPE_STR, 		ZBX_SERVER,		""},
+	{ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT, ZBX_SETTING_TYPE_INT, 	0,			""},
+	{ZBX_SETTINGS_DBPOOL_MAX_IDLE,	ZBX_SETTING_TYPE_INT, 		0,			""},
+	{ZBX_SETTINGS_DBPOOL_MAX_OPEN,	ZBX_SETTING_TYPE_INT, 		0,			""},
 	/* dbversion_status is used only directly */
 	{"dbversion_status",		ZBX_SETTING_TYPE_STR, 		0,			""},
 	{"default_inventory_mode",	ZBX_SETTING_TYPE_INT, 		ZBX_SERVER,		"-1"},

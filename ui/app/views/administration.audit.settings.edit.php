@@ -27,17 +27,16 @@ $html_page = (new CHtmlPage())
 $form = (new CForm())
 	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('audit')))->removeId())
 	->setId('audit-settings')
-	->setAction(
-		(new CUrl('zabbix.php'))
-			->setArgument('action', 'audit.settings.update')
-			->getUrl()
-	)
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID);
 
 $audit_settings_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
-		new CFormField((new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1))
+		new CFormField((new CCheckBox('auditlog_enabled'))
+			->setChecked($data['auditlog_enabled'] == 1)
+			->setUncheckedValue(0)
+		)
+
 	])
 	->addItem([
 		new CLabel([
@@ -48,11 +47,15 @@ $audit_settings_tab = (new CFormGrid())
 			(new CCheckBox('auditlog_mode'))
 				->setEnabled($data['auditlog_enabled'] == 1)
 				->setChecked($data['auditlog_mode'] == 1)
+				->setUncheckedValue(0)
 		)
 	])
 	->addItem([
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),
-		new CFormField((new CCheckBox('hk_audit_mode'))->setChecked($data['hk_audit_mode'] == 1))
+		new CFormField((new CCheckBox('hk_audit_mode'))
+			->setChecked($data['hk_audit_mode'] == 1)
+			->setUncheckedValue(0)
+		)
 	])
 	->addItem([
 		(new CLabel(_('Data storage period'), 'hk_audit'))->setAsteriskMark(),
@@ -68,11 +71,19 @@ $form->addItem(
 	(new CTabView())
 		->addTab('audit-settings', _('Audit log'), $audit_settings_tab)
 		->setFooter(makeFormFooter(
-			new CSubmit('update', _('Update')),
-			[new CButton('resetDefaults', _('Reset defaults'))]
+			(new CSubmit('', _('Update')))->addClass('js-submit'),
+			[(new CButton('', _('Reset defaults')))->addClass('js-reset-defaults')]
 		))
 );
 
 $html_page
 	->addItem($form)
+	->show();
+
+(new CScriptTag(
+	'view.init('.json_encode([
+		'rules' => $data['js_validation_rules'],
+		'default_values' => $data['default_values']
+	]).')'))
+	->setOnDocumentReady()
 	->show();

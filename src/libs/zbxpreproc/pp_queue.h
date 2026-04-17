@@ -52,7 +52,7 @@ void	pp_task_queue_notify(zbx_pp_queue_t *queue);
 void	pp_task_queue_notify_all(zbx_pp_queue_t *queue);
 
 void	pp_task_queue_push_test(zbx_pp_queue_t *queue, zbx_pp_task_t *task);
-void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task);
+void	pp_task_queue_push(zbx_pp_queue_t *queue, zbx_pp_task_t *task, unsigned char preprocessing);
 
 zbx_pp_task_t	*pp_task_queue_pop_new(zbx_pp_queue_t *queue);
 void	pp_task_queue_push_immediate(zbx_pp_queue_t *queue, zbx_pp_task_t *task);
