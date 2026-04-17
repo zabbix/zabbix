@@ -409,9 +409,14 @@ class CIntegrationTest extends CAPITest {
 
 		$failed_pids = [];
 		$failed_kills = [];
+		$backtraces = [];
 
 		foreach ($child_pids as $child_pid) {
 			if (ctype_digit($child_pid) && posix_kill($child_pid, 0)) {
+				$bt_lines = [];
+				exec('gdb -batch -ex "set pagination 0" -ex "thread apply all bt" -p '.escapeshellarg($child_pid).' 2>&1', $bt_lines);
+				$backtraces[$child_pid] = implode("\n", $bt_lines);
+
 				if (!posix_kill($child_pid, SIGKILL)) {
 					$error_code = posix_get_last_error();
 					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
@@ -429,8 +434,15 @@ class CIntegrationTest extends CAPITest {
 			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
 			: '';
 
+		$bt_section = '';
+		foreach ($backtraces as $bt_pid => $bt) {
+			if ($bt !== '') {
+				$bt_section .= "\nBacktrace for PID ".$bt_pid.":\n".$bt."\n";
+			}
+		}
+
 		throw new Exception('Multiple child processes for component "'.$component.'" did not stop gracefully:'."\n".
-			implode(', ', $failed_pids).$failed_kills."\n".
+			implode(', ', $failed_pids).$failed_kills.$bt_section."\n".
 			'Log file contents: '."\n".$log."\n");
 	}
 
