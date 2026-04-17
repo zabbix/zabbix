@@ -1092,6 +1092,21 @@ fail:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: compare events to sort by highest severity and host name          *
+ *                                                                            *
+ ******************************************************************************/
+static int	zbx_eventdata_compare(const void *a1, const void *a2)
+{
+	const zbx_eventdata_t	*d1 = (const zbx_eventdata_t *)a1;
+	const zbx_eventdata_t	*d2 = (const zbx_eventdata_t *)a2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(d2->nseverity, d1->nseverity);
+
+	return strcmp(d1->host, d2->host);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get root cause of service being in problem state.                 *
  *                                                                            *
  ******************************************************************************/

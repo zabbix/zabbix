@@ -34,6 +34,8 @@
 		timeout: null,
 		deferred: null,
 		opened_eventids: [],
+		_refresh_message_box: null,
+		_popup_message_box: null,
 
 		init({filter_options, refresh_url, refresh_interval, filter_defaults}) {
 			this.refresh_url = new Curl(refresh_url);
@@ -154,8 +156,7 @@
 
 				view.refreshNow();
 
-				clearMessages();
-				addMessage(makeMessageBox('good', [], response.success.title));
+				view._addPopupMessage(makeMessageBox('good', [], response.success.title));
 			});
 
 			$(document).on('submit', '#problem_form', function(e) {
@@ -275,6 +276,12 @@
 		},
 
 		refresh() {
+			if (isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			this.setLoading();
 
 			const params = this.refresh_url.getArgumentsObject();
@@ -342,12 +349,39 @@
 			this.refreshBody(response.body);
 
 			if ('messages' in response) {
-				clearMessages();
-				addMessage(makeMessageBox('good', [], response.messages, true, false));
+				this._addRefreshMessage(response.messages);
 			}
 
 			if ('debug' in response) {
 				this._refreshDebug(response.debug);
+			}
+		},
+
+		_addRefreshMessage(messages) {
+			this._removeRefreshMessage();
+
+			this._refresh_message_box = $($.parseHTML(messages));
+			addMessage(this._refresh_message_box);
+		},
+
+		_removeRefreshMessage() {
+			if (this._refresh_message_box !== null) {
+				this._refresh_message_box.remove();
+				this._refresh_message_box = null;
+			}
+		},
+
+		_addPopupMessage(message_box) {
+			this._removePopupMessage();
+
+			this._popup_message_box = message_box;
+			addMessage(this._popup_message_box);
+		},
+
+		_removePopupMessage() {
+			if (this._popup_message_box !== null) {
+				this._popup_message_box.remove();
+				this._popup_message_box = null;
 			}
 		},
 
@@ -422,7 +456,7 @@
 		},
 
 		editItem(target, data) {
-			clearMessages();
+			this._removePopupMessage();
 
 			const overlay = PopUp('item.edit', data, {
 				dialogueid: 'item-edit',
@@ -435,7 +469,7 @@
 		},
 
 		openHostPopup(host_data) {
-			clearMessages();
+			this._removePopupMessage();
 
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
@@ -451,6 +485,8 @@
 		},
 
 		editTemplate(parameters) {
+			this._removePopupMessage();
+
 			const overlay = PopUp('template.edit', parameters, {
 				dialogueid: 'templates-form',
 				dialogue_class: 'modal-popup-large',
@@ -461,7 +497,7 @@
 		},
 
 		editTrigger(trigger_data) {
-			clearMessages();
+			this._removePopupMessage();
 
 			const overlay = PopUp('trigger.edit', trigger_data, {
 				dialogueid: 'trigger-edit',
@@ -484,7 +520,7 @@
 						messages = data.success.messages;
 					}
 
-					addMessage(makeMessageBox('good', messages, title));
+					view._addPopupMessage(makeMessageBox('good', messages, title));
 				}
 
 				uncheckTableRows('problem');
