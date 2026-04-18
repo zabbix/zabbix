@@ -200,7 +200,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
-	uuid7id = zbx_gen_uuid7();
+	uuid7id = zbx_gen_uuid7_hyphenated();
 	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 
@@ -535,7 +535,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
-	uuid7id = zbx_gen_uuid7();
+	uuid7id = zbx_gen_uuid7_hyphenated();
 	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 	zbx_json_close(&request);
 

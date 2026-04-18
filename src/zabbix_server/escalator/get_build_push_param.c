@@ -178,7 +178,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addobject(&json, "payload");
 		zbx_json_addstring(&json, "specversion", "1", ZBX_JSON_TYPE_STRING);
 
-		message_uuid7 = zbx_gen_uuid7();
+		message_uuid7 = zbx_gen_uuid7_hyphenated();
 
 		zbx_json_addstring(&json, "id", message_uuid7, ZBX_JSON_TYPE_STRING);
 		zbx_json_addint64(&json, "time", event->clock);
@@ -222,7 +222,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_close(&json); /* params */
 
-		uuid7id = zbx_gen_uuid7();
+		uuid7id = zbx_gen_uuid7_hyphenated();
 
 		zbx_json_addstring(&json, "id", uuid7id, ZBX_JSON_TYPE_STRING);
 
