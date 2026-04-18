@@ -14,6 +14,8 @@
 
 #include "zbxdbhigh.h"
 
+#include "zbxalgo.h"
+
 void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t actionid, zbx_uint64_t userid, const char *sendto, const char *subject,
 		const char *message, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,

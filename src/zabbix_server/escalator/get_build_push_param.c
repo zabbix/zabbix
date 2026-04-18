@@ -15,7 +15,6 @@
 #include "get_build_push_param.h"
 #include "escalator.h"
 
-#include "zbxalgo.h"
 #include "zbxcrypto.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"
