@@ -92,7 +92,7 @@ zabbix_export:
             	if (typeof headers === "object") {
             		if (headers !== null) {
             			try {
-            				token = headers["X-Subject-Token"][0];
+            				token = headers["X-Subject-Token"] || headers["x-subject-token"];
             			} catch (error) {
             				throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
             			}
