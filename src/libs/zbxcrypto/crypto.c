@@ -180,9 +180,9 @@ char	*zbx_gen_uuid4(const char *seed)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: generates UUID version 7 as string of 32 symbols                  *
+ * Purpose: generates UUID version 7 as string of 36 symbols (with hyphens)   *
  *                                                                            *
- * Return value: uuid string                                                  *
+ * Return value: uuid string: 019da0d3-3fc7-710d-adfc-48abece93fc2            *
  *                                                                            *
  * Comments: Current implementation is minimal, developed for generating      *
  *           server ID.                                                       *
@@ -192,7 +192,7 @@ char	*zbx_gen_uuid4(const char *seed)
  *           (see https://www.rfc-editor.org/rfc/rfc9562).                    *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_gen_uuid7(void)
+char	*zbx_gen_uuid7_hyphenated(void)
 {
 #define ZBX_UUID7_BYTES      16
 	const char	*hex = "0123456789abcdef";
@@ -201,7 +201,7 @@ char	*zbx_gen_uuid7(void)
 	char		*out, *ptr;
 	uint64_t	ts_ms;
 
-	ptr = out = (char *)zbx_malloc(NULL, 2 * ZBX_UUID7_BYTES + 1);
+	ptr = out = (char *)zbx_malloc(NULL, 2 * (ZBX_UUID7_BYTES + 4) + 1);
 
 	zbx_timespec(&ts);
 
@@ -230,6 +230,9 @@ char	*zbx_gen_uuid7(void)
 	{
 		*ptr++ = hex[(uuid7[i] >> 4) & 0xf];
 		*ptr++ = hex[uuid7[i] & 0xf];
+
+		if (3 == i || 5 == i || 7 == i || 9 == i)
+			*ptr++ = '-';
 	}
 
 	*ptr = '\0';

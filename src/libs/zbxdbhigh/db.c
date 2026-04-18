@@ -770,7 +770,7 @@ int	zbx_db_check_serverid(void)
 
 	if (NULL == zbx_db_fetch(result))
 	{
-		char	*uuid7 = zbx_gen_uuid7();
+		char	*uuid7 = zbx_gen_uuid7_hyphenated();
 
 		if (ZBX_DB_OK > zbx_db_execute("insert into settings (name,type,value_str,value_int) values"
 				"('serverid',1,'%s',0)", uuid7))
