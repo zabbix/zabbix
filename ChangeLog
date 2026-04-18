@@ -1,6 +1,10 @@
 Changes for 8.0.0beta1
 
 New features:
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
+.........T [ZBXNEXT-10336] added template for Google Cloud Storage (kflorowski)
+.........T [ZBXNEXT-10510] added Azure Container Apps by HTTP template (abrosimovs)
+..F....... [ZBXNEXT-9746] implemented inline validation for user groups form (gberzina)
 ..F....... [ZBXNEXT-9751] added inline validation for General (GUI, timeout, trigger, other), auditlog and housekeeping settings pages (gberzina)
 .......PS. [ZBXNEXT-6492] added DBHost configuration option to support PostgreSQL connection to first read-write database from list. (sboidenko)
 A.F....... [ZBXNEXT-10121] added support for PHP 8.5 (talbergs)
@@ -23,6 +27,12 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
+..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
+..F....... [ZBX-27679] fixed missing translation reporting in JavaScript; added missing translations (averza)
+..F....... [ZBX-27392] fixed selected count staying unchanged when trigger is deleted (gklavins)
+..F....... [ZBX-27612] fixed OAuth configuration form to display correct error message when configuration is not completed (gberzina)
 ..F....... [ZBX-26459] fixed host macros view to avoid displaying both macro types when switching quickly (gberzina)
 ..F....... [ZBX-27597] fixed form state not being reset when using back/forward navigation (gklavins)
 ........S. [ZBX-27633] fixed capitalization of the log message (Sasha)
@@ -265,8 +275,15 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 Changes for 7.4.10rc1
 
 New features:
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
+..F....... [ZBX-27609] fixed saving colours of items when items are reordered in graph edit form (gberzina)
+..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
+..F....... [ZBX-27679] fixed missing translation reporting in JavaScript; added missing translations (averza)
+..F....... [ZBX-27392] fixed selected count staying unchanged when trigger is deleted (gklavins)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.9
@@ -1642,8 +1659,12 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.26rc1
 
 New features:
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
+..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.25

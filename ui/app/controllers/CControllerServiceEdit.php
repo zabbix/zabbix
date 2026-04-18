@@ -211,6 +211,8 @@ class CControllerServiceEdit extends CController {
 
 		$data['user'] = ['debug_mode' => $this->getDebugMode()];
 		$data['js_validation_rules'] = (new CFormValidator($js_validation_rules))->getRules();
+		$data['js_clone_validation_rules'] = (new CFormValidator(CControllerServiceCreate::getValidationRules()))
+			->getRules();
 
 		$this->setResponse(new CControllerResponseData($data));
 	}
