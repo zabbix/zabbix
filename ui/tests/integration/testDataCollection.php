@@ -624,7 +624,6 @@ class testDataCollection extends CIntegrationTest {
 	 * @required-components server
 	 */
 	public function testDataCollection_preprocNotsupportedCheck() {
-		sleep(500);
 		$response = $this->call('host.create', [
 			[
 				'host' => 'ssh_host',
