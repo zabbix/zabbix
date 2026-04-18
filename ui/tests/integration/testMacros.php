@@ -3423,6 +3423,7 @@ const SUBJECT_INTERNAL = "Internal";
 	 */
 
 	public function testMacros_AutoregestrationEvent() {
+		sleep(300);
 		if (file_exists(self::$metadata_file)) {
 			unlink(self::$metadata_file);
 		}
