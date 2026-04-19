@@ -30,7 +30,7 @@ class CDevice extends CApiService {
 	protected $tableAlias = 'd';
 	protected $sortColumns = ['deviceid', 'name'];
 
-	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'activated_at', 'lastaccess'];
+	public const OUTPUT_FIELDS = ['deviceid', 'userid', 'uuid', 'name', 'status', 'activated_at', 'lastaccess'];
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
@@ -118,8 +118,6 @@ class CDevice extends CApiService {
 			$sql_parts['where']['userid'] = 'd.userid!='.self::$userData['userid'];
 		}
 
-		$sql_parts['where'][] = 'd.status='.self::STATUS_ENABLED;
-
 		if ($options['roleids'] !== null) {
 			$sql_parts['join']['u'] = ['table' => 'users', 'using' => 'userid'];
 			$sql_parts['where'][] = dbConditionId('u.roleid', $options['roleids']);
@@ -141,9 +139,11 @@ class CDevice extends CApiService {
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (!$options['countOutput'] && in_array('lastaccess', $options['output'])) {
-			$sql_parts = $this->addQuerySelect('t.lastaccess', $sql_parts);
-			$sql_parts['join']['td'] = ['table' => 'token_device', 'using' => 'deviceid'];
-			$sql_parts['join']['t'] = ['left_table' => 'td', 'table' => 'token', 'using' => 'tokenid'];
+			$sql_parts = $this->addQuerySelect(dbConditionCoalesce('t.lastaccess', 0, 'lastaccess'), $sql_parts);
+			$sql_parts['join']['td'] = ['type' => 'left', 'table' => 'token_device', 'using' => 'deviceid'];
+			$sql_parts['join']['t'] = ['type' => 'left', 'left_table' => 'td', 'table' => 'token',
+				'using' => 'tokenid'
+			];
 		}
 
 		return $sql_parts;
