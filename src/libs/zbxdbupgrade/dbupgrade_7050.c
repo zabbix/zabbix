@@ -840,7 +840,7 @@ static int	DBpatch_7050061(void)
 
 static int	DBpatch_7050062(void)
 {
-	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, 0};
+	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("device", 1, &field);
 }
