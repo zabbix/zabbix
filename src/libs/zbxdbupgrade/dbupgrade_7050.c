@@ -969,12 +969,12 @@ static int	DBpatch_7050076(void)
 	int		i;
 	const char	*columns = "role_ruleid,roleid,type,name,value_int,value_str,value_moduleid,value_serviceid";
 	const char	*values[] = {
-			"1,0,'devices.access',1,'',NULL,NULL",
-			"1,0,'devices.actions.default_access',1,'',NULL,NULL",
+			"1,0,'devices.access',0,'',NULL,NULL",
+			"1,0,'devices.actions.default_access',0,'',NULL,NULL",
 			"2,0,'devices.access',0,'',NULL,NULL",
 			"2,0,'devices.actions.default_access',0,'',NULL,NULL",
-			"3,0,'devices.access',0,'',NULL,NULL",
-			"3,0,'devices.actions.default_access',0,'',NULL,NULL",
+			"3,0,'devices.access',1,'',NULL,NULL",
+			"3,0,'devices.actions.default_access',1,'',NULL,NULL",
 			"4,0,'devices.access',0,'',NULL,NULL",
 			"4,0,'devices.actions.default_access',0,'',NULL,NULL",
 			NULL
