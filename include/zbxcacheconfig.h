@@ -40,7 +40,8 @@
 #define	ZBX_POLLER_TYPE_SNMP		9
 #define ZBX_POLLER_TYPE_INTERNAL	10
 #define ZBX_POLLER_TYPE_BROWSER		11
-#define	ZBX_POLLER_TYPE_COUNT		12	/* number of poller types */
+#define ZBX_POLLER_TYPE_TELEMETRY_QUERY	12
+#define	ZBX_POLLER_TYPE_COUNT		13	/* number of poller types */
 
 typedef enum
 {
@@ -291,13 +292,32 @@ typedef struct
 }
 zbx_dc_httpagent_item_t;
 
+typedef struct
+{
+	zbx_uint64_t		hostid;
+	char			host_host[ZBX_HOSTNAME_BUF_LEN];
+	char			host_name[ZBX_MAX_HOSTNAME_LEN * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+	zbx_dc_interface_t	interface;
+	zbx_uint64_t		itemid;
+	unsigned char		value_type;
+	unsigned char		flags;
+	char			*key_orig, *key;
+	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
+	int			timeout;
+	/* TODO: query_fields should probably be on the heap (char * allocated separately) */
+	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	unsigned char		preprocessing;
+}
+zbx_dc_telemetry_query_item_t;
+
 typedef union
 {
-	zbx_dc_agent_item_t	*agent_items;
-	zbx_dc_snmp_item_t	*snmp_items;
-	zbx_dc_httpagent_item_t *httpagent_items;
-	zbx_dc_item_t		*dc_items;
-	void			*any;
+	zbx_dc_agent_item_t		*agent_items;
+	zbx_dc_snmp_item_t		*snmp_items;
+	zbx_dc_httpagent_item_t		*httpagent_items;
+	zbx_dc_telemetry_query_item_t	*telemetry_query_items;
+	zbx_dc_item_t			*dc_items;
+	void				*any;
 }
 zbx_dc_poller_item_t;
 

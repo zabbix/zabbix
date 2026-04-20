@@ -29,7 +29,4 @@ void	tq_condition_clean(zbx_tq_condition_t *condition);
 
 int	tq_formula_constant_to_condition_idx(const char *p, int len);
 
-void	tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
-void	tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
-
 #endif

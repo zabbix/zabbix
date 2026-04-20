@@ -27,6 +27,9 @@
 #	include "checks_snmp.h"
 #endif
 
+#include "async_telemetry_query.h"
+
+
 #include "zbxlog.h"
 #include "zbxalgo.h"
 #include "zbxtimekeeper.h"
@@ -212,6 +215,85 @@ static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+
+static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void *arg)
+{
+	long				response_code;
+	char				*error, *out = NULL;
+	char				status_codes[] = "200,201,202,203,204";
+	AGENT_RESULT			result;
+	zbx_telemetry_query_context	*telemetry_query_context;
+	zbx_dc_tq_item_context_t	*item_context;
+	zbx_timespec_t			timespec;
+	zbx_poller_config_t		*poller_config;
+	CURLcode			err_info;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	poller_config = (zbx_poller_config_t *)arg;
+
+	if (CURLE_OK != (err_info = curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &telemetry_query_context)))
+	{
+		THIS_SHOULD_NEVER_HAPPEN;
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get pointer to private data: %s", curl_easy_strerror(err_info));
+
+		goto fail;
+	}
+
+	zbx_timespec(&timespec);
+
+	zbx_init_agent_result(&result);
+	item_context = &telemetry_query_context->item_context;
+
+	if (SUCCEED == zbx_http_handle_response(easy_handle, &telemetry_query_context->http_context, err,
+			&response_code, &out, &error) &&
+			SUCCEED == zbx_handle_response_code(status_codes, response_code, out, &error))
+	{
+		/* TODO: transform result to json */
+
+		/* FIXME: placeholder */
+		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST1: %s(): '%s'", __func__, out);
+
+		SET_TEXT_RESULT(&result, out);
+		out = NULL;
+		if (ZBX_IS_RUNNING())
+		{
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+		}
+	}
+	else
+	{
+		/* FIXME: placeholder */
+		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST2: %s(): '%s'", __func__, error);
+
+		SET_MSG_RESULT(&result, error);
+		if (ZBX_IS_RUNNING())
+		{
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
+					result.msg);
+		}
+	}
+
+	zbx_free_agent_result(&result);
+	zbx_free(out);
+
+	zbx_async_manager_requeue(poller_config->manager, telemetry_query_context->item_context.itemid, SUCCEED,
+			timespec.sec);
+
+	poller_config->processing--;
+	poller_config->processed++;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "finished processing itemid:" ZBX_FS_UI64,
+			telemetry_query_context->item_context.itemid);
+
+	curl_multi_remove_handle(poller_config->curl_handle, easy_handle);
+	zbx_async_check_telemetry_query_clean(telemetry_query_context);
+	zbx_free(telemetry_query_context);
+fail:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
 #endif
 
 static void	async_wake(evutil_socket_t fd, short events, void *arg)
@@ -289,6 +371,11 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 						"Support for HTTP agent was not compiled in: missing cURL library"));
 #endif
 			}
+			else if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
+			{
+				errcodes[i] = zbx_async_check_telemetry_query(&items.telemetry_query_items[i],
+						&results[i], poller_config);
+			}
 			else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 			{
 				errcodes[i] = zbx_async_check_agent(&items.agent_items[i], &results[i],
@@ -337,6 +424,12 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 					value_type = items.httpagent_items[i].value_type;
 					flags = items.httpagent_items[i].flags;
 					preprocessing = items.httpagent_items[i].preprocessing;
+					break;
+				case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+					itemid = items.telemetry_query_items[i].itemid;
+					value_type = items.telemetry_query_items[i].value_type;
+					flags = items.telemetry_query_items[i].flags;
+					preprocessing = items.telemetry_query_items[i].preprocessing;
 					break;
 				case ZBX_POLLER_TYPE_AGENT:
 					itemid = items.agent_items[i].itemid;
@@ -768,6 +861,25 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;
 #endif
 	}
+	else if (ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
+	{
+	/* TODO: not initialize this if db type is postgresql/mysql */
+#ifdef HAVE_LIBCURL
+		char	*error = NULL;
+
+		zbx_async_httpagent_init();
+
+		if (NULL == (asynchttppoller_config = zbx_async_httpagent_create(poller_config.base,
+				process_telemetry_query_result, poller_update_selfmon_counter, &poller_config, &error)))
+		{
+			zabbix_log(LOG_LEVEL_ERR, "zbx_async_httpagent_create() error: %s", error);
+			zbx_free(error);
+			zbx_exit(EXIT_FAILURE);
+		}
+
+		poller_config.curl_handle = asynchttppoller_config->curl_handle;
+#endif
+	}
 	else if (ZBX_POLLER_TYPE_AGENT == poller_type)
 	{
 		async_poller_dns_init(&poller_config, poller_args_in);
@@ -860,11 +972,11 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 		}
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
-		if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+		if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type && ZBX_POLLER_TYPE_TELEMETRY_QUERY != poller_type)
 			zbx_async_dns_update_host_addresses(poller_config.dnsbase, poller_config.channel);
 	}
 
-	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type && ZBX_POLLER_TYPE_TELEMETRY_QUERY != poller_type)
 	{
 		async_poller_dns_destroy(&poller_config);
 	}
@@ -872,8 +984,9 @@ ZBX_THREAD_ENTRY(zbx_async_poller_thread, args)
 	event_del(rtc_event);
 	async_poller_stop(&poller_config);
 
-	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
+	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type || ZBX_POLLER_TYPE_TELEMETRY_QUERY == poller_type)
 	{
+		/* TODO: for telemetry query: not clean if db is postgresql/mysql */
 #ifdef HAVE_LIBCURL
 		zbx_async_httpagent_clean(asynchttppoller_config);
 		zbx_free(asynchttppoller_config);

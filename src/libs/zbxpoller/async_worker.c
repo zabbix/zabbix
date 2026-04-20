@@ -57,6 +57,10 @@ static zbx_poller_item_t	*dc_config_async_get_poller_items(zbx_uint64_t processi
 				zbx_prepare_snmp_items(poller_item->items.snmp_items, poller_item->errcodes,
 						poller_item->num, poller_item->results);
 				break;
+			case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+				zbx_prepare_telemetry_query_items(poller_item->items.telemetry_query_items,
+						poller_item->errcodes, poller_item->num, poller_item->results);
+				break;
 			default: /* ZBX_POLLER_TYPE_HTTPAGENT */
 				zbx_prepare_httpagent_items(poller_item->items.httpagent_items, poller_item->errcodes,
 						poller_item->num, poller_item->results);

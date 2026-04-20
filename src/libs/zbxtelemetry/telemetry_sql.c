@@ -694,7 +694,7 @@ static void	tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t n
 	}
 }
 
-void	tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);
@@ -753,7 +753,7 @@ void	tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t 
 	zbx_free(conditions);
 }
 
-void	tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
+void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
 	const int	query_has_conditions = (0 != query->conditions.values_num);

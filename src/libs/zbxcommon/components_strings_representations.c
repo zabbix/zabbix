@@ -128,6 +128,8 @@ const char	*get_process_type_string(unsigned char proc_type)
 			return "browser poller";
 		case ZBX_PROCESS_TYPE_SUPERVISOR:
 			return "supervisor";
+		case ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER:
+			return "telemetry query poller";
 	}
 
 	THIS_SHOULD_NEVER_HAPPEN;

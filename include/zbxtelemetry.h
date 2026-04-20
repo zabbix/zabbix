@@ -140,4 +140,7 @@ int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **out, char **error);
 
+void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
+void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
+
 #endif

@@ -229,6 +229,10 @@ void	zbx_poller_item_free(zbx_poller_item_t *poller_item)
 			zbx_clean_httpagent_items(poller_item->items.httpagent_items, poller_item->num,
 					poller_item->results);
 			break;
+		case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+			zbx_clean_telemetry_query_items(poller_item->items.telemetry_query_items, poller_item->num,
+					poller_item->results);
+			break;
 	}
 	zbx_free(poller_item->results);
 	zbx_free(poller_item->errcodes);

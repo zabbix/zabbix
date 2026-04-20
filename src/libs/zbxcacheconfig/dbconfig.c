@@ -540,6 +540,11 @@ static unsigned char	poller_by_item(unsigned char type, const char *key, unsigne
 				break;
 
 			return ZBX_POLLER_TYPE_HTTPAGENT;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER))
+				break;
+
+			return ZBX_POLLER_TYPE_TELEMETRY_QUERY;
 		case ITEM_TYPE_ZABBIX:
 			if (0 == get_config_forks_cb(ZBX_PROCESS_TYPE_AGENT_POLLER))
 				break;
@@ -3325,6 +3330,10 @@ static void	process_zero_pollers_items(ZBX_DC_ITEM *item)
 		case ITEM_TYPE_HTTPAGENT:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_HTTPAGENT_POLLER,
 					"HTTPAgent pollers");
+			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_TELEMETRY_QUERY_POLLER,
+					"Telemetry query pollers");
 			break;
 		case ITEM_TYPE_SNMP:
 			make_item_unsupported_if_zero_pollers(item, ZBX_PROCESS_TYPE_SNMP_POLLER, "SNMP pollers");
@@ -10175,6 +10184,40 @@ static void	DCget_httpagent_item(zbx_dc_httpagent_item_t *dst_item, const ZBX_DC
 	dst_item->password = NULL;
 }
 
+static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, const ZBX_DC_ITEM *src_item,
+		const ZBX_DC_HOST *src_host)
+{
+	const ZBX_DC_INTERFACE		*dc_interface;
+
+	dst_item->hostid = src_host->hostid;
+	zbx_strscpy(dst_item->host_host, src_host->host);
+	zbx_strscpy(dst_item->host_name, src_host->name);
+
+	dst_item->preprocessing = zbx_dc_item_requires_preprocessing(src_item);
+	dst_item->value_type = src_item->value_type;
+
+	dst_item->key_orig = zbx_strdup(NULL, src_item->key);
+
+	dst_item->itemid = src_item->itemid;
+	dst_item->flags = src_item->flags;
+	dst_item->key = NULL;
+	dst_item->timeout = 0;
+
+	dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &src_item->interfaceid);
+
+	DCget_interface(&dst_item->interface, dc_interface);
+
+	if ('\0' == *src_item->timeout)
+		zbx_strscpy(dst_item->timeout_orig, dc_get_global_item_type_timeout(src_item->type));
+	else
+		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
+
+	zbx_strscpy(dst_item->query_fields_orig, src_item->itemtype.tqitem->query_fields);
+
+	dst_item->timeout = 0;
+	dst_item->query_fields = NULL;
+}
+
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)
 {
 	size_t	i;
@@ -11940,6 +11983,9 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 		case ZBX_POLLER_TYPE_HTTPAGENT:
 			item_size = sizeof(zbx_dc_httpagent_item_t);
 			break;
+		case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+			item_size = sizeof(zbx_dc_telemetry_query_item_t);
+			break;
 		default:
 			item_size = sizeof(zbx_dc_item_t);
 	}
@@ -11953,6 +11999,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			max_items = ZBX_MAX_PINGER_ITEMS;
 			break;
 		case ZBX_POLLER_TYPE_HTTPAGENT:
+		case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
 		case ZBX_POLLER_TYPE_AGENT:
 		case ZBX_POLLER_TYPE_SNMP:
 			if (0 == (max_items = config_max_concurrent_checks - processing))
@@ -12081,6 +12128,9 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 			case ZBX_POLLER_TYPE_HTTPAGENT:
 				DCget_httpagent_item(&items->httpagent_items[num], dc_item, dc_host);
 				break;
+			case ZBX_POLLER_TYPE_TELEMETRY_QUERY:
+				DCget_telemetry_query_item(&items->telemetry_query_items[num], dc_item, dc_host);
+				break;
 			default:
 				DCget_host(&items->dc_items[num].host, dc_host);
 				DCget_item(&items->dc_items[num], dc_item);
@@ -12090,6 +12140,7 @@ int	zbx_dc_config_get_poller_items(unsigned char poller_type, int config_timeout
 	}
 
 	UNLOCK_CACHE;
+
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%d", __func__, num);
 

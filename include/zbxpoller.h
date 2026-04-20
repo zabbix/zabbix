@@ -69,6 +69,8 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 void	zbx_prepare_agent_items(zbx_dc_agent_item_t *items, int *errcodes, int num, AGENT_RESULT *results);
 void	zbx_prepare_snmp_items(zbx_dc_snmp_item_t *items, int *errcodes, int num, AGENT_RESULT *results);
 void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, int num, AGENT_RESULT *results);
+void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int *errcodes, int num,
+		AGENT_RESULT *results);
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_agent_result_ptr_t *add_results, unsigned char poller_type,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
@@ -80,6 +82,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_agent_items(zbx_dc_agent_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_snmp_items(zbx_dc_snmp_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_clean_httpagent_items(zbx_dc_httpagent_item_t *items, int num, AGENT_RESULT *results);
+void	zbx_clean_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 
 void	zbx_init_library_mt_snmp(const char *progname);

@@ -14,12 +14,12 @@
 
 #include "zbxjson.h"
 #include "zbxtelemetry.h"
-#include "telemetry.h"
 #include "zbxhttp.h"
 #include "zbxstr.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
 
+#ifdef HAVE_LIBCURL
 static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
@@ -33,7 +33,7 @@ static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now,
 	char			*http_error = NULL;
 	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201,202,203,204";
 
-	tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
+	zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
 	zbx_http_context_create(&context);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): generated SQL: '%s'", __func__, sql);
@@ -77,6 +77,7 @@ static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now,
 
 	return ret;
 }
+#endif
 
 static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, struct zbx_json *j)
 {
@@ -220,10 +221,14 @@ int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t
 	int	ret = FAIL;
 	char	*resp = NULL;
 
+#ifdef HAVE_LIBCURL
 	if (SUCCEED != tq_send_query_clickhouse_raw(query, now, lasttimestamp, conn_params, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
 		goto out;
-
+#elif
+	*error = zbx_strdup(NULL, "cURL was not compiled in");
+	goto out;
+#endif
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): Clickhouse response: '%s'", __func__, ZBX_NULL2STR(resp));
 
 	if (SUCCEED != tq_clickhouse_resp_to_json(query, resp, out)) {
