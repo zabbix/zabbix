@@ -1,3 +1,14 @@
+Changes for 7.0.26rc1
+
+New features:
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
+
+Bug fixes:
+.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
+..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
+
+--------------------------------------------------------------------------------
 Changes for 7.0.25
 
 7.0.25rc1 was released as 7.0.25 without any changes
