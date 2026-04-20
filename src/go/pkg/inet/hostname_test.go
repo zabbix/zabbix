@@ -35,9 +35,9 @@ func Test_IsDNSName(t *testing.T) {
 		want bool
 	}{
 		{"-empty", args{""}, false},
-		{"-starts_with_dash", args{"-"}, false},
-		{"-dash_before_sep", args{"a-.a"}, false},
-		{"-starts_after_sep", args{"a.-a"}, false},
+		{"-starts_with_hyphen", args{"-"}, false},
+		{"-hyphen_before_dot", args{"a-.a"}, false},
+		{"-hyphen_after_dot", args{"a.-a"}, false},
 		{"-too_long_label", args{"0123456789012345678901234567890123456789012345678901234567890123456789"},
 			false},
 		{"+label63", args{"123456789-123456789-123456789-123456789-123456789-123456789-123"}, true},
@@ -56,7 +56,7 @@ func Test_IsDNSName(t *testing.T) {
 		{"-leading_dot", args{".example.com"}, false},
 		{"-underscore", args{"example_com.com"}, false},
 		{"-space", args{"ex ample.com"}, false},
-		{"-end_with_dash", args{"example.com-"}, false},
+		{"-ends_with_hyphen", args{"example.com-"}, false},
 		{"-empty_label", args{"example.."}, false},
 		{"+min_label", args{"a.com"}, true},
 		{"+punycode", args{"xn--bcher-kva.com"}, true},
