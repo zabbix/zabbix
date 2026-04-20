@@ -104,6 +104,10 @@ class CDatatableElement extends CTableElement {
 	 * @return array
 	 */
 	public function getHeadersText() {
+		if ($this->getHeaders()->isStalled()) {
+			$this->invalidate();
+		}
+
 		if ($this->headers_text === null) {
 			$this->headers_text = $this->getHeaders()->asText();
 		}

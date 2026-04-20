@@ -2249,6 +2249,7 @@ class testFormHost extends CWebTest {
 
 		$this->query('name:zbx_filter')->asForm()->one()->waitUntilReady()->fill(['Name' => $host]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$this->page->waitUntilReady();
 		$table->waitUntilReady()->invalidate();
 
 		$row = $table->findRow('Name', $host, true);
