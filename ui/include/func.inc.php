@@ -2484,7 +2484,15 @@ function generateUuidV7(): string {
 	// Set variant: 9th byte to 10 (10xxxxxx)
 	$data[8] = chr(ord($data[8]) & 0x3f | 0x80);
 
-	return bin2hex($data);
+	$hex_data = bin2hex($data);
+
+	return implode('-', [
+		substr($hex_data, 0, 8),
+		substr($hex_data, 8, 4),
+		substr($hex_data, 12, 4),
+		substr($hex_data, 16, 4),
+		substr($hex_data, 20, 12)
+	]);
 }
 
 /**

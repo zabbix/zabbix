@@ -121,7 +121,7 @@ class CApiDpopHelper {
 
 		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.$check_time);
 
-		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['exp'])))) {
+		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['jti'])))) {
 			return false;
 		}
 

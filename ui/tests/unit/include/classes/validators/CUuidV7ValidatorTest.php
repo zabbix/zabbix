@@ -27,56 +27,56 @@ class CUuidV7ValidatorTest extends TestCase {
 	public function dataProvider() {
 		return [
 			// Valid uuids.
-			['018f8a67b9c47a128c7f8fdbde4c94ab', true, null],
-			['018f8a67b9c47b129a1f123456789abc', true, null],
-			['018f8a67b9c47c129b2fabcdefabcdef', true, null],
-			['018f8a67b9c47d1298ff001122334455', true, null],
-			['018f8a67b9c47e1299aa998877665544', true, null],
-			['018f8a67b9c47f1288bbccddeeff0011', true, null],
-			['018f8a67b9c4701289abcdefabcdef12', true, null],
+			['018f8a67-b9c4-7a12-8c7f-8fdbde4c94ab', true, null],
+			['018f8a67-b9c4-7b12-9a1f-123456789abc', true, null],
+			['018f8a67-b9c4-7c12-9b2f-abcdefabcdef', true, null],
+			['018f8a67-b9c4-7d12-98ff-001122334455', true, null],
+			['018f8a67-b9c4-7e12-99aa-998877665544', true, null],
+			['018f8a67-b9c4-7f12-88bb-ccddeeff0011', true, null],
+			['018f8a67-b9c4-7012-89ab-cdefabcdef12', true, null],
 
 			// Valid uppercase uuids.
-			['018F8A67B9C47A128C7F8FDBDE4C94AB', true, null],
-			['018F8A67B9C47B129A1F123456789ABC', true, null],
-			['018F8A67B9C47C129B2FABCDEFABCDEF', true, null],
+			['018F8A67-B9C4-7A12-8C7F-8FDBDE4C94AB', true, null],
+			['018F8A67-B9C4-7B12-9A1F-123456789ABC', true, null],
+			['018F8A67-B9C4-7C12-9B2F-ABCDEFABCDEF', true, null],
 
 			// Invalid uuid's length.
-			['018f8a67b9c47a128c7f8fdbde4c94a', false, 'must be 32 characters long'],
-			['018f8a67b9c47a128c7f8fdbde4c94abb', false, 'must be 32 characters long'],
-			['018f8a67b9c47a12', false, 'must be 32 characters long'],
-			['018f8a67b9c47a128c7f8fdbde4c94ab00', false, 'must be 32 characters long'],
-			['', false, 'must be 32 characters long'],
+			['018f8a67-b9c4-7a12-8c7f-8fdbde4c94a', false, 'must be 36 characters long'],
+			['018f8a67b9c47a128c7f8fdbde4c94ab', false, 'must be 36 characters long'],
+			['018f8a67-b9c4-7a12', false, 'must be 36 characters long'],
+			['018f8a67-b9c4-7a12-8c7f8fdbde4c94ab00', false, 'must be 36 characters long'],
+			['', false, 'must be 36 characters long'],
 
 			// Invalid (non-hex) characters.
-			['018f8a67b9c47a128c7f8fdbde4c94ag', false, 'must contain only hexadecimal characters'],
-			['018f8a67b9c47a128c7f8fdbde4c94az', false, 'must contain only hexadecimal characters'],
-			['018f8a67b9c47a128c7f8fdbde4c94a_', false, 'must contain only hexadecimal characters'],
-			['018f8a67b9c47a128c7f8fdbde4c94a-', false, 'must contain only hexadecimal characters'],
-			['018f8a67b9c47a128c7f8fdbde4c94a!', false, 'must contain only hexadecimal characters'],
+			['018f8a67-b9c4-7a12-8c7f-8fdbde4c94ag', false, 'a hyphenated UUID is expected'],
+			['018f8a6-7b9c4-7a12-8c7f8fd-bde4c94az', false, 'a hyphenated UUID is expected'],
+			['018f8a67-b9c4-7a12-8c7f-8fdbde4c94a_', false, 'a hyphenated UUID is expected'],
+			['018f8a67-b9c4-7a12-8c7f-8fdbde4c94a-', false, 'a hyphenated UUID is expected'],
+			['018f8a67-b9c4-7a12-8c7f-8fdbde4c94a!', false, 'a hyphenated UUID is expected'],
 
 			// Invalid version.
-			['018f8a67b9c46a128c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c45a128c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c44a128c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c41a128c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c40a128c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-6a12-8c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-5a12-8c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-4a12-8c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-1a12-8c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-0a12-8c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
 
 			// Invalid variant.
-			['018f8a67b9c47a127c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c47a123c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c47a120c7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c47a12fc7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
-			['018f8a67b9c47a12dc7f8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-7a12-7c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-7a12-3c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-7a12-0c7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-7a12-fc7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
+			['018f8a67-b9c4-7a12-dc7f-8fdbde4c94ab', false, 'a UUIDv7 is expected'],
 		];
 	}
 
 	/**
 	 * @dataProvider dataProvider
 	 */
-	public function testValidateUuidV7($uuid, $expected, $error) {
+	public function testValidateUuidV7($uuid, $expected_result, $expected_error) {
 		$uuid_v7_validator = new CUuidV7Validator();
 		$result = $uuid_v7_validator->validate($uuid);
-		$this->assertSame($expected, $result);
-		$this->assertSame($error, $uuid_v7_validator->getError());
+		$this->assertSame($expected_result, $result);
+		$this->assertSame($expected_error, $uuid_v7_validator->getError());
 	}
 }

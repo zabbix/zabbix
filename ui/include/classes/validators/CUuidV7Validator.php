@@ -19,7 +19,7 @@
  */
 class CUuidV7Validator extends CValidator {
 
-	private const LENGTH = 32;
+	private const LENGTH = 36;
 
 	/**
 	 * @param string $value
@@ -33,11 +33,15 @@ class CUuidV7Validator extends CValidator {
 			return false;
 		}
 
-		if (!ctype_xdigit($value)) {
-			$this->setError(_('must contain only hexadecimal characters'));
+		$value = strtolower($value);
+
+		if (!preg_match('/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/', $value)) {
+			$this->setError(_('a hyphenated UUID is expected'));
 
 			return false;
 		}
+
+		$value = str_replace('-', '', $value);
 
 		$binary = hex2bin($value);
 
