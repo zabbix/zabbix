@@ -246,4 +246,101 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->assertArrayNotHasKey('ns', $response['result'][0]);
 		}
 	}
+
+	/**
+	 * Add a trigger prototype per item type, verify that a trigger is created for every
+	 * discovered sensor across all value types, then resend values for each type.
+	 *
+	 * @depends testMultipleItemsHistory_LLDDiscovery
+	 */
+	public function testMultipleItemsHistory_TriggerDiscovery() {
+		foreach (self::prototypeDefs() as $def) {
+			$response = $this->call('triggerprototype.create', [
+				'description' => 'Sensor '.$def['suffix'].' alert ['.self::LLD_MACRO.']',
+				'expression' => 'last(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.'])>0'
+			]);
+			$this->assertArrayHasKey('triggerids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['triggerids']);
+		}
+
+		$this->reloadConfigurationCache();
+
+		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
+
+		// Wait until a trigger instance is created for every discovered sensor and type.
+		$response = $this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'description', 'status']
+		], 120, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
+			return count($r['result']) === $total_expected;
+		});
+
+		$this->assertCount($total_expected, $response['result'],
+			'Not all '.$total_expected.' discovered triggers were created.');
+
+		foreach ($response['result'] as $trigger) {
+			$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
+		}
+
+		$this->reloadConfigurationCache();
+
+		$this->sendAndVerifyHistory();
+	}
+
+	/**
+	 * @depends testMultipleItemsHistory_TriggerDiscovery
+	 */
+	public function testMultipleItemsHistory_TriggerDiscoveryAfterRestart() {
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
+
+		$this->sendAndVerifyHistory();
+	}
+
+	private function sendAndVerifyHistory(): void {
+		$tm = time();
+
+		foreach (self::prototypeDefs() as $def) {
+			$vtype = $def['value_type'];
+			$items_by_key = self::$discovered_itemids[$vtype];
+
+			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
+				'Expected '.self::LLD_DISCOVERY_COUNT.' item IDs for type '.$def['suffix'].'.');
+
+			$values = [];
+			$idx = 0;
+			foreach ($items_by_key as $key => $itemid) {
+				$values[] = [
+					'host' => self::HOSTNAME,
+					'key' => $key,
+					'value' => (string)($idx + 1),
+					'clock' => $tm,
+					'ns' => $idx
+				];
+				$idx++;
+			}
+
+			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+			$itemids = array_values($items_by_key);
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'limit' => self::LLD_DISCOVERY_COUNT
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
+			});
+
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'countOutput' => true
+			]);
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
+		}
+	}
 }
