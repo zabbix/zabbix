@@ -111,7 +111,7 @@ class CControllerUserProfileDeviceList extends CController {
 			'devices' => $devices,
 			'filter' => $filter,
 			'paging' => $paging,
-			'profileIdx' => $this->getProfilePrefix(),
+			'profileIdx' => $this->getProfilePrefix().'filter',
 			'sort' => $filter['sort'],
 			'sortorder' => $filter['sortorder'],
 			'url' => $view_url->getUrl(),
