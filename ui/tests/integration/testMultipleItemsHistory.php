@@ -105,8 +105,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 1,
 				'DebugLevel' => 3,
-				'CacheSize' => '64M'
-				'HistoryIndexCacheSize' => '16M'
+				'CacheSize' => '64M',
+				'HistoryIndexCacheSize' => '16M',
 			]
 		];
 	}
