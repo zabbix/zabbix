@@ -21,7 +21,8 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider configurationProvider
- * @backup hosts,items,item_discovery,history,history_uint,history_str,history_text,history_log
+ * @backup hosts,items,item_discovery
+ * @onAfter clearData
  */
 class testMultipleItemsHistory extends CIntegrationTest {
 
@@ -30,7 +31,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 10;
+	const LLD_DISCOVERY_COUNT = 4000;
 
 	private static $hostid;
 	private static $lld_ruleid;
@@ -40,10 +41,10 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static function prototypeDefs() {
 		return [
 			['suffix' => 'float', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
-			['suffix' => 'uint',  'value_type' => ITEM_VALUE_TYPE_UINT64],
-			['suffix' => 'str',   'value_type' => ITEM_VALUE_TYPE_STR],
-			['suffix' => 'text',  'value_type' => ITEM_VALUE_TYPE_TEXT],
-			['suffix' => 'log',   'value_type' => ITEM_VALUE_TYPE_LOG]
+			['suffix' => 'uint', 'value_type' => ITEM_VALUE_TYPE_UINT64],
+			['suffix' => 'str', 'value_type' => ITEM_VALUE_TYPE_STR],
+			['suffix' => 'text', 'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['suffix' => 'log', 'value_type' => ITEM_VALUE_TYPE_LOG]
 		];
 	}
 
