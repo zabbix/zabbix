@@ -21,7 +21,6 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  *
  * @required-components server
  * @configurationDataProvider configurationProvider
- * @backup hosts,items,item_discovery
  * @onAfter clearData
  */
 class testMultipleItemsHistory extends CIntegrationTest {
@@ -91,7 +90,11 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		return true;
 	}
-
+	public static function clearData(): void {
+		if (self::$hostid !== null) {
+			CDataHelper::call('host.delete', [self::$hostid]);
+		}
+	}
 	/**
 	 * Component configuration provider.
 	 *
