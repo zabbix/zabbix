@@ -246,7 +246,6 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 		zbx_ipc_async_socket_t *rtc)
 {
 	ZBX_UNUSED(get_program_type_cb);
-	ZBX_UNUSED(rtc);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
@@ -279,7 +278,7 @@ int	zbx_trapper_process_request_server(const char *request, zbx_socket_t *sock, 
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", jp->start);
 #endif
-		recv_proxy_data(sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
+		recv_proxy_data(rtc, sock, jp, ts, events_cbs, config_comms->config_timeout, proxydata_frequency);
 
 		return SUCCEED;
 	}

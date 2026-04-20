@@ -64,8 +64,6 @@ textarea.has-error {
 
 div[data-field-type="set"] {
 	&.has-error {
-		padding-left: 5px;
-		width: min-content;
 		border: 1px solid $error;
 	}
 }
