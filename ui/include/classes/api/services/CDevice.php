@@ -34,9 +34,6 @@ class CDevice extends CApiService {
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
-	private const STATUS_NEW = 0;
-	private const STATUS_ENABLED = 1;
-
 	public const MOBILE_IDENTITY_KEY = 0;
 	public const MOBILE_ENCRYPTION_KEY = 1;
 
@@ -180,8 +177,7 @@ class CDevice extends CApiService {
 
 		$ins_device = [
 			'uuid' => $uuid,
-			'userid' => $data['userid'],
-			'status' => self::STATUS_NEW
+			'userid' => $data['userid']
 		];
 
 		$deviceids = DB::insertBatch('device', [$ins_device]);
@@ -317,7 +313,7 @@ class CDevice extends CApiService {
 		DB::update('device', [
 			'values' => [
 				'name' => $options['name'],
-				'status' => self::STATUS_ENABLED,
+				'status' => ZBX_DEVICE_ACTIVATED,
 				'push_token' => $options['push_token'],
 				'activated_at' => time()
 			],
