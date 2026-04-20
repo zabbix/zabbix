@@ -707,7 +707,7 @@ class CFormValidator {
 		fields = fields.map((field) => field.split('/').filter(part => /^\d+$/.test(part) === false).join('/'));
 
 		const getRules = (rules, rule_path, parent_matching = false) => {
-			const rule = Object.create(null);
+			const rule = {};
 			let path_matching = false;
 
 			Object.entries(rules).forEach(([key, value]) => {
@@ -721,7 +721,7 @@ class CFormValidator {
 
 						rule_sets = rule_sets.filter(rule_set => rule_set);
 						if (rule_sets.length) {
-							if (!Object.hasOwn(rule, 'fields')) {
+							if (!('fields' in rule)) {
 								rule.fields = Object.create(null);
 							}
 

@@ -211,7 +211,7 @@ class CForm {
 				let data = values;
 
 				for (const part of parts) {
-					if (Object.hasOwn(data, part)) {
+					if (part in data) {
 						data = data[part];
 					}
 					else {
@@ -343,7 +343,7 @@ class CForm {
 		const {field_errors, general_errors} = this.convertRawErrors(raw_errors);
 
 		Object.entries(field_errors).forEach(([key, errors]) => {
-			if (Object.hasOwn(this.#fields, key)) {
+			if (key in this.#fields) {
 				const field = this.#fields[key];
 
 				if (field instanceof CFieldSet) {
@@ -418,7 +418,7 @@ class CForm {
 			Object.entries(raw_errors).filter(([path]) => {
 				return field_path === path || subfield_path.test(path);
 			}).forEach(([path, errors]) => {
-				if (!Object.hasOwn(field_errors, field_name)) {
+				if (!(field_name in field_errors)) {
 					field_errors[field_name] = Object.create(null);
 				}
 

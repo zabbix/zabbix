@@ -174,7 +174,7 @@ class CFieldSet extends CField {
 
 	setErrors(errors, force_display_errors) {
 		if (typeof errors === 'object' && '' in errors) {
-			Object.values(errors['']).forEach((error) => super.setErrors(error));
+			errors[''].forEach((error) => super.setErrors(error));
 			delete errors[''];
 		}
 
@@ -212,7 +212,7 @@ class CFieldSet extends CField {
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
-			if (Object.hasOwn(this.#fields, key_full)) {
+			if (key_full in this.#fields) {
 				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
 						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
