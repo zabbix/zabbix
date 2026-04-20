@@ -399,7 +399,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
+		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		$table->waitUntilReady()->invalidate();
@@ -873,7 +873,8 @@ class testPageMonitoringHosts extends CWebTest {
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReady();
+		$this->page->waitUntileady();
+		$table->waitUntilReady()->invalidate();
 		$reset_rows_count = $table->getRows()->count();
 		$this->assertEquals($start_rows_count, $reset_rows_count);
 		$this->assertDatatableStats($reset_rows_count);
@@ -1061,7 +1062,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 */
 	public function testPageMonitoringHosts_HostContextMenu($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1')->waitUntilReady();
-		$row = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
+		$row = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady()->findRow('Name', $data['name']);
 		$row->query('link', $data['name'])->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -1101,7 +1102,6 @@ class testPageMonitoringHosts extends CWebTest {
 			}
 
 			// Navigate to Problems page from Hosts.
-			$table->getRow(0)->highlight();
 			$table->getRow(0)->getColumn('Problems')->query('xpath:.//a')->one()->click();
 			$this->page->waitUntilReady();
 			$this->page->assertTitle('Problems');
