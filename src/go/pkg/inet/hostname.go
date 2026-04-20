@@ -14,7 +14,7 @@
 
 package inet
 
-func isAlnum(c byte) bool {
+func isAlnumASCII(c byte) bool {
 	return (c >= '0' && c <= '9') ||
 		(c >= 'a' && c <= 'z') ||
 		(c >= 'A' && c <= 'Z')
@@ -41,7 +41,7 @@ func IsDNSName(host string) bool {
 
 	// first character must be alphanumeric
 	c := host[0]
-	if !isAlnum(c) {
+	if !isAlnumASCII(c) {
 		return false
 	}
 
@@ -52,7 +52,7 @@ func IsDNSName(host string) bool {
 		c = host[i]
 
 		switch {
-		case isAlnum(c):
+		case isAlnumASCII(c):
 			labelLen++
 			prevHyphen = false
 		case c == '-':
