@@ -22,8 +22,18 @@ func isAlnum(c byte) bool {
 
 // IsDNSName checks if host is valid DNS name (should work the same as zbx_is_dnsname in C)
 //
+// Valid DNS hostnames for this function are names with only ASCII characters 0-9, A-Z, a-z,
+// hyphen ('-') and dot ('.').
+// Internationalized Domain Names with multibyte UTF-8 characters will be rejected as not
+// valid (Punycode can be used).
+//
 //nolint:cyclop,gocyclo // high complexity due to DNS validation, splitting not practical
 func IsDNSName(host string) bool {
+	// Requirements and limits for host names are defined in RFC 1035,
+	// with clarifications in RFC 1123, RFC 2181.
+
+	// Total length should not exceed 253 characters.
+	// This is excluding trailing dot and additional byte usually used when saved.
 	n := len(host)
 	if n == 0 || n > 253 {
 		return false
@@ -36,7 +46,7 @@ func IsDNSName(host string) bool {
 	}
 
 	labelLen := 1
-	prevDash := false
+	prevHyphen := false
 
 	for i := 1; i < n; i++ {
 		c = host[i]
@@ -44,23 +54,23 @@ func IsDNSName(host string) bool {
 		switch {
 		case isAlnum(c):
 			labelLen++
-			prevDash = false
+			prevHyphen = false
 		case c == '-':
-			// label must not start with dash
+			// label must not start with hyphen
 			if labelLen == 0 {
 				return false
 			}
 
 			labelLen++
-			prevDash = true
+			prevHyphen = true
 		case c == '.':
-			// empty label or label ending with dash
-			if labelLen == 0 || prevDash {
+			// empty label or label ending with hyphen
+			if labelLen == 0 || prevHyphen {
 				return false
 			}
 
 			labelLen = 0
-			prevDash = false
+			prevHyphen = false
 		default:
 			return false
 		}
@@ -70,8 +80,8 @@ func IsDNSName(host string) bool {
 		}
 	}
 
-	// last label must not be empty or end with dash
-	if labelLen == 0 || prevDash {
+	// last label must not be empty or end with hyphen
+	if labelLen == 0 || prevHyphen {
 		return false
 	}
 
