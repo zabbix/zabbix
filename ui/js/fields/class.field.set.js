@@ -191,7 +191,7 @@ class CFieldSet extends CField {
 
 	setErrors(errors, force_display_errors) {
 		if (typeof errors === 'object' && '' in errors) {
-			Object.values(errors['']).forEach((error) => super.setErrors(error));
+			errors[''].forEach((error) => super.setErrors(error));
 			delete errors[''];
 		}
 
@@ -229,7 +229,7 @@ class CFieldSet extends CField {
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
-			if (Object.hasOwn(this.#fields, key_full)) {
+			if (key_full in this.#fields) {
 				// These errors need to be added even if field is not changed, but smaller index one was.
 				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
 					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
