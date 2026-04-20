@@ -171,6 +171,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_LLDDiscovery
 	 */
 	public function testMultipleItemsHistory_SendAndVerify() {
+		$this->call('settings.update', ['auditlog_enabled' => 0]);
+
 		$tm = time();
 
 		foreach (self::prototypeDefs() as $def) {
