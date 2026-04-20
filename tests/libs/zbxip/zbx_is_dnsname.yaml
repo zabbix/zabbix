@@ -5,19 +5,19 @@ in:
 out:
   return: FAIL
 ---
-test case: "2. Starts with dash"
+test case: "2. Starts with hyphen"
 in:
   string: "-"
 out:
   return: FAIL
 ---
-test case: "3. Dash before separator"
+test case: "3. Hyphen before dot"
 in:
   string: "a-.a"
 out:
   return: FAIL
 ---
-test case: "4. Dash after separator"
+test case: "4. Hyphen after dot"
 in:
   string: "a.-a"
 out:
@@ -77,7 +77,7 @@ in:
 out:
   return: FAIL
 ---
-test case: "14. Ends with dash"
+test case: "14. Ends with hyphen"
 in:
   string: "example.com-"
 out:
