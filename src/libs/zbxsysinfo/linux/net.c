@@ -1348,9 +1348,13 @@ static void	sys_class_net_str_add(const char *if_name, const char *filename, con
 		{
 			zbx_rtrim(buf, "\n");
 
-			zbx_json_addstring(j1, key, buf, ZBX_JSON_TYPE_STRING);
-			if (NULL != j2)
-				zbx_json_addstring(j2, key, buf, ZBX_JSON_TYPE_STRING);
+			if ('\0' != *buf)
+			{
+				zbx_json_addstring(j1, key, buf, ZBX_JSON_TYPE_STRING);
+
+				if (NULL != j2)
+					zbx_json_addstring(j2, key, buf, ZBX_JSON_TYPE_STRING);
+			}
 		}
 		zbx_fclose(f);
 	}
