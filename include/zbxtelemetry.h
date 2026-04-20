@@ -135,12 +135,9 @@ zbx_tq_conn_params_clickhouse_t;
 int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
-int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **out, char **error);
-
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
+
+int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char **out_json);
 
 #endif

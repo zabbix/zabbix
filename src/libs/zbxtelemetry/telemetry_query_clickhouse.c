@@ -14,70 +14,8 @@
 
 #include "zbxjson.h"
 #include "zbxtelemetry.h"
-#include "zbxhttp.h"
-#include "zbxstr.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
-
-#ifdef HAVE_LIBCURL
-static int	tq_send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **out, char **error)
-{
-	int			ret;
-	char			*sql = NULL;
-	long			response_code;
-	zbx_http_context_t	context;
-	char			*http_out = NULL;
-	char			*http_error = NULL;
-	char			query_fields[] = "", headers[] = "", status_codes[] = "200,201,202,203,204";
-
-	zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &sql);
-	zbx_http_context_create(&context);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): generated SQL: '%s'", __func__, sql);
-
-	if (SUCCEED == zbx_http_request_prepare(&context, HTTP_REQUEST_POST, conn_params->url, query_fields, headers,
-			sql, ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, conn_params->timeout, conn_params->max_attempts,
-			conn_params->ssl_cert_file, conn_params->ssl_key_file, conn_params->ssl_key_password,
-			conn_params->verify_peer, conn_params->verify_host, conn_params->authtype,
-			conn_params->username, conn_params->password, conn_params->token, ZBX_POSTTYPE_RAW,
-			HTTP_STORE_RAW, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
-			config_ssl_key_location, &http_error))
-	{
-		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, 0,
-				ZBX_HTTP_IGNORE_RESPONSE_CODE);
-
-		if (SUCCEED == zbx_http_handle_response(context.easyhandle, &context, err, &response_code, &http_out,
-				&http_error) && SUCCEED == zbx_handle_response_code(status_codes, response_code,
-				http_out, &http_error))
-			ret = SUCCEED;
-		else
-			ret = FAIL;
-	}
-	else
-		ret = FAIL;
-
-	if (SUCCEED == ret)
-	{
-		*out = http_out;
-		http_out = NULL;
-	}
-	else
-	{
-		*error = http_error;
-		http_error = NULL;
-	}
-
-	zbx_free(sql);
-	zbx_free(http_out);
-	zbx_free(http_error);
-	zbx_http_context_destroy(&context);
-
-	return ret;
-}
-#endif
 
 static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, struct zbx_json *j)
 {
@@ -123,7 +61,6 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 		char		*field_name;
 		zbx_json_type_t	type;
 
-		/* TODO: decide on a format for columns with keys, maybe nested? */
 		if (NULL != col->key)
 			field_name = zbx_dsprintf(NULL, "%s.%s", col->name, col->key);
 		else
@@ -171,7 +108,7 @@ out:
  * Comments: modifies resp during parsing but returns it to initial state     *
  *                                                                            *
  ******************************************************************************/
-static int	tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char **out_json)
+int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char **out_json)
 {
 	int		ret = SUCCEED;
 	struct zbx_json	j;
@@ -209,41 +146,6 @@ static int	tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, c
 		*out_json = zbx_strdup(NULL, j.buffer);
 
 	zbx_json_close(&j);
-
-	return ret;
-}
-
-int	zbx_tq_send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
-		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **out, char **error)
-{
-	int	ret = FAIL;
-	char	*resp = NULL;
-
-#ifdef HAVE_LIBCURL
-	if (SUCCEED != tq_send_query_clickhouse_raw(query, now, lasttimestamp, conn_params, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
-		goto out;
-#elif
-	*error = zbx_strdup(NULL, "cURL was not compiled in");
-	goto out;
-#endif
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): Clickhouse response: '%s'", __func__, ZBX_NULL2STR(resp));
-
-	if (SUCCEED != tq_clickhouse_resp_to_json(query, resp, out)) {
-		*error = zbx_strdup(NULL, "Failed to parse Clickhouse response");
-		goto out;
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): resulting json: '%s'", __func__, ZBX_NULL2STR(*out));
-
-	ret = SUCCEED;
-out:
-	if (SUCCEED != ret)
-		zabbix_log(LOG_LEVEL_ERR, "%s(): query failed: \"%s\"", __func__, ZBX_NULL2STR(*error));
-
-	zbx_free(resp);
 
 	return ret;
 }

@@ -15,7 +15,6 @@
 #include "async_telemetry_query.h"
 #include "module.h"
 #include "zbxcommon.h"
-#include "zbxstr.h"
 #include "zbxtelemetry.h"
 #include "zbxtypes.h"
 #include <time.h>

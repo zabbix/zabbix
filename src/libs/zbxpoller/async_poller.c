@@ -47,6 +47,7 @@
 #include "zbxtime.h"
 #include "zbxtypes.h"
 #include "zbxasyncpoller.h"
+#include "zbxtelemetry.h"
 
 #include <event2/dns.h>
 
@@ -218,8 +219,9 @@ fail:
 
 static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void *arg)
 {
+	unsigned char			item_state;
 	long				response_code;
-	char				*error, *out = NULL;
+	char				*error, *http_resp = NULL;
 	char				status_codes[] = "200,201,202,203,204";
 	AGENT_RESULT			result;
 	zbx_telemetry_query_context	*telemetry_query_context;
@@ -246,38 +248,47 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	item_context = &telemetry_query_context->item_context;
 
 	if (SUCCEED == zbx_http_handle_response(easy_handle, &telemetry_query_context->http_context, err,
-			&response_code, &out, &error) &&
-			SUCCEED == zbx_handle_response_code(status_codes, response_code, out, &error))
+			&response_code, &http_resp, &error) &&
+			SUCCEED == zbx_handle_response_code(status_codes, response_code, http_resp, &error))
 	{
-		/* TODO: transform result to json */
+		char	*out = NULL;
 
-		/* FIXME: placeholder */
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST1: %s(): '%s'", __func__, out);
-
-		SET_TEXT_RESULT(&result, out);
-		out = NULL;
-		if (ZBX_IS_RUNNING())
+		if (SUCCEED == zbx_tq_clickhouse_resp_to_json(item_context->query, http_resp, &out))
 		{
-			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
-					item_context->preprocessing, &result, &timespec, ITEM_STATE_NORMAL, NULL);
+			/* FIXME: placeholder */
+			zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST1: %s(): '%s'", __func__, http_resp);
+			zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST11: %s(): '%s'", __func__, out);
+
+			SET_TEXT_RESULT(&result, out);
+			item_state = ITEM_STATE_NORMAL;
+		}
+		else
+		{
+			/* FIXME: placeholder */
+			zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST2: %s()", __func__);
+
+			SET_MSG_RESULT(&result, zbx_strdup(NULL, "Failed to parse Clickhouse response"));
+			item_state = ITEM_STATE_NOTSUPPORTED;
 		}
 	}
 	else
 	{
 		/* FIXME: placeholder */
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST2: %s(): '%s'", __func__, error);
+		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST3: %s(): '%s'", __func__, error);
 
 		SET_MSG_RESULT(&result, error);
-		if (ZBX_IS_RUNNING())
-		{
-			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
-					item_context->preprocessing, NULL, &timespec, ITEM_STATE_NOTSUPPORTED,
-					result.msg);
-		}
+		item_state = ITEM_STATE_NOTSUPPORTED;
+	}
+
+	if (ZBX_IS_RUNNING())
+	{
+		zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+				item_context->preprocessing, (ITEM_STATE_NORMAL == item_state ? &result : NULL),
+				&timespec, item_state, (ITEM_STATE_NORMAL == item_state ? NULL : result.msg));
 	}
 
 	zbx_free_agent_result(&result);
-	zbx_free(out);
+	zbx_free(http_resp);
 
 	zbx_async_manager_requeue(poller_config->manager, telemetry_query_context->item_context.itemid, SUCCEED,
 			timespec.sec);
