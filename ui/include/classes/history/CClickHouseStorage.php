@@ -152,7 +152,7 @@ class CClickHouseStorage {
 		}
 
 		if (is_array($options['limit_by'])) {
-			[$limit, $by] = $options['limit_by'];
+			[$limit, $by] = array_pad($options['limit_by'], 2, '');
 
 			if (!ctype_digit((string) $limit) || $by !== 'itemid') {
 				$options['limit_by'] = null;
@@ -161,10 +161,6 @@ class CClickHouseStorage {
 
 		$query_parts = $this->getQueryPartsFromOptions($options);
 		$query = $this->buildQueryFromParts($query_parts);
-
-		if ($options['countOutput']) {
-			$query = 'SELECT count() AS rowscount FROM ('.$query.')';
-		}
 
 		return $this->query($query, $query_parts['param']);
 	}
@@ -486,6 +482,8 @@ class CClickHouseStorage {
 	 * @return array
 	 */
 	protected function getEncodedParamMap(array $param): array {
+		$form_values = [];
+
 		foreach ($param as $column_type => $columns_values) {
 			foreach ($columns_values as $column => $value) {
 				$form_value = null;
@@ -679,6 +677,12 @@ class CClickHouseStorage {
 	 */
 	protected function addQueryOutputOptions(array $sql_parts, array $options): array {
 		$value = 'value';
+
+		if ($options['countOutput']) {
+			$sql_parts['select'] = ['rowscount' => 'count()'];
+
+			return $sql_parts;
+		}
 
 		if ($options['maxValueSize'] !== null) {
 			$value = match ($options['history']) {
