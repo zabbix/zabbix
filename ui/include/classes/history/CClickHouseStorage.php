@@ -335,8 +335,8 @@ class CClickHouseStorage {
 						}.
 					' FROM '.$table.
 					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
-					' WHERE clock_ns BETWEEN toDateTime64({time_gte:UInt64},9)'.
-						' AND addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
+					' WHERE clock_ns>=toDateTime64({time_gte:UInt64},9)'.
+						' AND clock_ns<toDateTime64({time_lt:UInt64},9)'.
 					' GROUP BY itemid,tick'.
 					' ORDER BY itemid,tick'.
 				')',
@@ -344,7 +344,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'pre_itemids' => array_keys($itemids),
 						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lte' => $this->getTtlLimitedTimestamp($value_type, $time_to),
+						'time_lt' => $this->getTtlLimitedTimestamp($value_type, $time_to) + 1,
 						'interval' => $interval
 					]
 				]
@@ -392,8 +392,8 @@ class CClickHouseStorage {
 						).
 					' FROM '.$table.
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
-						' AND clock_ns BETWEEN toDateTime64({time_gte:UInt64},9)'.
-							' AND addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
+						' AND clock_ns>=toDateTime64({time_gte:UInt64},9)'.
+						' AND clock_ns<toDateTime64({time_lt:UInt64},9)'.
 					' GROUP BY itemid'.($width === null ? '' : ',i').
 					' ORDER BY itemid'.($width === null ? '' : ',i').
 				')',
@@ -401,7 +401,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'itemids' => array_keys($itemids),
 						'time_gte' => $_time_from,
-						'time_lte' => $_time_to,
+						'time_lt' => $_time_to + 1,
 						'width' => $width,
 						'seconds' => $seconds
 					]
@@ -448,18 +448,17 @@ class CClickHouseStorage {
 						}.
 					' FROM '.$table.
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
-						' AND '.($time_to === null
-							? 'clock_ns>=toDateTime64({time_gte:UInt64},9)'
-							: 'clock_ns BETWEEN toDateTime64({time_gte:UInt64},9)'.
-								' AND addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'
-						).
+						' AND clock_ns>=toDateTime64({time_gte:UInt64},9)'.
+						($time_to !== null ? ' AND clock_ns<toDateTime64({time_lt:UInt64},9)' : '').
 					' GROUP BY itemid'.
 				')',
 				[
 					'UInt64' => [
 						'itemids' => array_keys($itemids),
 						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lte' => $this->getTtlLimitedTimestamp($value_type, $time_to)
+						'time_lt' => $time_to !== null
+							? $this->getTtlLimitedTimestamp($value_type, $time_to) + 1
+							: null
 					]
 				]
 			);
@@ -644,30 +643,16 @@ class CClickHouseStorage {
 				: 'itemid={pre_itemids:UInt64}';
 		}
 
-		$time_from = $options['time_from'] === null
-			? null
-			: $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_from']);
-		$time_till = $options['time_till'] === null
-			? null
-			: $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_till']);
+		if ($options['time_from'] !== null) {
+			$time_from = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_from']);
+			$sql_parts['param']['UInt64']['pre_time_gte'] = $time_from;
+			$sql_parts['prewhere']['clock_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
+		}
 
-		if ($time_from !== null || $time_till !== null) {
-			if ($time_till === null) {
-				$sql_parts['param']['UInt64']['pre_time_gte'] = $time_from;
-				$condition = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
-			}
-			elseif ($time_from === null) {
-				$sql_parts['param']['UInt64']['pre_time_lte'] = $time_till;
-				$condition = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
-			}
-			else {
-				$sql_parts['param']['UInt64']['pre_time_gte'] = $time_from;
-				$sql_parts['param']['UInt64']['pre_time_lte'] = $time_till;
-				$condition = 'clock_ns BETWEEN toDateTime64({pre_time_gte:UInt64},9)'.
-					' AND addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
-			}
-
-			$sql_parts['prewhere']['clock'] = $condition;
+		if ($options['time_till'] !== null) {
+			$time_till = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_till']);
+			$sql_parts['param']['UInt64']['pre_time_lt'] = $time_till + 1;
+			$sql_parts['prewhere']['clock_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
 		}
 
 		if (is_array($options['filter'])) {
@@ -790,9 +775,9 @@ class CClickHouseStorage {
 				$lte = is_array($clock_fields['clock']) ? max($clock_fields['clock']) : $clock_fields['clock'];
 
 				$sql_parts['param']['UInt64']['pre_time_gte'] = $gte;
-				$sql_parts['param']['UInt64']['pre_time_lte'] = $lte;
-				$sql_parts['prewhere']['clock'] = 'clock_ns BETWEEN toDateTime64({pre_time_gte:UInt64},9)'.
-					' AND addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
+				$sql_parts['param']['UInt64']['pre_time_lt'] = $lte + 1;
+				$sql_parts['prewhere']['clock_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
+				$sql_parts['prewhere']['clock_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
 			}
 		}
 
