@@ -247,7 +247,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'replace' => true,
 					'db' => 'SELECT * FROM graphs',
 					'link' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={hostid}&context=host',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF test name'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:items-table',
+						'fill' => [
+							'id:all_records' => true
+						]
+					]
 				]
 			],
 			// #16 Discovery rule update.
