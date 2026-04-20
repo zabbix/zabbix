@@ -468,7 +468,7 @@ class CHostPrototype extends CHostBase {
 		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['uuid'], ['ruleid', 'host'], ['ruleid', 'name']], 'fields' => [
 			'host_status' =>		['type' => API_ANY],
 			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID_V4],
+										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'uuid'), 'unset' => true]
 			]],
 			'ruleid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
@@ -680,7 +680,7 @@ class CHostPrototype extends CHostBase {
 		return ['type' => API_OBJECT, 'fields' => [
 			'host_status' =>		['type' => API_ANY],
 			'uuid' =>				['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID_V4],
+										['if' => ['field' => 'host_status', 'in' => HOST_STATUS_TEMPLATE], 'type' => API_UUID],
 										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('hosts', 'uuid'), 'unset' => true]
 			]],
 			'hostid' =>				['type' => API_ANY],

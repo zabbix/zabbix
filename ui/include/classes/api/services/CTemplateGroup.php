@@ -381,7 +381,7 @@ class CTemplateGroup extends CApiService {
 	 */
 	private static function validateCreate(array &$groups): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['name']], 'fields' => [
-			'uuid' =>	['type' => API_UUID_V4],
+			'uuid' =>	['type' => API_UUID],
 			'name' =>	['type' => API_TG_NAME, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
 
@@ -405,7 +405,7 @@ class CTemplateGroup extends CApiService {
 	 */
 	protected function validateUpdate(array &$groups, ?array &$db_groups = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['uuid'], ['groupid'], ['name']], 'fields' => [
-			'uuid' => 		['type' => API_UUID_V4],
+			'uuid' => 		['type' => API_UUID],
 			'groupid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 			'name' =>		['type' => API_TG_NAME, 'length' => DB::getFieldLength('hstgrp', 'name')]
 		]];
