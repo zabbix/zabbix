@@ -253,29 +253,23 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 	{
 		char	*out = NULL;
 
+		zabbix_log(LOG_LEVEL_TRACE, "%s(): response: '%s'", __func__, http_resp);
+
 		if (SUCCEED == zbx_tq_clickhouse_resp_to_json(item_context->query, http_resp, &out))
 		{
-			/* FIXME: placeholder */
-			zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST1: %s(): '%s'", __func__, http_resp);
-			zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST11: %s(): '%s'", __func__, out);
+			zabbix_log(LOG_LEVEL_TRACE, "%s(): transformed to json: '%s'", __func__, out);
 
 			SET_TEXT_RESULT(&result, out);
 			item_state = ITEM_STATE_NORMAL;
 		}
 		else
 		{
-			/* FIXME: placeholder */
-			zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST2: %s()", __func__);
-
 			SET_MSG_RESULT(&result, zbx_strdup(NULL, "Failed to parse Clickhouse response"));
 			item_state = ITEM_STATE_NOTSUPPORTED;
 		}
 	}
 	else
 	{
-		/* FIXME: placeholder */
-		zabbix_log(LOG_LEVEL_INFORMATION, "MYTEST3: %s(): '%s'", __func__, error);
-
 		SET_MSG_RESULT(&result, error);
 		item_state = ITEM_STATE_NOTSUPPORTED;
 	}

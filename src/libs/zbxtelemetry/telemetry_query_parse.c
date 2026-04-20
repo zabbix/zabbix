@@ -445,8 +445,6 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query)
 
 	while (NULL != (p = zbx_json_pair_next(jp, p, buf, buf_size)))
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "%s: p:'%s', buf:'%s'", __func__, p, buf);
-
 		if (0 == strcmp(buf, "category"))
 		{
 			if (FAIL == tq_read_enum(p, buf, buf_size, tq_set_category, &query->category, query->category,
