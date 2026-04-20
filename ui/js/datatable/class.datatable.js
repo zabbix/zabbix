@@ -1312,8 +1312,6 @@ class CDataTable {
 
 		if (!this.#initialized) {
 			this.#recalculateColumnSpans();
-			// this.#applyColumnWidths();
-			// this.#renderHeaderCells();
 		}
 
 		this.getData({check_changes, force_load})
