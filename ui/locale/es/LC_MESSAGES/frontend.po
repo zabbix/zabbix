@@ -8743,6 +8743,10 @@ msgstr "Introduzca una cadena de identidad de clave precompartida no secreta. Ev
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Ingrese la dirección IP/DNS y el puerto del agente Zabbix instalado en su objetivo de monitoreo."
@@ -11245,6 +11249,10 @@ msgstr "Si menos de %2$s servicios dependientes tienen el estado %1$s o inferior
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Si menos de %2$s de servicios dependientes tienen el estado %1$s o inferior"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -25551,6 +25559,10 @@ msgstr "Se revertirá la configuración del widget."
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El widget está en desuso."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
