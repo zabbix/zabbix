@@ -1,3 +1,4 @@
+<?php
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -12,16 +13,25 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_PROXYDATA_H
-#define ZABBIX_PROXYDATA_H
 
-#include "zbxcomms.h"
-#include "zbxdbhigh.h"
-#include "zbxtime.h"
-#include "zbxipcservice.h"
+abstract class CControllerGraphUpdateGeneral extends CController {
 
-void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_timespec_t *ts, const zbx_events_funcs_t *events_cbs, int config_timeout,
-		int proxydata_frequency);
+	protected static function processGraph(array $graph): array {
+		$graph['gitems'] = $graph['items'];
+		unset($graph['items']);
 
-#endif
+		if (array_key_exists('visible', $graph)) {
+			$graph['percent_left'] = $graph['visible']['percent_left'] && array_key_exists('percent_left', $graph)
+				? $graph['percent_left']
+				: 0;
+
+			$graph['percent_right'] = $graph['visible']['percent_right'] && array_key_exists('percent_right', $graph)
+				? $graph['percent_right']
+				: 0;
+
+			unset($graph['visible']);
+		}
+
+		return $graph;
+	}
+}
