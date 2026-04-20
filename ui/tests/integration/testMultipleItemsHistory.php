@@ -30,7 +30,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 100;
+	const LLD_DISCOVERY_COUNT = 4000;
 
 	private static $hostid;
 	private static $lld_ruleid;
@@ -121,19 +121,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		// Reload configuration cache so the server is aware of the LLD rule.
 		$this->reloadConfigurationCache();
 
-		// Build and send discovery data.
-		$data = [];
-		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
-			$data[] = [self::LLD_MACRO => self::SENSOR_BASE.$i];
-		}
-
-		$this->sendDataValues('sender', [
-			[
-				'host' => self::HOSTNAME,
-				'key' => self::LLD_RULE_KEY,
-				'value' => json_encode(['data' => $data])
-			]
-		], self::COMPONENT_SERVER);
+		$this->sendDiscoveryData();
 
 		$proto_defs = self::prototypeDefs();
 		$total_expected = self::LLD_DISCOVERY_COUNT * count($proto_defs);
@@ -268,6 +256,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 
 		$this->reloadConfigurationCache();
+		$this->sendDiscoveryData();
 
 		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
 
@@ -296,6 +285,21 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_TriggerDiscoveryAfterRestart() {
 		$this->sendAndVerifyHistory();
+	}
+
+	private function sendDiscoveryData(): void {
+		$data = [];
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+			$data[] = [self::LLD_MACRO => self::SENSOR_BASE.$i];
+		}
+
+		$this->sendDataValues('sender', [
+			[
+				'host' => self::HOSTNAME,
+				'key' => self::LLD_RULE_KEY,
+				'value' => json_encode(['data' => $data])
+			]
+		], self::COMPONENT_SERVER);
 	}
 
 	private function sendAndVerifyHistory(): void {
