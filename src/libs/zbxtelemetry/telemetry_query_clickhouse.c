@@ -22,19 +22,19 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 	int		ret = FAIL;
 	const char	*p = NULL;
 	char		buf[MAX_STRING_LEN];
-	zbx_uint32_t	row_idx;
+	zbx_uint32_t	row_id;
 	zbx_uint64_t	timestamp;
 
 	zbx_json_addobject(j, NULL);
 
-	/* row index */
-	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) || SUCCEED != zbx_is_uint32(buf, &row_idx))
+	/* row id */
+	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) || SUCCEED != zbx_is_uint32(buf, &row_id))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse row index from row \"%s\"", jp->start);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot parse row id from row \"%s\"", jp->start);
 		goto out;
 	}
 
-	zbx_json_adduint64(j, "id", row_idx);
+	zbx_json_adduint64(j, "id", row_id);
 
 	/* skip rounded time */
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
