@@ -101,7 +101,7 @@ in:
 out:
   return: SUCCEED
 ---
-test case: "17. Localhost"
+test case: "18. Localhost"
 in:
   string: "localhost"
 out:
