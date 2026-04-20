@@ -57,6 +57,8 @@ static int	async_send_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t *
 	zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &telemetry_query_context->item_context.posts);
 	telemetry_query_context->item_context.query = query;
 
+	zabbix_log(LOG_LEVEL_TRACE, "%s(): generated SQL: '%s'", __func__, telemetry_query_context->item_context.posts);
+
 	if (SUCCEED != zbx_http_request_prepare(&telemetry_query_context->http_context, HTTP_REQUEST_POST,
 			conn_params->url, query_fields, headers, telemetry_query_context->item_context.posts,
 			ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, item->timeout, conn_params->max_attempts,
