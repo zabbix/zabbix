@@ -2254,10 +2254,6 @@ class CDataTable {
 
 		let width = Math.ceil(Math.max(min_width, header_width, data_width));
 
-		// if (column.getWidth() === 'auto' && column.getDefaults().getWidth() === 'auto') {
-		// 	column.getDefaults().setWidth(`${width}px`);
-		// }
-
 		column.setWidth(`${width}px`);
 	}
 
