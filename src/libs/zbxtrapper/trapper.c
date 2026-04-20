@@ -177,8 +177,8 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
  * Purpose: processes received values from active agents                      *
  *                                                                            *
  ******************************************************************************/
-static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		int config_timeout)
+static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, int config_timeout)
 {
 	char	*info = NULL, *ext = NULL;
 	int	ret;
@@ -192,7 +192,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		info = zbx_strdup(info, "data collection is paused");
 		ret = FAIL;
 	}
-	else if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(rtc, sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -226,15 +226,15 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
  * Purpose: processes received values from senders                            *
  *                                                                            *
  ******************************************************************************/
-static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		int config_timeout)
+static void	recv_senderhistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, int config_timeout)
 {
 	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
+	if (FAIL == (ret = zbx_process_sender_history_data(rtc, sock, jp, ts, &info)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 	}
@@ -1263,14 +1263,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
-			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
+			recv_agenthistory(rtc, sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
-			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
+			recv_senderhistory(rtc, sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 		{
@@ -1410,7 +1410,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
+		zbx_process_history_data(rtc, &item, &av, &errcode, 1, NULL);
 
 		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
