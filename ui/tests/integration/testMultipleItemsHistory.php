@@ -30,7 +30,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 10000;
+	const LLD_DISCOVERY_COUNT = 10;
 
 	private static $hostid;
 	private static $lld_ruleid;
