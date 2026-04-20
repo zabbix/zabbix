@@ -33,6 +33,7 @@
 #include "zbx_rtc_constants.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
+#include "zbxcachehistory.h"
 
 #define CEP_WORKERS_MAX		100
 #define CEP_WORKERS_DEFAULT	10
@@ -371,7 +372,8 @@ void	*zbx_cep_manager_thread(void *args)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 
-		if (!ZBX_IS_RUNNING() || 1 == shutdown)
+		/* only stop cep when history syncers no longer require it */
+		if ((!ZBX_IS_RUNNING() || 1 == shutdown) && 0 == zbx_hc_refcount_peek())
 			break;
 
 		zbx_mw_queue_lock(manager->base.queue);
