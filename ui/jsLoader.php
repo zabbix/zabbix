@@ -249,10 +249,19 @@ $translate_strings = [
 		'Displaying %1$s to %2$s of %3$s found' => _('Displaying %1$s to %2$s of %3$s found')
 	],
 	'class.datatable.js' => [
+		'No data found' => _('No data found'),
+		'Unexpected server error.' => _('Unexpected server error.'),
 		'Enabled' => _('Enabled'),
 		'Disabled' => _('Disabled'),
-		'No data found' => _('No data found'),
 		'Inherited tag' => _('Inherited tag'),
+		'Inherited and template tag' => _('Inherited and template tag'),
+		'Inherited and host tag' => _('Inherited and host tag'),
+		'Inherited and host prototype tag' => _('Inherited and host prototype tag'),
+		'Inherited and item tag' => _('Inherited and item tag'),
+		'Inherited and item prototype tag' => _('Inherited and item prototype tag'),
+		'Inherited and trigger tag' => _('Inherited and trigger tag'),
+		'Inherited and trigger prototype tag' => _('Inherited and trigger prototype tag'),
+		'Inherited and web scenario tag' => _('Inherited and web scenario tag'),
 		'Are you sure you want to delete %1$s? This action cannot be undone.' =>
 			_('Are you sure you want to delete %1$s? This action cannot be undone.'),
 		'duplicate' => _('duplicate'),
