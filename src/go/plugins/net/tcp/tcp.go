@@ -514,7 +514,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		}
 
 		if len(params) >= 2 && params[1] != "" {
-			if net.ParseIP(params[1]) == nil && !inet.IsDNS(params[1]) {
+			if net.ParseIP(params[1]) == nil && !inet.IsDNSName(params[1]) {
 				return nil, errs.New(errorInvalidSecondParam)
 			}
 		}

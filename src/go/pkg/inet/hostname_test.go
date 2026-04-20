@@ -20,7 +20,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_IsDNS(t *testing.T) {
+func Test_IsDNSName(t *testing.T) {
 	t.Parallel()
 
 	// Synchronize with tests/libs/zbxip/zbx_is_dnsname.yaml
@@ -67,10 +67,10 @@ func Test_IsDNS(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := IsDNS(tt.args.host)
+			got := IsDNSName(tt.args.host)
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Fatalf("IsDNS() = %s", diff)
+				t.Fatalf("IsDNSName() = %s", diff)
 			}
 		})
 	}

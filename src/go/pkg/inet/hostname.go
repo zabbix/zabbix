@@ -20,10 +20,10 @@ func isAlnum(c byte) bool {
 		(c >= 'A' && c <= 'Z')
 }
 
-// IsDNS checks if host is valid DNS name (should work the same as zbx_is_dnsname in C)
+// IsDNSName checks if host is valid DNS name (should work the same as zbx_is_dnsname in C)
 //
 //nolint:cyclop,gocyclo // high complexity due to DNS validation, splitting not practical
-func IsDNS(host string) bool {
+func IsDNSName(host string) bool {
 	n := len(host)
 	if n == 0 || n > 253 {
 		return false
