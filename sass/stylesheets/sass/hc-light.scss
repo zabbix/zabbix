@@ -215,6 +215,7 @@ $arrow-fill-up-down: #000000;
 
 // Important! @import string should come after variables
 @import 'screen.scss';
+@import "base/icons-severity";
 
 // layout/sidebar
 .sidebar {
