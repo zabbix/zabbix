@@ -369,6 +369,7 @@ zbx_db_event	*zbx_create_internal_event(unsigned char object, zbx_uint64_t objec
 
 			if (NULL != dc_trigger)
 			{
+				event->trigger.triggerid = objectid;
 				event->trigger.expression = zbx_strdup(NULL, dc_trigger->expression);
 				event->trigger.recovery_expression = zbx_strdup(NULL, dc_trigger->recovery_expression);
 
