@@ -766,10 +766,11 @@ class CIntegrationTest extends CAPITest {
 	 * @param string $type         data type
 	 * @param array  $values       item values
 	 * @param string $component    component name or null for active component
+	 * @param int    $sleep        seconds to sleep after sending;
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendDataValues($type, $values, $component = null) {
+	protected function sendDataValues($type, $values, $component = null, $sleep = self::DATA_PROCESSING_DELAY) {
 		if ($component === null) {
 			$component = $this->getActiveComponent();
 		}
@@ -788,7 +789,9 @@ class CIntegrationTest extends CAPITest {
 				'Processed value count doesn\'t match sent value count.'
 		);
 
-		sleep(self::DATA_PROCESSING_DELAY);
+		if ($sleep > 0) {
+			sleep($sleep);
+		}
 
 		return $result;
 	}
@@ -823,11 +826,12 @@ class CIntegrationTest extends CAPITest {
 	 *
 	 * @param array  $values       item values
 	 * @param string $component    component name or null for active component
+	 * @param int    $sleep        seconds to sleep after sending; 0 skips the sleep and uses current ns
 	 *
 	 * @return array    processing result
 	 */
-	protected function sendSenderValues($values, $component = null) {
-		return $this->sendDataValues('sender', $values, $component);
+	protected function sendSenderValues($values, $component = null, $sleep = self::DATA_PROCESSING_DELAY) {
+		return $this->sendDataValues('sender', $values, $component, $sleep);
 	}
 
 	/**
@@ -915,6 +919,18 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Reload configuration cache and wait for it to finish.
+	 *
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride
+	 */
+	protected function reloadConfigurationCacheAndWaitForLogLine($component = null, $delayOverride = 0) {
+		$this->reloadConfigurationCache($component, $delayOverride);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER,
+			'finished forced reloading of the configuration cache');
+	}
+
+	/**
 	 * Reload user parameters.
 	 *
 	 * @param string $component    component name or null for active component
@@ -963,6 +979,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
+		$response = null;
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $params);
@@ -982,9 +999,12 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
-				"\n".json_encode($params)
-		);
+		$message = 'Data requested from '.$method.' API is not present within specified interval. Params used:'.
+				"\n".json_encode($params);
+		if ($response !== null) {
+			$message .= "\nLast response:\n".json_encode($response);
+		}
+		$this->fail($message);
 	}
 
 	/**
