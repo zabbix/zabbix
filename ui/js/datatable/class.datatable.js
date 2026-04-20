@@ -17,6 +17,7 @@ class CDataTable {
 
 	static EVENT_INIT = 'init';
 	static EVENT_RENDER = 'render';
+	static EVENT_RESIZE = 'resize';
 	static EVENT_RESET = 'reset';
 	static EVENT_SAVE = 'save';
 	static EVENT_SCROLL = 'scroll';
@@ -1326,6 +1327,8 @@ class CDataTable {
 				return response;
 			})
 			.then(response => {
+				window.addEventListener('resize', this.onWindowResize);
+
 				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
 
 				onSuccess(response);
@@ -2463,8 +2466,6 @@ class CDataTable {
 				.on(CPager.EVENT_SELECT, this.onPagerSelect)
 				.on(CPager.EVENT_STATE_CHANGE, this.onPagerStateChange);
 		}
-
-		window.addEventListener('resize', this.onWindowResize);
 
 		document.querySelector(`.${ZBX_STYLE_LAYOUT_WRAPPER}`)?.addEventListener('scroll', this.onWrapperScroll);
 
