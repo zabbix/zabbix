@@ -51,6 +51,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		$this->call('settings.update', ['auditlog_enabled' => 0]);
+
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME,
 			'interfaces' => [],
@@ -291,9 +293,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_TriggerDiscovery
 	 */
 	public function testMultipleItemsHistory_TriggerDiscoveryAfterRestart() {
-		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->startComponent(self::COMPONENT_SERVER);
-
 		$this->sendAndVerifyHistory();
 	}
 
