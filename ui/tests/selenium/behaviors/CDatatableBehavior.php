@@ -184,26 +184,26 @@ class CDatatableBehavior extends CTableBehavior {
 //		$this->assertTableHasData($data, $selector);
 //	}
 
-//	/**
-//	 * Select table rows.
-//	 *
-//	 * @param mixed $data			rows to be selected
-//	 * @param string $column		column name
-//	 * @param string $selector		table selector
-//	 */
-//	public function selectTableRows($data = [], $column = 'Name', $selector = null) {
-//		$table = $this->getTable($selector);
-//
-//		if (!$data) {
-//			// Select all rows in table.
-//			$table->query('xpath:./div[contains(@class, "datatable-header"]/div/input[@type="checkbox"]')->asCheckbox()
-//					->one()->check();
-//
-//			return;
-//		}
-//
-//		$table->findRows($column, $data)->select();
-//	}
+	/**
+	 * Select table rows.
+	 *
+	 * @param mixed  $data			rows to be selected
+	 * @param string $column		column name
+	 * @param string $selector		table selector
+	 */
+	public function selectDatatableRows($data = [], $column = 'Name', $selector = null) {
+		$table = $this->getDatatable($selector);
+
+		if (!$data) {
+			// Select all rows in table.
+			$table->query('xpath:./div[contains(@class, "datatable-header")]/div/input[@type="checkbox"]')->asCheckbox()
+					->one()->check();
+
+			return;
+		}
+
+		$table->findRows($column, $data)->select();
+	}
 
 	public function filterFromHeader($header_filter, $selector = self::COMMON_SELECTOR) {
 		$table = $this->getDatatable($selector);
@@ -284,6 +284,6 @@ class CDatatableBehavior extends CTableBehavior {
 	 * @param integer $count	selected rows count
 	 */
 	public function assertSelectedCount($count) {
-		$this->test->assertEquals($count.' selected', $this->test->query('class:js-selected-count')->one()->getText());
+		$this->test->assertEquals($count.' selected', $this->test->query('class:selected-item-count')->one()->getText());
 	}
 }

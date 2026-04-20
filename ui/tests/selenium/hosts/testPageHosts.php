@@ -43,7 +43,7 @@ class testPageHosts extends CLegacyWebTest {
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
 
-	public static function prepareHostsData() {
+	public function prepareHostsData() {
 		CDataHelper::createHosts([
 			[
 				'host' => 'Disabled status',
@@ -881,7 +881,7 @@ class testPageHosts extends CLegacyWebTest {
 
 		foreach (['Disabled' => HOST_STATUS_NOT_MONITORED, 'Enabled' => HOST_STATUS_MONITORED] as $status => $id) {
 			$host_row->invalidate();
-			$host_row->getColumn('Status')->click();
+			$host_row->getColumn('Status')->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, 'Host '.strtolower($status));
 			$this->assertEquals($status, $host_row->getColumn('Status')->getText());
@@ -889,7 +889,7 @@ class testPageHosts extends CLegacyWebTest {
 			CMessageElement::find()->one()->close();
 		}
 
-		$this->test->query('tag:h1')->one()->click();
+		$this->query('tag:h1')->one()->click();
 	}
 
 	public function testPageHosts_Delete() {
@@ -923,7 +923,7 @@ class testPageHosts extends CLegacyWebTest {
 		// Delete single/multiple hosts.
 		foreach ($delete_hosts as $selection) {
 			$host_count = count($selection);
-			$this->selectTableRows($selection);
+			$this->selectDatatableRows($selection);
 			$delete_button->click();
 			$this->page->acceptAlert();
 			$this->page->waitUntilReady();

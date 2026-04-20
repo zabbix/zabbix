@@ -401,7 +401,8 @@ class testPageMonitoringHosts extends CWebTest {
 		$form->fill($data['filter']);
 		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
-		$table->waitUntilReady();
+		$this->page->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 		$this->assertDatatableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$table->waitUntilReady();

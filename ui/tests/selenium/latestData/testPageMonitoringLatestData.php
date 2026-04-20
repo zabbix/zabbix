@@ -16,7 +16,7 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
-require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * @backup history_uint, profiles
@@ -38,15 +38,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CTableBehavior::class];
-	}
-
-	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
-	}
-
-	private function getTable() {
-		return $this->query($this->getTableSelector())->asTable()->one();
+		return [CDatatableBehavior::class];
 	}
 
 	public function prepareTestData() {
@@ -197,11 +189,11 @@ class testPageMonitoringLatestData extends CWebTest {
 			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
 		];
 
-		$table = $this->getTable();
+		$table = $this->query('id:latest')->one()->asDatatable();
 		foreach ($details_headers as $status => $headers) {
 			$this->query('name:show_details')->one()->asCheckbox()->set($status);
 			$form->submit();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady()->invalidate();
 			$this->assertEquals($headers, $table->getHeadersText());
 		}
 
@@ -533,14 +525,14 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->getTable()->waitUntilPresent();
+		$table = $this->getDatatable()->waitUntilPresent();
 
 		// Expand filter if it is collapsed.
 		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady()->invalidate();
 
 		// Fill filter form with data.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
@@ -555,21 +547,21 @@ class testPageMonitoringLatestData extends CWebTest {
 		$form->getField('id:tag_name_format_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags name', 'Full'));
 
 		$form->submit();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 
 		// Check filtered result.
-		$this->assertTableData($data['result'], $this->getTableSelector());
+		$this->assertDatatableData($data['result']);
 
 		// Check Show tags filter setting.
 		if (CTestArrayHelper::get($data, 'Show tags') === 'None') {
 			$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', '', 'Info'],
-					$this->getTable()->getHeadersText()
+					$this->query('id:latest')->one()->asDatatable()->getHeadersText()
 			);
 		}
 
 		// Reset filter not to impact the results of next tests.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 	}
 
 	public static function getSubfilterData() {
@@ -653,13 +645,13 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 
-		$this->assertTableData($data['result'], $this->getTableSelector());
+		$this->assertDatatableData($data['result']);
 
 		// Check that subfilter remains selected after main field is cleared.
 		if (CTestArrayHelper::get($data, 'check_after_clear', false)) {
-			$table = $this->getTable();
+			$table = $this->query('id:latest')->one()->asDatatable();
 			CFilterElement::find()->one()->getForm()->fill(['Name' => ''])->submit();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady()->invalidate();
 
 			foreach ($data['subfilter']['Tag values'] as $subfilter) {
 				$this->assertTrue($this->query('xpath://a[text()='.CXPathHelper::escapeQuotes($subfilter).']/..')
@@ -667,7 +659,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				);
 			}
 
-			$this->assertTableData($data['result'], $this->getTableSelector());
+			$this->assertDatatableData($data['result']);
 		}
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -697,7 +689,8 @@ class testPageMonitoringLatestData extends CWebTest {
 			$this->assertTrue($this->query('xpath://button[@title="Normal view"]')->exists());
 		}
 
-		$this->getTable()->query('button', $tag['tag'].$tag['value'])->waitUntilClickable()->one()->click();
+		$this->query('id:latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
+				->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 
 		// Check that tag value is selected in subfilter under correct header.
@@ -712,13 +705,13 @@ class testPageMonitoringLatestData extends CWebTest {
 			['Name' => 'Free swap space in %'],
 			['Name' => 'Total swap space']
 		];
-		$this->assertTableData($data, $this->getTableSelector());
+		$this->assertDatatableData($data);
 
 		if ($kiosk_mode) {
 			$this->query('xpath://button[@title="Normal view"]')->one()->click();
 			$this->page->waitUntilReady();
 			$this->assertTrue($this->query('xpath://button[@title="Kiosk mode"]')->exists());
-			$this->assertTableData($data, $this->getTableSelector());
+			$this->assertDatatableData($data);
 		}
 		else {
 			$this->query('button:Reset')->one()->click();
@@ -760,10 +753,10 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
 		CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['State' => 'Normal']);
-		$table = $this->getTable();
+		$table = $this->query('id:latest')->one()->asDatatable();
 		$this->query('button:Apply')->one()->click();
 		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady()->invalidate();
 
 		foreach ($result as $hosts) {
 			foreach ($hosts as $host) {
@@ -777,7 +770,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					$this->page->waitUntilReady();
 				}
 
-				$this->query('class:table-paging')->query('link:1')->waitUntilClickable()->one()->click();
+				$this->query('class:paging-btn-container')->query('link:1')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -876,7 +869,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				self::$hostids['Host with item descriptions'])->waitUntilReady();
 
 		// Find rows from the data provider and click on the description icon if such should persist.
-		$row = $this->getTable()->findRow('Name', $data['Item name'], true);
+		$row = $this->query('id:latest')->one()->asDatatable()->waitUntilReady()->findRow('Name', $data['Item name'], true);
 
 		if (CTestArrayHelper::get($data,'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
@@ -934,18 +927,19 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->getTable()->waitUntilPresent();
+		$table = $this->query('id:latest')->one()->asDatatable()->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady()->invalidate();
+		$row = $table->getRow(0);
 
 		foreach (['Last check', 'Last value'] as $column) {
 			if ($column === 'Last value') {
-				$this->assertEquals('15 UNIT', $this->getTable()->getRow(0)->getColumn($column)->getText());
+				$this->assertEquals('15 UNIT', $row->getColumn($column)->getText());
 			}
 
-			$this->getTable()->getRow(0)->getColumn($column)->query('class:cursor-pointer')->one()->click();
+			$row->getColumn($column)->query('class:cursor-pointer')->one()->click();
 			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last()->getText();
 			$compare_hint = ($column === 'Last check') ? $true_time : $value;
 			$this->assertEquals($compare_hint, $hint);

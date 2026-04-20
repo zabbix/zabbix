@@ -55,7 +55,6 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 				'"options":{}}';
 
 		$this->updateDatatableLayout($layout, 'web.hosts.datatable');
-
 	}
 
 	public function testFormHostLinkTemplates_Layout() {
