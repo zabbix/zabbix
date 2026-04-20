@@ -104,9 +104,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 1,
-				'DebugLevel' => 4,
-				'StartTrappers' => 1,
-				'StartDBSyncers' => 1
+				'DebugLevel' => 3,
 			]
 		];
 	}
@@ -141,7 +139,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
 			'output' => ['itemid', 'key_', 'value_type']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
+		], 120, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
 			return count($r['result']) === $total_expected;
 		});
 
