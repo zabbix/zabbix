@@ -26,6 +26,11 @@
  * Return value: SUCCEED - input is hostname address                          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
+ * Comments: valid DNS hostnames for this function are names with only ASCII  *
+ *           characters 0-9, A-Z, a-z, hyphen ('-') and dot ('.').            *
+ *           Internationalized Domain Names with multibyte UTF-8 characters   *
+ *           will be rejected as not valid (Punycode can be used).            *
+ *                                                                            *
  ******************************************************************************/
 int	zbx_is_dnsname(const char *host)
 {
@@ -82,12 +87,12 @@ int	zbx_is_dnsname(const char *host)
 			return FAIL;
 
 		p++;
-	}
 
-	/* Total length should not exceed 253 characters. */
-	/* This is excluding trailing dot and additional byte usually used when saved. */
-	if (253 < p - host)
-		return FAIL;
+		/* Total length should not exceed 253 characters. */
+		/* This is excluding trailing dot and additional byte usually used when saved. */
+		if (253 < p - host)
+			return FAIL;
+	}
 
 	return 0 == state ? SUCCEED : FAIL;
 #undef STATE_HYPHEN
