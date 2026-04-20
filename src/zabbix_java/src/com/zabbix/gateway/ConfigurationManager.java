@@ -64,7 +64,7 @@ class ConfigurationManager
 				null,
 				null),
 		new ConfigurationParameter(LISTEN_PORT, ConfigurationParameter.TYPE_INTEGER, 10052,
-				new IntegerValidator(1024, 32767),
+				new IntegerValidator(1024, 65535),
 				null),
 		new ConfigurationParameter(START_POLLERS, ConfigurationParameter.TYPE_INTEGER, 5,
 				new IntegerValidator(1, 1000),

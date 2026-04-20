@@ -37,8 +37,8 @@ type AgentOptions struct {
 	PersistentBufferPeriod   int      `conf:"optional,range=60:31536000,default=3600"`
 	PersistentBufferFile     string   `conf:"optional"`
 	ListenIP                 string   `conf:"optional"`
-	ListenPort               int      `conf:"optional,range=1024:32767,default=10050"`
-	StatusPort               int      `conf:"optional,range=1024:32767"`
+	ListenPort               int      `conf:"optional,range=1024:65535,default=10050"`
+	StatusPort               int      `conf:"optional,range=1024:65535"`
 	SourceIP                 string   `conf:"optional"`
 	Server                   string   `conf:"optional"`
 	UserParameter            []string `conf:"optional"`
