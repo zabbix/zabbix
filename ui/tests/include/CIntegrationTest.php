@@ -416,12 +416,16 @@ class CIntegrationTest extends CAPITest {
 				$bt_lines = [];
 				exec('gdb -batch -ex "set pagination 0" -ex "thread apply all bt" -p '.escapeshellarg($child_pid).' 2>&1', $bt_lines);
 				$backtraces[$child_pid] = implode("\n", $bt_lines);
-
-				if (!posix_kill($child_pid, SIGKILL)) {
-					$error_code = posix_get_last_error();
-					$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
-				}
 				$failed_pids[] = $child_pid;
+			}
+		}
+
+		sleep(3);
+
+		foreach ($failed_pids as $child_pid) {
+			if (!posix_kill($child_pid, SIGKILL)) {
+				$error_code = posix_get_last_error();
+				$failed_kills[] = ' - '.$child_pid.' ('.$error_code.') '.posix_strerror($error_code);
 			}
 		}
 
@@ -429,7 +433,22 @@ class CIntegrationTest extends CAPITest {
 			return;
 		}
 
-		$log = CLogHelper::readLog(self::getLogPath($component), false, false);
+		$log_path = self::getLogPath($component);
+		$log = CLogHelper::readLog($log_path, false, false);
+
+		$fatal_strings = ['child process exited', '=== Backtrace: ===', '====== Fatal information: ======'];
+		$fatal_offset = null;
+
+		foreach ($fatal_strings as $fatal_string) {
+			$offset = CLogHelper::getLineOffset($log, $fatal_string);
+			if ($offset !== null && ($fatal_offset === null || $offset < $fatal_offset)) {
+				$fatal_offset = $offset;
+			}
+		}
+
+		if ($fatal_offset !== null) {
+			$log = substr($log, $fatal_offset);
+		}
 		$failed_kills = $failed_kills
 			? "\n".'The following processes could not be terminated using SIGKILL:'."\n".implode("\n", $failed_kills)
 			: '';
