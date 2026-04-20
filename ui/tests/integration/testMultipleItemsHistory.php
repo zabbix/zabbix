@@ -1,0 +1,245 @@
+<?php
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
+
+/**
+ * Test suite to verify that history.get correctly returns values for
+ * a large set of LLD-discovered items across all supported value types.
+ *
+ * @required-components server
+ * @configurationDataProvider configurationProvider
+ * @backup hosts,items,item_discovery,history,history_uint,history_str,history_text,history_log
+ */
+class testMultipleItemsHistory extends CIntegrationTest {
+
+	const HOSTNAME = 'test_multiple_items_history';
+	const LLD_RULE_KEY = 'lld.multiple.history.trapper';
+	const LLD_MACRO = '{#SENSOR}';
+	const ITEM_PROTO_KEY = 'multiple.history.trap';
+	const SENSOR_BASE = 'sensor';
+	const LLD_DISCOVERY_COUNT = 10000;
+
+	private static $hostid;
+	private static $lld_ruleid;
+	private static $item_prototypeids = [];
+	private static $discovered_itemids = [];
+
+	private static function prototypeDefs() {
+		return [
+			['suffix' => 'float', 'value_type' => ITEM_VALUE_TYPE_FLOAT],
+			['suffix' => 'uint',  'value_type' => ITEM_VALUE_TYPE_UINT64],
+			['suffix' => 'str',   'value_type' => ITEM_VALUE_TYPE_STR],
+			['suffix' => 'text',  'value_type' => ITEM_VALUE_TYPE_TEXT],
+			['suffix' => 'log',   'value_type' => ITEM_VALUE_TYPE_LOG]
+		];
+	}
+
+	/**
+	 * @inheritdoc
+	 */
+	public function prepareData() {
+		$response = $this->call('host.create', [
+			'host' => self::HOSTNAME,
+			'interfaces' => [],
+			'groups' => [['groupid' => 4]],
+			'status' => HOST_STATUS_MONITORED
+		]);
+		$this->assertArrayHasKey('hostids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['hostids']);
+		self::$hostid = $response['result']['hostids'][0];
+
+		// Create LLD rule on the host (trapper type so tests can push data directly).
+		$response = $this->call('discoveryrule.create', [
+			'hostid' => self::$hostid,
+			'name' => 'Multiple Items History LLD Rule',
+			'key_' => self::LLD_RULE_KEY,
+			'type' => ITEM_TYPE_TRAPPER,
+			'lifetime_type' => 2
+		]);
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['itemids']);
+		self::$lld_ruleid = $response['result']['itemids'][0];
+
+		// Create one item prototype per value type.
+		foreach (self::prototypeDefs() as $def) {
+			$response = $this->call('itemprototype.create', [
+				'hostid' => self::$hostid,
+				'ruleid' => self::$lld_ruleid,
+				'name' => 'Sensor '.$def['suffix'].' ['.self::LLD_MACRO.']',
+				'key_' => self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.']',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => $def['value_type']
+			]);
+			$this->assertArrayHasKey('itemids', $response['result']);
+			$this->assertArrayHasKey(0, $response['result']['itemids']);
+			self::$item_prototypeids[$def['value_type']] = $response['result']['itemids'][0];
+		}
+
+		return true;
+	}
+
+	/**
+	 * Component configuration provider.
+	 *
+	 * @return array
+	 */
+	public function configurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'LogFileSize' => 1,
+				'DebugLevel' => 4,
+				'StartTrappers' => 1,
+				'StartDBSyncers' => 1
+			]
+		];
+	}
+
+	/**
+	 * Send LLD discovery data and verify that each item prototype is
+	 * instantiated for every discovered sensor.
+	 */
+	public function testMultipleItemsHistory_LLDDiscovery() {
+		// Reload configuration cache so the server is aware of the LLD rule.
+		$this->reloadConfigurationCache();
+
+		// Build and send discovery data.
+		$data = [];
+		for ($i = 1; $i <= self::LLD_DISCOVERY_COUNT; $i++) {
+			$data[] = [self::LLD_MACRO => self::SENSOR_BASE.$i];
+		}
+
+		$this->sendDataValues('sender', [
+			[
+				'host' => self::HOSTNAME,
+				'key' => self::LLD_RULE_KEY,
+				'value' => json_encode(['data' => $data])
+			]
+		], self::COMPONENT_SERVER);
+
+		$proto_defs = self::prototypeDefs();
+		$total_expected = self::LLD_DISCOVERY_COUNT * count($proto_defs);
+
+		// Wait until all items for all prototypes are created.
+		$response = $this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$hostid],
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
+			'output' => ['itemid', 'key_', 'value_type']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
+			return count($r['result']) === $total_expected;
+		});
+
+		$this->assertCount($total_expected, $response['result'],
+			'Not all '.$total_expected.' discovered items were created.');
+
+		foreach ($response['result'] as $item) {
+			$vtype = (int) $item['value_type'];
+			self::$discovered_itemids[$vtype][$item['key_']] = (int) $item['itemid'];
+		}
+
+		foreach ($proto_defs as $def) {
+			$this->assertCount(self::LLD_DISCOVERY_COUNT,
+				self::$discovered_itemids[$def['value_type']],
+				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered items for type '.$def['suffix'].'.');
+		}
+
+		$this->reloadConfigurationCache();
+	}
+
+	/**
+	 * Send a value to every LLD-discovered item for each value type and verify
+	 * that history.get returns one entry per item.
+	 *
+	 * @depends testMultipleItemsHistory_LLDDiscovery
+	 */
+	public function testMultipleItemsHistory_SendAndVerify() {
+		$tm = time();
+
+		foreach (self::prototypeDefs() as $def) {
+			$vtype = $def['value_type'];
+			$items_by_key = self::$discovered_itemids[$vtype];
+
+			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
+				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered item IDs for type '.$def['suffix'].'.');
+
+			$values = [];
+			$idx = 0;
+			foreach ($items_by_key as $key => $itemid) {
+				$values[] = [
+					'host' => self::HOSTNAME,
+					'key' => $key,
+					'value' => (string)($idx + 1),
+					'clock' => $tm,
+					'ns' => $idx
+				];
+				$idx++;
+			}
+
+			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+			$itemids = array_values($items_by_key);
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'limit' => self::LLD_DISCOVERY_COUNT
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
+			});
+
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'countOutput' => true
+			]);
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
+
+			// Verify sort + limit: returned records should be ordered by itemid DESC.
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'sortfield' => 'itemid',
+				'sortorder' => 'DESC',
+				'limit' => 10
+			]);
+			$this->assertCount(10, $response['result']);
+			for ($i = 0; $i < count($response['result']) - 1; $i++) {
+				$this->assertGreaterThanOrEqual(
+					(int) $response['result'][$i + 1]['itemid'],
+					(int) $response['result'][$i]['itemid']
+				);
+			}
+
+			// Verify output field selection: only requested fields are returned.
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => [$itemids[0]],
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'output' => ['itemid', 'value']
+			]);
+			$this->assertCount(1, $response['result']);
+			$this->assertArrayHasKey('itemid', $response['result'][0]);
+			$this->assertArrayHasKey('value', $response['result'][0]);
+			$this->assertArrayNotHasKey('clock', $response['result'][0]);
+			$this->assertArrayNotHasKey('ns', $response['result'][0]);
+		}
+	}
+}
