@@ -94,7 +94,8 @@ zabbix_export:
             			try {
             				token = headers["X-Subject-Token"][0];
             			} catch (error) {
-            				throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
+            				token = headers["x-subject-token"][0];
+            				// throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
             			}
             		} else {
             			throw 'Response object is empty. Check debug log for more information.';
