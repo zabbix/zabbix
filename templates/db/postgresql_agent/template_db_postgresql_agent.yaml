@@ -9674,7 +9674,7 @@ zabbix_export:
                       value: 7499FF
                     - type: STRING
                       name: items.0
-                      value: '*Temporary*'
+                      value: '*Temporary blocks*'
                     - type: STRING
                       name: primary_label
                       value: '{{ITEM.NAME}.regsub("^.*\s(\w+)$", "\1")}'
