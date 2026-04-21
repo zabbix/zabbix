@@ -55,19 +55,24 @@ class CClickHouseStorage {
 
 	protected array $request_context_data = [];
 
+	/**
+	 * Latest request HTTP error code. NULL when no errors.
+	 * @var int|null
+	 */
 	protected ?int $error_code;
 	protected ?string $error_message;
 
 	/**
-	 * @var array $value_type_ttl  Array of value type TTL values, key is value type and value is it TTL.
+	 * Array of value type TTL values, key is value type and value is it TTL.
+	 * Is NULL when no TTL set for specific value type.
+	 *
+	 * @var array $value_type_ttl
 	 */
 	protected array $value_type_ttl = [];
 
-	protected array $value_types = [];
-
 	public function __construct(array $config, array $value_type_ttl) {
-		$this->value_types = $config['types'];
-		$this->value_type_ttl = array_intersect_key($value_type_ttl, array_flip($this->value_types));
+		$_value_type_ttl = array_fill_keys($config['types'], null);
+		$this->value_type_ttl = array_replace($_value_type_ttl, array_intersect_key($value_type_ttl, $_value_type_ttl));
 		$this->url = (new CUrl($config['url']))->setArgument('database', $config['db']);
 		$this->request_context_data = [
 			'http' => [
@@ -119,7 +124,7 @@ class CClickHouseStorage {
 	 * @param int $value_type
 	 */
 	public function isValueTypeSupported(int $value_type): bool {
-		return in_array($value_type, $this->value_types);
+		return array_key_exists($value_type, $this->value_type_ttl);
 	}
 
 	/**
@@ -187,7 +192,7 @@ class CClickHouseStorage {
 	 * @see CHistoryManager::deleteHistory
 	 */
 	public function delete(array $itemid_value_type): bool {
-		foreach ($this->value_types as $value_type) {
+		foreach (array_keys($this->value_type_ttl) as $value_type) {
 			$itemids = array_keys($itemid_value_type, $value_type);
 
 			if (!$itemids) {
