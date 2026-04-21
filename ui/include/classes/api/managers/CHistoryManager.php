@@ -153,7 +153,11 @@ class CHistoryManager {
 			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
 				[$storage_provider, $storage_items] = $pair;
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getItemsHavingValues($storage_items, $period);
+				$results += $storage_provider->getItemsHavingValues($storage_items, $period) ?? [];
+
+				if ($storage_provider->getErrorCode()) {
+					error($storage_provider->getErrorMessage(), true);
+				}
 			}
 		}
 
@@ -227,7 +231,11 @@ class CHistoryManager {
 			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
 				[$storage_provider, $storage_items] = $pair;
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getLastValues($storage_items, $limit, $period, $length);
+				$results += $storage_provider->getLastValues($storage_items, $limit, $period, $length) ?? [];
+
+				if ($storage_provider->getErrorCode()) {
+					error($storage_provider->getErrorMessage(), true);
+				}
 			}
 		}
 
@@ -775,7 +783,11 @@ class CHistoryManager {
 				/** @var CClickHouseStorage $storage_provider */
 				$results += $storage_provider->getAggregationByInterval($storage_items, $time_from, $time_to, $function,
 					$interval
-				);
+				) ?? [];
+
+				if ($storage_provider->getErrorCode()) {
+					error($storage_provider->getErrorMessage(), true);
+				}
 			}
 		}
 
@@ -1117,7 +1129,12 @@ class CHistoryManager {
 			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
 				[$storage_provider, $storage_items] = $pair;
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getGraphAggregationByWidth($storage_items, $time_from, $time_to, $width);
+				$results += $storage_provider->getGraphAggregationByWidth($storage_items, $time_from, $time_to, $width)
+					?? [];
+
+				if ($storage_provider->getErrorCode()) {
+					error($storage_provider->getErrorMessage(), true);
+				}
 			}
 		}
 
@@ -1410,7 +1427,12 @@ class CHistoryManager {
 			foreach ($this->getProviderItemPairs($grouped_items[ZBX_HISTORY_SOURCE_CLICKHOUSE]) as $pair) {
 				[$storage_provider, $storage_items] = $pair;
 				/** @var CClickHouseStorage $storage_provider */
-				$results += $storage_provider->getAggregatedValues($storage_items, $function, $time_from, $time_to);
+				$results += $storage_provider->getAggregatedValues($storage_items, $function, $time_from, $time_to)
+					?? [];
+
+				if ($storage_provider->getErrorCode()) {
+					error($storage_provider->getErrorMessage(), true);
+				}
 			}
 		}
 

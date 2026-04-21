@@ -405,15 +405,15 @@ class CClickHouseStorage {
 							: ',round({width:UInt64}*(toUnixTimestamp(clock_ns)-{time_gte:UInt64})/{seconds:UInt64}) AS i'
 						).
 					' FROM '.$table.
-					' WHERE itemid IN {itemids:Array(UInt64)}'.
-						' AND clock_ns>=toDateTime64({time_gte:UInt64},9)'.
+					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
+					' WHERE clock_ns>=toDateTime64({time_gte:UInt64},9)'.
 						' AND clock_ns<toDateTime64({time_lt:UInt64},9)'.
 					' GROUP BY itemid'.($width === null ? '' : ',i').
 					' ORDER BY itemid'.($width === null ? '' : ',i').
 				')',
 				[
 					'UInt64' => [
-						'itemids' => array_keys($itemids),
+						'pre_itemids' => array_keys($itemids),
 						'time_gte' => $_time_from,
 						'time_lt' => $_time_to + 1,
 						'width' => $width,
@@ -718,11 +718,11 @@ class CClickHouseStorage {
 			$sql_parts['prewhere']['clock_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
 		}
 
-		if (is_array($options['filter'])) {
+		if (is_array($options['filter']) && $options['filter']) {
 			$sql_parts = $this->addQueryFilterOptions($sql_parts, $options);
 		}
 
-		if (is_array($options['search'])) {
+		if (is_array($options['search']) && $options['search']) {
 			$sql_parts = $this->addQuerySearchOptions($sql_parts, $options);
 		}
 
@@ -730,7 +730,11 @@ class CClickHouseStorage {
 			$sql_parts = $this->addQuerySortOptions($sql_parts, $options);
 		}
 
-		return $this->addQueryOutputOptions($sql_parts, $options);
+		if (is_array($options['output']) && $options['output']) {
+			$sql_parts = $this->addQueryOutputOptions($sql_parts, $options);
+		}
+
+		return $sql_parts;
 	}
 
 	/**
@@ -746,10 +750,6 @@ class CClickHouseStorage {
 		if ($options['countOutput']) {
 			$sql_parts['select'] = ['rowscount' => 'count()'];
 
-			return $sql_parts;
-		}
-
-		if (!$options['output']) {
 			return $sql_parts;
 		}
 
