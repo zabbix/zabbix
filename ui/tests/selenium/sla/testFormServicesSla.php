@@ -1106,10 +1106,9 @@ class testFormServicesSla extends CWebTest {
 		if (array_key_exists('inline_errors', $data)) {
 			$this->page->removeFocus();
 			$selector = (array_keys($data['inline_errors'])[0]);
-			$field = (strpos($selector, ':') === false)
-				? $form->getField($selector)
-				: $form->query($selector)->one();
+			$field = (strpos($selector, ':') === false) ? $form->getField($selector) : $form->query($selector)->one();
 
+			// An additional wait is required for the Custom Schedule block, as the error message may appear with a delay.
 			$field->waitUntilClassesPresent('has-error');
 			$this->assertInlineError($form, $data['inline_errors']);
 		}
