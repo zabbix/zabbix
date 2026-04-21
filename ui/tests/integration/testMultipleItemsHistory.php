@@ -177,7 +177,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 *
 	 * @depends testMultipleItemsHistory_LLDDiscovery
 	 */
-	public function testMultipleItemsHistory_Trends() {
+	public function testMultipleItemsHistory_HistoryAndTrends() {
 		$this->call('settings.update', ['auditlog_enabled' => 0]);
 
 		$now = time();
@@ -336,7 +336,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 					'key' => $key,
 					'value' => (string)($idx + 1),
 					'clock' => $tm,
-					'ns' => $idx
+					'ns' => (int)(microtime(true) * 1e9) % 1000000000
 				];
 				$idx++;
 			}
