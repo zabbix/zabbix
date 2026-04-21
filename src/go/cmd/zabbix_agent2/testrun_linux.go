@@ -78,6 +78,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`net.if.total[lo,bytes]`,
 		`net.if.collisions[lo]`,
 		`net.if.discovery`,
+		`net.if.get`,
 		`vm.memory.size[total]`,
 		`proc.cpu.util[inetd]`,
 		`proc.num[inetd]`,

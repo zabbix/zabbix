@@ -151,6 +151,7 @@ int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
