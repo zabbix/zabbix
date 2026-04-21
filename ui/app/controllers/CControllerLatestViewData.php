@@ -370,21 +370,13 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 			if ($sort_field === 'host') {
 				$items = array_map(function ($item) use ($hosts) {
-					return $item + [
-							'host_name' => $hosts[$item['hostid']]['name']
-						];
+					return $item + ['host_name' => $hosts[$item['hostid']]['name']];
 				}, $items);
 
-				CArrayHelper::sort($items, [[
-					'field' => 'host_name',
-					'order' => $sort_order
-				]]);
+				CArrayHelper::sort($items, [['field' => 'host_name', 'order' => $sort_order]]);
 			}
 			else {
-				CArrayHelper::sort($items, [[
-					'field' => 'name',
-					'order' => $sort_order
-				]]);
+				CArrayHelper::sort($items, [['field' => 'name', 'order' => $sort_order]]);
 			}
 		}
 		else {

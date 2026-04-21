@@ -41,7 +41,7 @@ class CControllerHostViewData extends CControllerDataTable {
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 
 		$hosts = API::Host()->get([
-			'output' => ['hostid', 'name', 'status'],
+			'output' => ['hostid', $sort_field],
 			'evaltype' => $filter['evaltype'],
 			'tags' => $filter['tags'] ?: null,
 			'inheritedTags' => true,
@@ -62,13 +62,12 @@ class CControllerHostViewData extends CControllerDataTable {
 					? null
 					: HOST_MAINTENANCE_STATUS_OFF
 			],
-			'sortfield' => 'name',
+			'sortfield' => $sort_field,
 			'limit' => $limit,
 			'preservekeys' => true
 		]);
 
-		// Sort for paging so we know which IDs go to which page.
-		CArrayHelper::sort($hosts, [['field' => $sort_field, 'order' => $sort_order]]);
+		order_result($hosts, $sort_field, $sort_order);
 
 		$view_curl = (new CUrl())->setArgument('action', 'host.view');
 		$paging_arguments = array_filter(array_intersect_key($filter, CControllerHost::FILTER_FIELDS_DEFAULT));
@@ -90,8 +89,8 @@ class CControllerHostViewData extends CControllerDataTable {
 			'hostids' => array_keys($hosts),
 			'preservekeys' => true
 		]);
-		// Re-sort the results again.
-		CArrayHelper::sort($hosts, [['field' => $sort_field, 'order' => $sort_order]]);
+
+		order_result($hosts, $sort_field, $sort_order);
 
 		CTagHelper::mergeOwnAndInheritedTags($hosts);
 

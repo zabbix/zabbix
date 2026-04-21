@@ -114,6 +114,8 @@ class CControllerHostListData extends CControllerDataTable {
 			]
 		]);
 
+		order_result($hosts, $sort_field, $sort_order);
+
 		$this->paging = $this->paginate($hosts, $page, $sort_order);
 
 		$hostids = array_column($hosts, 'hostid');
@@ -137,6 +139,8 @@ class CControllerHostListData extends CControllerDataTable {
 			'hostids' => $hostids,
 			'preservekeys' => true
 		]);
+
+		order_result($hosts, $sort_field, $sort_order);
 
 		// Selecting linked templates to templates linked to hosts.
 		$templateids = [];

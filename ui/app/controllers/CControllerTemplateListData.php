@@ -81,6 +81,8 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 		order_result($templates, $sort_field, $sort_order);
 
+		$this->paging = $this->paginate($templates, $page, $sort_order);
+
 		$templates = API::Template()->get([
 			'output' => $data_fields,
 			'selectHosts' => ['hostid'],
@@ -137,8 +139,6 @@ class CControllerTemplateListData extends CControllerDataTable {
 		}
 
 		$editable_templateids = array_column($editable_templates, 'templateid');
-
-		$this->paging = $this->paginate($templates, $page, $sort_order);
 
 		order_result($templates, $sort_field, $sort_order);
 
