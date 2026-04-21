@@ -126,6 +126,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'CacheSize' => '128M',
 				'HistoryIndexCacheSize' => '32M',
 				'ValueCacheSize' => '128M',
+				'LogSlowQueries' => '30000'
 			]
 		];
 	}
