@@ -1535,20 +1535,36 @@ function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTa
 				(new CCol([
 					$readonly ? null : (new CDiv)->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CInput('hidden', 'items[#{number}][gitemid]', '#{gitemid}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_gitemid'),
 					(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_itemid'),
 					(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_sortorder'),
 					(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_flags'),
 					(new CInput('hidden', 'items[#{number}][type]', GRAPH_ITEM_SIMPLE))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_type'),
 					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_calc_fnc'),
 					(new CInput('hidden', 'items[#{number}][drawtype]', '#{drawtype}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_drawtype'),
 					(new CInput('hidden', 'items[#{number}][yaxisside]', '#{yaxisside}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_yaxisside')
 				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
@@ -1563,12 +1579,14 @@ function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTa
 							CALC_FNC_MAX => _('max')
 						]))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CSelect('items[#{number}][drawtype]'))
 						->setValue('#{drawtype}')
 						->addOptions(CSelect::createOptionsFromArray($graph_item_drawtypes))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CSelect('items[#{number}][yaxisside]'))
@@ -1578,16 +1596,25 @@ function getItemTemplateNormal(bool $readonly, array $graph_item_drawtypes): CTa
 							GRAPH_YAXIS_SIDE_RIGHT => _('Right')
 						]))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CColorPicker('items[#{number}][color]'))
 						->setColor('#{color}')
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
 				->addClass('graph-item')
-				->setId('items_#{number}')
+				->setId('items_#{number}'),
+			(new CRow())
+				->addClass('error-container-row')
+				->addItem(
+					(new CCol())
+						->setId('items-#{number}-error-container')
+						->setColSpan(7 + ($readonly ? 0 : 1))
+				)
 		]);
 }
 
@@ -1598,20 +1625,36 @@ function getItemTemplateStacked(bool $readonly): CTag {
 				(new CCol([
 					$readonly ? null : (new CDiv)->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CInput('hidden', 'items[#{number}][gitemid]', '#{gitemid}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_gitemid'),
 					(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_itemid'),
 					(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_sortorder'),
 					(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_flags'),
 					(new CInput('hidden', 'items[#{number}][type]', GRAPH_TYPE_STACKED))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_type'),
 					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_calc_fnc'),
 					(new CInput('hidden', 'items[#{number}][drawtype]', '#{drawtype}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_drawtype'),
 					(new CInput('hidden', 'items[#{number}][yaxisside]', '#{yaxisside}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_yaxisside')
 				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
@@ -1625,6 +1668,7 @@ function getItemTemplateStacked(bool $readonly): CTag {
 							CALC_FNC_MAX => _('max')
 						]))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CSelect('items[#{number}][yaxisside]'))
@@ -1634,16 +1678,25 @@ function getItemTemplateStacked(bool $readonly): CTag {
 							GRAPH_YAXIS_SIDE_RIGHT => _('Right')
 						]))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CColorPicker('items[#{number}][color]'))
 						->setColor('#{color}')
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
 				->addClass('graph-item')
-				->setId('items_#{number}')
+				->setId('items_#{number}'),
+			(new CRow())
+				->addClass('error-container-row')
+				->addItem(
+					(new CCol())
+						->setId('items-#{number}-error-container')
+						->setColSpan(6 + ($readonly ? 0 : 1))
+				)
 		]);
 }
 
@@ -1654,20 +1707,36 @@ function getItemTemplatePieAndExploded(bool $readonly): CTag {
 				(new CCol([
 					$readonly ? null : (new CDiv)->addClass(ZBX_STYLE_DRAG_ICON),
 					(new CInput('hidden', 'items[#{number}][gitemid]', '#{gitemid}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_gitemid'),
 					(new CInput('hidden', 'items[#{number}][itemid]', '#{itemid}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_itemid'),
 					(new CInput('hidden', 'items[#{number}][sortorder]', '#{sortorder}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_sortorder'),
 					(new CInput('hidden', 'items[#{number}][flags]', '#{flags}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_flags'),
 					(new CInput('hidden', 'items[#{number}][type]', '#{type}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_type'),
 					(new CInput('hidden', 'items[#{number}][calc_fnc]', '#{calc_fnc}'))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_calc_fnc'),
 					(new CInput('hidden', 'items[#{number}][drawtype]', DRAWTYPE_LINE))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_drawtype'),
 					(new CInput('hidden', 'items[#{number}][yaxisside]', GRAPH_YAXIS_SIDE_LEFT))
+						->setAttribute('data-field-type', 'hidden')
+						->setErrorContainer('items-#{number}-error-container')
 						->setId('items_#{number}_yaxisside')
 				]))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				new CCol((new CSpan(':'))->addClass(ZBX_STYLE_LIST_NUMBERED_ITEM)),
@@ -1680,6 +1749,7 @@ function getItemTemplatePieAndExploded(bool $readonly): CTag {
 							GRAPH_ITEM_SUM =>_('Graph sum')
 						]))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CSelect('items[#{number}][calc_fnc]'))
@@ -1691,16 +1761,25 @@ function getItemTemplatePieAndExploded(bool $readonly): CTag {
 							CALC_FNC_LST => _('last')
 						]))
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				new CCol(
 					(new CColorPicker('items[#{number}][color]'))
 						->setColor('#{color}')
 						->setReadonly($readonly)
+						->setErrorContainer('items-#{number}-error-container')
 				),
 				$readonly ? null : getItemTemplateRemoveColumn()
 			]))
 				->addClass('graph-item')
-				->setId('items_#{number}')
+				->setId('items_#{number}'),
+			(new CRow())
+				->addClass('error-container-row')
+				->addItem(
+					(new CCol())
+						->setId('items-#{number}-error-container')
+						->setColSpan(6 + ($readonly ? 0 : 1))
+				)
 		]);
 }
 
