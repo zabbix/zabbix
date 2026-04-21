@@ -100,7 +100,7 @@ func (c *client) Output() plugin.ResultWriter {
 // addRequest requests client to start monitoring/update item described by request 'r' using plugin 'p' (*pluginAgent)
 // with output writer 'sink'
 //
-//nolint:gocognit,gocyclo,cyclop,maintidx,lll // will be cleaned up during refactor, legacy code
+//nolint:gocognit,gocyclo,cyclop,maintidx // will be cleaned up during refactor, legacy code
 func (c *client) addRequest(
 	p *pluginAgent, r *Request, sink plugin.ResultWriter, now time.Time, firstActiveChecksRefreshed bool,
 ) error {
