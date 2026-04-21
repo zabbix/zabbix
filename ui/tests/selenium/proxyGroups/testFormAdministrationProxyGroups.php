@@ -148,7 +148,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Failover period' => 9
 					],
 					'inline_errors' => [
-						'Failover period' => 'Value must be one of 10-900.'
+						'Failover period' => 'Value must be between 10s and 900s (15m).'
 					]
 				]
 			],
@@ -161,7 +161,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Failover period' => 901
 					],
 					'inline_errors' => [
-						'Failover period' => 'Value must be one of 10-900.'
+						'Failover period' => 'Value must be between 10s and 900s (15m).'
 					]
 				]
 			],
@@ -174,7 +174,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Failover period' => '1h'
 					],
 					'inline_errors' => [
-						'Failover period' => 'Value must be one of 10-900.'
+						'Failover period' => 'Value must be between 10s and 900s (15m).'
 					]
 				]
 			],
@@ -240,7 +240,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => ''
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
+						'Minimum number of proxies' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -253,7 +253,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => 0
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value must be no less than "1".'
+						'Minimum number of proxies' => 'Value must be greater than or equal to 1.'
 					]
 				]
 			],
@@ -266,7 +266,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => 1001
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value must be no greater than "1000".'
+						'Minimum number of proxies' => 'Value must be less than or equal to 1000.'
 						]
 				]
 			],
@@ -279,7 +279,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => '1k'
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
+						'Minimum number of proxies' => 'Value is not a valid integer.'
 						]
 				]
 			],
@@ -292,7 +292,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => '1.1'
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
+						'Minimum number of proxies' => 'Value is not a valid integer.'
 					]
 				]
 			],
@@ -305,7 +305,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Minimum number of proxies' => '{#MACRO}'
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
+						'Minimum number of proxies' => 'Value is not a valid integer.'
 					]
 				]
 			],
@@ -319,7 +319,7 @@ class testFormAdministrationProxyGroups extends CWebTest {
 						'Description' => '33'
 					],
 					'inline_errors' => [
-						'Minimum number of proxies' => 'This value is not a valid integer.'
+						'Minimum number of proxies' => 'Value is not a valid integer.'
 					]
 				]
 			],
@@ -365,9 +365,8 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					],
 					'trim' => true
 				]
-			]
+			],
 			# 20.
-			/* TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -379,7 +378,6 @@ class testFormAdministrationProxyGroups extends CWebTest {
 				]
 			],
 			# 21.
-			//TODO: uncomment after DEV-4248 done
 			[
 				[
 					'fields' => [
@@ -390,7 +388,6 @@ class testFormAdministrationProxyGroups extends CWebTest {
 					]
 				]
 			]
-			*/
 		];
 	}
 
