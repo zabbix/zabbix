@@ -25085,6 +25085,10 @@ msgstr "Widgetkonfigurationen kommer att återställas."
 msgid "Widget is deprecated."
 msgstr "Widget är föråldrad."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widgeten är för liten för det angivna antalet kolumner och rader."
