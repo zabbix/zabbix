@@ -278,6 +278,13 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 
 		$this->reloadConfigurationCache();
+	}
+
+	/**
+	 * @depends testMultipleItemsHistory_TriggerDiscovery
+	 */
+	public function testMultipleItemsHistory_TriggerFiring() {
+		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
 
 		$this->sendAndVerifyHistory();
 
@@ -312,9 +319,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testMultipleItemsHistory_TriggerDiscovery
+	 * @depends testMultipleItemsHistory_TriggerFiring
 	 */
-	public function testMultipleItemsHistory_TriggerDiscoveryAfterRestart() {
+	public function testMultipleItemsHistory_TriggerFiringRestart() {
 		$this->sendAndVerifyHistory();
 	}
 
@@ -400,6 +407,10 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
+		], 0);
+
+		$this->callUntilCountIsPresent('trigger.get', [
+			'triggerids' => self::$discovered_triggerids
 		], 0);
 
 		$this->executeHousekeeper();
