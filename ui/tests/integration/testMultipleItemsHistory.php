@@ -178,82 +178,59 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_SendAndVerify() {
 		$this->call('settings.update', ['auditlog_enabled' => 0]);
+		$this->sendAndVerifyHistoryWithOffset(0);
+	}
 
-		$tm = time();
+	/**
+	 * Send history values 1 hour in the past, then at current time, and verify
+	 * that trends are generated for numeric value types.
+	 *
+	 * @depends testMultipleItemsHistory_SendAndVerify
+	 */
+	public function testMultipleItemsHistory_Trends() {
+		$this->call('settings.update', ['auditlog_enabled' => 0]);
 
-		foreach (self::prototypeDefs() as $def) {
-			$vtype = $def['value_type'];
-			$items_by_key = self::$discovered_itemids[$vtype];
+		$tm_past = $this->sendAndVerifyHistoryWithOffset(-3600);
+		$this->sendAndVerifyHistoryWithOffset(0);
 
-			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
-				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered item IDs for type '.$def['suffix'].'.');
+		$trend_clock = $tm_past - ($tm_past % 3600);
 
-			$values = [];
-			$idx = 0;
-			foreach ($items_by_key as $key => $itemid) {
-				$values[] = [
-					'host' => self::HOSTNAME,
-					'key' => $key,
-					'value' => (string)($idx + 1),
-					'clock' => $tm,
-					'ns' => $idx
-				];
-				$idx++;
-			}
+		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
+			$itemids = array_values(self::$discovered_itemids[$vtype]);
 
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
-
-			$itemids = array_values($items_by_key);
-			$this->callUntilDataIsPresent('history.get', [
-				'history' => $vtype,
+			$this->callUntilDataIsPresent('trend.get', [
 				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
+				'time_from' => $trend_clock,
+				'time_till' => $trend_clock,
 				'limit' => self::LLD_DISCOVERY_COUNT
 			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
 			});
 
-			$response = $this->call('history.get', [
-				'history' => $vtype,
+			$response = $this->call('trend.get', [
 				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
+				'time_from' => $trend_clock,
+				'time_till' => $trend_clock,
 				'countOutput' => true
 			]);
 			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
 
-			// Verify sort + limit: returned records should be ordered by itemid DESC.
-			$response = $this->call('history.get', [
-				'history' => $vtype,
+			$response = $this->call('trend.get', [
 				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'sortfield' => 'itemid',
-				'sortorder' => 'DESC',
-				'limit' => 10
+				'time_from' => $trend_clock,
+				'time_till' => $trend_clock,
+				'limit' => self::LLD_DISCOVERY_COUNT
 			]);
-			$this->assertCount(10, $response['result']);
-			for ($i = 0; $i < count($response['result']) - 1; $i++) {
-				$this->assertGreaterThanOrEqual(
-					(int) $response['result'][$i + 1]['itemid'],
-					(int) $response['result'][$i]['itemid']
-				);
+			$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+			foreach ($response['result'] as $trend) {
+				$this->assertArrayHasKey('itemid', $trend);
+				$this->assertArrayHasKey('clock', $trend);
+				$this->assertArrayHasKey('num', $trend);
+				$this->assertArrayHasKey('value_min', $trend);
+				$this->assertArrayHasKey('value_avg', $trend);
+				$this->assertArrayHasKey('value_max', $trend);
+				$this->assertEquals((string) $trend_clock, $trend['clock']);
 			}
-
-			// Verify output field selection: only requested fields are returned.
-			$response = $this->call('history.get', [
-				'history' => $vtype,
-				'itemids' => [$itemids[0]],
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'output' => ['itemid', 'value']
-			]);
-			$this->assertCount(1, $response['result']);
-			$this->assertArrayHasKey('itemid', $response['result'][0]);
-			$this->assertArrayHasKey('value', $response['result'][0]);
-			$this->assertArrayNotHasKey('clock', $response['result'][0]);
-			$this->assertArrayNotHasKey('ns', $response['result'][0]);
 		}
 	}
 
@@ -340,6 +317,87 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_TriggerFiringRestart() {
 		$this->sendAndVerifyHistory();
+	}
+
+	private function sendAndVerifyHistoryWithOffset(int $offset): int {
+		$tm = time() + $offset;
+
+		foreach (self::prototypeDefs() as $def) {
+			$vtype = $def['value_type'];
+			$items_by_key = self::$discovered_itemids[$vtype];
+
+			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
+				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered item IDs for type '.$def['suffix'].'.');
+
+			$values = [];
+			$idx = 0;
+			foreach ($items_by_key as $key => $itemid) {
+				$values[] = [
+					'host' => self::HOSTNAME,
+					'key' => $key,
+					'value' => (string)($idx + 1),
+					'clock' => $tm,
+					'ns' => $idx
+				];
+				$idx++;
+			}
+
+			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+
+			$itemids = array_values($items_by_key);
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'limit' => self::LLD_DISCOVERY_COUNT
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
+			});
+
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'countOutput' => true
+			]);
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
+
+			// Verify sort + limit: returned records should be ordered by itemid DESC.
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'sortfield' => 'itemid',
+				'sortorder' => 'DESC',
+				'limit' => 10
+			]);
+			$this->assertCount(10, $response['result']);
+			for ($i = 0; $i < count($response['result']) - 1; $i++) {
+				$this->assertGreaterThanOrEqual(
+					(int) $response['result'][$i + 1]['itemid'],
+					(int) $response['result'][$i]['itemid']
+				);
+			}
+
+			// Verify output field selection: only requested fields are returned.
+			$response = $this->call('history.get', [
+				'history' => $vtype,
+				'itemids' => [$itemids[0]],
+				'time_from' => $tm,
+				'time_till' => $tm,
+				'output' => ['itemid', 'value']
+			]);
+			$this->assertCount(1, $response['result']);
+			$this->assertArrayHasKey('itemid', $response['result'][0]);
+			$this->assertArrayHasKey('value', $response['result'][0]);
+			$this->assertArrayNotHasKey('clock', $response['result'][0]);
+			$this->assertArrayNotHasKey('ns', $response['result'][0]);
+		}
+
+		return $tm;
 	}
 
 	private function sendDiscoveryData(): void {
