@@ -158,10 +158,34 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->page->assertTitle('Latest data');
 		$this->page->assertHeader('Latest data');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'Show tags', 'Tag display priority', 'State', 'Show details'],
+		$this->assertEquals(['Host groups', 'Hosts', 'Name', 'Tags', 'State'],
 				$form->getLabels()->asText()
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
+
+		// check the layout of filters that are hiddent in datatable headers.
+		$header_filters = [
+			'Name' => [
+				'Show item key' => [
+					'value' => false
+				]
+			],
+			'Tags' => [
+				'Number of tags' => [
+					'value' => 3,
+					'labels' => [1, 2, 3]
+				],
+				'Tag name display' => [
+					'value' => 'Full',
+					'labels' => ['Full', 'Shortened', 'None']
+				],
+				'Tag display priority' => [
+					'value' => '',
+					'maxlenght' => 250
+				]
+			]
+		];
+		$this->checkHeaderFilterLayout($header_filters);
 
 		// Subfilter is not visible if filter isn't set.
 		$this->assertFalse($this->query('id:latest-data-subfilter')->exists());
@@ -182,23 +206,26 @@ class testPageMonitoringLatestData extends CWebTest {
 			$this->assertTrue($subfilter->query($query)->one()->isValid());
 		}
 
-		// Check table headers.
-		$details_headers = [
-			true => ['', 'Host', 'Name', 'Interval', 'History', 'Trends', 'Type', 'Last check', 'Last value',
-				'Change', 'Tags', '', 'Info'],
-			false => ['', 'Host', 'Name', 'Last check', 'Last value', 'Change', 'Tags', '', 'Info']
+		// Check column list default configuration.
+		$column_list = [
+			'Host' => ['value' => true],
+			'Name' => ['value' => true, 'enabled' => false],
+			'Interval' => ['value' => false],
+			'History' => ['value' => false],
+			'Trends' => ['value' => false],
+			'Type' => ['value' => false],
+			'Last check' => ['value' => true],
+			'Last value' => ['value' => true],
+			'Change' => ['value' => true],
+			'Tags' => ['value' => true],
+			'Tag value' => ['value' => false],
+			'Actions' => ['value' => true],
+			'Info' => ['value' => true]
 		];
-
-		$table = $this->query('id:latest')->one()->asDatatable();
-		foreach ($details_headers as $status => $headers) {
-			$this->query('name:show_details')->one()->asCheckbox()->set($status);
-			$form->submit();
-			$table->waitUntilReady()->invalidate();
-			$this->assertEquals($headers, $table->getHeadersText());
-		}
+		$this->checkColumnList($column_list);
 
 		// Check that sortable headers are clickable.
-		$this->assertEquals(['Host', 'Name'], $table->getSortableHeaders()->asText());
+		$this->assertEquals(['Host', 'Name'], $this->getDatatable()->getSortableHeaders()->asText());
 
 		// Subfilter is not visible again after Reset.
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
@@ -525,7 +552,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->getDatatable()->waitUntilPresent();
+		$table = $this->getDatatable()->waitUntilReady();
 
 		// Expand filter if it is collapsed.
 		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();

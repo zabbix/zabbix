@@ -65,7 +65,7 @@ class CDatatableBehavior extends CTableBehavior {
 			$selector = self::COMMON_SELECTOR;
 		}
 
-		$datatable = $this->test->query($selector)->asDatatable()->waitUntilReady()->one();
+		$datatable = $this->test->query($selector)->asDatatable()->one()->waitUntilReady();
 		if ($this->column_names !== null) {
 			$datatable->setColumnNames($this->column_names);
 		}
@@ -218,6 +218,65 @@ class CDatatableBehavior extends CTableBehavior {
 				$popup_dialog->query('id', $for)->one()->detect()->fill($value);
 			}
 		}
+	}
+
+	public function checkHeaderFilterLayout($header_filter, $selector = self::COMMON_SELECTOR) {
+		$table = $this->getDatatable($selector);
+
+		foreach ($header_filter as $column => $column_filter) {
+			if ($column === 'Name') {
+				$table->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button')->one()->click();
+			}
+			else {
+				$table->getHeaderByText($column)->query('tag:button')->one()->click();
+			}
+			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
+
+			foreach ($column_filter as $field => $parameters) {
+				if ($field === 'duplicate') {
+					$this->test->assertTrue($popup_dialog->query('link:Duplicate column')->one()->isCLickable());
+
+					continue;
+				}
+
+				$for = $popup_dialog->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']')->one()
+						->getAttribute('for');
+				$field = $popup_dialog->query('id', $for)->one()->detect();
+
+				if (array_key_exists('value', $parameters)) {
+					$this->test->assertEquals($parameters['value'], $field->getValue());
+				}
+
+				if (array_key_exists('labels', $parameters)) {
+					$this->test->assertEquals($parameters['labels'], $field->getLabels()->asText());
+				}
+
+				if (array_key_exists('maxlength', $parameters)) {
+					$this->test->assertEquals($parameters['maxlength'], $field->getAttribute('maxlength'));
+				}
+			}
+		}
+	}
+
+	public function checkColumnList($column_list) {
+		$table = $this->test->query('id:latest')->one()->asDatatable();
+		$table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable()->click();
+
+		$popup_dialog = $this->test->query('xpath:.//div[@class="datatable-options-popup datatable-options"]')->one()
+				->waitUntilVisible();
+		$this->test->assertEquals('Column list', $popup_dialog->query('class:datatable-options-header')->one()->getText());
+
+		foreach ($column_list as $column => $parameters) {
+			$for = $popup_dialog->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($column).']/..')->one()
+						->getAttribute('for');
+			$field = $popup_dialog->query('id', $for)->one()->detect();
+
+			$this->test->assertEquals(CTestArrayHelper::get($parameters, 'enabled', true), $field->isEnabled());
+			$this->test->assertEquals($parameters['value'], $field->getValue());
+			$this->test->assertTrue($field->query('xpath:./../div[@class="drag-icon"]')->one(false)->isValid());
+		}
+
+		$this->test->assertTrue($popup_dialog->query('button:Reset layout')->one()->isClickable());
 	}
 
 	/**
