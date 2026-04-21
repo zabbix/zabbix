@@ -2373,7 +2373,7 @@ zabbix_export:
           tags:
             - tag: component
               value: wal
-        - uuid: e1057feecf054c0faf42b4bc019df5e1
+        - uuid: f482af7ed26d4f18b706efdea8475de2
           name: 'Get WAL lifecycle inventory'
           key: 'pgsql.wal.lifecycle.above.14.get["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}","{#SINGLETON}"]'
           history: '0'
