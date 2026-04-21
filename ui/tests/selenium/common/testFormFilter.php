@@ -118,7 +118,7 @@ class testFormFilter extends CWebTest {
 			$this->filterFromHeader($data['header_filter']);
 		}
 
-		$result_table->wauitUntilReady()->invalidate();
+		$result_table->waitUntilReady()->invalidate();
 		$filter_result = $result_table->getRows()->asText();
 
 		// Go to another page, to check saved filter after.
@@ -184,6 +184,9 @@ class testFormFilter extends CWebTest {
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
 		$result = $this->getTableResults($table_selector);
 		$filter->selectTab();
+
+		// Wait for button that is present only in Home and non-saved tabs to be clickable before clicking on toggle.
+		$this->query('button:Save as')->one()->waitUntilClickable();
 		$table->waitUntilReady();
 
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
@@ -191,7 +194,6 @@ class testFormFilter extends CWebTest {
 		$this->assertEquals($result, $popup_item->getAttribute('data-counter'));
 
 		// Checking that hosts/problems amount in filter displayed near name at the tab changed.
-sleep(10);
 		$this->assertEquals($result, $filter->getTabDataCounter('update_tab'));
 	}
 

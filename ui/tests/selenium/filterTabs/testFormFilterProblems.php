@@ -352,7 +352,7 @@ class testFormFilterProblems extends testFormFilter {
 		$this->createFilter($data, 'Admin', 'zabbix', $this->table_selector);
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
 		$form = $filter->getForm();
-		$table = $this->query($this->table_selector)->asDatatable()->one();
+		$table = $this->query($this->table_selector)->asDatatable()->one()->waitUntilReady();
 
 		// Checking result amount before changing time period.
 		$this->assertEquals($table->getRows()->count(), 2);
