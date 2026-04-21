@@ -34,11 +34,9 @@
  ******************************************************************************/
 int	zbx_is_dnsname(const char *host)
 {
-#define STATE_HYPHEN	1
-#define STATE_DOT	2
 	const char	*p = host;
-	int		state = 0;
-	int		len = 1;
+	int		label_len = 1;
+	int		prev_hyphen = 0;
 
 	/* Requirements and limits for host names are defined in RFC 1035, */
 	/* with clarifications in RFC 1123, RFC 2181. */
@@ -54,36 +52,32 @@ int	zbx_is_dnsname(const char *host)
 
 		if (0 != isalnum(*p))
 		{
-			state = 0;
-			len++;
+			label_len++;
+			prev_hyphen = 0;
 		}
 		else if ('-' == *p)
 		{
-			/* Labels should not start with hyphen. */
-			if (STATE_DOT == state)
+			/* label must not start with hyphen */
+			if (0 == label_len)
 				return FAIL;
 
-			state = STATE_HYPHEN;
-			len++;
+			label_len++;
+			prev_hyphen = 1;
 		}
 		else if ('.' == *p)
 		{
-			/* Labels should not end with hyphen. */
-			if (STATE_HYPHEN == state)
+			/* empty label or label ending with hyphen */
+			if (0 == label_len || 1 == prev_hyphen)
 				return FAIL;
 
-			/* Empty labels are not allowed. */
-			if (0 == len)
-				return FAIL;
-
-			state = STATE_DOT;
-			len = 0;
+			label_len = 0;
+			prev_hyphen = 0;
 		}
 		else
 			return FAIL;
 
-		/* Label should not exceed 63 characters */
-		if (63 < len)
+		/* label should not exceed 63 characters */
+		if (63 < label_len)
 			return FAIL;
 
 		p++;
@@ -94,9 +88,11 @@ int	zbx_is_dnsname(const char *host)
 			return FAIL;
 	}
 
-	return 0 == state ? SUCCEED : FAIL;
-#undef STATE_HYPHEN
-#undef STATE_DOT
+	// last label must not be empty or end with hyphen
+        if (0 == label_len || 1 == prev_hyphen)
+                return FAIL;
+
+        return SUCCEED;
 }
 
 /******************************************************************************
