@@ -12,7 +12,6 @@ FROM (
 		sum(
 			CASE
 				WHEN wait_event IS NOT NULL AND state != 'idle' THEN 1
-				WHEN wait_event IS NOT NULL AND state != 'idle' THEN 1
 				ELSE 0
 			END
 		) AS waiting,
