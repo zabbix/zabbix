@@ -113,9 +113,7 @@ class testFormFilter extends CWebTest {
 		$rows = $result_table->getRows();
 
 		if (array_key_exists('header_filter', $data)) {
-			$rows->invalidate();
 			$this->filterFromHeader($data['header_filter']);
-			$rows->waitUntilStalled();
 			$result_table->waitUntilReady()->invalidate();
 		}
 
