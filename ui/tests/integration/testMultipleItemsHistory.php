@@ -39,6 +39,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $discovered_itemids = [];
 	private static $discovered_triggerids = [];
 	private static $tm_past;
+	private static $tm_now;
 
 	private static function prototypeDefs() {
 		return [
@@ -184,22 +185,27 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	}
 
 	/**
-	 * Send history values at current time and verify that trends are generated
-	 * for both past and current hour.
+	 * Send history values at current time.
 	 *
 	 * @depends testMultipleItemsHistory_HistoryPast
 	 */
+	public function testMultipleItemsHistory_HistoryNow() {
+
+		self::$tm_now = time();
+
+		$this->sendAndVerifyHistoryAt(self::$tm_now);
+	}
+
+	/**
+	 * Verify that trends are generated for both past and current hour.
+	 *
+	 * @depends testMultipleItemsHistory_HistoryNow
+	 */
 	public function testMultipleItemsHistory_HistoryAndTrends() {
-		$this->call('settings.update', ['auditlog_enabled' => 0]);
-
-		$tm_now = time();
-
-		$this->sendAndVerifyHistoryAt($tm_now);
-
 		$this->verifyTrendsAtClock(self::$tm_past - (self::$tm_past % 3600));
 
 		$this->stopComponent(self::COMPONENT_SERVER);
-		$this->verifyTrendsAtClock($tm_now - ($tm_now % 3600));
+		$this->verifyTrendsAtClock(self::$tm_now - (self::$tm_now % 3600));
 		$this->startComponent(self::COMPONENT_SERVER);
 	}
 
