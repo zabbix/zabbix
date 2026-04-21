@@ -72,6 +72,7 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.fs.discovery`,
 		`vfs.fs.get`,
 		`vfs.dev.write[sda,operations]`,
+		`vfs.dev.get[disks,sda]`,
 		`net.if.in[lo,bytes]`,
 		`net.if.out[lo,bytes]`,
 		`net.if.total[lo,bytes]`,
