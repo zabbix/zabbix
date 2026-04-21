@@ -341,7 +341,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				$idx++;
 			}
 
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
+			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
 
 			$itemids = array_values($items_by_key);
 			$this->callUntilDataIsPresent('history.get', [

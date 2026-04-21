@@ -1129,12 +1129,17 @@ class CIntegrationTest extends CAPITest {
 
 		$count_params = array_merge($params, ['countOutput' => true]);
 		$exception = null;
+		$start = microtime(true);
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
 				$response = $this->call($method, $count_params);
 
 				if (isset($response['result']) && $response['result'] == $expected_count
 						&& ($callback === null || call_user_func($callback, $response))) {
+					if (static::$trace_delays) {
+						self::recordDelay('call_count_present', microtime(true) - $start);
+					}
+
 					return $response;
 				}
 			} catch (Exception $e) {
@@ -1142,6 +1147,10 @@ class CIntegrationTest extends CAPITest {
 			}
 
 			sleep($delay);
+		}
+
+		if (static::$trace_delays) {
+			self::recordDelay('call_count_present', microtime(true) - $start);
 		}
 
 		if ($exception !== null) {
