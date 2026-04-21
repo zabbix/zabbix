@@ -171,67 +171,26 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	}
 
 	/**
-	 * Send a value to every LLD-discovered item for each value type and verify
-	 * that history.get returns one entry per item.
-	 *
-	 * @depends testMultipleItemsHistory_LLDDiscovery
-	 */
-	public function testMultipleItemsHistory_SendAndVerify() {
-		$this->call('settings.update', ['auditlog_enabled' => 0]);
-		$this->sendAndVerifyHistoryWithOffset(0);
-	}
-
-	/**
 	 * Send history values 1 hour in the past, then at current time, and verify
 	 * that trends are generated for numeric value types.
 	 *
-	 * @depends testMultipleItemsHistory_SendAndVerify
+	 * @depends testMultipleItemsHistory_LLDDiscovery
 	 */
 	public function testMultipleItemsHistory_Trends() {
 		$this->call('settings.update', ['auditlog_enabled' => 0]);
 
-		$tm_past = $this->sendAndVerifyHistoryWithOffset(-3600);
-		$this->sendAndVerifyHistoryWithOffset(0);
+		$now = time();
+		$tm_past = $now - 3600;
+		$tm_now = $now;
 
-		$trend_clock = $tm_past - ($tm_past % 3600);
+		$this->sendAndVerifyHistoryAt($tm_past);
+		$this->sendAndVerifyHistoryAt($tm_now);
 
-		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
-			$itemids = array_values(self::$discovered_itemids[$vtype]);
+		$this->verifyTrendsAtClock($tm_past - ($tm_past % 3600));
 
-			$this->callUntilDataIsPresent('trend.get', [
-				'itemids' => $itemids,
-				'time_from' => $trend_clock,
-				'time_till' => $trend_clock,
-				'limit' => self::LLD_DISCOVERY_COUNT
-			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
-			});
-
-			$response = $this->call('trend.get', [
-				'itemids' => $itemids,
-				'time_from' => $trend_clock,
-				'time_till' => $trend_clock,
-				'countOutput' => true
-			]);
-			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
-
-			$response = $this->call('trend.get', [
-				'itemids' => $itemids,
-				'time_from' => $trend_clock,
-				'time_till' => $trend_clock,
-				'limit' => self::LLD_DISCOVERY_COUNT
-			]);
-			$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
-			foreach ($response['result'] as $trend) {
-				$this->assertArrayHasKey('itemid', $trend);
-				$this->assertArrayHasKey('clock', $trend);
-				$this->assertArrayHasKey('num', $trend);
-				$this->assertArrayHasKey('value_min', $trend);
-				$this->assertArrayHasKey('value_avg', $trend);
-				$this->assertArrayHasKey('value_max', $trend);
-				$this->assertEquals((string) $trend_clock, $trend['clock']);
-			}
-		}
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->verifyTrendsAtClock($tm_now - ($tm_now % 3600));
+		$this->startComponent(self::COMPONENT_SERVER);
 	}
 
 	/**
@@ -319,9 +278,47 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->sendAndVerifyHistory();
 	}
 
-	private function sendAndVerifyHistoryWithOffset(int $offset): int {
-		$tm = time() + $offset;
+	private function verifyTrendsAtClock(int $trend_clock): void {
+		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
+			$itemids = array_values(self::$discovered_itemids[$vtype]);
 
+			$this->callUntilDataIsPresent('trend.get', [
+				'itemids' => $itemids,
+				'time_from' => $trend_clock,
+				'time_till' => $trend_clock,
+				'limit' => self::LLD_DISCOVERY_COUNT
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
+				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
+			});
+
+			$response = $this->call('trend.get', [
+				'itemids' => $itemids,
+				'time_from' => $trend_clock,
+				'time_till' => $trend_clock,
+				'countOutput' => true
+			]);
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
+
+			$response = $this->call('trend.get', [
+				'itemids' => $itemids,
+				'time_from' => $trend_clock,
+				'time_till' => $trend_clock,
+				'limit' => self::LLD_DISCOVERY_COUNT
+			]);
+			$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
+			foreach ($response['result'] as $trend) {
+				$this->assertArrayHasKey('itemid', $trend);
+				$this->assertArrayHasKey('clock', $trend);
+				$this->assertArrayHasKey('num', $trend);
+				$this->assertArrayHasKey('value_min', $trend);
+				$this->assertArrayHasKey('value_avg', $trend);
+				$this->assertArrayHasKey('value_max', $trend);
+				$this->assertEquals((string) $trend_clock, $trend['clock']);
+			}
+		}
+	}
+
+	private function sendAndVerifyHistoryAt(int $tm): void {
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
 			$items_by_key = self::$discovered_itemids[$vtype];
@@ -397,7 +394,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->assertArrayNotHasKey('ns', $response['result'][0]);
 		}
 
-		return $tm;
 	}
 
 	private function sendDiscoveryData(): void {
