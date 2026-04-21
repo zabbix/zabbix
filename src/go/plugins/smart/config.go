@@ -35,8 +35,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("[Smart] Config value 'Plugins.Smart.Timeout' is deprecated." +
-			"Use 'Plugins.Smart.ConnectionTimeout' instead.")
+		log.Debugf("'Plugins.Smart.Timeout' is deprecated")
 
 		if p.options.ConnectionTimeout == 0 {
 			p.options.ConnectionTimeout = p.options.LegacyTimeout

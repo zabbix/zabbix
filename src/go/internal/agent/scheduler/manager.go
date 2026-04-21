@@ -233,7 +233,7 @@ func parseItemTimeout(s string) (int, error) {
 // Parses passive and active check item timeouts. Accepts nil, float, int and
 // string values. Timeout value must be in range from 1 to 600.
 // Nil and zero values are set to Agent.Options timeout value.
-// String values must be in `[integer]m` or `[integer]s` format, e.g. `4s` or
+// String values must be in `[integer]m` or `[integer]s` format, e.g. `4m` or
 // `150s`.
 // Returns item timeout in seconds.
 func ParseAndValidateItemTimeout(unparsedTimeout any) (int, error) {

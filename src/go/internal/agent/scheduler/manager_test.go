@@ -2079,7 +2079,7 @@ func Test_getPluginForceActiveChecks(t *testing.T) {
 	}
 }
 
-//nolint:gocognit,gocyclo,cyclop,paralleltest // it's a test, they're supposed to be like that
+//nolint:gocognit,gocyclo,cyclop,paralleltest // will require to rewrite this test to fit our unit test template
 func TestTimeoutParsing(t *testing.T) {
 	// !! this is why we don't globally variable
 	agentTimeoutBackup := agent.Options.Timeout

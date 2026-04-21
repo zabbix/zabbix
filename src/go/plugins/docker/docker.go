@@ -75,6 +75,8 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		ctx = plugin.OverrideTimeout(ctx, time.Now(), p.options.LegacyTimeout)
 	}
 
+	p.Tracef("query timeout set to: %d", ctx.Timeout())
+
 	var (
 		queryPath = metricsMeta[dockerKey].path
 		query     string

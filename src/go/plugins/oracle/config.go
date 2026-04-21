@@ -76,8 +76,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	p.options.setCustomQueriesPathDefault()
 
 	if p.options.LegacyConnectionTimeout != 0 {
-		log.Debugf("[%s] Config value 'Plugins.Oracle.ConnectTimeout' is deprecated."+
-			"Use 'Plugins.Oracle.Default.ConnectionTimeout' instead.", pluginName)
+		log.Debugf("'Plugins.Oracle.ConnectTimeout' is deprecated")
 
 		if p.options.Default.ConnectionTimeout == 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyConnectionTimeout
@@ -85,7 +84,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyItemTimeout != 0 {
-		log.Debugf("[%s] Config value 'Plugins.Mysql.CallTimeout' is deprecated.", pluginName)
+		log.Debugf("'Plugins.Mysql.CallTimeout' is deprecated")
 	}
 
 	if p.options.Default.ConnectionTimeout == 0 {

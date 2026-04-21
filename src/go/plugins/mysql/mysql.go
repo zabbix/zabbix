@@ -80,6 +80,9 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		ctx = plugin.OverrideTimeout(ctx, time.Now(), p.options.LegacyItemTimeout)
 	}
 
+	p.Tracef("query timeout set to: %d", ctx.Timeout())
+	p.Tracef("connectionTimeout timeout set to: %d", connectionTimeout)
+
 	conn, err := p.connMgr.GetConnection(uri, params, connectionTimeout)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested

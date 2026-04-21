@@ -95,8 +95,14 @@ func (p *Plugin) Export(key string, rawParams []string, ctx plugin.ContextProvid
 		return nil, errs.Wrap(err, "get connection failed")
 	}
 
-	result, err := handleMetric(ctx, conn, params, extraParams...)
+	if ctx.LegacyTimeout() {
+		ctx = plugin.OverrideTimeout(ctx, time.Now(), p.options.LegacyItemTimeout)
+	}
 
+	p.Tracef("query timeout set to: %d", ctx.Timeout())
+	p.Tracef("connectionTimeout timeout set to: %d", connectionTimeout)
+
+	result, err := handleMetric(ctx, conn, params, extraParams...)
 	if err != nil {
 		p.Errf("%s failed: %v\n", key, err.Error())
 

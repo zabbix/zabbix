@@ -41,8 +41,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("[Docker plugin] DEBUG: Config value 'Timeout' is deprecated." +
-			"Use 'ConnectionTimeout' instead.")
+		log.Debugf("config value 'Timeout' is deprecated")
 	}
 
 	if p.options.LegacyTimeout == 0 {

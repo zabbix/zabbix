@@ -33,7 +33,7 @@ var (
 	performTask   PerformTask
 )
 
-// PerformTask is involved in task scheduling, but I forgot what it does exactly.
+// PerformTask function signature for scheduler task performing functions.
 type PerformTask func(
 	key string, timeout time.Duration, legacyTimeout bool, clientID uint64,
 ) (result *string, err error)

@@ -50,8 +50,7 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options any) {
 	}
 
 	if p.options.LegacyTimeout != 0 {
-		log.Debugf("[MQTT plugin] DEBUG: Config value 'Plugins.MQTT.Timeout' is deprecated. " +
-			"Use 'Plugins.MQTT.Default.ConnectionTimeout'' instead.")
+		log.Debugf("config value 'Plugins.MQTT.Timeout' is deprecated")
 
 		if p.options.Default.ConnectionTimeout != 0 {
 			p.options.Default.ConnectionTimeout = p.options.LegacyTimeout

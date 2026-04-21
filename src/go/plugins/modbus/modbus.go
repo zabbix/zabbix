@@ -219,9 +219,9 @@ func (p *Plugin) Validate(options interface{}) error {
 
 	for _, s := range opts.Sessions {
 		if s.LegacyTimeout != 0 {
-			log.Debugf("[Modbus plugin] DEBUG: Config value 'Plugins.Modbus.Sessions.*.Timeout' is deprecated.")
+			log.Debugf("config value 'Plugins.Modbus.Sessions.*.Timeout' is deprecated")
 		}
-
+		// this check should be safe to remove.
 		if s.LegacyTimeout > 30 || s.LegacyTimeout < 0 {
 			return errs.Errorf("Unacceptable session Timeout value:%d", s.LegacyTimeout)
 		}
