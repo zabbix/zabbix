@@ -88,11 +88,11 @@ int	zbx_is_dnsname(const char *host)
 			return FAIL;
 	}
 
-	// last label must not be empty or end with hyphen
-        if (0 == label_len || 1 == prev_hyphen)
-                return FAIL;
+	/* last label must not be empty or end with hyphen */
+	if (0 == label_len || 1 == prev_hyphen)
+		return FAIL;
 
-        return SUCCEED;
+	return SUCCEED;
 }
 
 /******************************************************************************
