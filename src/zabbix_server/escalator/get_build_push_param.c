@@ -20,7 +20,10 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
 #include "zbxalgo.h"
+
+#define ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
 
 typedef struct
 {
@@ -31,6 +34,58 @@ typedef struct
 
 ZBX_VECTOR_DECL(push_target, zbx_push_target_t *)
 ZBX_VECTOR_IMPL(push_target, zbx_push_target_t *)
+
+static int	push_sendto_is_all(const char *sendto)
+{
+	char	*copy, *token, *saveptr;
+	int	ret = FAIL;
+
+	if (NULL == sendto || '\0' == *sendto)
+		return FAIL;
+
+	copy = zbx_strdup(NULL, sendto);
+
+	for (token = strtok_r(copy, ",\n", &saveptr); NULL != token; token = strtok_r(NULL, ",\n", &saveptr))
+	{
+		zbx_lrtrim(token, ZBX_WHITESPACE);
+
+		if (0 == strcmp(token, "*"))
+		{
+			ret = SUCCEED;
+			break;
+		}
+	}
+
+	zbx_free(copy);
+
+	return ret;
+}
+
+static int	push_sendto_has_device(const char *sendto, const char *device_id)
+{
+	char	*copy, *token, *saveptr;
+	int	ret = FAIL;
+
+	if (NULL == sendto || '\0' == *sendto || NULL == device_id || '\0' == *device_id)
+		return FAIL;
+
+	copy = zbx_strdup(NULL, sendto);
+
+	for (token = strtok_r(copy, ",\n", &saveptr); NULL != token; token = strtok_r(NULL, ",\n", &saveptr))
+	{
+		zbx_lrtrim(token, ZBX_WHITESPACE);
+
+		if (0 == strcmp(token, device_id))
+		{
+			ret = SUCCEED;
+			break;
+		}
+	}
+
+	zbx_free(copy);
+
+	return ret;
+}
 
 static void	add_hostids_array(struct zbx_json *json, const char *input)
 {
@@ -70,7 +125,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 {
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
-	int				message_type;
+	int				message_type, sendto_all;
 	zbx_dc_um_handle_t		*um_handle_unmasked;
 	zbx_vector_push_target_t	targets;
 	char				*subject_dyn = NULL;
@@ -88,22 +143,34 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_push_target_create(&targets);
+	sendto_all = push_sendto_is_all(sendto);
 
 	result = zbx_db_select(
-		"select d.uuid,d.push_token,dk.kid,dk.key_,dk.scope"
+		"select d.uuid,d.push_token,dk.key_"
 		" from device d "
 		" left join device_key dk"
-			" on dk.deviceid=d.deviceid and dk.active=1"
-				" where d.userid=" ZBX_FS_UI64 " and d.status=1", userid);
+			" on dk.device_keyid=("
+				"select max(dk2.device_keyid)"
+				" from device_key dk2"
+				" where dk2.deviceid=d.deviceid"
+					" and dk2.active=1"
+					" and dk2.scope=%d"
+			")"
+		" where d.userid=" ZBX_FS_UI64
+			" and d.status=1",
+		ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
 
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		if (SUCCEED != sendto_all && SUCCEED != push_sendto_has_device(sendto, row[0]))
+			continue;
+
 		zbx_push_target_t	*t = zbx_malloc(NULL, sizeof(zbx_push_target_t));
 
 		t->device_id = row[0];
 		t->token = row[1];
-		t->enc_key = row[3];
+		t->enc_key = row[2];
 
 		zbx_vector_push_target_append(&targets, t);
 	}
