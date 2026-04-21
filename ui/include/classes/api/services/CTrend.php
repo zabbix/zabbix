@@ -23,6 +23,8 @@ class CTrend extends CApiService {
 		'get' => ['min_user_type' => USER_TYPE_ZABBIX_USER]
 	];
 
+	public const OUTPUT_FIELDS = ['itemid', 'clock', 'num', 'value_min', 'value_avg', 'value_max'];
+
 	public function __construct() {
 		// the parent::__construct() method should not be called.
 	}
@@ -39,18 +41,7 @@ class CTrend extends CApiService {
 	 * @return array|int trend data as array or false if error
 	 */
 	public function get($options = []) {
-		$default_options = [
-			'itemids'		=> null,
-			// filter
-			'time_from'		=> null,
-			'time_till'		=> null,
-			// output
-			'output'		=> API_OUTPUT_EXTEND,
-			'countOutput'	=> false,
-			'limit'			=> null
-		];
-
-		$options = zbx_array_merge($default_options, $options);
+		self::validateGet($options);
 
 		$storage_items = [];
 		$result = ($options['countOutput']) ? 0 : [];
@@ -70,7 +61,7 @@ class CTrend extends CApiService {
 			}
 		}
 
-		foreach ([ZBX_HISTORY_SOURCE_ELASTIC, ZBX_HISTORY_SOURCE_SQL] as $source) {
+		foreach ([ZBX_HISTORY_SOURCE_ELASTIC, ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_SQL] as $source) {
 			if (array_key_exists($source, $storage_items)) {
 				$options['itemids'] = $storage_items[$source];
 
@@ -79,13 +70,18 @@ class CTrend extends CApiService {
 						$data = $this->getFromElasticsearch($options);
 						break;
 
-					default:
+					case ZBX_HISTORY_SOURCE_CLICKHOUSE:
+						$data = $this->getFromClickHouse($options);
+						break;
+
+					case ZBX_HISTORY_SOURCE_SQL:
 						if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL) == 1) {
 							$hk_trends = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
 							$options['time_from'] = max($options['time_from'], time() - $hk_trends + 1);
 						}
 
 						$data = $this->getFromSql($options);
+						break;
 				}
 
 				if (is_array($result)) {
@@ -98,6 +94,27 @@ class CTrend extends CApiService {
 		}
 
 		return is_array($result) ? $result : (string) $result;
+	}
+
+	private static function validateGet(array &$options): void {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			// Filters.
+			'itemids' =>		['type' => API_IDS, 'flags' => API_NORMALIZE, 'uniq' => true],
+			'time_from' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			'time_till' =>		['type' => API_TIMESTAMP, 'flags' => API_ALLOW_NULL, 'default' => null],
+			// Output.
+			'output' =>			['type' => API_OUTPUT, 'flags' => API_NOT_EMPTY, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
+			'countOutput' =>	['type' => API_BOOLEAN, 'default' => false],
+			'limit' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($options['output'] === API_OUTPUT_EXTEND) {
+			$options['output'] = self::OUTPUT_FIELDS;
+		}
 	}
 
 	/**
@@ -311,5 +328,49 @@ class CTrend extends CApiService {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * ClickHouse specific implemenation of get.
+	 *
+	 * @see CTrend::get
+	 */
+	private function getFromClickHouse(array $options) {
+		$result = [];
+		$rowcount = 0;
+
+		foreach ($options['itemids'] as $value_type => $itemids) {
+			/** @var CClickHouseStorage $storage */
+			$storage = Manager::History()->getStorageProviderInstance($value_type);
+			$values = $storage->getTrends([
+				'output' => $options['output'],
+				'history' => $value_type,
+				'itemids' => array_keys($itemids),
+				'time_from' => $options['time_from'],
+				'time_till' => $options['time_till'],
+				'countOutput' => $options['countOutput'],
+				'limit' => $options['limit']
+			]);
+
+			if ($storage->getErrorCode()) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
+			}
+
+			if ($options['countOutput']) {
+				$rowcount += $values[0]['rowscount'];
+			}
+			else {
+				$result = array_merge($result, $values);
+			}
+		}
+
+		if (!$this->outputIsRequested('itemid', $options['output'])) {
+			foreach ($result as &$row) {
+				unset($row['itemid']);
+			}
+			unset($row);
+		}
+
+		return $options['countOutput'] ? $rowcount : $result;
 	}
 }

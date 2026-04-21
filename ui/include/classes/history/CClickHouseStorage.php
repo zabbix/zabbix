@@ -129,40 +129,58 @@ class CClickHouseStorage {
 	 * @param array $options
 	 */
 	public function select(array $options): ?array {
-		$options = array_replace([
-			'itemids' => null,
-			'time_from' => null,
-			'time_till' => null,
-			'filter' => null,
-			'search' => null,
-			'searchByAny' => false,
-			'startSearch' => false,
-			'excludeSearch' => false,
-			'searchWildcardsEnabled' => false,
-			'sortfield' => null,
-			'sortorder' => null,
-			'limit' => null,
-			'limit_by' => null,
-			'maxValueSize' => null,
-			'countOutput' => false
-		], $options);
-
-		if ($options['limit'] !== null && !ctype_digit((string) $options['limit'])) {
-			$options['limit'] = null;
-		}
-
-		if (is_array($options['limit_by'])) {
-			[$limit, $by] = array_pad($options['limit_by'], 2, '');
-
-			if (!ctype_digit((string) $limit) || $by !== 'itemid') {
-				$options['limit_by'] = null;
-			}
-		}
-
 		$query_parts = $this->getQueryPartsFromOptions($options);
 		$query = $this->buildQueryFromParts($query_parts);
 
 		return $this->query($query, $query_parts['param']);
+	}
+
+	/**
+	 * Get trends data for specific time range.
+	 *
+	 * @param array $options
+	 */
+	public function getTrends(array $options): ?array {
+		if ($options['countOutput']) {
+			$options['output'] = ['itemid'];
+			$options['countOutput'] = false;
+			$query_parts = $this->getQueryPartsFromOptions($options);
+			$query_parts['group'] = ['itemid', 'toStartOfHour(clock_ns)'];
+
+			$query = 'SELECT count() AS rowscount FROM ('.$this->buildQueryFromParts($query_parts).')';
+
+			return $this->query($query, $query_parts['param']);
+		}
+
+		// Create query parts without SELECT
+		$query_parts = $this->getQueryPartsFromOptions(['output' => []] + $options);
+
+		// Add columns required for GROUP and ORDER
+		$output = array_merge($options['output'], ['itemid', 'clock']);
+		$query_parts['order'] = ['clock ASC'];
+		$query_parts['group'] = ['itemid', 'toStartOfHour(clock_ns)'];
+
+		$query_parts['select'] = array_intersect_key([
+			'itemid' => 'itemid',
+			'clock' => 'toUnixTimestamp(toStartOfHour(clock_ns))',
+			'num' => 'count()',
+			'value_min' => 'min(value)',
+			'value_avg' => 'avg(value)',
+			'value_max' => 'max(value)'
+		], array_flip($output));
+
+		$query = $this->buildQueryFromParts($query_parts);
+		$rows = $this->query($query, $query_parts['param']);
+
+		if (is_array($rows) && array_diff($output, $options['output'])) {
+			$output = array_flip($options['output']);
+			foreach ($rows as &$row) {
+				$row = array_intersect_key($row, $output);
+			}
+			unset($row);
+		}
+
+		return $rows;
 	}
 
 	/**
@@ -494,7 +512,7 @@ class CClickHouseStorage {
 					case 'UInt64':
 						if (is_array($value)) {
 							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit($v));
-							$form_value = $value ? '['.implode(',', $value).']' : null;
+							$form_value = '['.implode(',', $value ? $value : []).']';
 						}
 						elseif (is_int($value) || is_float($value) || ctype_digit($value)) {
 							$form_value = $value;
@@ -507,7 +525,7 @@ class CClickHouseStorage {
 								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
 								$value
 							);
-							$form_value = $value ? '['.implode(',', $value).']' : null;
+							$form_value = '['.implode(',', $value ? $value : []).']';
 						}
 						else {
 							$form_value = $value;
@@ -606,6 +624,7 @@ class CClickHouseStorage {
 			' FROM '.implode(',', $sql_parts['from']).
 			($sql_parts['prewhere'] ? ' PREWHERE '.implode(' AND ', $sql_parts['prewhere']) : '').
 			($sql_parts['where'] ? ' WHERE '.implode(' AND ', $sql_parts['where']) : '').
+			($sql_parts['group'] ? ' GROUP BY '.implode(',', $sql_parts['group']) : '').
 			($sql_parts['order'] ? ' ORDER BY '.implode(',', $sql_parts['order']) : '').
 			($sql_parts['limit'] ? ' LIMIT '.$sql_parts['limit'] : '').
 			($sql_parts['limit_by']
@@ -622,6 +641,37 @@ class CClickHouseStorage {
 	 * @param int   $options['history']  Item value type, required.
 	 */
 	protected function getQueryPartsFromOptions(array $options): array {
+		$options = array_replace([
+			'output' => ['itemid'],
+			'itemids' => null,
+			'time_from' => null,
+			'time_till' => null,
+			'filter' => null,
+			'search' => null,
+			'searchByAny' => false,
+			'startSearch' => false,
+			'excludeSearch' => false,
+			'searchWildcardsEnabled' => false,
+			'sortfield' => null,
+			'sortorder' => null,
+			'limit' => null,
+			'limit_by' => null,
+			'maxValueSize' => null,
+			'countOutput' => false
+		], $options);
+
+		if ($options['limit'] !== null && !ctype_digit((string) $options['limit'])) {
+			$options['limit'] = null;
+		}
+
+		if (is_array($options['limit_by'])) {
+			[$limit, $by] = array_pad($options['limit_by'], 2, '');
+
+			if (!ctype_digit((string) $limit) || $by !== 'itemid') {
+				$options['limit_by'] = null;
+			}
+		}
+
 		$table = $this->getTableName($options['history']);
 		$sql_parts = [
 			'select'	=> [],
@@ -629,6 +679,7 @@ class CClickHouseStorage {
 			'prewhere'	=> [],
 			'where'		=> [],
 			'order'		=> [],
+			'group'		=> [],
 			'limit'		=> $options['limit'],
 			'limit_by'	=> $options['limit_by'],
 			'param'		=> []
@@ -681,6 +732,10 @@ class CClickHouseStorage {
 		if ($options['countOutput']) {
 			$sql_parts['select'] = ['rowscount' => 'count()'];
 
+			return $sql_parts;
+		}
+
+		if (!$options['output']) {
 			return $sql_parts;
 		}
 
