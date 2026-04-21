@@ -94,6 +94,21 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		return true;
 	}
 	public static function clearData(): void {
+		$all_itemids = [];
+		foreach (self::$discovered_itemids as $itemids) {
+			foreach ($itemids as $itemid) {
+				$all_itemids[] = $itemid;
+			}
+		}
+
+		if ($all_itemids) {
+			CDataHelper::call('history.clear', $all_itemids);
+		}
+
+		if (self::$discovered_triggerids) {
+			DB::delete('events', ['objectid' => self::$discovered_triggerids]);
+		}
+
 		if (self::$hostid !== null) {
 			CDataHelper::call('host.delete', [self::$hostid]);
 		}
@@ -110,6 +125,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'DebugLevel' => 3,
 				'CacheSize' => '128M',
 				'HistoryIndexCacheSize' => '32M',
+				'ValueCacheSize' => '128M',
 			]
 		];
 	}
