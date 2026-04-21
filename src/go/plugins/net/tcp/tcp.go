@@ -77,6 +77,14 @@ func (p *Plugin) exportNetTcpPort(params []string, timeout int) (result int, err
 		err = errors.New(errorTooManyParams)
 		return
 	}
+
+	if len(params) >= 1 && params[0] != "" {
+		if net.ParseIP(params[0]) == nil && !inet.IsDNSName(params[0]) {
+			err = errors.New(errorInvalidFirstParam)
+			return
+		}
+	}
+
 	if len(params) < 2 || len(params[1]) == 0 {
 		err = errors.New(errorInvalidSecondParam)
 		return
