@@ -31,7 +31,7 @@ func isAlnumASCII(c byte) bool {
 func IsDNSName(host string) bool {
 	// Requirements and limits for host names are defined in RFC 1035,
 	// with clarifications in RFC 1123, RFC 2181.
-
+	//
 	// Total length should not exceed 253 characters.
 	// This is excluding trailing dot and additional byte usually used when saved.
 	n := len(host)
