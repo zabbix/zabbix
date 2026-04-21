@@ -138,7 +138,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_LLDDiscovery() {
 		// Reload configuration cache so the server is aware of the LLD rule.
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		$this->sendDiscoveryData();
 
