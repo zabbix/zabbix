@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-03-20 21:12+0000\n"
+"PO-Revision-Date: 2026-04-09 18:19+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -1756,7 +1756,7 @@ msgstr "À (heure:minute)"
 #: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
 #, c-format
 msgid "At least %1$d items based on field \"%2$s\" rules"
-msgstr ""
+msgstr "Au moins %1$d éléments selon les règles du champ \"%2$s\""
 
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
@@ -6457,7 +6457,7 @@ msgstr "Propriétés de la page du tableau de bord"
 
 #: app/controllers/CControllerPopupImportCompare.php:216
 msgid "Dashboard pages"
-msgstr ""
+msgstr "Pages du tableau de bord"
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -8743,6 +8743,10 @@ msgstr "Saisissez une chaîne d'identité de clé pré-partagée non secrète. �
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "Saisissez un nom unique que les composants Zabbix utiliseront pour reconnaître la clé pré-partagée."
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Saisissez l'adresse IP/DNS et le port de l'agent Zabbix installé sur votre cible à surveiller."
@@ -9001,7 +9005,7 @@ msgstr "La période d'indisponibilité exclue ne doit pas dépasser %1$s."
 #: app/controllers/CControllerSlaCreate.php:74
 #: app/controllers/CControllerSlaUpdate.php:75
 msgid "Excluded downtime periods must be unique."
-msgstr ""
+msgstr "Les périodes d'indisponibilité exclues doivent être uniques."
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -11245,6 +11249,10 @@ msgstr "Si moins de %2$s services enfants ont le statut %1$s ou inférieur"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Si moins de %2$s services enfants ont le statut %1$s ou inférieur"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -15995,7 +16003,7 @@ msgstr "Aucune correspondance trouvée"
 #: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
 #, c-format
 msgid "No more than %1$d items based on field \"%2$s\" rules"
-msgstr ""
+msgstr "Pas plus de %1$d éléments selon les règles du champ \"%2$s\""
 
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
@@ -22302,6 +22310,10 @@ msgstr "L'identifiant client enregistré dans le serveur d'autorisation."
 msgid "The client secret registered within the authorization server."
 msgstr "Le secret client enregistré dans le serveur d'autorisation."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr "Le secret client a été effacé suite à une modification du point de terminaison du jeton. Veuillez saisir le nouveau secret client."
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "L'hôte cloné contient des macros définies par l'utilisateur avec le type \"Texte secret\". La valeur et le type de ces macros ont été réinitialisés."
@@ -25547,6 +25559,10 @@ msgstr "La configuration du widget sera rétablie."
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "Le widget est obsolète."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

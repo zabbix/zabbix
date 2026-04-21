@@ -2370,7 +2370,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_history_global', false);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButton('Update');
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
@@ -2387,7 +2387,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('hk_trends_global');
 		$this->zbxTestInputType('hk_trends', '455d');
 
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButton('Update');
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
@@ -2413,7 +2413,7 @@ class testFormItem extends CLegacyWebTest {
 		$this->zbxTestInputType('hk_trends', 365);
 		$this->zbxTestCheckboxSelect('hk_trends_global', false);
 
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButton('Update');
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
 		$this->zbxTestOpen(self::HOST_LIST_PAGE);
