@@ -21,7 +21,13 @@
 
 $form = (new CForm())
 	->setId('preprocessing-test-form')
-	->setName('preprocessing_test_form');
+	->setName('preprocessing_test_form')
+	->addItem((new CVar(CSRF_TOKEN_NAME, CCsrfTokenHelper::get('itemtest')))->removeId())
+	->addVar('hostid', $data['hostid'])
+	->addVar('interfaceid', $data['interfaceid'])
+	->addVar('valuemapid', $data['valuemapid'])
+	->addVar('test_type', $data['test_type'])
+	->addVar('show_final_result', $data['show_final_result']);
 
 if ($data['show_prev']) {
 	$form
@@ -36,8 +42,19 @@ foreach ($data['inputs']['item'] as $name => $value) {
 			$form->addVar($name.'['.$num.'][value]', $row['value']);
 		}
 	}
+	elseif ($name === 'type') {
+		$form->addItem(
+			(new CInput('hidden', 'item_type', $value))
+				->setAttribute('data-field-type', 'hidden')
+				->removeId()
+		);
+	}
 	else {
-		$form->addItem((new CInput('hidden', $name, $value))->removeId());
+		$form->addItem(
+			(new CInput('hidden', $name, $value))
+				->setAttribute('data-field-type', 'hidden')
+				->removeId()
+		);
 	}
 }
 
@@ -69,15 +86,13 @@ $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name))
+			(new CTextAreaFlexible('macro_names['.$i.']', $macro_name))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
-				->removeAttribute('name')
 				->setReadonly()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol([
-			new CVar('macro_names['.$i.']', $macro_name),
 			(new CTextAreaFlexible('macro_values['.$i.']', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
@@ -97,7 +112,9 @@ if ($data['is_item_testable']) {
 	$form_grid->addItem([
 		new CLabel(_('Get value from host'), 'get_value'),
 		(new CFormField(
-			(new CCheckBox('get_value', 1))->setChecked($data['get_value'])
+			(new CCheckBox('get_value', 1))
+				->setChecked($data['get_value'])
+				->setUncheckedValue(0)
 		))->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID),
 
 		(new CLabel(_('Host address'), 'interface_address'))
@@ -287,7 +304,7 @@ if ($data['is_item_testable']) {
 
 		(new CFormField(
 			(new CSimpleButton(_('Get value')))
-				->setId('get_value_btn')
+				->addClass('js-get-value-submit')
 				->addClass(ZBX_STYLE_BTN_ALT)
 		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_OFFSET_3)
@@ -304,27 +321,42 @@ $form_grid->addItem([
 			->addStyle('display: none;')
 	], 'value'),
 	new CFormField(
-		(new CMultilineInput('value', '', [
-			'disabled' => false,
-			'readonly' => false,
-			'use_tab' => false
+		(new CMultilineInput('value', $data['value'], [
+			'placeholder' => _('value'),
+			'rows' => 0,
+			'grow' => 'auto',
+			'monospace_font' => false,
+			'readonly' => $data['not_supported'],
+			'use_tab' => false,
+			'autofocus' => true
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
 
 	new CLabel(_('Time'), 'time'),
 	new CFormField(
-		(new CTextBox(null, 'now', true))
+		(new CTextBox('', 'now', true))
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+			->removeAttribute('data-field-type')
 			->setId('time')
 	),
 
 	($data['test_type'] == CControllerPopupItemTestEdit::ZBX_TEST_TYPE_LLD)
 		? null
 		: (new CFormField([
-			(new CCheckBox('not_supported'))->setLabel(_('Not supported'))->setChecked((bool) $data['not_supported']),
+			(new CCheckBox('not_supported'))
+				->setLabel(_('Not supported'))
+				->setChecked((bool) $data['not_supported'])
+				->setUncheckedValue(0),
 			(new CDiv([
 				(new CLabel(_('Error'), 'runtime_error_match'))->setFor('runtime_error'),
-				(new CMultilineInput('runtime_error', '', ['readonly' => false, 'use_tab' => false]))
+				new CMultilineInput('runtime_error', $data['runtime_error'], [
+					'placeholder' => _('error text'),
+					'rows' => 0,
+					'grow' => 'auto',
+					'monospace_font' => false,
+					'readonly' => $data['not_supported'],
+					'use_tab' => false
+				])
 			]))
 		]))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
@@ -333,8 +365,12 @@ $form_grid->addItem([
 
 	new CLabel(_('Previous value'), 'prev_item_value'),
 	new CFormField(
-		(new CMultilineInput('prev_value', '', [
-			'disabled' => !$data['show_prev'],
+		(new CMultilineInput('prev_value', $data['prev_value'], [
+			'placeholder' => $data['show_prev'] ? _('value'): '',
+			'rows' => 0,
+			'grow' => 'auto',
+			'monospace_font' => false,
+			'disabled' => $data['show_prev'],
 			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
@@ -393,24 +429,30 @@ if (count($data['steps']) > 0) {
 			$form->addVar('steps['.$i.'][params]', $step['params']);
 		}
 
-		$result_table->addRow([
-			(new CCol($step['num'].':')),
-			(new CCol($step['name']))
-				->setId('preproc-test-step-'.$i.'-name')
-				->addClass(ZBX_STYLE_WORDBREAK),
-			(new CCol())
-				->addClass(ZBX_STYLE_RIGHT)
-				->setId('preproc-test-step-'.$i.'-result'),
-			(new CCol(
-				(new CButton('copy_button-'.$i))
-					->setTitle(_('Copy to clipboard'))
-					->addClass(ZBX_ICON_COPY)
-					->addClass(ZBX_STYLE_BTN_GREY_ICON)
-					->addClass('js-copy-button')
-					->setAttribute('data-index', $i)
-					->addStyle('display: none')
-			))->addClass('result-copy')
-		]);
+		$result_table->addRow(
+			(new CRow([
+				(new CCol($step['num'].':')),
+				(new CCol($step['name']))
+					->setId('preproc-test-step-'.$i.'-name')
+					->addClass('js-preproc-step-name')
+					->addClass(ZBX_STYLE_WORDBREAK),
+				(new CCol())
+					->addClass(ZBX_STYLE_RIGHT)
+					->addClass('js-preproc-step-result')
+					->setId('preproc-test-step-'.$i.'-result'),
+				(new CCol(
+					(new CButton('copy_button-'.$i))
+						->setTitle(_('Copy to clipboard'))
+						->addClass(ZBX_ICON_COPY)
+						->addClass(ZBX_STYLE_BTN_GREY_ICON)
+						->addClass('js-copy-button')
+						->setAttribute('data-index', $i)
+						->addStyle('display: none')
+				))->addClass('result-copy')
+			]))
+				->addClass('js-preprocessing-test-step')
+				->setAttribute('data-index', $i)
+		);
 	}
 
 	$form_grid->addItem([
@@ -425,10 +467,11 @@ if (count($data['steps']) > 0) {
 
 if ($data['show_final_result']) {
 	$form_grid->addItem([
-		(new CLabel(_('Result')))->addClass('js-final-result'),
+		(new CLabel(_('Result')))->addClass('js-final-result')->addStyle('display: none'),
 		(new CFormField())
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass('item-final-result')
+			->addStyle('display: none')
 	]);
 }
 
@@ -455,6 +498,12 @@ $form->addItem([
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass('item-test-result')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
+	),
+	(new CTemplateTag('preprocessing-step-result-empty'))->addItem(
+		(new CSpan('#{result}'))->addClass(ZBX_STYLE_GREY)
+	),
+	(new CTemplateTag('preprocessing-step-result-default'))->addItem(
+		(new CSpan('#{result}'))
 	),
 	(new CTemplateTag('preprocessing-step-result-warning'))->addItem(
 		(new CDiv([
@@ -493,18 +542,25 @@ $warning_box = $data['show_warning']
 $output = [
 	'header' => $data['title'],
 	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_TEST_EDIT),
-	'script_inline' => $this->readJsFile('popup.itemtestedit.view.js.php'),
 	'body' => (new CDiv([$warning_box, $form]))->toString(),
-	'cancel_action' => 'return saveItemTestInputs();',
 	'buttons' => [
 		[
 			'title' => ($data['is_item_testable'] && $data['get_value']) ? _('Get value and test') : _('Test'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'enabled' => true,
-			'isSubmit' => true,
-			'action' => 'return itemCompleteTest(overlay);'
+			'isSubmit' => true
 		]
-	]
+	],
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('popup.itemtestedit.view.js.php').
+		'itemtestedit_view_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'rules_get_value' => $data['js_validation_rules_get_value'],
+			'is_item_testable' => $data['is_item_testable'],
+			'show_prev' => $data['show_prev'],
+			'show_snmp_form' => $data['show_snmp_form']
+		]).');',
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
