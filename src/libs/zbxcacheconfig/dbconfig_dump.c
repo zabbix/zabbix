@@ -86,6 +86,7 @@ static void	DCdump_config(void)
 	zabbix_log(LOG_LEVEL_TRACE, "  telnet:%s", config->config->item_timeouts.telnet);
 	zabbix_log(LOG_LEVEL_TRACE, "  script:%s", config->config->item_timeouts.script);
 	zabbix_log(LOG_LEVEL_TRACE, "  browser:%s", config->config->item_timeouts.browser);
+	zabbix_log(LOG_LEVEL_TRACE, "  telemetry:%s", config->config->item_timeouts.telemetry);
 out:
 	zabbix_log(LOG_LEVEL_TRACE, "End of %s()", __func__);
 }

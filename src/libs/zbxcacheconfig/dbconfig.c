@@ -1409,6 +1409,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->item_timeouts.telnet);
 	dc_strpool_release(proxy->item_timeouts.script);
 	dc_strpool_release(proxy->item_timeouts.browser);
+	dc_strpool_release(proxy->item_timeouts.telemetry);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	dc_strpool_release(proxy->tls_issuer);
@@ -2731,7 +2732,6 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 {
 	const char	*global_timeout;
 
-	/* TODO: add ITEM_TYPE_TELEMETRY_QUERY */
 	switch (item_type)
 	{
 		case ITEM_TYPE_ZABBIX:
@@ -2764,6 +2764,9 @@ static const char	*dc_get_global_item_type_timeout(unsigned char item_type)
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			global_timeout = config->config->item_timeouts.http;
+			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			global_timeout = config->config->item_timeouts.telemetry;
 			break;
 		default:
 			global_timeout = "";
@@ -7762,6 +7765,7 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 		dc_strpool_replace(found, &proxy->item_timeouts.telnet, row[20]);
 		dc_strpool_replace(found, &proxy->item_timeouts.script, row[21]);
 		dc_strpool_replace(found, &proxy->item_timeouts.browser, row[26]);
+		dc_strpool_replace(found, &proxy->item_timeouts.telemetry, row[27]);
 
 		if (PROXY_OPERATING_MODE_PASSIVE == mode && (0 == found || mode != proxy->mode))
 		{
@@ -16258,6 +16262,7 @@ void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeo
 		zbx_strscpy(timeouts->telnet, timeouts_src->telnet);
 		zbx_strscpy(timeouts->script, timeouts_src->script);
 		zbx_strscpy(timeouts->browser, timeouts_src->browser);
+		zbx_strscpy(timeouts->telemetry, timeouts_src->telemetry);
 	}
 
 	UNLOCK_CACHE;
@@ -16299,6 +16304,7 @@ static void	proxy_discovery_get_timeouts(const ZBX_DC_PROXY *proxy, struct zbx_j
 	proxy_discovery_add_item_type_timeout("telnet_agent", json, timeouts->telnet, proxy->proxyid);
 	proxy_discovery_add_item_type_timeout("script", json, timeouts->script, proxy->proxyid);
 	proxy_discovery_add_item_type_timeout("browser", json, timeouts->browser, proxy->proxyid);
+	proxy_discovery_add_item_type_timeout("telemetry_query", json, timeouts->telemetry, proxy->proxyid);
 
 	zbx_json_close(json);
 }

@@ -4133,7 +4133,8 @@ int	zbx_dbsync_compare_proxies(zbx_dbsync_t *sync)
 				"p.timeout_zabbix_agent,p.timeout_simple_check,p.timeout_snmp_agent,"
 				"p.timeout_external_check,p.timeout_db_monitor,p.timeout_http_agent,"
 				"p.timeout_ssh_agent,p.timeout_telnet_agent,p.timeout_script,p.custom_timeouts,"
-				"p.proxy_groupid,p.local_address,p.local_port,p.timeout_browser"
+				"p.proxy_groupid,p.local_address,p.local_port,p.timeout_browser,"
+				"p.timeout_telemetry_query"
 			" from proxy p"
 			" left join proxy_rtdata pr"
 				" on p.proxyid=pr.proxyid");

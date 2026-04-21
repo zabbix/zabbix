@@ -700,7 +700,6 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
 
 	if (query->aggregation_size > query->loopback_limit)
 		return ret_errf(FAIL, error, max_error_len, "aggregation size cannot be larger than loopback limit");
-	/* TODO: probably add upper limit */
 
 	return SUCCEED;
 }

@@ -762,6 +762,13 @@ static int	DBpatch_7050052(void)
 	return ret;
 }
 
+static int	DBpatch_7050053(void)
+{
+	const zbx_db_field_t	field = {"timeout_telemetry_query", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy", &field);
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -821,5 +828,6 @@ DBPATCH_ADD(7050049, 0, 1)
 DBPATCH_ADD(7050050, 0, 1)
 DBPATCH_ADD(7050051, 0, 1)
 DBPATCH_ADD(7050052, 0, 1)
+DBPATCH_ADD(7050053, 0, 1)
 
 DBPATCH_END()

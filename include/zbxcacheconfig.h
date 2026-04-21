@@ -1575,6 +1575,7 @@ typedef struct
 	const char	*telnet;
 	const char	*script;
 	const char	*browser;
+	const char	*telemetry;
 }
 zbx_config_item_type_timeouts_t;
 
@@ -1593,6 +1594,7 @@ typedef struct
 	char	telnet[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	script[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 	char	browser[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
+	char	telemetry[ZBX_ITEM_TYPE_TIMEOUT_LEN_MAX];
 }
 zbx_dc_item_type_timeouts_t;
 
