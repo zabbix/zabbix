@@ -382,26 +382,6 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 }
 
-// moves next refresh after 60 seconds if communication failure, matching refresh failure retry.
-func (c *Connector) pullForwardActiveChecksRefresh() {
-	retryAfter := time.Now().Unix() + 60
-
-	for {
-		cur := atomic.LoadInt64(&c.nextRefreshUnix)
-		if cur == 0 {
-			return
-		}
-
-		if retryAfter >= cur {
-			return
-		}
-
-		if atomic.CompareAndSwapInt64(&c.nextRefreshUnix, cur, retryAfter) {
-			return
-		}
-	}
-}
-
 func (c *Connector) run() {
 	var lastFlush, lastHeartbeat int64
 
@@ -551,4 +531,24 @@ func processConfigItem(taskManager scheduler.Scheduler, timeout time.Duration, n
 
 func (c *Connector) ClientID() uint64 {
 	return c.clientID
+}
+
+// moves next refresh after 60 seconds if communication failure, matching refresh failure retry.
+func (c *Connector) pullForwardActiveChecksRefresh() {
+	retryAfter := time.Now().Unix() + 60
+
+	for {
+		cur := atomic.LoadInt64(&c.nextRefreshUnix)
+		if cur == 0 {
+			return
+		}
+
+		if retryAfter >= cur {
+			return
+		}
+
+		if atomic.CompareAndSwapInt64(&c.nextRefreshUnix, cur, retryAfter) {
+			return
+		}
+	}
 }
