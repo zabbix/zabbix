@@ -12,11 +12,13 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxnix.h"
 #include "zbxthreads.h"
 
 #include "fatal.h"
 #include "sigcommon.h"
+#include <setjmp.h>
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 #	include "zbxcomms.h"
@@ -27,7 +29,7 @@
 #define ZBX_EXIT_FAILURE	2
 
 static int				sig_parent_pid = -1;
-static ZBX_THREAD_LOCAL unsigned long	sig_thread;
+static ZBX_THREAD_LOCAL sigjmp_buf	*sig_jmp_ret = NULL;
 
 static pid_t	*child_pids = NULL;
 static size_t		child_pid_count = 0;
@@ -42,11 +44,12 @@ int	get_sig_parent_pid(void)
 	return sig_parent_pid;
 }
 
-int	zbx_init_thread_signal_handler(void)
+int	zbx_init_thread_signal_handler(sigjmp_buf *jmp_ret)
 {
 	sigset_t	mask;
+	int		err;
 
-	sig_thread = 1;
+	sig_jmp_ret = jmp_ret;
 
 	sigemptyset(&mask);
 	sigaddset(&mask, SIGTERM);
@@ -56,7 +59,10 @@ int	zbx_init_thread_signal_handler(void)
 	sigaddset(&mask, SIGQUIT);
 	sigaddset(&mask, SIGINT);
 
-	return pthread_sigmask(SIG_BLOCK, &mask, NULL);
+	if (0 != (err = pthread_sigmask(SIG_BLOCK, &mask, NULL)))
+		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+
+	return SUCCEED;
 }
 
 typedef struct
@@ -95,14 +101,35 @@ void	zbx_set_exiting_with_succeed(void)
 	sig_exiting = ZBX_EXIT_SUCCESS;
 }
 
+static int	zbx_is_running_default(void *args)
+{
+	ZBX_UNUSED(args);
+
+	return ZBX_EXIT_NONE == sig_exiting;
+}
+
+static ZBX_THREAD_LOCAL int	(*zbx_is_running_impl)(void *args) = zbx_is_running_default;
+static ZBX_THREAD_LOCAL void	*zbx_is_running_args = NULL;
+
 int	ZBX_IS_RUNNING(void)
 {
-	return ZBX_EXIT_NONE == sig_exiting;
+	return zbx_is_running_impl(zbx_is_running_args);
+}
+
+void	zbx_set_is_running(int (*is_running_func)(void *args), void *args)
+{
+	zbx_is_running_impl = is_running_func;
+	zbx_is_running_args = args;
 }
 
 int	ZBX_EXIT_STATUS(void)
 {
 	return ZBX_EXIT_SUCCESS == sig_exiting ? SUCCEED : FAIL;
+}
+
+int	ZBX_IS_NORMAL_EXIT(void)
+{
+	return ZBX_EXIT_FAILURE != sig_exiting ? SUCCEED : FAIL;
 }
 
 static void	log_fatal_signal(int sig, siginfo_t *siginfo, void *context)
@@ -120,7 +147,7 @@ static void	exit_with_failure(void)
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_free_on_signal();
 #endif
-	_exit(EXIT_FAILURE);
+	zbx_exit_immediate(EXIT_FAILURE);
 }
 
 /******************************************************************************
@@ -133,12 +160,10 @@ static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
 	log_fatal_signal(sig, siginfo, context);
 	zbx_log_fatal_info(context, ZBX_FATAL_LOG_FULL_INFO);
 
-	if (1 == sig_thread)
+	if (NULL != sig_jmp_ret)
 	{
 		zbx_set_exiting_with_fail();
-		int	ret = EXIT_FAILURE;
-
-		pthread_exit(&ret);
+		siglongjmp(*sig_jmp_ret, 1);
 	}
 
 	exit_with_failure();
@@ -248,7 +273,8 @@ static void	terminate_signal_handler(int sig, siginfo_t *siginfo, void *context)
 			if (0 != sig_exit_on_terminate)
 			{
 				zbx_log_exit_signal();
-				zbx_on_exit_cb(SUCCEED, zbx_on_exit_args);
+				/* shutdown during startup must be handled as exit with failure */
+				zbx_on_exit_cb(FAIL, zbx_on_exit_args);
 			}
 		}
 	}
@@ -329,16 +355,6 @@ void	zbx_set_common_signal_handlers(zbx_on_exit_t zbx_on_exit_cb_arg)
 
 	phan.sa_sigaction = alarm_signal_handler;
 	sigaction(SIGALRM, &phan, NULL);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: make main process to exit on terminate signals                    *
- *                                                                            *
- ******************************************************************************/
-void	zbx_set_exit_on_terminate(void)
-{
-	sig_exit_on_terminate = 1;
 }
 
 /******************************************************************************
@@ -458,3 +474,4 @@ void	zbx_set_child_pids(pid_t *pids, size_t pid_num)
 	child_pids = pids;
 	child_pid_count = pid_num;
 }
+

@@ -70,10 +70,10 @@ $form_grid = (new CFormGrid())
 			->setAsteriskMark()
 			->addClass('js-field-sendto'),
 		(new CFormField(
-			(new CTextBox('sendto', $data['form']['sendto'], $data['provisioned'] == CUser::PROVISION_STATUS_YES,
-				DB::getFieldLength('media', 'sendto')
-			))
+			(new CTextAreaFlexible('sendto', $data['form']['sendto']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('media', 'sendto'))
+				->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 				->setAriaRequired()
 		))->addClass('js-field-sendto')
 	])
@@ -97,10 +97,9 @@ $form_grid = (new CFormGrid())
 				),
 			(new CTemplateTag('sendto-emails-row-tmpl'))->addItem(
 				(new CRow([
-					(new CTextBox('sendto_emails[#{rowNum}]', '#{email}',
-						$data['provisioned'] == CUser::PROVISION_STATUS_YES
-					))
+					(new CTextAreaFlexible('sendto_emails[#{rowNum}]', '#{email}'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setReadonly($data['provisioned'] == CUser::PROVISION_STATUS_YES)
 						->setAriaRequired(),
 					(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						->setEnabled($data['provisioned'] == CUser::PROVISION_STATUS_NO)

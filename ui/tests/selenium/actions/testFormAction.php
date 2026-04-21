@@ -325,9 +325,9 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestTextPresent(['Action', 'Operations']);
 
 		$this->zbxTestTextPresent('Name');
-		$this->zbxTestAssertElementPresentXpath('//div[@class="form-grid"]//input[@id="name"]');
-		$this->zbxTestAssertAttribute('//input[@id="name"]', 'maxlength', 255);
-		$this->zbxTestAssertAttribute('//input[@id="name"]', 'autofocus');
+		$this->zbxTestAssertElementPresentXpath('//div[@class="form-grid"]//z-textarea-flexible[@id="name"]');
+		$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="name"]', 'maxlength', 255);
+		$this->zbxTestAssertAttribute('//z-textarea-flexible[@id="name"]', 'autofocus');
 
 		$this->zbxTestTextPresent('Enabled');
 		$this->zbxTestAssertElementPresentId('status');
