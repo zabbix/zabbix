@@ -399,10 +399,9 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill($data['filter']);
-		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->query('button:Apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
-		$table->waitUntilReady()->invalidate();
+		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 		$this->assertDatatableDataColumn($data['expected']);
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$table->waitUntilReady();
@@ -1145,7 +1144,7 @@ class testPageMonitoringHosts extends CWebTest {
 			$table->waitUntilReady()->invalidate();
 			$after_listing = $this->getDatatableColumnData($listing);
 			$query->one()->click();
-			$this->page->waitUntilReady();
+			$table->waitUntilReady();
 			$this->assertEquals(array_reverse($after_listing), $this->getDatatableColumnData($listing));
 		}
 	}
