@@ -447,7 +447,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->callUntilCountIsPresent('event.get', [
 			'objectids' => self::$discovered_triggerids,
 			'source' => EVENT_SOURCE_TRIGGERS
-		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+		], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
 			$this->executeHousekeeper();
 			return true;
 		});
