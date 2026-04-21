@@ -30,7 +30,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	const LLD_MACRO = '{#SENSOR}';
 	const ITEM_PROTO_KEY = 'multiple.history.trap';
 	const SENSOR_BASE = 'sensor';
-	const LLD_DISCOVERY_COUNT = 4000;
+	const LLD_DISCOVERY_COUNT = 10000;
 
 	private static $hostid;
 	private static $lld_ruleid;
@@ -108,8 +108,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			self::COMPONENT_SERVER => [
 				'LogFileSize' => 1,
 				'DebugLevel' => 3,
-				'CacheSize' => '64M',
-				'HistoryIndexCacheSize' => '16M',
+				'CacheSize' => '128M',
+				'HistoryIndexCacheSize' => '32M',
 			]
 		];
 	}
