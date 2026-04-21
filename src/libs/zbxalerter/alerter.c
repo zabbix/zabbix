@@ -26,6 +26,7 @@
 #include "zbxexec.h"
 #include "zbxhash.h"
 #include "zbxipcservice.h"
+#include "zbxjson.h"
 #include "zbxmedia.h"
 #include "zbxnix.h"
 #include "zbxself.h"
@@ -46,6 +47,9 @@
 #endif
 
 #define	ALARM_ACTION_TIMEOUT	40
+#define ZBX_ERROR_CODE_LEN	32
+#define ZBX_MESSAGE_LEN		256
+#define ZBX_INFO_LEN		512
 
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
 
@@ -529,7 +533,6 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zabbix_log(LOG_LEVEL_WARNING, "application compiled without cURL library");
 #else
 	int			ret = FAIL;
-	char 			alert_error[MAX_STRING_LEN];
 	zbx_uint64_t		alertid;
 	char			*params;
 	long			http_code = 0;
@@ -538,7 +541,10 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	CURLoption		opt;
 	struct curl_slist	*headers = NULL, *connect_to = NULL;
 	zbx_http_response_t	body = {0}, response_header = {0};
-	char			*payload = NULL, *error = NULL, errbuf[CURL_ERROR_SIZE];
+	struct zbx_json_parse	jp_body, jp_result;
+	char			*payload = NULL, *error = NULL, *error_curl = NULL, errbuf[CURL_ERROR_SIZE],
+				code[ZBX_ERROR_CODE_LEN], message[ZBX_MESSAGE_LEN],
+				error_data[ZBX_MESSAGE_LEN];
 
 	ZBX_UNUSED(config_adapter_timeout);
 
@@ -547,18 +553,18 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	zbx_alerter_deserialize_push(ipc_message->data, &alertid, &params);
 	payload = zbx_strdup(NULL, params);
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER STRATAX: %s", payload);
-
 	if (NULL == (curl = curl_easy_init()))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER failed initialize cURL library");
+		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
+		error = zbx_strdup(NULL, "Failed process device.notify request");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb, zbx_curl_write_cb,
-			errbuf, &error))
+			errbuf, &error_curl))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error_curl));
+		error = zbx_strdup(NULL, "Failed process device.notify request");
 		goto out;
 	}
 
@@ -572,28 +578,26 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECTTIMEOUT_MS, 2000L)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		zbx_snprintf(alert_error, sizeof(alert_error), "cannot set cURL option %d: %s.", (int)opt,
-				curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
+		error = zbx_strdup(NULL, "Failed process device.notify request");
 		goto out;
 	}
 
 	if (NULL != config_adapter_ca_file && NULL != config_adapter_cert_file && NULL != config_adapter_key_file)
 	{
-		if (SUCCEED != zbx_curl_setopt_https(curl, &error))
+		if (SUCCEED != zbx_curl_setopt_https(curl, &error_curl))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_https %s", curl_easy_strerror(err));
-			zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_https %s",
-					curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_https: %s",
+					ZBX_NULL2EMPTY_STR(error_curl));
+			error = zbx_strdup(NULL, "Failed process device.notify request");
 			goto out;
 		}
 
-		if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error))
+		if (SUCCEED != zbx_curl_setopt_ssl_version(curl, &error_curl))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "failed zbx_curl_setopt_ssl_version %s",
-					curl_easy_strerror(err));
-			zbx_snprintf(alert_error, sizeof(alert_error), "failed zbx_curl_setopt_ssl_version %s",
-					curl_easy_strerror(err));
+			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_ssl_version: %s",
+					ZBX_NULL2EMPTY_STR(error_curl));
+			error = zbx_strdup(NULL, "Failed process device.notify request");
 			goto out;
 		}
 
@@ -605,10 +609,9 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYPEER, 1L)) ||
 				CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_SSL_VERIFYHOST, 2L)))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt,
+			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			zbx_snprintf(alert_error, sizeof(alert_error), "failed set cURL option %d: %s.", (int)opt,
-					curl_easy_strerror(err));
+			error = zbx_strdup(NULL, "Failed process device.notify request");
 			goto out;
 		}
 	}
@@ -619,56 +622,84 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 
 		if (NULL == connect_to)
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "failed to prepare CURLOPT_CONNECT_TO value");
+			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
+			error = zbx_strdup(NULL, "Failed process device.notify request");
 			goto out;
 		}
 
 		if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECT_TO, connect_to)))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "failed set cURL option %d: %s.", (int)opt,
+			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
+			error = zbx_strdup(NULL, "Failed process device.notify request");
 			goto out;
 		}
 	}
 
 	if (CURLE_OK != (err = curl_easy_perform(curl)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed connect to bridge-adapter: %s", curl_easy_strerror(err));
-		zbx_snprintf(alert_error, sizeof(alert_error), "failed connect to bridge-adapter: %s",
-				curl_easy_strerror(err));
+		zabbix_log(LOG_LEVEL_WARNING, "failed connect to bridge-adapter: %s", curl_easy_strerror(err));
+		error = zbx_strdup(NULL, "Failed connect to bridge-adapter");
 		goto out;
 	}
 
 	if (CURLE_OK != (err = curl_easy_getinfo(curl, CURLINFO_RESPONSE_CODE, &http_code)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed obtain bridge-adapter response code: %s",
+		zabbix_log(LOG_LEVEL_WARNING, "failed obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		zbx_snprintf(alert_error, sizeof(alert_error), "failed obtain bridge-adapter response code: %s",
-				curl_easy_strerror(err));
+		error = zbx_strdup(NULL, "Failed process device.notify request");
+		goto out;
+	}
+
+	if (FAIL == zbx_json_open(body.data, &jp_body))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
+				ZBX_NULL2EMPTY_STR(body.data));
+		error = zbx_strdup(NULL, "Failed process device.notify request");
 		goto out;
 	}
 
 	if (http_code < 200 || http_code >= 300)
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "failed to send notification: "
-				"bridge-adapter returned HTTP %ld", http_code);
-		zbx_snprintf(alert_error, sizeof(alert_error), "failed to send notification: "
-				"bridge-adapter returned HTTP %ld", http_code);
+		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
+				ZBX_NULL2EMPTY_STR(body.data));
+		error = zbx_strdup(NULL, "Failed process device.notify request");
+		goto out;
+	}
+
+	if (SUCCEED == zbx_json_brackets_by_name(&jp_body, "error", &jp_result))
+	{
+		if (SUCCEED == zbx_json_value_by_name(&jp_result, "code", code, sizeof(code), NULL) &&
+				SUCCEED == zbx_json_value_by_name(&jp_result, "message", message,
+				sizeof(message), NULL) &&
+				SUCCEED == zbx_json_value_by_name(&jp_result, "data", error_data,
+				sizeof(error_data), NULL))
+		{
+			char	info[ZBX_INFO_LEN];
+
+			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data %s", code,
+					message, error_data);
+			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
+					code, message, error_data);
+			error = zbx_strdup(NULL, info);
+		}
+		else
+			error = zbx_strdup(NULL, "Failed process device.notify request");
 
 		goto out;
 	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "ALERT SUCCESS: %d", http_code);
-		ret = SUCCEED;
-	}
-out:
-	if (NULL != headers)
-		curl_slist_free_all(headers);
 
+	ret = SUCCEED;
+
+out:
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
+
+	curl_slist_free_all(headers);
+	curl_slist_free_all(connect_to);
 	curl_easy_cleanup(curl);
 	zbx_free(params);
+	zbx_free(error_curl);
+	zbx_free(error);
 	zbx_free(response_header.data);
 	zbx_free(body.data);
 	zbx_free(payload);
