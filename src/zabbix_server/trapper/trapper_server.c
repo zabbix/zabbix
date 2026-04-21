@@ -25,10 +25,104 @@
 #include "zbxalerter.h"
 #include "zbxipcservice.h"
 #include "zbxcommshigh.h"
+#include "zbxcacheconfig.h"
+#include "zbxcrypto.h"
 #include "zbxnum.h"
 #include "zbxdb.h"
 #include "zbxstr.h"
 #include "zbxjson.h"
+
+#define ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
+
+static int	trapper_build_push_test_params(const char *sendto, const char *subject, const char *message,
+		char **params, char **error)
+{
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	struct zbx_json		json;
+	zbx_config_t		cfg;
+	const char		*server_id, *device_id, *push_token, *mobile_encryption_key;
+	char			*sendto_esc = NULL, *message_uuid7 = NULL, *request_uuid7 = NULL;
+	int			ret = FAIL;
+
+	sendto_esc = zbx_db_dyn_escape_string(sendto);
+
+	result = zbx_db_select(
+			"select d.uuid,d.push_token,dk.key_"
+			" from device d"
+			" left join device_key dk"
+				" on dk.deviceid=d.deviceid"
+				" and dk.active=1"
+				" and dk.scope=%d"
+			" where d.uuid='%s'"
+				" and d.status=1"
+			" order by dk.device_keyid desc",
+			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, sendto_esc);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_free_result(result);
+		*error = zbx_strdup(NULL, "Cannot find enabled device for push media type test.");
+		goto out;
+	}
+
+	device_id = row[0];
+	push_token = row[1];
+	mobile_encryption_key = row[2];
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
+	server_id = cfg.serverid;
+
+	zbx_json_init(&json, 1024);
+	zbx_json_addstring(&json, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "method", "device.notify", ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addobject(&json, "params");
+
+	zbx_json_addobject(&json, "to");
+	zbx_json_addstring(&json, "push_token", push_token, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "server_id", server_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "device_id", device_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&json);
+
+	zbx_json_addobject(&json, "payload");
+	zbx_json_addstring(&json, "specversion", "1", ZBX_JSON_TYPE_STRING);
+
+	message_uuid7 = zbx_gen_uuid7_hyphenated();
+	zbx_json_addstring(&json, "id", message_uuid7, ZBX_JSON_TYPE_STRING);
+	zbx_json_addint64(&json, "time", (zbx_int64_t)time(NULL));
+	zbx_json_addstring(&json, "type", "notification.test", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "source", "zabbix/server", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "subject", "mediatype/test", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "schema", "urn:zabbix:server:test:1", ZBX_JSON_TYPE_STRING);
+
+	zbx_json_addobject(&json, "data");
+	zbx_json_addstring(&json, "title", subject, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json, "body", message, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&json);
+
+	zbx_json_close(&json);
+
+	zbx_json_addint64(&json, "priority", 0);
+	zbx_json_addraw(&json, "mobile_encryption_key", mobile_encryption_key);
+
+	zbx_json_close(&json);
+
+	request_uuid7 = zbx_gen_uuid7_hyphenated();
+	zbx_json_addstring(&json, "id", request_uuid7, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&json);
+
+	*params = zbx_strdup(NULL, json.buffer);
+	ret = SUCCEED;
+
+	zbx_json_free(&json);
+	zbx_db_free_result(result);
+out:
+	zbx_free(request_uuid7);
+	zbx_free(message_uuid7);
+	zbx_free(sendto_esc);
+
+	return ret;
+}
 
 static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
 		zbx_get_config_forks_f get_config_forks, const zbx_config_tls_t *config_tls,
@@ -182,6 +276,18 @@ static void	trapper_process_alert_send(zbx_socket_t *sock, const struct zbx_json
 	ZBX_STR2UCHAR(smtp_authentication, row[12]);
 	ZBX_STR2UCHAR(message_format, row[16]);
 	ZBX_STR2UCHAR(type, row[0]);
+
+	if (MEDIA_TYPE_PUSH == type)
+	{
+		zbx_free(params);
+		params = NULL;
+
+		if (SUCCEED != trapper_build_push_test_params(sendto, subject, message, &params, &error))
+		{
+			zbx_db_free_result(result);
+			goto fail;
+		}
+	}
 
 	size = zbx_alerter_serialize_alert_send(&data, mediatypeid, type, row[19], row[1], row[2], row[3], row[4],
 			row[5], row[6], row[7], smtp_port, smtp_security, smtp_verify_peer, smtp_verify_host,

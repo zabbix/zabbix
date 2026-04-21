@@ -725,7 +725,7 @@ int	zbx_alarm_timed_out(void);
 #define ZBX_SHA512_BINARY_LENGTH 64
 
 /* includes terminating '\0' */
-#define ZBX_UUID_LEN	33
+#define ZBX_UUID_LEN	37
 
 /* includes terminating '\0' */
 #define CUID_LEN	26
