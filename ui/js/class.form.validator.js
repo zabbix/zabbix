@@ -164,7 +164,7 @@ class CFormValidator {
 	 * @returns {boolean}  Returns true if validation passes. False otherwise.
 	 */
 	#validate(value, rules) {
-		this.#errors = Object.create(null);
+		this.#errors = {};
 
 		if (rules === false) {
 			throw new Error('Invalid validation rules.', {cause: 'RulesError'});
@@ -196,7 +196,7 @@ class CFormValidator {
 	 *                  - {Array} containing server-side parser/validator checks that must be performed later.
 	 */
 	#resolveFieldReferences(data_to_validate, data_all) {
-		const when_fields_data = Object.create(null);
+		const when_fields_data = {};
 		const api_uniq_rules = [];
 		const use_checks = [];
 		const rules_all = JSON.parse(JSON.stringify(this.#rules));
@@ -292,7 +292,7 @@ class CFormValidator {
 
 				matching_rulesets.forEach(({type, fields, field}) => {
 					if (fields === undefined) {
-						fields = Object.create(null);
+						fields = {};
 					}
 
 					if (type === 'object' || type === 'objects') {
@@ -1695,7 +1695,7 @@ class CFormValidator {
 
 		const checkDistinctness = (field_names, objects_values, field_path, ruleset) => {
 			const uniq_values = [];
-			const values = Object.create(null);
+			const values = {};
 
 			let is_distinct = true;
 
