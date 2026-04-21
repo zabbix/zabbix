@@ -516,11 +516,11 @@ class CClickHouseStorage {
 					case 'Int64':
 						if (is_array($value)) {
 							$value = array_filter($value,
-								fn($v) => is_int($v) || filter_var($value, FILTER_VALIDATE_INT)
+								fn($v) => is_int($v) || preg_match('/^(\-|\+){0,1}\d+$/', $v)
 							);
 							$form_value = '['.implode(',', $value).']';
 						}
-						elseif (is_int($value) || filter_var($value, FILTER_VALIDATE_INT)) {
+						elseif (is_int($value) || preg_match('/^(\-|\+){0,1}\d+$/', $value)) {
 							$form_value = $value;
 						}
 
