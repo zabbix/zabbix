@@ -509,12 +509,24 @@ class CClickHouseStorage {
 				switch ($column_type) {
 					case 'Int32':
 					case 'Int64':
+						if (is_array($value)) {
+							$value = array_filter($value,
+								fn($v) => is_int($v) || filter_var($value, FILTER_VALIDATE_INT)
+							);
+							$form_value = '['.implode(',', $value).']';
+						}
+						elseif (is_int($value) || filter_var($value, FILTER_VALIDATE_INT)) {
+							$form_value = $value;
+						}
+
+						break;
+
 					case 'UInt64':
 						if (is_array($value)) {
 							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit($v));
-							$form_value = '['.implode(',', $value ? $value : []).']';
+							$form_value = '['.implode(',', $value).']';
 						}
-						elseif (is_int($value) || is_float($value) || ctype_digit($value)) {
+						elseif (is_int($value) || ctype_digit($value)) {
 							$form_value = $value;
 						}
 
@@ -525,7 +537,7 @@ class CClickHouseStorage {
 								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
 								$value
 							);
-							$form_value = '['.implode(',', $value ? $value : []).']';
+							$form_value = '['.implode(',', $value).']';
 						}
 						else {
 							$form_value = $value;
@@ -588,15 +600,17 @@ class CClickHouseStorage {
 			$result = json_decode($result_raw, true);
 
 			if ($http_code != 200) {
-				$this->error_code = $http_code;
 				$error_message = is_array($result) && array_key_exists('exception', $result)
 					? $result['exception']
 					: $result_raw;
 
-				throw new Exception(_s('ClickHouse error: %1$s.', $error_message));
+				$this->error_code = $http_code;
+				$this->error_message = _s('ClickHouse error: %1$s.', $error_message);
 			}
 		} catch (Throwable $error) {
 			$result = null;
+			// Internal server error code
+			$this->error_code = 500;
 			$this->error_message = $error->getMessage();
 		}
 
