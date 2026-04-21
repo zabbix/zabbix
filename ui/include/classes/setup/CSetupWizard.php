@@ -75,7 +75,7 @@ class CSetupWizard extends CForm {
 	public function getStep(): int {
 		$step = $this->getConfig('step');
 
-		return array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
+		return $step !== null && array_key_exists($step, $this->stages) ? $step : self::STAGE_WELCOME;
 	}
 
 	private function doAction(): void {
@@ -295,7 +295,9 @@ class CSetupWizard extends CForm {
 		elseif ($this->getStep() == self::STAGE_SETTINGS) {
 			$this->setConfig('ZBX_SERVER_NAME', getRequest('zbx_server_name', $this->getConfig('ZBX_SERVER_NAME', '')));
 
-			$this->setConfig('ZBX_SERVER_TLS', getRequest('zbx_server_tls', $this->getConfig('ZBX_SERVER_TLS', '0')));
+			$this->setConfig('ZBX_SERVER_TLS', (bool) getRequest('zbx_server_tls',
+				$this->getConfig('ZBX_SERVER_TLS', false)
+			));
 			$this->setConfig('ZBX_SERVER_TLS_CA_FILE', getRequest('zbx_server_tls_ca_file',
 				$this->getConfig('ZBX_SERVER_TLS_CA_FILE', '')
 			));
@@ -305,8 +307,8 @@ class CSetupWizard extends CForm {
 			$this->setConfig('ZBX_SERVER_TLS_CERT_FILE', getRequest('zbx_server_tls_cert_file',
 				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE', '')
 			));
-			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', getRequest('zbx_server_tls_certificate_check',
-				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0')
+			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', (bool) getRequest('zbx_server_tls_certificate_check',
+				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', false)
 			));
 			$this->setConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', getRequest('zbx_server_tls_certificate_issuer',
 				$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER', '')
@@ -366,9 +368,9 @@ class CSetupWizard extends CForm {
 						break;
 				}
 
-				if ($this->getConfig('ZBX_SERVER_TLS', '0') == '1') {
+				if ($this->getConfig('ZBX_SERVER_TLS', false)) {
 					$server_tls_config = [
-						'ACTIVE' => $this->getConfig('ZBX_SERVER_TLS', '0'),
+						'ACTIVE' => true,
 						'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
 						'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 						'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
@@ -378,7 +380,7 @@ class CSetupWizard extends CForm {
 				}
 				else {
 					$server_tls_config = [
-						'ACTIVE' => '0',
+						'ACTIVE' => false,
 						'CA_FILE' => '',
 						'KEY_FILE' => '',
 						'CERT_FILE' => '',
@@ -606,7 +608,14 @@ class CSetupWizard extends CForm {
 					->setValue($DB['TYPE'])
 					->addOptions(CSelect::createOptionsFromArray(CFrontendSetup::getSupportedDatabases()))
 			)
-			->addRow(_('Database host'),
+			->addRow(new CLabel([
+					_('Database host'),
+					makeHelpIcon([
+						_('Enter one or more values as host:port or [host]:port (IPv6), separated by commas.'),
+						BR(),
+						_('If no port is specified, the "Database port" value is used.')
+					])
+				], 'server'),
 				(new CTextBox('server', $this->getConfig('DB_SERVER', $config->config['DB']['SERVER'])))
 					->setAttribute('placeholder', $config->config['DB']['SERVER'])
 					->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -1091,7 +1100,7 @@ class CSetupWizard extends CForm {
 				$this->getConfig('ZBX_SERVER_TLS_CERT_FILE')
 			);
 
-			if ($this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', '0') !== '0') {
+			if ($this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_CHECK', false)) {
 				$table->addRow(
 						(new CSpan(_('Server TLS certificate issuer')))->addClass(ZBX_STYLE_GREY),
 						$this->getConfig('ZBX_SERVER_TLS_CERTIFICATE_ISSUER')
@@ -1214,9 +1223,9 @@ class CSetupWizard extends CForm {
 
 		$this->setConfig('ZBX_CONFIG_FILE_CORRECT', true);
 
-		if ($this->getConfig('ZBX_SERVER_TLS', '0') == '1') {
+		if ($this->getConfig('ZBX_SERVER_TLS', false)) {
 			$server_tls_config = [
-				'ACTIVE' => $this->getConfig('ZBX_SERVER_TLS', '0'),
+				'ACTIVE' => true,
 				'CA_FILE' => $this->getConfig('ZBX_SERVER_TLS_CA_FILE', ''),
 				'KEY_FILE' => $this->getConfig('ZBX_SERVER_TLS_KEY_FILE', ''),
 				'CERT_FILE' => $this->getConfig('ZBX_SERVER_TLS_CERT_FILE', ''),
@@ -1226,7 +1235,7 @@ class CSetupWizard extends CForm {
 		}
 		else {
 			$server_tls_config = [
-				'ACTIVE' => '0',
+				'ACTIVE' => false,
 				'CA_FILE' => '',
 				'KEY_FILE' => '',
 				'CERT_FILE' => '',
@@ -1366,8 +1375,8 @@ class CSetupWizard extends CForm {
 		$DB['USER'] = $username ?? $this->getConfig('DB_USER', 'root');
 		$DB['PASSWORD'] = $password ?? $this->getConfig('DB_PASSWORD', '');
 		$DB['SCHEMA'] = $this->getConfig('DB_SCHEMA', '');
-		$DB['ENCRYPTION'] = (bool) $this->getConfig('DB_ENCRYPTION', true);
-		$DB['VERIFY_HOST'] = (bool) $this->getConfig('DB_VERIFY_HOST', true);
+		$DB['ENCRYPTION'] = $this->getConfig('DB_ENCRYPTION', true);
+		$DB['VERIFY_HOST'] = $this->getConfig('DB_VERIFY_HOST', true);
 		$DB['KEY_FILE'] = $this->getConfig('DB_KEY_FILE', '');
 		$DB['CERT_FILE'] = $this->getConfig('DB_CERT_FILE', '');
 		$DB['CA_FILE'] = $this->getConfig('DB_CA_FILE', '');
@@ -1441,7 +1450,7 @@ class CSetupWizard extends CForm {
 	}
 
 	private function checkServerTLSConfiguration(): bool {
-		if ($this->getConfig('ZBX_SERVER_TLS') == 0) {
+		if (!$this->getConfig('ZBX_SERVER_TLS')) {
 			return true;
 		}
 

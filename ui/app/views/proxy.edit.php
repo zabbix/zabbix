@@ -56,16 +56,19 @@ $local_address = (new CTable())
 $interface = (new CTable())
 	->setHeader([_('Address'), _('Port')])
 	->addRow([
-		(new CTextBox('address', $data['form']['address'], false, DB::getFieldLength('proxy', 'address')))
-			->setWidth(336)
-			->setErrorLabel(_('Address'))
-			->setErrorContainer('address-port-error-container'),
+		(new CCol(
+			(new CTextAreaFlexible('address', $data['form']['address']))
+				->setWidth(336)
+				->setMaxlength(DB::getFieldLength('proxy', 'address'))
+				->setErrorLabel(_('Address'))
+				->setErrorContainer('address-port-error-container')
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CTextBox('port', $data['form']['port'], false, DB::getFieldLength('proxy', 'port')))
 			->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 			->setErrorLabel(_('Port'))
 			->setErrorContainer('address-port-error-container')
 			->setAriaRequired()
-	])
+	])->addClass(ZBX_STYLE_ALIGN_TOP)
 	->addRow(
 		(new CCol())
 			->setId('address-port-error-container')
@@ -76,8 +79,9 @@ $proxy_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Proxy name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('proxy', 'name'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -130,17 +134,17 @@ $proxy_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Proxy address'), 'allowed_addresses'))->addClass('js-proxy-address'),
 		(new CFormField(
-			(new CTextBox('allowed_addresses', $data['form']['allowed_addresses'], false,
-				DB::getFieldLength('proxy', 'allowed_addresses')
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextAreaFlexible('allowed_addresses', $data['form']['allowed_addresses']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('proxy', 'allowed_addresses'))
 		))->addClass('js-proxy-address')
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
 		new CFormField(
 			(new CTextArea('description', $data['form']['description']))
-				->setMaxlength(DB::getFieldLength('proxy', 'description'))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('proxy', 'description'))
 		)
 	]);
 
@@ -184,10 +188,9 @@ $encryption_tab = (new CFormGrid())
 			->addClass('js-tls-psk-identity')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('tls_psk_identity', $data['form']['tls_psk_identity'], false,
-				DB::getFieldLength('proxy', 'tls_psk_identity')
-			))
+			(new CTextAreaFlexible('tls_psk_identity', $data['form']['tls_psk_identity']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('proxy', 'tls_psk_identity'))
 				->setAriaRequired()
 		))->addClass('js-tls-psk-identity')
 	])
@@ -196,10 +199,10 @@ $encryption_tab = (new CFormGrid())
 			->addClass('js-tls-psk')
 			->setAsteriskMark(),
 		(new CFormField(
-			(new CTextBox('tls_psk', $data['form']['tls_psk'], false, DB::getFieldLength('proxy', 'tls_psk')))
+			(new CTextAreaFlexible('tls_psk', $data['form']['tls_psk']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('proxy', 'tls_psk'))
 				->setAriaRequired()
-				->disableAutocomplete()
 		))->addClass('js-tls-psk')
 	]);
 
@@ -221,17 +224,17 @@ $encryption_tab
 	->addItem([
 		(new CLabel(_('Issuer'), 'tls_issuer'))->addClass('js-tls-issuer'),
 		(new CFormField(
-			(new CTextBox('tls_issuer', $data['form']['tls_issuer'], false,
-				DB::getFieldLength('hosts', 'tls_issuer')
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextAreaFlexible('tls_issuer', $data['form']['tls_issuer']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'tls_issuer'))
 		))->addClass('js-tls-issuer')
 	])
 	->addItem([
 		(new CLabel(_x('Subject', 'encryption certificate'), 'tls_subject'))->addClass('js-tls-subject'),
 		(new CFormField(
-			(new CTextBox('tls_subject', $data['form']['tls_subject'], false,
-				DB::getFieldLength('hosts', 'tls_subject')
-			))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			(new CTextAreaFlexible('tls_subject', $data['form']['tls_subject']))
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'tls_subject'))
 		))->addClass('js-tls-subject')
 	]);
 

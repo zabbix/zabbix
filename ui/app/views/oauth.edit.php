@@ -100,7 +100,12 @@ else {
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setAriaRequired()
 			->addStyle('display: none;')
-			->setEnabled(false)
+			->setEnabled(false),
+		makeWarningIcon(
+			_('The client secret was cleared due to a token endpoint change. Please enter the new client secret.')
+		)
+			->addStyle('display: none;')
+			->addClass('js-client-secret-warning')
 	];
 }
 

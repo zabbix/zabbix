@@ -33,8 +33,9 @@ $template_tab = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Template name'), 'template_name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('template_name', $data['template_name'], false, DB::getFieldLength('hosts', 'host')))
+			(new CTextAreaFlexible('template_name', $data['template_name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'host'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -42,8 +43,9 @@ $template_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Visible name'), 'visiblename'),
 		new CFormField(
-			(new CTextBox('visiblename', $data['visible_name'], false, DB::getFieldLength('hosts', 'name')))
+			(new CTextAreaFlexible('visiblename', $data['visible_name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'name'))
 		)
 	]);
 

@@ -61,10 +61,10 @@ if ($data['templates']) {
 $host_tab->addItem([
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('host', $data['host_prototype']['host'], $data['readonly'],
-				DB::getFieldLength('hosts', 'host'))
-			)
+			(new CTextAreaFlexible('host', $data['host_prototype']['host']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'host'))
+				->setReadonly($data['readonly'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 				->setAttribute('data-prevent-validation-on-change', $data['readonly'] ? 1 : null)
@@ -76,8 +76,10 @@ $name = ($data['host_prototype']['name'] !== $data['host_prototype']['host']) ? 
 $host_tab->addItem([
 	new CLabel(_('Visible name'), 'name'),
 	new CFormField(
-		(new CTextBox('name', $name, $data['readonly'], DB::getFieldLength('hosts', 'name')))
+		(new CTextAreaFlexible('name', $name))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('hosts', 'name'))
+			->setReadonly($data['readonly'])
 	)
 ]);
 
@@ -651,17 +653,19 @@ if ($is_cert_set) {
 		->addItem([
 			new CLabel(_('Issuer'), 'tls_issuer'),
 			new CFormField(
-				(new CTextBox('tls_issuer', $data['parent_host']['tls_issuer'], true,
-					DB::getFieldLength('hosts', 'tls_issuer')
-				))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				(new CTextAreaFlexible('tls_issuer', $data['parent_host']['tls_issuer']))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setMaxlength(DB::getFieldLength('hosts', 'tls_issuer'))
+					->setReadonly()
 			)
 		])
 		->addItem([
 			new CLabel(_x('Subject', 'encryption certificate'), 'tls_subject'),
 			new CFormField(
-				(new CTextBox('tls_subject', $data['parent_host']['tls_subject'], true,
-					DB::getFieldLength('hosts', 'tls_subject')
-				))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				(new CTextAreaFlexible('tls_subject', $data['parent_host']['tls_subject']))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setMaxlength(DB::getFieldLength('hosts', 'tls_subject'))
+					->setReadonly()
 			)
 	]);
 }

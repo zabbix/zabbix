@@ -8612,6 +8612,10 @@ msgstr ""
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -11096,6 +11100,10 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
 msgstr ""
 
 #: include/classes/api/services/CReport.php:368
@@ -22115,6 +22123,10 @@ msgstr ""
 msgid "The client secret registered within the authorization server."
 msgstr ""
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr ""
@@ -25338,6 +25350,10 @@ msgstr ""
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "ვიჯეტი მოძველებულია."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

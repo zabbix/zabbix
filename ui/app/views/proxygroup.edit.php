@@ -36,8 +36,9 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $data['form']['name'], false, DB::getFieldLength('proxy_group', 'name')))
+			(new CTextAreaFlexible('name', $data['form']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('proxy_group', 'name'))
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)

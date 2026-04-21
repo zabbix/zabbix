@@ -35,7 +35,7 @@ $form_grid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $this->data['drule']['name']))
+			(new CTextAreaFlexible('name', $this->data['drule']['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')

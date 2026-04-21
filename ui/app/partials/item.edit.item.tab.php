@@ -52,8 +52,10 @@ $formgrid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('name', $item['name'], $readonly, DB::getFieldLength('items', 'name')))
+			(new CTextAreaFlexible('name', $item['name']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'name'))
+				->setReadonly($readonly)
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 		)
@@ -72,9 +74,12 @@ $formgrid = (new CFormGrid())
 	->addItem([
 		(new CLabel(_('Key'), 'key'))->setAsteriskMark(),
 		(new CFormField([
-			(new CTextBox('key', $item['key'], $readonly, DB::getFieldLength('items', 'key_')))
+			(new CTextAreaFlexible('key', $item['key']))
 				->setAriaRequired()
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'key_'))
+				->setReadonly($readonly)
+				->setErrorContainer('key_error_container'),
 			$readonly
 				? null
 				: [
@@ -83,7 +88,10 @@ $formgrid = (new CFormGrid())
 						->addClass('js-select-key')
 						->addClass(ZBX_STYLE_BTN_GREY)
 						->setEnabled(in_array($item['type'], $data['type_with_key_select']))
-			]
+			],
+			(new CDiv())
+				->setId('key_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
 		]))
 	])
 	->addItem([
@@ -107,8 +115,10 @@ $formgrid = (new CFormGrid())
 			->setAsteriskMark()
 			->setId('js-item-url-label'),
 		(new CFormField([
-			(new CTextBox('url', $item['url'], $readonly, DB::getFieldLength('items', 'url')))
+			(new CTextAreaFlexible('url', $item['url']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'url'))
+				->setReadonly($readonly)
 				->setAriaRequired(),
 			(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 			(new CSimpleButton(_('Parse')))
@@ -135,19 +145,21 @@ $formgrid = (new CFormGrid())
 						))->setColSpan(5)
 					),
 				new CTemplateTag('query-field-row-tmpl', (new CRow([
-						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('query_fields[#{rowNum}][name]', '#{name}', $readonly))
-							->removeId()
-							->setAttribute('placeholder', _('name'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
-						RARR(),
-						(new CTextBox('query_fields[#{rowNum}][value]', '#{value}', $readonly))
-							->removeId()
-							->setAttribute('placeholder', _('value'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
-						(new CButtonLink(_('Remove')))
-							->addClass('element-table-remove')
-							->setEnabled(!$readonly)
+					(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
+					(new CTextAreaFlexible('query_fields[#{rowNum}][name]', '#{name}'))
+						->removeId()
+						->setAttribute('placeholder', _('name'))
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+						->setReadonly($readonly),
+					RARR(),
+					(new CTextAreaFlexible('query_fields[#{rowNum}][value]', '#{value}'))
+						->removeId()
+						->setAttribute('placeholder', _('value'))
+						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+						->setReadonly($readonly),
+					(new CButtonLink(_('Remove')))
+						->addClass('element-table-remove')
+						->setEnabled(!$readonly)
 					]))->addClass('form_row')
 				)
 			]))
@@ -285,15 +297,17 @@ $formgrid = (new CFormGrid())
 				new CTemplateTag('item-header-row-tmpl',
 					(new CRow([
 						(new CCol((new CDiv())->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-						(new CTextBox('headers[#{rowNum}][name]', '#{name}', $readonly))
+						(new CTextAreaFlexible('headers[#{rowNum}][name]', '#{name}'))
 							->removeId()
 							->setAttribute('placeholder', _('name'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH)
+							->setReadonly($readonly),
 						RARR(),
-						(new CTextBox('headers[#{rowNum}][value]', '#{value}', $readonly, 2000))
+						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}'))
 							->removeId()
 							->setAttribute('placeholder', _('value'))
-							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
+							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
+							->setReadonly($readonly),
 						(new CButtonLink(_('Remove')))
 							->addClass('element-table-remove')
 							->setEnabled(!$readonly)
@@ -530,8 +544,10 @@ $formgrid
 			->setAsteriskMark()
 			->setId('js-item-snmp-oid-label'),
 		(new CFormField(
-			(new CTextBox('snmp_oid', $item['snmp_oid'], $readonly, DB::getFieldLength('items', 'snmp_oid')))
+			(new CTextAreaFlexible('snmp_oid', $item['snmp_oid']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'snmp_oid'))
+				->setReadonly($readonly)
 				->setAttribute('placeholder', 'walk[OID1,OID2,...]')
 				->setAriaRequired()
 		))->setId('js-item-snmp-oid-field')
@@ -539,9 +555,11 @@ $formgrid
 	->addItem([
 		(new CLabel(_('IPMI sensor'), 'ipmi_sensor'))->setId('js-item-impi-sensor-label'),
 		(new CFormField(
-			(new CTextBox('ipmi_sensor', $item['ipmi_sensor'], $readonly, DB::getFieldLength('items', 'ipmi_sensor')))
+			(new CTextAreaFlexible('ipmi_sensor', $item['ipmi_sensor']))
 				->setAttribute('data-notrim', '')
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'ipmi_sensor'))
+				->setReadonly($readonly)
 		))->setId('js-item-impi-sensor-field')
 	])
 	->addItem([
@@ -846,10 +864,10 @@ $formgrid
 	->addItem([
 		(new CLabel(_('Allowed hosts'), 'trapper_hosts'))->setId('js-item-trapper-hosts-label'),
 		(new CFormField(
-			(new CTextBox('trapper_hosts', $item['trapper_hosts'], $item['discovered'],
-				DB::getFieldLength('items', 'trapper_hosts')
-			))
+			(new CTextAreaFlexible('trapper_hosts', $item['trapper_hosts']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('items', 'trapper_hosts'))
+				->setReadonly($item['discovered'])
 		))->setId('js-item-trapper-hosts-field')
 	]);
 

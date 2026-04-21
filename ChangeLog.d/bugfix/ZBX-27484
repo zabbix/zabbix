@@ -1,0 +1,1 @@
+..F....... [ZBX-27484] fixed displaying position of the error messages for empty Query, Parameters and Headers name fields, removed redundant error messages for empty fields for Custom intervals (msnihach)
