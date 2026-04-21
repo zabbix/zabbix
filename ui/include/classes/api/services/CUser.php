@@ -4071,35 +4071,14 @@ class CUser extends CApiService {
 		$db_media_types = DB::select('media_type', [
 			'output' => [],
 			'filter' => [
-				'type' => [MEDIA_TYPE_PUSH],
-				'status' => [MEDIA_TYPE_STATUS_ACTIVE]
+				'type' => [MEDIA_TYPE_PUSH]
 			],
-			'sortfield' => ['name'],
-			'sortorder' => [ZBX_SORT_UP],
+			'sortfield' => ['name', 'status'],
 			'preservekeys' => true
 		]);
 
 		if (!$db_media_types) {
 			return;
-		}
-
-		$db_user_medias = DB::select('media', [
-			'output' => ['mediaid', 'mediatypeid', 'sendto'],
-			'filter' => ['userid' => $userid],
-			'preservekeys' => true
-		]);
-
-		$db_user_media_types = DB::select('media_type', [
-			'output' => ['type'],
-			'filter' => ['mediatypeid' => array_column($db_user_medias, 'mediatypeid')],
-			'preservekeys' => true
-		]);
-
-		foreach ($db_user_medias as $db_media) {
-			if ($db_user_media_types[$db_media['mediatypeid']] == MEDIA_TYPE_PUSH
-				&& ($db_media['sendto'] === '*' || $db_media['sendto'] === $uuid)) {
-				return;
-			}
 		}
 
 		$db_users = DB::select('users', [
@@ -4108,25 +4087,46 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 
+		$db_user_medias = DB::select('media', [
+			'output' => ['mediaid', 'mediatypeid', 'sendto'],
+			'filter' => ['userid' => $userid],
+			'preservekeys' => true
+		]);
+
 		$users = [];
 
 		foreach ($db_users as &$db_user) {
 			$user = $db_user;
+
+			$db_user['medias'] = $db_user_medias;
 			$user['medias'] = array_values($db_user_medias);
-			$user['medias'][] = [
-				'mediatypeid' => key($db_media_types),
-				'sendto' => $uuid,
-				'status' => MEDIA_STATUS_ACTIVE
-			];
+
+			$existing_media_updated = false;
 
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = explode("\n", $media['sendto']);
+
+				if (!$existing_media_updated && array_key_exists($media['mediatypeid'], $db_media_types)) {
+					if (in_array('*', $media['sendto']) || in_array($uuid, $media['sendto'])) {
+						return;
+					}
+
+					$media['sendto'][] = $uuid;
+
+					$existing_media_updated = true;
+				}
 			}
 			unset($media);
 
-			$users[] = $user;
+			if (!$existing_media_updated) {
+				$user['medias'][] = [
+					'mediatypeid' => key($db_media_types),
+					'sendto' => [$uuid],
+					'status' => MEDIA_STATUS_ACTIVE
+				];
+			}
 
-			$db_user['medias'] = $db_user_medias;
+			$users[] = $user;
 		}
 		unset($db_user, $user);
 
@@ -4143,8 +4143,11 @@ class CUser extends CApiService {
 		]);
 
 		$db_user_media_types = DB::select('media_type', [
-			'output' => ['mediatypeid', 'type'],
-			'filter' => ['mediatypeid' => array_column($db_user_medias, 'mediatypeid')],
+			'output' => [],
+			'filter' => [
+				'mediatypeid' => array_column($db_user_medias, 'mediatypeid'),
+				'type' => MEDIA_TYPE_PUSH
+			],
 			'preservekeys' => true
 		]);
 
@@ -4161,14 +4164,17 @@ class CUser extends CApiService {
 			$user['medias'] = array_values($db_user_medias);
 
 			foreach ($user['medias'] as $key => &$user_media) {
-				if ($db_user_media_types[$user_media['mediatypeid']]['type'] == MEDIA_TYPE_PUSH
-					&& $user_media['sendto'] === $uuid) {
-					unset($user['medias'][$key]);
-
-					continue;
-				}
-
 				$user_media['sendto'] = explode("\n", $user_media['sendto']);
+
+				if (array_key_exists($user_media['mediatypeid'], $db_user_media_types)
+						&& in_array($uuid, $user_media['sendto'])) {
+					if (count($user_media['sendto']) == 1) {
+						unset($user['medias'][$key]);
+					}
+					else {
+						$user_media['sendto'] = array_diff($user_media['sendto'], [$uuid]);
+					}
+				}
 			}
 			unset($user_media);
 
