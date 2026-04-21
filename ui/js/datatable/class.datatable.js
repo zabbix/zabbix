@@ -1918,6 +1918,7 @@ class CDataTable {
 		this.#resetColumns();
 
 		const user_config = this.#user_configs[tabfilter_idx];
+		console.log('loading', tabfilter_idx);
 		if (!user_config) {
 			return this;
 		}
@@ -2517,10 +2518,12 @@ class CDataTable {
 
 	onTabfilterNewItem = e => {
 		const {item} = e.detail;
+		const index = item._index - 1;
 
-		this.#user_configs[item._index] = this.getConfig();
+		this.#tabfilter_item._index = index;
+		this.#user_configs[index] = this.getConfig();
 
-		this.#updateUserProfile(JSON.stringify(this.#user_configs[item._index]), [item._index]);
+		this.#updateUserProfile(JSON.stringify(this.#user_configs[index]), [index]);
 	}
 
 	onTabfilterDelete = e => {
