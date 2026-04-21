@@ -48,7 +48,7 @@ class testFormFilter extends CWebTest {
 
 		switch ($data['expected']) {
 			case TEST_GOOD:
-				$table = $this->query($table_selector)->asDatatable()->waitUntilReady()->one();
+				$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 				$rows = $table->getRows();
 
 				// If rows are expected, info rows, like date indication row in Problems page, should not be counted.
@@ -111,10 +111,6 @@ class testFormFilter extends CWebTest {
 		$home_form->fill($data['filter']);
 		$result_table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 		$rows = $result_table->getRows();
-		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
-		$this->page->waitUntilReady();
-		$rows->waitUntilStalled();
-		$result_table->waitUntilReady()->invalidate();
 
 		if (array_key_exists('header_filter', $data)) {
 			$rows->invalidate();
@@ -122,6 +118,11 @@ class testFormFilter extends CWebTest {
 			$rows->waitUntilStalled();
 			$result_table->waitUntilReady()->invalidate();
 		}
+
+		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$rows->waitUntilStalled();
+		$result_table->waitUntilReady()->invalidate();
 
 		$result_table->waitUntilReady()->invalidate();
 		$filter_result = $result_table->getRows()->asText();
@@ -282,11 +283,11 @@ class testFormFilter extends CWebTest {
 		$this->page->userLogin($user, $password);
 		$this->page->open($this->url)->waitUntilReady();
 		$filter = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
-
+		$result_table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 		// Checking if home tab is selected.
 		if ($filter->getSelectedTabName() !== 'Home') {
 			$filter->selectTab();
-			$this->page->waitUntilReady();
+			$result_table->waitUntilReady();
 		}
 
 		if (array_key_exists('filter_form', $data)) {
@@ -294,7 +295,7 @@ class testFormFilter extends CWebTest {
 			$home_form->fill($data['filter_form']);
 		}
 
-		$result_table = $this->query($table_selector)->one();
+		$result_table->invalidate();
 		$this->query('button:Save as')->one()->click();
 		$dialog = COverlayDialogElement::find()->asForm()->all()->last()->waitUntilReady();
 		$dialog->fill($data['filter']);
@@ -302,8 +303,8 @@ class testFormFilter extends CWebTest {
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
-			$result_table->waitUntilReloaded();
 			$this->page->waitUntilReady();
+			$result_table->waitUntilReloaded()->waitUntilReady();
 		}
 	}
 
