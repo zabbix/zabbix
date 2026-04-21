@@ -431,11 +431,11 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
-		], 0);
+		], 0, 120, self::WAIT_ITERATION_DELAY);
 
 		$this->callUntilCountIsPresent('trigger.get', [
 			'triggerids' => self::$discovered_triggerids
-		], 0);
+		], 0,120, self::WAIT_ITERATION_DELAY);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
