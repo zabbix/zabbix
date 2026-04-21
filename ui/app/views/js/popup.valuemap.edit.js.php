@@ -28,10 +28,13 @@ window.valuemap_edit_popup = {
 	init({rules, mappings}) {
 		this.overlay = overlays_stack.getById('valuemap_edit');
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form = rules !== null ? new CForm(this.form_element, rules) : null;
 		this.mappings = mappings;
 
 		this.initMappingTable();
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.submit());
 	},
 
 	submit() {
@@ -69,14 +72,15 @@ window.valuemap_edit_popup = {
 		})
 			.then(response => response.json())
 			.then(response => {
+				if ('error' in response) {
+					throw {error: response.error};
+				}
+
 				if ('form_errors' in response) {
 					this.form.setErrors(response.form_errors, true, true);
 					this.form.renderErrors();
 
 					return;
-				}
-				else if ('error' in response) {
-					throw {error: response.error};
 				}
 
 				new AddValueMap(response, 'edit' in fields ? this.overlay.element.closest('tr') : null);
