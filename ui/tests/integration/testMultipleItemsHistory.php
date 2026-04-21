@@ -239,7 +239,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	public function testMultipleItemsHistory_TriggerFiring() {
 		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
 
-		$this->sendAndVerifyHistory();
+		$this->sendAndVerifyHistoryAt(time());
 
 		// Verify all discovered triggers fired (value = PROBLEM, state = NORMAL).
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -275,7 +275,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_TriggerFiring
 	 */
 	public function testMultipleItemsHistory_TriggerFiringRestart() {
-		$this->sendAndVerifyHistory();
+		$this->sendAndVerifyHistoryAt(time());
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
@@ -411,53 +411,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		], self::COMPONENT_SERVER);
 	}
 
-	private function sendAndVerifyHistory(): void {
-		$tm = time();
-
-		foreach (self::prototypeDefs() as $def) {
-			$vtype = $def['value_type'];
-			$items_by_key = self::$discovered_itemids[$vtype];
-
-			$this->assertCount(self::LLD_DISCOVERY_COUNT, $items_by_key,
-				'Expected '.self::LLD_DISCOVERY_COUNT.' item IDs for type '.$def['suffix'].'.');
-
-			$values = [];
-			$idx = 0;
-			foreach ($items_by_key as $key => $itemid) {
-				$values[] = [
-					'host' => self::HOSTNAME,
-					'key' => $key,
-					'value' => (string)($idx + 1),
-					'clock' => $tm,
-					'ns' => $idx
-				];
-				$idx++;
-			}
-
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
-
-			$itemids = array_values($items_by_key);
-			$this->callUntilDataIsPresent('history.get', [
-				'history' => $vtype,
-				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'limit' => self::LLD_DISCOVERY_COUNT
-			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
-			});
-
-			$response = $this->call('history.get', [
-				'history' => $vtype,
-				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'countOutput' => true
-			]);
-			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
-		}
-	}
-
 	/**
 	 * Send empty LLD discovery, run housekeeper and verify that all discovered
 	 * items, their history and trigger events are removed.
@@ -492,7 +445,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->callUntilCountIsPresent('history.get', [
 				'history' => $vtype,
 				'itemids' => $itemids
-			], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
 				$this->executeHousekeeper();
 				return true;
 			});
