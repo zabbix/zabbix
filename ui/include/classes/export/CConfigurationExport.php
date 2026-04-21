@@ -1620,9 +1620,7 @@ class CConfigurationExport {
 			],
 			'selectMessageTemplates' => ['eventsource', 'recovery', 'subject', 'message'],
 			'mediatypeids' => $mediatypeids,
-			'filter' => [
-				'type' => CMediatypeHelper::getSupportedMediaTypes()
-			],
+			'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 			'preservekeys' => true
 		]);
 	}

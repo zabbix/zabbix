@@ -141,6 +141,11 @@ class CMediatypeHelper {
 		return $types[$type];
 	}
 
+	/**
+	 * Returns supported media types values.
+	 *
+	 * @return array
+	 */
 	public static function getSupportedMediaTypes(): array {
 		global $ZBX_FEATURE_FLAGS;
 

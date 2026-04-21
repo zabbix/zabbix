@@ -46,8 +46,8 @@ class CControllerMediatypeEdit extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)
-				|| !CMediatypeHelper::getSupportedMediaTypes()) {
+		if (!CMediatypeHelper::getSupportedMediaTypes()
+				|| !$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
 			return false;
 		}
 

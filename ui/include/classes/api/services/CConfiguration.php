@@ -160,9 +160,7 @@ class CConfiguration extends CApiService {
 			$count = API::MediaType()->get([
 				'countOutput' => true,
 				'mediatypeids' => $params['options']['mediaTypes'],
-				'filter' => [
-					'type' => CMediatypeHelper::getSupportedMediaTypes()
-				],
+				'filter' => ['type' => CMediatypeHelper::getSupportedMediaTypes()],
 				'editable' => true
 			]);
 
