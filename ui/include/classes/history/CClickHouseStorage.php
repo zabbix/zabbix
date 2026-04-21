@@ -216,7 +216,7 @@ class CClickHouseStorage {
 	 * @see CHistoryManager::getItemsHavingValues
 	 */
 	public function getItemsHavingValues(array $value_type_itemids, $lastn_sec = null): array {
-		$results = [];
+		$result = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$time_from = $lastn_sec === null ? null : $this->getTtlLimitedTimestamp($value_type, time() - $lastn_sec);
@@ -232,17 +232,17 @@ class CClickHouseStorage {
 				break;
 			}
 
-			$results += array_column($rows, null, 'itemid');
+			$result += array_column($rows, null, 'itemid');
 		}
 
-		return $results;
+		return $result;
 	}
 
 	/**
 	 * @see CHistoryManager::getLastValues
 	 */
 	public function getLastValues(array $value_type_itemids, int $limit, ?int $lastn_sec, ?int $length): array {
-		$results = [];
+		$result = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$time_from = $lastn_sec === null ? null : $this->getTtlLimitedTimestamp($value_type, time() - $lastn_sec);
@@ -267,11 +267,11 @@ class CClickHouseStorage {
 			}
 
 			foreach ($rows as $row) {
-				$results[$row['itemid']][] = $row;
+				$result[$row['itemid']][] = $row;
 			}
 		}
 
-		return $results;
+		return $result;
 	}
 
 	/**
@@ -328,7 +328,7 @@ class CClickHouseStorage {
 	 */
 	public function getAggregationByInterval(array $value_type_itemids, int $time_from, int $time_to, int $function,
 			int $interval): array {
-		$results = [];
+		$result = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$table = $this->getTableName($value_type);
@@ -368,16 +368,16 @@ class CClickHouseStorage {
 				continue;
 			}
 
-			foreach (array_column($values, 'itemid', 'itemid') as $itemid) {
-				$results[$itemid] = ['data' => [], 'source' => 'history'];
-			}
+			$result += array_fill_keys(array_column($values, 'itemid', 'itemid'),
+				['data' => [], 'source' => 'history']
+			);
 
 			foreach ($values as $value) {
-				$results[$value['itemid']]['data'][] = $value;
+				$result[$value['itemid']]['data'][] = $value;
 			}
 		}
 
-		return $results;
+		return $result;
 	}
 
 	/**
@@ -387,7 +387,7 @@ class CClickHouseStorage {
 	 */
 	public function getGraphAggregationByWidth(array $value_type_itemids, int $time_from, int $time_to,
 			?int $width): array {
-		$results = [];
+		$result = [];
 
 		foreach ($value_type_itemids as $value_type => $itemids) {
 			$table = $this->getTableName($value_type);
@@ -426,16 +426,16 @@ class CClickHouseStorage {
 				continue;
 			}
 
-			foreach (array_column($values, 'itemid', 'itemid') as $itemid) {
-				$results[$itemid] = ['data' => [], 'source' => 'history'];
-			}
+			$result += array_fill_keys(array_column($values, 'itemid', 'itemid'),
+				['data' => [], 'source' => 'history']
+			);
 
 			foreach ($values as $value) {
-				$results[$value['itemid']]['data'][] = $value;
+				$result[$value['itemid']]['data'][] = $value;
 			}
 		}
 
-		return $results;
+		return $result;
 	}
 
 	/**
@@ -712,7 +712,7 @@ class CClickHouseStorage {
 			$sql_parts = $this->addQuerySearchOptions($sql_parts, $options);
 		}
 
-		if (is_array($options['sortfield'])) {
+		if ($options['sortfield'] !== null) {
 			$sql_parts = $this->addQuerySortOptions($sql_parts, $options);
 		}
 
