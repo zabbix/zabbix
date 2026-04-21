@@ -18,6 +18,7 @@ declare -A BASELINE_TIMES=(
   [testHostConnMacroValidation]=99
   [testItemState]=98
   [testHistoryPush]=92
+  [testMultipleItemsHistory]=360
   [testValuemaps]=89
   [testAutoregistrationPSK]=85
   [testLowLevelDiscovery]=84
@@ -51,4 +52,5 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
+
 )
