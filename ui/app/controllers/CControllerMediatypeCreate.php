@@ -23,7 +23,7 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 
 		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
 			'type' => ['db media_type.type', 'required',
-				'in' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_EXEC, MEDIA_TYPE_SMS, MEDIA_TYPE_WEBHOOK]
+				'in' => CMediatypeHelper::getSupportedMediaTypes()
 			],
 			'name' => ['db media_type.name', 'required', 'not_empty'],
 			'provider' => ['db media_type.provider', 'in' => array_keys(CMediatypeHelper::getEmailProviders()),
@@ -272,6 +272,15 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 		}
 
 		return $ret;
+	}
+
+	protected function checkPermissions(): bool {
+		if (!CMediatypeHelper::getSupportedMediaTypes()
+				|| !$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction(): void {

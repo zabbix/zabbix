@@ -41,7 +41,12 @@ class CControllerMediatypeDisable extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES);
+		if (!CMediatypeHelper::getSupportedMediaTypes()
+				|| !$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction(): void {
