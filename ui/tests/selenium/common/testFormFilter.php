@@ -110,12 +110,17 @@ class testFormFilter extends CWebTest {
 		$home_form = $filter->getForm();
 		$home_form->fill($data['filter']);
 		$result_table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
+		$rows = $result_table->getRows();
 		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
 		$this->page->waitUntilReady();
+		$rows->waitUntilStalled();
 		$result_table->waitUntilReady()->invalidate();
 
 		if (array_key_exists('header_filter', $data)) {
+			$rows->invalidate();
 			$this->filterFromHeader($data['header_filter']);
+			$rows->waitUntilStalled();
+			$result_table->waitUntilReady()->invalidate();
 		}
 
 		$result_table->waitUntilReady()->invalidate();
