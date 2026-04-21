@@ -114,24 +114,6 @@ typedef struct
 }
 zbx_tq_query_t;
 
-typedef struct zbx_tq_conn_params_clickhouse
-{
-	const char	*url;
-	const char	*http_proxy;
-	int		timeout;
-	int 		max_attempts;
-	const char	*ssl_cert_file;
-	const char	*ssl_key_file;
-	const char	*ssl_key_password;
-	unsigned char	verify_peer;
-	unsigned char	verify_host;
-	unsigned char	authtype;
-	const char	*username;
-	const char	*password;
-	const char	*token;
-}
-zbx_tq_conn_params_clickhouse_t;
-
 int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 

@@ -16,8 +16,8 @@
 #include "module.h"
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
+#include "checks_telemetry.h"
 #include "zbxtypes.h"
-#include <time.h>
 
 #ifdef HAVE_LIBCURL
 void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetry_query_context)
@@ -35,7 +35,7 @@ void	zbx_async_check_telemetry_query_clean(zbx_telemetry_query_context *telemetr
  *                                                                            *
  ******************************************************************************/
 static int	async_send_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t *item, zbx_tq_query_t *query,
-		time_t now, time_t lasttimestamp, const zbx_tq_conn_params_clickhouse_t *conn_params,
+		time_t now, time_t lasttimestamp, const telemetry_query_conn_params_clickhouse_t *conn_params,
 		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, CURLM *curl_handle, char **error)
 {
@@ -63,7 +63,7 @@ static int	async_send_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t *
 
 	if (SUCCEED != zbx_http_request_prepare(&telemetry_query_context->http_context, HTTP_REQUEST_POST,
 			conn_params->url, query_fields, headers, telemetry_query_context->item_context.posts,
-			ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, item->timeout, conn_params->max_attempts,
+			ZBX_RETRIEVE_MODE_CONTENT, NULL, 0, conn_params->timeout, conn_params->max_attempts,
 			conn_params->ssl_cert_file, conn_params->ssl_key_file, conn_params->ssl_key_password,
 			conn_params->verify_peer, conn_params->verify_host, conn_params->authtype,
 			conn_params->username, conn_params->password, conn_params->token, ZBX_POSTTYPE_RAW,
@@ -116,7 +116,7 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 	query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
 	/* FIXME: placeholder */
-	const zbx_tq_conn_params_clickhouse_t	conn_params =
+	const telemetry_query_conn_params_clickhouse_t	conn_params =
 	{
 		.url			= "http://127.0.0.1:8123",
 		.http_proxy		= NULL,

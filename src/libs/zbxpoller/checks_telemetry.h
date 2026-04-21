@@ -17,6 +17,24 @@
 
 #include "zbxcacheconfig.h"
 
+typedef struct telemetry_query_conn_params_clickhouse
+{
+	const char	*url;
+	const char	*http_proxy;
+	int		timeout;
+	int 		max_attempts;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
+	unsigned char	verify_peer;
+	unsigned char	verify_host;
+	unsigned char	authtype;
+	const char	*username;
+	const char	*password;
+	const char	*token;
+}
+telemetry_query_conn_params_clickhouse_t;
+
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result);
 
 #endif

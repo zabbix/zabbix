@@ -21,7 +21,7 @@
 
 #ifdef HAVE_LIBCURL
 static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
+		const telemetry_query_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **out, char **error)
 {
@@ -79,7 +79,7 @@ static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, ti
 }
 
 static int	send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		const zbx_tq_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
+		const telemetry_query_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, char **out, char **error)
 {
@@ -121,7 +121,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	char		*send_error = NULL;
 
 	/* FIXME: placeholder, db type and connection parameters should be gotten from the global config */
-	const zbx_tq_conn_params_clickhouse_t	conn_params =
+	const telemetry_query_conn_params_clickhouse_t	conn_params =
 	{
 		.url			= "http://127.0.0.1:8123",
 		.http_proxy		= NULL,
