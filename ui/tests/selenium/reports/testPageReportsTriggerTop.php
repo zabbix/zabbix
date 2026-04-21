@@ -48,7 +48,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			['name' => 'Empty Group for Reports->TOP 100 triggers check'],
 			['name' => 'First Group for Reports->TOP 100 triggers check'],
 			['name' => 'Second Group for Reports->TOP 100 triggers check'],
-			['name' => 'Third Group for special ¢ⒽąŘαⒸⓣⒺⓇⓢ 🌍']
+			['name' => 'Third Group for special ¢ⒽąŘαⒸⓣⒺⓇⓢ 🌍'],
+			['name' => 'Group for time period check in Top triggers']
 		]);
 		self::$groupids = CDataHelper::getIds('name');
 
@@ -131,7 +132,8 @@ class testPageReportsTriggerTop extends CWebTest {
 					]
 				],
 				'groups' => [
-					'groupid' => self::$groupids['Second Group for Reports->TOP 100 triggers check']
+					['groupid' => self::$groupids['Second Group for Reports->TOP 100 triggers check']],
+					['groupid' => self::$groupids['Group for time period check in Top triggers']]
 				],
 				'items' => [
 					[
@@ -211,9 +213,9 @@ class testPageReportsTriggerTop extends CWebTest {
 		self::$time = time();
 		$trigger_data = [
 			[
-				'name' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
+				'name' => 'Problem Warning️',
 				'time' => self::$time, // current time.
-				'problem_count' => '2'
+				'problem_count' => '1'
 			],
 			[
 				'name' => 'Not classified ❌',
@@ -236,9 +238,9 @@ class testPageReportsTriggerTop extends CWebTest {
 				'problem_count' => '1'
 			],
 			[
-				'name' => 'Problem Disaster',
+				'name' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
 				'time' => self::$time - 600, // now - 10 minutes.
-				'problem_count' => '5'
+				'problem_count' => '1'
 			],
 			[
 				'name' => 'Severity status: High',
@@ -256,9 +258,9 @@ class testPageReportsTriggerTop extends CWebTest {
 				'problem_count' => '1'
 			],
 			[
-				'name' => 'Problem Warning',
+				'name' => 'Problem Disaster',
 				'time' => self::$time - 691200, // now - 8 days.
-				'problem_count' => '1'
+				'problem_count' => '5'
 			],
 			[
 				'name' => 'Not classified ❌',
@@ -358,7 +360,7 @@ class testPageReportsTriggerTop extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Check filter results from particular host group.
+			// #0 Check filter results from particular host group.
 			[
 				[
 					'fields' => [
@@ -377,7 +379,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from several host groups.
+			// #1 Check filter results from several host groups.
 			[
 				[
 					'fields' => [
@@ -388,12 +390,6 @@ class testPageReportsTriggerTop extends CWebTest {
 						]
 					],
 					'expected' => [
-						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks 3',
-							'Trigger' => 'Problem Disaster',
-							'Severity' => 'Disaster',
-							'Number of status changes' => '5'
-						],
 						[
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
@@ -408,13 +404,12 @@ class testPageReportsTriggerTop extends CWebTest {
 						]
 					],
 					'background_colors' => [
-						'Problem Disaster' => 'disaster-bg',
 						'Severity status: High' => 'high-bg',
 						'Problem Warning' => 'warning-bg'
 					]
 				]
 			],
-			// Check filter results from particular host.
+			// #2 Check filter results from particular host.
 			[
 				[
 					'fields' => [
@@ -433,37 +428,52 @@ class testPageReportsTriggerTop extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from several hosts.
+			// #3 Check filter results from several hosts.
 			[
 				[
 					'fields' => [
 						'Hosts' => [
 							'Host for Reports - TOP 100 triggers filter checks 2',
-							'Host for Reports - TOP 100 triggers filter checks 3',
+							'Host with triggers that contains special characters or macro',
 							'Empty Host for Reports - TOP 100 triggers filter checks'
 						]
 					],
 					'expected' => [
 						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks 3',
-							'Trigger' => 'Problem Disaster',
-							'Severity' => 'Disaster',
-							'Number of status changes' => '5'
-						],
-						[
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
 							'Number of status changes' => '2'
+						],
+						[
+							'Host' => 'Host with triggers that contains special characters or macro',
+							'Trigger' => 'Not classified ❌',
+							'Severity' => 'Not classified',
+							'Number of status changes' => '1'
+						],
+						[
+							'Host' => 'Host with triggers that contains special characters or macro',
+							'Trigger' => 'Severity status Average: Host with triggers that contains special characters or macro',
+							'Severity' => 'Average',
+							'Number of status changes' => '1'
+						],
+						[
+							'Host' => 'Host with triggers that contains special characters or macro',
+							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
+							'Severity' => 'Information',
+							'Number of status changes' => '1'
 						]
 					],
 					'background_colors' => [
-						'Problem Disaster' => 'disaster-bg',
-						'Severity status: High' => 'high-bg'
+						'Severity status: High' => 'high-bg',
+						'Not classified ❌' => 'na-bg',
+						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
+						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg'
+
 					]
 				]
 			],
-			// No filter results if host doesn't belong to host group.
+			// #4 No filter results if host doesn't belong to host group.
 			[
 				[
 					'fields' => [
@@ -473,6 +483,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					'expected' => []
 				]
 			],
+			// #5.
 			[
 				[
 					'fields' => [
@@ -482,7 +493,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search by severity.
+			// #6 Search by severity.
 			[
 				[
 					'fields' => [
@@ -501,7 +512,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					]
 				]
 			],
-			// Search by severities.
+			// #7 Search by severities.
 			[
 				[
 					'fields' => [
@@ -512,64 +523,52 @@ class testPageReportsTriggerTop extends CWebTest {
 					'expected' => [
 						[
 							'Host' => 'Host with triggers that contains special characters or macro',
-							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
-							'Severity' => 'Information',
-							'Number of status changes' => '2'
+							'Trigger' => 'Not classified ❌',
+							'Severity' => 'Not classified',
+							'Number of status changes' => '1'
 						],
 						[
 							'Host' => 'Host with triggers that contains special characters or macro',
-							'Trigger' => 'Not classified ❌',
-							'Severity' => 'Not classified',
+							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
+							'Severity' => 'Information',
 							'Number of status changes' => '1'
 						]
 					],
 					'background_colors' => [
-						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
-						'Not classified ❌' => 'na-bg'
+						'Not classified ❌' => 'na-bg',
+						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg'
 					]
 				]
 			],
-			// Search results with several filtering parameters.
+			// #8 Search results with several filtering parameters.
 			[
 				[
 					'fields' => [
 						'Host groups' => 'Second Group for Reports->TOP 100 triggers check',
-						'Hosts' => 'Host for Reports - TOP 100 triggers filter checks 3',
-						'Disaster' => true
+						'Hosts' => 'Host for Reports - TOP 100 triggers filter checks 2',
+						'High' => true
 					],
 					'expected' => [
-						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks 3',
-							'Trigger' => 'Problem Disaster',
-							'Severity' => 'Disaster',
-							'Number of status changes' => '5'
-						]
-					],
-					'background_colors' => [
-						'Problem Disaster' => 'disaster-bg'
-					]
-				]
-			],
-			// Search results without filtering parameters.
-			[
-				[
-					'expected' => [
-						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks 3',
-							'Trigger' => 'Problem Disaster',
-							'Severity' => 'Disaster',
-							'Number of status changes' => '5'
-						],
 						[
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
 							'Number of status changes' => '2'
-						],
+						]
+					],
+					'background_colors' => [
+						'Severity status: High' => 'high-bg'
+					]
+				]
+			],
+			// #9 Search results without filtering parameters.
+			[
+				[
+					'expected' => [
 						[
-							'Host' => 'Host with triggers that contains special characters or macro',
-							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
-							'Severity' => 'Information',
+							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
+							'Trigger' => 'Severity status: High',
+							'Severity' => 'High',
 							'Number of status changes' => '2'
 						],
 						[
@@ -589,27 +588,31 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Trigger' => 'Severity status Average: Host with triggers that contains special characters or macro',
 							'Severity' => 'Average',
 							'Number of status changes' => '1'
+						],
+						[
+							'Host' => 'Host with triggers that contains special characters or macro',
+							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
+							'Severity' => 'Information',
+							'Number of status changes' => '1'
 						]
 					],
 					'background_colors' => [
-						'Problem Disaster' => 'disaster-bg',
 						'Severity status: High' => 'high-bg',
-						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
 						'Not classified ❌' => 'na-bg',
 						'Problem Warning' => 'warning-bg',
-						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg'
+						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
+						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg'
 					]
 				]
 			],
-			/*
-			 * Search by date label.
-			 * Note: This test case depends on time when executed. E.g. if execution time is around 00:00 - 00:30 expected
-			 * result will be different, because some of prepareData generated problems will appear in yesterday's filter.
-			 */
+			// #10 Search for yesterdays problems.
 			[
 				[
 					'date' => [
 						'locator' => 'Yesterday'
+					],
+					'fields' => [
+						'Host groups' => 'Group for time period check in Top triggers'
 					],
 					'expected' => [
 						[
@@ -621,9 +624,11 @@ class testPageReportsTriggerTop extends CWebTest {
 					],
 					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg'
-					]
+					],
+					'day_based' => true
 				]
 			],
+			// #11 Search for problems from the day before yesterday.
 			[
 				[
 					'date' => [
@@ -639,10 +644,11 @@ class testPageReportsTriggerTop extends CWebTest {
 					],
 					'background_colors' => [
 						'Problem Warning' => 'warning-bg'
-					]
+					],
+					'day_based' => true
 				]
 			],
-			// Search by custom time period.
+			// #12 Search by custom time period.
 			[
 				[
 					'date' => [
@@ -662,6 +668,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					]
 				]
 			],
+			// #13 Search for problems using both from and to fields.
 			[
 				[
 					'date' => [
@@ -670,17 +677,18 @@ class testPageReportsTriggerTop extends CWebTest {
 					],
 					'expected' => [
 						[
-							'Host' => 'Host for Reports - TOP 100 triggers filter checks',
-							'Trigger' => 'Problem Warning',
-							'Severity' => 'Warning',
-							'Number of status changes' => '1'
+							'Host' => 'Host for Reports - TOP 100 triggers filter checks 3',
+							'Trigger' => 'Problem Disaster',
+							'Severity' => 'Disaster',
+							'Number of status changes' => '5'
 						]
 					],
 					'background_colors' => [
-						'Problem Warning' => 'warning-bg'
+						'Problem Disaster' => 'disaster-bg'
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'date' => [
@@ -700,7 +708,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					]
 				]
 			],
-			// Search by custom time period and without expected data.
+			// #15 Search by custom time period and without expected data.
 			[
 				[
 					'date' => [
@@ -710,7 +718,7 @@ class testPageReportsTriggerTop extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search results from last month using custom time period.
+			// #16 Search results from last month using custom time period.
 			[
 				[
 					'date' => [
@@ -728,18 +736,12 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks',
 							'Trigger' => 'Problem Warning',
 							'Severity' => 'Warning',
-							'Number of status changes' => '3'
+							'Number of status changes' => '2'
 						],
 						[
 							'Host' => 'Host for Reports - TOP 100 triggers filter checks 2',
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
-							'Number of status changes' => '2'
-						],
-						[
-							'Host' => 'Host with triggers that contains special characters or macro',
-							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
-							'Severity' => 'Information',
 							'Number of status changes' => '2'
 						],
 						[
@@ -753,15 +755,21 @@ class testPageReportsTriggerTop extends CWebTest {
 							'Trigger' => 'Severity status Average: Host with triggers that contains special characters or macro',
 							'Severity' => 'Average',
 							'Number of status changes' => '1'
+						],
+						[
+							'Host' => 'Host with triggers that contains special characters or macro',
+							'Trigger' => 'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️',
+							'Severity' => 'Information',
+							'Number of status changes' => '1'
 						]
 					],
 					'background_colors' => [
 						'Problem Disaster' => 'disaster-bg',
 						'Problem Warning' => 'warning-bg',
 						'Severity status: High' => 'high-bg',
-						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg',
 						'Not classified ❌' => 'na-bg',
-						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg'
+						'Severity status Average: Host with triggers that contains special characters or macro' => 'average-bg',
+						'ⓅⓡⓞⒷⓁⓔⓂ Information ℹ️' => 'info-bg'
 					]
 				]
 			]
@@ -772,17 +780,23 @@ class testPageReportsTriggerTop extends CWebTest {
 	 * @dataProvider getFilterData
 	 */
 	public function testPageReportsTriggerTop_Filter($data) {
+		if (CTestArrayHelper::get($data, 'day_based') && date('Y-m-d', self::$time) !== date('Y-m-d')) {
+			$this->markTestSkipped('Test data was created on a previous calendar day. Skipping day-based time filter case.');
+		}
+
 		$this->page->login()->open(self::LINK)->waitUntilReady();
 		$table = $this->getTable();
 
 		$filter = CFilterElement::find()->one();
-		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
+		if ($filter->getSelectedTabName() !== 'Filter') {
 			$filter->selectTab('Filter');
 		}
 
 		$filter_form = $filter->getForm();
 		if (array_key_exists('fields', $data)) {
 			$filter_form->fill($data['fields']);
+			$filter_form->submit();
+			$table->waitUntilReloaded();
 		}
 
 		if (array_key_exists('date', $data)) {
@@ -804,12 +818,8 @@ class testPageReportsTriggerTop extends CWebTest {
 
 			$filter->waitUntilReloaded();
 		}
-		else {
-			$filter_form->submit();
-		}
 
 		$this->page->waitUntilReady();
-		$table->waitUntilReloaded();
 
 		if (array_key_exists('background_colors', $data)) {
 			foreach ($data['background_colors'] as $trigger => $color) {
@@ -823,7 +833,11 @@ class testPageReportsTriggerTop extends CWebTest {
 		$this->assertTableData($data['expected']);
 
 		// Reset filter due to not influence further tests.
-		if ($filter->getSelectedTabName() === 'Filter') {
+		if (CTestArrayHelper::get($data, 'fields')) {
+			if ($filter->getSelectedTabName() !== 'Filter') {
+				$filter->selectTab('Filter');
+			}
+
 			$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		}
 	}

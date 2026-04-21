@@ -43,7 +43,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		'Service' => '',
 		'From' => '',
 		'To' => '',
-		'Show periods' => 20
+		'Show periods' => ZBX_SLA_DEFAULT_REPORTING_PERIODS
 	];
 
 	/*
@@ -144,7 +144,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			],
 			'Show periods' => [
 				'maxlength' => 3,
-				'value' => 20
+				'value' => ZBX_SLA_DEFAULT_REPORTING_PERIODS
 			],
 			'id:date_from' => [
 				'maxlength' => 255,
@@ -2337,7 +2337,9 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 */
 	private function getWidgetDateTimeData($data) {
 		// By default the last 20 periods are displayed.
-		$show_periods = (array_key_exists('Show periods', $data['fields'])) ? $data['fields']['Show periods'] : 20;
+		$show_periods = (array_key_exists('Show periods', $data['fields']))
+			? $data['fields']['Show periods']
+			: ZBX_SLA_DEFAULT_REPORTING_PERIODS;
 
 		if (array_key_exists('To', $data['fields'])) {
 			$to_date = $data['fields']['To'];
