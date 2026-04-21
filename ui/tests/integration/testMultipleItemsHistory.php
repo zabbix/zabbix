@@ -387,11 +387,11 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 	}
 
-		/**
+	/**
 	 * Send empty LLD discovery, run housekeeper and verify that all discovered
 	 * items, their history and trigger events are removed.
 	 *
-	 * @depends testMultipleItemsHistory_TriggerDiscoveryAfterRestart
+	 * @depends testMultipleItemsHistory_TriggerFiringRestart
 	 */
 	public function testMultipleItemsHistory_HousekeeperCleanup() {
 		$this->sendDataValues('sender', [
