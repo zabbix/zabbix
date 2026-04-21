@@ -109,17 +109,16 @@ class testFormFilter extends CWebTest {
 
 		$home_form = $filter->getForm();
 		$home_form->fill($data['filter']);
-
-		$result_table = $this->query($table_selector)->asDatatable()->waitUntilReady()->one();
-		$headers = $result_table->getHeaders();
+		$result_table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
+		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
+		$this->page->waitUntilReady();
+		$result_table->waitUntilReady()->invalidate();
 
 		if (array_key_exists('header_filter', $data)) {
 			$this->filterFromHeader($data['header_filter']);
 		}
 
-		$this->query('name:filter_apply')->waitUntilClickable()->one()->click();
-		$headers->waitUntilStalled();
-		$result_table->invalidate();
+		$result_table->wauitUntilReady()->invalidate();
 		$filter_result = $result_table->getRows()->asText();
 
 		// Go to another page, to check saved filter after.
@@ -130,6 +129,7 @@ class testFormFilter extends CWebTest {
 
 		// Check that filter form fields and table result match.
 		$home_form->invalidate()->checkValue($data['filter']);
+		$result_table->waitUntilReady()->invalidate();
 		$this->assertEquals($filter_result, $result_table->getRows()->asText());
 
 		// Reset filter not to interfere next tests.
