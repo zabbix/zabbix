@@ -391,7 +391,7 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 // If set to false, support for HTTP authentication will be disabled.
 // $ALLOW_HTTP_AUTH = true;
 
-$ZBX_SERVER_TLS[\'ACTIVE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['ACTIVE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'ACTIVE\'] = '.($this->config['ZBX_SERVER_TLS']['ACTIVE'] ? 'true' : 'false').';
 $ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['KEY_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
@@ -433,7 +433,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 		$this->config['SSO'] = null;
 		$this->config['ALLOW_HTTP_AUTH'] = true;
 		$this->config['ZBX_SERVER_TLS'] = [
-			'ACTIVE' => 0,
+			'ACTIVE' => false,
 			'CA_FILE' => '',
 			'KEY_FILE' => '',
 			'CERT_FILE' => '',

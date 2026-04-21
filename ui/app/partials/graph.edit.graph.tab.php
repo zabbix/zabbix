@@ -90,6 +90,7 @@ $graph_tab
 		new CFormField(
 			(new CCheckBox('show_legend'))
 				->setChecked($data['show_legend'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		)
 	])
@@ -98,6 +99,7 @@ $graph_tab
 		(new CFormField(
 			(new CCheckBox('show_work_period'))
 				->setChecked($data['show_work_period'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		))->setId('show_work_period_field')
 	])
@@ -106,6 +108,7 @@ $graph_tab
 		(new CFormField(
 			(new CCheckbox('show_triggers'))
 				->setchecked($data['show_triggers'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		))->setId('show_triggers_field')
 	]);
@@ -113,6 +116,7 @@ $graph_tab
 // Percent left.
 $percent_left_checkbox = (new CCheckBox('visible[percent_left]'))
 	->setChecked(true)
+	->setUncheckedValue(0)
 	->addClass('js-toggle-percent')
 	->setReadonly($data['readonly']);
 
@@ -128,7 +132,9 @@ $graph_tab->addItem([
 	(new CFormField([
 		$percent_left_checkbox,
 		NBSP(),
-		(new CTextBox('percent_left', $data['percent_left'], $data['readonly'], 7))
+		(new CTextBox('percent_left', $data['percent_left'] == 0 ? '' : $data['percent_left'],
+			$data['readonly'], 7
+		))
 			->setId('percent_left')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]))->setId('percent_left_field')
@@ -137,6 +143,7 @@ $graph_tab->addItem([
 // Percent right.
 $percent_right_checkbox = (new CCheckBox('visible[percent_right]'))
 	->setChecked(true)
+	->setUncheckedValue(0)
 	->addClass('js-toggle-percent')
 	->setReadonly($data['readonly']);
 
@@ -152,7 +159,9 @@ $graph_tab->addItem([
 	(new CFormField([
 		$percent_right_checkbox,
 		NBSP(),
-		(new CTextBox('percent_right', $data['percent_right'], $data['readonly'], 7))
+		(new CTextBox('percent_right', $data['percent_right'] == 0 ? '' : $data['percent_right'],
+			$data['readonly'], 7
+		))
 			->setId('percent_right')
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]))->setId('percent_right_field')
@@ -168,7 +177,8 @@ $yaxis_min_type = (new CSelect('ymin_type'))
 	]))
 	->setReadonly($data['readonly'])
 	->setFocusableElementId('ymin_type_label')
-	->addClass('yaxis-select');
+	->addClass('yaxis-select')
+	->addClass('align-top');
 
 $yaxis_min_value = (new CDiv(
 	(new CTextBox('yaxismin', $data['yaxismin'], $data['readonly']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -230,6 +240,7 @@ $yaxis_min_item_prototpye = (new CDiv(
 		->setEnabled(!$data['readonly'])
 ))
 	->setId('yaxis_min_prototype_ms')
+	->addClass('align-top')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 $graph_tab->addItem([
@@ -249,7 +260,8 @@ $yaxis_max_type = (new CSelect('ymax_type'))
 	]))
 	->setReadonly($data['readonly'])
 	->setFocusableElementId('ymax_type_label')
-	->addClass('yaxis-select');
+	->addClass('yaxis-select')
+	->addClass('align-top');
 
 $yaxis_max_value = (new CDiv(
 	(new CTextBox('yaxismax', $data['yaxismax'], $data['readonly']))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
@@ -311,6 +323,7 @@ $yaxis_max_item_prototpye = (new CDiv(
 		->setEnabled(!$data['readonly'])
 ))
 	->setId('yaxis_max_prototype_ms')
+	->addClass('align-top')
 	->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
 
 $graph_tab
@@ -325,6 +338,7 @@ $graph_tab
 		(new CFormField(
 			(new CCheckBox('show_3d'))
 				->setChecked($data['show_3d'] == 1)
+				->setUncheckedValue(0)
 				->setReadonly($data['readonly'])
 		))->setId('show_3d_field')
 	]);
@@ -373,9 +387,16 @@ foreach (graph_item_drawtypes() as $drawtype) {
 
 $graph_tab->addItem([
 	(new CLabel(_('Items'), $items_table->getId()))->setAsteriskMark(),
-	(new CDiv($items_table))
-		->addClass('graph-items')
-		->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR),
+	((new CDiv())
+		->addItem((new CDiv($items_table))
+			->addClass('graph-items')
+			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+			->setAttribute('data-field-type', 'set')
+			->setAttribute('data-field-name', 'items')
+			->setAttribute('data-error-container', 'items-error-container'),
+		)
+		->addItem((new CDiv())->setId('items-error-container'))
+	),
 	getItemTemplateNormal($data['readonly'], $graph_item_drawtypes),
 	getItemTemplateStacked($data['readonly']),
 	getItemTemplatePieAndExploded($data['readonly'])
@@ -386,6 +407,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 		new CLabel(_('Discover'), 'discover'),
 		new CFormField(
 			(new CCheckBox('discover', ZBX_PROTOTYPE_DISCOVER))
+				->setUncheckedValue(ZBX_PROTOTYPE_NO_DISCOVER)
 				->setChecked($data['discover'] == ZBX_PROTOTYPE_DISCOVER)
 				->setReadonly($data['is_discovered_prototype'])
 		)
