@@ -165,10 +165,6 @@ class CCepRule extends CApiService {
 			zbx_db_search('cep_rule cr', $options, $sql_parts);
 		}
 
-		// TODO editable?
-
-		// TODO countoutput?
-
 		$sql_parts = $this->applyQueryOutputOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 		$sql_parts = $this->applyQuerySortOptions($this->tableName, $this->tableAlias, $options, $sql_parts);
 
@@ -176,7 +172,16 @@ class CCepRule extends CApiService {
 		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		while ($row = DBfetch($res)) {
-			$result[$row['cep_ruleid']] = $row;
+			if ($options['countOutput']) {
+				$result = $row['rowscount'];
+			}
+			else {
+				$result[$row['cep_ruleid']] = $row;
+			}
+		}
+
+		if ($options['countOutput']) {
+			return $result;
 		}
 
 		if ($result) {
