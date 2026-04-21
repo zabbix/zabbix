@@ -106,6 +106,8 @@ static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec
 #define ZBX_HISTORY_UPLOAD_DISABLED	(-1)
 
 static ZBX_THREAD_LOCAL int	history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+/* used for accelerating config refresh after send_buffer comms errors */
+static ZBX_THREAD_LOCAL time_t	*active_checks_nextrefresh_ptr;
 
 typedef struct
 {
@@ -1283,6 +1285,14 @@ static int	send_buffer(zbx_vector_addr_ptr_t *addrs, zbx_vector_pre_persistent_t
 	else
 	{
 		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+
+		if (NULL != active_checks_nextrefresh_ptr)
+		{
+			time_t	retry_after = time(NULL) + 60;
+
+			if (*active_checks_nextrefresh_ptr > retry_after)
+				*active_checks_nextrefresh_ptr = retry_after;
+		}
 	}
 
 	if (SUCCEED == ret_metrics)
@@ -1955,6 +1965,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 	if (0 != activechks_args_in->config_heartbeat_frequency)
 		heartbeat_nextcheck = time(NULL);
 
+	active_checks_nextrefresh_ptr = &nextrefresh;
+
 	while (ZBX_IS_RUNNING())
 	{
 #ifndef _WINDOWS
@@ -2070,6 +2082,8 @@ ZBX_THREAD_ENTRY(active_checks_thread, args)
 			lash_cmd_hash_check = now;
 		}
 	}
+
+	active_checks_nextrefresh_ptr = NULL;
 
 	zbx_free(session_token);
 
