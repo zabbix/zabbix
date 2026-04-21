@@ -2520,7 +2520,7 @@ class CDataTable {
 
 		this.#user_configs[item._index] = this.getConfig();
 
-		this.#updateUserProfile(JSON.stringify({}), [item._index]);
+		this.#updateUserProfile(JSON.stringify(this.#user_configs[item._index]), [item._index]);
 	}
 
 	onTabfilterDelete = e => {
