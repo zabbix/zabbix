@@ -23,6 +23,7 @@ import (
 	"net"
 	"reflect"
 	"strings"
+	"sync/atomic"
 	"time"
 	"unicode/utf8"
 
@@ -55,6 +56,7 @@ type Connector struct {
 	taskManager                scheduler.Scheduler
 	options                    *agent.AgentOptions
 	tlsConfig                  *tls.Config
+	nextRefreshUnix            int64
 }
 
 type activeChecksRequest struct {
@@ -108,7 +110,7 @@ func (c *Connector) refreshActiveChecks() bool {
 	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.address)
-	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.address)
+	defer log.Warningf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.address)
 
 	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second,
 		"HostInterface", c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen,
@@ -380,11 +382,32 @@ func (c *Connector) sendHeartbeatMsg() {
 	}
 }
 
+// moves next refresh after 60 seconds if communication failure, matching refresh failure retry.
+func (c *Connector) pullForwardActiveChecksRefresh() {
+	retryAfter := time.Now().Unix() + 60
+
+	for {
+		cur := atomic.LoadInt64(&c.nextRefreshUnix)
+		if cur == 0 {
+			return
+		}
+
+		if retryAfter >= cur {
+			return
+		}
+
+		if atomic.CompareAndSwapInt64(&c.nextRefreshUnix, cur, retryAfter) {
+			return
+		}
+	}
+}
+
 func (c *Connector) run() {
-	var nextRefresh, lastFlush, lastHeartbeat int64
+	var lastFlush, lastHeartbeat int64
 
 	defer log.PanicHook()
 	log.Debugf("[%d] starting server connector for %s", c.clientID, c.address)
+	atomic.StoreInt64(&c.nextRefreshUnix, 0)
 
 	time.Sleep(time.Duration(1e9 - time.Now().Nanosecond()))
 	ticker := time.NewTicker(time.Second)
@@ -398,15 +421,16 @@ run:
 				c.resultCache.Upload(nil)
 				lastFlush = now
 			}
-			if now >= nextRefresh {
-				var ret = c.refreshActiveChecks()
+			if now >= atomic.LoadInt64(&c.nextRefreshUnix) {
+				ret := c.refreshActiveChecks()
 
-				nextRefresh = time.Now().Unix()
+				nextRefresh := time.Now().Unix()
 				if !ret {
 					nextRefresh += 60
 				} else {
 					nextRefresh += int64(c.options.RefreshActiveChecks)
 				}
+				atomic.StoreInt64(&c.nextRefreshUnix, nextRefresh)
 			}
 			if c.options.HeartbeatFrequency > 0 {
 				if (now - lastHeartbeat) >= int64(c.options.HeartbeatFrequency) {
@@ -467,6 +491,7 @@ func New(taskManager scheduler.Scheduler, addresses []string, hostname string,
 		tlsConfig: c.tlsConfig,
 		timeout:   options.Timeout,
 		session:   c.session,
+		connector: c,
 	}
 	c.resultCache = resultcache.New(&agent.Options, c.clientID, ac)
 

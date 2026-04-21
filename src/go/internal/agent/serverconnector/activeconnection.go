@@ -32,6 +32,7 @@ type activeConnection struct {
 	tlsConfig *tls.Config
 	timeout   int
 	session   string
+	connector *Connector
 }
 
 func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []error) {
@@ -40,6 +41,9 @@ func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []er
 	b, errs, _ := zbxcomms.ExchangeWithRedirect(c.address, &c.localAddr, timeout,
 		time.Second*time.Duration(c.timeout), data, c.tlsConfig)
 	if errs != nil {
+		if c.connector != nil {
+			c.connector.pullForwardActiveChecksRefresh()
+		}
 
 		return upload, errs
 	}
