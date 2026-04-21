@@ -400,9 +400,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->callUntilDataIsPresent('item.get', [
 			'hostids' => [self::$hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
-			'output' => ['itemid']
+			'countOutput' => true
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === 0;
+			return $r['result'] == 0;
 		});
 
 		$this->executeHousekeeper();
@@ -413,20 +413,20 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->callUntilDataIsPresent('history.get', [
 				'history' => $vtype,
 				'itemids' => $itemids,
-				'limit' => 1,
-				'output' => ['itemid']
+				'countOutput' => true
 			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-				return count($r['result']) === 0;
+				$this->executeHousekeeper();
+				return $r['result'] == 0;
 			});
 		}
 
 		$this->callUntilDataIsPresent('event.get', [
 			'objectids' => self::$discovered_triggerids,
 			'source' => EVENT_SOURCE_TRIGGERS,
-			'limit' => 1,
-			'output' => ['eventid']
+			'countOutput' => true
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === 0;
+			$this->executeHousekeeper();
+			return $r['result'] == 0;
 		});
 	}
 }
