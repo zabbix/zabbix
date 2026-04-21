@@ -17,6 +17,7 @@
 		margin-bottom: 8px;
 		background-color: $ui-bg-color;
 		border: 1px solid $ui-border-color;
+		border-radius: var(--surface-border-radius);
 
 		&.tabfilter-collapsed {
 			padding: 0 0 10px 0;
@@ -100,7 +101,7 @@
 	// Tab filter label li element.
 	.tabfilter-item-label {
 		display: inline-block;
-		border-radius: 2px;
+		border-radius: var(--button-border-radius);
 		border: 1px solid transparent;
 		color: $tab-label-color;
 		margin-right: 2px;
@@ -242,7 +243,7 @@
 		margin: -1px;
 		color: $btn-color;
 		border: 1px solid $btn-border-color;
-		border-radius: 2px;
+		border-radius: var(--button-border-radius);
 		height: 24px;
 		box-sizing: border-box;
 
@@ -286,7 +287,7 @@
 	padding: 0.1em 0.4em;
 	font-size: $font-h3-size;
 	background-color: $ui-bg-selected-color;
-	border-radius: 2px;
+	border-radius: var(--badge-border-radius);
 	color: $white;
 	content: attr(data-counter);
 }

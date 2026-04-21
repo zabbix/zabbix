@@ -31,6 +31,8 @@ z-color-picker {
 }
 
 .color-picker-dialog {
+	border-radius: var(--surface-border-radius);
+
 	.color-picker-tabs {
 		display: flex;
 		width: fit-content;
@@ -109,7 +111,7 @@ z-color-picker {
 				height: 20px;
 				padding: 0;
 				border: 1px solid $ui-bg-color;
-				border-radius: 0;
+				border-radius: calc(var(--input-border-radius) - 2px);
 				transition: none;
 
 				&:hover,
@@ -139,7 +141,7 @@ z-color-picker {
 					height: 20px;
 					padding: 0;
 					border: 1px solid $ui-bg-color;
-					border-radius: 0;
+					border-radius: calc(var(--input-border-radius) - 2px);
 					transition: none;
 				}
 			}
@@ -157,6 +159,7 @@ z-color-picker {
 			.color-picker-input {
 				width: 96px;
 				padding-left: 25px;
+				border-radius: var(--input-border-radius);
 			}
 
 			.color-picker-preview {
@@ -167,6 +170,7 @@ z-color-picker {
 				height: 18px;
 				color: $font-color;
 				border: 1px solid $form-border-color;
+				border-radius:  calc(var(--input-border-radius) - 2px);
 
 				&::after {
 					line-height: 14px;
@@ -236,13 +240,13 @@ z-color-picker {
 			}
 
 			&:first-of-type {
-				border-top-left-radius: 1px;
-				border-bottom-left-radius: 1px;
+				border-top-left-radius: calc(var(--badge-border-radius) - 2px);
+				border-bottom-left-radius: calc(var(--badge-border-radius) - 2px);
 			}
 
 			&:last-of-type {
-				border-top-right-radius: 1px;
-				border-bottom-right-radius: 1px;
+				border-top-right-radius: calc(var(--badge-border-radius) - 2px);
+				border-bottom-right-radius: calc(var(--badge-border-radius) - 2px);
 			}
 		}
 	}

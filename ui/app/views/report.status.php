@@ -31,7 +31,9 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 				'show_software_update_check_details' => true,
 				'user_type' => $data['user_type']
 			])
-		))->addClass(ZBX_STYLE_CONTAINER)
+		))
+			->addClass(ZBX_STYLE_CONTAINER)
+			->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	)
 	->addItem(
 		($data['user_type'] == USER_TYPE_SUPER_ADMIN && $data['system_info']['ha_cluster_enabled'])
@@ -41,7 +43,9 @@ require_once __DIR__.'/../../include/blocks.inc.php';
 					'ha_cluster_enabled' => $data['system_info']['ha_cluster_enabled'],
 					'failover_delay' => null
 				])
-			))->addClass(ZBX_STYLE_CONTAINER)
+			))
+				->addClass(ZBX_STYLE_CONTAINER)
+				->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 			: null
 	)
 	->show();

@@ -292,7 +292,7 @@ form.dashboard-widget-svggraph {
 			> div {
 				padding: 1px 0 1px 1px;
 				background-color: $ui-bg-selected-color;
-				border-radius: 2px;
+				border-radius: var(--badge-border-radius);
 				line-height: 22px;
 
 				span {

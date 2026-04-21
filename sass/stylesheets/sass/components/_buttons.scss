@@ -9,7 +9,7 @@
 	text-align: center;
 	cursor: pointer;
 	border: 1px solid;
-	border-radius: 2px;
+	border-radius: var(--button-border-radius);
 
 	@if $ui-transitions {
 		transition: color $ui-controls-transition-duration ease-out,

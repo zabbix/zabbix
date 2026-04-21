@@ -25,6 +25,7 @@ $info_table = (new CTableInfo())
 	->setHeader([_('Parameter'), _('Value'), _('Details')])
 	->setHeadingColumn(0)
 	->addClass(ZBX_STYLE_LIST_TABLE_STICKY_HEADER)
+	->addClass(ZBX_STYLE_ROUNDED_SURFACE)
 	->addRow([
 		_('Zabbix server is running'),
 		(new CSpan($status['is_running'] ? _('Yes') : _('No')))

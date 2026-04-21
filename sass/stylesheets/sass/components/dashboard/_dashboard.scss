@@ -91,7 +91,7 @@
 
 				background-color: $ui-bg-color;
 				border: 1px solid $ui-border-color;
-				border-radius: 2px;
+				border-radius: var(--surface-border-radius);
 
 				@if $ui-transitions {
 					transition: background-color $ui-transition-duration,
@@ -248,6 +248,7 @@
 		overflow: hidden;
 		background-color: rgba($ui-bg-color, .7);
 		border: 1px dashed $form-border-color;
+		border-radius: var(--surface-border-radius);
 		box-shadow: 2px 2px 6px $action-shadow-color;
 		flex: 1;
 	}
@@ -321,6 +322,8 @@
 	align-items: flex-start;
 	border: 1px solid $ui-border-color;
 	border-bottom: 0;
+	border-top-left-radius: var(--surface-border-radius);
+	border-top-right-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
 	z-index: 10;
 
@@ -392,6 +395,8 @@
 	padding-bottom: 8px;
 	overflow: auto;
 	border: 1px solid $ui-border-color;
+	border-bottom-left-radius: var(--surface-border-radius);
+	border-bottom-right-radius: var(--surface-border-radius);
 	background-color: $ui-bg-color;
 
 	@extend %webkit-scrollbar;
@@ -487,8 +492,9 @@
 
 	&.dashboard-grid-widget-hidden-header {
 		.dashboard-grid-widget-header {
-			height: 0;
+			height: 2px;
 			z-index: 11;
+			border-bottom: 0;
 
 			@if $ui-transitions {
 				transition: height $ui-transition-duration ease-out,
@@ -499,9 +505,10 @@
 		}
 
 		.dashboard-grid-widget-contents {
-			margin-top: 0;
+			margin-top: 3px;
 			height: 100%;
 			padding-top: 8px;
+			border-top: 0;
 
 			&.no-padding {
 				.dashboard-grid-widget-messages {
@@ -527,7 +534,7 @@
 		&.dashboard-grid-widget-focus {
 			.dashboard-grid-widget-header {
 				height: 2rem;
-				margin-top: -2rem;
+				margin-top: calc(-2rem + 2px);
 				box-shadow: 0 -6px 8px -2px rgba(128, 128, 128, .15);
 			}
 		}
@@ -785,6 +792,8 @@
 
 	.dashboard-grid-widget .dashboard-grid-widget-header,
 	.dashboard-grid-iterator .dashboard-grid-iterator-header {
+		border-top-left-radius: var(--surface-border-radius);
+		border-top-right-radius: var(--surface-border-radius);
 		cursor: auto;
 	}
 }
@@ -1084,6 +1093,7 @@
 		--modal-max-width: calc(100vw - 20px);
 		--modal-min-width: 650px;
 
+		border-radius: var(--overlay-border-radius);
 		box-sizing: border-box;
 
 		.overlay-dialogue-body {

@@ -777,7 +777,7 @@ class testPageMonitoringLatestData extends CWebTest {
 					$this->page->waitUntilReady();
 				}
 
-				$this->query('class:table-paging')->query('link:1')->waitUntilClickable()->one()->click();
+				$this->query('class:pager')->query('link:1')->waitUntilClickable()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}

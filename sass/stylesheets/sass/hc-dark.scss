@@ -616,7 +616,7 @@ a.link-action {
 	}
 }
 
-.table-paging {
+.pager {
 	a {
 		&:focus {
 			background-color: $link-hover-color;
@@ -630,13 +630,13 @@ a.link-action {
 			}
 		}
 	}
-}
 
-.paging-selected {
-	color: #000000 !important;
+	.selected {
+		color: #000000 !important;
 
-	&:focus {
-		background-color: $link-hover-color !important;
+		&:focus {
+			background-color: $link-hover-color !important;
+		}
 	}
 }
 
@@ -1091,7 +1091,7 @@ td.inactive-bg {
 
 			margin-right: 4px;
 			color: #000000;
-			border-radius: 3px;
+			border-radius: var(--badge-border-radius);
 		}
 	}
 
