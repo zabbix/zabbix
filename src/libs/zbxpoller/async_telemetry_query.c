@@ -55,6 +55,8 @@ static int	async_send_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t *
 	telemetry_query_context->item_context.preprocessing = item->preprocessing;
 
 	zbx_tq_sql_generate_clickhouse(query, now, lasttimestamp, &telemetry_query_context->item_context.posts);
+	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, NULL,
+			&telemetry_query_context->item_context.newlasttimestamp);
 	telemetry_query_context->item_context.query = query;
 
 	zabbix_log(LOG_LEVEL_TRACE, "%s(): generated SQL: '%s'", __func__, telemetry_query_context->item_context.posts);
@@ -135,8 +137,7 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 	const char *config_ssl_cert_location	= poller_config->config_ssl_cert_location;
 	const char *config_ssl_key_location	= poller_config->config_ssl_key_location;
 
-	/* FIXME: placeholder */
-	lasttimestamp = 0;
+	lasttimestamp = item->mtime;
 
 	if (FAIL == zbx_tq_query_from_json(item->query_fields, query))
 	{

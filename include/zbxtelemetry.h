@@ -138,6 +138,9 @@ void	zbx_tq_query_clean(zbx_tq_query_t *query);
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
 void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);
 
+void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		time_t *out_lower, time_t *out_upper);
+
 int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char **out_json);
 
 #endif

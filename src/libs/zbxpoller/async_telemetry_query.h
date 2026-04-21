@@ -31,6 +31,7 @@ typedef struct
 	char		*posts;
 	unsigned char	preprocessing;
 	zbx_tq_query_t	*query;
+	time_t		newlasttimestamp;
 }
 zbx_dc_tq_item_context_t;
 

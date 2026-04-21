@@ -302,6 +302,7 @@ typedef struct
 	unsigned char		value_type;
 	unsigned char		flags;
 	char			*key_orig, *key;
+	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
 	/* TODO: query_fields should probably be on the heap (char * allocated separately) */

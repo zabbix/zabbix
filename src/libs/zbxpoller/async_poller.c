@@ -48,6 +48,7 @@
 #include "zbxtypes.h"
 #include "zbxasyncpoller.h"
 #include "zbxtelemetry.h"
+#include "zbxsysinfo.h"
 
 #include <event2/dns.h>
 
@@ -260,6 +261,8 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 			zabbix_log(LOG_LEVEL_TRACE, "%s(): transformed to json: '%s'", __func__, out);
 
 			SET_TEXT_RESULT(&result, out);
+
+			zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 			item_state = ITEM_STATE_NORMAL;
 		}
 		else

@@ -671,29 +671,6 @@ static char	*tq_sql_dyn_get_conditions(const zbx_tq_query_t *query, tq_db_type_t
 	}
 }
 
-static void	tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
-		time_t *out_lower, time_t *out_upper)
-{
-	time_t	now_shifted = now - query->time_shift;
-
-	if (lasttimestamp > now_shifted)
-		lasttimestamp = now_shifted;
-
-	if (query->aggregation_size > now_shifted - lasttimestamp)
-	{
-		*out_lower = now_shifted - query->aggregation_size;
-		*out_upper = now_shifted;
-	}
-	else
-	{
-		time_t	start = MAX(lasttimestamp, now_shifted - (time_t)query->loopback_limit);
-
-		*out_lower = start;
-		*out_upper = start + ((now_shifted - start) / (time_t)query->aggregation_size) *
-				(time_t)query->aggregation_size;
-	}
-}
-
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql)
 {
 	const int	query_has_columns = (0 != query->columns.values_num);
@@ -710,7 +687,7 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	char	*conditions		= tq_sql_dyn_get_conditions(query, TQ_SQL_DB_TYPE_POSTGRESQL);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
+	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
 		&timestamp_filter_upper_bound);
 
 	/* select */
@@ -733,8 +710,8 @@ void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, tim
 	/* where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"\"Timestamp\">to_timestamp(" ZBX_FS_TIME_T ") "
-			"AND \"Timestamp\"<=to_timestamp(" ZBX_FS_TIME_T ") ",
+			"\"Timestamp\">=to_timestamp(" ZBX_FS_TIME_T ") "
+			"AND \"Timestamp\"<to_timestamp(" ZBX_FS_TIME_T ") ",
 			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
 	if (query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);
@@ -769,7 +746,7 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 	char	*conditions		= tq_sql_dyn_get_conditions(query, TQ_SQL_DB_TYPE_CLICKHOUSE);
 
 	time_t timestamp_filter_lower_bound, timestamp_filter_upper_bound;
-	tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
+	zbx_tq_get_timestamp_filter_bounds(query, now, lasttimestamp, &timestamp_filter_lower_bound,
 			&timestamp_filter_upper_bound);
 
 	/* select */
@@ -792,8 +769,8 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 	/* where */
 	zbx_snprintf_alloc(sql, &alloc, &offset, "WHERE ");
 	zbx_snprintf_alloc(sql, &alloc, &offset,
-			"\"Timestamp\">toDateTime(" ZBX_FS_TIME_T ") "
-			"AND \"Timestamp\"<=toDateTime(" ZBX_FS_TIME_T ") ",
+			"\"Timestamp\">=toDateTime(" ZBX_FS_TIME_T ") "
+			"AND \"Timestamp\"<toDateTime(" ZBX_FS_TIME_T ") ",
 			timestamp_filter_lower_bound, timestamp_filter_upper_bound);
 	if (query_has_conditions)
 		zbx_snprintf_alloc(sql, &alloc, &offset, "AND (%s) ", conditions);

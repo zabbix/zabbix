@@ -113,3 +113,30 @@ int	tq_formula_constant_to_condition_idx(const char *p, int len)
 
 	return res;
 }
+
+void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
+		time_t *out_lower, time_t *out_upper)
+{
+	time_t	now_shifted = now - query->time_shift;
+
+	if (lasttimestamp > now_shifted)
+		lasttimestamp = now_shifted;
+
+	if (query->aggregation_size > now_shifted - lasttimestamp)
+	{
+		if (NULL != out_lower)
+			*out_lower = now_shifted - query->aggregation_size;
+		if (NULL != out_upper)
+			*out_upper = now_shifted;
+	}
+	else
+	{
+		time_t	start = MAX(lasttimestamp, now_shifted - (time_t)query->loopback_limit);
+
+		if (NULL != out_lower)
+			*out_lower = start;
+		if (NULL != out_upper)
+			*out_upper = start + ((now_shifted - start) / (time_t)query->aggregation_size) *
+				(time_t)query->aggregation_size;
+	}
+}
