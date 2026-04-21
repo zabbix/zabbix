@@ -1,5 +1,22 @@
 <?php
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
 
+
+/**
+ * History data storage class for ClickHouse.
+ */
 class CClickHouseStorage {
 
 	public const PROVIDER_TYPE = ZBX_HISTORY_SOURCE_CLICKHOUSE;
@@ -617,6 +634,11 @@ class CClickHouseStorage {
 			// Internal server error code
 			$this->error_code = 500;
 			$this->error_message = $error->getMessage();
+			// error_log($this->error_message);
+			error_log('multipart form data stored to file '.APP::getRootDir().'/multipart-form-data.txt');
+			$debug = $stream_context['http']['header']."\r\n\r\n\r\n".$stream_context['http']['content'];
+			$debug .= "\r\n\r\n".json_encode(compact('query', 'param'), JSON_PRETTY_PRINT);
+			file_put_contents(APP::getRootDir().'/multipart-form-data.txt', $debug);
 		}
 
 		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, $stream_context['http']['method'],
