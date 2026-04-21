@@ -397,36 +397,31 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$this->callUntilDataIsPresent('item.get', [
+		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
-			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
-			'countOutput' => true
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return $r['result'] == 0;
-		});
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
+		], 0);
 
 		$this->executeHousekeeper();
 
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
 			$itemids = array_values(self::$discovered_itemids[$vtype]);
-			$this->callUntilDataIsPresent('history.get', [
+			$this->callUntilCountIsPresent('history.get', [
 				'history' => $vtype,
-				'itemids' => $itemids,
-				'countOutput' => true
-			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+				'itemids' => $itemids
+			], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 				$this->executeHousekeeper();
-				return $r['result'] == 0;
+				return true;
 			});
 		}
 
-		$this->callUntilDataIsPresent('event.get', [
+		$this->callUntilCountIsPresent('event.get', [
 			'objectids' => self::$discovered_triggerids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'countOutput' => true
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			'source' => EVENT_SOURCE_TRIGGERS
+		], 0, self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			$this->executeHousekeeper();
-			return $r['result'] == 0;
+			return true;
 		});
 	}
 }
