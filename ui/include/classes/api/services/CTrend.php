@@ -364,13 +364,6 @@ class CTrend extends CApiService {
 			}
 		}
 
-		if (!$this->outputIsRequested('itemid', $options['output'])) {
-			foreach ($result as &$row) {
-				unset($row['itemid']);
-			}
-			unset($row);
-		}
-
 		return $options['countOutput'] ? $rowcount : $result;
 	}
 }
