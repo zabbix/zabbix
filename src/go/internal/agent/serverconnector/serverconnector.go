@@ -110,7 +110,7 @@ func (c *Connector) refreshActiveChecks() bool {
 	}
 
 	log.Debugf("[%d] In refreshActiveChecks() from %s", c.clientID, c.address)
-	defer log.Warningf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.address)
+	defer log.Debugf("[%d] End of refreshActiveChecks() from %s", c.clientID, c.address)
 
 	if a.HostInterface, err = processConfigItem(c.taskManager, time.Duration(c.options.Timeout)*time.Second,
 		"HostInterface", c.options.HostInterface, c.options.HostInterfaceItem, agent.HostInterfaceLen,
