@@ -2037,6 +2037,37 @@ class CUser extends CApiService {
 			'where' => ['userid' => $userids]
 		]);
 
+		$db_devices = DB::select('device', [
+			'output' => ['deviceid', 'userid', 'name', 'status'],
+			'filter' => ['userid' => $userids],
+			'preservekeys' => true
+		]);
+
+		if ($db_devices) {
+			$devices = [];
+
+			foreach ($db_devices as $db_device) {
+				$devices[] = [
+					'deviceid' => $db_device['deviceid'],
+					'userid' => 0,
+					'name' => '',
+					'status' => ZBX_DEVICE_ORPHANED
+				];
+			}
+
+			CDevice::updateForce($devices, $db_devices);
+
+			$db_deviceids = array_keys($db_devices);
+
+			DB::delete('device_enrollment_token', ['deviceid' => $db_deviceids]);
+			DB::delete('device_key', ['deviceid' => $db_deviceids]);
+			DB::delete('token_device', ['deviceid' => $db_deviceids]);
+			DB::delete('token', [
+				'auth_scheme' => ZBX_AUTH_SCHEME_DPOP,
+				'userid' => $userids
+			]);
+		}
+
 		$db_tokens = DB::select('token', [
 			'output' => ['tokenid', 'name'],
 			'filter' => ['userid' => $userids],

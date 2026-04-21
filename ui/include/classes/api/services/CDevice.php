@@ -409,6 +409,27 @@ class CDevice extends CApiService {
 		DB::insertBatch('device_key', $fields, false);
 	}
 
+	public static function updateForce(array $devices, array $db_devices): void {
+		$upd_devices = [];
+
+		foreach ($devices as $device) {
+			$upd_device = DB::getUpdatedValues('device', $device, $db_devices[$device['deviceid']]);
+
+			if ($upd_device) {
+				$upd_devices[] = [
+					'values' => $upd_device,
+					'where' => ['deviceid' => $device['deviceid']]
+				];
+			}
+		}
+
+		if ($upd_devices) {
+			DB::update('device', $upd_devices);
+		}
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, $devices, $db_devices);
+	}
+
 	/**
 	 * @param array  $data
 	 *
