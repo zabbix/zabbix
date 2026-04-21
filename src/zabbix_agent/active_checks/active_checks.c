@@ -106,7 +106,6 @@ static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec
 #define ZBX_HISTORY_UPLOAD_DISABLED	(-1)
 
 static ZBX_THREAD_LOCAL int	history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
-/* used for accelerating config refresh after send_buffer comms errors */
 static ZBX_THREAD_LOCAL time_t	*active_checks_nextrefresh_ptr;
 
 typedef struct
@@ -995,7 +994,7 @@ static int	refresh_active_checks(zbx_vector_addr_ptr_t *addrs, const zbx_config_
 
 	zbx_json_free(&json);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	zabbix_log(LOG_LEVEL_WARNING, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
@@ -1053,7 +1052,7 @@ static int	format_metric_results(struct zbx_json *json, int now, int config_buff
 
 	if (ZBX_HISTORY_UPLOAD_ENABLED != history_upload)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot send buffer: server has paused history upload");
+		zabbix_log(LOG_LEVEL_WARNING, "cannot send buffer: server has paused history upload");
 		goto ret;
 	}
 
