@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
+require_once __DIR__ . '/../../include/CWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -607,5 +608,62 @@ class testFormUserProfile extends CLegacyWebTest {
 				$this->zbxTestTextPresent($data['error_msg']);
 				break;
 		}
+	}
+
+	public function triggerSeverity() {
+		return [
+			// #0. Scenario for ZBX-27632.
+			[
+				[
+					'expected' => TEST_BAD,
+					'messages_enabled' => true,
+					'checkbox_state' => true,
+					'timeout' => '86401',
+					'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
+					'trigger_severity' => [
+						'messages_triggers.recovery',
+						'messages_triggers.severities_0',
+						'messages_triggers.severities_1',
+						'messages_triggers.severities_2',
+						'messages_triggers.severities_3',
+						'messages_triggers.severities_4',
+						'messages_triggers.severities_5'
+					],
+					'trigger_severity_status' => [
+						'messages[triggers.recovery]',
+						'messages[triggers.severities][0]',
+						'messages[triggers.severities][1]',
+						'messages[triggers.severities][2]',
+						'messages[triggers.severities][3]',
+						'messages[triggers.severities][4]',
+						'messages[triggers.severities][5]'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider triggerSeverity
+	 */
+	public function testFormUserProfile_triggerSeverity($data) {
+		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
+		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
+		$form->selectTab('Frontend notifications');
+		$form->getField('id:messages_enabled')->fill($data['messages_enabled']);
+		$form->getField('id:messages_timeout')->fill($data['timeout']);
+
+		// Uncheck trigger severity checkboxes.
+		foreach ($data['trigger_severity'] as $id) {
+			$this->query('id:' . $id)->one()->click();
+		}
+
+		$this->query('id:update')->one()->click();
+
+		// Assert correct checkbox state.
+		foreach ($data['trigger_severity_status'] as $name) {
+			$this->assertTrue($form->getField('name:' . $name)->isAttributePresent(['type' => 'hidden'])
+			);
+		};
 	}
 }
