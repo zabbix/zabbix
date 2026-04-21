@@ -36,6 +36,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $lld_ruleid;
 	private static $item_prototypeids = [];
 	private static $discovered_itemids = [];
+	private static $discovered_triggerids = [];
 
 	private static function prototypeDefs() {
 		return [
@@ -273,11 +274,41 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		foreach ($response['result'] as $trigger) {
 			$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
+			self::$discovered_triggerids[] = (int) $trigger['triggerid'];
 		}
 
 		$this->reloadConfigurationCache();
 
 		$this->sendAndVerifyHistory();
+
+		// Verify all discovered triggers fired (value = PROBLEM, state = NORMAL).
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
+			if (count($r['result']) !== $total_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
+					return false;
+				}
+				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+					return false;
+				}
+			}
+			return true;
+		});
+
+		// Verify one event was created per discovered trigger.
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => self::$discovered_triggerids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'output' => ['eventid'],
+			'limit' => $total_expected
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
+			return count($r['result']) === $total_expected;
+		});
 	}
 
 	/**
@@ -347,5 +378,55 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			]);
 			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
 		}
+	}
+
+		/**
+	 * Send empty LLD discovery, run housekeeper and verify that all discovered
+	 * items, their history and trigger events are removed.
+	 *
+	 * @depends testMultipleItemsHistory_TriggerDiscoveryAfterRestart
+	 */
+	public function testMultipleItemsHistory_HousekeeperCleanup() {
+		$this->sendDataValues('sender', [
+			[
+				'host' => self::HOSTNAME,
+				'key' => self::LLD_RULE_KEY,
+				'value' => json_encode(['data' => []])
+			]
+		], self::COMPONENT_SERVER);
+
+		$this->reloadConfigurationCache();
+
+		$this->callUntilDataIsPresent('item.get', [
+			'hostids' => [self::$hostid],
+			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
+			'output' => ['itemid']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === 0;
+		});
+
+		$this->executeHousekeeper();
+
+		foreach (self::prototypeDefs() as $def) {
+			$vtype = $def['value_type'];
+			$itemids = array_values(self::$discovered_itemids[$vtype]);
+			$this->callUntilDataIsPresent('history.get', [
+				'history' => $vtype,
+				'itemids' => $itemids,
+				'limit' => 1,
+				'output' => ['itemid']
+			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+				return count($r['result']) === 0;
+			});
+		}
+
+		$this->callUntilDataIsPresent('event.get', [
+			'objectids' => self::$discovered_triggerids,
+			'source' => EVENT_SOURCE_TRIGGERS,
+			'limit' => 1,
+			'output' => ['eventid']
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === 0;
+		});
 	}
 }
