@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * a large set of LLD-discovered items across all supported value types.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider configurationProvider
  * @onAfter clearData
  */
@@ -167,7 +168,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'Expected '.self::LLD_DISCOVERY_COUNT.' discovered items for type '.$def['suffix'].'.');
 		}
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 
 	/**
@@ -209,7 +210,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->assertArrayHasKey(0, $response['result']['triggerids']);
 		}
 
-		$this->reloadConfigurationCache();
 		$this->sendDiscoveryData();
 
 		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
@@ -230,7 +230,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			self::$discovered_triggerids[] = (int) $trigger['triggerid'];
 		}
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 
 	/**
@@ -275,6 +275,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_TriggerFiring
 	 */
 	public function testMultipleItemsHistory_TriggerFiringRestart() {
+		$this->stopComponent(self::COMPONENT_SERVER);
+		$this->startComponent(self::COMPONENT_SERVER);
 		$this->sendAndVerifyHistoryAt(time());
 	}
 
@@ -339,7 +341,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				$idx++;
 			}
 
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 			$itemids = array_values($items_by_key);
 			$this->callUntilDataIsPresent('history.get', [
@@ -408,7 +410,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => json_encode(['data' => $data])
 			]
-		], self::COMPONENT_SERVER);
+		], self::COMPONENT_SERVER, 0);
 	}
 
 	/**
@@ -424,9 +426,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'key' => self::LLD_RULE_KEY,
 				'value' => json_encode(['data' => []])
 			]
-		], self::COMPONENT_SERVER);
-
-		$this->reloadConfigurationCache();
+		], self::COMPONENT_SERVER, 0);
 
 		$this->callUntilCountIsPresent('item.get', [
 			'hostids' => [self::$hostid],
@@ -436,6 +436,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->callUntilCountIsPresent('trigger.get', [
 			'triggerids' => self::$discovered_triggerids
 		], 0);
+
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$this->executeHousekeeper();
 
