@@ -2050,7 +2050,6 @@ class CUser extends CApiService {
 				$devices[] = [
 					'deviceid' => $db_device['deviceid'],
 					'userid' => 0,
-					'name' => '',
 					'status' => ZBX_DEVICE_ORPHANED
 				];
 			}
