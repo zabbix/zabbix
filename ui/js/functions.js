@@ -107,7 +107,13 @@ function normalizeNumericBox(input, {allow_empty, allow_negative, min_length}) {
  * @param {String} str
  */
 function t(str) {
-	return (!!locale[str]) ? locale[str] : str;
+	if (!!locale[str]) {
+		return locale[str];
+	}
+
+	console.warn(`Missing translation for string: ${str}`);
+
+	return str;
 }
 
 /**

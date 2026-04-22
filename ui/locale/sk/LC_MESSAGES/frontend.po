@@ -22024,6 +22024,10 @@ msgstr "Identifikátor klienta registrovaný na autorizačnom serveri."
 msgid "The client secret registered within the authorization server."
 msgstr "Tajný klúč klienta registrovaný na autorizačnom serveri."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "Klonovaný hostiteľ obsahuje makrá definované používateľom s typom \"Tajný text\". Hodnota a typ týchto makier boli resetované."
@@ -25278,6 +25282,10 @@ msgstr "Konfigurácia widgetu bude vrátená späť."
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "Widget je zastaraný."
+
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
