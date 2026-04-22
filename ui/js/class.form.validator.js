@@ -1419,13 +1419,7 @@ class CFormValidator {
 			 *
 			 * Another case why this is needed is that some arrays are passed as objects having IDs used as keys.
 			 */
-			const normalized_objects_values = Object.create(null);
-
-			for (const [key, obj] of Object.entries(objects_values)) {
-				normalized_objects_values[key] = obj;
-			}
-
-			objects_values = normalized_objects_values;
+			objects_values = {...objects_values};
 		}
 
 		if ('not_empty' in rules && !Object.keys(objects_values).length) {
