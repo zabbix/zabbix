@@ -34,7 +34,7 @@ window.itemtestedit_view_popup = new class {
 	#interface_port_enabled = false;
 
 	init({rules, rules_get_value, is_item_testable, show_prev, show_snmp_form, interface_address_enabled,
-			 interface_port_enabled}) {
+			interface_port_enabled}) {
 		this.#overlay = overlays_stack.getById('item-test');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
