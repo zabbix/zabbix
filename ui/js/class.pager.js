@@ -168,11 +168,13 @@ class CPager {
 		const stats = document.createElement('div');
 		stats.classList.add(ZBX_STYLE_TABLE_STATS);
 
-		if (num_pages == 1) {
-			stats.textContent = sprintf(t('Displaying %1$s of %2$s found'), num_rows, total);
-		}
-		else {
-			stats.textContent = sprintf(t('Displaying %1$s to %2$s of %3$s found'), start + 1, end, total);
+		if (num_rows > 0) {
+			if (num_pages == 1) {
+				stats.textContent = sprintf(t('Displaying %1$s of %2$s found'), num_rows, total);
+			}
+			else {
+				stats.textContent = sprintf(t('Displaying %1$s to %2$s of %3$s found'), start + 1, end, total);
+			}
 		}
 
 		if (!this.#element.classList.contains(ZBX_STYLE_TABLE_PAGING)) {

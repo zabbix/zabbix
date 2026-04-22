@@ -37,7 +37,9 @@ class CControllerLatestViewData extends CControllerDataTable {
 		}
 
 		$mandatory_filter_set = CControllerLatest::isMandatoryFilterFieldSet($filter);
-		if (!$mandatory_filter_set) {
+		$subfilter_set = CControllerLatest::isSubfilterSet($filter);
+
+		if (!$mandatory_filter_set && !$subfilter_set) {
 			return [
 				'fields' => [],
 				'rows' => [],
