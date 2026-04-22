@@ -393,24 +393,6 @@ class ZBase {
 	}
 
 	/**
-	 * Get configuration value.
-	 *
-	 * @param string $key			Configuration key.
-	 * @param string|null $default	Overwrite configuration value in case it is empty.
-	 *
-	 * @return mixed
-	 */
-	public static function getConfigValue(string $key, ?string $default = null): mixed {
-		if (array_key_exists($key, self::getInstance()->config)) {
-			return ($default !== null && self::getInstance()->config[$key] === '')
-				? $default
-				: self::getInstance()->config[$key];
-		}
-
-		return $default;
-	}
-
-	/**
 	 * Check if maintenance mode is enabled.
 	 *
 	 * @throws Exception

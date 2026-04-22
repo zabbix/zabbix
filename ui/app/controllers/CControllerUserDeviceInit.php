@@ -96,7 +96,9 @@ class CControllerUserDeviceInit extends CController {
 				'url' => (new CUrl('zabbix://v' . ZABBIX_MOBILE_VERSION . '/link_device'))
 					->setArgument('ver', ZABBIX_API_VERSION)
 					->setArgument('sid', $device['server_id'])
-					->setArgument('name', APP::getConfigValue('ZBX_SERVER_NAME', 'Zabbix'))
+					->setArgument('name',
+						APP::getConfig()['ZBX_SERVER_NAME'] === '' ? 'Zabbix' : APP::getConfig()['ZBX_SERVER_NAME']
+					)
 					->setArgument('did', $device['uuid'])
 					->setArgument('url', $device['bridge_enrollment_url'])
 					->setArgument('met', $device['mobile_enrollment_token'])
