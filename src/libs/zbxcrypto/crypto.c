@@ -182,7 +182,7 @@ char	*zbx_gen_uuid4(const char *seed)
  *                                                                            *
  * Purpose: generates UUID version 7 as string of 36 symbols (with hyphens)   *
  *                                                                            *
- * Return value: uuid string: 019da0d3-3fc7-710d-adfc-48abece93fc2            *
+ * Return value: uuid string: e.g. 019da0d3-3fc7-710d-adfc-48abece93fc2       *
  *                                                                            *
  * Comments: Current implementation is minimal, developed for generating      *
  *           server ID.                                                       *
@@ -201,7 +201,9 @@ char	*zbx_gen_uuid7_hyphenated(void)
 	char		*out, *ptr;
 	uint64_t	ts_ms;
 
-	ptr = out = (char *)zbx_malloc(NULL, 2 * (ZBX_UUID7_BYTES + 4) + 1);
+	ptr = out = (char *)zbx_malloc(NULL, 2 * ZBX_UUID7_BYTES +
+			4 +	/* hyphens */
+			1);	/* terminating '\0' */
 
 	zbx_timespec(&ts);
 
