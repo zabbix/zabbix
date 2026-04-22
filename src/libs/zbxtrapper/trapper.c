@@ -1246,6 +1246,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 		{
 			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
 					config_stats_allowed_ip);
+			return ret;
 		}
 
 		if (ZBX_TCP_SEC_UNENCRYPTED == sock->connection_type &&
