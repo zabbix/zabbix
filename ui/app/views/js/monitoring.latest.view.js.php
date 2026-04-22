@@ -311,8 +311,12 @@
 						description_icon.setAttribute('type', 'button');
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
-						description_icon.setAttribute('data-hintbox-contents', description_expanded);
+						description_icon.setAttribute('data-hintbox-contents',
+							description_expanded.replace(/\r\n/g, '<br>'));
 						description_icon.setAttribute('data-hintbox', '1');
+						description_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
+						description_icon.setAttribute('data-hintbox-static', '1');
+						description_icon.setAttribute('aria-expanded', 'false');
 
 						action_container.innerHTML += ' ';
 						action_container.appendChild(description_icon);
