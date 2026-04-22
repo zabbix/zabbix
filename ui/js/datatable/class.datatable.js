@@ -610,13 +610,8 @@ class CDataTable {
 			if (tag_display_priorities.size > 0) {
 				tag_display_priorities = [...tag_display_priorities];
 
-				const matched = tag_display_priorities.flatMap((priority) =>
-					tags.filter((tag) => tag.tag.startsWith(priority))
-				);
-
-				const unmatched = tags.filter(
-					(tag) => !tag_display_priorities.some((priority) => tag.tag.startsWith(priority))
-				);
+				const matched = tag_display_priorities.flatMap(priority => tags.filter(tag => tag.tag === priority));
+				const unmatched = tags.filter(tag => !tag_display_priorities.some(priority => tag.tag === priority));
 
 				tags = [...matched, ...unmatched];
 			}
