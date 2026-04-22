@@ -8445,7 +8445,6 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
-
 	DCsync_item_discovery(&item_discovery_sync);
 
 	/* relies on items, must be after DCsync_items() */
