@@ -708,9 +708,9 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 #endif
-#undef ZBX_ERROR_CODE_LEN	32
-#undef ZBX_MESSAGE_LEN		256
-#undef ZBX_INFO_LEN		512
+#undef ZBX_ERROR_CODE_LEN
+#undef ZBX_MESSAGE_LEN
+#undef ZBX_INFO_LEN
 }
 
 /******************************************************************************
