@@ -1277,7 +1277,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$error_msg = 'Failed to wait for '.$description.' to be present in '.$component.
-				'log file: '.self::getLogPath($component)."\n";
+				'log file: '.self::getLogPath($component).' at '.date('His')."\n";
 
 		$error_msg .= CLogHelper::readLog(self::getLogPath($component), false, true);
 

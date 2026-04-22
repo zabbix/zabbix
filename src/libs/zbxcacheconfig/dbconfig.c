@@ -3853,14 +3853,13 @@ static void	DCsync_triggers(zbx_dbsync_t *sync, zbx_vector_trigger_ptr_t *trigge
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		unsigned char	modified = 0, status, recovery_mode, timer, flags;
+		unsigned char	modified = 0, status, recovery_mode, timer;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
 
 		ZBX_STR2UINT64(triggerid, row[0]);
-		ZBX_STR2UCHAR(flags, row[19]);
 
 		trigger = (ZBX_DC_TRIGGER *)DCfind_id_ext(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER),
 				&found, uniq);
