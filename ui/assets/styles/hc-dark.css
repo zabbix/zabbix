@@ -2360,8 +2360,6 @@ textarea.has-error {
   border: 1px solid #ff5e5e; }
 
 div[data-field-type="set"].has-error {
-  padding-left: 5px;
-  width: min-content;
   border: 1px solid #ff5e5e; }
 
 div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {

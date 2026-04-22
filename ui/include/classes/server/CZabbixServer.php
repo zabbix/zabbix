@@ -640,7 +640,7 @@ class CZabbixServer {
 			return false;
 		}
 
-		if ($this->tls_config['ACTIVE'] == 1) {
+		if ($this->tls_config['ACTIVE']) {
 			$this->socket = $this->connectTLS();
 		}
 		else {
