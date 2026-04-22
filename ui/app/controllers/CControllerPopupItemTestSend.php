@@ -74,35 +74,42 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'get_value' => ['boolean'],
 			'test_with' => ['integer', 'in' => [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]],
 			'proxyid' => ['db proxy.proxyid', 'required', 'when' => ['test_with', 'in'  => [self::TEST_WITH_PROXY]]],
-			'interface' => ['object', 'fields' => [
-				'useip' => ['boolean'],
-				'details' => ['object',
-					'fields' => [
-						'version' => ['integer', 'required', 'in' => [SNMP_V1, SNMP_V2C, SNMP_V3]],
-						'community' => ['string', 'required', 'not_empty',
-							'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
+			'interface' => ['object',
+				'fields' => [
+					'useip' => ['boolean'],
+					'details' => ['object',
+						'fields' => [
+							'version' => ['integer', 'required', 'in' => [SNMP_V1, SNMP_V2C, SNMP_V3]],
+							'community' => ['string', 'required', 'not_empty',
+								'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
+							],
+							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
+								'min' => 1, 'max' => ZBX_MAX_INT32,
+								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
+							]
 						],
-						'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
-							'min' => 1, 'max' => ZBX_MAX_INT32,
-							'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
-						]
+						'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
 					],
-					'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
+					'address' => ['string', 'not_empty', 'required',
+						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE,
+							ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
+						]]
+					],
+					'port' => ['string', 'not_empty', 'required',
+						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
+					]
 				],
-				'address' => ['string', 'not_empty', 'required',
-					'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE,
-						ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
-					]]
-				],
-				'port' => ['string', 'not_empty', 'required',
-					'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
-				]
-			]],
+				'when' => ['get_value', 'in' => [1]]
+			],
 			'value' => ['string'],
 			'not_supported' => ['integer', 'in' => [self::SUPPORTED_STATE, self::NOT_SUPPORTED_STATE]],
 			'runtime_error' => ['string'],
 			'prev_value' => ['string'],
-			'prev_time'	=> ['string', 'use' => [CRelativeTimeParser::class]],
+			'prev_time'	=> ['string',
+				'use' => [CRelativeTimeValidator::class, ['allowed_suffixes' => self::$supported_time_suffixes,
+					'allowed_types' => [CRelativeTimeParser::ZBX_TOKEN_OFFSET], 'max_now' => true, 'max_tokens' => 1
+				]]
+			],
 			'eol' => ['integer', 'in' => [ZBX_EOL_LF, ZBX_EOL_CRLF]],
 			'macros' => ['string'],
 			'time_change' => ['integer'],
@@ -199,20 +206,13 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'ssl_cert_file' => ['string'],
 			'ssl_key_password' => ['string'],
 			'status_codes' => ['string'],
-			'steps' => ['array'],
-			// TODO: custom new validation rules: mix of item and API
-//			'steps' => [
-//				array_merge(
-//					CItemGeneralHelper::getPreprocessingValidationRules(false),
-//					['when' => ['test_type', 'in' => [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_LLD]]]
-//				),
-//				array_merge(
-//					CItemGeneralHelper::getPreprocessingValidationRules(true),
-//					['when' => ['test_type',
-//						'in' => [self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]]
-//					]
-//				)
-//			],
+			'steps' => ['objects', 'fields' => [
+				'type' => ['integer', 'required', 'in' => CItem::SUPPORTED_PREPROCESSING_TYPES],
+				// TODO: stricter validation
+				'params' => ['db item_preproc.params'],
+				'error_handler' => ['db item_preproc.error_handler'],
+				'error_handler_params' => ['db item_preproc.error_handler_params']
+			]],
 			'timeout' => ['string'],
 			'username' => ['string'],
 			'url' => ['string'],
@@ -241,69 +241,6 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			$prepr_types = zbx_objectValues($steps, 'type');
 			$this->use_prev_value = (count(array_intersect($prepr_types, self::$preproc_steps_using_prev_value)) > 0);
 			$this->show_final_result = ($this->getInput('show_final_result') == 1);
-
-			// Check preprocessing steps.
-			if ($steps) {
-				switch ($this->test_type) {
-					case self::ZBX_TEST_TYPE_ITEM:
-						$api_input_rules = CItem::getPreprocessingValidationRules();
-						break;
-
-					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-						$api_input_rules = CItemPrototype::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
-						break;
-
-					case self::ZBX_TEST_TYPE_LLD:
-						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
-						break;
-
-					case self::ZBX_TEST_TYPE_LLD_PROTOTYPE:
-						$api_input_rules = CDiscoveryRulePrototype::getPreprocessingValidationRules();
-						break;
-				}
-
-				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
-					error($error);
-					$ret = false;
-				}
-			}
-
-			// Check previous time.
-			if ($this->use_prev_value && $this->getInput('prev_value', '') !== '') {
-				$prev_time = $this->getInput('prev_time', '');
-
-				$relative_time_parser = new CRelativeTimeParser();
-				if ($relative_time_parser->parse($prev_time) != CParser::PARSE_SUCCESS) {
-					error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-						_('a relative time is expected')
-					));
-					$ret = false;
-				}
-				else {
-					$tokens = $relative_time_parser->getTokens();
-
-					if (count($tokens) > 1) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-							_('only one time unit is allowed')
-						));
-					}
-					elseif ($tokens && $tokens[0]['type'] == CRelativeTimeParser::ZBX_TOKEN_PRECISION) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-							_('a relative time is expected')
-						));
-					}
-					elseif ($tokens && !in_array($tokens[0]['suffix'], self::$supported_time_suffixes)) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-							_('unsupported time suffix')
-						));
-					}
-					elseif ($tokens && $tokens[0]['sign'] !== '-') {
-						error(_s('Incorrect value for field "%1$s": %2$s.', _('Prev. time'),
-							_('should be less than current time')
-						));
-					}
-				}
-			}
 		}
 
 		$messages = array_column(get_and_clear_messages(), 'message');

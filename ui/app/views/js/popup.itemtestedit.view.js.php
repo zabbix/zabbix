@@ -30,8 +30,11 @@ window.itemtestedit_view_popup = new class {
 	#is_item_testable = false;
 	#show_prev = false;
 	#show_snmp_form = false;
+	#interface_address_enabled = false;
+	#interface_port_enabled = false;
 
-	init({rules, rules_get_value, is_item_testable, show_prev, show_snmp_form}) {
+	init({rules, rules_get_value, is_item_testable, show_prev, show_snmp_form, interface_address_enabled,
+			 interface_port_enabled}) {
 		this.#overlay = overlays_stack.getById('item-test');
 		this.#dialogue = this.#overlay.$dialogue[0];
 		this.#footer = this.#overlay.$dialogue.$footer[0];
@@ -41,6 +44,8 @@ window.itemtestedit_view_popup = new class {
 		this.#is_item_testable = is_item_testable;
 		this.#show_prev = show_prev;
 		this.#show_snmp_form = show_snmp_form;
+		this.#interface_address_enabled = interface_address_enabled;
+		this.#interface_port_enabled = interface_port_enabled;
 
 		this.#form.discoverAllFields();
 
@@ -56,12 +61,15 @@ window.itemtestedit_view_popup = new class {
 
 	#initEvents() {
 		this.#form.findFieldByName('not_supported').getField().addEventListener('change', (e) => {
+			const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
+
 			$(this.#form.findFieldByName('value').getField())
-				.multilineInput(e.target.checked ? 'setReadOnly' : 'unsetReadOnly');
+				.multilineInput(get_value_checked || e.target.checked ? 'setReadOnly' : 'unsetReadOnly');
 			const runtime_error_field = this.#form.findFieldByName('runtime_error')?.getField();
 
 			if (runtime_error_field) {
-				$(runtime_error_field).multilineInput(e.target.checked ? 'unsetReadOnly' : 'setReadOnly');
+				$(runtime_error_field)
+					.multilineInput(!get_value_checked && e.target.checked ? 'unsetReadOnly' : 'setReadOnly');
 			}
 		});
 
@@ -73,10 +81,7 @@ window.itemtestedit_view_popup = new class {
 			.addEventListener('change', () => this.#update());
 
 		this.#form_element.querySelectorAll('.js-copy-button').forEach(button => {
-			button.addEventListener('click', e => {
-				writeTextClipboard(e.target.dataset.result);
-				e.target.focus();
-			});
+			button.addEventListener('click', this.#onCopyButtonClick);
 		})
 
 		this.#form_element.querySelector('.js-get-value-submit')?.addEventListener('click', () => this.#getValue());
@@ -89,15 +94,19 @@ window.itemtestedit_view_popup = new class {
 			return;
 		}
 
+		const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
+
+		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
+			element.disabled = !get_value_checked;
+		}
+
 		this.#form_element.querySelector('.js-test-with-proxy').style
 			.display = this.#form.findFieldByName('test_with').getValue() == 0 ? 'none' : '';
-
-		const get_value_checked = this.#form.findFieldByName('get_value').getField().checked;
 
 		const not_supported_field = this.#form.findFieldByName('not_supported');
 
 		if (not_supported_field) {
-			not_supported_field.disabled = !get_value_checked;
+			not_supported_field.getField().disabled = get_value_checked;
 			not_supported_field.getField().dispatchEvent(new Event('change'));
 		}
 		else {
@@ -114,11 +123,7 @@ window.itemtestedit_view_popup = new class {
 			$(this.#form.findFieldByName('prev_value').getField())
 				.multilineInput(get_value_checked ? 'setReadOnly' : 'unsetReadOnly');
 
-			this.#form.findFieldByName('prev_time').getField().readonly = !get_value_checked;
-		}
-
-		for (const element of this.#form_element.querySelectorAll('#test_with input')) {
-			element.disabled = !get_value_checked;
+			this.#form.findFieldByName('prev_time').getField().readOnly = get_value_checked;
 		}
 
 		const proxy_field = this.#form.findFieldByName('proxyid');
@@ -127,15 +132,17 @@ window.itemtestedit_view_popup = new class {
 			$(proxy_field.getField()).multiSelect(get_value_checked ? 'enable' : 'disable');
 		}
 
-		const interface_field_names = ['interface[address]', 'interface[port]'];
+		const interface_address_field = this.#form.findFieldByName('interface[address]');
 
-		interface_field_names.forEach(name => {
-			const field = this.#form.findFieldByName(name);
+		if (interface_address_field) {
+			interface_address_field.getField().disabled = !get_value_checked || !this.#interface_address_enabled;
+		}
 
-			if (field) {
-				field.getField().disabled = !get_value_checked;
-			}
-		});
+		const interface_port_field = this.#form.findFieldByName('interface[port]');
+
+		if (interface_port_field) {
+			interface_port_field.getField().disabled = !get_value_checked || !this.#interface_port_enabled;
+		}
 
 		this.#footer.querySelector('.js-submit').innerText = get_value_checked
 			? <?= json_encode(_('Get value and test')) ?>
@@ -150,7 +157,7 @@ window.itemtestedit_view_popup = new class {
 		if (get_value_checked && this.#show_snmp_form) {
 			const snmp_version = this.#form.findFieldByName('interface[details][version]').getValue();
 
-			const show_row_classnames = [];
+			const show_row_classnames = ['js-popup-row-snmp-version'];
 
 			if (snmp_version == '<?= SNMP_V1 ?>') {
 				show_row_classnames.push('js-popup-row-snmp-community');
@@ -166,21 +173,31 @@ window.itemtestedit_view_popup = new class {
 				const snmp_security_level = this.#form.findFieldByName('interface[details][securitylevel]').getValue();
 
 				if (snmp_security_level == '<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV ?>') {
-					show_row_classnames.push('.js-popup-row-snmpv3-authprotocol',
-						'.js-popup-row-snmpv3-authpassphrase'
-					);
+					show_row_classnames.push('js-popup-row-snmpv3-authprotocol', 'js-popup-row-snmpv3-authpassphrase');
 				}
 				else if (snmp_security_level == '<?= ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV ?>') {
-					show_row_classnames.push('.js-popup-row-snmpv3-authprotocol',
-						'.js-popup-row-snmpv3-authpassphrase', '.js-popup-row-snmpv3-privprotocol',
-						'.js-popup-row-snmpv3-privpassphrase'
+					show_row_classnames.push('js-popup-row-snmpv3-authprotocol', 'js-popup-row-snmpv3-authpassphrase',
+						'js-popup-row-snmpv3-privprotocol', 'js-popup-row-snmpv3-privpassphrase'
 					);
 				}
 			}
 
 			this.#form_element.querySelectorAll('[class*=js-popup-row-snmp]')
-				.forEach(row => row.style.display = show_row_classnames.includes(row.className) ? '' : 'none');
+				.forEach(row => {
+					let visible = false;
+
+					row.classList.forEach(classname => {
+						visible = visible || show_row_classnames.includes(classname);
+					});
+
+					row.style.display = visible ? '' : 'none'
+				});
 		}
+	}
+
+	#onCopyButtonClick(e) {
+		writeTextClipboard(e.target.dataset.result);
+		e.target.focus();
 	}
 
 	#onClose () {
@@ -188,25 +205,27 @@ window.itemtestedit_view_popup = new class {
 
 		const remember_values = {
 			value: fields.value,
-			not_supported: fields.not_supported,
+			not_supported: this.#form.findFieldByName('not_supported').getField().checked ? 1 : 0,
 			eol: fields.eol,
 			macros: fields.macros
 		};
 
 		if (this.#is_item_testable) {
-			if (fields.runtime_error.length) {
+			if ('runtime_error' in fields) {
 				remember_values.runtime_error = fields.runtime_error;
 			}
 
 			remember_values.get_value = fields.get_value;
-			remember_values.test_with = fields.test_with;
-			remember_values.proxyid = fields.test_with && fields.proxyid ? fields.proxyid: 0;
+			remember_values.test_with = this.#form.findFieldByName('test_with').getField()
+				.querySelector('input:checked').value;
+			remember_values.proxyid = fields.proxyid ? fields.proxyid: 0;
 			remember_values.interfaceid = fields.interfaceid ? fields.interfaceid : 0;
 			remember_values.address = this.#form.findFieldByName('interface[address]').getField().value;
 			remember_values.port = this.#form.findFieldByName('interface[port]').getField().value;
-			remember_values.interface_details = fields.interface && fields.interface.details
-				? fields.interface.details
-				: null;
+
+			if (fields.interface && fields.interface.details) {
+				remember_values.interface_details = fields.interface.details;
+			}
 		}
 
 		if (this.#show_prev) {
@@ -217,11 +236,21 @@ window.itemtestedit_view_popup = new class {
 		this.#dialogue.dispatchEvent(new CustomEvent('itemtest.close', {detail: remember_values}));
 	}
 
+	#setLoading() {
+		const get_value_button = this.#form_element.querySelector('.js-get-value-submit');
+
+		if (get_value_button) {
+			get_value_button.disabled = true;
+		}
+		this.#overlay.setLoading();
+	}
+
 	#unsetLoading() {
 		const get_value_button = this.#form_element.querySelector('.js-get-value-submit');
 
 		if (get_value_button) {
 			get_value_button.classList.remove('is-loading');
+			get_value_button.disabled = false;
 		}
 
 		this.#overlay.unsetLoading();
@@ -251,6 +280,13 @@ window.itemtestedit_view_popup = new class {
 	#getValue() {
 		this.#removePopupMessages();
 		const fields = this.#getFormFields(true);
+		const get_value_button = this.#form_element.querySelector('.js-get-value-submit');
+
+		if (get_value_button) {
+			get_value_button.classList.add('is-loading');
+		}
+
+		this.#setLoading();
 
 		// TODO: just specific fields
 
@@ -258,9 +294,9 @@ window.itemtestedit_view_popup = new class {
 		this.#form.validateSubmit(fields)
 			.then((result) => {
 				if (!result) {
-						this.#overlay.unsetLoading();
-						return;
-					}
+					this.#overlay.unsetLoading();
+					return;
+				}
 
 				this.#post(zabbixUrl({action: 'popup.itemtest.getvalue'}), fields, (response) => {
 					this.#processGetValueResult(response, fields.upd_last);
@@ -272,11 +308,8 @@ window.itemtestedit_view_popup = new class {
 		this.#removePopupMessages();
 		this.#cleanPreviousTestResults();
 		const fields = this.#getFormFields(this.#form.findFieldByName('get_value')?.getField().checked ? true : false);
-		const get_value_button = this.#form_element.querySelector('.js-get-value-submit');
 
-		if (get_value_button) {
-			get_value_button.classList.add('is-loading');
-		}
+		this.#setLoading();
 
 		this.#form.validateSubmit(fields)
 			.then((result) => {
@@ -302,6 +335,46 @@ window.itemtestedit_view_popup = new class {
 
 					if (response.final !== undefined) {
 						const result = this.#makeStepResult(response.final);
+						const template = new Template(this.#form_element.querySelector('#final-result-row').innerHTML);
+
+						const result_row = template.evaluateToElement({action: '', mode: 'final'});
+
+						result_row.querySelector('.final-result-action').innerHTML = response.final.action;
+						result_row.querySelector('.final-result-result').innerHTML = result.innerHTML;
+
+						if (response.final.error === undefined && response.final.result) {
+							const copy_button = result_row.querySelector('.js-copy-button');
+							copy_button.dataset.result = response.final.result;
+							copy_button.style.display = '';
+						}
+
+						this.#form_element.querySelector('.item-final-result > div').append(result_row);
+
+						if (response.mapped_value !== undefined) {
+							const mapped_value = this.#makeStepResult({result: response.mapped_value});
+							const mapping_row = template.evaluateToElement({
+								action: <?= json_encode(_('Result with value map applied')) ?>,
+								mode: 'mapped'
+							});
+
+							mapping_row.querySelector('.final-result-action').classList.add('<?= ZBX_STYLE_GREY ?>');
+							mapping_row.querySelector('.final-result-result').innerHTML = mapped_value.innerHTML;
+
+							if (response.final.error === undefined && response.final.result) {
+								const copy_button = mapping_row.querySelector('.js-copy-button');
+								copy_button.dataset.result = response.final.result;
+								copy_button.style.display = '';
+							}
+
+							this.#form_element.querySelector('.item-final-result > div').append(mapping_row);
+						}
+
+						this.#form_element.querySelector('.js-final-result').style.display = '';
+						this.#form_element.querySelector('.item-final-result').style.display = '';
+
+						this.#form_element.querySelectorAll('.item-final-result .js-copy-button').forEach(button => {
+							button.addEventListener('click', this.#onCopyButtonClick);
+						})
 					}
 				});
 			});
@@ -415,7 +488,7 @@ window.itemtestedit_view_popup = new class {
 			const template = new Template(this.#form_element.querySelector('#preprocessing-step-error-icon').innerHTML);
 
 			return template.evaluateToElement({
-				error: escapeHtml(step.error) || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>
+				error: escapeHtml(step.error) || <?= json_encode(_('<empty string>')) ?>
 			});
 		}
 
@@ -426,7 +499,7 @@ window.itemtestedit_view_popup = new class {
 
 			return template.evaluateToElement({
 				result: step.result === ''
-					? <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>
+					? <?= json_encode(_('<empty string>')) ?>
 					: <?= json_encode(_('No value')) ?>
 			});
 		}
@@ -456,10 +529,11 @@ window.itemtestedit_view_popup = new class {
 			element.remove();
 		});
 
-		// TODO: add checks
-		//this.#form_element.querySelector('.js-final-result').style.display = 'none';
-		//this.#form_element.querySelector('.item-final-result').innerHTML = '';
-		//this.#form_element.querySelector('.item-final-result').style.display = 'none';
+		if (this.#form_element.querySelector('.js-final-result')) {
+			this.#form_element.querySelector('.js-final-result').style.display = 'none';
+			this.#form_element.querySelector('.item-final-result > div').innerHTML = '';
+			this.#form_element.querySelector('.item-final-result').style.display = 'none';
+		}
 
 		this.#form_element.querySelectorAll('preprocessing-test-form .result-copy > .js-copy-button')
 			.forEach(element => {

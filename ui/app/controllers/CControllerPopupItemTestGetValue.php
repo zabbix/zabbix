@@ -41,30 +41,32 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			],
 			'test_with' => ['integer', 'in' => [self::TEST_WITH_SERVER, self::TEST_WITH_PROXY]],
 			'proxyid' => ['db proxy.proxyid', 'required', 'when' => ['test_with', 'in'  => [self::TEST_WITH_PROXY]]],
-			'interface' => ['object', 'fields' => [
-				'useip' => ['boolean'],
-				'details' => ['object',
-					'fields' => [
-						'version' => ['integer', 'required', 'in' => [SNMP_V1, SNMP_V2C, SNMP_V3]],
-						'community' => ['string', 'required', 'not_empty',
-							'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
+			'interface' => ['object',
+				'fields' => [
+					'useip' => ['boolean'],
+					'details' => ['object',
+						'fields' => [
+							'version' => ['integer', 'required', 'in' => [SNMP_V1, SNMP_V2C, SNMP_V3]],
+							'community' => ['string', 'required', 'not_empty',
+								'when' => ['version', 'in' => [SNMP_V1, SNMP_V2C]]
+							],
+							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
+								'min' => 1, 'max' => ZBX_MAX_INT32,
+								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
+							]
 						],
-						'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
-							'min' => 1, 'max' => ZBX_MAX_INT32,
-							'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
-						]
+						'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
 					],
-					'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
-				],
-				'address' => ['string', 'not_empty', 'required',
-					'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE,
-						ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
-					]]
-				],
-				'port' => ['string', 'not_empty', 'required',
-					'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
+					'address' => ['string', 'not_empty', 'required',
+						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SIMPLE,
+							ITEM_TYPE_SNMP, ITEM_TYPE_SSH, ITEM_TYPE_TELNET
+						]]
+					],
+					'port' => ['string', 'not_empty', 'required',
+						'when' => ['../item_type', 'in' => [ITEM_TYPE_ZABBIX, ITEM_TYPE_IPMI, ITEM_TYPE_SNMP]]
+					]
 				]
-			]],
+			],
 			'value' => ['string'],
 			'macros' => ['string'],
 			'time_change' => ['integer'],

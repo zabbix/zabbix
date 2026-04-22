@@ -370,7 +370,7 @@ $form_grid->addItem([
 			'rows' => 0,
 			'grow' => 'auto',
 			'monospace_font' => false,
-			'disabled' => $data['show_prev'],
+			'disabled' => !$data['show_prev'],
 			'use_tab' => false
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	),
@@ -468,7 +468,9 @@ if (count($data['steps']) > 0) {
 if ($data['show_final_result']) {
 	$form_grid->addItem([
 		(new CLabel(_('Result')))->addClass('js-final-result')->addStyle('display: none'),
-		(new CFormField())
+		(new CFormField(
+			(new CDiv())->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+		))
 			->addClass(CFormField::ZBX_STYLE_FORM_FIELD_FLUID)
 			->addClass('item-final-result')
 			->addStyle('display: none')
@@ -530,6 +532,20 @@ $form->addItem([
 		]))
 			->addStyle('margin-top: 1px;')
 			->addClass(ZBX_STYLE_GREY)
+	),
+	(new CTemplateTag('final-result-row'))->addItem(
+		(new CDiv([
+			(new CSpan('#{action}'))->addClass('final-result-action'),
+			(new CSpan())->addClass('final-result-result'),
+			(new CButton('copy_button_final_#{mode}'))
+				->setTitle(_('Copy to clipboard'))
+				->addClass(ZBX_ICON_COPY)
+				->addClass(ZBX_STYLE_BTN_GREY_ICON)
+				->addClass('js-copy-button')
+				->addStyle('display: none')
+		]))
+			->addClass('final-result-row')
+			->addClass('display-icon')
 	)
 ]);
 
@@ -559,7 +575,9 @@ $output = [
 			'rules_get_value' => $data['js_validation_rules_get_value'],
 			'is_item_testable' => $data['is_item_testable'],
 			'show_prev' => $data['show_prev'],
-			'show_snmp_form' => $data['show_snmp_form']
+			'show_snmp_form' => $data['show_snmp_form'],
+			'interface_address_enabled' => $data['interface_address_enabled'],
+			'interface_port_enabled' => $data['interface_port_enabled']
 		]).');',
 ];
 
