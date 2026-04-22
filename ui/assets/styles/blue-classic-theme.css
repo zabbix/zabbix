@@ -1258,6 +1258,9 @@ footer {
     margin-left: 10px; }
   .form-grid.form-grid-actions {
     margin-top: 10px; }
+  .form-grid .field-inline {
+    display: flex;
+    align-items: baseline; }
   .form-grid .form-field.offset-1 {
     grid-column-start: 2 !important; }
   .form-grid .form-field.offset-2 {
@@ -2418,8 +2421,6 @@ textarea.has-error {
   border: 1px solid #cc0000; }
 
 div[data-field-type="set"].has-error {
-  padding-left: 5px;
-  width: min-content;
   border: 1px solid #cc0000; }
 
 div[data-field-type="array"].has-error input[type="checkbox"]:not([readonly]) + label span {
