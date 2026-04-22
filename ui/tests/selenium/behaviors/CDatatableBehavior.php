@@ -209,8 +209,10 @@ class CDatatableBehavior extends CTableBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_filter as $column => $select_data) {
-			$header = $table->getHeaderByText($column);
-			$header->query('tag:button')->one()->click();
+			$button_selector = ($column === 'Name')
+				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
+				: 'tag:button';
+			$table->getHeaderByText($column)->query($button_selector)->one()->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($select_data as $field => $value) {
@@ -219,8 +221,8 @@ class CDatatableBehavior extends CTableBehavior {
 				$popup_dialog->query('id', $for)->one()->detect()->fill($value);
 			}
 
-			// Click on the header to close the popup.
-			$header->click(true);
+			// Click on any column resizer to close the popup.
+			$table->query('class:cell-header-resizer')->one()->click();
 		}
 	}
 
@@ -228,12 +230,10 @@ class CDatatableBehavior extends CTableBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_filter as $column => $column_filter) {
-			if ($column === 'Name') {
-				$table->query('xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button')->one()->click();
-			}
-			else {
-				$table->getHeaderByText($column)->query('tag:button')->one()->click();
-			}
+			$button_selector = ($column === 'Name')
+				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
+				: 'tag:button';
+			$table->getHeaderByText($column)->query($button_selector)->one()->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($column_filter as $field => $parameters) {
@@ -259,6 +259,9 @@ class CDatatableBehavior extends CTableBehavior {
 					$this->test->assertEquals($parameters['maxlength'], $field->getAttribute('maxlength'));
 				}
 			}
+
+			// Click on any column resizer to close the popup.
+			$table->query('class:cell-header-resizer')->one()->click();
 		}
 	}
 

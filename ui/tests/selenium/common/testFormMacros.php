@@ -16,6 +16,7 @@
 
 require_once __DIR__.'/../behaviors/CMacrosBehavior.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
 /**
@@ -37,7 +38,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public function getBehaviors() {
 		return [
 			CMacrosBehavior::class,
-			CMessageBehavior::class
+			CMessageBehavior::class,
+			CDatatableBehavior::class
 		];
 	}
 
@@ -2581,9 +2583,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 	 */
 	private function checkItemFields($url, $name, $key) {
 		$this->page->login()->open($url)->waitUntilReady();
-		$table = $this->query('xpath://form[@name="item_list"]/table[@class="list-table"] | '.
-				'//table[contains(@class, "list-table fixed")]')->asTable()->waitUntilPresent()->one();
 
+		if ($this->query('class:datatable')->one(false)->isValid()) {
+			$table = $this->getDatatable();
+			$this->filterFromHeader(['Name' => ['Show item key' => true]]);
+			$table->waitUntilReady()->invalidate();
+		}
+		else {
+			$table = $this->query('xpath://form[@name="item_list"]/table[@class="list-table"]')->asTable()
+					->waitUntilPresent()->one();
+		}
 		$name_column = $table->findRow('Name', $name, true)->getColumn('Name');
 		$this->assertEquals($name, $name_column->query('tag:a')->one()->getText());
 
