@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-03-21 08:18+0000\n"
+"PO-Revision-Date: 2026-04-09 21:33+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -8742,6 +8742,10 @@ msgstr "Entreu una cadena d'identitat de clau compartida prèviament que no sigu
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "Introduïu un nom únic que els components de Zabbix utilitzaran per reconèixer la clau precompartida."
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Entreu l'adreça IP/DNS i el port de l'agent Zabbix instal·lat a l'equip a monitorar."
@@ -11244,6 +11248,10 @@ msgstr "Si menys de %2$s serveis fills tenen un estat de %1$s o inferior"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Si menys de %2$s dels serveis fill tenen un estat de %1$s o inferior"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -22303,7 +22311,7 @@ msgstr "El secret del client registrat dins del servidor d'autorització."
 
 #: app/views/oauth.edit.php:105
 msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
-msgstr ""
+msgstr "S'ha netejat el secret del client arran d'un canvi de punt final simbòlic. Si et plau, introdueix el nou secret del client."
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -25550,6 +25558,10 @@ msgstr "La configuració del giny es revertirà."
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "El giny és obsolet."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

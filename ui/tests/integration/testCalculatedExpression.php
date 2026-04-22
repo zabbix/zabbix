@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * - calculated item with historical data
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_calc
  * @onAfter clearData
@@ -93,6 +94,14 @@ class testCalculatedExpression extends CIntegrationTest {
 			'value_type'		=> ITEM_VALUE_TYPE_FLOAT,
 			'tags'		=> [
 				['tag' => 'env', 'value' => 'prod']
+			],
+			'preprocessing' => [
+				[
+					'type'			=> ZBX_PREPROC_TRIM,
+					'params'		=> ' ',
+					'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+					'error_handler_params'	=> ''
+				]
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
@@ -122,26 +131,29 @@ class testCalculatedExpression extends CIntegrationTest {
 	private function sendIncrementingSequence($n, $itemkey)
 	{
 		for ($i = 1; $i <= $n; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, $i);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, $i, null, 1);
 		}
+		sleep(1);
 	}
 
 	private function sendSupportedExtremeValues($sendMax, $sendMin, $itemkey)
 	{
 		for ($i = 1; $i <= $sendMax; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MAX, null, 1);
 		}
 
 		for ($i = 1; $i <= $sendMin; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, (float)self::DBL_MIN, null, 1);
 		}
+		sleep(1);
 	}
 
 	private function sendScaledSequenceToSecondItem($itemkey, $n)
 	{
 		for ($i = 1; $i <= $n; $i++) {
-			$this->sendSenderValue(self::HOST_NAME, $itemkey, $i * 10);
+			$this->sendSenderValue(self::HOST_NAME, $itemkey, $i * 10, null, 1);
 		}
+		sleep(1);
 	}
 
 	private function getItemLastValue($itemid)
@@ -197,7 +209,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // 1..5 -> avg = 3
 		$history = $this->historyGet($trapId);
 
@@ -219,7 +231,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		$this->sendSupportedExtremeValues(5, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
@@ -248,7 +260,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		$this->sendIncrementingSequence(4, self::TRAPPER_ITEM_KEY . self::$iterator); // last 4 are 1,2,3,4 -> max = 4
 
 		$history = $this->historyGet($trapId);
@@ -270,7 +282,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'max4MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		// supported - 2 max and 2 min
 		$this->sendSupportedExtremeValues(2, 2, self::TRAPPER_ITEM_KEY . self::$iterator);
@@ -300,7 +312,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are 3,4,5 -> min = 3
 
 		$history = $this->historyGet($trapId);
@@ -322,7 +334,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'min3MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		$this->sendSupportedExtremeValues(3, 2, self::TRAPPER_ITEM_KEY . self::$iterator); // last 3 are max values
 		$this->checkItemState($itemid, ITEM_STATE_NORMAL);
@@ -352,7 +364,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY . self::$iterator); // last = 3
 
 		$history = $this->historyGet($trapId);
@@ -374,7 +386,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'last1MaxValue');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		$this->sendSupportedExtremeValues(3, 0, self::TRAPPER_ITEM_KEY . self::$iterator);
 
@@ -485,7 +497,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'avg5_mul2');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator); // last5:1,2,3,4,5 avg=3
 
 		$history = $this->historyGet($trapId);
@@ -509,7 +521,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'sum_minus_avg5');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		// sum(1,2,3,4,5)-avg(1,2,3,4,5) = 15-3=12
 		$this->sendIncrementingSequence(5, self::TRAPPER_ITEM_KEY . self::$iterator);
 
@@ -535,7 +547,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$itemid = $this->createCalculatedItemWithFormula($formula, 'multi_avg');
 		self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 		$this->sendIncrementingSequence(3, self::TRAPPER_ITEM_KEY . self::$iterator-1);
 		$this->sendScaledSequenceToSecondItem(self::TRAPPER_ITEM_KEY . self::$iterator, 3);
 
@@ -599,6 +611,7 @@ class testCalculatedExpression extends CIntegrationTest {
 	public function testCalculatedExpression_HistogramQuantile()
 	{
 		$itemids = [];
+		$trapperItemId;
 		// create a histogram bucket item (simulate with a trapper item for test)
 		foreach ([0.1, 0.5, 1, 2, 'Inf'] as $le) {
 			$response = $this->call('item.create', [
@@ -606,12 +619,21 @@ class testCalculatedExpression extends CIntegrationTest {
 				'name'		=> "bucket[$le]",
 				'key_'		=> self::TRAPPER_ITEM_KEY . ".bucket[$le]",
 				'type'		=> ITEM_TYPE_TRAPPER,
-				'value_type'	=> ITEM_VALUE_TYPE_FLOAT
+				'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
+				'preprocessing' => [
+					[
+						'type'			=> ZBX_PREPROC_TRIM,
+						'params'		=> ' ',
+						'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params'	=> ''
+					]
+				]
 			]);
 			$itemid = $response['result']['itemids'][0];
 			$this->assertEquals(1, count($response['result']['itemids']));
 			self::$itemIds = array_merge(self::$itemIds, [$itemid]);
 			$itemids = array_merge($itemids, [$itemid]);
+			$trapperItemId = $itemid;
 		}
 
 		$formula = 'histogram_quantile(0.25,' .
@@ -639,14 +661,21 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
 			" data:test.calc.calculated.histogram_quantile", true, 120);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		// send values to the bucket item (simulate histogram bucket values)
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.5]', 25);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32);
-		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.1]', 10, null, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[0.5]', 25, null, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[1]', 30, null, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[2]', 32, null, 1);
+		$this->sendSenderValue(self::HOST_NAME, self::TRAPPER_ITEM_KEY . '.bucket[Inf]', 35, null, 1);
+		for ($i = 0; $i < 30; $i++) {
+			$history = $this->historyGet([$trapperItemId]);
+			if (count($history) === 5) {
+				break;
+			}
+			usleep(100000);
+		}
 
 		$history = $this->historyGet($itemids);
 		$values = $this->extractHistoryValues($history);
@@ -683,7 +712,15 @@ class testCalculatedExpression extends CIntegrationTest {
 				'name'		=> "disk.pused[$fs]",
 				'key_'		=> self::TRAPPER_ITEM_KEY . ".disk.pused[$fs]",
 				'type'		=> ITEM_TYPE_TRAPPER,
-				'value_type'	=> ITEM_VALUE_TYPE_FLOAT
+				'value_type'	=> ITEM_VALUE_TYPE_FLOAT,
+				'preprocessing' => [
+					[
+						'type'			=> ZBX_PREPROC_TRIM,
+						'params'		=> ' ',
+						'error_handler'		=> ZBX_PREPROC_FAIL_DEFAULT,
+						'error_handler_params'	=> ''
+					]
+				]
 			]);
 			$itemid = $response['result']['itemids'][0];
 			$this->assertEquals(1, count($response['result']['itemids']));
@@ -709,7 +746,7 @@ class testCalculatedExpression extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "In zbx_substitute_item_key_params():" .
 			" data:test.calc.calculated.count_disk_pused_gt_95", true, 120);
 
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER, 1);
 
 		/* Send values to the trapper items: fs1=90, fs2=96, fs3=97, fs4=80. */
 		$senderValues = [

@@ -1272,7 +1272,7 @@ zabbix_export:
       description: |
         This template is designed to monitor Microsoft Azure by HTTP.
         It works without any external scripts and uses the script item.
-        Currently the template supports the discovery of virtual machines (VMs), Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+        Currently the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
         
         Setup:
           1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
@@ -1290,7 +1290,7 @@ zabbix_export:
         
         - This template is designed to monitor Microsoft Azure by HTTP.
         - It works without any external scripts and uses the script item.
-        - Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, and PostgreSQL servers.
+        - Currently, the template supports the discovery of virtual machines (VMs), VM scale sets, Cosmos DB for MongoDB, storage accounts, Microsoft SQL, MySQL, PostgreSQL servers, Backup Job vaults, Sentinel workspaces, and Container apps.
         
         ## Setup
         
@@ -1304,7 +1304,7 @@ zabbix_export:
         3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-5
       groups:
         - name: Templates/Cloud
       items:
@@ -1396,7 +1396,7 @@ zabbix_export:
             	},
             
             	nextlink: function (data) {
-            		next_data = data;
+            		var next_data = data;
             		while ('nextLink' in next_data) {
             			next_data = Azure.request(next_data.nextLink);
             			next_data.value.forEach(function (value) {
@@ -1713,6 +1713,215 @@ zabbix_export:
                 - tag: scope
                   value: availability
       discovery_rules:
+        - uuid: a2845cb2ce544653b184bf98026fd073
+          name: 'Azure Container App discovery'
+          type: SCRIPT
+          key: azure.container_app.discovery
+          delay: '{$AZURE.DISCOVERY.INTERVAL: "Container Apps"}'
+          params: |
+            var Azure = {
+            	params: {},
+            	token: null,
+            
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            
+            		Azure.params = params;
+            	},
+            
+            	login: function () {
+            		var response, login = new HttpRequest();
+            
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			login.setProxy(Azure.params.proxy);
+            		}
+            
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') +
+            				'&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' +
+            				encodeURIComponent(Azure.params.password)
+            		);
+            
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
+            
+            		Azure.token = response['access_token'];
+            	},
+            
+            	request: function (url) {
+            		var response, request = new HttpRequest();
+            
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			request.setProxy(Azure.params.proxy);
+            		}
+            
+            		if (!Azure.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Azure.token);
+            		Zabbix.log(4, '[ Azure Container App ] request url: ' + url);
+            
+            		response = request.get(url);
+            
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
+            
+            	nextlink: function (data) {
+            		var next_data = data;
+            		while ('nextLink' in next_data) {
+            			next_data = Azure.request(next_data.nextLink);
+            			next_data.value.forEach(function (value) {
+            				data.value.push(value);
+            			});
+            		}
+            
+            		return data;
+            	},
+            
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            			data = data[step];
+            		}
+            
+            		return data;
+            	},
+            
+            	getContainerApps: function () {
+            		var raw_data = Azure.request('https://management.azure.com/subscriptions/' +
+            				encodeURIComponent(Azure.params.subscription_id) +
+            				'/providers/Microsoft.App/containerApps?api-version=2026-01-01'),
+            			data = [];
+            
+            		if ('nextLink' in raw_data) {
+            			raw_data = Azure.nextlink(raw_data);
+            		}
+            
+            		raw_data = Azure.getField(raw_data, 'value');
+            
+            		if (!Array.isArray(raw_data)) {
+            			data.push({"ERROR":'Fetched list is not an array.'});
+            			throw "Fetched list is not an array."
+            		}
+            
+            		raw_data.forEach(function (item){
+            			data.push({
+            				'{#ID}': Azure.getField(item, 'id'),
+            				'{#NAME}': Azure.getField(item, 'name'),
+            				'{#LOCATION}': Azure.getField(item, 'location'),
+            				'{#GROUP}': Azure.getField(item, 'id').split("/")[4],
+            				'{#TYPE}':'Container Apps'
+            			})
+            		})
+            
+            		return data
+            	}
+            
+            };
+            
+            try {
+            	Azure.setParams(JSON.parse(value));
+            	Azure.login();
+            	return JSON.stringify(Azure.getContainerApps());
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Azure Container App ] ERROR: ' + error);
+            	return JSON.stringify('ERROR: '+ error);
+            }
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.MATCHES}'
+              - macro: '{#GROUP}'
+                value: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#LOCATION}'
+                value: '{$AZURE.CONT_APP.LOCATION.MATCHES}'
+              - macro: '{#LOCATION}'
+                value: '{$AZURE.CONT_APP.LOCATION.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+              - macro: '{#NAME}'
+                value: '{$AZURE.CONT_APP.NAME.MATCHES}'
+              - macro: '{#NAME}'
+                value: '{$AZURE.CONT_APP.NAME.NOT.MATCHES}'
+                operator: NOT_MATCHES_REGEX
+          description: 'The list of Azure Container apps provided by the subscription.'
+          host_prototypes:
+            - uuid: 85e290a094a747fe99d7c24eec434152
+              host: 'Azure Container App {#NAME}'
+              name: 'Azure Container App {#NAME}'
+              group_links:
+                - group:
+                    name: Applications
+              group_prototypes:
+                - name: 'Azure/{#TYPE}'
+              templates:
+                - name: 'Azure Container Apps by HTTP'
+              macros:
+                - macro: '{$AZURE.RESOURCE.ID}'
+                  value: '{#ID}'
+              tags:
+                - tag: location
+                  value: '{#LOCATION}'
+                - tag: resource-group
+                  value: '{#GROUP}'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            - name: app_id
+              value: '{$AZURE.APP.ID}'
+            - name: password
+              value: '{$AZURE.PASSWORD}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
+            - name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION.ID}'
+            - name: tenant_id
+              value: '{$AZURE.TENANT.ID}'
+          preprocessing:
+            - type: NOT_MATCHES_REGEX
+              parameters:
+                - ERROR
+              error_handler: CUSTOM_ERROR
+              error_handler_params: 'Errors in discovery script. Check logs for more info.'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 6h
         - uuid: 3bfbfc8d770a4c77a17d62aaebb55e64
           name: 'Cosmos DB account discovery'
           type: DEPENDENT
@@ -1748,6 +1957,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -1827,6 +2037,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -1929,6 +2140,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -2020,6 +2232,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -2113,6 +2326,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -2183,6 +2397,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3674,6 +3889,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3738,6 +3954,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3810,6 +4027,7 @@ zabbix_export:
               macros:
                 - macro: '{$AZURE.RESOURCE.ID}'
                   value: '{#ID}'
+                  description: 'Microsoft Azure resource ID.'
               tags:
                 - tag: location
                   value: '{#LOCATION}'
@@ -3854,16 +4072,52 @@ zabbix_export:
           value: azure
       macros:
         - macro: '{$AZURE.APP.ID}'
-          description: 'The App ID of Microsoft Azure.'
+          description: 'Client (Application) ID of the Azure service principal.'
           config:
             type: TEXT
             priority: '3'
             label: 'Azure App ID'
             description: 'Microsoft Azure App ID.'
             required: 'YES'
+        - macro: '{$AZURE.CONT_APP.LOCATION.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Azure Container App discovery rule.'
+          config:
+            type: TEXT
+            priority: '55'
+            section_name: Filters
+            label: 'Include container app location filter'
+            description: 'Regex string to include discovered Azure Container App locations by name.'
+        - macro: '{$AZURE.CONT_APP.LOCATION.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Azure Container App discovery rule.'
+          config:
+            type: TEXT
+            priority: '56'
+            section_name: Filters
+            label: 'Exclude container app location filter'
+            description: 'Regex string to exclude discovered Azure Container App locations by name.'
+        - macro: '{$AZURE.CONT_APP.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Azure Container App discovery rule.'
+          config:
+            type: TEXT
+            priority: '53'
+            section_name: Filters
+            label: 'Include container app filter'
+            description: 'Regex string to include discovered Azure Container App by name.'
+        - macro: '{$AZURE.CONT_APP.NAME.NOT.MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Azure Container App discovery rule.'
+          config:
+            type: TEXT
+            priority: '54'
+            section_name: Filters
+            label: 'Exclude container app filter'
+            description: 'Regex string to exclude discovered Azure Container App by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to include discovered Cosmos DB account locations by name.'
           config:
             type: TEXT
             priority: '47'
@@ -3872,7 +4126,7 @@ zabbix_export:
             description: 'Regex string to include discovered Cosmos DB account locations by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to exclude discovered Cosmos DB account locations by name.'
           config:
             type: TEXT
             priority: '48'
@@ -3881,7 +4135,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Cosmos DB account locations by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to include discovered Cosmos DB accounts by name.'
           config:
             type: TEXT
             priority: '45'
@@ -3890,7 +4144,7 @@ zabbix_export:
             description: 'Regex string to include discovered Cosmos DB accounts by name.'
         - macro: '{$AZURE.COSMOS.MONGO.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft Cosmos DB account discovery rule.'
+          description: 'Regex string to exclude discovered Cosmos DB accounts by name.'
           config:
             type: TEXT
             priority: '46'
@@ -3899,16 +4153,25 @@ zabbix_export:
             description: 'Regex string to exclude discovered Cosmos DB accounts by name.'
         - macro: '{$AZURE.DATA.TIMEOUT}'
           value: 15s
-          description: 'API response timeout.'
+          description: 'Maximum time to wait for Azure API responses before request fails.'
           config:
             type: TEXT
             priority: '5'
             section_name: Other
             label: 'API timeout'
             description: 'API response timeout, in seconds.'
+        - macro: '{$AZURE.DISCOVERY.INTERVAL}'
+          value: 1h
+          description: 'Azure resource discovery interval. Could be used with context.'
+          config:
+            type: TEXT
+            priority: '57'
+            section_name: Other
+            label: 'Discovery interval'
+            description: 'Azure resource discovery interval. Could be used with context.'
         - macro: '{$AZURE.MSSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to include discovered MSSQL database locations by name.'
           config:
             type: TEXT
             priority: '42'
@@ -3917,7 +4180,7 @@ zabbix_export:
             description: 'Regex string to include discovered MSSQL database locations by name.'
         - macro: '{$AZURE.MSSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to exclude discovered MSSQL database locations by name.'
           config:
             type: TEXT
             priority: '43'
@@ -3926,7 +4189,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MSSQL database locations by name.'
         - macro: '{$AZURE.MSSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to include discovered MSSQL databases by name.'
           config:
             type: TEXT
             priority: '40'
@@ -3935,7 +4198,7 @@ zabbix_export:
             description: 'Regex string to include discovered MSSQL databases by name.'
         - macro: '{$AZURE.MSSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to exclude discovered MSSQL databases by name.'
           config:
             type: TEXT
             priority: '41'
@@ -3944,7 +4207,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MSSQL databases by name.'
         - macro: '{$AZURE.MSSQL.DB.SIZE.NOT.MATCHES}'
           value: ^System$
-          description: 'This macro is used in Microsoft SQL databases discovery rule.'
+          description: 'Regex string to exclude discovered MSSQL database locations by SKU type.'
           config:
             type: TEXT
             priority: '44'
@@ -3953,7 +4216,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MSSQL database locations by SKU type.'
         - macro: '{$AZURE.MYSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to include discovered MySQL server locations by name.'
           config:
             type: TEXT
             priority: '34'
@@ -3962,7 +4225,7 @@ zabbix_export:
             description: 'Regex string to include discovered MySQL server locations by name.'
         - macro: '{$AZURE.MYSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to exclude discovered MySQL server locations by name.'
           config:
             type: TEXT
             priority: '35'
@@ -3971,7 +4234,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MySQL server locations by name.'
         - macro: '{$AZURE.MYSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to include discovered MySQL servers by name.'
           config:
             type: TEXT
             priority: '32'
@@ -3980,7 +4243,7 @@ zabbix_export:
             description: 'Regex string to include discovered MySQL servers by name.'
         - macro: '{$AZURE.MYSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in MySQL servers discovery rule.'
+          description: 'Regex string to exclude discovered MySQL servers by name.'
           config:
             type: TEXT
             priority: '33'
@@ -3989,7 +4252,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered MySQL servers by name.'
         - macro: '{$AZURE.PASSWORD}'
           type: SECRET_TEXT
-          description: 'Microsoft Azure password.'
+          description: 'Client secret of the Azure service principal used for API authentication.'
           config:
             type: TEXT
             priority: '4'
@@ -3998,7 +4261,7 @@ zabbix_export:
             required: 'YES'
         - macro: '{$AZURE.PGSQL.DB.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to include discovered PostgreSQL server locations by name.'
           config:
             type: TEXT
             priority: '38'
@@ -4007,7 +4270,7 @@ zabbix_export:
             description: 'Regex string to include discovered PostgreSQL server locations by name.'
         - macro: '{$AZURE.PGSQL.DB.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to exclude discovered PostgreSQL server locations by name.'
           config:
             type: TEXT
             priority: '39'
@@ -4016,7 +4279,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered PostgreSQL server locations by name.'
         - macro: '{$AZURE.PGSQL.DB.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to include discovered PostgreSQL servers by name.'
           config:
             type: TEXT
             priority: '36'
@@ -4025,7 +4288,7 @@ zabbix_export:
             description: 'Regex string to include discovered PostgreSQL servers by name.'
         - macro: '{$AZURE.PGSQL.DB.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in PostgreSQL servers discovery rule.'
+          description: 'Regex string to exclude discovered PostgreSQL servers by name.'
           config:
             type: TEXT
             priority: '37'
@@ -4033,7 +4296,7 @@ zabbix_export:
             label: 'Exclude PostgreSQL server filter'
             description: 'Regex string to exclude discovered PostgreSQL servers by name.'
         - macro: '{$AZURE.PROXY}'
-          description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+          description: 'HTTP proxy used for Azure API requests (leave empty to connect directly).'
           config:
             type: TEXT
             priority: '6'
@@ -4042,7 +4305,7 @@ zabbix_export:
             description: 'HTTP proxy to use for requests.'
         - macro: '{$AZURE.RESOURCE.GROUP.MATCHES}'
           value: '.*'
-          description: 'This macro is used in discovery rules.'
+          description: 'Regex string to include discovered resource groups by name.'
           config:
             type: TEXT
             priority: '30'
@@ -4051,7 +4314,7 @@ zabbix_export:
             description: 'Regex string to include discovered resource groups by name.'
         - macro: '{$AZURE.RESOURCE.GROUP.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in discovery rules.'
+          description: 'Regex string to exclude discovered resource groups by name.'
           config:
             type: TEXT
             priority: '31'
@@ -4060,7 +4323,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered resource groups by name.'
         - macro: '{$AZURE.SCALESET.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to include discovered VM scale set locations by name.'
           config:
             type: TEXT
             priority: '13'
@@ -4069,7 +4332,7 @@ zabbix_export:
             description: 'Regex string to include discovered VM scale set locations by name.'
         - macro: '{$AZURE.SCALESET.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to exclude discovered VM scale set locations by name.'
           config:
             type: TEXT
             priority: '14'
@@ -4078,7 +4341,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered VM scale set locations by name.'
         - macro: '{$AZURE.SCALESET.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to include discovered VM scale sets by name.'
           config:
             type: TEXT
             priority: '11'
@@ -4087,7 +4350,7 @@ zabbix_export:
             description: 'Regex string to include discovered VM scale sets by name.'
         - macro: '{$AZURE.SCALESET.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machine scale sets discovery rule.'
+          description: 'Regex string to exclude discovered VM scale sets by name.'
           config:
             type: TEXT
             priority: '12'
@@ -4096,7 +4359,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered VM scale sets by name.'
         - macro: '{$AZURE.SQL.INST.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to include discovered Azure SQL managed instance locations by name.'
           config:
             type: TEXT
             priority: '17'
@@ -4105,7 +4368,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure SQL managed instance locations by name.'
         - macro: '{$AZURE.SQL.INST.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to exclude discovered Azure SQL managed instance locations by name.'
           config:
             type: TEXT
             priority: '18'
@@ -4114,7 +4377,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Azure SQL managed instance locations by name.'
         - macro: '{$AZURE.SQL.INST.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to include discovered Azure SQL managed instances by name.'
           config:
             type: TEXT
             priority: '15'
@@ -4123,7 +4386,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure SQL managed instances by name.'
         - macro: '{$AZURE.SQL.INST.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure SQL Managed Instance discovery rule.'
+          description: 'Regex string to exclude discovered Azure SQL managed instances by name.'
           config:
             type: TEXT
             priority: '16'
@@ -4152,7 +4415,7 @@ zabbix_export:
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.STORAGE.ACC.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to include discovered storage account locations by name.'
           config:
             type: TEXT
             priority: '25'
@@ -4161,7 +4424,7 @@ zabbix_export:
             description: 'Regex string to include discovered storage account locations by name.'
         - macro: '{$AZURE.STORAGE.ACC.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to exclude discovered storage account locations by name.'
           config:
             type: TEXT
             priority: '26'
@@ -4170,7 +4433,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered storage account locations by name.'
         - macro: '{$AZURE.STORAGE.ACC.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to include discovered storage accounts by name.'
           config:
             type: TEXT
             priority: '23'
@@ -4179,7 +4442,7 @@ zabbix_export:
             description: 'Regex string to include discovered storage accounts by name.'
         - macro: '{$AZURE.STORAGE.ACC.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in storage accounts discovery rule.'
+          description: 'Regex string to exclude discovered storage accounts by name.'
           config:
             type: TEXT
             priority: '24'
@@ -4197,7 +4460,7 @@ zabbix_export:
             description: 'Warning threshold of the storage account table services availability, expressed in %. In the range from 0 to 100 inclusive.'
             regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
         - macro: '{$AZURE.SUBSCRIPTION.ID}'
-          description: 'Microsoft Azure subscription ID.'
+          description: 'Azure Subscription ID used to scope all API requests.'
           config:
             type: TEXT
             priority: '1'
@@ -4205,7 +4468,7 @@ zabbix_export:
             description: 'Microsoft Azure subscription ID.'
             required: 'YES'
         - macro: '{$AZURE.TENANT.ID}'
-          description: 'Microsoft Azure tenant ID.'
+          description: 'Azure Tenant (Directory) ID used for authentication.'
           config:
             type: TEXT
             priority: '2'
@@ -4214,7 +4477,7 @@ zabbix_export:
             required: 'YES'
         - macro: '{$AZURE.VAULT.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to include discovered Azure Vault locations by name.'
           config:
             type: TEXT
             priority: '21'
@@ -4223,7 +4486,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure Vault locations by name.'
         - macro: '{$AZURE.VAULT.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to exclude discovered Azure Vault locations by name.'
           config:
             type: TEXT
             priority: '22'
@@ -4232,7 +4495,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Azure Vault locations by name.'
         - macro: '{$AZURE.VAULT.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to include discovered Azure Vaults by name.'
           config:
             type: TEXT
             priority: '19'
@@ -4241,7 +4504,7 @@ zabbix_export:
             description: 'Regex string to include discovered Azure Vaults by name.'
         - macro: '{$AZURE.VAULT.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Azure Vault discovery rule.'
+          description: 'Regex string to exclude discovered Azure Vaults by name.'
           config:
             type: TEXT
             priority: '20'
@@ -4250,7 +4513,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered Azure Vaults by name.'
         - macro: '{$AZURE.VM.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to include discovered virtual machine locations by name.'
           config:
             type: TEXT
             priority: '9'
@@ -4259,7 +4522,7 @@ zabbix_export:
             description: 'Regex string to include discovered virtual machine locations by name.'
         - macro: '{$AZURE.VM.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to exclude discovered virtual machine locations by name.'
           config:
             type: TEXT
             priority: '10'
@@ -4268,7 +4531,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered virtual machine locations by name.'
         - macro: '{$AZURE.VM.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to include discovered virtual machines by name.'
           config:
             type: TEXT
             priority: '7'
@@ -4277,7 +4540,7 @@ zabbix_export:
             description: 'Regex string to include discovered virtual machines by name.'
         - macro: '{$AZURE.VM.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in virtual machines discovery rule.'
+          description: 'Regex string to exclude discovered virtual machines by name.'
           config:
             type: TEXT
             priority: '8'
@@ -4286,7 +4549,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered virtual machines by name.'
         - macro: '{$AZURE.WORKSPACE.LOCATION.MATCHES}'
           value: '.*'
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to include discovered workspace locations by name.'
           config:
             type: TEXT
             priority: '51'
@@ -4295,7 +4558,7 @@ zabbix_export:
             description: 'Regex string to include discovered workspace locations by name.'
         - macro: '{$AZURE.WORKSPACE.LOCATION.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to exclude discovered workspace locations by name.'
           config:
             type: TEXT
             priority: '52'
@@ -4304,7 +4567,7 @@ zabbix_export:
             description: 'Regex string to exclude discovered workspace locations by name.'
         - macro: '{$AZURE.WORKSPACE.NAME.MATCHES}'
           value: '.*'
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to include discovered workspace by name.'
           config:
             type: TEXT
             priority: '49'
@@ -4313,7 +4576,7 @@ zabbix_export:
             description: 'Regex string to include discovered workspace by name.'
         - macro: '{$AZURE.WORKSPACE.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'This macro is used in workspace discovery rule.'
+          description: 'Regex string to exclude discovered workspace by name.'
           config:
             type: TEXT
             priority: '50'
@@ -4375,6 +4638,1924 @@ zabbix_export:
                     - type: INTEGER
                       name: rows
                       value: '5'
+    - uuid: 07547000238945f7b130156f03257c5c
+      template: 'Azure Container Apps by HTTP'
+      name: 'Azure Container Apps by HTTP'
+      description: |
+        This template is designed to monitor Azure Container Apps via HTTP.
+        It works without any external scripts and uses the script item.
+        
+        Setup:
+          1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+            `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+            See https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli for more details.
+          2. Link the template to a host.
+          3. Configure the macros: {$AZURE.APP.ID}, {$AZURE.PASSWORD}, {$AZURE.TENANT.ID}, {$AZURE.SUBSCRIPTION.ID}, and {$AZURE.RESOURCE.ID}.
+        
+        You can discuss this template or leave feedback on our forum https://www.zabbix.com/forum/zabbix-suggestions-and-feedback/
+        
+        Generated by official Zabbix template tool "Templator"
+      wizard_ready: 'YES'
+      readme: |
+        ## Overview
+        
+        This template is designed to monitor Microsoft Azure Container Apps via HTTP.
+        It works without any external scripts and uses the script item.
+        
+        ## Setup
+        
+        1. Create an Azure service principal via the Azure command-line interface (Azure CLI) for your subscription.
+        
+              `az ad sp create-for-rbac --name zabbix --role reader --scope /subscriptions/<subscription_id>`
+        
+        > See [Azure documentation](https://docs.microsoft.com/en-us/cli/azure/create-an-azure-service-principal-azure-cli) for more details.
+        
+        2. Link the template to a host.
+        3. Configure the host wizard configuration fields: `Azure App ID`, `Azure password`, `Azure tenant ID`, `Azure subscription ID`.
+      vendor:
+        name: Zabbix
+        version: 8.0-0
+      groups:
+        - name: Templates/Cloud
+      items:
+        - uuid: f4d62937e2a54dea9e530966f9169be0
+          name: 'Network: Received bytes'
+          type: DEPENDENT
+          key: azure.container_app.bytes.rx
+          units: B
+          description: 'Bytes received by the container app.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.RxBytes
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: network
+        - uuid: e4d471cc223d4e29a5b06ad38b218652
+          name: 'Network: Transmitted bytes'
+          type: DEPENDENT
+          key: azure.container_app.bytes.tx
+          units: B
+          description: 'Bytes transmitted by the container app.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.TxBytes
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: network
+        - uuid: 81388f4db1e34bb188aa68a66d0777bb
+          name: 'Connection timeouts'
+          type: DEPENDENT
+          key: azure.container_app.connection.timeouts
+          description: 'Total connection timeouts.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResiliencyConnectTimeouts
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: network
+        - uuid: 997369cb0c694698983a36d1052ca392
+          name: 'Cores: Reserved, for revisions'
+          type: DEPENDENT
+          key: azure.container_app.cores.reserved.revisions
+          description: 'Number of reserved cores for container app revisions.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.CoresQuotaUsed
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 790ff0635bfe497986024af941976848
+          name: 'Cores: Reserved, total'
+          type: DEPENDENT
+          key: azure.container_app.cores.reserved.total
+          description: 'Number of total reserved cores for the container app.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.TotalCoresQuotaUsed
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 420f1a2339134a4184fa25fb56386d5f
+          name: 'Cores: Usage'
+          type: DEPENDENT
+          key: azure.container_app.cores.usage
+          value_type: FLOAT
+          units: cores
+          description: 'CPU consumed by the container app, in cores.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.UsageNanoCores
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '1.0E-9'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 2b08d64a8f99489090a438c4b7740380
+          name: 'Get data, errors'
+          type: DEPENDENT
+          key: azure.container_app.data.errors
+          value_type: TEXT
+          description: 'A list of errors from API requests.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: error
+          triggers:
+            - uuid: d63d6ca118954883b9835396a280208d
+              expression: 'length(last(/Azure Container Apps by HTTP/azure.container_app.data.errors))>0'
+              name: 'Azure container Apps: There are errors in requests to API'
+              opdata: 'Error: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'Zabbix has received errors in response to API requests.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 77ca1aed49cf45f582f42623b4bce992
+          name: 'Get data'
+          type: SCRIPT
+          key: azure.container_app.data.get
+          history: '0'
+          value_type: TEXT
+          params: |
+            var Azure = {
+            	params: {},
+            	token: null,
+            
+            	setParams: function (params) {
+            		['app_id', 'password', 'tenant_id', 'subscription_id', 'resource_id', 'jvm_metrics'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
+            
+            		Azure.params = params;
+            	},
+            
+            	login: function () {
+            		var response, login = new HttpRequest();
+            
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			login.setProxy(Azure.params.proxy);
+            		}
+            
+            		login.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		response = login.post(
+            			'https://login.microsoftonline.com/' + encodeURIComponent(Azure.params.tenant_id) + '/oauth2/token',
+            			'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') +
+            				'&client_id=' + encodeURIComponent(Azure.params.app_id) + '&client_secret=' +
+            				encodeURIComponent(Azure.params.password)
+            		);
+            
+            		if (login.getStatus() !== 200) {
+            			throw 'Login failed with status code ' + login.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse login session response.';
+            		}
+            
+            		if (!response.hasOwnProperty('access_token')) {
+            			throw 'Authentication response does not contain access token.';
+            		}
+            
+            		Azure.token = response['access_token'];
+            	},
+            
+            	request: function (url) {
+            		var response, request = new HttpRequest();
+            
+            		if (typeof Azure.params.proxy !== 'undefined' && Azure.params.proxy !== '') {
+            			request.setProxy(Azure.params.proxy);
+            		}
+            
+            		if (!Azure.token) {
+            			throw 'Request does not contain access token.';
+            		}
+            
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Azure.token);
+            		Zabbix.log(4, '[ Azure Container App ] request url: ' + url);
+            
+            		response = request.get(url);
+            
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
+            
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
+            			data = data[step];
+            		}
+            
+            		return data;
+            	},
+            
+            	getMetricsData: function () {
+            		var data = {},
+            			metric_endpoints = {
+            				'main_metrics': '/providers/microsoft.insights/metrics?api-version=2024-02-01&' +
+            					'timespan=PT1M&metricnames=' + encodeURIComponent('UsageNanoCores,WorkingSetBytes,' +
+            					'TxBytes,RxBytes,Requests,RestartCount,Replicas,GpuUtilizationPercentage,' +
+            					'CoresQuotaUsed,TotalCoresQuotaUsed,ResiliencyConnectTimeouts,' +
+            					'ResiliencyRequestRetries,ResiliencyRequestTimeouts,' +
+            					'ResiliencyRequestsPendingConnectionPool,ResiliencyEjectedHosts,' +
+            					'ResiliencyEjectionsAborted,ResponseTime,CpuPercentage,MemoryPercentage')
+            			};
+            
+            		data.metrics = {};
+            
+            		if (Azure.params.jvm_metrics) {
+            			metric_endpoints['jvm_metrics'] = '/providers/microsoft.insights/metrics?api-version=' +
+            				'2024-02-01&timespan=PT1M&metricnames=' + encodeURIComponent('JvmMemoryTotalUsed,' +
+            				'JvmMemoryTotalCommitted,JvmMemoryTotalLimit,JvmMemoryUsed,JvmMemoryCommitted,' +
+            				'JvmMemoryLimit,JvmGcCount,JvmGcDuration,JvmThreadCount,JvmBufferMemoryUsage,' +
+            				'JvmBufferMemoryLimit,JvmBufferCount')
+            		}
+            
+            		Object.keys(metric_endpoints).forEach(function (field) {
+            			metrics = Azure.getField(Azure.request('https://management.azure.com' +
+            				Azure.params.resource_id + metric_endpoints[field]), 'value');
+            			for (k in metrics) {
+            				var key = Azure.getField(metrics[k], 'name.value').replace(/(\s|\/)+/g, '');
+            
+            				if (metrics[k].timeseries.length === 0) {
+            					metrics[k].timeseries.push({ 'data': ['nodata'] })
+            				}
+            
+            				var values = Azure.getField(metrics[k], 'timeseries.0.data'),
+            					dataseries_keys = Object.keys(values[0]),
+            					aggregation = dataseries_keys[1];
+            
+            				if (typeof (values[0][aggregation]) !== 'undefined') {
+            					data.metrics[key] = values[0][aggregation];
+            				} else {
+            					data.metrics[key] = null;
+            				}
+            			}
+            		});
+            
+            		data.overview = Azure.request('https://management.azure.com' + Azure.params.resource_id + '?api-version=2025-07-01');
+            
+            		return data
+            	}
+            };
+            
+            try {
+            	Azure.setParams(JSON.parse(value));
+            	Azure.login();
+            	return JSON.stringify(Azure.getMetricsData());
+            }
+            catch (error) {
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Azure Container App ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
+            }
+          description: 'Gathers data of the Azure container app.'
+          timeout: '{$AZURE.DATA.TIMEOUT}'
+          parameters:
+            - name: app_id
+              value: '{$AZURE.APP.ID}'
+            - name: jvm_metrics
+              value: '{$AZURE.CONTAINER_APP.JVM.METRICS}'
+            - name: password
+              value: '{$AZURE.PASSWORD}'
+            - name: proxy
+              value: '{$AZURE.PROXY}'
+            - name: resource_id
+              value: '{$AZURE.RESOURCE.ID}'
+            - name: subscription_id
+              value: '{$AZURE.SUBSCRIPTION.ID}'
+            - name: tenant_id
+              value: '{$AZURE.TENANT.ID}'
+          tags:
+            - tag: component
+              value: raw
+        - uuid: 95c7f10655774f54bf482b297cd31c3f
+          name: 'Ejections, aborted'
+          type: DEPENDENT
+          key: azure.container_app.ejection.aborted
+          units: '!%'
+          description: 'Number of ejections aborted due to the max ejection %.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResiliencyEjectionsAborted
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+        - uuid: 1579aaae279e4940b163c2ab6a12624b
+          name: 'Ejected hosts'
+          type: DEPENDENT
+          key: azure.container_app.ejection.hosts
+          description: 'Number of currently ejected hosts.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResiliencyEjectedHosts
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+        - uuid: 6bf4c42ed59146c08f4234d7c86c2fde
+          name: 'Memory: Used'
+          type: DEPENDENT
+          key: azure.container_app.memory.bytes
+          units: B
+          description: 'Container app working set memory used, in bytes.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.WorkingSetBytes
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: memory
+        - uuid: 6bdd4b0d046c4636987a6e104fb659d7
+          name: 'Provisioning state'
+          type: DEPENDENT
+          key: azure.container_app.provisioning.state
+          description: |
+            The provisioning state of the container app.
+            0 - Unknown
+            1 - In progress
+            2 - Succeeded
+            3 - Failed
+            4 - Canceled
+            5 - Deleting
+          valuemap:
+            name: 'Azure container app provisioning state'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.overview.properties.provisioningState
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Unknown
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const idx =   {
+                    'Unknown': 0,
+                    'InProgress': 1,
+                    'Succeeded': 2,
+                    'Failed': 3,
+                    'Canceled': 4,
+                    'Deleting': 5
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: health
+          triggers:
+            - uuid: 3ec06ef1e63f454ab61cd33672fa2436
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=3'
+              name: 'Azure container Apps: Azure container app failed'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource failed.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: a50545a31c8f4c0592ac46cba7b066cd
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=5'
+              name: 'Azure container Apps: Azure container app is being deleted'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource deletion process is happening.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: 0db23c88c0bd4a3c8d6e8f6ad0f29f3e
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=4'
+              name: 'Azure container Apps: Azure container app is canceled'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is in the Canceled state.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: b0e1ba543911427b87fa6b5bc774e941
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.provisioning.state)=0'
+              name: 'Azure container Apps: Azure container app is in unknown state'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource state is Unknown.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 13a64a21abe4464fbb3636978c0640a1
+          name: 'Replica: Count'
+          type: DEPENDENT
+          key: azure.container_app.replica.count
+          description: 'Number of replicas.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.Replicas
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: replica
+        - uuid: fdfd1f7ef5814045bcfa0992e17c8f80
+          name: 'Requests: Pending'
+          type: DEPENDENT
+          key: azure.container_app.requests.pending
+          description: 'Total requests pending a connection pool connection.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResiliencyRequestsPendingConnectionPool
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: requests
+        - uuid: 658750764e6b41c48b8911d10f685c1c
+          name: 'Requests: Processed'
+          type: DEPENDENT
+          key: azure.container_app.requests.processed
+          description: 'Requests processed.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.Requests
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: requests
+        - uuid: 3e68579899354d2ca8d8f0c7b76fde28
+          name: 'Requests: Retries'
+          type: DEPENDENT
+          key: azure.container_app.requests.retries
+          description: 'Total request retries.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResiliencyRequestRetries
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: requests
+        - uuid: 1778a4af547f4db0a5d23e7ba8fb8def
+          name: 'Requests: Timed out'
+          type: DEPENDENT
+          key: azure.container_app.requests.timeouts
+          description: 'Total requests that timed out waiting for a response.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResiliencyRequestTimeouts
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: requests
+        - uuid: 927cb6e907624701b93b624c097720c7
+          name: 'Response time'
+          type: DEPENDENT
+          key: azure.container_app.response.time
+          value_type: FLOAT
+          units: s
+          description: 'Average response time per status code.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.ResponseTime
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: MULTIPLIER
+              parameters:
+                - '0.001'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          triggers:
+            - uuid: ab5ea91f662b41eb857f81dd918dcdc6
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.response.time,3m)>{$AZURE.CONTAINER_APP.RESPONSE.WARN}'
+              name: 'Azure container Apps: Container response time is too high'
+              event_name: 'Azure container Apps: Container response time is too high (over {$AZURE.CONTAINER_APP.RESPONSE.WARN} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'The average response time of the container app has exceeded the acceptable limit.'
+              tags:
+                - tag: scope
+                  value: availability
+                - tag: scope
+                  value: performance
+        - uuid: 08270587eadf4ec38fdae5aed063ba05
+          name: 'Replica: Restarts'
+          type: DEPENDENT
+          key: azure.container_app.restart.count
+          description: 'The number of times the replica has restarted since the last check.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.RestartCount
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: SIMPLE_CHANGE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: replica
+          triggers:
+            - uuid: a3a2e1571ea048a99e5649989724469c
+              expression: 'avg(/Azure Container Apps by HTTP/azure.container_app.restart.count,3m)>{$AZURE.CONTAINER_APP.REBOOT.WARN}'
+              name: 'Azure container Apps: Replica reboots too often'
+              event_name: 'Azure container Apps: Replica reboot rate is too high (average {$AZURE.CONTAINER_APP.REBOOT.WARN} times for 3m)'
+              opdata: 'Last minute reboots: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'A container app replica is restarting repeatedly within a defined time window.'
+              tags:
+                - tag: scope
+                  value: availability
+                - tag: scope
+                  value: capacity
+        - uuid: 8405c7089ac64fadbca44d1776dbb698
+          name: 'Running status'
+          type: DEPENDENT
+          key: azure.container_app.running.status
+          description: |
+            The current state of the container app.
+            0 - Unknown
+            1 - Progressing (container app is transitioning between Stopped and Running)
+            2 - Running
+            3 - Stopped
+            4 - Suspended
+            5 - Ready
+          valuemap:
+            name: 'Azure container app running status'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.overview.properties.runningStatus
+              error_handler: CUSTOM_VALUE
+              error_handler_params: Unknown
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  const idx =   {
+                    'Unknown': 0,
+                    'Progressing': 1,
+                    'Running': 2,
+                    'Stopped': 3,
+                    'Suspended': 4,
+                    'Ready': 5
+                  };
+                  
+                  return typeof idx[value] === 'undefined' ? 0 : idx[value];
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: health
+          triggers:
+            - uuid: b4611329dd4d4fb29b4bbe327568f003
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.running.status)=1'
+              name: 'Azure container Apps: Azure container app progressing'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The resource is transitioning between Stopped and Running states.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: be207dbcf7a54b738faa8c92ce71e93d
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.running.status)=0'
+              name: 'Azure container Apps: Azure container app status is unknown'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The status of the resource is Unknown.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: 8cba4996201c40cd8531aefc90ca1313
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.running.status)=3'
+              name: 'Azure container Apps: Azure container app stopped'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'The resource stopped.'
+              tags:
+                - tag: scope
+                  value: availability
+            - uuid: 5d99600fd4504562bf79c33aacb4dacc
+              expression: 'last(/Azure Container Apps by HTTP/azure.container_app.running.status)=4'
+              name: 'Azure container Apps: Azure container app suspended'
+              opdata: 'Current state: {ITEM.LASTVALUE1}'
+              priority: AVERAGE
+              description: 'The resource is suspended.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 41b4773c1fde47a2a652703c242cbd1a
+          name: 'CPU: Utilization'
+          type: DEPENDENT
+          key: azure.container_app.utilization.cpu
+          units: '!%'
+          description: 'CPU utilization, in percent.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.CpuPercentage
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: cpu
+          triggers:
+            - uuid: 4c0e27cd886647b7a7741fcde49f01d5
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}'
+              name: 'Azure container Apps: CPU utilization is critical'
+              event_name: 'Azure container Apps: CPU utilization is critical (over {$AZURE.CONTAINER_APP.CPU.CRIT} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'CPU usage has reached a critical threshold.'
+              tags:
+                - tag: scope
+                  value: capacity
+            - uuid: a1d1abd0f97f49deb656dd49a3af2401
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.WARN}'
+              name: 'Azure container Apps: CPU utilization is high'
+              event_name: 'Azure container Apps: CPU utilization is high (over {$AZURE.CONTAINER_APP.CPU.WARN} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'CPU usage has exceeded the warning threshold.'
+              dependencies:
+                - name: 'Azure container Apps: CPU utilization is critical'
+                  expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.cpu,3m)>{$AZURE.CONTAINER_APP.CPU.CRIT}'
+              tags:
+                - tag: scope
+                  value: capacity
+        - uuid: 11404d466a4d46c6b7ea129138faab51
+          name: 'GPU: Utilization'
+          type: DEPENDENT
+          key: azure.container_app.utilization.gpu
+          description: 'GPU utilization, in percent.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.GpuUtilizationPercentage
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: gpu
+          triggers:
+            - uuid: 34d986b7e8934b2da9e6f428e4677a0f
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}'
+              name: 'Azure container Apps: GPU utilization is critical'
+              event_name: 'Azure container Apps: GPU utilization is critical (over {$AZURE.CONTAINER_APP.GPU.CRIT} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'GPU usage has reached a critical threshold.'
+              tags:
+                - tag: scope
+                  value: capacity
+            - uuid: 1fd97787fcc04de29304e280a17af322
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.WARN}'
+              name: 'Azure container Apps: GPU utilization is high'
+              event_name: 'Azure container Apps: GPU utilization is high (over {$AZURE.CONTAINER_APP.GPU.WARN} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'GPU usage has exceeded the warning threshold.'
+              dependencies:
+                - name: 'Azure container Apps: GPU utilization is critical'
+                  expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.gpu,3m)>{$AZURE.CONTAINER_APP.GPU.CRIT}'
+              tags:
+                - tag: scope
+                  value: capacity
+        - uuid: af3806fe865746389d29f2be56b2a9e6
+          name: 'Memory: Utilization'
+          type: DEPENDENT
+          key: azure.container_app.utilization.memory
+          units: '!%'
+          description: 'Memory utilization, in percent.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.MemoryPercentage
+            - type: MATCHES_REGEX
+              parameters:
+                - ^\d+$
+              error_handler: DISCARD_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
+          master_item:
+            key: azure.container_app.data.get
+          tags:
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: 61fe8ef040d24ddb9abc9f68adc2cd8b
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}'
+              name: 'Azure container Apps: Memory utilization is critical'
+              event_name: 'Azure container Apps: Memory utilization is critical (over {$AZURE.CONTAINER_APP.MEMORY.CRIT} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: AVERAGE
+              description: 'Memory usage has reached a critical threshold.'
+              tags:
+                - tag: scope
+                  value: capacity
+            - uuid: e114854c681147fbaec8e290cde264d8
+              expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.WARN}'
+              name: 'Azure container Apps: Memory utilization is high'
+              event_name: 'Azure container Apps: Memory utilization is high (over {$AZURE.CONTAINER_APP.MEMORY.WARN} for 3m)'
+              opdata: 'Current value: {ITEM.LASTVALUE}'
+              priority: WARNING
+              description: 'Memory consumption has exceeded the warning threshold.'
+              dependencies:
+                - name: 'Azure container Apps: Memory utilization is critical'
+                  expression: 'max(/Azure Container Apps by HTTP/azure.container_app.utilization.memory,3m)>{$AZURE.CONTAINER_APP.MEMORY.CRIT}'
+              tags:
+                - tag: scope
+                  value: capacity
+      discovery_rules:
+        - uuid: d0b8c3eecc06451f993fa3efd3b108f0
+          name: 'Java metrics discovery'
+          type: SCRIPT
+          key: azure.container_app.jvm_metrics.discovery
+          delay: 1h
+          params: |
+            var obj = JSON.parse(value);
+            return JSON.stringify(obj.jvm_metrics === 'true' ? [{'{#SINGLETON}': ''}] : []);
+          description: 'Java metric discovery based on the `{$AZURE.CONTAINER_APP.JVM.METRICS}` macro.'
+          item_prototypes:
+            - uuid: ee0e19b55ac44a2abea7d475695e3641
+              name: 'JVM: Buffers: Count{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.buffers.count[{#SINGLETON}]'
+              description: 'Number of buffers in the memory pool.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmBufferCount
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+            - uuid: e6ee3ad411ce4bc8a955707a85b3d253
+              name: 'JVM: Buffers: Limit{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.buffers.limit[{#SINGLETON}]'
+              units: B
+              description: 'Amount of total memory capacity of buffers (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmBufferMemoryLimit
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+            - uuid: 69ef5c47c1734a7bb02011e56047b6b3
+              name: 'JVM: Buffers: Usage{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.buffers.usage[{#SINGLETON}]'
+              units: B
+              description: 'Amount of memory used by buffers, such as direct memory (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmBufferMemoryUsage
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+            - uuid: 52e2d0a2c807486692d49c418ef9c03b
+              name: 'JVM: GC: Actions{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.gc.actions[{#SINGLETON}]'
+              description: 'Count of JVM garbage collection actions.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmGcCount
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+              trigger_prototypes:
+                - uuid: 124a52f72fbe49f4915fc3094dc24f2b
+                  expression: 'avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.actions[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}'
+                  name: 'Azure container Apps: Garbage collector action count is high'
+                  event_name: 'Azure container Apps: Too many garbage collector action per minute (average {$AZURE.CONTAINER_APP.GC.ACTIONS.WARN} for 3m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'Garbage collection is running too frequently.'
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: 74f4c60abcef49f286da46a997ee9d12
+              name: 'JVM: GC: Duration{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.gc.duration[{#SINGLETON}]'
+              value_type: FLOAT
+              units: s
+              description: 'Duration of JVM garbage collection actions (in milliseconds).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmGcDuration
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: MULTIPLIER
+                  parameters:
+                    - '0.001'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+              trigger_prototypes:
+                - uuid: 604c77c4b09a48bb845495bd884498d3
+                  expression: 'avg(/Azure Container Apps by HTTP/azure.container_app.jvm.gc.duration[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.GC.DURATION.WARN}'
+                  name: 'Azure container Apps: Garbage collector duration is high'
+                  event_name: 'Azure container Apps: Garbage collector duration is high (average {$AZURE.CONTAINER_APP.GC.DURATION.WARN} for 3m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'Garbage collection duration has exceeded the warning threshold.'
+                  tags:
+                    - tag: scope
+                      value: performance
+            - uuid: 04462279b7ac471db6ce53d4141e2662
+              name: 'JVM: Memory: Committed, total{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.memory.committed.total[{#SINGLETON}]'
+              units: B
+              description: 'Total amount of memory guaranteed to be available for heap or non-heap (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmMemoryTotalCommitted
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+                - tag: component
+                  value: memory
+            - uuid: 8de416b52e8046a4b0b4942e433958f6
+              name: 'JVM: Memory: Committed{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.memory.committed[{#SINGLETON}]'
+              units: B
+              description: 'Amount of memory guaranteed to be available for each pool (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmMemoryCommitted
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+                - tag: component
+                  value: memory
+            - uuid: 78b36c95b4b345758d3f27909191edf1
+              name: 'JVM: Memory: Limit, total{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.memory.limit.total[{#SINGLETON}]'
+              units: B
+              description: 'Total amount of maximum obtainable memory for heap or non-heap (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmMemoryTotalLimit
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+                - tag: component
+                  value: memory
+            - uuid: 0d26b43366a64e748d0cc68749d1e973
+              name: 'JVM: Memory: Limit{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.memory.limit[{#SINGLETON}]'
+              units: B
+              description: 'Amount of maximum obtainable memory for each pool (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmMemoryLimit
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+                - tag: component
+                  value: memory
+            - uuid: 537cab7b1b2c4747864f0180662a1162
+              name: 'JVM: Memory: Used, total{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.memory.used.total[{#SINGLETON}]'
+              units: B
+              description: 'Total amount of memory used by heap or non-heap (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmMemoryTotalUsed
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+                - tag: component
+                  value: memory
+            - uuid: ef0fcfc52c744d5291187cf5969b9ecc
+              name: 'JVM: Memory: Used{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.memory.used[{#SINGLETON}]'
+              units: B
+              description: 'Amount of memory used by each pool (in bytes).'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmMemoryUsed
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+                - tag: component
+                  value: memory
+            - uuid: 0bb880700d42424cb5f44bb4e31c039b
+              name: 'JVM: Threads{#SINGLETON}'
+              type: DEPENDENT
+              key: 'azure.container_app.jvm.thread.count[{#SINGLETON}]'
+              description: 'Number of executing platform threads.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.metrics.JvmThreadCount
+                - type: MATCHES_REGEX
+                  parameters:
+                    - ^\d+$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              master_item:
+                key: azure.container_app.data.get
+              tags:
+                - tag: component
+                  value: jvm
+              trigger_prototypes:
+                - uuid: fe734da2ccf341c2bca8264679cb4740
+                  expression: 'avg(/Azure Container Apps by HTTP/azure.container_app.jvm.thread.count[{#SINGLETON}],3m)>{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}'
+                  name: 'Azure container Apps: JVM thread amount is high'
+                  event_name: 'Azure container Apps: JVM thread amount is high (average {$AZURE.CONTAINER_APP.THREAD.COUNT.WARN} for 3m)'
+                  opdata: 'Current value: {ITEM.LASTVALUE}'
+                  priority: WARNING
+                  description: 'Active JVM thread count has exceeded the warning threshold.'
+                  tags:
+                    - tag: scope
+                      value: performance
+          parameters:
+            - name: jvm_metrics
+              value: '{$AZURE.CONTAINER_APP.JVM.METRICS}'
+      tags:
+        - tag: class
+          value: cloud
+        - tag: subclass
+          value: container
+        - tag: target
+          value: azure
+      macros:
+        - macro: '{$AZURE.APP.ID}'
+          description: 'The App ID of Microsoft Azure.'
+          config:
+            type: TEXT
+            priority: '3'
+            label: 'Azure App ID'
+            description: 'Microsoft Azure App ID.'
+            required: 'YES'
+        - macro: '{$AZURE.CONTAINER_APP.CPU.CRIT}'
+          value: '90'
+          description: 'Critical threshold for CPU utilization.'
+          config:
+            type: TEXT
+            priority: '10'
+            section_name: Thresholds
+            label: 'Critical threshold for CPU'
+            description: 'Critical threshold for CPU utilization. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.CPU.WARN}'
+          value: '75'
+          description: 'Warning threshold for CPU utilization.'
+          config:
+            type: TEXT
+            priority: '9'
+            section_name: Thresholds
+            label: 'Warning threshold for CPU'
+            description: 'Warning threshold for CPU utilization. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.GC.ACTIONS.WARN}'
+          value: '10'
+          description: 'Threshold for amount of Java garbage collectors.'
+          config:
+            type: TEXT
+            priority: '17'
+            section_name: Thresholds
+            label: 'Java garbage collectors limit'
+            description: 'Threshold for amount of Java garbage collectors. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.GC.DURATION.WARN}'
+          value: '500'
+          description: 'Threshold for duration of Java garbage collectors, in milliseconds.'
+          config:
+            type: TEXT
+            priority: '18'
+            section_name: Thresholds
+            label: 'Java garbage collector duration limit'
+            description: 'Threshold for duration of Java garbage collectors, in ms. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.GPU.CRIT}'
+          value: '90'
+          description: 'Critical threshold for GPU utilization.'
+          config:
+            type: TEXT
+            priority: '14'
+            section_name: Thresholds
+            label: 'Critical threshold for GPU'
+            description: 'Critical threshold for GPU utilization. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.GPU.WARN}'
+          value: '75'
+          description: 'Warning threshold for GPU utilization.'
+          config:
+            type: TEXT
+            priority: '13'
+            section_name: Thresholds
+            label: 'Warning threshold for GPU'
+            description: 'Warning threshold for GPU utilization. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.JVM.METRICS}'
+          value: 'false'
+          description: 'Enable Java virtual machine metric collection. Useful for container apps with Java development stack.'
+          config:
+            type: LIST
+            priority: '8'
+            label: 'Get Java metrics'
+            description: 'Enable JVM metrics collection.'
+            options:
+              - value: 'false'
+                text: Disable
+              - value: 'true'
+                text: Enable
+        - macro: '{$AZURE.CONTAINER_APP.MEMORY.CRIT}'
+          value: '90'
+          description: 'Critical threshold for memory utilization.'
+          config:
+            type: TEXT
+            priority: '12'
+            section_name: Thresholds
+            label: 'Critical threshold for memory'
+            description: 'Critical threshold for memory utilization. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.MEMORY.WARN}'
+          value: '75'
+          description: 'Warning threshold for memory utilization.'
+          config:
+            type: TEXT
+            priority: '11'
+            section_name: Thresholds
+            label: 'Warning threshold for memory'
+            description: 'Warning threshold for memory utilization. In the range from 0 to 100 inclusive.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.REBOOT.WARN}'
+          value: '1'
+          description: 'Threshold for amount of reboots per minute for a replica.'
+          config:
+            type: TEXT
+            priority: '15'
+            section_name: Thresholds
+            label: 'Reboots limit'
+            description: 'Threshold for reboots per minute. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.RESPONSE.WARN}'
+          value: '5000'
+          description: 'Threshold for average response time threshold, in milliseconds.'
+          config:
+            type: TEXT
+            priority: '16'
+            section_name: Thresholds
+            label: 'Threshold for response time (ms)'
+            description: 'Threshold for average response time threshold, in ms. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.CONTAINER_APP.THREAD.COUNT.WARN}'
+          value: '500'
+          description: 'Threshold for amount of threads in Java virtual machine.'
+          config:
+            type: TEXT
+            priority: '19'
+            section_name: Thresholds
+            label: 'Java thread limit'
+            description: 'Threshold for amount of threads in JVM. No less than 0.'
+            regex: '^-?([0-9]+|(([0-9]+)\.([0-9]+)))$'
+        - macro: '{$AZURE.DATA.TIMEOUT}'
+          value: 15s
+          description: 'API response timeout.'
+          config:
+            type: TEXT
+            priority: '6'
+            section_name: Other
+            label: 'API timeout'
+            description: 'API response timeout, in seconds.'
+        - macro: '{$AZURE.PASSWORD}'
+          type: SECRET_TEXT
+          description: 'Microsoft Azure password.'
+          config:
+            type: TEXT
+            priority: '4'
+            label: 'Azure password'
+            description: 'Microsoft Azure password.'
+            required: 'YES'
+        - macro: '{$AZURE.PROXY}'
+          description: 'Sets the HTTP proxy value. If this macro is empty, then no proxy is used.'
+          config:
+            type: TEXT
+            priority: '7'
+            section_name: Other
+            label: 'HTTP proxy'
+            description: 'HTTP proxy to use for requests.'
+        - macro: '{$AZURE.RESOURCE.ID}'
+          description: 'Microsoft Azure container app resource ID.'
+          config:
+            type: TEXT
+            priority: '5'
+            label: 'Azure Container App ID'
+            description: 'Container App resource ID.'
+            required: 'YES'
+        - macro: '{$AZURE.SUBSCRIPTION.ID}'
+          description: 'Microsoft Azure subscription ID.'
+          config:
+            type: TEXT
+            priority: '1'
+            label: 'Azure subscription ID'
+            description: 'Microsoft Azure subscription ID.'
+            required: 'YES'
+        - macro: '{$AZURE.TENANT.ID}'
+          description: 'Microsoft Azure tenant ID.'
+          config:
+            type: TEXT
+            priority: '2'
+            label: 'Azure tenant ID'
+            description: 'Microsoft Azure tenant ID.'
+            required: 'YES'
+      dashboards:
+        - uuid: d28f091242da4bd6b1f7572b0db178bd
+          name: Overview
+          pages:
+            - widgets:
+                - type: item
+                  width: '15'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.running.status
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 97AAB3
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '3'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: E97659
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.5.threshold
+                      value: '5'
+                - type: gauge
+                  name: CPU
+                  'y': '2'
+                  width: '15'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.utilization.cpu
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '75'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: svggraph
+                  name: 'Traffic & cores'
+                  'y': '6'
+                  width: '72'
+                  height: '5'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 1192F0
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '1'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.bytes.tx
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 35C901
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '1'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.bytes.rx
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: INTEGER
+                      name: ds.2.axisy
+                      value: '1'
+                    - type: STRING
+                      name: ds.2.color.0
+                      value: E97659
+                    - type: INTEGER
+                      name: ds.2.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.2.fill
+                      value: '1'
+                    - type: ITEM
+                      name: ds.2.itemids.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.cores.usage
+                    - type: INTEGER
+                      name: ds.2.transparency
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.2.width
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '3'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: ZHJYM
+                - type: item
+                  x: '15'
+                  width: '15'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.provisioning.state
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 97AAB3
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E97659
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '3'
+                    - type: STRING
+                      name: thresholds.4.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.4.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.5.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.5.threshold
+                      value: '5'
+                - type: gauge
+                  name: Memory
+                  x: '15'
+                  'y': '2'
+                  width: '15'
+                  height: '4'
+                  fields:
+                    - type: INTEGER
+                      name: angle
+                      value: '270'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.utilization.memory
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '3'
+                    - type: INTEGER
+                      name: show.2
+                      value: '5'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '75'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '90'
+                    - type: INTEGER
+                      name: th_show_arc
+                      value: '1'
+                    - type: INTEGER
+                      name: th_show_labels
+                      value: '1'
+                    - type: INTEGER
+                      name: value_arc_size
+                      value: '30'
+                - type: item
+                  name: 'Response time'
+                  x: '30'
+                  width: '10'
+                  fields:
+                    - type: STRING
+                      name: bg_color
+                      value: 97AAB3
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.response.time
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '1500'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '3000'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '5000'
+                - type: svggraph
+                  name: Utilization
+                  x: '30'
+                  'y': '2'
+                  width: '42'
+                  height: '4'
+                  fields:
+                    - type: STRING
+                      name: ds.0.color.0
+                      value: 7499FF
+                    - type: INTEGER
+                      name: ds.0.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.0.fill
+                      value: '1'
+                    - type: ITEM
+                      name: ds.0.itemids.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.utilization.cpu
+                    - type: INTEGER
+                      name: ds.0.transparency
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.0.width
+                      value: '2'
+                    - type: STRING
+                      name: ds.1.color.0
+                      value: 00C48C
+                    - type: INTEGER
+                      name: ds.1.dataset_type
+                      value: '0'
+                    - type: INTEGER
+                      name: ds.1.fill
+                      value: '1'
+                    - type: ITEM
+                      name: ds.1.itemids.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.utilization.memory
+                    - type: INTEGER
+                      name: ds.1.transparency
+                      value: '3'
+                    - type: INTEGER
+                      name: ds.1.width
+                      value: '2'
+                    - type: STRING
+                      name: lefty_max
+                      value: '100'
+                    - type: STRING
+                      name: lefty_min
+                      value: '0'
+                    - type: INTEGER
+                      name: legend_lines
+                      value: '2'
+                    - type: INTEGER
+                      name: legend_statistic
+                      value: '1'
+                    - type: STRING
+                      name: reference
+                      value: INALK
+                    - type: INTEGER
+                      name: righty
+                      value: '0'
+                    - type: INTEGER
+                      name: simple_triggers
+                      value: '1'
+                - type: item
+                  name: Restarts
+                  x: '40'
+                  width: '8'
+                  fields:
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid.0
+                      value:
+                        host: 'Azure Container Apps by HTTP'
+                        key: azure.container_app.restart.count
+                    - type: INTEGER
+                      name: show.0
+                      value: '2'
+                    - type: INTEGER
+                      name: show.1
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.0.color
+                      value: 00C48C
+                    - type: STRING
+                      name: thresholds.0.threshold
+                      value: '0'
+                    - type: STRING
+                      name: thresholds.1.color
+                      value: FFBF59
+                    - type: STRING
+                      name: thresholds.1.threshold
+                      value: '2'
+                    - type: STRING
+                      name: thresholds.2.color
+                      value: FFA059
+                    - type: STRING
+                      name: thresholds.2.threshold
+                      value: '4'
+                    - type: STRING
+                      name: thresholds.3.color
+                      value: E45959
+                    - type: STRING
+                      name: thresholds.3.threshold
+                      value: '8'
+                - type: problemsbysv
+                  x: '48'
+                  width: '24'
+                  fields:
+                    - type: STRING
+                      name: reference
+                      value: LZQZA
+                    - type: INTEGER
+                      name: severities.0
+                      value: '1'
+                    - type: INTEGER
+                      name: severities.1
+                      value: '2'
+                    - type: INTEGER
+                      name: severities.2
+                      value: '3'
+                    - type: INTEGER
+                      name: severities.3
+                      value: '4'
+                    - type: INTEGER
+                      name: severities.4
+                      value: '5'
+      valuemaps:
+        - uuid: d036c13eff4f4e5881549b3f3781d557
+          name: 'Azure container app provisioning state'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: InProgress
+            - value: '2'
+              newvalue: Succeeded
+            - value: '3'
+              newvalue: Failed
+            - value: '4'
+              newvalue: Canceled
+            - value: '5'
+              newvalue: Deleting
+        - uuid: ddda75bba6f14bb7a1a4cb4ffd6c835d
+          name: 'Azure container app running status'
+          mappings:
+            - value: '0'
+              newvalue: Unknown
+            - value: '1'
+              newvalue: Progressing
+            - value: '2'
+              newvalue: Running
+            - value: '3'
+              newvalue: Stopped
+            - value: '4'
+              newvalue: Suspended
+            - value: '5'
+              newvalue: Ready
     - uuid: 29325098807848aa928b4192ad5e020f
       template: 'Azure Cosmos DB for MongoDB by HTTP'
       name: 'Azure Cosmos DB for MongoDB by HTTP'
