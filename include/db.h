@@ -817,6 +817,7 @@ typedef struct
 	unsigned char	state;
 	int		mtime;
 	const char	*error;
+	char		error_hash[ZBX_SHA512_BINARY_LENGTH];
 
 	zbx_uint64_t	flags;
 #define ZBX_FLAGS_ITEM_DIFF_UNSET			__UINT64_C(0x0000)

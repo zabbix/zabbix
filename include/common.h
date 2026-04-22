@@ -1697,6 +1697,8 @@ char	*zbx_expression_extract_constant(const char *src, const zbx_strloc_t *loc);
 /* internal on fail actions */
 #define ZBX_PREPROC_FAIL_FORCE_ERROR	4
 
+#define ZBX_SHA512_BINARY_LENGTH	64
+
 #define ZBX_HTTPFIELD_HEADER		0
 #define ZBX_HTTPFIELD_VARIABLE		1
 #define ZBX_HTTPFIELD_POST_FIELD	2
