@@ -171,8 +171,11 @@ class CHistory extends CApiService {
 				break;
 		}
 
-		if (!$options['countOutput'] && $options['history'] == ITEM_VALUE_TYPE_BINARY
-				&& $this->outputIsRequested('value', $options['output'])) {
+		if ($options['countOutput']) {
+			return (string) $result;
+		}
+
+		if ($options['history'] == ITEM_VALUE_TYPE_BINARY && $this->outputIsRequested('value', $options['output'])) {
 			foreach ($result as &$row) {
 				$row['value'] = base64_encode($row['value']);
 			}
