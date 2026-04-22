@@ -578,7 +578,7 @@ $output = [
 			'show_snmp_form' => $data['show_snmp_form'],
 			'interface_address_enabled' => $data['interface_address_enabled'],
 			'interface_port_enabled' => $data['interface_port_enabled']
-		]).');',
+		]).');'
 ];
 
 if ($data['user']['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
