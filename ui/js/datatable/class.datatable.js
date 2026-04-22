@@ -1918,7 +1918,6 @@ class CDataTable {
 		this.#resetColumns();
 
 		const user_config = this.#user_configs[tabfilter_idx];
-		console.log('loading', tabfilter_idx);
 		if (!user_config) {
 			return this;
 		}
