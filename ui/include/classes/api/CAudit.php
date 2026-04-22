@@ -637,7 +637,9 @@ class CAudit {
 	 *
 	 * @var array
 	 */
-	private const SKIP_FIELDS = ['token.creator_userid', 'token.created_at'];
+	private const SKIP_FIELDS = ['device.push_token', 'device.activated_at', 'token.creator_userid',
+		'token.created_at'
+	];
 
 	/**
 	 * Array of abstract paths that contain blob fields.

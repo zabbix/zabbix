@@ -310,16 +310,6 @@ class CDevice extends CApiService {
 
 		$token_data = reset($tokens_data);
 
-		DB::update('device', [
-			'values' => [
-				'name' => $options['name'],
-				'status' => ZBX_DEVICE_ACTIVATED,
-				'push_token' => $options['push_token'],
-				'activated_at' => time()
-			],
-			'where' => ['deviceid' => $db_device['deviceid']]
-		]);
-
 		$ins_device_token = [
 			'tokenid' => $token_data['tokenid'],
 			'deviceid' => $db_device['deviceid']
@@ -331,14 +321,13 @@ class CDevice extends CApiService {
 
 		$device = [
 			'deviceid' => $db_device['deviceid'],
-			'name' => $options['name']
+			'name' => $options['name'],
+			'status' => ZBX_DEVICE_ACTIVATED,
+			'push_token' => $options['push_token'],
+			'activated_at' => time()
 		];
 
-		$db_devices = [
-			$db_device['deviceid'] => array_intersect_key($db_device, array_flip(['deviceid', 'name']))
-		];
-
-		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_DEVICE, [$device], $db_devices);
+		self::updateForce([$device], [array_intersect_key($db_device, $device)]);
 
 		return ['token' => $token_data['token']];
 	}
@@ -362,7 +351,7 @@ class CDevice extends CApiService {
 		}
 
 		$db_device = DBfetch(DBselect(
-			'SELECT d.deviceid,d.userid,d.uuid,d.name,u.name AS username'.
+			'SELECT d.deviceid,d.userid,d.uuid,d.name,d.status,u.name AS username'.
 			' FROM device_enrollment_token det'.
 			' JOIN device d ON det.deviceid=d.deviceid'.
 			' JOIN users u ON d.userid=u.userid'.
