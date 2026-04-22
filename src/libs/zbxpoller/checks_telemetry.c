@@ -114,7 +114,6 @@ out:
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	int		ret = NOTSUPPORTED;
-	zbx_tq_query_t	query;
 	time_t		now = time(NULL);
 	time_t		lasttimestamp;
 	char		*send_out = NULL;
@@ -145,13 +144,7 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	/* when testing the item, the time range being queried is restricted only by the loopback limit */
 	lasttimestamp = 0;
 
-	if (FAIL == zbx_tq_query_from_json(item->query_fields, &query))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query format"));
-		goto out;
-	}
-
-	if (SUCCEED != send_query_clickhouse(&query, now, lasttimestamp, &conn_params, config_source_ip,
+	if (SUCCEED != send_query_clickhouse(item->telemetry_query, now, lasttimestamp, &conn_params, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &send_out,
 			&send_error))
 	{
@@ -166,9 +159,8 @@ int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	ret = SUCCEED;
 
 clean:
-	zbx_tq_query_clean(&query);
 	zbx_free(send_out);
 	zbx_free(send_error);
-out:
+
 	return ret;
 }

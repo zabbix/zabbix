@@ -9961,6 +9961,10 @@ static void	DCget_item(zbx_dc_item_t *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->username = NULL;
 			dst_item->password = NULL;
 			break;
+		case ITEM_TYPE_TELEMETRY_QUERY:
+			dst_item->query_fields = zbx_strdup(NULL, src_item->itemtype.tqitem->query_fields);
+			dst_item->telemetry_query = NULL;
+			break;
 		case ITEM_TYPE_SCRIPT:
 			dst_item->params = zbx_strdup(NULL, src_item->itemtype.scriptitem->script);
 
@@ -10218,10 +10222,10 @@ static void	DCget_telemetry_query_item(zbx_dc_telemetry_query_item_t *dst_item, 
 	else
 		zbx_strscpy(dst_item->timeout_orig, src_item->timeout);
 
-	zbx_strscpy(dst_item->query_fields_orig, src_item->itemtype.tqitem->query_fields);
+	dst_item->query_fields = zbx_strdup(NULL, src_item->itemtype.tqitem->query_fields);
+	dst_item->telemetry_query = NULL;
 
 	dst_item->timeout = 0;
-	dst_item->query_fields = NULL;
 }
 
 void	zbx_dc_config_clean_items(zbx_dc_item_t *items, int *errcodes, size_t num)

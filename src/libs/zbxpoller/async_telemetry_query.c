@@ -113,7 +113,8 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " key:'%s'", __func__, item->itemid, item->key);
 
 	now = time(NULL);
-	query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
+	query = item->telemetry_query;
+	item->telemetry_query = NULL;
 
 	/* FIXME: placeholder */
 	const telemetry_query_conn_params_clickhouse_t	conn_params =
@@ -138,14 +139,6 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 	const char *config_ssl_key_location	= poller_config->config_ssl_key_location;
 
 	lasttimestamp = item->mtime;
-
-	if (FAIL == zbx_tq_query_from_json(item->query_fields, query))
-	{
-		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid query format"));
-		zbx_free(query);
-
-		goto out;
-	}
 
 	if (SUCCEED != async_send_telemetry_query_clickhouse(item, query, now, lasttimestamp, &conn_params,
 			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,

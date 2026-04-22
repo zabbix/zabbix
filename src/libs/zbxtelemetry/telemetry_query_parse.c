@@ -26,7 +26,7 @@
  * Return value: resulting integer value of the enum that out points to       *
  *                                                                            *
  ******************************************************************************/
-typedef int (*tq_enum_set_func_t)(const char *str, void *out);
+typedef int	(*tq_enum_set_func_t)(const char *str, void *out);
 
 /******************************************************************************
  *                                                                            *
@@ -430,7 +430,16 @@ out:
 	return ret;
 }
 
-static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query)
+static int tq_expand_macros(char **text, zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx)
+{
+	if (NULL == *text)
+		return SUCCEED;
+
+	return macro_expand_cb(text, macro_expand_ctx);
+}
+
+static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query,
+		zbx_tq_macro_expand_func_t macro_expand_cb, void *macro_expand_ctx)
 {
 	/* in case of an error the query is cleaned by the calling function */
 	int			ret = FAIL;
@@ -523,7 +532,49 @@ static int	tq_parse_query(struct zbx_json_parse *jp, zbx_tq_query_t *query)
 		}
 	}
 
-	/* TODO: expand macros */
+	if (NULL != macro_expand_cb)
+	{
+		for (int i = 0; i < query->columns.values_num; i++)
+		{
+			if (SUCCEED != tq_expand_macros(&query->columns.values[i].key, macro_expand_cb,
+					macro_expand_ctx))
+				goto out;
+		}
+
+		for (int i = 0; i < query->aggregated_columns.values_num; i++)
+		{
+			zbx_tq_aggr_column_t *aggr_col = &query->aggregated_columns.values[i];
+
+			if (SUCCEED != tq_expand_macros(&aggr_col->alias, macro_expand_cb, macro_expand_ctx))
+				goto out;
+
+			for (int j = 0; j < aggr_col->args.values_num; j++)
+			{
+				if (SUCCEED != tq_expand_macros(&aggr_col->args.values[j], macro_expand_cb,
+						macro_expand_ctx))
+					goto out;
+			}
+		}
+
+		for (int i = 0; i < query->conditions.values_num; i++) {
+			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].json_path, macro_expand_cb,
+					macro_expand_ctx))
+				goto out;
+			if (SUCCEED != tq_expand_macros(&query->conditions.values[i].value, macro_expand_cb,
+					macro_expand_ctx))
+				goto out;
+		}
+
+		if (SUCCEED != tq_expand_macros(&query->formula, macro_expand_cb, macro_expand_ctx))
+			goto out;
+
+		if (SUCCEED != tq_expand_macros(&time_shift, macro_expand_cb, macro_expand_ctx))
+			goto out;
+		if (SUCCEED != tq_expand_macros(&loopback_limit, macro_expand_cb, macro_expand_ctx))
+			goto out;
+		if (SUCCEED != tq_expand_macros(&aggregation_size, macro_expand_cb, macro_expand_ctx))
+			goto out;
+	}
 
 	if (NULL != time_shift)
 	{
@@ -709,16 +760,20 @@ static int	tq_validate_query(const zbx_tq_query_t *query, char *error, size_t ma
  * Purpose: parses json_str contents and stores them into query and validates *
  *          it                                                                *
  *                                                                            *
- * Parameters: json_str     - [IN]                                            *
- *             query        - [OUT] parsed query, must not be initialized     *
- *                                  beforehand                                *
+ * Parameters: json_str         - [IN]                                        *
+ *             query            - [OUT] parsed query, must not be initialized *
+ *                                      beforehand                            *
+ *             macro_expand_cb  - [IN] NULL or callback called on every field *
+ *                                     where macros are supported             *
+ *             macro_expand_ctx - [IN] context passed to macro_expand_cb      *
  *                                                                            *
  * Return value: SUCCEED - json_str parsed successfully, query is valid,      *
  *                         query must be cleaned after use                    *
  *               FAIL    - otherwise, query is not initialized                *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
+int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
+		void *macro_expand_ctx)
 {
 	int			ret = FAIL;
 	struct zbx_json_parse	jp;
@@ -734,7 +789,7 @@ int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query)
 		goto out;
 	}
 
-	if (FAIL == tq_parse_query(&jp, query))
+	if (FAIL == tq_parse_query(&jp, query, macro_expand_cb, macro_expand_ctx))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "%s(): cannot parse query", __func__);
 		goto out;

@@ -17,6 +17,8 @@
 
 #include "zbxalgo.h"
 
+typedef int	(*zbx_tq_macro_expand_func_t)(char **text, void *ctx);
+
 typedef enum
 {
 	ZBX_TQ_CATEGORY_UNKNOWN = 0,
@@ -114,7 +116,8 @@ typedef struct
 }
 zbx_tq_query_t;
 
-int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query);
+int	zbx_tq_query_from_json(const char *json_str, zbx_tq_query_t *query, zbx_tq_macro_expand_func_t macro_expand_cb,
+		void *macro_expand_ctx);
 void	zbx_tq_query_clean(zbx_tq_query_t *query);
 
 void	zbx_tq_sql_generate_postgresql(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp, char **sql);

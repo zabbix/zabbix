@@ -19,6 +19,7 @@
 #include "zbxcomms.h"
 #include "zbxeval.h"
 #include "zbxavailability.h"
+#include "zbxtelemetry.h"
 #include "zbxversion.h"
 #include "zbxvault.h"
 #include "zbxregexp.h"
@@ -197,6 +198,7 @@ typedef struct
 	int			timeout;
 	char			*url;
 	char			*query_fields;
+	zbx_tq_query_t		*telemetry_query;
 	char			*posts;
 	char			*status_codes;
 	char			*http_proxy;
@@ -305,8 +307,8 @@ typedef struct
 	int			mtime;
 	char			timeout_orig[ZBX_ITEM_TIMEOUT_LEN_MAX];
 	int			timeout;
-	/* TODO: query_fields should probably be on the heap (char * allocated separately) */
-	char			query_fields_orig[ZBX_ITEM_QUERY_FIELDS_LEN_MAX], *query_fields;
+	char			*query_fields;
+	zbx_tq_query_t		*telemetry_query;
 	unsigned char		preprocessing;
 }
 zbx_dc_telemetry_query_item_t;

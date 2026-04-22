@@ -21,6 +21,7 @@
 #include "checks_browser.h"
 #include "checks_simple.h"
 #include "checks_telemetry.h"
+#include "zbxtelemetry.h"
 
 #ifdef HAVE_NETSNMP
 #	include "checks_snmp.h"
@@ -576,13 +577,11 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				break;
 		}
 
-		/* TODO: likely remove macro expansion for telemetry query from here when poller is added */
 		switch (items[i].type)
 		{
 			case ITEM_TYPE_ZABBIX:
 			case ITEM_TYPE_ZABBIX_ACTIVE:
 			case ITEM_TYPE_EXTERNAL:
-			case ITEM_TYPE_TELEMETRY_QUERY:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
@@ -726,6 +725,22 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 					zbx_free(timeout);
 					continue;
 				}
+				break;
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
+
+				if (SUCCEED != zbx_tq_query_from_json(items[i].query_fields, items[i].telemetry_query,
+						NULL, NULL))
+				{
+					SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
+					errcodes[i] = CONFIG_ERROR;
+					zbx_free(items[i].telemetry_query);
+					continue;
+				}
+
+				/* query_fields are not needed after the query has been parsed */
+				zbx_free(items[i].query_fields);
+				break;
 		}
 
 		if (NULL != timeout)
@@ -1031,6 +1046,20 @@ void	zbx_prepare_httpagent_items(zbx_dc_httpagent_item_t *items, int *errcodes, 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+typedef struct
+{
+	zbx_dc_um_handle_t			*um_handle;
+	const zbx_dc_telemetry_query_item_t	*item;
+}
+telemetry_query_macro_expand_ctx_t;
+
+static int	telemetry_query_macro_expand_cb(char **text, void *ctx)
+{
+	telemetry_query_macro_expand_ctx_t	*pctx = (telemetry_query_macro_expand_ctx_t *)ctx;
+
+	return zbx_dc_expand_user_and_func_macros(pctx->um_handle, text, &pctx->item->hostid, 1, NULL);
+}
+
 void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int *errcodes, int num,
 		AGENT_RESULT *results)
 {
@@ -1044,6 +1073,11 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 
 	for (int i = 0; i < num; i++)
 	{
+		telemetry_query_macro_expand_ctx_t	query_macro_expand_ctx = {
+			.um_handle = um_handle,
+			.item = &items[i]
+		};
+
 		zbx_init_agent_result(&results[i]);
 		errcodes[i] = SUCCEED;
 
@@ -1075,7 +1109,19 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 			items[i].timeout = timeout_sec;
 		}
 
-		ZBX_STRDUP(items[i].query_fields, items[i].query_fields_orig);
+		items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
+
+		if (SUCCEED != zbx_tq_query_from_json(items[i].query_fields, items[i].telemetry_query,
+				telemetry_query_macro_expand_cb, &query_macro_expand_ctx))
+		{
+			SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Invalid query format"));
+			errcodes[i] = CONFIG_ERROR;
+			zbx_free(items[i].telemetry_query);
+			continue;
+		}
+
+		/* query_fields are not needed after the query has been parsed */
+		zbx_free(items[i].query_fields);
 	}
 
 	zbx_free(timeout);
@@ -1183,6 +1229,14 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
 				zbx_free(items[i].password);
 				zbx_free(items[i].jmx_endpoint);
 				break;
+			case ITEM_TYPE_TELEMETRY_QUERY:
+				zbx_free(items[i].query_fields);
+				if (NULL != items[i].telemetry_query)
+				{
+					zbx_tq_query_clean(items[i].telemetry_query);
+					zbx_free(items[i].telemetry_query);
+				}
+				break;
 		}
 
 		zbx_free_agent_result(&results[i]);
@@ -1253,6 +1307,12 @@ void	zbx_clean_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int n
 		zbx_free(items[i].key);
 
 		zbx_free(items[i].query_fields);
+
+		if (NULL != items[i].telemetry_query)
+		{
+			zbx_tq_query_clean(items[i].telemetry_query);
+			zbx_free(items[i].telemetry_query);
+		}
 
 		zbx_free_agent_result(&results[i]);
 	}
