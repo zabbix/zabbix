@@ -352,7 +352,7 @@ class CTrend extends CApiService {
 				'limit' => $options['limit']
 			]);
 
-			if ($storage->getErrorCode()) {
+			if ($storage->getErrorCode() !== null) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
 			}
 

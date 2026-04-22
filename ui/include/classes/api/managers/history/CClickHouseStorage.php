@@ -634,11 +634,6 @@ class CClickHouseStorage {
 			// Internal server error code
 			$this->error_code = 500;
 			$this->error_message = $error->getMessage();
-			// error_log($this->error_message);
-			error_log('multipart form data stored to file '.APP::getRootDir().'/multipart-form-data.txt');
-			$debug = $stream_context['http']['header']."\r\n\r\n\r\n".$stream_context['http']['content'];
-			$debug .= "\r\n\r\n".json_encode(compact('query', 'param'), JSON_PRETTY_PRINT);
-			file_put_contents(APP::getRootDir().'/multipart-form-data.txt', $debug);
 		}
 
 		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, $stream_context['http']['method'],
@@ -728,7 +723,7 @@ class CClickHouseStorage {
 
 		if ($options['itemids'] !== null) {
 			$sql_parts['param']['UInt64']['pre_itemids'] = array_unique((array) $options['itemids']);
-			$sql_parts['prewhere']['itemid'] = is_array($options['itemids'])
+			$sql_parts['prewhere']['pre_itemids'] = is_array($options['itemids'])
 				? 'itemid IN {pre_itemids:Array(UInt64)}'
 				: 'itemid={pre_itemids:UInt64}';
 		}
@@ -736,13 +731,13 @@ class CClickHouseStorage {
 		if ($options['time_from'] !== null) {
 			$time_from = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_from']);
 			$sql_parts['param']['UInt64']['pre_time_gte'] = $time_from;
-			$sql_parts['prewhere']['clock_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
+			$sql_parts['prewhere']['pre_time_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
 		}
 
 		if ($options['time_till'] !== null) {
 			$time_till = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_till']);
 			$sql_parts['param']['UInt64']['pre_time_lt'] = $time_till + 1;
-			$sql_parts['prewhere']['clock_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
+			$sql_parts['prewhere']['pre_time_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
 		}
 
 		if (is_array($options['filter']) && $options['filter']) {
@@ -751,6 +746,12 @@ class CClickHouseStorage {
 
 		if (is_array($options['search']) && $options['search']) {
 			$sql_parts = $this->addQuerySearchOptions($sql_parts, $options);
+		}
+
+		if ($options['countOutput']) {
+			$sql_parts['select'] = ['rowscount' => 'count()'];
+
+			return $sql_parts;
 		}
 
 		if ($options['sortfield'] !== null) {
@@ -773,12 +774,6 @@ class CClickHouseStorage {
 	 */
 	protected function addQueryOutputOptions(array $sql_parts, array $options): array {
 		$value = 'value';
-
-		if ($options['countOutput']) {
-			$sql_parts['select'] = ['rowscount' => 'count()'];
-
-			return $sql_parts;
-		}
 
 		if ($options['maxValueSize'] !== null) {
 			$max_length = (int) $options['maxValueSize'];
@@ -846,46 +841,40 @@ class CClickHouseStorage {
 	protected function addQueryFilterOptions(array $sql_parts, array $options): array {
 		$filter = [];
 
-		$fields = self::VALUE_TYPE_SCHEMA[$options['history']];
+		$fields = ['clock' => 'UInt64', 'ns' => 'Int32'] + self::VALUE_TYPE_SCHEMA[$options['history']];
 		foreach (array_intersect_key($fields, $options['filter']) as $field => $param_type) {
 			$sql_parts['param'][$param_type]['filter_'.$field] = $options['filter'][$field];
-			$filter[$field] = is_array($options['filter'][$field])
-				? $field.' IN {filter_'.$field.':Array('.$param_type.')}'
-				: $field.'={filter_'.$field.':'.$param_type.'}';
+			$condition = is_array($options['filter'][$field])
+				? ' IN {filter_'.$field.':Array('.$param_type.')}'
+				: '={filter_'.$field.':'.$param_type.'}';
+			$filter[$field] = match($field) {
+				'clock' => 'toUnixTimestamp(clock_ns)'.$condition,
+				'ns' => 'toUnixTimestamp64Nano(clock_ns)%1000000000'.$condition,
+				default => $field.$condition
+			};
 		}
 
-		$clock_fields = array_intersect_key($options['filter'], array_flip(['clock', 'ns']));
-
-		if ($clock_fields) {
-			$clock_fields += ['clock' => time()];
-			$filter['clock'] = is_array($clock_fields['clock'])
-				? 'toUnixTimestamp(clock_ns) IN {filter_clock:Array(UInt64)}'
-				: 'toUnixTimestamp(clock_ns)={filter_clock:UInt64}';
-			$sql_parts['param']['UInt64']['filter_clock'] = $clock_fields['clock'];
-
-			if (array_key_exists('ns', $clock_fields)) {
-				$ns = is_array($clock_fields['ns'])
-					? 'toUnixTimestamp64Nano(clock_ns)%1000000000 IN {filter_ns:Array(Int32)}'
-					: 'toUnixTimestamp64Nano(clock_ns)%1000000000={filter_ns:Int32}';
-				$sql_parts['param']['Int32']['filter_ns'] = $clock_fields['ns'];
-				$filter['clock'] = '('.$filter['clock'].' AND '.$ns.')';
-			}
-
-			if ($options['time_from'] === null && $options['time_till'] === null) {
-				$gte = is_array($clock_fields['clock']) ? min($clock_fields['clock']) : $clock_fields['clock'];
-				$lte = is_array($clock_fields['clock']) ? max($clock_fields['clock']) : $clock_fields['clock'];
-
-				$sql_parts['param']['UInt64']['pre_time_gte'] = $gte;
-				$sql_parts['param']['UInt64']['pre_time_lt'] = $lte + 1;
-				$sql_parts['prewhere']['clock_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
-				$sql_parts['prewhere']['clock_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
-			}
+		if (!$filter) {
+			return $sql_parts;
 		}
 
 		$sql_parts['where']['filter'] = implode($options['searchByAny'] ? ' OR ' : ' AND ', $filter);
 
 		if ($options['searchByAny'] && count($filter) > 1) {
 			$sql_parts['where']['filter'] = '('.$sql_parts['where']['filter'].')';
+		}
+
+		/**
+		 * When filtering by 'clock' or 'ns' without 'time_from' and 'time_till' to improve performance add
+		 * PREWHERE by max/min clock. If filter do not contain 'clock' PREWHERE is added within current timestamp
+		 */
+		$clock_fields = array_intersect_key($options['filter'], array_flip(['clock', 'ns']));
+		if ($clock_fields && $options['time_from'] === null && $options['time_till'] === null) {
+			$clock = $clock_fields['clock'] ?? time();
+			$sql_parts['param']['UInt64']['pre_time_gte'] = is_array($clock) ? min($clock) : $clock;
+			$sql_parts['param']['UInt64']['pre_time_lt'] = (is_array($clock) ? max($clock) : $clock) + 1;
+			$sql_parts['prewhere']['pre_time_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
+			$sql_parts['prewhere']['pre_time_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
 		}
 
 		return $sql_parts;

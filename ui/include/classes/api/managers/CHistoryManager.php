@@ -155,7 +155,7 @@ class CHistoryManager {
 				/** @var CClickHouseStorage $storage_provider */
 				$results += $storage_provider->getItemsHavingValues($storage_items, $period) ?? [];
 
-				if ($storage_provider->getErrorCode()) {
+				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
 				}
 			}
@@ -233,7 +233,7 @@ class CHistoryManager {
 				/** @var CClickHouseStorage $storage_provider */
 				$results += $storage_provider->getLastValues($storage_items, $limit, $period, $length) ?? [];
 
-				if ($storage_provider->getErrorCode()) {
+				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
 				}
 			}
@@ -785,7 +785,7 @@ class CHistoryManager {
 					$interval
 				) ?? [];
 
-				if ($storage_provider->getErrorCode()) {
+				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
 				}
 			}
@@ -1132,7 +1132,7 @@ class CHistoryManager {
 				$results += $storage_provider->getGraphAggregationByWidth($storage_items, $time_from, $time_to, $width)
 					?? [];
 
-				if ($storage_provider->getErrorCode()) {
+				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
 				}
 			}
@@ -1430,7 +1430,7 @@ class CHistoryManager {
 				$results += $storage_provider->getAggregatedValues($storage_items, $function, $time_from, $time_to)
 					?? [];
 
-				if ($storage_provider->getErrorCode()) {
+				if ($storage_provider->getErrorCode() !== null) {
 					error($storage_provider->getErrorMessage(), true);
 				}
 			}
