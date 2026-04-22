@@ -637,7 +637,7 @@ class CClickHouseStorage {
 		}
 
 		CProfiler::getInstance()->profileClickhouse(microtime(true) - $time_start, $stream_context['http']['method'],
-			$this->url->getUrl(), $stream_context['http']['content']
+			$this->url->getUrl(), json_encode(['query' => $query] + $form_values)
 		);
 
 		return $result === null ? null : $result['data'];

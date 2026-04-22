@@ -253,13 +253,15 @@ class CProfiler {
 			$debug[] = BR();
 		}
 
-		$debug[] = BR();
+		if ($this->elasticQueryLog) {
+			$debug[] = BR();
+		}
 
 		foreach ($this->clickhouseQueryLog as $query) {
 			$time = $query[0];
 
 			$record = [
-				'Clickhouse ('.$time.'): ',
+				'ClickHouse ('.$time.'): ',
 				$query[1].' ',
 				(new CSpan($query[2]))->addClass(ZBX_STYLE_BLUE),
 				BR(),

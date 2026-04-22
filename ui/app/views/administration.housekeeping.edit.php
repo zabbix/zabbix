@@ -170,9 +170,9 @@ foreach ([ZBX_HISTORY_SOURCE_CLICKHOUSE, ZBX_HISTORY_SOURCE_ELASTIC] as $storage
 	foreach ($value_type_storage as $value_type => $storage) {
 		$house_keeper_tab->addRow(
 			new CLabel(itemValueTypeString($value_type)),
-			array_key_exists('value_ttl', $storage)
-				? array_slice(getTimeUnitFilters($storage['value_ttl']), -1)[0]
-				: _('Not available')
+			$storage['value_ttl'] === null
+				? _('Not available')
+				: array_slice(getTimeUnitFilters($storage['value_ttl']), -1)[0]
 		);
 	}
 }
