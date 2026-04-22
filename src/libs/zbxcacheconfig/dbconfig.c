@@ -8445,6 +8445,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
+
 	DCsync_item_discovery(&item_discovery_sync);
 
 	/* relies on items, must be after DCsync_items() */
@@ -8456,6 +8457,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	DCsync_functions(&func_sync, new_revision, ptriggerids, pfunction_timers);
 
 	FINISH_SYNC;
+
+	/* make memory available to sync triggers, trigger tags and item tags  */
+	zbx_dbsync_clear(&if_sync);
+	zbx_dbsync_clear(&items_sync);
+	zbx_dbsync_clear(&item_discovery_sync);
+	zbx_dbsync_clear(&itempp_sync);
+	zbx_dbsync_clear(&itemscrp_sync);
+	zbx_dbsync_clear(&func_sync);
 
 	if (NULL != pnew_items)
 	{
@@ -8887,7 +8896,9 @@ clean:
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-
+#ifdef	HAVE_MALLOC_TRIM
+	malloc_trim(128 * ZBX_MEBIBYTE);
+#endif
 	return new_revision;
 }
 
