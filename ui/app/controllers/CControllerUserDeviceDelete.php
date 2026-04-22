@@ -43,6 +43,10 @@ class CControllerUserDeviceDelete extends CController {
 	}
 
 	protected function checkPermissions(): bool {
+		if (CWebUser::isGuest() || !CTemporaryMobileFeatureHelper::isEnabled()) {
+			return false;
+		}
+
 		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN) ||
 				!($this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)
 					&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES))) {

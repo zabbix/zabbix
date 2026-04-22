@@ -431,8 +431,6 @@ class CControllerUserroleEdit extends CControllerUserroleEditGeneral {
 			'roleids' => $roleid
 		]);
 
-		error_log(json_encode($roles[0]['rules']['devices.actions']));
-
 		return $this->getRules($roles[0]['rules']);
 	}
 

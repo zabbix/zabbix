@@ -402,7 +402,6 @@ if (CTemporaryMobileFeatureHelper::isEnabled()) {
 		]);
 
 	$devices_actions = [];
-	error_log(json_encode($data['rules']['devices.actions']));
 	foreach ($data['labels']['devices_actions'] as $action => $label) {
 		$devices_actions[] = (new CDiv(
 			(new CCheckBox('devices_actions[]', $action))
