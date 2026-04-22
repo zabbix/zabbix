@@ -615,19 +615,20 @@ class testFormUserProfile extends CLegacyWebTest {
 			// #0. Scenario for ZBX-27632.
 			[
 				[
-					'expected' => TEST_BAD,
-					'messages_enabled' => true,
-					'checkbox_state' => true,
-					'timeout' => '86401',
+					'error_title' => 'Cannot update user',
 					'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
+					'frontend_notifications' => [
+						'Frontend notifications' => true,
+						'Message timeout' => '86401'
+					],
 					'trigger_severity' => [
-						'messages_triggers.recovery',
-						'messages_triggers.severities_0',
-						'messages_triggers.severities_1',
-						'messages_triggers.severities_2',
-						'messages_triggers.severities_3',
-						'messages_triggers.severities_4',
-						'messages_triggers.severities_5'
+						'Recovery' => false,
+						'Not classified' => false,
+						'Information' => false,
+						'Warning' => false,
+						'Average' => false,
+						'High' => false,
+						'Disaster' => false
 					],
 					'trigger_severity_status' => [
 						'messages[triggers.recovery]',
@@ -650,16 +651,10 @@ class testFormUserProfile extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
 		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
-		$form->getField('id:messages_enabled')->fill($data['messages_enabled']);
-		$form->getField('id:messages_timeout')->fill($data['timeout']);
-
-		// Uncheck trigger severity checkboxes.
-		foreach ($data['trigger_severity'] as $id) {
-			$this->query('id:' . $id)->one()->click();
-		}
-
-		$this->query('id:update')->one()->click();
-
+		$form->fill($data['frontend_notifications']);
+		$form->fill($data['trigger_severity']);
+		$this->query('button:Update')->one()->click();
+		$this->assertMessage($data['expected'], $data['error_title'], $data['error_msg']);
 		// Assert correct checkbox state.
 		foreach ($data['trigger_severity_status'] as $name) {
 			$this->assertTrue($form->getField('name:' . $name)->isAttributePresent(['type' => 'hidden'])
