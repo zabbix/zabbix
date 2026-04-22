@@ -314,4 +314,16 @@ class CDatatableElement extends CTableElement {
 
 		return $this;
 	}
+
+	public function waitUntilRowsCount($count) {
+		$table = $this;
+		CElementQuery::wait(3)->until(function () use ($table, $count) {
+			try {
+				return $table->getRows()->count() === $count;
+			}
+			catch (Exception $e) {
+				// Code is not missing here.
+			}
+		}, 'Failed to wait until there are exactly '.$count.' rows in the datatable.');
+	}
 }

@@ -246,18 +246,14 @@ class testPageMonitoringLatestData extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Host groups and Show details.
+			// Host groups.
 			[
 				[
 					'filter' => [
-						'Host groups' => 'Another group to check Overview',
-						'Show details' => true
+						'Host groups' => 'Another group to check Overview'
 					],
 					'result' => [
-						[
-							'Name' => "4_item".
-							"\ntrap[4]"
-						]
+						['Name' => '4_item']
 					]
 				]
 			],
@@ -432,25 +428,17 @@ class testPageMonitoringLatestData extends CWebTest {
 					]
 				]
 			],
-			// Tags None.
-			[
-				[
-					'filter' => [
-						'Name' => 'tag_item_1'
-					],
-					'Show tags' => 'None',
-					'result' => [
-						['Name' => 'tag_item_1']
-					]
-				]
-			],
 			// Tags: 1.
 			[
 				[
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Show tags' => '1',
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 1
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => 'component: name:tag_item_1']
 					]
@@ -462,7 +450,11 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Show tags' => '2',
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 2
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value"]
 					]
@@ -474,8 +466,12 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Show tags' => '3',
-					'Tags name' => 'Full',
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 3,
+							'Tag name display' => 'Full'
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
 					]
@@ -487,7 +483,11 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Tags name' => 'Shortened',
+					'header_filter' => [
+						'Tags' => [
+							'Tag name display' => 'Shortened'
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "com: name:tag_item_1\ntag: filtering_value\ntag: 0"]
 					]
@@ -499,7 +499,11 @@ class testPageMonitoringLatestData extends CWebTest {
 					'filter' => [
 						'Name' => 'tag_item_1'
 					],
-					'Tags name' => 'None',
+					'header_filter' => [
+						'Tags' => [
+							'Tag name display' => 'None'
+						]
+					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "name:tag_item_1\nfiltering_value\n0"]
 					]
@@ -509,8 +513,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'tag_item_1',
-						'Tag display priority' => 'tag_'
+						'Name' => 'tag_item_1'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Tag display priority' => 'tag_'
+						]
 					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "component: name:tag_item_1\ntag: filtering_value\ntag_number: 0"]
@@ -521,8 +529,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'tag_item_1',
-						'Tag display priority' => 'tag_number,tag,component'
+						'Name' => 'tag_item_1'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Tag display priority' => 'tag_number,tag,component'
+						]
 					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "tag_number: 0\ntag: filtering_value\ncomponent: name:tag_item_1"]
@@ -533,8 +545,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'tag_item_1',
-						'Tag display priority' => 'tag'
+						'Name' => 'tag_item_1'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Tag display priority' => 'tag'
+						]
 					],
 					'result' => [
 						['Name' => 'tag_item_1', 'Tags' => "tag: filtering_value\ncomponent: name:tag_item_1\ntag_number: 0"]
@@ -552,13 +568,25 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->getDatatable()->waitUntilReady();
 
 		// Expand filter if it is collapsed.
 		CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT)->expand();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
+
+		// Set the Tags header filter.
+		$table = $this->getDatatable()->waitUntilReady();
+		$tag_number = CTestArrayHelper::get($data, 'header_filter.Tags.Number of tags', 3);
+		$tag_display = CTestArrayHelper::get($data, 'header_filter.Tags.Tag name display', 'Full');
+		$tag_priority = CTestArrayHelper::get($data, 'header_filter.Tags.Tag display priority', '');
+		$this->filterFromHeader([
+			'Tags' => [
+				'Number of tags' => $tag_number,
+				'Tag name display' => $tag_display,
+				'Tag display priority' => $tag_priority
+			]
+		]);
 		$table->waitUntilReady()->invalidate();
 
 		// Fill filter form with data.
@@ -570,21 +598,12 @@ class testPageMonitoringLatestData extends CWebTest {
 			$form->getField('id:tags_0')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags', []));
 		}
 
-		$form->getField('id:show_tags_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Show tags', '3'));
-		$form->getField('id:tag_name_format_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags name', 'Full'));
-
 		$form->submit();
-		$table->waitUntilReady();
+		$this->page->waitUntilReady();
+		$table->waitUntilRowsCount(count($data['result']));
 
 		// Check filtered result.
 		$this->assertDatatableData($data['result']);
-
-		// Check Show tags filter setting.
-		if (CTestArrayHelper::get($data, 'Show tags') === 'None') {
-			$this->assertEquals(['', 'Host', 'Name', 'Last check', 'Last value', 'Change', '', 'Info'],
-					$this->query('id:latest')->one()->asDatatable()->getHeadersText()
-			);
-		}
 
 		// Reset filter not to impact the results of next tests.
 		$this->query('button:Reset')->one()->click();
@@ -663,7 +682,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		foreach ($data['subfilter'] as $header => $values) {
 			foreach ($values as $value) {
 				$this->query('xpath://h3[text()='.CXPathHelper::escapeQuotes($header).']/..//a[text()='.
-						CXPathHelper::escapeQuotes($value).']')->waitUntilClickable()->one()->click();
+						CXPathHelper::escapeQuotes($value).']')->waitUntilVisible()->one()->click();
 				$this->page->waitUntilReady();
 			}
 		}
@@ -717,7 +736,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		}
 
 		$this->query('id:latest')->one()->asDatatable()->waitUntilReady()->query('button', $tag['tag'].$tag['value'])
-				->waitUntilClickable()->one()->click();
+				->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 
 		// Check that tag value is selected in subfilter under correct header.
@@ -898,7 +917,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Find rows from the data provider and click on the description icon if such should persist.
 		$row = $this->query('id:latest')->one()->asDatatable()->waitUntilReady()->findRow('Name', $data['Item name'], true);
 
-		if (CTestArrayHelper::get($data,'description', false)) {
+		if (CTestArrayHelper::get($data, 'description', false)) {
 			$row->query('class:zi-alert-with-content')->one()->click()->waitUntilReady();
 			$overlay = $this->query('xpath://div[contains(@class, "hintbox-static")]')->one();
 
@@ -958,7 +977,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();
-		$table->waitUntilReady()->invalidate();
+		$table->waitUntilRowsCount(1);
 		$row = $table->getRow(0);
 
 		foreach (['Last check', 'Last value'] as $column) {

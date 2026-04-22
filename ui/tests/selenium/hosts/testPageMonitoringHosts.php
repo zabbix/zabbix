@@ -854,7 +854,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=host.view&filter_reset=1');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$this->page->waitUntilReady();
-		$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
+		$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 
 		// Check table contents before filtering.
 		$start_rows_count = $table->getRows()->count();
@@ -864,19 +864,18 @@ class testPageMonitoringHosts extends CWebTest {
 		// Filter hosts.
 		$form->fill(['Name' => 'Empty host']);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
-		$table->waitUntilReady();
+		$this->page->waitUntilReady();
 
 		// Check that filtered count matches expected.
-		$this->assertEquals(1, $table->getRows()->count());
+		$table->waitUntilRowsCount(1);
 		$this->assertDatatableStats(1);
 
 		// After pressing reset button, check that previous hosts are displayed again.
 		$this->query('button:Reset')->one()->click();
-		$this->page->waitUntileady();
+		$this->page->waitUntilReady();
 		$table->waitUntilReady()->invalidate();
-		$reset_rows_count = $table->getRows()->count();
-		$this->assertEquals($start_rows_count, $reset_rows_count);
-		$this->assertDatatableStats($reset_rows_count);
+		$table->waitUntilRowsCount($start_rows_count);
+		$this->assertDatatableStats($start_rows_count);
 		$this->assertEquals($start_contents, $this->getDatatableColumnData('Name'));
 	}
 

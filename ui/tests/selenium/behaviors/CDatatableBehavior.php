@@ -209,7 +209,8 @@ class CDatatableBehavior extends CTableBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_filter as $column => $select_data) {
-			$table->getHeaderByText($column)->query('tag:button')->one()->click();
+			$header = $table->getHeaderByText($column);
+			$header->query('tag:button')->one()->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($select_data as $field => $value) {
@@ -217,6 +218,9 @@ class CDatatableBehavior extends CTableBehavior {
 						->getAttribute('for');
 				$popup_dialog->query('id', $for)->one()->detect()->fill($value);
 			}
+
+			// Click on the header to close the popup.
+			$header->click(true);
 		}
 	}
 
