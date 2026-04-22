@@ -401,9 +401,10 @@ class ZBase {
 	 * @return mixed
 	 */
 	public static function getConfigValue(string $key, ?string $default = null): mixed {
-		if (array_key_exists($key, self::getInstance()->config)
-				&& (is_null($default) || !empty(self::getInstance()->config[$key]))) {
-			return self::getInstance()->config[$key];
+		if (array_key_exists($key, self::getInstance()->config)) {
+			return ($default !== null && self::getInstance()->config[$key] === '')
+				? $default
+				: self::getInstance()->config[$key];
 		}
 
 		return $default;
