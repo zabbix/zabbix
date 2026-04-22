@@ -2462,7 +2462,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		const char *config_ssl_key_location, const char *server)
 {
 	struct zbx_json_parse		jp_config, jp_kvs_paths = {0};
-	int				ret;
+	int				ret, locked = 0;
 	struct zbx_json			j;
 	char				*error = NULL;
 	zbx_uint64_t			config_revision, hostmap_revision;
