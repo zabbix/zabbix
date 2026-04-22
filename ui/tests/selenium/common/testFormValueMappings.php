@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -99,14 +99,14 @@ class testFormValueMappings extends CWebTest {
 		$this->assertEquals(['', 'Type', 'Value', '', 'Mapped to', ''], $mappings_table->getHeadersText());
 		$row = $mappings_table->getRow(0);
 		foreach (['Value', 'Mapped to'] as $mapping_column) {
-			$mapping_field = $row->getColumn($mapping_column)->query('xpath:.//input')->one();
+			$mapping_field = $row->getColumn($mapping_column)->query('xpath:.//z-textarea-flexible')->one();
 			$this->assertEquals('64', $mapping_field->getAttribute('maxlength'));
 		}
 		$this->assertEquals(1, $row->query('xpath:.//td[text()="⇒"]')->all()->count());
 		$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 
 		// Check types.
-		$value_column = $row->getColumn('Value')->query('xpath:.//input')->one();
+		$value_column = $row->getColumn('Value')->query('xpath:.//z-textarea-flexible')->one();
 		$dropdown = $row->query('name:mappings[0][type]')->asDropdown()->one();
 		$types = ['equals', 'is greater than or equals', 'is less than or equals', 'in range', 'regexp', 'default'];
 		$this->assertEquals($types, $dropdown->getOptions()->asText());

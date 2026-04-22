@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,6 +17,7 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
+require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -28,14 +29,15 @@ use Facebook\WebDriver\WebDriverBy;
 class testPageTriggers extends CLegacyWebTest {
 
 	/**
-	 * Attach TagBehavior and TableBehavior to the test.
+	 * Attach TableBehavior, TagBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CTableBehavior::class,
-			CTagBehavior::class
+			CTagBehavior::class,
+			CMessageBehavior::class
 		];
 	}
 
@@ -103,7 +105,7 @@ class testPageTriggers extends CLegacyWebTest {
 		foreach ($labels as $label) {
 			$this->zbxTestAssertElementPresentXpath('//label[text()="'.$label.'"]');
 		}
-		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
+		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc.
 		$this->zbxTestTextPresent('Enable', 'Disable', 'Mass update', 'Copy', 'Delete');
 	}
 
@@ -479,8 +481,10 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$this->zbxTestLogin('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$this->hostid.'&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 		$form->getField('Tags')->query('id:filter_tags_0_tag')->one()->fill('Tag1234');
 		$form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 		$this->assertTableDataColumn([], 'Name', $this->selector);
 
@@ -889,6 +893,7 @@ class testPageTriggers extends CLegacyWebTest {
 	public function testPageTriggers_FilterHostAndGroups($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]=99062&context=host');
 		$form = $this->query('name:zbx_filter')->asForm()->one();
+		$table = $this->getTable();
 
 		// Trigger create button enabled and breadcrumbs exist.
 		$this->assertTrue($this->query('button:Create trigger')->one()->isEnabled());
@@ -900,6 +905,7 @@ class testPageTriggers extends CLegacyWebTest {
 
 		$form->fill($data['filter_options']);
 		$form->submit();
+		$table = $this->getTable();
 		$this->page->waitUntilReady();
 
 		// Trigger create button disabled and breadcrumbs not exist.
@@ -907,5 +913,32 @@ class testPageTriggers extends CLegacyWebTest {
 		$this->assertTrue($this->query('class:breadcrumb')->all()->isEmpty());
 		// Check results in table.
 		$this->assertTableData(CTestArrayHelper::get($data, 'result', []), $this->selector);
+	}
+
+	/**
+	 * @dataProvider data
+	 */
+	public function testPageTriggers_Delete($data) {
+		$context = ((int) $data['status'] === HOST_STATUS_TEMPLATE) ? '&context=template' : '&context=host';
+		$this->page->login()->open('zabbix.php?action=trigger.list&filter_set=1&filter_hostids[0]='.$data['hostid'].$context)
+				->waitUntilReady();
+
+		$table_rows_count = $this->query('class:list-table')->asTable()->one()->getRows()->count();
+		$this->assertTableStats($table_rows_count);
+		$delete_button = $this->query('button:Delete')->one();
+
+		// Cancel delete.
+		$this->query('id:all_triggers')->asCheckbox()->one()->check();
+		$delete_button->click();
+		$this->page->dismissAlert();
+		$this->assertTableStats($table_rows_count);
+		$this->assertSelectedCount($table_rows_count);
+
+		// Delete all.
+		$delete_button->click();
+		$this->page->acceptAlert();
+		$this->assertMessage(TEST_GOOD, 'Trigger deleted');
+		$this->assertTableStats(0);
+		$this->assertSelectedCount(0);
 	}
 }

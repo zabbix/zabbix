@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -204,6 +204,9 @@ CViewSwitcher.prototype = {
 				obj.style.display = '';
 				break;
 			case 'z-select':
+				obj.style.display = 'inline-grid';
+				break
+			case 'z-textarea-flexible':
 				obj.style.display = 'inline-grid';
 				break
 			default:

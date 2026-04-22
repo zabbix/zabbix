@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -151,6 +151,7 @@ int	net_if_out(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_total(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_collisions(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_if_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	net_if_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_tcp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_tcp_socket_count(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	net_udp_listen(AGENT_REQUEST *request, AGENT_RESULT *result);
@@ -180,6 +181,7 @@ int	system_boottime(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_dev_read(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_dev_write(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_dev_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);
+int	vfs_dev_get(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_inode(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_size(AGENT_REQUEST *request, AGENT_RESULT *result);
 int	vfs_fs_discovery(AGENT_REQUEST *request, AGENT_RESULT *result);

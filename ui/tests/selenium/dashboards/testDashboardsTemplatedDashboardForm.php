@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1057,7 +1057,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:description',
 									'value' => '{ITEM.NAME}',
 									'attributes' => [
-										'maxlength' => 2048,
+										'maxlength' => 65535,
 										'aria-required' => 'true',
 										'rows' => 7
 									]
@@ -1483,7 +1483,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 									'field_locator' => 'id:description',
 									'value' => '{ITEM.NAME}',
 									'attributes' => [
-										'maxlength' => 2048,
+										'maxlength' => 65535,
 										'aria-required' => 'true',
 										'rows' => 7
 									]
@@ -4551,7 +4551,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Item card'),
-						'Name' => 'Selected more than 731 day for graph filter.',
+						'Name' => 'Selected more than 2 years for graph filter.',
 						'Item' => self::TEMPLATE_ITEM
 					],
 					'swap_expected' => [
@@ -4565,8 +4565,9 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 						'id:sparkline_time_period_to' => 'now'
 					],
 					'page' => '2nd page',
+					'days_count' => true,
 					'error_message' => [
-						'Maximum time period to display is 731 days.'
+						'Maximum time period to display is {days} days.'
 					]
 				]
 			],
@@ -5017,7 +5018,7 @@ class testDashboardsTemplatedDashboardForm extends CWebTest {
 				$form->checkValue($reference_data);
 			}
 
-			// Count of days mentioned in error depends ot presence of leap year february in selected period.
+			// If required, define max days count in error since it depends on leap year presence in desired period.
 			if (CTestArrayHelper::get($data, 'days_count')) {
 				$data['error_message'] = str_replace('{days}', CDateTimeHelper::countDays('now', 'P2Y'), $data['error_message']);
 			}

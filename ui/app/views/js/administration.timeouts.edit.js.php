@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,78 +20,136 @@
 ?>
 
 <script>
-	const view = new class {
+const view = new class {
+	init({rules, default_values}) {
+		this.form_element = document.getElementById('timeouts-form');
+		this.form = new CForm(this.form_element, rules);
+		this.rules = rules;
+		this.default_values = default_values;
+		this.#initEvents();
+	}
 
-		/** @type {HTMLFormElement} */
-		#form;
+	#initEvents() {
+		this.form_element.addEventListener('submit', (e) => this.#submit(e));
+		this.form_element.querySelector('.form-actions .js-reset-defaults')
+			.addEventListener('click', (e) => this.#resetDefaults(e.target));
+	}
 
-		/** @type {Object} */
-		#default_timeouts = {};
+	#resetDefaults(reset_button) {
+		overlayDialogue({
+			title: <?= json_encode(_('Reset confirmation')) ?>,
+			content: document.createElement('span').innerText = <?= json_encode(
+				_('Reset all fields to default values?')
+			) ?>,
+			buttons: [
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: () => {}
+				},
+				{
+					title: <?= json_encode(_('Reset defaults')) ?>,
+					focused: true,
+					action: () => {
+						clearMessages();
 
-		init({default_timeouts}) {
-			this.#form = document.getElementById('timeouts-form');
-			this.#default_timeouts = default_timeouts;
+						Object.entries(this.default_values).forEach(([key, value]) => {
+							const input = document.getElementById(key);
+							input.value = value;
+						});
 
-			this.#form.addEventListener('submit', (e) => this.#submit(e));
-
-			document.getElementById('reset-defaults').addEventListener('click', (e) => this.#resetDefaults(e.target));
-		}
-
-		#submit(event) {
-			event.preventDefault();
-
-			const fields_to_trim = ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
-				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
-				'timeout_telnet_agent', 'timeout_script', 'timeout_browser', 'socket_timeout', 'connect_timeout',
-				'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'report_test_timeout'
-			];
-
-			for (const id of fields_to_trim) {
-				const field = document.getElementById(id);
-
-				field.value = field.value.trim();
-			}
-
-			this.#form.submit();
-		}
-
-		#resetDefaults(reset_button) {
-			overlayDialogue({
-				title: <?= json_encode(_('Reset confirmation')) ?>,
-				content: document.createElement('span').innerText = <?= json_encode(
-					_('Reset all fields to default values?')
-				) ?>,
-				buttons: [
-					{
-						title: <?= json_encode(_('Cancel')) ?>,
-						cancel: true,
-						class: '<?= ZBX_STYLE_BTN_ALT ?>',
-						action: () => {}
-					},
-					{
-						title: <?= json_encode(_('Reset defaults')) ?>,
-						focused: true,
-						action: () => {
-							for (const element of document.querySelectorAll('.wrapper > output[role="contentinfo"]')) {
-								if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-									element.parentNode.removeChild(element);
-								}
-							}
-
-							for (const [timeout, default_value] of Object.entries(this.#default_timeouts)) {
-								const element = document.getElementById(timeout);
-
-								if (element !== null) {
-									element.value = default_value;
-								}
-							}
-						}
+						this.form.reload(this.rules);
 					}
-				]
-			}, {
-				position: Overlay.prototype.POSITION_CENTER,
-				trigger_element: reset_button
+				}
+			]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: reset_button
+		});
+	}
+
+	#submit(e) {
+		e.preventDefault();
+		this.#setLoadingStatus('js-submit');
+		clearMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'timeouts.update');
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = location.href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
 			});
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
 		}
-	};
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		addMessage(makeMessageBox('bad', messages, title)[0]);
+	}
+
+	#setLoadingStatus(loading_btn_class) {
+		this.form_element.classList.add('is-loading', 'is-loading-fadein');
+
+		this.form_element.querySelectorAll('.form-actions button:not(.js-cancel)').forEach(button => {
+			button.disabled = true;
+
+			if (button.classList.contains(loading_btn_class)) {
+				button.classList.add('is-loading');
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		this.form_element.querySelectorAll('.form-actions button:not(.js-cancel)').forEach(button => {
+			button.classList.remove('is-loading');
+			button.disabled = false;
+		});
+
+		this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+	}
+};
 </script>

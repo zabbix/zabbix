@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -442,25 +442,27 @@ int	lld_validate_lldrule_override_no_discover(const zbx_vector_lld_override_ptr_
 
 int	lld_update_items(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids);
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids, int auditlog_enabled,
+		int auditlog_mode);
 
 void	lld_item_links_sort(zbx_vector_lld_row_ptr_t *lld_rows);
 
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime,
-		int lastcheck, int dflags, const zbx_vector_uint64_t *ruleids);
+		int lastcheck, int dflags, const zbx_vector_uint64_t *ruleids, int auditlog_enabled, int auditlog_mode);
 
 int	lld_update_graphs(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		char **error, const zbx_lld_lifetime_t *lifetime, int lastcheck, int dflags,
-		const zbx_vector_uint64_t *ruleids);
+		const zbx_vector_uint64_t *ruleids, int auditlog_enabled, int auditlog_mode);
 
 void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_ptr_t *lld_rows, char **error,
 		const zbx_lld_lifetime_t *lifetime, const zbx_lld_lifetime_t *enabled_lifetime, int lastcheck,
-		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids);
+		int dflags, zbx_hashset_t *rule_index, const zbx_vector_uint64_t *ruleids, int auditlog_enabled,
+		int auditlog_mode);
 
 int	lld_rule_discover_prototypes(zbx_uint64_t hostid, const zbx_vector_lld_row_ptr_t *lld_rows,
 		const zbx_vector_lld_item_prototype_ptr_t *item_prototypes, zbx_vector_lld_item_full_ptr_t *items,
-		char **error, int lastcheck, zbx_hashset_t *items_index);
+		char **error, int lastcheck, zbx_hashset_t *items_index, int auditlog_enabled, int auditlog_mode);
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 

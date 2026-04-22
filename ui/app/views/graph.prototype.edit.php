@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -48,27 +48,24 @@ if ($data['graphid'] != 0) {
 	$buttons = [
 		[
 			'title' => _('Update'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
 			'isSubmit' => true,
-			'action' => 'graph_edit_popup.submit();',
 			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Clone'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-clone']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'action' => 'graph_edit_popup.clone();',
 			'enabled' => !$data['is_discovered_prototype']
 		],
 		[
 			'title' => _('Delete'),
-			'confirmation' => _('Delete graph prototype?'),
-			'class' => ZBX_STYLE_BTN_ALT,
+			'class' => implode(' ', [ZBX_STYLE_BTN_ALT, 'js-delete']),
 			'keepOpen' => true,
 			'isSubmit' => false,
-			'enabled' => !$is_templated,
-			'action' => 'graph_edit_popup.delete();'
+			'enabled' => !$is_templated
 		]
 	];
 }
@@ -76,9 +73,9 @@ else {
 	$buttons = [
 		[
 			'title' => _('Add'),
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'graph_edit_popup.submit();'
+			'isSubmit' => true
 		]
 	];
 }
@@ -102,28 +99,6 @@ $graph_form
 			)
 			->addTab('graph-preview-tab', _('Preview'), $preview_table)
 			->setSelected(0)
-	)
-	->addItem(
-		(new CScriptTag('
-			graph_edit_popup.init('.json_encode([
-				'form_name' => $graph_form->getName(),
-				'action' => 'graph.prototype.edit',
-				'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
-				'graphs' => [
-					'graphid' => $data['graphid'],
-					'graphtype' => $data['graphtype'],
-					'hostid' => $data['hostid'],
-					'is_template' => $data['is_template'],
-					'parent_discoveryid' => $data['parent_discoveryid']
-				],
-				'readonly' => $readonly,
-				'items' => $data['items'],
-				'context' => $data['context'],
-				'hostid' => $data['hostid'],
-				'overlayid' => 'graph.prototype.edit',
-				'return_url' => $return_url
-			]).');
-		'))->setOnDocumentReady()
 	);
 
 $output = [
@@ -131,7 +106,25 @@ $output = [
 	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_PROTOTYPE_GRAPH_EDIT),
 	'body' => $graph_form->toString(),
 	'buttons' => $buttons,
-	'script_inline' => getPagePostJs().$this->readJsFile('graph.edit.js.php'),
+	'script_inline' => getPagePostJs().
+		$this->readJsFile('graph.edit.js.php').
+		'graph_edit_popup.init('.json_encode([
+			'rules' => $data['js_validation_rules'],
+			'action' => 'graph.prototype.edit',
+			'theme_colors' => explode(',', getUserGraphTheme()['colorpalette']),
+			'graphs' => [
+				'graphid' => $data['graphid'],
+				'graphtype' => $data['graphtype'],
+				'hostid' => $data['hostid'],
+				'is_template' => $data['is_template'],
+				'parent_discoveryid' => $data['parent_discoveryid']
+			],
+			'readonly' => $readonly,
+			'items' => $data['items'],
+			'context' => $data['context'],
+			'hostid' => $data['hostid'],
+			'return_url' => $return_url
+		]).');',
 	'dialogue_class' => 'modal-popup-large'
 ];
 

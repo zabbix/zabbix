@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -547,4 +547,23 @@ zbx_int64_t	zbx_json_validate(const char *start, char **error)
 		return json_error("invalid character following JSON object", start, error);
 
 	return len;
+}
+
+int	zbx_json_validate_ext(const char *start, char **error)
+{
+	zbx_int64_t	len;
+
+	if (0 == (len = json_parse_value(start, NULL, 0, error)))
+		return FAIL;
+
+	start += len;
+	SKIP_WHITESPACE(start);
+
+	if ('\0' != *start)
+	{
+		(void)json_error("invalid character following JSON object", start, error);
+		return FAIL;
+	}
+
+	return SUCCEED;
 }

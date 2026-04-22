@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -146,7 +146,7 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 
 		foreach ($hints as $label => $hint_text) {
 			$form->getLabel($label)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilPresent()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($hint_text, $hint->getText());
 			$hint->close();
 		}
@@ -354,10 +354,10 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '',
 						'Login blocking interval' => ''
 					],
-					'details' => [
-						'Field "discovery_groupid" is mandatory.',
-						'Incorrect value for field "login_attempts": value must be no less than "1".',
-						'Incorrect value for field "login_block": a time unit is expected.'
+					'inline_errors' => [
+						'Group for discovered hosts' => 'This field cannot be empty.',
+						'Login attempts' => 'This value must be no less than "1".',
+						'Login blocking interval' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -373,9 +373,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Vault provider' => 'CyberArk Vault',
 						'Resolve secret vault macros by' => 'Zabbix server and proxy'
 					],
-					'details' => [
-						'Incorrect value for field "login_attempts": value must be no less than "1".',
-						'Incorrect value for field "login_block": a time unit is expected.'
+					'inline_errors' => [
+						'Login attempts' => 'This value must be no less than "1".',
+						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -388,9 +388,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '!@#$%^&*()_+',
 						'Login blocking interval' => '!@#$%^&*()_+'
 					],
-					'details' => [
-						'Incorrect value for field "login_attempts": value must be no less than "1".',
-						'Incorrect value for field "login_block": a time unit is expected.'
+					'inline_errors' => [
+						'Login attempts' => 'This value must be no less than "1".',
+						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -403,9 +403,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => 0,
 						'Login blocking interval' => 0
 					],
-					'details' => [
-						'Incorrect value for field "login_attempts": value must be no less than "1".',
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login attempts' => 'This value must be no less than "1".',
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -417,8 +417,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '0s'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -430,8 +430,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '29'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -443,8 +443,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '29s'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -457,9 +457,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => 33,
 						'Login blocking interval' => '3601'
 					],
-					'details' => [
-						'Incorrect value for field "login_attempts": value must be no greater than "32".',
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login attempts' => 'This value must be no greater than "32".',
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -471,8 +471,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '3601s'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -484,8 +484,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '61m'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -497,8 +497,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '2h'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -510,8 +510,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '1w'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -523,8 +523,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '1M'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": a time unit is expected.'
+					'inline_errors' => [
+						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -536,8 +536,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Authorization.
 						'Login blocking interval' => '1y'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": a time unit is expected.'
+					'inline_errors' => [
+						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -550,9 +550,9 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '99',
 						'Login blocking interval' => '99999999999999999999999999999999'
 					],
-					'details' => [
-						'Incorrect value for field "login_attempts": value must be no greater than "32".',
-						'Incorrect value for field "login_block": value must be one of 30-3600.'
+					'inline_errors' => [
+						'Login attempts' => 'This value must be no greater than "32".',
+						'Login blocking interval' => 'Value must be between 30s and 3600s (1h).'
 					]
 				]
 			],
@@ -565,8 +565,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						'Login attempts' => '-1',
 						'Login blocking interval' => '-1'
 					],
-					'details' => [
-						'Incorrect value for field "login_block": a time unit is expected.'
+					'inline_errors' => [
+						'Login blocking interval' => 'A time unit is expected.'
 					]
 				]
 			],
@@ -578,8 +578,8 @@ class testFormAdministrationGeneralOtherParams extends testFormAdministrationGen
 						// Security.
 						'id:x_frame_options' => ''
 					],
-					'details' => [
-						'Incorrect value for field "x_frame_options": cannot be empty.'
+					'inline_errors' => [
+						'id:x_frame_options' => 'This field cannot be empty.'
 					]
 				]
 			],

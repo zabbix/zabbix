@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -55,9 +55,10 @@
 
 	#define ZBX_THREAD_PRIORITY_NONE	0
 	#define ZBX_THREAD_PRIORITY_COLLECTOR	1
-	#define ZBX_THREAD_PRIORITY_SYNCER	2
-	#define ZBX_THREAD_PRIORITY_WORKER	3
-	#define ZBX_THREAD_PRIORITY_COUNT	4
+	#define ZBX_THREAD_PRIORITY_SUPERVISOR	2
+	#define ZBX_THREAD_PRIORITY_SYNCER	3
+	#define ZBX_THREAD_PRIORITY_WORKER	4
+	#define ZBX_THREAD_PRIORITY_COUNT	5
 
 	#define ZBX_THREAD_ENTRY_POINTER(pointer_name)	\
 		unsigned (* pointer_name)(void *)
@@ -97,7 +98,8 @@ zbx_thread_args_t;
 
 void	zbx_thread_start(ZBX_THREAD_ENTRY_POINTER(handler), zbx_thread_args_t *thread_args, ZBX_THREAD_HANDLE *thread);
 int	zbx_thread_wait(ZBX_THREAD_HANDLE thread);
-void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int ret);
+int	zbx_waitpid_nohang(ZBX_THREAD_HANDLE *threads, size_t threads_num);
+void	zbx_threads_kill_and_wait(ZBX_THREAD_HANDLE *threads, const int *threads_flags, int threads_num, int timeout);
 
 #if !defined(_WINDOWS) && !defined(__MINGW32__)
 void	zbx_pthread_init_attr(pthread_attr_t *attr);

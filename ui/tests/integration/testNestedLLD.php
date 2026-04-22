@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1790,6 +1790,7 @@ class testNestedLLD extends CIntegrationTest{
 	private function sendRuleData($hostname, $rule, $data) {
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, $rule, $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 	}
@@ -2088,6 +2089,7 @@ class testNestedLLD extends CIntegrationTest{
 
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
+		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->sendSenderValue($hostname, 'main_drule', $data);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of lld_update_hosts', true, 120, 1, true);
 
@@ -2218,7 +2220,8 @@ class testNestedLLD extends CIntegrationTest{
 			],
 			'countOutput' => true
 		]);
-		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match");
+		$this->assertEquals(3, $response['result'], "expected discovered rule count does not match, response: " .
+			json_encode($response));
 
 		$response = $this->call('discoveryrule.get', [
 			'hostids' => [$hostid],

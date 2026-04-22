@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -53,6 +53,7 @@ char	*zbx_xml_doc_read_value(xmlDoc *xdoc, const char *xpath);
 xmlNode	*zbx_xml_node_get(xmlDoc *xdoc, xmlNode *node, const char *xpath);
 xmlNode	*zbx_xml_doc_get(xmlDoc *xdoc, const char *xpath);
 int	zbx_xml_node_remove(xmlDoc *xdoc, xmlNode *node, const char *xpath);
+void	zbx_xml_node_dump(xmlNode *node, int log_level);
 #endif /* HAVE_LIBXML2 && HAVE_LIBCURL */
 
 typedef int (*zbx_xml_resolv_func_t)(char **data, char *error, size_t maxerrlen, va_list args);

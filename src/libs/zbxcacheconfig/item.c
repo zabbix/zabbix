@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -18,8 +18,6 @@
 #include "zbx_item_constants.h"
 #include "zbxcachevalue.h"
 #include "zbxtime.h"
-#include "zbxvariant.h"
-#include "zbxexpr.h"
 
 static const char	*item_logtype_string(unsigned char logtype)
 {
@@ -133,7 +131,8 @@ int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **key)
 		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_masked();
 		char			*key_tmp = zbx_strdup(NULL, dc_item.key_orig);
 
-		zbx_substitute_item_key_params(&key_tmp, NULL, 0, zbx_item_key_subst_cb, um_handle, &dc_item);
+		zbx_substitute_item_key_params_default(&key_tmp, NULL, 0, um_handle, dc_item.host.hostid,
+				dc_item.host.host, dc_item.host.name, dc_item.itemid, &dc_item.interface);
 		zbx_dc_close_user_macros(um_handle);
 
 		zbx_free(*key);

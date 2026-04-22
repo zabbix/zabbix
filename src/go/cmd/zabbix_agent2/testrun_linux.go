@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,11 +72,13 @@ func checkMetrics(s scheduler.Scheduler) {
 		`vfs.fs.discovery`,
 		`vfs.fs.get`,
 		`vfs.dev.write[sda,operations]`,
+		`vfs.dev.get[disks,sda]`,
 		`net.if.in[lo,bytes]`,
 		`net.if.out[lo,bytes]`,
 		`net.if.total[lo,bytes]`,
 		`net.if.collisions[lo]`,
 		`net.if.discovery`,
+		`net.if.get`,
 		`vm.memory.size[total]`,
 		`proc.cpu.util[inetd]`,
 		`proc.num[inetd]`,

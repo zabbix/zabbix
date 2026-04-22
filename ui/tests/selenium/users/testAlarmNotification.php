@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -311,6 +311,8 @@ class testAlarmNotification extends CWebTest {
 
 	/**
 	 * Check that colors displayed in alarm notification overlay are the same as in configuration.
+	 *
+	 * @onAfter deleteEvents
 	 */
 	public function testAlarmNotification_CheckColorChange() {
 		// Trigger problem.
@@ -346,6 +348,7 @@ class testAlarmNotification extends CWebTest {
 		}
 
 		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 		$this->page->waitUntilReady();
 		$form->invalidate();
 
@@ -600,12 +603,14 @@ class testAlarmNotification extends CWebTest {
 	/**
 	 * Check notification display after changing user Frontend notification settings.
 	 *
-	 * @onBefore resetTriggerSeverities
 	 * @onAfter deleteEvents
 	 *
 	 * @dataProvider getNotificationSettingsData
 	 */
 	public function testAlarmNotification_NotificationSettings($data) {
+		// Delete old setting whatever it was.
+		DBexecute('DELETE FROM profiles WHERE source='.zbx_dbstr('triggers.severities').' AND userid=1');
+
 		// Set checked trigger severity in messaging settings.
 		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
 		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
@@ -659,21 +664,6 @@ class testAlarmNotification extends CWebTest {
 	 */
 	protected function deleteEvents() {
 		DB::delete('events', ['eventid' => self::$eventids]);
-	}
-
-	/**
-	 * Update Frontend notifications settings, set all severities checkboxes => true.
-	 */
-	protected function resetTriggerSeverities() {
-		// Delete old setting whatever it was.
-		DBexecute('DELETE FROM profiles WHERE source='.zbx_dbstr('triggers.severities').' AND userid=1');
-
-		// Insert new row where value_str field means that all severities are checked.
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, source, type)'.
-				' VALUES (9950, 1, '.zbx_dbstr('web.messages').', '.
-				zbx_dbstr('a:6:{i:0;s:1:"1";i:1;s:1:"1";i:2;s:1:"1";i:3;s:1:"1";i:4;s:1:"1";i:5;s:1:"1";}').', '.
-				zbx_dbstr('triggers.severities').', 3)'
-		);
 	}
 
 	/**

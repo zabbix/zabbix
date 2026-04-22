@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -50,7 +50,7 @@ static wchar_t	*zbx_wcsdup2(const char *filename, int line, wchar_t *old, const 
 	zabbix_log(LOG_LEVEL_CRIT, "[file:%s,line:%d] zbx_wcsdup: out of memory. Requested " ZBX_FS_SIZE_T " bytes.",
 			filename, line, (zbx_fs_size_t)((wcslen(str) + 1) * sizeof(wchar_t)));
 
-	exit(EXIT_FAILURE);
+	zbx_exit(EXIT_FAILURE);
 }
 
 static int	wmpoint_compare_func(const void *d1, const void *d2)

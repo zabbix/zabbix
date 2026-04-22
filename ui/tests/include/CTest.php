@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,6 +52,8 @@ use PHPUnit\Framework\TestCase;
 
 class CTest extends TestCase {
 
+	protected static bool $trace_delays = false;
+
 	// Table that should be backed up at the test suite level.
 	protected static $suite_backup = null;
 	// Table that should be backed up at the test case level.
@@ -87,6 +89,10 @@ class CTest extends TestCase {
 	protected static $instances = 0;
 	// List of behaviors.
 	protected $behaviors = null;
+
+	static $last_test_case_name;
+	private static $backup_time_per_test_file = 0.0;
+	private static $backup_time_total = 0.0;
 
 	/**
 	 * Overridden constructor for collecting data on data sets from dataProvider annotations.
@@ -293,7 +299,15 @@ class CTest extends TestCase {
 		if (self::$last_test_case !== $case_name) {
 			// Restore data from backup if test case changed.
 			if (self::$case_backup_once !== null) {
+				$start = microtime(true);
 				CDBHelper::restoreTables();
+
+				if (static::$trace_delays) {
+					$caseDuration = microtime(true) - $start;
+					self::$backup_time_per_test_file += $caseDuration;
+					self::$backup_time_total += $caseDuration;
+				}
+
 				self::$case_backup_once = null;
 			}
 
@@ -391,6 +405,7 @@ class CTest extends TestCase {
 	 * @after
 	 */
 	public function onAfterTestCase() {
+		self::$last_test_case_name = get_class($this);
 		if (!CDBHelper::isValid()) {
 			return;
 		}
@@ -411,7 +426,14 @@ class CTest extends TestCase {
 		}
 
 		if ($this->case_backup !== null) {
+			$start = microtime(true);
 			CDBHelper::restoreTables();
+
+			if (static::$trace_delays) {
+				$caseDuration = microtime(true) - $start;
+				self::$backup_time_per_test_file += $caseDuration;
+				self::$backup_time_total += $caseDuration;
+			}
 		}
 
 		// Execute callbacks that should be executed after specific test case.
@@ -447,6 +469,14 @@ class CTest extends TestCase {
 		if (self::$suite_backup === null && self::$case_backup_once === null && !self::$suite_callbacks['afterOnce']
 				&& !self::$suite_callbacks['after']) {
 
+			if (static::$trace_delays) {
+				fwrite(STDERR, sprintf("[%s] onAfterTestSuite backup restore took %.4fs [total: %.4fs]\n",
+					self::$last_test_case_name, self::$backup_time_per_test_file,
+					self::$backup_time_total));
+
+				self::$backup_time_per_test_file = 0;
+			}
+
 			// Nothing to do after test suite.
 			return;
 		}
@@ -455,14 +485,37 @@ class CTest extends TestCase {
 
 		// Restore case level backups.
 		if (self::$case_backup_once !== null) {
+			$start = microtime(true);
 			CDBHelper::restoreTables();
+
+			if (static::$trace_delays) {
+				$caseDuration = microtime(true) - $start;
+				self::$backup_time_per_test_file += $caseDuration;
+				self::$backup_time_total += $caseDuration;
+			}
+
 			self::$case_backup_once = null;
 		}
 
 		// Restore suite level backups.
 		if (self::$suite_backup !== null) {
+			$start = microtime(true);
 			CDBHelper::restoreTables();
+
+			if (static::$trace_delays) {
+				$caseDuration = microtime(true) - $start;
+				self::$backup_time_per_test_file += $caseDuration;
+				self::$backup_time_total += $caseDuration;
+			}
+
 			self::$suite_backup = null;
+		}
+
+		if (static::$trace_delays) {
+			fwrite(STDERR, sprintf("[%s] onAfterTestSuite backup restore took %.4fs [total %.4fs]\n",
+				self::$last_test_case_name, self::$backup_time_per_test_file,
+				self::$backup_time_total));
+			self::$backup_time_per_test_file = 0;
 		}
 
 		$context = get_called_class();

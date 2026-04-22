@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -124,27 +124,42 @@ class CFieldSet extends CField {
 		return this._field.getAttribute('data-field-name');
 	}
 
+	#subFieldNameParts(sub_field_name) {
+		if (!sub_field_name.startsWith(this.getName())) {
+			return false;
+		}
+
+		return sub_field_name
+			.slice(this.getName().length)
+			.replace(/^\[|]$/g, '')
+			.split(/\]\[/);
+	}
+
 	getInnerValue(trim_value) {
 		let result = {};
+		let simple_fields = {};
 
 		for (const field of Object.values(this.#fields)) {
 			if (field._field.hasAttribute('data-skip-from-submit') || field.isDisabled()) {
 				continue;
 			}
 
-			/*
-			 * This code converts name of the simple field (belonged to the fieldset) to the array of name keys.
-			 * The main part that matches fieldset name is skipped.
-			 *
-			 * For example, field name: interfaces[0][port] must be converted to following array: ['0', 'port'].
-			 */
-			const name_parts = field.getName().replace(/]$/, '').split(/\]\[|\[/);
+			if (typeof field.getExtraFields === 'function') {
+				simple_fields = {...simple_fields, ...field.getExtraFields()};
+			}
+			else {
+				simple_fields[field.getName()] = trim_value ? field.getValueTrimmed() : field.getValue();
+			}
+		}
 
-			if (name_parts[0] === this.getName()) {
-				name_parts.shift();
+		for (const [key, value] of Object.entries(simple_fields)) {
+			const name_parts = this.#subFieldNameParts(key);
+
+			if (name_parts === false) {
+				continue;
 			}
 
-			result = objectSetDeepValue(result, name_parts, trim_value ? field.getValueTrimmed() : field.getValue());
+			result = objectSetDeepValue(result, name_parts, value);
 		}
 
 		return result;
@@ -156,6 +171,10 @@ class CFieldSet extends CField {
 
 	getValueTrimmed() {
 		return this.getInnerValue(true);
+	}
+
+	updateState() {
+		this.#discoverAllFields();
 	}
 
 	hasErrors() {
@@ -206,14 +225,17 @@ class CFieldSet extends CField {
 	}
 
 	#fieldsSetErrors(errors, force_display_errors) {
-		let missing_field_errors = {};
-
 		for (const [key, field_errors] of Object.entries(errors)) {
 			const key_full = key.charAt(0) === '[' ? key : `[${key}]`;
 
 			if (key_full in this.#fields) {
+				// These errors need to be added even if field is not changed, but smaller index one was.
+				const error_levels = [CFormValidator.ERROR_LEVEL_UNIQ,
+					CFormValidator.ERROR_LEVEL_OBJECTS_COUNT
+				];
+
 				if (this.#fields[key_full].hasChanged() || this.#hasObjectChanged(key_full) || force_display_errors
-						|| field_errors.some((error) => error.message === '' || error.level == CFormValidator.ERROR_LEVEL_UNIQ)) {
+						|| field_errors.some((error) => error.message === '' || error_levels.includes(error.level))) {
 					field_errors.forEach((error) => this.#fields[key_full].setErrors(error));
 
 					this._global_errors = {...this._global_errors, ...this.#fields[key_full].getGlobalErrors()};

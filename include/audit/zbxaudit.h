@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,7 +15,7 @@
 #ifndef ZABBIX_ZBXAUDIT_H
 #define ZABBIX_ZBXAUDIT_H
 
-#include "zbxjson.h"
+#include "zbxalgo.h"
 #include "zbxdb.h"
 
 /* audit logging mode */
@@ -114,16 +114,25 @@ void	zbx_audit_update_json_append_string_secret(const zbx_uint64_t id, const int
 int	zbx_auditlog_history_push(zbx_uint64_t userid, const char *username, const char *clientip, int processed_num,
 		int failed_num, double time_spent);
 
+typedef struct zbx_audit_entry_detail
+{
+	char	*key;
+	char	*value;
+}
+zbx_audit_entry_detail_t;
+
+ZBX_VECTOR_DECL(audit_entry_detail, zbx_audit_entry_detail_t)
+
 typedef struct zbx_audit_entry
 {
-	zbx_uint64_t	id;
-	char		*cuid;
-	int		id_table;
-	char		*name;
-	struct zbx_json	details_json;
-	int		audit_action;
-	int		resource_type;
-	char		audit_cuid[CUID_LEN];
+	zbx_uint64_t			id;
+	char				*cuid;
+	int				id_table;
+	char				*name;
+	zbx_vector_audit_entry_detail_t	details;
+	int				audit_action;
+	int				resource_type;
+	char				audit_cuid[CUID_LEN];
 }
 zbx_audit_entry_t;
 

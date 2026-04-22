@@ -1,5 +1,5 @@
 dnl
-dnl Copyright (C) 2001-2025 Zabbix SIA
+dnl Copyright (C) 2001-2026 Zabbix SIA
 dnl
 dnl This program is free software: you can redistribute it and/or modify it under the terms of
 dnl the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,7 +14,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([Zabbix], [8.0.0alpha2])
+AC_INIT([Zabbix], [8.0.0beta1])
 
 AC_MSG_NOTICE([Configuring $PACKAGE_NAME $PACKAGE_VERSION])
 
@@ -198,7 +198,7 @@ dnl ISO C Standard Library
 dnl
 AC_CHECK_HEADERS([assert.h ctype.h dirent.h dlfcn.h errno.h float.h          \
                   inttypes.h limits.h math.h signal.h stdarg.h stddef.h      \
-                  stdint.h stdio.h stdlib.h string.h time.h                  \
+                  stdint.h stdio.h stdlib.h string.h time.h setjmp.h         \
 ])
 
 dnl POSIX C Standard Library
@@ -210,6 +210,9 @@ AC_CHECK_HEADERS([sys/ipc.h sys/resource.h sys/sem.h sys/shm.h sys/socket.h  \
                   pthread.h pwd.h strings.h syslog.h termios.h unistd.h      \
                   utmpx.h libgen.h                                           \
 ])
+
+dnl atomics
+AC_CHECK_HEADERS([stdatomic.h])
 
 dnl X/Open and SUS
 AC_CHECK_HEADERS([sys/timeb.h])
@@ -382,6 +385,27 @@ dnl AIX
 AC_SEARCH_LIBS(perfstat_memory_total, perfstat, [AC_DEFINE([HAVE_LIBPERFSTAT], 1, [Define to 1 if you have the 'libperfstat' library (-lperfstat)])])
 AC_SEARCH_LIBS(devstat_getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
 AC_SEARCH_LIBS(getdevs, devstat, [AC_DEFINE([HAVE_LIBDEVSTAT], 1, [Define to 1 if you have the 'libdevstat' library (-ldevstat)])])
+
+case "$host_os" in
+  aix*)
+    AC_MSG_CHECKING([for ODM libraries (-lodm -lcfg)])
+    saved_LIBS="$LIBS"
+    LIBS="$LIBS -lodm -lcfg"
+    AC_LINK_IFELSE(
+      [AC_LANG_PROGRAM(
+        [#include <odmi.h>
+         #include <sys/cfgodm.h>],
+        [odm_initialize();
+         odm_open_class(CuAt_CLASS);]
+      )],
+      [AC_MSG_RESULT([yes])
+       AC_DEFINE([HAVE_LIBODM], 1, [Define to 1 if you have the ODM libraries (-lodm -lcfg)])],
+      [AC_MSG_RESULT([no])
+       LIBS="$saved_LIBS"
+       AC_MSG_ERROR([ODM libraries (-lodm -lcfg) not found, ODM support will not be available])]
+    )
+    ;;
+esac
 
 dnl on FreeBSD we have to link with -lexecinfo to get backtraces and also check jail_getname() availability (available after __FreeBSD_version >= 800099)
 AC_SEARCH_LIBS(backtrace_symbols, execinfo, [AC_DEFINE([HAVE_LIBEXECINFO], 1, [Define to 1 if you have the 'libexecinfo' library (-lexecinfo)])])
@@ -1716,22 +1740,6 @@ if test "x$server" = "xyes" || test "x$proxy" = "xyes"; then
 
 	AC_SUBST(ZLIB_CFLAGS)
 
-	dnl Checking for c-ares support
-	ARES_CHECK_CONFIG([no])
-	if test "x$want_ares" = "xyes"; then
-		if test "x$found_ares" != "xyes"; then
-			AC_MSG_ERROR([Unable to use ares (ares check failed)])
-		fi
-		have_ares="yes"
-	fi
-	SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
-	SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
-
-	PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
-	PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
-
-	AC_SUBST(ARES_CFLAGS)
-
 	dnl Check for 'libpthread' library that supports PTHREAD_PROCESS_SHARED flag
 	LIBPTHREAD_CHECK_CONFIG([no])
 	if test "x$found_libpthread" != "xyes"; then
@@ -1937,6 +1945,32 @@ AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
 AC_SUBST(LDAP_CPPFLAGS)
 
+
+dnl Checking for c-ares support
+ARES_CHECK_CONFIG([no])
+if test "x$want_ares" = "xyes"; then
+	if test "x$found_ares" != "xyes"; then
+		AC_MSG_ERROR([Unable to use ares (ares check failed)])
+	fi
+	have_ares="yes"
+fi
+SERVER_LDFLAGS="$SERVER_LDFLAGS $ARES_LDFLAGS"
+SERVER_LIBS="$SERVER_LIBS $ARES_LIBS"
+
+PROXY_LDFLAGS="$PROXY_LDFLAGS $ARES_LDFLAGS"
+PROXY_LIBS="$PROXY_LIBS $ARES_LIBS"
+
+AGENT_LDFLAGS="$AGENT_LDFLAGS $ARES_LDFLAGS"
+AGENT_LIBS="$AGENT_LIBS $ARES_LIBS"
+
+ZBXGET_LDFLAGS="$ZBXGET_LDFLAGS $ARES_LDFLAGS"
+ZBXGET_LIBS="$ZBXGET_LIBS $ARES_LIBS"
+
+SENDER_LDFLAGS="$SENDER_LDFLAGS $ARES_LDFLAGS"
+SENDER_LIBS="$SENDER_LIBS $ARES_LIBS"
+
+AC_SUBST(ARES_CFLAGS)
+
 dnl Currently required cURL library version is 7.19.1 . When it is
 dnl increased all the functionality in zbxcurl.h must be revised.
 found_curl="no"
@@ -2056,15 +2090,11 @@ if test "x$agent2" = "xyes"; then
 	CGO_CFLAGS="$TLS_CFLAGS $LIBPCRE2_CFLAGS"
 	CGO_LDFLAGS="$AGENT2_LDFLAGS $LD_START_GROUP \
 		\${abs_top_builddir}/src/libs/zbxalgo/libzbxalgo.a \
-		\${abs_top_builddir}/src/libs/zbxinterface/libzbxinterface.a \
 		\${abs_top_builddir}/src/libs/zbxcommon/libzbxcommon.a \
-		\${abs_top_builddir}/src/libs/zbxcomms/libzbxcomms.a \
-		\${abs_top_builddir}/src/libs/zbxcompress/libzbxcompress.a \
 		\${abs_top_builddir}/src/libs/zbxcrypto/libzbxcrypto.a \
 		\${abs_top_builddir}/src/libs/zbxexec/libzbxexec.a \
 		\${abs_top_builddir}/src/libs/zbxhash/libzbxhash.a \
 		\${abs_top_builddir}/src/libs/zbxjson/libzbxjson.a \
-		\${abs_top_builddir}/src/libs/zbxprof/libzbxprof.a \
 		\${abs_top_builddir}/src/libs/zbxnix/libzbxnix.a \
 		\${abs_top_builddir}/src/libs/zbxregexp/libzbxregexp.a \
 		\${abs_top_builddir}/src/libs/zbxnum/libzbxnum.a \
@@ -2073,16 +2103,12 @@ if test "x$agent2" = "xyes"; then
 		\${abs_top_builddir}/src/libs/zbxparam/libzbxparam.a \
 		\${abs_top_builddir}/src/libs/zbxexpr/libzbxexpr.a \
 		\${abs_top_builddir}/src/libs/zbxtime/libzbxtime.a \
-		\${abs_top_builddir}/src/libs/zbxip/libzbxip.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libspecsysinfo.a \
+		\${abs_top_builddir}/src/libs/zbxsysinfo/"$ARCH"/libzbxagent2specsysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/alias/libalias.a \
 		\${abs_top_builddir}/src/libs/zbxsysinfo/libzbxagent2sysinfo.a \
-		\${abs_top_builddir}/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 		\${abs_top_builddir}/src/libs/zbxthreads/libzbxthreads.a \
 		\${abs_top_builddir}/src/libs/zbxvariant/libzbxvariant.a \
 		\${abs_top_builddir}/src/zabbix_agent/logfiles/libzbxlogfiles.a \
-		\${abs_top_builddir}/src/zabbix_agent/active_checks/libzbxactive_checks.a \
-		\${abs_top_builddir}/src/zabbix_agent/metrics/libzbxmetrics.a \
 		$LIBS $AGENT2_LIBS $LD_END_GROUP"
 
 	AC_SUBST(CGO_CFLAGS)
@@ -2234,9 +2260,12 @@ AC_CONFIG_FILES([
 	src/libs/zbxrtc/Makefile
 	src/libs/zbxself/Makefile
 	src/libs/zbxserialize/Makefile
+	src/libs/zbxsupervisor/Makefile
+    src/libs/zbxsupervisor_client/Makefile
 	src/libs/zbxscripts/Makefile
 	src/libs/zbxservice/Makefile
 	src/libs/zbxshmem/Makefile
+	src/libs/zbxsnmp/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
 	src/libs/zbxvmware/Makefile
@@ -2270,6 +2299,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxalerter/Makefile
 	src/libs/zbxpinger/Makefile
 	src/libs/zbxescalations/Makefile
+	src/libs/zbxresolver/Makefile
 	src/zabbix_agent/Makefile
 	src/zabbix_agent/logfiles/Makefile
 	src/zabbix_agent/active_checks/Makefile
@@ -2299,7 +2329,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/audit/Makefile
 	src/zabbix_server/autoreg/Makefile
 	src/zabbix_server/actions/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/cachehistory/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile

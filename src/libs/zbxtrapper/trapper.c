@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,6 +52,9 @@
 #include "zbx_rtc_constants.h"
 #ifdef HAVE_NETSNMP
 #	include "zbxipcservice.h"
+#endif
+#ifdef HAVE_ARES_QUERY_CACHE
+#include "zbxresolver.h"
 #endif
 
 #define ZBX_MAX_SECTION_ENTRIES		4
@@ -174,8 +177,8 @@ int	zbx_check_frontend_conn_accept(zbx_socket_t *sock, const zbx_config_tls_t *c
  * Purpose: processes received values from active agents                      *
  *                                                                            *
  ******************************************************************************/
-static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		int config_timeout)
+static void	recv_agenthistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, int config_timeout)
 {
 	char	*info = NULL, *ext = NULL;
 	int	ret;
@@ -189,7 +192,7 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
 		info = zbx_strdup(info, "data collection is paused");
 		ret = FAIL;
 	}
-	else if (SUCCEED == (ret = zbx_process_agent_history_data(sock, jp, ts, &info)))
+	else if (SUCCEED == (ret = zbx_process_agent_history_data(rtc, sock, jp, ts, &info)))
 	{
 		if (!ZBX_IS_RUNNING())
 		{
@@ -223,15 +226,15 @@ static void	recv_agenthistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx
  * Purpose: processes received values from senders                            *
  *                                                                            *
  ******************************************************************************/
-static void	recv_senderhistory(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts,
-		int config_timeout)
+static void	recv_senderhistory(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, int config_timeout)
 {
 	char	*info = NULL, *ext = NULL;
 	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == (ret = zbx_process_sender_history_data(sock, jp, ts, &info)))
+	if (FAIL == (ret = zbx_process_sender_history_data(rtc, sock, jp, ts, &info)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot process sender data from \"%s\": %s", sock->peer, info);
 	}
@@ -367,9 +370,10 @@ static void	queue_stats_export(zbx_hashset_t *queue_stats, const char *id_name, 
 }
 
 /* queue item comparison function used to sort queue by nextcheck */
-static int	queue_compare_by_nextcheck_asc(zbx_queue_item_t **d1, zbx_queue_item_t **d2)
+static int	queue_compare_by_nextcheck_asc(const void *a1, const void *a2)
 {
-	zbx_queue_item_t	*i1 = *d1, *i2 = *d2;
+	const zbx_queue_item_t	*i1 = *(const zbx_queue_item_t * const *)a1;
+	const zbx_queue_item_t	*i2 = *(const zbx_queue_item_t * const *)a2;
 
 	return i1->nextcheck - i2->nextcheck;
 }
@@ -504,7 +508,7 @@ static int	recv_getqueue(zbx_socket_t *sock, struct zbx_json_parse *jp, int conf
 
 			break;
 		case ZBX_GET_QUEUE_DETAILS:
-			zbx_vector_queue_item_ptr_sort(&queue, (zbx_compare_func_t)queue_compare_by_nextcheck_asc);
+			zbx_vector_queue_item_ptr_sort(&queue, queue_compare_by_nextcheck_asc);
 			zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS,
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_addarray(&json, ZBX_PROTO_TAG_DATA);
@@ -1258,14 +1262,14 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
-			recv_agenthistory(sock, &jp, ts, config_comms->config_timeout);
+			recv_agenthistory(rtc, sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_SENDER_DATA))
 		{
 #ifndef ZBX_DEBUG
 		zabbix_log(LOG_LEVEL_DEBUG, "trapper got '%s'", s);
 #endif
-			recv_senderhistory(sock, &jp, ts, config_comms->config_timeout);
+			recv_senderhistory(rtc, sock, &jp, ts, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PROXY_HEARTBEAT))
 		{
@@ -1405,7 +1409,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, zbx_timespec_t *ts,
 			av.state = ITEM_STATE_NOTSUPPORTED;
 
 		zbx_dc_config_history_recv_get_items_by_keys(&item, &hk, &errcode, 1);
-		zbx_process_history_data(&item, &av, &errcode, 1, NULL);
+		zbx_process_history_data(rtc, &item, &av, &errcode, 1, NULL);
 
 		if (SUCCEED != zbx_tcp_send_ext(sock, "OK", ZBX_CONST_STRLEN("OK"), 0, 0, config_comms->config_timeout))
 			zabbix_log(LOG_LEVEL_WARNING, "Error sending result back");
@@ -1458,6 +1462,9 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
+#ifdef HAVE_ARES_QUERY_CACHE
+	zbx_ares_library_init();
+#endif
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb,
 			zbx_dc_get_psk_by_identity);
@@ -1490,6 +1497,12 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 				trapper_args_in->config_stats_allowed_ip);
 		zbx_update_env(get_process_type_string(process_type), zbx_time());
 
+		while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
+		{
+			if (ZBX_RTC_SHUTDOWN == rtc_cmd)
+				goto out;
+		}
+
 		if (TIMEOUT_ERROR == ret)
 			continue;
 
@@ -1504,15 +1517,6 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 
 			zbx_setproctitle("%s #%d [processing data]", get_process_type_string(process_type),
 					process_num);
-
-			while (SUCCEED == zbx_rtc_wait(&rtc, info, &rtc_cmd, &rtc_data, 0) && 0 != rtc_cmd)
-			{
-				if (ZBX_RTC_SHUTDOWN == rtc_cmd)
-				{
-					zbx_tcp_unaccept(&s);
-					goto out;
-				}
-			}
 
 			sec = zbx_time();
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
@@ -1542,13 +1546,16 @@ ZBX_THREAD_ENTRY(zbx_trapper_thread, args)
 		}
 	}
 out:
+	zbx_tcp_unaccept(&s);
 	zbx_ipc_async_socket_close(&rtc);
 	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	while (1)
-		zbx_sleep(SEC_PER_MIN);
+	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d stopped [%s #%d]", get_program_type_string(info->program_type),
+			server_num, get_process_type_string(process_type), process_num);
+
+	zbx_exit(SUCCEED == ZBX_IS_NORMAL_EXIT() ? EXIT_SUCCESS : EXIT_FAILURE);
 
 #undef POLL_TIMEOUT
 }

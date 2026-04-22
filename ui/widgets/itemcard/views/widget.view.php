@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,7 +52,8 @@ elseif ($data['item']) {
 					ITEM_VALUE_TYPE_STR => _('Character'),
 					ITEM_VALUE_TYPE_LOG => _('Log'),
 					ITEM_VALUE_TYPE_TEXT => _('Text'),
-					ITEM_VALUE_TYPE_BINARY => _('Binary')
+					ITEM_VALUE_TYPE_BINARY => _('Binary'),
+					ITEM_VALUE_TYPE_JSON => _('JSON')
 				];
 
 				$sections[] = makeSectionSingleParameter(_('Type of information'), $value_types[$item['value_type']]);
@@ -445,10 +446,14 @@ function makeSectionLatestData(array $item, string $context): CDiv {
 					->setAttribute('data-clock', $item_value['clock'].'.'.$item_value['ns']);
 			}
 			else {
+				$hintbox_value = $item['value_type'] == ITEM_VALUE_TYPE_JSON
+					? (new CTrim($item_value['value'], ZBX_HINTBOX_CONTENT_LIMIT))
+					: (new CDiv ($item_value['value']));
+
 				$last_value_column_value = (new CSpan(formatHistoryValue($item_value['value'], $item, false)))
 					->addClass(ZBX_STYLE_CURSOR_POINTER)
 					->setHint(
-						(new CDiv(mb_substr($item_value['value'], 0, ZBX_HINTBOX_CONTENT_LIMIT)))
+						$hintbox_value
 							->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 							->addClass(ZBX_STYLE_HINTBOX_WRAP),
 						'', true, '', 0

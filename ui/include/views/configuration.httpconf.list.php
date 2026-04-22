@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -33,7 +33,7 @@ $filter_column_left = (new CFormList())
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'host_groups' : 'template_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'filter_groupids_',
 					'editable' => true,
 					'enrich_parent_groups' => true
@@ -55,7 +55,7 @@ $filter_column_left = (new CFormList())
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',
 					'srcfld1' => 'hostid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'filter_hostids_',
 					'editable' => 1
 				]

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -214,11 +214,13 @@ ZBX_PTR_VECTOR_DECL(vmware_dvswitch_ptr, zbx_vmware_dvswitch_t *)
 #define ZBX_VMWARE_DEV_PROPS_IFCONNECTED		1
 #define ZBX_VMWARE_DEV_PROPS_IFTYPE			2
 #define ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE		3
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		4
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	5
-#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		6
-#define ZBX_VMWARE_DEV_PROPS_IFIPS			7
-#define ZBX_VMWARE_DEV_PROPS_NUM			8
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGNAME		4
+#define ZBX_VMWARE_DEV_PROPS_IFBACKINGNETWORK		5
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID		6
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORTGROUP	7
+#define ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_PORT		8
+#define ZBX_VMWARE_DEV_PROPS_IFIPS			9
+#define ZBX_VMWARE_DEV_PROPS_NUM			10
 
 typedef struct
 {
@@ -259,6 +261,9 @@ typedef struct
 	char	*time;
 	int	enabled;
 	int	acknowledged;
+	char	*entity_id;
+	char	*entity_uuid;
+	char	*entity_type;
 }
 zbx_vmware_alarm_t;
 ZBX_PTR_VECTOR_DECL(vmware_alarm_ptr, zbx_vmware_alarm_t *)
@@ -706,16 +711,17 @@ void	zbx_vmware_eventlog_job_create(zbx_vmware_service_t *service);
 #define ZBX_VMWARE_TYPE_VSPHERE	1
 #define ZBX_VMWARE_TYPE_VCENTER	2
 
-#define ZBX_VMWARE_SOAP_DATACENTER	"Datacenter"
 #define ZBX_VMWARE_SOAP_FOLDER		"Folder"
 #define ZBX_VMWARE_SOAP_CLUSTER		"ClusterComputeResource"
 #define ZBX_VMWARE_SOAP_DEFAULT		"VMware"
+#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 #define ZBX_VMWARE_SOAP_DS		"Datastore"
 #define ZBX_VMWARE_SOAP_HV		"HostSystem"
 #define ZBX_VMWARE_SOAP_VM		"VirtualMachine"
-#define ZBX_VMWARE_SOAP_DC		"Datacenter"
 #define ZBX_VMWARE_SOAP_RESOURCEPOOL	"ResourcePool"
 #define ZBX_VMWARE_SOAP_DVS		"VmwareDistributedVirtualSwitch"
+#define ZBX_VMWARE_SOAP_DVPG		"DistributedVirtualPortgroup"
+#define ZBX_VMWARE_SOAP_NETWORK		"Network"
 
 /* Indicates the unit of measure represented by a counter or statistical value. */
 #define ZBX_VMWARE_UNIT_UNDEFINED		0

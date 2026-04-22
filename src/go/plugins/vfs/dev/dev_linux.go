@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,7 +20,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"strconv"
@@ -29,86 +28,25 @@ import (
 	"time"
 
 	"golang.org/x/sys/unix"
+	"golang.zabbix.com/sdk/errs"
+	"golang.zabbix.com/sdk/log"
 )
 
 const (
 	devLocation       = "/dev/"
 	sysBlkdevLocation = "/sys/dev/block/"
+	devDiskByID       = "/dev/disk/by-id/"
 	devtypePrefix     = "DEVTYPE="
 	diskstatLocation  = "/proc/diskstats"
 	devTypeRom        = 5
 	devTypeRomString  = "rom"
 )
 
+var errCannotObtainDevInfo = errs.New("cannot obtain device information")
+
 type devRecord struct {
 	Name string `json:"{#DEVNAME}"`
 	Type string `json:"{#DEVTYPE}"`
-}
-
-func (p *Plugin) getDiscovery() (out string, err error) {
-	var entries []os.FileInfo
-	if entries, err = ioutil.ReadDir(devLocation); err != nil {
-		return
-	}
-
-	var sysfs bool
-	if stat, tmperr := os.Stat(sysBlkdevLocation); tmperr == nil {
-		sysfs = stat.IsDir()
-	}
-
-	devs := make([]*devRecord, 0)
-	for _, entry := range entries {
-		bypass := 0
-		devname := devLocation + entry.Name()
-		if stat, tmperr := os.Stat(devname); tmperr == nil {
-			if stat.Mode()&os.ModeType == os.ModeDevice {
-				dev := &devRecord{Name: entry.Name()}
-				if sysfs {
-					//nolint:unconvert
-					rdev := uint64(stat.Sys().(*syscall.Stat_t).Rdev)
-					dirname := fmt.Sprintf("%s%d:%d/", sysBlkdevLocation, unix.Major(rdev), unix.Minor(rdev))
-
-					if lstat, tmperr := os.Lstat(devname); tmperr == nil {
-						filename := dirname + "/device/type"
-						if file, tmperr := os.Open(filename); tmperr == nil {
-							var devtype int
-
-							if _, tmperr = fmt.Fscanf(file, "%d\n", &devtype); tmperr == nil {
-								if devtype == devTypeRom {
-									dev.Type = devTypeRomString
-									if lstat.Mode()&os.ModeSymlink != 0 {
-										bypass = 1
-									}
-								}
-							}
-							file.Close()
-						}
-					}
-
-					if dev.Type == "" {
-						filename := dirname + "uevent"
-						if file, tmperr := os.Open(filename); tmperr == nil {
-							scanner := bufio.NewScanner(file)
-							for scanner.Scan() {
-								if strings.HasPrefix(scanner.Text(), devtypePrefix) {
-									dev.Type = scanner.Text()[len(devtypePrefix):]
-								}
-							}
-							file.Close()
-						}
-					}
-				}
-				if bypass == 0 {
-					devs = append(devs, dev)
-				}
-			}
-		}
-	}
-	var b []byte
-	if b, err = json.Marshal(&devs); err != nil {
-		return
-	}
-	return string(b), nil
 }
 
 func (p *Plugin) getDeviceName(name string) (devName string, err error) {
@@ -285,4 +223,143 @@ func (p *Plugin) collectDeviceStats(devices map[string]*devUnit) (err error) {
 		}
 	}
 	return
+}
+
+func isSysfsAvailable() (bool, error) {
+	var found bool
+
+	stat, err := os.Stat(sysBlkdevLocation)
+	if err == nil {
+		found = stat.IsDir()
+	}
+
+	if !found {
+		return false, errs.Wrapf(errCannotObtainDevInfo, "directory \"%s\" is not found", sysBlkdevLocation)
+	}
+
+	return true, nil
+}
+
+//nolint:gocyclo,gocognit,cyclop // legacy code, suppressed until refactored
+func getDevRecords(sysfs bool) ([]*devRecord, map[string]uint64, error) {
+	entries, err := os.ReadDir(devLocation)
+	if err != nil {
+		return nil, nil, errs.Wrapf(err, "cannot read directory \"%s\"", devLocation)
+	}
+
+	devs := make([]*devRecord, 0)
+	rdevs := make(map[string]uint64)
+
+	for _, entry := range entries {
+		var rdev uint64
+
+		bypass := 0
+		devname := devLocation + entry.Name()
+
+		stat, err := os.Stat(devname)
+
+		if err != nil {
+			continue
+		}
+
+		//nolint:nestif // legacy code, suppressed until refactored
+		if stat.Mode()&os.ModeType == os.ModeDevice {
+			dev := &devRecord{Name: entry.Name()}
+
+			if sysfs {
+				sysInfo, ok := stat.Sys().(*syscall.Stat_t)
+
+				if !ok {
+					// should never happen
+					log.Errf("cannot get device major and minor for \"%s\"", devname)
+
+					continue
+				}
+
+				rdev = sysInfo.Rdev
+
+				dirname := fmt.Sprintf(
+					"%s%d:%d/",
+					sysBlkdevLocation,
+					unix.Major(rdev),
+					unix.Minor(rdev),
+				)
+
+				lstat, err := os.Lstat(devname)
+				if err == nil {
+					filename := dirname + "/device/type"
+					//nolint:gosec // path is constructed from controlled, trusted components
+					file, err := os.Open(filename)
+					if err == nil {
+						var devtype int
+
+						_, err = fmt.Fscanf(file, "%d\n", &devtype)
+						if err == nil {
+							//nolint:revive // legacy code, suppressed until refactored
+							if devtype == devTypeRom {
+								dev.Type = devTypeRomString
+
+								if lstat.Mode()&os.ModeSymlink != 0 {
+									bypass = 1
+								}
+							}
+						}
+
+						err = file.Close()
+						if err != nil {
+							log.Errf("cannot close file \"%s\"", filename)
+						}
+					}
+				}
+
+				if dev.Type == "" {
+					filename := dirname + "uevent"
+					//nolint:gosec // path is constructed from controlled, trusted components
+					file, err := os.Open(filename)
+					if err == nil {
+						scanner := bufio.NewScanner(file)
+						for scanner.Scan() {
+							//nolint:revive // legacy code, suppressed until refactored
+							if strings.HasPrefix(scanner.Text(), devtypePrefix) {
+								dev.Type = scanner.Text()[len(devtypePrefix):]
+							}
+						}
+
+						err = file.Close()
+						if err != nil {
+							log.Errf("cannot close file \"%s\"", filename)
+						}
+					}
+				}
+			}
+
+			if bypass == 0 {
+				devs = append(devs, dev)
+				rdevs[entry.Name()] = rdev
+			}
+		}
+	}
+
+	return devs, rdevs, nil
+}
+
+func getDiscovery() (string, error) {
+	sysfs, err := isSysfsAvailable()
+	if err != nil {
+		return "", err
+	}
+
+	devs, _, err := getDevRecords(sysfs)
+	if err != nil {
+		return "", err
+	}
+
+	var b []byte
+
+	b, err = json.Marshal(&devs)
+	if err != nil {
+		return "", errs.Wrap(err, "failed to marshal devices")
+	}
+
+	return string(b), nil
 }

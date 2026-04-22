@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -308,6 +308,9 @@ void	vmware_shmem_alarm_free(zbx_vmware_alarm_t *alarm)
 	vmware_shared_strfree(alarm->description);
 	vmware_shared_strfree(alarm->overall_status);
 	vmware_shared_strfree(alarm->time);
+	vmware_shared_strfree(alarm->entity_id);
+	vmware_shared_strfree(alarm->entity_uuid);
+	vmware_shared_strfree(alarm->entity_type);
 
 	__vm_shmem_free_func(alarm);
 }
@@ -796,6 +799,9 @@ static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src
 	alarm->time = vmware_shared_strdup(src->time);
 	alarm->enabled = src->enabled;
 	alarm->acknowledged = src->acknowledged;
+	alarm->entity_id = vmware_shared_strdup(src->entity_id);
+	alarm->entity_uuid = vmware_shared_strdup(src->entity_uuid);
+	alarm->entity_type = vmware_shared_strdup(src->entity_type);
 
 	return alarm;
 }
@@ -1011,7 +1017,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 		if (SUCCEED != zbx_hashset_reserve(&data->vms_index, hv->vms.values_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		for (int i = 0; i < hv->vms.values_num; i++)
@@ -1181,7 +1187,7 @@ void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_k
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < src->values_num; i++)

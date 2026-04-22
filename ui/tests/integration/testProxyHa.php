@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -171,7 +171,7 @@ class testProxyHa extends CIntegrationTest {
 	 * @required-components server, proxy, proxy_ha1
 	 */
 	public function testProxyHa_tc1() {
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$pg_logline = 'proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$assign_logline = '\bassigned hostid (' . self::$hostid1 . '|' . self::$hostid2 . ') to proxyid';
@@ -203,7 +203,7 @@ class testProxyHa extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$pg_logline = 'proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
@@ -245,7 +245,7 @@ class testProxyHa extends CIntegrationTest {
 		}
 		$this->assertNotNull($monitored_host);
 
-		$px_logline = 'Proxy "' . $this->getConfigurationValue(self::COMPONENT_PROXY, 'Hostname') . '" changed state from \b[a-z]+\b to offline';
+		$px_logline = 'proxy "' . $this->getConfigurationValue(self::COMPONENT_PROXY, 'Hostname') . '" changed state from \b[a-z]+\b to offline';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $px_logline, true, 90, 1, true);
 
 		$assign_logline = 're-assigned hostid ' . $monitored_host['hostid'] . ' to proxyid ' . self::$proxyid2;
@@ -262,7 +262,7 @@ class testProxyHa extends CIntegrationTest {
 		}
 
 		$this->startComponent(self::COMPONENT_PROXY);
-		$px_logline = 'Proxy "' . $this->getConfigurationValue(self::COMPONENT_PROXY, 'Hostname') . '" changed state from offline to online';
+		$px_logline = 'proxy "' . $this->getConfigurationValue(self::COMPONENT_PROXY, 'Hostname') . '" changed state from offline to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $px_logline, true, 90, 1, true);
 
 		$assign_logline = 're-assigned hostid ' . $monitored_host['hostid'] . ' to proxyid ' . $monitored_host['initial_proxyid'];
@@ -543,7 +543,7 @@ HEREDOC;
 
 		$this->startComponent(self::COMPONENT_PROXY_HANODE1);
 
-		$pg_logline = 'Proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
+		$pg_logline = 'proxy group "' . self::PG_NAME . '" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, false, 90, 1, true);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'assigned hostid', false, 90, 1);
@@ -671,7 +671,7 @@ HEREDOC;
 		$this->startComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_PROXY);
 
-		$pg_logline = 'Proxy group "Proxy group X" changed state from \b[a-z]+\b to online';
+		$pg_logline = 'proxy group "Proxy group X" changed state from \b[a-z]+\b to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $pg_logline, true, 90, 1, true);
 
 		$this->sendSenderValue('host3', 'trap', 333);
@@ -697,7 +697,7 @@ HEREDOC;
 		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, "End of zbx_dc_sync_configuration()", true, 120, 1, true);
 
-		$px_logline = 'Proxy "' . self::PROXY1_HOSTNAME . '" changed state from unknown to online';
+		$px_logline = 'proxy "' . self::PROXY1_HOSTNAME . '" changed state from unknown to online';
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, $px_logline, false, 120, 2, true);
 
 		$assign_logline = '\bassigned hostid ' . $hostid_trapper . ' to proxyid ' . $proxyid;

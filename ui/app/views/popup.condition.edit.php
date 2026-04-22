@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -251,7 +251,6 @@ switch ($data['type']) {
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setId('value');
 
-				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_grid
 					->addItem([
@@ -277,9 +276,6 @@ switch ($data['type']) {
 				$new_condition_value = (new CTextAreaFlexible('value'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setId('value');
-
-				$inline_js .= $new_condition_value2->getPostJS();
-				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_grid
 					->addItem([
@@ -554,8 +550,6 @@ switch ($data['type']) {
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setId('value');
 
-				$inline_js .= $new_condition_value->getPostJS();
-
 				$form_grid
 					->addItem([
 						new CLabel(_('Operator'), 'label-operator'),
@@ -660,8 +654,6 @@ switch ($data['type']) {
 				$new_condition_value = (new CTextAreaFlexible('value'))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					->setId('value');
-
-				$inline_js .= $new_condition_value->getPostJS();
 
 				$help_icon = $condition_type == ZBX_CONDITION_TYPE_EVENT_NAME
 					? makeHelpIcon(_('Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings.'))

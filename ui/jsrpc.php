@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -913,6 +913,22 @@ switch ($data['method']) {
 
 		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
 			$items = API::Item()->get([
+				'output' => ['value_type'],
+				'itemids' => $data['itemid'],
+				'webitems' => true
+			]);
+
+			if ($items) {
+				$result = $items[0]['value_type'];
+			}
+		}
+		break;
+
+	case 'item_prototype_value_type.get':
+		$result = '';
+
+		if (array_key_exists('itemid', $data) && is_scalar($data['itemid'])) {
+			$items = API::ItemPrototype()->get([
 				'output' => ['value_type'],
 				'itemids' => $data['itemid'],
 				'webitems' => true

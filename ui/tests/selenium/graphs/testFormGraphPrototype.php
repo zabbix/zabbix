@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -132,8 +132,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							'item' => 'testFormItem'
 						]
 					],
-					'details' => [
-						'Graph prototype "Empty item prototype {#KEY}" must have at least one item prototype.'
+					'inline_errors' => [
+						'class:graph-items' => 'At least one item must be a prototype'
 					]
 				]
 			],
@@ -163,9 +163,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							'item' => 'testFormItemPrototype1'
 						]
 					],
-					'details' => [
-						'Graph prototype "Duplicated graph prototype" already exists on the LLD rule with '.
-								'key "discovery-rule-form" of the host "Simple form test host".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			],
@@ -205,9 +204,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						]
 					],
-					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph prototype'.
-								' duplicated Graph sum type".'
+					'inline_errors' => [
+						'xpath:.//z-select[@name="items[2][type]"]' => 'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],
@@ -237,9 +235,8 @@ class testFormGraphPrototype extends testFormGraphs {
 							]
 						]
 					],
-					'details' => [
-						'Cannot add more than one item with type "Graph sum" on graph prototype "Exploded graph prototype '.
-								'duplicated Graph sum type mixed".'
+					'inline_errors' => [
+						'xpath:.//z-select[@name="items[1][type]"]' => 'Cannot add more than one item with type "Graph sum"'
 					]
 				]
 			],
@@ -247,8 +244,8 @@ class testFormGraphPrototype extends testFormGraphs {
 				[
 					'fields' => [
 						'Name' => 'Normal graph prototype with items in Y axis values {#KEY}',
-						'Width' => 65535,
-						'Height' => 65535,
+						'Width' => 8000,
+						'Height' => 4500,
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
 						'Show legend' => false,
 						'Show working time' => false,

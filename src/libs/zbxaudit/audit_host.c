@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -899,7 +899,7 @@ static int	audit_host_flags_to_resource_type(int flags)
 	else
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected host flags detected: %d", flags);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

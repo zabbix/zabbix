@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -163,7 +163,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 	 */
 	public function getCheckFormData() {
 		return [
-			// Unchecked checkboxes.
+			// #0 Unchecked checkboxes.
 			[
 				[
 					'fields' => [
@@ -191,7 +191,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Valid zero values without 's'.
+			// #1 Valid zero values without 's'.
 			[
 				[
 					'fields' => [
@@ -210,7 +210,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Valid zero values with 's'.
+			// #2 Valid zero values with 's'.
 			[
 				[
 					'fields' => [
@@ -229,7 +229,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Valid zero values in minutes.
+			// #3 Valid zero values in minutes.
 			[
 				[
 					'fields' => [
@@ -248,7 +248,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Valid zero values in hours.
+			// #4 Valid zero values in hours.
 			[
 				[
 					'fields' => [
@@ -267,7 +267,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Valid zero values in days.
+			// #5 Valid zero values in days.
 			[
 				[
 					'fields' => [
@@ -286,7 +286,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Valid zero values in weeks.
+			// #6 Valid zero values in weeks.
 			[
 				[
 					'fields' => [
@@ -305,13 +305,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Minimal valid values in seconds without 's'.
+			// #7 Minimal valid values in seconds without 's'.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86400',
+						'id:hk_events_service' => '86400',
 						'id:hk_events_internal' => '86400',
 						'id:hk_events_discovery' => '86400',
 						'id:hk_events_autoreg' => '86400',
@@ -333,6 +334,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => 86400,
+						'hk_events_service' => 86400,
 						'hk_events_internal' => 86400,
 						'hk_events_discovery' => 86400,
 						'hk_events_autoreg' => 86400,
@@ -349,13 +351,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Minimal valid values in seconds with 's'.
+			// #8 Minimal valid values in seconds with 's'.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86400s',
+						'id:hk_events_service' => '86400s',
 						'id:hk_events_internal' => '86400s',
 						'id:hk_events_discovery' => '86400s',
 						'id:hk_events_autoreg' => '86400s',
@@ -375,6 +378,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '86400s',
+						'hk_events_service' => '86400s',
 						'hk_events_internal' => '86400s',
 						'hk_events_discovery' => '86400s',
 						'hk_events_autoreg' => '86400s',
@@ -389,13 +393,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Minimal valid values in minutes.
+			// #9 Minimal valid values in minutes.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1440m',
+						'id:hk_events_service' => '1440m',
 						'id:hk_events_internal' => '1440m',
 						'id:hk_events_discovery' => '1440m',
 						'id:hk_events_autoreg' => '1440m',
@@ -415,6 +420,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '1440m',
+						'hk_events_service' => '1440m',
 						'hk_events_internal' => '1440m',
 						'hk_events_discovery' => '1440m',
 						'hk_events_autoreg' => '1440m',
@@ -429,13 +435,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Minimal valid values in hours.
+			// #10 Minimal valid values in hours.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '24h',
+						'id:hk_events_service' => '24h',
 						'id:hk_events_internal' => '24h',
 						'id:hk_events_discovery' => '24h',
 						'id:hk_events_autoreg' => '24h',
@@ -455,6 +462,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '24h',
+						'hk_events_service' => '24h',
 						'hk_events_internal' => '24h',
 						'hk_events_discovery' => '24h',
 						'hk_events_autoreg' => '24h',
@@ -469,13 +477,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Minimal valid values in days.
+			// #11 Minimal valid values in days.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1d',
+						'id:hk_events_service' => '1d',
 						'id:hk_events_internal' => '1d',
 						'id:hk_events_discovery' => '1d',
 						'id:hk_events_autoreg' => '1d',
@@ -492,6 +501,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '1d',
+						'hk_events_service' => '1d',
 						'hk_events_internal' => '1d',
 						'hk_events_discovery' => '1d',
 						'hk_events_autoreg' => '1d',
@@ -504,13 +514,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values in seconds without 's'.
+			// #12 Maximal valid values in seconds without 's'.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400000',
+						'id:hk_events_service' => '788400000',
 						'id:hk_events_internal' => '788400000',
 						'id:hk_events_discovery' => '788400000',
 						'id:hk_events_autoreg' => '788400000',
@@ -530,6 +541,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => 788400000,
+						'hk_events_service' => 788400000,
 						'hk_events_internal' => 788400000,
 						'hk_events_discovery' => 788400000,
 						'hk_events_autoreg' => 788400000,
@@ -544,13 +556,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values in seconds with 's'.
+			// #13 Maximal valid values in seconds with 's'.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400000s',
+						'id:hk_events_service' => '788400000s',
 						'id:hk_events_internal' => '788400000s',
 						'id:hk_events_discovery' => '788400000s',
 						'id:hk_events_autoreg' => '788400000s',
@@ -570,6 +583,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '788400000s',
+						'hk_events_service' => '788400000s',
 						'hk_events_internal' => '788400000s',
 						'hk_events_discovery' => '788400000s',
 						'hk_events_autoreg' => '788400000s',
@@ -584,13 +598,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values in minutes.
+			// #14 Maximal valid values in minutes.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '13140000m',
+						'id:hk_events_service' => '13140000m',
 						'id:hk_events_internal' => '13140000m',
 						'id:hk_events_discovery' => '13140000m',
 						'id:hk_events_autoreg' => '13140000m',
@@ -610,6 +625,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '13140000m',
+						'hk_events_service' => '13140000m',
 						'hk_events_internal' => '13140000m',
 						'hk_events_discovery' => '13140000m',
 						'hk_events_autoreg' => '13140000m',
@@ -624,13 +640,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values in hours.
+			// #15 Maximal valid values in hours.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '219000h',
+						'id:hk_events_service' => '219000h',
 						'id:hk_events_internal' => '219000h',
 						'id:hk_events_discovery' => '219000h',
 						'id:hk_events_autoreg' => '219000h',
@@ -650,6 +667,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '219000h',
+						'hk_events_service' => '219000h',
 						'hk_events_internal' => '219000h',
 						'hk_events_discovery' => '219000h',
 						'hk_events_autoreg' => '219000h',
@@ -664,13 +682,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values in days.
+			// #16 Maximal valid values in days.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '9125d',
+						'id:hk_events_service' => '9125d',
 						'id:hk_events_internal' => '9125d',
 						'id:hk_events_discovery' => '9125d',
 						'id:hk_events_autoreg' => '9125d',
@@ -690,6 +709,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '9125d',
+						'hk_events_service' => '9125d',
 						'hk_events_internal' => '9125d',
 						'hk_events_discovery' => '9125d',
 						'hk_events_autoreg' => '9125d',
@@ -704,13 +724,14 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Maximal valid values in weeks.
+			// #17 Maximal valid values in weeks.
 			[
 				[
 					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1303w',
+						'id:hk_events_service' => '1303w',
 						'id:hk_events_internal' => '1303w',
 						'id:hk_events_discovery' => '1303w',
 						'id:hk_events_autoreg' => '1303w',
@@ -730,6 +751,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					'db' => [
 						'hk_events_mode' => 1,
 						'hk_events_trigger' => '1303w',
+						'hk_events_service' => '1303w',
 						'hk_events_internal' => '1303w',
 						'hk_events_discovery' => '1303w',
 						'hk_events_autoreg' => '1303w',
@@ -744,7 +766,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 					]
 				]
 			],
-			// Invalid zero values without 's'.
+			// #18 Invalid zero values without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -752,6 +774,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0',
+						'id:hk_events_service' => '0',
 						'id:hk_events_internal' => '0',
 						'id:hk_events_discovery' => '0',
 						'id:hk_events_autoreg' => '0',
@@ -762,17 +785,18 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0'
 					],
-					'details' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid zero values with 's'.
+			// #19 Invalid zero values with 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -780,6 +804,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0s',
+						'id:hk_events_service' => '0s',
 						'id:hk_events_internal' => '0s',
 						'id:hk_events_discovery' => '0s',
 						'id:hk_events_autoreg' => '0s',
@@ -790,17 +815,18 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0s'
 					],
-					'details' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid zero values in minutes.
+			// #20 Invalid zero values in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -808,6 +834,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0m',
+						'id:hk_events_service' => '0m',
 						'id:hk_events_internal' => '0m',
 						'id:hk_events_discovery' => '0m',
 						'id:hk_events_autoreg' => '0m',
@@ -818,17 +845,18 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0m'
 					],
-					'details' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid zero values in hours.
+			// #21 Invalid zero values in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -836,6 +864,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0h',
+						'id:hk_events_service' => '0h',
 						'id:hk_events_internal' => '0h',
 						'id:hk_events_discovery' => '0h',
 						'id:hk_events_autoreg' => '0h',
@@ -846,17 +875,18 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0h'
 					],
-					'details' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid zero values in days.
+			// #22 Invalid zero values in days.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -864,6 +894,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0d',
+						'id:hk_events_service' => '0d',
 						'id:hk_events_internal' => '0d',
 						'id:hk_events_discovery' => '0d',
 						'id:hk_events_autoreg' => '0d',
@@ -874,17 +905,18 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0d'
 					],
-					'details' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid zero values in weeks.
+			// #23 Invalid zero values in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -892,6 +924,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0w',
+						'id:hk_events_service' => '0w',
 						'id:hk_events_internal' => '0w',
 						'id:hk_events_discovery' => '0w',
 						'id:hk_events_autoreg' => '0w',
@@ -902,17 +935,18 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_sessions_mode' => true,
 						'id:hk_sessions' => '0w'
 					],
-					'details' => [
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid zero values in Months (Months are not supported).
+			// #24 Invalid zero values in Months (Months are not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -920,6 +954,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0M',
+						'id:hk_events_service' => '0M',
 						'id:hk_events_internal' => '0M',
 						'id:hk_events_discovery' => '0M',
 						'id:hk_events_autoreg' => '0M',
@@ -936,19 +971,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '0M'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Invalid zero values in years (years are not supported).
+			// #25 Invalid zero values in years (years are not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -956,6 +992,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0y',
+						'id:hk_events_service' => '0y',
 						'id:hk_events_internal' => '0y',
 						'id:hk_events_discovery' => '0y',
 						'id:hk_events_autoreg' => '0y',
@@ -972,19 +1009,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '0y'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Minimal invalid values in seconds with 's'.
+			// #26 Minimal invalid values in seconds with 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -992,6 +1030,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86399s',
+						'id:hk_events_service' => '86399s',
 						'id:hk_events_internal' => '86399s',
 						'id:hk_events_discovery' => '86399s',
 						'id:hk_events_autoreg' => '86399s',
@@ -1008,19 +1047,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '86399s'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Minimal invalid values in seconds without 's'.
+			// #27 Minimal invalid values in seconds without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1028,6 +1068,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86399',
+						'id:hk_events_service' => '86399',
 						'id:hk_events_internal' => '86399',
 						'id:hk_events_discovery' => '86399',
 						'id:hk_events_autoreg' => '86399',
@@ -1044,19 +1085,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '86399'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Minimal invalid values in minutes.
+			// #28 Minimal invalid values in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1064,6 +1106,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1439m',
+						'id:hk_events_service' => '1439m',
 						'id:hk_events_internal' => '1439m',
 						'id:hk_events_discovery' => '1439m',
 						'id:hk_events_autoreg' => '1439m',
@@ -1080,19 +1123,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '1439m'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Minimal invalid values in hours.
+			// #29 Minimal invalid values in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1100,6 +1144,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '23h',
+						'id:hk_events_service' => '23h',
 						'id:hk_events_internal' => '23h',
 						'id:hk_events_discovery' => '23h',
 						'id:hk_events_autoreg' => '23h',
@@ -1113,18 +1158,19 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '23h'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values.
+			// #30 Maximal invalid values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1132,6 +1178,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '99999999999999999999999999999999',
+						'id:hk_events_service' => '99999999999999999999999999999999',
 						'id:hk_events_internal' => '99999999999999999999999999999999',
 						'id:hk_events_discovery' => '99999999999999999999999999999999',
 						'id:hk_events_autoreg' => '99999999999999999999999999999999',
@@ -1148,19 +1195,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '99999999999999999999999999999999'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values in seconds with 's'.
+			// #31 Maximal invalid values in seconds with 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1168,6 +1216,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400001s',
+						'id:hk_events_service' => '788400001s',
 						'id:hk_events_internal' => '788400001s',
 						'id:hk_events_discovery' => '788400001s',
 						'id:hk_events_autoreg' => '788400001s',
@@ -1184,19 +1233,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '788400001s'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values in seconds without 's'.
+			// #32 Maximal invalid values in seconds without 's'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1204,6 +1254,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400001',
+						'id:hk_events_service' => '788400001',
 						'id:hk_events_internal' => '788400001',
 						'id:hk_events_discovery' => '788400001',
 						'id:hk_events_autoreg' => '788400001',
@@ -1220,19 +1271,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '788400001'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values in minutes.
+			// #33 Maximal invalid values in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1240,6 +1292,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '13140001m',
+						'id:hk_events_service' => '13140001m',
 						'id:hk_events_internal' => '13140001m',
 						'id:hk_events_discovery' => '13140001m',
 						'id:hk_events_autoreg' => '13140001m',
@@ -1256,19 +1309,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '13140001m'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values in hours.
+			// #34 Maximal invalid values in hours.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1276,6 +1330,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '219001h',
+						'id:hk_events_service' => '219001h',
 						'id:hk_events_internal' => '219001h',
 						'id:hk_events_discovery' => '219001h',
 						'id:hk_events_autoreg' => '219001h',
@@ -1292,19 +1347,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '219001h'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values in days.
+			// #35 Maximal invalid values in days.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1312,6 +1368,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '9126d',
+						'id:hk_events_service' => '9126d',
 						'id:hk_events_internal' => '9126d',
 						'id:hk_events_discovery' => '9126d',
 						'id:hk_events_autoreg' => '9126d',
@@ -1328,19 +1385,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '9126d'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Maximal invalid values in weeks.
+			// #36 Maximal invalid values in weeks.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1348,6 +1406,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1304w',
+						'id:hk_events_service' => '1304w',
 						'id:hk_events_internal' => '1304w',
 						'id:hk_events_discovery' => '1304w',
 						'id:hk_events_autoreg' => '1304w',
@@ -1364,19 +1423,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '1304w'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": value must be one of 0, 86400-788400000.',
-						'Incorrect value for field "hk_history": value must be one of 0, 3600-788400000.',
-						'Incorrect value for field "hk_sessions": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_services": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_autoreg": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_discovery": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_internal": value must be one of 86400-788400000.',
-						'Incorrect value for field "hk_events_trigger": value must be one of 86400-788400000.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_service' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_internal' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_discovery' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_events_autoreg' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_services' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_sessions' => 'Value must be between 86400s (1d) and 788400000s (9125d).',
+						'id:hk_history' => 'Value must be between 3600s (1h) and 788400000s (9125d).',
+						'id:hk_trends' => 'Value must be between 86400s (1d) and 788400000s (9125d).'
 					]
 				]
 			],
-			// Invalid values in Months (Months are not supported).
+			// #37 Invalid values in Months (Months are not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1384,6 +1444,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '301M',
+						'id:hk_events_service' => '301M',
 						'id:hk_events_internal' => '301M',
 						'id:hk_events_discovery' => '301M',
 						'id:hk_events_autoreg' => '301M',
@@ -1400,19 +1461,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '301M'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Invalid values in years (years are not supported).
+			// #38 Invalid values in years (years are not supported).
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1420,6 +1482,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '26y',
+						'id:hk_events_service' => '26y',
 						'id:hk_events_internal' => '26y',
 						'id:hk_events_discovery' => '26y',
 						'id:hk_events_autoreg' => '26y',
@@ -1436,19 +1499,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '26y'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Invalid string values.
+			// #39 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1456,6 +1520,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => 'text',
+						'id:hk_events_service' => 'text',
 						'id:hk_events_internal' => 'text',
 						'id:hk_events_discovery' => 'text',
 						'id:hk_events_autoreg' => 'text',
@@ -1472,19 +1537,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => 'text'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Invalid special symbol values.
+			// #40 Invalid special symbol values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1492,6 +1558,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '!@#$%^&*()_+',
+						'id:hk_events_service' => '!@#$%^&*()_+',
 						'id:hk_events_internal' => '!@#$%^&*()_+',
 						'id:hk_events_discovery' => '!@#$%^&*()_+',
 						'id:hk_events_autoreg' => '!@#$%^&*()_+',
@@ -1508,19 +1575,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '!@#$%^&*()_+'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			],
-			// Invalid empty values.
+			// #41 Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1528,6 +1596,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '',
+						'id:hk_events_service' => '',
 						'id:hk_events_internal' => '',
 						'id:hk_events_discovery' => '',
 						'id:hk_events_autoreg' => '',
@@ -1544,19 +1613,20 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => ''
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'This field cannot be empty.',
+						'id:hk_events_service' => 'This field cannot be empty.',
+						'id:hk_events_internal' => 'This field cannot be empty.',
+						'id:hk_events_discovery' => 'This field cannot be empty.',
+						'id:hk_events_autoreg' => 'This field cannot be empty.',
+						'id:hk_services' => 'This field cannot be empty.',
+						'id:hk_sessions' => 'This field cannot be empty.',
+						'id:hk_history' => 'This field cannot be empty.',
+						'id:hk_trends' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// Invalid negative values.
+			// #42 Invalid negative values.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1564,6 +1634,7 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '-1',
+						'id:hk_events_service' => '-1',
 						'id:hk_events_internal' => '-1',
 						'id:hk_events_discovery' => '-1',
 						'id:hk_events_autoreg' => '-1',
@@ -1580,15 +1651,16 @@ class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 						'id:hk_trends_global' => true,
 						'id:hk_trends' => '-1'
 					],
-					'details' => [
-						'Incorrect value for field "hk_trends": a time unit is expected.',
-						'Incorrect value for field "hk_history": a time unit is expected.',
-						'Incorrect value for field "hk_sessions": a time unit is expected.',
-						'Incorrect value for field "hk_services": a time unit is expected.',
-						'Incorrect value for field "hk_events_autoreg": a time unit is expected.',
-						'Incorrect value for field "hk_events_discovery": a time unit is expected.',
-						'Incorrect value for field "hk_events_internal": a time unit is expected.',
-						'Incorrect value for field "hk_events_trigger": a time unit is expected.'
+					'inline_errors' => [
+						'id:hk_events_trigger' => 'A time unit is expected.',
+						'id:hk_events_service' => 'A time unit is expected.',
+						'id:hk_events_internal' => 'A time unit is expected.',
+						'id:hk_events_discovery' => 'A time unit is expected.',
+						'id:hk_events_autoreg' => 'A time unit is expected.',
+						'id:hk_services' => 'A time unit is expected.',
+						'id:hk_sessions' => 'A time unit is expected.',
+						'id:hk_history' => 'A time unit is expected.',
+						'id:hk_trends' => 'A time unit is expected.'
 					]
 				]
 			]

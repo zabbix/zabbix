@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -47,13 +47,18 @@ static const char	*help_message[] = {
 	"Execute script using Zabbix embedded scripting engine.",
 	"",
 	"General options:",
-	"  -s,--script script-file      Specify the filename of script to execute. Specify - for",
+	"  -s,--script script-file      Specify the filename of script to execute. Specify '-' for",
 	"                               standard input.",
-	"  -i,--input input-file        Specify input parameter file name. Specify - for",
-	"                               standard input.",
-	"  -p,--param input-param       Specify input parameter",
+	"  -i,--input input-file        Specify a file containing the input parameter passed to the",
+	"                               script. The file contents are passed verbatim as a string",
+	"                               and are available in the script via the 'value' variable.",
+	"                               Specify '-' to read from standard input. Mutually",
+	"                               exclusive with -p.",
+	"  -p,--param input-param       Specify the input parameter passed to the script. Parameter",
+	"                               is passed verbatim as a string and is available in the",
+	"                               script via the 'value' variable. Mutually exclusive with -i.",
 	"  -w,--webdriver url           Specify webdriver URL",
-	"  -l,--loglevel log-level      Specify log level",
+	"  -l,--loglevel log-level      Specify log level (Range: 0-5).",
 	"  -t --timeout timeout         Specify the timeout in seconds. Valid range: " JS_TIMEOUT_MIN_STR "-"
 			JS_TIMEOUT_MAX_STR " seconds",
 	"                               (default: " JS_TIMEOUT_DEF_STR " seconds)",
@@ -228,7 +233,7 @@ int	main(int argc, char **argv)
 
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 #ifndef _WINDOWS
 	zbx_init_library_nix(get_zbx_progname, NULL);
 #endif
@@ -263,7 +268,7 @@ int	main(int argc, char **argv)
 				{
 					zbx_error("Invalid timeout, valid range [" JS_TIMEOUT_MIN_STR ":"
 							JS_TIMEOUT_MAX_STR "] seconds");
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 				}
 
 				break;

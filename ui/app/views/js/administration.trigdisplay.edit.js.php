@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,130 +19,160 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(document).ready(function() {
-		const $form = jQuery('#trigdisplay-form');
+<script>
+const view = new class {
+	init({rules, default_values}) {
+		this.form_element = document.getElementById('trigdisplay-form');
+		this.form = new CForm(this.form_element, rules);
+		this.rules = rules;
+		this.default_values = default_values;
 
-		$form.on('submit', () => {
-			$form.trimValues(['#ok_period', '#blink_period', '#severity_name_0', '#severity_name_1', '#severity_name_2',
-				'#severity_name_3', '#severity_name_4', '#severity_name_5'
-			]);
-		});
+		this.#initEvents();
+	}
 
-		$("input[name=custom_color]").on('change', function() {
-			var checked = $(this).is(':checked');
-			$(".js-event-color-picker").each(function() {
-				this.disabled = !checked;
+	#initEvents() {
+		this.form_element.addEventListener('submit', (e) => this.#submit(e));
+
+		document.getElementById('custom_color').addEventListener('change', (e) => {
+			this.form_element.querySelectorAll('.js-event-color-picker').forEach(picker => {
+				picker.disabled = !e.target.checked;
 			});
 		});
 
-		$("#resetDefaults").click(function() {
-			overlayDialogue({
-				title: <?= json_encode(_('Reset confirmation')) ?>,
-				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				buttons: [
-					{
-						title: <?= json_encode(_('Cancel')) ?>,
-						cancel: true,
-						class: '<?= ZBX_STYLE_BTN_ALT ?>',
-						action: function() {}
-					},
-					{
-						title: <?= json_encode(_('Reset defaults')) ?>,
-						focused: true,
-						action: function() {
-							$('main')
-								.prev('.msg-bad')
-								.remove();
+		this.form_element.querySelector('.table-forms .tfoot-buttons .js-reset-defaults')
+			.addEventListener('click', (e) => this.#resetDefaults(e.target));
+	}
 
-							var custom_color_enabled = <?= json_encode((bool) CSettingsSchema::getDefault('custom_color')) ?>;
+	#resetDefaults(reset_button) {
+		overlayDialogue({
+			title: <?= json_encode(_('Reset confirmation')) ?>,
+			content: document.createElement('span').innerText = <?= json_encode(
+				_('Reset all fields to default values?')
+			) ?>,
+			buttons: [
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: () => {}
+				},
+				{
+					title: <?= json_encode(_('Reset defaults')) ?>,
+					focused: true,
+					action: () => {
+						clearMessages();
 
-							$('#custom_color')
-								.prop('checked', custom_color_enabled)
-								.change();
+						Object.entries(this.default_values).forEach(([key, value]) => {
+							const input = document.getElementById(key);
+							if (input) {
+								if (input.getAttribute('type') === 'checkbox') {
+									input.checked = value;
+									input.dispatchEvent(new Event('change'));
+								}
+								else {
+									input.value = value;
+								}
+							}
+							else {
+								const colorpicker = this.form_element
+									.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="${key}"]`);
+								if (colorpicker) {
+									colorpicker.color = value;
+								}
+							}
+						});
 
-							// unacknowledged problem events
-							const problem_unack_color = document.querySelector(
-								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="problem_unack_color"]`
-							);
-
-							problem_unack_color.color = '<?= CSettingsSchema::getDefault("problem_unack_color") ?>';
-							problem_unack_color.disabled = !custom_color_enabled;
-
-							$('#problem_unack_style').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('problem_unack_style')) ?>
-							);
-
-							// acknowledged problem events
-							const problem_ack_color = document.querySelector(
-								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="problem_ack_color"]`
-							);
-
-							problem_ack_color.color = '<?= CSettingsSchema::getDefault("problem_ack_color") ?>';
-							problem_ack_color.disabled = !custom_color_enabled;
-
-							$('#problem_ack_style').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('problem_ack_style')) ?>
-							);
-
-							// unacknowledged resolved events
-							const ok_unack_color = document.querySelector(
-								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="ok_unack_color"]`
-							);
-
-							ok_unack_color.color = '<?= CSettingsSchema::getDefault("ok_unack_color") ?>';
-							ok_unack_color.disabled = !custom_color_enabled;
-
-							$('#ok_unack_style').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('ok_unack_style')) ?>
-							);
-
-							// acknowledged resolved events
-							const ok_ack_color = document.querySelector(
-								`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="ok_ack_color"]`
-							);
-
-							ok_ack_color.color = '<?= CSettingsSchema::getDefault("ok_ack_color") ?>';
-							ok_ack_color.disabled = !custom_color_enabled;
-
-							$('#ok_ack_style').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('ok_ack_style')) ?>
-							);
-
-							$('#ok_period').val("<?= CSettingsSchema::getDefault('ok_period') ?>");
-							$('#blink_period').val("<?= CSettingsSchema::getDefault('blink_period') ?>");
-
-							$('#severity_name_0').val("<?= CSettingsSchema::getDefault('severity_name_0') ?>");
-							$('#severity_name_1').val("<?= CSettingsSchema::getDefault('severity_name_1') ?>");
-							$('#severity_name_2').val("<?= CSettingsSchema::getDefault('severity_name_2') ?>");
-							$('#severity_name_3').val("<?= CSettingsSchema::getDefault('severity_name_3') ?>");
-							$('#severity_name_4').val("<?= CSettingsSchema::getDefault('severity_name_4') ?>");
-							$('#severity_name_5').val("<?= CSettingsSchema::getDefault('severity_name_5') ?>");
-
-							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_0"]`)
-								.color = '<?= CSettingsSchema::getDefault("severity_color_0") ?>';
-
-							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_1"]`)
-								.color = '<?= CSettingsSchema::getDefault("severity_color_1") ?>';
-
-							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_2"]`)
-								.color = '<?= CSettingsSchema::getDefault("severity_color_2") ?>';
-
-							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_3"]`)
-								.color = '<?= CSettingsSchema::getDefault("severity_color_3") ?>';
-
-							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_4"]`)
-								.color = '<?= CSettingsSchema::getDefault("severity_color_4") ?>';
-
-							document.querySelector(`.${ZBX_STYLE_COLOR_PICKER}[color-field-name="severity_color_5"]`)
-								.color = '<?= CSettingsSchema::getDefault("severity_color_5") ?>';
-						}
+						this.form.reload(this.rules);
 					}
-				]
-			}, {
-				position: Overlay.prototype.POSITION_CENTER,
-				trigger_element: this
-			});
+				}
+			]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: reset_button
 		});
-	});
+	}
+
+	#submit(e) {
+		e.preventDefault();
+		this.#setLoadingStatus(['update']);
+		clearMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'trigdisplay.update');
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = location.href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
+			});
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		addMessage(makeMessageBox('bad', messages, title)[0]);
+	}
+
+	#setLoadingStatus(loading_btn_class) {
+		this.form_element.classList.add('is-loading', 'is-loading-fadein');
+
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.disabled = true;
+
+			if (button.classList.contains(loading_btn_class)) {
+				button.classList.add('is-loading');
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.classList.remove('is-loading');
+			button.disabled = false;
+		});
+
+		this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+	}
+};
 </script>

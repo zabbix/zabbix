@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -87,16 +87,24 @@ $mapping_row_tmpl = (new CTemplateTag('mapping-row-tmpl', [
 				VALUEMAP_MAPPING_TYPE_REGEXP => _('regexp'),
 				VALUEMAP_MAPPING_TYPE_DEFAULT => _('default')
 			])),
-		(new CTextBox('mappings[#{rowNum}][value]', '#{value}', false, DB::getFieldLength('valuemap_mapping', 'value')))
-			->setErrorContainer($data['has_inline_validation'] ? 'mappings_#{rowNum}_error_container' : null)
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setErrorLabel($data['has_inline_validation'] ? _('Value') : null),
-		RARR(),
-		(new CTextBox('mappings[#{rowNum}][newvalue]', '#{newvalue}', false, DB::getFieldLength('valuemap_mapping', 'newvalue')))
-			->setErrorContainer($data['has_inline_validation'] ? 'mappings_#{rowNum}_error_container' : null)
-			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
-			->setAriaRequired()
-			->setErrorLabel($data['has_inline_validation'] ? _('Mapped to') : null),
+		(new CCol(
+			(new CTextAreaFlexible('mappings[#{rowNum}][value]', '#{value}'))
+				->setErrorContainer($data['has_inline_validation'] ? 'mappings_#{rowNum}_error_container' : null)
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setMaxlength(DB::getFieldLength('valuemap_mapping', 'value'))
+				->setErrorLabel($data['has_inline_validation'] ? _('Value') : null)
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
+		(new CCol(
+			RARR()
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
+		(new CCol(
+			(new CTextAreaFlexible('mappings[#{rowNum}][newvalue]', '#{newvalue}'))
+				->setErrorContainer($data['has_inline_validation'] ? 'mappings_#{rowNum}_error_container' : null)
+				->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
+				->setMaxlength(DB::getFieldLength('valuemap_mapping', 'newvalue'))
+				->setAriaRequired()
+				->setErrorLabel($data['has_inline_validation'] ? _('Mapped to') : null)
+		))->addClass(ZBX_STYLE_ALIGN_TOP),
 		(new CButton('mappings[#{rowNum}][remove]', _('Remove')))
 			->addClass(ZBX_STYLE_BTN_LINK)
 			->addClass('element-table-remove')
@@ -139,10 +147,9 @@ $output = [
 	'buttons' => [
 		[
 			'title' => $data['edit'] ? _('Update') : _('Add'),
-			'class' => '',
+			'class' => 'js-submit',
 			'keepOpen' => true,
-			'isSubmit' => true,
-			'action' => 'return valuemap_edit_popup.submit(overlay);'
+			'isSubmit' => true
 		]
 	]
 ];

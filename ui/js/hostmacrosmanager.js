@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -21,7 +21,6 @@ class HostMacrosManager {
 	static ZBX_MACRO_TYPE_TEXT = 0;
 	static ZBX_MACRO_TYPE_SECRET = 1;
 	static ZBX_MACRO_TYPE_VAULT = 2;
-	static ZBX_STYLE_TEXTAREA_FLEXIBLE = 'textarea-flexible';
 	static DISCOVERY_STATE_AUTOMATIC = 0x1;
 	static DISCOVERY_STATE_CONVERTING = 0x2;
 	static DISCOVERY_STATE_MANUAL = 0x3;
@@ -31,9 +30,14 @@ class HostMacrosManager {
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.load_callback = load_callback ?? null;
+		this.xhr = null;
 	}
 
 	load(show_inherited_macros, templateids) {
+		if (this.xhr) {
+			this.xhr.abort();
+		}
+
 		const url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'hostmacros.list');
@@ -49,7 +53,7 @@ class HostMacrosManager {
 			post_data.parent_hostid = this.parent_hostid;
 		}
 
-		$.ajax(url.getUrl(), {
+		this.xhr = $.ajax(url.getUrl(), {
 			data: post_data,
 			dataType: 'json',
 			method: 'POST',
@@ -61,9 +65,11 @@ class HostMacrosManager {
 				if (typeof response === 'object' && 'error' in response) {
 					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 
-					this.$container.append(message_box);
+					this.$container.prepend(message_box);
 				}
 				else {
+					this.$container.empty();
+
 					if (typeof response.messages !== 'undefined') {
 						this.$container.append(response.messages);
 					}
@@ -71,10 +77,7 @@ class HostMacrosManager {
 					this.$container.append(response.body);
 
 					// Initialize macros.
-					if (this.readonly) {
-						$('.' + HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, this.getMacroTable()).textareaFlexible();
-					}
-					else {
+					if (!this.readonly) {
 						this.initMacroTable(show_inherited_macros);
 					}
 
@@ -100,7 +103,7 @@ class HostMacrosManager {
 	 * Get macros from UI.
 	 */
 	getMacros() {
-		const $macros = $('input[name^="macros"], textarea[name^="macros"]', this.$container).not(':disabled');
+		const $macros = $('input[name^="macros"], z-textarea-flexible[name^="macros"]', this.$container).not(':disabled');
 		const macros = {};
 
 		// Find the correct macro inputs and prepare to submit them via AJAX.
@@ -149,7 +152,7 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type & ~HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_description')
-						.prop('readonly', true)
+						.attr('readonly', true)
 						.val($('#macros_' + macro_num + '_inherited_description').val())
 						.trigger('input');
 					$('#macros_' + macro_num + '_type_button')
@@ -161,7 +164,7 @@ class HostMacrosManager {
 						.val(macro_type)
 						.trigger('change');
 					$('#macros_' + macro_num + '_value')
-						.prop(inherited_value_field_state)
+						.attr(inherited_value_field_state)
 						.val($('#macros_' + macro_num + '_inherited_value').val())
 						.trigger('input');
 					$('#macros_' + macro_num + '_value')
@@ -180,12 +183,12 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_inherited_type')
 						.val(inherited_type | HostMacrosManager.ZBX_PROPERTY_OWN);
 					$('#macros_' + macro_num + '_value')
-						.prop('disabled', false)
-						.prop('readonly', false)
+						.attr('disabled', false)
+						.attr('readonly', false)
 						.attr({'placeholder': t('value')})
 						.val('')
 						.focus();
-					$('#macros_' + macro_num + '_description').prop('readonly', false);
+					$('#macros_' + macro_num + '_description').attr('readonly', false);
 					$('#macros_' + macro_num + '_type_button')
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
@@ -221,7 +224,7 @@ class HostMacrosManager {
 						.trigger('change');
 					$('#macros_' + num + '_value', $row)
 						.val(original_value)
-						.prop(original_value_field_state)
+						.attr(original_value_field_state)
 						.trigger('input');
 					$('#macros_' + num + '_value', $row)
 						.closest('.macro-input-group')
@@ -229,7 +232,7 @@ class HostMacrosManager {
 						.hide();
 					$('#macros_' + num + '_description')
 						.val(original_descr)
-						.prop('readonly', true)
+						.attr('readonly', true)
 						.trigger('input');
 					$('#macros_' + num + '_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_AUTOMATIC);
@@ -237,13 +240,13 @@ class HostMacrosManager {
 				}
 				else {
 					$('#macros_' + num + '_value', $row)
-						.prop('readonly', false)
+						.attr('readonly', false)
 						.focus();
 					$('#macros_' + num + '_value_btn', $row).prop('disabled', false);
 					$('#macros_' + num + '_type_button', $row)
 						.prop('disabled', false)
 						.attr({'aria-haspopup': true});
-					$('#macros_' + num + '_description').prop('readonly', false);
+					$('#macros_' + num + '_description').attr('readonly', false);
 					$('#macros_' + num + '_type_button', $row).trigger('change');
 					$discovery.val(HostMacrosManager.DISCOVERY_STATE_CONVERTING);
 					$('#macros_' + num + '_change_state').text(t('Revert'));
@@ -257,22 +260,17 @@ class HostMacrosManager {
 	}
 
 	initMacroFields($parent) {
-		$('.'+HostMacrosManager.ZBX_STYLE_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field')
-				.each((index, textarea) => {
+		$(ZBX_STYLE_Z_TEXTAREA_FLEXIBLE, $parent).not('.initialized-field')
+		.each((index, textarea) => {
 			const $textarea = $(textarea);
 
 			if ($textarea.hasClass('macro')) {
 				$textarea.on('change keydown', (e) => {
 					if (e.type === 'change' || e.which === 13) {
 						this.macroToUpperCase($textarea);
-						$textarea.textareaFlexible();
 					}
 				});
 			}
-
-			$textarea
-				.addClass('initialized-field')
-				.textareaFlexible();
 		});
 	}
 
@@ -281,14 +279,22 @@ class HostMacrosManager {
 	}
 
 	loaderStart() {
+		this.$container.trigger('loader.start');
 		this.$preloader = $('<span>', {class: 'is-loading'});
-		this.$container
-			.empty()
-			.append(this.$preloader);
+
+		const macros_table = this.$container.find('table');
+
+		macros_table.hide();
+		this.$container.append(this.$preloader);
 	}
 
 	loaderStop() {
 		this.$preloader.remove();
+
+		const macros_table = this.$container.find('table');
+
+		macros_table.show();
+		this.$container.trigger('loader.stop');
 	}
 
 	macroToUpperCase($element) {

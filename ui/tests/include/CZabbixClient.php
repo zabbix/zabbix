@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -41,16 +41,17 @@ class CZabbixClient extends CZabbixServer {
 	/**
 	 * Send value for items to server/proxy.
 	 *
-	 * @param string $type      data type
-	 * @param array  $values    trapper values
+	 * @param string  $type      data type
+	 * @param array   $values    trapper values
+	 * @param integer $time      clock
 	 *
 	 * @return array|false    array with result data or false otherwise
 	 */
-	public function sendDataValues($type, $values) {
+	public function sendDataValues($type, $values, $time = null) {
 		$response = parent::request([
 			'request' => $type.' data',
 			'data' => $values,
-			'clock' => time(),
+			'clock' => $time ?? time(),
 			'ns' => 0
 		]);
 
