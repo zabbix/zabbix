@@ -188,7 +188,7 @@ class CDevice extends CApiService {
 
 		$ins_device_enrollment_token = [
 			'deviceid' => $deviceid,
-			'token' => hash('sha512', $enrollment_token),
+			'token' => CApiTokenHelper::hashToken($enrollment_token),
 			'expires_at' => $enrollment_token_expires_at
 		];
 
@@ -366,7 +366,7 @@ class CDevice extends CApiService {
 			' FROM device_enrollment_token det,device d,users u'.
 			' WHERE det.deviceid=d.deviceid'.
 				' AND d.userid=u.userid'.
-				' AND '.dbConditionString('det.token', [hash('sha512', $data['enrollment_token'])]).
+				' AND '.dbConditionString('det.token', [CApiTokenHelper::hashToken($data['enrollment_token'])]).
 				' AND det.expires_at>'.time()
 		));
 

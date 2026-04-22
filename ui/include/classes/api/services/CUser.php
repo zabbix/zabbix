@@ -3126,7 +3126,7 @@ class CUser extends CApiService {
 		$db_tokens = DB::select('token', [
 			'output' => ['userid', 'expires_at', 'tokenid'],
 			'filter' => [
-				'token' => hash('sha512', $auth_token),
+				'token' => CApiTokenHelper::hashToken($auth_token),
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
 				'auth_scheme' => $auth_scheme
 			]

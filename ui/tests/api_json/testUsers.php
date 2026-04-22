@@ -2871,7 +2871,7 @@ class testUsers extends CAPITest {
 			'status' => ZBX_AUTH_TOKEN_DISABLED,
 			'userid' => 1,
 			'name' => 'disabled',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -2899,7 +2899,7 @@ class testUsers extends CAPITest {
 			'userid' => 1,
 			'name' => 'expired',
 			'expires_at' => $now - 1,
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -2927,7 +2927,7 @@ class testUsers extends CAPITest {
 			'userid' => 1,
 			'name' => 'correct',
 			'expires_at'  => $now + 10,
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -2950,7 +2950,7 @@ class testUsers extends CAPITest {
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
 			'name' => 'debug mode',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		DB::update('usrgrp', [
@@ -2985,7 +2985,7 @@ class testUsers extends CAPITest {
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 1,
 			'name' => 'debug mode disabled',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([
@@ -3012,7 +3012,7 @@ class testUsers extends CAPITest {
 			'userid' => 1,
 			'lastaccess' => $formeraccess,
 			'name' => 'lastaccess updated',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$this->callRaw([
@@ -3040,7 +3040,7 @@ class testUsers extends CAPITest {
 			'status' => ZBX_AUTH_TOKEN_ENABLED,
 			'userid' => 13,
 			'name' => 'user with status "Disabled"',
-			'token' => hash('sha512', $token)
+			'token' => CApiTokenHelper::hashToken($token)
 		]]);
 
 		$res = $this->callRaw([

@@ -19,4 +19,8 @@ class CApiTokenHelper {
 	public static function generateToken(): string {
 		return bin2hex(random_bytes(32));
 	}
+
+	public static function hashToken(string $token): string {
+		return hash('sha512', $token);
+	}
 }

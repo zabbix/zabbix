@@ -101,7 +101,7 @@ class CToken extends CApiService {
 
 		// token
 		if ($options['token'] !== null) {
-			$token = hash('sha512', $options['token']);
+			$token = CApiTokenHelper::hashToken($options['token']);
 			$sql_parts['where'][] = dbConditionString($this->tableAlias().'.token', (array) $token);
 		}
 
@@ -469,7 +469,7 @@ class CToken extends CApiService {
 
 			$token = [
 				'tokenid' => $tokenid,
-				'token' => hash('sha512', $new_token),
+				'token' => CApiTokenHelper::hashToken($new_token),
 				'creator_userid' => self::$userData['userid']
 			];
 
