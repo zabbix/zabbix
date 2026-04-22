@@ -14,10 +14,10 @@ libzbxtrapper_a_SOURCES = \
 	trapper_expressions_evaluate.h \
 	trapper_item_test.c \
 	trapper_item_test.h \
-	trapper.h \
 	trapper_device_management.c \
 	trapper_device_management.h \
-	trapper.c
+	trapper.c \
+	trapper.h
 
 libzbxtrapper_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \

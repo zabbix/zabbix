@@ -12,8 +12,8 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
-#ifndef ZABBIX_TRAPPER_H
-#define ZABBIX_TRAPPER_H
+#ifndef ZABBIX_ZBX_TRAPPER_H
+#define ZABBIX_ZBX_TRAPPER_H
 
 typedef enum
 {

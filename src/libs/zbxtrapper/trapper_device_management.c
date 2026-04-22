@@ -107,6 +107,9 @@ out:
  *                                                                            *
  * Purpose: gets device owner userid by device uuid                           *
  *                                                                            *
+ * Parameters: uuid          - [IN] device UUID                               *
+ *             target_userid - [OUT] device owner user ID                     *
+ *                                                                            *
  * Return value:  SUCCEED - userid found                                      *
  *                FAIL    - otherwise                                         *
  *                                                                            *
@@ -184,14 +187,14 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in device.init request");
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in device.init request");
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -201,7 +204,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -210,7 +213,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -240,7 +243,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -251,7 +254,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_https: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
-			*error = zbx_strdup(NULL, "Failed process device.init request");
+			*error = zbx_strdup(NULL, "Failed to process device.init request");
 			goto out;
 		}
 
@@ -259,7 +262,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_ssl_version: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
-			*error = zbx_strdup(NULL, "Failed process device.init request");
+			*error = zbx_strdup(NULL, "Failed to process device.init request");
 			goto out;
 		}
 
@@ -273,7 +276,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			*error = zbx_strdup(NULL, "Failed process device.init request");
+			*error = zbx_strdup(NULL, "Failed to process device.init request");
 			goto out;
 		}
 	}
@@ -285,7 +288,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		if (NULL == connect_to)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			*error = zbx_strdup(NULL, "Failed process device.init request");
+			*error = zbx_strdup(NULL, "Failed to process device.init request");
 			goto out;
 		}
 
@@ -293,7 +296,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
-			*error = zbx_strdup(NULL, "Failed process device.init request");
+			*error = zbx_strdup(NULL, "Failed to process device.init request");
 			goto out;
 		}
 	}
@@ -309,7 +312,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -317,7 +320,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -325,7 +328,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -338,14 +341,13 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		{
 			char	info[ZBX_INFO_LEN];
 
-			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data %s", code,
-					message, error_data);
 			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, error_data);
+			zabbix_log(LOG_LEVEL_WARNING, info);
 			*error = zbx_strdup(NULL, info);
 		}
 		else
-			*error = zbx_strdup(NULL, "Failed process device.init request");
+			*error = zbx_strdup(NULL, "Failed to process device.init request");
 
 		goto out;
 	}
@@ -354,7 +356,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing result in bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -365,7 +367,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing met/bek/enroll_url in bridge-adapter result: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed process device.init request");
+		*error = zbx_strdup(NULL, "Failed to process device.init request");
 		goto out;
 	}
 
@@ -403,6 +405,18 @@ out:
 /******************************************************************************
  *                                                                            *
  * Purpose: processes device.init request                                     *
+ *                                                                            *
+ * Parameters: sock                       - [IN] connection socket            *
+ *             jp                         - [IN] parsed request JSON          *
+ *             config_comms               - [IN] communication configuration  *
+ *             config_tls                 - [IN] TLS configuration            *
+ *             config_frontend_allowed_ip - [IN] allowed frontend IP list     *
+ *             config_adapter_url         - [IN] bridge adapter URL           *
+ *             config_tls_ca_file         - [IN] TLS CA certificate file      *
+ *             config_tls_cert_file       - [IN] TLS client certificate file  *
+ *             config_tls_key_file        - [IN] TLS client private key file  *
+ *             config_connect_to          - [IN] optional adapter connect-to  *
+ *                                              override                      *
  *                                                                            *
  * Comments: validates caller permissions for requested target user and       *
  *           forwards request to bridge adapter                               *
@@ -520,14 +534,14 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in device.init request");
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in device.init request");
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -537,7 +551,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -546,7 +560,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -577,7 +591,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s", (int)opt,
 				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -585,7 +599,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_https: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -593,7 +607,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_ssl_version: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -605,7 +619,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s", (int)opt,
 				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -616,7 +630,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 		if (NULL == connect_to)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			*error = zbx_strdup(NULL, "Failed process device.offboard request");
+			*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 			goto out;
 		}
 
@@ -624,7 +638,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
-			*error = zbx_strdup(NULL, "Failed process device.offboard request");
+			*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 			goto out;
 		}
 	}
@@ -641,7 +655,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -649,7 +663,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -657,7 +671,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
-		*error = zbx_strdup(NULL, "Failed process device.offboard request");
+		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 		goto out;
 	}
 
@@ -670,14 +684,13 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 		{
 			char	info[ZBX_INFO_LEN];
 
-			zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned %s: message: %s data %s", code,
-					message, error_data);
 			zbx_snprintf(info, sizeof(info), "Bridge-adapter returned code: %s, message: %s data: %s",
 					code, message, error_data);
+			zabbix_log(LOG_LEVEL_WARNING, info);
 			*error = zbx_strdup(NULL, info);
 		}
 		else
-			*error = zbx_strdup(NULL, "Failed process device.offboard request");
+			*error = zbx_strdup(NULL, "Failed to process device.offboard request");
 
 		goto out;
 	}
@@ -700,6 +713,18 @@ out:
 /******************************************************************************
  *                                                                            *
  * Purpose: processes device.offboard request                                 *
+ *                                                                            *
+ * Parameters: sock                       - [IN] connection socket            *
+ *             jp                         - [IN] parsed request JSON          *
+ *             config_comms               - [IN] communication configuration  *
+ *             config_tls                 - [IN] TLS configuration            *
+ *             config_frontend_allowed_ip - [IN] allowed frontend IP list     *
+ *             config_adapter_url         - [IN] bridge adapter URL           *
+ *             config_tls_ca_file         - [IN] TLS CA certificate file      *
+ *             config_tls_cert_file       - [IN] TLS client certificate file  *
+ *             config_tls_key_file        - [IN] TLS client private key file  *
+ *             config_connect_to          - [IN] optional adapter connect-to  *
+ *                                              override                      *
  *                                                                            *
  * Comments: resolves device owner, validates caller permissions and forwards *
  *           request to bridge adapter                                        *

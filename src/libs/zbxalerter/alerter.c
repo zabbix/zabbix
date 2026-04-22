@@ -557,7 +557,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
-		error = zbx_strdup(NULL, "Failed process device.notify request");
+		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
@@ -565,7 +565,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			errbuf, &error_curl))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s", ZBX_NULL2EMPTY_STR(error_curl));
-		error = zbx_strdup(NULL, "Failed process device.notify request");
+		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
@@ -581,7 +581,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
-		error = zbx_strdup(NULL, "Failed process device.notify request");
+		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
@@ -591,7 +591,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_https: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
-			error = zbx_strdup(NULL, "Failed process device.notify request");
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
 		}
 
@@ -599,7 +599,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed zbx_curl_setopt_ssl_version: %s",
 					ZBX_NULL2EMPTY_STR(error_curl));
-			error = zbx_strdup(NULL, "Failed process device.notify request");
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
 		}
 
@@ -613,7 +613,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 					curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed process device.notify request");
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
 		}
 	}
@@ -625,7 +625,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		if (NULL == connect_to)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed to prepare CURLOPT_CONNECT_TO value");
-			error = zbx_strdup(NULL, "Failed process device.notify request");
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
 		}
 
@@ -633,7 +633,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "failed set cURL option %d: %s.", (int)opt,
 				curl_easy_strerror(err));
-			error = zbx_strdup(NULL, "Failed process device.notify request");
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 			goto out;
 		}
 	}
@@ -649,7 +649,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed obtain bridge-adapter response code: %s",
 				curl_easy_strerror(err));
-		error = zbx_strdup(NULL, "Failed process device.notify request");
+		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
@@ -657,7 +657,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "invalid bridge-adapter response body: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, "Failed process device.notify request");
+		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
@@ -665,7 +665,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "bridge-adapter returned HTTP %ld: %s", http_code,
 				ZBX_NULL2EMPTY_STR(body.data));
-		error = zbx_strdup(NULL, "Failed process device.notify request");
+		error = zbx_strdup(NULL, "Failed to process device.notify request");
 		goto out;
 	}
 
@@ -686,7 +686,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			error = zbx_strdup(NULL, info);
 		}
 		else
-			error = zbx_strdup(NULL, "Failed process device.notify request");
+			error = zbx_strdup(NULL, "Failed to process device.notify request");
 
 		goto out;
 	}
