@@ -362,11 +362,11 @@ class CDevice extends CApiService {
 		}
 
 		$db_device = DBfetch(DBselect(
-			'SELECT d.deviceid,d.uuid,d.userid,d.name,u.name AS username'.
-			' FROM device_enrollment_token det,device d,users u'.
-			' WHERE det.deviceid=d.deviceid'.
-				' AND d.userid=u.userid'.
-				' AND '.dbConditionString('det.token', [CApiTokenHelper::hashToken($data['enrollment_token'])]).
+			'SELECT d.deviceid,d.userid,d.uuid,d.name,u.name AS username'.
+			' FROM device_enrollment_token det'.
+			' JOIN device d ON det.deviceid=d.deviceid'.
+			' JOIN users u ON d.userid=u.userid'.
+			' WHERE '.dbConditionString('det.token', [CApiTokenHelper::hashToken($data['enrollment_token'])]).
 				' AND det.expires_at>'.time()
 		));
 
