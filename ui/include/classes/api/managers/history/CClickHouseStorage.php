@@ -781,11 +781,12 @@ class CClickHouseStorage {
 		}
 
 		if ($options['maxValueSize'] !== null) {
+			$max_length = (int) $options['maxValueSize'];
 			$value = match ($options['history']) {
 				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64 => 'value',
 				ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
-				ITEM_VALUE_TYPE_TEXT => 'substringUTF8(value,1,'.intval($options['maxValueSize']).')',
-				ITEM_VALUE_TYPE_JSON => 'substringUTF8(toString(value,1,'.intval($options['maxValueSize']).')'
+				ITEM_VALUE_TYPE_TEXT => 'substringUTF8(value,1,'.$max_length.')',
+				ITEM_VALUE_TYPE_JSON => 'substringUTF8(value_str!=\'\'?value_str:toString(value),1,'.$max_length.')'
 			};
 		}
 
