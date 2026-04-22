@@ -331,7 +331,7 @@ class CTrend extends CApiService {
 	}
 
 	/**
-	 * ClickHouse specific implemenation of get.
+	 * ClickHouse specific implementation of get.
 	 *
 	 * @see CTrend::get
 	 */

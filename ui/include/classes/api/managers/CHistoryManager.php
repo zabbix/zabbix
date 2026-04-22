@@ -1829,7 +1829,7 @@ class CHistoryManager {
 		}
 
 		$endpoints = [];
-		// Star character in the table name is to allow store history data in multiple date-based indicies.
+		// Star character in the table name is to allow store history data in multiple date-based indices.
 		$value_type_index = [
 			ITEM_VALUE_TYPE_LOG => 'log*',
 			ITEM_VALUE_TYPE_TEXT => 'text*',
