@@ -23,6 +23,9 @@ window.correlation_edit_popup = new class {
 
 	init({correlation}) {
 		this.overlay = overlays_stack.getById('correlation.edit');
+		this.#showWarning(<?= json_encode(
+			_('Global event correlation is deprecated and may be removed in next releases.')
+		) ?>);
 		this.dialogue = this.overlay.$dialogue[0];
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.correlation = correlation;
@@ -403,5 +406,12 @@ window.correlation_edit_popup = new class {
 				this.form.parentNode.insertBefore(message_box, this.form);
 			})
 			.finally(() => this.overlay.unsetLoading());
+	}
+
+	#showWarning(message) {
+		const message_node = makeMessageBox('warning', null, message, false)[0];
+
+		this.overlay.$dialogue.$body[0]
+			.insertAdjacentElement('beforebegin', message_node)
 	}
 }
