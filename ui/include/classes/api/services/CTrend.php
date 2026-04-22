@@ -342,7 +342,7 @@ class CTrend extends CApiService {
 		foreach ($options['itemids'] as $value_type => $itemids) {
 			/** @var CClickHouseStorage $storage */
 			$storage = Manager::History()->getStorageProviderInstance($value_type);
-			$values = $storage->getTrends([
+			$values = $storage->selectTrends([
 				'output' => $options['output'],
 				'history' => $value_type,
 				'itemids' => array_keys($itemids),

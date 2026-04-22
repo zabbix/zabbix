@@ -145,7 +145,7 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Query storage using API like options. Return NULL on error.
+	 * Query storage history data using API like options. Return NULL on error.
 	 *
 	 * @see CHistory::get()
 	 * @param array $options
@@ -158,11 +158,11 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Get trends data for specific time range.
+	 * Query storage trends data using API like options. Return NULL on error.
 	 *
 	 * @param array $options
 	 */
-	public function getTrends(array $options): ?array {
+	public function selectTrends(array $options): ?array {
 		if ($options['countOutput']) {
 			$options['output'] = ['itemid'];
 			$options['countOutput'] = false;
