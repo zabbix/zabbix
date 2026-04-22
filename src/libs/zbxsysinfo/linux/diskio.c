@@ -80,16 +80,6 @@
 
 typedef struct
 {
-	zbx_uint64_t	reads_completed;
-	zbx_uint64_t	writes_completed;
-	zbx_uint64_t	bytes_read;
-	zbx_uint64_t	bytes_written;
-	zbx_uint64_t	io_time_ms;
-}
-zbx_dev_stats_t;
-
-typedef struct
-{
 	unsigned int	major;
 	unsigned int	minor;
 	char		*devid;
