@@ -523,6 +523,34 @@ class CMaintenance extends CApiService {
 			'where' => ['maintenanceid' => $maintenanceids]
 		]);
 
+		/*
+		 * Select all active suppressions by maintenance from acknowledges table for the maintenances that are about to
+		 * be deleted and add unsuppression records in acknowledges table.
+		 */
+		$ins_acknowledges = [];
+
+		$db_acknowledges = DBselect(
+			'SELECT a.eventid,a.maintenanceid'.
+			' FROM acknowledges a'.
+			' WHERE '.dbConditionId('a.maintenanceid', $maintenanceids).
+			' AND a.suppress_until>'.time().
+			' AND a.action='.ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS
+		);
+
+		while ($db_acknowledge = DBfetch($db_acknowledges)) {
+			$ins_acknowledges[] = [
+				'eventid' => $db_acknowledge['eventid'],
+				'clock' => time(),
+				'action' => ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
+				'suppress_until' => 0,
+				'maintenanceid' => $db_acknowledge['maintenanceid']
+			];
+		}
+
+		if ($ins_acknowledges) {
+			DB::insert('acknowledges', $ins_acknowledges);
+		}
+
 		DB::delete('timeperiods', ['timeperiodid' => array_column($maintenances_windows, 'timeperiodid')]);
 		DB::delete('maintenances', ['maintenanceid' => $maintenanceids]);
 
