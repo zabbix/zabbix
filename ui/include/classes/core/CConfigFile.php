@@ -450,45 +450,43 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 	protected function getHistoryProviders(array $providers): array {
 		$result = [];
 		$value_types = [];
+		$required = [
+			ZBX_HISTORY_SOURCE_CLICKHOUSE => ['types', 'url', 'db', 'username', 'password'],
+			ZBX_HISTORY_SOURCE_ELASTIC => ['types', 'url']
+		];
 
 		foreach ($providers as $i => $provider) {
-			if (!array_key_exists('provider', $provider) || !in_array($provider['provider'], self::SUPPORTED_SOURCE)) {
-				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/provider',
+			$path = ($i + 1).'/';
+			$missing = array_key_exists('provider', $provider)
+				? array_diff($required[$provider['provider']] ?? [], array_keys($provider))
+				: ['provider'];
+
+			if ($missing) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path,
+					_s('the parameter "%1$s" is missing', reset($missing))
+				));
+			}
+
+			if (!in_array($provider['provider'], self::SUPPORTED_SOURCE)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path.'provider',
 					_s('value must be one of %1$s', implode(',', self::SUPPORTED_SOURCE))
 				));
 			}
 
-			if (array_diff($provider['types'], self::VALUE_TYPE_CONFIG_NAME)) {
-				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/types',
+			if (!is_array($provider['types']) || array_diff($provider['types'], self::VALUE_TYPE_CONFIG_NAME)) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path.'types',
 					_s('value must be one of %1$s', implode(',', self::VALUE_TYPE_CONFIG_NAME))
 				));
 			}
 
 			$provider_value_types = array_fill_keys($provider['types'], $i);
 			$in_use = array_intersect_key($value_types, $provider_value_types);
-
-			if ($in_use) {
-				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/types',
-					_s('value "%1$s" already exists', key($in_use))
-				));
-			}
-
 			$value_types += $provider_value_types;
 
-			if (!array_key_exists('url', $provider)) {
-				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/url',
-					_s('the parameter "%1$s" is missing', 'url')
+			if ($in_use) {
+				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path.'types',
+					_s('value "%1$s" already exists', key($in_use))
 				));
-			}
-
-			if ($provider['provider'] === ZBX_HISTORY_SOURCE_CLICKHOUSE) {
-				$fields = array_diff(['db', 'username', 'password'], array_keys($provider));
-
-				if ($fields) {
-					self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', ($i + 1).'/db',
-						_s('the parameter "%1$s" is missing', reset($fields))
-					));
-				}
 			}
 
 			$provider['url'] = rtrim($provider['url'], '/');
