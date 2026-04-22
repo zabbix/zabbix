@@ -2485,6 +2485,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		goto out;
 	}
 
+	locked = 1;
 	zbx_dc_get_upstream_revision(&config_revision, &hostmap_revision);
 
 	zbx_json_init(&j, 1024);
@@ -2509,7 +2510,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot receive proxy configuration data from server at \"%s\": %s",
 				sock->peer, zbx_socket_strerror());
-		goto out_unlock;
+		goto out;
 	}
 
 	if (NULL == sock->buffer)
@@ -2517,7 +2518,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse empty proxy configuration data received from server at"
 				" \"%s\"", sock->peer);
 		zbx_send_proxy_response(sock, FAIL, "cannot parse empty data", config_timeout);
-		goto out_unlock;
+		goto out;
 	}
 
 	if (SUCCEED != (ret = zbx_json_open(sock->buffer, &jp_config)))
@@ -2525,7 +2526,7 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 		zabbix_log(LOG_LEVEL_WARNING, "cannot parse proxy configuration data received from server at"
 				" \"%s\": %s", sock->peer, zbx_json_strerror());
 		zbx_send_proxy_response(sock, ret, zbx_json_strerror(), config_timeout);
-		goto out_unlock;
+		goto out;
 	}
 
 	if (SUCCEED == (ret = zbx_proxyconfig_process(sock->peer, &jp_config, &status, &error)))
@@ -2555,13 +2556,12 @@ void	zbx_recv_proxyconfig(zbx_socket_t *sock, const zbx_config_tls_t *config_tls
 	}
 
 	zbx_dc_sync_unlock();
+	locked = 0;
 	zbx_send_proxy_response(sock, ret, error, config_timeout);
 	zbx_free(error);
-	goto out;
-
-out_unlock:
-	zbx_dc_sync_unlock();
 out:
+	if (0 != locked)
+		zbx_dc_sync_unlock();
 #ifdef	HAVE_MALLOC_TRIM
 	/* avoid memory not being released back to the system if large proxy configuration is retrieved from database */
 	if (ZBX_PROXYCONFIG_WRITE_STATUS_DATA == status)
