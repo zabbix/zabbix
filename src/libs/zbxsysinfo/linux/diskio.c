@@ -806,7 +806,7 @@ static void	devids_init(zbx_vector_device_ptr_t *devices)
 
 	closedir(dir);
 
-	if (NULL != devices && 0 < devices->values_num)
+	if (0 < devices->values_num)
 		zbx_vector_device_ptr_sort(devices, device_compare);
 }
 
