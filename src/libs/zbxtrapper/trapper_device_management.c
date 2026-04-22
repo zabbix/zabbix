@@ -13,6 +13,7 @@
 **/
 
 #include "trapper_device_management.h"
+#include "trapper.h"
 #include "zbxtrapper.h"
 
 #include "zbxcommon.h"
@@ -52,8 +53,8 @@ static int	device_check_permissions(const zbx_user_t *user, zbx_uint64_t target_
 #define ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS	"devices.actions.default_access"
 #define ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN	"devices.actions.manage_own"
 #define ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER	"devices.actions.manage_user"
-#define ROLE_PERM_ALLOW					1
-	int			ret = FAIL, default_access = 0;
+	int				ret = FAIL;
+	zbx_user_role_permission_t	default_access = ROLE_PERM_DENY, permission;
 	const char		*required_rule;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
@@ -73,15 +74,21 @@ static int	device_check_permissions(const zbx_user_t *user, zbx_uint64_t target_
 
 	while (NULL != (row = zbx_db_fetch(result)))
 	{
+		permission = (zbx_user_role_permission_t)atoi(row[1]);
+
 		if (0 == strcmp(required_rule, row[0]))
 		{
-			ret = (ROLE_PERM_ALLOW == atoi(row[1]) ? SUCCEED : FAIL);
+			ret = (ROLE_PERM_ALLOW == permission ? SUCCEED : FAIL);
 			goto out;
 		}
 		else if (0 == strcmp(ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS, row[0]))
-			default_access = atoi(row[1]);
+			default_access = permission;
 		else
-			THIS_SHOULD_NEVER_HAPPEN;
+			THIS_SHOULD_NEVER_HAPPEN_MSG("unexpected role_rule entry returned while checking device"
+					" permissions: roleid:" ZBX_FS_UI64 " userid:" ZBX_FS_UI64
+					" target_userid:" ZBX_FS_UI64 " required_rule:\"%s\" name:\"%s\" value:\"%s\"",
+					user->roleid, user->userid, target_userid, required_rule,
+					ZBX_NULL2EMPTY_STR(row[0]), ZBX_NULL2EMPTY_STR(row[1]));
 	}
 
 	ret = (ROLE_PERM_ALLOW == default_access ? SUCCEED : FAIL);
@@ -94,7 +101,6 @@ out:
 #undef ZBX_USER_ROLE_PERMISSION_DEVICES_DEFAULT_ACCESS
 #undef ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_OWN
 #undef ZBX_USER_ROLE_PERMISSION_DEVICES_MANAGE_USER
-#undef ROLE_PERM_ALLOW
 }
 
 /******************************************************************************
@@ -192,20 +198,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
 	serverid = cfg.serverid;
 
-	zbx_json_init(&request, 512);
-
-	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "method", "device.init", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(&request, "params");
-	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&request);
-	uuid7id = zbx_gen_uuid7_hyphenated();
-	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&request);
-
-	payload = zbx_strdup(NULL, request.buffer);
-
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
@@ -223,7 +215,22 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	}
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
+	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
+
+	zbx_json_init(&request, 512);
+
+	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "method", "device.init", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(&request, "params");
+	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&request);
+	uuid7id = zbx_gen_uuid7_hyphenated();
+	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&request);
+
+	payload = zbx_strdup(NULL, request.buffer);
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
@@ -414,28 +421,28 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 	zbx_uint64_t		target_userid;
 
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
 		goto out;
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() failed to get user from request", __func__);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: failed to get user from request");
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_data))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() missing data object in request", __func__);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: missing data object in request");
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_data, "userid", target_userid_str, sizeof(target_userid_str), NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() missing userid in request data", __func__);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: missing userid in request data");
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
@@ -444,8 +451,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	if (FAIL == device_check_permissions(&user, target_userid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() permission denied for userid:" ZBX_FS_UI64 " target_userid:"
-				ZBX_FS_UI64, __func__, user.userid, target_userid);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: permission denied for userid:"
+				ZBX_FS_UI64 " target_userid:" ZBX_FS_UI64, user.userid, target_userid);
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
@@ -458,15 +465,15 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() failed sending device.init response", __func__);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: failed sending device.init response");
 		}
 	}
 	else
 	{
 		if (SUCCEED != zbx_send_response(sock, ret, ZBX_NULL2EMPTY_STR(error), config_comms->config_timeout))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() failed sending device.init error response",
-					__func__);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot initialize device: failed sending device.init"
+					" error response");
 		}
 
 		zbx_free(error);
@@ -474,7 +481,7 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	zbx_json_free(&json);
 out:
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *config_adapter_url,
@@ -527,20 +534,6 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
 	serverid = cfg.serverid;
 
-	zbx_json_init(&request, 512);
-
-	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "method", "device.offboard", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(&request, "params");
-	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&request);
-	uuid7id = zbx_gen_uuid7_hyphenated();
-	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
-	zbx_json_close(&request);
-
-	payload = zbx_strdup(NULL, request.buffer);
-
 	if (NULL == (curl = curl_easy_init()))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
@@ -558,7 +551,22 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	}
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
+	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
+
+	zbx_json_init(&request, 512);
+
+	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "method", "device.offboard", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(&request, "params");
+	zbx_json_addstring(&request, "server_id", serverid, ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&request, "device_id", device_id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&request);
+	uuid7id = zbx_gen_uuid7_hyphenated();
+	zbx_json_addstring(&request, "id", uuid7id, ZBX_JSON_TYPE_STRING);
+	zbx_json_close(&request);
+
+	payload = zbx_strdup(NULL, request.buffer);
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
@@ -674,6 +682,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 		goto out;
 	}
 
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 	ret = SUCCEED;
 out:
 	curl_slist_free_all(headers);
@@ -708,43 +717,44 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 	zbx_uint64_t		target_userid;
 	char			deviceid[ZBX_UUID_LEN], *error = NULL;
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "In %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
 		goto out;
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() failed to get user from request", __func__);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: failed to get user from request");
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_data))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() missing data object in request", __func__);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: missing data object in request");
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_data, "uuid", deviceid, sizeof(deviceid), NULL))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() missing uuid in request data", __func__);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: missing uuid in request data");
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
 
 	if (FAIL == device_get_userid_by_uuid(deviceid, &target_userid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() failed to resolve device owner by uuid: %s", __func__, deviceid);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: failed to resolve device owner by uuid:"
+				" %s", deviceid);
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
 
 	if (FAIL == device_check_permissions(&user, target_userid))
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "%s() permission denied for userid:" ZBX_FS_UI64 " target_userid:"
-				ZBX_FS_UI64, __func__, user.userid, target_userid);
+		zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: permission denied for userid:"
+				ZBX_FS_UI64 " target_userid:" ZBX_FS_UI64, user.userid, target_userid);
 		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
 		goto out;
 	}
@@ -757,16 +767,16 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 		if (SUCCEED != zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size,
 				config_comms->config_timeout))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() failed sending device.offboard response",
-					__func__);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: failed sending device.offboard"
+					" response");
 		}
 	}
 	else
 	{
 		if (SUCCEED != zbx_send_response(sock, ret, error, config_comms->config_timeout))
 		{
-			zabbix_log(LOG_LEVEL_WARNING, "%s() failed sending device.offboard error response",
-					__func__);
+			zabbix_log(LOG_LEVEL_WARNING, "cannot offboard device: failed sending device.offboard"
+					" error response");
 		}
 
 		zbx_free(error);
@@ -774,5 +784,5 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 
 	zbx_json_free(&json);
 out:
-	zabbix_log(LOG_LEVEL_INFORMATION, "End of %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

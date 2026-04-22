@@ -47,9 +47,6 @@
 #endif
 
 #define	ALARM_ACTION_TIMEOUT	40
-#define ZBX_ERROR_CODE_LEN	32
-#define ZBX_MESSAGE_LEN		256
-#define ZBX_INFO_LEN		512
 
 ZBX_PTR_VECTOR_IMPL(am_source_stats_ptr, zbx_am_source_stats_t *)
 
@@ -520,6 +517,10 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 		const char *config_adapter_key_file,
 		const char *config_adapter_connect_to)
 {
+#define ZBX_ERROR_CODE_LEN	32
+#define ZBX_MESSAGE_LEN		256
+#define ZBX_INFO_LEN		512
+
 #ifndef HAVE_LIBCURL
 	ZBX_UNUSED(socket);
 	ZBX_UNUSED(ipc_message);
@@ -569,6 +570,7 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 	}
 
 	headers = curl_slist_append(headers, "Content-Type:application/json");
+	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
 
 	if (CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_URL, config_adapter_url)) ||
@@ -706,6 +708,9 @@ out:
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 #endif
+#undef ZBX_ERROR_CODE_LEN	32
+#undef ZBX_MESSAGE_LEN		256
+#undef ZBX_INFO_LEN		512
 }
 
 /******************************************************************************
