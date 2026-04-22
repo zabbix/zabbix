@@ -1254,7 +1254,7 @@ static void	if_type_add(const char *if_name, struct zbx_json *j)
 	FILE		*f;
 	char		buf[MAX_STRING_LEN];
 	int		type = 0;
-	zbx_stat_t	st;
+	DIR		*dir;
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/type", if_name);
 
@@ -1273,24 +1273,21 @@ static void	if_type_add(const char *if_name, struct zbx_json *j)
 
 	zbx_snprintf(buf, sizeof(buf), ZBX_SYS_CLASS_NET_PFX "%s/device", if_name);
 
-	if (0 == lstat(buf, &st))
+	if (NULL != (dir = opendir(buf)))
 	{
 		int		found = 0;
-		DIR		*dir;
 		struct dirent	*entry;
 
-		if (NULL != (dir = opendir(buf)))
+		while (NULL != (entry = readdir(dir)))
 		{
-			while (NULL != (entry = readdir(dir)))
+			if (0 == strncmp(entry->d_name, VIRTFN_PFX, ZBX_CONST_STRLEN(VIRTFN_PFX)))
 			{
-				if (0 == strncmp(entry->d_name, VIRTFN_PFX, ZBX_CONST_STRLEN(VIRTFN_PFX)))
-				{
-					found = 1;
-					break;
-				}
+				found = 1;
+				break;
 			}
-			closedir(dir);
 		}
+
+		closedir(dir);
 
 		if (0 == found)
 		{
