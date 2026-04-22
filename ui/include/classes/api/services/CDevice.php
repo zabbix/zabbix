@@ -156,6 +156,16 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
+			}
+		}
+		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
+		}
+
 		$this->validateInit($data);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -213,16 +223,6 @@ class CDevice extends CApiService {
 	}
 
 	private function validateInit(array &$data): void {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
-			}
-		}
-		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'userid' =>	['type' => API_ID, 'default' => self::$userData['userid']]
 		]];
@@ -421,6 +421,16 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('You do not have permission to perform this operation.'));
 		}
 
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
+			}
+		}
+		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
+		}
+
 		$this->validateOffboard($data, $db_devices);
 
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
@@ -458,16 +468,6 @@ class CDevice extends CApiService {
 	}
 
 	private function validateOffboard(array $data, ?array &$db_devices): void {
-		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-				self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage own devices.'));
-			}
-		}
-		elseif (!self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
-				&& !self::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to manage user devices.'));
-		}
-
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'uuid' =>	['type' => API_UUID_V7, 'flags' => API_REQUIRED]
 		]];
