@@ -292,26 +292,18 @@ class CDevice extends CApiService {
 			$options['mobile_encryption_key']
 		);
 
-		$tokens_data = CToken::createForce([[
+		$token = CApiTokenHelper::generateToken();
+		$tokens = [[
 			'name' => $db_device['uuid'],
 			'userid' => $db_device['userid'],
-			'status' => ZBX_AUTH_TOKEN_ENABLED,
-			'auth_scheme' => ZBX_AUTH_SCHEME_DPOP,
-			'expires_at' => 0
-		]], $db_device['userid'], false);
+			'token' => CApiTokenHelper::hashToken($token),
+			'auth_scheme' => ZBX_AUTH_SCHEME_DPOP
+		]];
 
-		$db_tokens = DB::select('token', [
-			'output' => ['tokenid', 'name', 'token', 'creator_userid'],
-			'tokenids' => $tokens_data['tokenids'],
-			'preservekeys' => true
-		]);
-
-		$tokens_data = CToken::generateForce($db_tokens, false);
-
-		$token_data = reset($tokens_data);
+		CToken::createForce($tokens, false);
 
 		$ins_device_token = [
-			'tokenid' => $token_data['tokenid'],
+			'tokenid' => $tokens[0]['tokenid'],
 			'deviceid' => $db_device['deviceid']
 		];
 
@@ -329,7 +321,7 @@ class CDevice extends CApiService {
 
 		self::updateForce([$device], [array_intersect_key($db_device, $device)]);
 
-		return ['token' => $token_data['token']];
+		return ['token' => $token];
 	}
 
 	private function validateOnboard(array $data, ?array &$db_device): void {

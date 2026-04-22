@@ -164,37 +164,9 @@ class CToken extends CApiService {
 
 		$this->validateCreate($tokens);
 
-		return self::createForce($tokens, self::$userData['userid']);
-	}
+		self::createForce($tokens);
 
-	/**
-	 * @param array   $tokens
-	 * @param string  $userid
-	 * @param boolean $audit_log
-	 *
-	 * @return array
-	 */
-	public static function createForce(array $tokens, string $userid, bool $audit_log = true): array {
-		if (!$tokens) {
-			return [];
-		}
-
-		array_walk($tokens, static function (array &$token) use ($userid): void {
-			$token['created_at'] = time();
-			$token['creator_userid'] = $userid;
-		});
-
-		$tokenids = DB::insert('token', $tokens);
-
-		array_walk($tokens, static function (array &$token, int $index) use ($tokenids): void {
-			$token['tokenid'] = $tokenids[$index];
-		});
-
-		if ($audit_log) {
-			self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_AUTH_TOKEN, $tokens);
-		}
-
-		return ['tokenids' => $tokenids];
+		return ['tokenids' => array_column($tokens, 'tokenid')];
 	}
 
 	/**
@@ -293,6 +265,31 @@ class CToken extends CApiService {
 					$duplicate['name'], $userid
 				));
 			}
+		}
+	}
+
+	/**
+	 * @param array   $tokens
+	 * @param boolean $audit_log
+	 */
+	public static function createForce(array &$tokens, bool $audit_log = true): void {
+		$created_at = time();
+
+		foreach ($tokens as &$token) {
+			$token['created_at'] = $created_at;
+			$token['creator_userid'] = self::$userData['userid'];
+		}
+		unset($token);
+
+		$tokenids = DB::insert('token', $tokens);
+
+		foreach ($tokens as &$token) {
+			$token['tokenid'] = array_shift($tokenids);
+		}
+		unset($token);
+
+		if ($audit_log) {
+			self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_AUTH_TOKEN, $tokens);
 		}
 	}
 
@@ -436,35 +433,26 @@ class CToken extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		$db_count = $this->get([
+			'countOutput' => true,
+			'tokenids' => $tokenids
+		]);
+
+		if ($db_count != count($tokenids)) {
+			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
+		}
+
 		$db_tokens = DB::select('token', [
 			'output' => ['tokenid', 'name', 'token', 'creator_userid'],
 			'tokenids' => $tokenids,
 			'preservekeys' => true
 		]);
 
-		if (count($db_tokens) != count($tokenids)) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
-		}
-
-		return self::generateForce($db_tokens);
-	}
-
-	/**
-	 * @param array   $db_tokens
-	 * @param boolean $audit_log
-	 *
-	 * @return array
-	 */
-	public static function generateForce(array $db_tokens, bool $audit_log = true): array {
-		if (!$db_tokens) {
-			return [];
-		}
-
 		$tokens = [];
 		$response = [];
 		$upd_tokens = [];
 
-		foreach ($db_tokens as $tokenid => $db_token) {
+		foreach ($tokenids as $tokenid) {
 			$new_token = CApiTokenHelper::generateToken();
 
 			$token = [
@@ -481,16 +469,14 @@ class CToken extends CApiService {
 			];
 
 			$upd_tokens[] = [
-				'values' => DB::getUpdatedValues('token', $token, $db_token),
+				'values' => DB::getUpdatedValues('token', $token, $db_tokens[$tokenid]),
 				'where' => ['tokenid' => $tokenid]
 			];
 		}
 
 		DB::update('token', $upd_tokens);
 
-		if ($audit_log) {
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
-		}
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_AUTH_TOKEN, $tokens, $db_tokens);
 
 		return $response;
 	}
