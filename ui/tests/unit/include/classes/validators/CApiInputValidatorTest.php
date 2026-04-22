@@ -5657,9 +5657,9 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 			],
 			[
 				['type' => API_UUID_V7],
-				'019d6e13a1b47c8e8f12ab34cd56ef78',
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78',
 				'/uuid_v7',
-				'019d6e13a1b47c8e8f12ab34cd56ef78'
+				'019d6e13-a1b4-7c8e-8f12-ab34cd56ef78'
 			],
 			[
 				['type' => API_UUID_V7],
@@ -5695,35 +5695,47 @@ uwMrOBKatg7CZ1Uenv1K3ioD5w==
 				['type' => API_UUID_V7],
 				'23',
 				'/uuid_v7',
-				'Invalid parameter "/uuid_v7": must be 32 characters long.'
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
 			],
 			[
 				['type' => API_UUID_V7],
 				'1234567890123456789012345678901234567890',
 				'/uuid_v7',
-				'Invalid parameter "/uuid_v7": must be 32 characters long.'
+				'Invalid parameter "/uuid_v7": must be 36 characters long.'
 			],
 			[
 				['type' => API_UUID_V7],
-				'019d6e10-e3dc-72ea-8021-fefb3dae1e6f',
+				'123456789012345678901234567890123456',
 				'/uuid_v7',
-				'Invalid parameter "/uuid_v7": must be 32 characters long.'
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
 			],
 			[
 				['type' => API_UUID_V7],
-				'12345678901234567890123456789012',
+				'1234-1234-1234-1234-1234567890123456',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'12345678-1234-1234-1234-123456789012',
 				'/uuid_v7',
 				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
 			],
 			[
 				['type' => API_UUID_V7],
-				'019d6e13a1b47c8exf12ab34cd56ef78',
+				'019d6e13-a1b4-7c8e-xf12-ab34cd56ef78',
 				'/uuid_v7',
-				'Invalid parameter "/uuid_v7": must contain only hexadecimal characters.'
+				'Invalid parameter "/uuid_v7": a hyphenated UUID is expected.'
 			],
 			[
 				['type' => API_UUID_V7],
-				'019d6e13a1b40c8e8f12ab34cd56ef78',
+				'019d6e13-a1b4-0c8e-8f12-ab34cd56ef78',
+				'/uuid_v7',
+				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
+			],
+			[
+				['type' => API_UUID_V7],
+				'019d6e13-a1b4-7c8e-cf12-ab34cd56ef78',
 				'/uuid_v7',
 				'Invalid parameter "/uuid_v7": a UUIDv7 is expected.'
 			],
