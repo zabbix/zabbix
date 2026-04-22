@@ -300,6 +300,10 @@ class CControllerGraphEdit extends CController {
 			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
+		$data['js_validation_rules'] = $data['graphid'] != 0
+			? (new CFormValidator(CControllerGraphUpdate::getValidationRules()))->getRules()
+			: (new CFormValidator(CControllerGraphCreate::getValidationRules()))->getRules();
+
 		$response = new CControllerResponseData($data);
 		$this->setResponse($response);
 	}
