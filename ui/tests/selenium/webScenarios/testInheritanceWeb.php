@@ -21,17 +21,11 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup httptest
  */
 class testInheritanceWeb extends CLegacyWebTest {
-	private $templateid = 15000;	// 'Inheritance test template'
-	private $template = 'Inheritance test template';
-
-	private $hostid = 15001;		// 'Template inheritance test host'
-	private $host = 'Template inheritance test host';
+	private $templateid = 15000;	// 'Inheritance test template'.
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -123,7 +117,7 @@ class testInheritanceWeb extends CLegacyWebTest {
 			$this->zbxTestInputTypeByXpath('//div[@class="overlay-dialogue-body"]//input[@id="url"]', $step['url']);
 			$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Add"]');
 			$this->zbxTestTextNotPresent('Page received incorrect data');
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath('//a[contains(@href,"javascript:httpconf.steps.open")]'));
+			$this->query('xpath://a[contains(@href,"javascript:httpconf.steps.open")]')->waitUntilVisible()->one();
 			$this->zbxTestTextPresent($step['name']);
 		}
 
