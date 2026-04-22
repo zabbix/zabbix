@@ -614,7 +614,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		return [
 			// #0. Scenario for ZBX-27632.
 			[
-				[
+				[	'expected' => TEST_BAD,
 					'error_title' => 'Cannot update user',
 					'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
 					'frontend_notifications' => [
