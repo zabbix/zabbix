@@ -247,6 +247,12 @@
 					cell_inner.appendChild(host_link);
 
 					if (maintenance && host.status == HOST_STATUS_MONITORED) {
+						const maintenance_icon = document.createElement('button');
+						maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
+							ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
+						maintenance_icon.setAttribute('type', 'button');
+						maintenance_icon.setAttribute('role', 'button');
+
 						if (host.maintenance_status == HOST_MAINTENANCE_STATUS_ON) {
 							let hint = `${maintenance.name} [${maintenance.type
 								? <?= json_encode(_('Maintenance without data collection')); ?>
@@ -256,27 +262,19 @@
 								hint += "\n" + maintenance.description;
 							}
 
-							const maintenance_icon = document.createElement('button');
-							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
-								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
-							maintenance_icon.setAttribute('type', 'button');
-							maintenance_icon.setAttribute('role', 'button');
 							maintenance_icon.setAttribute('data-hintbox-contents', hint);
-							maintenance_icon.setAttribute('data-hintbox', '1');
-
-							cell_inner.appendChild(maintenance_icon);
 						}
 						else {
-							const maintenance_icon = document.createElement('button');
-							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
-								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
-							maintenance_icon.setAttribute('type', 'button');
-							maintenance_icon.setAttribute('role', 'button');
-							maintenance_icon.setAttribute('data-hintbox-contents', <?= json_encode(_('Inaccessible maintenance')); ?>);
-							maintenance_icon.setAttribute('data-hintbox', '1');
-
-							cell_inner.appendChild(maintenance_icon);
+							maintenance_icon.setAttribute('data-hintbox-contents',
+								<?= json_encode(_('Inaccessible maintenance')); ?>);
 						}
+
+						maintenance_icon.setAttribute('data-hintbox', '1');
+						maintenance_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
+						maintenance_icon.setAttribute('data-hintbox-static', '1');
+						maintenance_icon.setAttribute('aria-expanded', 'false');
+
+						cell_inner.appendChild(maintenance_icon);
 					}
 				})
 				.setCellRenderer('name', ({column, cell_data, cell_inner}) => {
@@ -311,8 +309,7 @@
 						description_icon.setAttribute('type', 'button');
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
-						description_icon.setAttribute('data-hintbox-contents',
-							description_expanded.replace(/\r\n/g, '<br>'));
+						description_icon.setAttribute('data-hintbox-contents', description_expanded);
 						description_icon.setAttribute('data-hintbox', '1');
 						description_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
 						description_icon.setAttribute('data-hintbox-static', '1');

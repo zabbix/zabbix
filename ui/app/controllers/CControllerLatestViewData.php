@@ -252,6 +252,10 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['tags'] = CTagHelper::getTagsList($item, ['filter_tags' => $filter['tags']]);
 
 			$item['item_icons'] = (string) makeInformationList($item_icons);
+
+			$item['description_expanded'] = (new CObject())
+				->addItem(zbx_str2links($item['description_expanded']))
+				->toString();
 		}
 		unset($item);
 
