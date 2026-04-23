@@ -17,7 +17,6 @@ class CDataTable {
 
 	static EVENT_INIT = 'init';
 	static EVENT_RENDER = 'render';
-	static EVENT_RESIZE = 'resize';
 	static EVENT_RESET = 'reset';
 	static EVENT_SAVE = 'save';
 	static EVENT_SCROLL = 'scroll';
@@ -2455,6 +2454,8 @@ class CDataTable {
 			}
 
 			this.#calculateColumnWidths(response);
+			this.#handleScrollbar();
+			this.#applyLastColumnPadding();
 		});
 	}
 
