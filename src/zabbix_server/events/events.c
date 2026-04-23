@@ -2289,7 +2289,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 	{
 		zbx_db_insert_t	db_insert_es;
 		zbx_db_insert_t	db_insert_ack;
-		int		now;
+		time_t		now;
 
 		/* get maintenance data and save it in database */
 		if (SUCCEED == zbx_dc_get_event_maintenances(&event_queries, maintenanceids) &&
@@ -2301,7 +2301,7 @@ static void	add_event_suppress_data(zbx_vector_ptr_t *event_refs, zbx_vector_uin
 			zbx_db_insert_prepare(&db_insert_ack, "acknowledges", "acknowledgeid",
 					"eventid", "clock", "action", "suppress_until", "maintenanceid", (char *)NULL);
 
-			now = zbx_time();
+			now = time(NULL);
 
 			for (int j = 0; j < event_queries.values_num; j++)
 			{

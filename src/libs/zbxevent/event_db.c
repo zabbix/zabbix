@@ -475,6 +475,7 @@ void	zbx_event_db_get_history(const zbx_db_event *event, char **replace_to,
 		else
 		{
 			ZBX_STR2UINT64(ack.userid, row[1]);
+
 			if (SUCCEED == zbx_check_user_permissions(&ack.userid, recipient_userid))
 				user_name = zbx_user_string(ack.userid);
 			else
