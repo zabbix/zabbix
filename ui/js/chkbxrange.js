@@ -46,7 +46,8 @@ var chkbxRange = {
 
 		// initialize checkboxes
 		const checkboxes = Array.from(
-			document.querySelectorAll(`${this.selector} input[type=checkbox]:not(:disabled)`)
+			document.querySelectorAll(
+				`${this.selector} ${this.row_selector} .${ZBX_STYLE_CHECKBOX_RADIO}:not(:disabled)`)
 		);
 
 		checkboxes.forEach(checkbox => this.implement(checkbox));
@@ -149,6 +150,7 @@ var chkbxRange = {
 	 */
 	getObjectIdFromName: function(name) {
 		let id = name.split('[')[1];
+		console.log(name, name.split('['));
 		id = id.substring(0, id.lastIndexOf(']'));
 
 		return id;
@@ -393,15 +395,12 @@ var chkbxRange = {
 	 * @param {string} object
 	 */
 	updateMainCheckbox: function(object) {
-		const checkbox_list = this.getObjectCheckboxes(object);
-		const $main_checkbox = $(checkbox_list)
-			.parents(this.selector)
-			.find(`${this.thead_selector} input[type="checkbox"]`);
-
-		if ($main_checkbox.length == 0) {
+		const main_checkbox = document.querySelector(`${this.thead_selector} .${ZBX_STYLE_CHECKBOX_RADIO}`);
+		if (main_checkbox === null) {
 			return;
 		}
 
+		const checkbox_list = this.getObjectCheckboxes(object);
 		const count_available = checkbox_list.length;
 
 		if (count_available > 0) {
@@ -413,7 +412,7 @@ var chkbxRange = {
 				}
 			});
 
-			$main_checkbox[0].checked = (checked.length == count_available);
+			main_checkbox.checked = (checked.length == count_available);
 		}
 	},
 

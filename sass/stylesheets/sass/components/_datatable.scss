@@ -45,6 +45,10 @@
 			height: calc(var(--datatable-compact-row-height) + 1px);
 			min-height: initial;
 		}
+
+		.cell.cell-data .cell-inner .tags-wrapper {
+			flex-wrap: nowrap;
+		}
 	}
 
 	&.has-highlighted-rows .rows .row:not(.row-disabled) {
@@ -215,7 +219,6 @@
 			background-color: transparent;
 			border: 1px solid transparent;
 			border-radius: 0;
-			pointer-events: all;
 
 			&:hover,
 			&:focus,
@@ -454,7 +457,6 @@
 					color: $link-color;
 					text-decoration: none;
 					border: none;
-					pointer-events: all;
 
 					&:hover,
 					&:focus {
@@ -500,10 +502,6 @@
 				}
 			}
 
-			.checkbox-radio {
-				pointer-events: all;
-			}
-
 			.cell-inner {
 				flex-grow: 1;
 				padding: 0 8px;
@@ -521,7 +519,6 @@
 				cursor: col-resize;
 				user-select: none;
 				touch-action: none;
-				pointer-events: all;
 
 				&::after {
 					position: absolute;
@@ -788,6 +785,25 @@
 					overflow: inherit;
 					text-overflow: inherit;
 					white-space: inherit;
+				}
+			}
+		}
+	}
+
+	&:not(.is-loading) {
+		.datatable-header .datatable-options-link {
+			pointer-events: all;
+		}
+
+		.cell {
+			.checkbox-radio {
+				pointer-events: all;
+			}
+
+			&.cell-header .cell-header-link {
+				.cell-header-resizer,
+				.header-link {
+					pointer-events: all;
 				}
 			}
 		}

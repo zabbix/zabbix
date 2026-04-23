@@ -2307,6 +2307,8 @@ button {
   .datatable.compact-view .datatable-body .row-spacer {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial; }
+  .datatable.compact-view .cell.cell-data .cell-inner .tags-wrapper {
+    flex-wrap: nowrap; }
   .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data a.link-action {
     color: #f2f2f2; }
   .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data a:hover {
@@ -2412,8 +2414,7 @@ button {
       user-select: none;
       background-color: transparent;
       border: 1px solid transparent;
-      border-radius: 0;
-      pointer-events: all; }
+      border-radius: 0; }
       .datatable .datatable-header .datatable-options-link:hover, .datatable .datatable-header .datatable-options-link:focus, .datatable .datatable-header .datatable-options-link.datatable-options-link-opened {
         color: #737373;
         background-color: #383838;
@@ -2569,8 +2570,7 @@ button {
           padding: 0 8px;
           color: #4796c4;
           text-decoration: none;
-          border: none;
-          pointer-events: all; }
+          border: none; }
           .datatable .cell.cell-header.cell-header-link .header-link:hover, .datatable .cell.cell-header.cell-header-link .header-link:focus {
             background-color: #383838; }
           .datatable .cell.cell-header.cell-header-link .header-link .name {
@@ -2594,8 +2594,6 @@ button {
         border-right: 1px solid #303030; }
         .datatable .cell.cell-header.cell-sticky:first-child + .cell-header {
           border-left: none; }
-      .datatable .cell.cell-header .checkbox-radio {
-        pointer-events: all; }
       .datatable .cell.cell-header .cell-inner {
         flex-grow: 1;
         padding: 0 8px;
@@ -2610,8 +2608,7 @@ button {
         height: calc(var(--datatable-row-height) + 1px);
         cursor: col-resize;
         user-select: none;
-        touch-action: none;
-        pointer-events: all; }
+        touch-action: none; }
         .datatable .cell.cell-header .cell-header-resizer::after {
           position: absolute;
           top: 0;
@@ -2774,6 +2771,13 @@ button {
           overflow: inherit;
           text-overflow: inherit;
           white-space: inherit; }
+  .datatable:not(.is-loading) .datatable-header .datatable-options-link {
+    pointer-events: all; }
+  .datatable:not(.is-loading) .cell .checkbox-radio {
+    pointer-events: all; }
+  .datatable:not(.is-loading) .cell.cell-header .cell-header-link .cell-header-resizer,
+  .datatable:not(.is-loading) .cell.cell-header .cell-header-link .header-link {
+    pointer-events: all; }
   .datatable .row-spacer {
     box-sizing: border-box;
     height: 100%;
