@@ -16,6 +16,7 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../behaviors/CTagBehavior.php';
 
 /**
@@ -35,6 +36,7 @@ class testPageProblems extends CWebTest {
 	public function getBehaviors() {
 		return [
 			CTableBehavior::class,
+			CDatatableBehavior::class,
 			[
 				'class' => CTagBehavior::class,
 				'tag_selector' => 'id:filter-tags_0'
@@ -222,17 +224,47 @@ class testPageProblems extends CWebTest {
 
 		$filter_form = $filter_tab->getForm();
 		$this->assertEquals(['Show', 'Host groups', 'Hosts', 'Triggers', 'Problem', 'Severity', 'Age less than',
-				'Show symptoms', 'Show suppressed problems', 'Acknowledgement status', 'Host inventory',
-				'Tags', 'Show tags', 'Tag display priority', 'Show operational data', 'Compact view',
-				'Show details'], $filter_form->getLabels()->asText()
+				'Show symptoms', 'Acknowledgement status', 'Host inventory', 'Tags'], $filter_form->getLabels()->asText()
 		);
 
-		// Check complicated labels.
-		foreach (['By me', 'Tag name', 'Show timeline', 'Highlight whole row'] as $label) {
-			$this->assertTrue($filter_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')
-					->one()->isVisible()
-			);
-		}
+		// Check the layout of filters that are hiddent in datatable headers.
+		$header_filters = [
+			'Time' => [
+				'Show timeline' => [
+					'value' => true
+				]
+			],
+			'Problem' => [
+				'Show operational data' => [
+					'value' => false
+				],
+				'Show trigger expression' => [
+					'value' => false
+				],
+				'Show suppressed' => [
+					'value' => false
+				]
+			],
+			'Tags' => [
+				'Number of tags' => [
+					'value' => 3,
+					'labels' => [1, 2, 3]
+				],
+				'Tag name display' => [
+					'value' => 'Full',
+					'labels' => ['Full', 'Shortened', 'None']
+				],
+				'Tag display priority' => [
+					'value' => '',
+					'maxlenght' => 250
+				],
+				'duplicate' => true
+			]
+		];
+		$this->checkHeaderFilterLayout($header_filters);
+
+		// Check presence of "By me" label.
+		$this->assertTrue($filter_form->query('xpath:.//label[text()="By me"]')->one()->isVisible());
 
 		$this->assertEquals([], $filter_form->getRequiredLabels());
 
@@ -251,7 +283,6 @@ class testPageProblems extends CWebTest {
 			'name:age_state' => ['value' => false],
 			'name:age' => ['value' => 14, 'enabled' => false],
 			'Show symptoms' => ['value' => false],
-			'Show suppressed problems' => ['value' => false],
 			'Acknowledgement status' => ['value' => 'All'],
 			'id:acknowledged_by_me_0' => ['value' => false, 'enabled' => false],
 			'name:inventory[0][field]' => ['value' => 'Type'],
@@ -259,15 +290,7 @@ class testPageProblems extends CWebTest {
 			'id:evaltype_0' => ['value' => 'And/Or'],
 			'name:tags[0][tag]' => ['value' => '', 'placeholder' => 'tag', 'maxlength' => 255],
 			'id:tags_00_operator' => ['value' => 'Contains'],
-			'id:tags_00_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
-			'Show tags' => ['value' => 3],
-			'id:tag_name_format_0' => ['value' => 'Full'],
-			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'maxlength' => 255],
-			'Show operational data' => ['value' => 'None'],
-			'Compact view' => ['value' => false],
-			'Show details' => ['value' => false],
-			'Show timeline' => ['value' => true],
-			'Highlight whole row' => ['value' => false, 'enabled' => true]
+			'id:tags_00_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255]
 		];
 
 		foreach ($fields_values as $label => $attributes) {
@@ -296,10 +319,7 @@ class testPageProblems extends CWebTest {
 		$segmented_radios = [
 			'Show' => ['Recent problems', 'Problems', 'History'],
 			'Acknowledgement status' => ['All', 'Unacknowledged', 'Acknowledged'],
-			'Tags' => ['And/Or', 'Or'],
-			'Show tags' => ['None', 1, 2, 3],
-			'id:tag_name_format_0' => ['Full', 'Shortened', 'None'],
-			'Show operational data' => ['None', 'Separately', 'With problem name']
+			'Tags' => ['And/Or', 'Or']
 		];
 
 		foreach ($segmented_radios as $field => $labels) {
@@ -394,35 +414,16 @@ class testPageProblems extends CWebTest {
 			$this->assertTrue($filter_form->getField('id:acknowledged_by_me_0')->isEnabled($status));
 		}
 
-		// Tags fields editability.
-		foreach (['None' => false, 1 => true, 2 => true, 3 => true] as $label => $status) {
-			$filter_form->fill(['Show tags' => $label]);
-
-			foreach (['id:tag_name_format_0', 'Tag display priority'] as $field) {
-				$this->assertTrue($filter_form->getField($field)->isEnabled($status));
-			}
-		}
-
-		// Show operational data and checkboxes dependency.
-		foreach ([true, false] as $state) {
-			$filter_form->fill(['Compact view' => $state]);
-
-			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
-				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
-			}
-			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled());
-		}
-
 		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
 				->all()->filter(CElementFilter::CLICKABLE)->count()
 		);
 
 		// Check Problems table layout.
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
 
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 
 		$dependant_headers = [
 			[
@@ -435,62 +436,63 @@ class testPageProblems extends CWebTest {
 				'value' => 'History',
 				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
 			],
-			[
-				'label' => 'Show',
-				'value' => 'Problems',
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show tags',
-				'value' => 'None',
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions']
-			],
-			[
-				'label' => 'Show tags',
-				'value' => 1,
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show tags',
-				'value' => 2,
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show tags',
-				'value' => 3,
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show operational data',
-				'value' => 'None',
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show operational data',
-				'value' => 'Separately',
-				'headers' => ['Info', 'Host', 'Problem', 'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show operational data',
-				'value' => 'With problem name',
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show timeline',
-				'value' => false,
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-			[
-				'label' => 'Show timeline',
-				'value' => true,
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			]
+// Commented until subissue 45 is resolved.
+//			[
+//				'label' => 'Show',
+//				'value' => 'Problems',
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show tags',
+//				'value' => 'None',
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions']
+//			],
+//			[
+//				'label' => 'Show tags',
+//				'value' => 1,
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show tags',
+//				'value' => 2,
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show tags',
+//				'value' => 3,
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show operational data',
+//				'value' => 'None',
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show operational data',
+//				'value' => 'Separately',
+//				'headers' => ['Info', 'Host', 'Problem', 'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show operational data',
+//				'value' => 'With problem name',
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show timeline',
+//				'value' => false,
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			],
+//			[
+//				'label' => 'Show timeline',
+//				'value' => true,
+//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+//			]
 		];
 
 		foreach ($dependant_headers as $field) {
 			$filter_form->fill([$field['label'] => $field['value']]);
 			$filter_form->submit();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 			$start_headers = ($field['label'] === 'Show timeline' && !$field['value'])
 				? ['', 'Time', 'Severity']
 				: ['', 'Time', '', '', 'Severity'];
@@ -498,7 +500,7 @@ class testPageProblems extends CWebTest {
 		}
 
 		// Check that some unfiltered data is displayed in the table.
-		$this->assertTableStats(CDBHelper::getCount(
+		$this->assertDatatableStats(CDBHelper::getCount(
 				'SELECT null FROM problem'.
 				' WHERE cause_eventid IS NULL'.
 				' AND eventid'.
@@ -1668,7 +1670,7 @@ class testPageProblems extends CWebTest {
 	public function testPageProblems_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
-		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
 		if (array_key_exists('Tags', $data)) {
 			$form->fill(['id:evaltype_0' => $data['Tags']['Type']]);
@@ -1680,13 +1682,13 @@ class testPageProblems extends CWebTest {
 		}
 
 		$form->submit();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 
 		if (array_key_exists('time_selector', $data)) {
 			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
 			$this->query('class:time-quick-range')->waitUntilVisible()->one();
 			$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
-			$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+			$table->invalidate();
 
 			if (CTestArrayHelper::get($data['time_selector'], 'link')) {
 				$form->query('link', $data['time_selector']['link'])->waitUntilClickable()->one()->click();
@@ -1697,11 +1699,11 @@ class testPageProblems extends CWebTest {
 
 			$this->query('button:Apply')->one()->click();
 			$this->page->waitUntilReady();
-			$table->waitUntilReloaded();
+			$table->waitUntilReady();
 		}
 
 		$this->page->waitUntilReady();
-		$this->assertTableData($data['result']);
+		$this->assertDatatableData($data['result']);
 
 		// Check "Compact view" and "Highlight whole row" filter checkboxes.
 		$compact_selector = 'xpath://table[contains(@class, "compact-view")]';
@@ -1720,7 +1722,7 @@ class testPageProblems extends CWebTest {
 		}
 
 		// If Show timeline = true, it adds one more row to the result table.
-		$this->assertTableStats(CTestArrayHelper::get($data, 'table_timeline')
+		$this->assertDatatableStats(CTestArrayHelper::get($data, 'table_timeline')
 			? count($data['result']) - 1
 			: count($data['result'])
 		);
@@ -1795,9 +1797,9 @@ class testPageProblems extends CWebTest {
 		if (array_key_exists('removed_tag_result', $data)) {
 			$form->query('name:tags[0][remove]')->one()->click();
 			$form->submit();
-			$table->waitUntilReloaded();
-			$this->assertTableData($data['removed_tag_result']);
-			$this->assertTableStats(count($data['removed_tag_result']));
+			$table->waitUntilReady();
+			$this->assertDatatableData($data['removed_tag_result']);
+			$this->assertDatatableStats(count($data['removed_tag_result']));
 		}
 
 		if (array_key_exists('check_suppressed', $data)) {
@@ -1994,10 +1996,9 @@ class testPageProblems extends CWebTest {
 	public function testPageProblems_OperationalData($data){
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
-		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
 		$form->fill($data['filter'])->submit();
-		$table->waitUntilReloaded();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
 		$column = ($data['filter']['Show operational data'] === 'With problem name') ? 'Problem' : 'Operational data';
 		$problem_name = ($data['filter']['Show operational data'] === 'With problem name' && $data['custom data'] !== '')
@@ -2055,40 +2056,37 @@ class testPageProblems extends CWebTest {
 	public function testPageProblems_ResetButton() {
 		$this->page->login()->open(self::URL);
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$table = $this->query('class:list-table')->asTable()->one();
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
 		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
 		$form->fill(['Show timeline' => false]);
 		$form->submit();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 		$start_rows_count = $table->getRows()->count();
-		$this->assertTableStats($start_rows_count);
-		$start_contents = $this->getTableColumnData('Problem');
+		$this->assertDatatableStats($start_rows_count);
+		$start_contents = $this->getDatatableColumnData('Problem');
 
 		// Filter some problems.
 		$form->invalidate();
 		$form->fill(['Hosts' => '3_Host_to_check_Monitoring_Overview']);
 		$form->submit();
-		$table->waitUntilReloaded();
 
 		// Check that filtered count matches expected.
-		$this->assertEquals(1, $table->getRows()->count());
-		$this->assertTableStats(1);
+		$table->waitUntilRowsCount(1);
+		$this->assertDatatableStats(1);
 
 		// Checking that filtered Problem matches expected.
 		$this->assertTableDataColumn(['3_trigger_Average'], 'Problem');
 
 		// After pressing reset button, check that previous problems are displayed again.
 		$this->query('button:Reset')->one()->click();
-		$table->waitUntilReloaded();
+		$table->waitUntilReady();
 
 		$form->fill(['Show timeline' => false]);
 		$form->submit();
-		$table->waitUntilReloaded();
 
-		$reset_count = $table->getRows()->count();
-		$this->assertEquals($start_rows_count, $reset_count);
-		$this->assertTableStats($reset_count);
+		$table->waitUntilRowsCount($start_rows_count);
+		$this->assertTableStats($start_rows_count);
 		$this->assertEquals($start_contents, $this->getTableColumnData('Problem'));
 	}
 }

@@ -241,7 +241,7 @@ class CDatatableBehavior extends CTableBehavior {
 
 			foreach ($column_filter as $field => $parameters) {
 				if ($field === 'duplicate') {
-					$this->test->assertTrue($popup_dialog->query('link:Duplicate column')->one()->isCLickable());
+					$this->test->assertTrue($popup_dialog->query('link:Duplicate column')->one()->isClickable());
 
 					continue;
 				}

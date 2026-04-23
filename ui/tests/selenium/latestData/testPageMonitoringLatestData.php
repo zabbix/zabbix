@@ -163,7 +163,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		);
 		$this->assertTrue($this->query('button:Apply')->one()->isClickable());
 
-		// check the layout of filters that are hiddent in datatable headers.
+		// Check the layout of filters that are hiddent in datatable headers.
 		$header_filters = [
 			'Name' => [
 				'Show item key' => [
@@ -182,7 +182,8 @@ class testPageMonitoringLatestData extends CWebTest {
 				'Tag display priority' => [
 					'value' => '',
 					'maxlenght' => 250
-				]
+				],
+				'duplicate' => true
 			]
 		];
 		$this->checkHeaderFilterLayout($header_filters);
