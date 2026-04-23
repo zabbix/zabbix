@@ -125,7 +125,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
 		$suite->addTestSuite('testDiagInfo');
-		$suite->addTestSuite('testMultipleItemsHistory.php');
+		$suite->addTestSuite('testMultipleItemsHistory');
 		return $suite;
 	}
 }
