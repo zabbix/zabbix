@@ -629,7 +629,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	zbx_asynchttppoller_config		*http_config = NULL;
 #endif
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX], first_ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int					ret = FAIL, abort = SUCCEED, total_cheks = 0;
+	int					ret = FAIL, abort = SUCCEED;
 	zbx_uint64_t				dec_counter = 0;
 
 	if (0 == log_worker_id)
@@ -675,7 +675,6 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 		dcheck = &task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck;
-		total_cheks++;
 
 		switch (dcheck->type)
 		{
@@ -768,9 +767,9 @@ out:
 #endif
 poller_fail:
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:" ZBX_FS_UI64
-			" first ip:%s last ip:%s abort:%d ret:%d total_cheks:%d", log_worker_id, __func__, druleid,
+			" first ip:%s last ip:%s abort:%d ret:%d", log_worker_id, __func__, druleid,
 			task->ds_dchecks.values[task->range.state.index_dcheck]->dcheck.type,
-			task->range.state.count, first_ip, ip, abort, ret, total_cheks);
+			task->range.state.count, first_ip, ip, abort, ret);
 
 	return ret;
 }
