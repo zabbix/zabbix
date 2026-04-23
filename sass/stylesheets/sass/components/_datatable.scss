@@ -218,6 +218,7 @@
 			user-select: none;
 			background-color: transparent;
 			border: 1px solid transparent;
+			border-left-color: $ui-border-color;
 			border-radius: 0;
 
 			&:hover,
@@ -259,12 +260,6 @@
 			color: $font-color;
 			user-select: none;
 			background-color: $ui-bg-color;
-			border-left: 1px solid $ui-border-color;
-		}
-
-		.row-spacer {
-			z-index: 1;
-			border-left: 1px solid $ui-border-color;
 		}
 	}
 
@@ -402,7 +397,6 @@
 		}
 
 		&.cell-header {
-			position: sticky;
 			top: 0;
 			box-sizing: border-box;
 			display: flex;
@@ -412,15 +406,10 @@
 			outline: none;
 			user-select: none;
 			background-color: $ui-bg-color;
-			border-left: 1px solid $ui-border-color;
-			pointer-events: none;
+			border-right: 1px solid $ui-border-color;
 
-			&:first-of-type {
-				border-left: 0;
-			}
-
-			&:hover {
-				z-index: 2;
+			&:last-of-type {
+				border-right: 0;
 			}
 
 			&:last-child {
@@ -429,10 +418,6 @@
 				.header-link {
 					border-top-right-radius: 2px;
 				}
-			}
-
-			&:nth-last-child(1 of .cell-header) {
-				margin-right: -1px;
 			}
 
 			&:focus {
@@ -689,6 +674,7 @@
 		}
 
 		&.cell-checkbox {
+			position: sticky;
 			justify-content: flex-start;
 			padding: 0 8px;
 
@@ -790,25 +776,6 @@
 		}
 	}
 
-	&:not(.is-loading) {
-		.datatable-header .datatable-options-link {
-			pointer-events: all;
-		}
-
-		.cell {
-			.checkbox-radio {
-				pointer-events: all;
-			}
-
-			&.cell-header.cell-header-link {
-				.cell-header-resizer,
-				.header-link {
-					pointer-events: all;
-				}
-			}
-		}
-	}
-
 	.row-spacer {
 		box-sizing: border-box;
 		height: 100%;
@@ -864,9 +831,5 @@
 	.datatable {
 		user-select: none;
 		pointer-events: none;
-
-		.cell-resizing {
-			z-index: 1;
-		}
 	}
 }

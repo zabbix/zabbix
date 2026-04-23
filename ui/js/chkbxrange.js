@@ -150,7 +150,6 @@ var chkbxRange = {
 	 */
 	getObjectIdFromName: function(name) {
 		let id = name.split('[')[1];
-		console.log(name, name.split('['));
 		id = id.substring(0, id.lastIndexOf(']'));
 
 		return id;

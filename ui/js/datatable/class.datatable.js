@@ -1120,7 +1120,12 @@ class CDataTable {
 
 		this.dispatchEvent(CDataTable.EVENT_INIT, {
 			onSuccess: () => requestAnimationFrame(() => {
-				this.#scrollBodyToTarget(column.getHeaderCell().target);
+				const header_cell = column.getHeaderCell();
+				if (header_cell === null) {
+					return;
+				}
+
+				this.#scrollBodyToTarget(header_cell.target);
 			})
 		});
 

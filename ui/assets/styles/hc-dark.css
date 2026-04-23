@@ -2349,6 +2349,7 @@ button {
       user-select: none;
       background-color: transparent;
       border: 1px solid transparent;
+      border-left-color: #444444;
       border-radius: 0; }
       .datatable .datatable-header .datatable-options-link:hover, .datatable .datatable-header .datatable-options-link:focus, .datatable .datatable-header .datatable-options-link.datatable-options-link-opened {
         color: #cacaca;
@@ -2375,11 +2376,7 @@ button {
       height: var(--datatable-row-height);
       color: #ffffff;
       user-select: none;
-      background-color: #000000;
-      border-left: 1px solid #444444; }
-    .datatable .datatable-header .row-spacer {
-      z-index: 1;
-      border-left: 1px solid #444444; }
+      background-color: #000000; }
   .datatable .datatable-body {
     display: grid;
     align-items: center;
@@ -2467,7 +2464,6 @@ button {
     .datatable .cell:first-of-type {
       grid-column-start: 1; }
     .datatable .cell.cell-header {
-      position: sticky;
       top: 0;
       box-sizing: border-box;
       display: flex;
@@ -2477,18 +2473,13 @@ button {
       outline: none;
       user-select: none;
       background-color: #000000;
-      border-left: 1px solid #444444;
-      pointer-events: none; }
-      .datatable .cell.cell-header:first-of-type {
-        border-left: 0; }
-      .datatable .cell.cell-header:hover {
-        z-index: 2; }
+      border-right: 1px solid #444444; }
+      .datatable .cell.cell-header:last-of-type {
+        border-right: 0; }
       .datatable .cell.cell-header:last-child {
         border-top-right-radius: 2px; }
         .datatable .cell.cell-header:last-child .header-link {
           border-top-right-radius: 2px; }
-      .datatable .cell.cell-header:nth-last-child(1 of .cell-header) {
-        margin-right: -1px; }
       .datatable .cell.cell-header:focus {
         outline: none; }
       .datatable .cell.cell-header.cell-header-link {
@@ -2648,6 +2639,7 @@ button {
         background-color: #000000;
         border: 2px solid #e0e0e0; }
     .datatable .cell.cell-checkbox {
+      position: sticky;
       justify-content: flex-start;
       padding: 0 8px; }
       .datatable .cell.cell-checkbox .cell-inner {
@@ -2706,13 +2698,6 @@ button {
           overflow: inherit;
           text-overflow: inherit;
           white-space: inherit; }
-  .datatable:not(.is-loading) .datatable-header .datatable-options-link {
-    pointer-events: all; }
-  .datatable:not(.is-loading) .cell .checkbox-radio {
-    pointer-events: all; }
-  .datatable:not(.is-loading) .cell.cell-header.cell-header-link .cell-header-resizer,
-  .datatable:not(.is-loading) .cell.cell-header.cell-header-link .header-link {
-    pointer-events: all; }
   .datatable .row-spacer {
     box-sizing: border-box;
     height: 100%;
@@ -2749,8 +2734,6 @@ button {
 .datatable-resizing .datatable {
   user-select: none;
   pointer-events: none; }
-  .datatable-resizing .datatable .cell-resizing {
-    z-index: 1; }
 
 .diff {
   padding: 4px;
