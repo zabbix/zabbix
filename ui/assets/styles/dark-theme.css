@@ -2775,8 +2775,8 @@ button {
     pointer-events: all; }
   .datatable:not(.is-loading) .cell .checkbox-radio {
     pointer-events: all; }
-  .datatable:not(.is-loading) .cell.cell-header .cell-header-link .cell-header-resizer,
-  .datatable:not(.is-loading) .cell.cell-header .cell-header-link .header-link {
+  .datatable:not(.is-loading) .cell.cell-header.cell-header-link .cell-header-resizer,
+  .datatable:not(.is-loading) .cell.cell-header.cell-header-link .header-link {
     pointer-events: all; }
   .datatable .row-spacer {
     box-sizing: border-box;
