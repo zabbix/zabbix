@@ -16,8 +16,11 @@
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
-#include "zbxhttp.h"
 #include "zbxstr.h"
+
+#ifdef HAVE_LIBCURL
+#	include "zbxhttp.h"
+#endif
 
 #ifdef HAVE_LIBCURL
 static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
@@ -109,9 +112,8 @@ out:
 
 	return ret;
 }
-#endif
 
-int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
+static int get_value_telemetry_clickhouse(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
 	int		ret = NOTSUPPORTED;
 	time_t		now = time(NULL);
@@ -163,4 +165,16 @@ clean:
 	zbx_free(send_error);
 
 	return ret;
+}
+#endif
+
+int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result)
+{
+#ifdef HAVE_LIBCURL
+	return get_value_telemetry_clickhouse(item, result);
+#else
+	ZBX_UNUSED(item);
+	SET_MSG_RESULT(result, zbx_strdup(NULL, "cURL library was not compiled in"));
+	return NOTSUPPORTED;
+#endif
 }

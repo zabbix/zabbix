@@ -17,6 +17,7 @@
 
 #include "zbxcacheconfig.h"
 
+#ifdef HAVE_LIBCURL
 typedef struct telemetry_query_conn_params_clickhouse
 {
 	const char	*url;
@@ -34,6 +35,7 @@ typedef struct telemetry_query_conn_params_clickhouse
 	const char	*token;
 }
 telemetry_query_conn_params_clickhouse_t;
+#endif
 
 int	get_value_telemetry(const zbx_dc_item_t *item, AGENT_RESULT *result);
 

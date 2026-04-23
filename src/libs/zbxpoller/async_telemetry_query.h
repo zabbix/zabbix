@@ -15,10 +15,13 @@
 #ifndef ZABBIX_ASYNC_TELEMETRY_QUERY_H
 #define ZABBIX_ASYNC_TELEMETRY_QUERY_H
 
-#include "zbxhttp.h"
 #include "zbxpoller.h"
 #include "zbxtelemetry.h"
 #include "zbxcacheconfig.h"
+
+#ifdef HAVE_LIBCURL
+#	include "zbxhttp.h"
+#endif
 
 /* TODO: support other db's */
 
