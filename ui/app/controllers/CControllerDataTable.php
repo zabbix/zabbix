@@ -162,4 +162,9 @@ abstract class CControllerDataTable extends CController {
 	protected function getDataFields(): array {
 		return array_values(array_intersect($this->getInput('data_fields'), $this->allowed_data_fields));
 	}
+
+	protected function getUserConfigs(string $storage_idx): array {
+		return array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
+			CProfile::getArray($storage_idx, []));
+	}
 }

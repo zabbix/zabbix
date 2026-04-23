@@ -297,10 +297,16 @@ class CControllerHostViewData extends CControllerDataTable {
 
 		$filters = $profile->getTabsWithDefaults();
 
+		$user_configs = $this->getUserConfigs('web.monitoring.hosts.datatable');
+
 		foreach ($filters as $index => $tabfilter) {
 			$tabfilter = CControllerHost::sanitizeFilter($tabfilter);
 
-			$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+			$column_options = array_merge(...array_column($user_configs[$index]['columns'], 'column_options'));
+
+			$filter_counters[$index] = $tabfilter['filter_show_counter']
+				? $this->getCount($tabfilter, $column_options)
+				: 0;
 		}
 
 		return $filter_counters;
@@ -321,10 +327,11 @@ class CControllerHostViewData extends CControllerDataTable {
 	 *        string $filter['severities']          Filter problems on hosts by severities.
 	 *        string $filter['show_suppressed']     Filter suppressed problems.
 	 *        int    $filter['maintenance_status']  Filter hosts by maintenance.
+	 * @param array  $column_options                Column options.
 	 *
 	 * @return int
 	 */
-	private function getCount(array $filter): int {
+	private function getCount(array $filter, array $column_options): int {
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 
 		return (int) API::Host()->get([
@@ -335,7 +342,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'inheritedTags' => true,
 			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? (($filter['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				? (($column_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
 				: null,
 			'search' => [
 				'name' => $filter['name'] === '' ? null : $filter['name'],

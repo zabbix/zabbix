@@ -54,6 +54,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 		$filters = $profile->getTabsWithDefaults();
 
+		$user_configs = $this->getUserConfigs('web.monitoring.problem.datatable');
+
 		foreach ($filters as $index => $tabfilter) {
 			$tabfilter = CControllerProblem::sanitizeFilter($tabfilter);
 
@@ -64,13 +66,21 @@ class CControllerProblemViewData extends CControllerDataTable {
 				$tabfilter['show'] = TRIGGERS_OPTION_ALL;
 			}
 
-			$filter_counters[$index] = $tabfilter['filter_show_counter'] ? $this->getCount($tabfilter) : 0;
+			$column_options = array_merge(...array_column($user_configs[$index]['columns'], 'column_options'));
+
+			$filter_counters[$index] = $tabfilter['filter_show_counter']
+				? $this->getCount($tabfilter, $column_options)
+				: 0;
 		}
 
 		return $filter_counters;
 	}
 
-	private function getCount(array $filter): int {
+	/**
+	 * @param array $filter          Filter options.
+	 * @param array $column_options  Column options.
+	 */
+	private function getCount(array $filter, array $column_options): int {
 		$range_time_parser = new CRangeTimeParser();
 
 		$range_time_parser->parse($filter['from']);
@@ -78,7 +88,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$range_time_parser->parse($filter['to']);
 		$filter['to'] = $range_time_parser->getDateTime(false)->getTimestamp();
 
-		$data = CScreenProblem::getData($filter, [], CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
+		$data = CScreenProblem::getData($filter, $column_options, CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT));
 
 		return count($data['problems']);
 	}
