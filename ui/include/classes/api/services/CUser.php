@@ -3047,10 +3047,11 @@ class CUser extends CApiService {
 
 		$resource = DBselect(
 			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
-			' FROM token_device td,device d,device_key dk'.
-			' WHERE td.deviceid=d.deviceid'.
-				' AND td.deviceid=dk.deviceid'.
-				' AND '.dbConditionId('td.tokenid', [$db_token['tokenid']]).
+			' FROM token_device td'.
+			' JOIN device d ON td.deviceid=d.deviceid'.
+			' JOIN device_key dk ON td.deviceid=dk.deviceid'.
+			' WHERE '.dbConditionId('td.tokenid', [$db_token['tokenid']]).
+				' AND '.dbConditionInt('d.status', [ZBX_DEVICE_ACTIVATED]).
 				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]).
 			' ORDER BY dk.device_keyid DESC'
 		);
