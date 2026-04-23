@@ -302,7 +302,9 @@ class CControllerHostViewData extends CControllerDataTable {
 		foreach ($filters as $index => $tabfilter) {
 			$tabfilter = CControllerHost::sanitizeFilter($tabfilter);
 
-			$column_options = array_merge(...array_column($user_configs[$index]['columns'], 'column_options'));
+			$column_options = $index > 0
+				? array_merge(...array_column($user_configs[$index - 1]['columns'] ?? [], 'column_options'))
+				: [];
 
 			$filter_counters[$index] = $tabfilter['filter_show_counter']
 				? $this->getCount($tabfilter, $column_options)
@@ -334,6 +336,9 @@ class CControllerHostViewData extends CControllerDataTable {
 	private function getCount(array $filter, array $column_options): int {
 		$groupids = $filter['groupids'] ? getSubGroups($filter['groupids']) : null;
 
+		$show_suppressed = array_key_exists('show_suppressed', $column_options)
+			&& $column_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE;
+
 		return (int) API::Host()->get([
 			'countOutput' => true,
 			'groupids' => $groupids,
@@ -342,7 +347,7 @@ class CControllerHostViewData extends CControllerDataTable {
 			'inheritedTags' => true,
 			'severities' => $filter['severities'] ?: null,
 			'withProblemsSuppressed' => $filter['severities']
-				? (($column_options['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE) ? null : false)
+				? ($show_suppressed ? null : false)
 				: null,
 			'search' => [
 				'name' => $filter['name'] === '' ? null : $filter['name'],
