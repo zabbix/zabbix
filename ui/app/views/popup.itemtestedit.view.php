@@ -84,20 +84,25 @@ foreach ($data['inputs']['host'] as $name => $value) {
 }
 
 // Create macros table.
-$macros_table = $data['macros'] ? (new CTable())->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER) : null;
+$macros_table = $data['macros']
+	? (new CTable())
+		->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
+		->setAttribute('data-field-type', 'set')
+		->setAttribute('data-field-name', 'macros')
+	: null;
 
 $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_names['.$i.']', $macro_name))
+			(new CTextAreaFlexible('macros['.$i.'][name]', $macro_name))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
 				->setReadonly()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol([
-			(new CTextAreaFlexible('macro_values['.$i.']', $macro_value))
+			(new CTextAreaFlexible('macros['.$i.'][value]', $macro_value))
 				->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
 				->setMaxlength(CControllerPopupItemTest::INPUT_MAX_LENGTH)
 				->setAttribute('placeholder', _('value'))

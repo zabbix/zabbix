@@ -103,7 +103,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 				]
 			],
 			'value' => ['string'],
-			'macros' => ['string'],
+			'macros' => ['objects', 'fields' => [
+				'name' => ['string', 'required'],
+				'value' => ['string', 'required']
+			]],
 			'time_change' => ['integer'],
 
 			// Hidden form input data: passed from item form

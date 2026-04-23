@@ -258,15 +258,6 @@ window.itemtestedit_view_popup = new class {
 
 	#getFormFields(with_get_value) {
 		const fields = this.#form.getAllValues();
-		const macros = Object.create(null);
-
-		if ('macro_names' in fields) {
-			Object.keys(fields.macro_names).forEach(index => {
-				macros[fields.macro_names[index]] = fields.macro_values[index];
-			});
-		}
-
-		fields.macros = JSON.stringify(macros);
 
 		if (this.#show_prev && with_get_value) {
 			fields.time_change = fields.upd_prev !== ''

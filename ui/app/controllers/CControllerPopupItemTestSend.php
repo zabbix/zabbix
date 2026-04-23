@@ -146,7 +146,10 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				]]
 			],
 			'eol' => ['integer', 'in' => [ZBX_EOL_LF, ZBX_EOL_CRLF]],
-			'macros' => ['string'],
+			'macros' => ['objects', 'fields' => [
+				'name' => ['string', 'required'],
+				'value' => ['string', 'required']
+			]],
 			'time_change' => ['integer'],
 
 			// Hidden form input data: passed from item form

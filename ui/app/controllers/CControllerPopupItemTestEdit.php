@@ -216,7 +216,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
 		if (array_key_exists('macros', $data)) {
-			$data['macros'] = json_decode($data['macros'], true);
+			$data['macros'] = array_combine(
+				array_column($data['macros'], 'name'),
+				array_column($data['macros'], 'value')
+			);
 		}
 
 		$inputs = $this->getItemTestProperties($this->getInputAll());
@@ -539,7 +542,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			],
 			'js_validation_rules' => (new CFormValidator(
 				CControllerPopupItemTestSend::getValidationRules())
-			)->getRules()
+			)->getRules(),
+			'js_validation_rules_get_value' => (new CFormValidator(
+				CControllerPopupItemTestGetValue::getValidationRules())
+			)->getRules(),
 		]));
 	}
 }
