@@ -211,7 +211,7 @@ class CRole extends CApiService {
 					'name' =>							['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('role_rule', 'value_str')],
 					'status' =>							['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
 				]],
-				'devices.actions.default_access' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED]), 'default' => ZBX_ROLE_RULE_ENABLED]
+				'devices.actions.default_access' =>	['type' => API_INT32, 'in' => implode(',', [ZBX_ROLE_RULE_DISABLED, ZBX_ROLE_RULE_ENABLED])]
 			]]
 		]];
 
@@ -808,7 +808,7 @@ class CRole extends CApiService {
 			$devices_access = $db_rules['devices.access'];
 		}
 		else {
-			$devices_access = ZBX_ROLE_RULE_ENABLED;
+			$devices_access = $type == USER_TYPE_SUPER_ADMIN ? ZBX_ROLE_RULE_ENABLED : ZBX_ROLE_RULE_DISABLED;
 		}
 
 		$all_actions = CRoleHelper::getDeviceActionsByUserType($type);
@@ -825,7 +825,9 @@ class CRole extends CApiService {
 			if ($devices_access == ZBX_ROLE_RULE_DISABLED && $rule_name === CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN
 					&& $rule['status'] == ZBX_ROLE_RULE_ENABLED) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
-					_s('Cannot enable device action "%2$s" for user role "%1$s": %3$s.', $name, $rule['name'], _('device access is disabled'))
+					_s('Cannot enable device action "%2$s" for user role "%1$s": %3$s.', $name, $rule['name'],
+						_('device access is disabled')
+					)
 				);
 			}
 		}
@@ -926,15 +928,21 @@ class CRole extends CApiService {
 			'api.mode' => ZBX_ROLE_RULE_API_MODE_DENY,
 			'actions' => [],
 			'actions.default_access' => ZBX_ROLE_RULE_ENABLED,
-			'devices.access' => ZBX_ROLE_RULE_ENABLED,
+			'devices.access' => ZBX_ROLE_RULE_DISABLED,
 			'devices.actions' => [],
-			'devices.actions.default_access' => ZBX_ROLE_RULE_ENABLED
+			'devices.actions.default_access' => ZBX_ROLE_RULE_DISABLED
 		];
 
 		$rules = [];
 
 		foreach ($roles as $roleid => $role) {
 			$type = array_key_exists('type', $role) ? $role['type'] : $db_roles[$role['roleid']]['type'];
+
+			if ($type == USER_TYPE_SUPER_ADMIN) {
+				$default_rules['devices.access'] = ZBX_ROLE_RULE_ENABLED;
+				$default_rules['devices.actions.default_access'] = ZBX_ROLE_RULE_ENABLED;
+			}
+
 			$old_rules = $db_roles !== null ? $db_roles[$roleid]['rules'] : $default_rules;
 			$new_rules = array_key_exists('rules', $role) ? $role['rules'] + $old_rules : $old_rules;
 
@@ -1648,17 +1656,21 @@ class CRole extends CApiService {
 	}
 
 	private function getRelatedDeviceActionsRules(array $rules, array $output, int $type): array {
-		$actions_default_access = array_key_exists('devices.actions.default_access', $rules)
-			? $rules['devices.actions.default_access']
-			: (string) ZBX_ROLE_RULE_ENABLED;
-
 		$result = [];
+
+		$default_access = $type == USER_TYPE_SUPER_ADMIN
+			? (string) ZBX_ROLE_RULE_ENABLED
+			: (string) ZBX_ROLE_RULE_DISABLED;
 
 		if (in_array('devices.access', $output, true)) {
 			$result['devices.access'] = array_key_exists('devices.access', $rules)
 				? $rules['devices.access']
-				: (string) ZBX_ROLE_RULE_ENABLED;
+				: $default_access;
 		}
+
+		$actions_default_access = array_key_exists('devices.actions.default_access', $rules)
+			? $rules['devices.actions.default_access']
+			: $default_access;
 
 		if (in_array('devices.actions', $output, true)) {
 			$actions = array_fill_keys(CRoleHelper::getDeviceActionsByUserType($type), $actions_default_access);
