@@ -352,10 +352,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 		}
 
 		$data = $this->prepareData();
-
-		$visible_columns = array_filter($data['columns'], static fn (array $column) => $column['visible'] ?? false);
-
-		$show_opdata_separately = in_array('opdata', array_column($visible_columns, 'id'));
+		$show_opdata_separately = in_array('opdata', $data['data_fields']);
 
 		$csv = [];
 

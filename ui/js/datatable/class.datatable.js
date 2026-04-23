@@ -1671,7 +1671,8 @@ class CDataTable {
 				return;
 			}
 
-			const blob = new Blob([response.export], { type: 'text/csv;charset=utf-8;' });
+			const byte_order_mark = new Uint8Array([0xEF, 0xBB, 0xBF]);
+			const blob = new Blob([byte_order_mark, response.export], { type: 'text/csv;charset=utf-8;' });
 			const url = URL.createObjectURL(blob);
 
 			target.setAttribute('href', url.toString());

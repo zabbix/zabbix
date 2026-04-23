@@ -819,5 +819,9 @@
 
 			('debug' in response) && this.refreshDebug(response.debug);
 		}
+
+		getDataTable() {
+			return this.#datatable;
+		}
 	};
 </script>
