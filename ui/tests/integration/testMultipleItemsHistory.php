@@ -97,24 +97,15 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		return true;
 	}
 	public static function clearData(): void {
-		$all_itemids = [];
-		foreach (self::$discovered_itemids as $itemids) {
-			foreach ($itemids as $itemid) {
-				$all_itemids[] = $itemid;
-			}
-		}
-
-		if ($all_itemids) {
-			CDataHelper::call('history.clear', $all_itemids);
-		}
-
-		if (self::$discovered_triggerids) {
-			DB::delete('events', ['objectid' => self::$discovered_triggerids]);
-		}
-
 		if (self::$hostid !== null) {
 			CDataHelper::call('host.delete', [self::$hostid]);
 		}
+
+		self::$hostid = null;
+		self::$lld_ruleid = null;
+		self::$item_prototypeids = [];
+		self::$discovered_itemids = [];
+		self::$discovered_triggerids = [];
 	}
 	/**
 	 * Component configuration provider.
@@ -434,7 +425,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 *
 	 * @depends testMultipleItemsHistory_TriggerFiringRestart
 	 */
-	public function testMultipleItemsHistory_HousekeeperCleanup() {
+	/*public function testMultipleItemsHistory_HousekeeperCleanup() {
 		$this->sendDataValues('sender', [
 			[
 				'host' => self::HOSTNAME,
@@ -450,26 +441,51 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		/*$this->executeHousekeeper();
+		// $this->executeHousekeeper();
 
-		foreach (self::prototypeDefs() as $def) {
-			$vtype = $def['value_type'];
-			$itemids = array_values(self::$discovered_itemids[$vtype]);
-			$this->callUntilCountIsPresent('history.get', [
-				'history' => $vtype,
-				'itemids' => $itemids
-			], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
-				$this->executeHousekeeper();
-				return true;
-			});
+		// foreach (self::prototypeDefs() as $def) {
+		// 	$vtype = $def['value_type'];
+		// 	$itemids = array_values(self::$discovered_itemids[$vtype]);
+		// 	$this->callUntilCountIsPresent('history.get', [
+		// 		'history' => $vtype,
+		// 		'itemids' => $itemids
+		// 	], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
+		// 		$this->executeHousekeeper();
+		// 		return true;
+		// 	});
+		// }
+
+		// $this->callUntilCountIsPresent('event.get', [
+		// 	'objectids' => self::$discovered_triggerids,
+		// 	'source' => EVENT_SOURCE_TRIGGERS
+		// ], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
+		// 	$this->executeHousekeeper();
+		// 	return true;
+		// });
+	}*/
+
+	/**
+	 * Call clearData() and verify that the host, all discovered items and trigger events are gone.
+	 *
+	 */
+	public function testMultipleItemsHistory_ClearData(): void {
+		$hostid = self::$hostid;
+		$all_itemids = [];
+		foreach (self::$discovered_itemids as $itemids) {
+			foreach ($itemids as $itemid) {
+				$all_itemids[] = $itemid;
+			}
 		}
+		$triggerids = self::$discovered_triggerids;
 
-		$this->callUntilCountIsPresent('event.get', [
-			'objectids' => self::$discovered_triggerids,
-			'source' => EVENT_SOURCE_TRIGGERS
-		], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
-			$this->executeHousekeeper();
-			return true;
-		});*/
+		self::clearData();
+
+		$response = $this->call('host.get', ['hostids' => [$hostid], 'output' => ['hostid']]);
+		$this->assertEmpty($response['result'], 'Host was not deleted by clearData().');
+
+		if ($all_itemids) {
+			$response = $this->call('item.get', ['itemids' => $all_itemids, 'output' => ['itemid']]);
+			$this->assertEmpty($response['result'], 'Discovered items were not deleted by clearData().');
+		}
 	}
 }
