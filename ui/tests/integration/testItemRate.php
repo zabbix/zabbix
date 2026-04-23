@@ -447,7 +447,7 @@ class testItemRate extends CIntegrationTest {
 			break;
 		}
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		if ($expected_error === false) {
 			$result = $this->call('history.get', $api_request, $expected_error);

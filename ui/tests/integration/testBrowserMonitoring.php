@@ -94,7 +94,7 @@ class testBrowserMonitoring extends CIntegrationTest {
 			]
 		]);
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_TEXT,
