@@ -2589,6 +2589,8 @@ button {
         border-right: 1px solid #dfe4e7; }
         .datatable .cell.cell-header.cell-sticky:first-child + .cell-header {
           border-left: none; }
+      .datatable .cell.cell-header .checkbox-radio {
+        pointer-events: all; }
       .datatable .cell.cell-header .cell-inner {
         flex-grow: 1;
         padding: 0 8px;

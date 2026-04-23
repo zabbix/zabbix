@@ -500,6 +500,10 @@
 				}
 			}
 
+			.checkbox-radio {
+				pointer-events: all;
+			}
+
 			.cell-inner {
 				flex-grow: 1;
 				padding: 0 8px;
