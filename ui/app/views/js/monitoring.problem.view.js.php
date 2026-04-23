@@ -392,15 +392,17 @@
 								hint += `\n${maintenance_description}`;
 							}
 
-							const maintenance = document.createElement('button');
-							maintenance.setAttribute('type', 'button');
-							maintenance.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
+							const maintenance_icon = document.createElement('button');
+							maintenance_icon.setAttribute('type', 'button');
+							maintenance_icon.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_WRENCH_ALT_SMALL,
 								ZBX_STYLE_COLOR_WARNING, ZBX_STYLE_NO_INDENT);
-							maintenance.setAttribute('data-hintbox-contents', hint)
-							maintenance.setAttribute('data-hintbox', '1');
-							maintenance.setAttribute('data-hintbox-static', '1');
+							maintenance_icon.setAttribute('data-hintbox-contents', hint)
+							maintenance_icon.setAttribute('data-hintbox', '1');
+							maintenance_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
+							maintenance_icon.setAttribute('data-hintbox-static', '1');
+							maintenance_icon.setAttribute('aria-expanded', 'false');
 
-							cell_inner.appendChild(maintenance);
+							cell_inner.appendChild(maintenance_icon);
 						}
 					}
 				})

@@ -270,7 +270,7 @@
 						}
 
 						maintenance_icon.setAttribute('data-hintbox', '1');
-						maintenance_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
+						maintenance_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
@@ -311,7 +311,7 @@
 						description_icon.setAttribute('data-content', '?');
 						description_icon.setAttribute('data-hintbox-contents', description_expanded);
 						description_icon.setAttribute('data-hintbox', '1');
-						description_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
+						description_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 						description_icon.setAttribute('data-hintbox-static', '1');
 						description_icon.setAttribute('aria-expanded', 'false');
 

@@ -577,7 +577,9 @@ class CDataTable {
 
 			tag_label.setAttribute('data-hintbox-contents', tag_label_hintbox.outerHTML);
 			tag_label.setAttribute('data-hintbox', '1');
+			tag_label.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 			tag_label.setAttribute('data-hintbox-static', '1');
+			tag_label.setAttribute('aria-expanded', 'false');
 
 			tags_wrapper.appendChild(tag_label);
 
@@ -691,7 +693,9 @@ class CDataTable {
 
 				tag_label.setAttribute('data-hintbox-contents', tag_label_hintbox.outerHTML);
 				tag_label.setAttribute('data-hintbox', '1');
+				tag_label.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 				tag_label.setAttribute('data-hintbox-static', '1');
+				tag_label.setAttribute('aria-expanded', 'false');
 
 				if (count > 0) {
 					let name = `${tag.tag}: ${tag.value}`;
@@ -729,10 +733,11 @@ class CDataTable {
 
 				const more_tags = document.createElement('button');
 				more_tags.classList.add(ZBX_STYLE_BTN_ICON, ZBX_ICON_MORE);
-				more_tags.setAttribute('data-hintbox', '1');
 				more_tags.setAttribute('data-hintbox-contents', more_tags_hintbox.innerHTML);
 				more_tags.setAttribute('data-hintbox-class', `${ZBX_STYLE_HINTBOX_WRAP} ${ZBX_STYLE_TAGS_WRAPPER}`);
+				more_tags.setAttribute('data-hintbox', '1');
 				more_tags.setAttribute('data-hintbox-static', '1');
+				more_tags.setAttribute('aria-expanded', 'false');
 
 				tags_wrapper.appendChild(more_tags);
 			}

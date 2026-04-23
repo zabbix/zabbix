@@ -219,7 +219,7 @@
 						}
 
 						maintenance_icon.setAttribute('data-hintbox', '1');
-						maintenance_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
+						maintenance_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 

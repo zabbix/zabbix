@@ -401,7 +401,7 @@
 						}
 
 						maintenance_icon.setAttribute('data-hintbox', '1');
-						maintenance_icon.setAttribute('data-hintbox-class', 'hintbox-wrap');
+						maintenance_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
 						maintenance_icon.setAttribute('data-hintbox-static', '1');
 						maintenance_icon.setAttribute('aria-expanded', 'false');
 
@@ -562,12 +562,15 @@
 
 					if (disabled_by_lld != 0) {
 						const description_icon = document.createElement('button');
-						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, 'hintbox-wrap');
+						description_icon.classList.add('btn-icon', ZBX_ICON_ALERT_WITH_CONTENT, ZBX_STYLE_HINTBOX_WRAP);
 						description_icon.setAttribute('role', 'button');
 						description_icon.setAttribute('data-content', '?');
 						description_icon.setAttribute('data-hintbox-contents',
 							<?= json_encode(_('Disabled automatically by an LLD rule.')); ?>);
 						description_icon.setAttribute('data-hintbox', '1');
+						description_icon.setAttribute('data-hintbox-class', ZBX_STYLE_HINTBOX_WRAP);
+						description_icon.setAttribute('data-hintbox-static', '1');
+						description_icon.setAttribute('aria-expanded', 'false');
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(description_icon);
