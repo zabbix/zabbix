@@ -1116,6 +1116,65 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Request data from API until result count matches expected value (@see call).
+	 *
+	 * @param string   $method          API method to be called
+	 * @param mixed    $params          API call params
+	 * @param integer  $expected_count  expected result count
+	 * @param integer  $iterations      iteration count
+	 * @param integer  $delay           iteration delay
+	 * @param callable $callback        Callback function to test if API response is valid.
+	 *
+	 * @return array
+	 */
+	public function callUntilCountIsPresent($method, $params, $expected_count, $iterations = null, $delay = null, $callback = null) {
+		if ($iterations === null) {
+			$iterations = self::WAIT_ITERATIONS;
+		}
+
+		if ($delay === null) {
+			$delay = self::WAIT_ITERATION_DELAY;
+		}
+
+		$count_params = array_merge($params, ['countOutput' => true]);
+		$exception = null;
+		$start = microtime(true);
+		for ($i = 0; $i < $iterations; $i++) {
+			try {
+				$response = $this->call($method, $count_params);
+
+				if (isset($response['result']) && $response['result'] == $expected_count
+						&& ($callback === null || call_user_func($callback, $response))) {
+					if (static::$trace_delays) {
+						self::recordDelay('call_count_present', microtime(true) - $start);
+					}
+
+					return $response;
+				}
+			} catch (Exception $e) {
+				$exception = $e;
+			}
+
+			sleep($delay);
+		}
+
+		if (static::$trace_delays) {
+			self::recordDelay('call_count_present', microtime(true) - $start);
+		}
+
+		if ($exception !== null) {
+			throw $exception;
+		}
+
+		$message = 'Count requested from '.$method.' API did not match expected count ('.$expected_count.') within '.
+				'specified interval. Params used:'."\n".json_encode($params);
+		if (isset($response)) {
+			$message .= "\nLast response:\n".json_encode($response);
+		}
+		$this->fail($message);
+	}
+
+	/**
 	 * Get path of the log file for component.
 	 *
 	 * @param string $component    name of the component
