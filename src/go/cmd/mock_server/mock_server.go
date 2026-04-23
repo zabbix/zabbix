@@ -58,7 +58,7 @@ func handleConnection(c *zbxcomms.Connection) {
 
 	switch pairs["request"] {
 	case "active checks":
-		activeChecks, err := ioutil.ReadFile(options.ActiveChecksFile)
+		activeChecks, err := os.ReadFile(options.ActiveChecksFile)
 		if err == nil {
 			err = c.Write(activeChecks)
 		}
