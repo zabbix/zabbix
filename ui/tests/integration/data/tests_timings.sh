@@ -52,5 +52,7 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
+  [testFunctions]=60
+  [testHistoryGet]=40
 
 )
