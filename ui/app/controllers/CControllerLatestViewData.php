@@ -16,9 +16,9 @@
 
 class CControllerLatestViewData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['host', 'maintenance', 'maintenanceid', 'maintenance_type',
-		'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval', 'history',
-		'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'itemid', 'is_graph', 'keep_history',
+	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
+		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
+		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'keep_history',
 		'keep_trends', 'item_icons', 'tags'];
 
 	protected function checkPermissions(): bool {

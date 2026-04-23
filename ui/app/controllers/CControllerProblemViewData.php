@@ -16,8 +16,8 @@
 
 class CControllerProblemViewData extends CControllerDataTable {
 
-	protected array $allowed_data_fields = ['time', 'eventid', 'objectid', 'severity', 'recovery', 'status',
-		'info', 'host', 'description', 'duration', 'can_be_closed', 'eventid', 'actions', 'opdata', 'tags'];
+	protected array $allowed_data_fields = ['eventid', 'data_actions', 'time', 'eventid', 'objectid', 'severity',
+		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'tags'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
