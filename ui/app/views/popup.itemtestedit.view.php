@@ -76,7 +76,11 @@ foreach ($data['inputs']['host'] as $name => $value) {
 		continue;
 	}
 
-	$form->addItem((new CInput('hidden', $name, $value))->removeId());
+	$form->addItem(
+		(new CInput('hidden', $name, $value))
+			->setAttribute('data-field-type', 'hidden')
+			->removeId()
+	);
 }
 
 // Create macros table.
@@ -423,7 +427,10 @@ if (count($data['steps']) > 0) {
 
 		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
 		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON || $step['type'] == ZBX_PREPROC_VALIDATE_RANGE) {
-			$form->addItem(new CInput('hidden', 'steps['.$i.'][params]', $step['params']));
+			$form->addItem(
+				(new CInput('hidden', 'steps['.$i.'][params]', $step['params']))
+					->setAttribute('data-field-type', 'hidden')
+			);
 		}
 		else {
 			$form->addVar('steps['.$i.'][params]', $step['params']);
