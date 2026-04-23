@@ -894,15 +894,12 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_Delete() {
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
-
-		$table = $this->query('id:hosts')->asDatatable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill('Host for t');
 		$filter->submit();
-		$table->waitUntilReloaded();
 
-		$table_rows_count = $table->getRows()->count();
+		$table_rows_count = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady()->getRows()->count();
 		$this->assertTableStats($table_rows_count);
 		$delete_button = $this->query('button:Delete')->one();
 

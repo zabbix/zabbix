@@ -136,7 +136,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		// Additional 50px scrolling needed because host name is behindthe horizontal scrollbar.
 		$this->query('link', self::HOST_VISIBLE_NAME)->waitUntilClickable()->one()->scrollIntoView(50)->click();
-		$dialog = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
+		$dialog = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$dialog->fill(['Templates' => self::LINKED_TEMPLATE]);
 
 		$this->zbxTestTextPresent(self::LINKED_TEMPLATE);

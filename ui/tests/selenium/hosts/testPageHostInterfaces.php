@@ -465,7 +465,7 @@ class testPageHostInterfaces extends CWebTest {
 			$availability = $this->query('xpath://div[@class="status-container"]')->waitUntilPresent()->one();
 		}
 		else {
-			$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
+			$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 			$availability = $table->findRow('Name', $data['host'])->getColumn('Availability');
 		}
 

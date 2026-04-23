@@ -270,7 +270,7 @@ class CDatatableBehavior extends CTableBehavior {
 	}
 
 	public function checkColumnList($column_list) {
-		$table = $this->test->query('id:latest')->one()->asDatatable();
+		$table = $this->test->query('id:latest')->one()->asDatatable()->waitUntilReady();
 		$table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable()->click();
 
 		$popup_dialog = $this->test->query('xpath:.//div[@class="datatable-options-popup datatable-options"]')->one()
@@ -318,8 +318,9 @@ class CDatatableBehavior extends CTableBehavior {
 	 */
 	public function assertDatatableStats($count = null, $total = null) {
 		if ($count === null || $count === 0) {
-			$this->test->assertFalse($this->test->query('xpath://div[@class="table-stats"]')->one()->isVisible(),
-					'Table rows amount is visible on page');
+			$this->test->assertFalse($this->getDatatable($selector)->query('xpath://div[@class="table-stats"]')
+					->one()->isVisible(), 'Table rows amount is visible on page'
+			);
 
 			return;
 		}

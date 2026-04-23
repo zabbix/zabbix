@@ -157,7 +157,7 @@ class testFormFilter extends CWebTest {
 		$filter->selectTab('update_tab');
 		$form = $filter->getForm();
 		$result_before = $this->getTableResults($table_selector);
-		$table = $this->query($table_selector)->asDatatable()->one();
+		$table = $this->query($table_selector)->asDatatable()->one()->waitUntilReady();
 
 		for ($i = 0; $i < 2; ++$i) {
 			$form->fill(['Host groups' => ['Group to check Overview', 'Another group to check Overview']]);
@@ -170,8 +170,7 @@ class testFormFilter extends CWebTest {
 			$filter->selectTab();
 			$filter->selectTab('update_tab');
 
-			$table->waitUntilReady();
-			$table->invalidate();
+			$table->waitUntilReady()->invalidate();
 
 			if ($i === 0) {
 				$this->query('button:Reset')->one()->click();
@@ -182,7 +181,7 @@ class testFormFilter extends CWebTest {
 			}
 
 			$this->page->waitUntilReady();
-			$table->waitUntilReady();
+			$table->waitUntilReady()->invalidate();
 		}
 
 		// Getting changed host/problem result and then comparing it with displayed result from dropdown.
@@ -191,7 +190,7 @@ class testFormFilter extends CWebTest {
 
 		// Wait for button that is present only in Home and non-saved tabs to be clickable before clicking on toggle.
 		$this->query('button:Save as')->one()->waitUntilClickable();
-		$table->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
 
 		$this->query('xpath://button[@data-action="toggleTabsList"]')->one()->click();
 		$popup_item = CPopupMenuElement::find()->waitUntilVisible()->one()->getItem('update_tab');
