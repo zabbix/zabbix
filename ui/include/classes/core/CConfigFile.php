@@ -218,6 +218,10 @@ class CConfigFile {
 			}
 		}
 
+		if (isset($NO_AUTH_DEBUG_MODE)) {
+			$this->config['NO_AUTH_DEBUG_MODE'] = $NO_AUTH_DEBUG_MODE;
+		}
+
 		$this->makeGlobal();
 
 		return $this->config;
@@ -225,7 +229,7 @@ class CConfigFile {
 
 	public function makeGlobal() {
 		global $DB, $ZBX_SERVER, $ZBX_SERVER_PORT, $ZBX_SERVER_NAME, $IMAGE_FORMAT_DEFAULT, $HISTORY, $SSO,
-			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS;
+			$ALLOW_HTTP_AUTH, $ZBX_SERVER_TLS, $NO_AUTH_DEBUG_MODE;
 
 		$DB = $this->config['DB'];
 		$ZBX_SERVER = $this->config['ZBX_SERVER'];
@@ -236,6 +240,7 @@ class CConfigFile {
 		$SSO = $this->config['SSO'];
 		$ALLOW_HTTP_AUTH = $this->config['ALLOW_HTTP_AUTH'];
 		$ZBX_SERVER_TLS = $this->config['ZBX_SERVER_TLS'];
+		$NO_AUTH_DEBUG_MODE = $this->config['NO_AUTH_DEBUG_MODE'];
 	}
 
 	public function save() {
@@ -347,6 +352,8 @@ $ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS'][
 $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_ISSUER\']  = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_ISSUER'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERTIFICATE_SUBJECT'], "'\\").'\';
+
+$NO_AUTH_DEBUG_MODE	= \''.addcslashes($this->config['NO_AUTH_DEBUG_MODE'], "'\\").'\';
 ';
 	}
 
@@ -389,5 +396,6 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'CERTIFICATE_ISSUER' => '',
 			'CERTIFICATE_SUBJECT' => ''
 		];
+		$this->config['NO_AUTH_DEBUG_MODE'] = false;
 	}
 }

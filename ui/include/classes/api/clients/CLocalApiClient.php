@@ -59,7 +59,9 @@ class CLocalApiClient extends CApiClient {
 	 * @return CApiClientResponse
 	 */
 	public function callMethod(string $requestApi, string $requestMethod, array $params, array $auth) {
-		global $DB;
+		global $DB, $NO_AUTH_DEBUG_MODE;
+
+		$this->debug = $NO_AUTH_DEBUG_MODE;
 
 		$api = strtolower($requestApi);
 		$method = strtolower($requestMethod);
@@ -173,6 +175,14 @@ class CLocalApiClient extends CApiClient {
 			// add debug data
 			if ($this->debug) {
 				$response->debug = $e->getTrace();
+
+				if ($e instanceof APIException) {
+					$debug_message = trim($e->getDebugMessage());
+
+					if ($debug_message !== '') {
+						$response->errorMessage .= ' '.$debug_message;
+					}
+				}
 			}
 		}
 

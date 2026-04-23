@@ -337,9 +337,12 @@ class CDevice extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		if (!CApiDpopHelper::checkJwkIntegrity($data['mobile_identity_key']) ||
-				!CApiDpopHelper::checkJwkIntegrity($data['mobile_encryption_key'])) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		if (!CApiDpopHelper::checkJwkIntegrity($data['mobile_identity_key'])) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Failed to parse identity key material.');
+		}
+
+		if (!CApiDpopHelper::checkJwkIntegrity($data['mobile_encryption_key'])) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Failed to parse encryption key material.');
 		}
 
 		$db_device = DBfetch(DBselect(

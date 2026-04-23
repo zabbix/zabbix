@@ -3065,13 +3065,26 @@ class CUser extends CApiService {
 			$uuid = $db_device_key['uuid'];
 		}
 
-		if (!$keys_per_scope || count($keys_per_scope) < 2) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		if (!$keys_per_scope) {
+			self::exception(
+				ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Device inactive or no active keys available.'
+			);
 		}
 
-		if (!CApiDpopHelper::verifyDpopSignature($params['signature'], $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY],
-				$params['token'], $params['requested_api_method'], $time)) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+		if (!array_key_exists(CDevice::MOBILE_IDENTITY_KEY, $keys_per_scope)) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'No active identity key found.');
+		}
+
+		if (!array_key_exists(CDevice::MOBILE_ENCRYPTION_KEY, $keys_per_scope)) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'No active encryption key found.');
+		}
+
+		try {
+			CApiDpopHelper::verifyDpopSignature($params['signature'], $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY],
+				$params['token'], $params['requested_api_method'], $time);
+		}
+		catch (Exception $e) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), $e->getMessage());
 		}
 
 		$this->getAuthenticationUserData($db_token['userid'], $db_user, $group_status);
@@ -3135,7 +3148,7 @@ class CUser extends CApiService {
 
 		if (!$db_tokens) {
 			usleep(10000);
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'API token not found.');
 		}
 
 		$db_token = reset($db_tokens);

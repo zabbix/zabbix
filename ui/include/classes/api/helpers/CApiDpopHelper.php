@@ -27,112 +27,157 @@ class CApiDpopHelper {
 
 	private const SIGNATURE_ALGORITHM = 'ES256';
 
+	/**
+	 * @throws Exception
+	 */
 	public static function verifyDpopSignature(string $signature, array $kid_keys, string $access_token,
-			string $requested_api_method, int $check_time): bool {
-		[$encoded_header, $encoded_payload] = explode('.', $signature);
+			string $requested_api_method, int $check_time): void {
+		$segments = explode('.', $signature);
 
-		// header check section
+		if (count($segments) != 3) {
+			throw new Exception('Wrong number of JWT segments.');
+		}
+
+		[$encoded_header, $encoded_payload] = $segments;
+
 		$header = json_decode(JWT::urlsafeB64Decode($encoded_header), true);
 
 		if (!is_array($header) || !$header) {
-			return false;
+			throw new Exception('Invalid header encoding.');
 		}
 
-		if (!self::checkKid($header, $kid_keys)) {
-			return false;
-		}
-
-		$jwk = json_decode($kid_keys[$header['kid']], true);
-
-		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
+		self::checkKid($header, $kid_keys);
 
 		JWT::$timestamp = $check_time;
 		JWT::$leeway = self::TIME_SKEW;
 
+		$jwk = json_decode($kid_keys[$header['kid']], true);
+
 		try {
+			$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
+
 			JWT::decode($signature, $key);
 		}
 		catch (Exception $e) {
-			return false;
+			throw new Exception($e->getMessage().'.');
 		}
 
-		// payload check section
 		$payload = json_decode(JWT::urlsafeB64Decode($encoded_payload), true);
 
-		if (!self::checkHtu($payload, $requested_api_method)) {
-			return false;
-		}
+		self::checkHtu($payload, $requested_api_method);
 
-		if (!self::checkAth($payload, $access_token)) {
-			return false;
-		}
+		self::checkAth($payload, $access_token);
 
-		if (!self::checkTokenLifeTime($payload, $check_time)) {
-			return false;
-		}
+		self::checkTokenLifeTime($payload, $check_time);
 
-		if (!self::checkJti($payload, $check_time)) {
-			return false;
-		}
-
-		return true;
+		self::checkJti($payload, $check_time);
 	}
 
-	private static function checkKid(array $header, array $kid_keys): bool {
-		return array_key_exists('kid', $header) && array_key_exists($header['kid'], $kid_keys);
+	/**
+	 * @throws Exception
+	 */
+	private static function checkKid(array $header, array $kid_keys): void {
+		if (!array_key_exists('kid', $header)) {
+			throw new Exception('Missing kid in DPoP header.');
+		}
+
+		if (!array_key_exists($header['kid'], $kid_keys)) {
+			throw new Exception('Unknown identity key for provided kid.');
+		}
 	}
 
-	private static function checkHtu(array $payload, string $requested_api_method): bool {
+	/**
+	 * @throws Exception
+	 */
+	private static function checkHtu(array $payload, string $requested_api_method): void {
+		if (!array_key_exists('htu', $payload)) {
+			throw new Exception('Missing htu claim.');
+		}
+
 		// todo - use method get server_id
 		$expected_htu = 'urn:zbx:'.self::getServerId().':'.$requested_api_method;
 
-		return array_key_exists('htu', $payload) && hash_equals($expected_htu, $payload['htu']);
+		if (!hash_equals($expected_htu, $payload['htu'])) {
+			throw new Exception('Invalid htu value.');
+		}
 	}
 
-	private static function checkAth(array $payload, string $access_token): bool {
+	/**
+	 * @throws Exception
+	 */
+	private static function checkAth(array $payload, string $access_token): void {
+		if (!array_key_exists('ath', $payload)) {
+			throw new Exception('Missing ath claim.');
+		}
+
 		$expected_ath = JWT::urlsafeB64Encode(hash('sha256', $access_token, true));
 
-		return array_key_exists('ath', $payload) && hash_equals($expected_ath, $payload['ath']);
+		if (!hash_equals($expected_ath, $payload['ath'])) {
+			throw new Exception('Invalid ath value.');
+		}
 	}
 
-	private static function checkTokenLifeTime(array $payload, int $check_time): bool {
-		if (!array_key_exists('iat', $payload) || !array_key_exists('exp', $payload)) {
-			return false;
+	/**
+	 * @throws Exception
+	 */
+	private static function checkTokenLifeTime(array $payload, int $check_time): void {
+		if (!array_key_exists('iat', $payload)) {
+			throw new Exception('Missing iat claim.');
+		}
+
+		if (!array_key_exists('exp', $payload)) {
+			throw new Exception('Missing exp claim.');
 		}
 
 		$iat = (int) $payload['iat'];
 		$exp = (int) $payload['exp'];
 
-		if ($iat > $exp || $iat > $check_time + self::TIME_SKEW) {
-			return false;
+		if ($iat > $exp) {
+			throw new Exception('iat exceeds exp.');
+		}
+
+		if ($iat > $check_time + self::TIME_SKEW) {
+			throw new Exception('Invalid iat: JWT token issued in the future beyond allowed skew.');
 		}
 
 		if ($exp - $iat <= self::MAX_ALLOWED_IAT_AGE) {
-			return $check_time <= $exp + self::TIME_SKEW;
+			if ($check_time > $exp + self::TIME_SKEW) {
+				throw new Exception('JWT token expired.');
+			}
 		}
-
-		return $check_time <= $iat + self::MAX_ALLOWED_IAT_AGE + self::TIME_SKEW;
+		elseif ($check_time > $iat + self::MAX_ALLOWED_IAT_AGE + self::TIME_SKEW) {
+			throw new Exception('JWT token exceeded maximum allowed lifetime.');
+		}
 	}
 
-	private static function checkJti(array $payload, int $check_time): bool {
+	/**
+	 * @throws Exception
+	 */
+	private static function checkJti(array $payload, int $check_time): void {
 		if (!array_key_exists('jti', $payload)) {
-			return false;
+			throw new Exception('Missing jti claim.');
 		}
 
 		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.$check_time);
 
 		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['jti'])))) {
-			return false;
+			throw new Exception('Replay detected: jti already used.');
 		}
 
-		return DBexecute(
-			'INSERT INTO dpop_jti_cache (jti, expires_at)'.
-				' VALUES ('.zbx_dbstr($payload['jti']).', '.zbx_dbstr($payload['exp']).')'
-		);
+		if (!DBexecute(
+				'INSERT INTO dpop_jti_cache (jti, expires_at)'.
+					' VALUES ('.zbx_dbstr($payload['jti']).', '.zbx_dbstr($payload['exp']).')')) {
+			throw new Exception('Internal error: unable to persist jti.');
+		}
 	}
 
 	public static function checkJwkIntegrity(array $jwk): bool {
-		$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
+		try {
+			$key = JWK::parseKey($jwk, self::SIGNATURE_ALGORITHM);
+		}
+		catch (Exception $e) {
+			return false;
+		}
 
 		if (openssl_pkey_get_public($key->getKeyMaterial()) === false) {
 			return false;

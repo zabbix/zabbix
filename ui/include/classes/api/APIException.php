@@ -16,11 +16,15 @@
 
 class APIException extends Exception {
 
-	/**
-	 * @param int    $code
-	 * @param string $message
-	 */
-	public function __construct($code = ZBX_API_ERROR_INTERNAL, $message = '') {
+	private string $debug_message;
+
+	public function __construct(int $code = ZBX_API_ERROR_INTERNAL, string $message = '', string $debug_message = '') {
+		$this->debug_message = $debug_message;
+
 		parent::__construct($message, $code);
+	}
+
+	public function getDebugMessage(): ?string {
+		return $this->debug_message;
 	}
 }
