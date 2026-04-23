@@ -20885,7 +20885,7 @@ msgstr "Zeiträume anzeigen"
 
 #: widgets/svggraph/includes/WidgetForm.php:377
 msgid "Show problems"
-msgstr "Ziege Probleme"
+msgstr "Zeig Probleme"
 
 # Passive Form besser lesbar im Dropdown-Feld
 #: include/views/monitoring.history.php:168
