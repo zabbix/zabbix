@@ -3805,6 +3805,9 @@ output {
           margin-left: 0;
           margin-right: 0; }
 
+.hintbox-wrap {
+  display: block; }
+
 .pager-container {
   min-height: 24px;
   position: relative; }
@@ -8053,9 +8056,6 @@ z-select[disabled] .focusable, z-textarea-flexible textarea[disabled], input[dis
   .calendar-footer .btn-grey {
     float: left;
     margin-top: 0; }
-
-.hintbox-wrap {
-  display: block; }
 
 .notif-body {
   max-height: 600px;
