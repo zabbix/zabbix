@@ -1,0 +1,88 @@
+<?php declare(strict_types = 0);
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+class CControllerCepRuleEdit extends CController {
+
+	private array $cep_rule = ['cep_ruleid' => null];
+
+	public function init(): void {
+		$this->disableCsrfValidation();
+	}
+
+	protected function checkPermissions(): bool {
+		if (!$this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)) {
+			return false;
+		}
+
+		if ($this->hasInput('cep_ruleid')) {
+			$cep_rules = API::CepRule()->get([
+				'cep_ruleids' => $this->getInput('cep_ruleid')
+			]);
+
+			if (!$cep_rules) {
+				return false;
+			}
+
+			$this->cep_rule = $cep_rules[0];
+		}
+
+
+		return $this->getUserType() >= USER_TYPE_SUPER_ADMIN;
+	}
+
+	protected function checkInput(): bool {
+		$fields = [
+			'cep_ruleid' => 'db cep_rule.cep_ruleid'
+		];
+
+		$ret = $this->validateInput($fields);
+
+		if (!$ret) {
+			$this->setResponse(
+				(new CControllerResponseData(['main_block' => json_encode([
+					'error' => [
+						'messages' => array_column(get_and_clear_messages(), 'message')
+					]
+				])]))->disableView()
+			);
+		}
+
+		return $ret;
+	}
+
+	protected function doAction() {
+
+		/* sdff(DB::getDefaults('cep_window_condition'));die; */
+		/* sdff(DB::getDefaults('cep_condition'));die; */
+		/* sdff(DB::getDefaults('cep_operation'));die; */
+		/* sdff(DB::getDefaults('cep_window'));die; */
+		/* sdff(DB::getDefaults('cep_rule'));die; */
+
+		$data = [
+			'js_validation_rules' => [],
+			'cep_rule' => $this->cep_rule + DB::getDefaults('cep_rule'),
+			'user' => ['debug_mode' => $this->getDebugMode()]
+		];
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle($this->cep_rule['cep_ruleid'] === null
+			? _('New complex event processing')
+			: _('Complex event processing')
+		);
+
+		$this->setResponse($response);
+	}
+}

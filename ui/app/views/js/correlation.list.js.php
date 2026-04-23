@@ -30,6 +30,9 @@
 		 * Creates the event listeners for create, edit, delete, enable, disable single and mass operations.
 		 */
 		#initActions() {
+			document.getElementById('js-create-cep').addEventListener('click', () => {
+				ZABBIX.PopupManager.open('ceprule.edit');
+			});
 			document.getElementById('js-create').addEventListener('click', () => {
 				ZABBIX.PopupManager.open('correlation.edit');
 			});
