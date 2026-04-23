@@ -30,6 +30,9 @@ class CPager {
 	 */
 	#page;
 
+	/**
+	 * @type {AbortController}
+	 */
 	#state_abort_controller;
 
 	/**
@@ -47,8 +50,8 @@ class CPager {
 		this.#state_abort_controller?.abort();
 		this.#state_abort_controller = new AbortController();
 
-		window.addEventListener('popstate', event => {
-			const page = new CState(event.target.location.href).getParams().get('page') || 1;
+		window.addEventListener('popstate', e => {
+			const page = new CState(e.target.location.href).getParams().get('page') || 1;
 
 			this.dispatchEvent(CPager.EVENT_SELECT, {page});
 		}, { signal: this.#state_abort_controller.signal });
@@ -64,10 +67,10 @@ class CPager {
 	}
 
 	/**
-	 * @param {CustomEvent} event
+	 * @param {CustomEvent} e
 	 */
-	onSelect(event) {
-		const {page} = event.detail;
+	onSelect(e) {
+		const {page} = e.detail;
 
 		this.#page = page;
 

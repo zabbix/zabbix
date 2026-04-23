@@ -374,17 +374,17 @@
 					cell_inner.appendChild(item_icons);
 				})
 				.setOptionsHandler('name', CDataTableOptionsPopupMonitoringLatestName)
-				.on(CMessageHelper.EVENT_MESSAGE, event => {
-					event.stopPropagation();
+				.on(CMessageHelper.EVENT_MESSAGE, e => {
+					e.stopPropagation();
 
-					const {type, title, messages} = event.detail;
+					const {type, title, messages} = e.detail;
 
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
 				.on(CPager.EVENT_SELECT, () => this.#scheduleRefresh())
-				.on(CPager.EVENT_STATE_CHANGE, event => {
-					const {page} = event.detail;
+				.on(CPager.EVENT_STATE_CHANGE, e => {
+					const {page} = e.detail;
 
 					new CState().setParams({page});
 				})

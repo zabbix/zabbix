@@ -531,8 +531,8 @@
 					status_link.textContent = is_monitored
 						? <?= json_encode(_('Enabled')); ?>
 						: <?= json_encode(_('Disabled')); ?>;
-					status_link.addEventListener('click', event => {
-						event.preventDefault();
+					status_link.addEventListener('click', e => {
+						e.preventDefault();
 
 						status_link.classList.add(ZBX_STYLE_LOADING);
 
@@ -805,16 +805,16 @@
 						cell_inner.appendChild(encryption);
 					}
 				})
-				.on(CMessageHelper.EVENT_MESSAGE, event => {
-					event.stopPropagation();
+				.on(CMessageHelper.EVENT_MESSAGE, e => {
+					e.stopPropagation();
 
-					const {type, title, messages} = event.detail;
+					const {type, title, messages} = e.detail;
 
 					clearMessages();
 					addMessage(makeMessageBox(type, messages, title));
 				})
-				.on(CPager.EVENT_STATE_CHANGE, event => {
-					const {page} = event.detail;
+				.on(CPager.EVENT_STATE_CHANGE, e => {
+					const {page} = e.detail;
 
 					new CState().setParams({page});
 				})

@@ -115,11 +115,11 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		const sortable = new CSortable(this.#sortable, {
 			selector_handle: `.${CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM}`
 		})
-			.on(CSortable.EVENT_SORT, event => {
+			.on(CSortable.EVENT_SORT, e => {
 				const items = sortable.getTarget()
 					.querySelectorAll(`.${CDataTableOptionsPopupTableOptions.ZBX_STYLE_OPTIONS_LIST_ITEM}`);
 
-				const {index, index_to} = event.detail;
+				const {index, index_to} = e.detail;
 
 				this.getDataTable().dispatchEvent(CDataTable.EVENT_COLUMNS_SORT, { items, index, index_to });
 			});
@@ -140,8 +140,8 @@ class CDataTableOptionsPopupTableOptions extends CDataTableOptionsPopup {
 		input.checked = column.isVisible();
 		input.disabled = !column.isTogglable();
 		input.value = '1';
-		input.addEventListener('change', (event) => {
-			const visible = event.target.checked;
+		input.addEventListener('change', e => {
+			const visible = e.target.checked;
 
 			this.getDataTable().dispatchEvent(CDataTable.EVENT_COLUMN_TOGGLE, {column_index, visible});
 		});

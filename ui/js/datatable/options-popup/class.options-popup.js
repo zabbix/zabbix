@@ -53,8 +53,6 @@ class CDataTableOptionsPopup {
 	 */
 	#handle;
 
-	#offset_top = 0;
-
 	/**
 	 * @type {HTMLElement|null}
 	 */
@@ -66,6 +64,11 @@ class CDataTableOptionsPopup {
 	#template = null;
 
 	/**
+	 * @type {number}
+	 */
+	#offset_top = 0;
+
+	/**
 	 * @type {Object<string, any>}
 	 */
 	#fields = {};
@@ -74,6 +77,11 @@ class CDataTableOptionsPopup {
 	 * @type {Object<string, any>}
 	 */
 	#data = {};
+
+	/**
+	 * @type {boolean}
+	 */
+	#mouse_down_inside = false;
 
 	/**
 	 * @type {Object<string, function>}
@@ -229,8 +237,8 @@ class CDataTableOptionsPopup {
 		const column_index = this.#column.getColumnIndex();
 
 		if (this.#column.isDuplicate() || this.#column.isDuplicatable()) {
-			const duplicate_link = this.#addContextLink(t('Duplicate column'), event => {
-				event.preventDefault();
+			const duplicate_link = this.#addContextLink(t('Duplicate column'), e => {
+				e.preventDefault();
 
 				this.#datatable.dispatchEvent(CDataTable.EVENT_COLUMN_DUPLICATE, {column_index});
 			});
@@ -250,8 +258,8 @@ class CDataTableOptionsPopup {
 			form_input.setAttribute('maxlength', CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH.toString());
 			form_input.setAttribute('data-field-type', 'text-box');
 			form_input.value = this.#column.getName();
-			form_input.addEventListener('input', event => {
-				const name = event.target.value.substring(0, CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH);
+			form_input.addEventListener('input', e => {
+				const name = e.target.value.substring(0, CDataTableOptionsPopup.COLUMN_NAME_MAXLENGTH);
 
 				this.#datatable.dispatchEvent(CDataTable.EVENT_COLUMN_RENAME, {column_index, name});
 			});
@@ -263,8 +271,8 @@ class CDataTableOptionsPopup {
 			this.#element.prepend(form_label, form_field);
 
 			if (this.#column.isDuplicate()) {
-				const delete_link = this.#addContextLink(t('Delete column'), event => {
-					event.preventDefault();
+				const delete_link = this.#addContextLink(t('Delete column'), e => {
+					e.preventDefault();
 
 					this.#datatable.dispatchEvent(CDataTable.EVENT_COLUMN_DELETE, {column_index});
 				});
@@ -284,6 +292,7 @@ class CDataTableOptionsPopup {
 			this.#element.appendChild(popup_links);
 		}
 
+		document.addEventListener('mousedown', this.onMouseDown);
 		document.addEventListener('click', this.onClickOutside);
 		document.addEventListener('keydown', this.onKeyDown);
 
@@ -309,10 +318,13 @@ class CDataTableOptionsPopup {
 	}
 
 	onClose() {
+		document.removeEventListener('mousedown', this.onMouseDown);
 		document.removeEventListener('keydown', this.onKeyDown);
 		document.removeEventListener('click', this.onClickOutside);
 
 		this.#element.remove();
+
+		this.#mouse_down_inside = false;
 	}
 
 	onUpdate() {}
@@ -375,16 +387,20 @@ class CDataTableOptionsPopup {
 	/**
 	 * Callback for handling a click outside popup.
 	 *
-	 * @param {PointerEvent} event
+	 * @param {PointerEvent} e
 	 */
-	onClickOutside = event => {
+	onClickOutside = e => {
 		const elements = [this.#handle, this.#element];
 
-		if (!event.target.parentElement || event.target === this.#element) {
+		if (!e.target.parentElement || e.target === this.#element) {
 			return;
 		}
 
-		if (elements.includes(event.target) || elements.some(element => element.contains(event.target))) {
+		if (elements.includes(e.target) || elements.some(element => element.contains(e.target))) {
+			return;
+		}
+
+		if (this.#mouse_down_inside) {
 			return;
 		}
 
@@ -392,20 +408,24 @@ class CDataTableOptionsPopup {
 		this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 	}
 
+	onMouseDown = e => {
+		this.#mouse_down_inside = this.#element.contains(e.target);
+	}
+
 	/**
 	 * Callback for handling an "Escape" button.
 	 *
-	 * @param {KeyboardEvent} event
+	 * @param {KeyboardEvent} e
 	 */
-	onKeyDown = event => {
-		if (event.key === 'Enter') {
+	onKeyDown = e => {
+		if (e.key === 'Enter') {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE);
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			this.position();
 		}
 
-		if (event.key === 'Escape') {
+		if (e.key === 'Escape') {
 			this.dispatchEvent(CDataTableOptionsPopup.EVENT_RESET);
 		}
 	}

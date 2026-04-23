@@ -1885,7 +1885,7 @@ class CDataTable {
 				}
 
 				for (const data_cell of column.getDataCells()) {
-					data_cell.target.remove();
+					data_cell?.target.remove();
 				}
 
 				column.setDataCells([]);
