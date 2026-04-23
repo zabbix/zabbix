@@ -111,40 +111,31 @@
 		}
 
 		#displayPasswordChange(visible = true) {
-			const password1_element = document.getElementById('password1');
-			const password2_element = document.getElementById('password2');
-			const current_password_element = document.getElementById('current_password');
+			const password1 = document.getElementById('password1');
+			const password2 = document.getElementById('password2');
+			const current_password = document.getElementById('current_password');
 
-			if (password1_element === null && password2_element === null) {
+			if (password1 === null && password2 === null) {
 				return;
 			}
 
-			const password_elements_disabled_state = !visible;
-			const active_elements_display_state = (visible === true ? '' : 'none');
-			const inactive_elements_display_state = (visible === true ? 'none' : '');
-
-			password1_element.toggleAttribute('disabled', password_elements_disabled_state);
-			password2_element.toggleAttribute('disabled', password_elements_disabled_state);
-
-			if (current_password_element !== null) {
-				current_password_element.toggleAttribute('disabled', password_elements_disabled_state);
-			}
-
 			this.form_element.querySelectorAll('.password-change-active').forEach(element => {
-				element.style.display = active_elements_display_state;
+				element.style.display = visible === true ? '' : 'none';
 			});
 
 			this.form_element.querySelectorAll('.password-change-inactive').forEach(element => {
-				element.style.display = inactive_elements_display_state;
+				element.style.display = visible === true ? 'none' : '';
 			});
 
-			if (visible === true) {
-				const default_focus_element = current_password_element;
-				const fallback_focus_element = password1_element;
+			password1.toggleAttribute('disabled', !visible);
+			password2.toggleAttribute('disabled', !visible);
 
-				const focus_element = (default_focus_element !== null ? default_focus_element : fallback_focus_element);
+			if (current_password !== null) {
+				current_password.toggleAttribute('disabled', !visible);
 
-				focus_element.focus();
+				if (visible) {
+					current_password.focus();
+				}
 			}
 		}
 
