@@ -2460,6 +2460,7 @@ button {
         background-color: #1e1e1e; }
       .datatable .datatable-body .row.nested.nested-small {
         font-size: 11px; }
+      .datatable .datatable-body .row.row-selected .row-spacer,
       .datatable .datatable-body .row.row-selected .cell:not(.cell-bg) {
         background-color: #2f280a;
         border-bottom-color: rgba(31, 44, 51, 0.1); }

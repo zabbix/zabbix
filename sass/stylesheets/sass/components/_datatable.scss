@@ -304,9 +304,12 @@
 				}
 			}
 
-			&.row-selected .cell:not(.cell-bg) {
-				background-color: $lighter-yellow;
-				border-bottom-color: rgba(31, 44, 51, .1);
+			&.row-selected {
+				.row-spacer,
+				.cell:not(.cell-bg) {
+					background-color: $lighter-yellow;
+					border-bottom-color: rgba(31, 44, 51, .1);
+				}
 			}
 
 			.table-stats.table-stats-small {
