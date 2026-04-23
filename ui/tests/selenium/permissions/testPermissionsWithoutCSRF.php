@@ -809,12 +809,13 @@ class testPermissionsWithoutCSRF extends CWebTest {
 		// If form opens in the overlay dialog - open that dialog.
 		if (array_key_exists('overlay', $data)) {
 			$selectors = [
-				'create' => "//div[@class=\"header-controls\"]//button",
-				'create_host' => "//div[@class=\"header-controls\"]//button[@class=\"js-create-host\"]",
-				'update' => "//table[@class=\"list-table\"]//tr[1]/td[2]/a",
-				'trigger_update' => "//table[@class=\"list-table\"]//tr[1]/td[4]/a",
-				'item_update' => "//table[@class=\"list-table\"]//tr[1]/td[3]/a",
-				'problem' => '//table[@class="list-table"]//tr[1]//a[text()="Update"]',
+				'create' => '//div[@class="header-controls"]//button',
+				'create_host' => '//div[@class="header-controls"]//button[@class="js-create-host"]',
+				'update' => '//table[@class="list-table"]//tr[1]/td[2]/a|//div[contains(@class, "datatable-scrollable")]'.
+						'//div[@class="row"][1]/div[2]//a',
+				'trigger_update' => '//table[@class="list-table"]//tr[1]/td[4]/a',
+				'item_update' => '//table[@class="list-table"]//tr[1]/td[3]/a',
+				'problem' => '//div[contains(@class, "datatable-scrollable")]//div[@class="row"][1]//a[text()="Update"]',
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];
 

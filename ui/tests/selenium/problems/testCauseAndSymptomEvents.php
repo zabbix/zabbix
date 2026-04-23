@@ -15,6 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CWebTest.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 
 /**
  * @backup !profiles, !problem, !problem_tag, !service_problem, !event_symptom
@@ -26,13 +27,13 @@ require_once __DIR__.'/../../include/CWebTest.php';
 class testCauseAndSymptomEvents extends CWebTest {
 
 	/**
-	 * Attach TableBehavior and MessageBehavior to the test.
+	 * Attach DatatableBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			CTableBehavior::class,
+			CDatatableBehavior::class,
 			CMessageBehavior::class
 		];
 	}
@@ -181,10 +182,10 @@ class testCauseAndSymptomEvents extends CWebTest {
 			['Problem' => 'Problem trap>150 [Cause]'],
 			['Problem' => 'Problem trap>10 [Symptom]']
 		];
-		$this->assertTableData($result);
+		$this->assertDatatableData($result);
 
 		// Check collapsed symptom count.
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$cause = $table->findRow('Problem', 'Problem trap>150 [Cause]');
 		$this->assertTrue($cause->query('class:entity-count')->one()->isVisible());
 		$this->assertEquals(1, $cause->query('class:entity-count')->one()->getText());
@@ -335,7 +336,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&groupids[]='.self::$groupids['Group for Cause and Symptom check']);
 
 		if (array_key_exists('linked_events', $data)) {
-			$this->query('class:list-table')->asTable()->waitUntilPresent()->one()->query(self::EXPAND_XPATH)->one()->click();
+			$this->getDatatable()->query(self::EXPAND_XPATH)->one()->click();
 		}
 
 		if (array_key_exists('selected_events', $data)) {
@@ -427,7 +428,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom update']
 		);
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		$count = count($data['problems']);
 
 		if (array_key_exists('expand', $data)) {
@@ -435,7 +436,7 @@ class testCauseAndSymptomEvents extends CWebTest {
 		}
 
 		if ($count > 1) {
-			$this->selectTableRows(CTestArrayHelper::get($data, 'select_all', false) ? [] : $data['problems'], 'Problem');
+			$this->selectDatatableRows(CTestArrayHelper::get($data, 'select_all', false) ? [] : $data['problems'], 'Problem');
 			$this->query('button:Mass update')->waitUntilClickable()->one()->click();
 		}
 		else {
@@ -609,11 +610,11 @@ class testCauseAndSymptomEvents extends CWebTest {
 		$this->page->open('zabbix.php?action=problem.view&hostids[]='.
 				self::$hostsids['hostids']['Host for Cause and Symptom check']
 		);
-		$table = $this->getTable();
+		$table = $this->getDatatable();
 		CFilterElement::find()->one()->getForm()->fill($data['fields'])->submit();
 		$table->waitUntilReloaded();
 		$this->assertEquals($data['headers'], $table->getHeadersText());
-		$this->assertTableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Problem');
+		$this->assertDatatableDataColumn(CTestArrayHelper::get($data, 'result', []), 'Problem');
 
 		if (array_key_exists('result', $data)) {
 			// Check 'cause and symptom' icons when trigger(s) state is changed.

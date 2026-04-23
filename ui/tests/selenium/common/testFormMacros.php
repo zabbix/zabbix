@@ -536,7 +536,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 		if ($update) {
 			if ($host_type === 'host') {
 				$this->page->login()->open('zabbix.php?action=host.view&filter_selected=0&filter_reset=1')->waitUntilReady();
-				$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+
+				$column = $this->getNameColumn($name);
 				$column->query('link', $name)->asPopupButton()->one()->select('Host');
 				$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 			}
@@ -646,7 +647,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 	protected function checkRemoveAll($name, $host_type, $is_prototype = false, $lld_id = null) {
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -925,8 +927,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1063,8 +1064,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 			$lld_id = null, $name = null) {
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1224,8 +1224,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($host_type === 'host') {
 			$this->page->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 		}
 		else if ($host_type === 'template') {
@@ -1289,8 +1288,8 @@ abstract class testFormMacros extends CLegacyWebTest {
 
 		if ($host_type === 'host') {
 			$this->page->login()->open('zabbix.php?action=host.view')->waitUntilReady();
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)
-					->getColumn('Name');
+
+			$column = $this->getNameColumn($name);
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 		}
@@ -1831,8 +1830,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 		$this->page->open($url)->waitUntilReady();
 
 		if ($source === 'hosts') {
-			$column = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilReady()
-					->findRow('Name', $name, true)->getColumn('Name');
+			$column = $this->getDatatable()->findRow('Name', $name, true)->getColumn('Name');
 			$column->query('link', $name)->asPopupButton()->one()->select('Host');
 			$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible()->selectTab('Macros');
 		}
@@ -2600,5 +2598,21 @@ abstract class testFormMacros extends CLegacyWebTest {
 				? $name_column->query('xpath://span[@class="green"]')->one()->getText()
 				: $table->findRow('Name', $name)->getColumn('Key')->getText()
 		));
+	}
+
+	/**
+	 * Return "Name" column in the corresponding list table or datatable.
+	 *
+	 * @param string $name   value of "Name" column in the required row.
+	 *
+	 * @return CElement
+	 */
+	protected function getNameColumn($name) {
+		if ($this->query('class:datatable')->one(false)->isValid()) {
+			return $this->getDatatable()->findRow('Name', $name)->getColumn('Name');
+		}
+		else {
+			return $this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $name)->getColumn('Name');
+		}
 	}
 }
