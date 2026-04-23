@@ -279,22 +279,34 @@ window.itemtestedit_view_popup = new class {
 
 	#getValue() {
 		this.#removePopupMessages();
-		const fields = this.#getFormFields(true);
 		const get_value_button = this.#form_element.querySelector('.js-get-value-submit');
+		const fields = this.#getFormFields(true);
 
 		if (get_value_button) {
 			get_value_button.classList.add('is-loading');
 		}
 
 		this.#setLoading();
+		const field_names = ['item_type', 'test_type', 'test_with', 'proxyid',
+			'interface[address]', 'interface[port]', 'interface[details][version]',
+			'interface[details][community]', 'interface[details][max_repetitions]', 'interface[details][securityname]',
+			'interface[details][securitylevel]', 'interface[details][authprotocol]',
+			'interface[details][authpassphrase]', 'interface[details][privprotocol]',
+			'interface[details][privpassphrase]'
+		];
 
-		// TODO: just specific fields
+		field_names.forEach(field_name => {
+			const field = this.#form.findFieldByName(field_name);
 
-		// this.#form.validateFieldsForAction(fields, this.#rules_get_value)
-		this.#form.validateSubmit(fields)
+			if (field) {
+				field.setChanged();
+			}
+		});
+
+		this.#form.validateFieldsForAction(field_names, this.#rules_get_value)
 			.then((result) => {
 				if (!result) {
-					this.#overlay.unsetLoading();
+					this.#unsetLoading();
 					return;
 				}
 

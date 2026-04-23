@@ -53,7 +53,42 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 							'max_repetitions' => ['db interface_snmp.max_repetitions', 'required',
 								'min' => 1, 'max' => ZBX_MAX_INT32,
 								'when' => ['version', 'in' => [SNMP_V2C, SNMP_V3]]
-							]
+							],
+							'contextname' => ['db interface_snmp.contextname', 'when' => ['version', 'in' => [SNMP_V3]]],
+							'securityname' => ['db interface_snmp.securityname', 'when' => ['version', 'in' => [SNMP_V3]]],
+							'securitylevel' => [
+								'db interface_snmp.securitylevel', 'required',
+								'in' => [ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+									ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+								],
+								'when' => ['version', 'in' => [SNMP_V3]]
+							],
+							'authprotocol' => [
+								'db interface_snmp.authprotocol', 'required',
+								'in' => [ITEM_SNMPV3_AUTHPROTOCOL_MD5, ITEM_SNMPV3_AUTHPROTOCOL_SHA1,
+									ITEM_SNMPV3_AUTHPROTOCOL_SHA224, ITEM_SNMPV3_AUTHPROTOCOL_SHA256,
+									ITEM_SNMPV3_AUTHPROTOCOL_SHA384, ITEM_SNMPV3_AUTHPROTOCOL_SHA512
+								],
+								'when' => ['securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV,
+									ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV
+								]]
+							],
+							'authpassphrase' => ['db interface_snmp.authpassphrase', 'when' => [
+								'securitylevel',
+								'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHNOPRIV, ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
+							]],
+							'privprotocol' => [
+								'db interface_snmp.privprotocol', 'required',
+								'in' => [ITEM_SNMPV3_PRIVPROTOCOL_DES, ITEM_SNMPV3_PRIVPROTOCOL_AES128,
+									ITEM_SNMPV3_PRIVPROTOCOL_AES192, ITEM_SNMPV3_PRIVPROTOCOL_AES256,
+									ITEM_SNMPV3_PRIVPROTOCOL_AES192C, ITEM_SNMPV3_PRIVPROTOCOL_AES256C
+								],
+								'when' => ['securitylevel', 'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]]
+							],
+							'privpassphrase' => ['db interface_snmp.privpassphrase', 'when' => [
+								'securitylevel',
+								'in' => [ITEM_SNMPV3_SECURITYLEVEL_AUTHPRIV]
+							]]
 						],
 						'when' => ['../item_type', 'in' => [ITEM_TYPE_SNMP]]
 					],
