@@ -1082,7 +1082,7 @@ class testPageMonitoringHosts extends CWebTest {
 		$hosts_names = ['1_Host_to_check_Monitoring_Overview', 'ЗАББИКС Сервер', 'Host for tag permissions', 'Empty host'];
 		foreach ($hosts_names as $host) {
 			$this->page->open('zabbix.php?action=host.view&name='.$host)->waitUntilReady();
-			$table = $this->query('class:datatable')->waitUntilReady()->asDatatable()->one();
+			$table = $this->query('class:datatable')->asDatatable()->one()->waitUntilReady();
 
 			// Get number of problems displayed on icon and it severity level.
 			if ($host !== 'Empty host') {
@@ -1156,7 +1156,7 @@ class testPageMonitoringHosts extends CWebTest {
 	 * @param string $page_header	Page header name
 	 */
 	private function selectLink($host_name, $column, $page_header) {
-		$this->query('class:datatable')->waitUntilReady()->asDatatable()->one()->findRow('Name', $host_name)
+		$this->query('class:datatable')->one()->asDatatable()->waitUntilReady()->findRow('Name', $host_name)
 				->query('link', $column)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		$this->page->waitUntilReady();
 		if ($page_header !== null) {

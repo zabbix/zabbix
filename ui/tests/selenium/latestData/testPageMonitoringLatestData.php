@@ -812,7 +812,7 @@ class testPageMonitoringLatestData extends CWebTest {
 				 */
 				for ($i = 1; $i < 2; $i++) {
 					$this->assertFalse($this->query('link', $host['host'])->one(false)->isValid());
-					$this->query('class:arrow-right')->waitUntilClickable()->one()->click();
+					$this->query('class:arrow-right')->waitUntilClickable()->one()->scrollIntoView(50)->click();
 					$this->page->waitUntilReady();
 				}
 
@@ -946,6 +946,14 @@ class testPageMonitoringLatestData extends CWebTest {
 	 * Maintenance icon hintbox.
 	 */
 	public function testPageMonitoringLatestData_checkMaintenanceIcon() {
+		// Change datatable layout to make sure that the maintenance icon is visible.
+		$layout = '{"columns":[{"id":"host","resized":true,"width":"249px"},{"id":"name","resized":true,"width":"239px"}'.
+				',{"id":"interval"},{"id":"history"},{"id":"trends"},{"id":"type"},{"id":"last_check","width":"79px"},'.
+				'{"id":"last_value","resized":true,"width":"142px"},{"id":"change","width":"62px"},'.
+				'{"id":"tags","resized":true,"width":"194px"},{"id":"tagvalue"},{"id":"actions","width":"60px"},'.
+				'{"id":"info","width":"83px"}],"options":{}}';
+		$this->updateDatatableLayout($layout, 'web.monitoring.latest.datatable');
+
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
 		$form->fill(['Hosts' => self::MAINTENANCE_HOSTNAME]);
