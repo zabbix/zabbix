@@ -178,11 +178,13 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	char				*payload = NULL, *error_curl = NULL, *bek_raw = NULL, errbuf[CURL_ERROR_SIZE],
 					device_id[ZBX_UUID_LEN], met[ZBX_ENROLL_TOKE_LEN],
 					enroll_url[ZBX_ENROLL_URL_LEN], code[ZBX_ERROR_CODE_LEN],
-					message[ZBX_MESSAGE_LEN], error_data[ZBX_MESSAGE_LEN], *uuid7id;
+					message[ZBX_MESSAGE_LEN], error_data[ZBX_MESSAGE_LEN], *uuid7id = NULL;
 	int				ret = FAIL;
 	size_t				bek_len;
 	zbx_config_t			cfg;
 	const char			*serverid;
+
+	zbx_json_init(&request, 512);
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
@@ -220,8 +222,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
-
-	zbx_json_init(&request, 512);
 
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "method", "device.init", ZBX_JSON_TYPE_STRING);
@@ -393,6 +393,7 @@ out:
 	zbx_free(body.data);
 	zbx_free(response_header.data);
 	zbx_free(bek_raw);
+	zbx_free(uuid7id);
 
 	return ret;
 
@@ -406,17 +407,16 @@ out:
  *                                                                            *
  * Purpose: processes device.init request                                     *
  *                                                                            *
- * Parameters: sock                       - [IN] connection socket            *
- *             jp                         - [IN] parsed request JSON          *
- *             config_comms               - [IN] communication configuration  *
- *             config_tls                 - [IN] TLS configuration            *
- *             config_frontend_allowed_ip - [IN] allowed frontend IP list     *
- *             config_adapter_url         - [IN] bridge adapter URL           *
- *             config_tls_ca_file         - [IN] TLS CA certificate file      *
- *             config_tls_cert_file       - [IN] TLS client certificate file  *
- *             config_tls_key_file        - [IN] TLS client private key file  *
- *             config_connect_to          - [IN] optional adapter connect-to  *
- *                                              override                      *
+ * Parameters: sock                       - [IN]                              *
+ *             jp                         - [IN]                              *
+ *             config_comms               - [IN]                              *
+ *             config_tls                 - [IN]                              *
+ *             config_frontend_allowed_ip - [IN]                              *
+ *             config_adapter_url         - [IN]                              *
+ *             config_tls_ca_file         - [IN]                              *
+ *             config_tls_cert_file       - [IN]                              *
+ *             config_tls_key_file        - [IN]                              *
+ *             config_connect_to          - [IN]                              *
  *                                                                            *
  * Comments: validates caller permissions for requested target user and       *
  *           forwards request to bridge adapter                               *
@@ -436,6 +436,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_user_init(&user);
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
 		goto out;
@@ -495,6 +497,8 @@ void	zbx_trapper_device_init(zbx_socket_t *sock, const struct zbx_json_parse *jp
 
 	zbx_json_free(&json);
 out:
+	zbx_user_free(&user);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
@@ -526,10 +530,12 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	struct zbx_json_parse		jp_body, jp_result;
 	char				*payload = NULL, *error_curl = NULL, errbuf[CURL_ERROR_SIZE],
 					device_id[ZBX_UUID_LEN], code[ZBX_ERROR_CODE_LEN], message[ZBX_MESSAGE_LEN],
-					error_data[ZBX_MESSAGE_LEN], *uuid7id;
+					error_data[ZBX_MESSAGE_LEN], *uuid7id = NULL;
 	int				ret = FAIL;
 	zbx_config_t			cfg;
 	const char			*serverid;
+
+	zbx_json_init(&request, 512);
 
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
@@ -567,8 +573,6 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
-
-	zbx_json_init(&request, 512);
 
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "method", "device.offboard", ZBX_JSON_TYPE_STRING);
@@ -705,6 +709,7 @@ out:
 	zbx_free(error_curl);
 	zbx_free(body.data);
 	zbx_free(response_header.data);
+	zbx_free(uuid7id);
 
 	return ret;
 #endif
@@ -714,17 +719,16 @@ out:
  *                                                                            *
  * Purpose: processes device.offboard request                                 *
  *                                                                            *
- * Parameters: sock                       - [IN] connection socket            *
- *             jp                         - [IN] parsed request JSON          *
- *             config_comms               - [IN] communication configuration  *
- *             config_tls                 - [IN] TLS configuration            *
- *             config_frontend_allowed_ip - [IN] allowed frontend IP list     *
- *             config_adapter_url         - [IN] bridge adapter URL           *
- *             config_tls_ca_file         - [IN] TLS CA certificate file      *
- *             config_tls_cert_file       - [IN] TLS client certificate file  *
- *             config_tls_key_file        - [IN] TLS client private key file  *
- *             config_connect_to          - [IN] optional adapter connect-to  *
- *                                              override                      *
+ * Parameters: sock                       - [IN]                              *
+ *             jp                         - [IN]                              *
+ *             config_comms               - [IN]                              *
+ *             config_tls                 - [IN]                              *
+ *             config_frontend_allowed_ip - [IN]                              *
+ *             config_adapter_url         - [IN]                              *
+ *             config_tls_ca_file         - [IN]                              *
+ *             config_tls_cert_file       - [IN]                              *
+ *             config_tls_key_file        - [IN]                              *
+ *             config_connect_to          - [IN]                              *
  *                                                                            *
  * Comments: resolves device owner, validates caller permissions and forwards *
  *           request to bridge adapter                                        *
@@ -743,6 +747,8 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 	char			deviceid[ZBX_UUID_LEN], *error = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_user_init(&user);
 
 	if (SUCCEED != zbx_check_frontend_conn_accept(sock, config_tls, config_frontend_allowed_ip))
 		goto out;
@@ -809,5 +815,7 @@ void	zbx_trapper_device_offboard(zbx_socket_t *sock, const struct zbx_json_parse
 
 	zbx_json_free(&json);
 out:
+	zbx_user_free(&user);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
