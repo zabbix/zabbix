@@ -212,7 +212,8 @@ class CDatatableBehavior extends CTableBehavior {
 			$button_selector = ($column === 'Name')
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$table->getHeaderByText($column)->query($button_selector)->one()->click();
+			$button = $table->getHeaderByText($column)->query($button_selector)->one();
+			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($select_data as $field => $value) {
@@ -221,8 +222,9 @@ class CDatatableBehavior extends CTableBehavior {
 				$popup_dialog->query('id', $for)->one()->detect()->fill($value);
 			}
 
-			// Click on any column resizer to close the popup.
-			$table->query('class:cell-header-resizer')->one()->click();
+			// Click on button again to close the popup.
+			$button->click();
+			$popup_dialog->waitUntilNotVisible();
 		}
 	}
 
@@ -233,7 +235,8 @@ class CDatatableBehavior extends CTableBehavior {
 			$button_selector = ($column === 'Name')
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$table->getHeaderByText($column)->query($button_selector)->one()->click();
+			$button = $table->getHeaderByText($column)->query($button_selector)->one();
+			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
 			foreach ($column_filter as $field => $parameters) {
@@ -260,8 +263,9 @@ class CDatatableBehavior extends CTableBehavior {
 				}
 			}
 
-			// Click on any column resizer to close the popup.
-			$table->query('class:cell-header-resizer')->one()->click();
+			// Click on button again to close the popup.
+			$button->click();
+			$popup_dialog->waitUntilNotVisible();
 		}
 	}
 
