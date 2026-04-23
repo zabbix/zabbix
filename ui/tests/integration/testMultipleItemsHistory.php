@@ -336,13 +336,14 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 			$values = [];
 			$idx = 0;
+			$base_ns = (int)(microtime(true) * 1e9) % 1000000000;
 			foreach ($items_by_key as $key => $itemid) {
 				$values[] = [
 					'host' => self::HOSTNAME,
 					'key' => $key,
 					'value' => (string)($idx + 1),
 					'clock' => $tm,
-					'ns' => (int)(microtime(true) * 1e9) % 1000000000
+					'ns' => ($base_ns + $idx) % 1000000000
 				];
 				$idx++;
 			}
