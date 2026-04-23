@@ -1,5 +1,6 @@
 build
 vendor
+composer.lock
 *.swp
 *.swo
 .idea
