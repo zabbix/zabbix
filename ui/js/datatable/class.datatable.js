@@ -1445,7 +1445,7 @@ class CDataTable {
 		const {column, handle} = e.detail;
 
 		if (this.#options_popup?.isOpen(handle)) {
-			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
+			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			return;
 		}
@@ -1520,7 +1520,7 @@ class CDataTable {
 		}
 
 		if (this.#options_popup?.isOpen(handle)) {
-			this.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
+			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			return;
 		}
