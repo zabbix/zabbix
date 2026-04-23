@@ -46,9 +46,7 @@ class CControllerBannerGet extends CController {
 			if ($check_data['nextcheck'] > $now) {
 				$output += [
 					'delay' => $check_data['nextcheck'] - $now + mt_rand(1, SEC_PER_MIN),
-					'banners' => $check_data['banners'] ?? [],
-					'storage_idx' => 'web.banner.dismissed_ids',
-					'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true)
+					'banners' => $check_data['banners'] ?? []
 				];
 			}
 			else {
@@ -62,6 +60,11 @@ class CControllerBannerGet extends CController {
 				CSettings::updatePrivate(['banner_data' => $check_data]);
 			}
 		}
+
+		$output += [
+			'storage_idx' => 'web.banner.dismissed_ids',
+			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true),
+		];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

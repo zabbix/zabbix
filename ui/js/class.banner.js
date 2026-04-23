@@ -164,7 +164,10 @@ class CBanner {
 				const from = new Date(banner.from);
 				const to = new Date(banner.to);
 
-				return !this.#dismissed_banner_ids.has(banner.id) && from <= now && now <= to;
+				return !this.#dismissed_banner_ids.has(banner.id)
+					&& [this.#language, CBanner.CONTENT_LANG_ALL].some(key => key in banner.content)
+					&& from <= now
+					&& now <= to;
 			})
 			.sort((a, b) => a.id - b.id)
 			.at(0);
