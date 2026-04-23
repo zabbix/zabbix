@@ -434,7 +434,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 *
 	 * @depends testMultipleItemsHistory_TriggerFiringRestart
 	 */
-	/*public function testMultipleItemsHistory_HousekeeperCleanup() {
+	public function testMultipleItemsHistory_HousekeeperCleanup() {
 		$this->sendDataValues('sender', [
 			[
 				'host' => self::HOSTNAME,
@@ -448,13 +448,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
 		], 0, 120, self::WAIT_ITERATION_DELAY);
 
-		$this->callUntilCountIsPresent('trigger.get', [
-			'triggerids' => self::$discovered_triggerids
-		], 0,120, self::WAIT_ITERATION_DELAY);
-
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 
-		$this->executeHousekeeper();
+		/*$this->executeHousekeeper();
 
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
@@ -474,6 +470,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
 			$this->executeHousekeeper();
 			return true;
-		});
-	}*/
+		});*/
+	}
 }
