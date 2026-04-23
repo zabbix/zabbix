@@ -425,7 +425,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 *
 	 * @depends testMultipleItemsHistory_TriggerFiringRestart
 	 */
-	/*public function testMultipleItemsHistory_HousekeeperCleanup() {
+	public function testMultipleItemsHistory_HousekeeperCleanup() {
 		$this->sendDataValues('sender', [
 			[
 				'host' => self::HOSTNAME,
@@ -462,7 +462,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		// 	$this->executeHousekeeper();
 		// 	return true;
 		// });
-	}*/
+	}
 
 	/**
 	 * Call clearData() and verify that the host, all discovered items and trigger events are gone.
