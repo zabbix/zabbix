@@ -22,13 +22,12 @@
 $this->includeJsFile('correlation.list.js.php');
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Event correlation'))
+	->setTitle(_('Event processing'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
 	->setControls(
-		(new CTag('nav', true,
-			(new CList())->addItem(
-				(new CSimpleButton(_('Create event correlation')))->setId('js-create')
-			)
+		(new CTag('nav', true, (new CList())
+			->addItem((new CSimpleButton(_('Create complex event processing')))->setId('js-create-cep'))
+			->addItem((new CSimpleButton(_('Create event correlation')))->setId('js-create'))
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
@@ -52,9 +51,19 @@ $html_page = (new CHtmlPage())
 					new CLabel(_('Status')),
 					new CFormField(
 						(new CRadioButtonList('filter_status', (int) $data['filter']['status']))
-							->addValue(_('Any'), -1)
+							->addValue(_('All'), -1)
 							->addValue(_('Enabled'), ACTION_STATUS_ENABLED)
 							->addValue(_('Disabled'), ACTION_STATUS_DISABLED)
+							->setModern()
+					)
+				])
+				->addItem([
+					new CLabel(_('Type')),
+					new CFormField(
+						(new CRadioButtonList('filter_type', (int) $data['filter']['type']))
+							->addValue(_('All'), ZBX_CEP_FILTER_SHOW_ALL)
+							->addValue(_('Complex event processing'), ZBX_CEP_FILTER_SHOW_CEP)
+							->addValue(_('Event correlation'), ZBX_CEP_FILTER_SHOW_LEGACY)
 							->setModern()
 					)
 				])

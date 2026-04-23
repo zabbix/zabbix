@@ -442,7 +442,7 @@ class CRoleHelper {
 				}
 
 				if ($user_type === USER_TYPE_SUPER_ADMIN) {
-					$labels += [self::UI_CONFIGURATION_EVENT_CORRELATION => _('Event correlation')];
+					$labels += [self::UI_CONFIGURATION_EVENT_CORRELATION => _('Event processing')];
 				}
 
 				if ($user_type === USER_TYPE_ZABBIX_ADMIN || $user_type === USER_TYPE_SUPER_ADMIN) {

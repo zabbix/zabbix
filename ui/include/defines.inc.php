@@ -2533,6 +2533,10 @@ define('ZBX_CEP_GROUP_BY_HOSTGROUP',	0x1);
 define('ZBX_CEP_GROUP_BY_HOST',			0x2);
 define('ZBX_CEP_GROUP_BY_TAG',			0x4);
 
+define('ZBX_CEP_FILTER_SHOW_ALL', 0);
+define('ZBX_CEP_FILTER_SHOW_LEGACY', 1);
+define('ZBX_CEP_FILTER_SHOW_CEP', 2);
+
 // init $_REQUEST
 ini_set('variables_order', 'GP');
 $_REQUEST = $_POST + $_GET;

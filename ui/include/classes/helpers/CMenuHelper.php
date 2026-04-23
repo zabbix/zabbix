@@ -193,7 +193,7 @@ class CMenuHelper {
 				? (new CMenuItem(_('Maintenance')))->setAction('maintenance.list')
 				: null,
 			CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION)
-				? (new CMenuItem(_('Event correlation')))
+				? (new CMenuItem(_('Event processing')))
 					->setAction('correlation.list')
 					->setAliases(['correlation.edit'])
 				: null,

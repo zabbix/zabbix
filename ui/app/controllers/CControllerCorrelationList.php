@@ -28,6 +28,7 @@ class CControllerCorrelationList extends CController {
 			'filter_rst' =>		'in 1',
 			'filter_name' =>	'string',
 			'filter_status' =>	'in -1,'.ZBX_CORRELATION_ENABLED.','.ZBX_CORRELATION_DISABLED,
+			'filter_type' =>	'in '.ZBX_CEP_FILTER_SHOW_ALL.','.ZBX_CEP_FILTER_SHOW_CEP.','.ZBX_CEP_FILTER_SHOW_LEGACY,
 			'page' =>			'ge 1'
 		];
 
@@ -53,16 +54,19 @@ class CControllerCorrelationList extends CController {
 		// filter
 		if ($this->hasInput('filter_set')) {
 			CProfile::update('web.correlation.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.correlation.filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.correlation.filter_status', $this->getInput('filter_status', ZBX_CEP_FILTER_SHOW_ALL), PROFILE_TYPE_INT);
+			CProfile::update('web.correlation.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
 			CProfile::delete('web.correlation.filter_name');
 			CProfile::delete('web.correlation.filter_status');
+			CProfile::delete('web.correlation.filter_type');
 		}
 
 		$filter = [
 			'name' => CProfile::get('web.correlation.filter_name', ''),
-			'status' => CProfile::get('web.correlation.filter_status', -1)
+			'status' => CProfile::get('web.correlation.filter_status', -1),
+			'type' => CProfile::get('web.correlation.filter_type', ZBX_CEP_FILTER_SHOW_ALL)
 		];
 
 		$data = [
@@ -118,7 +122,7 @@ class CControllerCorrelationList extends CController {
 		}
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Event correlation rules'));
+		$response->setTitle(_('Configuration of event processing rules'));
 		$this->setResponse($response);
 	}
 }
