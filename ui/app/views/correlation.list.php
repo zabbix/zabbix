@@ -84,56 +84,119 @@ $table = (new CTableInfo())
 				->onClick("checkAll('".$form->getName()."', 'all_items', 'correlationids');")
 		))->addClass(ZBX_STYLE_CELL_WIDTH),
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $url),
+		_('Type'),
 		_('Conditions'),
+		_('Time window processing'),
 		_('Operations'),
+		_('Stop after this rule'),
+		make_sorting_header(_('Sort order'), 'sortorder', $data['sort'], $data['sortorder'], $url),
 		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $url)
 	])
 	->setPageNavigation($data['paging']);
 
 foreach ($data['correlations'] as $correlation) {
+	$is_legacy = array_key_exists('correlationid', $correlation);
 	$conditions = [];
 	$operations = [];
 
 	foreach ($correlation['filter']['conditions'] as $condition) {
-		if (!array_key_exists('operator', $condition)) {
-			$condition['operator'] = CONDITION_OPERATOR_EQUAL;
-		}
+		if ($is_legacy) {
+			if (!array_key_exists('operator', $condition)) {
+				$condition['operator'] = CONDITION_OPERATOR_EQUAL;
+			}
 
-		$conditions[] = CCorrelationHelper::getConditionDescription($condition, $data['group_names']);
-		$conditions[] = BR();
+			$conditions[] = CCorrelationHelper::getConditionDescription($condition, $data['group_names']);
+			$conditions[] = BR();
+		}
+		else {
+			$conditions[] = CCepRuleHelper::getConditionDescription($condition);
+			$conditions[] = BR();
+		}
 	}
 
 	CArrayHelper::sort($correlation['operations'], ['type']);
 
 	foreach ($correlation['operations'] as $operation) {
-		$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
-		$operations[] = BR();
+		if ($is_legacy) {
+			$operations[] = CCorrelationHelper::getOperationTypes()[$operation['type']];
+			$operations[] = BR();
+			continue;
+		}
+		else {
+			$operations[] = CCepRuleHelper::getOperationDescription($operation);
+			$operations[] = BR();
+		}
 	}
 
-	$status = ($correlation['status'] == ZBX_CORRELATION_ENABLED)
-		? (new CLink(_('Enabled')))
+	$make_stop_toggle_button = function (array $correlation): CLink {
+		if ($correlation['stop'] == ZBX_CEP_EXECUTION_CONTINUE) {
+			return (new CLink(_('Enabled')))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->addClass('js-disable-stop')
+				->setAttribute('data-cepruleid', (int) $correlation['cep_ruleid']);
+		}
+
+		return (new CLink(_('Disabled')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(ZBX_STYLE_GREEN)
-			->addClass('js-disable')
-			->setAttribute('data-correlationid', (int) $correlation['correlationid'])
-		: (new CLink(_('Disabled')))
+			->addClass(ZBX_STYLE_RED)
+			->addClass('js-enable-stop')
+			->setAttribute('data-cepruleid', (int) $correlation['cep_ruleid']);
+	};
+
+	$make_status_toggle_button = function (array $ceprule, bool $is_legacy): CLink {
+		if ($is_legacy) {
+			return ($ceprule['status'] == ZBX_CORRELATION_ENABLED)
+				? (new CLink(_('Enabled')))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_GREEN)
+					->addClass('js-disable')
+					->setAttribute('data-correlationid', (int) $ceprule['correlationid'])
+				: (new CLink(_('Disabled')))
+					->addClass(ZBX_STYLE_LINK_ACTION)
+					->addClass(ZBX_STYLE_RED)
+					->addClass('js-enable')
+					->setAttribute('data-correlationid', (int) $ceprule['correlationid']);
+		}
+
+		if ($ceprule['status'] == ZBX_CEP_STATUS_ENABLED) {
+			return (new CLink(_('Enabled')))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(ZBX_STYLE_GREEN)
+				->addClass('js-disable')
+				->setAttribute('data-cepruleid', (int) $ceprule['cep_ruleid']);
+		}
+
+		return (new CLink(_('Disabled')))
 			->addClass(ZBX_STYLE_LINK_ACTION)
 			->addClass(ZBX_STYLE_RED)
 			->addClass('js-enable')
-			->setAttribute('data-correlationid', (int) $correlation['correlationid']);
-
-	$correlation_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'popup')
-		->setArgument('popup', 'correlation.edit')
-		->setArgument('correlationid', $correlation['correlationid'])
-		->getUrl();
+			->setAttribute('data-cepruleid', (int) $ceprule['cep_ruleid']);
+	};
 
 	$table->addRow([
-		new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid']),
-		new CLink($correlation['name'], $correlation_url),
+		$is_legacy
+			? new CCheckBox('correlationids['.$correlation['correlationid'].']', $correlation['correlationid'])
+			: new CCheckBox('cepruleids['.$correlation['cep_ruleid'].']', $correlation['cep_ruleid']),
+		$is_legacy
+			? new CLink($correlation['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'correlation.edit')
+				->setArgument('correlationid', $correlation['correlationid'])
+				->getUrl()
+			)
+			: new CLink($correlation['name'], (new CUrl('zabbix.php'))
+				->setArgument('action', 'popup')
+				->setArgument('popup', 'ceprule.edit')
+				->setArgument('cep_ruleid', $correlation['cep_ruleid'])
+				->getUrl()),
+		$is_legacy ? _('Event correlation') : _('Complex event processing'),
 		$conditions,
+		$is_legacy ? '' : CCepRuleHelper::getWindowLabelString($correlation),
 		$operations,
-		$status
+		$is_legacy ? '' : $make_stop_toggle_button($correlation),
+		$is_legacy ? '' : $correlation['sortorder'],
+		$make_status_toggle_button($correlation, $is_legacy)
 	]);
 }
 

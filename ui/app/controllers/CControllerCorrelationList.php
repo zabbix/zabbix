@@ -22,7 +22,7 @@ class CControllerCorrelationList extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'sort' =>			'in name,status',
+			'sort' =>			'in name,status,sortorder',
 			'sortorder' =>		'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'filter_set' =>		'in 1',
 			'filter_rst' =>		'in 1',
@@ -77,20 +77,8 @@ class CControllerCorrelationList extends CController {
 			'active_tab' => CProfile::get('web.correlation.filter.active', 1)
 		];
 
-		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
-		$data['correlations'] = API::Correlation()->get([
-			'output' => ['correlationid', 'name', 'description', 'status'],
-			'selectFilter' => ['conditions'],
-			'selectOperations' => ['type'],
-			'search' => [
-				'name' => ($filter['name'] === '') ? null : $filter['name']
-			],
-			'filter' => [
-				'status' => ($filter['status'] == -1) ? null : $filter['status']
-			],
-			'editable' => true,
-			'limit' => $limit
-		]);
+		$data['correlations'] = self::fetchCepRules($filter);
+		$data['group_names'] = self::fetchGroupNames($data['correlations']);
 
 		CArrayHelper::sort($data['correlations'], [['field' => $sort_field, 'order' => $sort_order]]);
 
@@ -101,12 +89,70 @@ class CControllerCorrelationList extends CController {
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
 
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Configuration of event processing rules'));
+		$this->setResponse($response);
+	}
+
+	protected static function fetchCepRules(array $filter): array {
+		$limit = CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1;
+
+		$result_cep = [];
+		$result_legacy = [];
+
+		if ($filter['type'] == ZBX_CEP_FILTER_SHOW_ALL || $filter['type'] == ZBX_CEP_FILTER_SHOW_LEGACY) {
+			$result_legacy = API::Correlation()->get([
+				'output' => ['correlationid', 'name', 'description', 'status'],
+				'selectFilter' => ['conditions'],
+				'selectOperations' => ['type'],
+				'search' => [
+					'name' => ($filter['name'] === '') ? null : $filter['name']
+				],
+				'filter' => [
+					'status' => ($filter['status'] == -1) ? null : $filter['status']
+				],
+				'editable' => true,
+				'limit' => $limit
+			]);
+		}
+
+		if ($filter['type'] == ZBX_CEP_FILTER_SHOW_ALL || $filter['type'] == ZBX_CEP_FILTER_SHOW_CEP) {
+			$result_cep = API::CepRule()->get([
+				'output' => 'extend',
+				'selectFilter' => 'extend',
+				'selectOperations' => 'extend',
+				'selectWindow' => 'extend',
+				'search' => [
+					'name' => ($filter['name'] === '') ? null : $filter['name']
+				],
+				'filter' => [
+					'status' => ($filter['status'] == -1) ? null : $filter['status']
+				],
+				'limit' => $limit
+			]);
+		}
+
+		return array_map(function(array $record) {
+			if (array_key_exists('filter', $record)) {
+				$record['filter'] += [
+					'conditions' => []
+				];
+			}
+
+			return $record;
+		}, array_merge($result_cep, $result_legacy));
+	}
+
+	protected static function fetchGroupNames(array $ceprules): array {
 		$groupids = [];
 
-		foreach ($data['correlations'] as &$correlation) {
-			$groupids += array_column($correlation['filter']['conditions'], 'groupid', 'groupid');
+		foreach ($ceprules as $ceprule) {
+			$is_legacy = array_key_exists('correlationid', $ceprule);
+
+			if ($is_legacy) {
+				$groupids += array_column($ceprule['filter']['conditions'], 'groupid', 'groupid');
+			}
 		}
-		unset($correlation);
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
@@ -115,14 +161,9 @@ class CControllerCorrelationList extends CController {
 				'preservekeys' => true
 			]);
 
-			$data['group_names'] = array_column($groups, 'name', 'groupid');
-		}
-		else {
-			$data['group_names'] = [];
+			return array_column($groups, 'name', 'groupid');
 		}
 
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Configuration of event processing rules'));
-		$this->setResponse($response);
+		return [];
 	}
 }
