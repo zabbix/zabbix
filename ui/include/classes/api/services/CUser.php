@@ -3090,19 +3090,23 @@ class CUser extends CApiService {
 		$this->getAuthenticationUserData($db_token['userid'], $db_user, $group_status);
 
 		if ($group_status == GROUP_STATUS_DISABLED) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'User group is disabled.');
 		}
-
-		DB::update('token', [
-			'values' => ['lastaccess' => $time],
-			'where' => ['tokenid' => $db_token['tokenid']]
-		]);
 
 		$mobile_encryption_kid = array_key_first($keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY]);
 		$mobile_encryption_key = $keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY][$mobile_encryption_kid];
 
 		self::$userData = $db_user + ['token' => $params['token']] + ['uuid' => $uuid] +
 			['kid' => $mobile_encryption_kid, 'key' => $mobile_encryption_key];
+
+		if (!CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $db_user['roleid'])) {
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Linked devices not allowed.');
+		}
+
+		DB::update('token', [
+			'values' => ['lastaccess' => $time],
+			'where' => ['tokenid' => $db_token['tokenid']]
+		]);
 
 		unset($db_user['ugsetid']);
 
