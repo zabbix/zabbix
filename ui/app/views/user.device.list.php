@@ -23,7 +23,7 @@ $this->includeJsFile('user.device.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Linked devices'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_USER_DEVICE_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_DEVICE_LIST))
 	->setControls((new CList([
 		(new CTag('nav', true,
 			(new CList())->addItem(

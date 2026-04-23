@@ -35,6 +35,7 @@ window.user_device_create_popup = new class {
 		this.#footer = this.#overlay.$dialogue.$footer[0];
 		this.#form_element = this.#overlay.$dialogue.$body[0].querySelector('form');
 		this.#form = new CForm(this.#form_element, rules);
+		this.#device_uuid = null;
 
 		const return_url = new URL('zabbix.php', location.href);
 		return_url.searchParams.set('action', admin_mode ? 'user.device.list': 'userprofile.device.list');
@@ -43,12 +44,15 @@ window.user_device_create_popup = new class {
 		this.#initEvents();
 
 		if (!admin_mode) {
+			this.#overlay.setLoading();
+			this.#footer.querySelector('.js-submit').classList.add('is-loading');
 			this.#submit();
 		}
 	}
 
 	#initEvents() {
 		this.#footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
+		this.#dialogue.addEventListener('dialogue.close', () => this.#device_uuid = null);
 	}
 
 	#submit() {
@@ -114,9 +118,8 @@ window.user_device_create_popup = new class {
 					return;
 				}
 
-				return response;
+				success_callback(response);
 			})
-			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.#overlay.unsetLoading());
 	}
@@ -130,12 +133,20 @@ window.user_device_create_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if ('success' in response) {
+				if('error' in response) {
+					throw {error: response.error};
+				}
+
+				if ('success' in response && this.#device_uuid) {
 					this.#device_uuid = null;
 					overlayDialogueDestroy(this.#overlay.dialogueid);
 
 					this.#dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 				}
+			})
+			.catch((exception) => {
+				this.#device_uuid = null;
+				this.#ajaxExceptionHandler(exception);
 			})
 			.finally(() => {
 				if (this.#device_uuid && new CDate().getTime() < this.#qr_expires_at_ms) {

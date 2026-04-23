@@ -56,7 +56,7 @@ class CControllerUserDeviceStatus extends CController {
 	protected function doAction() {
 		$device = API::Device()->get([
 			'output' => ['deviceid'],
-			'filter' => ['uuid' => $this->getInput('uuid')]
+			'filter' => ['uuid' => $this->getInput('uuid'), 'status' => ZBX_DEVICE_ACTIVATED]
 		]);
 
 		$output = [];
@@ -69,12 +69,6 @@ class CControllerUserDeviceStatus extends CController {
 			}
 
 			$output['success'] = $success;
-		}
-		else {
-			$output['error'] = [
-				'title' => _('Device is not linked'),
-				'messages' => array_column(get_and_clear_messages(), 'message')
-			];
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

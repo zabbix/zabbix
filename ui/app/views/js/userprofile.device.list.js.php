@@ -41,7 +41,7 @@ const view = new class {
 		});
 
 		document.querySelector('.js-create-device')?.addEventListener('click', () => {
-			ZABBIX.PopupManager.open('user.device.create');
+			ZABBIX.PopupManager.open('user.device.create', null, {popup_options: {prevent_navigation: false}});
 		});
 	}
 

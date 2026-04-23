@@ -82,7 +82,7 @@ $buttons = [
 
 $output = [
 	'header' => $title,
-	'doc_url' => CDocHelper::getUrl(CDocHelper::POPUP_CONNECTOR_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::USERS_DEVICE),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => getPagePostJs().
