@@ -440,28 +440,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		], 0, 120, self::WAIT_ITERATION_DELAY);
 
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-
-		// $this->executeHousekeeper();
-
-		// foreach (self::prototypeDefs() as $def) {
-		// 	$vtype = $def['value_type'];
-		// 	$itemids = array_values(self::$discovered_itemids[$vtype]);
-		// 	$this->callUntilCountIsPresent('history.get', [
-		// 		'history' => $vtype,
-		// 		'itemids' => $itemids
-		// 	], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
-		// 		$this->executeHousekeeper();
-		// 		return true;
-		// 	});
-		// }
-
-		// $this->callUntilCountIsPresent('event.get', [
-		// 	'objectids' => self::$discovered_triggerids,
-		// 	'source' => EVENT_SOURCE_TRIGGERS
-		// ], 0, 120, self::WAIT_ITERATION_DELAY, function ($r) {
-		// 	$this->executeHousekeeper();
-		// 	return true;
-		// });
 	}
 
 	/**
