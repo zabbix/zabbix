@@ -27,9 +27,9 @@
 
 typedef struct
 {
-	const char	*device_id;
-	const char	*token;
-	const char	*enc_key;
+	char	*device_id;
+	char	*token;
+	char	*enc_key;
 } zbx_push_target_t;
 
 ZBX_VECTOR_DECL(push_target, zbx_push_target_t *)
@@ -168,12 +168,14 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_push_target_t	*t = zbx_malloc(NULL, sizeof(zbx_push_target_t));
 
-		t->device_id = row[0];
-		t->token = row[1];
-		t->enc_key = row[2];
+		t->device_id = zbx_strdup(NULL, row[0]);
+		t->token = zbx_strdup(NULL, row[1]);
+		t->enc_key = zbx_strdup(NULL, row[2]);
 
 		zbx_vector_push_target_append(&targets, t);
 	}
+
+	zbx_db_free_result(result);
 
 	if (0 == targets.values_num)
 	{
@@ -216,10 +218,6 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	substitute_message_macros(&trigger_id, NULL, 0, message_type, um_handle_unmasked, &actionid, event,
 			r_event, &userid, NULL, &alert, service_alarm, service, tz, ack);
 
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER_OMEGA: %s, %s, %s, %s", trigger_severity, event_id, event_value,
-			trigger_id);
-
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
 	server_id = cfg.serverid;
 
@@ -236,6 +234,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_addobject(&json, "params");
 
 		zbx_json_addobject(&json, "to");
+
 		zbx_json_addstring(&json, "push_token", t->token, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "server_id", server_id, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, "device_id", t->device_id, ZBX_JSON_TYPE_STRING);
@@ -295,24 +294,31 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 		zbx_json_close(&json);
 
 		zbx_vector_str_append(params, zbx_strdup(NULL, json.buffer));
+
 		zbx_free(message_uuid7);
 		zbx_free(uuid7id);
 		zbx_json_free(&json);
 	}
 
-	zbx_db_free_result(result);
-
 	zbx_dc_close_user_macros(um_handle_unmasked);
 
 	for (int i = 0; i < targets.values_num; i++)
 	{
+		zbx_free(targets.values[i]->device_id);
+		zbx_free(targets.values[i]->token);
+		zbx_free(targets.values[i]->enc_key);
 		zbx_free(targets.values[i]);
 	}
 
 	zbx_vector_push_target_destroy(&targets);
 
-	zbx_free(subject_dyn);
+	zbx_free(trigger_id);
+	zbx_free(trigger_severity);
+	zbx_free(event_id);
+	zbx_free(event_value);
+	zbx_free(event_update_action);
 	zbx_free(host_ids);
+	zbx_free(subject_dyn);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
