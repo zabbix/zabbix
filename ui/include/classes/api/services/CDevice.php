@@ -319,7 +319,9 @@ class CDevice extends CApiService {
 			'activated_at' => time()
 		];
 
-		self::updateForce([$device], [array_intersect_key($db_device, $device)]);
+		$db_devices = [$db_device['deviceid'] => array_intersect_key($db_device, $device)];
+
+		self::updateForce([$device], $db_devices);
 
 		return ['token' => $token];
 	}
