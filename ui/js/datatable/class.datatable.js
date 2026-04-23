@@ -855,7 +855,7 @@ class CDataTable {
 	}
 
 	initCheckBoxRange() {
-		const selector = `.${CDataTable.ZBX_STYLE_BODY}`;
+		const selector = `.${CDataTable.ZBX_STYLE_DATATABLE}`;
 		const row_selector = `.${CDataTable.ZBX_STYLE_ROW}`;
 		const thead_selector = `.${CDataTable.ZBX_STYLE_HEADER} .${CDataTable.ZBX_STYLE_CELL_CHECKBOX}`;
 
