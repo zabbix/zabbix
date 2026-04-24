@@ -133,7 +133,7 @@ window.user_device_create_popup = new class {
 		})
 			.then((response) => response.json())
 			.then((response) => {
-				if('error' in response) {
+				if ('error' in response) {
 					throw {error: response.error};
 				}
 
