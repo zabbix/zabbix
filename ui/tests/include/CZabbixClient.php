@@ -76,25 +76,19 @@ class CZabbixClient extends CZabbixServer {
 	/**
 	 * Send item values to server/proxy using the agent data protocol (variant 2).
 	 *
-	 * @param array  $values     item values, each with keys: itemid, value, clock, ns
+	 * @param array  $data       item values, each with keys: itemid, value, clock, ns
 	 * @param string $session    agent session identifier
 	 * @param string $host       host name
 	 * @param string $version    agent version
 	 *
 	 * @return array|false    array with result data or false otherwise
 	 */
-	public function sendAgentDataValues(array $values, string $session, string $host, string $version = '7.4.0') {
-		$data = [];
+	public function sendAgentDataValues(array $data, string $session, string $host, string $version = '7.4.0') {
 		$id = 1;
-		foreach ($values as $value) {
-			$data[] = [
-				'id' => $id++,
-				'itemid' => $value['itemid'],
-				'value' => $value['value'],
-				'clock' => $value['clock'],
-				'ns' => $value['ns']
-			];
+		foreach ($data as &$item) {
+			$item['id'] = $id++;
 		}
+		unset($item);
 
 		$response = parent::request([
 			'request' => 'agent data',

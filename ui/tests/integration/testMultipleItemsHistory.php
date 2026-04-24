@@ -98,7 +98,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'name' => 'Sensor '.$def['suffix'].' ['.self::LLD_MACRO.']',
 				'key_' => self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.']',
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-				'value_type' => $def['value_type']
+				'value_type' => $def['value_type'],
+				'delay' => '1s'
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['itemids']);
