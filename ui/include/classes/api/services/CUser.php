@@ -3729,13 +3729,15 @@ class CUser extends CApiService {
 			return $medias;
 		}
 
-		$email_mediatypeids = [];
+		$db_mediatypes = [];
 		$mediatypeids = array_unique(array_column($medias, 'mediatypeid'));
 
 		if ($mediatypeids) {
-			$email_mediatypeids = DB::select('media_type', [
-				'output' => [],
-				'filter' => ['type' => MEDIA_TYPE_EMAIL],
+			$db_mediatypes = DB::select('media_type', [
+				'output' => ['type'],
+				'filter' => [
+					'type' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_PUSH]
+				],
 				'mediatypeids' => $mediatypeids,
 				'preservekeys' => true
 			]);
@@ -3744,16 +3746,21 @@ class CUser extends CApiService {
 		$user_medias = [];
 
 		$email_validator = new CEmailValidator();
+		$sendto_validators = [
+			MEDIA_TYPE_EMAIL => fn($value) => $email_validator->validate($value),
+			MEDIA_TYPE_PUSH => static fn($value): bool => $value === '*'
+		];
 		$max_length = DB::getFieldLength('media', 'sendto');
 		$fields = array_flip(['mediatypeid', 'sendto', 'active', 'severity', 'period', 'userdirectory_mediaid']);
 
 		foreach ($medias as $media) {
 			$sendto = array_filter($media['sendto'], 'strlen');
 
-			if (array_key_exists($media['mediatypeid'], $email_mediatypeids)) {
-				$sendto = array_filter($media['sendto'], [$email_validator, 'validate']);
+			if (array_key_exists($media['mediatypeid'], $db_mediatypes)) {
+				$type = $db_mediatypes[$media['mediatypeid']]['type'];
+				$sendto = array_filter($sendto, $sendto_validators[$type]);
 
-				while (mb_strlen(implode("\n", $sendto)) > $max_length && count($sendto) > 0) {
+				while ($sendto && mb_strlen(implode("\n", $sendto)) > $max_length) {
 					array_pop($sendto);
 				}
 			}
