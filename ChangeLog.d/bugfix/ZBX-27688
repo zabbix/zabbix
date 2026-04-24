@@ -1,1 +1,1 @@
-..F....... [ZBX-27688] removed the 'Incomplete configuration' error message when Gmail or Office 365 media types are enabled from the list (aluchko)
+..F....... [ZBX-27688] removed checks to prevent bulk enabling of Gmail and Office 365 media types with incomplete configuration (aluchko)
