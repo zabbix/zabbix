@@ -124,17 +124,18 @@
 					background-color: $ui-hover-bg-color;
 				}
 
+				.checkbox-radio {
+					left: 18px;
+					margin-top: 0;
+
+					& + label span {
+						margin-top: -1px;
+						vertical-align: middle;
+					}
+				}
+
 				label {
 					display: flex;
-
-					.checkbox-radio {
-						display: none;
-
-						& + label span {
-							margin-top: -1px;
-							vertical-align: middle;
-						}
-					}
 
 					.datatable-options-list-item-label {
 						@extend %overflow-ellipsis;

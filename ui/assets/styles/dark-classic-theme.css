@@ -2342,13 +2342,14 @@ button {
         padding: 5px; }
         .datatable .datatable-options .datatable-options-list .datatable-options-list-item:hover {
           background-color: #383838; }
+        .datatable .datatable-options .datatable-options-list .datatable-options-list-item .checkbox-radio {
+          left: 18px;
+          margin-top: 0; }
+          .datatable .datatable-options .datatable-options-list .datatable-options-list-item .checkbox-radio + label span {
+            margin-top: -1px;
+            vertical-align: middle; }
         .datatable .datatable-options .datatable-options-list .datatable-options-list-item label {
           display: flex; }
-          .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .checkbox-radio {
-            display: none; }
-            .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .checkbox-radio + label span {
-              margin-top: -1px;
-              vertical-align: middle; }
           .datatable .datatable-options .datatable-options-list .datatable-options-list-item label .datatable-options-list-item-label {
             display: inline-block;
             flex-grow: 1;

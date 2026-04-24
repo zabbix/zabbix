@@ -1120,24 +1120,25 @@ class CDataTable {
 
 		column.setVisible(visible);
 
-		this.updateUserConfig();
-
 		this.#options_popup_updated = true;
 
-		this.dispatchEvent(CDataTable.EVENT_INIT, {
-			onSuccess: () => requestAnimationFrame(() => {
-				const header_cell = column.getHeaderCell();
-				if (header_cell === null) {
-					return;
-				}
+		this.updateUserConfig()
+			.getData()
+			.then(response => {
+				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
+				this.dispatchEvent(CDataTable.EVENT_SAVE);
 
-				this.#scrollBodyToTarget(header_cell.target);
+				requestAnimationFrame(() => {
+					const header_cell = column.getHeaderCell();
+					if (header_cell === null) {
+						return;
+					}
 
-				requestAnimationFrame(() => this.#options_popup?.position());
-			})
-		});
+					this.#scrollBodyToTarget(header_cell.target);
 
-		this.dispatchEvent(CDataTable.EVENT_SAVE);
+					this.#options_popup?.position();
+				});
+			});
 	}
 
 	onColumnsSort(e) {
@@ -1163,12 +1164,12 @@ class CDataTable {
 
 		this.#sortColumns();
 
-		this.updateUserConfig();
-
-		this.getData().then(response => {
-			this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
-			this.dispatchEvent(CDataTable.EVENT_SAVE);
-		});
+		this.updateUserConfig()
+			.getData()
+			.then(response => {
+				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
+				this.dispatchEvent(CDataTable.EVENT_SAVE);
+			});
 	}
 
 	onColumnDuplicate(e) {
