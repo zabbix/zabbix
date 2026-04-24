@@ -144,7 +144,7 @@ foreach ($data['devices'] as $device) {
 				: ''
 			: null,
 		$device['name'] === ''
-			? new CTag('em', true, _('Unknown name'))
+			? new CTag('em', true, _('unknown name'))
 			: $device['name'],
 		$device['uuid'],
 		$device['user_fullname'],
