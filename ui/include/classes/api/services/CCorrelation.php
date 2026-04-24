@@ -657,7 +657,7 @@ class CCorrelation extends CApiService {
 	 * @throws APIException if the input is invalid.
 	 */
 	protected static function validateFormula(array $correlations): void {
-		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser = new CConditionFormulaParser();
 
 		foreach ($correlations as $i => $correlation) {
 			if (!array_key_exists('filter', $correlation)) {
@@ -667,7 +667,7 @@ class CCorrelation extends CApiService {
 			if ($correlation['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 				$condition_formula_parser->parse($correlation['filter']['formula']);
 
-				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
+				$constants = array_column($condition_formula_parser->getConstants(), 'value', 'value');
 				$path = '/'.($i + 1).'/filter';
 
 				if (count($correlation['filter']['conditions']) != count($constants)) {
