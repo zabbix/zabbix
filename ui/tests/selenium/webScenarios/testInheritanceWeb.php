@@ -16,17 +16,11 @@
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../../../include/items.inc.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup httptest
  */
 class testInheritanceWeb extends CLegacyWebTest {
-	private $templateid = 15000;	// 'Inheritance test template'
-	private $template = 'Inheritance test template';
-
-	private $hostid = 15001;		// 'Template inheritance test host'
-	private $host = 'Template inheritance test host';
+	private $templateid = 15000;	// 'Inheritance test template'.
 
 	/**
 	 * Attach MessageBehavior to the test.
