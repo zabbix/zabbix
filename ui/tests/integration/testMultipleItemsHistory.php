@@ -270,7 +270,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_TriggerDiscovery
 	 */
 	public function testMultipleItemsHistory_TriggerFiring() {
-		$this->sendAndVerifyHistoryAt(time());
+		$tm = time();
+		$sent = $this->sendHistoryAt($tm);
+		$this->verifyHistoryAt($tm, $sent);
 
 		// Verify all discovered triggers fired (value = PROBLEM, state = NORMAL).
 		$this->callUntilDataIsPresent('trigger.get', [
@@ -308,7 +310,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	public function testMultipleItemsHistory_TriggerFiringRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
-		$this->sendAndVerifyHistoryAt(time());
+		$tm = time();
+		$sent = $this->sendHistoryAt($tm);
+		$this->verifyHistoryAt($tm, $sent);
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
@@ -394,7 +398,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'expected_by_itemid' => $expected_by_itemid
 			];
 		}
-
+		
 		return $sent;
 	}
 
