@@ -25,6 +25,7 @@ declare -A BASELINE_TIMES=(
   [testProxyConfSync]=70
   [testComplexServiceStatus]=66
   [testItemRate]=66
+  [testMultipleItemsHistory]=60
   [testUserParametersReload]=47
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
@@ -51,5 +52,4 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
-  [testMultipleItemsHistory]=60
 )
