@@ -34,33 +34,33 @@ func Test_IsRFCHostName(t *testing.T) {
 		args args
 		want bool
 	}{
-		{"-empty_string", args{""}, false},
-		{"-starts_with_hyphen", args{"-"}, false},
-		{"-hyphen_before_dot", args{"a-.a"}, false},
-		{"-hyphen_after_dot", args{"a.-a"}, false},
-		{"-too_long_label", args{"0123456789012345678901234567890123456789012345678901234567890123456789"},
+		{"-emptyString", args{""}, false},
+		{"-startsWithHyphen", args{"-"}, false},
+		{"-hyphenBeforeDot", args{"a-.a"}, false},
+		{"-hyphenAfterDot", args{"a.-a"}, false},
+		{"-tooLongLabel", args{"0123456789012345678901234567890123456789012345678901234567890123456789"},
 			false},
-		{"+label_is_63_character_long", args{"123456789-123456789-123456789-123456789-123456789-123456789-123"},
+		{"+labelIs63CharactersLong", args{"123456789-123456789-123456789-123456789-123456789-123456789-123"},
 			true},
-		{"-label_is_64_character_long",
+		{"-labelIs64CharactersLong",
 			args{"123456789-123456789-123456789-123456789-123456789-123456789-1234"}, false},
-		{"+hostname_is_253_character_long", args{"123456789-123456789-123456789-123456789-123456789." +
+		{"+hostnameIs253CharactersLong", args{"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789.123"}, true},
-		{"-hostname_is_254_character_long", args{"123456789-123456789-123456789-123456789-123456789." +
+		{"-hostnameIs254CharactersLong", args{"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789.1234"}, false},
-		{"-unicode_character", args{"tēst.zabbix.com"}, false},
-		{"-leading_dot", args{".example.com"}, false},
+		{"-unicodeCharacter", args{"tēst.zabbix.com"}, false},
+		{"-leadingDot", args{".example.com"}, false},
 		{"-underscore", args{"example_com.com"}, false},
 		{"-space", args{"ex ample.com"}, false},
-		{"-ends_with_hyphen", args{"example.com-"}, false},
-		{"-empty_label", args{"example.."}, false},
-		{"+minimal_label", args{"a.com"}, true},
+		{"-endsWithHyphen", args{"example.com-"}, false},
+		{"-emptyLabel", args{"example.."}, false},
+		{"+minimalLabel", args{"a.com"}, true},
 		{"+punycode", args{"xn--bcher-kva.com"}, true},
 		{"+localhost", args{"localhost"}, true},
 	}
