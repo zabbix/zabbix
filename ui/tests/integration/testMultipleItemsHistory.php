@@ -40,6 +40,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $total_trigger_expected;
 	private static $tm_past;
 	private static $tm_now;
+	private static $sent_past = [];
+	private static $sent_now = [];
 
 	private static function prototypeDefs() {
 		return [
@@ -175,28 +177,45 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 *
 	 * @depends testMultipleItemsHistory_LLDDiscovery
 	 */
-	public function testMultipleItemsHistory_HistoryPast() {
+	public function testMultipleItemsHistory_HistoryPastSend() {
 		self::$tm_past = time() - 3600;
 
-		$this->sendAndVerifyHistoryAt(self::$tm_past);
+		self::$sent_past = $this->sendHistoryAt(self::$tm_past);
+	}
+
+	/**
+	 * Verify history values sent 1 hour in the past.
+	 *
+	 * @depends testMultipleItemsHistory_HistoryPastSend
+	 */
+	public function testMultipleItemsHistory_HistoryPastVerify() {
+		$this->verifyHistoryAt(self::$tm_past, self::$sent_past);
 	}
 
 	/**
 	 * Send history values at current time.
 	 *
-	 * @depends testMultipleItemsHistory_HistoryPast
+	 * @depends testMultipleItemsHistory_HistoryPastVerify
 	 */
-	public function testMultipleItemsHistory_HistoryNow() {
-
+	public function testMultipleItemsHistory_HistoryNowSend() {
 		self::$tm_now = time();
 
-		$this->sendAndVerifyHistoryAt(self::$tm_now);
+		self::$sent_now = $this->sendHistoryAt(self::$tm_now);
+	}
+
+	/**
+	 * Verify history values sent at current time.
+	 *
+	 * @depends testMultipleItemsHistory_HistoryNowSend
+	 */
+	public function testMultipleItemsHistory_HistoryNowVerify() {
+		$this->verifyHistoryAt(self::$tm_now, self::$sent_now);
 	}
 
 	/**
 	 * Verify that trends are generated for both past and current hour.
 	 *
-	 * @depends testMultipleItemsHistory_HistoryNow
+	 * @depends testMultipleItemsHistory_HistoryNowVerify
 	 */
 	public function testMultipleItemsHistory_HistoryAndTrends() {
 		$this->verifyTrendsAtClock(self::$tm_past - (self::$tm_past % 3600));
@@ -338,7 +357,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 	}
 
-	private function sendAndVerifyHistoryAt(int $tm): void {
+	private function sendHistoryAt(int $tm): array {
+		$sent = [];
+
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
 			$items_by_key = self::$discovered_itemids[$vtype];
@@ -363,6 +384,26 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 			$itemids = array_values($items_by_key);
+			$expected_by_itemid = [];
+			foreach ($itemids as $i => $itemid) {
+				$expected_by_itemid[$itemid] = $values[$i];
+			}
+
+			$sent[$vtype] = [
+				'itemids' => $itemids,
+				'expected_by_itemid' => $expected_by_itemid
+			];
+		}
+
+		return $sent;
+	}
+
+	private function verifyHistoryAt(int $tm, array $sent): void {
+		foreach (self::prototypeDefs() as $def) {
+			$vtype = $def['value_type'];
+			$itemids = $sent[$vtype]['itemids'];
+			$expected_by_itemid = $sent[$vtype]['expected_by_itemid'];
+
 			$history_response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $vtype,
 				'itemids' => $itemids,
@@ -372,11 +413,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
 			});
-
-			$expected_by_itemid = [];
-			foreach ($itemids as $i => $itemid) {
-				$expected_by_itemid[$itemid] = $values[$i];
-			}
 
 			$this->assertCount(self::LLD_DISCOVERY_COUNT, $history_response['result']);
 			foreach ($history_response['result'] as $record) {
@@ -413,7 +449,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				);
 			}
 		}
-
 	}
 
 	private function sendDiscoveryData(): void {
