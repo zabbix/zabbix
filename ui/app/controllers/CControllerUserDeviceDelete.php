@@ -96,20 +96,20 @@ class CControllerUserDeviceDelete extends CController {
 
 		if (count($success_deviceids) == 0) {
 			$output['error'] = [
-				'title' => _n('Cannot unlink device', 'Cannot unlink devices', count($failed_deviceids)),
+				'title' => _n('Cannot remove device', 'Cannot remove devices', count($failed_deviceids)),
 				'messages' => $failed_messages
 			];
 		}
 		else {
 			$output['success'] = [
-				'title' => _n('Device unlinked', 'Devices unlinked', count($success_deviceids)),
+				'title' => _n('Device removed', 'Devices removed', count($success_deviceids)),
 				'action' => 'delete',
 				'messages' => $success_messages
 			];
 
 			if (count($failed_deviceids) > 0) {
 				$output['success']['error_messages'] = array_merge(
-					[_n('Cannot unlink device', 'Cannot unlink devices', count($failed_deviceids))],
+					[_n('Cannot remove device', 'Cannot remove devices', count($failed_deviceids))],
 					$failed_messages
 				);
 			}

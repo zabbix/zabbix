@@ -206,7 +206,7 @@ class CControllerUserDeviceList extends CController {
 		];
 
 		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Linked devices'));
+		$response->setTitle(_('Devices'));
 		$this->setResponse($response);
 	}
 }

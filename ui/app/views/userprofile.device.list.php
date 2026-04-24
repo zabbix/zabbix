@@ -22,12 +22,12 @@
 $this->includeJsFile('userprofile.device.list.js.php');
 
 $html_page = (new CHtmlPage())
-	->setTitle(_('Linked devices'))
+	->setTitle(_('Devices'))
 	->setDocUrl(CDocHelper::getUrl(CDocHelper::USERS_DEVICE_LIST))
 	->setControls((new CList([
 		(new CTag('nav', true,
 			(new CList())->addItem(
-				(new CSimpleButton(_('Link a device')))
+				(new CSimpleButton(_('Add a device')))
 					->addClass('js-create-device')
 					->setEnabled(CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN))
 			)
@@ -63,7 +63,7 @@ foreach ($data['devices'] as $device) {
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
-			? (new CButton('', _('Unlink')))
+			? (new CButton('', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)
 				->removeId()
 				->setEnabled(true)
@@ -75,7 +75,7 @@ foreach ($data['devices'] as $device) {
 
 $buttons = [
 	[
-		'content' => (new CSimpleButton(_('Unlink')))
+		'content' => (new CSimpleButton(_('Remove')))
 			->addClass(ZBX_STYLE_BTN_ALT)
 			->addClass('js-massdelete-device')
 			->addClass('js-no-chkbxrange')
@@ -94,7 +94,7 @@ $html_page
 	->show();
 
 $confirm_messages = [
-	'user.device.delete' => [_('Unlink selected device?'), _('Unlink selected devices?')]
+	'user.device.delete' => [_('Remove selected device?'), _('Remove selected devices?')]
 ];
 
 (new CScriptTag('

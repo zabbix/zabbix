@@ -318,7 +318,7 @@ class CMenuHelper {
 				: null,
 			!CWebUser::isGuest() && CTemporaryMobileFeatureHelper::isEnabled() &&
 				CWebUser::checkAccess(CRoleHelper::UI_ADMINISTRATION_LINKED_DEVICES)
-				? (new CMenuItem(_('Linked devices')))
+				? (new CMenuItem(_('Devices')))
 					->setAction('user.device.list')
 				: null
 		];
@@ -478,7 +478,7 @@ class CMenuHelper {
 
 			if (CTemporaryMobileFeatureHelper::isEnabled() && CWebUser::checkAccess(CRoleHelper::DEVICES_ACCESS)) {
 				$submenu->add(
-					(new CMenuItem(_('Linked devices')))
+					(new CMenuItem(_('Devices')))
 						->setAction('userprofile.device.list')
 				);
 			}

@@ -509,7 +509,7 @@ class CRoleHelper {
 					];
 
 					if (CTemporaryMobileFeatureHelper::isEnabled()) {
-						$labels[self::UI_ADMINISTRATION_LINKED_DEVICES] = _('Linked devices');
+						$labels[self::UI_ADMINISTRATION_LINKED_DEVICES] = _('Devices');
 					}
 				}
 

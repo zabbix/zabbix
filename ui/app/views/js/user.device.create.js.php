@@ -69,7 +69,7 @@ window.user_device_create_popup = new class {
 				this.#post(zabbixUrl({action: 'user.device.init'}), fields, (response) => {
 					this.#footer.querySelector('.js-submit').remove();
 					this.#footer.querySelector('.js-cancel').remove();
-					this.#overlay.setProperties({title: <?= json_encode(_('Link a device')) ?>});
+					this.#overlay.setProperties({title: <?= json_encode(_('Add a device')) ?>});
 					this.#form_element.querySelector('.js-qr-expires-at').textContent = response.expires_at_text;
 					this.#form_element.querySelector('.form-grid').style.display = 'none';
 					this.#form_element.querySelector('.qr-code-container').style.display = '';
