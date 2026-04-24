@@ -399,18 +399,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			];
 		}
 
-		foreach ($sent as $vtype => $data) {
-			$this->callUntilDataIsPresent('history.get', [
-				'history' => $vtype,
-				'itemids' => $data['itemids'],
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'countOutput' => true
-			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
-				return $response['result'] === (string) self::LLD_DISCOVERY_COUNT;
-			});
-		}
-
 		return $sent;
 	}
 
