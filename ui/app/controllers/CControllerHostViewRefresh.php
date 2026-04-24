@@ -60,7 +60,8 @@ class CControllerHostViewRefresh extends CControllerHostView {
 				'sort' => $filter['sort'],
 				'sortorder' => $filter['sortorder'],
 				'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+				'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'user' => ['debug_mode' => $this->getDebugMode()]
 			] + $this->getData($filter);
 
 			$response = new CControllerResponseData($data);

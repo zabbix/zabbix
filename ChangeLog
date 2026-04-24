@@ -1,8 +1,15 @@
 Changes for 7.4.10rc1
 
 New features:
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
+..F....... [ZBX-27609] fixed saving colours of items when items are reordered in graph edit form (gberzina)
+..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
+..F....... [ZBX-27679] fixed missing translation reporting in JavaScript; added missing translations (averza)
+..F....... [ZBX-27392] fixed selected count staying unchanged when trigger is deleted (gklavins)
 
 --------------------------------------------------------------------------------
 Changes for 7.4.9
@@ -1378,8 +1385,12 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.26rc1
 
 New features:
+.......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
+.........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
+..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
 
 --------------------------------------------------------------------------------
 Changes for 7.0.25

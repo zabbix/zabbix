@@ -25089,6 +25089,10 @@ msgstr ""
 msgid "Widget is deprecated."
 msgstr "Widget está obsoleto."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "O widget é muito pequeno para o número especificado de colunas e linhas."
