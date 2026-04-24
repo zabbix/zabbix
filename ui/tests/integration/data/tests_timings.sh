@@ -18,6 +18,7 @@ declare -A BASELINE_TIMES=(
   [testHostConnMacroValidation]=99
   [testItemState]=98
   [testHistoryPush]=92
+  [testMultipleItemsHistory]=90
   [testValuemaps]=89
   [testAutoregistrationPSK]=85
   [testLowLevelDiscovery]=84
@@ -25,7 +26,7 @@ declare -A BASELINE_TIMES=(
   [testProxyConfSync]=70
   [testComplexServiceStatus]=66
   [testItemRate]=66
-  [testMultipleItemsHistory]=90
+
   [testUserParametersReload]=47
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
