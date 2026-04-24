@@ -87,6 +87,7 @@ class CControllerUserProfileDeviceList extends CController {
 	private function getDevices(array $filter): array {
 		$options = [
 			'userids' => CWebUser::$data['userid'],
+			'filter' => ['status' => ZBX_DEVICE_ACTIVATED],
 			'limit' => CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT) + 1
 		];
 

@@ -95,6 +95,17 @@ $html_page = (new CHtmlPage())
 						]))->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 					)
 				])
+				->addItem([
+					new CLabel(_('Status'), 'filter_status'),
+					new CFormField(
+						(new CRadioButtonList('filter_status', (int) $data['filter']['filter_status']))
+							->addValue(_('Any'), -1)
+							->addValue(_('New'), ZBX_DEVICE_NEW)
+							->addValue(_('Active'), ZBX_DEVICE_ACTIVATED)
+							->addValue(_('Orphaned'), ZBX_DEVICE_ORPHANED)
+							->setModern()
+					)
+				])
 		])
 		->addVar('action', 'user.device.list')
 	);
@@ -116,6 +127,7 @@ $deviceTable = (new CTableInfo())
 		make_sorting_header(_('User role'), 'user_role', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Last active'), 'lastaccess', $data['sort'], $data['sortorder'], $data['url']),
+		make_sorting_header(_('Status'), 'status', $data['sort'], $data['sortorder'], $data['url']),
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] ? _('Action') : null
 	])
 	->setPageNavigation($data['paging']);
@@ -131,12 +143,15 @@ foreach ($data['devices'] as $device) {
 				? (new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid']))
 				: ''
 			: null,
-		$device['name'],
+		$device['name'] === ''
+			? new CTag('em', true, _('Unknown name'))
+			: $device['name'],
 		$device['uuid'],
 		$device['user_fullname'],
 		$device['user_role'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['lastaccess']),
+		$data['device_statuses'][$device['status']],
 		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_USER] && $can_manage
 			? (new CButton('', _('Remove')))
 				->addClass(ZBX_STYLE_BTN_LINK)

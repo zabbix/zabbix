@@ -27,7 +27,8 @@ class CControllerUserDeviceList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_roleids' =>			'array_db role.roleid',
 			'filter_usrgrpids' =>		'array_db users_groups.usrgrpid',
-			'sort' =>					'in name,uuid,activated_at,lastaccess,user_fullname,user_role',
+			'filter_status' =>			'in '.implode(',', [-1, ZBX_DEVICE_NEW, ZBX_DEVICE_ACTIVATED, ZBX_DEVICE_ORPHANED]),
+			'sort' =>					'in name,uuid,activated_at,lastaccess,user_fullname,user_role,status',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
 		];
@@ -61,6 +62,7 @@ class CControllerUserDeviceList extends CController {
 			'filter_userids'				=> CProfile::getArray($prefix.'filter_userids', []),
 			'filter_roleids'				=> CProfile::getArray($prefix.'filter_roleids', []),
 			'filter_usrgrpids'				=> CProfile::getArray($prefix.'filter_usrgrpids', []),
+			'filter_status'					=> CProfile::get($prefix.'filter_status', -1),
 			'sort'							=> CProfile::get($prefix.'sort', 'lastaccess'),
 			'sortorder' 					=> CProfile::get($prefix.'sortorder', ZBX_SORT_UP)
 		];
@@ -73,6 +75,7 @@ class CControllerUserDeviceList extends CController {
 		CProfile::updateArray($prefix.'filter_userids', $this->getInput('filter_userids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_roleids', $this->getInput('filter_roleids', []), PROFILE_TYPE_ID);
 		CProfile::updateArray($prefix.'filter_usrgrpids', $this->getInput('filter_usrgrpids', []), PROFILE_TYPE_ID);
+		CProfile::update($prefix.'filter_status', $this->getInput('filter_status', -1), PROFILE_TYPE_INT);
 
 		$this->updateProfileSort();
 	}
@@ -95,6 +98,7 @@ class CControllerUserDeviceList extends CController {
 		CProfile::deleteIdx($prefix.'filter_userids');
 		CProfile::deleteIdx($prefix.'filter_roleids');
 		CProfile::deleteIdx($prefix.'filter_usrgrpids');
+		CProfile::deleteIdx($prefix.'filter_status');
 	}
 
 	private function getFilter(): array {
@@ -151,6 +155,10 @@ class CControllerUserDeviceList extends CController {
 			$options['usrgrpids'] = $filter['filter_usrgrpids'];
 		}
 
+		if ($filter['filter_status'] != -1) {
+			$options['filter'] = ['status' => $filter['filter_status']];
+		}
+
 		$devices = API::Device()->get($options);
 
 		if (count($devices) > 0) {
@@ -162,8 +170,14 @@ class CControllerUserDeviceList extends CController {
 			]);
 
 			foreach ($devices as &$device) {
-				$device['user_fullname'] = getUserFullname($users[$device['userid']]);
-				$device['user_role'] = $users[$device['userid']]['role']['name'];
+				if (isset($users[$device['userid']])) {
+					$device['user_fullname'] = getUserFullname($users[$device['userid']]);
+					$device['user_role'] = $users[$device['userid']]['role']['name'];
+				}
+				else {
+					$device['user_fullname'] = _('Inaccessible user');
+					$device['user_role'] = '';
+				}
 			}
 
 			CArrayHelper::sort($devices, [
@@ -202,6 +216,11 @@ class CControllerUserDeviceList extends CController {
 					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER),
 				CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN =>
 					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
+			],
+			'device_statuses' => [
+				ZBX_DEVICE_NEW => _('New'),
+				ZBX_DEVICE_ACTIVATED => _('Active'),
+				ZBX_DEVICE_ORPHANED => _('Orphaned')
 			]
 		];
 
