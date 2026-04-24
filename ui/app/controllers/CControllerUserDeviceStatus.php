@@ -59,7 +59,7 @@ class CControllerUserDeviceStatus extends CController {
 			'filter' => ['uuid' => $this->getInput('uuid'), 'status' => ZBX_DEVICE_ACTIVATED]
 		];
 
-		if (CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+		if (!CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
 			$options['userids'] = [CWebUser::$data['userid']];
 		}
 
