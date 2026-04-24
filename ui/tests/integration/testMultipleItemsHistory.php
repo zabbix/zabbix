@@ -307,6 +307,13 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			]);
 			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
 
+			$idx = 0;
+			$expected_by_itemid = [];
+			foreach (self::$discovered_itemids[$vtype] as $itemid) {
+				$expected_by_itemid[$itemid] = $idx + 1;
+				$idx++;
+			}
+
 			$response = $this->call('trend.get', [
 				'itemids' => $itemids,
 				'time_from' => $trend_clock,
@@ -315,13 +322,12 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			]);
 			$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
 			foreach ($response['result'] as $trend) {
-				$this->assertArrayHasKey('itemid', $trend);
-				$this->assertArrayHasKey('clock', $trend);
-				$this->assertArrayHasKey('num', $trend);
-				$this->assertArrayHasKey('value_min', $trend);
-				$this->assertArrayHasKey('value_avg', $trend);
-				$this->assertArrayHasKey('value_max', $trend);
+				$expected = (float) $expected_by_itemid[$trend['itemid']];
 				$this->assertEquals((string) $trend_clock, $trend['clock']);
+				$this->assertEquals('1', $trend['num']);
+				$this->assertEquals($expected, (float) $trend['value_min']);
+				$this->assertEquals($expected, (float) $trend['value_avg']);
+				$this->assertEquals($expected, (float) $trend['value_max']);
 			}
 		}
 	}
