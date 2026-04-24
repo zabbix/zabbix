@@ -32,6 +32,31 @@ class CCepRule extends CApiService {
 	protected $tableAlias = 'cr';
 	protected $sortColumns = ['cep_ruleid', 'name', 'stop', 'sortorder', 'status'];
 
+	private const EXECUTE_WHEN_BY_WINDOW_TYPE = [
+		ZBX_CEP_WINDOW_NONE => [
+			ZBX_CEP_OP_WHEN_EVENT_OCCURRED
+		],
+		ZBX_CEP_WINDOW_SIMPLE => [
+			ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+			ZBX_CEP_OP_WHEN_EVENT_EVICTED
+		],
+		ZBX_CEP_WINDOW_CAUSE_SYMPTOM => [
+			ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+			ZBX_CEP_OP_WHEN_EVENT_EVICTED,
+			ZBX_CEP_OP_WHEN_WINDOW_CLOSED
+		],
+		ZBX_CEP_WINDOW_TAG_MATCH => [
+			ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+			ZBX_CEP_OP_WHEN_EVENT_EVICTED,
+			ZBX_CEP_OP_WHEN_TAGS_CORRELATED
+		],
+		ZBX_CEP_WINDOW_PATTERN_MATCH => [
+			ZBX_CEP_OP_WHEN_EVENT_OCCURRED,
+			ZBX_CEP_OP_WHEN_EVENT_EVICTED,
+			ZBX_CEP_OP_WHEN_PATTERN_MATCHED
+		]
+	];
+
 	private const OPERATION_TYPES_BY_EXECUTE_WHEN = [
 		ZBX_CEP_OP_WHEN_EVENT_OCCURRED => [
 			ZBX_CEP_OP_SET_NAME,
@@ -50,37 +75,54 @@ class CCepRule extends CApiService {
 			ZBX_CEP_OP_REMOVE_TAG
 		],
 		ZBX_CEP_OP_WHEN_EVENT_EVICTED => [
-			ZBX_CEP_OP_SET_NAME,
-			ZBX_CEP_OP_CLOSE,
-			ZBX_CEP_OP_SET_SEVERITY,
-			ZBX_CEP_OP_INCREASE_SEVERITY,
-			ZBX_CEP_OP_DECREASE_SEVERITY,
-			ZBX_CEP_OP_SUPPRESS,
-			ZBX_CEP_OP_ADD_TAG,
-			ZBX_CEP_OP_SET_TAG,
-			ZBX_CEP_OP_SET_TAG_VALUE,
-			ZBX_CEP_OP_INCREASE_TAG_VALUE,
-			ZBX_CEP_OP_DECREASE_TAG_VALUE,
-			ZBX_CEP_OP_RENAME_TAG,
-			ZBX_CEP_OP_REMOVE_TAG
-		],
-		'ZBX_CEP_OP_WHEN_EVENT_EVICTED_WITH_ZBX_CEP_EVICTION_CAUSE_CAPACITY' => [
-			ZBX_CEP_OP_SET_NAME,
-			ZBX_CEP_OP_CLOSE,
-			ZBX_CEP_OP_DISCARD,
-			ZBX_CEP_OP_SET_SEVERITY,
-			ZBX_CEP_OP_INCREASE_SEVERITY,
-			ZBX_CEP_OP_DECREASE_SEVERITY,
-			ZBX_CEP_OP_SUPPRESS,
-			ZBX_CEP_OP_COPY_FIRST,
-			ZBX_CEP_OP_COPY_LAST,
-			ZBX_CEP_OP_ADD_TAG,
-			ZBX_CEP_OP_SET_TAG,
-			ZBX_CEP_OP_SET_TAG_VALUE,
-			ZBX_CEP_OP_INCREASE_TAG_VALUE,
-			ZBX_CEP_OP_DECREASE_TAG_VALUE,
-			ZBX_CEP_OP_RENAME_TAG,
-			ZBX_CEP_OP_REMOVE_TAG
+			ZBX_CEP_EVICTION_CAUSE_ANY => [
+				ZBX_CEP_OP_SET_NAME,
+				ZBX_CEP_OP_CLOSE,
+				ZBX_CEP_OP_SET_SEVERITY,
+				ZBX_CEP_OP_INCREASE_SEVERITY,
+				ZBX_CEP_OP_DECREASE_SEVERITY,
+				ZBX_CEP_OP_SUPPRESS,
+				ZBX_CEP_OP_ADD_TAG,
+				ZBX_CEP_OP_SET_TAG,
+				ZBX_CEP_OP_SET_TAG_VALUE,
+				ZBX_CEP_OP_INCREASE_TAG_VALUE,
+				ZBX_CEP_OP_DECREASE_TAG_VALUE,
+				ZBX_CEP_OP_RENAME_TAG,
+				ZBX_CEP_OP_REMOVE_TAG
+			],
+			ZBX_CEP_EVICTION_CAUSE_DURATION => [
+				ZBX_CEP_OP_SET_NAME,
+				ZBX_CEP_OP_CLOSE,
+				ZBX_CEP_OP_SET_SEVERITY,
+				ZBX_CEP_OP_INCREASE_SEVERITY,
+				ZBX_CEP_OP_DECREASE_SEVERITY,
+				ZBX_CEP_OP_SUPPRESS,
+				ZBX_CEP_OP_ADD_TAG,
+				ZBX_CEP_OP_SET_TAG,
+				ZBX_CEP_OP_SET_TAG_VALUE,
+				ZBX_CEP_OP_INCREASE_TAG_VALUE,
+				ZBX_CEP_OP_DECREASE_TAG_VALUE,
+				ZBX_CEP_OP_RENAME_TAG,
+				ZBX_CEP_OP_REMOVE_TAG
+			],
+			ZBX_CEP_EVICTION_CAUSE_CAPACITY => [
+				ZBX_CEP_OP_SET_NAME,
+				ZBX_CEP_OP_CLOSE,
+				ZBX_CEP_OP_DISCARD,
+				ZBX_CEP_OP_SET_SEVERITY,
+				ZBX_CEP_OP_INCREASE_SEVERITY,
+				ZBX_CEP_OP_DECREASE_SEVERITY,
+				ZBX_CEP_OP_SUPPRESS,
+				ZBX_CEP_OP_COPY_FIRST,
+				ZBX_CEP_OP_COPY_LAST,
+				ZBX_CEP_OP_ADD_TAG,
+				ZBX_CEP_OP_SET_TAG,
+				ZBX_CEP_OP_SET_TAG_VALUE,
+				ZBX_CEP_OP_INCREASE_TAG_VALUE,
+				ZBX_CEP_OP_DECREASE_TAG_VALUE,
+				ZBX_CEP_OP_RENAME_TAG,
+				ZBX_CEP_OP_REMOVE_TAG
+			]
 		],
 		ZBX_CEP_OP_WHEN_WINDOW_CLOSED => [
 			ZBX_CEP_OP_SET_NAME,
@@ -443,25 +485,24 @@ class CCepRule extends CApiService {
 		self::checkDuplicates($ceprules);
 		self::checkFilter($ceprules);
 		self::validateWindow($ceprules);
-		self::checkWindowFilter($ceprules);
 		self::validateOperations($ceprules);
 	}
 
 	private static function getValidationRules(bool $is_update = false): array {
-		$flag_required = $is_update ? 0 : API_REQUIRED | API_NOT_EMPTY;
+		$api_required = $is_update ? 0 : API_REQUIRED | API_NOT_EMPTY;
 
 		$fields = $is_update
 			? ['cep_ruleid' => 	['type' => API_ANY]]
 			: [];
 		$fields += [
-			'name' =>			['type' => API_STRING_UTF8, 'flags' => $flag_required, 'length' => DB::getFieldLength('cep_rule', 'name')],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => $api_required, 'length' => DB::getFieldLength('cep_rule', 'name')],
 			'filter' =>			['type' => API_OBJECT, 'fields' => [
 				'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [
 										CONDITION_EVAL_TYPE_AND_OR,
 										CONDITION_EVAL_TYPE_AND,
 										CONDITION_EVAL_TYPE_OR,
 										CONDITION_EVAL_TYPE_EXPRESSION
-									]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
+									]), 'flags' => API_REQUIRED],
 				'formula' =>		['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'evaltype', 'in' => implode(',', [
 											CONDITION_EVAL_TYPE_EXPRESSION
@@ -473,8 +514,8 @@ class CCepRule extends CApiService {
 											CONDITION_EVAL_TYPE_EXPRESSION
 										])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['formulaid']], 'fields' => [
 											'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-										] + self::getConditionFields()],
-										['else' => true, 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => self::getConditionFields()]
+										] + self::getConditionValidationFields()],
+										['else' => true, 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'fields' => self::getConditionValidationFields()]
 				]]
 			]],
 			'window_type' =>	['type' => API_INT32, 'in' => implode(',', [
@@ -484,8 +525,26 @@ class CCepRule extends CApiService {
 									ZBX_CEP_WINDOW_TAG_MATCH,
 									ZBX_CEP_WINDOW_PATTERN_MATCH
 								])] + ($is_update ? [] : ['default' => ZBX_CEP_WINDOW_NONE]),
-			'window' =>			['type' => API_ANY],
-			'operations' =>		['type' => API_OBJECTS, 'flags' => $flag_required | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []],
+			'window' =>			['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'window_type', 'in' => implode(',', [
+										ZBX_CEP_WINDOW_SIMPLE,
+										ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+										ZBX_CEP_WINDOW_TAG_MATCH,
+										ZBX_CEP_WINDOW_PATTERN_MATCH
+									])], 'type' => API_OBJECT, 'flags' => $api_required | API_NOT_EMPTY | API_ALLOW_UNEXPECTED, 'fields' => []],
+									['else' => true, 'type' => API_OBJECT, 'fields' => [], 'unset' => true]
+			]],
+			'operations' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'window_type', 'in' => implode(',', [
+										ZBX_CEP_WINDOW_NONE,
+										ZBX_CEP_WINDOW_SIMPLE,
+										ZBX_CEP_WINDOW_TAG_MATCH,
+										ZBX_CEP_WINDOW_PATTERN_MATCH
+									])], 'type' => API_OBJECTS, 'flags' => $api_required | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []],
+									['if' => ['field' => 'window_type', 'in' => implode(',', [
+										ZBX_CEP_WINDOW_CAUSE_SYMPTOM
+									])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'fields' => []]
+			]],
 			'stop' =>			['type' => API_INT32, 'in' => implode(',', [ZBX_CEP_EXECUTION_CONTINUE, ZBX_CEP_EXECUTION_STOP])],
 			'sortorder' =>		['type' => API_INT32, 'in' => ZBX_MIN_INT64.':'.ZBX_MAX_INT64],
 			'description' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_rule', 'description')],
@@ -495,7 +554,7 @@ class CCepRule extends CApiService {
 		return ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => $fields];
 	}
 
-	private static function getConditionFields(): array {
+	private static function getConditionValidationFields(): array {
 		return [
 			'type' =>			['type' => API_INT32, 'in' => implode(',', [
 									ZBX_CEP_CONDITION_EVENT_NAME,
@@ -505,7 +564,7 @@ class CCepRule extends CApiService {
 									ZBX_CEP_CONDITION_HOST,
 									ZBX_CEP_CONDITION_HOST_GROUP,
 									ZBX_CEP_CONDITION_TIME_PERIOD
-								]), 'default' => ZBX_CEP_CONDITION_EVENT_NAME],
+								]), 'flags' => API_REQUIRED],
 			'operator' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => implode(',', [
 										ZBX_CEP_CONDITION_EVENT_NAME,
@@ -545,11 +604,11 @@ class CCepRule extends CApiService {
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_condition', 'operator')]
 			]],
 			'event_name' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_EVENT_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'event_name')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_EVENT_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'event_name')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'event_name')]
 			]],
 			'tag' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_TAG_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'tag')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_TAG_NAME])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'tag')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'tag')]
 			]],
 			'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [
@@ -561,124 +620,150 @@ class CCepRule extends CApiService {
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_condition', 'severity')]
 			]],
 			'host' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_HOST])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'host')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_HOST])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'host')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'host')]
 			]],
 			'host_group' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_HOST_GROUP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'host_group')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_HOST_GROUP])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'host_group')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'host_group')]
 			]],
 			'time_period' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_TIME_PERIOD])], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_condition', 'time_period')],
+									['if' => ['field' => 'type', 'in' => implode(',', [ZBX_CEP_CONDITION_TIME_PERIOD])], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_condition', 'time_period')],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_condition', 'time_period')]
 			]]
 		];
 	}
 
-	private static function validateWindow(array &$ceprules): void {
+	private static function checkFilter(array $ceprules): void {
+		foreach ($ceprules as $i => $ceprule) {
+			self::checkFilterFormula($ceprule, '/'.($i + 1));
+		}
+	}
+
+	protected static function checkFilterFormula(array $object, string $path): void {
+		if (!array_key_exists('filter', $object)
+				|| $object['filter']['evaltype'] != CONDITION_EVAL_TYPE_EXPRESSION) {
+			return;
+		}
+
+		$path .= '/filter';
+		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser->parse($object['filter']['formula']);
+		$constants = array_unique(array_column($condition_formula_parser->constants, 'value'));
+		$condition_formulaids = array_column($object['filter']['conditions'], 'formulaid');
+
+		foreach ($constants as $constant) {
+			if (!in_array($constant, $condition_formulaids)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/formula',
+					_s('missing filter condition "%1$s"', $constant)
+				));
+			}
+		}
+
+		foreach ($object['filter']['conditions'] as $j => $condition) {
+			if (!in_array($condition['formulaid'], $constants)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+					$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
+				));
+			}
+		}
+	}
+
+	private static function validateWindow(array &$ceprules, ?array $db_ceprules = null): void {
+		$is_update = $db_ceprules !== null;
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
 		foreach ($ceprules as $i => &$ceprule) {
-			$path = '/'.($i + 1);
-
-			$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-				'window' => $ceprule['window_type'] == ZBX_CEP_WINDOW_NONE
-					? ['type' => API_OBJECT, 'fields' => [], 'unset' => true]
-					: ['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => self::getWindowFields($ceprule['window_type'])]
-			]];
-
-			if (!CApiInputValidator::validate($api_input_rules, $ceprule, $path, $error)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-			}
-
-			if ($ceprule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM) {
-				if (!array_filter(array_intersect_key($ceprule['window'],
-					array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag'])
-				))) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						$path.'/window', _('grouping criteria is missing')
-					));
-				}
-			}
-
-			if ($ceprule['window_type'] == ZBX_CEP_WINDOW_NONE) {
+			if (!array_key_exists('window', $ceprule)) {
 				continue;
 			}
 
-			$ceprule['window']['duration'] = timeUnitToSeconds($ceprule['window']['duration'], API_TIME_UNIT_WITH_YEAR);
+			$path = '/'.($i + 1).'/window';
 
-			foreach (['group_by_host_group', 'group_by_host', 'group_by_tag'] as $field) {
-				if (array_key_exists($field, $ceprule['window'])) {
-					$ceprule['window'][$field] = (int) $ceprule['window'][$field];
+			$grouping_allowed = in_array($ceprule['window_type'], [
+				ZBX_CEP_WINDOW_SIMPLE,
+				ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+				ZBX_CEP_WINDOW_PATTERN_MATCH
+			]);
+
+			if ($is_update && $grouping_allowed) {
+				$ceprule['window'] += array_intersect_key($db_ceprules[$ceprule['cep_ruleid']],
+					array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag', 'tag'])
+				);
+			}
+
+			$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+				'duration' =>				['type' => API_TIME_UNIT, 'in' => '1:'.SEC_PER_YEAR] + ($is_update ? [] : ['default' => '1']),
+				'capacity' =>				['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT64],
+				'filter' =>					$ceprule['window_type'] == ZBX_CEP_WINDOW_TAG_MATCH
+												? ['type' => API_OBJECT, 'fields' => [
+													'evaltype' =>	['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [
+																		CONDITION_EVAL_TYPE_AND_OR,
+																		CONDITION_EVAL_TYPE_AND,
+																		CONDITION_EVAL_TYPE_OR,
+																		CONDITION_EVAL_TYPE_EXPRESSION
+																	])],
+													'formula' =>	['type' => API_MULTIPLE, 'rules' => [
+																		['if' => ['field' => 'evaltype', 'in' =>implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_rule', 'formula')],
+																		['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule', 'formula')]
+													]],
+													'conditions' =>	['type' => API_MULTIPLE, 'rules' => [
+																		['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['formulaid']], 'fields' => [
+																			'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
+																		] + self::getWindowConditionValidationFields()],
+																		['else' => true, 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => self::getWindowConditionValidationFields()]
+													]]
+												]]
+												: ['type' => API_OBJECT, 'fields' => [], 'unset' => true],
+				'event_count_tag' =>		$ceprule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM
+												? ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_window', 'event_count_tag')]
+												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'event_count_tag')],
+				'script' =>					$ceprule['window_type'] == ZBX_CEP_WINDOW_PATTERN_MATCH
+												? ['type' => API_STRING_UTF8, 'flags' => $api_required | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'script')]
+												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'script')],
+				'group_by_host_group' =>	$grouping_allowed
+												? ['type' => API_INT32, 'in' => implode(',', [ZBX_CEP_GROUP_BY_NO, ZBX_CEP_GROUP_BY_YES])]
+												: ['type' => API_INT32, 'in' => DB::getDefault('cep_window', 'group_by_host_group')],
+				'group_by_host' =>			$grouping_allowed
+												? ['type' => API_INT32, 'in' => implode(',', [ZBX_CEP_GROUP_BY_NO, ZBX_CEP_GROUP_BY_YES])]
+												: ['type' => API_BOOLEAN, 'in' => DB::getDefault('cep_window', 'group_by_host')],
+				'group_by_tag' =>			$grouping_allowed
+												? ['type' => API_INT32, 'in' => implode(',', [ZBX_CEP_GROUP_BY_NO, ZBX_CEP_GROUP_BY_YES])] + ($is_update ? [] : ['default' => ZBX_CEP_GROUP_BY_NO])
+												: ['type' => API_BOOLEAN, 'in' => DB::getDefault('cep_window', 'group_by_tag')],
+				'tag' =>					$grouping_allowed
+												? ['type' => API_MULTIPLE, 'rules' => [
+													['if' => ['field' => 'group_by_tag', 'in' => (string) ZBX_CEP_GROUP_BY_YES], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'tag')],
+													['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tag')]
+												]]
+												: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tag')]
+			]];
+
+			if (!CApiInputValidator::validate($api_input_rules, $ceprule['window'], $path, $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+
+			self::checkFilterFormula($ceprule['window'], $path);
+
+			if ($ceprule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM) {
+				$grouping_fields = array_flip(['group_by_host_group', 'group_by_host', 'group_by_tag']);
+
+				if (!array_filter(array_intersect_key($ceprule['window'], $grouping_fields))) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
+						$path, _('at least one of "group_by_host_group", "group_by_host" or "group_by_tag" parameters must be enabled')
+					));
 				}
 			}
 		}
 		unset($ceprule);
 	}
 
-	private static function getWindowFields(int $window_type): array {
+	private static function getWindowConditionValidationFields(): array {
 		return [
-			'duration' => ['type' => API_TIME_UNIT, 'flags' => API_TIME_UNIT_WITH_YEAR, 'in' => '1:'.SEC_PER_YEAR, 'default' => '1'],
-			'capacity' => ['type' => API_INT32, 'in' => '0:'.ZBX_MAX_INT64],
-			'filter' => $window_type != ZBX_CEP_WINDOW_NONE
-				? ['type' => API_OBJECT, 'fields' => [
-					'evaltype' =>	['type' => API_INT32, 'in' => implode(',', [
-										CONDITION_EVAL_TYPE_AND_OR,
-										CONDITION_EVAL_TYPE_AND,
-										CONDITION_EVAL_TYPE_OR,
-										CONDITION_EVAL_TYPE_EXPRESSION
-									]), 'default' => CONDITION_EVAL_TYPE_AND_OR],
-					'formula' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' =>implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_COND_FORMULA, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_rule', 'formula')],
-										['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_rule', 'formula')]
-					]],
-					'conditions' =>	['type' => API_MULTIPLE, 'rules' => [
-										['if' => ['field' => 'evaltype', 'in' => implode(',', [CONDITION_EVAL_TYPE_EXPRESSION])], 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['formulaid']], 'fields' => [
-											'formulaid' =>	['type' => API_COND_FORMULAID, 'flags' => API_REQUIRED | API_NOT_EMPTY]
-										] + self::getWindowConditionFields()],
-										['else' => true, 'type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE, 'fields' => self::getWindowConditionFields()]
-					]]
-				]]
-				: ['type' => API_OBJECT, 'fields' => [], 'unset' => true],
-			'script' => $window_type == ZBX_CEP_WINDOW_PATTERN_MATCH
-				? ['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'script')]
-				: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'script')],
-			'group_by_host_group' => in_array($window_type, [
-				ZBX_CEP_WINDOW_SIMPLE,
-				ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
-				ZBX_CEP_WINDOW_PATTERN_MATCH
-			])
-				? ['type' => API_BOOLEAN]
-				: ['type' => API_BOOLEAN, 'in' => DB::getDefault('cep_window', 'group_by_host_group')],
-			'group_by_host' => in_array($window_type, [
-				ZBX_CEP_WINDOW_SIMPLE,
-				ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
-				ZBX_CEP_WINDOW_PATTERN_MATCH
-			])
-				? ['type' => API_BOOLEAN]
-				: ['type' => API_BOOLEAN, 'in' => DB::getDefault('cep_window', 'group_by_host')],
-			'group_by_tag' => in_array($window_type, [
-				ZBX_CEP_WINDOW_SIMPLE,
-				ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
-				ZBX_CEP_WINDOW_PATTERN_MATCH
-			])
-				? ['type' => API_BOOLEAN, 'default' => false]
-				: ['type' => API_BOOLEAN],
-			'tag' =>	['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'group_by_tag', 'in' => (string) true], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window', 'tag')],
-							['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'tag')]
-			]],
-			'event_count_tag' => $window_type == ZBX_CEP_WINDOW_CAUSE_SYMPTOM
-				? ['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_window', 'event_count_tag')]
-				: ['type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window', 'event_count_tag')]
-		];
-	}
-
-	private static function getWindowConditionFields(): array {
-		return [
-			'type' =>		['type' => API_INT32, 'in' => implode(',', [
+			'type' =>		['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [
 								ZBX_CEP_WINDOW_CONDITION_TAG_PAIR,
 								ZBX_CEP_WINDOW_CONDITION_OLD_TAG,
 								ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE
-							]), 'default' => ZBX_CEP_WINDOW_CONDITION_TAG_PAIR],
+							])],
 			'past_tag' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_window_condition', 'past_tag')],
 			'operator' =>	['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [
@@ -690,22 +775,22 @@ class CCepRule extends CApiService {
 								])], 'type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
 								['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_window_condition', 'operator')]
 			]],
-			'tag_value' =>	['type' => API_MULTIPLE, 'rules' => [
-								['if' => ['field' => 'type', 'in' => implode(',', [
-									ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE,
-								])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_window_condition', 'tag_value')],
-								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window_condition', 'tag_value')]
-			]],
 			'tag' =>		['type' => API_MULTIPLE, 'rules' => [
 								['if' => ['field' => 'type', 'in' => implode(',', [
 									ZBX_CEP_WINDOW_CONDITION_TAG_PAIR
 								])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_window_condition', 'tag')],
 								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window_condition', 'tag')]
+			]],
+			'tag_value' =>	['type' => API_MULTIPLE, 'rules' => [
+								['if' => ['field' => 'type', 'in' => implode(',', [
+									ZBX_CEP_WINDOW_CONDITION_OLD_TAG_VALUE
+								])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_window_condition', 'tag_value')],
+								['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_window_condition', 'tag_value')]
 			]]
 		];
 	}
 
-	private static function validateOperations(array $ceprules): void {
+	private static function validateOperations(array &$ceprules): void {
 		foreach ($ceprules as $i => &$ceprule) {
 			if (!array_key_exists('operations', $ceprule)) {
 				continue;
@@ -713,129 +798,102 @@ class CCepRule extends CApiService {
 
 			$path = '/'.($i + 1).'/operations';
 
-			$allowed_execute_when = [ZBX_CEP_OP_WHEN_EVENT_OCCURRED];
-			if ($ceprule['window_type'] != ZBX_CEP_WINDOW_NONE) {
-				$allowed_execute_when[] = ZBX_CEP_OP_WHEN_EVENT_EVICTED;
-			}
-			$additional_when = match ($ceprule['window_type']) {
-				ZBX_CEP_WINDOW_CAUSE_SYMPTOM => ZBX_CEP_OP_WHEN_WINDOW_CLOSED,
-				ZBX_CEP_WINDOW_TAG_MATCH => ZBX_CEP_OP_WHEN_TAGS_CORRELATED,
-				ZBX_CEP_WINDOW_PATTERN_MATCH => ZBX_CEP_OP_WHEN_PATTERN_MATCHED,
-				default => null
-			};
-			if ($additional_when !== null) {
-				$allowed_execute_when[] = $additional_when;
-			}
-
 			foreach ($ceprule['operations'] as $j => &$operation) {
 				$operation_path = $path.'/'.($j + 1);
 
+				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', self::EXECUTE_WHEN_BY_WINDOW_TYPE[$ceprule['window_type']]), 'flags' => API_REQUIRED],
+					'eviction_cause' =>	$ceprule['window_type'] != ZBX_CEP_WINDOW_NONE
+											? ['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'execute_when', 'in' => implode(',', [ZBX_CEP_OP_WHEN_EVENT_EVICTED])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [
+													ZBX_CEP_EVICTION_CAUSE_ANY,
+													ZBX_CEP_EVICTION_CAUSE_DURATION,
+													ZBX_CEP_EVICTION_CAUSE_CAPACITY
+												])],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'eviction_cause')]
+											]]
+											: ['type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'eviction_cause')],
+				]];
+
+				if (!CApiInputValidator::validate($api_input_rules, $operation, $operation_path, $error)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+				}
+
+				$types = $operation['execute_when'] == ZBX_CEP_OP_WHEN_EVENT_EVICTED
+					? self::OPERATION_TYPES_BY_EXECUTE_WHEN[$operation['execute_when']][$operation['eviction_cause']]
+					: self::OPERATION_TYPES_BY_EXECUTE_WHEN[$operation['execute_when']];
+
 				$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-					'execute_when' =>	['type' => API_INT32, 'in' => implode(',', $allowed_execute_when), 'flags' => API_REQUIRED],
-					'event_type' => $ceprule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM
-						? ['type' => API_MULTIPLE, 'rules' => [
-							['if' => ['field' => 'execute_when', 'in' => implode(',', [ZBX_CEP_OP_WHEN_EVENT_OCCURRED])], 'type' => API_INT32, 'in' => implode(',', [
-								ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
-								ZBX_CEP_EXECUTE_EVENT_TYPE_CAUSE,
-								ZBX_CEP_EXECUTE_EVENT_TYPE_SYMPTOM
-							])],
-							['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'event_type')]
-						]]
-						: ['type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'event_type')],
-					'eviction_cause' =>	['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'execute_when', 'in' => implode(',', [ZBX_CEP_OP_WHEN_EVENT_EVICTED])], 'type' => API_INT32, 'in' => implode(',', [
-												ZBX_CEP_EVICTION_CAUSE_ANY,
-												ZBX_CEP_EVICTION_CAUSE_DURATION,
-												ZBX_CEP_EVICTION_CAUSE_CAPACITY
-											]), 'default' => ZBX_CEP_EVICTION_CAUSE_ANY],
-											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'eviction_cause')]
-					]],
+					'execute_when' =>	['type' => API_ANY],
+					'eviction_cause' =>	['type' => API_ANY],
+					'event_type' =>		$ceprule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM
+											? ['type' => API_MULTIPLE, 'rules' => [
+												['if' => ['field' => 'execute_when', 'in' => implode(',', [ZBX_CEP_OP_WHEN_EVENT_OCCURRED])], 'type' => API_INT32, 'in' => implode(',', [
+													ZBX_CEP_EXECUTE_EVENT_TYPE_ANY,
+													ZBX_CEP_EXECUTE_EVENT_TYPE_CAUSE,
+													ZBX_CEP_EXECUTE_EVENT_TYPE_SYMPTOM
+												])],
+												['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'event_type')]
+											]]
+											: ['type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'event_type')],
+					'evaltype' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND])],
 					'tags' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['tag', 'value']], 'fields' => [
 						'tag' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation_tag', 'tag')],
 						'operator' =>		['type' => API_INT32, 'in' => implode(',', [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL])],
-						'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation_tag', 'value')]
+						'value' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation_tag', 'value'), 'default' => '']
 					]],
-					'type' =>			['type' => API_ANY, 'flags' => API_REQUIRED],
-					'evaltype' => 		['type' => API_INT32, 'in' => implode(',', [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND])],
-					'event_name' =>		['type' => API_ANY],
-					'tag' =>			['type' => API_ANY],
-					'new_tag' =>		['type' => API_ANY],
-					'tag_value' =>		['type' => API_ANY],
-					'severity' =>		['type' => API_ANY],
-					'sortorder' =>		['type' => API_INT32, 'in' => ZBX_MIN_INT64.':'.ZBX_MAX_INT64]
+					'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', $types)],
+					'event_name' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												ZBX_CEP_OP_SET_NAME
+											])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation', 'event_name')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'event_name')]
+					]],
+					'tag' =>			['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												ZBX_CEP_OP_ADD_TAG,
+												ZBX_CEP_OP_SET_TAG,
+												ZBX_CEP_OP_SET_TAG_VALUE,
+												ZBX_CEP_OP_INCREASE_TAG_VALUE,
+												ZBX_CEP_OP_DECREASE_TAG_VALUE,
+												ZBX_CEP_OP_RENAME_TAG,
+												ZBX_CEP_OP_REMOVE_TAG
+											])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation', 'tag')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'tag')]
+					]],
+					'new_tag' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												ZBX_CEP_OP_RENAME_TAG
+											])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation', 'new_tag')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'new_tag')]
+					]],
+					'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												ZBX_CEP_OP_ADD_TAG,
+												ZBX_CEP_OP_SET_TAG,
+												ZBX_CEP_OP_SET_TAG_VALUE,
+												ZBX_CEP_OP_INCREASE_TAG_VALUE,
+												ZBX_CEP_OP_DECREASE_TAG_VALUE,
+												ZBX_CEP_OP_RENAME_TAG,
+												ZBX_CEP_OP_REMOVE_TAG
+											])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation', 'tag_value')],
+											['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'tag_value')]
+					]],
+					'severity' =>		['type' => API_MULTIPLE, 'rules' => [
+											['if' => ['field' => 'type', 'in' => implode(',', [
+												ZBX_CEP_OP_SET_SEVERITY
+											])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
+											['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'severity')]
+					]]
 				]];
 
 				if (!CApiInputValidator::validate($api_input_rules, $operation, $operation_path, $error)) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 				}
-
-				$execute_when_index = $operation['execute_when'];
-				if ($operation['execute_when'] == ZBX_CEP_OP_WHEN_EVENT_EVICTED
-						&& $operation['eviction_cause'] == ZBX_CEP_EVICTION_CAUSE_CAPACITY) {
-					$execute_when_index = 'ZBX_CEP_OP_WHEN_EVENT_EVICTED_WITH_ZBX_CEP_EVICTION_CAUSE_CAPACITY';
-				}
-
-				$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-					'type' =>	['type' => API_INT32, 'in' => implode(',', self::OPERATION_TYPES_BY_EXECUTE_WHEN[$execute_when_index])]
-				]];
-
-				if (!CApiInputValidator::validate($api_input_rules, $operation, $operation_path, $error)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-				}
-
-				self::validateOperationFieldsByType($operation, $operation_path);
 			}
 			unset($operation);
 		}
 		unset($ceprule);
-	}
-
-	private static function validateOperationFieldsByType(array &$operation, string $operation_path): void {
-		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'type' =>			['type' => API_ANY],
-			'event_name' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [
-										ZBX_CEP_OP_SET_NAME
-									])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_operation', 'event_name')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'event_name')]
-			]],
-			'tag' =>			['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [
-										ZBX_CEP_OP_ADD_TAG,
-										ZBX_CEP_OP_SET_TAG,
-										ZBX_CEP_OP_SET_TAG_VALUE,
-										ZBX_CEP_OP_INCREASE_TAG_VALUE,
-										ZBX_CEP_OP_DECREASE_TAG_VALUE,
-										ZBX_CEP_OP_RENAME_TAG,
-										ZBX_CEP_OP_REMOVE_TAG
-									])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => DB::getFieldLength('cep_operation', 'tag')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'tag')]
-			]],
-			'new_tag' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [
-										ZBX_CEP_OP_RENAME_TAG
-									])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('cep_operation', 'new_tag')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'new_tag')]
-			]],
-			'tag_value' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [
-										ZBX_CEP_OP_ADD_TAG,
-										ZBX_CEP_OP_SET_TAG,
-										ZBX_CEP_OP_SET_TAG_VALUE
-									])], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('cep_operation', 'tag_value')],
-									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('cep_operation', 'tag_value')]
-			]],
-			'severity' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => implode(',', [
-										ZBX_CEP_OP_SET_SEVERITY
-									])], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
-									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('cep_operation', 'severity')]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $operation, $operation_path, $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
 	}
 
 	private static function checkDuplicates(array $ceprules, ?array $db_ceprules = null): void {
@@ -859,68 +917,6 @@ class CCepRule extends CApiService {
 
 		if ($duplicates) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('CEP rule "%1$s" already exists.', $duplicates[0]['name']));
-		}
-	}
-
-	private static function checkFilter(array $ceprules): void {
-		$condition_formula_parser = new CConditionFormula();
-
-		foreach ($ceprules as $i => $ceprule) {
-			if (!array_key_exists('filter', $ceprule)) {
-				continue;
-			}
-
-			$path = '/'.($i + 1).'/filter';
-
-			if ($ceprule['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$condition_formula_parser->parse($ceprule['filter']['formula']);
-				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
-
-				if (count($ceprule['filter']['conditions']) != count($constants)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', $path.'/conditions', _('incorrect number of conditions'))
-					);
-				}
-
-				foreach ($ceprule['filter']['conditions'] as $j => $condition) {
-					if (!array_key_exists($condition['formulaid'], $constants)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
-						));
-					}
-				}
-			}
-		}
-	}
-
-	private static function checkWindowFilter(array $ceprules): void {
-		$condition_formula_parser = new CConditionFormula();
-
-		foreach ($ceprules as $i => $ceprule) {
-			if (!array_key_exists('window', $ceprule) || !array_key_exists('filter', $ceprule['window'])) {
-				continue;
-			}
-
-			$path = '/'.($i + 1).'/window/filter';
-
-			if ($ceprule['window']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
-				$condition_formula_parser->parse($ceprule['window']['filter']['formula']);
-				$constants = array_column($condition_formula_parser->constants, 'value', 'value');
-
-				if (count($ceprule['window']['filter']['conditions']) != count($constants)) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Invalid parameter "%1$s": %2$s.', $path.'/conditions', _('incorrect number of conditions'))
-					);
-				}
-
-				foreach ($ceprule['window']['filter']['conditions'] as $j => $condition) {
-					if (!array_key_exists($condition['formulaid'], $constants)) {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							$path.'/conditions/'.($j + 1).'/formulaid', _('an identifier is not defined in the formula')
-						));
-					}
-				}
-			}
 		}
 	}
 
@@ -1022,7 +1018,10 @@ class CCepRule extends CApiService {
 		$del_windowids = [];
 		$upd_windows = [];
 		$ins_windows = [];
-		$db_defaults = DB::getDefaults('cep_window');
+
+		if ($db_ceprules !== null) {
+			self::addWindowFieldDefaultsByType($ceprules, $db_ceprules);
+		}
 
 		foreach ($ceprules as &$ceprule) {
 			$cepruleid = $ceprule['cep_ruleid'];
@@ -1042,7 +1041,6 @@ class CCepRule extends CApiService {
 				}
 				else {
 					$db_window = $db_ceprules[$cepruleid]['window'];
-					$ceprule['window'] += $db_defaults;
 					$upd_window = DB::getUpdatedValues('cep_window', $ceprule['window'], $db_window);
 
 					if ($upd_window) {
@@ -1074,6 +1072,48 @@ class CCepRule extends CApiService {
 
 		self::updateWindowConditions($ceprules, $db_ceprules);
 		self::updateWindowFormula($ceprules, $db_ceprules);
+	}
+
+	private static function addWindowFieldDefaultsByType(array &$ceprules, array $db_ceprules): void {
+		$db_defaults = DB::getDefaults('cep_window');
+
+		foreach ($ceprules as &$ceprule) {
+			if (!array_key_exists('window', $ceprule)) {
+				continue;
+			}
+
+			$db_ceprule = $db_ceprules[$ceprule['cep_ruleid']];
+
+			if ($ceprule['window_type'] == $db_ceprule['window_type']) {
+				continue;
+			}
+
+			$allowed_fields = ['duration', 'capacity'];
+
+			if (in_array($ceprule['window_type'], [
+				ZBX_CEP_WINDOW_SIMPLE,
+				ZBX_CEP_WINDOW_CAUSE_SYMPTOM,
+				ZBX_CEP_WINDOW_PATTERN_MATCH
+			])) {
+				$allowed_fields[] = 'group_by_host_group';
+				$allowed_fields[] = 'group_by_host';
+				$allowed_fields[] = 'group_by_tag';
+				$allowed_fields[] = 'tag';
+			}
+
+			if ($ceprule['window_type'] == ZBX_CEP_WINDOW_CAUSE_SYMPTOM) {
+				$allowed_fields[] = 'event_count_tag';
+			}
+			elseif ($ceprule['window_type'] == ZBX_CEP_WINDOW_TAG_MATCH) {
+				$allowed_fields[] = 'filter';
+			}
+			elseif ($ceprule['window_type'] == ZBX_CEP_WINDOW_PATTERN_MATCH) {
+				$allowed_fields[] = 'script';
+			}
+
+			$ceprule['window'] += array_diff_key($db_defaults, array_flip($allowed_fields));
+		}
+		unset($ceprule);
 	}
 
 	private static function updateWindowConditions(array &$ceprules, ?array $db_ceprules = null): void {
@@ -1363,8 +1403,7 @@ class CCepRule extends CApiService {
 		self::addAffectedObjects($ceprules, $db_ceprules);
 
 		self::checkFilter($ceprules);
-		self::validateWindow($ceprules);
-		self::checkWindowFilter($ceprules);
+		self::validateWindow($ceprules, $db_ceprules);
 		self::validateOperations($ceprules);
 	}
 
@@ -1413,6 +1452,23 @@ class CCepRule extends CApiService {
 			$db_ceprules[$row['cep_ruleid']]['filter']['conditions'][$row['cep_conditionid']] =
 				array_diff_key($row, array_flip(['cep_ruleid']));
 		}
+
+		foreach ($db_ceprules as &$db_ceprule) {
+			if (array_key_exists('filter', $db_ceprule) && array_key_exists('conditions', $db_ceprule['filter'])) {
+				if ($db_ceprule['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					CConditionHelper::addFormulaIds($db_ceprule['filter']['conditions'],
+						$db_ceprule['filter']['formula']
+					);
+				}
+				else {
+					foreach ($db_ceprule['filter']['conditions'] as &$condition) {
+						$condition['formulaid'] = '';
+					}
+					unset($condition);
+				}
+			}
+		}
+		unset($db_ceprule);
 	}
 
 	private static function addAffectedWindow(array $ceprules, ?array &$db_ceprules = null): void {
@@ -1453,12 +1509,13 @@ class CCepRule extends CApiService {
 		$windowids = [];
 
 		foreach ($ceprules as $ceprule) {
-			if (!array_key_exists('window', $ceprule) || !array_key_exists('conditions', $ceprule['window'])) {
+			if (!array_key_exists('window', $ceprule) || !array_key_exists('filter', $ceprule['window'])
+					|| !array_key_exists('conditions', $ceprule['window']['filter'])) {
 				continue;
 			}
 
 			$cepruleid = $ceprule['cep_ruleid'];
-			$db_ceprules[$cepruleid]['window']['conditions'] = [];
+			$db_ceprules[$cepruleid]['window']['filter']['conditions'] = [];
 
 			if (array_key_exists('cep_windowid', $db_ceprules[$cepruleid]['window'])) {
 				$windowids[$db_ceprules[$cepruleid]['window']['cep_windowid']] = $cepruleid;
@@ -1479,9 +1536,27 @@ class CCepRule extends CApiService {
 		while ($row = DBfetch($db_windows)) {
 			$cepruleid = $windowids[$row['cep_windowid']];
 
-			$db_ceprules[$cepruleid]['window']['conditions'][$row['cep_window_conditionid']] =
+			$db_ceprules[$cepruleid]['window']['filter']['conditions'][$row['cep_window_conditionid']] =
 				array_diff_key($row, array_flip(['cep_windowid']));
 		}
+
+		foreach ($db_ceprules as &$db_ceprule) {
+			if (array_key_exists('window', $db_ceprule) && array_key_exists('filter', $db_ceprule['window'])
+					&& array_key_exists('conditions', $db_ceprule['window']['filter'])) {
+				if ($db_ceprule['window']['filter']['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
+					CConditionHelper::addFormulaIds($db_ceprule['window']['filter']['conditions'],
+						$db_ceprule['window']['filter']['formula']
+					);
+				}
+				else {
+					foreach ($db_ceprule['window']['filter']['conditions'] as &$condition) {
+						$condition['formulaid'] = '';
+					}
+					unset($condition);
+				}
+			}
+		}
+		unset($db_ceprule);
 	}
 
 	private static function addAffectedOperations(array $ceprules, ?array &$db_ceprules = null): void {
@@ -1502,10 +1577,10 @@ class CCepRule extends CApiService {
 
 		$db_windows = DB::select('cep_operation', [
 			'output' => ['cep_operationid', 'cep_ruleid', 'execute_when', 'event_type', 'eviction_cause', 'type',
-				'evaltype', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity', 'sortorder'
+				'evaltype', 'event_name', 'tag', 'new_tag', 'tag_value', 'severity'
 			],
 			'filter' => ['cep_ruleid' => $cepruleids],
-			'sortfield' => ['sortorder']
+			'sortfield' => ['cep_operationid']
 		]);
 		$operation_rules = [];
 
@@ -1520,7 +1595,7 @@ class CCepRule extends CApiService {
 			$db_tags = DB::select('cep_operation_tag', [
 				'output' => ['cep_operation_tagid', 'cep_operationid', 'tag', 'operator', 'value'],
 				'filter' => ['cep_operationid' => array_keys($operation_rules)],
-				'sortfield' => ['sortorder']
+				'sortfield' => ['cep_operation_tagid']
 			]);
 
 			while ($row = DBfetch($db_tags)) {
