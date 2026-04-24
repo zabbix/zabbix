@@ -8457,7 +8457,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 
 	FINISH_SYNC;
 
-	/* make memory available to sync triggers, trigger tags and item tags  */
+	/* make memory available to sync triggers, trigger tags and item tags */
 	zbx_dbsync_clear(&if_sync);
 	zbx_dbsync_clear(&items_sync);
 	zbx_dbsync_clear(&item_discovery_sync);
