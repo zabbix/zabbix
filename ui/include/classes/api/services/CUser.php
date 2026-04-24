@@ -1222,6 +1222,7 @@ class CUser extends CApiService {
 		}
 
 		$email_validator = new CEmailValidator();
+		$uuid_v7_validator = new CUuidV7Validator();
 		$length = DB::getFieldLength('media', 'sendto');
 
 		foreach ($users as $i1 => $user) {
@@ -1234,33 +1235,52 @@ class CUser extends CApiService {
 					continue;
 				}
 
-				if ($db_media_types[$media['mediatypeid']]['type'] != MEDIA_TYPE_EMAIL && count($media['sendto']) > 1) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto', _('a character string is expected')
-					));
+				$type = $db_media_types[$media['mediatypeid']]['type'];
+				$base_path = '/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto';
+
+				if ($type != MEDIA_TYPE_EMAIL && $type != MEDIA_TYPE_PUSH) {
+					if (count($media['sendto']) > 1) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', $base_path, _('a character string is expected'))
+						);
+					}
+
+					continue;
 				}
 
-				if ($db_media_types[$media['mediatypeid']]['type'] == MEDIA_TYPE_EMAIL) {
-					foreach ($media['sendto'] as $i3 => $email) {
-						if ($email === '') {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto/'.($i3 + 1), _('cannot be empty')
-							));
+				foreach ($media['sendto'] as $i3 => $sendto) {
+					$path = $base_path.'/'.($i3 + 1);
+
+					if ($sendto === '') {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', $path, _('cannot be empty'))
+						);
+					}
+
+					if ($type == MEDIA_TYPE_EMAIL) {
+						if (!$email_validator->validate($sendto)) {
+							self::exception(ZBX_API_ERROR_PARAMETERS,
+								_s('Invalid parameter "%1$s": %2$s.', $path, _('an email address is expected'))
+							);
 						}
 
-						if (!$email_validator->validate($email)) {
-							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-								'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto/'.($i3 + 1),
-								_('an email address is expected')
-							));
-						}
+						continue;
+					}
+
+					// MEDIA_TYPE_PUSH
+					if ($sendto !== '*' && !$uuid_v7_validator->validate($sendto)) {
+						self::exception(ZBX_API_ERROR_PARAMETERS,
+							_s('Invalid parameter "%1$s": %2$s.', $path,
+								_("a wildcard pattern '*' or a UUIDv7 is expected")
+							)
+						);
 					}
 				}
 
 				if (mb_strlen(implode("\n", $media['sendto'])) > $length) {
-					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-						'/'.($i1 + 1).'/medias/'.($i2 + 1).'/sendto', _('value is too long')
-					));
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Invalid parameter "%1$s": %2$s.', $base_path, _('value is too long'))
+					);
 				}
 			}
 		}
