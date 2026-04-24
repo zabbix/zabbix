@@ -34,7 +34,7 @@ zabbix_export:
           name: 'Blocked clients'
           type: DEPENDENT
           key: redis.clients.blocked
-          description: 'Retrieves blocked clients from Redis server.'
+          description: 'Retrieves blocked clients from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -59,12 +59,12 @@ zabbix_export:
             - tag: component
               value: connections
         - uuid: daff9d68e5c6439082842959224ff709
-          name: 'Get Clients info'
+          name: 'Get Client info'
           type: DEPENDENT
           key: redis.clients.info_raw
           history: '0'
           value_type: TEXT
-          description: 'Extracts client-related information from Redis server.'
+          description: 'Extracts client-related information from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -79,7 +79,7 @@ zabbix_export:
           name: 'Max input buffer'
           type: DEPENDENT
           key: redis.clients.max_input_buffer
-          description: 'Monitors the maximum input buffer size of Redis server clients.'
+          description: 'Monitors maximum input buffer size of Redis server clients.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -95,7 +95,7 @@ zabbix_export:
           name: 'Max output buffer'
           type: DEPENDENT
           key: redis.clients.max_output_buffer
-          description: 'Monitors the maximum output buffer size of Redis server clients.'
+          description: 'Monitors maximum output buffer size of Redis server clients.'
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -147,7 +147,7 @@ zabbix_export:
           key: 'redis.config["{$REDIS.CONN.URI}","{$REDIS.PASSWORD}","{$REDIS.PATTERN}","{$REDIS.USERNAME}"]'
           history: 1h
           value_type: TEXT
-          description: 'Extract Redis server info.'
+          description: 'Extracts Redis server info.'
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -171,7 +171,7 @@ zabbix_export:
           key: redis.cpu.info_raw
           history: '0'
           value_type: TEXT
-          description: 'Extracts CPU usage data from Redis server.'
+          description: 'Extracts CPU usage data from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -204,7 +204,7 @@ zabbix_export:
           key: redis.cpu.sys_children
           value_type: FLOAT
           units: s
-          description: 'Retrieves system CPU usage of Redis server child processes.'
+          description: 'Retrieves system CPU usage of the Redis server child processes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -220,7 +220,7 @@ zabbix_export:
           key: redis.cpu.user
           value_type: FLOAT
           units: s
-          description: 'Collects user CPU usage data from Redis server.'
+          description: 'Collects user CPU usage data from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -261,7 +261,7 @@ zabbix_export:
               name: 'Redis: Failed to fetch INFO'
               event_name: 'Redis: Failed to fetch INFO (or no data for 30m)'
               priority: WARNING
-              description: 'Zabbix has not received any data from the Redis INFO item for the last 30 minutes.'
+              description: 'Zabbix has not received any item data for the last 30 minutes.'
               manual_close: 'YES'
               dependencies:
                 - name: 'Redis: Service is down'
@@ -275,7 +275,7 @@ zabbix_export:
           key: redis.keyspace.info_raw
           history: '0'
           value_type: TEXT
-          description: 'Extracts keyspace data from Redis server.'
+          description: 'Extracts keyspace data from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -296,7 +296,7 @@ zabbix_export:
              This value indicates the efficiency of Redis memory mapping:
                Above 1.0 – Memory fragmentation is likely. Consider restarting the Redis server to allow the operating system to reclaim fragmented memory, especially if the ratio exceeds 1.5.
                Below 1.0 – Redis may have insufficient available memory. Consider optimizing memory usage or adding more RAM.
-             
+            
              Note: If peak memory usage is significantly higher than current memory usage, the memory fragmentation ratio may be unreliable.
              More information: https://redis.io/topics/memory-optimization
           preprocessing:
@@ -316,8 +316,8 @@ zabbix_export:
               priority: WARNING
               description: |
                 This ratio is an indication of memory mapping efficiency:
-                  - Value over 1.0 indicate that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.
-                  - Value under 1.0 indicate that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.
+                  - Value over 1.0 indicates that memory fragmentation is very likely. Consider restarting the Redis server so the operating system can recover fragmented memory, especially with a ratio over 1.5.
+                  - Value under 1.0 indicates that Redis likely has insufficient memory available. Consider optimizing memory usage or adding more RAM.
                 
                 Note: If your peak memory usage is much higher than your current memory usage, the memory fragmentation ratio may be unreliable.
                 
@@ -331,7 +331,7 @@ zabbix_export:
           key: redis.memory.info_raw
           history: '0'
           value_type: TEXT
-          description: 'Extracts memory data from Redis server.'
+          description: 'Extracts memory data from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -362,7 +362,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.memory.used_memory_lua
           units: B
-          description: 'Monitors memory used by Lua scripts in Redis server.'
+          description: 'Monitors the memory used by Lua scripts in the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -392,7 +392,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.memory.used_memory_rss
           units: B
-          description: 'Monitors the resident memory (RSS) used by Redis server.'
+          description: 'Monitors resident memory (RSS) used by the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -424,7 +424,7 @@ zabbix_export:
           name: 'AOF enabled'
           type: DEPENDENT
           key: redis.persistence.aof_enabled
-          description: 'Indicates if AOF persistence is enabled on Redis server.'
+          description: 'Indicates if AOF persistence is enabled on the Redis server.'
           valuemap:
             name: 'Redis flag'
           preprocessing:
@@ -440,7 +440,7 @@ zabbix_export:
           name: 'AOF last bgrewrite status'
           type: DEPENDENT
           key: redis.persistence.aof_last_bgrewrite_status
-          description: 'Shows the status of the last AOF background rewrite on Redis server.'
+          description: 'Shows the status of the last AOF background rewrite on the Redis server.'
           valuemap:
             name: 'Redis bgwrite status'
           preprocessing:
@@ -459,7 +459,7 @@ zabbix_export:
           key: redis.persistence.aof_last_rewrite_time_sec
           value_type: FLOAT
           units: s
-          description: 'Shows the duration of the last AOF rewrite in seconds on Redis server.'
+          description: 'Shows the duration of the last AOF rewrite in seconds on the Redis server.'
           valuemap:
             name: 'Redis bgsave time'
           preprocessing:
@@ -475,7 +475,7 @@ zabbix_export:
           name: 'AOF last write status'
           type: DEPENDENT
           key: redis.persistence.aof_last_write_status
-          description: 'Shows the status of the last AOF write on Redis server.'
+          description: 'Shows the status of the last AOF write on the Redis server.'
           valuemap:
             name: 'Redis bgwrite status'
           preprocessing:
@@ -501,7 +501,7 @@ zabbix_export:
           name: 'AOF rewrite in progress'
           type: DEPENDENT
           key: redis.persistence.aof_rewrite_in_progress
-          description: 'Indicates if an AOF rewrite is currently in progress on Redis server.'
+          description: 'Indicates if an AOF rewrite is currently in progress on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -531,7 +531,7 @@ zabbix_export:
           key: redis.persistence.info_raw
           history: '0'
           value_type: TEXT
-          description: 'Collects persistence data from Redis server.'
+          description: 'Collects persistence data from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -562,7 +562,7 @@ zabbix_export:
           name: 'RDB bgsave in progress'
           type: DEPENDENT
           key: redis.persistence.rdb_bgsave_in_progress
-          description: 'Indicates if an RDB BGSAVE is currently in progress on Redis server.'
+          description: 'Indicates if an RDB `BGSAVE` is currently in progress on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -576,7 +576,7 @@ zabbix_export:
           name: 'RDB changes since last save'
           type: DEPENDENT
           key: redis.persistence.rdb_changes_since_last_save
-          description: 'Shows the number of changes since the last RDB save on Redis server.'
+          description: 'Shows the number of changes since the last RDB save on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -592,7 +592,7 @@ zabbix_export:
           key: redis.persistence.rdb_current_bgsave_time_sec
           value_type: FLOAT
           units: s
-          description: 'Monitors the current RDB BGSAVE duration in Redis server.'
+          description: 'Monitors the current RDB `BGSAVE` duration in the Redis server.'
           valuemap:
             name: 'Redis bgsave time'
           preprocessing:
@@ -608,7 +608,7 @@ zabbix_export:
           name: 'RDB last bgsave status'
           type: DEPENDENT
           key: redis.persistence.rdb_last_bgsave_status
-          description: 'Shows the status of the last RDB BGSAVE operation in Redis server.'
+          description: 'Shows the status of the last RDB `BGSAVE` operation in the Redis server.'
           valuemap:
             name: 'Redis bgwrite status'
           preprocessing:
@@ -636,7 +636,7 @@ zabbix_export:
           key: redis.persistence.rdb_last_bgsave_time_sec
           value_type: FLOAT
           units: s
-          description: 'Monitors the last RDB BGSAVE duration in Redis server.'
+          description: 'Monitors the last RDB `BGSAVE` duration in the Redis server.'
           valuemap:
             name: 'Redis bgsave time'
           preprocessing:
@@ -652,7 +652,7 @@ zabbix_export:
           name: 'RDB last save time'
           type: DEPENDENT
           key: redis.persistence.rdb_last_save_time
-          description: 'Shows the timestamp of the last RDB save on Redis server.'
+          description: 'Shows the timestamp of the last RDB save on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -717,7 +717,7 @@ zabbix_export:
           key: redis.replication.info_raw
           history: '0'
           value_type: TEXT
-          description: 'Extracts replication data from Redis server.'
+          description: 'Extracts replication data from the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -733,7 +733,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.replication.master_repl_offset
           units: B
-          description: 'Shows the master replication offset on Redis server.'
+          description: 'Shows the master replication offset on the Redis server.'
           valuemap:
             name: 'Redis repl offset'
           preprocessing:
@@ -749,7 +749,7 @@ zabbix_export:
           name: 'Replication backlog active'
           type: DEPENDENT
           key: redis.replication.repl_backlog_active
-          description: 'Indicates if the replication backlog is active on Redis server.'
+          description: 'Indicates if the replication backlog is active on the Redis server.'
           valuemap:
             name: 'Redis flag'
           preprocessing:
@@ -766,7 +766,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.replication.repl_backlog_first_byte_offset
           units: B
-          description: 'Shows the offset of the first byte in Redis server replication backlog.'
+          description: 'Shows the offset of the first byte in the Redis server replication backlog.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -780,7 +780,7 @@ zabbix_export:
           name: 'Replication backlog history length'
           type: DEPENDENT
           key: redis.replication.repl_backlog_histlen
-          description: 'Shows the length of Redis server replication backlog history.'
+          description: 'Shows the length of the Redis server replication backlog history.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -795,7 +795,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.replication.repl_backlog_size
           units: B
-          description: 'Shows the size of Redis server replication backlog.'
+          description: 'Shows the size of the Redis server replication backlog.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -874,7 +874,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.server.redis_mode
           value_type: CHAR
-          description: 'Retrieves the current Redis server mode ("standalone", "sentinel" or "cluster").'
+          description: 'Retrieves the current Redis server mode (`standalone`, `sentinel`, or `cluster`).'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -892,7 +892,7 @@ zabbix_export:
           type: DEPENDENT
           key: redis.server.redis_version
           value_type: CHAR
-          description: 'Version of Redis server.'
+          description: 'Version of the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -962,7 +962,7 @@ zabbix_export:
         - uuid: 51a65fa1d27e4fcd915c5019687e7bc9
           name: 'Slowlog entries per second'
           key: 'redis.slowlog.count["{$REDIS.CONN.URI}","{$REDIS.PASSWORD}","{$REDIS.USERNAME}"]'
-          description: 'Tracks the rate of slowlog entries from the Redis server.'
+          description: 'Tracks `SLOWLOG` entry rate on the Redis server.'
           preprocessing:
             - type: CHANGE_PER_SECOND
           tags:
@@ -981,7 +981,7 @@ zabbix_export:
           name: 'Evicted keys'
           type: DEPENDENT
           key: redis.stats.evicted_keys
-          description: 'Number of keys evicted by Redis server due to maxmemory limit.'
+          description: 'Number of keys evicted by the Redis server due to the `maxmemory` limit.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -995,7 +995,7 @@ zabbix_export:
           name: 'Expired keys'
           type: DEPENDENT
           key: redis.stats.expired_keys
-          description: 'Total number of keys expired on Redis server.'
+          description: 'Total number of keys expired on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1028,7 +1028,7 @@ zabbix_export:
           key: redis.stats.instantaneous_input.rate
           value_type: FLOAT
           units: Bps
-          description: 'Instantaneous network read rate in KB/sec on  Redis server.'
+          description: 'Instantaneous network read rate in KB/sec on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1045,7 +1045,7 @@ zabbix_export:
           name: 'Instantaneous operations per sec'
           type: DEPENDENT
           key: redis.stats.instantaneous_ops.rate
-          description: 'Shows the number of operations processed per second by Redis server.'
+          description: 'Shows the number of operations processed per second by the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1061,7 +1061,7 @@ zabbix_export:
           key: redis.stats.instantaneous_output.rate
           value_type: FLOAT
           units: Bps
-          description: 'Instantaneous network write rate in KB/sec on Redis server.'
+          description: 'Instantaneous network write rate in KB/sec on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1092,7 +1092,7 @@ zabbix_export:
           name: 'Keyspace misses'
           type: DEPENDENT
           key: redis.stats.keyspace_misses
-          description: 'Number of failed key lookups in Redis server main dictionary.'
+          description: 'Number of failed key lookups in the Redis server main dictionary.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1124,7 +1124,7 @@ zabbix_export:
           name: 'Migrate cached sockets'
           type: DEPENDENT
           key: redis.stats.migrate_cached_sockets
-          description: 'Number of sockets currently open for Redis server MIGRATE operations.'
+          description: 'Number of sockets currently open for the Redis server `MIGRATE` operations.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1166,7 +1166,7 @@ zabbix_export:
           name: 'Rejected connections'
           type: DEPENDENT
           key: redis.stats.rejected_connections
-          description: 'Number of connections rejected by the Redis server due to the maxclients limit.'
+          description: 'Number of connections rejected by the Redis server due to the `maxclients` limit.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1182,7 +1182,7 @@ zabbix_export:
               name: 'Redis: Connections are rejected'
               priority: HIGH
               description: |
-                Number of connections rejected after Redis server reached the "maxclients" limit.
+                Number of connections rejected after Redis server reached the `maxclients` limit.
                 
                 https://redis.io/topics/clients
               tags:
@@ -1206,7 +1206,7 @@ zabbix_export:
           name: 'Sync partial err'
           type: DEPENDENT
           key: redis.stats.sync_partial_err
-          description: 'Number of denied partial resynchronization requests on Redis server.'
+          description: 'Number of denied partial resynchronization requests on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1220,7 +1220,7 @@ zabbix_export:
           name: 'Sync partial ok'
           type: DEPENDENT
           key: redis.stats.sync_partial_ok
-          description: 'Number of accepted partial resynchronization requests on Redis server.'
+          description: 'Number of accepted partial resynchronization requests on the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1234,7 +1234,7 @@ zabbix_export:
           name: 'Total commands processed'
           type: DEPENDENT
           key: redis.stats.total_commands_processed
-          description: 'Total number of commands processed by Redis server.'
+          description: 'Total number of commands processed by the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1248,7 +1248,7 @@ zabbix_export:
           name: 'Total connections received'
           type: DEPENDENT
           key: redis.stats.total_connections_received
-          description: 'Total number of connections received by Redis server.'
+          description: 'Total number of connections received by the Redis server.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1308,7 +1308,7 @@ zabbix_export:
               name: 'Memory usage (rss)'
               key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,rss]'
               units: B
-              description: 'Resident set size memory used by process in bytes.'
+              description: 'Resident Set Size memory used by the process, in bytes.'
               tags:
                 - tag: component
                   value: memory
@@ -1316,7 +1316,7 @@ zabbix_export:
               name: 'Memory usage (vsize)'
               key: 'proc.mem["{$REDIS.PROCESS_NAME}{#SINGLETON}",,,,vsize]'
               units: B
-              description: 'Virtual memory size used by process in bytes.'
+              description: 'Virtual memory size used by the process, in bytes.'
               tags:
                 - tag: component
                   value: memory
@@ -1390,7 +1390,7 @@ zabbix_export:
               name: 'DB {#DB}: Expires'
               type: DEPENDENT
               key: 'redis.db.expires["{#DB}"]'
-              description: 'Number of keys with an expiration.'
+              description: 'Number of keys with an expiration set.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1408,7 +1408,7 @@ zabbix_export:
               key: 'redis.db.info_raw["{#DB}"]'
               history: '0'
               value_type: TEXT
-              description: 'The item gets information about keyspace of {#DB} database.'
+              description: 'The item gets information about the keyspace of database `{#DB}`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1484,7 +1484,7 @@ zabbix_export:
               name: 'Lazyfree pending objects{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.memory.lazyfree_pending_objects[{#SINGLETON}]'
-              description: 'The number of objects waiting to be freed (as a result of calling UNLINK, or FLUSHDB and FLUSHALL with the ASYNC option).'
+              description: 'The number of objects waiting to be freed (as a result of calling `UNLINK`, or `FLUSHDB` and `FLUSHALL` with the `ASYNC` option).'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1514,7 +1514,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'redis.memory.maxmemory_policy[{#SINGLETON}]'
               value_type: CHAR
-              description: 'The value of the maxmemory-policy configuration directive.'
+              description: 'The value of the `maxmemory-policy` configuration directive.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1532,7 +1532,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'redis.memory.total_system_memory[{#SINGLETON}]'
               units: B
-              description: 'The total amount of memory that the Redis host has.'
+              description: 'The total amount of memory of the Redis host.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1563,7 +1563,7 @@ zabbix_export:
               key: 'redis.memory.used_memory_dataset_perc[{#SINGLETON}]'
               value_type: FLOAT
               units: '%'
-              description: 'The percentage of used_memory_dataset out of the net memory usage (used_memory minus used_memory_startup).'
+              description: 'The percentage of `used_memory_dataset` out of the net memory usage (`used_memory` minus `used_memory_startup`).'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1598,7 +1598,7 @@ zabbix_export:
               key: 'redis.memory.used_memory_peak_perc[{#SINGLETON}]'
               value_type: FLOAT
               units: '%'
-              description: 'The percentage of "used_memory_peak" out of "used_memory".'
+              description: 'The percentage of `used_memory_peak` out of `used_memory`.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1617,7 +1617,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'redis.memory.used_memory_startup[{#SINGLETON}]'
               units: B
-              description: 'Initial amount of memory consumed by Redis at startup in bytes.'
+              description: 'Initial amount of memory consumed by Redis at startup, in bytes.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1697,7 +1697,7 @@ zabbix_export:
               name: 'Active defrag hits{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.stats.active_defrag_hits[{#SINGLETON}]'
-              description: 'Number of value reallocations performed by active the defragmentation process.'
+              description: 'Number of value reallocations performed by the active defragmentation process.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2132,7 +2132,7 @@ zabbix_export:
               name: 'AOF delayed fsync{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_delayed_fsync[{#SINGLETON}]'
-              description: 'Delayed fsync counter.'
+              description: 'Count of delayed `fsync` jobs.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2146,7 +2146,7 @@ zabbix_export:
               name: 'AOF pending background I/O fsync{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_pending_bio_fsync[{#SINGLETON}]'
-              description: 'Number of fsync pending jobs in background I/O queue.'
+              description: 'Number of pending `fsync` jobs in the background I/O queue.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2160,7 +2160,7 @@ zabbix_export:
               name: 'AOF pending rewrite{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.persistence.aof_pending_rewrite[{#SINGLETON}]'
-              description: 'Flag indicating an AOF rewrite operation will.'
+              description: 'Flag indicating an AOF rewrite operation is pending.'
               valuemap:
                 name: 'Redis flag'
               preprocessing:
@@ -2208,7 +2208,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'redis.replication.lag_bytes["{#SLAVE_IP}:{#SLAVE_PORT}"]'
               units: B
-              description: 'Replication lag in bytes.'
+              description: 'Replication lag, in bytes.'
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
@@ -2280,7 +2280,7 @@ zabbix_export:
               key: 'redis.replication.master_last_io_seconds_ago[{#SINGLETON}]'
               value_type: FLOAT
               units: s
-              description: 'Number of seconds since the last interaction with master.'
+              description: 'Number of seconds since the last interaction with the master.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2319,7 +2319,7 @@ zabbix_export:
               name: 'Master port{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_port[{#SINGLETON}]'
-              description: 'Master listening TCP port.'
+              description: 'TCP port the master is listening on.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2336,7 +2336,7 @@ zabbix_export:
               name: 'Master sync in progress{#SINGLETON}'
               type: DEPENDENT
               key: 'redis.replication.master_sync_in_progress[{#SINGLETON}]'
-              description: 'Indicate the master is syncing to the replica.'
+              description: 'Indicates the master is syncing to the replica.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -2431,14 +2431,14 @@ zabbix_export:
         - macro: '{$REDIS.CONN.URI}'
           value: 'tcp://localhost:6379'
           description: |
-            Connection string in the URI format. This param overwrites a value configured
-            in the "Server" option of the configuration file if that option is set,
-            otherwise, the plugin's default value is used: "tcp://localhost:6379".
+            Connection string in URI format.
+            When set, this parameter overrides the value specified in the `Server` option of the configuration file.
+            Otherwise, the plugin's default value is used: `tcp://localhost:6379`.
           config:
             type: TEXT
             priority: '1'
             label: 'Connection string'
-            description: 'Connection string in the URI format. This param overwrites a value configured in the "Server" option of the configuration file if that option is set, otherwise, the plugin''s default value is used: "tcp://localhost:6379".'
+            description: 'Connection string in the URI format. This param overwrites a value configured in the `Server` option of the configuration file if that option is set, otherwise, the plugin''s default value is used: "tcp://localhost:6379".'
             required: 'YES'
         - macro: '{$REDIS.LLD.FILTER.DB.MATCHES}'
           value: '.*'
@@ -2513,13 +2513,13 @@ zabbix_export:
             required: 'YES'
         - macro: '{$REDIS.REPL.LAG.MAX.WARN}'
           value: 30s
-          description: 'Maximum replication lag allowed between Redis master and replica (in seconds).'
+          description: 'Maximum replication lag allowed between Redis master and replica, in seconds.'
           config:
             type: TEXT
             priority: '10'
             section_name: Thresholds
             label: 'Max replication lag (sec)'
-            description: 'Maximum replication lag allowed between Redis master and replica (in seconds).'
+            description: 'Maximum replication lag allowed between Redis master and replica, in seconds.'
         - macro: '{$REDIS.SECTION}'
           description: 'Section of Redis server information to retrieve.'
           config:
@@ -2765,7 +2765,7 @@ zabbix_export:
       event_name: 'Redis: Total number of connected clients is too high (over {$REDIS.CLIENTS.PRC.MAX.WARN}% in 5m)'
       priority: WARNING
       description: |
-        When the number of clients reaches the value of the "maxclients" parameter, new connections will be rejected.
+        When the number of clients reaches the value of the `maxclients` parameter, new connections will be rejected.
         
         https://redis.io/topics/clients#maximum-number-of-clients
       tags:
