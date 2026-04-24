@@ -97,7 +97,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'ruleid' => $lld_ruleid,
 				'name' => 'Sensor '.$def['suffix'].' ['.self::LLD_MACRO.']',
 				'key_' => self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.']',
-				'type' => ITEM_TYPE_TRAPPER,
+				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => $def['value_type']
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
@@ -195,7 +195,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_HistoryPastSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_past;
-		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
+		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
 
 		self::$sent_past = $sent;
 	}
@@ -216,7 +216,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_HistoryNowSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
-		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
+		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
 
 		self::$sent_now = $sent;
 	}
@@ -395,8 +395,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$base_ns = (int)(microtime(true) * 1e9) % 1000000000;
 			foreach ($items_by_key as $key => $itemid) {
 				$values[] = [
-					'host' => self::HOSTNAME,
-					'key' => $key,
+					'itemid' => $itemid,
 					'value' => (string)($idx + 1),
 					'clock' => $tm,
 					'ns' => ($base_ns + $idx) % 1000000000
@@ -430,7 +429,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 	private function sendHistoryAt(int $tm): array {
 		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm);
-		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
+		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
 
 		return $sent;
 	}
