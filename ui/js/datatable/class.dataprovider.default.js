@@ -75,24 +75,22 @@ class CDefaultDataProvider extends CDataProvider {
 	}
 
 	/**
-	 * @param {CDataTableColumn[]} columns        Column configurations
-	 * @param {Object}             filter         Filters
-	 * @param {Object}             options        Table and column options
-	 * @param {number}             page           The current page
-	 * @param {string}             sort_field     Sort field
-	 * @param {string}             sort_order     Sort order (ASC/DESC)
-	 * @param {boolean}            check_changes  Check against cached state to prevent redundant requests
-	 * @param {boolean}            force_load     Bypasses all checks and guarantees a new request
-	 * @param {string}             export_file    If provided, triggers file generation server-side
+	 * @param {CDataTableColumn[]} columns         Column configurations
+	 * @param {Object}             filter          Filters
+	 * @param {Object}             column_options  Column options
+	 * @param {Object}             options         Table options
+	 * @param {number}             page            The current page
+	 * @param {string}             sort_field      Sort field
+	 * @param {string}             sort_order      Sort order (ASC/DESC)
+	 * @param {boolean}            check_changes   Check against cached state to prevent redundant requests
+	 * @param {boolean}            force_load      Bypasses all checks and guarantees a new request
+	 * @param {string}             export_file     If provided, triggers file generation server-side
 	 */
-	getData({columns, filter, options, page, sort_field, sort_order, check_changes, force_load, export_file}) {
+	getData({columns, filter, column_options, options, page, sort_field, sort_order, check_changes, force_load,
+			export_file}) {
 		const data_fields = [
 			...new Set(columns.flatMap(column => column.isVisible() ? column.getFields() : []))
 		];
-
-		const columns_options = columns.reduce((options, column) => {
-			return Object.assign(options, column.getColumnOptions());
-		}, {});
 
 		filter = Object.fromEntries(
 			Object.entries(filter).filter(([key]) => {
@@ -108,11 +106,11 @@ class CDefaultDataProvider extends CDataProvider {
 			const fields_set_changed = !data_fields.every(field => this.#last_data_fields.includes(field));
 			const filter_changed = !deepCompare(this.#last_filter, filter);
 			const options_changed = !deepCompare(this.#last_options, options);
-			const columns_options_changed = !deepCompare(this.#last_column_options, columns_options);
+			const column_options_changed = !deepCompare(this.#last_column_options, column_options);
 			const page_changed = this.#last_page !== page;
 			const sort_changed = this.#last_sort_field !== sort_field || this.#last_sort_order !== sort_order;
 
-			if (!fields_set_changed && !columns_options_changed && !filter_changed && !options_changed
+			if (!fields_set_changed && !column_options_changed && !filter_changed && !options_changed
 				&& !page_changed && !sort_changed
 			) {
 				return Promise.resolve(this.#last_response);
@@ -122,7 +120,7 @@ class CDefaultDataProvider extends CDataProvider {
 		this.#last_data_fields = data_fields;
 		this.#last_filter = filter;
 		this.#last_options = options;
-		this.#last_column_options = columns_options;
+		this.#last_column_options = column_options;
 		this.#last_page = page;
 		this.#last_sort_field = sort_field;
 		this.#last_sort_order = sort_order;
@@ -139,7 +137,7 @@ class CDefaultDataProvider extends CDataProvider {
 			],
 			body: JSON.stringify({
 				data_fields,
-				options: Object.assign({}, columns_options, options),
+				options: Object.assign({}, column_options, options),
 				filter,
 				page,
 				sort_field,

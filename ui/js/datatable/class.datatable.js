@@ -2220,7 +2220,8 @@ class CDataTable {
 		const defaults = column.clone()
 			.setDuplicate(false)
 			.setName(`${name} (${duplicate_count})`)
-			.setSpan(1);
+			.setSpan(1)
+			.setVisible(user_column.visible || true);
 
 		return defaults.clone()
 			.setDuplicate(true)
@@ -2442,19 +2443,18 @@ class CDataTable {
 	}
 
 	#getDataProviderParams(params) {
-		const data_columns = this.getNonDuplicateColumns();
-
-		let column_options = {};
-		for (const column of data_columns) {
-			column_options = Object.assign(column_options, column.getColumnOptions());
-		}
+		const column_options = this.getNonDuplicateColumns().reduce((options, column) => {
+			return Object.assign(options, column.getColumnOptions());
+		}, {});
 
 		const options = Object.fromEntries(
 			Object.entries(this.#options).map(([id, option]) => [id, option.checked ? 1 : 0])
 		);
 
+		const visible_columns = this.getVisibleColumns();
+
 		return {
-			columns: [...data_columns].sort((a, b) => a.getColumnIndex() - b.getColumnIndex()),
+			columns: [...visible_columns].sort((a, b) => a.getColumnIndex() - b.getColumnIndex()),
 			filter: this.#filter,
 			options,
 			column_options,
