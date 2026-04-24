@@ -114,6 +114,10 @@ class CControllerCorrelationList extends CController {
 				'editable' => true,
 				'limit' => $limit
 			]);
+
+			if ($result_legacy === false) {
+				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
+			}
 		}
 
 		if ($filter['type'] == ZBX_CEP_FILTER_SHOW_ALL || $filter['type'] == ZBX_CEP_FILTER_SHOW_CEP) {
@@ -130,6 +134,11 @@ class CControllerCorrelationList extends CController {
 				],
 				'limit' => $limit
 			]);
+
+
+			if ($result_cep === false) {
+				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.
+			}
 		}
 
 		return array_map(function(array $record) {
