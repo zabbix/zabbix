@@ -252,7 +252,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			CClickHouseStorage::class
 		);
 
-		yield 'Support <name> AS <alias> in SELECT when <name>!==<alias>' => [
+		yield 'Support <value> AS <key> in SELECT when <key>!==<value>' => [
 			$closure,
 			[
 				'select' => ['itemid' => 'itemid', 'type' => 'i.type'],
@@ -476,6 +476,171 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	 * @dataProvider dataProviderAddQuerySortOptions
 	 */
 	public function testAddQuerySortOptions(Closure $method, array $sql_parts, array $options, $expected) {
+		$this->assertSame($expected, $method($sql_parts, $options));
+	}
+
+	public static function dataProviderAddQueryFilterOptions() {
+		$closure = Closure::bind(
+			fn($sql_parts, $options) => $this->addQueryFilterOptions($sql_parts, $options),
+			new CClickHouseStorage([
+				'url' => '',
+				'types' => [],
+				'db' => '',
+				'username' => '',
+				'password' => ''
+			], []),
+			CClickHouseStorage::class
+		);
+		$defaults = [
+			'history' => null,
+			'time_from' => null,
+			'time_till' => null,
+			'searchByAny' => null
+		];
+
+		yield 'Filter for clock produces condition for clock_ns' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'time_from' => 1234567,
+				'filter' => ['clock' => 1234567]
+			] + $defaults,
+			[
+				'where' => [
+					'filter' => 'toUnixTimestamp(clock_ns)={filter_clock:UInt64}'
+				],
+				'param' => [
+					'UInt64' => ['filter_clock' => 1234567]
+				],
+			]
+		];
+
+		yield 'Filter for ns produces condition for clock_ns' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'time_from' => 1234567,
+				'filter' => ['ns' => 1234567]
+			] + $defaults,
+			[
+				'where' => [
+					'filter' => 'toUnixTimestamp64Nano(clock_ns)%1000000000={filter_ns:Int32}'
+				],
+				'param' => [
+					'Int32' => ['filter_ns' => 1234567]
+				],
+			]
+		];
+
+		yield 'Filter adds IN for array of values' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'filter' => ['itemid' => [1, 2, 3, 4]]
+			] + $defaults,
+			[
+				'where' => [
+					'filter' => 'itemid IN {filter_itemid:Array(UInt64)}'
+				],
+				'param' => [
+					'UInt64' => ['filter_itemid' => [1, 2, 3, 4]]
+				],
+			]
+		];
+
+		// This may be flaky because the value returned by time() may differ by 1 second.
+		yield 'Filter by ns add PREWHERE current timestamp when clock, time_from and time_till not set' => [
+			$closure,
+			['prewhere' => [], 'where' => [], 'param' => ['UInt64' => [], 'Int32' => []]],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'filter' => ['ns' => 1234567]
+			] + $defaults,
+			[
+				'prewhere' => [
+					'pre_time_gte' => 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)',
+					'pre_time_lte' => 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)'
+				],
+				'where' => [
+					'filter' => 'toUnixTimestamp64Nano(clock_ns)%1000000000={filter_ns:Int32}'
+				],
+				'param' => [
+					'UInt64' => [
+						'pre_time_gte' => time(),
+						'pre_time_lte' => time()
+					],
+					'Int32' => [
+						'filter_ns' => 1234567
+					]
+				]
+			]
+		];
+
+		yield 'Filter by ns add PREWHERE when time_from and time_till not set' => [
+			$closure,
+			['prewhere' => [], 'where' => [], 'param' => ['UInt64' => [], 'Int32' => []]],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'filter' => ['clock' => 1234567, 'ns' => 1234567]
+			] + $defaults,
+			[
+				'prewhere' => [
+					'pre_time_gte' => 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)',
+					'pre_time_lte' => 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)'
+				],
+				'where' => [
+					'filter' => 'toUnixTimestamp(clock_ns)={filter_clock:UInt64} AND toUnixTimestamp64Nano(clock_ns)%1000000000={filter_ns:Int32}'
+				],
+				'param' => [
+					'UInt64' => [
+						'filter_clock' => 1234567,
+						'pre_time_gte' => 1234567,
+						'pre_time_lte' => 1234567
+					],
+					'Int32' => [
+						'filter_ns' => 1234567
+					]
+				]
+			]
+		];
+
+		yield 'Filter by ns add PREWHERE with min/max when clock,time_from and time_till not set' => [
+			$closure,
+			['prewhere' => [], 'where' => [], 'param' => ['UInt64' => [], 'Int32' => []]],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'filter' => ['clock' => [1, 28, 2018], 'ns' => 1234567]
+			] + $defaults,
+			[
+				'prewhere' => [
+					'pre_time_gte' => 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)',
+					'pre_time_lte' => 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)'
+				],
+				'where' => [
+					'filter' => 'toUnixTimestamp(clock_ns) IN {filter_clock:Array(UInt64)} AND toUnixTimestamp64Nano(clock_ns)%1000000000={filter_ns:Int32}'
+				],
+				'param' => [
+					'UInt64' => [
+						'filter_clock' => [1, 28, 2018],
+						'pre_time_gte' => 1,
+						'pre_time_lte' => 2018
+					],
+					'Int32' => [
+						'filter_ns' => 1234567
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @covers CClickHouseStorage::addQueryFilterOptions
+	 * @dataProvider dataProviderAddQueryFilterOptions
+	 */
+	public function testAddQueryFilterOptions(Closure $method, array $sql_parts, array $options, $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
 }
