@@ -17,8 +17,8 @@
 class CControllerTemplateListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['templateid', 'data_actions', 'name', 'hosts', 'items', 'triggers',
-		'graphs', 'dashboards', 'discovery', 'web', 'vendor_name', 'vendor_version', 'parentTemplates', 'templates',
-		'tags'];
+		'graphs', 'dashboards', 'discoveryRules', 'httpTests', 'vendor_name', 'vendor_version', 'parentTemplates',
+		'templates', 'tags'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);

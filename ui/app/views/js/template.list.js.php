@@ -122,10 +122,10 @@
 						.setFields(['templateid', 'dashboards'])
 						.setRenderer('dashboards'),
 					new CDataTableColumn('discovery', <?= json_encode(_('Discovery')); ?>)
-						.setFields(['templateid', 'discovery'])
+						.setFields(['templateid', 'discoveryRules'])
 						.setRenderer('discovery'),
 					new CDataTableColumn('web', <?= json_encode(_('Web')); ?>)
-						.setFields(['templateid', 'web'])
+						.setFields(['templateid', 'httpTests'])
 						.setRenderer('web'),
 					new CDataTableColumn('vendor', <?= json_encode(_('Vendor')); ?>)
 						.setFields(['vendor_name']),
@@ -170,10 +170,9 @@
 
 					if (allowed_ui_conf_hosts) {
 						const url = new URL('zabbix.php', location.href);
-						url.searchParams.set('action', 'template.list');
+						url.searchParams.set('action', 'host.list');
 						url.searchParams.set('filter_set', '1');
 						url.searchParams.set('filter_templates[0]', templateid);
-						url.searchParams.set('context', 'template');
 
 						const item_link = document.createElement('a');
 						item_link.setAttribute('href', url.toString());
@@ -285,11 +284,11 @@
 					}
 				})
 				.setCellRenderer('discovery', ({cell_data, cell_inner}) => {
-					const [templateid, discovery] = cell_data;
+					const [templateid, discovery_rules] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'template.dashboard.list');
-					url.searchParams.set('templateid', templateid);
+					const url = new URL('host_discovery.php', location.href);
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', templateid);
 					url.searchParams.set('context', 'template');
 
 					const item_link = document.createElement('a');
@@ -298,20 +297,20 @@
 
 					cell_inner.appendChild(item_link);
 
-					if (discovery > 0) {
+					if (discovery_rules > 0) {
 						const count = document.createElement('sup');
-						count.textContent = discovery;
+						count.textContent = discovery_rules;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
 					}
 				})
 				.setCellRenderer('web', ({cell_data, cell_inner}) => {
-					const [templateid, web] = cell_data;
+					const [templateid, http_tests] = cell_data;
 
-					const url = new URL('zabbix.php', location.href);
-					url.searchParams.set('action', 'template.dashboard.list');
-					url.searchParams.set('templateid', templateid);
+					const url = new URL('httpconf.php', location.href);
+					url.searchParams.set('filter_set', '1');
+					url.searchParams.set('filter_hostids[0]', templateid);
 					url.searchParams.set('context', 'template');
 
 					const item_link = document.createElement('a');
@@ -320,54 +319,51 @@
 
 					cell_inner.appendChild(item_link);
 
-					if (web > 0) {
+					if (http_tests > 0) {
 						const count = document.createElement('sup');
-						count.textContent = web;
+						count.textContent = http_tests;
 
 						cell_inner.innerHTML += ' ';
 						cell_inner.appendChild(count);
 					}
 				})
-				.setCellRenderer('linked_templates', ({cell_data, cell_inner}) => {
+				.setCellRenderer('linked_templates', ({cell_data, cell_inner, response}) => {
 					const [parent_templates] = cell_data;
+					const {max_in_table} = response;
+					const length = Math.min(max_in_table, parent_templates.length);
 
-					this.datatable.getData().then(response => {
-						const {max_in_table} = response;
-						const length = Math.min(max_in_table, parent_templates.length);
+					for (let i = 0; i < length; i++) {
+						const template = parent_templates[i];
 
-						for (let i = 0; i < length; i++) {
-							const template = parent_templates[i];
+						if (template.editable) {
+							const url = new URL('zabbix.php', location.href);
+							url.searchParams.set('action', 'popup');
+							url.searchParams.set('popup', 'template.edit');
+							url.searchParams.set('templateid', template.templateid);
 
-							if (template.editable) {
-								const url = new URL('zabbix.php', location.href);
-								url.searchParams.set('action', 'popup');
-								url.searchParams.set('popup', 'template.edit');
-								url.searchParams.set('templateid', template.templateid);
+							const template_link = document.createElement('a');
+							template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
+							template_link.setAttribute('href', url.toString());
+							template_link.textContent = template.name;
 
-								const template_link = document.createElement('a');
-								template_link.classList.add(ZBX_STYLE_LINK_ALT, ZBX_STYLE_GREY);
-								template_link.setAttribute('href', url.toString());
-								template_link.textContent = template.name;
+							cell_inner.appendChild(template_link);
+						}
+						else {
+							const template_link = document.createElement('span');
+							template_link.classList.add(ZBX_STYLE_GREY);
+							template_link.textContent = template.name;
 
-								cell_inner.appendChild(template_link);
-							}
-							else {
-								const template_link = document.createElement('span');
-								template_link.classList.add(ZBX_STYLE_GREY);
-								template_link.textContent = template.name;
-
-								cell_inner.appendChild(template_link);
-							}
-
-							if (i < length - 1) {
-								cell_inner.innerHTML += ', ';
-							}
+							cell_inner.appendChild(template_link);
 						}
 
-						if (parent_templates.length > max_in_table) {
-							cell_inner.innerHTML += ' &hellip;';
+						if (i < length - 1) {
+							cell_inner.innerHTML += ', ';
 						}
-					});
+					}
+
+					if (parent_templates.length > max_in_table) {
+						cell_inner.innerHTML += ' &hellip;';
+					}
 				})
 				.setCellRenderer('linked_to_templates', ({cell_data, cell_inner, response}) => {
 					const [templates] = cell_data;
