@@ -14,7 +14,7 @@
 **/
 
 
-class CControllerCorrelationList extends CController {
+class CControllerCepRuleList extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -84,7 +84,7 @@ class CControllerCorrelationList extends CController {
 
 		// pager
 		$page_num = $this->getInput('page', 1);
-		CPagerHelper::savePage('correlation.list', $page_num);
+		CPagerHelper::savePage('ceprule.list', $page_num);
 		$data['paging'] = CPagerHelper::paginate($page_num, $data['correlations'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);

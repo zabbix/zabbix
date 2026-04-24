@@ -110,7 +110,7 @@ $form = (new CForm())
 
 $output = [
 	'header' => $data['cep_rule']['cep_ruleid'] === null ? _('New complex event processing') : _('Complex event processing'),
-	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CEP_EDIT),
+	'doc_url' => CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CEPRULE_EDIT),
 	'body' => $form->toString(),
 	'buttons' => $buttons,
 	'script_inline' => $this->readJsFile('ceprule.edit.js.php'),

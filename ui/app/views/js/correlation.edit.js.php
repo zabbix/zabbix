@@ -32,7 +32,7 @@ window.correlation_edit_popup = new class {
 		this.correlationid = correlation.correlationid;
 
 		const return_url = new URL('zabbix.php', location.href);
-		return_url.searchParams.set('action', 'correlation.list');
+		return_url.searchParams.set('action', 'ceprule.list');
 		ZABBIX.PopupManager.setReturnUrl(return_url.href);
 
 		this.dialogue.addEventListener('click', (e) => {

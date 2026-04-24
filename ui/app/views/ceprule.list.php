@@ -19,11 +19,11 @@
  * @var array $data
  */
 
-$this->includeJsFile('correlation.list.js.php');
+$this->includeJsFile('ceprule.list.js.php');
 
 $html_page = (new CHtmlPage())
 	->setTitle(_('Event processing'))
-	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CORRELATION_LIST))
+	->setDocUrl(CDocHelper::getUrl(CDocHelper::DATA_COLLECTION_CEPRULE_LIST))
 	->setControls(
 		(new CTag('nav', true, (new CList())
 			->addItem((new CSimpleButton(_('Create complex event processing')))->setId('js-create-cep'))
@@ -31,7 +31,7 @@ $html_page = (new CHtmlPage())
 		))->setAttribute('aria-label', _('Content controls'))
 	)
 	->addItem((new CFilter())
-		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'correlation.list'))
+		->setResetUrl((new CUrl('zabbix.php'))->setArgument('action', 'ceprule.list'))
 		->setProfile($data['profileIdx'])
 		->setActiveTab($data['active_tab'])
 		->addFilterTab(_('Filter'), [
@@ -68,13 +68,13 @@ $html_page = (new CHtmlPage())
 					)
 				])
 		])
-		->addVar('action', 'correlation.list')
+		->addVar('action', 'ceprule.list')
 	);
 
 $form = (new CForm())->setName('correlations-form');
 
 $url = (new CUrl('zabbix.php'))
-	->setArgument('action', 'correlation.list')
+	->setArgument('action', 'ceprule.list')
 	->getUrl();
 
 $table = (new CTableInfo())
