@@ -712,7 +712,9 @@ function downloadSvgImage(svg, file_name, legend_class = '') {
 		a = document.createElement('a'),
 		style = document.createElementNS('http://www.w3.org/1999/xhtml', 'style'),
 		$labels_clone,
-		labels_height = labels.length ? labels.height() : 0,
+		labels_height = labels.length
+			? labels.height() + Math.max(0, parseFloat(getComputedStyle(labels[0]).top) || 0)
+			: 0,
 		context2d;
 
 	// Clone only svg styles.
