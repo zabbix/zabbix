@@ -494,7 +494,7 @@ static int	get_ipv6_support(const char *fping, const char *dst)
  *             host        - [OUT] found correspondent host from array        *
  *                                                                            *
  * Return value: SUCCEED - successfully processed hosts                       *
- *               NOTSUPPORTED - otherwise                                     *
+ *               FAIL - otherwise                                             *
  *                                                                            *
  ******************************************************************************/
 static int	check_hostip_response(char *resp, zbx_fping_host_t *hosts, const int hosts_count, const int rdns,
