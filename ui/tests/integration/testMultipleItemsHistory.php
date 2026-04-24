@@ -74,7 +74,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'name' => 'Multiple Items History LLD Rule',
 			'key_' => self::LLD_RULE_KEY,
 			'type' => ITEM_TYPE_TRAPPER,
-			'lifetime_type' => 2
+			'lifetime_type' => ZBX_LLD_DELETE_IMMEDIATELY
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
