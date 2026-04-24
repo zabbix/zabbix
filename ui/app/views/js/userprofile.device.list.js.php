@@ -33,7 +33,7 @@ const view = new class {
 	#initEvents() {
 		this.#form.addEventListener('click', e => {
 			if (e.target.classList.contains('js-device-delete')) {
-				this.#delete(e.target, {deviceids: [e.target.dataset.deviceid]});
+				this.#delete(e.target, {deviceid: e.target.dataset.deviceid});
 			}
 		});
 
@@ -55,8 +55,7 @@ const view = new class {
 	}
 
 	#confirmAction(urlparams, data, target) {
-		const confirm = this.#confirm_messages[urlparams.action];
-		const message = confirm ? confirm[data.deviceids.length > 1 ? 1 : 0] : '';
+		const message = this.#confirm_messages[urlparams.action]
 
 		if (!window.confirm(message)) {
 			return;

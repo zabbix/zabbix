@@ -16,7 +16,7 @@
 
 class CControllerUserDeviceDelete extends CController {
 
-	private $devices;
+	private $device;
 
 	protected function init(): void {
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
@@ -24,7 +24,7 @@ class CControllerUserDeviceDelete extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'deviceids' =>	'required|array_db device.deviceid'
+			'deviceid' =>	'required|db device.deviceid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -54,7 +54,7 @@ class CControllerUserDeviceDelete extends CController {
 		}
 
 		$filter = [
-			'deviceids' => $this->getInput('deviceids'),
+			'deviceids' => [$this->getInput('deviceid')],
 			'output' => ['deviceid', 'uuid', 'userid']
 		];
 
@@ -63,57 +63,35 @@ class CControllerUserDeviceDelete extends CController {
 			$filter['userids'] = [CWebUser::$data['userid']];
 		}
 
-		$this->devices = API::Device()->get($filter);
+		$devices = API::Device()->get($filter);
 
-		if (!$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
-			$this->devices = array_filter($this->devices, function ($db_device) {
-				return $db_device['userid'] == CWebUser::$data['userid'];
-			});
+		if (!$devices) {
+			return false;
 		}
 
-		return count($this->devices) == count($this->getInput('deviceids'));
+		$this->device = reset($devices);
+
+		if ($this->device['userid'] == CWebUser::$data['userid']
+				&& !$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)) {
+			return false;
+		}
+
+		return true;
 	}
 
 	protected function doAction(): void {
-		$failed_messages = [];
-		$success_messages = [];
-		$failed_deviceids = [];
-		$success_deviceids = [];
+		$result = API::Device()->offboard(['uuid' => $this->device['uuid']]);
 
-		foreach ($this->devices as $db_device) {
-			$result = API::Device()->offboard(['uuid' => $db_device['uuid']]);
-			$messages = array_column(get_and_clear_messages(), 'message');
-
-			if ($result) {
-				$success_messages = array_unique(array_merge($success_messages, $messages));
-				$success_deviceids[] = $db_device['deviceid'];
-			}
-			else {
-				$failed_messages = array_unique(array_merge($failed_messages, $messages));
-				$failed_deviceids[] = $db_device['deviceid'];
-			}
-		}
-
-		if (count($success_deviceids) == 0) {
-			$output['error'] = [
-				'title' => _n('Cannot remove device', 'Cannot remove devices', count($failed_deviceids)),
-				'messages' => $failed_messages
-			];
-		}
-		else {
-			$output['success'] = [
-				'title' => _n('Device removed', 'Devices removed', count($success_deviceids)),
+		$output = $result
+			? ['success' => [
+				'title' => _('Device removed'),
 				'action' => 'delete',
-				'messages' => $success_messages
-			];
-
-			if (count($failed_deviceids) > 0) {
-				$output['success']['error_messages'] = array_merge(
-					[_n('Cannot remove device', 'Cannot remove devices', count($failed_deviceids))],
-					$failed_messages
-				);
-			}
-		}
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			]]
+			: ['error' => [
+				'title' => _('Cannot remove device'),
+				'messages' => array_column(get_and_clear_messages(), 'message')
+			]];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
 	}

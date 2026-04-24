@@ -159,7 +159,7 @@ $html_page
 	->show();
 
 $confirm_messages = [
-	'user.device.delete' => [_('Remove selected device?'), _('Remove selected devices?')]
+	'user.device.delete' => _('Remove selected device?')
 ];
 
 (new CScriptTag('
