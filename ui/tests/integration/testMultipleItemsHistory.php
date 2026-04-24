@@ -363,7 +363,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 	private function sendHistoryAt(int $tm): array {
 		$sent = [];
-		$all_values = [];
+		$values_by_type = [];
 
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
@@ -397,7 +397,14 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'expected_by_itemid' => $expected_by_itemid
 			];
 
-			$all_values = array_merge($all_values, $values);
+			$values_by_type[] = $values;
+		}
+
+		$all_values = [];
+		for ($i = 0; $i < self::LLD_DISCOVERY_COUNT; $i++) {
+			foreach ($values_by_type as $values) {
+				$all_values[] = $values[$i];
+			}
 		}
 
 		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
