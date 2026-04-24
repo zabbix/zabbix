@@ -3539,19 +3539,19 @@ class CUser extends CApiService {
 			'preservekeys' => true
 		]);
 
-		// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL are returned as array.
+		// 'sendto' parameter in media types with 'type' == MEDIA_TYPE_EMAIL and MEDIA_TYPE_PUSH is returned as array.
 		if ($this->outputIsRequested('sendto', $options['selectMedias']) && $db_medias) {
-			$db_email_medias = DB::select('media_type', [
+			$db_mediatypes = DB::select('media_type', [
 				'output' => [],
 				'filter' => [
 					'mediatypeid' => array_unique(array_column($db_medias, 'mediatypeid')),
-					'type' => MEDIA_TYPE_EMAIL
+					'type' => [MEDIA_TYPE_EMAIL, MEDIA_TYPE_PUSH]
 				],
 				'preservekeys' => true
 			]);
 
 			foreach ($db_medias as &$db_media) {
-				if (array_key_exists($db_media['mediatypeid'], $db_email_medias)) {
+				if (array_key_exists($db_media['mediatypeid'], $db_mediatypes)) {
 					$db_media['sendto'] = explode("\n", $db_media['sendto']);
 				}
 			}
