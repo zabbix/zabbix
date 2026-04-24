@@ -3065,43 +3065,38 @@ class CUser extends CApiService {
 
 		$db_token = self::tokenAuthentication($params['token'], ZBX_AUTH_SCHEME_DPOP, $time);
 
-		$resource = DBselect(
-			'SELECT d.uuid,dk.key_,dk.kid,dk.scope'.
+		$db_device = DBfetch(DBselect(
+			'SELECT d.deviceid,d.uuid'.
 			' FROM token_device td'.
 			' JOIN device d ON td.deviceid=d.deviceid'.
-			' JOIN device_key dk ON td.deviceid=dk.deviceid'.
-			' WHERE '.dbConditionId('td.tokenid', [$db_token['tokenid']]).
 				' AND '.dbConditionInt('d.status', [ZBX_DEVICE_ACTIVATED]).
-				' AND '.dbConditionInt('dk.active', [CDevice::DEVICE_KEY_ACTIVE]).
+			' WHERE '.dbConditionId('td.tokenid', [$db_token['tokenid']])
+		));
+
+		if (!$db_device) {
+			self::exception(
+				ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Device inactive.'
+			);
+		}
+
+		$resource = DBselect(
+			'SELECT dk.scope,dk.kid,dk.key_'.
+			' FROM device_key dk'.
+			' WHERE '.dbConditionId('dk.deviceid', [$db_device['deviceid']]).
 			' ORDER BY dk.device_keyid DESC'
 		);
 
 		$keys_per_scope = [];
-		$uuid = '';
 
 		while ($db_device_key = DBfetch($resource)) {
 			$keys_per_scope[$db_device_key['scope']][$db_device_key['kid']] = $db_device_key['key_'];
-
-			$uuid = $db_device_key['uuid'];
-		}
-
-		if (!$keys_per_scope) {
-			self::exception(
-				ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Device inactive or no active keys available.'
-			);
-		}
-
-		if (!array_key_exists(CDevice::MOBILE_IDENTITY_KEY, $keys_per_scope)) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'No active identity key found.');
-		}
-
-		if (!array_key_exists(CDevice::MOBILE_ENCRYPTION_KEY, $keys_per_scope)) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'No active encryption key found.');
 		}
 
 		try {
-			CApiDpopHelper::verifyDpopSignature($params['signature'], $keys_per_scope[CDevice::MOBILE_IDENTITY_KEY],
-				$params['token'], $params['requested_api_method'], $time);
+			CApiDpopHelper::verifyDpopSignature($params['signature'],
+				$keys_per_scope[CDevice::MOBILE_KEY_SCOPE_IDENTITY], $params['token'], $params['requested_api_method'],
+				$time
+			);
 		}
 		catch (Exception $e) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), $e->getMessage());
@@ -3113,15 +3108,17 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'User group is disabled.');
 		}
 
-		$mobile_encryption_kid = array_key_first($keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY]);
-		$mobile_encryption_key = $keys_per_scope[CDevice::MOBILE_ENCRYPTION_KEY][$mobile_encryption_kid];
-
-		self::$userData = $db_user + ['token' => $params['token']] + ['uuid' => $uuid] +
-			['kid' => $mobile_encryption_kid, 'key' => $mobile_encryption_key];
+		self::$userData = $db_user + ['token' => $params['token']];
 
 		if (!CRoleHelper::checkAccess(CRoleHelper::DEVICES_ACCESS, $db_user['roleid'])) {
 			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Linked devices not allowed.');
 		}
+
+		$mobile_encryption_kid = array_key_first($keys_per_scope[CDevice::MOBILE_KEY_SCOPE_ENCRYPTION]);
+		$mobile_encryption_key = $keys_per_scope[CDevice::MOBILE_KEY_SCOPE_ENCRYPTION][$mobile_encryption_kid];
+
+		self::$userData += ['uuid' => $db_device['uuid']] +
+			['kid' => $mobile_encryption_kid, 'key' => $mobile_encryption_key];
 
 		DB::update('token', [
 			'values' => ['lastaccess' => $time],

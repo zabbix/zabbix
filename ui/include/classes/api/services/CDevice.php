@@ -34,10 +34,8 @@ class CDevice extends CApiService {
 
 	private const ENROLLMENT_TOKEN_EXPIRATION_TTL = 600;
 
-	public const MOBILE_IDENTITY_KEY = 0;
-	public const MOBILE_ENCRYPTION_KEY = 1;
-
-	public const DEVICE_KEY_ACTIVE = 0;
+	public const MOBILE_KEY_SCOPE_IDENTITY = 0;
+	public const MOBILE_KEY_SCOPE_ENCRYPTION = 1;
 
 	/**
 	 * @return array|string
@@ -379,14 +377,14 @@ class CDevice extends CApiService {
 			[
 				'device_keyid' => $device_keyid,
 				'deviceid' => $deviceid,
-				'scope' => self::MOBILE_IDENTITY_KEY,
+				'scope' => self::MOBILE_KEY_SCOPE_IDENTITY,
 				'kid' => $mobile_identity_key['kid'],
 				'key_' => json_encode($mobile_identity_key)
 			],
 			[
 				'device_keyid' => bcadd($device_keyid, 1, 0),
 				'deviceid' => $deviceid,
-				'scope' => self::MOBILE_ENCRYPTION_KEY,
+				'scope' => self::MOBILE_KEY_SCOPE_ENCRYPTION,
 				'kid' => $mobile_encryption_key['kid'],
 				'key_' => json_encode($mobile_encryption_key)
 			]
