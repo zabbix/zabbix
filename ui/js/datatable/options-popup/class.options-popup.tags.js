@@ -24,7 +24,52 @@ class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
 	}
 
 	getTemplate() {
-		return document.querySelector('template#tags');
+		return new Template(`
+			<template>
+				<label for="number_of_tags_0" class="${ZBX_STYLE_FORM_LABEL}">${t('Number of tags')}</label>
+				<div class="${ZBX_STYLE_FORM_FIELD}">
+					<ul id="number_of_tags" data-field-type="radio-list" class="${ZBX_STYLE_RADIO_LIST_CONTROL}">
+						<li>
+							<input type="radio" id="number_of_tags_0" name="number_of_tags" value="${SHOW_TAGS_1}">
+							<label for="number_of_tags_0">${SHOW_TAGS_1}</label>
+						</li>
+						<li>
+							<input type="radio" id="number_of_tags_1" name="number_of_tags" value="${SHOW_TAGS_2}">
+							<label for="number_of_tags_1">${SHOW_TAGS_2}</label>
+						</li>
+						<li>
+							<input type="radio" id="number_of_tags_2" name="number_of_tags" value="${SHOW_TAGS_3}">
+							<label for="number_of_tags_2">${SHOW_TAGS_3}</label>
+						</li>
+					</ul>
+				</div>
+				<label for="tag_name_display" class="${ZBX_STYLE_FORM_LABEL}">${t('Tag name display')}</label>
+				<div class="${ZBX_STYLE_FORM_FIELD}">
+					<ul id="tag_name_display" data-field-type="radio-list" class="${ZBX_STYLE_RADIO_LIST_CONTROL}">
+						<li>
+							<input type="radio" id="tag_name_display_0" name="tag_name_display"
+								value="${TAG_NAME_FULL}">
+							<label for="tag_name_display_0">${t('Full')}</label>
+						</li>
+						<li>
+							<input type="radio" id="tag_name_display_1" name="tag_name_display"
+								value="${TAG_NAME_SHORTENED}">
+							<label for="tag_name_display_1">${t('Shortened')}</label>
+						</li>
+						<li>
+							<input type="radio" id="tag_name_display_2" name="tag_name_display"
+								value="${TAG_NAME_NONE}">
+							<label for="tag_name_display_2">${t('None')}</label>
+						</li>
+					</ul>
+				</div>
+				<label for="tag_display_priority" class="${ZBX_STYLE_FORM_LABEL}">${t('Tag display priority')}</label>
+				<div class="${ZBX_STYLE_FORM_FIELD}">
+					<input type="text" id="tag_display_priority" name="tag_display_priority" maxlength="255"
+						data-field-type="text-box" placeholder="${t('comma-separated list')}">
+				</div>
+			</template>
+		`).evaluateToElement();
 	}
 
 	getFieldData() {

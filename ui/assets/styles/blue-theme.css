@@ -2391,6 +2391,8 @@ button {
       cursor: pointer; }
     .datatable .datatable-options-popup .form-field input {
       width: 100%; }
+    .datatable .datatable-options-popup .form-field .radio-list-control {
+      display: flex; }
     .datatable .datatable-options-popup .form-field + .datatable-options-popup-links {
       margin-top: 5px; }
   .datatable .datatable-header {
@@ -2401,6 +2403,7 @@ button {
       top: 0;
       z-index: 10; }
     .datatable .datatable-header .datatable-options-link {
+      z-index: 1;
       box-sizing: border-box;
       display: flex;
       justify-content: center;
@@ -2408,6 +2411,7 @@ button {
       flex-shrink: 0;
       width: var(--datatable-row-height);
       height: var(--datatable-row-height);
+      margin-right: -1px;
       padding: 0;
       color: #768d99;
       text-align: center;
@@ -2442,6 +2446,8 @@ button {
       color: #1f2c33;
       user-select: none;
       background-color: #ffffff; }
+      .datatable .datatable-header .datatable-options-button .datatable-options-link {
+        margin-right: 0; }
   .datatable .datatable-body {
     display: grid;
     align-items: center;
@@ -2651,9 +2657,6 @@ button {
           text-overflow: initial; }
         .datatable .cell.cell-data .cell-inner .problem-icon-link {
           vertical-align: middle; }
-      .datatable .cell.cell-data.cell-checkbox .cell-inner {
-        display: flex;
-        align-items: center; }
       .datatable .cell.cell-data .btn-icon {
         min-width: 18px;
         height: 18px; }
@@ -2720,7 +2723,8 @@ button {
         margin: 0; }
         .datatable .cell.cell-checkbox .checkbox-radio + label {
           display: inline-block;
-          height: 16px; }
+          height: 16px;
+          margin-top: 1px; }
           .datatable .cell.cell-checkbox .checkbox-radio + label span {
             margin: 0; }
     .datatable .cell.cell-timeline {

@@ -341,6 +341,13 @@ class CDataTable {
 	#user_configs = [];
 
 	/**
+	 * Elements in this queue are all removed at the same time, once new data is ready to be rendered.
+	 *
+	 * @type {HTMLElement[]}
+	 */
+	#element_remove_queue = [];
+
+	/**
 	 * @type {HTMLElement|null}
 	 */
 	#element = null;
@@ -1125,6 +1132,8 @@ class CDataTable {
 				}
 
 				this.#scrollBodyToTarget(header_cell.target);
+
+				requestAnimationFrame(() => this.#options_popup?.position());
 			})
 		});
 
@@ -1883,13 +1892,15 @@ class CDataTable {
 			if (column.isDuplicate()) {
 				const header_cell = column.getHeaderCell();
 				if (header_cell) {
-					header_cell.target.remove();
+					this.#element_remove_queue.push(header_cell.target);
 
 					column.setHeaderCell(null);
 				}
 
 				for (const data_cell of column.getDataCells()) {
-					data_cell?.target.remove();
+					if (data_cell) {
+						this.#element_remove_queue.push(data_cell.target);
+					}
 				}
 
 				column.setDataCells([]);
@@ -2083,6 +2094,11 @@ class CDataTable {
 	}
 
 	#updateLayoutAfterRender() {
+		for (const element of this.#element_remove_queue) {
+			element?.remove();
+		}
+		this.#element_remove_queue = [];
+
 		this.#header.scrollTo({left: 0});
 		this.#body.scrollTo({left: 0});
 
@@ -2764,7 +2780,7 @@ class CDataTable {
 			? Math.min(table_options_button_rect.width, right_edge - right_boundary)
 			: 0;
 
-		header_cell.target.style.paddingRight = `${right_offset}px`;
+		header_cell.target.style.paddingRight = `${right_offset + 1}px`;
 
 		if (header_resizer) {
 			header_resizer.style.marginRight = `${right_offset}px`;

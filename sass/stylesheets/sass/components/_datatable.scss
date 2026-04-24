@@ -199,6 +199,10 @@
 				width: 100%;
 			}
 
+			.radio-list-control {
+				display: flex;
+			}
+
 			& + .datatable-options-popup-links {
 				margin-top: 5px;
 			}
@@ -216,6 +220,7 @@
 		}
 
 		.datatable-options-link {
+			z-index: 1;
 			box-sizing: border-box;
 			display: flex;
 			justify-content: center;
@@ -223,6 +228,7 @@
 			flex-shrink: 0;
 			width: var(--datatable-row-height);
 			height: var(--datatable-row-height);
+			margin-right: -1px;
 			padding: 0;
 			color: $font-alt-color;
 			text-align: center;
@@ -271,6 +277,10 @@
 			color: $font-color;
 			user-select: none;
 			background-color: $ui-bg-color;
+
+			.datatable-options-link {
+				margin-right: 0;
+			}
 		}
 	}
 
@@ -608,11 +618,6 @@
 				}
 			}
 
-			&.cell-checkbox .cell-inner {
-				display: flex;
-				align-items: center;
-			}
-
 			.btn-icon {
 				min-width: 18px;
 				height: 18px;
@@ -710,6 +715,7 @@
 				& + label {
 					display: inline-block;
 					height: 16px;
+					margin-top: 1px;
 
 					span {
 						margin: 0;

@@ -22,7 +22,18 @@ class CDataTableOptionsPopupMonitoringLatestName extends CDataTableOptionsPopup 
 	}
 
 	getTemplate() {
-		return document.querySelector('template#name');
+		return new Template(`
+			<template>
+				<div class="${ZBX_STYLE_FORM_FIELD}">
+					<input type="checkbox" id="show_item_key" name="show_item_key" value="1"
+						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
+					<label for="show_item_key">
+						<span></span>
+						${t('Show item key')}
+					</label>
+				</div>
+			</template>
+		`).evaluateToElement();
 	}
 
 	getFieldData() {

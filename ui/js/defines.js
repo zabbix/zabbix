@@ -61,6 +61,8 @@ const ZBX_STYLE_FORM_FIELD = 'form-field';
 const ZBX_STYLE_FORM_FIELDS_HINT = 'form-fields-hint';
 const ZBX_STYLE_FORM_DESCRIPTION = 'form-description';
 
+const ZBX_STYLE_RADIO_LIST_CONTROL = 'radio-list-control';
+
 const ZBX_STYLE_FIELD_LABEL_ASTERISK = 'form-label-asterisk';
 
 const ZBX_STYLE_MARKDOWN = 'markdown';

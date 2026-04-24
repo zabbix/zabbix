@@ -22,7 +22,14 @@ class CDataTableOptionsPopupTagValue extends CDataTableOptionsPopup {
 	}
 
 	getTemplate() {
-		return document.querySelector('template#tagvalue');
+		return new Template(`
+			<template>
+				<label for="tag_name" class="${ZBX_STYLE_FORM_LABEL}">${t('Tag name')}</label>
+				<div class="${ZBX_STYLE_FORM_FIELD}">
+					<input type="text" id="tag_name" name="tag_name" maxlength="255" data-field-type="text-box">
+				</div>
+			</template>
+		`).evaluateToElement();
 	}
 
 	getFieldData() {

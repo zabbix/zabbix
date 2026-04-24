@@ -273,6 +273,29 @@ $translate_strings = [
 		'Duplicate column' => _('Duplicate column'),
 		'Delete column' => _('Delete column')
 	],
+	'class.options-popup.monitoring.host.problems.js' => [
+		'Show suppressed problems' => _('Show suppressed problems')
+	],
+	'class.options-popup.monitoring.latest.name.js' => [
+		'Show item key' => _('Show item key')
+	],
+	'class.options-popup.monitoring.problems.problem.js' => [
+		'Show operational data' => _('Show operational data'),
+		'Show trigger expression' => _('Show trigger expression'),
+		'Show suppressed' => _('Show suppressed')
+	],
+	'class.options-popup.monitoring.problems.time.js' => [
+		'Show timeline' => _('Show timeline'),
+	],
+	'class.options-popup.tags.js' => [
+		'Number of tags' => _('Number of tags'),
+		'Tag name display' => _('Tag name display'),
+		'Full' => _('Full'),
+		'Shortened' => _('Shortened'),
+		'None' => _('None'),
+		'Tag display priority' => _('Tag display priority'),
+		'comma-separated list' => _('comma-separated list')
+	],
 	'class.options-popup.table-options.js' => [
 		'Table options' => _('Table options'),
 		'Column list' => _('Column list'),
