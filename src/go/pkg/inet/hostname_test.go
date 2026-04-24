@@ -20,10 +20,10 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-func Test_IsDNSName(t *testing.T) {
+func Test_IsRFCHostName(t *testing.T) {
 	t.Parallel()
 
-	// Synchronize with tests/libs/zbxip/zbx_is_dnsname.yaml
+	// Synchronize with tests/libs/zbxip/zbx_is_rfc_hostname.yaml
 
 	type args struct {
 		host string
@@ -69,10 +69,10 @@ func Test_IsDNSName(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
-			got := IsDNSName(tt.args.host)
+			got := IsRFCHostName(tt.args.host)
 
 			if diff := cmp.Diff(tt.want, got); diff != "" {
-				t.Fatalf("IsDNSName() = %s", diff)
+				t.Fatalf("IsRFCHostName() = %s", diff)
 			}
 		})
 	}

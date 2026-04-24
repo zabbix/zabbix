@@ -20,15 +20,15 @@ func isAlnumASCII(c byte) bool {
 		(c >= 'A' && c <= 'Z')
 }
 
-// IsDNSName checks if host is valid DNS name (should work the same as zbx_is_dnsname in C)
+// IsRFCHostName checks if host is valid DNS name (should work the same as zbx_is_rfc_hostname() in C)
 //
-// Valid DNS hostnames for this function are names with only ASCII characters 0-9, A-Z, a-z,
+// Valid host names for this function are names with only ASCII characters 0-9, A-Z, a-z,
 // hyphen ('-') and dot ('.').
 // Internationalized Domain Names with multibyte UTF-8 characters will be rejected as not
 // valid (Punycode can be used).
 //
 //nolint:cyclop,gocyclo // high complexity due to DNS validation, splitting not practical
-func IsDNSName(host string) bool {
+func IsRFCHostName(host string) bool {
 	// Requirements and limits for host names are defined in RFC 1035,
 	// with clarifications in RFC 1123, RFC 2181.
 	//

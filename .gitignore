@@ -271,6 +271,7 @@ tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxhttp/zbx_determine_charset
 tests/libs/zbxip/zbx_ip_in_list
 tests/libs/zbxip/zbx_is_ip
+tests/libs/zbxip/zbx_is_rfc_hostname
 tests/libs/zbxip/zbx_is_supported_ip
 tests/libs/zbxip/zbx_iprange_ip2str
 tests/libs/zbxip/zbx_iprange_parse
@@ -280,7 +281,6 @@ tests/libs/zbxip/zbx_iprange_uniq_next
 tests/libs/zbxip/zbx_parse_serveractive_element
 tests/libs/zbxip/zbx_portrange_uniq_next
 tests/libs/zbxip/zbx_join_hostport
-tests/libs/zbxip/zbx_is_dnsname
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
 tests/libs/zbxjson/zbx_json_decodevalue

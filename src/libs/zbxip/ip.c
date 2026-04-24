@@ -19,20 +19,20 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check if string is valid DNS hostname used for checking services  *
+ * Purpose: check if string is valid host name used for checking services     *
  *                                                                            *
  * Parameters: host - [IN]                                                    *
  *                                                                            *
  * Return value: SUCCEED - input is hostname address                          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
- * Comments: valid DNS hostnames for this function are names with only ASCII  *
+ * Comments: valid host names for this function are names with only ASCII     *
  *           characters 0-9, A-Z, a-z, hyphen ('-') and dot ('.').            *
  *           Internationalized Domain Names with multibyte UTF-8 characters   *
  *           will be rejected as not valid (Punycode can be used).            *
  *                                                                            *
  ******************************************************************************/
-int	zbx_is_dnsname(const char *host)
+int	zbx_is_rfc_hostname(const char *host)
 {
 	const char	*p = host;
 	int		label_len = 1;
