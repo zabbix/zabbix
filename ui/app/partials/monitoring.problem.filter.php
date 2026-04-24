@@ -25,7 +25,7 @@ $left_column = (new CFormList())
 			->addValue(_('Problems'), TRIGGERS_OPTION_IN_PROBLEM, 'show_3#{uniqid}')
 			->addValue(_('History'), TRIGGERS_OPTION_ALL, 'show_2#{uniqid}')
 			->setId('show_#{uniqid}')
-			->setModern(true)
+			->setModern()
 	)
 	->addRow((new CLabel(_('Host groups'), 'groupids_#{uniqid}_ms')),
 		(new CMultiSelect([
@@ -121,30 +121,7 @@ $left_column
 		$filter_age,
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		_('days')
-	])
-	->addRow(_('Show symptoms'), [
-		(new CCheckBox('show_symptoms'))
-			->setChecked($data['show_symptoms'] == 1)
-			->setUncheckedValue(0)
-			->setId('show_symptoms_#{uniqid}')
-	])
-	->addRow(
-		_('Acknowledgement status'),
-		(new CHorList())
-			->addItem((new CRadioButtonList('acknowledgement_status', (int) $data['acknowledgement_status']))
-				->addValue(_('All'), ZBX_ACK_STATUS_ALL, 'acknowledgement_status_0_#{uniqid}')
-				->addValue(_('Unacknowledged'), ZBX_ACK_STATUS_UNACK, 'acknowledgement_status_1_#{uniqid}')
-				->addValue(_('Acknowledged'), ZBX_ACK_STATUS_ACK, 'acknowledgement_status_2_#{uniqid}')
-				->setModern(true)
-			)
-			->addItem((new CCheckBox('acknowledged_by_me', 1))
-				->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
-				->setChecked($data['acknowledged_by_me'] == 1)
-				->setUncheckedValue(0)
-				->setLabel(_('By me'))
-				->setId('acknowledged_by_me_#{uniqid}')
-			)
-	);
+	]);
 
 $filter_inventory_table = (new CTable())->setId('filter-inventory_#{uniqid}');
 
@@ -239,7 +216,32 @@ $filter_tags_table->addRow(
 
 $right_column = (new CFormList())
 	->addRow(_('Host inventory'), $filter_inventory_table)
-	->addRow(_('Tags'), $filter_tags_table);
+	->addRow(_('Tags'), $filter_tags_table)
+	->addRow(_('Show symptoms'), [
+		(new CCheckBox('show_symptoms'))
+			->setChecked($data['show_symptoms'] == 1)
+			->setUncheckedValue(0)
+			->setId('show_symptoms_#{uniqid}')
+	])
+	->addRow(
+		_('Acknowledgement status'),
+		(new CHorList())
+			->addItem(
+				(new CRadioButtonList('acknowledgement_status', (int) $data['acknowledgement_status']))
+					->addValue(_('All'), ZBX_ACK_STATUS_ALL, 'acknowledgement_status_0_#{uniqid}')
+					->addValue(_('Unacknowledged'), ZBX_ACK_STATUS_UNACK, 'acknowledgement_status_1_#{uniqid}')
+					->addValue(_('Acknowledged'), ZBX_ACK_STATUS_ACK, 'acknowledgement_status_2_#{uniqid}')
+					->setModern()
+			)
+			->addItem(
+				(new CCheckBox('acknowledged_by_me', 1))
+					->setLabelPosition(CCheckBox::LABEL_POSITION_LEFT)
+					->setChecked($data['acknowledged_by_me'] == 1)
+					->setUncheckedValue(0)
+					->setLabel(_('By me'))
+					->setId('acknowledged_by_me_#{uniqid}')
+			)
+	);
 
 $template = (new CDiv())
 	->addClass(ZBX_STYLE_TABLE)
