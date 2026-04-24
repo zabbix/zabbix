@@ -1,6 +1,13 @@
 Changes for 8.0.0beta1
 
 New features:
+.........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
+A.F....... [ZBXNEXT-8791] implemented inline validation in event correlation form (miks, talbergs)
+..F....... [ZBXNEXT-9754] Added inline validation to proxy groups form (talbergs)
+..FG...... [ZBXNEXT-7502] added new agent item for network interface discovery with key net.if.get (msnihach, sboidenko)
+.........T [ZBXNEXT-10502] added support for native connection mode in Ceph by Zabbix agent 2 template (abakaldin)
+..FG...... [ZBXNEXT-10039] added new item vfs.dev.get for block device discovery for Linux and AIX (mprihodko)
+..F....... [ZBXNEXT-9736] implemented inline validation for graph and graph prototype form (gberzina)
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 .........T [ZBXNEXT-10336] added template for Google Cloud Storage (kflorowski)
 .........T [ZBXNEXT-10510] added Azure Container Apps by HTTP template (abrosimovs)
@@ -27,6 +34,17 @@ A.......S. [ZBXNEXT-10454] updated maximum supported TimescaleDB version to 2.25
 A...I..PS. [ZBXNEXT-10076] changed delayed deletion process via housekeeper table (agriscenko, askolmeisters)
 
 Bug fixes:
+.........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
+..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
+..F....... [ZBX-27559] fixed inline validation error display for Inherited and host macros section in host and template forms (gberzina)
+.........T [ZBX-26388] improved memory usage monitoring for Docker by Zabbix agent 2 template (smansurovs)
+.......PS. [ZBX-27115] fixed some ODBC errors not being processed (mkorotkov)
+.......PS. [ZBX-26903] fixed zabbix.stats log spam (sboidenko)
+.........T [ZBX-27025] fixed incorrect headers parsing in JS files (kflorowski)
+..F.I..... [ZBX-26615] fixed inconsistent parameter types in Zabbix configuration file (Ivo)
+..F....... [ZBX-27484] fixed displaying position of the error messages for empty Query, Parameters and Headers name fields, removed redundant error messages for empty fields for Custom intervals (msnihach)
+..F....... [ZBX-27485] fixed issue with toggling disabled and readonly attributes in the 'Access to API' section (msnihach)
+.........T [ZBX-27418] fixed disk failed status in HPE Primera by HTTP template (smansurovs)
 .........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
 .........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
 ..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
@@ -275,9 +293,23 @@ A......... [ZBX-27567] prevented low-privilege users from modifying entities via
 Changes for 7.4.10rc1
 
 New features:
+.........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
+.........T [ZBXNEXT-10502] added support for native connection mode in Ceph by Zabbix agent 2 template (abakaldin)
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
+..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
+..F....... [ZBX-27559] fixed inline validation error display for Inherited and host macros section in host and template forms (gberzina)
+.........T [ZBX-27671] updated Proxmox template (abakaldin)
+.........T [ZBX-26388] improved memory usage monitoring for Docker by Zabbix agent 2 template (smansurovs)
+.......PS. [ZBX-26903] fixed zabbix.stats log spam (sboidenko)
+.......PS. [ZBX-27115] fixed some ODBC errors not being processed (mkorotkov)
+.........T [ZBX-27025] fixed incorrect headers parsing in JS files (kflorowski)
+..F.I..... [ZBX-26615] fixed inconsistent parameter types in Zabbix configuration file (Ivo)
+..F....... [ZBX-27484] fixed displaying position of the error messages for empty Query, Parameters and Headers name fields, removed redundant error messages for empty fields for Custom intervals (msnihach)
+..F....... [ZBX-27485] fixed issue with toggling disabled and readonly attributes in the 'Access to API' section (msnihach)
+.........T [ZBX-27418] fixed disk failed status in HPE Primera by HTTP template (smansurovs)
 .........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
 .........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
 ..F....... [ZBX-27609] fixed saving colours of items when items are reordered in graph edit form (gberzina)
@@ -1659,9 +1691,18 @@ A.F....... [ZBX-23227] fixed issue where using an empty array or string value fo
 Changes for 7.0.26rc1
 
 New features:
+.........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
+.........T [ZBXNEXT-10502] added support for native connection mode in Ceph by Zabbix agent 2 template (abakaldin)
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
+..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
+.........T [ZBX-26388] improved memory usage monitoring for Docker by Zabbix agent 2 template (smansurovs)
+.......PS. [ZBX-27115] fixed some ODBC errors not being processed (mkorotkov)
+.........T [ZBX-27025] fixed incorrect headers parsing in JS files (kflorowski)
+..F....... [ZBX-27485] fixed issue with toggling disabled and readonly attributes in the 'Access to API' section (msnihach)
+.........T [ZBX-27418] fixed disk failed status in HPE Primera by HTTP template (smansurovs)
 .........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
 .........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
 ..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
@@ -5706,6 +5747,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27603] fixed an issue with updating existing LDAP settings after an LDAP host change (kkuzmina)
 A......... [ZBX-27306] prevented deletion of httptest item tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
