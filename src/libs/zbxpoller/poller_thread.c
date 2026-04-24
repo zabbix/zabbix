@@ -1111,6 +1111,7 @@ void	zbx_prepare_telemetry_query_items(zbx_dc_telemetry_query_item_t *items, int
 
 		items[i].telemetry_query = zbx_malloc(NULL, sizeof(zbx_tq_query_t));
 
+		/* TODO: maybe detect if failed because of a macro expansion failure and set different message */
 		if (SUCCEED != zbx_tq_query_from_json(items[i].query_fields, items[i].telemetry_query,
 				telemetry_query_macro_expand_cb, &query_macro_expand_ctx))
 		{

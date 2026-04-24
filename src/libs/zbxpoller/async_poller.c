@@ -262,6 +262,7 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 
 			SET_TEXT_RESULT(&result, out);
 
+			/* FIXME: item metadata might not update in time for the next check, this must be changed */
 			zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
 			item_state = ITEM_STATE_NORMAL;
 		}
