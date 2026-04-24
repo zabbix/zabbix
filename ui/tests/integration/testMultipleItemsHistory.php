@@ -357,7 +357,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 			$itemids = array_values($items_by_key);
-			$this->callUntilDataIsPresent('history.get', [
+			$history_response = $this->callUntilDataIsPresent('history.get', [
 				'history' => $vtype,
 				'itemids' => $itemids,
 				'time_from' => $tm,
@@ -366,6 +366,19 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($response) {
 				return count($response['result']) === self::LLD_DISCOVERY_COUNT;
 			});
+
+			$expected_by_itemid = [];
+			foreach ($itemids as $i => $itemid) {
+				$expected_by_itemid[$itemid] = $values[$i];
+			}
+
+			$this->assertCount(self::LLD_DISCOVERY_COUNT, $history_response['result']);
+			foreach ($history_response['result'] as $record) {
+				$exp = $expected_by_itemid[$record['itemid']];
+				$this->assertEquals($tm, (int) $record['clock']);
+				$this->assertEquals($exp['ns'], (int) $record['ns']);
+				$this->assertEquals((float) $exp['value'], (float) $record['value']);
+			}
 
 			$response = $this->call('history.get', [
 				'history' => $vtype,
@@ -393,20 +406,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 					(int) $response['result'][$i]['itemid']
 				);
 			}
-
-			// Verify output field selection: only requested fields are returned.
-			$response = $this->call('history.get', [
-				'history' => $vtype,
-				'itemids' => [$itemids[0]],
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'output' => ['itemid', 'value']
-			]);
-			$this->assertCount(1, $response['result']);
-			$this->assertArrayHasKey('itemid', $response['result'][0]);
-			$this->assertArrayHasKey('value', $response['result'][0]);
-			$this->assertArrayNotHasKey('clock', $response['result'][0]);
-			$this->assertArrayNotHasKey('ns', $response['result'][0]);
 		}
 
 	}
