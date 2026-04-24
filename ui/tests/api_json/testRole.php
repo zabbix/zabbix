@@ -14,7 +14,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CAPITest.php';
+require_once __DIR__.'/../include/CAPITest.php';
 
 /**
  * @onBefore prepareTestData
@@ -814,6 +814,10 @@ class testRole extends CAPITest {
 									'status' => '1'
 								],
 								[
+									'name' => 'administration.linked_devices',
+									'status' => '1'
+								],
+								[
 									'name' => 'administration.general',
 									'status' => '1'
 								],
@@ -906,7 +910,7 @@ class testRole extends CAPITest {
 			foreach ($result['result'] as $role) {
 				foreach ($expected_result['result'] as $field => $expected_value){
 					$this->assertArrayHasKey($field, $role, 'Field should be present.');
-					$this->assertEquals($role[$field], $expected_value, 'Returned value should match.');
+					$this->assertEquals($expected_value, $role[$field], 'Returned value should match.');
 				}
 			}
 		}
@@ -942,33 +946,33 @@ class testRole extends CAPITest {
 				'name' => 'second-role-for-update',
 				'type' => 3,
 				'rules' => [
-						'ui' => [
-							[
-								'name' => 'administration.macros',
-								'status' => '0'
-							],
-							[
-								'name' => 'administration.housekeeping',
-								'status' => '1'
-							]
+					'ui' => [
+						[
+							'name' => 'administration.macros',
+							'status' => '0'
 						],
+						[
+							'name' => 'administration.housekeeping',
+							'status' => '1'
+						]
+					],
 					'ui.default_access' => '0'
 				]
 			],
-						[
+			[
 				'name' => 'role-for-get',
 				'type' => 3,
 				'rules' => [
-						'ui' => [
-							[
-								'name' => 'configuration.discovery_actions',
-								'status' => '0'
-							],
-							[
-								'name' => 'configuration.internal_actions',
-								'status' => '1'
-							]
+					'ui' => [
+						[
+							'name' => 'configuration.discovery_actions',
+							'status' => '0'
 						],
+						[
+							'name' => 'configuration.internal_actions',
+							'status' => '1'
+						]
+					],
 					'ui.default_access' => '0'
 				]
 			]
