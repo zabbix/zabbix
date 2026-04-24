@@ -29,7 +29,7 @@ class CDatatableElement extends CTableElement {
 	 */
 	protected $selectors = [
 		'header' => 'xpath:./div[contains(@class, "datatable-header")]/div[contains(@class, "cell-header")]',
-		'row' => 'xpath:./div[@class="datatable-body"]/div[@class="row"]',
+		'row' => 'xpath:./div[@class="datatable-body"]/div[contains(@class, "row")]',
 		'column' => 'xpath:./*'
 	];
 
@@ -227,8 +227,8 @@ class CDatatableElement extends CTableElement {
 			? '['.$column.'][contains(string(), '.CXPathHelper::escapeQuotes($value).')]/..'
 			: '['.$column.'][string()='.CXPathHelper::escapeQuotes($value).']/..';
 
-		return $this->query('xpath:.//div[@class="datatable-body"]/div[@class="row"]/div[contains(@class, "cell-data")]'.$suffix)
-				->asTableRow(['parent' => $this, 'column_selector' => $this->selectors['column']])->one(false);
+		return $this->query('xpath:.//div[@class="datatable-body"]/div[contains(@class,"row")]/div[contains(@class, "cell-data")]'.
+				$suffix)->asTableRow(['parent' => $this, 'column_selector' => $this->selectors['column']])->one(false);
 	}
 
 	/**
