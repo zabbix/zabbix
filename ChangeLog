@@ -1,9 +1,18 @@
 Changes for 7.0.26rc1
 
 New features:
+.........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
+.........T [ZBXNEXT-10502] added support for native connection mode in Ceph by Zabbix agent 2 template (abakaldin)
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm json and 'ifbackingnetwork' info to json for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
+..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
+.........T [ZBX-26388] improved memory usage monitoring for Docker by Zabbix agent 2 template (smansurovs)
+.......PS. [ZBX-27115] fixed some ODBC errors not being processed (mkorotkov)
+.........T [ZBX-27025] fixed incorrect headers parsing in JS files (kflorowski)
+..F....... [ZBX-27485] fixed issue with toggling disabled and readonly attributes in the 'Access to API' section (msnihach)
+.........T [ZBX-27418] fixed disk failed status in HPE Primera by HTTP template (smansurovs)
 .........T [ZBX-27611] reduced received data size for elasticsearch template (kflorowski)
 .........T [ZBX-27552] fixed macro descriptions in Azure template (kflorowski)
 ..F....... [ZBX-27569] fixed broadcasting of item in Item history widget (dfofanovs)
@@ -4048,6 +4057,7 @@ A......PS. [ZBXNEXT-10448] updated maximum supported MySQL version to 9.6 (mprih
 .......PS. [ZBXNEXT-10477] updated maximum supported MariaDB version to 12.2 (mprihodko)
 
 Bug fixes:
+..F....... [ZBX-27603] fixed an issue with updating existing LDAP settings after an LDAP host change (kkuzmina)
 A......... [ZBX-27306] prevented deletion of httptest item tags when 'tags' parameter wasn't passed to httptest.update API method (aluchko)
 
 --------------------------------------------------------------------------------
