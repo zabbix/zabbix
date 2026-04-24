@@ -56,6 +56,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
+		$this->call('settings.update', ['auditlog_enabled' => 0, 'auditlog_mode' => 0]);
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
 			'output' => ['groupid']
@@ -107,6 +108,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 
 		self::$hostid = null;
+
+		CDataHelper::call('settings.update', ['auditlog_enabled' => 1, 'auditlog_mode' => 1]);
 	}
 	/**
 	 * Component configuration provider.
