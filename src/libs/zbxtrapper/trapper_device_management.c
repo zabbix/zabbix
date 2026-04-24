@@ -184,8 +184,6 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	zbx_config_t			cfg;
 	const char			*serverid;
 
-	zbx_json_init(&request, 512);
-
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in device.init request");
@@ -222,6 +220,8 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
+
+	zbx_json_init(&request, 512);
 
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "method", "device.init", ZBX_JSON_TYPE_STRING);
@@ -368,7 +368,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		zabbix_log(LOG_LEVEL_WARNING, "missing met/bek/enroll_url in bridge-adapter result: %s",
 				ZBX_NULL2EMPTY_STR(body.data));
 		*error = zbx_strdup(NULL, "Failed to process device.init request");
-		goto out;
+		goto out2;
 	}
 
 	bek_len = (size_t)(jp_bek.end - jp_bek.start + 1);
@@ -385,9 +385,10 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 
 	ret = SUCCEED;
 out:
+	zbx_json_free(&request);
+out2:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(curl);
-	zbx_json_free(&request);
 	zbx_free(error_curl);
 	zbx_free(payload);
 	zbx_free(body.data);
@@ -535,20 +536,18 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	zbx_config_t			cfg;
 	const char			*serverid;
 
-	zbx_json_init(&request, 512);
-
 	if (FAIL == zbx_json_brackets_by_name(jp, "data", &jp_body))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in device.init request");
 		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
-		goto out;
+		goto out2;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in device.init request");
 		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
-		goto out;
+		goto out2;
 	}
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
@@ -558,7 +557,7 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
 		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
-		goto out;
+		goto out2;
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb,
@@ -567,12 +566,14 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
 		*error = zbx_strdup(NULL, "Failed to process device.offboard request");
-		goto out;
+		goto out2;
 	}
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
 	/* Will be removed, currently necessary for adapter-mock */
 	headers = curl_slist_append(headers, "X-Trace-Id: test-trace-1");
+
+	zbx_json_init(&request, 512);
 
 	zbx_json_addstring(&request, "jsonrpc", "2.0", ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(&request, "method", "device.offboard", ZBX_JSON_TYPE_STRING);
@@ -702,9 +703,10 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 	ret = SUCCEED;
 out:
+	zbx_json_free(&request);
+out2:
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(curl);
-	zbx_json_free(&request);
 	zbx_free(payload);
 	zbx_free(error_curl);
 	zbx_free(body.data);
