@@ -353,8 +353,7 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]
 			],
 			'formula' => ['db items.formula', 'required',
-				// TODO: uncomment once ZBXNEXT-8791 is merged
-				// 'use' => [CConditionFormulaParser::class, []],
+				'use' => [CConditionFormulaParser::class, []],
 				'when' => ['evaltype', 'in' => [CONDITION_EVAL_TYPE_EXPRESSION]]
 			],
 			'conditions' => [
