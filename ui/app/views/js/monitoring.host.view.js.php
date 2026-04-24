@@ -359,8 +359,10 @@
 
 					new CState().setParams({page});
 				})
-				.on(CDataTable.EVENT_RENDER, () => {
-					this.#datatable.getData().then(response => this.#refreshCounters(response));
+				.on(CDataTable.EVENT_RENDER, e => {
+					const response = e.detail.response;
+
+					this.#refreshCounters(response);
 				})
 				.on(CDataTable.EVENT_DATA_SORT, () => this.#scheduleRefresh())
 				.on(CDataTable.EVENT_OPTIONS_POPUP_OPEN, () => this.#unscheduleRefresh())

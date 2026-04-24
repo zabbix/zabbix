@@ -591,11 +591,10 @@
 
 					new CState().setParams({page});
 				})
-				.on(CDataTable.EVENT_INIT, () => {
-					requestAnimationFrame(() => this.#initExpandables());
-				})
-				.on(CDataTable.EVENT_RENDER, () => {
-					this.#datatable.getData().then(response => this.refreshCounters(response));
+				.on(CDataTable.EVENT_RENDER, e => {
+					const response = e.detail.response;
+
+					this.refreshCounters(response);
 
 					requestAnimationFrame(() => this.#initExpandables());
 				})
