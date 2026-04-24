@@ -38,6 +38,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $item_prototypeids = [];
 	private static $discovered_itemids = [];
 	private static $discovered_triggerids = [];
+	private static $total_expected;
 	private static $tm_past;
 	private static $tm_now;
 
@@ -106,6 +107,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		self::$item_prototypeids = [];
 		self::$discovered_itemids = [];
 		self::$discovered_triggerids = [];
+		self::$total_expected = null;
 	}
 	/**
 	 * Component configuration provider.
@@ -136,19 +138,19 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		$this->sendDiscoveryData();
 
 		$proto_defs = self::prototypeDefs();
-		$total_expected = self::LLD_DISCOVERY_COUNT * count($proto_defs);
+		self::$total_expected = self::LLD_DISCOVERY_COUNT * count($proto_defs);
 
 		// Wait until all items for all prototypes are created.
 		$response = $this->callUntilDataIsPresent('item.get', [
 			'hostids' => [self::$hostid],
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.'],
 			'output' => ['itemid', 'key_', 'value_type']
-		], 120, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
-			return count($r['result']) === $total_expected;
+		], 120, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === self::$total_expected;
 		});
 
-		$this->assertCount($total_expected, $response['result'],
-			'Expected '.$total_expected.' discovered items, got '.count($response['result']).'.');
+		$this->assertCount(self::$total_expected, $response['result'],
+			'Expected '.self::$total_expected.' discovered items, got '.count($response['result']).'.');
 
 		foreach ($response['result'] as $item) {
 			$vtype = (int) $item['value_type'];
@@ -218,18 +220,16 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		$this->sendDiscoveryData();
 
-		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
-
 		// Wait until a trigger instance is created for every discovered sensor and type.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'description', 'status']
-		], 120, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
-			return count($r['result']) === $total_expected;
+		], 120, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === self::$total_expected;
 		});
 
-		$this->assertCount($total_expected, $response['result'],
-			'Not all '.$total_expected.' discovered triggers were created.');
+		$this->assertCount(self::$total_expected, $response['result'],
+			'Not all '.self::$total_expected.' discovered triggers were created.');
 
 		foreach ($response['result'] as $trigger) {
 			$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
@@ -243,16 +243,14 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_TriggerDiscovery
 	 */
 	public function testMultipleItemsHistory_TriggerFiring() {
-		$total_expected = self::LLD_DISCOVERY_COUNT * count(self::prototypeDefs());
-
 		$this->sendAndVerifyHistoryAt(time());
 
 		// Verify all discovered triggers fired (value = PROBLEM, state = NORMAL).
 		$this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
-			if (count($r['result']) !== $total_expected) {
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			if (count($r['result']) !== self::$total_expected) {
 				return false;
 			}
 			foreach ($r['result'] as $trigger) {
@@ -271,9 +269,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'objectids' => self::$discovered_triggerids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'output' => ['eventid'],
-			'limit' => $total_expected
-		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) use ($total_expected) {
-			return count($r['result']) === $total_expected;
+			'limit' => self::$total_expected
+		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
+			return count($r['result']) === self::$total_expected;
 		});
 	}
 
