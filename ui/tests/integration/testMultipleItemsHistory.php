@@ -398,7 +398,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'expected_by_itemid' => $expected_by_itemid
 			];
 		}
-		
+
 		return $sent;
 	}
 
