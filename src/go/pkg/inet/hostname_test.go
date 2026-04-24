@@ -34,35 +34,35 @@ func Test_IsRFCHostName(t *testing.T) {
 		args args
 		want bool
 	}{
-		{"-emptyString", args{""}, false},
-		{"-startsWithHyphen", args{"-"}, false},
-		{"-hyphenBeforeDot", args{"a-.a"}, false},
-		{"-hyphenAfterDot", args{"a.-a"}, false},
-		{"-tooLongLabel", args{"0123456789012345678901234567890123456789012345678901234567890123456789"},
-			false},
+		{"+localhost", args{"localhost"}, true},
+		{"+punycode", args{"xn--bcher-kva.com"}, true},
+		{"+minimalLabel", args{"a.com"}, true},
 		{"+labelIs63CharactersLong", args{"123456789-123456789-123456789-123456789-123456789-123456789-123"},
 			true},
-		{"-labelIs64CharactersLong",
-			args{"123456789-123456789-123456789-123456789-123456789-123456789-1234"}, false},
 		{"+hostnameIs253CharactersLong", args{"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789.123"}, true},
+		{"-emptyString", args{""}, false},
 		{"-hostnameIs254CharactersLong", args{"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789." +
 			"123456789-123456789-123456789-123456789-123456789.1234"}, false},
-		{"-unicodeCharacter", args{"tēst.zabbix.com"}, false},
+		{"-startsWithHyphen", args{"-"}, false},
 		{"-leadingDot", args{".example.com"}, false},
-		{"-underscore", args{"example_com.com"}, false},
+		{"-labelStartsWithHyphen", args{"a.-a"}, false},
+		{"-labelIsEmpty", args{"example.."}, false},
+		{"-labelEndsWithHyphen", args{"a-.a"}, false},
+		{"-labelIs64CharactersLong",
+			args{"123456789-123456789-123456789-123456789-123456789-123456789-1234"}, false},
+		{"-labelIsTooLong", args{"0123456789012345678901234567890123456789012345678901234567890123456789"},
+			false},
 		{"-space", args{"ex ample.com"}, false},
+		{"-underscore", args{"example_com.com"}, false},
+		{"-unicodeCharacter", args{"tēst.zabbix.com"}, false},
 		{"-endsWithHyphen", args{"example.com-"}, false},
-		{"-emptyLabel", args{"example.."}, false},
-		{"+minimalLabel", args{"a.com"}, true},
-		{"+punycode", args{"xn--bcher-kva.com"}, true},
-		{"+localhost", args{"localhost"}, true},
 	}
 
 	for _, tt := range tests {
