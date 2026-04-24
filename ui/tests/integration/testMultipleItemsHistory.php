@@ -56,8 +56,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @inheritdoc
 	 */
 	public function prepareData() {
-		$this->call('settings.update', ['auditlog_enabled' => 0]);
-
 		$response = $this->call('hostgroup.get', [
 			'filter' => ['name' => ['Zabbix servers']],
 			'output' => ['groupid']
