@@ -14,12 +14,6 @@
 
 package inet
 
-func isAlnumASCII(c byte) bool {
-	return (c >= '0' && c <= '9') ||
-		(c >= 'a' && c <= 'z') ||
-		(c >= 'A' && c <= 'Z')
-}
-
 // IsRFCHostName checks if host is valid host name (should work the same as zbx_is_rfc_hostname() in C)
 //
 // Valid host names for this function are names with only ASCII characters 0-9, A-Z, a-z,
@@ -86,4 +80,10 @@ func IsRFCHostName(host string) bool {
 	}
 
 	return true
+}
+
+func isAlnumASCII(c byte) bool {
+	return (c >= '0' && c <= '9') ||
+		(c >= 'a' && c <= 'z') ||
+		(c >= 'A' && c <= 'Z')
 }
