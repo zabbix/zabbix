@@ -30,9 +30,14 @@ class HostMacrosManager {
 		this.readonly = readonly;
 		this.parent_hostid = parent_hostid ?? null;
 		this.load_callback = load_callback ?? null;
+		this.xhr = null;
 	}
 
 	load(show_inherited_macros, templateids) {
+		if (this.xhr) {
+			this.xhr.abort();
+		}
+
 		const url = new Curl('zabbix.php');
 
 		url.setArgument('action', 'hostmacros.list');
@@ -48,7 +53,7 @@ class HostMacrosManager {
 			post_data.parent_hostid = this.parent_hostid;
 		}
 
-		$.ajax(url.getUrl(), {
+		this.xhr = $.ajax(url.getUrl(), {
 			data: post_data,
 			dataType: 'json',
 			method: 'POST',
@@ -60,9 +65,11 @@ class HostMacrosManager {
 				if (typeof response === 'object' && 'error' in response) {
 					const message_box = makeMessageBox('bad', response.error.messages, response.error.title);
 
-					this.$container.append(message_box);
+					this.$container.prepend(message_box);
 				}
 				else {
+					this.$container.empty();
+
 					if (typeof response.messages !== 'undefined') {
 						this.$container.append(response.messages);
 					}
@@ -138,7 +145,6 @@ class HostMacrosManager {
 				const inherited_value_field_state = (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
 					? {'disabled': true}
 					: {'readonly': true};
-				const fields = document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`);
 
 				if (inherited_type & HostMacrosManager.ZBX_PROPERTY_OWN) {
 					// Switching from ZBX_PROPERTY_BOTH to ZBX_PROPERTY_INHERITED.
@@ -169,7 +175,8 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_allow_revert').remove();
 					$('#macros_' + macro_num + '_hostmacroid').remove();
 
-					fields.forEach(field => field.setAttribute('data-skip-from-submit', 1));
+					document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`)
+						.forEach(field => field.setAttribute('data-skip-from-submit', 1));
 				}
 				else {
 					// Switching from ZBX_PROPERTY_INHERITED to ZBX_PROPERTY_BOTH.
@@ -187,7 +194,8 @@ class HostMacrosManager {
 						.attr({'aria-haspopup': true});
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Remove'));
 
-					fields.forEach(field => field.removeAttribute('data-skip-from-submit'));
+					document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`)
+						.forEach(field => field.removeAttribute('data-skip-from-submit'));
 				}
 
 				$('#macros_' + macro_num + '_discovery_state').val(HostMacrosManager.DISCOVERY_STATE_MANUAL);
@@ -272,14 +280,22 @@ class HostMacrosManager {
 	}
 
 	loaderStart() {
+		this.$container.trigger('loader.start');
 		this.$preloader = $('<span>', {class: 'is-loading'});
-		this.$container
-			.empty()
-			.append(this.$preloader);
+
+		const macros_table = this.$container.find('table');
+
+		macros_table.hide();
+		this.$container.append(this.$preloader);
 	}
 
 	loaderStop() {
 		this.$preloader.remove();
+
+		const macros_table = this.$container.find('table');
+
+		macros_table.show();
+		this.$container.trigger('loader.stop');
 	}
 
 	macroToUpperCase($element) {

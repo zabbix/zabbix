@@ -31,7 +31,7 @@ zabbix_export:
         Set filters with host wizard configuration fields if you want to override default filter parameters.
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -59,6 +59,22 @@ zabbix_export:
             	organizations = [],
             	devices = [];
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 60 * 1000;
@@ -84,7 +100,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
@@ -439,7 +455,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-5
+        version: 8.0-6
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -495,6 +511,22 @@ zabbix_export:
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            
+            	return false;
+            }
+            
             function parseTime(timeString) {
             	var match = timeString.match(/^(\d+)([h|m|s])$/);
             	if (match) {
@@ -546,7 +578,7 @@ zabbix_export:
             				var now = new Date().getTime();
             				var headers = request.getHeaders(false);
             	
-            				if ('Retry-After' in headers) {
+            				if (hasHeader(headers, 'Retry-After')) {
             					var retryAfter = headers['Retry-After'];
             					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             					waitFor = parseInt(retryAfter) * 1000;
@@ -884,6 +916,22 @@ zabbix_export:
             	return string;
             };
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = (parseInt(timespan, 10) - 10) * 1000;
@@ -909,7 +957,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
@@ -1038,6 +1086,22 @@ zabbix_export:
             request.addHeader('X-Cisco-Meraki-API-Key:' + params.token);
             request.addHeader('User-Agent: ZabbixServer/1.2 Zabbix');
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            
+            	return false;
+            }
+            
             function parseTime(timeString) {
             	var match = timeString.match(/^(\d+)([h|m|s])$/);
             	if (match) {
@@ -1089,7 +1153,7 @@ zabbix_export:
             				var now = new Date().getTime();
             				var headers = request.getHeaders(false);
             	
-            				if ('Retry-After' in headers) {
+            				if (hasHeader(headers, 'Retry-After')) {
             					var retryAfter = headers['Retry-After'];
             					Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             					waitFor = parseInt(retryAfter) * 1000;
@@ -1441,7 +1505,7 @@ zabbix_export:
         This template is used in low-level discovery and will be auto-assigned to host prototypes. Additional configuration is not required.
       vendor:
         name: Zabbix
-        version: 8.0-3
+        version: 8.0-4
       groups:
         - name: Templates/Applications
         - name: 'Templates/Network devices'
@@ -1654,6 +1718,22 @@ zabbix_export:
             	return string;
             };
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            	
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = parseInt(timespan, 10) * 1000;
@@ -1679,7 +1759,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
@@ -1808,6 +1888,22 @@ zabbix_export:
             	adminAccount = [],
             	loginSecurity = [];
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 60 * 1000;
@@ -1833,7 +1929,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
@@ -1975,6 +2071,22 @@ zabbix_export:
             
             };
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            	
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 60 * 1000;
@@ -2000,7 +2112,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
@@ -2115,6 +2227,22 @@ zabbix_export:
             	networks = [],
             	uplinks = [];
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            	
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = 1 * 60 * 1000;
@@ -2140,7 +2268,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
@@ -2322,6 +2450,22 @@ zabbix_export:
             	return string;
             };
             
+            function hasHeader(headers, name) {
+            	if (typeof headers !== 'object' || headers === null) {
+            		return false;
+            	}
+            
+            	var target = name.toLowerCase();
+            
+            	for (var key in headers) {
+            		if (key.toLowerCase() === target) {
+            			return true;
+            		}
+            	}
+            	
+            	return false;
+            }
+            
             function getHttpData(url) {
             	var startTime = new Date().getTime();
             	var maxWait = parseInt(timespan, 10) * 1000;
@@ -2347,7 +2491,7 @@ zabbix_export:
             			var now = new Date().getTime();
             			var headers = request.getHeaders(false);
             
-            			if ('Retry-After' in headers) {
+            			if (hasHeader(headers, 'Retry-After')) {
             				var retryAfter = headers['Retry-After'];
             				Zabbix.log(4, '[ Meraki API ] API rate limit exceeded. Retrying after ' + retryAfter + ' seconds.');				 
             				waitFor = parseInt(retryAfter) * 1000;
