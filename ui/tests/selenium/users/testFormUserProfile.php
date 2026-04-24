@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup users
  */
