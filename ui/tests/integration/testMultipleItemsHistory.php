@@ -40,6 +40,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $total_trigger_expected;
 	private static $tm_past;
 	private static $tm_now;
+	private static $prepared_past = [];
+	private static $prepared_now = [];
 	private static $sent_past = [];
 	private static $sent_now = [];
 
@@ -173,14 +175,28 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	}
 
 	/**
-	 * Send history values 1 hour in the past.
+	 * Prepare history values for past and current time.
 	 *
 	 * @depends testMultipleItemsHistory_LLDDiscovery
 	 */
-	public function testMultipleItemsHistory_HistoryPastSend() {
+	public function testMultipleItemsHistory_HistoryPrepare() {
 		self::$tm_past = time() - 3600;
+		self::$tm_now = time();
 
-		self::$sent_past = $this->sendHistoryAt(self::$tm_past);
+		self::$prepared_past = $this->prepareHistoryAt(self::$tm_past);
+		self::$prepared_now = $this->prepareHistoryAt(self::$tm_now);
+	}
+
+	/**
+	 * Send history values 1 hour in the past.
+	 *
+	 * @depends testMultipleItemsHistory_HistoryPrepare
+	 */
+	public function testMultipleItemsHistory_HistoryPastSend() {
+		['sent' => $sent, 'values' => $all_values] = self::$prepared_past;
+		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
+
+		self::$sent_past = $sent;
 	}
 
 	/**
@@ -198,9 +214,10 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 * @depends testMultipleItemsHistory_HistoryPastVerify
 	 */
 	public function testMultipleItemsHistory_HistoryNowSend() {
-		self::$tm_now = time();
+		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
+		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
 
-		self::$sent_now = $this->sendHistoryAt(self::$tm_now);
+		self::$sent_now = $sent;
 	}
 
 	/**
@@ -361,7 +378,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 	}
 
-	private function sendHistoryAt(int $tm): array {
+	private function prepareHistoryAt(int $tm): array {
 		$sent = [];
 		$values_by_type = [];
 
@@ -407,6 +424,11 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			}
 		}
 
+		return ['sent' => $sent, 'values' => $all_values];
+	}
+
+	private function sendHistoryAt(int $tm): array {
+		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm);
 		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
 
 		return $sent;
