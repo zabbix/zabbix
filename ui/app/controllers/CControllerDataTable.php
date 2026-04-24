@@ -167,4 +167,8 @@ abstract class CControllerDataTable extends CController {
 		return array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
 			CProfile::getArray($storage_idx, []));
 	}
+
+	protected function getColumnOptions(array $user_configs, int $tabfilter_index = 0): array {
+		return array_merge(...array_column($user_configs[$tabfilter_index]['columns'] ?? [], 'column_options'));
+	}
 }

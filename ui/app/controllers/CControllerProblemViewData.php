@@ -67,9 +67,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				$tabfilter['show'] = TRIGGERS_OPTION_ALL;
 			}
 
-			$column_options = $index > 0
-				? array_merge(...array_column($user_configs[$index - 1]['columns'] ?? [], 'column_options'))
-				: [];
+			$column_options = $this->getColumnOptions($user_configs, $index);
 
 			$filter_counters[$index] = $tabfilter['filter_show_counter']
 				? $this->getCount($tabfilter, $column_options)
