@@ -473,9 +473,7 @@
 					}
 
 					.name {
-						overflow: hidden;
-						text-overflow: ellipsis;
-						white-space: nowrap;
+						@extend %overflow-ellipsis;
 						pointer-events: none;
 					}
 
@@ -732,7 +730,6 @@
 			width: 100%;
 			overflow: hidden;
 			text-overflow: ellipsis;
-			white-space: nowrap;
 
 			.btn-icon:not(.btn-small) {
 				min-width: 18px;
@@ -777,11 +774,9 @@
 			}
 
 			.status-container {
+				@extend %overflow-ellipsis;
 				display: flex;
 				gap: 0;
-				overflow: hidden;
-				text-overflow: ellipsis;
-				white-space: nowrap;
 
 				.in,
 				.out {
