@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -57,11 +57,23 @@ typedef struct
 	char		*db_tls_ca_file;
 	char		*db_tls_cipher;
 	char		*db_tls_cipher_13;
+#if defined(HAVE_POSTGRESQL)
+	char		*dbports;
+#endif
 	unsigned int	dbport;
 	int		log_slow_queries;
 	int		read_only_recoverable;
 }
 zbx_db_config_t;
+
+#define ZBX_MAX_SQL_SIZE	256 * 1024	/* 256KB */
+
+#ifndef ZBX_MAX_OVERFLOW_SQL_SIZE
+#	define ZBX_MAX_OVERFLOW_SQL_SIZE	ZBX_MAX_SQL_SIZE
+#elif 0 != ZBX_MAX_OVERFLOW_SQL_SIZE && \
+	(1024 > ZBX_MAX_OVERFLOW_SQL_SIZE || ZBX_MAX_OVERFLOW_SQL_SIZE > ZBX_MAX_SQL_SIZE)
+#error ZBX_MAX_OVERFLOW_SQL_SIZE is out of range
+#endif
 
 #ifdef HAVE_SQLITE3
 	/* we have to put double % here for sprintf */
@@ -318,6 +330,7 @@ zbx_db_result_t	zbx_dbconn_select_n(zbx_dbconn_t *db, const char *query, int n);
 zbx_db_row_t	zbx_db_fetch(zbx_db_result_t result);
 void	zbx_db_free_result(zbx_db_result_t result);
 
+void	zbx_dbconn_begin_deferred(zbx_dbconn_t *db);
 int	zbx_dbconn_begin(zbx_dbconn_t *db);
 int	zbx_dbconn_commit(zbx_dbconn_t *db);
 int	zbx_dbconn_rollback(zbx_dbconn_t *db);
@@ -503,6 +516,7 @@ void	zbx_dbconn_pool_sync(zbx_dbconn_pool_t *pool);
 void	zbx_db_init_autoincrement_options(void);
 int	zbx_db_connect(int flag);
 void	zbx_db_close(void);
+void	zbx_db_begin_deferred(void);
 void	zbx_db_begin(void);
 int	zbx_db_commit(void);
 void	zbx_db_rollback(void);
@@ -565,6 +579,12 @@ void	zbx_db_large_query_append_sql(zbx_db_large_query_t *query, const char *sql)
 
 zbx_db_query_mask_t	zbx_db_set_log_masked_values(zbx_db_query_mask_t flag);
 zbx_db_query_mask_t	zbx_db_get_log_masked_values(void);
+
+/* connection pool settings */
+#define ZBX_SETTINGS_DBPOOL			"dbpool_"
+#define ZBX_SETTINGS_DBPOOL_MAX_IDLE		ZBX_SETTINGS_DBPOOL "max_idle"
+#define ZBX_SETTINGS_DBPOOL_MAX_OPEN		ZBX_SETTINGS_DBPOOL "max_open"
+#define ZBX_SETTINGS_DBPOOL_IDLE_TIMEOUT	ZBX_SETTINGS_DBPOOL "idle_timeout"
 
 #endif
 

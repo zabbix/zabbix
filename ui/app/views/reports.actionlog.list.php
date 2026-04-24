@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -52,7 +52,7 @@ $filter = (new CFilter())
 							'srctbl' => 'users',
 							'srcfld1' => 'userid',
 							'srcfld2' => 'fullname',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_userids_'
 						]
 					]
@@ -69,7 +69,7 @@ $filter = (new CFilter())
 							'srctbl' => 'actions',
 							'srcfld1' => 'actionid',
 							'srcfld2' => 'name',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_actionids_'
 						]
 					]
@@ -86,7 +86,7 @@ $filter = (new CFilter())
 							'srctbl' => 'media_types',
 							'srcfld1' => 'mediatypeid',
 							'srcfld2' => 'name',
-							'dstfrm' => 'zbx_filter',
+							'dstfrm' => CFilter::FORM_NAME,
 							'dstfld1' => 'filter_mediatypeids_'
 						]
 					]

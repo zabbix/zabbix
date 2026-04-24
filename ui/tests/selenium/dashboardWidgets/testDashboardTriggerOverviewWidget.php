@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -25,7 +25,7 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  *
  * @onBefore prepareData
  *
- * @dataSource DynamicItemWidgets
+ * @dataSource DynamicItemWidgets, MonitoringOverview
  */
 class testDashboardTriggerOverviewWidget extends CWebTest {
 
@@ -725,8 +725,8 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		foreach ($popup_content as $trigger => $dependency) {
 			// Hover hint and check table headers in hint.
 			$row->getColumn($trigger)->query('tag:button')->one()->hoverMouse();
-			$hint_table = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilVisible()->one()
-					->query('class:list-table')->one()->asTable();
+			$hint_table = $this->query('xpath://div[contains(@class, "overlay-dialogue hintbox wordbreak")]')
+					->waitUntilVisible()->one()->query('class:list-table')->one()->asTable();
 			$this->assertEquals(array_keys($dependency), $hint_table->getHeadersText());
 
 			// Gather data from rows and compare result with reference.

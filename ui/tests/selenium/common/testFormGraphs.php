@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -236,8 +236,8 @@ class testFormGraphs extends CWebTest {
 						'id:visible_percent_right' => true // Percentile line (right) checkbox.
 					],
 					'check_fields' => [
-						'id:percent_left' => ['value' => 0, 'visible' => true], // Percentile line (left) input.
-						'id:percent_right' => ['value' => 0, 'visible' => true] // Percentile line (right) input.
+						'id:percent_left' => ['value' => '', 'visible' => true], // Percentile line (left) input.
+						'id:percent_right' => ['value' => '', 'visible' => true] // Percentile line (right) input.
 					]
 				]
 			],
@@ -365,11 +365,11 @@ class testFormGraphs extends CWebTest {
 						'Width' => '',
 						'Height' => ''
 					],
-					'details' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Incorrect value for field "width": value must be no less than "20".',
-						'Incorrect value "" for "height" field.',
-						'Field "items" is mandatory.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'Width' => 'This value must be no less than "20".',
+						'Height' => 'This value must be no less than "20".',
+						'class:graph-items' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -382,10 +382,10 @@ class testFormGraphs extends CWebTest {
 						'Width' => 1.2,
 						'Height' => 15.5
 					],
-					'details' => [
-						'Incorrect value "1.2" for "width" field.',
-						'Incorrect value "15.5" for "height" field.',
-						'Field "items" is mandatory.'
+					'inline_errors' => [
+						'Width' => 'This value is not a valid integer.',
+						'Height' => 'This value is not a valid integer.',
+						'class:graph-items' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -406,10 +406,14 @@ class testFormGraphs extends CWebTest {
 						'id:yaxismin' => '',
 						'id:yaxismax' => ''
 					],
-					'details' => [
-						'Incorrect value for field "width": value must be no less than "20".',
-						'Incorrect value for field "height": value must be no less than "20".',
-						'Field "items" is mandatory.'
+					'inline_errors' => [
+						'Width' => 'This value must be no less than "20".',
+						'Height' => 'This value must be no less than "20".',
+						'Percentile line (left)' => 'This value must be no less than "0".',
+						'Percentile line (right)' => 'This value must be no less than "0".',
+						'id:yaxismin' => 'This field cannot be empty.',
+						'id:yaxismax' => 'This field cannot be empty.',
+						'class:graph-items' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -419,8 +423,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Too large width and height'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => 65536,
-						'Height' => 65536
+						'Width' => 8001,
+						'Height' => 4501
 					],
 					'items' => [
 						[
@@ -434,9 +438,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Incorrect value for field "width": value must be no greater than "65535".',
-						'Incorrect value for field "height": value must be no greater than "65535".'
+					'inline_errors' => [
+						'Width' => 'This value must be no greater than "8000".',
+						'Height' => 'This value must be no greater than "4500".'
 					]
 				]
 			],
@@ -446,8 +450,8 @@ class testFormGraphs extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Too low width and height'.($this->prototype ? ' {#KEY}' : NULL),
-						'Width' => -65536,
-						'Height' => -65536
+						'Width' => -8001,
+						'Height' => -4501
 					],
 					'items' => [
 						[
@@ -461,9 +465,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Incorrect value for field "width": value must be no less than "20".',
-						'Incorrect value for field "height": value must be no less than "20".'
+					'inline_errors' => [
+						'Width' => 'This value must be no less than "20".',
+						'Height' => 'This value must be no less than "20".'
 					]
 				]
 			],
@@ -488,9 +492,8 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Incorrect value for field "percent_left": value must be between "0" and "100", '.
-							'and have no more than "4" digits after the decimal point.'
+					'inline_errors' => [
+						'Percentile line (left)' => 'This value must be no greater than "100".'
 					]
 				]
 			],
@@ -515,9 +518,8 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Incorrect value for field "percent_left": value must be between "0" and "100", '.
-							'and have no more than "4" digits after the decimal point.'
+					'inline_errors' => [
+						'Percentile line (left)' => 'This value must be no less than "0".'
 					]
 				]
 			],
@@ -542,7 +544,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "percent_left": a number is expected.']
+					'inline_errors' => [
+						'Percentile line (left)' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #8.
@@ -566,9 +570,8 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Incorrect value for field "percent_right": value must be between "0" and "100", '.
-							'and have no more than "4" digits after the decimal point.'
+					'inline_errors' => [
+						'Percentile line (right)' => 'This value must be no greater than "100".'
 					]
 				]
 			],
@@ -593,9 +596,8 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Incorrect value for field "percent_right": value must be between "0" and "100", '.
-							'and have no more than "4" digits after the decimal point.'
+					'inline_errors' => [
+						'Percentile line (right)' => 'This value must be no less than "0".'
 					]
 				]
 			],
@@ -620,7 +622,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "percent_right": a number is expected.']
+					'inline_errors' => [
+						'Percentile line (right)' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #11.
@@ -644,7 +648,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "yaxismin": a number is expected.']
+					'inline_errors' => [
+						'id:yaxismin' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #12.
@@ -668,7 +674,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "yaxismin": a number is expected.']
+					'inline_errors' => [
+						'id:yaxismin' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #13.
@@ -692,7 +700,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "yaxismax": a number is expected.']
+					'inline_errors' => [
+						'id:yaxismax' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #14.
@@ -716,10 +726,13 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "yaxismax": a number is expected.']
+					'inline_errors' => [
+						'id:yaxismax' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #15.
+			// TODO: Move this check to inline validation once DEV-4632 is fixed.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -766,7 +779,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "percent_left": a number is expected.']
+					'inline_errors' => [
+						'Percentile line (left)' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #17.
@@ -790,7 +805,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => ['Incorrect value for field "percent_right": a number is expected.']
+					'inline_errors' => [
+						'Percentile line (right)' => 'This value is not a valid floating-point value.'
+					]
 				]
 			],
 			// #18.
@@ -814,9 +831,9 @@ class testFormGraphs extends CWebTest {
 							]
 						]
 					],
-					'details' => [
-						'Field "ymin_itemid" is mandatory.',
-						'Field "ymax_itemid" is mandatory.'
+					'inline_errors' => [
+						'xpath://div[@id="ymin_itemid"]/..' => 'This field cannot be empty.',
+						'xpath://div[@id="ymax_itemid"]/..' => 'This field cannot be empty.'
 					]
 				]
 			]
@@ -913,11 +930,17 @@ class testFormGraphs extends CWebTest {
 		$this->page->waitUntilReady();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$error = $update
-				? 'Cannot update graph'.$this->getGraphSuffix()
-				: 'Cannot add graph'.$this->getGraphSuffix();
+			// TODO: Leave only inline validation error check after DEV-4632 is fixed.
+			if (array_key_exists('inline_errors', $data)) {
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
+			else{
+				$error = $update
+					? 'Cannot update graph'.$this->getGraphSuffix()
+					: 'Cannot add graph'.$this->getGraphSuffix();
 
-			$this->assertMessage(TEST_BAD, $error, $data['details']);
+				$this->assertMessage(TEST_BAD, $error, $data['details']);
+			}
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
@@ -1052,7 +1075,7 @@ class testFormGraphs extends CWebTest {
 		$name = 'Graph'.$this->getGraphSuffix().' for clone';
 		$this->query('link', $name)->waitUntilClickable()->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-		$dialog->query('button:Clone')->waitUntilClickable()->one()->click();
+		$dialog->query('button:Clone')->waitUntilClickable()->one()->click()->waitUntilNotVisible();
 		$dialog->waitUntilReady();
 		$form = $dialog->asForm();
 
@@ -1253,6 +1276,10 @@ class testFormGraphs extends CWebTest {
 		$this->page->acceptAlert();
 		$dialog->ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Graph'.$this->getGraphSuffix().' deleted');
+		$title = ($this->prototype)
+			? 'Configuration of graph prototypes'
+			: 'Configuration of graphs';
+		$this->page->assertTitle($title);
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM graphs WHERE name='.zbx_dbstr($name)));
 	}
 

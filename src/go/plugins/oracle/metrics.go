@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -81,16 +81,20 @@ var metricsMeta = map[string]handlerFunc{ //nolint:gochecknoglobals
 
 // Common params: [URI|Session][,User][,Password][,Service].
 var (
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name."). //nolint:gochecknoglobals
-			WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
-			WithSession().
-			WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp"}})
-	paramUsername = metric.NewConnParam("User", "Oracle user."). //nolint:gochecknoglobals
-			WithDefault("")
-	paramPassword = metric.NewConnParam("Password", "User's password."). //nolint:gochecknoglobals
-			WithDefault("")
-	paramService = metric.NewConnParam("Service", "Service name to be used for connection."). //nolint:gochecknoglobals
-			WithDefault("XE")
+	//nolint:gochecknoglobals
+	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
+		WithValidator(uri.URIValidator{Defaults: dbconn.URIDefaults, AllowedSchemes: []string{"tcp", "tcps"}}). //nolint:gci,gofmt,lll //here and next - suppress linter's dislike of newlines in fluent builder
+		WithDefault(dbconn.URIDefaults.Scheme + "://localhost:" + dbconn.URIDefaults.Port).
+		WithSession()
+	//nolint:gochecknoglobals
+	paramUsername = metric.NewConnParam("User", "Oracle user.").
+		WithDefault("") //nolint:gci,gofmt
+	//nolint:gochecknoglobals
+	paramPassword = metric.NewConnParam("Password", "User's password.").
+		WithDefault("") //nolint:gci,gofmt
+	//nolint:gochecknoglobals
+	paramService = metric.NewConnParam("Service", "Service name to be used for connection.").
+		WithDefault("XE") //nolint:gci,gofmt
 )
 
 var metrics = metric.MetricSet{ //nolint:gochecknoglobals

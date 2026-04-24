@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -67,7 +67,7 @@ class testFormSetup extends CWebTest {
 
 	public function testFormSetup_prerequisitesSectionLayout() {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 
 		// Check Pre-requisites section.
 		$this->checkPageTextElements('Check of pre-requisites');
@@ -124,6 +124,7 @@ class testFormSetup extends CWebTest {
 			'User' => 'zabbix',
 			'Password' => ''
 		];
+
 		$fields['Database host'] = ($db_parameters['Database type'] === 'PostgreSQL') ?
 				'localhost' : $db_parameters['Database host'];
 		$text = 'Please create database manually, and set the configuration parameters for connection to this database. '.
@@ -162,6 +163,16 @@ class testFormSetup extends CWebTest {
 					// Check that Database Schema and Database TLS encryption fields are visible.
 					$schema_field = $form->getField('Database schema');
 					$this->assertEquals(255, $schema_field->getAttribute('maxlength'));
+
+					// Check hint for database host field.
+					$hint_text = "Enter one or more values as host:port or [host]:port (IPv6), separated by commas.\n".
+							'If no port is specified, the "Database port" value is used.';
+
+					$form->getLabel('Database host')->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
+					$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilPresent()->one();
+					$this->assertEquals($hint_text, $hint->getText());
+					$hint->close();
+
 					$this->checkTlsFieldsLayout();
 					break;
 			}
@@ -296,6 +307,7 @@ class testFormSetup extends CWebTest {
 
 		// Select Dark theme.
 		$this->query('id:default-theme')->one()->asDropdown()->select('Dark');
+		$form->waitUntilReloaded();
 
 		// Check that default theme has changed.
 		$stylesheet = $this->query('xpath://link[@rel="stylesheet"]')->one();
@@ -883,7 +895,9 @@ class testFormSetup extends CWebTest {
 	 * @param	string	$text		text that should be present in a paragraph of the current setup form section
 	 */
 	private function checkPageTextElements($title, $text = null) {
-		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->one()->isValid());
+		$this->assertTrue($this->query('xpath://h1[text()='.CXPathHelper::escapeQuotes($title).']')->waitUntilVisible()
+				->one()->isValid()
+		);
 		$this->checkSections($title);
 		if ($text) {
 			$this->assertStringContainsString($text, $this->query('xpath:.//p')->one()->getText());
@@ -968,7 +982,7 @@ class testFormSetup extends CWebTest {
 	 */
 	private function openSpecifiedSection($section) {
 		$this->page->login()->open('setup.php')->waitUntilReady();
-		$this->query('button:Next step')->one()->click();
+		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		$this->query('button:Next step')->one()->click()->waitUntilStalled();
 		// No actions required in case of Configure DB connection section.
 		if ($section === 'Configure DB connection') {

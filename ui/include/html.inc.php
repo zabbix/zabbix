@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -953,30 +953,20 @@ function makePageFooter(bool $with_version = true): CTag {
  * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getUserSettingsSubmenu(): array {
-	$profile_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'userprofile.edit')
-		->getUrl();
+	$user_settings_items = [];
 
-	$notification = (new CUrl('zabbix.php'))
-		->setArgument('action', 'userprofile.notification.edit')
-		->getUrl();
+	$menu_items = APP::Component()->get('menu.user')
+		->find(_('User settings'))
+		->getSubMenu()
+		->getMenuItems();
 
-	$items = [
-		$profile_url => _('Profile'),
-		$notification => _('Notifications')
-	];
-
-	if (CWebUser::checkAccess(CRoleHelper::ACTIONS_MANAGE_API_TOKENS)) {
-		$tokens_url = (new CUrl('zabbix.php'))
-			->setArgument('action', 'user.token.list')
-			->getUrl();
-
-		$items[$tokens_url] = _('API tokens');
+	foreach ($menu_items as $menu_item) {
+		$user_settings_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
 	}
 
 	return [
 		'main_section' => [
-			'items' => array_filter($items)
+			'items' => array_filter($user_settings_items)
 		]
 	];
 }
@@ -987,65 +977,74 @@ function getUserSettingsSubmenu(): array {
  * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
  */
 function getAdministrationGeneralSubmenu(): array {
-	$gui_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'gui.edit')
-		->getUrl();
+	$general_items = [];
 
-	$autoreg_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'autoreg.edit')
-		->getUrl();
+	$menu_items = APP::Component()->get('menu.main')
+		->find(_('Administration'))
+		->getSubMenu()
+		->find(_('General'))
+		->getSubMenu()
+		->getMenuItems();
 
-	$timeouts_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'timeouts.edit')
-		->getUrl();
-
-	$image_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'image.list')
-		->getUrl();
-
-	$iconmap_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'iconmap.list')
-		->getUrl();
-
-	$regex_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'regex.list')
-		->getUrl();
-
-	$trigdisplay_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'trigdisplay.edit')
-		->getUrl();
-
-	$geomap_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'geomaps.edit')
-		->getUrl();
-
-	$modules_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'module.list')
-		->getUrl();
-
-	$connectors_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'connector.list')
-		->getUrl();
-
-	$miscconfig_url = (new CUrl('zabbix.php'))
-		->setArgument('action', 'miscconfig.edit')
-		->getUrl();
+	foreach ($menu_items as $menu_item) {
+		$general_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
+	}
 
 	return [
 		'main_section' => [
-			'items' => array_filter([
-				$gui_url            => _('GUI'),
-				$autoreg_url        => _('Autoregistration'),
-				$timeouts_url       => _('Timeouts'),
-				$image_url          => _('Images'),
-				$iconmap_url        => _('Icon mapping'),
-				$regex_url          => _('Regular expressions'),
-				$trigdisplay_url    => _('Trigger displaying options'),
-				$geomap_url			=> _('Geographical maps'),
-				$modules_url        => _('Modules'),
-				$connectors_url     => _('Connectors'),
-				$miscconfig_url     => _('Other')
-			])
+			'items' => array_filter($general_items)
+		]
+	];
+}
+
+/**
+ * Get drop-down submenu item list for the Administration->Queue section.
+ *
+ * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
+ */
+function getAdministrationQueueSubmenu(): array {
+	$queue_items = [];
+
+	$menu_items = APP::Component()->get('menu.main')
+		->find(_('Administration'))
+		->getSubMenu()
+		->find(_('Queue'))
+		->getSubMenu()
+		->getMenuItems();
+
+	foreach ($menu_items as $menu_item) {
+		$queue_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
+	}
+
+	return [
+		'main_section' => [
+			'items' => array_filter($queue_items)
+		]
+	];
+}
+
+/**
+ * Get drop-down submenu item list for the Alerts->Actions section.
+ *
+ * @return array  Menu definition for CHtmlPage::setTitleSubmenu.
+ */
+function getAlertsActionsSubmenu(): array {
+	$actions_items = [];
+
+	$menu_items = APP::Component()->get('menu.main')
+		->find(_('Alerts'))
+		->getSubMenu()
+		->find(_('Actions'))
+		->getSubMenu()
+		->getMenuItems();
+
+	foreach ($menu_items as $menu_item) {
+		$actions_items[$menu_item->getUrl()->getUrl()] = $menu_item->getLabel();
+	}
+
+	return [
+		'main_section' => [
+			'items' => array_filter($actions_items)
 		]
 	];
 }

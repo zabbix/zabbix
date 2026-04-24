@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -46,7 +46,7 @@ class CMacrosBehavior extends CBehavior {
 			'mapping' => [
 				'Macro' => [
 					'name' => 'macro',
-					'selector' => 'xpath:./textarea',
+					'selector' => 'xpath:./z-textarea-flexible',
 					'class' => 'CElement'
 				],
 				$value_column => [
@@ -56,7 +56,7 @@ class CMacrosBehavior extends CBehavior {
 				],
 				'Description' => [
 					'name' => 'description',
-					'selector' => 'xpath:./textarea',
+					'selector' => 'xpath:./z-textarea-flexible',
 					'class' => 'CElement'
 				]
 			]
@@ -123,7 +123,7 @@ class CMacrosBehavior extends CBehavior {
 	 */
 	public function removeMacro($macros) {
 		foreach ($macros as $macro) {
-			$this->test->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro['macro']).
+			$this->test->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($macro['macro']).
 				']/../..//button[text()="Remove"]')->waitUntilPresent()->one()->click();
 		}
 	}
@@ -164,7 +164,7 @@ class CMacrosBehavior extends CBehavior {
 	 * @return CElement
 	 */
 	public function getValueField($macro) {
-		return $this->test->query('xpath://textarea[text()='.CXPathHelper::escapeQuotes($macro).
+		return $this->test->query('xpath://z-textarea-flexible[@value='.CXPathHelper::escapeQuotes($macro).
 				']/../..//div[contains(@class, "macro-value")]')->asInputGroup()->waitUntilVisible()->one();
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,7 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
+require_once __DIR__.'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup graphs
@@ -30,7 +29,8 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			'class' => CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -471,7 +471,7 @@ class testPageHostGraph extends CLegacyWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 		else {
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::className('msg-good'));
+			$this->query('class:msg-good')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementPresentXpath('//output[@class="msg-good"]/span[contains(text(),"copied")]');
 
 			// DB check, if copy target was host or template.
@@ -610,10 +610,17 @@ class testPageHostGraph extends CLegacyWebTest {
 	 */
 	public function testPageHostGraph_DeleteSelected($data) {
 		$this->selectGraph($data);
+		$table = $this->query('class:list-table')->asTable()->one();
+		$before_rows_count = $table->getRows()->count();
+		$this->assertTableStats($before_rows_count);
+		$selected_count = ($data['graph'] === 'all') ? $before_rows_count : count($data['graph']);
+		$this->assertSelectedCount($selected_count);
 		$this->zbxTestClickButtonText('Delete');
 		$this->zbxTestAcceptAlert();
 
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Graphs deleted');
+		$this->assertTableStats($before_rows_count - $selected_count);
+		$this->assertSelectedCount(0);
 		$this->zbxTestCheckTitle('Configuration of graphs');
 		$this->zbxTestCheckHeader('Graphs');
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -88,7 +88,7 @@ $left_column = (new CFormList())
 				'parameters' => [
 					'srctbl' => 'host_groups',
 					'srcfld1' => 'groupid',
-					'dstfrm' => 'zbx_filter',
+					'dstfrm' => CFilter::FORM_NAME,
 					'dstfld1' => 'groupids_',
 					'with_hosts' => true,
 					'enrich_parent_groups' => true
@@ -158,7 +158,7 @@ $template = (new CDiv())
 		(new CDiv($right_column))->addClass(ZBX_STYLE_CELL)
 	]);
 $template = (new CForm('get'))
-	->setName('zbx_filter')
+	->setName(CFilter::FORM_NAME)
 	->addItem([
 		$template,
 		(new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN),
@@ -242,7 +242,7 @@ if (array_key_exists('render_html', $data)) {
 					multiselect: '1',
 					srctbl: 'host_groups',
 					srcfld1: 'groupid',
-					dstfrm: 'zbx_filter',
+					dstfrm: '<?= CFilter::FORM_NAME; ?>',
 					dstfld1: 'groupids_' + data.uniqid,
 					with_hosts: 1,
 					enrich_parent_groups: 1

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -63,6 +63,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 				'fill'					=> ['type' => API_INT32, 'in' => '0:10'],
 				'missingdatafunc'		=> ['type' => API_INT32, 'in' => implode(',', [SVG_GRAPH_MISSING_DATA_NONE, SVG_GRAPH_MISSING_DATA_CONNECTED, SVG_GRAPH_MISSING_DATA_TREAT_AS_ZERO, SVG_GRAPH_MISSING_DATA_LAST_KNOWN])],
 				'axisy'					=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [GRAPH_YAXIS_SIDE_LEFT, GRAPH_YAXIS_SIDE_RIGHT])],
+				'invert_values'			=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [SVG_GRAPH_INVERT_VALUES_OFF, SVG_GRAPH_INVERT_VALUES_ON])],
 				'timeshift'				=> ['type' => API_TIME_UNIT, 'flags' => API_REQUIRED, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 				'aggregate_function'	=> ['type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
 				'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
@@ -120,6 +121,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'transparency' => SVG_GRAPH_DEFAULT_TRANSPARENCY,
 			'fill' => SVG_GRAPH_DEFAULT_FILL,
 			'axisy' => GRAPH_YAXIS_SIDE_LEFT,
+			'invert_values' => SVG_GRAPH_INVERT_VALUES_OFF,
 			'timeshift' => '',
 			'missingdatafunc' => SVG_GRAPH_MISSING_DATA_NONE,
 			'aggregate_function' => AGGREGATE_NONE,
@@ -248,6 +250,7 @@ class CWidgetFieldDataSet extends CWidgetField {
 			'transparency' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'fill' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'axisy' => ZBX_WIDGET_FIELD_TYPE_INT32,
+			'invert_values' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'missingdatafunc' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,

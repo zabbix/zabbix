@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,7 +15,6 @@
 #include "lld.h"
 
 #include "zbxregexp.h"
-#include "audit/zbxaudit.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 #include "zbx_trigger_constants.h"
@@ -108,8 +107,16 @@ static int	lld_filter_condition_add(zbx_vector_lld_condition_ptr_t *conditions, 
 	else
 	{
 		zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+		zbx_macro_resolv_item_t macro_resolv_item = {
+			.um_handle = um_handle,
+			.hostid = item->host.hostid,
+			.host_host = item->host.host,
+			.host_name = item->host.name,
+			.itemid = item->itemid,
+			.interface = &item->interface,
+		};
 
-		zbx_substitute_macros(&condition->regexp, NULL, 0, zbx_macro_field_params_resolv, um_handle, item);
+		zbx_substitute_macros(&condition->regexp, NULL, 0, zbx_macro_field_params_resolv, macro_resolv_item);
 
 		zbx_dc_close_user_macros(um_handle);
 	}
@@ -1179,10 +1186,8 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 
 	now = time(NULL);
 
-	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
-
 	if (SUCCEED != lld_update_items(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
-			ZBX_FLAG_DISCOVERY_NORMAL, NULL, NULL))
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL, NULL, cfg.auditlog_enabled, cfg.auditlog_mode))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -1192,7 +1197,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	lld_item_links_sort(&lld_rows);
 
 	if (SUCCEED != lld_update_triggers(hostid, item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now,
-			ZBX_FLAG_DISCOVERY_NORMAL, NULL))
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL, cfg.auditlog_enabled, cfg.auditlog_mode))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
@@ -1200,7 +1205,7 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	}
 
 	if (SUCCEED != lld_update_graphs(hostid, item->itemid, &lld_rows, error, &lifetime, now,
-			ZBX_FLAG_DISCOVERY_NORMAL, NULL))
+			ZBX_FLAG_DISCOVERY_NORMAL, NULL, cfg.auditlog_enabled, cfg.auditlog_mode))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
@@ -1208,14 +1213,13 @@ int	lld_process_discovery_rule(zbx_dc_item_t *item, zbx_vector_lld_entry_ptr_t *
 	}
 
 	lld_update_hosts(item->itemid, &lld_rows, error, &lifetime, &enabled_lifetime, now, ZBX_FLAG_DISCOVERY_NORMAL,
-			NULL, NULL);
+			NULL, NULL, cfg.auditlog_enabled, cfg.auditlog_mode);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
 		*error = zbx_strdcat(*error, info);
 out:
 	zbx_config_clean(&cfg);
-	zbx_audit_flush(ZBX_AUDIT_LLD_CONTEXT);
 	zbx_free(info);
 	zbx_free(discovery_key);
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -22,7 +22,9 @@
 <script>
 	const view = new class {
 
-		init({templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status, can_update_group}) {
+		init({rules, templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status, can_update_group}) {
+			this.form_element = document.getElementById('user-group-form');
+			this.form = new CForm(this.form_element, rules);
 			this.tag_filters = tag_filters;
 			this.templategroup_rights = templategroup_rights;
 			this.can_update_group = can_update_group;
@@ -38,6 +40,8 @@
 				document.getElementById('hostgroup-right-row-template').innerHTML
 			);
 			this.host_counter = 0;
+
+			this.form_element.addEventListener('submit', (e) => this.submit(e));
 
 			const permission_types = [<?= PERM_READ_WRITE ?>, <?= PERM_READ ?>, <?= PERM_DENY ?>];
 
@@ -72,25 +76,68 @@
 			});
 
 			document.getElementById('user-group-form').addEventListener('change', event => {
-				if (event.target.name == 'gui_access') {
-					this.#toggleUserdirectoryAndMfa(event.target.value);
-				}
-				if (event.target.name == 'mfaid') {
-					this.#toggleMfaWarningIcon(event.target.value);
-				}
-				if (event.target.name == 'userdirectoryid') {
-					this.#toggleLdapWarningIcon(event.target.value);
-				}
+				this.#update();
 			})
+
+			this.form_element.querySelector('.table-forms .tfoot-buttons .js-delete')?.addEventListener('click', (e) =>
+				this.#delete(e.target)
+			);
 
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
 			this.#setMultiselectDisabling('ms_templategroup');
 
-			if (this.can_update_group) {
-				this.#toggleUserdirectoryAndMfa(document.querySelector('[name="gui_access"]').value);
-				this.#toggleMfaWarningIcon(document.querySelector('[name="mfaid"]').value);
-				this.#toggleLdapWarningIcon(document.querySelector('[name="userdirectoryid"]').value);
+			this.#update();
+		}
+
+		#update() {
+			if (!this.can_update_group) {
+				return;
+			}
+
+			const gui_access = this.form.findFieldByName('gui_access').getValue();
+			const userdirectory_input = this.form_element.querySelector('[name="userdirectoryid"]');
+			const mfa_select = this.form_element.querySelector('[name="mfaid"]');
+			const mfa_status_checkbox = this.form_element.querySelector('.checkbox-radio[name="mfa_status"]');
+
+			switch (parseInt(gui_access)) {
+				case GROUP_GUI_ACCESS_DISABLED:
+					userdirectory_input.disabled = true;
+					mfa_status_checkbox.disabled = true;
+					mfa_select.disabled = true;
+					break;
+
+				case GROUP_GUI_ACCESS_INTERNAL:
+					userdirectory_input.disabled = true;
+					mfa_status_checkbox.disabled = false;
+					mfa_select.disabled = !mfa_status_checkbox.checked;
+					break;
+
+				default:
+					userdirectory_input.disabled = false;
+					mfa_status_checkbox.disabled = false;
+					mfa_select.disabled = !mfa_status_checkbox.checked;
+			}
+
+			const mfa_warning_icon = document.getElementById('mfa-warning');
+			const mfaid_value = this.form.findFieldByName('mfaid').getValue();
+
+			if (this.mfa_status == <?= MFA_DISABLED ?> && mfaid_value != null) {
+				mfa_warning_icon.style.display = '';
+			}
+			else {
+				mfa_warning_icon.style.display = 'none';
+			}
+
+			const ldap_warning_icon = document.getElementById('ldap-warning');
+			const userdirectory_value = this.form.findFieldByName('userdirectoryid').getValue();
+
+			if (this.ldap_status == <?= ZBX_AUTH_LDAP_DISABLED ?>
+					&& userdirectory_value != 0 && userdirectory_value != null) {
+				ldap_warning_icon.style.display = '';
+			}
+			else {
+				ldap_warning_icon.style.display = 'none';
 			}
 		}
 
@@ -112,18 +159,13 @@
 
 			placeholder_row.insertAdjacentHTML('beforebegin', new_row);
 
-			const ms = document.getElementById(`ms_${group_type}_right_groupids_${rowid}_`);
+			const ms = document.getElementById(`${group_type}_rights_${rowid}_groupids_`);
 			let disable_groupids = [];
 
 			$(ms).multiSelect();
 
 			if (!groups.length) {
-				if (group_type === 'templategroup') {
-					this.#setMultiselectDisabling('ms_templategroup');
-				}
-				else if (group_type === 'hostgroup') {
-					this.#setMultiselectDisabling('ms_hostgroup');
-				}
+				this.#setMultiselectDisabling(group_type);
 			}
 			else {
 				for (const id in groups) {
@@ -143,7 +185,7 @@
 			}
 
 			const permission_radio = document
-				.querySelector(`input[name="${group_type}_right[permission][${rowid}]"][value="${permission}"]`);
+				.querySelector(`input[name="${group_type}_rights[${rowid}][permission]"][value="${permission}"]`);
 
 			permission_radio.checked = true;
 
@@ -160,7 +202,7 @@
 		#setMultiselectDisabling(group_type, is_single = false) {
 			const multiselects = is_single
 				? [document.getElementById(`${group_type}_`)]
-				: [...document.querySelectorAll(`[id^="${group_type}_right_groupids_"]`)];
+				: [...document.querySelectorAll(`.multiselect[id^="${group_type}_rights_"]`)];
 
 			multiselects.forEach(ms => {
 				$(ms).on('change', (event) => {
@@ -283,50 +325,113 @@
 				.finally(() => {
 					tag_filter_form_field.classList.remove('is-loading');
 					document.dispatchEvent(new Event('tab-indicator-update'));
-			});
+					this.form.discoverAllFields();
+				});
 		}
 
-		#toggleUserdirectoryAndMfa(gui_access) {
-			const userdirectory = document.querySelector('[name="userdirectoryid"]');
-			const mfa = document.querySelector('[name="mfaid"]');
+		submit (e) {
+			e.preventDefault();
+			this.#setLoadingStatus('js-submit');
+			clearMessages();
+			const fields = this.form.getAllValues();
 
-			switch (parseInt(gui_access)) {
-				case GROUP_GUI_ACCESS_DISABLED:
-					userdirectory.disabled = true;
-					mfa.disabled = true;
-					break;
+			this.form.validateSubmit(fields)
+				.then((result) => {
+					if (!result) {
+						this.#unsetLoadingStatus();
+						return;
+					}
 
-				case GROUP_GUI_ACCESS_INTERNAL:
-					userdirectory.disabled = true;
-					mfa.disabled = false;
-					break;
+					var curl = new Curl('zabbix.php');
 
-				default:
-					userdirectory.disabled = false;
-					mfa.disabled = false;
+					const action = document.getElementById('usrgrpid') !== null
+						? 'usergroup.update'
+						: 'usergroup.create';
+
+					curl.setArgument('action', action);
+
+					fetch(curl.getUrl(), {
+						method: 'POST',
+						headers: {'Content-Type': 'application/json'},
+						body: JSON.stringify(fields)
+					})
+						.then((response) => response.json())
+						.then((response) => {
+							if ('error' in response) {
+								throw {error: response.error};
+							}
+
+							if ('form_errors' in response) {
+								this.form.setErrors(response.form_errors, true, true);
+								this.form.renderErrors();
+
+								return;
+							}
+
+							if ('success' in response) {
+								postMessageOk(response.success.title);
+
+								if ('messages' in response.success) {
+									postMessageDetails('success', response.success.messages);
+								}
+
+								location.href = new URL(response.success.redirect, location.href).href;
+							}
+						})
+						.catch((exception) => this.#ajaxExceptionHandler(exception))
+						.finally(() => this.#unsetLoadingStatus())
+				});
+		}
+
+		#delete() {
+			if (window.confirm(<?= json_encode(_('Delete selected group?')) ?>)) {
+				this.#setLoadingStatus('js-delete');
+				const fields = this.form.getAllValues();
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'usergroup.delete');
+				curl.setArgument('usrgrpids', [fields.usrgrpid]);
+				curl.setArgument(CSRF_TOKEN_NAME, <?= json_encode(CCsrfTokenHelper::get('usergroup')) ?>);
+
+				redirect(curl.getUrl(), 'post', 'action', undefined, true);
 			}
 		}
 
-		#toggleMfaWarningIcon(mfa_value) {
-			const icon = document.getElementById('mfa-warning');
+		#ajaxExceptionHandler(exception) {
+			let title, messages;
 
-			if (this.mfa_status == <?= MFA_DISABLED ?> && mfa_value != -1) {
-				icon.style.display = '';
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
 			}
 			else {
-				icon.style.display = 'none';
+				messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 			}
+
+			addMessage(makeMessageBox('bad', messages, title)[0]);
 		}
 
-		#toggleLdapWarningIcon(userdirectory_value) {
-			const icon = document.getElementById('ldap-warning');
+		#setLoadingStatus(loading_btn_class) {
+			this.form_element.classList.add('is-loading', 'is-loading-fadein');
 
-			if (this.ldap_status == <?= ZBX_AUTH_LDAP_DISABLED ?> && userdirectory_value != 0) {
-				icon.style.display = '';
-			}
-			else {
-				icon.style.display = 'none';
-			}
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.disabled = true;
+
+					if (button.classList.contains(loading_btn_class)) {
+						button.classList.add('is-loading');
+					}
+				});
+		}
+
+		#unsetLoadingStatus() {
+			this.form_element.querySelectorAll('.table-forms .tfoot-buttons button:not(.js-cancel)')
+				.forEach(button => {
+					button.classList.remove('is-loading');
+					button.disabled = false;
+				});
+
+			this.form_element.classList.remove('is-loading', 'is-loading-fadein');
 		}
 	};
 </script>

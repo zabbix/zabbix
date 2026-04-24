@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -94,8 +94,10 @@ static void	connector_clear_wrapper(void *data)
 	connector_clear((zbx_connector_t*)data);
 }
 
-static void	data_point_link_clean(zbx_data_point_link_t *data_point_link)
+static void	data_point_link_clean(void *ptr)
 {
+	zbx_data_point_link_t	*data_point_link = (zbx_data_point_link_t*)ptr;
+
 	zbx_vector_connector_data_point_clear_ext(&data_point_link->connector_data_points,
 			zbx_connector_data_point_free);
 	zbx_vector_connector_data_point_destroy(&data_point_link->connector_data_points);
@@ -173,11 +175,12 @@ static void	connector_register_worker(zbx_connector_manager_t *manager, zbx_ipc_
 		if (manager->worker_fork_count == manager->worker_count)
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		worker = (zbx_connector_worker_t *)&manager->workers[manager->worker_count++];
 		worker->client = client;
+		zbx_ipc_client_addref(worker->client);
 		zbx_vector_uint64_create(&worker->ids);
 	}
 
@@ -328,7 +331,7 @@ static void	connector_assign_tasks(zbx_connector_manager_t *manager, int now, in
 					(zbx_uint32_t)data_offset))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot send data to connector worker");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			connector->senders++;
@@ -418,7 +421,7 @@ static zbx_connector_worker_t	*connector_get_worker_by_client(zbx_connector_mana
 	if (NULL == worker)
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	return worker;
@@ -642,7 +645,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start connector manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_CONNECTORMANAGER, 0, NULL, 0, SEC_PER_MIN,
@@ -690,7 +693,7 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 				case ZBX_IPC_CONNECTOR_REQUEST:
 					zbx_dc_config_history_sync_get_connectors(&manager.connectors, &manager.iter,
 							&manager.config_revision, &manager.connector_revision,
-							(zbx_clean_func_t)data_point_link_clean);
+							data_point_link_clean);
 					zbx_connector_deserialize_object(message->data, message->size,
 							&connector_objects);
 					connector_enqueue(&manager, &connector_objects);
@@ -760,6 +763,6 @@ ZBX_THREAD_ENTRY(connector_manager_thread, args)
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }

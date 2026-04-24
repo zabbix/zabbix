@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxcommon.h"
 #include "zbxnix.h"
 
 #include "nix_internal.h"
@@ -81,7 +82,9 @@ void	zbx_signal_process_by_type(int proc_type, int proc_num, int flags, char **o
 	for (i = 0; i < threads_num; i++)
 	{
 		if (FAIL == nix_get_process_info_by_thread_func_cb()(i + 1, &process_type, &process_num))
+		{
 			break;
+		}
 
 		if (proc_type != process_type)
 		{
@@ -143,7 +146,7 @@ void	zbx_signal_process_by_pid(int pid, int flags, char **out)
 	int	threads_num = get_threads_num_func_cb();
 	for (i = 0; i < threads_num; i++)
 	{
-		int	thread_pid = get_threads_func_cb()[i];
+		int		thread_pid = get_threads_func_cb()[i];
 
 		if ((0 != pid && thread_pid != pid) || 0 == thread_pid)
 			continue;
@@ -273,41 +276,41 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		{
 			zbx_error("user %s does not exist", user);
 			zbx_error("cannot run as root!");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (0 == pwd->pw_uid)
 		{
 			zbx_error("User=%s contradicts AllowRoot=0", user);
 			zbx_error("cannot run as root!");
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		if (-1 == setgid(pwd->pw_gid))
 		{
 			zbx_error("cannot setgid to %s: %s", user, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 #ifdef HAVE_FUNCTION_INITGROUPS
 		if (-1 == initgroups(user, pwd->pw_gid))
 		{
 			zbx_error("cannot initgroups to %s: %s", user, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #endif
 
 		if (-1 == setuid(pwd->pw_uid))
 		{
 			zbx_error("cannot setuid to %s: %s", user, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 #ifdef HAVE_FUNCTION_SETEUID
 		if (-1 == setegid(pwd->pw_gid) || -1 == seteuid(pwd->pw_uid))
 		{
 			zbx_error("cannot setegid or seteuid to %s: %s", user, zbx_strerror(errno));
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 #endif
 	}
@@ -337,7 +340,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 #else
 			ZBX_UNUSED(child_pid);
 #endif
-			exit(EXIT_SUCCESS);
+			zbx_exit(EXIT_SUCCESS);
 		}
 
 		setsid();
@@ -345,7 +348,7 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		signal(SIGHUP, SIG_IGN);
 
 		if (0 != zbx_fork())
-			exit(EXIT_SUCCESS);
+			zbx_exit(EXIT_SUCCESS);
 
 		if (-1 == chdir("/"))	/* this is to eliminate warning: ignoring return value of chdir */
 		{
@@ -354,11 +357,11 @@ int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		}
 
 		if (FAIL == zbx_redirect_stdio(ZBX_LOG_TYPE_FILE == config_log_type ? config_log_file : NULL))
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == create_pid_file(get_pid_file_cb()))
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 
 	atexit(zbx_daemon_stop);
 

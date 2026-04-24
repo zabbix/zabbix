@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -639,7 +639,8 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  flags:%x status:%u", item->flags, item->status);
 		zabbix_log(LOG_LEVEL_TRACE, "  valuemapid:" ZBX_FS_UI64, item->valuemapid);
 		zabbix_log(LOG_LEVEL_TRACE, "  lastlogsize:" ZBX_FS_UI64 " mtime:%d", item->lastlogsize, item->mtime);
-		zabbix_log(LOG_LEVEL_TRACE, "  delay:'%s' nextcheck:%d", item->delay, item->nextcheck);
+		zabbix_log(LOG_LEVEL_TRACE, "  delay_ex:'%s' delay:'%s' nextcheck:%d", ZBX_NULL2STR(item->delay_ex),
+				item->delay, item->nextcheck);
 		zabbix_log(LOG_LEVEL_TRACE, "  data_expected_from:%d", item->data_expected_from);
 		zabbix_log(LOG_LEVEL_TRACE, "  history:%s", item->history_period);
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
@@ -659,6 +660,7 @@ static void	DCdump_items(void)
 			case ITEM_VALUE_TYPE_STR:
 			case ITEM_VALUE_TYPE_TEXT:
 			case ITEM_VALUE_TYPE_BIN:
+			case ITEM_VALUE_TYPE_JSON:
 			case ITEM_VALUE_TYPE_NONE:
 				break;
 		}
@@ -1646,7 +1648,7 @@ static void	DCdump_host_proxy_index(void)
 void	DCdump_configuration(void)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "=== Configuration cache contents (revision:" ZBX_FS_UI64 ") ===",
-			get_dc_config()->revision.config);
+			dc_config_get_config_revision());
 
 	zabbix_log(LOG_LEVEL_TRACE, "  autoreg_tls_revision:" ZBX_FS_UI64, get_dc_config()->revision.autoreg_tls);
 

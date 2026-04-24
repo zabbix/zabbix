@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,13 +15,15 @@
 
 class CopyWidgetsDashboards {
 
+	const ZABBIX_SERVER_HOSTID = 10084; // ЗАББИКС Сервер.
+
 	/**
 	 * Create data for Copy widgets test.
 	 *
-	 * !!! Please, add new widgets to "Dashboard for Copying widgets _2" if necessary.
-	 * If "Dashboard for Copying widgets _2" is run out of space, create new dashboard with this exact name:
-	 * "Dashboard for Copying widgets _3", etc.
-	 * Second page on new dashboard for paste widgets should be named "Test_page".
+	 * !!! Please, add new widgets to "Widget copy dashboard 2" if necessary.
+	 * If "Widget copy dashboard 2" is run out of space, create new dashboard with this exact name:
+	 * "Widget copy dashboard 3", etc.
+	 * Second page on new widget pasting dashboard should be named "Test_page".
 	 *
 	 * @return array
 	 */
@@ -89,7 +91,7 @@ class CopyWidgetsDashboards {
 		]);
 		$templateid = $templates['templateids']['Template for copy widgets'];
 		$template_itemid = $templates['itemids']['Template for copy widgets:templ_key[1]'];
-		$discoveryruleid =  $templates['discoveryruleids']['Template for copy widgets:drule'];
+		$discoveryruleid = $templates['discoveryruleids']['Template for copy widgets:drule'];
 
 		$item_protototypes = CDataHelper::call('itemprototype.create', [
 			[
@@ -116,7 +118,7 @@ class CopyWidgetsDashboards {
 
 		CDataHelper::call('dashboard.create', [
 			[
-				'name' => 'Dashboard for Copying widgets _1',
+				'name' => 'Widget copy dashboard 1',
 				'display_period' => 30,
 				'auto_start' => 0,
 				'pages' => [
@@ -207,12 +209,12 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 50012
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -253,7 +255,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
 										'name' => 'itemid',
-										'value' => 99088
+										'value' => 42243 // Available memory.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -708,7 +710,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -725,7 +727,7 @@ class CopyWidgetsDashboards {
 				]
 			],
 			[
-				'name' => 'Dashboard for Copying widgets _2',
+				'name' => 'Widget copy dashboard 2',
 				'display_period' => 30,
 				'auto_start' => 0,
 				'pages' => [
@@ -785,7 +787,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
@@ -1074,7 +1076,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
@@ -1526,12 +1528,12 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_GROUP,
 										'name' => 'groupids',
-										'value' => 50011
+										'value' => 6 // Virtual machines.
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 50012
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -1902,7 +1904,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2232,7 +2234,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hosts.0',
-										'value' => 10084 // ЗАББИКС Сервер.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -2343,7 +2345,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostids.0',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									],
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_STR,
@@ -2468,7 +2470,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostid.0',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									]
 								]
 							],
@@ -2516,7 +2518,7 @@ class CopyWidgetsDashboards {
 				]
 			],
 			[
-				'name' => 'Dashboard for Paste widgets',
+				'name' => 'Widget pasting dashboard',
 				'display_period' => 30,
 				'auto_start' => 0,
 				'pages' => [
@@ -3263,7 +3265,7 @@ class CopyWidgetsDashboards {
 									[
 										'type' => ZBX_WIDGET_FIELD_TYPE_HOST,
 										'name' => 'hostid.0',
-										'value' => 10084 // Zabbix server.
+										'value' => self::ZABBIX_SERVER_HOSTID
 									]
 								]
 							],

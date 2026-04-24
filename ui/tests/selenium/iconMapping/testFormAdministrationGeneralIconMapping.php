@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup icon_map
@@ -840,6 +838,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
 		$this->zbxTestClickLinkTextWait($data['old_name']);
 		$this->zbxTestClickWait('clone');
+		$this->query('button:Update')->waitUntilNotVisible();
 		if (array_key_exists('name', $data)) {
 			$this->zbxTestInputTypeOverwrite('name', $data['name']);
 		}
@@ -882,23 +881,32 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 
 	/**
 	 * Test cancel cloning of icon mapping.
+	 *
+	 * TODO: Remove @ignoreBrowserErrors after the console.error for "Failed to fetch" is resolved in ZBX-27065
+	 * @ignoreBrowserErrors
 	 */
 	public function testFormAdministrationGeneralIconMapping_CancelCloning() {
 		$sql_hash = 'SELECT * FROM icon_map ORDER BY iconmapid';
 		$old_hash = CDBHelper::getHash($sql_hash);
 
-		$this->zbxTestLogin('zabbix.php?action=iconmap.list');
+		$this->page->login()->open('zabbix.php?action=iconmap.list')->waitUntilReady();
 
 		foreach (CDBHelper::getAll('SELECT name FROM icon_map LIMIT 2') as $iconmap) {
-			$this->zbxTestClickLinkText($iconmap['name']);
-			$this->zbxTestInputTypeOverwrite('name', $iconmap['name'].' (cloned)');
-			$this->zbxTestClickWait('clone');
-			$this->zbxTestClick('cancel');
+			$new_name = $iconmap['name'].' (cloned)';
+			$this->query('link', $iconmap['name'])->waitUntilClickable()->one()->click();
+			$form = $this->query('id:iconmap')->waitUntilVisible()->asForm()->one();
+			$form->fill(['Name' => $new_name]);
+			$form->query('button:Clone')->one()->click()->waitUntilNotVisible();
+			$form->waitUntilReloaded();
+			$form->checkValue(['Name' => $new_name]);
+			$form->query('button:Cancel')->waitUntilVisible()->one()->click()->waitUntilNotVisible();
+			$this->page->waitUntilReady();
 
 			// Check the results in frontend.
-			$this->zbxTestCheckTitle('Configuration of icon mapping');
-			$this->zbxTestCheckHeader('Icon mapping');
-			$this->zbxTestTextNotPresent($iconmap['name'].' (cloned)');
+			$this->page->assertTitle('Configuration of icon mapping');
+			$this->page->assertHeader('Icon mapping');
+			$this->assertFalse($this->query('link', $new_name)->exists(),
+					'Icon mapping "'.$new_name.'" should not be visible on page.');
 		}
 
 		// Check the results in DB
@@ -962,11 +970,10 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Icon map "'.$name.'" cannot be deleted. Used in map');
 
 		// Check the results in DB.
-		$sql = 'SELECT * FROM icon_map WHERE name='.zbx_dbstr($name);
 		$this->assertEquals($old_hash, CDBHelper::getHash($sql_hash));
 	}
 
-	private function checkFormFields($data) {
+	protected function checkFormFields($data) {
 		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestAssertElementValue('name', $data['name']);
 		$this->zbxTestAssertElementValue('mappings_0_expression', $data['mappings'][0]['expression']);
@@ -975,7 +982,7 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 		$this->zbxTestDropdownAssertSelected('default-mapping-icon', $data['default_icon']);
 	}
 
-	private function processExpressionRows($rows) {
+	protected function processExpressionRows($rows) {
 		foreach ($rows as $i => $mapping_row) {
 			switch (CTestArrayHelper::get($mapping_row, 'action', 'add')) {
 				case 'add':
@@ -992,13 +999,14 @@ class testFormAdministrationGeneralIconMapping extends CLegacyWebTest {
 				case 'update':
 					if (!$this->zbxTestElementPresentId('mappings_'.$i.'_expression')) {
 						$this->zbxTestClickXpath('//button[@id="add" and @type="button"]');
-						$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('mappings_'.$i.'_expression'));
+						$this->query('id:iconmap_mappings_'.$i.'_expression')->waitUntilVisible()->one();
 					}
-					$this->zbxTestInputType('mappings_'.$i.'_expression', $mapping_row['expression']);
+					$this->query('id:mappings_'.$i.'_expression')->one()->fill($mapping_row['expression']);
+
 					break;
 
 				case 'remove':
-					$this->zbxTestClickXpathWait('//input[@id="mappings_'.$i.'_expression"]/../../td/button');
+					$this->zbxTestClickXpathWait('//z-textarea-flexible[@id="mappings_'.$i.'_expression"]/../../td/button');
 
 					break;
 			}

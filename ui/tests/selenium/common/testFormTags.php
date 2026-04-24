@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -250,7 +250,7 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
-			'item', 'item prototype', 'service']
+			'item', 'item prototype', 'service', 'connector']
 		);
 
 		switch ($object) {
@@ -485,7 +485,7 @@ class testFormTags extends CWebTest {
 		$old_hash = null;
 		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
 		$inline_validation = in_array($object, ['host', 'host prototype', 'template', 'trigger', 'trigger prototype',
-			'item', 'item prototype', 'service'
+			'item', 'item prototype', 'service', 'connector'
 		]);
 
 		switch ($object) {
@@ -578,7 +578,7 @@ class testFormTags extends CWebTest {
 	 * @param string    $old_hash           db hash before changes
 	 * @param bool      $inline_validation  flag that determines if inline validation is enabled in the form
 	 */
-	private function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
+	protected function checkResult($data, $object, $form, $action, $sql = null, $old_hash = null, $inline_validation = false) {
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
 			if ($inline_validation) {
 				$inline_error = [];
@@ -614,7 +614,7 @@ class testFormTags extends CWebTest {
 			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
 
 			if (in_array($object, ['connector', 'template', 'trigger', 'trigger prototype', 'item', 'item prototype',
-				'host', 'service'])) {
+				'host', 'service', 'connector'])) {
 				COverlayDialogElement::find()->one()->close();
 			}
 		}
@@ -850,7 +850,7 @@ class testFormTags extends CWebTest {
 	 * @param string   $object   host, template, trigger, item or prototype
 	 * @param string   $form     object configuration form
 	 */
-	private function checkTagFields($data, $object, $form) {
+	protected function checkTagFields($data, $object, $form) {
 		switch ($object) {
 			case 'item':
 			case 'item prototype':
@@ -1275,6 +1275,7 @@ class testFormTags extends CWebTest {
 		$form->fill(['id:show_inherited_tags' => 'Inherited and '.$field_name.' tags']);
 
 		if ($object === 'web scenario') {
+			$form->waitUntilReloaded();
 			$this->page->waitUntilReady();
 		}
 		else {
@@ -1287,8 +1288,8 @@ class testFormTags extends CWebTest {
 		foreach ($tags_table->getRows() as $row) {
 			$parent_template = $row->getColumn('Parent templates')->getText();
 			$current_tag = [];
-			$current_tag['tag'] = $row->getColumn('Name')->getText();
-			$current_tag['value'] = $row->getColumn('Value')->getText();
+			$current_tag['tag'] = $row->getColumn('Name')->query('tag:z-textarea-flexible')->one()->getValue();
+			$current_tag['value'] = $row->getColumn('Value')->query('tag:z-textarea-flexible')->one()->getValue();
 
 			if (in_array($current_tag, $unique_template_tags)) {
 				$this->assertEquals($this->template, $parent_template);
@@ -1311,11 +1312,12 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function getInheritedTags() {
+	protected function getInheritedTags() {
 		$inherited_tags = [];
 
 		$tags_table = $this->query($this->tags_table)->asMultifieldTable()->one();
 		$headers = $tags_table->getHeadersText();
+
 		// Find disabled rows of host and/or template tags by disabled Name field.
 		$disabled_rows = $tags_table->findRows(function ($row) {
 			return $row->getColumn('Name')->children()->one()->detect()->isEnabled() === false;
@@ -1323,8 +1325,9 @@ class testFormTags extends CWebTest {
 
 		foreach ($disabled_rows as $row) {
 			// Check other disabled fields.
-			$this->assertFalse($row->getColumn('Value')->children()->one()->detect()->isEnabled());
-			$this->assertFalse($row->getColumn('')->children()->one()->detect()->isEnabled());
+			foreach (['Value', ''] as $column) {
+				$this->assertFalse($row->getColumn($column)->children()->one()->isEnabled());
+			}
 
 			$values = [];
 			// Get disabled row values.
@@ -1345,7 +1348,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareAllTags($tags, $parent_tags) {
+	protected function prepareAllTags($tags, $parent_tags) {
 		// Prepare all tags data (inherited form host and/or template, and element tags).
 		$all_tags = array_merge($parent_tags, $tags);
 		// Sort reference tags array by field "tag".
@@ -1364,7 +1367,7 @@ class testFormTags extends CWebTest {
 	 *
 	 * @return array
 	 */
-	private function prepareInheritedTags($tags, $parent_tags = false) {
+	protected function prepareInheritedTags($tags, $parent_tags = false) {
 		if (!$parent_tags) {
 			$host_template_tags = array_merge(self::HOST_TAGS, self::TEMPLATE_TAGS);
 			$parent_tags = array_unique($host_template_tags, SORT_REGULAR);

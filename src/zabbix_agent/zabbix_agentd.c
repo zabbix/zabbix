@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -388,7 +388,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #ifndef _WINDOWS
 			case 'R':
 				if (SUCCEED != zbx_parse_rtc_options(zbx_optarg, &t->data))
-					exit(EXIT_FAILURE);
+					zbx_exit(EXIT_FAILURE);
 
 				t->task = ZBX_TASK_RUNTIME_CONTROL;
 				break;
@@ -711,7 +711,7 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 	if (0 == hostnames->values_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	for (int i = 0; i < hostnames->values_num; i++)
@@ -723,7 +723,7 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 			zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s",
 					hostnames->values[i], ch_error);
 			zbx_free(ch_error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 }
@@ -810,7 +810,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 #endif
 
 	if (0 != err)
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 
 	zbx_config_eventlog_max_lines_per_second = zbx_config_max_lines_per_second;
 }
@@ -882,7 +882,7 @@ static void	parse_hostnames(const char *hostname_param, zbx_vector_str_t *hostna
 			zbx_error("error parsing the \"Hostname\" parameter: host \"%s\" specified more than"
 					" once", hostname);
 			zbx_free(hostname);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		zbx_vector_str_append(hostnames, hostname);
@@ -1208,7 +1208,7 @@ static void	zbx_on_exit(int ret, void *on_exit_args)
 		;
 #endif
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }
 
 #ifdef ZABBIX_DAEMON
@@ -1279,14 +1279,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zbx_error("cannot create locks: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, zabbix_event_source, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 #ifdef HAVE_IPV6
@@ -1315,7 +1315,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot disable core dump, exiting...");
 		zbx_free_service_resources();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 #ifndef _WINDOWS
@@ -1323,7 +1323,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		zbx_free_service_resources();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 
@@ -1332,7 +1332,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 		zbx_free(error);
 		zbx_free_service_resources();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (0 != config_forks[ZBX_PROCESS_TYPE_LISTENER])
@@ -1347,7 +1347,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			zbx_free_service_resources();
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -1356,7 +1356,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize modbus: %s", error);
 		zbx_free(error);
 		zbx_free_service_resources();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	if (SUCCEED != zbx_init_collector_data(&error))
@@ -1364,7 +1364,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize collector: %s", error);
 		zbx_free(error);
 		zbx_free_service_resources();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 #ifdef _WINDOWS
@@ -1392,7 +1392,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
 				" parameter or the number of active servers in ServerActive configuration parameter.");
 		zbx_free_service_resources();
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 	zbx_threads = (ZBX_THREAD_HANDLE *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(ZBX_THREAD_HANDLE));
@@ -1414,7 +1414,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		if (FAIL == get_process_info_by_thread(i + 1, &thread_info->process_type, &thread_info->process_num))
 		{
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 
 		thread_info->program_type = zbx_program_type;
@@ -1424,13 +1424,22 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
+#ifndef _WINDOWS
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
+#endif
 				zbx_thread_start(zbx_collector_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listener_args;
+#ifndef _WINDOWS
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
+#endif
 				zbx_thread_start(listener_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
+#ifndef _WINDOWS
+				threads_flags[i] = ZBX_THREAD_PRIORITY_COLLECTOR;
+#endif
 				thread_args->args = &config_active_args[j++];
 				zbx_thread_start(active_checks_thread, thread_args, &zbx_threads[i]);
 				break;
@@ -1514,10 +1523,11 @@ int	MAIN_ZABBIX_ENTRY(int flags)
  ******************************************************************************/
 void	zbx_free_service_resources(void)
 {
+#define ZBX_AGENT_WAIT_STOP	10
 	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, SUCCEED);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ZBX_AGENT_WAIT_STOP);
 
 		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
@@ -1544,6 +1554,7 @@ void	zbx_free_service_resources(void)
 #ifndef _WINDOWS
 	zbx_locks_destroy();
 #endif
+#undef ZBX_AGENT_WAIT_TIMEOUT
 }
 
 int	main(int argc, char **argv)
@@ -1556,7 +1567,7 @@ int	main(int argc, char **argv)
 	argv = zbx_setproctitle_init(argc, argv);
 	zbx_progname = get_program_name(argv[0]);
 
-	zbx_init_library_common(zbx_log_impl, get_zbx_progname, zbx_backtrace);
+	zbx_init_library_common(zabbix_log_impl, zbx_get_log_level_impl, get_zbx_progname, zbx_backtrace);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
@@ -1576,7 +1587,7 @@ int	main(int argc, char **argv)
 	zbx_config_tls = zbx_config_tls_new();
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 #ifdef _WINDOWS
 	/* if agent is started as windows service then try to log errors */
 	/* into windows event log while zabbix_log is not ready */
@@ -1598,7 +1609,7 @@ int	main(int argc, char **argv)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 #endif
 
@@ -1611,12 +1622,12 @@ int	main(int argc, char **argv)
 	{
 		case ZBX_TASK_SHOW_USAGE:
 			zbx_print_usage(zbx_progname, usage_message);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			exit(SUCCEED == zbx_sigusr_send(t.data, config_pid_file) ? EXIT_SUCCESS : EXIT_FAILURE);
+			zbx_exit(SUCCEED == zbx_sigusr_send(t.data, config_pid_file) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -1651,7 +1662,7 @@ int	main(int argc, char **argv)
 				;
 
 			zbx_free_metrics();
-			exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
+			zbx_exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #endif
 		case ZBX_TASK_TEST_CONFIG:
@@ -1664,7 +1675,7 @@ int	main(int argc, char **argv)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 				zbx_free(error);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			zbx_free_metrics();
@@ -1672,7 +1683,7 @@ int	main(int argc, char **argv)
 			zbx_free_config();
 			printf("Validation successful\n");
 
-			exit(EXIT_SUCCESS);
+			zbx_exit(EXIT_SUCCESS);
 		case ZBX_TASK_TEST_METRIC:
 		case ZBX_TASK_PRINT_SUPPORTED:
 			zbx_load_config(ZBX_CFG_FILE_OPTIONAL, &t);
@@ -1693,7 +1704,7 @@ int	main(int argc, char **argv)
 					0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 #endif
 			zbx_set_user_parameter_dir(config_user_parameter_dir);
@@ -1702,7 +1713,7 @@ int	main(int argc, char **argv)
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "cannot load user parameters: %s", error);
 				zbx_free(error);
-				exit(EXIT_FAILURE);
+				zbx_exit(EXIT_FAILURE);
 			}
 
 			load_aliases(config_aliases);
@@ -1724,7 +1735,7 @@ int	main(int argc, char **argv)
 #endif
 			zbx_free_metrics();
 			zbx_alias_list_free();
-			exit(EXIT_SUCCESS);
+			zbx_exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:
 			zbx_print_version(title_message);
@@ -1736,11 +1747,11 @@ int	main(int argc, char **argv)
 			printf("\n");
 			tl_version();
 #endif
-			exit(EXIT_SUCCESS);
+			zbx_exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
 			zbx_print_help(zbx_progname, help_message, usage_message, config_file);
-			exit(EXIT_SUCCESS);
+			zbx_exit(EXIT_SUCCESS);
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
@@ -1761,5 +1772,5 @@ int	main(int argc, char **argv)
 			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,
 			get_zbx_threads_num);
 #endif
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 }

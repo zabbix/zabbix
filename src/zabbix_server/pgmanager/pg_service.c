@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,6 +19,8 @@
 #include "zbxcacheconfig.h"
 #include "zbxnix.h"
 #include "zbxpgservice.h"
+#include "zbxprof.h"
+#include "zbxregexp.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"
 #include "zbxtime.h"
@@ -360,14 +362,13 @@ static void	*pg_service_entry(void *data)
 	zbx_timespec_t		timeout = {1, 0};
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	int			err;
+	sigjmp_buf		jmp_ret;
 
-	if (0 != (err = zbx_init_thread_signal_handler()))
-		zabbix_log(LOG_LEVEL_WARNING, "cannot block signals: %s", zbx_strerror(err));
+	ZBX_INIT_THREAD_OR_RETURN(jmp_ret);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	while (ZBX_IS_RUNNING())
+	while (0 == atomic_load(&pgs->stop))
 	{
 		(void)zbx_ipc_service_recv(&pgs->service, &timeout, &client, &message);
 
@@ -390,8 +391,6 @@ static void	*pg_service_entry(void *data)
 				case ZBX_IPC_PGM_GET_ALL_PGROUP_RTDATA:
 					pg_get_all_pgroup_rtdata(pgs, client);
 					break;
-				case ZBX_IPC_PGM_STOP:
-					goto out;
 			}
 
 			zbx_ipc_message_free(message);
@@ -400,7 +399,11 @@ static void	*pg_service_entry(void *data)
 		if (NULL != client)
 			zbx_ipc_client_release(client);
 	}
-out:
+
+	zbx_deinit_regexp_env();
+
+	zbx_prof_destroy();
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return NULL;
@@ -421,6 +424,7 @@ int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 		goto out;
 
 	pgs->cache = cache;
+	pgs->stop = 0;
 
 	pthread_attr_t	attr;
 	int		err;
@@ -446,21 +450,9 @@ out:
  ******************************************************************************/
 void	pg_service_destroy(zbx_pg_service_t *pgs)
 {
-	zbx_ipc_socket_t	sock;
-	char			*error = NULL;
-
-	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, &error))
-	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot connect to to proxy group manager service: %s", error);
-		zbx_free(error);
-		return;
-	}
-
-	zbx_ipc_socket_write(&sock, ZBX_IPC_PGM_STOP, NULL, 0);
-	zbx_ipc_socket_close(&sock);
-
 	void	*retval;
 
+	atomic_store(&pgs->stop, 1);
 	pthread_join(pgs->thread, &retval);
 
 	zbx_ipc_service_close(&pgs->service);

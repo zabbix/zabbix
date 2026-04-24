@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -103,13 +103,11 @@ class CControllerDashboardList extends CController {
 		order_result($data['dashboards'], $sort_field, $sort_order);
 
 		// pager
-		$page_num = getRequest('page', 1);
-		CPagerHelper::savePage('dashboard.list', $page_num);
-		$data['paging'] = CPagerHelper::paginate($page_num, $data['dashboards'], $sort_order,
+		$data['page'] = $this->getInput('page', 1);
+		CPagerHelper::savePage('dashboard.list', $data['page']);
+		$data['paging'] = CPagerHelper::paginate($data['page'], $data['dashboards'], $sort_order,
 			(new CUrl('zabbix.php'))->setArgument('action', $this->getAction())
 		);
-
-		CDashboardHelper::updateEditableFlag($data['dashboards']);
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Dashboards'));

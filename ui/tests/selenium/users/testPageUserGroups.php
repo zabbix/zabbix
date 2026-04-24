@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -72,10 +72,10 @@ class testPageUserGroups extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestClickLinkText($name);
-		$this->zbxTestClickWait('update');
+		$this->zbxTestClickButtonText('Update');
+		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestCheckHeader('User groups');
 		$this->zbxTestCheckTitle('Configuration of user groups');
-		$this->assertMessage(TEST_GOOD, 'User group updated');
 		$this->zbxTestTextPresent($name);
 
 		$this->assertEquals($oldHashGroup, CDBHelper::getHash($sqlHashGroup));

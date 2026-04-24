@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -39,6 +39,8 @@ class CColorPicker extends CTag {
 		if ($palette_field_name !== null) {
 			$this->setAttribute('palette-field-name', $palette_field_name);
 		}
+
+		$this->setAttribute('data-field-type', 'z-color-picker');
 	}
 
 	public function setColor(?string $color = null): self {
@@ -101,6 +103,19 @@ class CColorPicker extends CTag {
 		else {
 			$this->removeAttribute('allow-empty');
 		}
+
+		return $this;
+	}
+
+	/**
+	 * Specify ID of error container.
+	 *
+	 * @param string|null $container_id    ID of form element where to display field errors.
+	 *
+	 * @return self
+	 */
+	public function setErrorContainer(?string $container_id): self {
+		$this->setAttribute('data-error-container', $container_id);
 
 		return $this;
 	}

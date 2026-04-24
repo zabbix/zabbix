@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,17 +19,29 @@
 #include "zbxdbhigh.h"
 #include "zbxcacheconfig.h"
 
-void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids);
-void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids);
-void	op_groups_add(const zbx_db_event *event,  zbx_config_t *cfg, zbx_vector_uint64_t *groupids);
-void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids);
-void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg);
-void	op_host_del(const zbx_db_event *event);
-void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg);
-void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg);
-void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode);
+typedef struct
+{
+	zbx_uint64_t	hostid;
+/* these statuses should not be saved to database */
+#define HOST_STATUS_UNKNOWN	-1
+#define HOST_STATUS_FAILED	-2
+	int		status;
+	char		*name;
+}
+zbx_op_host_t;
+
+void	op_template_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_vector_uint64_t *lnk_templateids,
+		zbx_op_host_t *h);
+void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templateids, zbx_op_host_t *h);
+void	op_groups_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *groupids, zbx_op_host_t *h);
+void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids, zbx_op_host_t *h);
+void	op_host_add(const zbx_db_event *event, const zbx_config_t *cfg, zbx_op_host_t *h);
+void	op_host_del(const zbx_db_event *event, zbx_op_host_t *h);
+void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg, zbx_op_host_t *h);
+void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg, zbx_op_host_t *h);
+void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode,  zbx_op_host_t *h);
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
-		zbx_vector_uint64_t *del_optagids);
+		zbx_vector_uint64_t *del_optagids, zbx_op_host_t *h);
 
 int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -61,10 +61,10 @@ if ($data['templates']) {
 $host_tab->addItem([
 		(new CLabel(_('Host name'), 'host'))->setAsteriskMark(),
 		new CFormField(
-			(new CTextBox('host', $data['host_prototype']['host'], $data['readonly'],
-				DB::getFieldLength('hosts', 'host'))
-			)
+			(new CTextAreaFlexible('host', $data['host_prototype']['host']))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->setMaxlength(DB::getFieldLength('hosts', 'host'))
+				->setReadonly($data['readonly'])
 				->setAriaRequired()
 				->setAttribute('autofocus', 'autofocus')
 				->setAttribute('data-prevent-validation-on-change', $data['readonly'] ? 1 : null)
@@ -76,8 +76,10 @@ $name = ($data['host_prototype']['name'] !== $data['host_prototype']['host']) ? 
 $host_tab->addItem([
 	new CLabel(_('Visible name'), 'name'),
 	new CFormField(
-		(new CTextBox('name', $name, $data['readonly'], DB::getFieldLength('hosts', 'name')))
+		(new CTextAreaFlexible('name', $name))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->setMaxlength(DB::getFieldLength('hosts', 'name'))
+			->setReadonly($data['readonly'])
 	)
 ]);
 
@@ -476,7 +478,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -490,7 +492,7 @@ if (!$data['readonly']) {
 						->setErrorLabel(_('Value'))
 				))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
@@ -518,7 +520,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol([
-					(new CTextAreaFlexible('macros[#{rowNum}][macro]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][macro]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->addClass('macro')
 						->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
@@ -555,7 +557,7 @@ if (!$data['readonly']) {
 		->addItem(
 			(new CRow([
 				(new CCol(
-					(new CTextAreaFlexible('macros[#{rowNum}][description]', '', ['add_post_js' => false]))
+					(new CTextAreaFlexible('macros[#{rowNum}][description]', ''))
 						->setErrorContainer('macros_#{rowNum}_error_container')
 						->setMaxlength(DB::getFieldLength('globalmacro', 'description'))
 						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
@@ -651,17 +653,19 @@ if ($is_cert_set) {
 		->addItem([
 			new CLabel(_('Issuer'), 'tls_issuer'),
 			new CFormField(
-				(new CTextBox('tls_issuer', $data['parent_host']['tls_issuer'], true,
-					DB::getFieldLength('hosts', 'tls_issuer')
-				))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				(new CTextAreaFlexible('tls_issuer', $data['parent_host']['tls_issuer']))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setMaxlength(DB::getFieldLength('hosts', 'tls_issuer'))
+					->setReadonly()
 			)
 		])
 		->addItem([
 			new CLabel(_x('Subject', 'encryption certificate'), 'tls_subject'),
 			new CFormField(
-				(new CTextBox('tls_subject', $data['parent_host']['tls_subject'], true,
-					DB::getFieldLength('hosts', 'tls_subject')
-				))->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+				(new CTextAreaFlexible('tls_subject', $data['parent_host']['tls_subject']))
+					->setWidth(ZBX_TEXTAREA_BIG_WIDTH)
+					->setMaxlength(DB::getFieldLength('hosts', 'tls_subject'))
+					->setReadonly()
 			)
 	]);
 }

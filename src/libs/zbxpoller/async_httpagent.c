@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -27,7 +27,7 @@ void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context)
 	zbx_http_context_destroy(&httpagent_context->http_context);
 }
 
-int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
+int	zbx_async_check_httpagent(zbx_dc_httpagent_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
 		const char *config_ssl_key_location, CURLM *curl_handle)
 {
@@ -41,7 +41,6 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 	httpagent_context->item_context.itemid = item->itemid;
 	httpagent_context->item_context.value_type = item->value_type;
 	httpagent_context->item_context.flags = item->flags;
-	httpagent_context->item_context.state = item->state;
 	httpagent_context->item_context.posts = item->posts;
 	item->posts = NULL;
 	httpagent_context->item_context.status_codes = item->status_codes;

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -29,14 +29,16 @@
 		->setErrorContainer('expressions-'.$data['index'].'-error-container')
 		->setErrorLabel(_('Expression type'))
 	)
-	->addItem((new CTextBox('expressions['.$data['index'].'][expression]', $data['expression'], false,
-		DB::getFieldLength('expressions', 'expression'))
-	)
-		->setAttribute('data-notrim', '')
-		->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-		->setAriaRequired()
-		->setErrorContainer('expressions-'.$data['index'].'-error-container')
-		->setErrorLabel(_('Expression'))
+	->addItem(
+		(new CCol(
+			(new CTextAreaFlexible('expressions['.$data['index'].'][expression]', $data['expression']))
+			->setAttribute('data-notrim', '')
+			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+			->setMaxlength(DB::getFieldLength('expressions', 'expression'))
+			->setAriaRequired()
+			->setErrorContainer('expressions-'.$data['index'].'-error-container')
+			->setErrorLabel(_('Expression'))
+		))->addClass(ZBX_STYLE_ALIGN_TOP)
 	)
 	->addItem((new CSelect('expressions['.$data['index'].'][exp_delimiter]'))
 		->setValue($data['delimiter'])

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * Test suite for tag inheritance.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @onAfter clearData
  */
@@ -357,12 +358,12 @@ class testTagInheritance extends CIntegrationTest {
 	}
 
 	public function testInheritedTags() {
-		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . '0', self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . '0', self::VALUE_TO_FIRE_TRIGGER, null, 0);
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'hostids' => [self::$host_id],
 			'selectTags' => ['tag', 'value']
-		], 5, 2);
+		], 5, 1);
 
 		$this->assertCount(1, self::$event_response['result']);
 
@@ -388,12 +389,12 @@ class testTagInheritance extends CIntegrationTest {
 		sort($result_tags);
 		$this->assertEquals(json_encode($expected_template_tags), json_encode($result_tags));
 
-		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::HOST_ITEM_KEY, self::VALUE_TO_FIRE_TRIGGER, null, 0);
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'objectids' => self::$host_trigger_id,
 			'hostids' => [self::$host_id],
 			'selectTags' => ['tag', 'value']
-		], 5, 2);
+		], 5, 1);
 
 		$this->assertCount(1, self::$event_response['result']);
 
@@ -704,13 +705,13 @@ class testTagInheritance extends CIntegrationTest {
 
 	private function generateEvent($n) {
 
-		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . $n, self::VALUE_TO_FIRE_TRIGGER);
+		$this->sendSenderValue(self::HOST_NAME, self::TEMPLATE_ITEM_KEY_PREFIX . $n, self::VALUE_TO_FIRE_TRIGGER, null, 0);
 
 		self::$event_response = $this->callUntilDataIsPresent('event.get', [
 			'tags' => [['tag' => self::TEMPLATE_TRIGGER_TAG_NAME_PREFIX . $n,
 						'value' => self::TEMPLATE_TRIGGER_TAG_VALUE_PREFIX . $n]],
 			'selectTags' => ['tag', 'value']
-		], 5, 2);
+		], 5, 1);
 
 		$this->assertCount(1, self::$event_response['result']);
 		array_push(self::$event_ids, self::$event_response['result'][0]['eventid']);
@@ -718,24 +719,27 @@ class testTagInheritance extends CIntegrationTest {
 
 	/**
 	 * @depends testInheritedTags
-	 * @dataProvider event_get_data
 	 */
-	public function testEvent_Get($filter, $expected) {
+	public function testEvent_Get() {
 
-		$request = [
-			'output' => ['name'],
-			'groupids' => 4, // Zabbx servers
-			'hostids' => [self::$host_id]
-		] + $filter;
+		foreach ($this->event_get_data() as $case) {
+			[$filter, $expected] = array_values($case);
 
-		['result' => $result] = $this->call('event.get', $request);
+			$request = [
+				'output' => ['name'],
+				'groupids' => 4, // Zabbx servers
+				'hostids' => [self::$host_id]
+			] + $filter;
 
-		$result = array_column($result, 'name');
+			['result' => $result] = $this->call('event.get', $request);
 
-		sort($result);
-		sort($expected);
+			$result = array_column($result, 'name');
 
-		$this->assertEquals(json_encode($result), json_encode($expected));
+			sort($result);
+			sort($expected);
+
+			$this->assertEquals(json_encode($result), json_encode($expected));
+		}
 	}
 
 	/**

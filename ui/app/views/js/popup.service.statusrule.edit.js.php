@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,17 +20,20 @@ window.service_status_rule_edit_popup = new class {
 	init({rules}) {
 		this.overlay = overlays_stack.getById('service_status_rule_edit');
 		this.dialogue = this.overlay.$dialogue[0];
+		this.footer = this.overlay.$dialogue.$footer[0];
 		this.form_element = this.overlay.$dialogue.$body[0].querySelector('form');
 		this.form = new CForm(this.form_element, rules);
 
 		document
 			.getElementById('service-status-rule-type')
-			.addEventListener('change', (e) => this._update());
+			.addEventListener('change', () => this.#update());
 
-		this._update();
+		this.#update();
+
+		this.footer.querySelector('.js-submit').addEventListener('click', () => this.#submit());
 	}
 
-	_update() {
+	#update() {
 		const type = document.getElementById('service-status-rule-type').value;
 
 		const limit_value_label = document.getElementById('service-status-rule-limit-value-label');
@@ -62,7 +65,8 @@ window.service_status_rule_edit_popup = new class {
 		}
 	}
 
-	submit() {
+	#submit() {
+		this.#removePopupMessages();
 		const fields = this.form.getAllValues();
 
 		this.form.validateSubmit(fields)
@@ -78,17 +82,9 @@ window.service_status_rule_edit_popup = new class {
 				curl.setArgument('action', 'service.statusrule.validate');
 
 				this.#post(curl.getUrl(), fields, (response) => {
-					if ('form_errors' in response) {
-						this.form.setErrors(response.form_errors, true, true);
-						this.form.renderErrors();
-					}
-					else if ('error' in response) {
-						throw {error: response.error};
-					}
-					else {
-						overlayDialogueDestroy(this.overlay.dialogueid);
-						this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
-					}
+					overlayDialogueDestroy(this.overlay.dialogueid);
+
+					this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response.body}));
 				});
 			});
 	}
@@ -105,32 +101,40 @@ window.service_status_rule_edit_popup = new class {
 					throw {error: response.error};
 				}
 
-				return response;
+				if ('form_errors' in response) {
+					this.form.setErrors(response.form_errors, true, true);
+					this.form.renderErrors();
+
+					return;
+				}
+
+				success_callback(response);
 			})
-			.then(success_callback)
-			.catch((exception) => {
-				for (const element of this.form_element.parentNode.children) {
-					if (element.matches('.msg-good, .msg-bad, .msg-warning')) {
-						element.parentNode.removeChild(element);
-					}
-				}
+			.catch((exception) => this.#ajaxExceptionHandler(exception))
+			.finally(() => this.overlay.unsetLoading());
+	}
 
-				let title, messages;
+	#removePopupMessages() {
+		for (const el of this.form_element.parentNode.children) {
+			if (el.matches('.msg-good, .msg-bad, .msg-warning')) {
+				el.parentNode.removeChild(el);
+			}
+		}
+	}
 
-				if (typeof exception === 'object' && 'error' in exception) {
-					title = exception.error.title;
-					messages = exception.error.messages;
-				}
-				else {
-					messages = [<?= json_encode(_('Unexpected server error.')) ?>];
-				}
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
 
-				const message_box = makeMessageBox('bad', messages, title)[0];
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
 
-				this.form_element.parentNode.insertBefore(message_box, this.form_element);
-			})
-			.finally(() => {
-				this.overlay.unsetLoading();
-			});
+		const message_box = makeMessageBox('bad', messages, title)[0];
+
+		this.form_element.parentNode.insertBefore(message_box, this.form_element);
 	}
 };

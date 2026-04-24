@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -154,11 +154,11 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Check mandatory fields.
-		$this->assertEquals(['Name', 'Conditions'], $form->getRequiredLabels());
+		$this->assertEquals(['Name', 'Conditions', 'Operations'], $form->getRequiredLabels());
 
-		// Check input attributes.
+		// Check input and textarea attributes.
 		$field_attributes = [
-			'Name' => ['type' => 'text', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
+			'Name' => ['data-field-type' => 'z-textarea-flexible', 'maxlength' => 255, 'value' => '', 'autofocus' => 'true'],
 			'id:evaltype' => ['value' => 0],
 			'id:formula' => ['type' => 'text', 'value' => '', 'maxlength' => 255, 'placeholder' => 'A or (B and C) ...',
 					'disabled' => 'true'],
@@ -190,11 +190,6 @@ class testFormEventCorrelation extends CWebTest {
 		);
 		$this->assertEquals([], $operations_checkbox_list->getValue());
 		$this->assertTrue($operations_checkbox_list->isEnabled());
-
-		// Check that "one operation must be selected" text exists.
-		$this->assertTrue($dialog->query('xpath:.//label[text()="At least one operation must be selected."]')->one()
-				->hasClass('form-label-asterisk')
-		);
 
 		// Assert Enabled checkbox.
 		$enabled_checkbox = $form->getField('Enabled');
@@ -330,9 +325,9 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'update_name' => true,
 					'remove_condition' => true,
-					'errors' => [
-						'Incorrect value for field "name": cannot be empty.',
-						'Field "conditions" is mandatory.'
+					'inline_errors' => [
+						'Name' => 'This field cannot be empty.',
+						'xpath://div[@data-field-name="conditions"]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -350,8 +345,8 @@ class testFormEventCorrelation extends CWebTest {
 							'Tag' => 'Test tag'
 						]
 					],
-					'errors' => [
-						'Event correlation "Event correlation for clone" already exists.'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			],
@@ -384,8 +379,8 @@ class testFormEventCorrelation extends CWebTest {
 						'Name' => 'Without conditions'
 					],
 					'remove_condition' => true,
-					'errors' => [
-						'Field "conditions" is mandatory.'
+					'inline_errors' => [
+						'xpath://div[@data-field-name="conditions"]' => 'This field cannot be empty.'
 					]
 				]
 			],
@@ -403,8 +398,8 @@ class testFormEventCorrelation extends CWebTest {
 							'Tag' => 'Test tag'
 						]
 					],
-					'errors' => [
-						'Invalid parameter "/1/operations": cannot be empty.'
+					'inline_errors' => [
+						'Operations' => 'At least one operation must be selected.'
 					]
 				]
 			],
@@ -546,7 +541,9 @@ class testFormEventCorrelation extends CWebTest {
 							'Type' => 'New event tag name'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
+					'condition_errors' => [
+						'Tag' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #13
@@ -561,7 +558,9 @@ class testFormEventCorrelation extends CWebTest {
 							'Type' => 'New event host group'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "groupid": cannot be empty.'
+					'condition_errors' => [
+						'Host groups' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #14
@@ -569,34 +568,20 @@ class testFormEventCorrelation extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty Old tag in Event tag pair'
+						'Name' => 'Empty tags in Event tag pair'
 					],
 					'conditions' => [
 						[
-							'Type' => 'Event tag pair',
-							'New tag name' => 'New tag'
+							'Type' => 'Event tag pair'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "oldtag": cannot be empty.'
+					'condition_errors' => [
+						'Old tag name' => 'This field cannot be empty.',
+						'New tag name' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #15
-			[
-				[
-					'expected' => TEST_BAD,
-					'fields' => [
-						'Name' => 'Empty New tag in Event tag pair'
-					],
-					'conditions' => [
-						[
-							'Type' => 'Event tag pair',
-							'Old tag name' => 'Old tag'
-						]
-					],
-					'condition_error' => 'Incorrect value for field "newtag": cannot be empty.'
-				]
-			],
-			// #16
 			[
 				[
 					'expected' => TEST_BAD,
@@ -608,10 +593,12 @@ class testFormEventCorrelation extends CWebTest {
 							'Type' => 'Old event tag value'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
+					'condition_errors' => [
+						'Tag' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #17
+			// #16
 			[
 				[
 					'expected' => TEST_BAD,
@@ -625,10 +612,12 @@ class testFormEventCorrelation extends CWebTest {
 							'Operator' => 'contains'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+					'condition_errors' => [
+						'Value' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #18
+			// #17
 			[
 				[
 					'expected' => TEST_BAD,
@@ -642,10 +631,12 @@ class testFormEventCorrelation extends CWebTest {
 							'Operator' => 'does not contain'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+					'condition_errors' => [
+						'Value' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #19
+			// #18
 			[
 				[
 					'expected' => TEST_BAD,
@@ -657,10 +648,12 @@ class testFormEventCorrelation extends CWebTest {
 							'Type' => 'New event tag value'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "tag": cannot be empty.'
+					'condition_errors' => [
+						'Tag' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #20
+			// #19
 			[
 				[
 					'expected' => TEST_BAD,
@@ -674,10 +667,12 @@ class testFormEventCorrelation extends CWebTest {
 							'Operator' => 'contains'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+					'condition_errors' => [
+						'Value' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #21
+			// #20
 			[
 				[
 					'expected' => TEST_BAD,
@@ -691,10 +686,12 @@ class testFormEventCorrelation extends CWebTest {
 							'Operator' => 'does not contain'
 						]
 					],
-					'condition_error' => 'Incorrect value for field "value": cannot be empty.'
+					'condition_errors' => [
+						'Value' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// #22
+			// #21
 			[
 				[
 					'fields' => [
@@ -714,7 +711,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A or B) and C'
 				]
 			],
-			// #23
+			// #22
 			[
 				[
 					'fields' => [
@@ -747,7 +744,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A or B or E) and (C or D)'
 				]
 			],
-			// #24
+			// #23
 			[
 				[
 					'fields' => [
@@ -768,7 +765,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A and B) and C'
 				]
 			],
-			// #25
+			// #24
 			[
 				[
 					'fields' => [
@@ -789,7 +786,7 @@ class testFormEventCorrelation extends CWebTest {
 					'expected_expression_update' => '(A or B) or C'
 				]
 			],
-			// #26
+			// #25
 			[
 				[
 					'fields' => [
@@ -818,7 +815,7 @@ class testFormEventCorrelation extends CWebTest {
 					'formula' => 'C or (A and not B)'
 				]
 			],
-			// #27
+			// #26
 			[
 				[
 					'expected' => TEST_BAD,
@@ -837,12 +834,12 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => '',
-					'errors' => [
-						'Invalid parameter "/1/filter/formula": cannot be empty.'
+					'inline_errors' => [
+						'id:formula' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// #28
+			// #27
 			[
 				[
 					'expected' => TEST_BAD,
@@ -868,12 +865,13 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A or B',
+					// TODO: Convert the below error into and inline validation error after DEV-4267 is fixed.
 					'errors' => [
 						'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
 					]
 				]
 			],
-			// #29
+			// #28
 			[
 				[
 					'expected' => TEST_BAD,
@@ -899,8 +897,41 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => '(A or B) and (C or D)',
+					// TODO: Convert the below error into and inline validation error after DEV-4267 is fixed.
 					'errors' => [
 						'Invalid parameter "/1/filter/conditions": incorrect number of conditions.'
+					]
+				]
+			],
+			// #29
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Non existing arguments'
+					],
+					'remove_condition' => true,
+					'conditions' => [
+						[
+							'Type' => 'Old event tag name',
+							'Tag' => 'Test tag1'
+						],
+						[
+							'Type' => 'New event tag name',
+							'Tag' => 'Test tag2'
+						],
+						[
+							'Type' => 'Old event tag value',
+							'Tag' => 'Test tag3',
+							'Operator' => 'contains',
+							'Value' => 'Value'
+						]
+					],
+					'calculation' => 'Custom expression',
+					'formula' => 'C or X or A',
+					// TODO: Convert the below error into and inline validation error after DEV-4267 is fixed.
+					'errors' => [
+						'Invalid parameter "/1/filter/conditions/2/formulaid": an identifier is not defined in the formula.'
 					]
 				]
 			],
@@ -929,8 +960,8 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'Invalid formula',
-					'errors' => [
-						'Invalid parameter "/1/filter/formula": incorrect syntax near "Invalid formula".'
+					'inline_errors' => [
+						'id:formula' => 'Incorrect syntax near "Invalid formula".'
 					]
 				]
 			],
@@ -953,8 +984,8 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'A and Not B',
-					'errors' => [
-						'Invalid parameter "/1/filter/formula": incorrect syntax near "Not B".'
+					'inline_errors' => [
+						'id:formula' => 'Incorrect syntax near "Not B".'
 					]
 				]
 			],
@@ -977,8 +1008,8 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'NOT A and not B',
-					'errors' => [
-						'Invalid parameter "/1/filter/formula": incorrect syntax near " A and not B".'
+					'inline_errors' => [
+						'id:formula' => 'Incorrect syntax near " A and not B".'
 					]
 				]
 			],
@@ -1001,8 +1032,8 @@ class testFormEventCorrelation extends CWebTest {
 					],
 					'calculation' => 'Custom expression',
 					'formula' => 'not A not B',
-					'errors' => [
-						'Invalid parameter "/1/filter/formula": incorrect syntax near " not B".'
+					'inline_errors' => [
+						'id:formula' => 'Incorrect syntax near " not B".'
 					]
 				]
 			]
@@ -1184,7 +1215,7 @@ class testFormEventCorrelation extends CWebTest {
 			$condition_form->submit();
 
 			// Only expect Condition modal to close if error not expected.
-			if (!array_key_exists('condition_error', $data)) {
+			if (!array_key_exists('condition_errors', $data)) {
 				$condition_dialog->waitUntilNotVisible();
 			}
 		}
@@ -1204,7 +1235,7 @@ class testFormEventCorrelation extends CWebTest {
 		}
 
 		// Submit 'New event correlation' form only if error in the 'New condition' modal not expected.
-		if (!array_key_exists('condition_error', $data)) {
+		if (!array_key_exists('condition_errors', $data)) {
 			$form->submit();
 		}
 
@@ -1261,10 +1292,9 @@ class testFormEventCorrelation extends CWebTest {
 
 			$dialog->close();
 		}
-		else if (array_key_exists('condition_error', $data)) {
+		else if (array_key_exists('condition_errors', $data)) {
 			// When expecting an error in the 'New condition' modal.
-
-			$this->assertMessage(TEST_BAD, null, $data['condition_error']);
+			$this->assertInlineError($condition_form, $data['condition_errors']);
 			$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 
 			// Close both dialogs.
@@ -1272,8 +1302,13 @@ class testFormEventCorrelation extends CWebTest {
 		}
 		else {
 			// When expecting an error in the 'New event correlation' modal.
-
-			$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation', $data['errors']);
+			// TODO: Remove the condition and the part for checking regular errors after DEV-4267 is fixed.
+			if (array_key_exists('errors', $data)) {
+				$this->assertMessage(TEST_BAD, 'Cannot '.($update ? 'update' : 'create').' event correlation', $data['errors']);
+			}
+			else {
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
 			$dialog->close();
 			$this->assertEquals($hash_before, CDBHelper::getHash(self::HASH_SQL));
 		}

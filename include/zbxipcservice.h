@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -80,6 +80,9 @@ typedef struct
 
 	/* the clients with messages */
 	zbx_queue_ptr_t			clients_recv;
+
+	/* incremental id for next connected client */
+	zbx_uint64_t			next_clientid;
 }
 zbx_ipc_service_t;
 

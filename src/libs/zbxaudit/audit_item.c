@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -62,7 +62,7 @@ int	zbx_audit_item_flag_to_resource_type(int flag)
 	else
 	{
 		THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported item flag detected: %d", flag);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 
@@ -87,7 +87,7 @@ const char	*lld_audit_item_prop(int flags, const char *field, char *buf, size_t 
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN_MSG("unsupported resource type: %d", resource_type);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	if (offset < len - 1)

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-10-27 13:05+0000\n"
+"PO-Revision-Date: 2026-04-09 11:01+0000\n"
 "Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: sk\n"
@@ -374,6 +374,10 @@ msgstr "(0 – použiť predvolenú akciu)"
 msgid "(Only super admins can create groups)"
 msgstr "(Skupiny môžu vytvárať iba super administrátori)"
 
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr "(vytvorené pomocou LLD)"
+
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
@@ -501,6 +505,10 @@ msgstr "Ešte niekoľko krokov"
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
 msgstr "Očakáva sa hodnota s pohyblivou desatinnou čiarkou."
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:89
+msgid "A message or at least one operation is required."
+msgstr "Vyžaduje sa správa alebo minimálne jedna operácia."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
@@ -1314,6 +1322,10 @@ msgstr "Bez agenta"
 msgid "Aggregate"
 msgstr "Agreguj"
 
+#: widgets/topitems/views/column.edit.php:283
+msgid "Aggregate columns"
+msgstr "Agregované stĺpce"
+
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
 msgstr "Agregačná funkcie"
@@ -1331,6 +1343,12 @@ msgstr "Agreguje celý data set."
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
 msgstr "Agregačná funkcia"
+
+#: widgets/item/views/widget.edit.php:85 widgets/item/views/widget.edit.php:90
+#: widgets/tophosts/views/column.edit.php:330
+#: widgets/topitems/views/column.edit.php:256
+msgid "Aggregation function does not affect the sparkline."
+msgstr "Funkcia agregácie nemá vplyv na prerušovanú čiaru."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -1761,6 +1779,11 @@ msgstr "O %1$s v deň %2$s z každého %3$s"
 msgid "At (hour:minute)"
 msgstr "O (hodina:minúta)"
 
+#: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
+#, c-format
+msgid "At least %1$d items based on field \"%2$s\" rules"
+msgstr "Aspoň %1$d položiek podľa pravidiel poľa \"%2$s\""
+
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Musí existovať aspoň jeden server LDAP."
@@ -1800,6 +1823,11 @@ msgstr "Musí byť uvedený aspoň jeden deň v týždni alebo deň v mesiaci."
 msgid "At least one encryption level must be selected."
 msgstr "Minimálne jedna kryptovacia úroveň musí byť vybratá."
 
+#: app/controllers/CControllerSlaCreate.php:53
+#: app/controllers/CControllerSlaUpdate.php:54
+msgid "At least one entry should be selected."
+msgstr "Je potrebné označiť aspoň jednu možnosť."
+
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
 msgid "At least one expression must be added."
@@ -1812,6 +1840,11 @@ msgstr "Aspoň jeden výraz musí byť pridaný."
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "Musí byť vybratá aspoň jedna host grupa alebo host."
+
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -1852,6 +1885,11 @@ msgstr "Musí byť povolený aspoň jeden parameter."
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
 msgstr "Aspoň jedna perióda musí byť pridaná."
+
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr "Je potrebné ozačiť aspoň jeden typ informácie."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -2305,6 +2343,13 @@ msgstr "Pri zmene PSK pre šifrovanie pripojenia, musia byť špecifikované pol
 msgid "Both passwords must be equal."
 msgstr "Obe heslá musia byť rovnaké."
 
+#: app/controllers/CControllerItemCreate.php:256
+#: app/controllers/CControllerItemPrototypeCreate.php:269
+#: app/controllers/CControllerItemPrototypeUpdate.php:257
+#: app/controllers/CControllerItemUpdate.php:256
+msgid "Both username and password should be either present or empty."
+msgstr "Obe polia \"používateľ\" a \"heslo\" musia byť zadané, alebo musia byť obe prázdne."
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -2572,6 +2617,13 @@ msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "Nie je možné pridať modul: %1$s."
 msgstr[1] "Nie je možné pridať moduly: %1$s."
 msgstr[2] "Nie je možné pridať moduly: %1$s. "
+
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -3570,6 +3622,11 @@ msgstr "Nemôžem nájsť skupinu \"%1$s\" pre prototyp hosta \"%2$s\" prehľad�
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "Nemôžem nájsť skupinu \"%1$s\" pre prototyp hosta \"%2$s\" v prototype zisťovacieho pravidla \"%3$s\" na \"%4$s\"."
 
+#: include/classes/import/importers/CDashboardImporterGeneral.php:57
+#, c-format
+msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
+msgstr "Nemožno nájsť hosta \"%1$s\" použitého na dashboarde \"%2$s\"."
+
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
 msgid "Cannot find host interface on \"%1$s\" for item key \"%2$s\"."
@@ -4343,7 +4400,7 @@ msgstr "Nie je možné nastaviť \"Agregáciu množiny údajov\", keď je do gra
 
 #: include/classes/db/MysqlDbBackend.php:197
 msgid "Cannot set charset."
-msgstr ""
+msgstr "Nie je možné nastaviť znakovú sadu."
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -4968,6 +5025,14 @@ msgstr "Informácie o šasi. Vráti reťazec"
 msgid "Check already exists."
 msgstr "Kontrola už existuje."
 
+#: app/controllers/CControllerPopupImportCompare.php:121
+msgid "Check and reconfigure widgets after the import is completed."
+msgstr "Keď je import kompletný, skontrolujte a zmeňte konfiguráciu."
+
+#: app/controllers/CControllerPopupImport.php:136
+msgid "Check and reconfigure widgets."
+msgstr "Skontroluj a zmeň nastavenie widgetu."
+
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
@@ -5298,10 +5363,18 @@ msgstr "Farebná interpolácia"
 msgid "Colors"
 msgstr "Farby"
 
+#: widgets/topitems/views/column.edit.php:293
+msgid "Column aggregation function"
+msgstr "Funkcia agregácie stľpca"
+
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
 msgid "Columns"
 msgstr "Stĺpce"
+
+#: widgets/topitems/views/column.edit.php:313
+msgid "Combined column name"
+msgstr "Názov kombinovaného stĺpca"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -6507,6 +6580,10 @@ msgstr "Zoznam dashboardov"
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
 msgstr "Vlastnosti stránky dashboardu"
+
+#: app/controllers/CControllerPopupImportCompare.php:216
+msgid "Dashboard pages"
+msgstr "Stránka dashboardov"
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -8314,6 +8391,10 @@ msgctxt "compact table header"
 msgid "Duration"
 msgstr "Trvanie"
 
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
+msgid "Duration must be no less than a minute."
+msgstr "Trvanie nesmie byť menej ako 1 minúta."
+
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
 msgstr "Holandsky (nl_NL)"
@@ -8794,6 +8875,10 @@ msgstr "Zadajte reťazec identifikácie (identity string) vopred zdieľaného k�
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "Zadajte jedinečný názov, ktorý komponenty Zabbixu použijú na rozpoznanie predzdieľaného kľúča PSK."
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Zadajte IP/DNS adresu a port agenta Zabbix nainštalovaného na vašom monitorovacom cieli."
@@ -9047,6 +9132,16 @@ msgstr "Vylúčiť host grupu"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "Excluded downtime"
 msgstr "Vylúčené prestoje"
+
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
+#, c-format
+msgid "Excluded downtime must not extend beyond %1$s."
+msgstr "Vylúčený čas prestoja nesmie presiahnuť %1$s."
+
+#: app/controllers/CControllerSlaCreate.php:74
+#: app/controllers/CControllerSlaUpdate.php:75
+msgid "Excluded downtime periods must be unique."
+msgstr "Vylúčený čas periódy prestoja musí byť unikátny."
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -9411,6 +9506,66 @@ msgstr "Pole \"%1$s\" nie je reťazec."
 msgid "Field \"%1$s\" must be missing."
 msgstr "Pole \"%1$s\" musí chýbať."
 
+#: include/classes/data/CTriggerConditionFunctionData.php:275
+#: include/classes/data/CTriggerConditionFunctionData.php:298
+#: include/classes/data/CTriggerConditionFunctionData.php:321
+#: include/classes/data/CTriggerConditionFunctionData.php:344
+#: include/classes/data/CTriggerConditionFunctionData.php:367
+#: include/classes/data/CTriggerConditionFunctionData.php:441
+#: include/classes/data/CTriggerConditionFunctionData.php:466
+#: include/classes/data/CTriggerConditionFunctionData.php:490
+#: include/classes/data/CTriggerConditionFunctionData.php:513
+#: include/classes/data/CTriggerConditionFunctionData.php:537
+#: include/classes/data/CTriggerConditionFunctionData.php:560
+#: include/classes/data/CTriggerConditionFunctionData.php:584
+#: include/classes/data/CTriggerConditionFunctionData.php:608
+#: include/classes/data/CTriggerConditionFunctionData.php:632
+#: include/classes/data/CTriggerConditionFunctionData.php:655
+#: include/classes/data/CTriggerConditionFunctionData.php:678
+#: include/classes/data/CTriggerConditionFunctionData.php:732
+#: include/classes/data/CTriggerConditionFunctionData.php:755
+#: include/classes/data/CTriggerConditionFunctionData.php:779
+#: include/classes/data/CTriggerConditionFunctionData.php:802
+#: include/classes/data/CTriggerConditionFunctionData.php:825
+#: include/classes/data/CTriggerConditionFunctionData.php:905
+#: include/classes/data/CTriggerConditionFunctionData.php:929
+#: include/classes/data/CTriggerConditionFunctionData.php:952
+#: include/classes/data/CTriggerConditionFunctionData.php:975
+#: include/classes/data/CTriggerConditionFunctionData.php:1043
+#: include/classes/data/CTriggerConditionFunctionData.php:1115
+#: include/classes/data/CTriggerConditionFunctionData.php:1139
+#: include/classes/data/CTriggerConditionFunctionData.php:1165
+#: include/classes/data/CTriggerConditionFunctionData.php:1213
+#: include/classes/data/CTriggerConditionFunctionData.php:1236
+#: include/classes/data/CTriggerConditionFunctionData.php:1259
+#: include/classes/data/CTriggerConditionFunctionData.php:1283
+#: include/classes/data/CTriggerConditionFunctionData.php:1306
+#: include/classes/data/CTriggerConditionFunctionData.php:1329
+#: include/classes/data/CTriggerConditionFunctionData.php:1352
+#: include/classes/data/CTriggerConditionFunctionData.php:1376
+#: include/classes/data/CTriggerConditionFunctionData.php:1399
+#: include/classes/data/CTriggerConditionFunctionData.php:1423
+#: include/classes/data/CTriggerConditionFunctionData.php:1446
+#: include/classes/data/CTriggerConditionFunctionData.php:1543
+#: include/classes/data/CTriggerConditionFunctionData.php:1618
+#: include/classes/data/CTriggerConditionFunctionData.php:1742
+#: include/classes/data/CTriggerConditionFunctionData.php:1766
+#: include/classes/data/CTriggerConditionFunctionData.php:1808
+#: include/classes/data/CTriggerConditionFunctionData.php:1832
+#: include/classes/data/CTriggerConditionFunctionData.php:1857
+#: include/classes/data/CTriggerConditionFunctionData.php:1881
+#: include/classes/data/CTriggerConditionFunctionData.php:1905
+#: include/classes/data/CTriggerConditionFunctionData.php:1929
+#: include/classes/data/CTriggerConditionFunctionData.php:1952
+#: include/classes/data/CTriggerConditionFunctionData.php:1975
+#: include/classes/data/CTriggerConditionFunctionData.php:2021
+#: include/classes/data/CTriggerConditionFunctionData.php:2163
+#: include/classes/data/CTriggerConditionFunctionData.php:2376
+#: include/classes/data/CTriggerConditionFunctionData.php:2400
+#: include/classes/data/CTriggerConditionFunctionData.php:2470
+msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
+msgstr "Pole \"Posledný z\" nesmie byť prázdne ak je \"Posun času\" vyplnený."
+
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
 #: include/views/js/item.preprocessing.js.php:165
@@ -9430,7 +9585,7 @@ msgstr "Kontrolný súčet súboru vypočítaný algoritmom cksum UNIX. Vráti c
 
 #: include/classes/validators/CFormValidator.php:1451 jsLoader.php:445
 msgid "File format is unsupported."
-msgstr ""
+msgstr "Formát súboru nie je podporovaný."
 
 #: include/classes/import/readers/CYamlImportReader.php:52
 msgid "File is empty"
@@ -9452,7 +9607,7 @@ msgstr "Veľkosť súboru v bajtoch (predvolené) alebo v nových riadkoch. Vrá
 #: include/classes/helpers/CUploadFile.php:129 jsLoader.php:444
 #, c-format
 msgid "File size must be less than %1$s."
-msgstr ""
+msgstr "Veľkosť súboru musí byť menšia ako %1$s."
 
 #: include/classes/data/CItemData.php:1687
 msgid "File time information. Returns integer (Unix timestamp)"
@@ -10282,6 +10437,11 @@ msgstr "Hexadecimálne na desiatkové"
 msgid "Hidden"
 msgstr "Skrytý"
 
+#: widgets/scatterplot/includes/WidgetForm.php:176
+#: widgets/svggraph/includes/WidgetForm.php:268
+msgid "Hide"
+msgstr "Skryť"
+
 #: jsLoader.php:395
 msgid "Hide debug"
 msgstr "Skryť debug"
@@ -10748,6 +10908,11 @@ msgstr "Hostove metaúdaje"
 #: widgets/tophosts/views/column.edit.php:65
 msgid "Host name"
 msgstr "Meno hosta"
+
+#: widgets/scatterplot/includes/WidgetForm.php:173
+#: widgets/svggraph/includes/WidgetForm.php:265
+msgid "Host names in labels"
+msgstr "Názvy hostov v štítkoch"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -11233,6 +11398,10 @@ msgstr "Ak má menej ako %2$s podradená služba stav %1$s alebo menej"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Ak má menej ako %2$s podradená služba stav %1$s alebo menej"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr ""
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -12308,15 +12477,15 @@ msgstr "Zdedené a hostiteľské prototypové makrá"
 
 #: include/classes/helpers/CTagHelper.php:230
 msgid "Inherited and host tag"
-msgstr ""
+msgstr "Zdedený tag a tag hosta"
 
 #: app/partials/configuration.tags.tab.php:42
 msgid "Inherited and host tags"
-msgstr ""
+msgstr "Zdedený tagy a tagy hosta"
 
 #: include/classes/helpers/CTagHelper.php:231
 msgid "Inherited and item tag"
-msgstr ""
+msgstr "Zdedený tag a item tag"
 
 #: app/partials/configuration.tags.tab.php:165
 msgid "Inherited and item tags"
@@ -12332,15 +12501,15 @@ msgstr "Zdedené makrá šablón"
 
 #: include/classes/helpers/CTagHelper.php:229
 msgid "Inherited and template tag"
-msgstr ""
+msgstr "Zdedený tag a šablóna tagu"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Inherited and template tags"
-msgstr ""
+msgstr "Zdedený tag a šablóna tagov"
 
 #: include/classes/helpers/CTagHelper.php:232
 msgid "Inherited and trigger tag"
-msgstr ""
+msgstr "Zdedený tag a tag spúšťača"
 
 #: app/partials/configuration.tags.tab.php:155
 msgid "Inherited and trigger tags"
@@ -12348,7 +12517,7 @@ msgstr "Zdedené a trigger tagy"
 
 #: include/classes/helpers/CTagHelper.php:233
 msgid "Inherited and web scenario tag"
-msgstr ""
+msgstr "Zdedený web scenár a tag web scenára"
 
 #: include/forms.inc.php:311
 msgid "Inherited items"
@@ -12356,7 +12525,7 @@ msgstr "Zdedené položky"
 
 #: include/classes/helpers/CTagHelper.php:222
 msgid "Inherited tag"
-msgstr ""
+msgstr "Zdedený tag"
 
 #: widgets/geomap/includes/WidgetForm.php:62
 msgid "Initial view"
@@ -12538,6 +12707,13 @@ msgstr "Interval a ukladanie"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "Neplatná metóda rozhrania API „%2$s“ pre rolu používateľa „%1$s“."
 
+#: app/controllers/CControllerItemCreate.php:175
+#: app/controllers/CControllerItemPrototypeCreate.php:188
+#: app/controllers/CControllerItemPrototypeUpdate.php:176
+#: app/controllers/CControllerItemUpdate.php:175
+msgid "Invalid HTTP status code or range."
+msgstr "Neplatný HTTP stavový kód alebo rozsah."
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12635,6 +12811,10 @@ msgstr "Neplatná e-mailová adresa „%1$s“."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná e-mailová adresa pre typ média s ID „%1$s“."
+
+#: app/controllers/CControllerPopupTriggerExprCheck.php:61
+msgid "Invalid function"
+msgstr "Neplatná funkcia"
 
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
@@ -13071,6 +13251,13 @@ msgstr "Polia inventára"
 msgid "Inventory mode"
 msgstr "Režim inventára"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr "Obráť hodnoty"
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "Vyvolajte \"Vykonať teraz\" na hostoch iba na čítanie"
@@ -13112,6 +13299,11 @@ msgstr "Taliansky (it_IT)"
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
 msgstr "Položka"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
+#, c-format
+msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
+msgstr "Položka \"%1$s\" nesmie byť použitá v spúšťači: nepodporovaný dátový typ."
 
 #: items.php:667
 msgid "Item added"
@@ -13526,6 +13718,10 @@ msgstr "Vzor skupiny LDAP"
 msgid "LDAP is not configured"
 msgstr "LDAP nie je nakonfigurovaný"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:34
+msgid "LDAP is not configured."
+msgstr "LDAP nie je nakonfigurovaný."
+
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
 msgstr "LDAP musí byť povolený"
@@ -13918,6 +14114,10 @@ msgstr "Zoznam konfiguračných údajov skupín proxy Zabbix a údajov v reálno
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Zoznam blokových zariadení a ich typ. Vráti JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr "Zoznam znakov"
@@ -13937,6 +14137,10 @@ msgstr "Zoznam pripojených súborových systémov a ich typov. Vráti JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "Zoznam pripojených súborových systémov, ich typy, miesto na disku a štatistiky inode. Vráti JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -14686,6 +14890,13 @@ msgstr "Typ média „%1$s“ používa akcia „%2$s“."
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
 msgstr "Typ média pridaný"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:104
+#: app/controllers/CControllerAuthenticationUpdate.php:175
+#: app/controllers/CControllerAuthenticationUpdate.php:296
+#: app/controllers/CControllerPopupLdapCheck.php:116
+msgid "Media type and attribute is not unique."
+msgstr "Typ média a atribútu nie je unikát."
 
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
@@ -15473,6 +15684,22 @@ msgstr "Meno"
 msgid "Name ID"
 msgstr "ID mena"
 
+#: app/controllers/CControllerMfaCheck.php:30
+#: app/controllers/CControllerPopupLdapCheck.php:30
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
+msgid "Name already exists."
+msgstr "Názov úž existuje."
+
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr "Kombinácia názvu a hodnoty nie je unikát."
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr "Názov nie je unikát."
+
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "Názov poľa formulára by nemal presiahnuť 255 znakov."
@@ -15954,6 +16181,11 @@ msgstr "Žiadne mapy neboli pridané."
 msgid "No matches found"
 msgstr "Žiadne výbery nenájdené"
 
+#: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr "Nie viac ako %1$d položiek založených na poly pravidiel \"%2$s\""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "Nenašli sa žiadne nové moduly"
@@ -16012,6 +16244,10 @@ msgstr "Žiadne oprávnenia pre prístup do systému."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "Žiadne povolenia na volanie „%1$s.%2$s“."
+
+#: include/classes/api/services/CConfiguration.php:337
+msgid "No permissions to import dashboards."
+msgstr "Žiadne oprávnenia na import dashboard-ov."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16944,6 +17180,11 @@ msgstr "Otvoriť pokyny na inštaláciu"
 msgid "Open log"
 msgstr "Otvoriť log"
 
+#: include/classes/validators/CSslCertificateValidator.php:28
+#: include/classes/validators/CSslPrivateKeyValidator.php:28
+msgid "OpenSSL extension is not available"
+msgstr "Rozšírenie OpenSSL nie je k dispozícii"
+
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
 msgstr "Rozšírenie OpenSSL nie je k dispozícii."
@@ -17726,6 +17967,12 @@ msgstr "Percento online proxy serverov. Vracia číslo s pohyblivou rádovou či
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "Percento času, počas ktorého bol virtuálny počítač pripravený, ale nebolo možné naplánovať spustenie na fyzickom CPU, \"url\" – URL služby VMware, \"uuid\" – globálny jedinečný identifikátor virtuálneho stroja VMware, \"inštancia\" – inštancia CPU"
+
+#: include/classes/graph/CSvgGraph.php:1764
+#: include/classes/graphdraw/CLineGraphDraw.php:1620
+#, c-format
+msgid "Percentile %1$s: %2$s"
+msgstr "Percentile %1$s: %2$s"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -18712,6 +18959,14 @@ msgstr "Koncový bod presmerovania"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Referenčný atribút"
+
+#: app/controllers/CControllerPopupImport.php:135
+msgid "References to missing objects were ignored:"
+msgstr "Referencie na chýbajúce objekty boli ignorované:"
+
+#: app/controllers/CControllerPopupImportCompare.php:120
+msgid "References to missing objects will be ignored:"
+msgstr "Referencie na chýbajúce objekty budú ignorované:"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -21605,6 +21860,10 @@ msgstr "Veľkosť voľného swap miesta v bytoch alebo v percentách. Vráti cel
 msgid "Swedish (sv_SE)"
 msgstr "Švédsky (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr "Prepnúť používateľa SSO"
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Prepnutie autentifikačnej metódy spôsobí ukončenie všetkých sedeni okrem Vásho! Pokračovať?"
@@ -21766,6 +22025,11 @@ msgstr "Tag zobrazenia priority"
 #: app/views/connector.edit.php:71
 msgid "Tag filter"
 msgstr "Tag filter"
+
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr "Tag filter názov, operátor a kombinácia hodnoty nie je unikát."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -22012,7 +22276,7 @@ msgstr "Oprávnenia šablóny"
 
 #: app/partials/configuration.tags.tab.php:33
 msgid "Template tags"
-msgstr ""
+msgstr "Tagy šablóny"
 
 #: report2.php:398
 msgid "Template trigger"
@@ -22241,6 +22505,10 @@ msgstr "Identifikátor klienta registrovaný na autorizačnom serveri."
 #: app/views/oauth.edit.php:110
 msgid "The client secret registered within the authorization server."
 msgstr "Tajný klúč klienta registrovaný na autorizačnom serveri."
+
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr ""
 
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
@@ -22522,13 +22790,18 @@ msgstr[2] "Táto hodnota nemôže byť jedna z %1$s."
 msgid "This value cannot be one of %1$s."
 msgstr "Táto hodnota nemôže byť jedna z %1$s."
 
+#: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
+#, c-format
+msgid "This value cannot have more than %1$s decimal places."
+msgstr "Táto hodnota nemôže mať viac ako %1$s desatinných miest."
+
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
 msgstr "Táto hodnota nezodpovedá vzoru."
 
 #: jsLoader.php:442
 msgid "This value is not a valid file."
-msgstr ""
+msgstr "Táto hodnota nie je platný súbor."
 
 #: include/classes/validators/CFormValidator.php:874 jsLoader.php:424
 msgid "This value is not a valid floating-point value."
@@ -23642,6 +23915,10 @@ msgstr "Zrušte potvrdenie problému."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Neočakávaný stavový kód odpovede HTTP."
+
+#: app/views/mediatype.edit.php:166
+msgid "Unexpected access token update time."
+msgstr "Neočakávaný čas aktualizácie prístupového tokenu."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25501,6 +25778,10 @@ msgstr "Konfigurácia widgetu bude vrátená späť."
 msgid "Widget is deprecated."
 msgstr "Widget je zastaraný."
 
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widget je príliš malý pre zadaný počet stĺpcov a riadkov."
@@ -25915,6 +26196,10 @@ msgstr "Pre aktuálny výber nemôžete prepínať templaty."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "Nemáte oprávnenie na vykonanie tejto operácie."
+
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr "Boli ste autorizovaný pomocou Single sign-on (SSO), avšak prihlásenie do Zabbx-u zlyhalo."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26832,6 +27117,11 @@ msgstr "kruhová závislosť položky nie je povolená"
 msgid "color"
 msgstr "farba"
 
+#: include/classes/validators/CTimeRangesValidator.php:33
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
+msgid "comma separated list of time periods is expected"
+msgstr "je očakávaný zoznam časových periód oddelených čiarkou"
+
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
 msgstr "pre naplánované dni v týždni sa očakáva zoznam časových období oddelených čiarkami"
@@ -27334,6 +27624,11 @@ msgstr "neplatná sekvencia bajtov v UTF-8"
 msgid "invalid data type"
 msgstr "neplatný typ údajov"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr "neplatný dátum"
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "neplatné oneskorenie"
@@ -27425,6 +27720,10 @@ msgstr "neplatný čas"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "neplatné obdobie uloženia trendu"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr "obrátený"
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
@@ -28026,6 +28325,11 @@ msgstr "vzory"
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentil() – percentil P periódy T"
 
+#: include/classes/validators/CTimeRangesValidator.php:56
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
+msgid "periods must be unique"
+msgstr "periódy musia byť unikát"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() - Vráti konštantu Pi"
@@ -28245,6 +28549,11 @@ msgstr "skewness() - Meria asymetriu rozdelenia pravdepodobnosti"
 #: app/controllers/CControllerPopupTriggerExpr.php:1020
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt() - Druhá odmocnina hodnoty"
+
+#: include/classes/validators/CTimeRangesValidator.php:44
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
+msgid "start time must be less than end time"
+msgstr "čas štartu musi byť menší ako koniec"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28561,6 +28870,10 @@ msgstr "neznámy"
 msgid "unknown function \"%1$s\""
 msgstr "neznáma funkcia \"%1$s\""
 
+#: include/classes/api/services/CMap.php:1999
+msgid "unsupported data type"
+msgstr "nepodporovaný dátový typ"
+
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
 msgstr "nepodporovaná časová prípona"
@@ -28657,6 +28970,14 @@ msgstr "hodnota %1$s už existuje"
 msgid "value contains unescaped character at position %1$d"
 msgstr "hodnota obsahuje neescapovaný znak na pozícii %1$d"
 
+#: include/classes/validators/CNumberValidator.php:74
+msgid "value is not a valid floating point number"
+msgstr "hodnota nie je hodnotou s plávajúciou desatinnou čarkou"
+
+#: include/classes/validators/CNumberValidator.php:77
+msgid "value is not a valid integer"
+msgstr "hodnota nie je celé číslo"
+
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
 #: include/classes/api/services/CItemGeneral.php:284
@@ -28734,6 +29055,11 @@ msgstr "hodnota musí byť medzi \"%1$s\" a \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "hodnota musí byť medzi \"%1$s\" a \"%2$s\" a nesmie mať viac ako \"%3$s\" číslic za desatinnou čiarkou"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr "hodnota musí byť medzi %1$s a %2$s"
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "hodnota musí byť prázdna"
@@ -28751,6 +29077,16 @@ msgstr[2] "hodnoty musia byť prázdne alebo %1$s "
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "hodnota musí byť väčšia ako \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr "hodnota musí byť väčšia alebo rovná ako %1$s"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr "hodnota musí byť menšia, alebo rovná %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

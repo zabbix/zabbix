@@ -37,7 +37,7 @@ zabbix_export:
         4. Set the password of the user that you created in step 1 in the `Password` host wizard configuration field.
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-3
       groups:
         - name: 'Templates/Server hardware'
       items:
@@ -112,8 +112,8 @@ zabbix_export:
             		}
             
             		try {
-            			ilo.session_token = headers['X-Auth-Token'];
-            			ilo.session_url = headers['Location'];
+            			ilo.session_token = ilo.getHeader(headers, 'X-Auth-Token');
+            			ilo.session_url = ilo.getHeader(headers, 'Location');
             		}
             		catch (error) {
             			throw 'Failed to retrieve auth token or session URL from API. Check debug log for more information.';
@@ -183,6 +183,21 @@ zabbix_export:
             
             	checkArray: function (array) {
             		return typeof array !== 'undefined' && Array.isArray(array) && array.length > 0 ? true : false;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            
+            		throw name + ' header not found';
             	}
             };
             
@@ -1189,6 +1204,8 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.StatusIndicator
+                  error_handler: CUSTOM_VALUE
+                  error_handler_params: Unknown
                 - type: JAVASCRIPT
                   parameters:
                     - |
@@ -2150,7 +2167,8 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - $.Status.HealthRollup
+                    - '$.Status["Health","HealthRollup"].first()'
+                  error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
                     - |

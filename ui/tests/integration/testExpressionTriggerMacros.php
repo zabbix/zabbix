@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -235,7 +235,7 @@ class testExpressionTriggerMacros extends CIntegrationTest {
 	public function testExpressionTriggerMacros_testOperation() {
 		$this->createScripts();
 		$this->clearLog(self::COMPONENT_SERVER);
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_1, 51);
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME_2, 50);

@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -74,7 +74,9 @@ class CControllerPopupLdapTestEdit extends CController {
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
-			'test_username' => CWebUser::$data['username']
+			'test_username' => CWebUser::$data['username'],
+			'js_validation_rules' => (new CFormValidator(CControllerPopupLdapTestSend::getValidationRules()))
+				->getRules()
 		];
 
 		$this->getInputs($data['ldap_config'], ['userdirectoryid', 'host', 'port', 'base_dn', 'bind_dn',

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -12,6 +12,7 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "../../../include/zbxsupervisor_client.h"
 #include "service_server.h"
 
 #include "service_manager_impl.h"
@@ -1414,8 +1415,11 @@ static zbx_service_update_t	*update_service(zbx_hashset_t *service_updates, zbx_
  * Purpose: sorts service updates by source id                                *
  *                                                                            *
  ******************************************************************************/
-static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_status_update_t **update2)
+static int	its_updates_compare(const void *a1, const void *a2)
 {
+	const zbx_status_update_t * const	*update1 = (const zbx_status_update_t * const *)a1;
+	const zbx_status_update_t * const	*update2 = (const zbx_status_update_t * const *)a2;
+
 	ZBX_RETURN_IF_NOT_EQUAL((*update1)->sourceid, (*update2)->sourceid);
 
 	return 0;
@@ -1463,7 +1467,7 @@ static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *ala
 
 	if (0 != updates.values_num)
 	{
-		zbx_vector_status_update_ptr_sort(&updates, (zbx_compare_func_t)its_updates_compare);
+		zbx_vector_status_update_ptr_sort(&updates, its_updates_compare);
 
 		for (int i = 0; i < updates.values_num; i++)
 		{
@@ -3569,13 +3573,15 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot start service manager service: %s", error);
 		zbx_free(error);
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	/* initialize statistics */
 	time_stat = zbx_time();
 
 	service_manager_init(&service_manager);
+
+	zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_SERVICEMAN, 0, NULL, 0, SEC_PER_MIN, ZBX_IPC_SERVICE_SERVICE);
 
 	if (0 != (services_num = get_services_num()))
 	{
@@ -3649,29 +3655,17 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 				/* load service problems once during startup */
 				if (0 == (int)time_flush)
 				{
-					zbx_ipc_async_socket_t	rtc;
-
 					sync_service_problems(&service_manager.services,
 							&service_manager.service_problems_index);
-
-					if (FAIL == zbx_ipc_async_socket_open(&rtc, ZBX_IPC_SERVICE_RTC, 30, &error))
-					{
-						zabbix_log(LOG_LEVEL_CRIT, "cannot open socket from service manager to"
-								" rtc: %s", error);
-						zbx_free(error);
-						goto out;
-					}
-
-					zbx_rtc_notify_finished_sync(30,
-							ZBX_RTC_SERVICE_SYNC_NOTIFY,
-							get_process_type_string(process_type), &rtc);
-					zbx_ipc_async_socket_close(&rtc);
-
-					zbx_rtc_subscribe_service(ZBX_PROCESS_TYPE_SERVICEMAN, 0, NULL, 0, SEC_PER_MIN,
-						ZBX_IPC_SERVICE_SERVICE);
 				}
 			}
 			while (ZBX_DB_DOWN == zbx_db_commit());
+
+			if (0 == time_flush)
+			{
+				/* only after the initial sync has been done the service manager is started */
+				zbx_supervisor_set_process_running(server_num);
+			}
 
 			if (0 != updated)
 				recalculate_services(&service_manager);
@@ -3761,6 +3755,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 					zabbix_log(LOG_LEVEL_DEBUG, "shutdown message received, terminating...");
 					timeout.sec = 0;
 					timeout.ns = 1e8;
+					running = 0;
 					break;
 				default:
 					THIS_SHOULD_NEVER_HAPPEN;
@@ -3787,14 +3782,14 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			timeout.ns = 0;
 		}
 	}
-out:
+
 	service_manager_free(&service_manager);
 
 	zbx_db_close();
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
 
-	exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #undef STAT_INTERVAL
 }
 #undef ZBX_PROBLEM_CLEANUP_AGE

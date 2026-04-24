@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -44,7 +44,7 @@ void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *u
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to proxy group manager service: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -62,7 +62,7 @@ void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *u
 	if (FAIL == zbx_ipc_socket_write(&pgservice_sock, code, data, (zbx_uint32_t)(ptr - data)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot send data to proxy group manager service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_free(data);
@@ -86,7 +86,7 @@ void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int versio
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to proxy group manager service: %s", error);
 			zbx_free(error);
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 		}
 	}
 
@@ -100,7 +100,7 @@ void	zbx_pg_update_proxy_rtdata(zbx_uint64_t proxyid, int lastaccess, int versio
 			(zbx_uint32_t)(ptr - data)))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Cannot send data to proxy group manager service");
-		exit(EXIT_FAILURE);
+		zbx_exit(EXIT_FAILURE);
 	}
 }
 

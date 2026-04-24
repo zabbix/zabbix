@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -43,7 +43,7 @@ $filter = (new CFilter())
 							'parameters' => [
 								'srctbl' => 'sla',
 								'srcfld1' => 'slaid',
-								'dstfrm' => 'zbx_filter',
+								'dstfrm' => CFilter::FORM_NAME,
 								'dstfld1' => 'filter_slaid',
 								'enabled_only' => 1
 							]

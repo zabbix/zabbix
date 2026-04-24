@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,7 +16,6 @@
 
 #include "zbxmutexs.h"
 #include "zbxtime.h"
-#include "zbxvariant.h"
 #include "zbxalgo.h"
 #include "zbxhistory.h"
 #include "zbxshmem.h"
@@ -473,7 +472,7 @@ static int	vc_db_get_values(zbx_uint64_t itemid, int value_type, zbx_vector_hist
 	if (SUCCEED != ret)
 		return ret;
 
-	zbx_vector_history_record_sort(values, (zbx_compare_func_t)zbx_history_record_compare_desc_func);
+	zbx_vector_history_record_sort(values, zbx_history_record_compare_desc);
 
 	/* History backend returns values by full second intervals. With nanosecond resolution */
 	/* some of returned values might be outside the requested range, for example:          */
@@ -557,12 +556,15 @@ static int	vc_strpool_compare_func(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: compares two item weight data structures by their 'weight'        *
  *                                                                            *
- * Parameters: d1   - [IN] the first item weight data structure               *
- *             d2   - [IN] the second item weight data structure              *
+ * Parameters: a1   - [IN] first item weight data structure                   *
+ *             a2   - [IN] second item weight data structure                  *
  *                                                                            *
  ******************************************************************************/
-static int	vc_item_weight_compare_func(const zbx_vc_item_weight_t *d1, const zbx_vc_item_weight_t *d2)
+static int	vc_item_weight_compare(const void *a1, const void *a2)
 {
+	const zbx_vc_item_weight_t	*d1 = (const zbx_vc_item_weight_t *)a1;
+	const zbx_vc_item_weight_t	*d2 = (const zbx_vc_item_weight_t *)a2;
+
 	ZBX_RETURN_IF_NOT_EQUAL(d1->weight, d2->weight);
 
 	return 0;
@@ -635,10 +637,11 @@ static void	vc_history_record_vector_clean(zbx_vector_history_record_t *vector, 
 		case ITEM_VALUE_TYPE_FLOAT:
 			break;
 		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	zbx_vector_history_record_clear(vector);
@@ -889,7 +892,7 @@ static void	vc_release_space(zbx_vc_item_t *source_item, size_t space)
 		}
 	}
 
-	zbx_vector_vc_itemweight_sort(&items, (zbx_compare_func_t)vc_item_weight_compare_func);
+	zbx_vector_vc_itemweight_sort(&items, vc_item_weight_compare);
 
 	for (i = 0; i < items.values_num && freed < space; i++)
 	{
@@ -1166,11 +1169,12 @@ static size_t	vc_item_free_values(zbx_vc_item_t *item, zbx_history_record_t *val
 		case ITEM_VALUE_TYPE_UINT64:
 		case ITEM_VALUE_TYPE_FLOAT:
 			break;
+		case ITEM_VALUE_TYPE_JSON:
 		case ITEM_VALUE_TYPE_BIN:
 		case ITEM_VALUE_TYPE_NONE:
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			exit(EXIT_FAILURE);
+			zbx_exit(EXIT_FAILURE);
 	}
 
 	item->values_total -= (last - first + 1);
@@ -1801,9 +1805,9 @@ static int	vch_item_add_value_at_head(zbx_vc_item_t *item, const zbx_history_rec
 	zbx_vc_chunk_t	*chunk, *schunk;
 
 	if (NULL != item->head &&
-			0 < zbx_history_record_compare_asc_func(&item->head->slots[item->head->last_value], value))
+			0 < zbx_history_record_compare_asc(&item->head->slots[item->head->last_value], value))
 	{
-		if (0 < zbx_history_record_compare_asc_func(&item->tail->slots[item->tail->first_value], value))
+		if (0 < zbx_history_record_compare_asc(&item->tail->slots[item->tail->first_value], value))
 		{
 			/* If the added value has the same or older timestamp as the first value in cache */
 			/* we can't add it to keep cache consistency. Additionally we must make sure no   */
@@ -2000,10 +2004,7 @@ static int	vch_item_cache_values_by_time(zbx_vc_item_t **item, int range_start)
 	UNLOCK_CACHE;
 
 	if (SUCCEED == (ret = vc_db_read_values_by_time(itemid, value_type, &records, range_start, range_end)))
-	{
-		zbx_vector_history_record_sort(&records,
-				(zbx_compare_func_t)zbx_history_record_compare_asc_func);
-	}
+		zbx_vector_history_record_sort(&records, zbx_history_record_compare_asc);
 
 	WRLOCK_CACHE;
 
@@ -2114,8 +2115,7 @@ static int	vch_item_cache_values_by_time_and_count(zbx_vc_item_t **item, int ran
 	if (SUCCEED == ret && SUCCEED == (ret = vc_db_read_values_by_time_and_count(itemid, value_type, &records,
 			range_start, count - cached_records, range_end, ts)))
 	{
-		zbx_vector_history_record_sort(&records,
-				(zbx_compare_func_t)zbx_history_record_compare_asc_func);
+		zbx_vector_history_record_sort(&records, zbx_history_record_compare_asc);
 	}
 
 	WRLOCK_CACHE;
@@ -2428,7 +2428,7 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 	memset(vc_cache, 0, sizeof(zbx_vc_cache_t));
 
 	zbx_hashset_create_ext(&vc_cache->items, VC_ITEMS_INIT_SIZE,
-			ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
+			ZBX_DEFAULT_ID_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC, NULL,
 			__vc_shmem_malloc_func, __vc_shmem_realloc_func, __vc_shmem_free_func);
 
 	if (NULL == vc_cache->items.slots)
@@ -2457,7 +2457,7 @@ int	zbx_vc_init(zbx_uint64_t value_cache_size, char **error)
 
 	ret = SUCCEED;
 out:
-	zbx_vc_disable();
+	zbx_vc_enable();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
@@ -2533,6 +2533,26 @@ void	zbx_vc_reset(void)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: check if value type is supported by value cache                   *
+ *                                                                            *
+ * Return value:  SUCCEED - value type is supported                           *
+ *                FAIL    - otherwise                                         *
+ *                                                                            *
+ ******************************************************************************/
+static int	vc_is_value_type_supported(unsigned char value_type)
+{
+	switch (value_type)
+	{
+		case ITEM_VALUE_TYPE_BIN:
+		case ITEM_VALUE_TYPE_JSON:
+			return FAIL;
+		default:
+			return SUCCEED;
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: adds item values to history and value cache                       *
  *                                                                            *
  * Parameters:                                                                *
@@ -2563,6 +2583,14 @@ int	zbx_vc_add_values(zbx_vector_dc_history_ptr_t *history, int *ret_flush, int 
 		h = history->values[i];
 
 		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+
+		if (FAIL == vc_is_value_type_supported(h->value_type))
+		{
+			if (NULL != item)
+				vc_remove_item(item);
+
+			continue;
+		}
 
 		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
 		{
@@ -2644,7 +2672,7 @@ int	zbx_vc_get_values(zbx_uint64_t itemid, unsigned char value_type, zbx_vector_
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() itemid:" ZBX_FS_UI64 " value_type:%d count:%d period:%d end_timestamp"
 			" '%s'", __func__, itemid, value_type, count, seconds, zbx_timespec_str(ts));
 
-	if (ITEM_VALUE_TYPE_BIN == value_type)
+	if (SUCCEED != vc_is_value_type_supported(value_type))
 		return FAIL;
 
 	RDLOCK_CACHE;
@@ -2916,6 +2944,7 @@ void	zbx_vc_flush_stats(void)
 	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
 }
 
+
 /******************************************************************************
  *                                                                            *
  * Purpose: add newly created items with triggers to value cachel              *
@@ -2934,12 +2963,17 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 
 		for (i = 0; i < items->values_num; i++)
 		{
+			unsigned char	value_type = (unsigned char)items->values[i].second;
+
+			if (SUCCEED != vc_is_value_type_supported(value_type))
+				continue;
+
 			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i]))
 				continue;
 
 			zbx_vc_item_t	item_local = {
 					.itemid = items->values[i].first,
-					.value_type = (unsigned char)items->values[i].second,
+					.value_type = value_type,
 					.status = ZBX_ITEM_STATUS_CACHED_ALL,
 					.active_range = VC_MIN_RANGE,
 					.last_accessed = (int)time(NULL)

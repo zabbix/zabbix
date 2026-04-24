@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -133,7 +133,8 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *                                                                            *
  * Purpose: receives 'proxy data' request from proxy                          *
  *                                                                            *
- * Parameters: sock                - [IN] connection socket                   *
+ * Parameters: rtc                 - [IN] RTC socket                          *
+ *             sock                - [IN] connection socket                   *
  *             jp                  - [IN] received JSON data                  *
  *             ts                  - [IN] connection timestamp                *
  *             events_cbs          - [IN]                                     *
@@ -141,8 +142,9 @@ static int	proxy_data_no_history(const struct zbx_json_parse *jp)
  *             proxydata_frequency - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
-void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
-		const zbx_events_funcs_t *events_cbs, int config_timeout, int proxydata_frequency)
+void	recv_proxy_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_timespec_t *ts, const zbx_events_funcs_t *events_cbs, int config_timeout,
+		int proxydata_frequency)
 {
 	int			ret = FAIL, upload_status = 0, status, version_int, responded = 0;
 	char			*error = NULL, *version_str = NULL;
@@ -185,8 +187,8 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 
 	if (SUCCEED == ret)
 	{
-		if (SUCCEED != (ret = zbx_process_proxy_data(&proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE, events_cbs,
-				proxydata_frequency, zbx_discovery_update_host_server,
+		if (SUCCEED != (ret = zbx_process_proxy_data(rtc, &proxy, jp, ts, PROXY_OPERATING_MODE_ACTIVE,
+				events_cbs, proxydata_frequency, zbx_discovery_update_host_server,
 				zbx_discovery_update_service_server, zbx_discovery_update_service_down_server,
 				zbx_discovery_find_host_server, zbx_discovery_update_drule_server,
 				zbx_autoreg_host_free_server, zbx_autoreg_flush_hosts_server,

@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -174,7 +174,7 @@ static void	zbx_json_setempty(struct zbx_json *j)
 	*j->buffer = '\0';
 }
 
-void	zbx_json_clean(struct zbx_json *j)
+void	zbx_json_reset(struct zbx_json *j)
 {
 	zbx_json_setempty(j);
 	zbx_json_addobject(j, NULL);

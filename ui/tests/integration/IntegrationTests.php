@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -17,7 +17,7 @@ require_once dirname(__FILE__).'/testInitialConfSync.php';
 require_once dirname(__FILE__).'/testProxyConfSync.php';
 require_once dirname(__FILE__).'/testTimescaleDb.php';
 require_once dirname(__FILE__).'/testDataCollection.php';
-require_once dirname(__FILE__).'/testBinaryValueTypeDataCollection.php';
+require_once dirname(__FILE__).'/testBinaryAndJSONValueTypesDataCollection.php';
 require_once dirname(__FILE__).'/testDiagnosticDataTask.php';
 require_once dirname(__FILE__).'/testLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/testGoAgentDataCollection.php';
@@ -63,6 +63,7 @@ require_once dirname(__FILE__).'/testUserMacrosWithContext.php';
 require_once dirname(__FILE__).'/testUserMacrosWithContextRegex.php';
 require_once dirname(__FILE__).'/testNestedLLD.php';
 require_once dirname(__FILE__).'/testCalculatedExpression.php';
+require_once dirname(__FILE__).'/testDiagInfo.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -78,7 +79,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testAutoregistrationPSK');
 		$suite->addTestSuite('testAutoregistrationHostMetaDataItem');
 		$suite->addTestSuite('testDataCollection');
-		$suite->addTestSuite('testBinaryValueTypeDataCollection');
+		$suite->addTestSuite('testBinaryAndJSONValueTypesDataCollection');
 		$suite->addTestSuite('testDiagnosticDataTask');
 		$suite->addTestSuite('testLowLevelDiscovery');
 		$suite->addTestSuite('testGoAgentDataCollection');
@@ -93,6 +94,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testServiceRoles');
 		$suite->addTestSuite('testMacros');
 		$suite->addTestSuite('testExpressionTriggerMacros');
+		$suite->addTestSuite('testAgentItems');
 		$suite->addTestSuite('testScriptItems');
 		$suite->addTestSuite('testItemRate');
 		$suite->addTestSuite('testHistoryValueDuplicates');
@@ -121,6 +123,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosWithContextRegex');
 		$suite->addTestSuite('testNestedLLD');
 		$suite->addTestSuite('testCalculatedExpression');
+		$suite->addTestSuite('testDiagInfo');
 		return $suite;
 	}
 }

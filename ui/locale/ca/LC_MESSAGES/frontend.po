@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2025-11-06 22:05+0000\n"
+"PO-Revision-Date: 2026-04-18 06:16+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -355,6 +355,10 @@ msgstr "(0 - emprar l'acció per defecte)"
 msgid "(Only super admins can create groups)"
 msgstr "(Només els superadministradors poden crear grups)"
 
+#: include/forms.inc.php:969
+msgid "(created by LLD)"
+msgstr "(creat per LLD)"
+
 #: app/partials/configuration.tags.tab.php:86
 #: app/partials/hostmacros.inherited.list.html.php:204
 #: app/partials/hostmacros.list.html.php:105
@@ -482,6 +486,10 @@ msgstr "Unes quantes passes més"
 #: include/classes/helpers/CItemGeneralHelper.php:407
 msgid "A floating point value is expected."
 msgstr "S'espera un valor de coma flotant."
+
+#: app/controllers/CControllerPopupAcknowledgeCreate.php:89
+msgid "A message or at least one operation is required."
+msgstr "Com a mínim cal un missatge o una operació."
 
 #: app/views/host.wizard.edit.php:139
 msgid "A template is a set of predefined configurations (metrics to be collected, conditions for generating alerts, etc.) designed for your monitoring target."
@@ -1289,6 +1297,10 @@ msgstr "Sense agent"
 msgid "Aggregate"
 msgstr "Agregat"
 
+#: widgets/topitems/views/column.edit.php:283
+msgid "Aggregate columns"
+msgstr "Afegir columnes"
+
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
 msgstr "Funcions agregades"
@@ -1306,6 +1318,12 @@ msgstr "Afegeix tot el conjunt de dades."
 #: widgets/tophosts/views/column.edit.php:142
 msgid "Aggregation function"
 msgstr "Funció d'agregació"
+
+#: widgets/item/views/widget.edit.php:85 widgets/item/views/widget.edit.php:90
+#: widgets/tophosts/views/column.edit.php:330
+#: widgets/topitems/views/column.edit.php:256
+msgid "Aggregation function does not affect the sparkline."
+msgstr "La funció d'afegir no permet pas minigràfics."
 
 #: widgets/svggraph/includes/CWidgetFieldDataSetView.php:406
 #: widgets/tophosts/views/column.edit.php:165
@@ -1734,6 +1752,11 @@ msgstr "A %1$s el dia %2$s de cada %3$s"
 msgid "At (hour:minute)"
 msgstr "A les (hora:minut)"
 
+#: include/classes/validators/CFormValidator.php:2323 jsLoader.php:418
+#, c-format
+msgid "At least %1$d items based on field \"%2$s\" rules"
+msgstr "Com a mínim %1$d elements basats en les regles del camp \"%2$s\""
+
 #: include/classes/api/services/CAuthentication.php:153
 msgid "At least one LDAP server must exist."
 msgstr "Com a mínim ha d'existir un servidor LDAP."
@@ -1773,6 +1796,11 @@ msgstr "Cal triar, com a mínim, un dia de la setmana o un dia del mes."
 msgid "At least one encryption level must be selected."
 msgstr "Com a mínim heu de triar un nivell de xifrat."
 
+#: app/controllers/CControllerSlaCreate.php:53
+#: app/controllers/CControllerSlaUpdate.php:54
+msgid "At least one entry should be selected."
+msgstr "Com a mínim s'ha de triar una entrada."
+
 #: app/controllers/CControllerRegExCreate.php:54
 #: app/controllers/CControllerRegExUpdate.php:55
 msgid "At least one expression must be added."
@@ -1785,6 +1813,11 @@ msgstr "Com a mínim heu d'afegir una expressió."
 #: include/classes/api/services/CMaintenance.php:577
 msgid "At least one host group or host must be selected."
 msgstr "S'ha de triar, com a mínim, almenys un grup d'equips o un equip."
+
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
 
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
@@ -1825,6 +1858,11 @@ msgstr "Com a mínim s'ha d'habilitar un paràmetre."
 #: app/controllers/CControllerMaintenanceUpdate.php:41
 msgid "At least one period must be added."
 msgstr "Com a mínim heu d'afegir un període."
+
+#: app/controllers/CControllerConnectorCreate.php:44
+#: app/controllers/CControllerConnectorUpdate.php:45
+msgid "At least one type of information must be selected."
+msgstr "S'ha de triar com a mínim un tipus d'informació."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -2278,6 +2316,13 @@ msgstr "Tant els camps \"tls_psk_identity\" com \"tls_psk\" s'han d'especificar 
 msgid "Both passwords must be equal."
 msgstr "Ambdues paraules de pas han d'ésser iguals."
 
+#: app/controllers/CControllerItemCreate.php:256
+#: app/controllers/CControllerItemPrototypeCreate.php:269
+#: app/controllers/CControllerItemPrototypeUpdate.php:257
+#: app/controllers/CControllerItemUpdate.php:256
+msgid "Both username and password should be either present or empty."
+msgstr "Tant el nom d'usuari com la contrasenya haurien d'estar presents o buits"
+
 #: include/views/js/monitoring.sysmaps.js.php:42
 #: include/views/js/monitoring.sysmaps.js.php:156
 #: include/views/js/monitoring.sysmaps.js.php:681
@@ -2544,6 +2589,13 @@ msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "No es pot pas afegir el mòdul: %1$s."
 msgstr[1] "No es poden pas afegir els mòduls: %1$s."
+
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -3475,6 +3527,11 @@ msgstr "No es troba el grup d'equips \"%1$s\" per al prototip d'equips \"%2$s\" 
 #, c-format
 msgid "Cannot find host group \"%1$s\" for host prototype \"%2$s\" of discovery rule prototype \"%3$s\" on \"%4$s\"."
 msgstr "No es troba el grup d'equips \"%1$s\" per al prototip d'equips \"%2$s\" del prototip de regla de descoberta \"%3$s\" a \"%4$s\"."
+
+#: include/classes/import/importers/CDashboardImporterGeneral.php:57
+#, c-format
+msgid "Cannot find host group \"%1$s\" used in dashboard \"%2$s\"."
+msgstr "No es troba el grup d'equips \"%1$s\" emprat al tauler \"%2$s\"."
 
 #: include/classes/api/services/CDiscoveryRule.php:3350
 #, c-format
@@ -4860,6 +4917,14 @@ msgstr "Informació del xassís. Retorna una cadena"
 msgid "Check already exists."
 msgstr "El control ja existeix."
 
+#: app/controllers/CControllerPopupImportCompare.php:121
+msgid "Check and reconfigure widgets after the import is completed."
+msgstr "Reviseu i reconfigureu els ginys després d'haver fet la importació."
+
+#: app/controllers/CControllerPopupImport.php:136
+msgid "Check and reconfigure widgets."
+msgstr "Valideu i reconfigureu els ginys."
+
 #: include/classes/parsers/C10TriggerExpression.php:542
 #, c-format
 msgid "Check expression part starting from \"%1$s\"."
@@ -5190,10 +5255,18 @@ msgstr "Interpolació de colors"
 msgid "Colors"
 msgstr "Colors"
 
+#: widgets/topitems/views/column.edit.php:293
+msgid "Column aggregation function"
+msgstr "Funció d'afegir columnes"
+
 #: widgets/graphprototype/includes/WidgetForm.php:82
 #: widgets/tophosts/includes/WidgetForm.php:140
 msgid "Columns"
 msgstr "Columnes"
+
+#: widgets/topitems/views/column.edit.php:313
+msgid "Combined column name"
+msgstr "Nom de la columna combinada"
 
 #: app/views/js/administration.regex.edit.js.php:66
 msgid "Combined result"
@@ -6392,6 +6465,10 @@ msgstr "Llistat de taulers"
 #: app/views/dashboard.page.properties.edit.php:59
 msgid "Dashboard page properties"
 msgstr "Propietats de la pàgina del tauler"
+
+#: app/controllers/CControllerPopupImportCompare.php:216
+msgid "Dashboard pages"
+msgstr "Pàgines del tauler"
 
 #: app/views/dashboard.properties.edit.php:87
 msgid "Dashboard properties"
@@ -8193,6 +8270,10 @@ msgctxt "compact table header"
 msgid "Duration"
 msgstr "Durada"
 
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:38
+msgid "Duration must be no less than a minute."
+msgstr "La durada no pot ésser inferior a un minut."
+
 #: include/locales.inc.php:40
 msgid "Dutch (nl_NL)"
 msgstr "Holandès (nl_NL)"
@@ -8673,6 +8754,10 @@ msgstr "Entreu una cadena d'identitat de clau compartida prèviament que no sigu
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr "Introduïu un nom únic que els components de Zabbix utilitzaran per reconèixer la clau precompartida."
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr "Introduïu un o més valors com a equip:port o [equip]:port (IPv6), separats per comes."
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr "Entreu l'adreça IP/DNS i el port de l'agent Zabbix instal·lat a l'equip a monitorar."
@@ -8922,6 +9007,16 @@ msgstr "Exclou els grups d'equips"
 #: app/controllers/CControllerPopupSlaExcludedDowntimeEdit.php:100
 msgid "Excluded downtime"
 msgstr "Temps d'inactivitat exclosos"
+
+#: app/controllers/CControllerSlaExcludedDowntimeValidate.php:88
+#, c-format
+msgid "Excluded downtime must not extend beyond %1$s."
+msgstr "El temps d'inactivitat exclòs no pot superar el termini de %1$s."
+
+#: app/controllers/CControllerSlaCreate.php:74
+#: app/controllers/CControllerSlaUpdate.php:75
+msgid "Excluded downtime periods must be unique."
+msgstr "Els períodes d'inactivitat exclosos han d'ésser únics."
 
 #: app/views/popup.sla.edit.php:196 app/views/popup.sla.edit.php:207
 #: app/views/slareport.list.php:168
@@ -9285,6 +9380,66 @@ msgstr "El camp \"%1$s\" no és una cadena."
 #, c-format
 msgid "Field \"%1$s\" must be missing."
 msgstr "Hi manca el camp \"%1$s\"."
+
+#: include/classes/data/CTriggerConditionFunctionData.php:275
+#: include/classes/data/CTriggerConditionFunctionData.php:298
+#: include/classes/data/CTriggerConditionFunctionData.php:321
+#: include/classes/data/CTriggerConditionFunctionData.php:344
+#: include/classes/data/CTriggerConditionFunctionData.php:367
+#: include/classes/data/CTriggerConditionFunctionData.php:441
+#: include/classes/data/CTriggerConditionFunctionData.php:466
+#: include/classes/data/CTriggerConditionFunctionData.php:490
+#: include/classes/data/CTriggerConditionFunctionData.php:513
+#: include/classes/data/CTriggerConditionFunctionData.php:537
+#: include/classes/data/CTriggerConditionFunctionData.php:560
+#: include/classes/data/CTriggerConditionFunctionData.php:584
+#: include/classes/data/CTriggerConditionFunctionData.php:608
+#: include/classes/data/CTriggerConditionFunctionData.php:632
+#: include/classes/data/CTriggerConditionFunctionData.php:655
+#: include/classes/data/CTriggerConditionFunctionData.php:678
+#: include/classes/data/CTriggerConditionFunctionData.php:732
+#: include/classes/data/CTriggerConditionFunctionData.php:755
+#: include/classes/data/CTriggerConditionFunctionData.php:779
+#: include/classes/data/CTriggerConditionFunctionData.php:802
+#: include/classes/data/CTriggerConditionFunctionData.php:825
+#: include/classes/data/CTriggerConditionFunctionData.php:905
+#: include/classes/data/CTriggerConditionFunctionData.php:929
+#: include/classes/data/CTriggerConditionFunctionData.php:952
+#: include/classes/data/CTriggerConditionFunctionData.php:975
+#: include/classes/data/CTriggerConditionFunctionData.php:1043
+#: include/classes/data/CTriggerConditionFunctionData.php:1115
+#: include/classes/data/CTriggerConditionFunctionData.php:1139
+#: include/classes/data/CTriggerConditionFunctionData.php:1165
+#: include/classes/data/CTriggerConditionFunctionData.php:1213
+#: include/classes/data/CTriggerConditionFunctionData.php:1236
+#: include/classes/data/CTriggerConditionFunctionData.php:1259
+#: include/classes/data/CTriggerConditionFunctionData.php:1283
+#: include/classes/data/CTriggerConditionFunctionData.php:1306
+#: include/classes/data/CTriggerConditionFunctionData.php:1329
+#: include/classes/data/CTriggerConditionFunctionData.php:1352
+#: include/classes/data/CTriggerConditionFunctionData.php:1376
+#: include/classes/data/CTriggerConditionFunctionData.php:1399
+#: include/classes/data/CTriggerConditionFunctionData.php:1423
+#: include/classes/data/CTriggerConditionFunctionData.php:1446
+#: include/classes/data/CTriggerConditionFunctionData.php:1543
+#: include/classes/data/CTriggerConditionFunctionData.php:1618
+#: include/classes/data/CTriggerConditionFunctionData.php:1742
+#: include/classes/data/CTriggerConditionFunctionData.php:1766
+#: include/classes/data/CTriggerConditionFunctionData.php:1808
+#: include/classes/data/CTriggerConditionFunctionData.php:1832
+#: include/classes/data/CTriggerConditionFunctionData.php:1857
+#: include/classes/data/CTriggerConditionFunctionData.php:1881
+#: include/classes/data/CTriggerConditionFunctionData.php:1905
+#: include/classes/data/CTriggerConditionFunctionData.php:1929
+#: include/classes/data/CTriggerConditionFunctionData.php:1952
+#: include/classes/data/CTriggerConditionFunctionData.php:1975
+#: include/classes/data/CTriggerConditionFunctionData.php:2021
+#: include/classes/data/CTriggerConditionFunctionData.php:2163
+#: include/classes/data/CTriggerConditionFunctionData.php:2376
+#: include/classes/data/CTriggerConditionFunctionData.php:2400
+#: include/classes/data/CTriggerConditionFunctionData.php:2470
+msgid "Field \"Last of\" cannot be empty when \"Time shift\" is not empty."
+msgstr "El camp \"Darrer de\" no es pot pas deixar buit quan \"Desplaçament temporal\" no sigui pas buit."
 
 #: include/forms.inc.php:1495 include/forms.inc.php:1530
 #: include/views/js/item.preprocessing.js.php:154
@@ -10154,6 +10309,11 @@ msgstr "Hexadecimal a decimal"
 msgid "Hidden"
 msgstr "Ocult"
 
+#: widgets/scatterplot/includes/WidgetForm.php:176
+#: widgets/svggraph/includes/WidgetForm.php:268
+msgid "Hide"
+msgstr "Amagar"
+
 #: jsLoader.php:395
 msgid "Hide debug"
 msgstr "Amaga la depuració"
@@ -10615,6 +10775,11 @@ msgstr "Metadades dels equips"
 #: widgets/tophosts/views/column.edit.php:65
 msgid "Host name"
 msgstr "Nom de l'equip"
+
+#: widgets/scatterplot/includes/WidgetForm.php:173
+#: widgets/svggraph/includes/WidgetForm.php:265
+msgid "Host names in labels"
+msgstr "Noms d'equips en etiquetes"
 
 #: widgets/hostnavigator/Widget.php:29
 msgid "Host navigator"
@@ -11095,6 +11260,10 @@ msgstr "Si menys de %2$s serveis fills tenen un estat de %1$s o inferior"
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
 msgstr "Si menys de %2$s dels serveis fill tenen un estat de %1$s o inferior"
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
+msgstr "Si no s'especifica cap port, s'utilitza el valor \"Port de base de dades\"."
 
 #: include/classes/api/services/CReport.php:368
 msgid "If no user groups are specified, at least one user must be included in the mailing list."
@@ -12400,6 +12569,13 @@ msgstr "Interval i emmagatzematge"
 msgid "Invalid API method \"%2$s\" for user role \"%1$s\"."
 msgstr "El mètode \"%2$s\" de l'api no és pas vàlid per a la funció d'usuari \"%1$s\"."
 
+#: app/controllers/CControllerItemCreate.php:175
+#: app/controllers/CControllerItemPrototypeCreate.php:188
+#: app/controllers/CControllerItemPrototypeUpdate.php:176
+#: app/controllers/CControllerItemUpdate.php:175
+msgid "Invalid HTTP status code or range."
+msgstr "Codi o rang d'estat HTTP no vàlids."
+
 #: include/classes/api/services/CHostInterface.php:824
 #, c-format
 msgid "Invalid IP address \"%1$s\"."
@@ -12497,6 +12673,10 @@ msgstr "L'adreça electrònica \"%1$s\" no és vàlida."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adreça electrònica no vàlida per al tipus de suport amb l'identificador \"%1$s\"."
+
+#: app/controllers/CControllerPopupTriggerExprCheck.php:61
+msgid "Invalid function"
+msgstr "Funció no vàlida"
 
 #: app/controllers/CControllerHostGroupCreate.php:31
 #: app/controllers/CControllerHostGroupUpdate.php:34
@@ -12933,6 +13113,13 @@ msgstr "Camps d'inventari"
 msgid "Inventory mode"
 msgstr "Mode d'inventari"
 
+#: widgets/svggraph/includes/CWidgetFieldDataSetView.php:456
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:157
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:235
+#: widgets/svggraph/includes/CWidgetFieldOverrideView.php:236
+msgid "Invert values"
+msgstr "Valors invertits"
+
 #: include/classes/helpers/CRoleHelper.php:560
 msgid "Invoke \"Execute now\" on read-only hosts"
 msgstr "Invocar \"Executar ara\" sobre els equips de només lectura"
@@ -12974,6 +13161,11 @@ msgstr "Italià (it_IT)"
 #: widgets/tophosts/views/column.edit.php:120
 msgid "Item"
 msgstr "Element"
+
+#: app/controllers/CControllerPopupTriggerExpr.php:1472
+#, c-format
+msgid "Item \"%1$s\" cannot be used in trigger: unsupported data type."
+msgstr "L'element \"%1$s\" no es pot emprar a un trigger: tipus d'informació no admès."
 
 #: items.php:667
 msgid "Item added"
@@ -13381,6 +13573,10 @@ msgstr "Patró de grup LDAP"
 msgid "LDAP is not configured"
 msgstr "LDAP no és pas configurat"
 
+#: app/controllers/CControllerAuthenticationUpdate.php:34
+msgid "LDAP is not configured."
+msgstr "LDAP no és pas configurat."
+
 #: include/classes/api/services/CAuthentication.php:175
 msgid "LDAP must be enabled"
 msgstr "S'ha d'activar l'LDAP"
@@ -13767,6 +13963,10 @@ msgstr "Llistat de dades de configuració de grups de proxys Zabbix i dades en t
 msgid "List of block devices and their type. Returns JSON"
 msgstr "Llista de dispositius de bloc i el seu tipus. Retorna un JSON"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr "Llistat de caràcters"
@@ -13786,6 +13986,10 @@ msgstr "Llista de sistemes de fitxers muntats i els seus tipus. Retorna un JSON"
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "Llista de sistemes de fitxers muntats, els seus tipus, espai en disc i estadístiques d'inode. Retorna JSON"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -14533,6 +14737,13 @@ msgstr "El tipus de suport \"%1$s\" s'empra per l'acció \"%2$s\"."
 #: app/controllers/CControllerMediatypeCreate.php:187
 msgid "Media type added"
 msgstr "Afegit el tipus de suport"
+
+#: app/controllers/CControllerAuthenticationUpdate.php:104
+#: app/controllers/CControllerAuthenticationUpdate.php:175
+#: app/controllers/CControllerAuthenticationUpdate.php:296
+#: app/controllers/CControllerPopupLdapCheck.php:116
+msgid "Media type and attribute is not unique."
+msgstr "Atribut i tipus de suport no és pas únic."
 
 #: app/controllers/CControllerMediatypeDelete.php:61
 msgid "Media type deleted"
@@ -15312,6 +15523,22 @@ msgstr "Nom"
 msgid "Name ID"
 msgstr "ID del nom"
 
+#: app/controllers/CControllerMfaCheck.php:30
+#: app/controllers/CControllerPopupLdapCheck.php:30
+#: app/controllers/CControllerPopupUserGroupMappingCheck.php:30
+msgid "Name already exists."
+msgstr "El nom ja existeix."
+
+#: app/controllers/CControllerOauthCheck.php:36
+#: app/controllers/CControllerOauthCheck.php:44
+msgid "Name and value combination is not unique."
+msgstr "La combinació de nom i valor no és única."
+
+#: app/controllers/CControllerMediatypeCreate.php:193
+#: app/controllers/CControllerMediatypeUpdate.php:194
+msgid "Name is not unique."
+msgstr "El nom no és únic."
+
 #: app/views/js/webscenario.step.edit.js.php:286
 msgid "Name of the form field should not exceed 255 characters."
 msgstr "El nom del camp del formulari no ha de superar els 255 caràcters."
@@ -15792,6 +16019,11 @@ msgstr "No s'han afegit pas mapes."
 msgid "No matches found"
 msgstr "No s'han trobat pas coincidències"
 
+#: include/classes/validators/CFormValidator.php:2332 jsLoader.php:419
+#, c-format
+msgid "No more than %1$d items based on field \"%2$s\" rules"
+msgstr "No més de %1$d elements basats en les regles del camp \"%2$s\""
+
 #: app/controllers/CControllerModuleScan.php:130
 msgid "No new modules discovered"
 msgstr "No s'han descobert pas mòduls nous"
@@ -15850,6 +16082,10 @@ msgstr "No hi ha pas permís per accedir al sistema."
 #, c-format
 msgid "No permissions to call \"%1$s.%2$s\"."
 msgstr "No hi ha pas permís per trucar a \"%1$s.%2$s\"."
+
+#: include/classes/api/services/CConfiguration.php:337
+msgid "No permissions to import dashboards."
+msgstr "No hi ha permisos per importar taulers."
 
 #: include/classes/api/services/CConfiguration.php:312
 msgid "No permissions to import discovery rules."
@@ -16781,6 +17017,11 @@ msgstr "Obrir les instruccions d'instal·lació"
 msgid "Open log"
 msgstr "Obriu el registre"
 
+#: include/classes/validators/CSslCertificateValidator.php:28
+#: include/classes/validators/CSslPrivateKeyValidator.php:28
+msgid "OpenSSL extension is not available"
+msgstr "L'extensió OpenSSL no és pas disponible"
+
 #: include/classes/server/CZabbixServer.php:627
 msgid "OpenSSL extension is not available."
 msgstr "L'extensió OpenSSL no és pas disponible."
@@ -17563,6 +17804,12 @@ msgstr "Percentatge de proxys en línia. Retorna un flotant."
 #: include/classes/data/CItemData.php:2268
 msgid "Percentage of time that the virtual machine was ready, but could not get scheduled to run on the physical CPU, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - CPU instance"
 msgstr "Percentatge de temps que la màquina virtual era llesta, però no es va poder programar per executar-se a la CPU física, \"url\" - URL del servei de VMware, \"uuid\" - identificador únic global de la màquina virtual de VMware, \"instance\" - instància de CPU"
+
+#: include/classes/graph/CSvgGraph.php:1764
+#: include/classes/graphdraw/CLineGraphDraw.php:1620
+#, c-format
+msgid "Percentile %1$s: %2$s"
+msgstr "Percentil %1$s: %2$s"
 
 #: graphs.php:50 include/views/configuration.graph.edit.php:154
 #: widgets/svggraph/includes/WidgetForm.php:87
@@ -18547,6 +18794,14 @@ msgstr "Punt final de redirecció"
 #: app/views/popup.ldap.edit.php:172
 msgid "Reference attribute"
 msgstr "Atribut de referència"
+
+#: app/controllers/CControllerPopupImport.php:135
+msgid "References to missing objects were ignored:"
+msgstr "Shan ignorat les referències a objectes desapareguts:"
+
+#: app/controllers/CControllerPopupImportCompare.php:120
+msgid "References to missing objects will be ignored:"
+msgstr "S'ignoraran les referències a objectes desapareguts:"
 
 #: jsLoader.php:151
 msgid "Referred widget became unavailable. Please update configuration."
@@ -21431,6 +21686,10 @@ msgstr "Canvia la mida de l'espai en octets o en percentatge del total. Retorna 
 msgid "Swedish (sv_SE)"
 msgstr "Suec (sv_SE)"
 
+#: index_sso.php:367
+msgid "Switch SSO user"
+msgstr "Canviar usuari SSO"
+
 #: app/views/js/administration.authentication.edit.js.php:241
 msgid "Switching authentication method will reset all except this session! Continue?"
 msgstr "Si canvieu el mètode d'autenticació, es restablirà tot excepte aquesta sessió! Continuem?"
@@ -21592,6 +21851,11 @@ msgstr "Prioritat de visualització de l'etiqueta"
 #: app/views/connector.edit.php:71
 msgid "Tag filter"
 msgstr "Filtre d'etiquetes"
+
+#: app/controllers/CControllerConnectorCreate.php:120
+#: app/controllers/CControllerConnectorUpdate.php:121
+msgid "Tag filter name, operator and value combination is not unique."
+msgstr "La combinació de filtre de nom, operador i valor no és única."
 
 #: app/partials/trigger.edit.trigger.tab.php:253
 msgid "Tag for matching"
@@ -22065,6 +22329,10 @@ msgstr "L'identificador de client registrat al servidor d'autorització."
 msgid "The client secret registered within the authorization server."
 msgstr "El secret del client registrat dins del servidor d'autorització."
 
+#: app/views/oauth.edit.php:105
+msgid "The client secret was cleared due to a token endpoint change. Please enter the new client secret."
+msgstr "S'ha netejat el secret del client arran d'un canvi de punt final simbòlic. Si et plau, introdueix el nou secret del client."
+
 #: app/controllers/CControllerHostEdit.php:282
 msgid "The cloned host contains user defined macros with type \"Secret text\". The value and type of these macros were reset."
 msgstr "L'equip clonat conté macros definides per l'usuari amb el tipus \"Text secret\". El valor i el tipus d'aquestes macros es van restablir."
@@ -22340,6 +22608,11 @@ msgstr[1] "Aquest valor no pot ser un de %1$s."
 #, c-format
 msgid "This value cannot be one of %1$s."
 msgstr "Aquest valor no pot ser un de %1$s."
+
+#: include/classes/validators/CFormValidator.php:1143 jsLoader.php:427
+#, c-format
+msgid "This value cannot have more than %1$s decimal places."
+msgstr "Aquest valor no pot contindre més de %1$s decimals."
 
 #: include/classes/validators/CFormValidator.php:946 jsLoader.php:421
 msgid "This value does not match pattern."
@@ -23453,6 +23726,10 @@ msgstr "Desfer el reconeixement del problema."
 #: app/controllers/CControllerOauthAuthorize.php:146
 msgid "Unexpected HTTP response status code."
 msgstr "Codi d'estat de resposta HTTP inesperat."
+
+#: app/views/mediatype.edit.php:166
+msgid "Unexpected access token update time."
+msgstr "Temps d'actualització del token d'accés no esperat."
 
 #: app/controllers/CControllerHostWizardUpdateGeneral.php:119
 #, c-format
@@ -25302,6 +25579,10 @@ msgstr "La configuració del giny es revertirà."
 msgid "Widget is deprecated."
 msgstr "El giny és obsolet."
 
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr "El giny no s'ha configurat del tot"
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "El giny és massa petit per al nombre especificat de columnes i files."
@@ -25716,6 +25997,10 @@ msgstr "No podeu pas canviar les plantilles per a la selecció actual."
 #: include/classes/api/services/CToken.php:436
 msgid "You do not have permission to perform this operation."
 msgstr "No teniu pas permís per realitzar aquesta operació."
+
+#: index_sso.php:358
+msgid "You have been authorized via Single sign-on (SSO), but logging in to Zabbix failed."
+msgstr "Heu estat autoritzat mitjançant l'inici de sessió únic (SSO), però no s'ha pogut iniciar la sessió a Zabbix."
 
 #: include/classes/core/ZBase.php:759 include/func.inc.php:1686
 msgid "You have no permissions to access this page."
@@ -26633,6 +26918,11 @@ msgstr "no és permesa la dependència d'elements circulars"
 msgid "color"
 msgstr "color"
 
+#: include/classes/validators/CTimeRangesValidator.php:33
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:22
+msgid "comma separated list of time periods is expected"
+msgstr "s'espera períodes de temps com a llista d'elements separats per comes"
+
 #: app/controllers/CControllerSlaCreateUpdate.php:35
 msgid "comma separated list of time periods is expected for scheduled week days"
 msgstr "S'espera una llista de períodes de temps separats per comes per als dies de la setmana programats"
@@ -27135,6 +27425,11 @@ msgstr "seqüència d'octets no vàlida en UTF-8"
 msgid "invalid data type"
 msgstr "tipus de dades no vàlid"
 
+#: include/classes/validators/CAbsoluteTimeValidator.php:45
+#: include/classes/validators/CAbsoluteTimeValidator.php:53
+msgid "invalid date"
+msgstr "informació no vàlida"
+
 #: include/classes/graphdraw/CLineGraphDraw.php:140 include/items.inc.php:1805
 msgid "invalid delay"
 msgstr "endarreriment no vàlid"
@@ -27226,6 +27521,10 @@ msgstr "hora no vàlida"
 #: widgets/tophosts/actions/WidgetView.php:570
 msgid "invalid trend storage period"
 msgstr "període d'emmagatzematge de tendències no vàlid"
+
+#: widgets/svggraph/includes/CSvgGraphHelper.php:1119
+msgid "inverted"
+msgstr "invertit"
 
 #: app/views/popup.valuemap.edit.php:75 include/actions.inc.php:29
 msgid "is greater than or equals"
@@ -27827,6 +28126,11 @@ msgstr "patrons"
 msgid "percentile() - Percentile P of a period T"
 msgstr "percentil() - Percentil P d'un període T"
 
+#: include/classes/validators/CTimeRangesValidator.php:56
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:24
+msgid "periods must be unique"
+msgstr "els períodes han d'ésser únics"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:885
 msgid "pi() - Returns the Pi constant"
 msgstr "pi() - Retorna la constant Pi"
@@ -28046,6 +28350,11 @@ msgstr "skewness() - Mesura l'asimetria de la distribució de probabilitat"
 #: app/controllers/CControllerPopupTriggerExpr.php:1020
 msgid "sqrt() - Square root of a value"
 msgstr "sqrt() - Arrel quadrada d'un valor"
+
+#: include/classes/validators/CTimeRangesValidator.php:44
+#: tests/unit/include/classes/validators/CTimeRagesValidatorTest.php:23
+msgid "start time must be less than end time"
+msgstr "l'hora d'inici del servei ha d'ésser anterior a l'hora de fi"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1027
 msgid "stddevpop() - Population standard deviation"
@@ -28362,6 +28671,10 @@ msgstr "desconegut"
 msgid "unknown function \"%1$s\""
 msgstr "funció desconeguda \"%1$s\""
 
+#: include/classes/api/services/CMap.php:1999
+msgid "unsupported data type"
+msgstr "tipus de dades no admès"
+
 #: app/controllers/CControllerPopupItemTestSend.php:212
 msgid "unsupported time suffix"
 msgstr "sufix de temps no compatible"
@@ -28458,6 +28771,14 @@ msgstr "ja existeix el valor %1$s"
 msgid "value contains unescaped character at position %1$d"
 msgstr "El valor conté un caràcter sense escapar a la posició %1$d"
 
+#: include/classes/validators/CNumberValidator.php:74
+msgid "value is not a valid floating point number"
+msgstr "el valor no és un nombre decimal vàlid"
+
+#: include/classes/validators/CNumberValidator.php:77
+msgid "value is not a valid integer"
+msgstr "el valor no és un enter vàlid"
+
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
 #: include/classes/api/services/CItemGeneral.php:284
@@ -28534,6 +28855,11 @@ msgstr "el valor ha d'ésser entre \"%1$s\" i \"%2$s\""
 msgid "value must be between \"%1$s\" and \"%2$s\", and have no more than \"%3$s\" digits after the decimal point"
 msgstr "el valor ha de ser entre \"%1$s\" i \"%2$s\" i no tindre més de \"%3$s\" dígits després del punt decimal"
 
+#: include/classes/validators/CTimeUnitValidator.php:84
+#, c-format
+msgid "value must be between %1$s and %2$s"
+msgstr "el valor ha d'ésser entre %1$s i %2$s "
+
 #: include/classes/validators/CApiInputValidator.php:676
 msgid "value must be empty"
 msgstr "el valor ha d'ésser buit"
@@ -28550,6 +28876,16 @@ msgstr[1] "els valors han d'ésser buits o un d'entre %1$s"
 #, c-format
 msgid "value must be greater than \"%1$s\""
 msgstr "el valor ha d'ésser més gran de \"%1$s\""
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:59
+#, c-format
+msgid "value must be greater than or equal to %1$s"
+msgstr "el valor ha d'ésser més gran o igual que %1$s"
+
+#: include/classes/validators/CAbsoluteTimeValidator.php:64
+#, c-format
+msgid "value must be less than or equal to %1$s"
+msgstr "el valor ha d'ésser més petit o igual que %1$s"
 
 #: app/controllers/CControllerPopupItemTest.php:1342
 #: include/classes/validators/CNewValidator.php:220

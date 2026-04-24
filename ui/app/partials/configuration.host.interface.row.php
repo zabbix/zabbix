@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -185,19 +185,21 @@ $snmp_details = (new CDiv(
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_TYPE),
 		(new CDiv(
-			(new CTextBox('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}', false, DB::getFieldLength('interface', 'ip')))
+			(new CTextAreaFlexible('interfaces[#{iface.interfaceid}][ip]', '#{iface.ip}'))
 				->setErrorContainer('interface_#{iface.interfaceid}_error_container')
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_IP_WIDTH)
+				->setMaxlength(DB::getFieldLength('interface', 'ip'))
 				->setErrorLabel(_('IP address'))
 		))
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL_IP),
 		(new CDiv(
-			(new CTextBox('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}', false, DB::getFieldLength('interface', 'dns')))
+			(new CTextAreaFlexible('interfaces[#{iface.interfaceid}][dns]', '#{iface.dns}'))
 				->setErrorContainer('interface_#{iface.interfaceid}_error_container')
 				->addClass(ZBX_STYLE_HOST_INTERFACE_INPUT_EXPAND)
 				->setWidth(ZBX_TEXTAREA_INTERFACE_DNS_WIDTH)
+				->setMaxlength(DB::getFieldLength('interface', 'dns'))
 				->setErrorLabel(_('DNS name'))
 		))
 			->addClass(ZBX_STYLE_HOST_INTERFACE_CELL)

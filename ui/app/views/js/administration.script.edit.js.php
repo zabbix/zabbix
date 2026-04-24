@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -216,8 +216,8 @@ window.script_edit_popup = new class {
 		}
 
 		if (typeof fields.parameters !== 'undefined') {
-			fields.parameters.name = fields.parameters.name.map(name => name.trim());
-			fields.parameters.value = fields.parameters.value.map(value => value.trim());
+			fields.parameters.name = Object.values(fields.parameters.name).map(name => name.trim());
+			fields.parameters.value = Object.values(fields.parameters.value).map(value => value.trim());
 		}
 
 		const curl = new Curl('zabbix.php');
@@ -511,14 +511,8 @@ window.script_edit_popup = new class {
 		this.form.querySelector('label[for=dropdown_options]').style.display = is_input_type_string ? 'none' : '';
 		this.form.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
 
-		if (this.user_input_checked) {
-			document.querySelector(`label[for="${validator.name}"]`).classList
-				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}
-		else {
-			document.querySelector(`label[for="${validator.name}"]`).classList
-				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
-		}
+		document.querySelector(`label[for="${validator.name}"]`)
+			.classList.toggle(ZBX_STYLE_FIELD_LABEL_ASTERISK, this.user_input_checked);
 
 		const updateTestUserInput = () => test_user_input.disabled = !(
 			input_prompt.value.trim() !== '' && validator.value.trim() !== '' && this.user_input_checked

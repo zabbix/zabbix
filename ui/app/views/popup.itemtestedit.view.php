@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -69,10 +69,11 @@ $i = 0;
 foreach ($data['macros'] as $macro_name => $macro_value) {
 	$macros_table->addRow([
 		(new CCol(
-			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name, ['readonly' => true]))
+			(new CTextAreaFlexible('macro_rows['.$i.']', $macro_name))
 				->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
 				->removeId()
 				->removeAttribute('name')
+				->setReadonly()
 		))->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
 		(new CCol(RARR()))->addStyle('vertical-align: top;'),
 		(new CCol([

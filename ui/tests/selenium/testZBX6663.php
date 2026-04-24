@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -14,8 +14,6 @@
 **/
 
 require_once __DIR__.'/../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup profiles
@@ -203,12 +201,12 @@ class testZBX6663 extends CLegacyWebTest {
 			}
 		}
 
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('selected_count'));
+		$this->query('id:selected_count')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('0 selected');
 		$this->zbxTestCheckboxSelect("all_$checkbox");
 
 		$this->zbxTestClickLinkText($this->templated);
-		$this->zbxTestWaitUntilElementPresent(WebDriverBy::id('selected_count'));
+		$this->query('id:selected_count')->waitUntilPresent()->one();
 		$this->zbxTestTextPresent('0 selected');
 	}
 }

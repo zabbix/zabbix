@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -37,21 +37,21 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'parameter_1',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]|'.
-						'.//z-select[contains(@name, "params_0")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_params_0")]|.//input[contains(@id, "_params_0")]|'.
+						'.//div[contains(@id, "_params_0")]|.//z-select[contains(@name, "params_0")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_2',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "params_1")]|'.
-						'.//input[contains(@name, "params_1")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_params_1")]|.//input[contains(@id, "_params_1")]|'.
+						'.//z-select[contains(@name, "params_1")]|.//z-textarea-flexible[contains(@name, "params_1")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
 			[
 				'name'		=> 'parameter_3',
-				'selector'	=> 'xpath:.//input[contains(@id, "_params_2")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_params_2")]|.//input[contains(@id, "_params_2")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
@@ -69,7 +69,7 @@ class CPreprocessingBehavior extends CBehavior {
 			],
 			[
 				'name'		=> 'error_handler_params',
-				'selector'	=> 'xpath:.//input[contains(@id, "_error_handler_params")]',
+				'selector'	=> 'xpath:.//z-textarea-flexible[contains(@id, "_error_handler_params")]',
 				'value'		=> ['getValue']
 			],
 			[
@@ -205,7 +205,7 @@ class CPreprocessingBehavior extends CBehavior {
 				}
 
 				if (!$control['element']->isValid()) {
-					$this->fail('Field "'.$field['name'].'" is not present.');
+					$this->test->fail('Field "'.$field['name'].'" is not present.');
 				}
 
 				$value = call_user_func_array([$control['element'], $field['value'][0]],

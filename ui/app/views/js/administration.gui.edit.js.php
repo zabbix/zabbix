@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -19,56 +19,145 @@
  */
 ?>
 
-<script type="text/javascript">
-	$(document).ready(function() {
-		const $form = jQuery('#gui-form');
+<script>
+const view = new class {
+	init({rules, default_values}) {
+		this.form_element = document.getElementById('gui-form');
+		this.form = new CForm(this.form_element, rules);
+		this.rules = rules;
+		this.default_values = default_values;
 
-		$form.on('submit', () => {
-			$form.trimValues(['#work_period', '#history_period', '#period_default', '#max_period']);
-		});
+		this.#initEvents();
+	}
 
-		$("#resetDefaults").click(function() {
-			overlayDialogue({
-				title: <?= json_encode(_('Reset confirmation')) ?>,
-				content: $('<span>').text(<?= json_encode(_('Reset all fields to default values?')) ?>),
-				buttons: [
-					{
-						title: <?= json_encode(_('Cancel')) ?>,
-						cancel: true,
-						class: '<?= ZBX_STYLE_BTN_ALT ?>',
-						action: function() {}
-					},
-					{
-						title: <?= json_encode(_('Reset defaults')) ?>,
-						focused: true,
-						action: function() {
-							$('main')
-								.prev('.msg-bad')
-								.remove();
+	#initEvents() {
+		this.form_element.addEventListener('submit', (e) => this.#submit(e));
+		this.form_element.querySelector('.table-forms .tfoot-buttons .js-reset-defaults')
+			.addEventListener('click', (e) => this.#resetDefaults(e.target));
+	}
 
-							$('#default_lang').val("<?= CSettingsSchema::getDefault('default_lang') ?>");
-							$('#default_timezone').val("<?= CSettingsSchema::getDefault('default_timezone') ?>");
-							$('#default_theme').val("<?= CSettingsSchema::getDefault('default_theme') ?>");
-							$('#search_limit').val("<?= CSettingsSchema::getDefault('search_limit') ?>");
-							$('#max_overview_table_size').val("<?= CSettingsSchema::getDefault('max_overview_table_size') ?>");
-							$('#max_in_table').val("<?= CSettingsSchema::getDefault('max_in_table') ?>");
-							$('#server_check_interval').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('server_check_interval')) ?>
-							);
-							$('#work_period').val("<?= CSettingsSchema::getDefault('work_period') ?>");
-							$('#show_technical_errors').prop('checked',
-								<?= json_encode((bool) CSettingsSchema::getDefault('show_technical_errors')) ?>
-							);
-							$('#history_period').val("<?= CSettingsSchema::getDefault('history_period') ?>");
-							$('#period_default').val("<?= CSettingsSchema::getDefault('period_default') ?>");
-							$('#max_period').val("<?= CSettingsSchema::getDefault('max_period') ?>");
-						}
+	#resetDefaults(reset_button) {
+		overlayDialogue({
+			title: <?= json_encode(_('Reset confirmation')) ?>,
+			content: document.createElement('span').innerText = <?= json_encode(
+				_('Reset all fields to default values?')
+			) ?>,
+			buttons: [
+				{
+					title: <?= json_encode(_('Cancel')) ?>,
+					cancel: true,
+					class: '<?= ZBX_STYLE_BTN_ALT ?>',
+					action: () => {}
+				},
+				{
+					title: <?= json_encode(_('Reset defaults')) ?>,
+					focused: true,
+					action: () => {
+						clearMessages();
+
+						Object.entries(this.default_values).forEach(([key, value]) => {
+							const input = document.getElementById(key);
+							if (input) {
+								if (input.getAttribute('type') === 'checkbox') {
+									input.checked = value;
+								}
+								else {
+									input.value = value;
+								}
+							}
+						});
+
+						this.form.reload(this.rules);
 					}
-				]
-			}, {
-				position: Overlay.prototype.POSITION_CENTER,
-				trigger_element: this
-			});
+				}
+			]
+		}, {
+			position: Overlay.prototype.POSITION_CENTER,
+			trigger_element: reset_button
 		});
-	});
+	}
+
+	#submit(e) {
+		e.preventDefault();
+		this.#setLoadingStatus('js-submit');
+		clearMessages();
+		const fields = this.form.getAllValues();
+
+		this.form.validateSubmit(fields)
+			.then((result) => {
+				if (!result) {
+					this.#unsetLoadingStatus();
+					return;
+				}
+
+				const curl = new Curl('zabbix.php');
+				curl.setArgument('action', 'gui.update');
+
+				fetch(curl.getUrl(), {
+					method: 'POST',
+					headers: {'Content-Type': 'application/json'},
+					body: JSON.stringify(fields)
+				})
+					.then((response) => response.json())
+					.then((response) => {
+						if ('error' in response) {
+							throw {error: response.error};
+						}
+
+						if ('form_errors' in response) {
+							this.form.setErrors(response.form_errors, true, true);
+							this.form.renderErrors();
+							return;
+						}
+
+						if ('success' in response) {
+							postMessageOk(response.success.title);
+
+							if ('messages' in response.success) {
+								postMessageDetails('success', response.success.messages);
+							}
+
+							location.href = location.href;
+						}
+					})
+					.catch((exception) => this.#ajaxExceptionHandler(exception))
+					.finally(() => this.#unsetLoadingStatus());
+			});
+	}
+
+	#ajaxExceptionHandler(exception) {
+		let title, messages;
+
+		if (typeof exception === 'object' && 'error' in exception) {
+			title = exception.error.title;
+			messages = exception.error.messages;
+		}
+		else {
+			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
+		}
+
+		addMessage(makeMessageBox('bad', messages, title)[0]);
+	}
+
+	#setLoadingStatus(loading_btn_class) {
+		this.form_element.classList.add('is-loading', 'is-loading-fadein');
+
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.disabled = true;
+
+			if (button.classList.contains(loading_btn_class)) {
+				button.classList.add('is-loading');
+			}
+		});
+	}
+
+	#unsetLoadingStatus() {
+		this.form_element.querySelectorAll('.table-forms .tfoot-buttons button').forEach(button => {
+			button.classList.remove('is-loading');
+			button.disabled = false;
+		});
+
+		this.form_element.classList.remove('is-loading', 'is-loading-fadein');
+	}
+};
 </script>

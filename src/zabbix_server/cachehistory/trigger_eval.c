@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -222,8 +222,7 @@ static void	populate_function_items(const zbx_vector_uint64_t *functionids, zbx_
 		zbx_hashset_insert(ifuncs, &ifunc_local, sizeof(ifunc_local));
 	}
 
-	zbx_dc_config_clean_functions(functions, errcodes, functionids->values_num);
-
+	zbx_dc_config_clean_functions(functions, functionids->values_num);
 	zbx_free(errcodes);
 	zbx_free(functions);
 
@@ -300,6 +299,14 @@ static void	evaluate_item_functions(zbx_hashset_t *funcs, const zbx_vector_uint6
 			zbx_free(func->error);
 			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
 					func->parameter, "binary-type items are not supported in functions");
+			continue;
+		}
+
+		if (ITEM_VALUE_TYPE_JSON == item->value_type)
+		{
+			zbx_free(func->error);
+			func->error = zbx_eval_format_function_error(func->function, item->host.host, item->key_orig,
+					func->parameter, "json-type items are not supported in functions");
 			continue;
 		}
 
@@ -688,7 +695,7 @@ void	zbx_evaluate_expressions(zbx_vector_dc_trigger_t *triggers, const zbx_vecto
 
 	if (0 != items_num)
 	{
-		zbx_dc_config_clean_history_sync_items(items, items_err, (size_t)items_num);
+		zbx_dc_config_clean_history_sync_items(items, (size_t)items_num);
 		zbx_free(items);
 		zbx_free(items_err);
 	}

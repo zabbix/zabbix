@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -94,9 +94,8 @@ class testInheritanceGraph extends CLegacyWebTest {
 					'addItems' => [
 						['itemName' => 'testInheritanceItem1']
 					],
-					'error_msg' => 'Cannot add graph',
-					'errors'=> [
-						'Graph "testInheritanceGraph4" already exists on the template "Inheritance test template".'
+					'inline_errors' => [
+						'Name' => 'This object already exists.'
 					]
 				]
 			]
@@ -137,10 +136,9 @@ class testInheritanceGraph extends CLegacyWebTest {
 				break;
 
 			case TEST_BAD:
-				$this->assertMessage(TEST_BAD, $data['error_msg']);
 				$this->zbxTestCheckTitle('Graph edit');
 				$this->zbxTestTextNotPresent('Graph added');
-				$this->zbxTestTextPresent($data['errors']);
+				$this->assertInlineError($dialog->asForm(), $data['inline_errors']);
 				break;
 		}
 	}

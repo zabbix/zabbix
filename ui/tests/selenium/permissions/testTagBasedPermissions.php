@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -15,8 +15,6 @@
 
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * Test tag based permissions.
@@ -340,9 +338,7 @@ class testTagBasedPermissions extends CLegacyWebTest {
 						$this->query('link', $hostgroup)->waitUntilVisible()->one()->click();
 
 						if ($tag !== '' || $value !== '') {
-							$form->fill(['Filter' => 'Tag list', 'id:new_tag_filter_0_tag' => $tag,
-									'id:new_tag_filter_0_value' => $value]
-							);
+							$form->fill(['id:new_tag_filters_0_tag' => $tag, 'id:new_tag_filters_0_value' => $value]);
 						}
 
 						$form->submit();
@@ -351,11 +347,11 @@ class testTagBasedPermissions extends CLegacyWebTest {
 				}
 
 				$xpath = '//table[@id="tag-filter-table"]//tbody//tr['.$i.']//td/button[text()="Remove"]';
-				$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath($xpath));
+				$this->query('xpath:'.$xpath)->waitUntilVisible()->one();
 				$i++;
 			}
 
-			$this->zbxTestClick('update');
+			$this->zbxTestClickButtonText('Update');
 			$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'User group updated');
 		}
 

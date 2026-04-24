@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -104,6 +104,10 @@
 
 			const delete_btn = document.getElementById('delete');
 			delete_btn && delete_btn.addEventListener('click', () => this.#delete(delete_btn.getAttribute('data-redirect-url')));
+
+			document.querySelectorAll('z-select').forEach(zselect => {
+				zselect.setAttribute('width', zselect._listWidth());
+			});
 		}
 
 		#clone() {

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2450,7 +2450,7 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 	 * Close popup or dialog that is opened when clicking on element in broadcaster widget.
 	 */
 	protected function closeOpenedPopup() {
-		if ($this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->one(false)->isValid()) {
+		if ($this->query('xpath://div[contains(@class, "hintbox-static")]')->one(false)->isValid()) {
 			$this->query('class:btn-overlay-close')->all()->last()->click();
 		}
 
@@ -2556,10 +2556,10 @@ class testDashboardWidgetCommunication extends testWidgetCommunication {
 				case 'geomap':
 					foreach ($values as $icon_index => $popup_values) {
 						$listener->query('xpath:.//img[contains(@class,"leaflet-marker-icon")]['.$icon_index.']')
-								->one()->click();
-						$this->assertTableData([$popup_values], 'xpath://div[@class="overlay-dialogue wordbreak"]');
-						$this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->query('class:btn-overlay-close')
-								->one()->click();
+							->one()->click();
+						$this->assertTableData([$popup_values], 'xpath://div[contains(@class, "hintbox-static")]');
+						$this->query('xpath://div[contains(@class, "hintbox-static")]')->query('class:btn-overlay-close')
+							->one()->click();
 					}
 					break;
 

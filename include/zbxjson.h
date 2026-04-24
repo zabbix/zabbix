@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -329,7 +329,7 @@ const char	*zbx_json_strerror(void);
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
 void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len);
-void	zbx_json_clean(struct zbx_json *j);
+void	zbx_json_reset(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
@@ -423,7 +423,8 @@ void	zbx_jsonobj_clear(zbx_jsonobj_t *obj);
 int	zbx_jsonobj_query(const zbx_jsonobj_t *obj, const char *path, char **output);
 int	zbx_jsonobj_query_ext(const zbx_jsonobj_t *obj, zbx_jsonpath_index_t *index, const char *path, char **output);
 int	zbx_jsonobj_to_string(char **str, size_t *str_alloc, size_t *str_offset, const zbx_jsonobj_t *obj);
-zbx_jsonobj_t *zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
+zbx_jsonobj_t	*zbx_jsonobj_get_value(const zbx_jsonobj_t *obj, const char *name);
 void	zbx_jsonobj_remove_value(zbx_jsonobj_t *obj, const char *name);
+int	zbx_json_validate_ext(const char *start, char **error);
 
 #endif /* ZABBIX_ZJSON_H */

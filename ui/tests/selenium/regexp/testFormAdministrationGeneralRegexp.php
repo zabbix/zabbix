@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -16,8 +16,6 @@
 
 require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup regexps
@@ -51,9 +49,9 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestTextPresent('Name');
 		$this->zbxTestTextPresent('Expressions');
 		$this->zbxTestAssertElementPresentId('name');
-		$this->zbxTestAssertAttribute("//input[@id='name']", "maxlength", 128);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='name']", "maxlength", 128);
 
-		$this->zbxTestAssertAttribute("//input[@id='expressions_0_expression']", "maxlength", 255);
+		$this->zbxTestAssertAttribute("//z-textarea-flexible[@id='expressions_0_expression']", "maxlength", 255);
 
 		$this->zbxTestDropdownHasOptions('expressions_0_expression_type', [
 			'Character string included',
@@ -90,9 +88,13 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickButtonText('New regular expression');
 
-		$this->zbxTestInputType('name', $name);
-		$this->zbxTestInputType('expressions_0_expression', $expression);
-		$this->zbxTestDropdownSelect('expressions_0_expression_type', $expression_type);
+		$form = $this->query('id:regexp-form')->waitUntilVisible()->asForm()->one();
+		$form->fill([
+			'Name' => $name,
+			'id:expressions_0_expression' => $expression,
+			'id:expressions_0_expression_type' => $expression_type
+		]);
+
 		if ($case_sensitive == 1) {
 			$this->zbxTestCheckboxSelect('expressions_0_case_sensitive');
 		}
@@ -146,7 +148,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestClickLinkText($this->regexp);
 
 		$this->zbxTestTabSwitchById('tab_test', 'Test');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='green']"));
+		$this->query('xpath://table[@id="test-result-table"]//span[@class="green"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('TRUE');
 	}
 
@@ -159,7 +161,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->query('xpath://textarea[@id="test-string"][@disabled]')->waitUntilNotPresent();
 		$this->zbxTestInputType('test-string', 'abcdef');
 		$this->zbxTestClick('test-expression');
-		$this->zbxTestWaitUntilElementVisible(WebDriverBy::xpath("//table[@id='test-result-table']//span[@class='red']"));
+		$this->query('xpath://table[@id="test-result-table"]//span[@class="red"]')->waitUntilVisible()->one();
 		$this->zbxTestTextPresent('FALSE');
 	}
 
@@ -168,7 +170,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
 		$this->zbxTestClickWait('clone');
-		$this->zbxTestInputType('name', $this->regexp.'_clone');
+		$this->query('id:name')->one()->fill($this->regexp.'_clone');
 		$this->zbxTestClickWait('add');
 		$this->assertMessage(TEST_GOOD, 'Regular expression added');
 
@@ -180,7 +182,7 @@ class testFormAdministrationGeneralRegexp extends CLegacyWebTest {
 		$this->zbxTestLogin('zabbix.php?action=regex.list');
 		$this->zbxTestCheckHeader('Regular expressions');
 		$this->zbxTestClickLinkText($this->regexp);
-		$this->zbxTestInputTypeOverwrite('name', $this->regexp.'2');
+		$this->query('id:name')->one()->fill($this->regexp.'2');
 		$this->zbxTestClickWait('update');
 		$this->assertMessage(TEST_GOOD, 'Regular expression updated');
 

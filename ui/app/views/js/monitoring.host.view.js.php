@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -182,7 +182,24 @@
 			}
 		},
 
+		_refreshDebug(debug) {
+			const debug_output = document
+				.querySelector('.wrapper > main > .<?= ZBX_STYLE_DEBUG_OUTPUT_TABLE_REFRESH ?>');
+
+			if (debug_output) {
+				debug_output.classList.add('<?= ZBX_STYLE_DEBUG_OUTPUT ?>');
+				debug_output.innerHTML = new DOMParser().parseFromString(debug, 'text/html')
+					.querySelector('.<?= ZBX_STYLE_DEBUG_OUTPUT ?>').innerHTML;
+			}
+		},
+
 		refresh() {
+			if (isUserInteracting()) {
+				this.scheduleRefresh();
+
+				return;
+			}
+
 			this.setLoading();
 
 			const params = this.refresh_url.getArgumentsObject();
@@ -239,6 +256,10 @@
 
 			if ('messages' in response) {
 				this._addRefreshMessage(response.messages);
+			}
+
+			if ('debug' in response) {
+				this._refreshDebug(response.debug);
 			}
 		},
 

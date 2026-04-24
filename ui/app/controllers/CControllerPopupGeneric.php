@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1597,6 +1597,14 @@ class CControllerPopupGeneric extends CController {
 				}
 				elseif ($this->templateids) {
 					$options['templateids'] = $this->templateids;
+				}
+
+				$value_types = $this->hasInput('value_types')
+					? $this->getInput('value_types')
+					: ($this->hasInput('numeric') ? [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] : null);
+
+				if ($value_types !== null) {
+					$options['filter']['value_type'] = $value_types;
 				}
 
 				$records = !$this->template_preselect_required || $this->templateids

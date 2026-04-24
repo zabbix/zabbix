@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -322,6 +322,6 @@ ZBX_THREAD_ENTRY(zbx_vmware_thread, args)
 #else
 	ZBX_UNUSED(args);
 	THIS_SHOULD_NEVER_HAPPEN;
-	zbx_thread_exit(EXIT_SUCCESS);
+	zbx_exit(EXIT_SUCCESS);
 #endif
 }

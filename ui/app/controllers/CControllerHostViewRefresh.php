@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -60,7 +60,8 @@ class CControllerHostViewRefresh extends CControllerHostView {
 				'sort' => $filter['sort'],
 				'sortorder' => $filter['sortorder'],
 				'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
-				'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
+				'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS),
+				'user' => ['debug_mode' => $this->getDebugMode()]
 			] + $this->getData($filter);
 
 			$response = new CControllerResponseData($data);

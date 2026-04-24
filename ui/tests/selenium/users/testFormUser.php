@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -139,10 +139,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '50',
 						'URL (after login)' => ''
 					],
-					// TODO: xpath should be replaced after ZBX-23936 fix.
-					'disabled' => ['Username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
-						'xpath:.//button[@id="label-timezone"]/..', 'xpath:.//button[@id="label-theme"]/..'
-					],
+					'disabled' => ['Username', 'xpath:.//button[@id="label-lang"]/..', 'Time zone', 'xpath:.//button[@id="label-theme"]/..'],
 					'disabled_values' => [
 						'id:label-lang' => 'System default',
 						'id:label-timezone' => CDateTimeHelper::getTimeZoneFormat('System default'),
@@ -174,10 +171,10 @@ class testFormUser extends CWebTest {
 						'id:autologout_visible' => false,
 						'id:autologout' => '15m',
 						'Refresh' => '30s',
-						'Rows per page' => '100',
+						'Rows per page' => '150',
 						'URL (after login)' => ''
 					],
-					'disabled' => ['id:autologout', 'button:Delete'],
+					'disabled' => ['id:autologout'],
 					'enabled_buttons' => ['Update', 'Cancel', 'Select'],
 					'hintbox_warning' => [
 						'Language' => 'You are not able to choose some of the languages,'.
@@ -211,16 +208,21 @@ class testFormUser extends CWebTest {
 
 		// Check default values.
 		if ($user === 'Admin') {
-			foreach (['id:current_password', 'id:password1', 'id:password2'] as $field) {
-				$this->assertFalse($form->query($field)->one(false)->isValid());
-			}
+			$this->assertEquals(3, $this->query('id', ['current_password', 'password1', 'password2'])->all()
+					->filter(CElementFilter::NOT_VISIBLE)->count()
+			);
 
 			$form->query('button:Change password')->one()->click();
-			$form->waitUntilReloaded();
-			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
+			$this->assertTrue($form->query('button:Change password')->one()->isVisible(false));
 		}
 
 		$form->checkValue($data['default']);
+
+		if ($user === 'Admin' || $user === 'guest') {
+			$disabled_button = ($user === 'Admin') ? 'button:Delete' : 'button:Change password';
+			$this->assertTrue($form->query($disabled_button)->one()->isDisplayed());
+			$this->assertFalse($form->query($disabled_button)->one()->isEnabled());
+		}
 
 		foreach ($data['disabled'] as $locator) {
 			$field = $form->getField($locator);
@@ -271,8 +273,14 @@ class testFormUser extends CWebTest {
 				$this->assertTrue($form->getField('Current password')->isAttributePresent(['maxlength' => '255']));
 			}
 
+			// Activate inline validation error to be able to click on hintbox with one mouse click.
+			if ($data['default']['Username'] === '') {
+				$this->page->removeFocus();
+				$form->getField('Username')->waitUntilClassesPresent('has-error');
+			}
+
 			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->waitUntilReady();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->waitUntilReady();
 			$help_message = "Password requirements:\n".
 					"must be at least 8 characters long\n".
 					"must not contain user's name, surname or username\n".
@@ -289,7 +297,7 @@ class testFormUser extends CWebTest {
 		// Check hintbox contains correct text message.
 		foreach ($data['hintbox_warning'] as $field => $text) {
 			$form->getField($field)->query('xpath:./..//button[@data-hintbox]')->one()->waitUntilClickable()->click();
-			$hint = $this->query('xpath://div[@class="overlay-dialogue wordbreak"]')->asOverlayDialog()->waitUntilReady()->one();
+			$hint = $this->query('xpath://div[contains(@class, "hintbox-static")]')->asOverlayDialog()->waitUntilReady()->one();
 			$this->assertEquals($text, $hint->getText());
 			$hint->close();
 		}
@@ -367,7 +375,7 @@ class testFormUser extends CWebTest {
 			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
-			$this->assertTrue($form->getField('id:roleid')->isEnabled());
+			$this->assertTrue($form->getField('Role')->isEnabled());
 			$this->assertTrue($form->isRequired('Role'));
 		}
 
@@ -378,7 +386,7 @@ class testFormUser extends CWebTest {
 
 	public function getCreateData() {
 		return [
-			// Username is already taken by another user.
+			// #0 Username is already taken by another user.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -389,11 +397,12 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'test5678'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'User with username "Admin" already exists.'
+					'inline_errors' => [
+						'Username' => 'This object already exists.'
+					]
 				]
 			],
-			// Empty 'Username' field.
+			// #1 Empty 'Username' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -404,11 +413,12 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'zabbix'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "username": cannot be empty.'
+					'inline_errors' => [
+						'Username' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Space as 'Username' field value.
+			// #2 Space as 'Username' field value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -419,11 +429,12 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'test5678'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "username": cannot be empty.'
+					'inline_errors' => [
+						'Username' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Empty 'Role' field.
+			// #3 Empty 'Role' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -433,25 +444,24 @@ class testFormUser extends CWebTest {
 						'Password' => 'test5678',
 						'Password (once again)' => 'test5678'
 					],
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Field "roleid" is mandatory.'
+					'inline_errors' => [
+						'Role' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Empty mandatory fields
+			// #4 Empty mandatory fields
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Username' => ''
 					],
-					'error_title' => 'Cannot add user',
-					'error_details' => [
-						'Incorrect value for field "username": cannot be empty.',
-						'Field "roleid" is mandatory.'
+					'inline_errors' => [
+						'Username' => 'This field cannot be empty.'
 					]
 				]
 			],
-			// 'Password' fields not specified.
+			// #5 'Password' fields not specified.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -464,21 +474,22 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Incorrect value for field "Password": cannot be empty.'
 				]
 			],
-			// Empty 'Password (once again)' field.
+			// #6 Empty 'Password (once again)' field.
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Username' => 'Negative_Test3',
 						'Groups' => 'Zabbix administrators',
-						'Password' => 'test5678'
+						'Password' => 'test5678',
+						'Password (once again)' => ''
 					],
 					'role' => 'Super admin role',
 					'error_title' => 'Cannot add user',
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// Empty 'Password' field.
+			// #7 Empty 'Password' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -492,7 +503,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// 'Password' and 'Password (once again)' do not match.
+			// #8 'Password' and 'Password (once again)' do not match.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -507,7 +518,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// Empty 'Refresh' field.
+			// #9 Empty 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -519,11 +530,12 @@ class testFormUser extends CWebTest {
 						'Refresh' => ''
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
+					'inline_errors' => [
+						'Refresh' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// Digits in value of the 'Refresh' field.
+			// #10 Digits in value of the 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -535,11 +547,12 @@ class testFormUser extends CWebTest {
 						'Refresh' => '123abc'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+					'inline_errors' => [
+						'Refresh' => 'A time unit is expected.'
+					]
 				]
 			],
-			// Value of the 'Refresh' field too large.
+			// #11 Value of the 'Refresh' field too large.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -551,10 +564,12 @@ class testFormUser extends CWebTest {
 						'Refresh' => '3601'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -566,10 +581,12 @@ class testFormUser extends CWebTest {
 						'Refresh' => '2h'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -581,11 +598,12 @@ class testFormUser extends CWebTest {
 						'Refresh' => '61m'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
-			// Non-time unit value in 'Refresh' field.
+			// #14 Non-time unit value in 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -597,11 +615,12 @@ class testFormUser extends CWebTest {
 						'Refresh' => '00000000000001'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+					'inline_errors' => [
+						'Refresh' => 'A time unit is expected.'
+					]
 				]
 			],
-			// 'Rows per page' field equal to '0'.
+			// #15 'Rows per page' field equal to '0'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -613,11 +632,12 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '0'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
+					'inline_errors' => [
+						'Rows per page' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// Non-numeric value of 'Rows per page' field.
+			// #16 Non-numeric value of 'Rows per page' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -629,11 +649,12 @@ class testFormUser extends CWebTest {
 						'Rows per page' => 'abc123'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
+					'inline_errors' => [
+						'Rows per page' => 'This value must be no less than "1".'
+					]
 				]
 			],
-			// 'Autologout' below minimal value.
+			// #17 'Autologout' below minimal value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -648,10 +669,12 @@ class testFormUser extends CWebTest {
 						'value' => '89'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -666,11 +689,12 @@ class testFormUser extends CWebTest {
 						'value' => '1m'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
-			// 'Autologout' above maximal value.
+			// #19 'Autologout' above maximal value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -685,10 +709,12 @@ class testFormUser extends CWebTest {
 						'value' => '86401'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -703,10 +729,12 @@ class testFormUser extends CWebTest {
 						'value' => '1441m'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -721,11 +749,12 @@ class testFormUser extends CWebTest {
 						'value' => '25h'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
-			// 'Autologout' with a non-numeric value.
+			// #22 'Autologout' with a non-numeric value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -740,11 +769,12 @@ class testFormUser extends CWebTest {
 						'value' => 'ninety'
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+					'inline_errors' => [
+						'Auto-logout' => 'A time unit is expected.'
+					]
 				]
 			],
-			// 'Autologout' with an empty value.
+			// #23 'Autologout' with an empty value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -759,11 +789,12 @@ class testFormUser extends CWebTest {
 						'value' => ''
 					],
 					'role' => 'Super admin role',
-					'error_title' => 'Cannot add user',
-					'error_details' => 'Incorrect value for field "autologout": cannot be empty.'
+					'inline_errors' => [
+						'Auto-logout' => 'This field cannot be empty.'
+					]
 				]
 			],
-			// URL unacceptable.
+			// #24 URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -779,7 +810,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// Incorrect URL protocol.
+			// #25 Incorrect URL protocol.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -795,7 +826,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// Creating user by specifying only mandatory parameters.
+			// #26 Creating user by specifying only mandatory parameters.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -808,7 +839,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Guest role'
 				]
 			],
-			// Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
+			// #27 Creating a user with optional parameters specified (including autologout) using Cyrillic characters.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -829,7 +860,7 @@ class testFormUser extends CWebTest {
 					'check_form' => true
 				]
 			],
-			// Creating a user with punctuation symbols in password and optional parameters specified.
+			// #28 Creating a user with punctuation symbols in password and optional parameters specified.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -859,7 +890,7 @@ class testFormUser extends CWebTest {
 					'check_user' => true
 				]
 			],
-			// Creating user without a user group.
+			// #29 Creating user without a user group.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -871,7 +902,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Super admin role'
 				]
 			],
-			// Verification that field password is not mandatory for users with LDAP authentication.
+			// #30 Verification that field password is not mandatory for users with LDAP authentication.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -882,7 +913,7 @@ class testFormUser extends CWebTest {
 					'role' => 'Super admin role'
 				]
 			],
-			// Verification that field password is not mandatory for users with no access to frontend.
+			// #31 Verification that field password is not mandatory for users with no access to frontend.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -920,7 +951,13 @@ class testFormUser extends CWebTest {
 
 		// Verify that the user was created.
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
+			if (array_key_exists('error_title', $data)) {
+				$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
+			}
+			else {
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
+
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
@@ -1073,8 +1110,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => 'Admin'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'User with username "Admin" already exists.'
+					'inline_errors' => [
+						'Username' => 'This object already exists.'
+					]
 				]
 			],
 			// #5 Empty 'Username' field.
@@ -1084,8 +1122,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Username' => ''
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Incorrect value for field "username": cannot be empty.'
+					'inline_errors' => [
+						'Username' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #6 Empty 'Password (once again)' field.
@@ -1157,8 +1196,9 @@ class testFormUser extends CWebTest {
 						'Password (once again)' => 'test5678',
 						'Refresh' => ''
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
+					'inline_errors' => [
+						'Refresh' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #12 Digits in value of the 'Refresh' field.
@@ -1168,8 +1208,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '123abc'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+					'inline_errors' => [
+						'Refresh' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #13 Value of the 'Refresh' field too large.
@@ -1179,8 +1220,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '3601'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
 			// #14.
@@ -1190,8 +1232,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '61m'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
+					'inline_errors' => [
+						'Refresh' => 'Value must be between 0 and 3600s (1h).'
+					]
 				]
 			],
 			// #15 Non time unit value in 'Refresh' field.
@@ -1201,8 +1244,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Refresh' => '00000000000001'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
+					'inline_errors' => [
+						'Refresh' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #16 'Rows per page' field equal to '0'.
@@ -1212,8 +1256,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Rows per page' => '0'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
+					'inline_errors' => [
+						'Rows per page' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			// #17 Non-numeric value of 'Rows per page' field.
@@ -1223,8 +1268,9 @@ class testFormUser extends CWebTest {
 					'fields' => [
 						'Rows per page' => 'abc123'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
+					'inline_errors' => [
+						'Rows per page' => 'This value must be no less than "1".'
+					]
 				]
 			],
 			// #18 'Autologout' below minimal value.
@@ -1236,8 +1282,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '89'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
 			// #19 'Autologout' above maximal value.
@@ -1249,8 +1296,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '86401'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
 			// #20.
@@ -1262,8 +1310,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1m'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
 			// #21.
@@ -1275,8 +1324,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '1441m'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
 			// #22.
@@ -1288,8 +1338,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => '25h'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
+					'inline_errors' => [
+						'Auto-logout' => 'Value must be between 90s (1m 30s) and 86400s (1d).'
+					]
 				]
 			],
 			// #23 'Autologout' with a non-numeric value.
@@ -1301,8 +1352,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => 'ninety'
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Invalid parameter "/1/autologout": a time unit is expected.'
+					'inline_errors' => [
+						'Auto-logout' => 'A time unit is expected.'
+					]
 				]
 			],
 			// #24 'Autologout' with an empty value.
@@ -1314,8 +1366,9 @@ class testFormUser extends CWebTest {
 						'checked' => true,
 						'value' => ''
 					],
-					'error_title' => 'Cannot update user',
-					'error_details' => 'Incorrect value for field "autologout": cannot be empty.'
+					'inline_errors' => [
+						'Auto-logout' => 'This field cannot be empty.'
+					]
 				]
 			],
 			// #25 URL unacceptable.
@@ -1483,7 +1536,13 @@ class testFormUser extends CWebTest {
 
 		// Verify if the user was updated.
 		if ($data['expected'] === TEST_BAD) {
-			$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
+			if (array_key_exists('error_title', $data)) {
+				$this->assertMessage(TEST_BAD, $data['error_title'], $data['error_details']);
+			}
+			else {
+				$this->assertInlineError($form, $data['inline_errors']);
+			}
+
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 		}
 		else {
@@ -1571,6 +1630,13 @@ class testFormUser extends CWebTest {
 				$this->page->getAlertText()
 		);
 		$this->page->acceptAlert();
+
+		if ($update_user === 'Admin') {
+			$this->query('button:Sign in')->waitUntilVisible();
+		}
+		else {
+			$this->assertMessage(TEST_GOOD, 'User updated');
+		}
 
 		try {
 			$this->page->logout();

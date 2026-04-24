@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -1117,7 +1117,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 	 * @throws APIException
 	 */
 	protected static function checkFilterFormula(array $objects, string $path = '/'): void {
-		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser = new CConditionFormulaParser();
 
 		foreach ($objects as $i => $object) {
 			if (!array_key_exists('filter', $object)
@@ -1127,7 +1127,7 @@ abstract class CDiscoveryRuleGeneral extends CItemGeneral {
 
 			$condition_formula_parser->parse($object['filter']['formula']);
 
-			$constants = array_unique(array_column($condition_formula_parser->constants, 'value'));
+			$constants = array_unique(array_column($condition_formula_parser->getConstants(), 'value'));
 			$subpath = ($path === '/' ? $path : $path.'/').($i + 1).'/filter';
 
 			$condition_formulaids = array_column($object['filter']['conditions'], 'formulaid');

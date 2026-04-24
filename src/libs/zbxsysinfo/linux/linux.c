@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -30,6 +30,7 @@ static zbx_metric_t	parameters_specific[] =
 	{"vfs.dev.read",		CF_HAVEPARAMS,	vfs_dev_read,		"sda,operations"},
 	{"vfs.dev.write",		CF_HAVEPARAMS,	vfs_dev_write,		"sda,operations"},
 	{"vfs.dev.discovery",		0,		vfs_dev_discovery,	NULL},
+	{"vfs.dev.get",			CF_HAVEPARAMS,	vfs_dev_get,		"disks,sda"},
 
 	{"net.tcp.listen",		CF_HAVEPARAMS,	net_tcp_listen,		"80"},
 	{"net.udp.listen",		CF_HAVEPARAMS,	net_udp_listen,		"68"},
@@ -42,6 +43,7 @@ static zbx_metric_t	parameters_specific[] =
 	{"net.if.total",		CF_HAVEPARAMS,	net_if_total,		"lo,bytes"},
 	{"net.if.collisions",		CF_HAVEPARAMS,	net_if_collisions,	"lo"},
 	{"net.if.discovery",		0,		net_if_discovery,	NULL},
+	{"net.if.get",			CF_HAVEPARAMS,	net_if_get,		NULL},
 
 	{"vm.memory.size",		CF_HAVEPARAMS,	vm_memory_size,		"total"},
 
