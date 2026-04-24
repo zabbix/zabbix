@@ -2285,39 +2285,41 @@ button {
   .datatable.is-loading::before {
     z-index: 20;
     background-color: rgba(255, 255, 255, 0.5); }
-  .datatable.compact-view .cell.cell-data {
+  .datatable.compact-view .datatable-body .cell.cell-data {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial;
     padding: 2px 8px; }
-    .datatable.compact-view .cell.cell-data .cell-inner {
-      padding: 0; }
-    .datatable.compact-view .cell.cell-data .symptoms {
+    .datatable.compact-view .datatable-body .cell.cell-data .symptoms {
       height: calc(var(--datatable-compact-row-height) - 4px); }
-      .datatable.compact-view .cell.cell-data .symptoms .btn-icon {
+      .datatable.compact-view .datatable-body .cell.cell-data .symptoms .btn-icon {
         height: calc(var(--datatable-compact-row-height) - 6px); }
-    .datatable.compact-view .cell.cell-data .table-stats {
+    .datatable.compact-view .datatable-body .cell.cell-data .table-stats {
       position: absolute;
       right: 0;
       padding: 0; }
+    .datatable.compact-view .datatable-body .cell.cell-data .cell-inner {
+      min-height: auto;
+      padding: 0; }
+      .datatable.compact-view .datatable-body .cell.cell-data .cell-inner .tags-wrapper {
+        flex-wrap: nowrap; }
   .datatable.compact-view .datatable-body .row-spacer {
     height: calc(var(--datatable-compact-row-height) + 1px);
     min-height: initial; }
-  .datatable.compact-view .cell.cell-data .cell-inner .tags-wrapper {
-    flex-wrap: nowrap; }
-  .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data a.link-action {
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled) .cell.cell-data a.link-action {
     color: #1f2c33; }
-  .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data a:hover {
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled) .cell.cell-data a:hover {
     color: #0275b8; }
-  .datatable.has-highlighted-rows .rows .row:not(.row-disabled) .cell.cell-data .btn-icon {
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .btn-icon,
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .icon {
     background-color: #ffffff; }
-  .datatable.has-highlighted-rows .rows .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data a:not(.link-action) {
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data a:not(.link-action) {
     color: #0275b8; }
-  .datatable.has-highlighted-rows .rows .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data:not(.cell-bg) {
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):hover .cell.cell-data:not(.cell-bg) {
     background-color: #e8f5ff;
     border-bottom-color: #dfe4e7; }
-  .datatable.has-highlighted-rows .rows .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data {
+  .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data {
     color: #1f2c33; }
-    .datatable.has-highlighted-rows .rows .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data a {
+    .datatable.has-highlighted-rows .datatable-body .row:not(.row-disabled):not(.row-selected):not(:hover) .cell.cell-data a {
       color: #1f2c33; }
   .datatable .hidden {
     display: none !important; }
@@ -2456,7 +2458,7 @@ button {
         background-color: #e8f5ff; }
       .datatable .datatable-body .row:not(.row-disabled):hover .row-spacer {
         background-color: #e8f5ff; }
-      .datatable .datatable-body .row.nested:not(.row-selected) .cell.cell-data:not(.cell-bg) {
+      .datatable .datatable-body .row.nested:not(.row-selected) .cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
         background-color: #f2f2f2; }
       .datatable .datatable-body .row.nested.nested-small {
         font-size: 11px; }
@@ -2646,6 +2648,9 @@ button {
           text-overflow: initial; }
         .datatable .cell.cell-data .cell-inner .problem-icon-link {
           vertical-align: middle; }
+      .datatable .cell.cell-data.cell-checkbox .cell-inner {
+        display: flex;
+        align-items: center; }
       .datatable .cell.cell-data .btn-icon {
         min-width: 18px;
         height: 18px; }
@@ -2657,11 +2662,13 @@ button {
         gap: 3px;
         height: var(--datatable-row-height); }
         .datatable .cell.cell-data .symptoms .symptoms-left {
-          min-width: 28px;
+          min-width: 17px;
           max-width: 3ch;
+          height: 16px;
           text-align: center; }
         .datatable .cell.cell-data .symptoms .symptoms-right {
-          width: 18px; }
+          width: 18px;
+          height: 16px; }
       .datatable .cell.cell-data .timeline-date,
       .datatable .cell.cell-data .timeline-axis,
       .datatable .cell.cell-data .timeline-td {

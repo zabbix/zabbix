@@ -17,41 +17,44 @@
 	}
 
 	&.compact-view {
-		.cell.cell-data {
-			height: calc(var(--datatable-compact-row-height) + 1px);
-			min-height: initial;
-			padding: 2px 8px;
+		.datatable-body {
+			.cell.cell-data {
+				height: calc(var(--datatable-compact-row-height) + 1px);
+				min-height: initial;
+				padding: 2px 8px;
 
-			.cell-inner {
-				padding: 0;
-			}
+				.symptoms {
+					height: calc(var(--datatable-compact-row-height) - 4px);
 
-			.symptoms {
-				height: calc(var(--datatable-compact-row-height) - 4px);
+					.btn-icon {
+						height: calc(var(--datatable-compact-row-height) - 6px);
+					}
+				}
 
-				.btn-icon {
-					height: calc(var(--datatable-compact-row-height) - 6px);
+				.table-stats {
+					position: absolute;
+					right: 0;
+					padding: 0;
+				}
+
+				.cell-inner {
+					min-height: auto;
+					padding: 0;
+
+					.tags-wrapper {
+						flex-wrap: nowrap;
+					}
 				}
 			}
 
-			.table-stats {
-				position: absolute;
-				right: 0;
-				padding: 0;
+			.row-spacer {
+				height: calc(var(--datatable-compact-row-height) + 1px);
+				min-height: initial;
 			}
-		}
-
-		.datatable-body .row-spacer {
-			height: calc(var(--datatable-compact-row-height) + 1px);
-			min-height: initial;
-		}
-
-		.cell.cell-data .cell-inner .tags-wrapper {
-			flex-wrap: nowrap;
 		}
 	}
 
-	&.has-highlighted-rows .rows .row:not(.row-disabled) {
+	&.has-highlighted-rows .datatable-body .row:not(.row-disabled) {
 		.cell.cell-data {
 			a.link-action {
 				color: $font-color;
@@ -60,13 +63,16 @@
 			a:hover {
 				color: $btn-alt-color;
 			}
-
-			.btn-icon {
-				background-color: $ui-bg-color;
-			}
 		}
 
 		&:not(.row-selected) {
+			&:not(:hover) {
+				.btn-icon,
+				.icon {
+					background-color: $ui-bg-color;
+				}
+			}
+
 			&:hover .cell.cell-data {
 				a:not(.link-action) {
 					color: $btn-alt-color;
@@ -295,7 +301,7 @@
 			}
 
 			&.nested {
-				&:not(.row-selected) .cell.cell-data:not(.cell-bg) {
+				&:not(.row-selected) .cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
 					background-color: darken($ui-bg-color, 5%);
 				}
 
@@ -597,6 +603,11 @@
 				}
 			}
 
+			&.cell-checkbox .cell-inner {
+				display: flex;
+				align-items: center;
+			}
+
 			.btn-icon {
 				min-width: 18px;
 				height: 18px;
@@ -611,13 +622,15 @@
 				height: var(--datatable-row-height);
 
 				.symptoms-left {
-					min-width: 28px;
+					min-width: 17px;
 					max-width: 3ch;
+					height: 16px;
 					text-align: center;
 				}
 
 				.symptoms-right {
 					width: 18px;
+					height: 16px;
 				}
 			}
 

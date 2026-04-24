@@ -1798,7 +1798,7 @@ class CDataTable {
 				continue;
 			}
 
-			const cell_data = this.#collectColumnData(column, data_fields, row_data);
+			const cell_data = this.collectColumnData(column, data_fields, row_data);
 			const data_cells = column.getDataCells();
 			const data_cell = data_cells[row_index];
 
@@ -2169,7 +2169,7 @@ class CDataTable {
 		});
 	}
 
-	#collectColumnData(column, data_fields, row_data) {
+	collectColumnData(column, data_fields, row_data) {
 		const column_fields = column.isDuplicate()
 			? this.getColumnById(column.getId()).getFields()
 			: column.getFields();
@@ -2414,7 +2414,7 @@ class CDataTable {
 				}
 
 				const row = data_cell.target.closest(`.${CDataTable.ZBX_STYLE_ROW}`);
-				const cell_data = this.#collectColumnData(column, data_fields, row_data);
+				const cell_data = this.collectColumnData(column, data_fields, row_data);
 
 				this.renderDataCellContents(column, row, row_index, data_cell, data_fields, cell_data, response);
 			}

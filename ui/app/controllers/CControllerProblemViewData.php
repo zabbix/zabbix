@@ -17,7 +17,8 @@
 class CControllerProblemViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['eventid', 'data_actions', 'time', 'eventid', 'objectid', 'severity',
-		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'tags'];
+		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'nested',
+		'symptom_count', 'cause_eventid', 'tags'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
@@ -107,6 +108,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 				if ($breakpoint != null) {
 					$rows[] = [['renderer' => 'breakpoint', 'raw_data' => true], [$breakpoint]];
 				}
+
+				$data['last_clock'] = $problem['clock'];
 			}
 
 			$clock = $problem['clock'];
@@ -212,28 +215,30 @@ class CControllerProblemViewData extends CControllerDataTable {
 			$problem['host'] = $data['triggers_hosts'][$trigger['triggerid']];
 
 			$opdata = null;
-			if ($trigger['opdata'] === '') {
-				$opdata = (new CDiv(
-					CScreenProblem::getLatestValues($trigger['items'])
-				))->addClass('latest-values');
-			}
-			else {
-				$opdata = (new CSpan(CMacrosResolverHelper::resolveTriggerOpdata(
-					[
-						'triggerid' => $trigger['triggerid'],
-						'expression' => $trigger['expression'],
-						'opdata' => $trigger['opdata'],
-						'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
-						'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
-					],
-					[
-						'events' => true,
-						'html' => true
-					]
-				)))->addClass('opdata');
+
+			if (array_key_exists('opdata', $trigger)) {
+				if ($trigger['opdata'] === '') {
+					$opdata = (new CDiv(
+						CScreenProblem::getLatestValues($trigger['items'])
+					))->addClass('latest-values');
+				} else {
+					$opdata = (new CSpan(CMacrosResolverHelper::resolveTriggerOpdata(
+						[
+							'triggerid' => $trigger['triggerid'],
+							'expression' => $trigger['expression'],
+							'opdata' => $trigger['opdata'],
+							'clock' => ($problem['r_eventid'] != 0) ? $problem['r_clock'] : $problem['clock'],
+							'ns' => ($problem['r_eventid'] != 0) ? $problem['r_ns'] : $problem['ns']
+						],
+						[
+							'events' => true,
+							'html' => true
+						]
+					)))->addClass('opdata');
+				}
 			}
 
-			$problem['opdata'] = $opdata->toString(false);
+			$problem['opdata'] = $opdata?->toString(false);
 
 			$description = array_key_exists($trigger['triggerid'], $data['dependencies'])
 				? makeTriggerDependencies($data['dependencies'][$trigger['triggerid']])
@@ -250,7 +255,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 					'show_rank_change_symptom' => true
 				]));
 
-			if ($trigger['opdata'] != '' && !$options['compact_view'] && $options['show_opdata'] == 1) {
+			if (array_key_exists('opdata', $trigger) && $trigger['opdata'] != '' && !$options['compact_view']
+					&& $options['show_opdata'] == 1) {
 				$description[] = ' (';
 				$description[] = $opdata;
 				$description[] = ')';

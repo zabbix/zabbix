@@ -212,6 +212,20 @@
 					const show_symptoms = filter.show_symptoms == 1;
 					const {show_two_columns, show_three_columns} = response;
 
+					if (!column.isResized()) {
+						column.setResized(true);
+
+						if (show_three_columns) {
+							column.setWidth('78px');
+						}
+						else if (show_two_columns) {
+							column.setWidth('72px');
+						}
+						else {
+							column.setWidth('37px');
+						}
+					}
+
 					if (show_two_columns || show_three_columns) {
 						const symptoms = document.createElement('div');
 						symptoms.classList.add('symptoms');
@@ -456,26 +470,10 @@
 					cell.classList.add(CDataTable.ZBX_STYLE_CELL_STICKY);
 					cell_inner.appendChild(paging_container);
 				})
-				.setRowRenderer('default', ({columns, row, row_index, data_fields, row_data, response}) => {
-					const {show_two_columns, show_three_columns} = response;
-					const column = this.#datatable.getCheckboxColumn();
-
-					if (show_three_columns) {
-						column.setWidth('93px');
-					}
-					else if (show_two_columns) {
-						column.setWidth('72px');
-					}
-					else {
-						column.setWidth('37px');
-					}
-
-					this.#datatable.renderDataCells({columns, row, row_index, data_fields, row_data, response});
-				})
 				.setRowRenderer('nested_symptom', ({columns, row, row_index, data_fields, row_data, response}) => {
 					const column = this.#datatable.getCheckboxColumn();
-					const column_index = column.getColumnIndex();
-					const [, , , cause_eventid, severity] = row_data[column_index];
+					const cell_data = this.#datatable.collectColumnData(column, column.getFields(), row_data);
+					const [, , , cause_eventid, severity] = cell_data;
 
 					row.classList.add('nested', 'nested-small', 'hidden');
 					row.setAttribute('data-cause-eventid', cause_eventid);
@@ -487,14 +485,17 @@
 
 						if (highlight_row.checked) {
 							const severity_data = severities.find(data => data.value == severity);
+							if (!severity_data) {
+								return;
+							}
 
-							if (severity_data) {
-								this.#datatable
-									.findDataCells({row_index})
-									.forEach(data_cell => {
-										data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG,
-											severity_data.style);
-									});
+							for (const data_cell of this.#datatable.findDataCells({row_index})) {
+								data_cell.target.classList.add(CDataTable.ZBX_STYLE_CELL_BG_HOVER, severity_data.style);
+							}
+
+							const row_spacer = this.#datatable.findRowSpacer(row);
+							if (row_spacer) {
+								row_spacer.classList.add(severity_data.style);
 							}
 						}
 					});
@@ -730,9 +731,8 @@
 			// Prevent multiple clicking by first disabling button.
 			btn.disabled = true;
 
-			const table = this.#datatable.getElement();
-			let rows = table.querySelectorAll(
-				`.${CDataTable.ZBX_STYLE_ROW}[data-cause-eventid="${btn.dataset.eventid}"]`);
+			const rows = this.#datatable.getElement()
+				.querySelectorAll(`.${CDataTable.ZBX_STYLE_ROW}[data-cause-eventid="${btn.dataset.eventid}"]`);
 
 			// Show symptom rows for the current cause.
 			if (rows[0].classList.contains('hidden')) {
