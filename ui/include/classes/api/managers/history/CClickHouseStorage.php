@@ -809,25 +809,20 @@ class CClickHouseStorage {
 	 * @param mixed $options['sortorder']  Sorting order, required.
 	 */
 	private function addQuerySortOptions(array $sql_parts, array $options): array {
-		$sortorder = (array) ($options['sortorder'] ?? ZBX_SORT_UP);
+		$sortorder = $options['sortorder'];
 		$sortfield = (array) $options['sortfield'];
 
 		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$options['history']]);
+		$fields = array_diff($fields, ['clock_ns', 'value_str']);
 		$fields[] = 'clock';
 		foreach ($sortfield as $i => $field) {
 			if (!in_array($field, $fields)) {
 				continue;
 			}
 
-			if ($field === 'clock' || $field === 'ns') {
-				$field = 'clock_ns';
-			}
-
-			$sql_parts['order'][$field] = $field.' '.(
-				array_key_exists($i, $sortorder) && $sortorder[$i] === ZBX_SORT_DOWN
-					? ZBX_SORT_DOWN
-					: ZBX_SORT_UP
-			);
+			$field = $field === 'clock' ? 'clock_ns' : $field;
+			$order = is_array($sortorder) ? ($sortorder[$i] ?? ZBX_SORT_UP) : $sortorder;
+			$sql_parts['order'][$field] = $field.' '.($order === ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP);
 		}
 
 		return $sql_parts;

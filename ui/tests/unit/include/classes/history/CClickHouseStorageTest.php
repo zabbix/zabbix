@@ -358,4 +358,124 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	public function testAddQueryOutputOptions(Closure $method, array $sql_parts, array $options, $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
+
+	public static function dataProviderAddQuerySortOptions() {
+		$closure = Closure::bind(
+			fn($sql_parts, $options) => $this->addQuerySortOptions($sql_parts, $options),
+			new CClickHouseStorage([
+				'url' => '',
+				'types' => [],
+				'db' => '',
+				'username' => '',
+				'password' => ''
+			], []),
+			CClickHouseStorage::class
+		);
+		$defaults = [
+			'history' => null,
+			'sortfield' => null,
+			'sortorder' => null
+		];
+
+		yield 'Unknown field is ignored' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'sortfield' => 'severity'
+			] + $defaults,
+			[]
+		];
+
+		yield 'Sorting by value_str or ns is not allowed' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'sortfield' => ['value_str', 'ns']
+			] + $defaults,
+			[]
+		];
+
+		yield 'Default sort is ZBX_SORT_UP' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'sortfield' => 'severity'
+			] + $defaults,
+			[
+				'order' => ['severity' => 'severity '.ZBX_SORT_UP]
+			]
+		];
+
+		yield 'Field with it own sort' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'sortfield' => ['severity', 'itemid'],
+				'sortorder' => [ZBX_SORT_DOWN, ZBX_SORT_DOWN]
+			] + $defaults,
+			[
+				'order' => [
+					'severity' => 'severity '.ZBX_SORT_DOWN,
+					'itemid' => 'itemid '.ZBX_SORT_DOWN
+				]
+			]
+		];
+
+		yield 'Without own sort default ZBX_SORT_UP is set' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'sortfield' => ['severity', 'itemid'],
+				'sortorder' => [ZBX_SORT_DOWN]
+			] + $defaults,
+			[
+				'order' => [
+					'severity' => 'severity '.ZBX_SORT_DOWN,
+					'itemid' => 'itemid '.ZBX_SORT_UP
+				]
+			]
+		];
+
+		yield 'String value sortorder is applied to all fields' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'sortfield' => ['severity', 'itemid'],
+				'sortorder' => ZBX_SORT_DOWN
+			] + $defaults,
+			[
+				'order' => [
+					'severity' => 'severity '.ZBX_SORT_DOWN,
+					'itemid' => 'itemid '.ZBX_SORT_DOWN
+				]
+			]
+		];
+
+		yield 'Sorting by clock produces clock_ns sorting' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'sortfield' => ['clock'],
+				'sortorder' => ZBX_SORT_DOWN
+			] + $defaults,
+			[
+				'order' => ['clock_ns' => 'clock_ns '.ZBX_SORT_DOWN]
+			]
+		];
+	}
+
+	/**
+	 * @covers CClickHouseStorage::addQuerySortOptions
+	 * @dataProvider dataProviderAddQuerySortOptions
+	 */
+	public function testAddQuerySortOptions(Closure $method, array $sql_parts, array $options, $expected) {
+		$this->assertSame($expected, $method($sql_parts, $options));
+	}
 }
