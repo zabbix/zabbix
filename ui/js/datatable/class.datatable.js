@@ -1122,23 +1122,19 @@ class CDataTable {
 
 		this.#options_popup_updated = true;
 
-		this.updateUserConfig()
-			.getData()
-			.then(response => {
-				this.dispatchEvent(CDataTable.EVENT_RENDER, {response});
-				this.dispatchEvent(CDataTable.EVENT_SAVE);
+		this.updateUserConfig();
 
-				requestAnimationFrame(() => {
-					const header_cell = column.getHeaderCell();
-					if (header_cell === null) {
-						return;
-					}
+		this.dispatchEvent(CDataTable.EVENT_INIT, {reset: true});
+		this.dispatchEvent(CDataTable.EVENT_SAVE);
 
-					this.#scrollBodyToTarget(header_cell.target);
+		requestAnimationFrame(() => {
+			const header_cell = column.getHeaderCell();
+			if (header_cell === null) {
+				return;
+			}
 
-					this.#options_popup?.position();
-				});
-			});
+			this.#scrollBodyToTarget(header_cell.target);
+		});
 	}
 
 	onColumnsSort(e) {
@@ -2155,8 +2151,10 @@ class CDataTable {
 
 		this.#pager.update(response);
 
-		setTimeout(() => {
-			this.#options_popup?.position();
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				this.#options_popup?.position();
+			});
 
 			this.initCheckBoxRange();
 
@@ -2777,15 +2775,14 @@ class CDataTable {
 
 		const header_resizer = header_cell.target.querySelector(`.${CDataTable.ZBX_STYLE_CELL_HEADER_RESIZER}`);
 		const element_rect = this.#element.getBoundingClientRect();
-		const table_options_button_rect = table_options_button.getBoundingClientRect();
 
 		const right_edge = header_cell.target.getBoundingClientRect().right - element_rect.left;
-		const right_boundary = element_rect.width - table_options_button_rect.width;
+		const right_boundary = element_rect.width - table_options_button.clientWidth;
 		const right_offset = right_edge > right_boundary || this.#element.scrollWidth > element_rect.width
-			? Math.min(table_options_button_rect.width, right_edge - right_boundary)
+			? Math.min(table_options_button.clientWidth, right_edge - right_boundary)
 			: 0;
 
-		header_cell.target.style.paddingRight = `${right_offset + 1}px`;
+		header_cell.target.style.paddingRight = `${right_offset}px`;
 
 		if (header_resizer) {
 			header_resizer.style.marginRight = `${right_offset}px`;
