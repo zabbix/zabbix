@@ -1138,6 +1138,7 @@ class CIntegrationTest extends CAPITest {
 
 		$count_params = array_merge($params, ['countOutput' => true]);
 		$exception = null;
+		$usleep_total = 0;
 		$start = microtime(true);
 		for ($i = 0; $i < $iterations; $i++) {
 			try {
@@ -1153,6 +1154,13 @@ class CIntegrationTest extends CAPITest {
 				}
 			} catch (Exception $e) {
 				$exception = $e;
+			}
+
+			if ($usleep_total < 1000000 && $iterations > 1) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$i = -1;
+				continue;
 			}
 
 			sleep($delay);
