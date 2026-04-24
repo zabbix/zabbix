@@ -34,8 +34,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	const LLD_DISCOVERY_COUNT = 10000;
 
 	private static $hostid;
-	private static $lld_ruleid;
-	private static $item_prototypeids = [];
 	private static $discovered_itemids = [];
 	private static $discovered_triggerids = [];
 	private static $total_expected;
@@ -83,13 +81,13 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertArrayHasKey(0, $response['result']['itemids']);
-		self::$lld_ruleid = $response['result']['itemids'][0];
+		$lld_ruleid = $response['result']['itemids'][0];
 
 		// Create one item prototype per value type.
 		foreach (self::prototypeDefs() as $def) {
 			$response = $this->call('itemprototype.create', [
 				'hostid' => self::$hostid,
-				'ruleid' => self::$lld_ruleid,
+				'ruleid' => $lld_ruleid,
 				'name' => 'Sensor '.$def['suffix'].' ['.self::LLD_MACRO.']',
 				'key_' => self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.']',
 				'type' => ITEM_TYPE_TRAPPER,
@@ -97,7 +95,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			]);
 			$this->assertArrayHasKey('itemids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['itemids']);
-			self::$item_prototypeids[$def['value_type']] = $response['result']['itemids'][0];
 		}
 
 		return true;
