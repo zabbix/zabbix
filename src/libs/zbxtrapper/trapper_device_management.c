@@ -188,14 +188,14 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing data object in device.init request");
 		*error = zbx_strdup(NULL, "Failed to process device.init request");
-		goto out;
+		goto out2;
 	}
 
 	if (FAIL == zbx_json_value_by_name(&jp_body, "uuid", device_id, sizeof(device_id), NULL))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "missing uuid in device.init request");
 		*error = zbx_strdup(NULL, "Failed to process device.init request");
-		goto out;
+		goto out2;
 	}
 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_SERVER_ID);
@@ -205,7 +205,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed initialize cURL library");
 		*error = zbx_strdup(NULL, "Failed to process device.init request");
-		goto out;
+		goto out2;
 	}
 
 	if (SUCCEED != zbx_http_prepare_callbacks(curl, &response_header, &body, zbx_curl_ignore_cb,
@@ -214,7 +214,7 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 		zabbix_log(LOG_LEVEL_WARNING, "cannot prepare HTTP callbacks: %s",
 				ZBX_NULL2EMPTY_STR(error_curl));
 		*error = zbx_strdup(NULL, "Failed to process device.init request");
-		goto out;
+		goto out2;
 	}
 
 	headers = curl_slist_append(headers, "Content-Type: application/json");
