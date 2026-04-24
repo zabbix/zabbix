@@ -58,10 +58,17 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	public function prepareData() {
 		$this->call('settings.update', ['auditlog_enabled' => 0]);
 
+		$response = $this->call('hostgroup.get', [
+			'filter' => ['name' => ['Zabbix servers']],
+			'output' => ['groupid']
+		]);
+		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found.');
+		$groupid = $response['result'][0]['groupid'];
+
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME,
 			'interfaces' => [],
-			'groups' => [['groupid' => 4]],
+			'groups' => [['groupid' => $groupid]],
 			'status' => HOST_STATUS_MONITORED
 		]);
 		$this->assertArrayHasKey('hostids', $response['result']);
