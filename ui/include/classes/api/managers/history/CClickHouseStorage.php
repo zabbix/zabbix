@@ -471,7 +471,7 @@ class CClickHouseStorage {
 				'SELECT itemid,value,toUnixTimestamp(ts) AS clock'.
 				' FROM ('.
 					'SELECT itemid,'.
-						match($function) {
+						match ($function) {
 							AGGREGATE_MIN	=> 'min(value) AS value,max(clock_ns) AS ts',
 							AGGREGATE_MAX	=> 'max(value) AS value,max(clock_ns) AS ts',
 							AGGREGATE_AVG	=> 'avg(value) AS value,max(clock_ns) AS ts',
@@ -516,13 +516,12 @@ class CClickHouseStorage {
 	 * into bracketed lists (e.g. "[1,2]" or "['a','b']").
 	 * Invalid or empty values are skipped.
 	 *
-	 * @param array $param  Array of typed parameters.
-	 * @return array
+	 * @param array $params  Array of typed parameters.
 	 */
-	private function getEncodedParamMap(array $param): array {
+	private function getEncodedParamMap(array $params): array {
 		$form_values = [];
 
-		foreach ($param as $column_type => $columns_values) {
+		foreach ($params as $column_type => $columns_values) {
 			foreach ($columns_values as $column => $value) {
 				$form_value = null;
 
@@ -531,36 +530,35 @@ class CClickHouseStorage {
 					case 'Int64':
 						if (is_array($value)) {
 							$value = array_filter($value,
-								fn($v) => is_int($v) || preg_match('/^(\-|\+){0,1}\d+$/', $v)
+								fn($v) => is_int($v) || preg_match('/^\-{0,1}\d+$/', strval($v))
 							);
 							$form_value = '['.implode(',', $value).']';
 						}
-						elseif (is_int($value) || preg_match('/^(\-|\+){0,1}\d+$/', $value)) {
+						elseif (is_int($value) || preg_match('/^\-{0,1}\d+$/', strval($value))) {
 							$form_value = $value;
 						}
-
 						break;
 
 					case 'UInt64':
 						if (is_array($value)) {
-							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit($v));
+							$value = array_filter($value, fn($v) => is_int($v) || ctype_digit(strval($v)));
 							$form_value = '['.implode(',', $value).']';
 						}
-						elseif (is_int($value) || ctype_digit($value)) {
+						elseif (is_int($value) || ctype_digit((string) $value)) {
 							$form_value = $value;
 						}
-
 						break;
+
 					case 'String':
 						if (is_array($value)) {
 							$value = array_map(
 								fn($v) => '\''.addcslashes($v, '\\\'').'\'',
-								$value
+								array_filter($value, 'is_string')
 							);
 							$form_value = '['.implode(',', $value).']';
 						}
-						else {
-							$form_value = $value;
+						elseif (is_string($value)) {
+							$form_value = '\''.addcslashes($value, '\\\'').'\'';
 						}
 						break;
 				}
@@ -569,7 +567,7 @@ class CClickHouseStorage {
 					continue;
 				}
 
-				$form_values[$column] = $form_value;
+				$form_values[$column] = is_array($form_value) ? array_map('strval', $form_value) : (string) $form_value;
 			}
 		}
 
@@ -769,7 +767,8 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
-	 * @param int   $options['history']  Item value type, required.
+	 * @param int   $options['history']       Item value type, required.
+	 * @param ?int  $options['maxValueSize']  Value max length, required.
 	 */
 	private function addQueryOutputOptions(array $sql_parts, array $options): array {
 		$value = 'value';
@@ -777,12 +776,11 @@ class CClickHouseStorage {
 		if ($options['maxValueSize'] !== null) {
 			$max_length = (int) $options['maxValueSize'];
 			$value = match ($options['history']) {
-				ITEM_VALUE_TYPE_FLOAT,
-				ITEM_VALUE_TYPE_UINT64 => 'value',
 				ITEM_VALUE_TYPE_STR,
 				ITEM_VALUE_TYPE_LOG,
 				ITEM_VALUE_TYPE_TEXT => 'substringUTF8(value,1,'.$max_length.')',
-				ITEM_VALUE_TYPE_JSON => 'substringUTF8(value_str!=\'\'?value_str:toString(value),1,'.$max_length.')'
+				ITEM_VALUE_TYPE_JSON => 'substringUTF8(value_str!=\'\'?value_str:toString(value),1,'.$max_length.')',
+				default => 'value'
 			};
 		}
 
@@ -852,7 +850,7 @@ class CClickHouseStorage {
 			$condition = is_array($options['filter'][$field])
 				? ' IN {filter_'.$field.':Array('.$param_type.')}'
 				: '={filter_'.$field.':'.$param_type.'}';
-			$filter[$field] = match($field) {
+			$filter[$field] = match ($field) {
 				'clock' => 'toUnixTimestamp(clock_ns)'.$condition,
 				'ns' => 'toUnixTimestamp64Nano(clock_ns)%1000000000'.$condition,
 				default => $field.$condition
