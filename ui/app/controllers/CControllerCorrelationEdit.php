@@ -16,21 +16,17 @@
 
 class CControllerCorrelationEdit extends CController {
 
-	/**
-	 * @var mixed
-	 */
-	private $correlation = [];
+	private array $correlation = [];
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->disableCsrfValidation();
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'correlationid' => 'db correlation.correlationid'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'correlationid' => ['db correlation.correlationid']
+		]]);
 
 		if (!$ret) {
 			$this->setResponse(
@@ -64,64 +60,117 @@ class CControllerCorrelationEdit extends CController {
 			}
 
 			$this->correlation = $correlations[0];
-
-			$op_types = array_column($this->correlation['operations'], 'type', 'type');
-			$this->correlation['op_close_old'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_OLD, $op_types);
-			$this->correlation['op_close_new'] = array_key_exists(ZBX_CORR_OPERATION_CLOSE_NEW, $op_types);
-			$this->correlation += $this->correlation['filter'];
-			unset($this->correlation['filter']);
 		}
 
 		return true;
 	}
 
 	protected function doAction(): void {
-		$data = $this->correlation + DB::getDefaults('correlation') + [
-			'correlationid' => null,
-			'op_close_new' => false,
-			'op_close_old' => false,
-			'conditions' => []
+		if (!$this->correlation) {
+			$correlation = [
+				'correlationid' => null,
+				'name' => DB::getDefault('correlation', 'name'),
+				'filter' => [
+					'evaltype' => DB::getDefault('correlation', 'evaltype'),
+					'formula' => DB::getDefault('correlation', 'formula'),
+					'conditions' => []
+				],
+				'operations' => [],
+				'description' => DB::getDefault('correlation', 'description'),
+				'status' => DB::getDefault('correlation', 'status')
+			];
+		}
+		else {
+			$correlation = [
+				'correlationid' => $this->correlation['correlationid'],
+				'name' => $this->correlation['name'],
+				'filter' => [
+					'evaltype' => $this->correlation['filter']['evaltype'],
+					'formula' => $this->correlation['filter']['formula'],
+					'conditions' =>	$this->prepareConditions($this->correlation['filter']['conditions'])
+				],
+				'operations' => $this->correlation['operations'],
+				'description' => $this->correlation['description'],
+				'status' => $this->correlation['status']
+			];
+		}
+
+		$js_validation_rules = $correlation['correlationid']
+			? CControllerCorrelationUpdate::getValidationRules()
+			: CControllerCorrelationCreate::getValidationRules();
+
+		$data = [
+			'correlation' => $correlation,
+			'js_validation_rules' => (new CFormValidator($js_validation_rules))->getRules(),
+			'js_clone_validation_rules' => (new CFormValidator(CControllerCorrelationCreate::getValidationRules()))
+				->getRules(),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		];
 
-		foreach ($data['conditions'] as &$condition) {
-			$condition += [
-				'operator' => array_key_exists('operator', $condition)
-					? (int) $condition['operator']
-					: CONDITION_OPERATOR_EQUAL,
-				'conditiontype' => (int) $condition['type']
+
+		$response = new CControllerResponseData($data);
+		$response->setTitle(_('Event correlation rules'));
+		$this->setResponse($response);
+	}
+
+	protected function prepareConditions(array $conditions): array {
+		$result = [];
+		$hostgroup_names = $this->fetchHostGroupNames($conditions);
+
+		foreach ($conditions as $condition) {
+			$type = (int) $condition['type'];
+
+			$template_data = [
+				'type' => $condition['type'],
+				'formulaid' => $condition['formulaid']
 			];
-			$condition['operator_name'] = CCorrelationHelper::getLabelByOperator($condition['operator']);
 
-			unset($condition['type']);
+			$result[] = $template_data + match ($type) {
+				ZBX_CORR_CONDITION_OLD_EVENT_TAG,
+				ZBX_CORR_CONDITION_NEW_EVENT_TAG => [
+					'tag' => $condition['tag']
+				],
+				ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP => [
+					'groupid' => $condition['groupid'],
+					'group_name' => $hostgroup_names[$condition['groupid']],
+					'operator' => $condition['operator'],
+					'operator_name' => CCorrelationHelper::getLabelByOperator($condition['operator'])
+				],
+				ZBX_CORR_CONDITION_EVENT_TAG_PAIR => [
+					'oldtag' => $condition['oldtag'],
+					'newtag' => $condition['newtag']
+				],
+				ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE,
+				ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE => [
+					'tag' => $condition['tag'],
+					'value' => $condition['value'],
+					'operator' => $condition['operator'],
+					'operator_name' => CCorrelationHelper::getLabelByOperator($condition['operator'])
+				]
+			};
 		}
-		unset($condition);
 
-		$groupids = array_column($data['conditions'], 'groupid', 'groupid');
+		return $result;
+	}
+
+	/**
+	 * @param array $conditions
+	 *
+	 * @return array<string, string>  Host group names keyed by group ID.
+	 */
+	protected function fetchHostGroupNames(array $conditions): array {
+		$groupids = array_column($conditions, 'groupid', 'groupid');
 		$group_names = [];
 
 		if ($groupids) {
 			$groups = API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => array_keys($groupids),
-				'preservekeys' => true
+				'groupids' => array_keys($groupids)
 			]);
 
 			$group_names = array_column($groups, 'name', 'groupid');
 		}
 
-		foreach ($data['conditions'] as &$condition) {
-			if (array_key_exists('groupid', $condition)
-					&& array_key_exists($condition['groupid'], $group_names)) {
-				$condition['groupid'] = [$condition['groupid'] => $group_names[$condition['groupid']]];
-			}
-		}
-		unset($condition);
-
-		$data['conditions'] = array_values($data['conditions']);
-		$data['user'] = ['debug_mode' => $this->getDebugMode()];
-
-		$response = new CControllerResponseData($data);
-		$response->setTitle(_('Event correlation rules'));
-		$this->setResponse($response);
+		return $group_names;
 	}
 }

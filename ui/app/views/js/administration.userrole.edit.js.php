@@ -410,7 +410,7 @@
 			}
 		}
 
-		#ajaxExceptionHandler (exception) {
+		#ajaxExceptionHandler(exception) {
 			let title, messages;
 
 			if (typeof exception === 'object' && 'error' in exception) {

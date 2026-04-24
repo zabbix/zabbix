@@ -20,7 +20,6 @@ require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 define('LONG_KEY', substr(STRING_6000, 0, 2038).'[{#MACRO}]');
 
-use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
 
 /**

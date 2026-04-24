@@ -78,6 +78,7 @@ window.maintenance_edit = new class {
 
 			// Update form field state according to the form data.
 			document.getElementById('maintenance_type').addEventListener('change', () => this.#update());
+			this.form.findFieldByName('timeperiods').setButtonOnBlur('js-add', 'maintenance-timeperiod-edit');
 		}
 
 		this.#update();
@@ -167,10 +168,6 @@ window.maintenance_edit = new class {
 				this.#addTimePeriod(e.detail);
 			}
 		});
-
-		overlay.$dialogue[0].addEventListener('dialogue.close', () =>
-			this.form.validateChanges(['timeperiods'])
-		);
 	}
 
 	#addTimePeriod(timeperiod) {
