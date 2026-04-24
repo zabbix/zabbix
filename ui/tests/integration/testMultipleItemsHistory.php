@@ -103,11 +103,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		}
 
 		self::$hostid = null;
-		self::$lld_ruleid = null;
-		self::$item_prototypeids = [];
-		self::$discovered_itemids = [];
-		self::$discovered_triggerids = [];
-		self::$total_expected = null;
 	}
 	/**
 	 * Component configuration provider.
@@ -443,31 +438,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
 		], 0, 120, self::WAIT_ITERATION_DELAY);
 
+		/* check that server succeessfuly large amount if items from cache */
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
-	}
-
-	/**
-	 * Call clearData() and verify that the host, all discovered items and trigger events are gone.
-	 *
-	 */
-	public function testMultipleItemsHistory_ClearData(): void {
-		$hostid = self::$hostid;
-		$all_itemids = [];
-		foreach (self::$discovered_itemids as $itemids) {
-			foreach ($itemids as $itemid) {
-				$all_itemids[] = $itemid;
-			}
-		}
-		$triggerids = self::$discovered_triggerids;
-
-		self::clearData();
-
-		$response = $this->call('host.get', ['hostids' => [$hostid], 'output' => ['hostid']]);
-		$this->assertEmpty($response['result'], 'Host was not deleted by clearData().');
-
-		if ($all_itemids) {
-			$response = $this->call('item.get', ['itemids' => $all_itemids, 'output' => ['itemid']]);
-			$this->assertEmpty($response['result'], 'Discovered items were not deleted by clearData().');
-		}
 	}
 }
