@@ -37,6 +37,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $discovered_itemids = [];
 	private static $discovered_triggerids = [];
 	private static $total_expected;
+	private static $total_trigger_expected;
 	private static $tm_past;
 	private static $tm_now;
 
@@ -46,7 +47,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			['suffix' => 'uint', 'value_type' => ITEM_VALUE_TYPE_UINT64],
 			['suffix' => 'str', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['suffix' => 'text', 'value_type' => ITEM_VALUE_TYPE_TEXT],
-			['suffix' => 'log', 'value_type' => ITEM_VALUE_TYPE_LOG]
+			['suffix' => 'log', 'value_type' => ITEM_VALUE_TYPE_LOG],
+			['suffix' => 'json', 'value_type' => ITEM_VALUE_TYPE_JSON]
 		];
 	}
 
@@ -136,6 +138,8 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		$proto_defs = self::prototypeDefs();
 		self::$total_expected = self::LLD_DISCOVERY_COUNT * count($proto_defs);
+		$trigger_defs = array_filter($proto_defs, fn($d) => $d['value_type'] !== ITEM_VALUE_TYPE_JSON);
+		self::$total_trigger_expected = self::LLD_DISCOVERY_COUNT * count($trigger_defs);
 
 		// Wait until all items for all prototypes are created.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -207,6 +211,10 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_TriggerDiscovery() {
 		foreach (self::prototypeDefs() as $def) {
+			if ($def['value_type'] === ITEM_VALUE_TYPE_JSON) {
+				continue;
+			}
+
 			$response = $this->call('triggerprototype.create', [
 				'description' => 'Sensor '.$def['suffix'].' alert ['.self::LLD_MACRO.']',
 				'expression' => 'last(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.'])>0'
@@ -217,16 +225,16 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 		$this->sendDiscoveryData();
 
-		// Wait until a trigger instance is created for every discovered sensor and type.
+		// Wait until a trigger instance is created for every discovered sensor and non-JSON type.
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'description', 'status']
 		], 120, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::$total_expected;
+			return count($r['result']) === self::$total_trigger_expected;
 		});
 
-		$this->assertCount(self::$total_expected, $response['result'],
-			'Not all '.self::$total_expected.' discovered triggers were created.');
+		$this->assertCount(self::$total_trigger_expected, $response['result'],
+			'Not all '.self::$total_trigger_expected.' discovered triggers were created.');
 
 		foreach ($response['result'] as $trigger) {
 			$this->assertEquals(TRIGGER_STATUS_ENABLED, $trigger['status']);
@@ -247,7 +255,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			if (count($r['result']) !== self::$total_expected) {
+			if (count($r['result']) !== self::$total_trigger_expected) {
 				return false;
 			}
 			foreach ($r['result'] as $trigger) {
@@ -266,9 +274,9 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'objectids' => self::$discovered_triggerids,
 			'source' => EVENT_SOURCE_TRIGGERS,
 			'output' => ['eventid'],
-			'limit' => self::$total_expected
+			'limit' => self::$total_trigger_expected
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::$total_expected;
+			return count($r['result']) === self::$total_trigger_expected;
 		});
 	}
 
