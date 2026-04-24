@@ -148,7 +148,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		});
 
 		$this->assertCount($total_expected, $response['result'],
-			'Not all '.$total_expected.' discovered items were created.');
+			'Expected '.$total_expected.' discovered items, got '.count($response['result']).'.');
 
 		foreach ($response['result'] as $item) {
 			$vtype = (int) $item['value_type'];
