@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2026-04-11 06:27+0000\n"
+"PO-Revision-Date: 2026-04-19 05:28+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -25086,7 +25086,7 @@ msgstr "El giny és obsolet."
 
 #: jsLoader.php:253
 msgid "Widget is not fully configured"
-msgstr ""
+msgstr "El giny no s'ha configurat del tot"
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
