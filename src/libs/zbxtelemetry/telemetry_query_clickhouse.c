@@ -17,23 +17,17 @@
 #include "zbxcommon.h"
 #include "zbxtypes.h"
 
-static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, struct zbx_json *j)
+static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, struct zbx_json *j,
+		int row_id)
 {
 	int		ret = FAIL;
 	const char	*p = NULL;
 	char		buf[MAX_STRING_LEN];
-	zbx_uint32_t	row_id;
 	zbx_uint64_t	timestamp;
 
 	zbx_json_addobject(j, NULL);
 
 	/* row id */
-	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)) || SUCCEED != zbx_is_uint32(buf, &row_id))
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "cannot parse row id from row \"%s\"", jp->start);
-		goto out;
-	}
-
 	zbx_json_adduint64(j, "id", row_id);
 
 	/* skip rounded time */
@@ -113,6 +107,7 @@ int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char
 	int		ret = SUCCEED;
 	struct zbx_json	j;
 	char		*start = resp;
+	int		row_count = 0;
 
 	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
 
@@ -128,7 +123,8 @@ int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char
 		if (NULL != (end = strchr(start, '\n')))
 			*end = '\0';
 
-		if (SUCCEED != zbx_json_open(start, &jp) || SUCCEED != tq_clickhouse_parse_row(query, &jp, &j))
+		if (SUCCEED != zbx_json_open(start, &jp) ||
+				SUCCEED != tq_clickhouse_parse_row(query, &jp, &j, ++row_count))
 			ret = FAIL;
 
 		if (NULL == end) {
