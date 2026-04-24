@@ -1715,9 +1715,13 @@ class CDataTable {
 
 	/**
 	 * @param {Object|undefined} user_config
+	 *
+	 * @returns {CDataTable}
 	 */
 	updateUserConfig(user_config = undefined) {
 		this.#user_configs[this.#tabfilter_item._index] = user_config || this.getConfig();
+
+		return this;
 	}
 
 	/**

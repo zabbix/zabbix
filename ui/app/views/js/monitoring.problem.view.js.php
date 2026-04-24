@@ -91,6 +91,8 @@
 				filter.to = this.#global_timerange.to;
 			}
 
+			const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
+
 			this.#datatable = new CDataTable(document.getElementById('problems'), data_provider)
 				.setColumns([
 					new CDataTableColumn('time', <?= json_encode(_('Time')); ?>)
@@ -107,9 +109,15 @@
 						.setRenderer('severity')
 						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
-						.setFields(['recovery']),
+						.setFields(['recovery'])
+						.setShowInTableOptions(show_columns)
+						.setTogglable(show_columns)
+						.setVisible(show_columns),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
-						.setFields(['status']),
+						.setFields(['status'])
+						.setShowInTableOptions(show_columns)
+						.setTogglable(show_columns)
+						.setVisible(show_columns),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info']),
 					new CDataTableColumn('host', <?= json_encode(_('Host')); ?>)
@@ -781,7 +789,18 @@
 				filter.to = this.#global_timerange.to;
 			}
 
-			this.#datatable.setFilter(filter)
+			const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
+
+			for (const column_name of ['recovery', 'status']) {
+				const column = this.#datatable.getColumnById(column_name);
+
+				column.setShowInTableOptions(show_columns)
+					.setTogglable(show_columns)
+					.setVisible(show_columns);
+			}
+
+			this.#datatable.updateUserConfig()
+				.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
