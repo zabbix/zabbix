@@ -124,21 +124,26 @@
 					background-color: $ui-hover-bg-color;
 				}
 
-				.checkbox-radio {
-					display: none;
+				label {
+					display: flex;
 
-					& + label span {
-						margin-top: -1px;
-						vertical-align: middle;
+					.checkbox-radio {
+						display: none;
+
+						& + label span {
+							margin-top: -1px;
+							vertical-align: middle;
+						}
 					}
-				}
 
-				.datatable-options-list-item-label {
-					@extend %overflow-ellipsis;
-					display: inline-block;
-					width: 140px;
-					vertical-align: middle;
-					cursor: pointer;
+					.datatable-options-list-item-label {
+						@extend %overflow-ellipsis;
+						display: inline-block;
+						flex-grow: 1;
+						max-width: 140px;
+						vertical-align: middle;
+						cursor: pointer;
+					}
 				}
 			}
 
