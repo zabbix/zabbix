@@ -206,6 +206,12 @@ class CDatatableElement extends CTableElement {
 	 * @return CTableRow|CNullElement
 	 */
 	public function findRow($column, $value, $contains = false) {
+		try {
+			$this->getColumnNames();
+		}
+		catch (StaleElementReferenceException $exception) {
+			$this->invalidate();
+		}
 		$headers = $this->getColumnNames();
 
 		if (is_string($column)) {

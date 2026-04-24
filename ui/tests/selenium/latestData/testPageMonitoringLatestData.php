@@ -576,20 +576,6 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
 
-		// Set the Tags header filter.
-		$table = $this->getDatatable()->waitUntilReady();
-		$tag_number = CTestArrayHelper::get($data, 'header_filter.Tags.Number of tags', 3);
-		$tag_display = CTestArrayHelper::get($data, 'header_filter.Tags.Tag name display', 'Full');
-		$tag_priority = CTestArrayHelper::get($data, 'header_filter.Tags.Tag display priority', '');
-		$this->filterFromHeader([
-			'Tags' => [
-				'Number of tags' => $tag_number,
-				'Tag name display' => $tag_display,
-				'Tag display priority' => $tag_priority
-			]
-		]);
-		$table->waitUntilReady()->invalidate();
-
 		// Fill filter form with data.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 
@@ -601,7 +587,20 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$form->submit();
 		$this->page->waitUntilReady();
+		$table = $this->getDatatable()->waitUntilReady();
 		$table->waitUntilRowsCount(count($data['result']));
+
+		// Set the Tags header filter.
+		$tag_number = CTestArrayHelper::get($data, 'header_filter.Tags.Number of tags', 3);
+		$tag_display = CTestArrayHelper::get($data, 'header_filter.Tags.Tag name display', 'Full');
+		$tag_priority = CTestArrayHelper::get($data, 'header_filter.Tags.Tag display priority', '');
+		$this->filterFromHeader([
+			'Tags' => [
+				'Number of tags' => $tag_number,
+				'Tag name display' => $tag_display,
+				'Tag display priority' => $tag_priority
+			]
+		]);
 
 		// Check filtered result.
 		$this->assertDatatableData($data['result']);

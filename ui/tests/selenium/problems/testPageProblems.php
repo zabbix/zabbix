@@ -206,6 +206,13 @@ class testPageProblems extends CWebTest {
 				'message' => 'Closed problem'
 			]);
 		}
+
+		$layout = '{"columns":[{"id":"time","width":"171px"},{"id":"severity","width":"94px"},{"id":"recovery","width":"99px"},'.
+				'{"id":"status","width":"74px"},{"id":"info","width":"50px"},{"id":"host","resized":true,"width":"160px"},'.
+				'{"id":"problem","width":"127px"},{"id":"duration","width":"77px"},{"id":"update","width":"59px"},'.
+				'{"id":"actions","width":"60px"},{"id":"opdata"},{"id":"tags","resized":true,"width":"186px"},'.
+				'{"id":"tagvalue"}],"options":{"compact_view":0,"highlight_row":0}}';
+		$this->updateDatatableLayout($layout, 'web.monitoring.problem.datatable');
 	}
 
 	public function testPageProblems_Layout() {
@@ -429,19 +436,23 @@ class testPageProblems extends CWebTest {
 			[
 				'label' => 'Show',
 				'value' => 'Recent problems',
-				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+				'headers' => ['', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration',
+					'Update', 'Actions', 'Tags'
+				]
 			],
 			[
 				'label' => 'Show',
 				'value' => 'History',
-				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+				'headers' => ['', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration',
+					'Update', 'Actions', 'Tags'
+				]
 			],
 // Commented until subissue 45 is resolved.
-//			[
-//				'label' => 'Show',
-//				'value' => 'Problems',
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
+			[
+				'label' => 'Show',
+				'value' => 'Problems',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
 //			[
 //				'label' => 'Show tags',
 //				'value' => 'None',
@@ -493,10 +504,10 @@ class testPageProblems extends CWebTest {
 			$filter_form->fill([$field['label'] => $field['value']]);
 			$filter_form->submit();
 			$table->waitUntilReady();
-			$start_headers = ($field['label'] === 'Show timeline' && !$field['value'])
-				? ['', 'Time', 'Severity']
-				: ['', 'Time', '', '', 'Severity'];
-			$this->assertEquals(array_merge($start_headers, $field['headers']), $table->getHeadersText());
+//			$start_headers = ($field['label'] === 'Show timeline' && !$field['value'])
+//				? ['', 'Time', 'Severity']
+//				: ['', 'Time', '', '', 'Severity'];
+			$this->assertEquals($field['headers'], $table->getHeadersText());
 		}
 
 		// Check that some unfiltered data is displayed in the table.

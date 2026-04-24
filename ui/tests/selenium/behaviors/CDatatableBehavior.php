@@ -209,10 +209,10 @@ class CDatatableBehavior extends CTableBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_filter as $column => $select_data) {
-			$button_selector = ($column === 'Name')
+			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one();
+			$button = $table->getHeaderByText($column)->query($button_selector)->one()->waitUntilClickable();
 			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
@@ -232,10 +232,10 @@ class CDatatableBehavior extends CTableBehavior {
 		$table = $this->getDatatable($selector);
 
 		foreach ($header_filter as $column => $column_filter) {
-			$button_selector = ($column === 'Name')
+			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one();
+			$button = $table->getHeaderByText($column)->query($button_selector)->one()->waitUntilClickable();
 			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
@@ -318,7 +318,7 @@ class CDatatableBehavior extends CTableBehavior {
 	 */
 	public function assertDatatableStats($count = null, $total = null) {
 		if ($count === null || $count === 0) {
-			$this->test->assertFalse($this->getDatatable($selector)->query('xpath://div[@class="table-stats"]')
+			$this->test->assertFalse($this->getDatatable()->query('xpath://div[@class="table-stats"]')
 					->one()->isVisible(), 'Table rows amount is visible on page'
 			);
 

@@ -2248,8 +2248,8 @@ class testFormHost extends CWebTest {
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
 		$this->page->waitUntilReady();
 
-		$table = $this->query('id:hosts')->asDatatable()->one()->waitUntilReady();
-		$host_link = $table->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)->waitUntilPresent();
+		$host_link = $this->getDatatable()->findRow('Name', $host, true)->getColumn('Name')->query('link', $host)
+				->waitUntilPresent();
 
 		if ($this->monitoring) {
 			$host_link->asPopupButton()->one()->select('Host');
