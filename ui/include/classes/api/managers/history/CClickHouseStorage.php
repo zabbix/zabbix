@@ -68,24 +68,22 @@ class CClickHouseStorage {
 		]
 	];
 
-	protected CUrl $url;
-
-	protected array $request_context_data = [];
-
+	private CUrl $url;
+	private array $request_context_data = [];
 	/**
-	 * Latest request HTTP error code. NULL when no errors.
+	 * Last request HTTP error code. NULL when no errors.
 	 * @var int|null
 	 */
-	protected ?int $error_code;
-	protected ?string $error_message;
+	private ?int $error_code = null;
+	private ?string $error_message = null;
 
 	/**
 	 * Array of value type TTL values, key is value type and value is it TTL.
-	 * Is NULL when no TTL set for specific value type.
+	 * Value is set to NULL when no TTL existis for specific value type.
 	 *
 	 * @var array $value_type_ttl
 	 */
-	protected array $value_type_ttl = [];
+	private array $value_type_ttl = [];
 
 	public function __construct(array $config, array $value_type_ttl) {
 		$_value_type_ttl = array_fill_keys($config['types'], null);
@@ -372,7 +370,7 @@ class CClickHouseStorage {
 					' FROM '.$table.
 					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
 					' WHERE clock_ns>=toDateTime64({time_gte:UInt64},9)'.
-						' AND clock_ns<toDateTime64({time_lt:UInt64},9)'.
+						' AND clock_ns<=addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
 					' GROUP BY itemid,tick'.
 					' ORDER BY itemid,tick'.
 				')',
@@ -380,7 +378,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'pre_itemids' => array_keys($itemids),
 						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lt' => $this->getTtlLimitedTimestamp($value_type, $time_to) + 1,
+						'time_lte' => $this->getTtlLimitedTimestamp($value_type, $time_to),
 						'interval' => $interval
 					]
 				]
@@ -429,7 +427,7 @@ class CClickHouseStorage {
 					' FROM '.$table.
 					' PREWHERE itemid IN {pre_itemids:Array(UInt64)}'.
 					' WHERE clock_ns>=toDateTime64({time_gte:UInt64},9)'.
-						' AND clock_ns<toDateTime64({time_lt:UInt64},9)'.
+						' AND clock_ns<=addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)'.
 					' GROUP BY itemid'.($width === null ? '' : ',i').
 					' ORDER BY itemid'.($width === null ? '' : ',i').
 				')',
@@ -437,7 +435,7 @@ class CClickHouseStorage {
 					'UInt64' => [
 						'pre_itemids' => array_keys($itemids),
 						'time_gte' => $_time_from,
-						'time_lt' => $_time_to + 1,
+						'time_lte' => $_time_to,
 						'width' => $width,
 						'seconds' => $seconds
 					]
@@ -485,15 +483,15 @@ class CClickHouseStorage {
 					' FROM '.$table.
 					' WHERE itemid IN {itemids:Array(UInt64)}'.
 						' AND clock_ns>=toDateTime64({time_gte:UInt64},9)'.
-						($time_to !== null ? ' AND clock_ns<toDateTime64({time_lt:UInt64},9)' : '').
+						($time_to !== null ? ' AND clock_ns<=addNanoseconds(toDateTime64({time_lte:UInt64},9),999999999)' : '').
 					' GROUP BY itemid'.
 				')',
 				[
 					'UInt64' => [
 						'itemids' => array_keys($itemids),
 						'time_gte' => $this->getTtlLimitedTimestamp($value_type, $time_from),
-						'time_lt' => $time_to !== null
-							? $this->getTtlLimitedTimestamp($value_type, $time_to) + 1
+						'time_lte' => $time_to !== null
+							? $this->getTtlLimitedTimestamp($value_type, $time_to)
 							: null
 					]
 				]
@@ -521,7 +519,7 @@ class CClickHouseStorage {
 	 * @param array $param  Array of typed parameters.
 	 * @return array
 	 */
-	protected function getEncodedParamMap(array $param): array {
+	private function getEncodedParamMap(array $param): array {
 		$form_values = [];
 
 		foreach ($param as $column_type => $columns_values) {
@@ -584,7 +582,7 @@ class CClickHouseStorage {
 	 * @param string $query  Query string.
 	 * @param array  $param  Array of query parameters grouped by column value type.
 	 */
-	protected function query(string $query, array $param = []): ?array {
+	private function query(string $query, array $param = []): ?array {
 		$result = null;
 		$time_start = microtime(true);
 
@@ -626,6 +624,7 @@ class CClickHouseStorage {
 					? $result['exception']
 					: $result_raw;
 
+				$result = null;
 				$this->error_code = $http_code;
 				$this->error_message = _s('ClickHouse error: %1$s.', $error_message);
 			}
@@ -648,7 +647,7 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 */
-	protected function buildQueryFromParts(array $sql_parts): string {
+	private function buildQueryFromParts(array $sql_parts): string {
 		$select = implode(',', array_map(
 			fn($field, $expression) => $field === $expression ? $field : $expression.' AS '.$field,
 			array_keys($sql_parts['select']),
@@ -676,7 +675,7 @@ class CClickHouseStorage {
 	 * @param array $options
 	 * @param int   $options['history']  Item value type, required.
 	 */
-	protected function getQueryPartsFromOptions(array $options): array {
+	private function getQueryPartsFromOptions(array $options): array {
 		$options = array_replace([
 			'output' => ['itemid'],
 			'itemids' => null,
@@ -736,8 +735,8 @@ class CClickHouseStorage {
 
 		if ($options['time_till'] !== null) {
 			$time_till = $this->getTtlLimitedTimestamp($options['history'], (int) $options['time_till']);
-			$sql_parts['param']['UInt64']['pre_time_lt'] = $time_till + 1;
-			$sql_parts['prewhere']['pre_time_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
+			$sql_parts['param']['UInt64']['pre_time_lte'] = $time_till;
+			$sql_parts['prewhere']['pre_time_lte'] = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64}, 9),999999999)';
 		}
 
 		if (is_array($options['filter']) && $options['filter']) {
@@ -772,14 +771,16 @@ class CClickHouseStorage {
 	 * @param array $options
 	 * @param int   $options['history']  Item value type, required.
 	 */
-	protected function addQueryOutputOptions(array $sql_parts, array $options): array {
+	private function addQueryOutputOptions(array $sql_parts, array $options): array {
 		$value = 'value';
 
 		if ($options['maxValueSize'] !== null) {
 			$max_length = (int) $options['maxValueSize'];
 			$value = match ($options['history']) {
-				ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64 => 'value',
-				ITEM_VALUE_TYPE_STR, ITEM_VALUE_TYPE_LOG,
+				ITEM_VALUE_TYPE_FLOAT,
+				ITEM_VALUE_TYPE_UINT64 => 'value',
+				ITEM_VALUE_TYPE_STR,
+				ITEM_VALUE_TYPE_LOG,
 				ITEM_VALUE_TYPE_TEXT => 'substringUTF8(value,1,'.$max_length.')',
 				ITEM_VALUE_TYPE_JSON => 'substringUTF8(value_str!=\'\'?value_str:toString(value),1,'.$max_length.')'
 			};
@@ -805,9 +806,11 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
-	 * @param int   $options['history']  Item value type, required.
+	 * @param int   $options['history']    Item value type, required.
+	 * @param mixed $options['sortfield']  Sorting field, required.
+	 * @param mixed $options['sortorder']  Sorting order, required.
 	 */
-	protected function addQuerySortOptions(array $sql_parts, array $options): array {
+	private function addQuerySortOptions(array $sql_parts, array $options): array {
 		$sortorder = (array) ($options['sortorder'] ?? ZBX_SORT_UP);
 		$sortfield = (array) $options['sortfield'];
 
@@ -837,8 +840,10 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
+	 * @param int   $options['history']      Item value type, required.
+	 * @param bool  $options['searchByAny']  Flag, required.
 	 */
-	protected function addQueryFilterOptions(array $sql_parts, array $options): array {
+	private function addQueryFilterOptions(array $sql_parts, array $options): array {
 		$filter = [];
 
 		$fields = ['clock' => 'UInt64', 'ns' => 'Int32'] + self::VALUE_TYPE_SCHEMA[$options['history']];
@@ -872,9 +877,9 @@ class CClickHouseStorage {
 		if ($clock_fields && $options['time_from'] === null && $options['time_till'] === null) {
 			$clock = $clock_fields['clock'] ?? time();
 			$sql_parts['param']['UInt64']['pre_time_gte'] = is_array($clock) ? min($clock) : $clock;
-			$sql_parts['param']['UInt64']['pre_time_lt'] = (is_array($clock) ? max($clock) : $clock) + 1;
+			$sql_parts['param']['UInt64']['pre_time_lte'] = is_array($clock) ? max($clock) : $clock;
 			$sql_parts['prewhere']['pre_time_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';
-			$sql_parts['prewhere']['pre_time_lt'] = 'clock_ns<toDateTime64({pre_time_lt:UInt64},9)';
+			$sql_parts['prewhere']['pre_time_lte'] = 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)';
 		}
 
 		return $sql_parts;
@@ -885,13 +890,13 @@ class CClickHouseStorage {
 	 *
 	 * @param array $sql_parts
 	 * @param array $options
-	 * @param int   $options['history']
-	 * @param bool  $options['startSearch']
-	 * @param bool  $options['excludeSearch']
-	 * @param bool  $options['searchWildcardsEnabled']
-	 * @param bool  $options['searchByAny']
+	 * @param int   $options['history']                 Item value type, required.
+	 * @param bool  $options['searchByAny']             Flag, required.
+	 * @param bool  $options['startSearch']             Flag, required.
+	 * @param bool  $options['excludeSearch']           Flag, required.
+	 * @param bool  $options['searchWildcardsEnabled']  Flag, required.
 	 */
-	protected function addQuerySearchOptions(array $sql_parts, array $options): array {
+	private function addQuerySearchOptions(array $sql_parts, array $options): array {
 		$search = [];
 		$fields = self::VALUE_TYPE_SCHEMA[$options['history']];
 		$prefix = $options['startSearch'] ? '' : '%';
@@ -941,7 +946,7 @@ class CClickHouseStorage {
 	 * @param int $value_type
 	 * @param int $timestamp
 	 */
-	protected function getTtlLimitedTimestamp(int $value_type, int $timestamp): int {
+	private function getTtlLimitedTimestamp(int $value_type, int $timestamp): int {
 		$value_ttl = $this->value_type_ttl[$value_type];
 
 		return $value_ttl === null ? $timestamp : max($timestamp, time() - $value_ttl);
@@ -954,7 +959,7 @@ class CClickHouseStorage {
 	 * @param int $value_type
 	 * @param int $timestamp
 	 */
-	protected function isTtlValidTimestamp(int $value_type, int $timestamp): bool {
+	private function isTtlValidTimestamp(int $value_type, int $timestamp): bool {
 		$value_ttl = $this->value_type_ttl[$value_type];
 
 		return $value_ttl === null ? true : ($timestamp >= time() - $value_ttl);
