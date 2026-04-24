@@ -86,6 +86,10 @@ class CField {
 		return this._global_errors;
 	}
 
+	getField() {
+		return this._field;
+	}
+
 	getName() {
 		// abstract method
 	}

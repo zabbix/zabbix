@@ -174,7 +174,7 @@ static void	zbx_json_setempty(struct zbx_json *j)
 	*j->buffer = '\0';
 }
 
-void	zbx_json_clean(struct zbx_json *j)
+void	zbx_json_reset(struct zbx_json *j)
 {
 	zbx_json_setempty(j);
 	zbx_json_addobject(j, NULL);
