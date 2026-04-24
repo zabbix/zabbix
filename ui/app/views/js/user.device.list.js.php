@@ -35,9 +35,6 @@ const view = new class {
 			if (e.target.classList.contains('js-device-delete')) {
 				this.#delete(e.target, {deviceids: [e.target.dataset.deviceid]});
 			}
-			else if (e.target.classList.contains('js-massdelete-device')) {
-				this.#delete(e.target, {deviceids: Object.keys(chkbxRange.getSelectedIds())});
-			}
 		});
 
 		document.querySelector('.js-create-device')?.addEventListener('click', () => {

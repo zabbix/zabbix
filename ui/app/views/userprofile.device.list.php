@@ -39,12 +39,6 @@ $deviceForm = (new CForm())
 
 $deviceTable = (new CTableInfo())
 	->setHeader([
-		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
-			? (new CColHeader(
-			(new CCheckBox('all_items'))
-				->onClick("checkAll('".$deviceForm->getName()."', 'all_items', 'g_deviceid');")
-			))->addClass(ZBX_STYLE_CELL_WIDTH)
-			: null,
 		make_sorting_header(_('Name'), 'name', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Device ID'), 'uuid', $data['sort'], $data['sortorder'], $data['url']),
 		make_sorting_header(_('Linked on'), 'activated_at', $data['sort'], $data['sortorder'], $data['url']),
@@ -55,9 +49,6 @@ $deviceTable = (new CTableInfo())
 
 foreach ($data['devices'] as $device) {
 	$deviceTable->addRow([
-		$data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN]
-			? (new CCheckBox('g_deviceid['.$device['deviceid'].']', $device['deviceid']))
-			: null,
 		$device['name'],
 		$device['uuid'],
 		zbx_date2str(DATE_TIME_FORMAT_SECONDS, $device['activated_at']),
@@ -73,21 +64,7 @@ foreach ($data['devices'] as $device) {
 	]);
 }
 
-$buttons = [
-	[
-		'content' => (new CSimpleButton(_('Remove')))
-			->addClass(ZBX_STYLE_BTN_ALT)
-			->addClass('js-massdelete-device')
-			->addClass('js-no-chkbxrange')
-			->setEnabled($data['has_access'][CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN])
-	]
-];
-
-$deviceForm->addItem([
-	$deviceTable,
-	new CActionButtonList('action', 'g_deviceid', $buttons, 'g_deviceid')
-]);
-
+$deviceForm->addItem($deviceTable);
 
 $html_page
 	->addItem($deviceForm)
