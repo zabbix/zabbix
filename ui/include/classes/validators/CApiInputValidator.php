@@ -567,10 +567,10 @@ class CApiInputValidator {
 			return false;
 		}
 
-		$condition_formula_parser = new CConditionFormula();
+		$condition_formula_parser = new CConditionFormulaParser();
 
-		if (!$condition_formula_parser->parse($data)) {
-			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $condition_formula_parser->error);
+		if ($condition_formula_parser->parse($data) != CParser::PARSE_SUCCESS) {
+			$error = _s('Invalid parameter "%1$s": %2$s.', $path, $condition_formula_parser->getError());
 			return false;
 		}
 
