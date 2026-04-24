@@ -125,6 +125,10 @@ window.user_device_create_popup = new class {
 	}
 
 	#checkDeviceStatus() {
+		if (!this.#device_uuid) {
+			return;
+		}
+
 		const url = zabbixUrl({action: 'user.device.status', uuid: this.#device_uuid});
 
 		fetch(url, {

@@ -54,11 +54,16 @@ class CControllerUserDeviceStatus extends CController {
 	}
 
 	protected function doAction() {
-		$device = API::Device()->get([
+		$options = [
 			'output' => ['deviceid'],
 			'filter' => ['uuid' => $this->getInput('uuid'), 'status' => ZBX_DEVICE_ACTIVATED]
-		]);
+		];
 
+		if (CWebUser::checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_USER)) {
+			$options['userids'] = [CWebUser::$data['userid']];
+		}
+
+		$device = API::Device()->get($options);
 		$output = [];
 
 		if ($device) {
