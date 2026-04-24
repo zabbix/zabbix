@@ -363,6 +363,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 
 	private function sendHistoryAt(int $tm): array {
 		$sent = [];
+		$all_values = [];
 
 		foreach (self::prototypeDefs() as $def) {
 			$vtype = $def['value_type'];
@@ -385,8 +386,6 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				$idx++;
 			}
 
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
-
 			$itemids = array_values($items_by_key);
 			$expected_by_itemid = [];
 			foreach ($itemids as $i => $itemid) {
@@ -397,7 +396,11 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'itemids' => $itemids,
 				'expected_by_itemid' => $expected_by_itemid
 			];
+
+			$all_values = array_merge($all_values, $values);
 		}
+
+		$this->sendDataValues('sender', $all_values, self::COMPONENT_SERVER, 0);
 
 		return $sent;
 	}
