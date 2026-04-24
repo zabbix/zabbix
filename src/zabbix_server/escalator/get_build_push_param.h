@@ -16,7 +16,19 @@
 
 #include "zbxalgo.h"
 
+typedef struct
+{
+	char	*sendto;
+	char	*params;
+	char	*error;
+	int	status;
+}
+zbx_push_alert_t;
+
+ZBX_PTR_VECTOR_DECL(push_alert, zbx_push_alert_t *)
+
+void	zbx_push_alert_free(zbx_push_alert_t *alert);
 void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t actionid, zbx_uint64_t userid, const char *sendto, const char *subject,
 		const char *message, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, zbx_vector_str_t *params, const char *tz);
+		const zbx_db_service *service, zbx_vector_push_alert_t *alerts, const char *tz);

@@ -24,6 +24,7 @@
 #include "zbxalgo.h"
 
 #define ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION	1
+#define ZBX_DEVICE_NEW				0
 
 typedef struct
 {
@@ -34,57 +35,255 @@ typedef struct
 
 ZBX_VECTOR_DECL(push_target, zbx_push_target_t *)
 ZBX_VECTOR_IMPL(push_target, zbx_push_target_t *)
+ZBX_PTR_VECTOR_IMPL(push_alert, zbx_push_alert_t *)
 
-static int	push_sendto_is_all(const char *sendto)
+#define ZBX_PUSH_ALERT_ERROR_INVALID_UUID		"Invalid device UUID."
+#define ZBX_PUSH_ALERT_ERROR_NO_PERMISSION		"No permissions to referred device or it does not exist."
+#define ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_LINKED		"Device linkage or registration is not finished."
+
+static int	push_uuid_is_valid(const char *uuid)
 {
-	char	*copy, *token, *saveptr;
-	int	ret = FAIL;
+	size_t	i;
 
-	if (NULL == sendto || '\0' == *sendto)
+	if (NULL == uuid || 36 != strlen(uuid))
 		return FAIL;
 
-	copy = zbx_strdup(NULL, sendto);
-
-	for (token = strtok_r(copy, ",\n", &saveptr); NULL != token; token = strtok_r(NULL, ",\n", &saveptr))
+	for (i = 0; i < 36; i++)
 	{
-		zbx_lrtrim(token, ZBX_WHITESPACE);
-
-		if (0 == strcmp(token, "*"))
+		if (8 == i || 13 == i || 18 == i || 23 == i)
 		{
-			ret = SUCCEED;
-			break;
+			if ('-' != uuid[i])
+				return FAIL;
 		}
+		else if (0 == isxdigit((unsigned char)uuid[i]))
+			return FAIL;
 	}
 
-	zbx_free(copy);
+	return SUCCEED;
+}
+
+static void	push_uuid_normalize(char *uuid)
+{
+	for (size_t i = 0; '\0' != uuid[i]; i++)
+	{
+		if ('-' != uuid[i])
+			uuid[i] = (char)tolower((unsigned char)uuid[i]);
+	}
+}
+
+static int	push_target_exists(const zbx_vector_push_target_t *targets, const char *device_id)
+{
+	if (NULL == device_id || '\0' == *device_id)
+		return FAIL;
+
+	for (int i = 0; i < targets->values_num; i++)
+	{
+		if (0 == strcmp(targets->values[i]->device_id, device_id))
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+void	zbx_push_alert_free(zbx_push_alert_t *alert)
+{
+	if (NULL == alert)
+		return;
+
+	zbx_free(alert->sendto);
+	zbx_free(alert->params);
+	zbx_free(alert->error);
+	zbx_free(alert);
+}
+
+static void	push_alert_append_failed(zbx_vector_push_alert_t *alerts, const char *sendto, const char *error)
+{
+	zbx_push_alert_t	*alert = zbx_malloc(NULL, sizeof(zbx_push_alert_t));
+
+	alert->sendto = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(sendto));
+	alert->params = NULL;
+	alert->error = zbx_strdup(NULL, error);
+	alert->status = ALERT_STATUS_FAILED;
+
+	zbx_vector_push_alert_append(alerts, alert);
+}
+
+static void	push_target_append(zbx_vector_push_target_t *targets, const char *device_id, const char *token,
+		const char *enc_key)
+{
+	zbx_push_target_t	*target;
+
+	if (SUCCEED == push_target_exists(targets, device_id))
+		return;
+
+	target = zbx_malloc(NULL, sizeof(zbx_push_target_t));
+	target->device_id = zbx_strdup(NULL, device_id);
+	target->token = zbx_strdup(NULL, token);
+	target->enc_key = zbx_strdup(NULL, enc_key);
+
+	zbx_vector_push_target_append(targets, target);
+}
+
+static int	push_get_target_info_by_uuid(const char *uuid, zbx_uint64_t *target_userid, int *status)
+{
+	int			ret = FAIL;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	result = zbx_db_select(
+			"select d.userid,d.status"
+			" from device d"
+			" where d.uuid='%s'",
+			uuid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		ret = SUCCEED;
+
+		if (NULL != target_userid)
+			ZBX_STR2UINT64(*target_userid, row[0]);
+
+		if (NULL != status)
+			*status = atoi(row[1]);
+	}
+
+	zbx_db_free_result(result);
 
 	return ret;
 }
 
-static int	push_sendto_has_device(const char *sendto, const char *device_id)
+static int	push_get_target_by_uuid(const char *uuid, zbx_push_target_t **target)
+{
+	int			ret = FAIL;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+
+	result = zbx_db_select(
+			"select d.push_token,dk.key_"
+			" from device d"
+			" left join device_key dk"
+				" on dk.device_keyid=("
+					"select max(dk2.device_keyid)"
+					" from device_key dk2"
+					" where dk2.deviceid=d.deviceid"
+						" and dk2.active=1"
+						" and dk2.scope=%d"
+				")"
+			" where d.uuid='%s'"
+				" and d.status=1",
+			ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, uuid);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (SUCCEED != zbx_db_is_null(row[0]) && SUCCEED != zbx_db_is_null(row[1]))
+		{
+			ret = SUCCEED;
+			*target = zbx_malloc(NULL, sizeof(zbx_push_target_t));
+			(*target)->device_id = zbx_strdup(NULL, uuid);
+			(*target)->token = zbx_strdup(NULL, row[0]);
+			(*target)->enc_key = zbx_strdup(NULL, row[1]);
+		}
+	}
+
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static void	push_add_all_user_targets(zbx_uint64_t userid, zbx_vector_push_target_t *targets)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	result = zbx_db_select(
+		"select d.uuid,d.push_token,dk.key_"
+		" from device d "
+		" left join device_key dk"
+			" on dk.device_keyid=("
+				"select max(dk2.device_keyid)"
+				" from device_key dk2"
+				" where dk2.deviceid=d.deviceid"
+					" and dk2.active=1"
+					" and dk2.scope=%d"
+			")"
+		" where d.userid=" ZBX_FS_UI64
+			" and d.status=1",
+		ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+		push_target_append(targets, row[0], row[1], row[2]);
+
+	zbx_db_free_result(result);
+}
+
+static void	push_collect_targets(zbx_uint64_t userid, const char *sendto, zbx_vector_push_target_t *targets,
+		zbx_vector_push_alert_t *alerts)
 {
 	char	*copy, *token, *saveptr;
-	int	ret = FAIL;
 
-	if (NULL == sendto || '\0' == *sendto || NULL == device_id || '\0' == *device_id)
-		return FAIL;
+	if (NULL == sendto || '\0' == *sendto)
+		return;
 
 	copy = zbx_strdup(NULL, sendto);
 
 	for (token = strtok_r(copy, ",\n", &saveptr); NULL != token; token = strtok_r(NULL, ",\n", &saveptr))
 	{
+		zbx_uint64_t		target_userid;
+		int			target_status;
+
 		zbx_lrtrim(token, ZBX_WHITESPACE);
 
-		if (0 == strcmp(token, device_id))
+		if ('\0' == *token)
+			continue;
+
+		if (0 == strcmp(token, "*"))
 		{
-			ret = SUCCEED;
-			break;
+			push_add_all_user_targets(userid, targets);
+			continue;
+		}
+
+		if (SUCCEED != push_uuid_is_valid(token))
+		{
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_INVALID_UUID);
+			continue;
+		}
+
+		push_uuid_normalize(token);
+
+		if (SUCCEED != push_get_target_info_by_uuid(token, &target_userid, &target_status))
+		{
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_NO_PERMISSION);
+			continue;
+		}
+
+		if (userid != target_userid)
+		{
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_NO_PERMISSION);
+			continue;
+		}
+
+		if (ZBX_DEVICE_NEW == target_status)
+		{
+			push_alert_append_failed(alerts, token, ZBX_PUSH_ALERT_ERROR_DEVICE_NOT_LINKED);
+			continue;
+		}
+
+		if (SUCCEED != push_target_exists(targets, token))
+		{
+			zbx_push_target_t	*target = NULL;
+
+			if (SUCCEED != push_get_target_by_uuid(token, &target))
+				continue;
+
+			push_target_append(targets, target->device_id, target->token, target->enc_key);
+			zbx_free(target->device_id);
+			zbx_free(target->token);
+			zbx_free(target->enc_key);
+			zbx_free(target);
 		}
 	}
 
 	zbx_free(copy);
-
-	return ret;
 }
 
 static void	add_hostids_array(struct zbx_json *json, const char *input)
@@ -121,11 +320,9 @@ out:
 void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_event,
 		zbx_uint64_t actionid, zbx_uint64_t userid, const char *sendto, const char *subject,
 		const char *message, const zbx_db_acknowledge *ack, const zbx_service_alarm_t *service_alarm,
-		const zbx_db_service *service, zbx_vector_str_t *params, const char *tz)
+		const zbx_db_service *service, zbx_vector_push_alert_t *alerts, const char *tz)
 {
-	zbx_db_result_t			result;
-	zbx_db_row_t			row;
-	int				message_type, sendto_all;
+	int				message_type;
 	zbx_dc_um_handle_t		*um_handle_unmasked;
 	zbx_vector_push_target_t	targets;
 	char				*subject_dyn = NULL;
@@ -143,39 +340,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_push_target_create(&targets);
-	sendto_all = push_sendto_is_all(sendto);
-
-	result = zbx_db_select(
-		"select d.uuid,d.push_token,dk.key_"
-		" from device d "
-		" left join device_key dk"
-			" on dk.device_keyid=("
-				"select max(dk2.device_keyid)"
-				" from device_key dk2"
-				" where dk2.deviceid=d.deviceid"
-					" and dk2.active=1"
-					" and dk2.scope=%d"
-			")"
-		" where d.userid=" ZBX_FS_UI64
-			" and d.status=1",
-		ZBX_DEVICE_KEY_SCOPE_MOBILE_ENCRYPTION, userid);
-
-
-	while (NULL != (row = zbx_db_fetch(result)))
-	{
-		if (SUCCEED != sendto_all && SUCCEED != push_sendto_has_device(sendto, row[0]))
-			continue;
-
-		zbx_push_target_t	*t = zbx_malloc(NULL, sizeof(zbx_push_target_t));
-
-		t->device_id = zbx_strdup(NULL, row[0]);
-		t->token = zbx_strdup(NULL, row[1]);
-		t->enc_key = zbx_strdup(NULL, row[2]);
-
-		zbx_vector_push_target_append(&targets, t);
-	}
-
-	zbx_db_free_result(result);
+	push_collect_targets(userid, sendto, &targets, alerts);
 
 	if (0 == targets.values_num)
 	{
@@ -225,6 +390,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	{
 		struct zbx_json		json;
 		zbx_push_target_t	*t = targets.values[i];
+		zbx_push_alert_t	*alert;
 		char			*message_uuid7, *uuid7id;
 
 		zbx_json_init(&json, 1024);
@@ -293,7 +459,13 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_close(&json);
 
-		zbx_vector_str_append(params, zbx_strdup(NULL, json.buffer));
+		alert = zbx_malloc(NULL, sizeof(zbx_push_alert_t));
+		alert->sendto = zbx_strdup(NULL, t->device_id);
+		alert->params = zbx_strdup(NULL, json.buffer);
+		alert->error = NULL;
+		alert->status = ALERT_STATUS_NEW;
+
+		zbx_vector_push_alert_append(alerts, alert);
 
 		zbx_free(message_uuid7);
 		zbx_free(uuid7id);

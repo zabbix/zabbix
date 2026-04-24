@@ -1812,22 +1812,33 @@ static void	add_message_alert(const zbx_db_event *event, const zbx_db_event *r_e
 		}
 		else if (MEDIA_TYPE_PUSH == type)
 		{
-			zbx_vector_str_t	params_vec;
+			zbx_vector_push_alert_t	push_alerts;
 
-			zbx_vector_str_create(&params_vec);
+			zbx_vector_push_alert_create(&push_alerts);
 
-			get_build_push_params(event, r_event, actionid, userid, row[1], subject, message, ack,
-					service_alarm, service, &params_vec, tz);
+			get_build_push_params(event, r_event, actionid, userid, row[1], subject, message,
+					ack, service_alarm, service, &push_alerts, tz);
 
-			for (int i = 0; i < params_vec.values_num; i++)
+			for (int i = 0; i < push_alerts.values_num; i++)
 			{
+				const zbx_push_alert_t	*push_alert = push_alerts.values[i];
+				const char		*push_error = push_alert->error;
+				int			push_status = push_alert->status;
+
+				if (ALERT_STATUS_FAILED != push_status)
+				{
+					push_status = status;
+					push_error = perror;
+				}
+
 				zbx_db_insert_add_values(&db_insert, __UINT64_C(0), actionid, eventid, userid,
-						now, mediatypeid, row[1], subject, message, status, perror, esc_step,
-						(int)ALERT_TYPE_MESSAGE, ackid, params_vec.values[i], p_eventid);
+						now, mediatypeid, push_alert->sendto, subject, message, push_status,
+						push_error, esc_step, (int)ALERT_TYPE_MESSAGE, ackid,
+						push_alert->params, p_eventid);
 			}
 
-			zbx_vector_str_clear_ext(&params_vec, zbx_str_free);
-			zbx_vector_str_destroy(&params_vec);
+			zbx_vector_push_alert_clear_ext(&push_alerts, zbx_push_alert_free);
+			zbx_vector_push_alert_destroy(&push_alerts);
 			continue;
 		}
 		else
