@@ -118,7 +118,7 @@ void	zbx_preprocessor_stats_procinfo(zbx_process_info_t *info);
 void	zbx_preprocess_item_value(zbx_uint64_t itemid, unsigned char item_value_type, unsigned char item_flags,
 		unsigned char preprocessing, AGENT_RESULT *result, zbx_timespec_t *ts, unsigned char state,
 		char *error);
-void	zbx_preprocessor_flush(void);
+size_t	zbx_preprocessor_flush(void);
 int	zbx_preprocessor_get_diag_stats(zbx_uint64_t *preproc_num, zbx_uint64_t *pending_num,
 		zbx_uint64_t *finished_num, zbx_uint64_t *sequences_num, zbx_uint64_t *queued_num,
 		zbx_uint64_t *queued_sz, zbx_uint64_t *direct_num, zbx_uint64_t *direct_sz, zbx_uint64_t *history_sz,

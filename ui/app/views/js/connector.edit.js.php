@@ -196,9 +196,8 @@ window.connector_edit_popup = new class {
 					return;
 				}
 
-				return response;
+				success_callback(response);
 			})
-			.then(success_callback)
 			.catch((exception) => this.#ajaxExceptionHandler(exception))
 			.finally(() => this.overlay.unsetLoading());
 	}

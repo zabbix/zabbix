@@ -1789,6 +1789,11 @@ msgstr ""
 msgid "At least one host group or host must be selected."
 msgstr ""
 
+#: app/controllers/CControllerGraphPrototypeCreate.php:116
+#: app/controllers/CControllerGraphPrototypeUpdate.php:118
+msgid "At least one item must be a prototype"
+msgstr ""
+
 #: app/controllers/CControllerMaintenanceCreate.php:57
 #: app/controllers/CControllerMaintenanceTimePeriodCheck.php:45
 #: app/controllers/CControllerMaintenanceUpdate.php:58
@@ -2558,6 +2563,13 @@ msgstr "მატარებლის ტიპის დამატება 
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] "მოდულის დამატება შეუძლებელია: %1$s."
+
+#: app/controllers/CControllerGraphCreate.php:111
+#: app/controllers/CControllerGraphPrototypeCreate.php:121
+#: app/controllers/CControllerGraphPrototypeUpdate.php:123
+#: app/controllers/CControllerGraphUpdate.php:113
+msgid "Cannot add more than one item with type \"Graph sum\""
+msgstr ""
 
 #: include/classes/api/services/CGraph.php:42
 #, c-format
@@ -8612,6 +8624,10 @@ msgstr ""
 msgid "Enter a unique name that Zabbix components will use to recognize the pre-shared key."
 msgstr ""
 
+#: include/classes/setup/CSetupWizard.php:612
+msgid "Enter one or more values as host:port or [host]:port (IPv6), separated by commas."
+msgstr ""
+
 #: app/views/host.wizard.edit.php:609
 msgid "Enter the IP/DNS address and port of the Zabbix agent installed on your monitoring target."
 msgstr ""
@@ -11096,6 +11112,10 @@ msgstr ""
 #: include/classes/helpers/CServiceHelper.php:101
 #, c-format
 msgid "If less than %2$s of child services have %1$s status or below"
+msgstr ""
+
+#: include/classes/setup/CSetupWizard.php:614
+msgid "If no port is specified, the \"Database port\" value is used."
 msgstr ""
 
 #: include/classes/api/services/CReport.php:368
@@ -13783,6 +13803,10 @@ msgstr ""
 msgid "List of block devices and their type. Returns JSON"
 msgstr "ბლოკური მოწყობილობებისა და მათი ტიპების სია. აბრუნებს JSON-ს"
 
+#: include/classes/data/CItemData.php:1724
+msgid "List of block devices with detailed information. Returns JSON"
+msgstr ""
+
 #: include/forms.inc.php:448 include/views/js/item.preprocessing.js.php:111
 msgid "List of characters"
 msgstr ""
@@ -13802,6 +13826,10 @@ msgstr "მიმაგრებული ფაილური სისტე�
 #: include/classes/data/CItemData.php:1703
 msgid "List of mounted filesystems, their types, disk space and inode statistics. Returns JSON"
 msgstr "მიმაგრებული ფაილური სისტემების, მათი ტიპების, დისკზე ადგილის და inode-ების სტატისტიკის სია. აბრუნებს JSON-ს"
+
+#: include/classes/data/CItemData.php:1266
+msgid "List of network interfaces with detailed information. Returns JSON"
+msgstr ""
 
 #: include/classes/data/CItemData.php:1109
 msgid "List of network interfaces. Returns JSON"
@@ -25342,6 +25370,10 @@ msgstr ""
 #: include/classes/html/widgets/CWidgetFormView.php:234
 msgid "Widget is deprecated."
 msgstr "ვიჯეტი მოძველებულია."
+
+#: jsLoader.php:255
+msgid "Widget is not fully configured"
+msgstr ""
 
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."

@@ -247,7 +247,16 @@ class testPermissionsWithoutCSRF extends CWebTest {
 					'replace' => true,
 					'db' => 'SELECT * FROM graphs',
 					'link' => 'zabbix.php?action=graph.list&filter_set=1&filter_hostids%5B0%5D={hostid}&context=host',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF test name'
+					],
+					'secondary_dialog' => [
+						'field' => 'id:items-table',
+						'fill' => [
+							'id:all_records' => true
+						]
+					]
 				]
 			],
 			// #16 Discovery rule update.
@@ -329,7 +338,25 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM correlation',
 					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation event correlation',
+						'id:operations_0' => true
+					],
+					'secondary_dialog' => [
+						'field' => 'id:condition_table',
+						'fill' => [
+							'Tag' => 'CSRF test tag'
+						]
+					],
+					'dialog_actions' => [
+						[
+							'click' => 'class:js-condition-add',
+							'fill' => [
+								'id:tag' => 'event_tag'
+							]
+						]
+					]
 				]
 			],
 			// #25 Event correlation update.
@@ -361,7 +388,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=gui.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #29 Autoregistration update.
@@ -376,7 +403,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM housekeeper',
 					'link' => 'zabbix.php?action=housekeeping.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #31 Image update.
@@ -446,7 +473,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=trigdisplay.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #38 API token create.
@@ -475,7 +502,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=miscconfig.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #41 Proxy update.
@@ -511,8 +538,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 			[
 				[
 					'db' => 'SELECT * FROM users_groups',
-					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7',
-					'return_button' => true
+					'link' => 'zabbix.php?action=usergroup.edit&usrgrpid=7'
 				]
 			],
 			// #45 User group create.
@@ -520,7 +546,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM users_groups',
 					'link' => 'zabbix.php?action=usergroup.edit',
-					'return_button' => true
+					'fields' => [
+						'id:name' => 'CSRF validation User group create'
+					]
 				]
 			],
 			// #46 User update.
@@ -736,7 +764,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM module',
 					'link' => 'zabbix.php?action=audit.settings.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			],
 			// #69 Timeout options update.
@@ -744,7 +772,7 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM settings',
 					'link' => 'zabbix.php?action=timeouts.edit',
-					'return_button' => true
+					'return_button' => false
 				]
 			]
 		];

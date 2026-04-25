@@ -329,7 +329,7 @@ const char	*zbx_json_strerror(void);
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
 void	zbx_json_init_with(struct zbx_json *j, const char *src, size_t len);
-void	zbx_json_clean(struct zbx_json *j);
+void	zbx_json_reset(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);
 void	zbx_json_addarray(struct zbx_json *j, const char *name);
