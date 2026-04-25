@@ -23,8 +23,11 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxcomms.h"
-#include "zbxip.h"
 #include "zbx_discoverer_constants.h"
+
+#ifdef HAVE_LIBCURL || HAVE_LDAP
+#	include "zbxip.h"
+#endif
 
 #ifdef HAVE_LIBCURL
 #	include "zbxcurl.h"
