@@ -23,7 +23,6 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxcomms.h"
-#include "zbxcurl.h"
 #include "zbxcfg.h"
 #include "zbx_discoverer_constants.h"
 
