@@ -78,8 +78,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				'fields' => [
 					'value' => ['string', 'length' => 255],
 					'name' => [
-						['string', 'length' => 255],
-						['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
 					],
 					'sortorder' => ['integer']
 				],
@@ -121,8 +121,8 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 				'fields' => [
 					'value' => ['string', 'length' => 2000],
 					'name' => [
-						['string', 'length' => 255],
-						['string', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
+						['string', 'required', 'length' => 255],
+						['string', 'required', 'length' => 255, 'not_empty', 'when' => ['value', 'not_empty']]
 					]
 				],
 				'when' => ['type', 'in' => [ITEM_TYPE_HTTPAGENT]]
@@ -226,17 +226,17 @@ abstract class CControllerLldRuleUpdateGeneral extends CController {
 			],
 			'delay_flex' => ['objects', 'fields' => [
 				'type' => ['integer', 'in' => [ITEM_DELAY_FLEXIBLE, ITEM_DELAY_SCHEDULING]],
-				'schedule' => ['string', 'required', 'not_empty',
+				'schedule' => ['string', 'required',
 					'use' => [CSchedulingIntervalParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_SCHEDULING]]
 				],
-				'delay' => ['string', 'required', 'not_empty',
+				'delay' => ['string', 'required',
 					'use' => [CSimpleIntervalParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid interval.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
 				],
-				'period' => ['string', 'required', 'not_empty',
+				'period' => ['string', 'required',
 					'use' => [CTimePeriodParser::class, ['usermacros' => true]],
 					'messages' => ['use' => _('Invalid period.')],
 					'when' => ['type', 'in' => [ITEM_DELAY_FLEXIBLE]]
