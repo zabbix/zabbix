@@ -26,7 +26,7 @@ class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
 	getTemplate() {
 		return new Template(`
 			<template>
-				<label for="number_of_tags_0" class="${ZBX_STYLE_FORM_LABEL}">${t('Number of tags')}</label>
+				<label for="number_of_tags" class="${ZBX_STYLE_FORM_LABEL}">${t('Number of tags')}</label>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<ul id="number_of_tags" data-field-type="radio-list" class="${ZBX_STYLE_RADIO_LIST_CONTROL}">
 						<li>
