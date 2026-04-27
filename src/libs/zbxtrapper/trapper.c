@@ -1078,7 +1078,7 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 	unsigned char		*data = NULL;
 	zbx_uint32_t		data_len;
 	zbx_comms_redirect_t	redirect;
-	int			ret;
+	int			ret, freq;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HOST, host, sizeof(host), NULL))
 		return FAIL;
@@ -1098,13 +1098,29 @@ static int	process_active_check_heartbeat(zbx_socket_t *sock, const struct zbx_j
 		return FAIL;
 	}
 
+	if (0 == (sock->connection_type & recv_host.tls_accept))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "heartbit not allowed for \"%s\" connection type for host \"%s\""
+				" from \"%s\"", zbx_tcp_connection_type_name(sock->connection_type), host, sock->peer);
+
+		return FAIL;
+	}
+
 	if (HOST_MONITORED_BY_SERVER != recv_host.monitored_by || HOST_STATUS_NOT_MONITORED == recv_host.status)
 		return SUCCEED;
 
 	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_HEARTBEAT_FREQ, hbfreq, sizeof(hbfreq), NULL))
 		return FAIL;
 
-	data_len = zbx_availability_serialize_active_heartbeat(&data, recv_host.hostid, atoi(hbfreq));
+	if (SUCCEED != zbx_is_uint31(hbfreq, &freq) || 0 == freq || SEC_PER_HOUR < freq)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "received invalid heartbeat frequency \"%s\" from \"%s\"", hbfreq,
+				sock->peer);
+
+		return FAIL;
+	}
+
+	data_len = zbx_availability_serialize_active_heartbeat(&data, recv_host.hostid, freq);
 	zbx_availability_send(ZBX_IPC_AVAILMAN_ACTIVE_HB, data, data_len, NULL);
 
 	zbx_free(data);
