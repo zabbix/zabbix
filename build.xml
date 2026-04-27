@@ -616,8 +616,21 @@
 			<arg line="--bootstrap=bootstrap.php"/>
 			<arg line="--do-not-cache-result"/>
 			<arg line="--dont-report-useless-tests"/>
+			<arg line="--testdox"/>
+			<arg line="--verbose"/>
 			<arg line="${phpunit_filter}"/>
 			<arg line="integration/IntegrationTests.php"/>
+		</exec>
+
+		<exec executable="bash" failonerror="off">
+			<arg value="-c"/>
+			<arg value="
+				echo '=== Test suite durations (seconds) ===';
+				grep '&lt;testsuite .*file=' ${basedir}/build/logs/phpunit.xml |
+				sed -E 's/.*name=&quot;([^&quot;]+)&quot;.*time=&quot;([^&quot;]+)&quot;.*/\2 \1/' |
+				sort -nr
+			"/>
+			<redirector output="phpunit_summary.log" append="false" alwaysLog="true"/>
 		</exec>
 	</target>
 

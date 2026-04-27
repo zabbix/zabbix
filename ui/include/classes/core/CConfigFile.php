@@ -375,7 +375,7 @@ $SSO[\'CERT_STORAGE\']		= \'database\';
 // Possible values \'email\', \'script\', \'sms\', \'webhook\'. Can be defined one or several.
 //$ZBX_FEATURE_FLAGS[\'media_type_denylist\'] = [];
 
-$ZBX_SERVER_TLS[\'ACTIVE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['ACTIVE'], "'\\").'\';
+$ZBX_SERVER_TLS[\'ACTIVE\'] = '.($this->config['ZBX_SERVER_TLS']['ACTIVE'] ? 'true' : 'false').';
 $ZBX_SERVER_TLS[\'CA_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CA_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'KEY_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['KEY_FILE'], "'\\").'\';
 $ZBX_SERVER_TLS[\'CERT_FILE\'] = \''.addcslashes($this->config['ZBX_SERVER_TLS']['CERT_FILE'], "'\\").'\';
@@ -445,7 +445,7 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 			'media_type_denylist' => []
 		];
 		$this->config['ZBX_SERVER_TLS'] = [
-			'ACTIVE' => 0,
+			'ACTIVE' => false,
 			'CA_FILE' => '',
 			'KEY_FILE' => '',
 			'CERT_FILE' => '',
