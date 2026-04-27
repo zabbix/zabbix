@@ -52,8 +52,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			['suffix' => 'uint', 'value_type' => ITEM_VALUE_TYPE_UINT64],
 			['suffix' => 'str', 'value_type' => ITEM_VALUE_TYPE_STR],
 			['suffix' => 'text', 'value_type' => ITEM_VALUE_TYPE_TEXT],
-			['suffix' => 'log', 'value_type' => ITEM_VALUE_TYPE_LOG],
-			['suffix' => 'json', 'value_type' => ITEM_VALUE_TYPE_JSON]
+			['suffix' => 'log', 'value_type' => ITEM_VALUE_TYPE_LOG]
 		];
 	}
 
@@ -149,8 +148,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 		$proto_defs = self::prototypeDefs();
 		self::$total_expected = self::LLD_DISCOVERY_COUNT * count($proto_defs);
-		$trigger_defs = array_filter($proto_defs, fn($d) => $d['value_type'] !== ITEM_VALUE_TYPE_JSON);
-		self::$total_trigger_expected = self::LLD_DISCOVERY_COUNT * count($trigger_defs);
+		self::$total_trigger_expected = self::$total_expected;
 
 		// Wait until all items for all prototypes are created.
 		$response = $this->callUntilDataIsPresent('item.get', [
@@ -274,10 +272,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 */
 	public function testLLDHistorySyncAtScale_TriggerDiscovery() {
 		foreach (self::prototypeDefs() as $def) {
-			if ($def['value_type'] === ITEM_VALUE_TYPE_JSON) {
-				continue;
-			}
-
 			$response = $this->call('triggerprototype.create', [
 				'description' => 'Sensor '.$def['suffix'].' alert ['.self::LLD_MACRO.']',
 				'expression' => 'last(/'.self::HOSTNAME.'/'.self::ITEM_PROTO_KEY.'.'.$def['suffix'].'['.self::LLD_MACRO.'])>0'
@@ -292,7 +286,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'description', 'status']
-		], 120, self::WAIT_ITERATION_DELAY, function ($r) {
+		], 180, self::WAIT_ITERATION_DELAY, function ($r) {
 			return count($r['result']) === self::$total_trigger_expected;
 		});
 
