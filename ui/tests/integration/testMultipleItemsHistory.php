@@ -44,6 +44,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	private static $prepared_now = [];
 	private static $sent_past = [];
 	private static $sent_now = [];
+	private static $vps_last;
 
 	private static function prototypeDefs() {
 		return [
@@ -196,15 +197,25 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_HistoryPastSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_past;
+		self::$vps_last = $this->getVpsWritten();
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
 
 		self::$sent_past = $sent;
 	}
 
 	/**
-	 * Verify history values sent 1 hour in the past.
+	 * Verify that VPS written counter increased by the number of values sent in the past batch.
 	 *
 	 * @depends testMultipleItemsHistory_HistoryPastSend
+	 */
+	public function testMultipleItemsHistory_HistoryPastVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
+	}
+
+	/**
+	 * Verify history values sent 1 hour in the past.
+	 *
+	 * @depends testMultipleItemsHistory_HistoryPastVpsWritten
 	 */
 	public function testMultipleItemsHistory_HistoryPastVerify() {
 		$this->verifyHistoryAt(self::$tm_past, self::$sent_past);
@@ -217,15 +228,25 @@ class testMultipleItemsHistory extends CIntegrationTest {
 	 */
 	public function testMultipleItemsHistory_HistoryNowSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
+		self::$vps_last = $this->getVpsWritten();
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
 
 		self::$sent_now = $sent;
 	}
 
 	/**
-	 * Verify history values sent at current time.
+	 * Verify that VPS written counter increased by the number of values sent in the current-time batch.
 	 *
 	 * @depends testMultipleItemsHistory_HistoryNowSend
+	 */
+	public function testMultipleItemsHistory_HistoryNowVpsWritten() {
+		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
+	}
+
+	/**
+	 * Verify history values sent at current time.
+	 *
+	 * @depends testMultipleItemsHistory_HistoryNowVpsWritten
 	 */
 	public function testMultipleItemsHistory_HistoryNowVerify() {
 		$this->verifyHistoryAt(self::$tm_now, self::$sent_now);
@@ -513,6 +534,53 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				'value' => json_encode(['data' => $data])
 			]
 		], self::COMPONENT_SERVER, 0);
+	}
+
+	private function testItemOnServer(string $hostid, string $sid, array $item,
+			array $options = ['single' => false, 'state' => 0]): array|false {
+		$response = $this->call('host.get', [
+			'hostids' => [$hostid],
+			'output' => ['maintenance_status', 'maintenance_type', 'proxyid']
+		]);
+		$this->assertCount(1, $response['result']);
+		$host = $response['result'][0];
+
+		$data = [
+			'options' => $options,
+			'item' => $item,
+			'host' => [
+				'hostid' => $hostid,
+				'maintenance_status' => $host['maintenance_status'],
+				'maintenance_type' => $host['maintenance_type'],
+				'proxyid' => (int) $host['proxyid']
+			]
+		];
+
+		return $this->getClient(self::COMPONENT_SERVER)->testItem($data, $sid);
+	}
+
+	private function getVpsWritten(): int {
+		$result = $this->testItemOnServer((string) self::$hostid, $this->getApiSessionId(),
+			['value_type' => '3', 'type' => '5', 'key' => 'zabbix[vps,written]']
+		);
+		$this->assertNotFalse($result);
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertIsNumeric($result['item']['result']);
+
+		return (int) $result['item']['result'];
+	}
+
+	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
+		$expected = $baseline + $min_increase;
+		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+			if ($this->getVpsWritten() >= $expected) {
+				break;
+			}
+			usleep(100000);
+		}
+		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
 	}
 
 	/**
