@@ -141,7 +141,7 @@ $mediatypes = API::Mediatype()->get([
 ]);
 
 $allowed = [
-	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION),
+	'ui_correlation' => CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES),
 	'add_comments' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ADD_PROBLEM_COMMENTS),
 	'change_severity' => CWebUser::checkAccess(CRoleHelper::ACTIONS_CHANGE_SEVERITY),
 	'acknowledge' => CWebUser::checkAccess(CRoleHelper::ACTIONS_ACKNOWLEDGE_PROBLEMS),

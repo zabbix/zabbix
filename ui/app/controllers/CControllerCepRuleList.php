@@ -42,39 +42,39 @@ class CControllerCepRuleList extends CController {
 	}
 
 	protected function checkPermissions(): bool {
-		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_EVENT_CORRELATION);
+		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_CEPRULES);
 	}
 
 	protected function doAction(): void {
-		$sort_field = $this->getInput('sort', CProfile::get('web.correlation.php.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.correlation.php.sortorder', ZBX_SORT_UP));
-		CProfile::update('web.correlation.php.sort', $sort_field, PROFILE_TYPE_STR);
-		CProfile::update('web.correlation.php.sortorder', $sort_order, PROFILE_TYPE_STR);
+		$sort_field = $this->getInput('sort', CProfile::get('web.ceprule.list.sort', 'name'));
+		$sort_order = $this->getInput('sortorder', CProfile::get('web.ceprule.list.sortorder', ZBX_SORT_UP));
+		CProfile::update('web.ceprule.list.sort', $sort_field, PROFILE_TYPE_STR);
+		CProfile::update('web.ceprule.list.sortorder', $sort_order, PROFILE_TYPE_STR);
 
 		// filter
 		if ($this->hasInput('filter_set')) {
-			CProfile::update('web.correlation.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
-			CProfile::update('web.correlation.filter_status', $this->getInput('filter_status', ZBX_CEP_FILTER_SHOW_ALL), PROFILE_TYPE_INT);
-			CProfile::update('web.correlation.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
+			CProfile::update('web.ceprule.filter_name', $this->getInput('filter_name', ''), PROFILE_TYPE_STR);
+			CProfile::update('web.ceprule.filter_status', $this->getInput('filter_status', ZBX_CEP_FILTER_SHOW_ALL), PROFILE_TYPE_INT);
+			CProfile::update('web.ceprule.filter_type', $this->getInput('filter_type', -1), PROFILE_TYPE_INT);
 		}
 		elseif ($this->hasInput('filter_rst')) {
-			CProfile::delete('web.correlation.filter_name');
-			CProfile::delete('web.correlation.filter_status');
-			CProfile::delete('web.correlation.filter_type');
+			CProfile::delete('web.ceprule.filter_name');
+			CProfile::delete('web.ceprule.filter_status');
+			CProfile::delete('web.ceprule.filter_type');
 		}
 
 		$filter = [
-			'name' => CProfile::get('web.correlation.filter_name', ''),
-			'status' => CProfile::get('web.correlation.filter_status', -1),
-			'type' => CProfile::get('web.correlation.filter_type', ZBX_CEP_FILTER_SHOW_ALL)
+			'name' => CProfile::get('web.ceprule.filter_name', ''),
+			'status' => CProfile::get('web.ceprule.filter_status', -1),
+			'type' => CProfile::get('web.ceprule.filter_type', ZBX_CEP_FILTER_SHOW_ALL)
 		];
 
 		$data = [
 			'sort' => $sort_field,
 			'sortorder' => $sort_order,
 			'filter' => $filter,
-			'profileIdx' => 'web.correlation.filter',
-			'active_tab' => CProfile::get('web.correlation.filter.active', 1)
+			'profileIdx' => 'web.ceprule.filter',
+			'active_tab' => CProfile::get('web.ceprule.filter.active', 1)
 		];
 
 		$data['correlations'] = self::fetchCepRules($filter);
@@ -134,7 +134,6 @@ class CControllerCepRuleList extends CController {
 				],
 				'limit' => $limit
 			]);
-
 
 			if ($result_cep === false) {
 				return []; // The get_prepared_messages function for layout.htmlpage will do the error handling.

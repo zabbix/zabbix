@@ -877,6 +877,59 @@ static int	DBpatch_7050067(void)
 	return DBadd_foreign_key("trigger_depends", 2, &field);
 }
 
+static int	DBpatch_7050068(void)
+{
+	int	i;
+	const char	*values[] = {
+		"web.correlation.filter_name", "web.ceprule.filter_name",
+		"web.correlation.filter_type", "web.ceprule.filter_type",
+		"web.correlation.filter_status", "web.ceprule.filter_status",
+		"web.correlation.php.sortorder", "web.ceprule.list.sortorder",
+		"web.correlation.php.sort", "web.ceprule.list.sort",
+		"web.correlation.filter.active", "web.ceprule.filter.active"
+	};
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	for (i = 0; i < (int)ARRSIZE(values); i += 2)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("update profiles set idx='%s' where idx='%s'", values[i + 1], values[i]))
+			return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_7050069(void)
+{
+	zbx_db_result_t result;
+	zbx_db_row_t	row;
+	int				ret = SUCCEED;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select("select role_ruleid from role_rule where name='ui.configuration.event_correlation'");
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	role_ruleid;
+		ZBX_STR2UINT64(role_ruleid, row[0]);
+
+		if (ZBX_DB_OK > zbx_db_execute(
+					"update role_rule set name='ui.configuration.ceprules' where role_ruleid=" ZBX_FS_UI64,
+					role_ruleid))
+		{
+			ret = FAIL;
+			break;
+		}
+	}
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
 #endif
 
 DBPATCH_START(7050)
@@ -951,5 +1004,7 @@ DBPATCH_ADD(7050064, 0, 1)
 DBPATCH_ADD(7050065, 0, 1)
 DBPATCH_ADD(7050066, 0, 1)
 DBPATCH_ADD(7050067, 0, 1)
+DBPATCH_ADD(7050068, 0, 1)
+DBPATCH_ADD(7050069, 0, 1)
 
 DBPATCH_END()
