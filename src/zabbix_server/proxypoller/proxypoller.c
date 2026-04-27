@@ -292,7 +292,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 		goto clean;
 	}
 
-	zbx_json_clean(&j);
+	zbx_json_reset(&j);
 
 	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error)))

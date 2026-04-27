@@ -631,7 +631,7 @@ int	zbx_es_execute(zbx_es_t *es, const char *script, const char *code, int size,
 
 	if (NULL != es->env->json)
 	{
-		zbx_json_clean(es->env->json);
+		zbx_json_reset(es->env->json);
 		zbx_json_addarray(es->env->json, "logs");
 	}
 
