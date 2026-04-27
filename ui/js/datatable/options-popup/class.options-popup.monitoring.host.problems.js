@@ -27,10 +27,7 @@ class CDataTableOptionsPopupMonitoringHostProblems extends CDataTableOptionsPopu
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_suppressed" name="show_suppressed" value="1"
 						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
-					<label for="show_suppressed">
-						<span></span>
-						${t('Show suppressed problems')}
-					</label>
+					<label for="show_suppressed"><span></span>${t('Show suppressed problems')}</label>
 				</div>
 			</template>
 		`).evaluateToElement();

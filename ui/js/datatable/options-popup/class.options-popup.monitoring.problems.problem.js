@@ -29,26 +29,17 @@ class CDataTableOptionsPopupMonitoringProblemsProblem extends CDataTableOptionsP
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_opdata" name="show_opdata" value="1"
 						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
-					<label for="show_opdata">
-						<span></span>
-						${t('Show operational data')}
-					</label>
+					<label for="show_opdata"><span></span>${t('Show operational data')}</label>
 				</div>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="details" name="details" value="1"
 						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
-					<label for="details">
-						<span></span>
-						${t('Show trigger expression')}
-					</label>
+					<label for="details"><span></span>${t('Show trigger expression')}</label>
 				</div>
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_suppressed" name="show_suppressed" value="1"
 						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
-					<label for="show_suppressed">
-						<span></span>
-						${t('Show suppressed')}
-					</label>
+					<label for="show_suppressed"><span></span>${t('Show suppressed')}</label>
 				</div>
 			</template>
 		`).evaluateToElement();

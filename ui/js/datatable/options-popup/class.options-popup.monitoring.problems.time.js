@@ -27,10 +27,7 @@ class CDataTableOptionsPopupMonitoringProblemsTime extends CDataTableOptionsPopu
 				<div class="${ZBX_STYLE_FORM_FIELD}">
 					<input type="checkbox" id="show_timeline" name="show_timeline" value="1"
 						class="${ZBX_STYLE_CHECKBOX_RADIO}" data-field-type="checkbox">
-					<label for="show_timeline">
-						<span></span>
-						${t('Show timeline')}
-					</label>
+					<label for="show_timeline"><span></span>${t('Show timeline')}</label>
 				</div>
 			</template>
 		`).evaluateToElement();
