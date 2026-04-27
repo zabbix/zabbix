@@ -2650,7 +2650,8 @@ static void	vc_precache_item(zbx_item_history_t *hist, unsigned char value_type,
 			.active_range = VC_MIN_RANGE
 	};
 
-	item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
+	if (NULL == (item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local))))
+		return;
 
 	if (SUCCEED == vc_query_item_cached(item))
 		return;
