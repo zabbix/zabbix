@@ -19,7 +19,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 	protected array $allowed_data_fields = ['itemid', 'data_actions', 'host', 'maintenance', 'maintenanceid',
 		'maintenance_type', 'maintenance_status', 'itemid', 'description_expanded', 'name', 'key_expanded', 'interval',
 		'history', 'trends', 'type', 'state', 'last_check', 'last_value', 'change', 'is_graph', 'keep_history',
-		'keep_trends', 'item_icons', 'tags'];
+		'keep_trends', 'item_icons', 'tags', 'custom_text'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA);
@@ -27,6 +27,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 		$sort_field = $this->getInput('sort_field', $filter['sort'] ?? 'name');
@@ -184,7 +185,8 @@ class CControllerLatestViewData extends CControllerDataTable {
 			}
 
 			if (in_array($item['type'], [ITEM_TYPE_SNMPTRAP, ITEM_TYPE_TRAPPER, ITEM_TYPE_DEPENDENT])
-					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE && strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
+					|| ($item['type'] == ITEM_TYPE_ZABBIX_ACTIVE
+						&& strncmp($item['key_expanded'], 'mqtt.get', 8) == 0)) {
 				$item_delay = '';
 			}
 			elseif ($update_interval_parser->parse($item['delay']) == CParser::PARSE_SUCCESS) {
@@ -256,6 +258,10 @@ class CControllerLatestViewData extends CControllerDataTable {
 			$item['description_expanded'] = (new CObject())
 				->addItem(zbx_str2links($item['description_expanded']))
 				->toString();
+
+			if (array_key_exists('custom_text', $options)) {
+				$item['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
+			}
 		}
 		unset($item);
 

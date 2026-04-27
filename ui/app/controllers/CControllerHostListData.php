@@ -21,7 +21,7 @@ class CControllerHostListData extends CControllerDataTable {
 		'maintenance_status', 'items', 'triggers', 'graphs', 'discoveryRules', 'httpTests', 'interface', 'monitored_by',
 		'proxyid', 'assigned_proxyid', 'proxy', 'proxy_groupid', 'proxy_group', 'assigned_proxy', 'templates',
 		'parentTemplates', 'disabled_by_lld', 'disable_source', 'availability', 'active_available', 'tls_accept',
-		'tls_connect', 'info_icons', 'tags'];
+		'tls_connect', 'info_icons', 'tags', 'custom_text'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_HOSTS);
@@ -29,6 +29,7 @@ class CControllerHostListData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', (int) CPagerHelper::loadPage('host.list'));
 		$sort_field = $this->getInput('sort_field', 'name');
@@ -231,6 +232,8 @@ class CControllerHostListData extends CControllerDataTable {
 
 		order_result($hosts, $sort_field, $sort_order);
 
+		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
+
 		foreach ($hosts as &$host) {
 			$host['discovery'] = [
 				'data' => $host['discoveryData'],
@@ -318,14 +321,13 @@ class CControllerHostListData extends CControllerDataTable {
 			$host['assigned_proxy'] = array_key_exists('assigned_proxyid', $host) && $host['assigned_proxyid']
 				? array_merge($proxies[$host['assigned_proxyid']], ['proxyid' => $host['assigned_proxyid']])
 				: null;
-		}
-		unset($host);
 
-		CTagHelper::mergeOwnAndInheritedTags($hosts, true);
-
-		foreach ($hosts as &$host) {
 			CArrayHelper::sort($host['tags'], ['tag', 'value']);
 			$host['tags'] = CTagHelper::getTagsList($host, ['filter_tags' => $filter['tags']]);
+
+			if (array_key_exists('custom_text', $options)) {
+				$host['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
+			}
 		}
 		unset($host);
 

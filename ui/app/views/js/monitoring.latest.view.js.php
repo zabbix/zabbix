@@ -216,7 +216,8 @@
 						.setFields(['itemid', 'is_graph', 'keep_history', 'keep_trends'])
 						.setRenderer('actions'),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
-						.setFields(['item_icons'])
+						.setFields(['item_icons']),
+					new CDataTableColumnCustomText('custom_text', <?= json_encode(_('Custom text')); ?>)
 				])
 				.setPage(page)
 				.setFilter(filter)

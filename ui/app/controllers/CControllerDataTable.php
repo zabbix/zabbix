@@ -171,4 +171,8 @@ abstract class CControllerDataTable extends CController {
 	protected function getColumnOptions(array $user_configs, int $tabfilter_index = 0): array {
 		return array_merge(...array_column($user_configs[$tabfilter_index]['columns'] ?? [], 'column_options'));
 	}
+
+	protected function resolveColumnTexts(array $texts): array {
+		return $texts;
+	}
 }

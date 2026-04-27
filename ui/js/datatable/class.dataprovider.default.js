@@ -137,7 +137,7 @@ class CDefaultDataProvider extends CDataProvider {
 			],
 			body: JSON.stringify({
 				data_fields,
-				options: Object.assign({}, column_options, options),
+				options: deepMerge(column_options, options),
 				filter,
 				page,
 				sort_field,

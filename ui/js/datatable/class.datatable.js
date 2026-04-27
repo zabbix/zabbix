@@ -498,6 +498,7 @@ class CDataTable {
 
 		this.setOptionsHandler('tags', CDataTableOptionsPopupTags);
 		this.setOptionsHandler('tagvalue', CDataTableOptionsPopupTagValue);
+		this.setOptionsHandler('custom_text', CDataTableOptionsPopupCustomText);
 
 		this.setRowRenderer('default', this.renderDataCells);
 
@@ -749,6 +750,13 @@ class CDataTable {
 			}
 
 			cell_inner.appendChild(tags_wrapper);
+		});
+
+		this.setCellRenderer('custom_text', ({column, cell_data, cell_inner}) => {
+			const column_index = column.getColumnIndex();
+			const [custom_text] = cell_data;
+
+			cell_inner.textContent = custom_text ? (custom_text[column_index] ?? '') : '';
 		});
 
 		this.setOptionsHandler(CDataTableColumn.TABLE_OPTIONS, CDataTableOptionsPopupTableOptions);
@@ -1564,6 +1572,10 @@ class CDataTable {
 
 		const handle = this.#options_popup.getHandle();
 		handle.classList.remove(CDataTable.ZBX_STYLE_OPTIONS_LINK_OPENED);
+
+		if (this.#options_popup.isForceLoadOnClose()) {
+			this.dispatchEvent(CDataTable.EVENT_INIT, {force_load: true});
+		}
 
 		this.#options_popup = null;
 		this.#options_popup_updated = false;
@@ -2443,7 +2455,7 @@ class CDataTable {
 
 	#getDataProviderParams(params) {
 		const column_options = this.getNonDuplicateColumns().reduce((options, column) => {
-			return Object.assign(options, column.getColumnOptions());
+			return deepMerge(options, column.getColumnOptions());
 		}, {});
 
 		const options = Object.fromEntries(

@@ -18,7 +18,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['eventid', 'data_actions', 'time', 'eventid', 'objectid', 'severity',
 		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'nested',
-		'symptom_count', 'cause_eventid', 'tags'];
+		'symptom_count', 'cause_eventid', 'tags', 'custom_text'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
@@ -27,10 +27,18 @@ class CControllerProblemViewData extends CControllerDataTable {
 	protected function getData(): array {
 		$rows = [];
 		$data = $this->prepareData();
+		$options = $data['options'];
 
-		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $data['options']);
+		self::addProblemRows($rows, $data, $data['problems'], $data['filter'], $options);
 
 		order_result($data['problems'], $data['sort_field'], $data['sort_order']);
+
+		foreach ($data['problems'] as &$problem) {
+			if (array_key_exists('custom_text', $options)) {
+				$problem['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
+			}
+		}
+		unset($problem);
 
 		return [
 			'filter_counters' => $this->getFilterCounters(),

@@ -18,7 +18,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 	protected array $allowed_data_fields = ['templateid', 'data_actions', 'name', 'hosts', 'items', 'triggers',
 		'graphs', 'dashboards', 'discoveryRules', 'httpTests', 'vendor_name', 'vendor_version', 'parentTemplates',
-		'templates', 'tags'];
+		'templates', 'tags', 'custom_text'];
 
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
@@ -26,6 +26,7 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 	protected function getData(): array {
 		$data_fields = $this->getDataFields();
+		$options = $this->getInput('options', []);
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
 		$sort_field = $this->getInput('sort_field', 'name');
@@ -143,6 +144,8 @@ class CControllerTemplateListData extends CControllerDataTable {
 
 		order_result($templates, $sort_field, $sort_order);
 
+		CTagHelper::mergeOwnAndInheritedTags($templates, true);
+
 		foreach ($templates as &$template) {
 			$template['editable_hosts'] = array_intersect_key($template['hosts'], $editable_hosts);
 
@@ -155,14 +158,13 @@ class CControllerTemplateListData extends CControllerDataTable {
 				$parent_template['editable'] = in_array($parent_template['templateid'], $editable_templateids);
 			}
 			unset($parent_template);
-		}
-		unset($template);
 
-		CTagHelper::mergeOwnAndInheritedTags($templates, true);
-
-		foreach ($templates as &$template) {
 			CArrayHelper::sort($template['tags'], ['tag', 'value']);
 			$template['tags'] = CTagHelper::getTagsList($template, ['filter_tags' => $filter['tags']]);
+
+			if (array_key_exists('custom_text', $options)) {
+				$template['custom_text'] = $this->resolveColumnTexts($options['custom_text']);
+			}
 		}
 		unset($template);
 

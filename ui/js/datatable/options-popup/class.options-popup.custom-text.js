@@ -1,0 +1,75 @@
+/*
+** Copyright (C) 2001-2026 Zabbix SIA
+**
+** This program is free software: you can redistribute it and/or modify it under the terms of
+** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
+**
+** This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+** without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+** See the GNU Affero General Public License for more details.
+**
+** You should have received a copy of the GNU Affero General Public License along with this program.
+** If not, see <https://www.gnu.org/licenses/>.
+**/
+
+
+class CDataTableOptionsPopupCustomText extends CDataTableOptionsPopup {
+
+	getFields() {
+		const custom_text = this.getElement().querySelector('[name="custom_text"]');
+
+		return {custom_text};
+	}
+
+	getTemplate() {
+		return new Template(`
+			<template>
+				<label for="custom_text" class="${ZBX_STYLE_FORM_LABEL}">Custom text</label>
+				<div class="${ZBX_STYLE_FORM_FIELD}">
+					<input type="text" id="custom_text" name="custom_text" maxlength="255"
+						placeholder="${t('Text, macros, or combined')}" data-field-type="text-box">
+				</div>
+			</template>
+		`).evaluateToElement();
+	}
+
+	getFieldData() {
+		const column_index = this.getColumnConfig().getColumnIndex();
+		const column_options = this.getColumnConfig().getColumnOptions();
+
+		return {
+			...column_options,
+			custom_text: {
+				[column_index]: this.getField('custom_text').value
+			}
+		};
+	}
+
+	getDefaultData() {
+		const column_index = this.getColumnConfig().getColumnIndex();
+
+		return {
+			custom_text: {
+				[column_index]: ''
+			}
+		};
+	}
+
+	onInit() {
+		super.onInit();
+
+		const column_index = this.getColumnConfig().getColumnIndex();
+		const column_options = this.getColumnConfig().getColumnOptions();
+
+		const custom_text_field = this.getField('custom_text');
+
+		if ('custom_text' in column_options) {
+			custom_text_field.value = column_options.custom_text[column_index] ?? '';
+		}
+
+		const old_value = custom_text_field.value;
+
+		custom_text_field.addEventListener('input', e => this.setForceLoadOnClose(old_value !== e.target.value));
+	}
+
+}
