@@ -105,7 +105,7 @@ class CTrend extends CApiService {
 			// Output.
 			'output' =>			['type' => API_OUTPUT, 'flags' => API_NOT_EMPTY, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>	['type' => API_BOOLEAN, 'default' => false],
-			'limit' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null],
+			'limit' =>			['type' => API_INT32, 'flags' => API_ALLOW_NULL, 'in' => '1:'.ZBX_MAX_INT32, 'default' => null]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $options, '/', $error)) {

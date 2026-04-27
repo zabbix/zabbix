@@ -47,7 +47,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				'Int32' => ['A' => 1],
 				'Int64' => ['A' => 1],
 				'UInt64' => ['A' => 1],
-				'String' => ['A' => 'overwritten'],
+				'String' => ['A' => 'overwritten']
 			],
 			[
 				'A' => '\'overwritten\''
@@ -256,7 +256,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			$closure,
 			[
 				'select' => ['itemid' => 'itemid', 'type' => 'i.type'],
-				'from' => ['items i'],
+				'from' => ['items i']
 			] + $defaults,
 			'SELECT itemid,i.type AS type FROM items i'
 		];
@@ -309,7 +309,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 		$defaults = [
 			'output' => [],
 			'history' => null,
-			'maxValueSize' => null,
+			'maxValueSize' => null
 		];
 
 		yield 'Ignore fields for another value type' => [
@@ -512,7 +512,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				],
 				'param' => [
 					'UInt64' => ['filter_clock' => 1234567]
-				],
+				]
 			]
 		];
 
@@ -530,7 +530,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				],
 				'param' => [
 					'Int32' => ['filter_ns' => 1234567]
-				],
+				]
 			]
 		];
 
@@ -547,7 +547,7 @@ class CHistoryStorageClickHouseTest extends TestCase {
 				],
 				'param' => [
 					'UInt64' => ['filter_itemid' => [1, 2, 3, 4]]
-				],
+				]
 			]
 		];
 
