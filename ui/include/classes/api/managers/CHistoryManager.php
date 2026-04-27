@@ -1736,6 +1736,8 @@ class CHistoryManager {
 	 * @see CHistoryManager::deleteHistory
 	 */
 	private function deleteHistoryFromElasticsearch(array $itemids) {
+		$value_types = [];
+
 		foreach ($this->value_type_storage as $value_type => $storage) {
 			if ($storage['provider'] === ZBX_HISTORY_SOURCE_ELASTIC) {
 				$value_types[] = $value_type;
