@@ -896,6 +896,14 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 				" setting \"StartReportWriters\" configuration parameter");
 	}
 
+	if (NULL != config_adapter_connect_to &&
+			(NULL == config_adapter_url || '\0' == *config_adapter_url))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "\"BridgeAdapterURL\" configuration parameter must be specified"
+				" when \"BridgeAdapterConnectTo\" is set.");
+		err = 1;
+	}
+
 	if (0 != err)
 		zbx_exit(EXIT_FAILURE);
 }
