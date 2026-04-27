@@ -370,12 +370,19 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			]);
 			$this->assertCount(self::LLD_DISCOVERY_COUNT, $response['result']);
 			foreach ($response['result'] as $trend) {
-				$expected = (float) $expected_by_itemid[$trend['itemid']];
+				$expected = $expected_by_itemid[$trend['itemid']];
 				$this->assertEquals((string) $trend_clock, $trend['clock']);
 				$this->assertEquals('1', $trend['num']);
-				$this->assertEquals($expected, (float) $trend['value_min']);
-				$this->assertEquals($expected, (float) $trend['value_avg']);
-				$this->assertEquals($expected, (float) $trend['value_max']);
+				if ($vtype === ITEM_VALUE_TYPE_FLOAT) {
+					$this->assertEquals((float) $expected, (float) $trend['value_min']);
+					$this->assertEquals((float) $expected, (float) $trend['value_avg']);
+					$this->assertEquals((float) $expected, (float) $trend['value_max']);
+				}
+				else {
+					$this->assertEquals((string) $expected, $trend['value_min']);
+					$this->assertEquals((string) $expected, $trend['value_avg']);
+					$this->assertEquals((string) $expected, $trend['value_max']);
+				}
 			}
 		}
 	}
@@ -456,7 +463,12 @@ class testMultipleItemsHistory extends CIntegrationTest {
 				$exp = $expected_by_itemid[$record['itemid']];
 				$this->assertEquals($tm, (int) $record['clock']);
 				$this->assertEquals($exp['ns'], (int) $record['ns']);
-				$this->assertEquals((float) $exp['value'], (float) $record['value']);
+				if ($vtype === ITEM_VALUE_TYPE_FLOAT) {
+					$this->assertEquals((float) $exp['value'], (float) $record['value']);
+				}
+				else {
+					$this->assertEquals($exp['value'], $record['value']);
+				}
 			}
 
 			$response = $this->call('history.get', [
