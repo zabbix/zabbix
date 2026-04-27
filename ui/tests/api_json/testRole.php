@@ -15,13 +15,62 @@
 
 
 require_once __DIR__.'/../include/CAPITest.php';
+require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 
 /**
  * @onBefore prepareTestData
- *
- * @backup role
+ * @onAfter  cleanTestData
  */
 class testRole extends CAPITest {
+
+	public static function prepareTestData(): void {
+		CTestDataHelper::createObjects([
+			'roles' => [
+				['name' => 'used-role', 'type' => USER_TYPE_ZABBIX_ADMIN],
+				['name' => 'deletable-role', 'type' => USER_TYPE_ZABBIX_USER],
+				['name' => 'first-role-for-update', 'type' => USER_TYPE_SUPER_ADMIN],
+				['name' => 'second-role-for-update', 'type' => USER_TYPE_SUPER_ADMIN, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'administration.macros',
+							'status' => '0'
+						],
+						[
+							'name' => 'administration.housekeeping',
+							'status' => '1'
+						]
+					],
+					'ui.default_access' => '0'
+				]],
+				['name' => 'role-for-get', 'type' => USER_TYPE_SUPER_ADMIN, 'rules' => [
+					'ui' => [
+						[
+							'name' => 'configuration.discovery_actions',
+							'status' => '0'
+						],
+						[
+							'name' => 'configuration.internal_actions',
+							'status' => '1'
+						]
+					],
+					'ui.default_access' => '0'
+				]]
+			],
+			'user_groups' => [
+				['name' => 'user-group-used-for-role.delete-tests']
+			],
+			'users' => [
+				[
+					'username' => 'user-used-for-role.delete-tests',
+					'roleid' => ':role:used-role',
+					'passwd' => 'Z@bb1x1234',
+					'usrgrps' => [
+						['usrgrpid' => ':user_group:user-group-used-for-role.delete-tests']
+					]
+				]
+			]
+		]);
+	}
 
 	public static function role_create() {
 		return [
@@ -413,38 +462,38 @@ class testRole extends CAPITest {
 	public static function role_delete() {
 		return [
 			[
-				'role' => [
-					'roleid_2'
+				'roleids' => [
+					':role:deletable-role'
 				],
 				'expected_error' => null
 			],
 			[
-				'role' => [
+				'roleids' => [
 					''
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'role' => [
+				'roleids' => [
 					'123456'
 				],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'role' => [
+				'roleids' => [
 					'abc'
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'role' => [
+				'roleids' => [
 					'.'
 				],
 				'expected_error' => 'Invalid parameter "/1": a number is expected.'
 			],
 			[
-				'role' => [
-					'roleid_1'
+				'roleids' => [
+					':role:used-role'
 				],
 				'expected_error' => 'Cannot delete assigned user role "used-role".'
 			]
@@ -454,13 +503,10 @@ class testRole extends CAPITest {
 	/**
 	* @dataProvider role_delete
 	*/
-	public function testRole_Delete($role, $expected_error) {
+	public function testRole_Delete($roleids, $expected_error) {
+		CTestDataHelper::convertValueReferences($roleids);
 
-		if ($role[0] === 'roleid_1' || $role[0] === 'roleid_2') {
-			$role = [self::$data['roleids'][$role[0]]];
-		}
-
-		$result = $this->call('role.delete', $role, $expected_error);
+		$result = $this->call('role.delete', $roleids, $expected_error);
 
 		if ($expected_error === null) {
 			foreach ($result['result']['roleids'] as $id) {
@@ -474,7 +520,7 @@ class testRole extends CAPITest {
 			// Check successful update.
 			[
 				'role' => [
-					'roleid' => 'roleid_4',
+					'roleid' => ':role:second-role-for-update',
 					'name' => 'Successfully updated role',
 					'type' => '2'
 				],
@@ -482,7 +528,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_4',
+					'roleid' => ':role:second-role-for-update',
 					'name' => 'Successfully updated role',
 					'type' => '3',
 					'rules' => [
@@ -503,7 +549,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'non existent parameter',
 					'type' => '4'
 				],
@@ -551,7 +597,7 @@ class testRole extends CAPITest {
 			// Check name.
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => '',
 					'type' => '3'
 				],
@@ -559,7 +605,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'Phasellus imperdiet sapien sed justo elementum, quis maximus ipsum iaculis! Proin egestas, felis non efficitur molestie, nulla risus facilisis nisi, sed consectetur lorem mauris non arcu. Aliquam hendrerit massa vel metus maximus consequat. Sed condimen256',
 					'type' => '3'
 				],
@@ -567,7 +613,7 @@ class testRole extends CAPITest {
 			],
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'Super admin role',
 					'type' => '3'
 				],
@@ -576,7 +622,7 @@ class testRole extends CAPITest {
 			// Check for removed ui elements
 			[
 				'role' => [
-					'roleid' => 'roleid_3',
+					'roleid' => ':role:first-role-for-update',
 					'name' => 'Unknown ui element',
 					'type' => '3',
 					'rules' => [
@@ -604,10 +650,7 @@ class testRole extends CAPITest {
 	*/
 	public function testRole_Update($role, $expected_error) {
 		if (isset($role['roleid'])) {
-			if (isset($role['roleid']) && $role['roleid'] === 'roleid_3' ||
-				isset($role['roleid']) && $role['roleid'] === 'roleid_4') {
-				$role['roleid'] = (int) self::$data['roleids'][$role['roleid']];
-			}
+			$role['roleid'] = CTestDataHelper::getConvertedValueReference($role['roleid']);
 		}
 
 		$result = $this->call('role.update', $role, $expected_error);
@@ -642,12 +685,12 @@ class testRole extends CAPITest {
 			[
 				'params' => [
 					'output' => ['roleid', 'name', 'type'],
-					'roleids' => ['roleid_5']
+					'roleids' => [':role:role-for-get']
 				],
 				'expected_result' => [
 					'jsonrpc' => '2.0',
 					'result' => [
-						'roleid' => 'roleid_5',
+						'roleid' => ':role:role-for-get',
 						'name' => 'role-for-get',
 						'type' => '3'
 					],
@@ -659,12 +702,12 @@ class testRole extends CAPITest {
 				'params' => [
 					'output' => ['roleid', 'name', 'type'],
 					'selectRules' => ['ui', 'ui.default_access'],
-					'roleids' => ['roleid_5']
+					'roleids' => [':role:role-for-get']
 				],
 				'expected_result' => [
 					'jsonrpc' => '2.0',
 					'result' => [
-						'roleid' => 'roleid_5',
+						'roleid' => ':role:role-for-get',
 						'name' => 'role-for-get',
 						'type' => '3',
 						'rules' => [
@@ -897,11 +940,13 @@ class testRole extends CAPITest {
 	 * @dataProvider role_get
 	 */
 	public function testRole_Get($params, $expected_result, $expected_error) {
-		if (isset($params['roleids']) && $params['roleids'] === ['roleid_5']) {
-			$params['roleids'] = [(int) self::$data['roleids'][$params['roleids'][0]]];
+		if (isset($params['roleids']) && is_array($params['roleids'])) {
+			$params['roleids'] = CTestDataHelper::getConvertedValueReferences($params['roleids']);
 		}
-		if (isset($expected_result['result']['roleid']) && $expected_result['result']['roleid'] === 'roleid_5') {
-			$expected_result['result']['roleid'] = self::$data['roleids'][$expected_result['result']['roleid']];
+		if (isset($expected_result['result']['roleid'])) {
+			$expected_result['result']['roleid'] = CTestDataHelper::getConvertedValueReference(
+				$expected_result['result']['roleid']
+			);
 		}
 
 		$result = $this->call('role.get', $params, $expected_error);
@@ -916,88 +961,7 @@ class testRole extends CAPITest {
 		}
 	}
 
-	/**
-	 * Test data used by tests.
-	 */
-	protected static $data = [
-		'roleids' => ['roleid_1', 'roleid_2', 'roleid_3', 'roleid_4', 'roleid_5'],
-		'usergroupids' => ['usergroupid_1']
-	];
-
-	/**
-	 * Prepare data for tests.
-	 */
-	public function prepareTestData() {
-
-		$response = CDataHelper::call('role.create', [
-			[
-				'name' => 'used-role',
-				'type' => 2
-			],
-			[
-				'name' => 'deletable-role',
-				'type' => 1
-			],
-			[
-				'name' => 'first-role-for-update',
-				'type' => 3
-			],
-			[
-				'name' => 'second-role-for-update',
-				'type' => 3,
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'administration.macros',
-							'status' => '0'
-						],
-						[
-							'name' => 'administration.housekeeping',
-							'status' => '1'
-						]
-					],
-					'ui.default_access' => '0'
-				]
-			],
-			[
-				'name' => 'role-for-get',
-				'type' => 3,
-				'rules' => [
-					'ui' => [
-						[
-							'name' => 'configuration.discovery_actions',
-							'status' => '0'
-						],
-						[
-							'name' => 'configuration.internal_actions',
-							'status' => '1'
-						]
-					],
-					'ui.default_access' => '0'
-				]
-			]
-		]);
-
-		$this->assertArrayHasKey('roleids', $response);
-		self::$data['roleids'] = array_combine(self::$data['roleids'], $response['roleids']);
-
-		$response = CDataHelper::call('usergroup.create', [
-			[
-				'name' => 'user-group-used-for-role.delete-tests'
-			]
-		]);
-
-		$userGroupId = (int) $response['usrgrpids'][0];
-
-		CDataHelper::call('user.create', [
-			[
-				'username' => 'user-used-for-role.delete-tests',
-				'roleid' => self::$data['roleids']['roleid_1'],
-				'passwd' => 'Z@bb1x1234',
-				'usrgrps' => [
-						['usrgrpid' => $userGroupId]
-					]
-			]
-		]);
+	public static function cleanTestData(): void {
+		CTestDataHelper::cleanUp();
 	}
 }
