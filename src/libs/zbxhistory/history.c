@@ -1429,7 +1429,7 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
  * Purpose: checks if a database entry represents a history storage database  *
  *                                                                            *
  * Parameters: jp       - [IN] JSON object containing database information    *
- *             info     - [IN] history provoder information                   *
+ *             info     - [IN] history provider information                   *
  *             info_num - [IN] number of history providers                    *
  *                                                                            *
  ******************************************************************************/
@@ -1455,7 +1455,7 @@ static int	history_dbversion_is_history(zbx_json_parse_t *jp,zbx_history_provide
  *          provider databases                                                *
  *                                                                            *
  * Parameters: j        - [IN/OUT] output JSON object for filtered entries    *
- *             info     - [IN] history provoder information                   *
+ *             info     - [IN] history provider information                   *
  *             info_num - [IN] number of history providers                    *
  *                                                                            *
  ******************************************************************************/
