@@ -1151,12 +1151,9 @@ class CIntegrationTest extends CAPITest {
 			throw $exception;
 		}
 
-		$message = 'Data requested from '.$method.' API is not present within specified interval. Params used:'.
-				"\n".json_encode($params);
-		if ($response !== null) {
-			$message .= "\nLast response:\n".json_encode($response);
-		}
-		$this->fail($message);
+		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
+				"\n".json_encode($params)
+		);
 	}
 
 	/**
@@ -1348,7 +1345,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$error_msg = 'Failed to wait for '.$description.' to be present in '.$component.
-				'log file: '.self::getLogPath($component).' at '.date('His')."\n";
+				'log file: '.self::getLogPath($component)."\n";
 
 		$error_msg .= CLogHelper::readLog(self::getLogPath($component), false, true);
 
