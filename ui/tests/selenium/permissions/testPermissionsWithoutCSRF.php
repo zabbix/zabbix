@@ -338,7 +338,25 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM correlation',
 					'link' => 'zabbix.php?action=correlation.list',
-					'overlay' => 'create'
+					'overlay' => 'create',
+					'fields' => [
+						'id:name' => 'CSRF validation event correlation',
+						'id:operations_0' => true
+					],
+					'secondary_dialog' => [
+						'field' => 'id:condition_table',
+						'fill' => [
+							'Tag' => 'CSRF test tag'
+						]
+					],
+					'dialog_actions' => [
+						[
+							'click' => 'class:js-condition-add',
+							'fill' => [
+								'id:tag' => 'event_tag'
+							]
+						]
+					]
 				]
 			],
 			// #25 Event correlation update.

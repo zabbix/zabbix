@@ -454,7 +454,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 					$form->query('button:Configure')->one()->click();
 					$oauth_overlay = COverlayDialogElement::find()->all()->last()->waitUntilReady();
 					$oauth_form = $oauth_overlay->asForm();
-					$this->assertEquals('New oauth', $oauth_overlay->getTitle());
+					$this->assertEquals('New OAuth', $oauth_overlay->getTitle());
 
 					// Check that "Copy" button is enabled and displayed.
 					$this->assertTrue($oauth_form->query('xpath:.//button[contains(@class, "zi-copy")]')->one()->isClickable());

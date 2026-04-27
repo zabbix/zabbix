@@ -1265,7 +1265,7 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 			continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
@@ -1403,7 +1403,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 			continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);

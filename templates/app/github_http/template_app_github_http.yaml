@@ -135,7 +135,7 @@ zabbix_export:
         Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the organization being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
@@ -226,7 +226,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -266,6 +267,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -411,7 +428,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -451,6 +469,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -725,7 +759,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -765,6 +800,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3265,7 +3316,7 @@ zabbix_export:
         Note: Update intervals and timeouts for script items can be changed individually via `Data update interval` and `API timeout` host wizard configuration fields with context. Depending on the repository being monitored, it can be adjusted if needed (if you are exceeding rate limits, you can increase update intervals for some script items to stay within per hour request limits). But be aware that it may also affect the triggers (check whether the item is used in triggers and adjust thresholds and/or evaluation periods if needed).
       vendor:
         name: Zabbix
-        version: 8.0-2
+        version: 8.0-3
       groups:
         - name: Templates/Applications
       items:
@@ -3341,7 +3392,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3381,6 +3433,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3518,7 +3586,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3558,6 +3627,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3797,7 +3882,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -3837,6 +3923,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -3980,7 +4082,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4020,6 +4123,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4355,7 +4474,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4395,6 +4515,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4543,7 +4679,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4583,6 +4720,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4709,7 +4862,8 @@ zabbix_export:
             
             			headers = request.getHeaders();
             
-            			url = ((headers.link || '').match(next_pattern) || [])[1];
+            			var link_header = github.getHeader(headers, 'Link');
+            			url = ((link_header || '').match(next_pattern) || [])[1];
             
             			if (pagination_required === 'false') {
             				url = '';
@@ -4749,6 +4903,22 @@ zabbix_export:
             		}
             
             		return response_data.data.length;
+            	},
+            
+            	getHeader: function (headers, name) {
+            		if (!headers || typeof headers !== 'object') {
+            			return null;
+            		}
+            
+            		var target = name.toLowerCase();
+            
+            		for (var key in headers) {
+            			if (key.toLowerCase() === target) {
+            				return headers[key];
+            			}
+            		}
+            		
+            		return null;
             	}
             }
             
@@ -4895,7 +5065,8 @@ zabbix_export:
                 
                 			headers = request.getHeaders();
                 
-                			url = ((headers.link || '').match(next_pattern) || [])[1];
+                			var link_header = github.getHeader(headers, 'Link');
+                			url = ((link_header || '').match(next_pattern) || [])[1];
                 
                 			if (pagination_required === 'false') {
                 				url = '';
@@ -4935,6 +5106,22 @@ zabbix_export:
                 		}
                 
                 		return response_data.data.length;
+                	},
+                
+                	getHeader: function (headers, name) {
+                		if (!headers || typeof headers !== 'object') {
+                			return null;
+                		}
+                
+                		var target = name.toLowerCase();
+                
+                		for (var key in headers) {
+                			if (key.toLowerCase() === target) {
+                				return headers[key];
+                			}
+                		}
+                		
+                		return null;
                 	}
                 }
                 
@@ -5366,7 +5553,8 @@ zabbix_export:
                 
                 			headers = request.getHeaders();
                 
-                			url = ((headers.link || '').match(next_pattern) || [])[1];
+                			var link_header = github.getHeader(headers, 'Link');
+                			url = ((link_header || '').match(next_pattern) || [])[1];
                 
                 			if (pagination_required === 'false') {
                 				url = '';
@@ -5406,6 +5594,22 @@ zabbix_export:
                 		}
                 
                 		return response_data.data.length;
+                	},
+                
+                	getHeader: function (headers, name) {
+                		if (!headers || typeof headers !== 'object') {
+                			return null;
+                		}
+                
+                		var target = name.toLowerCase();
+                
+                		for (var key in headers) {
+                			if (key.toLowerCase() === target) {
+                				return headers[key];
+                			}
+                		}
+                		
+                		return null;
                 	}
                 }
                 
