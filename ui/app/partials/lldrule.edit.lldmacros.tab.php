@@ -35,6 +35,7 @@ $formgrid
 					->setAttribute('data-field-name', 'lld_macro_paths')
 					->setHeader([_('LLD macro'), _('JSONPath'), ''])
 					->addClass('js-lld-macro-paths')
+					->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_CONTAINER)
 					->setFooter(
 						(new CCol(
 							(new CButtonLink(_('Add')))
@@ -44,26 +45,34 @@ $formgrid
 					),
 				(new CTemplateTag('', [
 					(new CRow([
-						(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '#{lld_macro}'))
-							->removeId()
-							->setReadonly($readonly)
-							->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'))
-							->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
-							->setAttribute('placeholder', '{#MACRO}')
-							->addClass('js-macro')
-							->disableSpellcheck()
-							->setErrorContainer('lld-macro-paths-#{rowNum}-error-container'),
-						(new CTextBox('lld_macro_paths[#{rowNum}][path]', '#{path}', $readonly,
-							DB::getFieldLength('lld_macro_path', 'path')
+						(new CCol(
+							(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][lld_macro]', '#{lld_macro}'))
+								->removeId()
+								->setReadonly($readonly)
+								->setMaxlength(DB::getFieldLength('lld_macro_path', 'lld_macro'))
+								->setWidth(ZBX_TEXTAREA_MACRO_WIDTH)
+								->setAttribute('placeholder', '{#MACRO}')
+								->addClass('js-macro')
+								->disableSpellcheck()
+								->setErrorContainer('lld-macro-paths-#{rowNum}-error-container')
 						))
-							->removeId()
-							->setAttribute('placeholder', _('$.path.to.node'))
-							->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
-							->setAttribute('spellcheck', false)
-							->setErrorContainer('lld-macro-paths-#{rowNum}-error-container'),
-						(new CButtonLink(_('Remove')))
-							->addClass('element-table-remove')
-							->setEnabled(!$readonly)
+							->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+						(new CCol(
+							(new CTextAreaFlexible('lld_macro_paths[#{rowNum}][path]', '#{path}'))
+								->removeId()
+								->setReadonly($readonly)
+								->setAttribute('placeholder', _('$.path.to.node'))
+								->setMaxlength(DB::getFieldLength('lld_macro_path', 'path'))
+								->setWidth(ZBX_TEXTAREA_MACRO_VALUE_WIDTH)
+								->setAttribute('spellcheck', false)
+								->setErrorContainer('lld-macro-paths-#{rowNum}-error-container')
+						))
+							->addClass(ZBX_STYLE_TEXTAREA_FLEXIBLE_PARENT),
+						(new CCol(
+							(new CButtonLink(_('Remove')))
+								->addClass('element-table-remove')
+								->setEnabled(!$readonly)
+						))->addClass(ZBX_STYLE_NOWRAP)
 					]))->addClass('form_row'),
 					(new CRow())
 						->addClass('error-container-row')
