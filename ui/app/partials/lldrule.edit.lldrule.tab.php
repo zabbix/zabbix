@@ -563,6 +563,17 @@ $formgrid
 		))->setId('js-item-private-key-field')
 	])
 	->addItem([
+		(new CLabel(_('Key passphrase'), 'passphrase'))->setId('js-item-passphrase-label'),
+		(new CFormField(
+			(new CTextBox('password', $lldrule['password'], $lldrule['discovered_lld'],
+				DB::getFieldLength('items', 'password')
+			))
+				->setAttribute('data-notrim', '')
+				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+				->disableAutocomplete()
+		))->setId('js-item-passphrase-field')
+	])
+	->addItem([
 		(new CLabel(_('Password'), 'password'))->setId('js-item-password-label'),
 		(new CFormField(
 			(new CTextBox('password', $lldrule['password'], $lldrule['discovered_lld'],

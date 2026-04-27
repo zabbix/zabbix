@@ -169,6 +169,31 @@ var LldRuleEditPrototypeTab = class {
 			el.classList.toggle('<?=ZBX_STYLE_DISPLAY_NONE ?>', delete_immediately)
 		);
 
+		let set_hidden = false;
+		const toggle_field_ids = [];
+
+		if (type == <?= ITEM_TYPE_SIMPLE ?>) {
+			toggle_field_ids.push('js-item-timeout-label', 'js-item-timeout-field');
+			set_hidden = key.substring(0, 8) === 'icmpping' || key.substring(0, 7) === 'vmware.';
+		}
+		else if (type == <?= ITEM_TYPE_ZABBIX_ACTIVE ?>) {
+			toggle_field_ids.push('delay', 'js-item-delay-label', 'js-item-delay-field',
+				'js-item-flex-intervals-label', 'js-item-flex-intervals-field'
+			);
+			set_hidden = key.substring(0, 8) === 'mqtt.get';
+		}
+		else if (type == <?= ITEM_TYPE_SNMP ?>) {
+			toggle_field_ids.push('js-item-timeout-label', 'js-item-timeout-field');
+			const snmp_oid = this.#container.querySelector('[name="snmp_oid"]').value;
+			set_hidden = snmp_oid.substring(0, 4) !== 'get[' && snmp_oid.substring(0, 5) !== 'walk[';
+		}
+
+		const object_switcher = globalAllObjForViewSwitcher['type'];
+
+		toggle_field_ids.forEach(id =>
+			object_switcher[set_hidden ? 'hideObj' : 'showObj']({id})
+		);
+
 		const custom_timeout = this.#container.querySelector(['[name="custom_timeout"]:checked']).value;
 		const inherited_hidden = custom_timeout == <?= ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED; ?>
 
