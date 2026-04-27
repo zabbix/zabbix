@@ -235,7 +235,6 @@ try
 		Zabbix.log(3, "finished navigation");
 
 		browser2.setElementWaitTimeout(3000);
-		browser2.setScriptTimeout(15000);
 		findElementStrict(browser2, "xpath", "//div[@class='dashboard is-ready']");
 
 		browser2.setElementWaitTimeout(0);

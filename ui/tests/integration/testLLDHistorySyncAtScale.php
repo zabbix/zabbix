@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @configurationDataProvider configurationProvider
  * @onAfter clearData
  */
-class testLldHistorySyncAtScale extends CIntegrationTest {
+class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 	const HOSTNAME = 'test_lld_history_sync_at_scale';
 	const LLD_RULE_KEY = 'lld.multiple.history.trapper';
@@ -142,7 +142,7 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	 * Send LLD discovery data and verify that each item prototype is
 	 * instantiated for every discovered sensor.
 	 */
-	public function testLldHistorySyncAtScale_LLDDiscovery() {
+	public function testLLDHistorySyncAtScale_LLDDiscovery() {
 		// Reload configuration cache so the server is aware of the LLD rule.
 		$this->reloadConfigurationCacheAndWaitForLogLine();
 
@@ -182,9 +182,9 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Prepare history values for past and current time.
 	 *
-	 * @depends testLldHistorySyncAtScale_LLDDiscovery
+	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
-	public function testLldHistorySyncAtScale_HistoryPrepare() {
+	public function testLLDHistorySyncAtScale_HistoryPrepare() {
 		self::$tm_past = time() - 3600;
 		self::$tm_now = time();
 
@@ -195,9 +195,9 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Send history values 1 hour in the past.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryPrepare
+	 * @depends testLLDHistorySyncAtScale_HistoryPrepare
 	 */
-	public function testLldHistorySyncAtScale_HistoryPastSend() {
+	public function testLLDHistorySyncAtScale_HistoryPastSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_past;
 		self::$vps_last = $this->getVpsWritten();
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
@@ -208,27 +208,27 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Verify that VPS written counter increased by the number of values sent in the past batch.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryPastSend
+	 * @depends testLLDHistorySyncAtScale_HistoryPastSend
 	 */
-	public function testLldHistorySyncAtScale_HistoryPastVpsWritten() {
+	public function testLLDHistorySyncAtScale_HistoryPastVpsWritten() {
 		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
 	}
 
 	/**
 	 * Verify history values sent 1 hour in the past.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryPastVpsWritten
+	 * @depends testLLDHistorySyncAtScale_HistoryPastVpsWritten
 	 */
-	public function testLldHistorySyncAtScale_HistoryPastVerify() {
+	public function testLLDHistorySyncAtScale_HistoryPastVerify() {
 		$this->verifyHistoryAt(self::$tm_past, self::$sent_past);
 	}
 
 	/**
 	 * Send history values at current time.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryPastVerify
+	 * @depends testLLDHistorySyncAtScale_HistoryPastVerify
 	 */
-	public function testLldHistorySyncAtScale_HistoryNowSend() {
+	public function testLLDHistorySyncAtScale_HistoryNowSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
 		self::$vps_last = $this->getVpsWritten();
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
@@ -239,27 +239,27 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Verify that VPS written counter increased by the number of values sent in the current-time batch.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryNowSend
+	 * @depends testLLDHistorySyncAtScale_HistoryNowSend
 	 */
-	public function testLldHistorySyncAtScale_HistoryNowVpsWritten() {
+	public function testLLDHistorySyncAtScale_HistoryNowVpsWritten() {
 		$this->assertVpsWrittenIncreasedBy(self::$vps_last, self::$total_expected);
 	}
 
 	/**
 	 * Verify history values sent at current time.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryNowVpsWritten
+	 * @depends testLLDHistorySyncAtScale_HistoryNowVpsWritten
 	 */
-	public function testLldHistorySyncAtScale_HistoryNowVerify() {
+	public function testLLDHistorySyncAtScale_HistoryNowVerify() {
 		$this->verifyHistoryAt(self::$tm_now, self::$sent_now);
 	}
 
 	/**
 	 * Verify that trends are generated for both past and current hour.
 	 *
-	 * @depends testLldHistorySyncAtScale_HistoryNowVerify
+	 * @depends testLLDHistorySyncAtScale_HistoryNowVerify
 	 */
-	public function testLldHistorySyncAtScale_HistoryAndTrends() {
+	public function testLLDHistorySyncAtScale_HistoryAndTrends() {
 		$this->verifyTrendsAtClock(self::$tm_past - (self::$tm_past % 3600));
 
 		$this->stopComponent(self::COMPONENT_SERVER);
@@ -271,9 +271,9 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	 * Add a trigger prototype per item type, verify that a trigger is created for every
 	 * discovered sensor across all value types, then resend values for each type.
 	 *
-	 * @depends testLldHistorySyncAtScale_LLDDiscovery
+	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
-	public function testLldHistorySyncAtScale_TriggerDiscovery() {
+	public function testLLDHistorySyncAtScale_TriggerDiscovery() {
 		foreach (self::prototypeDefs() as $def) {
 			if ($def['value_type'] === ITEM_VALUE_TYPE_JSON) {
 				continue;
@@ -309,9 +309,9 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testLldHistorySyncAtScale_TriggerDiscovery
+	 * @depends testLLDHistorySyncAtScale_TriggerDiscovery
 	 */
-	public function testLldHistorySyncAtScale_TriggerFiring() {
+	public function testLLDHistorySyncAtScale_TriggerFiring() {
 		$tm = time();
 		$sent = $this->sendHistoryAt($tm);
 		$this->verifyHistoryAt($tm, $sent);
@@ -347,9 +347,9 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
-	 * @depends testLldHistorySyncAtScale_TriggerFiring
+	 * @depends testLLDHistorySyncAtScale_TriggerFiring
 	 */
-	public function testLldHistorySyncAtScale_TriggerFiringRestart() {
+	public function testLLDHistorySyncAtScale_TriggerFiringRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$tm = time();
@@ -602,9 +602,9 @@ class testLldHistorySyncAtScale extends CIntegrationTest {
 	 * Send empty LLD discovery, run housekeeper and verify that all discovered
 	 * items, their history and trigger events are removed.
 	 *
-	 * @depends testLldHistorySyncAtScale_TriggerFiringRestart
+	 * @depends testLLDHistorySyncAtScale_TriggerFiringRestart
 	 */
-	public function testLldHistorySyncAtScale_HousekeeperCleanup() {
+	public function testLLDHistorySyncAtScale_HousekeeperCleanup() {
 		$this->sendDataValues('sender', [
 			[
 				'host' => self::HOSTNAME,
