@@ -76,7 +76,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 						ZBX_PREPROC_FAIL_SET_VALUE => _('Set value to'),
 						ZBX_PREPROC_FAIL_SET_ERROR => _('Set error to')
 					])),
-				(new CTextBox('preprocessing[#{rowNum}][error_handler_params]', '#{error_handler_params}'))
+				(new CTextAreaFlexible('preprocessing[#{rowNum}][error_handler_params]', '#{error_handler_params}'))
 					->setErrorLabel(_('Error message'))
 					->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			]))
@@ -105,21 +105,21 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)
 	]))->addClass('preprocessing-steps-parameters-trim-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('XPath'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('XPath'))
 	]))->addClass('preprocessing-steps-parameters-xpath-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Pattern'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('pattern'))
 	]))->addClass('preprocessing-steps-parameters-regex-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('JSON path'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
@@ -143,24 +143,24 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setAttribute('placeholder', _('max'))
 	]))->addClass('preprocessing-steps-parameters-validate-range-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Search string'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('search string')),
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Replacement'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('replacement'))
 	]))->addClass('preprocessing-steps-parameters-replace-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Pattern'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('pattern')),
-		(new CTextBox('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1]', '#{params[1]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Output'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
@@ -196,7 +196,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 	]))->addClass('preprocessing-steps-parameters-script-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setErrorLabel(_('Pattern'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>')),
@@ -219,13 +219,13 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setAttribute('placeholder', _('<label name>'))
 	]))->addClass('preprocessing-steps-parameters-prometheus-pattern-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setErrorLabel(_('Pattern'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
 			->setAttribute('placeholder', _('<metric name>{<label name>="<label value>", ...} == <value>'))
 	]))->addClass('preprocessing-steps-parameters-prometheus-to-json-tmpl'),
 	(new CTemplateTag('', [
-		(new CTextBox('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_0]', '#{params[0]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('OID'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')
@@ -272,7 +272,7 @@ foreach (get_preprocessing_types(null, true, $data['preprocessing_types']) as $g
 			->setAttribute('placeholder', _('error-matching'))
 			->addClass('js-preproc-param-error-matching')
 			->setValue('#{params[0]}'),
-		(new CTextBox('preprocessing[#{rowNum}][params_1_not_supported]', '#{params[1]}'))
+		(new CTextAreaFlexible('preprocessing[#{rowNum}][params_1_not_supported]', '#{params[1]}'))
 			->setAttribute('data-notrim', '')
 			->setErrorLabel(_('Pattern'))
 			->setErrorContainer('preprocessing-#{rowNum}-error-container')

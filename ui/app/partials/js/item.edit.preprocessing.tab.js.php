@@ -134,7 +134,7 @@ var ItemEditPreprocessingTab = class {
 	#updateRow (row) {
 		const on_fail = row.querySelector('[name*="[on_fail]"]');
 		const select = row.querySelector('z-select[name*="[error_handler]"');
-		const checkbox = row.querySelector('input[name*="error_handler_params"]');
+		const checkbox = row.querySelector('.on-fail-options [name*="[error_handler_params]"]');
 
 		if (on_fail.checked) {
 			row.querySelector('.on-fail-options').style.display = '';
