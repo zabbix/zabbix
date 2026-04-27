@@ -562,6 +562,10 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	private function getVpsWritten(): int {
+		if (CAPIHelper::getSessionId() === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+		}
+
 		$result = $this->testItemOnServer((string) self::$hostid, CAPIHelper::getSessionId(),
 			['value_type' => '3', 'type' => '5', 'key' => 'zabbix[vps,written]']
 		);
