@@ -82,7 +82,7 @@ zabbix_export:
         If you use another path, then do not forget to change the `Apache status page path` host wizard configuration field.
       vendor:
         name: Zabbix
-        version: 8.0-0
+        version: 8.0-1
       groups:
         - name: Templates/Applications
       items:
@@ -689,6 +689,11 @@ zabbix_export:
                   parameters:
                     - $.pmem
                   error_handler: DISCARD_VALUE
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - ''
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'apache.proc.get[{#APACHE.NAME}]'
               tags:
@@ -705,6 +710,11 @@ zabbix_export:
                   parameters:
                     - $.rss
                   error_handler: DISCARD_VALUE
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - ''
+                  error_handler: DISCARD_VALUE
               master_item:
                 key: 'apache.proc.get[{#APACHE.NAME}]'
               tags:
@@ -720,6 +730,11 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.vsize
+                  error_handler: DISCARD_VALUE
+                - type: IN_RANGE
+                  parameters:
+                    - '0'
+                    - ''
                   error_handler: DISCARD_VALUE
               master_item:
                 key: 'apache.proc.get[{#APACHE.NAME}]'
