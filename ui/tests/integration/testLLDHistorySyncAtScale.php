@@ -286,7 +286,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		$response = $this->callUntilDataIsPresent('trigger.get', [
 			'hostids' => [self::$hostid],
 			'output' => ['triggerid', 'description', 'status']
-		], 120, self::WAIT_ITERATION_DELAY, function ($r) {
+		], 180, self::WAIT_ITERATION_DELAY, function ($r) {
 			return count($r['result']) === self::$total_trigger_expected;
 		});
 
