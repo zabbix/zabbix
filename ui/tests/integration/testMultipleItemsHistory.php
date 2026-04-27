@@ -536,6 +536,19 @@ class testMultipleItemsHistory extends CIntegrationTest {
 		], self::COMPONENT_SERVER, 0);
 	}
 
+
+	private function getApiSessionId(): string {
+		if (self::$sessionid === null) {
+			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+			self::$sessionid = CAPIHelper::getSessionId();
+		}
+		else {
+			CAPIHelper::setSessionId(self::$sessionid);
+		}
+
+		return self::$sessionid;
+	}
+
 	private function testItemOnServer(string $hostid, string $sid, array $item,
 			array $options = ['single' => false, 'state' => 0]): array|false {
 		$response = $this->call('host.get', [
@@ -578,7 +591,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			if ($this->getVpsWritten() >= $expected) {
 				break;
 			}
-			usleep(100000);
+			usleep(50000); // 50 ms: detects ~1.2 M values/s throughput lower bound (LLD_DISCOVERY_COUNT * types / 0.05 s)
 		}
 		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
 	}
