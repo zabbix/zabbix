@@ -797,7 +797,7 @@ class CIntegrationTest extends CAPITest {
 			throw new Exception('There is no client available for Zabbix Agent.');
 		}
 
-		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051), 3, 3,
+		return new CZabbixClient('localhost', self::getConfigurationValue($component, 'ListenPort', 10051), 5, 5,
 			ZBX_SOCKET_BYTES_LIMIT
 		);
 	}
