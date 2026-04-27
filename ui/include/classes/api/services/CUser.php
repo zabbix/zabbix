@@ -3092,15 +3092,10 @@ class CUser extends CApiService {
 			$keys_per_scope[$db_device_key['scope']][$db_device_key['kid']] = $db_device_key['key_'];
 		}
 
-		try {
-			CApiDpopHelper::verifyDpopSignature($params['signature'],
-				$keys_per_scope[CDevice::MOBILE_KEY_SCOPE_IDENTITY], $params['token'], $params['requested_api_method'],
-				$time
-			);
-		}
-		catch (Exception $e) {
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), $e->getMessage());
-		}
+		CApiDpopHelper::verifyDpopSignature($params['signature'],
+			$keys_per_scope[CDevice::MOBILE_KEY_SCOPE_IDENTITY], $params['token'], $params['requested_api_method'],
+			$time
+		);
 
 		$this->getAuthenticationUserData($db_token['userid'], $db_user, $group_status);
 

@@ -28,14 +28,14 @@ class CApiDpopHelper {
 	private const SIGNATURE_ALGORITHM = 'ES256';
 
 	/**
-	 * @throws Exception
+	 * @throws APIException
 	 */
 	public static function verifyDpopSignature(string $signature, array $kid_keys, string $access_token,
 			string $requested_api_method, int $check_time): void {
 		$segments = explode('.', $signature);
 
 		if (count($segments) != 3) {
-			throw new Exception('Wrong number of JWT segments.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Wrong number of JWT segments.');
 		}
 
 		[$encoded_header, $encoded_payload] = $segments;
@@ -43,7 +43,7 @@ class CApiDpopHelper {
 		$header = json_decode(JWT::urlsafeB64Decode($encoded_header), true);
 
 		if (!is_array($header) || !$header) {
-			throw new Exception('Invalid header encoding.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid header encoding.');
 		}
 
 		self::checkKid($header, $kid_keys);
@@ -59,7 +59,7 @@ class CApiDpopHelper {
 			JWT::decode($signature, $key);
 		}
 		catch (Exception $e) {
-			throw new Exception($e->getMessage().'.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), $e->getMessage().'.');
 		}
 
 		$payload = json_decode(JWT::urlsafeB64Decode($encoded_payload), true);
@@ -74,101 +74,108 @@ class CApiDpopHelper {
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws APIException
 	 */
 	private static function checkKid(array $header, array $kid_keys): void {
 		if (!array_key_exists('kid', $header)) {
-			throw new Exception('Missing kid in DPoP header.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing kid in DPoP header.');
 		}
 
 		if (!array_key_exists($header['kid'], $kid_keys)) {
-			throw new Exception('Unknown identity key for provided kid.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'),
+				'Unknown identity key for provided kid.'
+			);
 		}
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws APIException
 	 */
 	private static function checkHtu(array $payload, string $requested_api_method): void {
 		if (!array_key_exists('htu', $payload)) {
-			throw new Exception('Missing htu claim.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing htu claim.');
 		}
 
 		// todo - use method get server_id
 		$expected_htu = 'urn:zbx:'.self::getServerId().':'.$requested_api_method;
 
 		if (!hash_equals($expected_htu, $payload['htu'])) {
-			throw new Exception('Invalid htu value.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid htu value.');
 		}
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws APIException
 	 */
 	private static function checkAth(array $payload, string $access_token): void {
 		if (!array_key_exists('ath', $payload)) {
-			throw new Exception('Missing ath claim.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing ath claim.');
 		}
 
 		$expected_ath = JWT::urlsafeB64Encode(hash('sha256', $access_token, true));
 
 		if (!hash_equals($expected_ath, $payload['ath'])) {
-			throw new Exception('Invalid ath value.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Invalid ath value.');
 		}
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws APIException
 	 */
 	private static function checkTokenLifeTime(array $payload, int $check_time): void {
 		if (!array_key_exists('iat', $payload)) {
-			throw new Exception('Missing iat claim.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing iat claim.');
 		}
 
 		if (!array_key_exists('exp', $payload)) {
-			throw new Exception('Missing exp claim.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing exp claim.');
 		}
 
 		$iat = (int) $payload['iat'];
 		$exp = (int) $payload['exp'];
 
 		if ($iat > $exp) {
-			throw new Exception('iat exceeds exp.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'iat exceeds exp.');
 		}
 
 		if ($iat > $check_time + self::TIME_SKEW) {
-			throw new Exception('Invalid iat: JWT token issued in the future beyond allowed skew.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'),
+				'Invalid iat: JWT token issued in the future beyond allowed skew.'
+			);
 		}
 
 		if ($exp - $iat <= self::MAX_ALLOWED_IAT_AGE) {
 			if ($check_time > $exp + self::TIME_SKEW) {
-				throw new Exception('JWT token expired.');
+				throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'JWT token expired.');
 			}
 		}
 		elseif ($check_time > $iat + self::MAX_ALLOWED_IAT_AGE + self::TIME_SKEW) {
-			throw new Exception('JWT token exceeded maximum allowed lifetime.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'),
+				'JWT token exceeded maximum allowed lifetime.'
+			);
 		}
 	}
 
 	/**
-	 * @throws Exception
+	 * @throws APIException
 	 */
 	private static function checkJti(array $payload, int $check_time): void {
 		if (!array_key_exists('jti', $payload)) {
-			throw new Exception('Missing jti claim.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Missing jti claim.');
 		}
 
 		DBexecute('DELETE FROM dpop_jti_cache WHERE expires_at<'.$check_time);
 
 		if (DBfetch(DBselect('SELECT jti FROM dpop_jti_cache WHERE jti='.zbx_dbstr($payload['jti'])))) {
-			throw new Exception('Replay detected: jti already used.');
+			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'Replay detected: jti already used.');
 		}
 
-		if (!DBexecute(
-				'INSERT INTO dpop_jti_cache (jti, expires_at)'.
-					' VALUES ('.zbx_dbstr($payload['jti']).', '.zbx_dbstr($payload['exp']).')')) {
-			throw new Exception('Internal error: unable to persist jti.');
-		}
+		$dpop_jti_cache_ins = [
+			'jti' => $payload['jti'],
+			'expires_at' => $payload['exp']
+		];
+
+		DB::insertBatch('dpop_jti_cache', [$dpop_jti_cache_ins], false);
 	}
 
 	public static function checkJwkIntegrity(array $jwk): bool {
