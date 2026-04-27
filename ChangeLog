@@ -3,7 +3,7 @@ Changes for 8.0.0beta1
 New features:
 .........T [ZBXNEXT-9722] added authentication macros to Redis by Zabbix agent 2 template (smansurovs)
 A.F....... [ZBXNEXT-8791] implemented inline validation in event correlation form (miks, talbergs)
-..F....... [ZBXNEXT-9754] Added inline validation to proxy groups form (talbergs)
+..F....... [ZBXNEXT-9754] added inline validation to proxy groups form (talbergs)
 ..FG...... [ZBXNEXT-7502] added new agent item for network interface discovery with key net.if.get (msnihach, sboidenko)
 .........T [ZBXNEXT-10502] added support for native connection mode in Ceph by Zabbix agent 2 template (abakaldin)
 ..FG...... [ZBXNEXT-10039] added new item vfs.dev.get for block device discovery for Linux and AIX (mprihodko)
