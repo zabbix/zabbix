@@ -563,7 +563,7 @@ class testMultiselectsWithoutData extends testMultiselectDialogs {
 		if (array_key_exists('sub_object', $data)) {
 			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()
 					->findRow('Name', ($data['object'] === 'Hosts') ? self::EMPTY_HOST : self::EMPTY_TEMPLATE)
-					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->click();
+					->getColumn($data['sub_object'])->query('tag:a')->waitUntilClickable()->one()->scrollIntoView(50)->click();
 			$this->page->waitUntilReady();
 		}
 

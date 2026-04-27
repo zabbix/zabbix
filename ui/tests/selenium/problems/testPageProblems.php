@@ -231,7 +231,7 @@ class testPageProblems extends CWebTest {
 
 		$filter_form = $filter_tab->getForm();
 		$this->assertEquals(['Show', 'Host groups', 'Hosts', 'Triggers', 'Problem', 'Severity', 'Age less than',
-				'Show symptoms', 'Acknowledgement status', 'Host inventory', 'Tags'], $filter_form->getLabels()->asText()
+				'Host inventory', 'Tags', 'Show symptoms', 'Acknowledgement status'], $filter_form->getLabels()->asText()
 		);
 
 		// Check the layout of filters that are hiddent in datatable headers.
@@ -432,82 +432,240 @@ class testPageProblems extends CWebTest {
 		$this->query('button:Reset')->waitUntilClickable()->one()->click();
 		$table->waitUntilReady();
 
+		// Check how displayed datatable headers change based on the selected value in "Show" field.
 		$dependant_headers = [
 			[
-				'label' => 'Show',
 				'value' => 'Recent problems',
 				'headers' => ['', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration',
 					'Update', 'Actions', 'Tags'
 				]
 			],
 			[
-				'label' => 'Show',
 				'value' => 'History',
 				'headers' => ['', 'Time', 'Severity', 'Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration',
 					'Update', 'Actions', 'Tags'
 				]
 			],
-// Commented until subissue 45 is resolved.
 			[
-				'label' => 'Show',
 				'value' => 'Problems',
-				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-			],
-//			[
-//				'label' => 'Show tags',
-//				'value' => 'None',
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions']
-//			],
-//			[
-//				'label' => 'Show tags',
-//				'value' => 1,
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show tags',
-//				'value' => 2,
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show tags',
-//				'value' => 3,
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show operational data',
-//				'value' => 'None',
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show operational data',
-//				'value' => 'Separately',
-//				'headers' => ['Info', 'Host', 'Problem', 'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show operational data',
-//				'value' => 'With problem name',
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show timeline',
-//				'value' => false,
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			],
-//			[
-//				'label' => 'Show timeline',
-//				'value' => true,
-//				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
-//			]
+				'headers' => ['', 'Time', 'Severity', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			]
 		];
 
 		foreach ($dependant_headers as $field) {
-			$filter_form->fill([$field['label'] => $field['value']]);
+			$filter_form->fill(['Show' => $field['value']]);
 			$filter_form->submit();
 			$table->waitUntilReady();
-//			$start_headers = ($field['label'] === 'Show timeline' && !$field['value'])
-//				? ['', 'Time', 'Severity']
-//				: ['', 'Time', '', '', 'Severity'];
 			$this->assertEquals($field['headers'], $table->getHeadersText());
+		}
+
+		// Check how the data displayed in datatable changes based on the selected values in header filters.
+		$header_options = [
+			[
+				'column' => [
+					'Time' => [
+						'Show timeline' => true
+					]
+				],
+				'elements_present' => [
+					[
+						'row' => 'Two trigger expressions',
+						'column' => 'Time',
+						'locator' => 'class:timeline-axis'
+					],
+					[
+						'row' => 'Two trigger expressions',
+						'column' => 'Time',
+						'locator' => 'class:timeline-td'
+					]
+				]
+			],
+			[
+				'column' => [
+					'Time' => [
+						'Show timeline' => false
+					]
+				],
+				'elements_not_present' => [
+					[
+						'row' => 'Two trigger expressions',
+						'column' => 'Time',
+						'locator' => 'class:timeline-axis'
+					],
+					[
+						'row' => 'Two trigger expressions',
+						'column' => 'Time',
+						'locator' => 'class:timeline-td'
+					]
+				]
+			],
+			[
+				'column' => [
+					'Problem' => [
+						'Show operational data' => true,
+						'Show trigger expression' => true,
+						'Show suppressed' => true
+					]
+				],
+				'elements_present' => [
+					[
+						'row' => 'Two trigger expressions',
+						'column' => 'Problem',
+						'locator' => 'class:overflow-ellipsis'
+					],
+					[
+						'row' => 'Filled opdata with macros',
+						'column' => 'Problem',
+						'locator' => 'class:opdata'
+					],
+					[
+						'row' => 'Trigger_for_suppression',
+						'column' => 'Info',
+						'locator' => 'class:zi-eye-off'
+					]
+				]
+			],
+			[
+				'column' => [
+					'Problem' => [
+						'Show operational data' => false,
+						'Show trigger expression' => false,
+						'Show suppressed' => false
+					]
+				],
+				'elements_not_present' => [
+					[
+						'row' => 'Two trigger expressions',
+						'column' => 'Problem',
+						'locator' => 'class:overflow-ellipsis'
+					],
+					[
+						'row' => 'Filled opdata with macros',
+						'column' => 'Problem',
+						'locator' => 'class:opdata'
+					],
+					[
+						'row' => 'Trigger_for_suppression'
+					]
+				]
+			],
+			[
+				'column' => [
+					'Tags' => [
+						'Number of tags' => 1
+					]
+				],
+				'elements_present' => [
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][1]'
+					]
+				],
+				'elements_not_present' => [
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][2]'
+					],
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][3]'
+					]
+				]
+			],
+			[
+				'column' => [
+					'Tags' => [
+						'Number of tags' => 2
+					]
+				],
+				'elements_present' => [
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][1]'
+					],
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][2]'
+					]
+				],
+				'elements_not_present' => [
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][3]'
+					]
+				]
+			],
+			[
+				'column' => [
+					'Tags' => [
+						'Number of tags' => 3
+					]
+				],
+				'elements_present' => [
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][1]'
+					],
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][2]'
+					],
+					[
+						'row' => 'Test trigger to check tag filter on problem page',
+						'column' => 'Tags',
+						'locator' => 'xpath:.//span[@class="tag"][3]'
+					]
+				]
+			]
+		];
+
+		// Cgange header filter and check in corresponding elements are show or not shown in datatable.
+		foreach ($header_options as $options) {
+			$this->filterFromHeader($options['column']);
+			$table->waitUntilReady()->invalidate();
+
+			// Check that expected elements are shown in the speciffic datatable row and column.
+			if (array_key_exists('elements_present', $options)) {
+				foreach ($options['elements_present'] as $element) {
+					$expected_element = $table->findRow('Problem', $element['row'], true)->getColumn($element['column'])
+							->query($element['locator'])->one(false);
+					$this->assertTrue($expected_element->isValid(), 'Element with locator '.$element['locator'].' is missing.');
+				}
+			}
+
+			// Check that elements are not present in corresponding datatable row and column.
+			if (array_key_exists('elements_not_present', $options)) {
+				foreach ($options['elements_not_present'] as $element) {
+					if (array_key_exists('column', $element)) {
+						$unexpected_element = $table->findRow('Problem', $element['row'], true)->getColumn($element['column'])
+								->query($element['locator'])->one(false);
+						$this->assertFalse($unexpected_element->isValid(), 'Element with locator '.$element['locator'].
+								' should not be present.'
+						);
+					}
+					else {
+						// For "Show suppressed" the whole row should not be present in the datatable.
+						$this->assertFalse($table->findRow('Problem', $element['row'], true)->isValid());
+					}
+				}
+			}
+		}
+
+		// Check column list updates in datatable.
+		foreach (['Tags' => false, 'Operational data' => true] as $column => $new_state) {
+			$this->updateColumnList([$column => $new_state]);
+			$this->assertEquals($new_state, in_array($column, $table->getHeadersText()));
+			// Change the column back to its default state and verify that changes are applied.
+			$this->updateColumnList([$column => !$new_state]);
+			$this->assertEquals(!$new_state, in_array($column, $table->getHeadersText()));
 		}
 
 		// Check that some unfiltered data is displayed in the table.
@@ -602,8 +760,10 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Triggers' => ['Trigger_for_suppression', '2_trigger_Information'],
-						'Show suppressed problems' => true
+						'Triggers' => ['Trigger_for_suppression', '2_trigger_Information']
+					],
+					'header_filter' => [
+						'Problem' => ['Show suppressed' => true]
 					],
 					'result' => [
 						[
@@ -678,8 +838,8 @@ class testPageProblems extends CWebTest {
 			// #5 Or tag operator.
 			[
 				[
-					'fields' => [
-						'Show timeline' => false
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -765,8 +925,8 @@ class testPageProblems extends CWebTest {
 			// #8 "And/Or" and operator Exists, one tag.
 			[
 				[
-					'fields' => [
-						'Show timeline' => false
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -785,14 +945,14 @@ class testPageProblems extends CWebTest {
 			// #9 "Or" and operator Exists, one tag.
 			[
 				[
-					'fields' => [
-						'Show timeline' => false
-					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
 							['name' => 'Service', 'operator' => 'Exists']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
@@ -820,15 +980,15 @@ class testPageProblems extends CWebTest {
 			// #11 "Or" and operator Exists, two tags.
 			[
 				[
-					'fields' => [
-						'Show timeline' => false
-					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
 							['name' => 'Service', 'operator' => 'Exists'],
 							['name' => 'Database', 'operator' => 'Exists']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
@@ -842,8 +1002,10 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => 'Zabbix servers',
-						'Show timeline' => false
+						'Host groups' => 'Zabbix servers'
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -863,14 +1025,16 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => 'Zabbix servers',
-						'Show timeline' => false
+						'Host groups' => 'Zabbix servers'
 					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
 							['name' => 'Alpha', 'operator' => 'Does not exist']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -884,8 +1048,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Host group for tag permissions', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Host group for tag permissions', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -893,6 +1056,9 @@ class testPageProblems extends CWebTest {
 							['name' => 'Service', 'operator' => 'Does not exist'],
 							['name' => 'Database', 'operator' => 'Does not exist']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Fourth test trigger with tag priority'],
@@ -906,8 +1072,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Host group for tag permissions', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Host group for tag permissions', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -915,6 +1080,9 @@ class testPageProblems extends CWebTest {
 							['name' => 'Service', 'operator' => 'Does not exist'],
 							['name' => 'Database', 'operator' => 'Does not exist']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Trigger for tag permissions Oracle'],
@@ -930,14 +1098,14 @@ class testPageProblems extends CWebTest {
 			// #16 "And/Or" and operator Does not equal.
 			[
 				[
-					'fields' => [
-						'Show timeline' => false
-					],
 					'Tags' => [
 						'Type' => 'And/Or',
 						'tags' => [
 							['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
@@ -994,8 +1162,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -1003,6 +1170,9 @@ class testPageProblems extends CWebTest {
 							['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium'],
 							['name' => 'Beta', 'operator' => 'Does not equal', 'value' => 'b']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1016,8 +1186,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -1025,6 +1194,9 @@ class testPageProblems extends CWebTest {
 							['name' => 'Service', 'operator' => 'Does not equal', 'value' => 'abc'],
 							['name' => 'Database', 'operator' => 'Does not equal']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1041,14 +1213,16 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
 						'tags' => [
 							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1064,14 +1238,16 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
 							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1086,8 +1262,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -1095,6 +1270,9 @@ class testPageProblems extends CWebTest {
 							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'] ,
 							['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
 						]
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1109,8 +1287,7 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Show timeline' => false
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
 					'Tags' => [
 						'Type' => 'Or',
@@ -1144,12 +1321,22 @@ class testPageProblems extends CWebTest {
 						'Host inventory' => [
 							'action' => USER_ACTION_UPDATE, 'index' => 0,
 							'field' => 'Location latitude', 'value' => '56.97612'
+						]
+					],
+					'update_colmuns' => [
+						'Operational data' => true,
+						'Status' => false,
+						'Info' => false
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 3,
+							'Tag name display' => 'Shortened',
+							'Tag display priority' => 'Tag4'
 						],
-						'Show tags' => 3,
-						'id:tag_name_format_0' => 'Shortened',
-						'Tag display priority' => 'Tag4',
-						'Show operational data' => 'Separately',
-						'Show details' => true
+						'Problem' => [
+							'Show trigger expression' => true
+						]
 					],
 					'Tags' => [
 						'Type' => 'And/Or',
@@ -1165,8 +1352,6 @@ class testPageProblems extends CWebTest {
 							'' => '',
 							'Severity' => 'Average',
 							'Recovery time' => '',
-							'Status' => 'PROBLEM',
-							'Info' => '',
 							'Host' => 'ЗАББИКС Сервер',
 							'Problem' => "Test trigger to check tag filter on problem page\navg(/Test host/proc.num,5m)>100",
 							'Operational data' => '*UNKNOWN*',
@@ -1188,9 +1373,18 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Problem' => 'Test trigger',
-						'Average' => true,
-						'Show tags' => 2,
-						'id:tag_name_format_0' => 'Full'
+						'Average' => true
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 2,
+							'Tag name display' => 'Full'
+						]
+					],
+					'update_colmuns' => [
+						'Operational data' => false,
+						'Status' => true,
+						'Info' => true
 					],
 					'result' => [
 						[
@@ -1210,9 +1404,13 @@ class testPageProblems extends CWebTest {
 				[
 					'fields' => [
 						'Problem' => 'Test trigger',
-						'Average' => true,
-						'Show tags' => 1,
-						'id:tag_name_format_0' => 'None'
+						'Average' => true
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 1,
+							'Tag name display' => 'None'
+						]
 					],
 					'result' => [
 						[
@@ -1226,28 +1424,17 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #27 Show tags = None. Tags column absence is being checked in _Layout.
+			// #27 Tags priority check 1.
 			[
 				[
 					'fields' => [
-						'Problem' => 'Test trigger',
-						'Average' => true,
-						'Show tags' => 'None'
+						'Problem' => 'test trigger with tag priority'
 					],
-					'result' => [
-						[
-							'Problem' => 'Test trigger to check tag filter on problem page'
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 3,
+							'Tag display priority' => 'Kappa'
 						]
-					]
-				]
-			],
-			// #28 Tags priority check 1.
-			[
-				[
-					'fields' => [
-						'Problem' => 'test trigger with tag priority',
-						'Show tags' => 3,
-						'Tag display priority' => 'Kappa'
 					],
 					'result' => [
 						[
@@ -1269,13 +1456,17 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #29 Tags priority check 2.
+			// #28 Tags priority check 2.
 			[
 				[
 					'fields' => [
-						'Problem' => 'test trigger with tag priority',
-						'Show tags' => 3,
-						'Tag display priority' => 'Kappa, Beta'
+						'Problem' => 'test trigger with tag priority'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 3,
+							'Tag display priority' => 'Kappa, Beta'
+						]
 					],
 					'result' => [
 						[
@@ -1297,13 +1488,17 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #30 Tags priority check 3.
+			// #29 Tags priority check 3.
 			[
 				[
 					'fields' => [
-						'Problem' => 'test trigger with tag priority',
-						'Show tags' => 3,
-						'Tag display priority' => 'Gamma, Kappa, Beta'
+						'Problem' => 'test trigger with tag priority'
+					],
+					'header_filter' => [
+						'Tags' => [
+							'Number of tags' => 3,
+							'Tag display priority' => 'Gamma, Kappa, Beta'
+						]
 					],
 					'result' => [
 						[
@@ -1325,7 +1520,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #31 Test result with 2 tags, and then result after removing one tag.
+			// #30 Test result with 2 tags, and then result after removing one tag.
 			[
 				[
 					'Tags' => [
@@ -1344,22 +1539,30 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #32 Suppressed problem not shown.
+			// #31 Suppressed problem not shown.
 			[
 				[
 					'fields' => [
-						'Hosts' => 'Host for suppression',
-						'Show suppressed problems' => false
+						'Hosts' => 'Host for suppression'
+					],
+					'header_filter' => [
+						'Problem' => [
+							'Show suppressed' => false
+						]
 					],
 					'result' => []
 				]
 			],
-			// #33 Suppressed problem is shown.
+			// #32 Suppressed problem is shown.
 			[
 				[
 					'fields' => [
-						'Hosts' => 'Host for suppression',
-						'Show suppressed problems' => true
+						'Hosts' => 'Host for suppression'
+					],
+					'header_filter' => [
+						'Problem' => [
+							'Show suppressed' => true
+						]
 					],
 					'result' => [
 						[
@@ -1374,12 +1577,15 @@ class testPageProblems extends CWebTest {
 					'check_suppressed' => "Suppressed till: 12:17\nMaintenance: Maintenance for suppression test"
 				]
 			],
-			// #34 Show timeline.
+			// #33 Show timeline.
 			[
 				[
 					'fields' => [
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Warning' => true
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => true]
 					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
@@ -1392,13 +1598,15 @@ class testPageProblems extends CWebTest {
 					'table_timeline' => true
 				]
 			],
-			// #35 Age filter - 999.
+			// #34 Age filter - 999.
 			[
 				[
 					'fields' => [
 						'id:age_state_0' => true,
-						'name:age' => 999,
-						'Show timeline' => false
+						'name:age' => 999
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
@@ -1420,7 +1628,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #36 Age filter - 0.
+			// #35 Age filter - 0.
 			[
 				[
 					'fields' => [
@@ -1430,13 +1638,17 @@ class testPageProblems extends CWebTest {
 					'result' => []
 				]
 			],
-			// #37 Age filter - 1.
+			// #36 Age filter - 1.
 			[
 				[
 					'fields' => [
 						'id:age_state_0' => true,
-						'name:age' => 10,
-						'Show timeline' => false
+						'name:age' => 10
+					],
+					'header_filter' => [
+						'Time' => [
+							'Show timeline' => false
+						]
 					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
@@ -1457,15 +1669,17 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #38 History.
+			// #37 History.
 			[
 				[
 					'fields' => [
-						'Show' => 'History',
-						'Show timeline' => false
+						'Show' => 'History'
 					],
 					'time_selector' => [
 						'link' => 'Last 1 day'
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
@@ -1485,13 +1699,15 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #39 Problems.
+			// #38 Problems.
 			[
 				[
 					'fields' => [
 						'Show' => 'Problems',
-						'Not classified' => true,
-						'Show timeline' => false
+						'Not classified' => true
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
@@ -1501,13 +1717,15 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #40 Unacknowledged.
+			// #39 Unacknowledged.
 			[
 				[
 					'fields' => [
 						'Severity' => 'Warning',
-						'Acknowledgement status' => 'Unacknowledged',
-						'Show timeline' => false
+						'Acknowledgement status' => 'Unacknowledged'
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'trigger on host 2'],
@@ -1520,12 +1738,11 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #41 Acknowledged.
+			// #40 Acknowledged.
 			[
 				[
 					'fields' => [
-						'Acknowledgement status' => 'Acknowledged',
-						'Show timeline' => false
+						'Acknowledgement status' => 'Acknowledged'
 					],
 					'result' => [
 						['Problem' => '4_trigger_Average'],
@@ -1534,13 +1751,12 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #42 Acknowledged by me.
+			// #41 Acknowledged by me.
 			[
 				[
 					'fields' => [
 						'Acknowledgement status' => 'Acknowledged',
-						'id:acknowledged_by_me_0' => true,
-						'Show timeline' => false
+						'id:acknowledged_by_me_0' => true
 					],
 					'result' => [
 						['Problem' => '3_trigger_Average'],
@@ -1548,11 +1764,13 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #43 Compact view.
+			// #42 Compact view.
 			[
 				[
 					'fields' => [
-						'Problem' => '1_trigger_Disaster',
+						'Problem' => '1_trigger_Disaster'
+					],
+					'update_colmuns' => [
 						'Compact view' => true
 					],
 					'result' => [
@@ -1560,11 +1778,13 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #44 Highlight whole row.
+			// #43 Highlight whole row.
 			[
 				[
 					'fields' => [
-						'Problem' => '1_trigger_Average',
+						'Problem' => '1_trigger_Average'
+					],
+					'update_colmuns' => [
 						'Compact view' => true,
 						'Highlight whole row' => true
 					],
@@ -1573,13 +1793,12 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #45 Time selector 1 day.
+			// #44 Time selector 1 day.
 			[
 				[
 					'fields' => [
 						'Show' => 'History',
-						'Hosts' => 'Host for Problems Page',
-						'Show timeline' => false
+						'Hosts' => 'Host for Problems Page'
 					],
 					'time_selector' => [
 						'id:from' => 'now-1d',
@@ -1598,13 +1817,12 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #46 Time selector 2 weeks.
+			// #45 Time selector 2 weeks.
 			[
 				[
 					'fields' => [
 						'Show' => 'History',
-						'Hosts' => 'Host for Problems Page',
-						'Show timeline' => false
+						'Hosts' => 'Host for Problems Page'
 					],
 					'time_selector' => [
 						'id:from' => 'now-2w',
@@ -1624,13 +1842,12 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #47 Time selector Last 1 year.
+			// #46 Time selector Last 1 year.
 			[
 				[
 					'fields' => [
 						'Show' => 'History',
-						'Hosts' => 'Host for Problems Page',
-						'Show timeline' => false
+						'Hosts' => 'Host for Problems Page'
 					],
 					'time_selector' => [
 						'link' => 'Last 1 year'
@@ -1650,7 +1867,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #48 Multiple spaces between words in "Problem" field name.
+			// #47 Multiple spaces between words in "Problem" field name.
 			[
 				[
 					'fields' => [
@@ -1661,7 +1878,7 @@ class testPageProblems extends CWebTest {
 					]
 				]
 			],
-			// #49 Multiple spaces in "Problem" field name.
+			// #48 Multiple spaces in "Problem" field name.
 			[
 				[
 					'fields' => [
@@ -1693,7 +1910,17 @@ class testPageProblems extends CWebTest {
 		}
 
 		$form->submit();
-		$table->waitUntilReady();
+		$table->waitUntilReady()->invalidate();
+
+		// Apply the filter from datatable headers.
+		if (array_key_exists('header_filter', $data)) {
+			$this->filterFromHeader($data['header_filter']);
+			$table->waitUntilReady()->invalidate();
+		}
+
+		if (array_key_exists('update_colmuns', $data)) {
+			$this->updateColumnList($data['update_colmuns']);
+		}
 
 		if (array_key_exists('time_selector', $data)) {
 			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();

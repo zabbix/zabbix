@@ -213,6 +213,13 @@ class CDatatableBehavior extends CTableBehavior {
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
 			$button = $table->getHeaderByText($column)->query($button_selector)->one()->waitUntilClickable();
+
+//			try {
+//				$button->waitUntilClickable();
+//			}
+//			catch (Exception $e) {
+//				$table->scrollHorizontally(30);
+//			}
 			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
@@ -220,9 +227,12 @@ class CDatatableBehavior extends CTableBehavior {
 				$for = $popup_dialog->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($field).']')->one()
 						->getAttribute('for');
 				$popup_dialog->query('id', $for)->one()->detect()->fill($value);
+
+				$table->waitUntilReady()->invalidate();
 			}
 
 			// Click on button again to close the popup.
+			$button->invalidate();
 			$button->click();
 			$popup_dialog->waitUntilNotVisible();
 		}
@@ -251,6 +261,7 @@ class CDatatableBehavior extends CTableBehavior {
 				$field = $popup_dialog->query('id', $for)->one()->detect();
 
 				if (array_key_exists('value', $parameters)) {
+
 					$this->test->assertEquals($parameters['value'], $field->getValue());
 				}
 
@@ -270,7 +281,7 @@ class CDatatableBehavior extends CTableBehavior {
 	}
 
 	public function checkColumnList($column_list) {
-		$table = $this->test->query('id:latest')->one()->asDatatable()->waitUntilReady();
+		$table = $this->getDatatable();
 		$table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable()->click();
 
 		$popup_dialog = $this->test->query('xpath:.//div[@class="datatable-options-popup datatable-options"]')->one()
@@ -288,6 +299,26 @@ class CDatatableBehavior extends CTableBehavior {
 		}
 
 		$this->test->assertTrue($popup_dialog->query('button:Reset layout')->one()->isClickable());
+	}
+
+	public function updateColumnList($field_changes) {
+		$table = $this->getDatatable();
+		$button = $table->query('xpath:.//button[@title="Customize table"]')->one()->waitUntilClickable();
+		$button->click();
+		$popup_dialog = $this->test->query('xpath:.//div[@class="datatable-options-popup datatable-options"]')->one()
+				->waitUntilVisible();
+
+		foreach ($field_changes as $field => $value) {
+			$for = $popup_dialog->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($field).']/..')->one()
+						->getAttribute('for');
+			$popup_dialog->query('id', $for)->one()->detect()->fill($value);
+			$table->waitUntilReady()->invalidate();
+		}
+sleep(5);
+		// Click on button again to close the popup.
+		$button->invalidate();
+		$button->click();
+		$popup_dialog->waitUntilNotVisible();
 	}
 
 	/**
@@ -339,6 +370,8 @@ class CDatatableBehavior extends CTableBehavior {
 	 *
 	 * @param string $column    column name, where value should be checked
 	 * @param string $selector  table selector
+	 *
+	 * @return array
 	 */
 	public function getDatatableColumnData($column, $selector = null) {
 		$table = $this->getDatatable($selector);

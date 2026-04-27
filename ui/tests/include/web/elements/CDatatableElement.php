@@ -332,4 +332,11 @@ class CDatatableElement extends CTableElement {
 			}
 		}, 'Failed to wait until there are exactly '.$count.' rows in the datatable.');
 	}
+
+//	/**
+//	 * Scroll the datatable to the right position.
+//	 */
+//	public function scrollHorizontally($shift) {
+//		CElementQuery::getDriver()->executeScript('arguments[0].scrollLeft +='.$shift.';', [$this]);
+//	}
 }
