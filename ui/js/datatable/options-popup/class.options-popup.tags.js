@@ -113,8 +113,42 @@ class CDataTableOptionsPopupTags extends CDataTableOptionsPopup {
 
 		const {number_of_tags, tag_name_display, tag_display_priority} = this.getData();
 
-		this.getField('number_of_tags').forEach(field => field.checked = field.value == number_of_tags);
-		this.getField('tag_name_display').forEach(field => field.checked = field.value == tag_name_display);
+		const number_of_tags_fields = this.getField('number_of_tags');
+
+		for (const number_of_tags_field of number_of_tags_fields) {
+			if (number_of_tags_field.value == number_of_tags) {
+				number_of_tags_field.setAttribute('checked', 'true');
+			}
+
+			number_of_tags_field.addEventListener('change', e => {
+				for (const number_of_tags_field of number_of_tags_fields) {
+					number_of_tags_field.removeAttribute('checked');
+				}
+
+				if (e.target.value == number_of_tags_field.value) {
+					number_of_tags_field.setAttribute('checked', 'true');
+				}
+			});
+		}
+
+		const tag_name_display_fields = this.getField('tag_name_display');
+
+		for (const tag_name_display_field of tag_name_display_fields) {
+			if (tag_name_display_field.value == tag_name_display) {
+				tag_name_display_field.setAttribute('checked', 'true');
+			}
+
+			tag_name_display_field.addEventListener('change', e => {
+				for (const tag_name_display_field of tag_name_display_fields) {
+					tag_name_display_field.removeAttribute('checked');
+				}
+
+				if (e.target.value == tag_name_display_field.value) {
+					tag_name_display_field.setAttribute('checked', 'true');
+				}
+			});
+		}
+
 		this.getField('tag_display_priority').value = tag_display_priority;
 	}
 }
