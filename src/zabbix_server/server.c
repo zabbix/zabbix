@@ -101,10 +101,7 @@
 #include "zbxbincommon.h"
 #include "zbxsupervisor.h"
 #include "zbxsupervisor_client.h"
-
-#ifdef HAVE_LIBCURL
-#	include "zbxcurl.h"
-#endif
+#include "zbxcurl.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
