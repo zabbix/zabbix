@@ -892,9 +892,10 @@ class CClickHouseStorage {
 	private function addQuerySearchOptions(array $sql_parts, array $options): array {
 		$search = [];
 		$fields = self::VALUE_TYPE_SCHEMA[$options['history']];
-		$prefix = $options['startSearch'] ? '' : '%';
+		$prefix = $options['startSearch'] || $options['searchWildcardsEnabled'] ? '' : '%';
+		$suffix = $options['searchWildcardsEnabled'] ? '' : '%';
 		$operation = $options['excludeSearch'] ? ' NOT ILIKE ' : ' ILIKE ';
-		$pairs = ($options['searchWildcardsEnabled'] ? ['*' => '%'] : []) + ['%' => '\%', '_' => '\_'];
+		$escape_pairs = ($options['searchWildcardsEnabled'] ? ['*' => '%'] : []) + ['%' => '\%', '_' => '\_'];
 
 		foreach (array_intersect_key($fields, $options['search']) as $field => $param_type) {
 			if ($param_type !== 'String') {
@@ -908,7 +909,7 @@ class CClickHouseStorage {
 			}
 
 			foreach ($patterns as &$pattern) {
-				$pattern = $prefix.strtr($pattern, $pairs).'%';
+				$pattern = $prefix.strtr($pattern, $escape_pairs).$suffix;
 			}
 			unset($pattern);
 
@@ -922,6 +923,10 @@ class CClickHouseStorage {
 				$sql_parts['param'][$param_type]['search_'.$field] = reset($patterns);
 				$search[$field] = $field.$operation.'{search_'.$field.':String}';
 			}
+		}
+
+		if (!$search) {
+			return $sql_parts;
 		}
 
 		$sql_parts['where']['search'] = implode($options['searchByAny'] ? ' OR ' : ' AND ', $search);

@@ -643,4 +643,147 @@ class CHistoryStorageClickHouseTest extends TestCase {
 	public function testAddQueryFilterOptions(Closure $method, array $sql_parts, array $options, $expected) {
 		$this->assertSame($expected, $method($sql_parts, $options));
 	}
+
+	public static function dataProviderAddQuerySearchOptions() {
+		$closure = Closure::bind(
+			fn($sql_parts, $options) => $this->addQuerySearchOptions($sql_parts, $options),
+			new CClickHouseStorage([
+				'url' => '',
+				'types' => [],
+				'db' => '',
+				'username' => '',
+				'password' => ''
+			], []),
+			CClickHouseStorage::class
+		);
+		$defaults = [
+			'history' => null,
+			'startSearch' => false,
+			'excludeSearch' => false,
+			'searchWildcardsEnabled' => false,
+			'searchByAny' => false
+		];
+
+		yield 'Search ignore fields for another value type' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_UINT64,
+				'search' => ['severity' => 7]
+			] + $defaults,
+			[]
+		];
+
+		yield 'Search ignore fields of not String type' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_JSON,
+				'search' => ['itemid' => 7]
+			] + $defaults,
+			[]
+		];
+
+		yield 'Search ignore empty patterns' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'searchWildcardsEnabled' => true,
+				'search' => [
+					'value' => '',
+					'source' => [' ', '']
+				]
+			] + $defaults,
+			[
+				'where' => [
+					'search' => 'source ILIKE {search_source:String}'
+				],
+				'param' => [
+					'String' => ['search_source' => ' ']
+				]
+			]
+		];
+
+		yield 'Search startSearch' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'startSearch' => true,
+				'search' => [
+					'value' => 'str',
+					'source' => ['*str1', '%str2']
+				]
+			] + $defaults,
+			[
+				'where' => [
+					'search' => 'value ILIKE {search_value:String} AND arrayAll(p -> source ILIKE p, {search_source:Array(String)})'
+				],
+				'param' => [
+					'String' => [
+						'search_value' => 'str%',
+						'search_source' => ['*str1%', '\\%str2%']
+					]
+				]
+			]
+		];
+
+		yield 'Search startSearch with searchByAny' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'startSearch' => true,
+				'searchByAny' => true,
+				'search' => [
+					'value' => 'str',
+					'source' => ['*str1', '%str2']
+				]
+			] + $defaults,
+			[
+				'where' => [
+					'search' => '(value ILIKE {search_value:String} OR arrayExists(p -> source ILIKE p, {search_source:Array(String)}))'
+				],
+				'param' => [
+					'String' => [
+						'search_value' => 'str%',
+						'search_source' => ['*str1%', '\\%str2%']
+					]
+				]
+			]
+		];
+
+		yield 'Search searchWildcardsEnabled' => [
+			$closure,
+			['where' => [], 'param' => []],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'searchWildcardsEnabled' => true,
+				'search' => [
+					'value' => 'str',
+					'source' => ['*str1', '%str2']
+				]
+			] + $defaults,
+			[
+				'where' => [
+					'search' => 'value ILIKE {search_value:String} AND arrayAll(p -> source ILIKE p, {search_source:Array(String)})'
+				],
+				'param' => [
+					'String' => [
+						'search_value' => 'str',
+						'search_source' => ['%str1', '\\%str2']
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @covers CClickHouseStorage::addQuerySearchOptions
+	 * @dataProvider dataProviderAddQuerySearchOptions
+	 */
+	public function testAddQuerySearchOptions(Closure $method, array $sql_parts, array $options, $expected) {
+		$this->assertSame($expected, $method($sql_parts, $options));
+	}
 }
