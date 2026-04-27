@@ -535,7 +535,7 @@ class testMultipleItemsHistory extends CIntegrationTest {
 			'search' => ['key_' => self::ITEM_PROTO_KEY.'.']
 		], 0, 120, self::WAIT_ITERATION_DELAY);
 
-		/* check that server succeessfuly large amount if items from cache */
+		/* check that server succeessfuly removed large amount of items from cache */
 		$this->reloadConfigurationCacheAndWaitForLogLine(self::COMPONENT_SERVER);
 	}
 }
