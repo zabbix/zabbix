@@ -145,7 +145,6 @@ class HostMacrosManager {
 				const inherited_value_field_state = (macro_type == HostMacrosManager.ZBX_MACRO_TYPE_SECRET)
 					? {'disabled': true}
 					: {'readonly': true};
-				const fields = document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`);
 
 				if (inherited_type & HostMacrosManager.ZBX_PROPERTY_OWN) {
 					// Switching from ZBX_PROPERTY_BOTH to ZBX_PROPERTY_INHERITED.
@@ -176,7 +175,8 @@ class HostMacrosManager {
 					$('#macros_' + macro_num + '_allow_revert').remove();
 					$('#macros_' + macro_num + '_hostmacroid').remove();
 
-					fields.forEach(field => field.setAttribute('data-skip-from-submit', 1));
+					document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`)
+						.forEach(field => field.setAttribute('data-skip-from-submit', 1));
 				}
 				else {
 					// Switching from ZBX_PROPERTY_INHERITED to ZBX_PROPERTY_BOTH.
@@ -194,7 +194,8 @@ class HostMacrosManager {
 						.attr({'aria-haspopup': true});
 					$('#macros_' + macro_num + '_change_inheritance').text(t('Remove'));
 
-					fields.forEach(field => field.removeAttribute('data-skip-from-submit'));
+					document.querySelectorAll(`[data-field-type][name^="macros[${macro_num}]"]`)
+						.forEach(field => field.removeAttribute('data-skip-from-submit'));
 				}
 
 				$('#macros_' + macro_num + '_discovery_state').val(HostMacrosManager.DISCOVERY_STATE_MANUAL);
