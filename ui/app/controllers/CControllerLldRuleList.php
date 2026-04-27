@@ -250,7 +250,7 @@ class CControllerLldRuleList extends CController {
 				]), ['templateid' => 'id']);
 			}
 
-			$filter['filter_hostids'] = array_keys($filter['ms_hosts']);
+			$filter['filter_hostids'] = array_column($filter['ms_hosts'], 'hostid');
 		}
 
 		if ($filter['filter_groupids']) {
