@@ -414,6 +414,7 @@ class CIntegrationTest extends CAPITest {
 		$start = microtime(true);
 		self::validateComponent($component);
 
+		$saved_time = time();
 		for ($r = 0; $r < self::WAIT_ITERATIONS; $r++) {
 			$pid = @file_get_contents(self::getPidPath($component));
 			if ($skip_pid == true || ($pid && is_numeric($pid) && posix_kill($pid, 0))) {

@@ -589,8 +589,11 @@ class testAgentItems extends CIntegrationTest {
 				]
 			]
 		],
+		// Cannot use zabbix_agentd/zabbix_agent2 here since it forks, when executes some metrics.
+		// Other processes like systemd may not be available in Docker.
+		// So, we are left with the zabbix_server for which the number of processes/threads should be stable.
 		[
-			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'key' => 'proc.get[zabbix_server,,,summary]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
@@ -598,14 +601,14 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['processes', 'threads'],
 			'result' => [
 				[
-					'name' => 'zabbix_agentd',
-					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
-					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
+					'name' => 'zabbix_server',
+					'processes' => 'ps --no-headers -C zabbix_server | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_server | wc -l'
 				]
 			]
 		],
 		[
-			'key' => 'proc.get[zabbix_agentd,,,summary]',
+			'key' => 'proc.get[zabbix_server,,,summary]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
@@ -613,9 +616,9 @@ class testAgentItems extends CIntegrationTest {
 			'fields_exec' => ['processes', 'threads'],
 			'result' => [
 				[
-					'name' => 'zabbix_agentd',
-					'processes' => 'ps --no-headers -C zabbix_agentd | wc -l',
-					'threads' => 'ps --no-headers -T -C zabbix_agentd | wc -l'
+					'name' => 'zabbix_server',
+					'processes' => 'ps --no-headers -C zabbix_server | wc -l',
+					'threads' => 'ps --no-headers -T -C zabbix_server | wc -l'
 				]
 			]
 		],
