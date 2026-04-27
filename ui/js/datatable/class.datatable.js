@@ -1114,6 +1114,8 @@ class CDataTable {
 			return;
 		}
 
+		this.#lockHeight();
+
 		if (!column.isResized()) {
 			column.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
 		}
