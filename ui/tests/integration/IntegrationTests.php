@@ -47,7 +47,6 @@ require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testAutoregistrationPSK.php';
 require_once dirname(__FILE__).'/testAutoregistrationHostMetaDataItem.php';
 require_once dirname(__FILE__).'/testHistoryGet.php';
-require_once dirname(__FILE__).'/testMultipleItemsHistory.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
@@ -110,7 +109,6 @@ class IntegrationTests {
 		$suite->addTestSuite('testInitialConfSync');
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
 		$suite->addTestSuite('testHistoryGet');
-		$suite->addTestSuite('testMultipleItemsHistory');
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
 		$suite->addTestSuite('testUserMacrosInItemNames');

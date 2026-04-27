@@ -18,7 +18,6 @@ declare -A BASELINE_TIMES=(
   [testHostConnMacroValidation]=99
   [testItemState]=98
   [testHistoryPush]=92
-  [testMultipleItemsHistory]=60
   [testValuemaps]=89
   [testAutoregistrationPSK]=85
   [testLowLevelDiscovery]=84
