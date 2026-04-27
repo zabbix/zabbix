@@ -275,12 +275,8 @@ class CControllerMediatypeCreate extends CControllerMediatypeUpdateGeneral {
 	}
 
 	protected function checkPermissions(): bool {
-		if (!CMediatypeHelper::getSupportedMediaTypes()
-				|| !$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES)) {
-			return false;
-		}
-
-		return true;
+		return (CMediatypeHelper::getSupportedMediaTypes()
+			&& $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_MEDIA_TYPES));
 	}
 
 	protected function doAction(): void {
