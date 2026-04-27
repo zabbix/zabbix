@@ -45,7 +45,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	private static $sent_past = [];
 	private static $sent_now = [];
 	private static $vps_last;
-	private static $sessionid;
 
 	private static function prototypeDefs() {
 		return [
@@ -539,18 +538,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 
-	private function getApiSessionId(): string {
-		if (self::$sessionid === null) {
-			$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
-			self::$sessionid = CAPIHelper::getSessionId();
-		}
-		else {
-			CAPIHelper::setSessionId(self::$sessionid);
-		}
-
-		return self::$sessionid;
-	}
-
 	private function testItemOnServer(string $hostid, string $sid, array $item,
 			array $options = ['single' => false, 'state' => 0]): array|false {
 		$response = $this->call('host.get', [
@@ -575,7 +562,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	private function getVpsWritten(): int {
-		$result = $this->testItemOnServer((string) self::$hostid, $this->getApiSessionId(),
+		$result = $this->testItemOnServer((string) self::$hostid, CAPIHelper::getSessionId(),
 			['value_type' => '3', 'type' => '5', 'key' => 'zabbix[vps,written]']
 		);
 		$this->assertNotFalse($result);
