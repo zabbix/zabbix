@@ -408,7 +408,274 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-postgresql,init-proxy-postgresql">
+	<target name="create-frontend-elasticsearch-configs" if="elasticsearch">
+		<property name="elasticsearch_url" value="${ELASTICSEARCH_URL}"/>
+
+		<echo file="ui/conf/zabbix.conf.php" append="true">${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['url'] = [${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'dbl' =&gt; '${elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'str' =&gt; '${elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'log' =&gt; '${elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'uint' =&gt; '${elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'text' =&gt; '${elasticsearch_url}',${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">     'json' =&gt; '${elasticsearch_url}'${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['types'] = ['dbl', 'str', 'log', 'uint', 'text', 'json'];${line.separator}</echo>
+	</target>
+
+	<target name="apply-frontend-elasticsearch-patches" if="elasticsearch">
+		<exec executable="sed" failonerror="on">
+			<arg line="-r"/>
+			<arg line="'/^\tpublic static function getElasticsearchEndpoints\(/,/^\t\}/ s/(\$url\.)(\$index\.)/\1&quot;${dbname}_&quot;.\2/g'"/>
+			<arg line="-i ui/include/classes/api/managers/CHistoryManager.php"/>
+		</exec>
+	</target>
+
+	<target name="apply-server-elasticsearch-patches" if="elasticsearch">
+		<exec executable="sed" failonerror="on">
+			<arg line="-r"/>
+			<arg line="'/^const char[[:space:]]+\*value_type_str\[\][[:space:]]+=/ s/&quot;([^&quot;]*)&quot;/&quot;${dbname}_\1&quot;/g'"/>
+			<arg line="-i src/libs/zbxhistory/history_elastic.c"/>
+		</exec>
+	</target>
+
+	<target name="apply-elasticsearch-patches" depends="apply-frontend-elasticsearch-patches,apply-server-elasticsearch-patches"/>
+
+	<target name="drop-db-elasticsearch" if="elasticsearch">
+		<property name="drop-db-args" value="--silent --request DELETE"/>
+
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_dbl"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_str"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_log"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_uint"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_text"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_json"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${drop-db-args} ${elasticsearch_url}/_ingest/pipeline/${dbname}_json"/>
+		</exec>
+	</target>
+
+	<target name="create-db-elasticsearch" depends="drop-db-elasticsearch" if="elasticsearch">
+		<property name="create-db-args" value="--silent --request PUT --header 'Content-Type: application/json'"/>
+		<property name="index-dbl"><![CDATA[
+{
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
+      }
+   },
+   "mappings": {
+      "dynamic": false,
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "type": "double"
+         }
+      }
+   }
+}
+		]]></property>
+		<property name="index-str"><![CDATA[
+{
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
+      }
+   },
+   "mappings": {
+      "dynamic": false,
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "fields": {
+               "analyzed": {
+                  "index": true,
+                  "type": "text",
+                  "analyzer": "standard"
+               }
+            },
+            "index": false,
+            "type": "text"
+         }
+      }
+   }
+}
+		]]></property>
+		<property name="index-log"><![CDATA[
+{
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
+      }
+   },
+   "mappings": {
+      "dynamic": false,
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "fields": {
+               "analyzed": {
+                  "index": true,
+                  "type": "text",
+                  "analyzer": "standard"
+               }
+            },
+            "index": false,
+            "type": "text"
+         }
+      }
+   }
+}
+		]]></property>
+		<property name="index-uint"><![CDATA[
+{
+   "settings": {
+      "index": {
+         "number_of_replicas": 1,
+         "number_of_shards": 5
+      }
+   },
+   "mappings": {
+      "dynamic": false,
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "format": "epoch_second",
+            "type": "date"
+         },
+         "value": {
+            "type": "long"
+         }
+      }
+   }
+}
+		]]></property>
+		<property name="index-text" value="${index-str}"/>
+		<property name="index-json"><![CDATA[
+{
+   "settings": {
+      "number_of_shards": 5,
+      "number_of_replicas": 1
+   },
+   "mappings": {
+      "dynamic": false,
+      "properties": {
+         "itemid": {
+            "type": "long"
+         },
+         "clock": {
+            "type": "date",
+            "format": "epoch_second"
+         },
+         "ns": {
+            "type": "long"
+         },
+         "value_parsed": {
+            "type": "flattened"
+         },
+         "value_raw": {
+            "type": "keyword",
+            "ignore_above": 1000000
+         }
+      }
+   }
+}
+		]]></property>
+		<property name="pipeline-json"><![CDATA[
+{
+   "processors": [
+      {
+         "json": {
+            "field": "value",
+            "target_field": "value_parsed",
+            "ignore_failure": true
+         }
+      },
+      {
+         "set": {
+            "if": "ctx.value_parsed == null",
+            "field": "value_raw",
+            "value": "{{{ value }}}"
+         }
+      }
+   ],
+   "on_failure": [
+      {
+         "set": {
+            "field": "value_raw",
+            "value": "{{{ value }}}"
+         }
+      }
+   ]
+}
+		]]></property>
+
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_dbl --data '${index-dbl}'"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_str --data '${index-str}'"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_log --data '${index-log}'"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_uint --data '${index-uint}'"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_text --data '${index-text}'"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_json --data '${index-json}'"/>
+		</exec>
+		<exec executable="curl" failonerror="on">
+			<arg line="${create-db-args} ${elasticsearch_url}/_ingest/pipeline/${dbname}_json --data '${pipeline-json}'"/>
+		</exec>
+	</target>
+
+	<condition property="elasticsearch">
+		<and>
+			<isset property="HISTORY_STORAGE"/>
+			<equals arg1="${HISTORY_STORAGE}" arg2="ES"/>
+		</and>
+	</condition>
+
+	<target name="init-integration-postgresql" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-postgresql,create-db-elasticsearch,init-proxy-postgresql">
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -421,7 +688,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql"/>
+	<target name="init-integration-tsdb" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-postgresql,create-db-tsdb,create-db-elasticsearch,init-proxy-postgresql"/>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
 
@@ -567,7 +834,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,create-frontend-elasticsearch-configs,init-integration,make-binary-agent-3.0,apply-elasticsearch-patches,make-binaries-mysql,create-db-mysql,create-db-elasticsearch,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
