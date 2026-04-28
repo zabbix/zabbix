@@ -446,7 +446,7 @@ void	zbx_audit_flush(int audit_context_mode)
 	{
 		if (SUCCEED == zbx_audit_validate_entry(*audit_entry))
 		{
-			zbx_json_clean(&details_json);
+			zbx_json_reset(&details_json);
 			zbx_audit_details_to_json(&(*audit_entry)->details, &details_json);
 			zbx_db_insert_add_values(&db_insert_audit, (*audit_entry)->audit_cuid, AUDIT_USERID,
 					AUDIT_USERNAME, (int)time(NULL), (*audit_entry)->audit_action, AUDIT_IP,
@@ -501,7 +501,7 @@ int	zbx_audit_flush_dbconn(zbx_dbconn_t *db, int audit_context_mode)
 
 		name_esc = zbx_db_dyn_escape_string((*audit_entry)->name);
 
-		zbx_json_clean(&details_json);
+		zbx_json_reset(&details_json);
 		zbx_audit_details_to_json(&(*audit_entry)->details, &details_json);
 		details_esc = zbx_db_dyn_escape_string(details_json.buffer);
 

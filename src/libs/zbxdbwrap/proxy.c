@@ -40,6 +40,8 @@
 #include "zbxjson.h"
 #include "zbxstr.h"
 #include "zbxautoreg.h"
+#include "zbx_rtc_constants.h"
+#include "zbxrtc.h"
 
 /* the space reserved in json buffer to hold at least one record plus service data */
 #define ZBX_DATA_JSON_RESERVED		(ZBX_HISTORY_TEXT_VALUE_LEN * 4 + ZBX_KIBIBYTE * 4)
@@ -748,7 +750,8 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
  *                                                                            *
  * Purpose: process new item values                                           *
  *                                                                            *
- * Parameters: items    - [IN] the items to process                           *
+ * Parameters: rtc      - [IN] RTC socket                                     *
+ *             items    - [IN] the items to process                           *
  *             values   - [IN] the item values value to process               *
  *             errcodes - [IN/OUT] in - item configuration error code         *
  *                                      (FAIL - item/host was not found)      *
@@ -760,11 +763,15 @@ static int	process_history_data_value(zbx_history_recv_item_t *item, zbx_agent_v
  * Return value: the number of processed values                               *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *values, int *errcodes,
-		size_t values_num, zbx_proxy_suppress_t *nodata_win)
+int	zbx_process_history_data(zbx_ipc_async_socket_t *rtc, zbx_history_recv_item_t *items, zbx_agent_value_t *values,
+		int *errcodes, size_t values_num, zbx_proxy_suppress_t *nodata_win)
 {
-	size_t	i;
-	int	processed_num = 0, history_num;
+#define MIN_SECONDS_BETWEEN_NOTIFICATIONS	0.1
+
+	static double	time_flush = 0;
+	size_t		i;
+	int		processed_num = 0, history_num;
+	double		sec = zbx_time();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -805,12 +812,16 @@ int	zbx_process_history_data(zbx_history_recv_item_t *items, zbx_agent_value_t *
 	if (0 < processed_num)
 		zbx_dc_items_update_nextcheck(items, values, errcodes, values_num);
 
-	preprocessor_flush_cb();
-	zbx_dc_flush_history();
+	if (0 != preprocessor_flush_cb() && MIN_SECONDS_BETWEEN_NOTIFICATIONS < sec - time_flush)
+	{
+		zbx_rtc_notify_generic(rtc, ZBX_PROCESS_TYPE_HISTSYNCER, 1, ZBX_RTC_HISTORY_SYNC_NOTIFY, NULL, 0);
+		time_flush = sec;
+	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() processed:%d", __func__, processed_num);
 
 	return processed_num;
+#undef MIN_SECONDS_BETWEEN_NOTIFICATIONS
 }
 
 /******************************************************************************
@@ -884,14 +895,6 @@ static void	log_client_timediff(int level, struct zbx_json_parse *jp, const zbx_
 	}
 }
 
-static void	adjust_time(zbx_timespec_t *unique_shift, zbx_agent_value_t *av)
-{
-	av->ts.sec += unique_shift->sec;
-	av->ts.ns = unique_shift->ns++;
-
-	zbx_timespec_normalize(unique_shift);
-}
-
 /******************************************************************************
  *                                                                            *
  * Purpose: parses agent value from history data json row                     *
@@ -940,10 +943,6 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 			if (SUCCEED == zbx_is_uint_n_range(*tmp, *tmp_alloc, &av->ts.ns, sizeof(av->ts.ns), 0LL,
 					999999999LL))
 			{
-				/* adjust ns for older systems where sometimes ns == 0 */
-				if (av->ts.ns == 0)
-					adjust_time(unique_shift, av);
-
 				found_ns = SUCCEED;
 			}
 			else
@@ -989,7 +988,9 @@ static void	parse_history_data_row_value(const struct zbx_json_parse *jp_row, zb
 		if (FAIL == found_ns)
 		{
 			/* ensure unique value timestamp (clock, ns) if only clock is available */
-			adjust_time(unique_shift, av);
+			av->ts.sec += unique_shift->sec;
+			av->ts.ns = unique_shift->ns++;
+			zbx_timespec_normalize(unique_shift);
 		}
 	}
 	else
@@ -1245,6 +1246,7 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
  * Purpose: parses history data array and processes the data                  *
  *                                                                            *
  * Parameters:                                                                *
+ *   rtc            - [IN] RTC socket                                         *
  *   sock           - [IN]  socket for host permission validation             *
  *   validator_func - [IN]  function to validate item permission              *
  *   validator_args - [IN]  validator function arguments                      *
@@ -1265,9 +1267,10 @@ static int	proxy_item_validator(zbx_history_recv_item_t *item, zbx_socket_t *soc
  *           proxy or agent.                                                  *
  *                                                                            *
  ******************************************************************************/
-static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
-		void *validator_args, struct zbx_json_parse *jp_data, zbx_session_t *session,
-		zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode, const char *source)
+static int	process_history_data_by_itemids(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock,
+		zbx_client_item_validator_t validator_func, void *validator_args, struct zbx_json_parse *jp_data,
+		zbx_session_t *session, zbx_proxy_suppress_t *nodata_win, char **info, unsigned int mode,
+		const char *source)
 {
 	const char		*pnext = NULL;
 	int			ret = SUCCEED, processed_num = 0, total_num = 0, values_num, read_num, i, *errcodes;
@@ -1314,7 +1317,7 @@ static int	process_history_data_by_itemids(zbx_socket_t *sock, zbx_client_item_v
 			}
 		}
 
-		processed_num += zbx_process_history_data(items, values, errcodes, values_num, nodata_win);
+		processed_num += zbx_process_history_data(rtc, items, values, errcodes, values_num, nodata_win);
 
 		total_num += read_num;
 
@@ -1502,8 +1505,9 @@ static int	item_timestamp_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_validator_t validator_func,
-		void *validator_args, char **info, struct zbx_json_parse *jp_data, const char *token)
+static void	process_history_data_by_keys(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock,
+		zbx_client_item_validator_t validator_func, void *validator_args, char **info,
+		struct zbx_json_parse *jp_data, const char *token)
 {
 	int			values_num, read_num, processed_num = 0, total_num = 0, i;
 	zbx_timespec_t		unique_shift = {0, 0};
@@ -1607,7 +1611,7 @@ static void	process_history_data_by_keys(zbx_socket_t *sock, zbx_client_item_val
 				session->last_id = values[i].id;
 		}
 
-		processed_num += zbx_process_history_data(items, values, errcodes, values_num, NULL);
+		processed_num += zbx_process_history_data(rtc, items, values, errcodes, values_num, NULL);
 		total_num += read_num;
 
 		zbx_agent_values_clean(values, values_num);
@@ -1675,7 +1679,8 @@ static int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, s
  *                                                                            *
  * Purpose: process history data received from Zabbix active agent            *
  *                                                                            *
- * Parameters: sock         - [IN] connection socket                          *
+ * Parameters: rtc          - [IN] RTC socket                                 *
+ *             sock         - [IN] connection socket                          *
  *             jp           - [IN] JSON with history data                     *
  *             ts           - [IN] connection timestamp                       *
  *             info         - [OUT] address of a pointer to the info string   *
@@ -1685,7 +1690,8 @@ static int	peek_hostkey_host(const struct zbx_json_parse *jp_data, char *host, s
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
+int	zbx_process_agent_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, char **info)
 {
 	zbx_comms_redirect_t	redirect;
 	struct zbx_json_parse	jp_data;
@@ -1770,12 +1776,12 @@ int	zbx_process_agent_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp
 		else
 			session = zbx_dc_get_or_create_session(hostid, token, ZBX_SESSION_TYPE_DATA);
 
-		ret = process_history_data_by_itemids(sock, agent_item_validator, &rights, &jp_data, session, NULL,
+		ret = process_history_data_by_itemids(rtc, sock, agent_item_validator, &rights, &jp_data, session, NULL,
 				info, ZBX_ITEM_GET_DEFAULT, "agent");
 	}
 	else
 	{
-		process_history_data_by_keys(sock, agent_item_validator, &rights, info, &jp_data, token);
+		process_history_data_by_keys(rtc, sock, agent_item_validator, &rights, info, &jp_data, token);
 		ret = SUCCEED;
 	}
 out:
@@ -1790,7 +1796,8 @@ out:
  *                                                                            *
  * Purpose: process history data received from Zabbix sender                  *
  *                                                                            *
- * Parameters: sock         - [IN] connection socket                          *
+ * Parameters: rtc          - [IN] RTC socket                                 *
+ *             sock         - [IN] connection socket                          *
  *             jp           - [IN] JSON with history data                     *
  *             ts           - [IN] connection timestamp                       *
  *             info         - [OUT] address of a pointer to the info string   *
@@ -1800,7 +1807,8 @@ out:
  *                FAIL - an error occurred                                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *jp, zbx_timespec_t *ts, char **info)
+int	zbx_process_sender_history_data(zbx_ipc_async_socket_t *rtc, zbx_socket_t *sock, struct zbx_json_parse *jp,
+		zbx_timespec_t *ts, char **info)
 {
 	zbx_host_rights_t	rights = {0};
 	int			ret = FAIL;
@@ -1838,7 +1846,7 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 			}
 		}
 
-		process_history_data_by_keys(sock, sender_item_validator, &rights, info, &jp_data, NULL);
+		process_history_data_by_keys(rtc, sock, sender_item_validator, &rights, info, &jp_data, NULL);
 		ret = SUCCEED;
 	}
 	else
@@ -2566,6 +2574,7 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  * Purpose: processes 'proxy data' request                                   *
  *                                                                           *
  * Parameters:                                                               *
+ *    rtc                         - [IN] RTC socket                          *
  *    proxy                       - [IN] source proxy                        *
  *    jp                          - [IN] JSON with proxy data                *
  *    ts                          - [IN] timestamp when proxy connection was *
@@ -2586,7 +2595,8 @@ static void	check_proxy_nodata_empty(const zbx_timespec_t *ts, unsigned char pro
  *                FAIL - error occurred                                      *
  *                                                                           *
  *****************************************************************************/
-int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
+int	zbx_process_proxy_data(zbx_ipc_async_socket_t *rtc, const zbx_dc_proxy_t *proxy,
+		const struct zbx_json_parse *jp, const zbx_timespec_t *ts,
 		unsigned char proxy_status, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_discovery_update_host_func_t discovery_update_host_cb,
 		zbx_discovery_update_service_func_t discovery_update_service_cb,
@@ -2671,7 +2681,7 @@ int	zbx_process_proxy_data(const zbx_dc_proxy_t *proxy, const struct zbx_json_pa
 			session = zbx_dc_get_or_create_session(proxy->proxyid, value, ZBX_SESSION_TYPE_DATA);
 		}
 
-		if (SUCCEED != (ret = process_history_data_by_itemids(NULL, proxy_item_validator,
+		if (SUCCEED != (ret = process_history_data_by_itemids(rtc, NULL, proxy_item_validator,
 				(void *)&proxy->proxyid, &jp_data, session, &proxy_diff.nodata_win, &error_step,
 				ZBX_ITEM_GET_PROCESS, "proxy")))
 		{

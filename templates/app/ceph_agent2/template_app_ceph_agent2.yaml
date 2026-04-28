@@ -26,17 +26,18 @@ zabbix_export:
         1. Setup and configure zabbix-agent2 compiled with the Ceph monitoring plugin.
         2. Set the `Connection string` such as <protocol(host:port)> or named session.
         3. Set the user name and password in host wizard configuration field (`Username`, `API key`) if you want to override parameters from the Zabbix agent configuration file.
+        4. Select the mode of connection (`Mode`).
         
-        Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]`
+        Test availability: `zabbix_get -s ceph-host -k ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]`
       vendor:
         name: Zabbix
-        version: 8.0-1
+        version: 8.0-2
       groups:
         - name: Templates/Applications
       items:
         - uuid: af3e6faf835f41ef93cbbc44aa57f97e
           name: 'Get df'
-          key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           history: '0'
           value_type: TEXT
           tags:
@@ -58,7 +59,7 @@ zabbix_export:
               parameters:
                 - 1h
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: monitors
@@ -86,7 +87,7 @@ zabbix_export:
               parameters:
                 - 30m
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: monitors
@@ -103,7 +104,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -122,7 +123,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -141,7 +142,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -160,7 +161,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -176,7 +177,7 @@ zabbix_export:
               parameters:
                 - $.num_pg_temp
           master_item:
-            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -190,7 +191,7 @@ zabbix_export:
               parameters:
                 - $.num_pools
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -198,7 +199,7 @@ zabbix_export:
               value: pools
         - uuid: e7eb1f67d81c4e2ba7c57cfbc81d1a00
           name: 'Get OSD dump'
-          key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           history: '0'
           value_type: TEXT
           tags:
@@ -208,7 +209,7 @@ zabbix_export:
               value: raw
         - uuid: 35b63ca6519e4137bb7655e37ed08e51
           name: 'Get OSD stats'
-          key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           history: '0'
           value_type: TEXT
           tags:
@@ -230,7 +231,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -246,7 +247,7 @@ zabbix_export:
               parameters:
                 - $.osd_fill.avg
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -264,7 +265,7 @@ zabbix_export:
               parameters:
                 - $.osd_fill.max
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -282,7 +283,7 @@ zabbix_export:
               parameters:
                 - $.osd_fill.min
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -302,7 +303,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -318,7 +319,7 @@ zabbix_export:
               parameters:
                 - $.osd_latency_apply.avg
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -336,7 +337,7 @@ zabbix_export:
               parameters:
                 - $.osd_latency_apply.max
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -354,7 +355,7 @@ zabbix_export:
               parameters:
                 - $.osd_latency_apply.min
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -372,7 +373,7 @@ zabbix_export:
               parameters:
                 - $.osd_latency_commit.avg
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -390,7 +391,7 @@ zabbix_export:
               parameters:
                 - $.osd_latency_commit.max
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -408,7 +409,7 @@ zabbix_export:
               parameters:
                 - $.osd_latency_commit.min
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -428,7 +429,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -443,7 +444,7 @@ zabbix_export:
               parameters:
                 - $.osd_pgs.avg
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -462,7 +463,7 @@ zabbix_export:
               parameters:
                 - $.osd_pgs.max
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -481,7 +482,7 @@ zabbix_export:
               parameters:
                 - $.osd_pgs.min
           master_item:
-            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -504,7 +505,7 @@ zabbix_export:
               parameters:
                 - 10m
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: health
@@ -540,7 +541,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.active
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -554,7 +555,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.backfilling
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -568,7 +569,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.backfill_toofull
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -582,7 +583,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.backfill_wait
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -596,7 +597,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.clean
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -610,7 +611,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.degraded
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -624,7 +625,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.inconsistent
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -638,7 +639,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.peering
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -652,7 +653,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.recovering
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -666,7 +667,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.recovery_wait
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -680,7 +681,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.remapped
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -694,7 +695,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.scrubbing
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -708,7 +709,7 @@ zabbix_export:
               parameters:
                 - $.pg_states.undersized
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
@@ -722,13 +723,13 @@ zabbix_export:
               parameters:
                 - $.pg_states.unknown
           master_item:
-            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: placement-groups
         - uuid: 911e8a654ca44e7ca56b8010ac7381c8
           name: Ping
-          key: 'ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           valuemap:
             name: 'Service state'
           preprocessing:
@@ -742,7 +743,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 9ffc9a5c3d1c47d288c665c8be7d2fbb
-              expression: 'last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"])=0'
+              expression: 'last(/Ceph by Zabbix agent 2/ceph.ping["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"])=0'
               name: 'Ceph: Can not connect to cluster'
               priority: AVERAGE
               description: 'The connection to the Ceph RESTful module is broken (if there is any error presented including *AUTH* and the configuration issues).'
@@ -762,7 +763,7 @@ zabbix_export:
                 - $.rd_bytes
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -781,7 +782,7 @@ zabbix_export:
                 - $.rd_ops
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -789,7 +790,7 @@ zabbix_export:
               value: disk
         - uuid: 8b43d105f9d64a3a94196f3f3bc7eac3
           name: 'Get overall cluster status'
-          key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.status["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           history: '0'
           value_type: TEXT
           tags:
@@ -806,7 +807,7 @@ zabbix_export:
               parameters:
                 - $.total_avail_bytes
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -823,7 +824,7 @@ zabbix_export:
               parameters:
                 - $.total_bytes
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -839,7 +840,7 @@ zabbix_export:
               parameters:
                 - $.total_objects
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -854,7 +855,7 @@ zabbix_export:
               parameters:
                 - $.total_used_bytes
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -873,7 +874,7 @@ zabbix_export:
                 - $.wr_bytes
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -892,7 +893,7 @@ zabbix_export:
                 - $.wr_ops
             - type: CHANGE_PER_SECOND
           master_item:
-            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+            key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           tags:
             - tag: component
               value: cluster
@@ -901,7 +902,7 @@ zabbix_export:
       discovery_rules:
         - uuid: 374557a43a824d938e9a8e656151e0c9
           name: OSD
-          key: 'ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.osd.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           delay: 1h
           item_prototypes:
             - uuid: 4f7a72a5c4c14b9da63ddbae9e2ebf5f
@@ -916,7 +917,7 @@ zabbix_export:
                     - '$.osds.{#OSDNAME}.osd_fill'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: class
                   value: '{#CLASS}'
@@ -938,7 +939,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: class
                   value: '{#CLASS}'
@@ -961,7 +962,7 @@ zabbix_export:
                     - '$.osds.{#OSDNAME}.osd_latency_apply'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: class
                   value: '{#CLASS}'
@@ -984,7 +985,7 @@ zabbix_export:
                     - '$.osds.{#OSDNAME}.osd_latency_commit'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: class
                   value: '{#CLASS}'
@@ -1004,7 +1005,7 @@ zabbix_export:
                     - '$.osds.{#OSDNAME}.num_pgs'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.osd.stats["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: class
                   value: '{#CLASS}'
@@ -1026,7 +1027,7 @@ zabbix_export:
                   parameters:
                     - 10m
               master_item:
-                key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.osd.dump["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: class
                   value: '{#CLASS}'
@@ -1080,7 +1081,7 @@ zabbix_export:
                     key: 'ceph.osd[{#OSDNAME},latency_commit]'
         - uuid: fb6b4d27f46e4160ad978244aa845d0e
           name: Pool
-          key: 'ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+          key: 'ceph.pool.discovery["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
           delay: 1h
           item_prototypes:
             - uuid: 1090dc09ce79458e9471863fcb973460
@@ -1094,7 +1095,7 @@ zabbix_export:
                   parameters:
                     - '$.pools["{#POOLNAME}"].bytes_used'
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1113,7 +1114,7 @@ zabbix_export:
                   parameters:
                     - '$.pools["{#POOLNAME}"].max_avail'
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1131,7 +1132,7 @@ zabbix_export:
                   parameters:
                     - '$.pools["{#POOLNAME}"].objects'
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1151,7 +1152,7 @@ zabbix_export:
                   parameters:
                     - '$.pools["{#POOLNAME}"].percent_used'
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1172,7 +1173,7 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].rd_bytes'
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1193,7 +1194,7 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].rd_ops'
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1212,7 +1213,7 @@ zabbix_export:
                   parameters:
                     - '$.pools["{#POOLNAME}"].stored_raw'
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1233,7 +1234,7 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].wr_bytes'
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1254,7 +1255,7 @@ zabbix_export:
                     - '$.pools["{#POOLNAME}"].wr_ops'
                 - type: CHANGE_PER_SECOND
               master_item:
-                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}"]'
+                key: 'ceph.df.details["{$CEPH.CONNSTRING}","{$CEPH.USER}","{$CEPH.API.KEY}","{$CEPH.MODE}"]'
               tags:
                 - tag: component
                   value: pools
@@ -1311,7 +1312,7 @@ zabbix_export:
           value: ceph
       macros:
         - macro: '{$CEPH.API.KEY}'
-          value: zabbix_pass
+          type: SECRET_TEXT
           config:
             type: TEXT
             priority: '2'
@@ -1324,6 +1325,19 @@ zabbix_export:
             priority: '3'
             label: 'Connection string'
             required: 'YES'
+        - macro: '{$CEPH.MODE}'
+          value: restful
+          description: 'The mode of data collection. Supported value is `restful` (deprecated), `native`.'
+          config:
+            type: LIST
+            priority: '4'
+            label: Mode
+            description: 'The mode of data collection. Supported value is `restful` (deprecated), `native`. The `restful` mode will be removed in future releases, please switch to `native` mode.'
+            options:
+              - value: restful
+                text: 'Restful (deprecated)'
+              - value: native
+                text: Native
         - macro: '{$CEPH.USER}'
           value: zabbix
           config:

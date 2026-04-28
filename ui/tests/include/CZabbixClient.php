@@ -41,17 +41,62 @@ class CZabbixClient extends CZabbixServer {
 	/**
 	 * Send value for items to server/proxy.
 	 *
-	 * @param string $type      data type
-	 * @param array  $values    trapper values
+	 * @param string  $type      data type
+	 * @param array   $values    trapper values
+	 * @param integer $time      clock
 	 *
 	 * @return array|false    array with result data or false otherwise
 	 */
-	public function sendDataValues($type, $values) {
+	public function sendDataValues($type, $values, $time = null) {
 		$response = parent::request([
 			'request' => $type.' data',
 			'data' => $values,
-			'clock' => time(),
+			'clock' => $time ?? time(),
 			'ns' => 0
+		]);
+
+		if ($response !== false && $this->error === null) {
+			$result = [];
+
+			foreach (explode('; ', $response) as $line) {
+				$parts = explode(': ', $line);
+				if (count($parts) !== 2) {
+					continue;
+				}
+
+				$result[$parts[0]] = floatval($parts[1]);
+			}
+
+			return $result;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Send item values to server/proxy using the agent data protocol (variant 2).
+	 *
+	 * @param array  $data       item values, each with keys: itemid, value, clock, ns
+	 * @param string $session    agent session identifier
+	 * @param string $host       host name
+	 * @param string $version    agent version
+	 *
+	 * @return array|false    array with result data or false otherwise
+	 */
+	public function sendAgentDataValues(array $data, string $session, string $host, string $version = '7.4.0') {
+		$id = 1;
+		foreach ($data as &$item) {
+			$item['id'] = $id++;
+		}
+		unset($item);
+
+		$response = parent::request([
+			'request' => 'agent data',
+			'data' => $data,
+			'session' => $session,
+			'host' => $host,
+			'version' => $version,
+			'variant' => 2
 		]);
 
 		if ($response !== false && $this->error === null) {
