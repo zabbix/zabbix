@@ -89,18 +89,16 @@ class CHistoryManager {
 
 	/**
 	 * Get array of value type TTL values. Value type is key, TTL is value.
+	 * Value is set to NULL when no TTL exists for specific value type.
 	 */
 	public function getValueTypesStorageTtls(): array {
 		$value_type_ttl = [];
 
 		foreach ($this->value_type_storage as $value_type => $storage) {
-			$value_type_ttl[$value_type] = ['provider' => $storage['provider']];
-
-			if (!array_key_exists('value_ttl', $storage)) {
-				continue;
-			}
-
-			$value_type_ttl[$value_type]['value_ttl'] = $storage['value_ttl'];
+			$value_type_ttl[$value_type] = [
+				'provider' => $storage['provider'],
+				'value_ttl' => $storage['value_ttl'] ?? null
+			];
 		}
 
 		foreach ($this->storage_providers as $storage_provider) {
