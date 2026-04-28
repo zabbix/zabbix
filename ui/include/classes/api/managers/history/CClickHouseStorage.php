@@ -79,7 +79,7 @@ class CClickHouseStorage {
 
 	/**
 	 * Array of value type TTL values, key is value type and value is it TTL.
-	 * Value is set to NULL when no TTL existis for specific value type.
+	 * Value is set to NULL when no TTL exists for specific value type.
 	 *
 	 * @var array $value_type_ttl
 	 */
