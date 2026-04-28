@@ -25283,6 +25283,10 @@ msgstr "Konfigurácia widgetu bude vrátená späť."
 msgid "Widget is deprecated."
 msgstr "Widget je zastaraný."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "Widget je príliš malý pre zadaný počet stĺpcov a riadkov."

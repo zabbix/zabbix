@@ -67,7 +67,7 @@ static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_jso
 
 	zbx_report_test(&jp_data, user.userid, &j);
 	zbx_tcp_send_bytes_to(sock, j.buffer, j.buffer_size, config_timeout);
-	zbx_json_clean(&j);
+	zbx_json_free(&j);
 out:
 	zbx_user_free(&user);
 }

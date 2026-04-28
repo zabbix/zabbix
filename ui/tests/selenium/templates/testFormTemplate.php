@@ -18,7 +18,6 @@ require_once __DIR__.'/../../include/CLegacyWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\Exception\NoSuchElementException;
-use Facebook\WebDriver\WebDriverBy;
 
 /**
  * @backup hosts
@@ -192,7 +191,7 @@ class testFormTemplate extends CLegacyWebTest {
 			$name = CTestArrayHelper::get($data, 'visible_name', $data['name']);
 			$this->filterAndOpenTemplate($name);
 
-			$this->zbxTestWaitUntilElementVisible(WebDriverBy::id('template_name'));
+			$this->query('id:template_name')->waitUntilVisible()->one();
 			$this->zbxTestAssertElementValue('template_name', $data['name']);
 
 			$this->zbxTestMultiselectAssertSelected('template_groups_', 'Templates');

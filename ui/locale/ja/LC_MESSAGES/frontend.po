@@ -24888,6 +24888,10 @@ msgstr "ウィジェットの設定が元に戻ります。"
 msgid "Widget is deprecated."
 msgstr "ウィジェットは廃止予定です。"
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "指定された列と行の数に対してウィジェットが小さすぎます。"

@@ -4,26 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "eacd757f8c21b3585fa84b89e2f0f3b8",
+    "content-hash": "fe4fdb357f02fab6186f238ce4e683df",
     "packages": [
         {
             "name": "duosecurity/duo_universal_php",
-            "version": "1.1.1",
+            "version": "1.1.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/duosecurity/duo_universal_php.git",
-                "reference": "4ee7253863d84653a60a8cad4b03aa3b66fcfd35"
+                "reference": "68e699c52d41f681df07dc0f98e2ba551bef2fd3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/duosecurity/duo_universal_php/zipball/4ee7253863d84653a60a8cad4b03aa3b66fcfd35",
-                "reference": "4ee7253863d84653a60a8cad4b03aa3b66fcfd35",
+                "url": "https://api.github.com/repos/duosecurity/duo_universal_php/zipball/68e699c52d41f681df07dc0f98e2ba551bef2fd3",
+                "reference": "68e699c52d41f681df07dc0f98e2ba551bef2fd3",
                 "shasum": ""
             },
             "require": {
                 "ext-curl": "*",
                 "ext-json": "*",
-                "firebase/php-jwt": "^6.0",
+                "firebase/php-jwt": "^6.0 || ^7.0",
                 "php": ">=7.4"
             },
             "require-dev": {
@@ -45,9 +45,9 @@
             "support": {
                 "email": "support@duosecurity.com",
                 "issues": "https://github.com/duosecurity/duo_universal_php/issues",
-                "source": "https://github.com/duosecurity/duo_universal_php/tree/1.1.1"
+                "source": "https://github.com/duosecurity/duo_universal_php/tree/1.1.2"
             },
-            "time": "2025-08-13T14:05:56+00:00"
+            "time": "2026-02-04T19:44:44+00:00"
         },
         {
             "name": "erusev/parsedown",
@@ -101,26 +101,26 @@
         },
         {
             "name": "firebase/php-jwt",
-            "version": "v6.10.0",
+            "version": "v7.0.3",
             "source": {
                 "type": "git",
                 "url": "https://github.com/firebase/php-jwt.git",
-                "reference": "a49db6f0a5033aef5143295342f1c95521b075ff"
+                "reference": "28aa0694bcfdfa5e2959c394d5a1ee7a5083629e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/a49db6f0a5033aef5143295342f1c95521b075ff",
-                "reference": "a49db6f0a5033aef5143295342f1c95521b075ff",
+                "url": "https://api.github.com/repos/firebase/php-jwt/zipball/28aa0694bcfdfa5e2959c394d5a1ee7a5083629e",
+                "reference": "28aa0694bcfdfa5e2959c394d5a1ee7a5083629e",
                 "shasum": ""
             },
             "require": {
-                "php": "^7.4||^8.0"
+                "php": "^8.0"
             },
             "require-dev": {
-                "guzzlehttp/guzzle": "^6.5||^7.4",
+                "guzzlehttp/guzzle": "^7.4",
                 "phpspec/prophecy-phpunit": "^2.0",
                 "phpunit/phpunit": "^9.5",
-                "psr/cache": "^1.0||^2.0",
+                "psr/cache": "^2.0||^3.0",
                 "psr/http-client": "^1.0",
                 "psr/http-factory": "^1.0"
             },
@@ -158,9 +158,9 @@
             ],
             "support": {
                 "issues": "https://github.com/firebase/php-jwt/issues",
-                "source": "https://github.com/firebase/php-jwt/tree/v6.10.0"
+                "source": "https://github.com/firebase/php-jwt/tree/v7.0.3"
             },
-            "time": "2023-12-01T16:26:39+00:00"
+            "time": "2026-02-25T22:16:40+00:00"
         },
         {
             "name": "onelogin/php-saml",

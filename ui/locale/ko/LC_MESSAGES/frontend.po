@@ -24889,6 +24889,10 @@ msgstr ""
 msgid "Widget is deprecated."
 msgstr "위젯은 더 이상 사용되지 않습니다."
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "지정된 열과 행 수에 비해 위젯이 너무 작습니다."

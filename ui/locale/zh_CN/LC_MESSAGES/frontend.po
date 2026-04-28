@@ -24891,6 +24891,10 @@ msgstr "部件配置将被还原"
 msgid "Widget is deprecated."
 msgstr "小组件已弃用。"
 
+#: jsLoader.php:253
+msgid "Widget is not fully configured"
+msgstr ""
+
 #: jsLoader.php:187
 msgid "Widget is too small for the specified number of columns and rows."
 msgstr "对于指定的列数和行数而言小组件太小。"

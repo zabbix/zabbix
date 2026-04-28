@@ -1053,6 +1053,7 @@ class testFormServicesSla extends CWebTest {
 				return;
 			}
 		}
+
 		$form->submit();
 		$this->page->waitUntilReady();
 
