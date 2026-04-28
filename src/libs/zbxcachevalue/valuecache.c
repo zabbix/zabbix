@@ -2446,9 +2446,10 @@ static int	vc_is_value_type_supported(unsigned char value_type)
  *                                                                            *
  * Purpose: adds item values to history and value cache                       *
  *                                                                            *
- * Parameters:                                                                *
- *   history                          - [IN] item history values              *
- *   *flush_err                       - [OUT]                                 *
+ *                                                                            *
+ * Parameters: history   - [IN] item history values                           *
+ *             flush_err - [OUT] bitmask containing flush error statuses per  *
+ *                               value types                                  *
  *                                                                            *
  * Return value: SUCCEED - values were added successfully                     *
  *               FAIL    - otherwise                                          *

@@ -1201,8 +1201,6 @@ static int	elastic_read_values_by_count(zbx_history_elastic_data_t *data, zbx_ui
  * Return value: >=0      - number of records retrieved                       *
  *               FAIL     - otherwise                                         *
  *                                                                            *
- * Comments: The                                                              *
- *                                                                            *
  ******************************************************************************/
 static int	history_elastic_fetch(void *data, zbx_uint64_t itemid, unsigned char value_type, time_t start,
 		time_t end, int count, zbx_history_record_t **values, char **error)

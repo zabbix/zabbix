@@ -43,7 +43,7 @@ const char	*history_option_value_type_str(unsigned char value_type)
  *                                                                            *
  * Purpose: convert history value type string to its numeric representation   *
  *                                                                            *
- * Parameters: value_type_str - [IN] the history value type string            *
+ * Parameters: value_type_str - [IN] history value type string                *
  *                                                                            *
  * Return value: value type or FAIL if unknown                                *
  *                                                                            *

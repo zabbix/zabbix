@@ -802,7 +802,7 @@ static int	history_sql_fetch_batch(void *data, zbx_vector_item_history_t *result
  * Parameters:                                                                *
  *     data  - [IN] history provider data                                     *
  *     info  - [OUT] pointer to structure for storing module information      *
- *     error - [OUT] error message in case of failure                         *
+ *     error - [OUT] unused                                                   *
  *                                                                            *
  * Return value: SUCCEED - information retrieved successfully                 *
  *               FAIL    - an error occurred                                  *
@@ -883,9 +883,7 @@ static void	history_sql_validate_options(const zbx_history_option_t *options, in
  * Parameters:                                                                *
  *     options     - [IN] array of history storage options                    *
  *     options_num - [IN] number of elements in the options array             *
- *     error       - [OUT] error message if function fails                    *
- *                                                                            *
- * Return value: history provider or NULL if initialization fails             *
+ *     error       - [OUT] unused                                             *
  *                                                                            *
  ******************************************************************************/
 zbx_history_provider_t	*history_sql_open(const zbx_history_option_t *options, int options_num, char **error)

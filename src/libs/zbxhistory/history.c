@@ -88,7 +88,7 @@ struct zbx_history_manager
 	zbx_uint64_t				default_type_flags;
 };
 
-static zbx_history_manager_t        history_manager;
+static zbx_history_manager_t	history_manager;
 
 static void	history_session_clear(zbx_history_session_t *session);
 
