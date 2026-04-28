@@ -52,16 +52,18 @@ class ScimApiClient extends CLocalApiClient {
 	/**
 	 * Checks if the authentication token is valid.
 	 *
-	 * @param string $auth
+	 *
+	 * @param array  $auth
+	 * @param string $requested_api_method
 	 *
 	 * @throws APIException
 	 */
-	protected function authenticate($auth) {
-		if ($auth === null) {
+	protected function authenticate(array $auth, string $requested_api_method = ''): void {
+		if ($auth['auth'] === null) {
 			throw new APIException(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
-		$user = (new CUser())->checkAuthentication(['token' => $auth]);
+		$user = (new CUser())->checkAuthentication(['token' => $auth['auth']]);
 
 		$this->debug = $user['debug_mode'];
 	}
