@@ -420,23 +420,14 @@
 		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['types'] = ['dbl', 'str', 'log', 'uint', 'text'];${line.separator}</echo>
 	</target>
 
-	<target name="apply-frontend-elasticsearch-patches" if="elasticsearch">
-		<exec executable="sed" failonerror="on">
-			<arg line="-r"/>
-			<arg line="'/^\tpublic static function getElasticsearchEndpoints\(/,/^\t\}/ s/(\$url\.)(\$index\.)/\1&quot;${dbname}_&quot;.\2/g'"/>
-			<arg line="-i ui/include/classes/api/managers/CHistoryManager.php"/>
+	<target name="apply-elasticsearch-patches">
+		<exec executable="git" failonerror="on">
+			<arg line="apply"/>
+			<arg line="ui/tests/integration/patches/elasticsearch.patch"/>
 		</exec>
+		<replace file="ui/include/classes/api/managers/CHistoryManager.php" token="{DBNAME}" value="${dbname}"/>
+		<replace file="src/libs/zbxhistory/history_elastic.c" token="{DBNAME}" value="${dbname}"/>
 	</target>
-
-	<target name="apply-server-elasticsearch-patches" if="elasticsearch">
-		<exec executable="sed" failonerror="on">
-			<arg line="-r"/>
-			<arg line="'/^const char[[:space:]]+\*value_type_str\[\][[:space:]]+=/ s/&quot;([^&quot;]*)&quot;/&quot;${dbname}_\1&quot;/g'"/>
-			<arg line="-i src/libs/zbxhistory/history_elastic.c"/>
-		</exec>
-	</target>
-
-	<target name="apply-elasticsearch-patches" depends="apply-frontend-elasticsearch-patches,apply-server-elasticsearch-patches"/>
 
 	<target name="drop-db-elasticsearch" if="elasticsearch">
 		<property name="drop-db-args" value="--silent --request DELETE"/>
