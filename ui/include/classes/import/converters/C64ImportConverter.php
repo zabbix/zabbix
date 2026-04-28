@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -384,8 +384,9 @@ class C64ImportConverter extends CConverter {
 						$widget['fields'][] = [
 							'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 							'name' => 'reference',
-							'value' => $reference++
+							'value' => $reference
 						];
+						$reference = PHP_VERSION_ID >= 80300 ? str_increment($reference) : ++$reference;
 					}
 
 					if ($widget['type'] === 'plaintext') {
@@ -403,9 +404,10 @@ class C64ImportConverter extends CConverter {
 							[
 								'type' => CXmlConstantName::DASHBOARD_WIDGET_FIELD_TYPE_STRING,
 								'name' => 'reference',
-								'value' => $reference++
+								'value' => $reference
 							]
 						];
+						$reference = PHP_VERSION_ID >= 80300 ? str_increment($reference) : ++$reference;
 
 						foreach ($old_fields as $field) {
 							switch ($field['name']) {

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -294,8 +294,8 @@ class testPageSearch extends CWebTest {
 		$this->assertFalse($search_button->isClickable());
 
 		$search_field->fill($this->search_string);
-		$search_button->waitUntilClickable()->click();
-		$this->page->assertHeader('Search: ' . $this->search_string);
+		$search_button->waitUntilClickable()->click()->waitUntilStalled();
+		$this->page->assertHeader('Search: '.$this->search_string);
 	}
 
 	/**
