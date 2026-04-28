@@ -551,7 +551,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			)->getRules(),
 			'js_validation_rules_get_value' => (new CFormValidator(
 				CControllerPopupItemTestGetValue::getValidationRules())
-			)->getRules(),
+			)->getRules()
 		]));
 	}
 }
