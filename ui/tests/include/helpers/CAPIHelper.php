@@ -38,6 +38,7 @@ class CAPIHelper {
 
 		static::clearDebugInfo();
 		static::setSessionId(null);
+		static::enableAuth();
 	}
 
 	/**
