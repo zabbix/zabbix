@@ -473,13 +473,14 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB;
+		global $DB, $HISTORY;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
 			'DBUser' => $DB['USER'],
 			'DBPassword' => $DB['PASSWORD']
 		];
+		$db_history = [];
 
 		if ($DB['SERVER'] !== 'localhost' && $DB['SERVER'] !== '127.0.0.1') {
 			$db['DBHost'] = $DB['SERVER'];
@@ -493,15 +494,20 @@ class CIntegrationTest extends CAPITest {
 			$db['DBSchema'] = $DB['SCHEMA'];
 		}
 
+		if (isset($HISTORY)) {
+			$db_history['HistoryStorageURL'] = reset($HISTORY['url']);
+			$db_history['HistoryStorageTypes'] = implode(',', $HISTORY['types']);
+		}
+
 		$configuration = [
-			self::COMPONENT_SERVER => array_merge($db, [
+			self::COMPONENT_SERVER => array_merge($db, $db_history, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
-			self::COMPONENT_SERVER_HANODE1 => array_merge($db, [
+			self::COMPONENT_SERVER_HANODE1 => array_merge($db, $db_history, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
