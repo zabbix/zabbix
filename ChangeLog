@@ -6,6 +6,9 @@ New features:
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm JSON and ifbackingnetwork info to JSON for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
+.......PS. [ZBX-27635] fixed Zabbix server and proxy build without libcurl (arimdjonoks)
+..F....... [ZBX-27463] replaced 'New oauth' with 'New OAuth' in Media Type edit form (dpankins)
 .........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
 ..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
 ..F....... [ZBX-27559] fixed inline validation error display for "Inherited and host macros" section in host and template forms (gberzina)
@@ -1404,6 +1407,8 @@ New features:
 .......PS. [ZBXNEXT-10211] added info about VMware entities to alarm JSON and ifbackingnetwork info to JSON for *vm.discovery and *vm.net.if.discovery items (MVekslers)
 
 Bug fixes:
+.......PS. [ZBX-27635] fixed Zabbix server and proxy build without libcurl (arimdjonoks)
+.........T [ZBX-27592] fixed memory items becoming unsupported in Apache templates (kflorowski)
 .........T [ZBX-17971] fixed macro view in trigger descriptions in some SNMP templates (abrosimovs)
 ..F....... [ZBX-27610] fixed http agent item user macros not resolving in required status codes (kastafjevs)
 .........T [ZBX-26388] improved memory usage monitoring for Docker by Zabbix agent 2 template (smansurovs)
