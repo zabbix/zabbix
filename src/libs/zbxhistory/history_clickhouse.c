@@ -37,8 +37,6 @@
 #include "zbxtime.h"
 #include "zbx_dbversion_constants.h"
 
-typedef void (*write_value_t)(zbx_json_t *row, const zbx_history_value_t *value);
-
 typedef struct
 {
 	unsigned char		value_type;
