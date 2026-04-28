@@ -918,8 +918,8 @@ static int	DBpatch_7050069(void)
 		ZBX_STR2UINT64(role_ruleid, row[0]);
 
 		if (ZBX_DB_OK > zbx_db_execute(
-					"update role_rule set name='ui.configuration.ceprules' where role_ruleid=" ZBX_FS_UI64,
-					role_ruleid))
+			"update role_rule set name='ui.configuration.ceprules' where role_ruleid=" ZBX_FS_UI64,
+			role_ruleid))
 		{
 			ret = FAIL;
 			break;
