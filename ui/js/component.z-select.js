@@ -35,29 +35,20 @@ class ZSelect extends HTMLElement {
 
 		this._events = {};
 
-		this._is_initialized = false;
 		this._is_connected = false;
 	}
 
 	connectedCallback() {
-		if (!this._is_initialized) {
+		if (!this.contains(this._button)) {
 			this.init();
-			this._is_initialized = true;
-		}
-
-		if (!this._is_connected) {
-			this.registerEvents();
 			this._is_connected = true;
 		}
+
+		this.registerEvents();
 	}
 
 	disconnectedCallback() {
-		if (!this._is_connected) {
-			return;
-		}
-
 		this.unregisterEvents();
-		this._is_connected = false;
 	}
 
 	/**
@@ -74,7 +65,7 @@ class ZSelect extends HTMLElement {
 				break;
 
 			case 'value':
-				if (!this._is_connected || this._input.value !== new_value) {
+				if (this._input.value !== new_value) {
 					const option = this.getOptionByValue(new_value);
 
 					this._highlight(option ? option._index : -1);
