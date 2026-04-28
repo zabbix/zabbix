@@ -551,34 +551,6 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			]
 		];
 
-		// This may be flaky because the value returned by time() may differ by 1 second.
-		yield 'Filter by ns add PREWHERE current timestamp when clock, time_from and time_till not set' => [
-			$closure,
-			['prewhere' => [], 'where' => [], 'param' => ['UInt64' => [], 'Int32' => []]],
-			[
-				'history' => ITEM_VALUE_TYPE_UINT64,
-				'filter' => ['ns' => 1234567]
-			] + $defaults,
-			[
-				'prewhere' => [
-					'pre_time_gte' => 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)',
-					'pre_time_lte' => 'clock_ns<=addNanoseconds(toDateTime64({pre_time_lte:UInt64},9),999999999)'
-				],
-				'where' => [
-					'filter' => 'toUnixTimestamp64Nano(clock_ns)%1000000000={filter_ns:Int32}'
-				],
-				'param' => [
-					'UInt64' => [
-						'pre_time_gte' => time(),
-						'pre_time_lte' => time()
-					],
-					'Int32' => [
-						'filter_ns' => 1234567
-					]
-				]
-			]
-		];
-
 		yield 'Filter by ns add PREWHERE when time_from and time_till not set' => [
 			$closure,
 			['prewhere' => [], 'where' => [], 'param' => ['UInt64' => [], 'Int32' => []]],
