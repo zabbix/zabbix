@@ -39,52 +39,6 @@ class testFormMaintenance extends CWebTest {
 	const MAINTENANCE_NAME = 'Test maintenance';
 	const PERIODS_TABLE = 'id:timeperiods';
 
-	public function prepareMaintenanceData() {
-		CDataHelper::call('maintenance.create', [
-			[
-				'name' => self::MAINTENANCE_NAME,
-				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
-				'active_since' => 1681765260, // 18.04.2023 00:01
-				'active_till' => 1899410340, // 10.03.2030 23:59
-				'description' => 'Test description',
-				'groups' => [['groupid' => 4]], // Zabbix servers.
-				'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_OR,
-				'tags' => [
-					['tag' => 'Tag1', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => 'A'],
-					['tag' => 'Tag2', 'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL, 'value' => 'B']
-				],
-				'timeperiods' => [
-					[
-						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
-						'start_date' => 1774013400, // 20.03.2026.
-						'period' => 5400
-					],
-					[
-						'timeperiod_type' => TIMEPERIOD_TYPE_DAILY,
-						'start_time' => 50400, // 14:00
-						'every' => 3,
-						'period' => 300
-					],
-					[
-						'timeperiod_type' => TIMEPERIOD_TYPE_WEEKLY,
-						'start_time' => 3600, // 01:00
-						'every' => 2,
-						'dayofweek' => 1 + 64, // Monday + Sunday.
-						'period' => 7200
-					],
-					[
-						'timeperiod_type' => TIMEPERIOD_TYPE_MONTHLY,
-						'start_time' => 82800, // 23:00
-						'day' => 15,
-						'month' => 1 + 1024, // January + November.
-						'period' => 86399940
-					]
-				]
-
-			]
-		]);
-	}
-
 	const EXPECTED_MAINTENANCE = [
 		'Name' => self::MAINTENANCE_NAME,
 		'Maintenance type' => 'With data collection',
@@ -92,13 +46,12 @@ class testFormMaintenance extends CWebTest {
 		'Active till' => '2030-03-10 23:59',
 		'Host groups' => 'Zabbix servers',
 		'id:tags_evaltype' => 'Or',
-		'id:tags_0_tag' => 'Tag1',
-		'id:tags_0_operator' => 'Contains',
-		'id:tags_0_value' => 'A',
-		'id:tags_1_tag' => 'Tag2',
-		'id:tags_1_operator' => 'Equals',
-		'id:tags_1_value' => 'B',
 		'Description' => 'Test description'
+	];
+
+	const EXPECTED_TAGS = [
+		['tag' => 'Tag1', 'operator' => 'Contains', 'value' => 'A'],
+		['tag' => 'Tag2', 'operator' => 'Equals', 'value' => 'B']
 	];
 
 	const EXPECTED_PERIODS = [
@@ -124,8 +77,68 @@ class testFormMaintenance extends CWebTest {
 		]
 	];
 
+	protected static $update_maintenance = [
+		'fields'=> self::EXPECTED_MAINTENANCE,
+		'tags' => self::EXPECTED_TAGS,
+		'periods' => self::EXPECTED_PERIODS
+	];
 
-	// opening with Create done, but layout needs to be checked with edit as well
+	public function prepareMaintenanceData() {
+		$maintenance_data = [
+			'name' => self::MAINTENANCE_NAME,
+			'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+			'active_since' => 1681765260, // 18.04.2023 00:01
+			'active_till' => 1899410340, // 10.03.2030 23:59
+			'description' => 'Test description',
+			'groups' => [['groupid' => 4]], // Zabbix servers.
+			'tags_evaltype' => MAINTENANCE_TAG_EVAL_TYPE_OR,
+			'tags' => [
+				['tag' => 'Tag1', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => 'A'],
+				['tag' => 'Tag2', 'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL, 'value' => 'B']
+			],
+			'timeperiods' => [
+				[
+					'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+					'start_date' => 1774013400, // 20.03.2026.
+					'period' => 5400
+				],
+				[
+					'timeperiod_type' => TIMEPERIOD_TYPE_DAILY,
+					'start_time' => 50400, // 14:00
+					'every' => 3,
+					'period' => 300
+				],
+				[
+					'timeperiod_type' => TIMEPERIOD_TYPE_WEEKLY,
+					'start_time' => 3600, // 01:00
+					'every' => 2,
+					'dayofweek' => 1 + 64, // Monday + Sunday.
+					'period' => 7200
+				],
+				[
+					'timeperiod_type' => TIMEPERIOD_TYPE_MONTHLY,
+					'start_time' => 82800, // 23:00
+					'day' => 15,
+					'month' => 1 + 1024, // January + November.
+					'period' => 86399940
+				]
+			]
+		];
+
+		// Create a copy for the update scenario.
+		$maintenance_for_update = $maintenance_data;
+		$maintenance_for_update['name'] = self::MAINTENANCE_NAME.' (for update)';
+
+		CDataHelper::call('maintenance.create', [
+			$maintenance_data,
+			$maintenance_for_update
+		]);
+
+		// Update the static tracker so the Update test clicks the correct link.
+		self::$update_maintenance['fields']['Name'] = $maintenance_for_update['name'];
+	}
+
+	// done except No data collection part
 	public function testFormMaintenance_Layout() {
 		foreach ([false, true] as $is_update) {
 			$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
@@ -183,6 +196,8 @@ class testFormMaintenance extends CWebTest {
 					$this->assertEquals($value, $form->getField($field)->getAttribute($attribute));
 				}
 			}
+
+			// todo: change to No data collection, assert tags inactive
 
 			// Check Periods table.
 			$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
@@ -248,7 +263,7 @@ class testFormMaintenance extends CWebTest {
 		}
 	}
 
-	// done, except screenshots
+	// done, except one screenshot failing
 	public function testFormMaintenance_PeriodFormLayout() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
@@ -493,7 +508,7 @@ class testFormMaintenance extends CWebTest {
 		];
 	}
 
-	//done
+	//done, except tags operators
 	/**
 	 * @dataProvider getCancelData
 	 */
@@ -563,6 +578,8 @@ class testFormMaintenance extends CWebTest {
 				]
 			];
 
+			// todo: tags operators
+
 			// Fill tags first since when maintenance type 'No data collection' is selected, tags become disabled
 			$form->query('id:tags')->asMultifieldTable()->one()->fill($test_data['tags']);
 
@@ -609,105 +626,36 @@ class testFormMaintenance extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 	}
 
-	/**
-	 * Create maintenance with periods and host group.
-	 */
-	/*public function testFormMaintenance_Create() {
-		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->page->assertTitle('Configuration of maintenance periods');
-		$this->page->assertHeader('Maintenance periods');
-		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
-
-		// Type maintenance name.
-		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		$form->fill(['Name' => 'Tessssssst', 'Host groups' => 'Zabbix servers', 'id:tags_evaltype' => 'Or']);
-
-		$periods = [
-			[
-				'fields' => '',
-				'result' => [['Period type' => 'One time only']]
-			],
-			[
-				'fields' => [
-					'Period type' => 'Daily'
-				],
-				'result' => [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day']]
-			],
-			[
-				'fields' => [
-					'Period type' => 'Weekly',
-					'Monday' => true,
-					'Sunday' => true
-				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Sunday of every 1 week']]
-			],
-			[
-				'fields' => [
-					'Period type' => 'Monthly',
-					'January' => true,
-					'November' => true
-				],
-				'result' => [['Period type' => 'Monthly', 'Schedule' => 'At 00:00 on day 1 of every January, November']]
-			]
-		];
-		foreach ($periods as $period) {
-			$form->query('button:Add')->one()->click();
-			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
-			$period_overlay->fill($period['fields']);
-			$period_overlay->submit();
-			$period_overlay->waitUntilNotVisible();
-			$this->assertTableHasData($period['result'], self::PERIODS_TABLE);
-		}
-
-		// Add problem tags.
-		$value = 'Value';
-		$tags = [
-			[
-				'action' => USER_ACTION_UPDATE,
-				'index' => 0,
-				'tag' => 'Tag1',
-				'value' => $value
-			],
-			[
-				'tag' => 'Tag2',
-				'value' => $value
-			],
-			[
-				'tag' => 'Tag3',
-				'value' => $value
-			]
-		];
-		$this->query('id:tags')->asMultifieldTable()->one()->fill($tags);
-
-		// Create maintenance and check the results in frontend.
-		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
-		$this->assertTableHasData([['Name' => self::MAINTENANCE_NAME, 'Type' => 'With data collection']]);
-
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
-		$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
-	}*/
-
-	public static function getCreateData() {
+	public static function getCreateUpdateData() {
 		return [
 			// #0 Minimal required fields
 			[
 				[
 					'fields' => [
 						'Name' => 'Minimal fields',
-						'Hosts' => 'ЗАББИКС Сервер'
+						'Maintenance type' => 'With data collection',
+						'Active since' => '2022-04-05 04:20',
+						'Active till' => '2023-05-22 20:45',
+						'Hosts' => 'ЗАББИКС Сервер',
+						'id:tags_evaltype' => 'And/Or'
+					],
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
 					]
 				]
 			],
-			// #1 Maximally filling all possible fields
+			// #1 Filling all possible form fields and period types, overlapping periods
 			[
 				[
 					'fields' => [
-						'Name' => 'Maximal fields',
+						'Name' => 'Fill all fields',
 						'Maintenance type' => 'With data collection',
-						'Active since' => '1970-01-02 00:00',
-						'Active till' => '2038-01-19 00:00',
+						'Active since' => '2025-02-03 14:30',
+						'Active till' => '2025-09-01 22:55',
 						'Host groups' => ['Zabbix servers', 'Hypervisors'],
 						'Hosts' => ['ЗАББИКС Сервер'],//vajag ieimportet vel vienu hostu mosh
 						'id:tags_evaltype' => 'Or',
@@ -718,10 +666,12 @@ class testFormMaintenance extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'tag' => 'TagOne',
+							'operator' => 'Contains',
 							'value' => 'ValueOne'
 						],
 						[
 							'tag' => 'TagTwo',
+							'operator' => 'Equals',
 							'value' => 'ValueTwo'
 						]
 					],
@@ -730,14 +680,27 @@ class testFormMaintenance extends CWebTest {
 							'fields' => [
 								'Period type' => 'One time only',
 								'Date' => '2026-03-20 15:30',
+								'id:period_days' => '0',
 								'name:period_hours' => '1',
 								'name:period_minutes' => '30'
 							]
 						],
 						[
 							'fields' => [
+								'Period type' => 'One time only',
+								'Date' => '2026-03-20 15:30',
+								'id:period_days' => '0',
+								'name:period_hours' => '2',
+								'name:period_minutes' => '40'
+							]
+						],
+						[
+							'fields' => [
 								'Period type' => 'Daily',
 								'id:every_day' => '2',
+								'id:hour' => '23',
+								'id:minute' => '30',
+								'id:period_days' => '0',
 								'name:period_hours' => '0',
 								'name:period_minutes' => '5'
 							]
@@ -745,10 +708,14 @@ class testFormMaintenance extends CWebTest {
 						[
 							'fields' => [
 								'Period type' => 'Weekly',
-								'id:weekly_days_1' => true,
-								'id:weekly_days_4' => true,
-								'id:weekly_days_16' => true,
 								'id:every_week' => '2',
+								'id:weekly_days_1' => true,
+								'id:weekly_days_2' => false,
+								'id:weekly_days_4' => true,
+								'id:weekly_days_8' => false,
+								'id:weekly_days_16' => true,
+								'id:weekly_days_32' => false,
+								'id:weekly_days_64' => false,
 								'id:hour' => '05',
 								'id:minute' => '30',
 								'id:period_days' => '1',
@@ -759,11 +726,50 @@ class testFormMaintenance extends CWebTest {
 						[
 							'fields' => [
 								'Period type' => 'Monthly',
+								'id:months_1' => false,
+								'id:months_2' => true,
+								'id:months_4' => false,
+								'id:months_8' => false,
+								'id:months_16' => false,
+								'id:months_32' => true,
+								'id:months_64' => false,
+								'id:months_128' => false,
+								'id:months_256' => false,
+								'id:months_512' => false,
+								'id:months_1024' => false,
+								'id:months_2048' => true,
+								'Date' => 'Day of month',
+								'id:day' => '14',
+								'id:hour' => '22',
+								'id:minute' => '30',
+								'id:period_days' => '0',
+								'name:period_hours' => '0',
+								'name:period_minutes' => '30'
+							]
+						],
+						[
+							'fields' => [
+								'Period type' => 'Monthly',
 								'id:months_1' => true,
+								'id:months_2' => false,
+								'id:months_4' => false,
+								'id:months_8' => false,
+								'id:months_16' => false,
+								'id:months_32' => false,
 								'id:months_64' => true,
+								'id:months_128' => false,
+								'id:months_256' => false,
+								'id:months_512' => false,
+								'id:months_1024' => false,
+								'id:months_2048' => false,
 								'Date' => 'Day of week',
 								'name:every_dow' => 'second',
+								'id:monthly_days_1' => false,
+								'id:monthly_days_2' => false,
 								'id:monthly_days_4' => true,
+								'id:monthly_days_8' => false,
+								'id:monthly_days_16' => false,
+								'id:monthly_days_32' => false,
 								'id:monthly_days_64' => true,
 								'id:hour' => '23',
 								'id:minute' => '55',
@@ -773,6 +779,18 @@ class testFormMaintenance extends CWebTest {
 							]
 						]
 					],
+					'expected_tags' => [
+						[
+							'tag' => 'TagOne',
+							'operator' => 'Contains',
+							'value' => 'ValueOne'
+						],
+						[
+							'tag' => 'TagTwo',
+							'operator' => 'Equals',
+							'value' => 'ValueTwo'
+						]
+					],
 					'expected_periods' => [
 						[
 							'Period type' => 'One time only',
@@ -780,8 +798,13 @@ class testFormMaintenance extends CWebTest {
 							'Period' => '1h 30m'
 						],
 						[
+							'Period type' => 'One time only',
+							'Schedule' => '2026-03-20 15:30',
+							'Period' => '2h 40m'
+						],
+						[
 							'Period type' => 'Daily',
-							'Schedule' => 'At 00:00 every 2 days',
+							'Schedule' => 'At 23:30 every 2 days',
 							'Period' => '5m'
 						],
 						[
@@ -791,50 +814,244 @@ class testFormMaintenance extends CWebTest {
 						],
 						[
 							'Period type' => 'Monthly',
+							'Schedule' => 'At 22:30 on day 14 of every February, June, December',
+							'Period' => '30m'
+						],
+						[
+							'Period type' => 'Monthly',
 							'Schedule' => 'At 23:55 on second Wednesday, Sunday of every January, July',
 							'Period' => '2d 20h 10m'
 						]
 					]
 				]
 			],
-			// #2 Leading and trailing spaces
+			// #2 With maintenance type No data collection
+			[
+				[
+					'fields' => [
+						'Name' => 'With No data collection',
+						'Maintenance type' => 'No data collection',
+						'Hosts' => 'ЗАББИКС Сервер'
+					],
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
+					]
+				]
+			],
+			// #3 Long strings with allowed symbols in all fields
+			[
+				[
+					'fields' => [
+						'Name' => 'Very long name-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00',
+						'Maintenance type' => 'With data collection',
+						'Active since' => '1970-01-02 00:00',
+						'Active till' => '2038-01-19 00:00',
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => 'ЗАББИКС Сервер',
+						'id:tags_evaltype' => 'And/Or',
+						'Description' => 'Very long description-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
+					],
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'Very long 1st tag-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00',
+							'operator' => 'Equals',
+							'value' => 'Very long 1st value-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
+						],
+						[
+							'tag' => 'Very long 2nd tag-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00',
+							'operator' => 'Contains',
+							'value' => 'Very long 2nd value-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
+						]
+					],
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
+					],
+					'expected_tags' => [
+						[
+							'tag' => 'Very long 1st tag-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00',
+							'operator' => 'Equals',
+							'value' => 'Very long 1st value-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
+						],
+						[
+							'tag' => 'Very long 2nd tag-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00',
+							'operator' => 'Contains',
+							'value' => 'Very long 2nd value-., /!?@#$%^&*()_=+[]{}\| ;:<>/ бц 頑張って 😀 &nbsp; \t \r \n 1E+308 %00'
+						]
+					]
+				]
+			],
+			// #4 Leading and trailing spaces, incomplete dates
 			[
 				[
 					'fields' => [
 						'Name' => '  Trim test  ',
-						'Active since' => '2025-01-01 00:00', // 8.0 šiem arī var likt atstarpes
-						'Active till' => '2030-01-01 00:00',
+						'Maintenance type' => 'With data collection',
+						'Active since' => '2025-02-03',
+						'Active till' => '2030',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'ЗАББИКС Сервер',
+						'id:tags_evaltype' => 'And/Or',
 						'Description' => '  This description should be trimmed  '
 					],
 					'tags' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'tag' => '  TagTrim  ',
-							'value' => '  ValueTrim  '
+							'tag' => '  TagTrim1  ',
+							'operator' => 'Contains',
+							'value' => '  ValueTrim1  '
+						],
+						[
+							'tag' => '  TagTrim2  ',
+							'operator' => 'Equals',
+							'value' => '  ValueTrim2  '
 						]
 					],
-					'expected' => [
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
+					],
+					'expected_fields' => [
 						'Name' => 'Trim test',
-						'Active since' => '2025-01-01 00:00', // 8.0 šiem arī var likt atstarpes
+						'Active since' => '2025-02-03 00:00',
 						'Active till' => '2030-01-01 00:00',
 						'Host groups' => 'Zabbix servers',
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Description' => 'This description should be trimmed',
-						'id:tags_0_tag' => 'TagTrim',
-						'id:tags_0_value' => 'ValueTrim'
+					],
+					'expected_tags' => [
+						[
+							'tag' => 'TagTrim1',
+							'operator' => 'Contains',
+							'value' => 'ValueTrim1'
+						],
+						[
+							'tag' => 'TagTrim2',
+							'operator' => 'Equals',
+							'value' => 'ValueTrim2'
+						]
 					]
 				]
-			]
+			],
+			// #5 All mandatory form fields empty
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => '',
+						'Maintenance type' => 'With data collection',
+						'Active since' => '',
+						'Active till' => '',
+						'id:tags_evaltype' => 'And/Or'
+					],
+					'error_details' => [
+						'Incorrect value for field "name": cannot be empty.',
+						'Incorrect value for field "active_since": a time is expected.',
+						'Incorrect value for field "active_till": a time is expected.',
+						'Field "timeperiods" is mandatory.'
+					]
+				]
+			],
+			// #6 Duplicate name
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => self::MAINTENANCE_NAME,
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
+					],
+					'error_details' => [
+						'Maintenance "'.self::MAINTENANCE_NAME.'" already exists.'
+					]
+				]
+			],
+			// #7 Duplicate tags
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Duplicate tags',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
+					],
+					'tags' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'tag' => 'DuplicateTag',
+							'value' => 'DuplicateValue'
+						],
+						[
+							'tag' => 'DuplicateTag',
+							'value' => 'DuplicateValue'
+						]
+					],
+					'error_details' => [
+						'Invalid parameter "/1/tags/2": value (tag, operator, value)=(DuplicateTag, 2, DuplicateValue) already exists.'
+					]
+				]
+			],
+			// #8 Active since greater than Active till
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => self::MAINTENANCE_NAME. '(active times error)',
+						'Active since' => '2025-02-03 00:00',
+						'Active till' => '2024-01-01 00:00',
+						'Host groups' => 'Zabbix servers'
+					],
+					'periods' => [
+						[
+							'fields' => [
+								'Period type' => 'Daily'
+							]
+						]
+					],
+					'error_details' => [
+						'Invalid parameter "/1/active_till": cannot be less than or equal to the value of parameter "/1/active_since".'
+					]
+				]
+			],
 		];
 	}
 
 	/**
-	 * @dataProvider getCreateData
+	 * @dataProvider getCreateUpdateData
 	 */
 	public function testFormMaintenance_Create($data) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
+			$sql = 'SELECT * FROM maintenances ORDER BY maintenanceid';
+			$old_hash = CDBHelper::getHash($sql);
+		}
+
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('button:Create maintenance period')->one()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -842,149 +1059,211 @@ class testFormMaintenance extends CWebTest {
 
 		$form->fill($data['fields']);
 
-		// Fill Tags if they exist
+		// Fill tags if they exist.
 		if (array_key_exists('tags', $data)) {
-			$form->query('id:tags')->asMultifieldTable()->one()->fill($data['tags']);
-		}
+			$tags_table = $form->query('id:tags')->asMultifieldTable()->one();
+			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+			$tags_table->fill($data['tags']);
+		};
 
-		//Use provided periods or default to 'Daily'
-		$periods = array_key_exists('periods', $data)
-			? $data['periods']
-			: [['fields' => ['Period type' => 'Daily']]];
-
-		foreach ($periods as $period) {
-			$form->getField('Periods')->query('button:Add')->one()->click();
-			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
-			$period_overlay->fill($period['fields']);
-			$period_overlay->submit();
-			$period_overlay->waitUntilNotVisible();
+		// Fill periods if they exist.
+		if (array_key_exists('periods', $data)) {
+			foreach ($data['periods'] as $period) {
+				$form->getField('Periods')->query('button:Add')->one()->click();
+				$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+				$period_overlay->fill($period['fields']);
+				$period_overlay->submit();
+				$period_overlay->waitUntilNotVisible();
+			}
 		}
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$this->assertMessage(TEST_GOOD, 'Maintenance period created');
 
-		// Open the newly created maintenance form and assert saved values
-		$search_name = trim($data['fields']['Name']);
-		$this->query('link', $search_name)->one()->click();
+		if ($expected === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot create maintenance period', $data['error_details']);
+			// Check that DB hash has not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+			$dialog->close();
+		} else {
+			$this->assertMessage(TEST_GOOD, 'Maintenance period created');
 
-		//Use 'expected' if defined, otherwise use 'fields'
-		$expected_form = $data['expected'] ?? $data['fields'];
-		//Use 'expected_periods' if defined, otherwise use 'Daily' with default values
-		$expected_periods = array_key_exists('expected_periods', $data)
-			? $data['expected_periods']
-			: [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day', 'Period' => '1h']];
+			$search_name = trim($data['fields']['Name']);
+			$this->query('link', $search_name)->one()->click();
 
-		$this->checkMaintenanceForm($expected_form, $expected_periods);
-		$dialog->close();
-
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($search_name)));
-		//$this->assertEquals(3, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value='.zbx_dbstr($value)));
-	}
-
-
-	/**
-	 * Test update by changing maintenance period and type.
-	 *
-	 * @depends testFormMaintenance_Create
-	 */
-	public function testFormMaintenance_Update() {
-		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-
-		// Change maintenance type.
-		$form->fill(['Maintenance type' => 'No data collection']);
-
-		// Remove "One time only".
-		$table = $this->query(self::PERIODS_TABLE)->asTable()->one();
-		$table->findRow('Period type', 'One time only')->getColumn('Action')->query('button:Remove')->one()->click()->waitUntilNotvisible();
-
-		$periods = [
-			[
-				'schedule' => 'Weekly',
-				'fields' => [
-					'Wednesday' => true,
-					'Friday' => true
-				],
-				'result' => [['Period type' => 'Weekly', 'Schedule' => 'At 00:00 Monday, Wednesday, Friday, Sunday of every 1 week']]
-			],
-			[
-				'schedule' => 'Monthly',
-				'fields' => [
-					'Date' => 'Day of week',
-					'June' => true,
-					'September' => true
-				],
-				'result' => [['Period type' => 'Monthly', 'Schedule' => 'At 00:00 on first Wednesday of every January, June, September, November']]
-			]
-		];
-		foreach ($periods as $period) {
-			$table->findRow('Period type', $period['schedule'])->getColumn('Action')->query('button:Edit')->one()->click();
-			$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
-			$period_overlay->fill($period['fields']);
-
-			if ($period['schedule'] === 'Monthly') {
-				$this->query('id:monthly_days_4')->waitUntilPresent()->asCheckbox()->one()->check();
+			//Use 'expected_fields' if defined, otherwise use 'fields'.
+			$expected_form = $data['expected_fields'] ?? $data['fields'];
+			//Use 'expected_periods' if defined, otherwise if one period defined use 'Daily' with default values.
+			$expected_periods = CTestArrayHelper::get($data, 'expected_periods');
+			if ($expected_periods === null && count($data['periods']) === 1) {
+				$expected_periods = [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day', 'Period' => '1h']];
+			}
+			// If tags have been entered, use 'expected_tags' if defined, otherwise use 'tags'.
+			if (array_key_exists('tags', $data)) {
+				$expected_tags = $data['expected_tags'] ?? $data['tags'];
+			} else {
+				$expected_tags = [];
 			}
 
-			$period_overlay->submit();
-			$period_overlay->waitUntilNotVisible();
-			$this->assertTableHasData($period['result'], self::PERIODS_TABLE);
+			$this->checkMaintenanceForm($expected_form, $expected_periods, $expected_tags);
+			$dialog->close();
+
+			// Check values in DB.
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($search_name)));
+
+			$expected_tag_count = array_key_exists('tags', $data) ? count($data['tags']) : 0;
+			$sql_tag_count = 'SELECT NULL FROM maintenance_tag WHERE maintenanceid='.
+					'(SELECT maintenanceid FROM maintenances WHERE name='.zbx_dbstr($search_name).')';
+
+			$this->assertEquals($expected_tag_count, CDBHelper::getCount($sql_tag_count));
+		}
+	}
+
+	// period formas negatīvie scenāriji
+	//public function testFormMaintenance_PeriodFormValidation($data) {	}
+
+	/**
+	 * @dataProvider getCreateUpdateData
+	 */
+	public function testFormMaintenance_Update($data) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+		if ($expected === TEST_BAD) {
+			$sql = 'SELECT * FROM maintenances ORDER BY maintenanceid';
+			$old_hash = CDBHelper::getHash($sql);
 		}
 
-		// Check the results in frontend.
-		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Maintenance period updated');
-		$this->assertTableHasData([['Name' => self::MAINTENANCE_NAME, 'Type' => 'No data collection']]);
+		// A suffix is added to TEST_GOOD update scenarios in order to avoid name duplication with create TEST_GOOD scenarios.
+		if ($expected === TEST_GOOD) {
+			$prefix = 'Update - ';
+			$name = $data['fields']['Name'];
+			$trimmed_name = trim($name);
 
-		// Check the results in DB.
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
-	}
+			// Update the input (preserving outer spaces)
+			// e.g., '  Trim test  ' becomes '  Update - Trim test  '
+			$data['fields']['Name'] = str_replace($trimmed_name, $prefix . $trimmed_name, $name);
 
-	public function testFormMaintenance_UpdateTags() {
-		$maintenance = self::MAINTENANCE_NAME;
+			// Update expectation (which is always already trimmed)
+			// e.g., 'Trim test' becomes 'Update - Trim test'
+			if (array_key_exists('expected_fields', $data) && array_key_exists('Name', $data['expected_fields'])) {
+				$data['expected_fields']['Name'] = $prefix . $data['expected_fields']['Name'];
+			}
+		}
+
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
-		$this->query('link', $maintenance)->one()->waitUntilClickable()->click();
-		$form = COverlayDialogElement::find()->waitUntilReady()->asForm()->one();
-		$form->fill(['id:tags_evaltype' => 'And/Or']);
 
-		// Update tags.
-		$tag = 'Tag';
-		$tags = [
-			[
-				'action' => USER_ACTION_UPDATE,
-				'index' => 0,
-				'tag' => 'Tag',
-				'value' => 'A1'
-			],
-			[
-				'action' => USER_ACTION_UPDATE,
-				'index' => 1,
-				'tag' => 'Tag',
-				'value' => 'B1'
-			]
-		];
-		$this->query('id:tags')->asMultifieldTable()->one()->fill($tags);
-		$this->query('xpath://label[@for="tags_0_operator_1"]')->one()->click();
-		$this->query('xpath://label[@for="tags_1_operator_0"]')->one()->click();
+		$current_name = self::$update_maintenance['fields']['Name'];
+		$this->query('link', $current_name)->one()->waitUntilClickable()->click();
+
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+		$form = $dialog->asForm();
+
+		// Fill changes.
+		$form->fill($data['fields']);
+
+		$tags_table = $form->query('id:tags')->asMultifieldTable()->one();
+		$add_button_tags_table = $tags_table->query('button:Add')->one();
+
+		// Check tags table is enabled (is disabled in the case when Maintenance type is No data collection).
+		if ($add_button_tags_table->isEnabled()) {
+
+			// Remove all tags table rows except one.
+			$tag_rows = $tags_table->getRows();
+			if ($tag_rows->count() > 1) {
+				// Remove all rows except the first one (index 0).
+				foreach ($tag_rows->slice(1) as $row) {
+					$row->query('button:Remove')->one()->click();
+				}
+			}
+
+			// Fill tags if they exist.
+			if (array_key_exists('tags', $data)) {
+				$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+				$tags_table->fill($data['tags']);
+			} else {
+				// Clear values from the 1st tag row.
+				$row0 = $tags_table->getRow(0);
+				$row0->query('xpath:.//input[contains(@id, "_tag")]')->one()->clear();
+				$row0->query('xpath:.//input[contains(@id, "_value")]')->one()->clear();
+			}
+		}
+
+		// Remove all periods.
+		$periods_table = $this->query(self::PERIODS_TABLE)->asTable()->one();
+		if ($periods_table->getRows()->count() >= 1) {
+			foreach ($periods_table->getRows() as $row) {
+				$row->query('button:Remove')->one()->click();
+			}
+		}
+
+		// Fill periods if they exist.
+		if (array_key_exists('periods', $data)) {
+			foreach ($data['periods'] as $period) {
+				$form->getField('Periods')->query('button:Add')->one()->click();
+				$period_overlay = COverlayDialogElement::find()->waitUntilReady()->all()->last()->asForm();
+				$period_overlay->fill($period['fields']);
+				$period_overlay->submit();
+				$period_overlay->waitUntilNotVisible();
+			}
+		}
 
 		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$this->assertMessage(TEST_GOOD, 'Maintenance period updated');
+		// periods - only successful adding; editing, removing and unsuccessful scenarios will be done in a separate method
 
-		$this->assertEquals(2, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE tag='.zbx_dbstr($tag)));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value=\'A1\' AND operator=0'));
-		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE value=\'B1\' AND operator=2'));
+		if ($expected === TEST_BAD) {
+			$this->assertMessage(TEST_BAD, 'Cannot update maintenance period', $data['error_details']);
+			// Check that DB hash has not changed.
+			$this->assertEquals($old_hash, CDBHelper::getHash($sql));
+			$dialog->close();
+		} else {
+			$this->assertMessage(TEST_GOOD, 'Maintenance period updated');
+
+			$search_name = trim($data['fields']['Name']);
+			$this->query('link', $search_name)->one()->click();
+
+			//Use 'expected_fields' if defined, otherwise use 'fields'.
+			$expected_form = $data['expected_fields'] ?? $data['fields'];
+			//Use 'expected_periods' if defined, otherwise if one period defined use 'Daily' with default values.
+			$expected_periods = CTestArrayHelper::get($data, 'expected_periods');
+			if ($expected_periods === null && count($data['periods']) === 1) {
+				$expected_periods = [['Period type' => 'Daily', 'Schedule' => 'At 00:00 every 1 day', 'Period' => '1h']];
+			}
+			// If tags have been entered, use 'expected_tags' if defined, otherwise use 'tags'.
+			if (array_key_exists('tags', $data)) {
+				$expected_tags = $data['expected_tags'] ?? $data['tags'];
+			} else {
+				$expected_tags = [];
+			}
+
+			$this->checkMaintenanceForm($expected_form, $expected_periods, $expected_tags);
+			$dialog->close();
+
+			self::$update_maintenance = [
+				'fields' => $expected_form,
+				'tags' => $expected_tags,
+				'periods' => $expected_periods
+			];
+
+			// Check values in DB.
+			$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($search_name)));
+
+			$expected_tag_count = array_key_exists('tags', $data) ? count($data['tags']) : 0;
+			$sql_tag_count = 'SELECT NULL FROM maintenance_tag WHERE maintenanceid='.
+					'(SELECT maintenanceid FROM maintenances WHERE name='.zbx_dbstr($search_name).')';
+
+			$this->assertEquals($expected_tag_count, CDBHelper::getCount($sql_tag_count));
+		}
 	}
+
+	//public function testFormMaintenance_PeriodFormUpdate($data) {	}
 
 	//done
-	//nedrikst but aiz update tags, tad kriit, jo tagi mainijusies
-	// nu vai ari vajag tags update laikaa updeitot const EXPECTED_MAINTENANCE
 	public function testFormMaintenance_Clone() {
 		$suffix = ' (cloned)';
 		$clone_name = self::MAINTENANCE_NAME.$suffix;
+
+		$sql_original = 'SELECT NULL FROM maintenance_tag WHERE maintenanceid='.
+			'(SELECT maintenanceid FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME).')';
+		$expected_tag_count = CDBHelper::getCount($sql_original);
 
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
@@ -1007,12 +1286,21 @@ class testFormMaintenance extends CWebTest {
 		$this->checkMaintenanceForm($clone_data);
 		COverlayDialogElement::find()->one()->close();
 
+		// Check values in DB.
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
 		$this->assertEquals(1, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr($clone_name)));
+
+		$sql_clone = 'SELECT NULL FROM maintenance_tag WHERE maintenanceid='.
+			'(SELECT maintenanceid FROM maintenances WHERE name='.zbx_dbstr($clone_name).')';
+
+		$this->assertEquals($expected_tag_count, CDBHelper::getCount($sql_original));
+		$this->assertEquals($expected_tag_count, CDBHelper::getCount($sql_clone));
 	}
 
 	//done
 	public function testFormMaintenance_Delete() {
+		$maintenance_id = CDBHelper::getValue('SELECT maintenanceid FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME));
+
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('link', self::MAINTENANCE_NAME)->one()->waitUntilClickable()->click();
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
@@ -1025,13 +1313,15 @@ class testFormMaintenance extends CWebTest {
 		COverlayDialogElement::ensureNotPresent();
 		$this->assertMessage(TEST_GOOD, 'Maintenance period deleted');
 
+		// Check values in DB.
 		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenances WHERE name='.zbx_dbstr(self::MAINTENANCE_NAME)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT NULL FROM maintenance_tag WHERE maintenanceid='.$maintenance_id));
 	}
 
 	/**
 	 * Check the content of the Maintenance form and the Periods table.
 	 */
-	private function checkMaintenanceForm($data = self::EXPECTED_MAINTENANCE, $periods = self::EXPECTED_PERIODS) {
+	private function checkMaintenanceForm($data = self::EXPECTED_MAINTENANCE, $periods = self::EXPECTED_PERIODS, $tags = self::EXPECTED_TAGS) {
 		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$form = $dialog->asForm();
 
@@ -1039,6 +1329,12 @@ class testFormMaintenance extends CWebTest {
 
 		if ($periods !== null) {
 			$this->assertTableHasData($periods, self::PERIODS_TABLE);
+		}
+
+		if ($tags !== []) {
+			$tags_table = $form->query('id:tags')->asMultifieldTable()->one();
+			$tags_table->setFieldMapping(['tag', 'operator', 'value']);
+			$tags_table->checkValue($tags);
 		}
 	}
 }
