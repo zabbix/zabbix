@@ -1,0 +1,26 @@
+diff --git a/src/libs/zbxhistory/history_elastic.c b/src/libs/zbxhistory/history_elastic.c
+index 6509d3e1e26..f4fb3a6dcde 100644
+--- a/src/libs/zbxhistory/history_elastic.c
++++ b/src/libs/zbxhistory/history_elastic.c
+@@ -34,7 +34,7 @@
+ #define		ZBX_IDX_JSON_ALLOCATE		256
+ #define		ZBX_JSON_ALLOCATE		2048
+ 
+-const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
++const char	*value_type_str[] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text"};
+ 
+ extern char	*CONFIG_HISTORY_STORAGE_URL;
+ extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
+diff --git a/ui/include/classes/api/managers/CHistoryManager.php b/ui/include/classes/api/managers/CHistoryManager.php
+index 060f6e17318..38db036b606 100644
+--- a/ui/include/classes/api/managers/CHistoryManager.php
++++ b/ui/include/classes/api/managers/CHistoryManager.php
+@@ -1440,7 +1440,7 @@ class CHistoryManager {
+ 
+ 		foreach ($indices as $type => $index) {
+ 			if (($url = self::getElasticsearchUrl($index)) !== null) {
+-				$endponts[$type] = $url.$index.'*/'.$action;
++				$endponts[$type] = $url."{DBNAME}_".$index.'*/'.$action;
+ 			}
+ 		}
+ 
