@@ -323,7 +323,7 @@ class CDatatableElement extends CTableElement {
 
 	public function waitUntilRowsCount($count) {
 		$table = $this;
-		CElementQuery::wait(3)->until(function () use ($table, $count) {
+		CElementQuery::wait(2)->until(function () use ($table, $count) {
 			try {
 				return $table->getRows()->count() === $count;
 			}
@@ -333,10 +333,12 @@ class CDatatableElement extends CTableElement {
 		}, 'Failed to wait until there are exactly '.$count.' rows in the datatable.');
 	}
 
-//	/**
-//	 * Scroll the datatable to the right position.
-//	 */
-//	public function scrollHorizontally($shift) {
-//		CElementQuery::getDriver()->executeScript('arguments[0].scrollLeft +='.$shift.';', [$this]);
-//	}
+	/**
+	 * Scroll the datatable to the right position.
+	 */
+	public function scrollRightHorizontally() {
+		CElementQuery::getDriver()->executeScript('arguments[0].querySelector(\'.datatable-body\').scrollLeft = '.
+				'arguments[0].offsetWidth;', [$this]
+		);
+	}
 }

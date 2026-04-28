@@ -1289,6 +1289,9 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers']
 					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
+					],
 					'Tags' => [
 						'Type' => 'Or',
 						'tags' => [
@@ -1381,11 +1384,6 @@ class testPageProblems extends CWebTest {
 							'Tag name display' => 'Full'
 						]
 					],
-					'update_colmuns' => [
-						'Operational data' => false,
-						'Status' => true,
-						'Info' => true
-					],
 					'result' => [
 						[
 							'Problem' => 'Test trigger to check tag filter on problem page',
@@ -1432,7 +1430,6 @@ class testPageProblems extends CWebTest {
 					],
 					'header_filter' => [
 						'Tags' => [
-							'Number of tags' => 3,
 							'Tag display priority' => 'Kappa'
 						]
 					],
@@ -1464,7 +1461,6 @@ class testPageProblems extends CWebTest {
 					],
 					'header_filter' => [
 						'Tags' => [
-							'Number of tags' => 3,
 							'Tag display priority' => 'Kappa, Beta'
 						]
 					],
@@ -1496,7 +1492,6 @@ class testPageProblems extends CWebTest {
 					],
 					'header_filter' => [
 						'Tags' => [
-							'Number of tags' => 3,
 							'Tag display priority' => 'Gamma, Kappa, Beta'
 						]
 					],
@@ -1584,12 +1579,9 @@ class testPageProblems extends CWebTest {
 						'Hosts' => 'ЗАББИКС Сервер',
 						'Warning' => true
 					],
-					'header_filter' => [
-						'Time' => ['Show timeline' => true]
-					],
 					'result' => [
 						['Problem' => 'Test trigger with tag'],
-						['' => 'October'],
+						['Time' => 'October'],
 						['Problem' => 'Fourth test trigger with tag priority'],
 						['Problem' => 'Third test trigger with tag priority'],
 						['Problem' => 'Second test trigger with tag priority'],
@@ -1828,6 +1820,9 @@ class testPageProblems extends CWebTest {
 						'id:from' => 'now-2w',
 						'id:to' => 'now'
 					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
+					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
 						['Problem' => 'Two trigger expressions'],
@@ -1851,6 +1846,9 @@ class testPageProblems extends CWebTest {
 					],
 					'time_selector' => [
 						'link' => 'Last 1 year'
+					],
+					'header_filter' => [
+						'Time' => ['Show timeline' => false]
 					],
 					'result' => [
 						['Problem' => 'Multiple spaces in problem name'],
@@ -1892,8 +1890,14 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
+	protected function removeSavedLayout() {
+		DBexecute('DELETE FROM profiles WHERE idx=\'web.monitoring.problem.datatable\'');
+	}
+
 	/**
 	 * @dataProvider getFilterData
+	 *
+	 * @onAfter removeSavedLayout
 	 */
 	public function testPageProblems_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
@@ -1905,6 +1909,17 @@ class testPageProblems extends CWebTest {
 			$this->setTags($data['Tags']['tags']);
 		}
 
+		// Apply the filter from datatable headers.
+		if (array_key_exists('header_filter', $data)) {
+			$this->filterFromHeader($data['header_filter']);
+			$table->waitUntilReady()->invalidate();
+		}
+
+		// If required, update the list of columns in problems datatable.
+		if (array_key_exists('update_colmuns', $data)) {
+			$this->updateColumnList($data['update_colmuns']);
+		}
+
 		if (array_key_exists('fields', $data)) {
 			$form->fill($data['fields']);
 		}
@@ -1912,14 +1927,15 @@ class testPageProblems extends CWebTest {
 		$form->submit();
 		$table->waitUntilReady()->invalidate();
 
-		// Apply the filter from datatable headers.
-		if (array_key_exists('header_filter', $data)) {
-			$this->filterFromHeader($data['header_filter']);
-			$table->waitUntilReady()->invalidate();
-		}
-
+		// If required, update the list of columns in problems datatable.
 		if (array_key_exists('update_colmuns', $data)) {
-			$this->updateColumnList($data['update_colmuns']);
+			foreach ($data['update_colmuns'] as $column => $presence) {
+				if (!in_array($column, ['Compact view', 'Highlight whole row'])) {
+					$this->assertEquals($presence, in_array($column, $table->getHeadersText()),
+							'Header '.$column.' '.(($presence) ? 'should' : 'should not'). ' be present.'
+					);
+				}
+			}
 		}
 
 		if (array_key_exists('time_selector', $data)) {
@@ -1936,11 +1952,10 @@ class testPageProblems extends CWebTest {
 			}
 
 			$this->query('button:Apply')->one()->click();
-			$this->page->waitUntilReady();
-			$table->waitUntilReady();
 		}
 
 		$this->page->waitUntilReady();
+		$table->waitUntilRowsCount(count($data['result']));
 		$this->assertDatatableData($data['result']);
 
 		// Check "Compact view" and "Highlight whole row" filter checkboxes.
@@ -2054,8 +2069,10 @@ class testPageProblems extends CWebTest {
 			'String in operational data' => [
 				[
 					'filter' => [
-						'Problem' => 'Trigger for String problem',
-						'Show operational data' => 'Separately'
+						'Problem' => 'Trigger for String problem'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2071,8 +2088,10 @@ class testPageProblems extends CWebTest {
 			'Number in operational data' => [
 				[
 					'filter' => [
-						'Problem' => 'Trigger for Age problem',
-						'Show operational data' => 'Separately'
+						'Problem' => 'Trigger for Age problem'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2089,8 +2108,10 @@ class testPageProblems extends CWebTest {
 					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
 					'screen_name' => 'operational data separately',
 					'filter' => [
-						'Problem' => 'Filled opdata with macros',
-						'Show operational data' => 'Separately'
+						'Problem' => 'Filled opdata with macros'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2105,8 +2126,10 @@ class testPageProblems extends CWebTest {
 			'ASCII symbols in metric' => [
 				[
 					'filter' => [
-						'Problem' => 'Symbols in Item metric',
-						'Show operational data' => 'Separately'
+						'Problem' => 'Symbols in Item metric'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2122,8 +2145,10 @@ class testPageProblems extends CWebTest {
 			'XSS code in Item metric' => [
 				[
 					'filter' => [
-						'Problem' => 'XSS code in Item metric',
-						'Show operational data' => 'Separately'
+						'Problem' => 'XSS code in Item metric'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2139,8 +2164,10 @@ class testPageProblems extends CWebTest {
 			'SQL injection in Item metric' => [
 				[
 					'filter' => [
-						'Problem' => 'SQL Injection Item metric',
-						'Show operational data' => 'Separately'
+						'Problem' => 'SQL Injection Item metric'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2156,8 +2183,10 @@ class testPageProblems extends CWebTest {
 			'Two metrics in operational data pop-up window' => [
 				[
 					'filter' => [
-						'Problem' => 'Two trigger expressions',
-						'Show operational data' => 'Separately'
+						'Problem' => 'Two trigger expressions'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => [
 						[
@@ -2182,8 +2211,10 @@ class testPageProblems extends CWebTest {
 					'custom data' => 'Operational data - (150),150, [*UNKNOWN*]',
 					'screen_name' => 'operational data with problem name',
 					'filter' => [
-						'Problem' => 'Filled opdata with macros',
-						'Show operational data' => 'With problem name'
+						'Problem' => 'Filled opdata with macros'
+					],
+					'header_filter' => [
+						'Problem' => ['Show operational data' => true]
 					],
 					'popup rows' => [
 						[
@@ -2199,8 +2230,10 @@ class testPageProblems extends CWebTest {
 				[
 					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
 					'filter' => [
-						'Problem' => 'No operational data popup',
-						'Show operational data' => 'With problem name'
+						'Problem' => 'No operational data popup'
+					],
+					'header_filter' => [
+						'Problem' => ['Show operational data' => true]
 					],
 					'popup rows' => []
 				]
@@ -2209,8 +2242,10 @@ class testPageProblems extends CWebTest {
 				[
 					'custom data' => '',
 					'filter' => [
-						'Problem' => 'Two trigger expressions',
-						'Show operational data' => 'With problem name'
+						'Problem' => 'Two trigger expressions'
+					],
+					'header_filter' => [
+						'Problem' => ['Show operational data' => true]
 					],
 					'popup rows' => []
 				]
@@ -2219,8 +2254,10 @@ class testPageProblems extends CWebTest {
 				[
 					'custom data' => 'No popup "],*,a[x=": "],*,a[x="/\|\'/æ㓴🍭🍭',
 					'filter' => [
-						'Problem' => 'No operational data popup',
-						'Show operational data' => 'Separately'
+						'Problem' => 'No operational data popup'
+					],
+					'update_colmuns' => [
+						'Operational data' => true
 					],
 					'popup rows' => []
 				]
@@ -2230,16 +2267,28 @@ class testPageProblems extends CWebTest {
 
 	/**
 	 * @dataProvider getFilterForOperationalData
+	 *
+	 * @onAfter removeSavedLayout
 	 */
 	public function testPageProblems_OperationalData($data){
 		$this->page->login()->open(self::URL.'&sort=clock&sortorder=ASC');
 		$form = CFilterElement::find()->one()->getForm();
 
 		$form->fill($data['filter'])->submit();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
-		$column = ($data['filter']['Show operational data'] === 'With problem name') ? 'Problem' : 'Operational data';
-		$problem_name = ($data['filter']['Show operational data'] === 'With problem name' && $data['custom data'] !== '')
+		// Set oprational data in Problem column.
+		if (array_key_exists('header_filter', $data)) {
+			$this->filterFromHeader($data['header_filter']);
+		}
+
+		// Add "Operational data" column to the list of columns in problems datatable.
+		if (array_key_exists('update_colmuns', $data)) {
+			$this->updateColumnList($data['update_colmuns']);
+		}
+
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
+		$column = (array_key_exists('header_filter', $data)) ? 'Problem' : 'Operational data';
+		$problem_name = (array_key_exists('header_filter', $data) && $data['custom data'] !== '')
 			? $data['filter']['Problem'].' ('.$data['custom data'].')'
 			: $data['filter']['Problem'];
 		$opdata_column = $table->findRow('Problem', $problem_name)->getColumn($column);
@@ -2252,7 +2301,7 @@ class testPageProblems extends CWebTest {
 
 		// Check operation data in table on page.
 		$data_in_column = CTestArrayHelper::get($data, 'custom data', implode(', ', $metrics));
-		if ($data['filter']['Show operational data'] === 'With problem name') {
+		if (array_key_exists('header_filter', $data)) {
 			$data_in_column = ($data_in_column === '')
 				? $data['filter']['Problem']
 				: $data['filter']['Problem'].' ('.$data_in_column.')';
@@ -2293,19 +2342,16 @@ class testPageProblems extends CWebTest {
 
 	public function testPageProblems_ResetButton() {
 		$this->page->login()->open(self::URL);
-		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
-		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
 		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
-		$form->fill(['Show timeline' => false]);
-		$form->submit();
-		$table->waitUntilReady();
+		$this->filterFromHeader(['Time' => ['Show timeline' => false]]);
+		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 		$start_rows_count = $table->getRows()->count();
 		$this->assertDatatableStats($start_rows_count);
 		$start_contents = $this->getDatatableColumnData('Problem');
 
 		// Filter some problems.
-		$form->invalidate();
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
 		$form->fill(['Hosts' => '3_Host_to_check_Monitoring_Overview']);
 		$form->submit();
 
@@ -2314,17 +2360,14 @@ class testPageProblems extends CWebTest {
 		$this->assertDatatableStats(1);
 
 		// Checking that filtered Problem matches expected.
-		$this->assertTableDataColumn(['3_trigger_Average'], 'Problem');
+		$this->assertDatatableDataColumn(['3_trigger_Average'], 'Problem');
 
 		// After pressing reset button, check that previous problems are displayed again.
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReady();
 
-		$form->fill(['Show timeline' => false]);
-		$form->submit();
-
 		$table->waitUntilRowsCount($start_rows_count);
-		$this->assertTableStats($start_rows_count);
-		$this->assertEquals($start_contents, $this->getTableColumnData('Problem'));
+		$this->assertDatatableStats($start_rows_count);
+		$this->assertEquals($start_contents, $this->getDatatableColumnData('Problem'));
 	}
 }

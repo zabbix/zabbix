@@ -819,6 +819,9 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				'service' => '//table[@class="list-table"]//tr[1]//button[@title="Edit"]'
 			];
 
+			if ($this->query('class:datatable-scrollable')->one(false)->isValid()) {
+				$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
+			}
 			$this->query('xpath', $selectors[$data['overlay']])->one()->waitUntilClickable()->click();
 			$element = COverlayDialogElement::find()->waitUntilReady()->one();
 		}

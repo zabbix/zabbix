@@ -212,14 +212,12 @@ class CDatatableBehavior extends CTableBehavior {
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one()->waitUntilClickable();
+			$button = $table->getHeaderByText($column)->query($button_selector)->one();
 
-//			try {
-//				$button->waitUntilClickable();
-//			}
-//			catch (Exception $e) {
-//				$table->scrollHorizontally(30);
-//			}
+			if (!$button->isClickable()) {
+				$table->scrollRightHorizontally();
+			}
+
 			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
@@ -246,6 +244,11 @@ class CDatatableBehavior extends CTableBehavior {
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
 			$button = $table->getHeaderByText($column)->query($button_selector)->one()->waitUntilClickable();
+
+			if (!$button->isClickable()) {
+				$table->scrollRightHorizontally();
+			}
+
 			$button->click();
 			$popup_dialog = $this->test->query('class:datatable-options-popup')->waitUntilVisible()->one();
 
@@ -311,10 +314,10 @@ class CDatatableBehavior extends CTableBehavior {
 		foreach ($field_changes as $field => $value) {
 			$for = $popup_dialog->query('xpath:.//div[text()='.CXPathHelper::escapeQuotes($field).']/..')->one()
 						->getAttribute('for');
-			$popup_dialog->query('id', $for)->one()->detect()->fill($value);
-			$table->waitUntilReady()->invalidate();
+			$popup_dialog->query('id', $for)->one()->asCheckbox()->set($value);
+			$table->waitUntilReady();
 		}
-sleep(5);
+
 		// Click on button again to close the popup.
 		$button->invalidate();
 		$button->click();
