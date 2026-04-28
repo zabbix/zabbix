@@ -448,6 +448,11 @@ class testItemRate extends CIntegrationTest {
 		}
 
 		if ($expected_error === false) {
+			$this->callUntilDataIsPresent('history.get', [
+				'itemids'       => $api_request['itemids'],
+				'history'       => ITEM_VALUE_TYPE_FLOAT
+			]);
+
 			$result = $this->call('history.get', $api_request, $expected_error);
 		} else {
 			$result = $this->call('item.get',[
