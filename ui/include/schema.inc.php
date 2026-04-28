@@ -10612,6 +10612,12 @@ return [
 				'ref_table' => 'cep_rule',
 				'ref_field' => 'cep_ruleid'
 			],
+			'step' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
 			'execute_when' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
