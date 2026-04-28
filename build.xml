@@ -162,6 +162,7 @@
 			<arg line="--with-postgresql"/>
 			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
@@ -546,6 +547,7 @@
 			<arg line="--with-mysql"/>
 			<arg line="--with-libpcre2"/>
 			<arg line="--prefix=${basedir}"/>
+			<arg line="--with-libcurl"/>
 		</exec>
 		<exec executable="make" failonerror="on">
 			<arg line="-j4"/>
