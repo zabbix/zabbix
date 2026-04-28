@@ -3164,7 +3164,7 @@ class CUser extends CApiService {
 
 		if (!$db_tokens) {
 			usleep(10000);
-			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'), 'API token not found.');
+			self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 		}
 
 		$db_token = reset($db_tokens);

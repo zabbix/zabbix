@@ -28,6 +28,8 @@ class CAPIHelper {
 	// Session id.
 	protected static $session = null;
 
+	protected static bool $auth_disabled = false;
+
 	/**
 	 * Reset API helper state.
 	 */
@@ -74,7 +76,7 @@ class CAPIHelper {
 			]
 		];
 
-		if ($sessionid !== null) {
+		if (!static::$auth_disabled && $sessionid !== null) {
 			$params['http']['header'][] = 'Authorization: Bearer '.$sessionid;
 		}
 
@@ -136,6 +138,14 @@ class CAPIHelper {
 		static::$session = $session;
 	}
 
+	public static function disableAuth() {
+		static::$auth_disabled = true;
+	}
+
+	public static function enableAuth() {
+		static::$auth_disabled = false;
+	}
+
 	/**
 	 * Create session id.
 	 *
@@ -172,7 +182,7 @@ class CAPIHelper {
 	 * @returns CAPIHelper
 	 */
 	public static function authorize(string $username, string $password) {
-		static::$session = null;
+		static::setSessionId(null);
 
 		$result = static::call('user.login', ['username' => $username, 'password' => $password]);
 		if (array_key_exists('result', $result)) {

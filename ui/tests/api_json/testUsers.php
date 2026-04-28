@@ -288,19 +288,19 @@ class testUsers extends CAPITest {
 				'name' => 'API test disabled token',
 				'userid' => self::$data['userids']['user_for_token_tests'],
 				'status' => ZBX_AUTH_TOKEN_DISABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + SEC_PER_HOUR
 			],
 			[
 				'name' => 'API test valid token',
 				'userid' => self::$data['userids']['user_with_valid_session'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + SEC_PER_HOUR
 			],
 			[
 				'name' => 'API test valid token for user with disabled user group',
 				'userid' => self::$data['userids']['user_with_disabled_usergroup'],
 				'status' => ZBX_AUTH_TOKEN_ENABLED,
-				'expires_at' => $now + 100
+				'expires_at' => $now + SEC_PER_HOUR
 			]
 		];
 
@@ -2845,6 +2845,8 @@ class testUsers extends CAPITest {
 	public function testUsers_Login($user, $expected_error) {
 		$this->disableAuthorization();
 		$this->call('user.login', $user, $expected_error);
+
+		$this->enableAuthorization();
 	}
 
 	public function testUsers_AuthTokenIncorrect() {
@@ -2915,7 +2917,7 @@ class testUsers extends CAPITest {
 		$this->assertTrue(array_key_exists('error', $res));
 
 		['error' => ['data' => $error]] = $res;
-		$this->assertEquals($error, 'API token expired.');
+		$this->assertEquals('API token expired.', $error);
 	}
 
 	public function testUsers_AuthTokenNotExpired() {
@@ -3066,6 +3068,8 @@ class testUsers extends CAPITest {
 		$this->assertEquals('Incorrect user name or password or account is temporarily blocked.',
 			$result['error']['data']
 		);
+
+		$this->enableAuthorization();
 	}
 
 	/**
@@ -3252,6 +3256,8 @@ class testUsers extends CAPITest {
 			$end_time = microtime(true);
 			$this->assertTrue($end_time - $start_time >= 1);
 		}
+
+		$this->enableAuthorization();
 	}
 
 	/**
