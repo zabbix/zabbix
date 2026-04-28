@@ -430,15 +430,52 @@ if (count($data['steps']) > 0) {
 			->addVar('steps['.$i.'][error_handler]', $step['error_handler'])
 			->addVar('steps['.$i.'][error_handler_params]', $step['error_handler_params']);
 
-		// Temporary solution to fix "\n\n1" conversion to "\n1" in the hidden textarea field after jQuery.append().
-		if ($step['type'] == ZBX_PREPROC_CSV_TO_JSON || $step['type'] == ZBX_PREPROC_VALIDATE_RANGE) {
-			$form->addItem(
-				(new CInput('hidden', 'steps['.$i.'][params]', $step['params']))
-					->setAttribute('data-field-type', 'hidden')
-			);
+		if ($step['error_handler'] == ZBX_PREPROC_FAIL_SET_VALUE
+				|| $step['error_handler'] == ZBX_PREPROC_FAIL_SET_ERROR) {
+			$form->addVar('steps['.$i.'][on_fail]', 1);
+		}
+
+		$step_params = $step['type'] == ZBX_PREPROC_SCRIPT
+			? [$step['params'], ''] : explode("\n", $step['params']);
+
+		if (in_array($step['type'], [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX,
+				ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])) {
+			foreach ($step_params as $j => $param_value) {
+				$form->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_'.$j.'_not_supported]', $param_value))
+							->setAttribute('data-field-type', 'hidden')
+					);
+			}
+		}
+		elseif ($step['type'] == ZBX_PREPROC_SNMP_WALK_TO_JSON) {
+			$j = 0;
+
+			for ($k = 0; $k < count($step_params); $k += 3) {
+				$form->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_set_snmp]['.$j.'][name]', $step_params[$k]))
+							->setAttribute('data-field-type', 'hidden')
+					)
+					->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_set_snmp]['.$j.'][oid_prefix]',
+							$step_params[$k+1]
+						))
+							->setAttribute('data-field-type', 'hidden')
+					)
+					->addItem(
+						(new CInput('hidden', 'steps['.$i.'][params_set_snmp]['.$j.'][format]', $step_params[$k+2]))
+							->setAttribute('data-field-type', 'hidden')
+					);
+
+				$j++;
+			}
 		}
 		else {
-			$form->addVar('steps['.$i.'][params]', $step['params']);
+			foreach ($step_params as $j => $param_value) {
+				$form->addItem(
+					(new CInput('hidden', 'steps['.$i.'][params_'.$j.']', $param_value))
+						->setAttribute('data-field-type', 'hidden')
+				);
+			}
 		}
 
 		$result_table->addRow(

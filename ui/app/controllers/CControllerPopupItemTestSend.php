@@ -244,13 +244,16 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 			'ssl_cert_file' => ['string'],
 			'ssl_key_password' => ['string'],
 			'status_codes' => ['string'],
-			'steps' => ['objects', 'fields' => [
-				'type' => ['integer', 'required', 'in' => CItem::SUPPORTED_PREPROCESSING_TYPES],
-				// TODO: stricter validation
-				'params' => ['db item_preproc.params'],
-				'error_handler' => ['db item_preproc.error_handler'],
-				'error_handler_params' => ['db item_preproc.error_handler_params']
-			]],
+			'steps' => [
+				array_merge(CItemGeneralHelper::getPreprocessingValidationRules(false),
+					['when' => ['test_type', 'in' => [self::ZBX_TEST_TYPE_ITEM, self::ZBX_TEST_TYPE_LLD]]]
+				),
+				array_merge(CItemGeneralHelper::getPreprocessingValidationRules(true),
+					['when' => ['test_type',
+						'in' => [self::ZBX_TEST_TYPE_ITEM_PROTOTYPE, self::ZBX_TEST_TYPE_LLD_PROTOTYPE]
+					]]
+				)
+			],
 			'timeout' => ['string'],
 			'username' => ['string'],
 			'url' => ['string'],
@@ -336,7 +339,9 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 		$data['item']['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
 
 		// Steps array can be empty if only value conversion is tested.
-		$steps_data = $this->resolvePreprocessingStepMacros($this->getInput('steps', []));
+		$steps_data = $this->resolvePreprocessingStepMacros(
+			normalizeItemPreprocessingSteps($this->getInput('steps', []))
+		);
 
 		if ($steps_data) {
 			$data['item']['steps'] = $steps_data;

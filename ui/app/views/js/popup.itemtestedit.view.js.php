@@ -55,8 +55,9 @@ window.itemtestedit_view_popup = new class {
 
 		this.#initEvents();
 		this.#update();
-
 		this.#form.discoverAllFields();
+		this.#form_element.style.display = '';
+		this.#overlay.recoverFocus();
 	}
 
 	#initEvents() {
@@ -220,8 +221,14 @@ window.itemtestedit_view_popup = new class {
 				.querySelector('input:checked').value;
 			remember_values.proxyid = fields.proxyid ? fields.proxyid: 0;
 			remember_values.interfaceid = fields.interfaceid ? fields.interfaceid : 0;
-			remember_values.address = this.#form.findFieldByName('interface[address]').getField().value;
-			remember_values.port = this.#form.findFieldByName('interface[port]').getField().value;
+
+			if (this.#interface_address_enabled) {
+				remember_values.address = this.#form.findFieldByName('interface[address]').getField().value;
+			}
+
+			if (this.#interface_port_enabled) {
+				remember_values.port = this.#form.findFieldByName('interface[port]').getField().value;
+			}
 
 			if (fields.interface && fields.interface.details) {
 				remember_values.interface_details = fields.interface.details;
@@ -450,10 +457,11 @@ window.itemtestedit_view_popup = new class {
 				step.action = tmpl_gray_label.evaluateToElement({label: <?= json_encode(_('Discard value')) ?>});
 			}
 			else if (step.action === <?= ZBX_PREPROC_FAIL_SET_VALUE ?>) {
+				step.result = step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result;
 				step.action = tmpl_act_done.evaluateToElement({
 					action_name: <?= json_encode(_('Set value to')) ?>,
-					failed: step.failed,
-					failed_hint: escapeHtml(step.failed)
+					failed: step.result,
+					failed_hint: escapeHtml(step.result)
 				});
 			}
 			else if (step.action === <?= ZBX_PREPROC_FAIL_SET_ERROR ?>) {
@@ -554,6 +562,7 @@ window.itemtestedit_view_popup = new class {
 	}
 
 	#ajaxExceptionHandler(exception) {
+		debugger;
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
