@@ -46,14 +46,18 @@ calendar.prototype = {
 	clndr_month_div: null,		// html obj
 	clndr_year_div: null,		// html obj
 	clndr_days: null,			// html obj
-	clndr_month: null,			// html obj
 	clndr_year: null,			// html obj
+	clndr_year_live: null,		// html obj
 	clndr_year_wrap: null,		// html obj
-	clndr_month_wrap: null,		// html obj
-	clndr_monthup: null,		// html bttn obj
-	clndr_monthdown: null,		// html bttn obj
+	clndr_year_live_wrap: null,	// html obj
 	clndr_yearup: null,			// html bttn obj
 	clndr_yeardown: null,		// html bttn obj
+	clndr_month: null,			// html obj
+	clndr_month_live: null,		// html obj
+	clndr_month_wrap: null,		// html obj
+	clndr_month_live_wrap: null,// html obj
+	clndr_monthup: null,		// html bttn obj
+	clndr_monthdown: null,		// html bttn obj
 	timeobject: null,			// Input field with selected time. Source and destination of selected date.
 	is_visible: false,			// State of calendar visibility.
 	has_user_time: false,		// Confirms, if time was selected from input field.
@@ -490,7 +494,9 @@ calendar.prototype = {
 
 	setCDate: function() {
 		this.clndr_month.textContent = this.monthname[this.month];
+		this.clndr_month_live.textContent = this.monthname[this.month];
 		this.clndr_year.textContent = this.year;
+		this.clndr_year_live.textContent = this.year;
 		this.createDaysTab();
 	},
 
@@ -596,10 +602,16 @@ calendar.prototype = {
 		this.clndr_year_div.appendChild(this.clndr_yeardown);
 
 		this.clndr_year = document.createTextNode('');
+		this.clndr_year_live = document.createTextNode('');
 		this.clndr_year_wrap = document.createElement('span');
+		this.clndr_year_live_wrap = document.createElement('span')
 		this.clndr_year_wrap.appendChild(this.clndr_year);
 		this.clndr_year_wrap.setAttribute('id', `current-year${this.id}`);
+		this.clndr_year_live_wrap.appendChild(this.clndr_year_live);
+		this.clndr_year_live_wrap.setAttribute('aria-live', 'polite');
+		this.clndr_year_live_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
 		this.clndr_year_div.appendChild(this.clndr_year_wrap);
+		this.clndr_year_div.appendChild(this.clndr_year_live_wrap);
 		this.clndr_year_div.setAttribute('aria-labelledby', this.clndr_year_wrap.id);
 
 		this.clndr_yearup = document.createElement('button');
@@ -627,10 +639,16 @@ calendar.prototype = {
 		this.clndr_month_div.appendChild(this.clndr_monthdown);
 
 		this.clndr_month = document.createTextNode('');
+		this.clndr_month_live = document.createTextNode('');
 		this.clndr_month_wrap = document.createElement('span');
+		this.clndr_month_live_wrap = document.createElement('span');
 		this.clndr_month_wrap.appendChild(this.clndr_month);
 		this.clndr_month_wrap.setAttribute('id', `current-month${this.id}`);
+		this.clndr_month_live_wrap.appendChild(this.clndr_month_live);
+		this.clndr_month_live_wrap.setAttribute('aria-live', 'polite');
+		this.clndr_month_live_wrap.classList.add(ZBX_STYLE_DISPLAY_NONE);
 		this.clndr_month_div.appendChild(this.clndr_month_wrap);
+		this.clndr_month_div.appendChild(this.clndr_month_live_wrap);
 		this.clndr_month_div.setAttribute('aria-labelledby', this.clndr_month_wrap.id);
 
 		this.clndr_monthup = document.createElement('button');
