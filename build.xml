@@ -416,9 +416,8 @@
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'log' =&gt; '${elasticsearch_url}',${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'uint' =&gt; '${elasticsearch_url}',${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">     'text' =&gt; '${elasticsearch_url}',${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">     'json' =&gt; '${elasticsearch_url}'${line.separator}</echo>
 		<echo file="ui/conf/zabbix.conf.php" append="true">];${line.separator}</echo>
-		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['types'] = ['dbl', 'str', 'log', 'uint', 'text', 'json'];${line.separator}</echo>
+		<echo file="ui/conf/zabbix.conf.php" append="true">$HISTORY['types'] = ['dbl', 'str', 'log', 'uint', 'text'];${line.separator}</echo>
 	</target>
 
 	<target name="apply-frontend-elasticsearch-patches" if="elasticsearch">
@@ -456,12 +455,6 @@
 		</exec>
 		<exec executable="curl" failonerror="on">
 			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_text"/>
-		</exec>
-		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/${dbname}_json"/>
-		</exec>
-		<exec executable="curl" failonerror="on">
-			<arg line="${drop-db-args} ${elasticsearch_url}/_ingest/pipeline/${dbname}_json"/>
 		</exec>
 	</target>
 
@@ -584,64 +577,6 @@
 }
 		]]></property>
 		<property name="index-text" value="${index-str}"/>
-		<property name="index-json"><![CDATA[
-{
-   "settings": {
-      "number_of_shards": 5,
-      "number_of_replicas": 1
-   },
-   "mappings": {
-      "dynamic": false,
-      "properties": {
-         "itemid": {
-            "type": "long"
-         },
-         "clock": {
-            "type": "date",
-            "format": "epoch_second"
-         },
-         "ns": {
-            "type": "long"
-         },
-         "value_parsed": {
-            "type": "flattened"
-         },
-         "value_raw": {
-            "type": "keyword",
-            "ignore_above": 1000000
-         }
-      }
-   }
-}
-		]]></property>
-		<property name="pipeline-json"><![CDATA[
-{
-   "processors": [
-      {
-         "json": {
-            "field": "value",
-            "target_field": "value_parsed",
-            "ignore_failure": true
-         }
-      },
-      {
-         "set": {
-            "if": "ctx.value_parsed == null",
-            "field": "value_raw",
-            "value": "{{{ value }}}"
-         }
-      }
-   ],
-   "on_failure": [
-      {
-         "set": {
-            "field": "value_raw",
-            "value": "{{{ value }}}"
-         }
-      }
-   ]
-}
-		]]></property>
 
 		<exec executable="curl" failonerror="on">
 			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_dbl --data '${index-dbl}'"/>
@@ -657,12 +592,6 @@
 		</exec>
 		<exec executable="curl" failonerror="on">
 			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_text --data '${index-text}'"/>
-		</exec>
-		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/${dbname}_json --data '${index-json}'"/>
-		</exec>
-		<exec executable="curl" failonerror="on">
-			<arg line="${create-db-args} ${elasticsearch_url}/_ingest/pipeline/${dbname}_json --data '${pipeline-json}'"/>
 		</exec>
 	</target>
 
