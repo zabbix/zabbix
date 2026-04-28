@@ -872,16 +872,6 @@ zbx_sync_row_t	*zbx_sync_rowset_search_by_parent(zbx_sync_rowset_t *rowset, zbx_
 void	zbx_sync_rowset_rollback(zbx_sync_rowset_t *rowset);
 void	zbx_sync_rowset_copy(zbx_sync_rowset_t *dst, const zbx_sync_rowset_t *src);
 
-/* type of value in settings table */
-#define ZBX_SETTING_TYPE_STR			1
-#define ZBX_SETTING_TYPE_INT			2
-#define ZBX_SETTING_TYPE_USRGRPID		3
-#define ZBX_SETTING_TYPE_HOSTGROUPID		4
-#define ZBX_SETTING_TYPE_USRDIRID		5
-#define ZBX_SETTING_TYPE_MFAID			6
-
-#define ZBX_SETTING_TYPE_MAX			7
-
 int	zbx_db_settings_set_value(const char *name, const void *value, int type);
 
 #endif
