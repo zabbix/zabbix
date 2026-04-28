@@ -22,8 +22,8 @@ class CJsonRpc {
 	public const AUTH_TYPE_COOKIE = 3;
 	public const AUTH_TYPE_DPOP = 4;
 
-	private const HEADER_AUTHENTICATE_BEARER = 'Bearer';
-	private const HEADER_AUTHENTICATE_DPOP = 'DPoP';
+	public const HEADER_AUTHENTICATE_BEARER = 'Bearer';
+	public const HEADER_AUTHENTICATE_DPOP = 'DPoP';
 
 	/**
 	 * API client to use for making requests.

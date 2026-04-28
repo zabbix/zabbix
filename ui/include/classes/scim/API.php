@@ -43,7 +43,9 @@ class API {
 
 		$response->setResponse(
 			$client->callMethod($endpoint, $method, $input, [
-				'type' => CJsonRpc::AUTH_TYPE_BEARER,
+				'type' => $auth_header['type'] === CJsonRpc::HEADER_AUTHENTICATE_BEARER
+					? CJsonRpc::AUTH_TYPE_BEARER
+					: CJsonRpc::AUTH_TYPE_COOKIE,
 				'auth' => $auth_header['auth']
 			])
 		);
