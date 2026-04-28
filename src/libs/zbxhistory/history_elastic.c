@@ -924,8 +924,8 @@ static int	elastic_get_values_for_period(zbx_history_elastic_data_t *data, zbx_u
 	zbx_json_close(&query);
 
 	url_offset = 0;
-	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search%s", history_options_value_types[value_type],
-			scroll);
+	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search%s",
+			history_option_value_type_str(value_type), scroll);
 
 	if (SUCCEED != history_elastic_conn_init(&conn, data, post_url, "application/json", NULL, &error))
 	{
@@ -1434,7 +1434,8 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 
 	url_offset = 0;
-	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search", history_options_value_types[value_type]);
+	zbx_snprintf_alloc(&post_url, &url_alloc, &url_offset, "%s*/_search",
+			history_option_value_type_str(value_type));
 
 	if (SUCCEED != history_elastic_conn_init(&conn, d, post_url, "application/json", NULL, error))
 	{
@@ -1541,11 +1542,11 @@ static void	history_elastic_write(void *data, unsigned char value_type,
 
 	zbx_json_init(&json_idx, ZBX_IDX_JSON_ALLOCATE);
 	zbx_json_addobject(&json_idx, "index");
-	zbx_json_addstring(&json_idx, "_index", history_options_value_types[value_type], ZBX_JSON_TYPE_STRING);
+	zbx_json_addstring(&json_idx, "_index", history_option_value_type_str(value_type), ZBX_JSON_TYPE_STRING);
 
 	if (1 == d->pipelines)
 	{
-		zbx_snprintf(pipeline, sizeof(pipeline), "%s-pipeline", history_options_value_types[value_type]);
+		zbx_snprintf(pipeline, sizeof(pipeline), "%s-pipeline", history_option_value_type_str(value_type));
 		zbx_json_addstring(&json_idx, "pipeline", pipeline, ZBX_JSON_TYPE_STRING);
 	}
 

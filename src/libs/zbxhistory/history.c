@@ -1407,7 +1407,7 @@ static void	history_add_version_info(struct zbx_json *json, zbx_history_provider
 
 			zbx_json_addobject(json, NULL);
 
-			zbx_json_addstring(json, "type", history_value_type_str(type_info->value_type),
+			zbx_json_addstring(json, "type", history_option_value_type_str(type_info->value_type),
 					ZBX_JSON_TYPE_STRING);
 
 			if (0 != type_info->ttl)
@@ -1623,23 +1623,6 @@ const char	*history_value_type_desc(unsigned char value_type)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get description of history value type                             *
- *                                                                            *
- * Parameters: value_type - [IN] the history value type                       *
- *                                                                            *
- * Return value: description of the history value type                        *
- *                                                                            *
- ******************************************************************************/
-const char	*history_value_type_str(unsigned char value_type)
-{
-	if (value_type >= ARRSIZE(history_options_value_types))
-		return "unknown";
-
-	return history_options_value_types[value_type];
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: convert history value type string to its numeric representation   *
  *                                                                            *
  * Parameters: value_type_str - [IN] the history value type string            *
@@ -1649,15 +1632,7 @@ const char	*history_value_type_str(unsigned char value_type)
  ******************************************************************************/
 int	zbx_history_value_type_from_str(const char *value_type_str)
 {
-	for (int i = 0; i < (int)ARRSIZE(history_options_value_types); i++)
-	{
-		if (0 == strcmp(history_options_value_types[i], value_type_str))
-			return i;
-	}
-
-	THIS_SHOULD_NEVER_HAPPEN_MSG("unknown history value type \"%s\"", value_type_str);
-
-	return FAIL;
+	return history_option_value_type_from_str(value_type_str);
 }
 
 /******************************************************************************

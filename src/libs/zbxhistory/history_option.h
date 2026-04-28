@@ -44,7 +44,8 @@
 
 ZBX_VECTOR_DECL(history_option, zbx_history_option_t)
 
-extern const char	*history_options_value_types[ITEM_VALUE_TYPE_COUNT];
+const char	*history_option_value_type_str(unsigned char value_type);
+int		history_option_value_type_from_str(const char *value_type_str);
 
 zbx_history_option_t	history_option_str(const char *name, const char *value);
 zbx_history_option_t	history_option_int(const char *name, int value);
