@@ -655,7 +655,10 @@ class CDataTable {
 					tag_label.classList.add(ZBX_STYLE_TAG);
 				}
 
-				tag_label.textContent = `${tag.tag}: ${tag.value}`;
+				tag_label.textContent = `${tag.tag}`;
+				if (tag.value) {
+					tag_label.textContent += `: ${tag.value}`;
+				}
 
 				const tag_label_hintbox = document.createElement('div');
 
@@ -704,16 +707,21 @@ class CDataTable {
 				tag_label.setAttribute('aria-expanded', 'false');
 
 				if (count > 0) {
-					let name = `${tag.tag}: ${tag.value}`;
+					const tag_label_clone = tag_label.cloneNode(true);
 
-					if (tag_name_display != TAG_NAME_FULL) {
-						name = tag_name_display == TAG_NAME_SHORTENED
-							? `${tag.tag.substring(0, 3)}: ${tag.value}`
-							: tag.value;
+					if (tag_name_display == TAG_NAME_NONE && tag.value) {
+						tag_label_clone.textContent = tag.value;
+					}
+					else if (tag_name_display == TAG_NAME_SHORTENED) {
+						tag_label_clone.textContent = tag.tag.substring(0, 3);
+					}
+					else {
+						tag_label_clone.textContent = tag.tag;
 					}
 
-					const tag_label_clone = tag_label.cloneNode(true);
-					tag_label_clone.textContent = name;
+					if (tag_name_display != TAG_NAME_NONE && tag.value) {
+						tag_label_clone.textContent += `: ${tag.value}`;
+					}
 
 					if (has_subfilters) {
 						tag_label_clone.addEventListener('click', e => {
@@ -723,7 +731,12 @@ class CDataTable {
 						});
 					}
 
-					tags_wrapper.appendChild(tag_label_clone);
+					if (tag_name_display != TAG_NAME_NONE || tag.value) {
+						tags_wrapper.appendChild(tag_label_clone);
+					}
+					else {
+						count++;
+					}
 				}
 
 				tag_labels.push(tag_label);
