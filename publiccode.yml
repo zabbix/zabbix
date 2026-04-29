@@ -1,4 +1,4 @@
-publiccodeYmlVersion: 0.5.0
+publiccodeYmlVersion: '0'
 name: Zabbix Monitoring and Observability Platform
 url: https://github.com/zabbix/zabbix
 softwareVersion: Zabbix 7.4.9
@@ -10,7 +10,6 @@ platforms:
   - web
   - linux
 categories:
-  - monitoring
   - data-collection
   - data-visualization
   - data-analytics
