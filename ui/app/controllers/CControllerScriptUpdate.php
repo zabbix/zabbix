@@ -111,7 +111,8 @@ class CControllerScriptUpdate extends CController {
 						['db script_param.name', 'required', 'not_empty', 'when' => ['value', 'not_empty']]
 					]
 				],
-				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
+				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]],
+				'messages' => ['uniq' => _('Name is not unique.')]
 			],
 			'script' => ['db scripts.command', 'required', 'not_empty',
 				'when' => ['type', 'in' => [ZBX_SCRIPT_TYPE_WEBHOOK]]
