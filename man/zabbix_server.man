@@ -102,7 +102,7 @@ Ignored if configuration cache or secrets are being currently loaded.
 .TP 4
 \fBdiaginfo\fR[=\fIsection\fR]
 Log internal diagnostic information of the specified section. Section can be \fIhistorycache\fR, \fIpreprocessing\fR,
-\fIalerting\fR, \fIlld\fR, \fIvaluecache\fR, \fIlocks\fR.
+\fIalerting\fR, \fIlld\fR, \fIvaluecache\fR, \fIlocks\fR, and \fIconnector\fR.
 By default diagnostic information of all sections is logged.
 .RE
 .RS 4
@@ -152,7 +152,7 @@ Log level control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, availability\ manager, browser\ poller, configuration\ syncer, configuration\ syncer worker, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ group\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (alerter, alert\ manager, alert\ syncer, availability\ manager, browser\ poller, configuration\ syncer, configuration\ syncer\ worker, connector\ manager, connector\ worker, discovery\ manager, discovery\ worker, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, http\ agent\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, odbc\ poller, poller, agent\ poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, proxy\ group\ manager, report\ manager, report\ writer, self\-monitoring, service\ manager, snmp\ poller, snmp\ trapper, task\ manager, timer, trapper, trigger\ housekeeper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4
@@ -171,7 +171,7 @@ Profiling control targets
 .RS 4
 .TP 4
 .I process\-type
-All processes of specified type (alerter, alert\ manager, availability\ manager, configuration\ syncer, connector\ manager, connector\ worker, discovery\ manager, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, odbc\ poller, poller, agent\ poller, http\ agent\ poller, snmp\ poller, preprocessing\ manager, proxy\ group\ manager, proxy\ poller, self\-monitoring, service\ manager, snmp\ trapper, task\ manager, timer, trapper, unreachable\ poller, vmware\ collector)
+All processes of specified type (alerter, alert\ manager, alert\ syncer, availability\ manager, browser\ poller, configuration\ syncer, configuration\ syncer\ worker, connector\ manager, connector\ worker, discovery\ manager, discovery\ worker, escalator, ha\ manager, history\ poller, history\ syncer, housekeeper, http\ poller, http\ agent\ poller, icmp\ pinger, internal\ poller, ipmi\ manager, ipmi\ poller, java\ poller, lld\ manager, lld\ worker, odbc\ poller, poller, agent\ poller, preprocessing\ manager, preprocessing\ worker, proxy\ poller, proxy\ group\ manager, report\ manager, report\ writer, self\-monitoring, service\ manager, snmp\ poller, snmp\ trapper, task\ manager, timer, trapper, trigger\ housekeeper, unreachable\ poller, vmware\ collector)
 .RE
 .RS 4
 .TP 4

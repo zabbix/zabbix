@@ -1,6 +1,6 @@
 <?php declare(strict_types = 0);
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -242,7 +242,8 @@ class CControllerLatestView extends CControllerLatest {
 			'tags' => makeTags($prepared_data['items'], true, 'itemid', (int) $filter['show_tags'], $filter['tags'],
 				array_key_exists('tags', $subfilters_fields) ? $subfilters_fields['tags'] : [],
 				(int) $filter['tag_name_format'], $filter['tag_priority']
-			)
+			),
+			'user' => ['debug_mode' => $this->getDebugMode()]
 		] + $prepared_data;
 
 		$response = new CControllerResponseData($data);

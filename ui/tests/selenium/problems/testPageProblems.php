@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -2022,6 +2022,10 @@ class testPageProblems extends CWebTest {
 		$this->assertEquals($data_in_column, $opdata_column->getText());
 
 		if (array_key_exists('screen_name', $data)) {
+			// Remove time from table column - column width varies depending on time text, causing unstable screenshots.
+			CElementQuery::getDriver()->executeScript("arguments[0].textContent = '';",
+					[$table->findRow('Problem', $problem_name)->getColumn('Time')]
+			);
 			$this->assertScreenshot($opdata_column, $data['screen_name']);
 		}
 

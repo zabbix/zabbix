@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -20,6 +20,7 @@ require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
  * Test suite for value mapping.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @hosts test_valuemaps
  * @backup history
  */
@@ -64,7 +65,15 @@ class testValuemaps extends CIntegrationTest {
 			'name' => self::ITEM_NAME,
 			'key_' => self::ITEM_NAME,
 			'type' => ITEM_TYPE_TRAPPER,
-			'value_type' => ITEM_VALUE_TYPE_FLOAT
+			'value_type' => ITEM_VALUE_TYPE_FLOAT,
+			'preprocessing' => [
+				[
+					'type' => ZBX_PREPROC_TRIM,
+					'params' => ' ',
+					'error_handler' => ZBX_PREPROC_FAIL_DEFAULT,
+					'error_handler_params' => ''
+				]
+			]
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -260,9 +269,9 @@ class testValuemaps extends CIntegrationTest {
 		$valuemapid = $response['result']['valuemapids'];
 
 		$response = $this->call('item.update', [
-				'itemid' => self::$itemid[0],
-				'valuemapid' => $valuemapid[0],
-				'value_type' => $inputType
+			'itemid' => self::$itemid[0],
+			'valuemapid' => $valuemapid[0],
+			'value_type' => $inputType
 		]);
 		$this->assertArrayHasKey('itemids', $response['result']);
 		$this->assertEquals(1, count($response['result']['itemids']));
@@ -276,7 +285,7 @@ class testValuemaps extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['triggerids']));
 		$triggerid =  $response['result']['triggerids'];
 
-		$this->reloadConfigurationCache();
+		$this->reloadConfigurationCacheAndWaitForLogLine();
 
 		$this->sendSenderValue(self::HOST_NAME, self::ITEM_NAME, $inputData);
 

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -23,7 +23,6 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
  * @dataSource Services, Sla
  *
  * @onBefore prepareDashboardData
- * @onBefore getDateTimeData
  */
 class testDashboardSlaReportWidget extends testSlaReport {
 
@@ -39,7 +38,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 		'Service' => '',
 		'From' => '',
 		'To' => '',
-		'Show periods' => 20
+		'Show periods' => ZBX_SLA_DEFAULT_REPORTING_PERIODS
 	];
 
 	/*
@@ -140,7 +139,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 			],
 			'Show periods' => [
 				'maxlength' => 3,
-				'value' => 20
+				'value' => ZBX_SLA_DEFAULT_REPORTING_PERIODS
 			],
 			'id:date_period_from' => [
 				'maxlength' => 255,
@@ -460,7 +459,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 
 		// Save or cancel widget.
 		if (CTestArrayHelper::get($data, 'save_widget', false)) {
-			$form->submit();
+			$form->submit()->waitUntilNotVisible();
 
 			// Check that changes took place on the unsaved dashboard.
 			$this->assertTrue($dashboard->getWidget($new_name)->isVisible());
@@ -542,7 +541,7 @@ class testDashboardSlaReportWidget extends testSlaReport {
 				&& CTestArrayHelper::get($data['fields'], 'Service', '') === ''
 				&& !array_key_exists('no_data', $data)
 				&& in_array($data['reporting_period'], ['Monthly', 'Quarterly', 'Annually'])) {
-			$data['fields']['Show periods'] = count(self::$reporting_periods[$data['reporting_period']]);
+			$data['fields']['Show periods'] = count($this->getDateTimeData($data['reporting_period']));
 		}
 
 		// Type mode chooses the 1st entry in the list, which for some cases in data provider is incorrect.
@@ -2192,7 +2191,8 @@ class testDashboardSlaReportWidget extends testSlaReport {
 					'fields' => [
 						'SLA' => 'SLA Quarterly',
 						'Service' => 'Simple actions service',
-						'To' => 'now/d-100d',
+						// TODO: Change the value of the "To" field to 'now/d-100d' when ZBX-27363 is fixed.
+						'To' => 'now-100d',
 						'Show periods' => 3
 					],
 					'reporting_period' => 'Quarterly',
@@ -2337,7 +2337,9 @@ class testDashboardSlaReportWidget extends testSlaReport {
 	 */
 	private function getWidgetDateTimeData($data) {
 		// By default the last 20 periods are displayed.
-		$show_periods = (array_key_exists('Show periods', $data['fields'])) ? $data['fields']['Show periods'] : 20;
+		$show_periods = (array_key_exists('Show periods', $data['fields']))
+			? $data['fields']['Show periods']
+			: ZBX_SLA_DEFAULT_REPORTING_PERIODS;
 
 		if (array_key_exists('To', $data['fields'])) {
 			$to_date = $data['fields']['To'];

@@ -34,11 +34,12 @@ class Client
     const DEFAULT_STATE_LENGTH = 36;
     const CLIENT_ID_LENGTH = 20;
     const CLIENT_SECRET_LENGTH = 40;
+    const HS512_MIN_KEY_LENGTH = 64;
     const JWT_EXPIRATION = 300;
     const JWT_LEEWAY = 60;
     const SUCCESS_STATUS_CODE = 200;
 
-    const USER_AGENT = "duo_universal_php/1.0.2";
+    const USER_AGENT = "duo_universal_php/1.1.2";
     const SIG_ALGORITHM = "HS512";
     const GRANT_TYPE = "authorization_code";
     const CLIENT_ASSERTION_TYPE = "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
@@ -63,6 +64,7 @@ class Client
     public $redirect_url;
     public $use_duo_code_attribute;
     private $client_secret;
+    private $user_agent_extension;
 
     /**
      * Retrieves exception message for DuoException from HTTPS result message.
@@ -120,6 +122,18 @@ class Client
         return json_decode($result, true);
     }
 
+    /**
+     * Pads the client secret to meet minimum key length requirements for HS512.
+     * HMAC-SHA512 in php-jwt v7+ requires 64-byte keys. Padding with null bytes
+     * doesn't affect HMAC output because HMAC internally pads to block size.
+     *
+     * @return string The padded client secret
+     */
+    private function getPaddedSecret(): string
+    {
+        return str_pad($this->client_secret, self::HS512_MIN_KEY_LENGTH, "\0");
+    }
+
     private function createJwtPayload(string $audience): string
     {
         $date = new \DateTime();
@@ -131,7 +145,7 @@ class Client
                       "iat" => $current_date,
                       "exp" => $current_date + self::JWT_EXPIRATION
         ];
-        return JWT::encode($payload, $this->client_secret, self::SIG_ALGORITHM);
+        return JWT::encode($payload, $this->getPaddedSecret(), self::SIG_ALGORITHM);
     }
 
     /**
@@ -190,6 +204,34 @@ class Client
         $this->redirect_url = $redirect_url;
         $this->use_duo_code_attribute = $use_duo_code_attribute;
         $this->http_proxy = $http_proxy;
+        $this->user_agent_extension = null;
+    }
+
+    /**
+     * Append custom information to the user agent string.
+     *
+     * @param string $user_agent_extension Custom user agent information
+     *
+     * @return void
+     */
+    public function appendToUserAgent(string $user_agent_extension): void
+    {
+        $this->user_agent_extension = trim($user_agent_extension);
+    }
+
+    /**
+     * Build the complete user agent string.
+     *
+     * @return string The complete user agent string
+     */
+    private function buildUserAgent(): string
+    {
+        $base_user_agent = self::USER_AGENT . " php/" . phpversion() . " "
+                         . php_uname();
+        if (!empty($this->user_agent_extension)) {
+            return $base_user_agent . " " . $this->user_agent_extension;
+        }
+        return $base_user_agent;
     }
 
     /**
@@ -254,7 +296,7 @@ class Client
             'use_duo_code_attribute' => $this->use_duo_code_attribute
         ];
 
-        $jwt = JWT::encode($payload, $this->client_secret, self::SIG_ALGORITHM);
+        $jwt = JWT::encode($payload, $this->getPaddedSecret(), self::SIG_ALGORITHM);
         $allArgs = [
             'response_type' => 'code',
             'client_id' => $this->client_id,
@@ -282,7 +324,7 @@ class Client
     public function exchangeAuthorizationCodeFor2FAResult(string $duoCode, string $username, ?string $nonce = null): array
     {
         $token_endpoint = "https://" . $this->api_host . self::TOKEN_ENDPOINT;
-        $useragent = self::USER_AGENT . " php/" . phpversion() . " " . php_uname();
+        $useragent = $this->buildUserAgent();
         $jwt = $this->createJwtPayload($token_endpoint);
         $request = ["grant_type" => self::GRANT_TYPE,
                     "code" => $duoCode,
@@ -305,7 +347,7 @@ class Client
 
         try {
             JWT::$leeway = self::JWT_LEEWAY;
-            $jwt_key = new Key($this->client_secret, self::SIG_ALGORITHM);
+            $jwt_key = new Key($this->getPaddedSecret(), self::SIG_ALGORITHM);
             $token_obj = JWT::decode($result['id_token'], @$jwt_key);
             /* JWT::decode returns a PHP object, this will turn the object into a multidimensional array */
             $token = json_decode(json_encode($token_obj), true);

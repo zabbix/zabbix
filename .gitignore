@@ -202,6 +202,7 @@ tests/libs/zbxexpression/macro_fmttime
 tests/libs/zbxexpression/macro_functions
 tests/libs/zbxexpression/substitute_lld_macros
 tests/libs/zbxexpression/valuemaps
+tests/libs/zbxexpression/zbx_format_value
 tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxhttp/zbx_determine_charset
@@ -277,6 +278,8 @@ tests/libs/zbxvariant/zbx_variant_to_value_type
 tests/libs/zbxxml/zbx_json_to_xml
 tests/libs/zbxxml/zbx_xml_to_json
 tests/zabbix_server/lld/zbx_lld_hgsets_test
+tests/zabbix_server/lld/zbx_substitute_expression_lld_macros
+tests/zabbix_server/lld/zbx_substitute_macros_in_json_pairs
 tests/zabbix_server/pinger/zbx_pinger_test
 tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rootcause_eventids

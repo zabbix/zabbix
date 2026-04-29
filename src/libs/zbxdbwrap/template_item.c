@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -3384,7 +3384,9 @@ void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templ
 
 	get_template_items(hostid, templateids, &items);
 
-	if (0 == items.values_num)
+	/* It should be (0 == items.values_num) but need to       */
+	/* silence false-positive GCC stringop-overflow= warning. */
+	if (0 >= items.values_num)
 		goto out;
 
 	get_template_lld_rule_map(&items, &lld_rules);

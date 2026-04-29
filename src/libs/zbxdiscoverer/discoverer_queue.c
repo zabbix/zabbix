@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -98,15 +98,15 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 	zbx_vector_uint64_create(&ids);
 
-	while (SUCCEED == zbx_list_pop(&queue->jobs, (void*)&job))
+	while (SUCCEED == zbx_list_pop(&queue->jobs, (void**)&job))
 	{
 		int		one_task = SUCCEED;
 		zbx_uint64_t	id;
 
-		if (SUCCEED != zbx_list_peek(&job->tasks, (void*)&task))
+		if (SUCCEED != zbx_list_peek(&job->tasks, (void**)&task))
 			break;
 
-		if (SVC_SNMPv3 != GET_DTYPE(task) && SVC_SNMPv2c != GET_DTYPE(task) && SVC_SNMPv1 != GET_DTYPE(task))
+		if (SVC_SNMPv3 != GET_DTYPE(task))
 			break;
 
 		if (0 != queue->snmp_allowed_workers)
@@ -119,7 +119,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 
 		if (job->tasks.head != job->tasks.tail)				/* if not one snmp task in the list */
 		{
-			(void)zbx_list_pop(&job->tasks, (void*)&task);
+			(void)zbx_list_pop(&job->tasks, (void**)&task);
 			(void)zbx_list_append(&job->tasks, (void*)task, NULL);	/* put task to end of the list */
 			one_task = FAIL;
 		}

@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -249,7 +249,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'id:units_bold' => true,
 					'Aggregation function' => 'not used',
 					'Time period' => 'Dashboard',
-					'id:time_period_reference' => '',
+					'Widget' => '',
 					'id:time_period_from' => 'now-1h',
 					'id:time_period_to' => 'now',
 					'History data' => 'Auto'

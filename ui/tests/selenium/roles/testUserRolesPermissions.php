@@ -1,6 +1,6 @@
 <?php
 /*
-** Copyright (C) 2001-2025 Zabbix SIA
+** Copyright (C) 2001-2026 Zabbix SIA
 **
 ** This program is free software: you can redistribute it and/or modify it under the terms of
 ** the GNU Affero General Public License as published by the Free Software Foundation, version 3.
@@ -461,6 +461,13 @@ class testUserRolesPermissions extends CWebTest {
 	 * @dataProvider getProblemActionsData
 	 */
 	public function testUserRolesPermissions_ProblemAction($data) {
+		// Remove event status blinking to get correct status in table column.
+		CAPIHelper::authorize('user_for_role', 'zabbixzabbix');
+		CAPIHelper::call('settings.update', [
+			'blink_period' => 0
+		]);
+		CAPIHelper::reset();
+
 		$this->page->userLogin('user_for_role', 'zabbixzabbix');
 
 		foreach ([true, false] as $action_status) {
@@ -469,6 +476,7 @@ class testUserRolesPermissions extends CWebTest {
 			$row->getColumn('Update')->query('link:Update')->waitUntilClickable()->one()->click();
 			$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertTrue($dialog->query('id', $data['activityid'])->one()->isEnabled($action_status));
+			$dialog->close();
 			$this->changeRoleRule([$data['action'] => !$action_status]);
 
 			// Check that problem actions works after they were turned on.
@@ -496,6 +504,7 @@ class testUserRolesPermissions extends CWebTest {
 					}
 
 					$dialog->query('button:Update')->one()->click();
+					$dialog->ensureNotPresent();
 					$this->page->waitUntilReady();
 					$status = $row->getColumn($data['column'])->getText();
 					$this->assertEquals($data['value'], $status);
@@ -1886,10 +1895,12 @@ class testUserRolesPermissions extends CWebTest {
 	public function testUserRolesPermissions_ExecuteNowContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->userLogin($data['user'], 'zabbixzabbix');
-		$this->page->open('zabbix.php?action=latest.view')->waitUntilReady();
+		$this->page->open('zabbix.php?action=latest.view&filter_reset=1')->waitUntilReady();
+		$table = $this->getTable();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
+		$table->waitUntilReloaded();
 		$this->page->waitUntilReady();
 
 		foreach ($data['test_cases'] as $test_case) {
