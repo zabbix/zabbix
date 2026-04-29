@@ -127,8 +127,7 @@
 					new CDataTableColumn('problem', <?= json_encode(_('Problem')); ?>)
 						.setColumnOptions({
 							show_opdata: '0',
-							details: '0',
-							show_suppressed: '0'
+							details: '0'
 						})
 						.setOptionsPopupHandler('problem')
 						.setFields(['description'])

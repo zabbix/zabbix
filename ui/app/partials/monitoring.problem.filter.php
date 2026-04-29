@@ -223,6 +223,12 @@ $right_column = (new CFormList())
 			->setUncheckedValue(0)
 			->setId('show_symptoms_#{uniqid}')
 	])
+	->addRow(_('Show suppressed problems'), [
+		(new CCheckBox('show_suppressed'))
+			->setChecked($data['show_suppressed'] == ZBX_PROBLEM_SUPPRESSED_TRUE)
+			->setUncheckedValue(0)
+			->setId('show_suppressed_#{uniqid}')
+	])
 	->addRow(
 		_('Acknowledgement status'),
 		(new CHorList())
@@ -338,7 +344,7 @@ if (array_key_exists('render_html', $data)) {
 		$('[name="filter_new"],[name="filter_update"]').hide()
 			.filter(data.filter_configurable ? '[name="filter_update"]' : '[name="filter_new"]').show();
 
-		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_tags',
+		let fields = ['show', 'name', 'tag_priority', 'show_opdata', 'show_symptoms', 'show_suppressed', 'show_tags',
 				'acknowledgement_status', 'acknowledged_by_me', 'age_state', 'age', 'tag_name_format', 'evaltype'
 			],
 			eventHandler = {

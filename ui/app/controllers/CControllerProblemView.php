@@ -37,6 +37,7 @@ class CControllerProblemView extends CControllerProblem {
 			'evaltype' =>				'in '.TAG_EVAL_TYPE_AND_OR.','.TAG_EVAL_TYPE_OR,
 			'tags' =>					'array',
 			'show_symptoms' =>			'in 0,1',
+			'show_suppressed' =>		'in 0,1',
 			'acknowledgement_status' =>	'in '.ZBX_ACK_STATUS_ALL.','.ZBX_ACK_STATUS_UNACK.','.ZBX_ACK_STATUS_ACK,
 			'acknowledged_by_me' =>		'in 0,1',
 			'from' =>					'range_time',

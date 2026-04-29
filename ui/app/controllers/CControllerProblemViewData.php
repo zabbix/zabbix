@@ -202,7 +202,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				}
 			}
 
-			if ($options['compact_view'] && $options['show_suppressed'] && count($info_icons) > 1) {
+			if ($options['compact_view'] && $filter['show_suppressed'] && count($info_icons) > 1) {
 				$cell_info = (new CButtonIcon(ZBX_ICON_MORE))->setHint(makeInformationList($info_icons));
 			}
 			else {

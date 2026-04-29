@@ -33,6 +33,7 @@ abstract class CControllerProblem extends CController {
 		'evaltype' => TAG_EVAL_TYPE_AND_OR,
 		'tags' => [],
 		'show_symptoms' => 0,
+		'show_suppressed' => 0,
 		'acknowledgement_status' => ZBX_ACK_STATUS_ALL,
 		'acknowledged_by_me' => 0,
 		'page' => null,
