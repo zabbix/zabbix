@@ -514,6 +514,8 @@ class testFunctions extends CIntegrationTest{
 	 */
 	public function testFunctions_Step1() {
 		$this->processStep1();
+		$this->processStep2();
+		$this->processStep3();
 	}
 
 	/**
@@ -521,7 +523,6 @@ class testFunctions extends CIntegrationTest{
 	 * @depends testFunctions_Step1
 	 */
 	public function testFunctions_Step2() {
-		$this->processStep2();
 	}
 
 	/**
@@ -529,7 +530,6 @@ class testFunctions extends CIntegrationTest{
 	 * @depends testFunctions_Step2
 	 */
 	public function testFunctions_Step3() {
-		$this->processStep3();
 	}
 
 	/**
