@@ -441,7 +441,6 @@ ZBX_Notifications.prototype.handleCloseClicked = function() {
 
 			this.alarm.reset();
 			this.pushUpdates();
-			this._closing = false;
 		})
 		.catch((exception) => {
 			if (typeof exception === 'object' && 'error' in exception) {
@@ -454,6 +453,9 @@ ZBX_Notifications.prototype.handleCloseClicked = function() {
 			else {
 				console.log('Could not read notifications:', exception);
 			}
+		})
+		.finally(() => {
+			this._closing = false;
 		});
 };
 
