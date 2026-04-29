@@ -281,8 +281,7 @@ $translate_strings = [
 	],
 	'class.options-popup.monitoring.problems.problem.js' => [
 		'Show operational data' => _('Show operational data'),
-		'Show trigger expression' => _('Show trigger expression'),
-		'Show suppressed' => _('Show suppressed')
+		'Show trigger expression' => _('Show trigger expression')
 	],
 	'class.options-popup.monitoring.problems.time.js' => [
 		'Show timeline' => _('Show timeline'),
