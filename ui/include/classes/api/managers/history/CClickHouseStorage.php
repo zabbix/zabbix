@@ -1,4 +1,4 @@
-<?php
+<?php declare(strict_types = 0);
 /*
 ** Copyright (C) 2001-2026 Zabbix SIA
 **
@@ -71,7 +71,7 @@ class CClickHouseStorage {
 	private CUrl $url;
 	private array $request_context_data = [];
 	/**
-	 * Last request HTTP error code. NULL when no errors.
+	 * Last request HTTP error code. null when no errors.
 	 * @var int|null
 	 */
 	private ?int $error_code = null;
@@ -79,7 +79,7 @@ class CClickHouseStorage {
 
 	/**
 	 * Array of value type TTL values, key is value type and value is it TTL.
-	 * Value is set to NULL when no TTL exists for specific value type.
+	 * Value is set to null when no TTL exists for specific value type.
 	 *
 	 * @var array $value_type_ttl
 	 */
@@ -104,14 +104,14 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Get error code for last query. When no errors NULL is returned.
+	 * Get error code for last query. When no errors null is returned.
 	 */
 	public function getErrorCode(): ?int {
 		return $this->error_code;
 	}
 
 	/**
-	 * Get error message for last query. When no errors NULL is returned.
+	 * Get error message for last query. When no errors null is returned.
 	 */
 	public function getErrorMessage(): ?string {
 		return $this->error_message;
@@ -143,7 +143,7 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Query storage history data using API like options. Return NULL on error.
+	 * Query storage history data using API like options. Return null on error.
 	 *
 	 * @see CHistory::get()
 	 * @param array $options
@@ -156,7 +156,7 @@ class CClickHouseStorage {
 	}
 
 	/**
-	 * Query storage trends data using API like options. Return NULL on error.
+	 * Query storage trends data using API like options. Return null on error.
 	 *
 	 * @param array $options
 	 */
@@ -336,11 +336,11 @@ class CClickHouseStorage {
 			'limit' => 1
 		]);
 
-		if ($rows === null) {
+		if ($rows === null || !$rows) {
 			return null;
 		}
 
-		return $rows[0] ?? null;
+		return $rows[0];
 	}
 
 	/**
@@ -613,9 +613,12 @@ class CClickHouseStorage {
 			$this->error_message = null;
 			$stream_context['http']['header'] = implode("\r\n", $stream_context['http']['header']);
 			$result_raw = file_get_contents($this->url->getUrl(), false, stream_context_create($stream_context));
-
-			sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
 			$result = json_decode($result_raw, true);
+			$http_code = 500;
+
+			if ($http_response_header) {
+				sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
+			}
 
 			if ($http_code != 200) {
 				$error_message = is_array($result) && array_key_exists('exception', $result)
@@ -809,8 +812,11 @@ class CClickHouseStorage {
 	 * @param mixed $options['sortorder']  Sorting order, required.
 	 */
 	private function addQuerySortOptions(array $sql_parts, array $options): array {
-		$sortorder = $options['sortorder'];
 		$sortfield = (array) $options['sortfield'];
+		$sortorder = (array) $options['sortorder'] + array_fill_keys(
+			array_keys($sortfield),
+			is_string($options['sortorder']) ? $options['sortorder'] : ZBX_SORT_UP
+		);
 
 		$fields = array_keys(self::VALUE_TYPE_SCHEMA[$options['history']]);
 		$fields = array_diff($fields, ['clock_ns', 'value_str']);
@@ -821,8 +827,7 @@ class CClickHouseStorage {
 			}
 
 			$field = $field === 'clock' ? 'clock_ns' : $field;
-			$order = is_array($sortorder) ? ($sortorder[$i] ?? ZBX_SORT_UP) : $sortorder;
-			$sql_parts['order'][$field] = $field.' '.($order === ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP);
+			$sql_parts['order'][$field] = $field.' '.($sortorder[$i] === ZBX_SORT_DOWN ? ZBX_SORT_DOWN : ZBX_SORT_UP);
 		}
 
 		return $sql_parts;
@@ -868,7 +873,7 @@ class CClickHouseStorage {
 		 */
 		$clock_fields = array_intersect_key($options['filter'], array_flip(['clock', 'ns']));
 		if ($clock_fields && $options['time_from'] === null && $options['time_till'] === null) {
-			$clock = $clock_fields['clock'] ?? time();
+			$clock = array_key_exists('clock', $clock_fields) ? $clock_fields['clock'] : time();
 			$sql_parts['param']['UInt64']['pre_time_gte'] = is_array($clock) ? min($clock) : $clock;
 			$sql_parts['param']['UInt64']['pre_time_lte'] = is_array($clock) ? max($clock) : $clock;
 			$sql_parts['prewhere']['pre_time_gte'] = 'clock_ns>=toDateTime64({pre_time_gte:UInt64},9)';

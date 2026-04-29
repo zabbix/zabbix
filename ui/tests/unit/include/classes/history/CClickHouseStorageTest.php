@@ -409,6 +409,22 @@ class CHistoryStorageClickHouseTest extends TestCase {
 			]
 		];
 
+		yield 'Uses ZBX_SORT_UP when sortorder index not set for sortfield index' => [
+			$closure,
+			[],
+			[
+				'history' => ITEM_VALUE_TYPE_LOG,
+				'sortfield' => ['severity', 'itemid'],
+				'sortorder' => [ZBX_SORT_DOWN]
+			] + $defaults,
+			[
+				'order' => [
+					'severity' => 'severity '.ZBX_SORT_DOWN,
+					'itemid' => 'itemid '.ZBX_SORT_UP
+				]
+			]
+		];
+
 		yield 'Field with it own sort' => [
 			$closure,
 			[],

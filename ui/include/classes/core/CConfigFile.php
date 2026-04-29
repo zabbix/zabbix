@@ -367,7 +367,7 @@ $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 // \'db\' - Database name. Used for ClickHouse.
 // \'username\' and \'password\' - Database user and password. Used for ClickHouse.
 //$HISTORY_PROVIDERS[] = [
-//	\'types\' => [\'dbl\', \'str\', \'log\', \'uint\', \'text\', \'binary\'],
+//	\'types\' => [\'dbl\', \'str\', \'log\', \'uint\', \'text\', \'json\'],
 //	\'provider\' => \'<provider>\',
 //	\'url\' => \'<url>\',
 //	\'db\' => \'zabbix\',
@@ -457,9 +457,10 @@ $ZBX_SERVER_TLS[\'CERTIFICATE_SUBJECT\'] = \''.addcslashes($this->config['ZBX_SE
 
 		foreach ($providers as $i => $provider) {
 			$path = ($i + 1).'/';
-			$missing = array_key_exists('provider', $provider)
-				? array_diff($required[$provider['provider']] ?? [], array_keys($provider))
+			$missing = array_key_exists('provider', $provider) && array_key_exists($provider['provider'], $required)
+				? $required[$provider['provider']]
 				: ['provider'];
+			$missing = array_diff($missing, array_keys($provider));
 
 			if ($missing) {
 				self::exception(_s('Incorrect history storage configuration %1$s: %2$s.', $path,
