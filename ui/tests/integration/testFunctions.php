@@ -218,7 +218,7 @@ class testFunctions extends CIntegrationTest{
 
 	private function sendValues($filename) {
 		$data = $this->getSenderData($filename);
-		$this->sendSenderValues($data, null, 1);
+		$this->sendSenderValues($data, null, 0);
 	}
 
 	private function processStep1() {
