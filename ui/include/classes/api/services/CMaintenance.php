@@ -524,26 +524,27 @@ class CMaintenance extends CApiService {
 		]);
 
 		/*
-		 * Select all active suppressions by maintenance from acknowledges table for the maintenances that are about to
-		 * be deleted and add unsuppression records in acknowledges table.
+		 * Select all active suppressions (not expired or expired if server stopped) for the maintenances that are about
+		 * to be deleted and add unsuppression records in acknowledges table.
 		 */
 		$ins_acknowledges = [];
 
-		$db_acknowledges = DBselect(
-			'SELECT a.eventid,a.maintenanceid'.
-			' FROM acknowledges a'.
-			' WHERE '.dbConditionId('a.maintenanceid', $maintenanceids).
-			' AND a.suppress_until>'.time().
-			' AND a.action='.ZBX_PROBLEM_UPDATE_MAINTENANCE_SUPPRESS
+		$db_suppressions = DBselect(
+			'SELECT es.eventid,es.maintenanceid,es.suppress_until'.
+			' FROM event_suppress es'.
+			' WHERE '.dbConditionId('es.maintenanceid', $maintenanceids)
 		);
 
-		while ($db_acknowledge = DBfetch($db_acknowledges)) {
+		$now = time();
+
+		while ($db_suppression = DBfetch($db_suppressions)) {
 			$ins_acknowledges[] = [
-				'eventid' => $db_acknowledge['eventid'],
-				'clock' => time(),
+				'eventid' => $db_suppression['eventid'],
+				// Current time when maintenance is active or suppress_until time if maintenace is expired.
+				'clock' => $db_suppression['suppress_until'] > $now ? $now : $db_suppression['suppress_until'],
 				'action' => ZBX_PROBLEM_UPDATE_MAINTENANCE_UNSUPPRESS,
 				'suppress_until' => 0,
-				'maintenanceid' => $db_acknowledge['maintenanceid']
+				'maintenanceid' => $db_suppression['maintenanceid']
 			];
 		}
 
