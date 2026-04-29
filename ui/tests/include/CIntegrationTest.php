@@ -305,7 +305,7 @@ class CIntegrationTest extends CAPITest {
 			if (file_exists($log_file)) {
 				copy($log_file, PHPUNIT_COMPONENT_DIR.'all/'.$case_name.'/'.basename($log_file));
 				if ($this->hasFailed()) {
-					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
+					copy($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
 				}
 			}
 		}

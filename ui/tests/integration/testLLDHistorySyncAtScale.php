@@ -216,7 +216,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Verify history values sent 1 hour in the past.
 	 *
-	 * @depends testLLDHistorySyncAtScale_HistoryPastVpsWritten
+	 * @depends testLLDHistorySyncAtScale_HistoryPastSend
 	 */
 	public function testLLDHistorySyncAtScale_HistoryPastVerify() {
 		$this->verifyHistoryAt(self::$tm_past, self::$sent_past);
@@ -225,7 +225,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Send history values at current time.
 	 *
-	 * @depends testLLDHistorySyncAtScale_HistoryPastVerify
+	 * @depends testLLDHistorySyncAtScale_HistoryPrepare
 	 */
 	public function testLLDHistorySyncAtScale_HistoryNowSend() {
 		['sent' => $sent, 'values' => $all_values] = self::$prepared_now;
@@ -247,7 +247,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Verify history values sent at current time.
 	 *
-	 * @depends testLLDHistorySyncAtScale_HistoryNowVpsWritten
+	 * @depends testLLDHistorySyncAtScale_HistoryNowSend
 	 */
 	public function testLLDHistorySyncAtScale_HistoryNowVerify() {
 		$this->verifyHistoryAt(self::$tm_now, self::$sent_now);
@@ -256,15 +256,15 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * Verify that trends are generated for both past and current hour.
 	 *
-	 * @depends testLLDHistorySyncAtScale_HistoryNowVerify
+	 * @depends testLLDHistorySyncAtScale_HistoryNowSend
 	 */
-	/*public function testLLDHistorySyncAtScale_TrendsVerify() {
+	public function testLLDHistorySyncAtScale_TrendsVerify() {
 		$this->verifyTrendsAtClock(self::$tm_past - (self::$tm_past % 3600));
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->verifyTrendsAtClock(self::$tm_now - (self::$tm_now % 3600));
 		$this->startComponent(self::COMPONENT_SERVER);
-	}*/
+	}
 
 	/**
 	 * Add a trigger prototype per item type, verify that a trigger is created for every
@@ -348,7 +348,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	/**
 	 * @depends testLLDHistorySyncAtScale_TriggerFiring
 	 */
-	public function testLLDHistorySyncAtScale_TriggerFiringRestart() {
+	public function testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
 		$tm = time();
@@ -360,7 +360,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
 			$itemids = array_values(self::$discovered_itemids[$vtype]);
 
-			/*$this->callUntilDataIsPresent('trend.get', [
+			$this->callUntilDataIsPresent('trend.get', [
 				'itemids' => $itemids,
 				'time_from' => $trend_clock,
 				'time_till' => $trend_clock,
@@ -375,7 +375,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'time_till' => $trend_clock,
 				'countOutput' => true
 			]);
-			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);*/
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
 
 			$idx = 0;
 			$expected_by_itemid = [];
@@ -493,14 +493,14 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				}
 			}
 
-			/*$response = $this->call('history.get', [
+			$response = $this->call('history.get', [
 				'history' => $vtype,
 				'itemids' => $itemids,
 				'time_from' => $tm,
 				'time_till' => $tm,
 				'countOutput' => true
 			]);
-			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);*/
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
 
 			// Verify sort + limit: returned records should be ordered by itemid DESC.
 			$response = $this->call('history.get', [
@@ -599,9 +599,9 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 * Send empty LLD discovery, run housekeeper and verify that all discovered
 	 * items, their history and trigger events are removed.
 	 *
-	 * @depends testLLDHistorySyncAtScale_TriggerFiringRestart
+	 * @depends testLLDHistorySyncAtScale_LLDDiscovery
 	 */
-	public function testLLDHistorySyncAtScale_HousekeeperCleanup() {
+	public function testLLDHistorySyncAtScale_LLDCleanup() {
 		$this->sendDataValues('sender', [
 			[
 				'host' => self::HOSTNAME,
