@@ -254,6 +254,47 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	}
 
 	/**
+	 * Verify history count output and sort order for past and current time values.
+	 *
+	 * @depends testLLDHistorySyncAtScale_HistoryNowVerify
+	 */
+	public function testLLDHistorySyncAtScale_HistoryVerifySortAndCount() {
+		foreach ([self::$tm_past => self::$sent_past, self::$tm_now => self::$sent_now] as $tm => $sent) {
+			foreach (self::prototypeDefs() as $def) {
+				$vtype = $def['value_type'];
+				$itemids = $sent[$vtype]['itemids'];
+
+				$response = $this->call('history.get', [
+					'history' => $vtype,
+					'itemids' => $itemids,
+					'time_from' => $tm,
+					'time_till' => $tm,
+					'countOutput' => true
+				]);
+				$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
+
+				// Verify sort + limit: returned records should be ordered by itemid DESC.
+				$response = $this->call('history.get', [
+					'history' => $vtype,
+					'itemids' => $itemids,
+					'time_from' => $tm,
+					'time_till' => $tm,
+					'sortfield' => 'itemid',
+					'sortorder' => 'DESC',
+					'limit' => 10
+				]);
+				$this->assertCount(10, $response['result']);
+				for ($i = 0; $i < count($response['result']) - 1; $i++) {
+					$this->assertGreaterThanOrEqual(
+						(int) $response['result'][$i + 1]['itemid'],
+						(int) $response['result'][$i]['itemid']
+					);
+				}
+			}
+		}
+	}
+
+	/**
 	 * Verify that trends are generated for both past and current hour.
 	 *
 	 * @depends testLLDHistorySyncAtScale_HistoryNowSend
@@ -491,33 +532,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				else {
 					$this->assertEquals($exp['value'], $record['value']);
 				}
-			}
-
-			$response = $this->call('history.get', [
-				'history' => $vtype,
-				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'countOutput' => true
-			]);
-			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
-
-			// Verify sort + limit: returned records should be ordered by itemid DESC.
-			$response = $this->call('history.get', [
-				'history' => $vtype,
-				'itemids' => $itemids,
-				'time_from' => $tm,
-				'time_till' => $tm,
-				'sortfield' => 'itemid',
-				'sortorder' => 'DESC',
-				'limit' => 10
-			]);
-			$this->assertCount(10, $response['result']);
-			for ($i = 0; $i < count($response['result']) - 1; $i++) {
-				$this->assertGreaterThanOrEqual(
-					(int) $response['result'][$i + 1]['itemid'],
-					(int) $response['result'][$i]['itemid']
-				);
 			}
 		}
 	}
