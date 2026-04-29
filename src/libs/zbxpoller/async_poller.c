@@ -220,11 +220,11 @@ fail:
 
 static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void *arg)
 {
-	unsigned char			item_state;
+	int				status;
 	long				response_code;
-	char				*error, *http_resp = NULL;
+	char				*error = NULL, *http_resp = NULL;
 	char				status_codes[] = "200,201,202,203,204";
-	AGENT_RESULT			result;
+	zbx_vector_str_t		values;
 	zbx_telemetry_query_context	*telemetry_query_context;
 	zbx_dc_tq_item_context_t	*item_context;
 	zbx_timespec_t			timespec;
@@ -243,49 +243,98 @@ static void	process_telemetry_query_result(CURL *easy_handle, CURLcode err, void
 		goto fail;
 	}
 
+	/* FIXME: should be changed to max of current time and min_free_ts */
 	zbx_timespec(&timespec);
 
-	zbx_init_agent_result(&result);
 	item_context = &telemetry_query_context->item_context;
 
 	if (SUCCEED == zbx_http_handle_response(easy_handle, &telemetry_query_context->http_context, err,
 			&response_code, &http_resp, &error) &&
 			SUCCEED == zbx_handle_response_code(status_codes, response_code, http_resp, &error))
 	{
-		char	*out = NULL;
-
 		zabbix_log(LOG_LEVEL_TRACE, "%s(): response: '%s'", __func__, http_resp);
 
-		if (SUCCEED == zbx_tq_clickhouse_resp_to_json(item_context->query, http_resp, &out))
+		if (SUCCEED == zbx_tq_clickhouse_parse_resp(item_context->query, http_resp, &values))
 		{
-			zabbix_log(LOG_LEVEL_TRACE, "%s(): transformed to json: '%s'", __func__, out);
-
-			SET_TEXT_RESULT(&result, out);
-
-			/* FIXME: item metadata might not update in time for the next check, this must be changed */
-			zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
-			item_state = ITEM_STATE_NORMAL;
+			status = SUCCEED;
 		}
 		else
 		{
-			SET_MSG_RESULT(&result, zbx_strdup(NULL, "Failed to parse Clickhouse response"));
-			item_state = ITEM_STATE_NOTSUPPORTED;
+			error = zbx_strdup(NULL, "Failed to parse Clickhouse response");
+			status = FAIL;
 		}
 	}
 	else
 	{
-		SET_MSG_RESULT(&result, error);
-		item_state = ITEM_STATE_NOTSUPPORTED;
+		status = FAIL;
 	}
 
 	if (ZBX_IS_RUNNING())
 	{
-		zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
-				item_context->preprocessing, (ITEM_STATE_NORMAL == item_state ? &result : NULL),
-				&timespec, item_state, (ITEM_STATE_NORMAL == item_state ? NULL : result.msg));
+		if (SUCCEED == status)
+		{
+			for (int i = 0; i < values.values_num; i++)
+			{
+				AGENT_RESULT	result;
+
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): bucket %d: '%s'", __func__, i, values.values[i]);
+
+				zbx_init_agent_result(&result);
+
+				SET_TEXT_RESULT(&result, values.values[i]);
+				values.values[i] = NULL;
+
+				/* FIXME: item metadata might not update in time for the next check, */
+				/* this must be changed */
+				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
+
+				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
+						item_context->flags, item_context->preprocessing, &result, &timespec,
+						ITEM_STATE_NORMAL, NULL);
+
+				zbx_free_agent_result(&result);
+
+				timespec.ns++;
+				while (timespec.ns >= 1000000000)
+				{
+					timespec.ns -= 1000000000;
+					timespec.sec++;
+				}
+			}
+
+			/* FIXME: this is really only needed because zbx_set_agent_result_meta is used */
+			/* if lasttimestamp is updated some other way, this should be removed */
+			if (0 == values.values_num)
+			{
+				AGENT_RESULT	result;
+
+				zabbix_log(LOG_LEVEL_TRACE, "%s(): saving empty result", __func__);
+
+				zbx_init_agent_result(&result);
+
+				/* FIXME: item metadata might not update in time for the next check, */
+				/* this must be changed */
+				zbx_set_agent_result_meta(&result, 0, item_context->newlasttimestamp);
+
+				zbx_preprocess_item_value(item_context->itemid, item_context->value_type,
+						item_context->flags, item_context->preprocessing, &result, &timespec,
+						ITEM_STATE_NORMAL, NULL);
+
+				zbx_free_agent_result(&result);
+			}
+
+			/* no need to clean */
+			zbx_vector_str_destroy(&values);
+		}
+		else
+		{
+			zbx_preprocess_item_value(item_context->itemid, item_context->value_type, item_context->flags,
+					item_context->preprocessing, NULL,
+					&timespec, ITEM_STATE_NOTSUPPORTED, error);
+		}
 	}
 
-	zbx_free_agent_result(&result);
+	zbx_free(error);
 	zbx_free(http_resp);
 
 	zbx_async_manager_requeue(poller_config->manager, telemetry_query_context->item_context.itemid, SUCCEED,

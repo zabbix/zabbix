@@ -126,6 +126,6 @@ void	zbx_tq_sql_generate_clickhouse(const zbx_tq_query_t *query, time_t now, tim
 void	zbx_tq_get_timestamp_filter_bounds(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		time_t *out_lower, time_t *out_upper);
 
-int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char **out_json);
+int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values);
 
 #endif

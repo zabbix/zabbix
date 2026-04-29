@@ -13,6 +13,7 @@
 **/
 
 #include "checks_telemetry.h"
+#include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxcommon.h"
 #include "zbxtelemetry.h"
@@ -84,27 +85,22 @@ static int	send_query_clickhouse_raw(const zbx_tq_query_t *query, time_t now, ti
 static int	send_query_clickhouse(const zbx_tq_query_t *query, time_t now, time_t lasttimestamp,
 		const telemetry_query_conn_params_clickhouse_t *conn_params, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **out, char **error)
+		const char *config_ssl_key_location, zbx_vector_str_t *values, char **error)
 {
 	int	ret = FAIL;
 	char	*resp = NULL;
 
-#ifdef HAVE_LIBCURL
 	if (SUCCEED != send_query_clickhouse_raw(query, now, lasttimestamp, conn_params, config_source_ip,
 			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &resp, error))
 		goto out;
-#elif
-	*error = zbx_strdup(NULL, "cURL was not compiled in");
-	goto out;
-#endif
+
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): Clickhouse response: '%s'", __func__, ZBX_NULL2STR(resp));
 
-	if (SUCCEED != zbx_tq_clickhouse_resp_to_json(query, resp, out)) {
+	if (SUCCEED != zbx_tq_clickhouse_parse_resp(query, resp, values))
+	{
 		*error = zbx_strdup(NULL, "Failed to parse Clickhouse response");
 		goto out;
 	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "%s(): resulting json: '%s'", __func__, ZBX_NULL2STR(*out));
 
 	ret = SUCCEED;
 out:
@@ -115,11 +111,11 @@ out:
 
 static int get_value_telemetry_clickhouse(const zbx_dc_item_t *item, AGENT_RESULT *result)
 {
-	int		ret = NOTSUPPORTED;
-	time_t		now = time(NULL);
-	time_t		lasttimestamp;
-	char		*send_out = NULL;
-	char		*send_error = NULL;
+	int			ret = NOTSUPPORTED;
+	time_t			now = time(NULL);
+	time_t			lasttimestamp;
+	zbx_vector_str_t	values;
+	char			*error = NULL;
 
 	/* FIXME: placeholder, db type and connection parameters should be gotten from the global config */
 	const telemetry_query_conn_params_clickhouse_t	conn_params =
@@ -147,22 +143,30 @@ static int get_value_telemetry_clickhouse(const zbx_dc_item_t *item, AGENT_RESUL
 	lasttimestamp = 0;
 
 	if (SUCCEED != send_query_clickhouse(item->telemetry_query, now, lasttimestamp, &conn_params, config_source_ip,
-			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &send_out,
-			&send_error))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &values,
+			&error))
 	{
-		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Query failed: '%s'", send_error));
-		send_error = NULL;
-		goto clean;
+		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Query failed: '%s'", error));
+		error = NULL;
+		goto out;
 	}
 
-	SET_TEXT_RESULT(result, send_out);
-	send_out = NULL;
+	if (0 != values.values_num)
+	{
+		SET_TEXT_RESULT(result, values.values[0]);
+		values.values[0] = NULL;
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "%s() no buckets, not setting value", __func__);
+	}
+
+	zbx_vector_str_clear(&values);
+	zbx_vector_str_destroy(&values);
 
 	ret = SUCCEED;
-
-clean:
-	zbx_free(send_out);
-	zbx_free(send_error);
+out:
+	zbx_free(error);
 
 	return ret;
 }

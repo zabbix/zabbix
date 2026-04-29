@@ -140,6 +140,8 @@ static int	async_check_telemetry_query_clickhouse(zbx_dc_telemetry_query_item_t 
 
 	lasttimestamp = item->mtime;
 
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() lasttimestamp: " ZBX_FS_TIME_T, __func__, lasttimestamp);
+
 	if (SUCCEED != async_send_telemetry_query_clickhouse(item, query, now, lasttimestamp, &conn_params,
 			config_source_ip, config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location,
 			poller_config->curl_handle, &send_error))

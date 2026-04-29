@@ -12,23 +12,24 @@
 ** If not, see <https://www.gnu.org/licenses/>.
 **/
 
+#include "zbxalgo.h"
 #include "zbxjson.h"
 #include "zbxtelemetry.h"
 #include "zbxcommon.h"
 #include "zbxtypes.h"
 
-static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, struct zbx_json *j,
-		int row_id)
+static char	*tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_parse *jp, int row_id)
 {
-	int		ret = FAIL;
+	struct zbx_json	j;
+	char		*str = NULL;
 	const char	*p = NULL;
 	char		buf[MAX_STRING_LEN];
 	zbx_uint64_t	timestamp;
 
-	zbx_json_addobject(j, NULL);
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
 
 	/* row id */
-	zbx_json_adduint64(j, "id", row_id);
+	zbx_json_adduint64(&j, "id", row_id);
 
 	/* skip rounded time */
 	if (NULL == (p = zbx_json_next_value(jp, p, buf, sizeof(buf), NULL)))
@@ -45,9 +46,9 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 		goto out;
 	}
 
-	zbx_json_adduint64(j, "timestamp", timestamp);
+	zbx_json_adduint64(&j, "timestamp", timestamp);
 
-	zbx_json_addobject(j, "columns");
+	zbx_json_addobject(&j, "columns");
 
 	for (int i = 0; i < query->columns.values_num; i++)
 	{
@@ -65,10 +66,10 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from row \"%s\"", field_name,
 					jp->start);
 			zbx_free(field_name);
-			goto out_columns;
+			goto out;
 		}
 
-		zbx_json_addstring(j, field_name, buf, type);
+		zbx_json_addstring(&j, field_name, buf, type);
 
 		zbx_free(field_name);
 	}
@@ -82,19 +83,19 @@ static int	tq_clickhouse_parse_row(const zbx_tq_query_t *query, struct zbx_json_
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot parse column \"%s\" from row \"%s\"", field_name,
 					jp->start);
-			goto out_columns;
+			goto out;
 		}
 
-		zbx_json_addstring(j, field_name, buf, type);
+		zbx_json_addstring(&j, field_name, buf, type);
 	}
 
-	ret = SUCCEED;
-out_columns:
-	zbx_json_close(j);
+	zbx_json_close(&j);
+	zbx_json_close(&j);
+	str = zbx_strdup(NULL, j.buffer);
 out:
-	zbx_json_close(j);
+	zbx_json_free(&j);
 
-	return ret;
+	return str;
 }
 
 /******************************************************************************
@@ -102,19 +103,19 @@ out:
  * Comments: modifies resp during parsing but returns it to initial state     *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char **out_json)
+int	zbx_tq_clickhouse_parse_resp(const zbx_tq_query_t *query, char *resp, zbx_vector_str_t *values)
 {
-	int		ret = SUCCEED;
-	struct zbx_json	j;
-	char		*start = resp;
-	int		row_count = 0;
+	int	ret = SUCCEED;
+	char	*start = resp;
+	int	row_count = 0;
 
-	zbx_json_initarray(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_vector_str_create(values);
 
 	while (1)
 	{
 		char			*end;
 		struct zbx_json_parse	jp;
+		char			*str = NULL;
 
 		/* handle empty resp */
 		if ('\0' == *start)
@@ -124,8 +125,11 @@ int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char
 			*end = '\0';
 
 		if (SUCCEED != zbx_json_open(start, &jp) ||
-				SUCCEED != tq_clickhouse_parse_row(query, &jp, &j, ++row_count))
+				NULL == (str = tq_clickhouse_parse_row(query, &jp, ++row_count)))
 			ret = FAIL;
+
+		if (NULL != str)
+			zbx_vector_str_append(values, str);
 
 		if (NULL == end) {
 			break;
@@ -138,10 +142,11 @@ int	zbx_tq_clickhouse_resp_to_json(const zbx_tq_query_t *query, char *resp, char
 			break;
 	}
 
-	if (SUCCEED == ret)
-		*out_json = zbx_strdup(NULL, j.buffer);
-
-	zbx_json_close(&j);
+	if (SUCCEED != ret)
+	{
+		zbx_vector_str_clear(values);
+		zbx_vector_str_destroy(values);
+	}
 
 	return ret;
 }
