@@ -1125,6 +1125,7 @@ class CIntegrationTest extends CAPITest {
 		$start = microtime(true);
 
 		for ($i = 0; $i < $iterations; $i++) {
+			$callback_error = null;
 			try {
 				$response = $this->call($method, $params);
 
