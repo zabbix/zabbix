@@ -33,6 +33,12 @@
 			document.getElementById('change-password-button')?.addEventListener('click', () => {
 				document.getElementById('change_password').setAttribute('value', 1);
 				this.#displayPasswordChange(true);
+
+				const current_password = document.getElementById('current_password');
+
+				if (current_password !== null) {
+					current_password.focus();
+				}
 			});
 
 			this.#displayPasswordChange(false);
@@ -120,22 +126,18 @@
 			}
 
 			this.form_element.querySelectorAll('.password-change-active').forEach(element => {
-				element.style.display = visible === true ? '' : 'none';
+				element.style.display = visible ? '' : 'none';
 			});
 
 			this.form_element.querySelectorAll('.password-change-inactive').forEach(element => {
-				element.style.display = visible === true ? 'none' : '';
+				element.style.display = visible ? 'none' : '';
 			});
 
-			password1.toggleAttribute('disabled', !visible);
-			password2.toggleAttribute('disabled', !visible);
+			password1.disabled = !visible;
+			password2.disabled = !visible;
 
 			if (current_password !== null) {
-				current_password.toggleAttribute('disabled', !visible);
-
-				if (visible) {
-					current_password.focus();
-				}
+				current_password.disabled = !visible;
 			}
 		}
 
