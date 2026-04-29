@@ -22,7 +22,7 @@ require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
  * @required-components server
  * @suite-components-reuse true
  * @configurationDataProvider configurationProvider
- * @onAfter clearData
+ * @onAfterOnce clearData
  */
 class testLLDHistorySyncAtScale extends CIntegrationTest {
 

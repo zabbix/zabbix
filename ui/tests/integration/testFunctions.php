@@ -22,7 +22,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @required-components server
  * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
- * @onAfter clearData
+ * @onAfterOnce clearData
  *
  */
 class testFunctions extends CIntegrationTest{
