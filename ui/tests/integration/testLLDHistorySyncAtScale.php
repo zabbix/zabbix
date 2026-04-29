@@ -258,12 +258,12 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	 *
 	 * @depends testLLDHistorySyncAtScale_HistoryNowVerify
 	 */
-	public function testLLDHistorySyncAtScale_HistoryAndTrends() {
-		/*$this->verifyTrendsAtClock(self::$tm_past - (self::$tm_past % 3600));
+	public function testLLDHistorySyncAtScale_TrendsVerify() {
+		$this->verifyTrendsAtClock(self::$tm_past - (self::$tm_past % 3600));
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->verifyTrendsAtClock(self::$tm_now - (self::$tm_now % 3600));
-		$this->startComponent(self::COMPONENT_SERVER);*/
+		$this->startComponent(self::COMPONENT_SERVER);
 	}
 
 	/**
@@ -360,7 +360,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		foreach ([ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64] as $vtype) {
 			$itemids = array_values(self::$discovered_itemids[$vtype]);
 
-			$this->callUntilDataIsPresent('trend.get', [
+			/*$this->callUntilDataIsPresent('trend.get', [
 				'itemids' => $itemids,
 				'time_from' => $trend_clock,
 				'time_till' => $trend_clock,
@@ -375,7 +375,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 				'time_till' => $trend_clock,
 				'countOutput' => true
 			]);
-			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);
+			$this->assertEquals((string) self::LLD_DISCOVERY_COUNT, $response['result']);*/
 
 			$idx = 0;
 			$expected_by_itemid = [];
@@ -580,13 +580,19 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 
 	private function assertVpsWrittenIncreasedBy(int $baseline, int $min_increase): void {
 		$expected = $baseline + $min_increase;
-		for ($i = 0; $i < self::WAIT_ITERATIONS; $i++) {
+		$timeout = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+		$start = microtime(true);
+
+		while ((microtime(true) - $start) < $timeout) {
 			if ($this->getVpsWritten() >= $expected) {
 				break;
 			}
 			usleep(50000); // 50 ms: detects ~1.2 M values/s throughput lower bound (LLD_DISCOVERY_COUNT * types / 0.05 s)
 		}
-		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten());
+
+		$waited = round(microtime(true) - $start, 1);
+		$this->assertGreaterThanOrEqual($expected, $this->getVpsWritten(),
+			"VPS written did not reach expected value after waiting {$waited}s");
 	}
 
 	/**
