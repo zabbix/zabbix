@@ -128,11 +128,18 @@ class testFunctions extends CIntegrationTest{
 		$this->assertCount(1, $response['result']);
 		self::$templateid = $response['result'][0]['templateid'];
 
+		$response = $this->call('hostgroup.get', [
+			'filter' => ['name' => ['Zabbix servers']],
+			'output' => ['groupid']
+		]);
+		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found.');
+		$groupid = $response['result'][0]['groupid'];
+
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME_MAIN,
 			'interfaces' => [],
 			'groups' => [
-				['groupid' => 4]
+				['groupid' => $groupid]
 			],
 			'templates' => [
 				'templateid' => self::$templateid
