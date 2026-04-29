@@ -187,16 +187,6 @@ typedef int (*zbx_history_provider_fetch_batch_t)(void *data, zbx_vector_item_hi
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve the traits of the history storage provider               *
- *                                                                            *
- * Return value: A bitmask of supported features and capabilities, (see       *
- *               ZBX_HISTORY_TRAIT_* constants)                               *
- *                                                                            *
- ******************************************************************************/
-typedef zbx_uint64_t (*zbx_history_provider_get_traits_t)(void);
-
-/******************************************************************************
- *                                                                            *
  * Purpose: retrieve information about the history storage provider           *
  *                                                                            *
  * Parameters:                                                                *

@@ -71,8 +71,6 @@ ZBX_VECTOR_DECL(item_history, zbx_item_history_t)
 #define ZBX_HISTORY_CHECK_TYPE_FLAGS(flags, value_type) \
 	(0 == (flags & (__UINT64_C(1) << value_type)) ? FAIL : SUCCEED)
 
-int	zbx_history_record_float_compare(const void *d1, const void *d2);
-
 void	zbx_history_record_vector_clean(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_vector_destroy(zbx_vector_history_record_t *vector, int value_type);
 void	zbx_history_record_clear(zbx_history_record_t *value, int value_type);

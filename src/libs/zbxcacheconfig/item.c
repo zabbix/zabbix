@@ -14,8 +14,6 @@
 
 #include "zbxcacheconfig.h"
 
-#include "zbxexpr.h"
-
 int	zbx_dc_get_item_key(zbx_uint64_t itemid, char **key)
 {
 	zbx_dc_item_t	dc_item;
