@@ -133,7 +133,7 @@ foreach ($data['devices'] as $device) {
 
 	$deviceTable->addRow([
 		$device['name'] === ''
-			? new CTag('em', true, _('unknown name'))
+			? new CTag('em', true, _('(unknown name)'))
 			: $device['name'],
 		$device['uuid'],
 		$device['user_fullname'],
