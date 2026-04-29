@@ -115,13 +115,9 @@
 						.setSortable(true),
 					new CDataTableColumn('recovery', <?= json_encode(_('Recovery time')); ?>)
 						.setFields(['recovery'])
-						.setShowInTableOptions(show_columns)
-						.setTogglable(show_columns)
 						.setVisible(show_columns),
 					new CDataTableColumn('status', <?= json_encode(_('Status')); ?>)
 						.setFields(['status'])
-						.setShowInTableOptions(show_columns)
-						.setTogglable(show_columns)
 						.setVisible(show_columns),
 					new CDataTableColumn('info', <?= json_encode(_('Info')); ?>)
 						.setFields(['info']),
@@ -641,7 +637,9 @@
 			this.#filter.on(TABFILTER_EVENT_URLSET, () => {
 				chkbxRange.clearSelectedOnFilterChange();
 
-				if (this.#active_filter !== this.#filter._active_item) {
+				const tabfilter_changed = this.#active_filter !== this.#filter._active_item;
+
+				if (tabfilter_changed) {
 					this.#active_filter = this.#filter._active_item;
 					chkbxRange.checkObjectAll(chkbxRange.pageGoName, false);
 
@@ -649,7 +647,7 @@
 				}
 
 				this.#scheduleRefresh();
-				this.#refresh();
+				this.#refresh(tabfilter_changed);
 			});
 
 			$.subscribe('timeselector.rangeupdate', (e, data) => {
@@ -781,32 +779,36 @@
 			);
 		}
 
-		#refresh() {
+		#refresh(tabfilter_changed = false) {
 			if (isUserInteracting()) {
 				return;
 			}
 
 			const search_params = new URLSearchParams(location.search.substring(1));
-			const current_filter = searchParamsToObject(search_params);
-			const filter = {...this.#filter_defaults, ...current_filter};
+			const url_filter = searchParamsToObject(search_params);
+			const filter = {...this.#filter_defaults, ...url_filter};
+			const current_filter = this.#datatable.getFilter();
 
 			if (filter.filter_custom_time == 0) {
 				filter.from = this.#global_timerange.from;
 				filter.to = this.#global_timerange.to;
 			}
 
-			const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
+			if (current_filter.show != url_filter.show) {
+				const show_columns = filter.show != <?= TRIGGERS_OPTION_IN_PROBLEM; ?>;
 
-			for (const column_name of ['recovery', 'status']) {
-				const column = this.#datatable.getColumnById(column_name);
+				for (const id of ['recovery', 'status']) {
+					const column = this.#datatable.getColumnById(id);
 
-				column.setShowInTableOptions(show_columns)
-					.setTogglable(show_columns)
-					.setVisible(show_columns);
+					column.setVisible(show_columns);
+				}
 			}
 
-			this.#datatable/*.updateUserConfig()*/
-				.setFilter(filter)
+			if (!tabfilter_changed) {
+				this.#datatable.updateUserConfig();
+			}
+
+			this.#datatable.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,
 					force_load: true,
