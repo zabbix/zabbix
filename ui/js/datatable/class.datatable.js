@@ -1136,6 +1136,7 @@ class CDataTable {
 
 		this.#visible_columns = this.getVisibleColumns();
 
+		this.#lockHeight();
 		this.#clearBody();
 		this.#recalculateColumnSpans();
 		this.#renderHeaderCells();
@@ -1150,8 +1151,6 @@ class CDataTable {
 		if (!column || !column.isTogglable()) {
 			return;
 		}
-
-		this.#lockHeight();
 
 		if (!column.isResized()) {
 			column.setWidth(`${CDataTable.COLUMN_TOGGLE_INITIAL_MIN_WIDTH}px`);
@@ -1485,8 +1484,6 @@ class CDataTable {
 		this.#sort_field = sort_field;
 		this.#sort_order = sort_order;
 
-		this.#lockHeight();
-
 		this.#element.classList.add(ZBX_STYLE_LOADING);
 
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
@@ -1687,8 +1684,6 @@ class CDataTable {
 		const {page} = e.detail;
 
 		this.#page = page;
-
-		this.#lockHeight();
 
 		this.dispatchEvent(CDataTable.EVENT_INIT);
 		this.dispatchEvent(CPager.EVENT_SELECT, e.detail);
