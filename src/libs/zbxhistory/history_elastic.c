@@ -1649,19 +1649,19 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 	char				*version_friendly = NULL;
 	int				major_num, minor_num, increment_num, ret = FAIL;
 	zbx_uint32_t			version = ZBX_DBVERSION_UNDEFINED;
-	zbx_elastic_conn_t		conn;
+	zbx_elastic_conn_t		conn = {0};
 	CURLM				*mhandle;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	if (SUCCEED != history_elastic_conn_init(&conn, d, NULL, "application/json", NULL, error))
-		goto out;
 
 	if (NULL == (mhandle = curl_multi_init()))
 	{
 		*error = zbx_strdup(NULL, "Cannot initialize curl multi session");
 		goto out;
 	}
+
+	if (SUCCEED != history_elastic_conn_init(&conn, d, NULL, "application/json", NULL, error))
+		goto out;
 
 	if (FAIL == history_elastic_query(d, mhandle, &conn, ELASTIC_RETRIES_OFF))
 	{
@@ -1678,40 +1678,36 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 		goto out;
 	}
 
-	ret = SUCCEED;
-out:
-	if (FAIL != ret)
+	zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved unparsed: %s", version_friendly);
+
+	if (3 != sscanf(version_friendly, "%d.%d.%d", &major_num, &minor_num, &increment_num) ||
+			major_num >= 100 || major_num <= 0 || minor_num >= 100 || minor_num < 0 ||
+			increment_num >= 100 || increment_num < 0)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "Elasticsearch version retrieved unparsed: %s", version_friendly);
-
-		if (3 != sscanf(version_friendly, "%d.%d.%d", &major_num, &minor_num, &increment_num) ||
-				major_num >= 100 || major_num <= 0 || minor_num >= 100 || minor_num < 0 ||
-				increment_num >= 100 || increment_num < 0)
-		{
-			*error = zbx_dsprintf(NULL, "Failed to detect Elasticsearch version from the "
-					"following query result: %s", version_friendly);
-		}
-		else
-		{
-			version = major_num * 10000 + minor_num * 100 + increment_num;
-		}
-
-		info->database = zbx_strdup(NULL, "Elasticsearch");
-		info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTIC);
-		info->current_version = version;
-		info->min_version = ZBX_ELASTIC_MIN_VERSION;
-		info->max_version = ZBX_ELASTIC_MAX_VERSION;
-		info->min_supported_version = ZBX_DBVERSION_UNDEFINED;
-
-		info->friendly_current_version = version_friendly;
-		info->friendly_min_version = zbx_strdup(NULL, ZBX_ELASTIC_MIN_VERSION_STR);
-		info->friendly_max_version = zbx_strdup(NULL, ZBX_ELASTIC_MAX_VERSION_STR);
-		info->friendly_min_supported_version = zbx_strdup(NULL, ZBX_ELASTIC_MIN_VERSION_STR);
-
-		zbx_vector_history_provider_value_type_info_create(&info->value_types);
-		history_elastic_get_value_type_data(d, info);
+		*error = zbx_dsprintf(NULL, "Failed to detect Elasticsearch version from the "
+				"following query result: %s", version_friendly);
+	}
+	else
+	{
+		version = major_num * 10000 + minor_num * 100 + increment_num;
 	}
 
+	info->database = zbx_strdup(NULL, "Elasticsearch");
+	info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTIC);
+	info->current_version = version;
+	info->min_version = ZBX_ELASTIC_MIN_VERSION;
+	info->max_version = ZBX_ELASTIC_MAX_VERSION;
+	info->min_supported_version = ZBX_DBVERSION_UNDEFINED;
+
+	info->friendly_current_version = version_friendly;
+	info->friendly_min_version = zbx_strdup(NULL, ZBX_ELASTIC_MIN_VERSION_STR);
+	info->friendly_max_version = zbx_strdup(NULL, ZBX_ELASTIC_MAX_VERSION_STR);
+	info->friendly_min_supported_version = zbx_strdup(NULL, ZBX_ELASTIC_MIN_VERSION_STR);
+
+	zbx_vector_history_provider_value_type_info_create(&info->value_types);
+	history_elastic_get_value_type_data(d, info);
+	ret = SUCCEED;
+out:
 	elastic_conn_clear(&conn);
 	curl_multi_cleanup(mhandle);
 
