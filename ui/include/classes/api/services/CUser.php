@@ -2070,7 +2070,7 @@ class CUser extends CApiService {
 				$devices[] = [
 					'deviceid' => $db_device['deviceid'],
 					'userid' => 0,
-					'status' => ZBX_DEVICE_ORPHANED
+					'status' => ZBX_DEVICE_STATUS_ORPHANED
 				];
 			}
 
@@ -3069,7 +3069,7 @@ class CUser extends CApiService {
 			'SELECT d.deviceid,d.uuid'.
 			' FROM token_device td'.
 			' JOIN device d ON td.deviceid=d.deviceid'.
-				' AND '.dbConditionInt('d.status', [ZBX_DEVICE_ACTIVATED]).
+				' AND '.dbConditionInt('d.status', [ZBX_DEVICE_STATUS_ACTIVATED]).
 			' WHERE '.dbConditionId('td.tokenid', [$db_token['tokenid']])
 		));
 

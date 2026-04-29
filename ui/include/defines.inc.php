@@ -2480,9 +2480,9 @@ define('ZBX_NODE_STATUS_ACTIVE',		3);
 
 define('ZABBIX_MOBILE_VERSION',			1);
 
-define('ZBX_DEVICE_NEW',		0);
-define('ZBX_DEVICE_ACTIVATED',	1);
-define('ZBX_DEVICE_ORPHANED',	2);
+define('ZBX_DEVICE_STATUS_NEW',			0);
+define('ZBX_DEVICE_STATUS_ACTIVATED',	1);
+define('ZBX_DEVICE_STATUS_ORPHANED',	2);
 
 // init $_REQUEST
 ini_set('variables_order', 'GP');

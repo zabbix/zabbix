@@ -27,7 +27,7 @@ class CControllerUserDeviceList extends CController {
 			'filter_userids' =>			'array_db users.userid',
 			'filter_roleids' =>			'array_db role.roleid',
 			'filter_usrgrpids' =>		'array_db users_groups.usrgrpid',
-			'filter_status' =>			'in '.implode(',', [-1, ZBX_DEVICE_NEW, ZBX_DEVICE_ACTIVATED, ZBX_DEVICE_ORPHANED]),
+			'filter_status' =>			'in '.implode(',', [-1, ZBX_DEVICE_STATUS_NEW, ZBX_DEVICE_STATUS_ACTIVATED, ZBX_DEVICE_STATUS_ORPHANED]),
 			'sort' =>					'in name,uuid,activated_at,lastaccess,user_fullname,user_role,status',
 			'sortorder' =>				'in '.ZBX_SORT_DOWN.','.ZBX_SORT_UP,
 			'page' =>					'ge 1'
@@ -218,9 +218,9 @@ class CControllerUserDeviceList extends CController {
 					$this->checkAccess(CRoleHelper::DEVICES_ACTIONS_MANAGE_OWN)
 			],
 			'device_statuses' => [
-				ZBX_DEVICE_NEW => _('New'),
-				ZBX_DEVICE_ACTIVATED => _('Active'),
-				ZBX_DEVICE_ORPHANED => _('Orphaned')
+				ZBX_DEVICE_STATUS_NEW => _('New'),
+				ZBX_DEVICE_STATUS_ACTIVATED => _('Active'),
+				ZBX_DEVICE_STATUS_ORPHANED => _('Orphaned')
 			]
 		];
 

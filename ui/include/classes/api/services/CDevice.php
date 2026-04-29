@@ -312,7 +312,7 @@ class CDevice extends CApiService {
 		$device = [
 			'deviceid' => $db_device['deviceid'],
 			'name' => $options['name'],
-			'status' => ZBX_DEVICE_ACTIVATED,
+			'status' => ZBX_DEVICE_STATUS_ACTIVATED,
 			'push_token' => $options['push_token'],
 			'activated_at' => time()
 		];
