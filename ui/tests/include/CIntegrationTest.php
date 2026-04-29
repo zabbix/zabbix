@@ -577,7 +577,7 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB, $HISTORY;
+		global $DB, $HISTORY_PROVIDERS;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
@@ -598,9 +598,10 @@ class CIntegrationTest extends CAPITest {
 			$db['DBSchema'] = $DB['SCHEMA'];
 		}
 
-		if (isset($HISTORY)) {
-			$db_history['HistoryStorageURL'] = reset($HISTORY['url']);
-			$db_history['HistoryStorageTypes'] = implode(',', $HISTORY['types']);
+		if (isset($HISTORY_PROVIDERS)) {
+			$db_history['HistoryProvider'] = 'elastic;'.
+				'value_types="'.implode(',', $HISTORY_PROVIDERS[0]['types']).'",'.
+				'url='.$HISTORY_PROVIDERS[0]['url'];
 		}
 
 		$configuration = [
