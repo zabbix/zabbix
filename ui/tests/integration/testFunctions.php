@@ -216,21 +216,22 @@ class testFunctions extends CIntegrationTest{
 
 	private function sendValues($filename) {
 		$data = $this->getSenderData($filename);
-		$this->sendSenderValues($data);
-		sleep(15);
+		$this->sendSenderValues($data, null, 0);
 	}
 
 	private function processStep1() {
 		$this->sendValues('values1');
 
-		$response = $this->call('trigger.get', [
+		$this->callUntilDataIsPresent('trigger.get', [
 			'output' => ['description', 'state', 'value', 'error'],
 			'selectFunctions' => 'extend',
 			'hostids' => $this->hostid
-			]);
+		], null, null, function($response) {
+			return $this->assertStep1TriggerExpectations($response);
+		});
+	}
 
-		$triggers = $response['result'];
-
+	private function assertStep1TriggerExpectations($response) {
 		$triggers_expected = [
 			'Item 01 min(#5) gt 10' => ['state' => 0, 'value' => 0],
 			'Item 01 min(5m) gt 10' => ['state' => 0, 'value' => 0],
@@ -295,7 +296,7 @@ class testFunctions extends CIntegrationTest{
 		];
 
 		$failures = [];
-		foreach ($triggers as $trigger) {
+		foreach ($response['result'] as $trigger) {
 			$description = $trigger['description'];
 
 			if (!array_key_exists($description, $triggers_expected)) {
@@ -311,20 +312,22 @@ class testFunctions extends CIntegrationTest{
 				$failures[] = "[1] Value mismatch for trigger: $description";
 			}
 		}
-		$this->assertEmpty($failures, implode("\n", $failures));
+		return $failures === [] ? true : implode("\n", $failures);
 	}
 
 	private function processStep2() {
 		$this->sendValues('values2');
 
-		$response = $this->call('trigger.get', [
+		$this->callUntilDataIsPresent('trigger.get', [
 			'output' => ['description', 'state', 'value', 'error'],
 			'selectFunctions' => 'extend',
 			'hostids' => $this->hostid
-		]);
+		], null, null, function($response) {
+			return $this->assertStep2TriggerExpectations($response);
+		});
+	}
 
-		$triggers = $response['result'];
-
+	private function assertStep2TriggerExpectations($response) {
 		$triggers_expected = [
 			'Item 01 min(#5) gt 10' => ['state' => 0, 'value' => 0],
 			'Item 01 min(5m) gt 10' => ['state' => 0, 'value' => 1],
@@ -389,7 +392,7 @@ class testFunctions extends CIntegrationTest{
 		];
 
 		$failures = [];
-		foreach ($triggers as $trigger) {
+		foreach ($response['result'] as $trigger) {
 			$description = $trigger['description'];
 
 			if (!array_key_exists($description, $triggers_expected)) {
@@ -405,20 +408,22 @@ class testFunctions extends CIntegrationTest{
 				$failures[] = "[2] Value mismatch for trigger: $description";
 			}
 		}
-		$this->assertEmpty($failures, implode("\n", $failures));
+		return $failures === [] ? true : implode("\n", $failures);
 	}
 
 	private function processStep3() {
 		$this->sendValues('values3');
 
-		$response = $this->call('trigger.get', [
+		$this->callUntilDataIsPresent('trigger.get', [
 			'output' => ['description', 'state', 'value', 'error'],
 			'selectFunctions' => 'extend',
 			'hostids' => $this->hostid
-		]);
+		], null, null, function($response) {
+			return $this->assertStep3TriggerExpectations($response);
+		});
+	}
 
-		$triggers = $response['result'];
-
+	private function assertStep3TriggerExpectations($response) {
 		$triggers_expected = [
 			'Item 01 min(#5) gt 10' => ['state' => 0, 'value' => 0],
 			'Item 01 min(5m) gt 10' => ['state' => 0, 'value' => 0],
@@ -483,7 +488,7 @@ class testFunctions extends CIntegrationTest{
 		];
 
 		$failures = [];
-		foreach ($triggers as $trigger) {
+		foreach ($response['result'] as $trigger) {
 			$description = $trigger['description'];
 
 			if (!array_key_exists($description, $triggers_expected)) {
@@ -499,7 +504,7 @@ class testFunctions extends CIntegrationTest{
 				$failures[] = "[3] Value mismatch for trigger: $description";
 			}
 		}
-		$this->assertEmpty($failures, implode("\n", $failures));
+		return $failures === [] ? true : implode("\n", $failures);
 	}
 
 	/**

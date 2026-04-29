@@ -1120,6 +1120,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$exception = null;
+		$callback_error = null;
 		$usleep_total = 0;
 		$start = microtime(true);
 
@@ -1128,13 +1129,17 @@ class CIntegrationTest extends CAPITest {
 				$response = $this->call($method, $params);
 
 				if (is_array($response['result']) && count($response['result']) > 0
-					&& ($callback === null || call_user_func($callback, $response))) {
+					&& ($callback === null || ($result = call_user_func($callback, $response)) === true)) {
 
 					if (static::$trace_delays) {
 						self::recordDelay('call_data_present', microtime(true) - $start);
 					}
 
 					return $response;
+				}
+
+				if (isset($result) && is_string($result) && $result !== '') {
+					$callback_error = $result;
 				}
 			} catch (Exception $e) {
 				$exception = $e;
@@ -1159,7 +1164,8 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
-				"\n".json_encode($params)
+				"\n".json_encode($params).
+				($callback_error !== null ? "\nCallback error: ".$callback_error : '')
 		);
 	}
 
