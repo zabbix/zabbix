@@ -25,6 +25,8 @@
 #include "zbxdb.h"
 #include "zbxnum.h"
 #include "zbxstr.h"
+#include "zbxdbhigh.h"
+#include "zbx_bridge_adapter_constants.h"
 
 #if defined(HAVE_LIBCURL)
 #	include "zbxcurl.h"
@@ -239,8 +241,8 @@ static int	trapper_device_init(const struct zbx_json_parse *jp, const char *conf
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECTTIMEOUT_MS, 2000L)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT,
+					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		*error = zbx_strdup(NULL, "Failed to process device.init request");
@@ -591,8 +593,8 @@ static int	trapper_device_offboard(const struct zbx_json_parse *jp, const char *
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECTTIMEOUT_MS, 2000L)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT,
+					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s", (int)opt,
 				curl_easy_strerror(err));

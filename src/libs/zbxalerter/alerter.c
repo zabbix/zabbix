@@ -37,6 +37,7 @@
 #include "zbxdbhigh.h"
 #include "zbxthreads.h"
 #include "zbxexpr.h"
+#include "zbx_bridge_adapter_constants.h"
 #ifdef HAVE_ARES_QUERY_CACHE
 #include "zbxresolver.h"
 #endif
@@ -577,8 +578,8 @@ static void	alerter_process_push(zbx_ipc_socket_t *socket,
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_HTTPHEADER, headers)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDS, payload)) ||
 			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_POSTFIELDSIZE, strlen(payload))) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_CONNECTTIMEOUT_MS, 2000L)) ||
-			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT_MS, 5000L)))
+			CURLE_OK != (err = curl_easy_setopt(curl, opt = CURLOPT_TIMEOUT,
+					(long)ZBX_BRIDGE_ADAPTER_TIMEOUT)))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		error = zbx_strdup(NULL, "Failed to process device.notify request");
