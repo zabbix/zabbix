@@ -616,6 +616,7 @@ class CControllerProblemViewData extends CControllerDataTable {
 				// Get all symptoms for given cause event ID.
 				$_symptom_data = CScreenProblem::getData([
 					'show_symptoms' => true,
+					'show_suppressed' => true,
 					'cause_eventid' => $cause_eventid,
 					'show' => $filter['show']
 				], $options, ZBX_PROBLEM_SYMPTOM_LIMIT, true);
