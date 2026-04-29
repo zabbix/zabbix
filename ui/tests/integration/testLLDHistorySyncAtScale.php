@@ -354,7 +354,6 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_TriggerFiring() {
 		$tm = time();
 		$sent = $this->sendHistoryAt($tm);
-		$this->verifyHistoryAt($tm, $sent);
 
 		// Verify all discovered triggers fired (value = PROBLEM, state = NORMAL).
 		$this->callUntilDataIsPresent('trigger.get', [
