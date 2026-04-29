@@ -1288,7 +1288,7 @@ class testDashboardPieChartWidget extends testWidgets {
 			$legend_name = CTestArrayHelper::get($data, 'expected_dataset_name', $legend_name);
 
 			// Locate sector for checking.
-			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-contents, '.
+			$sector = $widget->query('xpath:.//*[contains(@data-hintbox-html, '.
 					CXPathHelper::escapeQuotes($legend_name).')]/*[@class="svg-pie-chart-arc"]')->one();
 
 			// Assert sector fill color.

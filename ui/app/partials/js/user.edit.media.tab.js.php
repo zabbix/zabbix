@@ -161,7 +161,7 @@
 			if (media.sendto_short.length > 50) {
 				const hint = row.querySelector('td:nth-child(2) span');
 
-				hint.setAttribute('data-hintbox-contents', escapeHtml(sendto_full));
+				hint.setAttribute('data-hintbox-html', escapeHtml(sendto_full));
 				hint.setAttribute('data-hintbox', '1');
 				hint.setAttribute('data-hintbox-static', '1');
 			}
@@ -223,11 +223,11 @@
 				const span = severities_span[severity];
 
 				if (media_active) {
-					span.dataset.hintboxContents += ' (' + <?= json_encode(_('on')) ?> + ')';
+					span.dataset.hintboxHtml += ' (' + <?= json_encode(_('on')) ?> + ')';
 				}
 				else {
 					span.className = '<?= ZBX_STYLE_STATUS_DISABLED ?>';
-					span.dataset.hintboxContents += ' (' + <?= json_encode(_('off')) ?> + ')';
+					span.dataset.hintboxHtml += ' (' + <?= json_encode(_('off')) ?> + ')';
 				}
 
 				span.dataset.hintbox = '1';
