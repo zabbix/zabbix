@@ -21,7 +21,6 @@ import (
 const (
 	errorInvalidSecondParam   = "invalid second parameter"
 	errorEmptyIfName          = "network interface name cannot be empty"
-	errorTooManyParams        = "too many parameters"
 	errorUnsupportedMetric    = "unsupported metric"
 	errorParametersNotAllowed = "item does not allow parameters"
 )
@@ -36,7 +35,9 @@ const (
 type Plugin struct {
 	plugin.Base
 
-	netDevFilepath string
+	netDevFilepath     string
+	netDevStatsCount   int
+	sysClassNetDirpath string
 }
 
 type networkDirection uint8
