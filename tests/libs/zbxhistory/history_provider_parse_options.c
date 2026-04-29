@@ -22,8 +22,8 @@
 
 static int	history_option_compare(const void *d1, const void *d2)
 {
-	const zbx_history_option_t *opt1 = (zbx_history_option_t *)d1;
-	const zbx_history_option_t *opt2 = (zbx_history_option_t *)d2;
+	const zbx_history_option_t	*opt1 = (zbx_history_option_t *)d1;
+	const zbx_history_option_t	*opt2 = (zbx_history_option_t *)d2;
 
 	return strcmp(opt1->name, opt2->name);
 }

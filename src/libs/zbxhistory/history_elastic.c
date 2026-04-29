@@ -1830,7 +1830,7 @@ static void	history_elastic_validate_options(const zbx_history_option_t *options
  * Return value: history provider or NULL if initialization fails             *
  *                                                                            *
  ******************************************************************************/
-zbx_history_provider_t *history_elastic_open(const zbx_history_option_t *options, int options_num, char **error)
+zbx_history_provider_t	*history_elastic_open(const zbx_history_option_t *options, int options_num, char **error)
 {
 	zbx_history_provider_t	*provider;
 	void			*data;

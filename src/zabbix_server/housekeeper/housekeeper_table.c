@@ -397,8 +397,6 @@ static int	hk_cfg_disabled(void)
 
 /******************************************************************************
  *                                                                            *
- * Function: hk_disable_table_housekeeping                                    *
- *                                                                            *
  * Purpose: disable housekeeping for a specific table                         *
  *                                                                            *
  * Parameters:                                                                *
