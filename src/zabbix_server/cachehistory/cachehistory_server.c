@@ -1416,14 +1416,14 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *                                            ZBX_SYNC_DONE - nothing to sync, go idle *
  *                                            ZBX_SYNC_MORE - more data to sync        *
  *                                                                                     *
- * Comments: This function loops syncing history values by 1k batches and              *
- *           processing timer triggers by batches of 500 triggers.                     *
+ * Comments: This function loops syncing history values by 2k batches and              *
+ *           processing timer triggers by batches of 1000 triggers.                    *
  *           Unless full sync is being done the loop is aborted if either              *
  *           timeout has passed or there are no more data to process.                  *
  *           The last is assumed when the following is true:                           *
  *            a) history cache is empty or less than 10% of batch values were          *
  *               processed (the other items were locked by triggers)                   *
- *            b) less than 500 (full batch) timer triggers were processed              *
+ *            b) less than 1000 (full batch) timer triggers were processed             *
  *                                                                                     *
  ***************************************************************************************/
 void	zbx_sync_history_cache_server(const zbx_events_funcs_t *events_cbs, zbx_ipc_async_socket_t *rtc,
