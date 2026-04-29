@@ -374,15 +374,32 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			}
 			return true;
 		});
+	}
 
-		// Verify one event was created per discovered trigger.
-		$this->callUntilDataIsPresent('event.get', [
-			'objectids' => self::$discovered_triggerids,
-			'source' => EVENT_SOURCE_TRIGGERS,
-			'output' => ['eventid'],
-			'limit' => self::$total_trigger_expected
+	/**
+	 * @depends testLLDHistorySyncAtScale_TriggerFiring
+	 */
+	public function testLLDHistorySyncAtScale_TriggerRecovery() {
+		$tm = time();
+		$this->sendHistoryAt($tm, '0');
+
+		// Verify all discovered triggers recovered (value = OK, state = NORMAL).
+		$this->callUntilDataIsPresent('trigger.get', [
+			'hostids' => [self::$hostid],
+			'output' => ['triggerid', 'value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
-			return count($r['result']) === self::$total_trigger_expected;
+			if (count($r['result']) !== self::$total_trigger_expected) {
+				return false;
+			}
+			foreach ($r['result'] as $trigger) {
+				if ((int) $trigger['value'] !== TRIGGER_VALUE_FALSE) {
+					return false;
+				}
+				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
+					return false;
+				}
+			}
+			return true;
 		});
 	}
 
@@ -392,9 +409,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 	public function testLLDHistorySyncAtScale_TriggerFiringWarmupAfterRestart() {
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->startComponent(self::COMPONENT_SERVER);
-		$tm = time();
-		$sent = $this->sendHistoryAt($tm);
-		$this->verifyHistoryAt($tm, $sent);
+		$this->testLLDHistorySyncAtScale_TriggerFiring();
 	}
 
 	private function verifyTrendsAtClock(int $trend_clock): void {
@@ -450,7 +465,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		}
 	}
 
-	private function prepareHistoryAt(int $tm): array {
+	private function prepareHistoryAt(int $tm, ?string $value = null): array {
 		$sent = [];
 		$values_by_type = [];
 
@@ -467,7 +482,7 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			foreach ($items_by_key as $key => $itemid) {
 				$values[] = [
 					'itemid' => $itemid,
-					'value' => (string)($idx + 1),
+					'value' => isset($value) ? $value : (string)($idx + 1),
 					'clock' => $tm,
 					'ns' => ($base_ns + $idx) % 1000000000
 				];
@@ -498,8 +513,8 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 		return ['sent' => $sent, 'values' => $all_values];
 	}
 
-	private function sendHistoryAt(int $tm): array {
-		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm);
+	private function sendHistoryAt(int $tm, ?string $value = null): array {
+		['sent' => $sent, 'values' => $all_values] = $this->prepareHistoryAt($tm, $value);
 		$this->sendAgentDataValues($all_values, self::HOSTNAME, self::COMPONENT_SERVER, 0);
 
 		return $sent;
