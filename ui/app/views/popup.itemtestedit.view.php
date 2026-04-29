@@ -439,8 +439,7 @@ if (count($data['steps']) > 0) {
 		$step_params = $step['type'] == ZBX_PREPROC_SCRIPT
 			? [$step['params'], ''] : explode("\n", $step['params']);
 
-		if (in_array($step['type'], [ZBX_PREPROC_MATCH_ERROR_ANY, ZBX_PREPROC_MATCH_ERROR_REGEX,
-				ZBX_PREPROC_MATCH_ERROR_NOT_REGEX])) {
+		if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 			foreach ($step_params as $j => $param_value) {
 				$form->addItem(
 						(new CInput('hidden', 'steps['.$i.'][params_'.$j.'_not_supported]', $param_value))

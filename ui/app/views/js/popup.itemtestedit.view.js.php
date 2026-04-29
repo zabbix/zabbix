@@ -562,7 +562,6 @@ window.itemtestedit_view_popup = new class {
 	}
 
 	#ajaxExceptionHandler(exception) {
-		debugger;
 		let title, messages;
 
 		if (typeof exception === 'object' && 'error' in exception) {
