@@ -34,11 +34,11 @@ class CControllerValidateApiExists extends CController {
 					'filter' => [
 						['object', 'fields' => [
 							'name' => ['string'],
-							'host' => ['string'],
+							'host' => ['string']
 						], 'when' => ['../api', 'in' => ['host', 'template']]],
 						['object', 'fields' => [
 							'key_' => ['string', 'required', 'not_empty'],
-							'hostid' => ['id', 'required'],
+							'hostid' => ['id', 'required']
 						], 'when' => ['../api', 'in' => ['item', 'itemprototype']]]
 					]
 				]],
