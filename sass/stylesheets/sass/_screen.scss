@@ -1696,6 +1696,15 @@ select {
 	}
 }
 
+.ui-selectable {
+	.map-elements {
+		rect {
+			rx: var(--overlay-border-radius);
+			ry: var(--overlay-border-radius);
+		}
+	}
+}
+
 .ui-selectable-helper {
 	position: absolute;
 	z-index: 100;
