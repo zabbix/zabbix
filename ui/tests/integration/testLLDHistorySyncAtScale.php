@@ -361,15 +361,25 @@ class testLLDHistorySyncAtScale extends CIntegrationTest {
 			'output' => ['triggerid', 'value', 'state']
 		], self::WAIT_ITERATIONS, self::WAIT_ITERATION_DELAY, function ($r) {
 			if (count($r['result']) !== self::$total_trigger_expected) {
-				return false;
+				return 'Expected '.self::$total_trigger_expected.' triggers, got '.count($r['result']);
 			}
+			$wrong_value = 0;
+			$wrong_state = 0;
 			foreach ($r['result'] as $trigger) {
 				if ((int) $trigger['value'] !== TRIGGER_VALUE_TRUE) {
-					return false;
+					$wrong_value++;
 				}
 				if ((int) $trigger['state'] !== TRIGGER_STATE_NORMAL) {
-					return false;
+					$wrong_state++;
 				}
+			}
+			if ($wrong_value > 0 || $wrong_state > 0) {
+				$fired = self::$total_trigger_expected - $wrong_value;
+				$elapsed = self::WAIT_ITERATIONS * self::WAIT_ITERATION_DELAY;
+				$tps = round($fired / $elapsed, 1);
+				return $wrong_value.' triggers did not change value, '.$wrong_state.' triggers in wrong state'
+					.'; trigger processing rate too low: '.$tps.' triggers/sec'
+					.' (waited '.self::WAIT_ITERATIONS.'x'.self::WAIT_ITERATION_DELAY.'s = '.$elapsed.'s)';
 			}
 			return true;
 		});
