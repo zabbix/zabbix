@@ -22,7 +22,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * @required-components server
  * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
- * @backup hosts,items,item_rtdata,triggers,actions,operations,graphs
+ * @onAfter clearData
  *
  */
 class testFunctions extends CIntegrationTest{
@@ -31,7 +31,8 @@ class testFunctions extends CIntegrationTest{
 	const LASTCLOCK = 1762430060;
 	const FIRSTCLOCK = 1762430300;
 
-	private $hostid;
+	private static $hostid;
+	private static $templateid;
 	private $timeOffset = 0;
 
 	/**
@@ -125,7 +126,7 @@ class testFunctions extends CIntegrationTest{
 		]);
 
 		$this->assertCount(1, $response['result']);
-		$templateid = $response['result'][0]['templateid'];
+		self::$templateid = $response['result'][0]['templateid'];
 
 		$response = $this->call('host.create', [
 			'host' => self::HOSTNAME_MAIN,
@@ -134,23 +135,23 @@ class testFunctions extends CIntegrationTest{
 				['groupid' => 4]
 			],
 			'templates' => [
-				'templateid' => $templateid
+				'templateid' => self::$templateid
 			]
 		]);
 
 		$this->assertCount(1, $response['result']['hostids']);
-		$this->hostid = $response['result']['hostids'][0];
+		self::$hostid = $response['result']['hostids'][0];
 
 		$this->getTimeOffset('values1');
 
 		$this->call('usermacro.create', [
 			[
-				'hostid' => $this->hostid,
+				'hostid' => self::$hostid,
 				'macro' => '{$FIRSTCLOCK}',
 				'value' => (string)(self::FIRSTCLOCK + $this->timeOffset)
 			],
 			[
-				'hostid' => $this->hostid,
+				'hostid' => self::$hostid,
 				'macro' => '{$LASTCLOCK}',
 				'value' => (string)(self::LASTCLOCK + $this->timeOffset)
 			]
@@ -226,7 +227,7 @@ class testFunctions extends CIntegrationTest{
 		$this->callUntilDataIsPresent('trigger.get', [
 			'output' => ['description', 'state', 'value', 'error'],
 			'selectFunctions' => 'extend',
-			'hostids' => $this->hostid
+			'hostids' => self::$hostid
 		], null, null, function($response) {
 			return $this->assertStep1TriggerExpectations($response);
 		});
@@ -322,7 +323,7 @@ class testFunctions extends CIntegrationTest{
 		$this->callUntilDataIsPresent('trigger.get', [
 			'output' => ['description', 'state', 'value', 'error'],
 			'selectFunctions' => 'extend',
-			'hostids' => $this->hostid
+			'hostids' => self::$hostid
 		], null, null, function($response) {
 			return $this->assertStep2TriggerExpectations($response);
 		});
@@ -418,7 +419,7 @@ class testFunctions extends CIntegrationTest{
 		$this->callUntilDataIsPresent('trigger.get', [
 			'output' => ['description', 'state', 'value', 'error'],
 			'selectFunctions' => 'extend',
-			'hostids' => $this->hostid
+			'hostids' => self::$hostid
 		], null, null, function($response) {
 			return $this->assertStep3TriggerExpectations($response);
 		});
@@ -529,5 +530,18 @@ class testFunctions extends CIntegrationTest{
 	 */
 	public function testFunctions_Step3() {
 		$this->processStep3();
+	}
+
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 * @depends testFunctions_Step3
+	 */
+	public function testFunctions_Step4_clearData() {
+		self::clearData();
+	}
+
+	public static function clearData(): void {
+		CDataHelper::call('host.delete', [self::$hostid]);
+		CDataHelper::call('template.delete', [self::$templateid]);
 	}
 }
