@@ -20,6 +20,7 @@ require_once dirname(__FILE__) . '/../include/CIntegrationTest.php';
  * Test suite for LLD.
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @backup hosts,items,item_rtdata,triggers,actions,operations,graphs
  *
@@ -508,14 +509,25 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	/**
-	 * @required-components server
 	 * @configurationDataProvider serverConfigurationProvider
 	 */
-	public function testFunctions_testAllFunctions() {
-		$this->reloadConfigurationCache(self::COMPONENT_SERVER);
-
+	public function testFunctions_Step1() {
 		$this->processStep1();
+	}
+
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 * @depends testFunctions_Step1
+	 */
+	public function testFunctions_Step2() {
 		$this->processStep2();
+	}
+
+	/**
+	 * @configurationDataProvider serverConfigurationProvider
+	 * @depends testFunctions_Step2
+	 */
+	public function testFunctions_Step3() {
 		$this->processStep3();
 	}
 }
