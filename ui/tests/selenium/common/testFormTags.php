@@ -688,7 +688,7 @@ class testFormTags extends CWebTest {
 			if ($object === 'host' || $object === 'template') {
 				$this->query('button:Reset')->one()->click();
 			}
-			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
+			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->scrollIntoView(50)->click();
 		}
 
 		switch ($object) {
@@ -1001,9 +1001,10 @@ class testFormTags extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Reset')->one()->click();
 		$form = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$form->fill(['Name' => $new_name]);
 		$this->query('button:Apply')->one()->waitUntilClickable()->click();
+		$table->waitUntilReady()->invalidate();
 
 		switch ($object) {
 			case 'trigger':
@@ -1025,7 +1026,7 @@ class testFormTags extends CWebTest {
 				break;
 		}
 
-		$table->waitUntilReloaded()->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
+		$table->findRow('Name', $new_name)->getColumn($column)->query('link', $column)->one()->click();
 
 		switch ($object) {
 			case 'trigger':
@@ -1100,7 +1101,7 @@ class testFormTags extends CWebTest {
 			$filter = $this->query('name:zbx_filter')->asForm()->waitUntilReady()->one();
 			$filter->fill(['Name' => $parent]);
 			$this->query('button:Apply')->one()->waitUntilClickable()->click();
-			$this->query('xpath://table[@class="list-table"]')->asTable()->one()->findRow('Name', $parent)
+			$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady()->findRow('Name', $parent)
 					->getColumn(ucfirst($object).'s')->query('link', ucfirst($object).'s')->one()->click();
 
 			$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();

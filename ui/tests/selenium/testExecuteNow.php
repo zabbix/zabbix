@@ -15,7 +15,7 @@
 
 require_once __DIR__.'/../include/CWebTest.php';
 require_once __DIR__.'/behaviors/CMessageBehavior.php';
-require_once __DIR__.'/behaviors/CTableBehavior.php';
+require_once __DIR__.'/behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../include/helpers/CDataHelper.php';
 
 /**
@@ -26,14 +26,14 @@ require_once __DIR__.'/../include/helpers/CDataHelper.php';
 class testExecuteNow extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CDatatableBehavior::class
 		];
 	}
 
@@ -184,11 +184,15 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_LatestDataPage($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->one();
+		$table = $this->getDatatable();
+		$headers = $table->getHeaders();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$headers->waitUntilStalled();
+
+		$table->waitUntilReady()->invalidate();
 		$this->selectItemsAndExecuteNow($data, $table);
 	}
 
@@ -249,11 +253,11 @@ class testExecuteNow extends CWebTest {
 	public function testExecuteNow_ContextMenu($data) {
 		// Login and select host group for testing.
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
-		$table = $this->query('xpath://table['.CXPathHelper::fromClass('list-table fixed').']')->asTable()->waitUntilVisible()->one();
 		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
 		$filter_form->fill(['Host groups' => 'HG-for-executenow']);
 		$filter_form->submit();
-		$table->waitUntilReloaded();
+		$this->page->waitUntilReady();
+		$this->query('id:latest')->asDatatable()->one()->waitUntilReady();
 
 		$this->query('link', $data['item'])->waitUntilClickable()->one()->click();
 		$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
@@ -603,7 +607,7 @@ class testExecuteNow extends CWebTest {
 	 * @param CElement $table		table element
 	 */
 	private function selectItemsAndExecuteNow($data, $table) {
-		$selected_count = $this->query('id:selected_count')->one();
+		$selected_count = $this->query('class:selected-item-count')->one();
 
 		$table->findRows('Name', $data['items'])->select();
 		$this->assertSelectedCount(count($data['items']));

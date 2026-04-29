@@ -185,8 +185,7 @@ class testExpandExpressionMacros extends CWebTest {
 	public function testExpandExpressionMacros_Graph($data) {
 		$this->page->login()->open('zabbix.php?action=host.view&groupids%5B%5D='.self::$data['hostgroupid'])
 				->waitUntilReady();
-		$table = $this->query('xpath://form[@name="host_view"]/table[@class="list-table"]')->asTable()
-				->waitUntilReady()->one();
+		$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 		$table->findRow('Name', $data['host_name'])->getColumn('Graphs')->query('tag:a')->one()->click();
 		$this->page->waitUntilReady();
 		$this->waitUntilGraphIsLoaded();

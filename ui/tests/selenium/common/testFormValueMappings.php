@@ -16,7 +16,7 @@
 
 require_once __DIR__.'/../../include/CWebTest.php';
 require_once __DIR__.'/../behaviors/CMessageBehavior.php';
-require_once __DIR__.'/../behaviors/CTableBehavior.php';
+require_once __DIR__.'/../behaviors/CDatatableBehavior.php';
 require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 
 /**
@@ -27,14 +27,14 @@ require_once __DIR__.'/../../include/helpers/CDataHelper.php';
 class testFormValueMappings extends CWebTest {
 
 	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
+	 * Attach MessageBehavior and DatatableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
 			CMessageBehavior::class,
-			CTableBehavior::class
+			CDatatableBehavior::class
 		];
 	}
 
@@ -1016,7 +1016,8 @@ class testFormValueMappings extends CWebTest {
 		$name = CDBHelper::getValue('SELECT host FROM hosts WHERE hostid='.zbx_dbstr($sourceid));
 
 		$this->page->open('zabbix.php?action='.$source.'.list&filter_name='.$name.'&filter_set=1')->waitUntilReady();
-		$this->query('link', $name)->one()->click();
+		$this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
+		$this->query('link', $name)->one()->scrollIntoView(50)->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
 
 		if ($open_tab) {
@@ -1191,7 +1192,7 @@ class testFormValueMappings extends CWebTest {
 	 */
 	public function checkMassValuemappingScreenshot($source) {
 		$this->page->login()->open(($source === 'hosts') ? 'zabbix.php?action=host.list' : 'zabbix.php?action=template.list')->waitUntilReady();
-		$this->selectTableRows();
+		$this->selectDatatableRows();
 		$this->query('button:Mass update')->one()->click();
 		$update_form = COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 		$update_form->selectTab('Value mapping');

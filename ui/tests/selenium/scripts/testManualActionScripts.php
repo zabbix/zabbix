@@ -2233,16 +2233,15 @@ class testManualActionScripts extends CWebTest {
 
 			if ($content === 'Latest data') {
 				CFilterElement::find()->one()->waitUntilVisible()->getForm()->fill(['Hosts' => $data[$scope]]);
-				$table = $this->query('xpath://table[contains(@class, "list-table fixed")]')->asTable()->one();
-				$this->query('button:Apply')->one()->click();
+				$this->query('button:Apply')->one()->waitUntilClickable()->click();
 				$this->page->waitUntilReady();
-				$table->waitUntilReloaded();
+				$table = $this->query('id:latest')->asDatatable()->one()->waitUntilReady();
 			}
 			elseif ($content === 'Global view') {
 				$table = CDashboardElement::find()->one()->getWidget('Current problems');
 			}
 			else {
-				$table = $this->query('class:list-table')->asTable()->waitUntilVisible()->one();
+				$table = $this->query('class:datatable-scrollable')->asDatatable()->one()->waitUntilReady();
 			}
 
 			$table->query('link', $data[$scope])->one()->click();
@@ -2297,7 +2296,7 @@ class testManualActionScripts extends CWebTest {
 					$this->query('button:Ok')->waitUntilVisible()->one();
 					$output_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 					$this->assertEquals($data['fields']['Name'], $output_dialog->getTitle());
-
+sleep(15);
 					// Check that Zabbix server is down and return error message.
 					$error = "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
 						"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
