@@ -30,6 +30,7 @@ declare -A BASELINE_TIMES=(
   [testEventsCauseAndSymptoms]=44
   [testTimescaleDb]=44
   [testHistoryValueDuplicates]=43
+  [testHistoryGet]=40
   [testDiagnosticDataTask]=38
   [testSnmpTrapsInHa]=37
   [testInitialConfSync]=34
@@ -52,7 +53,5 @@ declare -A BASELINE_TIMES=(
   [testAutoregistration]=10
   [testUserMacrosWithContext]=10
   [testGraphLinking]=8
-  [testFunctions]=60
-  [testHistoryGet]=40
-
+  [testFunctions]=3
 )
