@@ -279,8 +279,8 @@ const ZBX_TEXTAREA_COLOR_WIDTH = 96;
 
 				addToOverlaysStack('color_picker', target, 'color_picker');
 
-				Overlay.prototype.recoverFocus.call({'$dialogue': overlay});
-				Overlay.prototype.containFocus.call({'$dialogue': overlay});
+				Focuser.recoverFocus(overlay[0]);
+				Focuser.containFocus(overlay[0]);
 			},
 			/**
 			 * Set color as background color value of colorbox and as value for input.

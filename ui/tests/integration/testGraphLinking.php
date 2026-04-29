@@ -124,7 +124,7 @@ class testGraphLinking extends CIntegrationTest {
 		{
 			array_push(self::$stringids, $z);
 			array_push(self::$colors, dechex(16 + $i));
-			$z++;
+			$z = PHP_VERSION_ID >= 80300 ? str_increment($z) : ++$z;
 		}
 		sort(self::$stringids);
 

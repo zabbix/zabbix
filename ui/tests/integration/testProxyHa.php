@@ -716,7 +716,8 @@ HEREDOC;
 			'history' => ITEM_VALUE_TYPE_UINT64,
 			'itemids' => [$itemid]
 		], 60, 2);
-		$this->assertCount(2, $response['result']);
+
+		$this->assertCount(2, $response['result'], json_encode($response['result']));
 
 		return true;
 	}
