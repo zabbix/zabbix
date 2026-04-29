@@ -553,7 +553,7 @@ function isEventRecentlySuppressed(array $acknowledges, &$suppression_action = n
  * @param array $acknowledges  Array of acknowledges.
  *
  * $acknowledges = [[
- *     'action' => (int)  Action that was performed by problem update.
+ *     'action' => (string)  Action that was performed by problem update.
  * ]]
  *
  * @param array $unsuppression_action  [OUT] Variable to store unsuppression action data.

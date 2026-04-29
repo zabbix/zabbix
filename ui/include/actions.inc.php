@@ -1146,7 +1146,7 @@ function getEventsActionsIconsData(array $events, array $triggers): array {
  * ]]
  *
  * $events[]['acknowledges'] = [[
- *     'action' =>         (int)     Action that was performed by problem update.
+ *     'action' =>         (string)  Action that was performed by problem update.
  *     'message' =>        (string)  Message text.
  *     'clock' =>          (string)  Time when message was added.
  *     'userid' =>         (string)  Author's user ID.
@@ -1206,7 +1206,7 @@ function getEventsSuppressions(array $events): array {
  * ]]
  *
  * $events[]['acknowledges'] = [[
- *     'action' =>  (int)     Action that was performed by problem update.
+ *     'action' =>  (string)  Action that was performed by problem update.
  *     'message' => (string)  Message text.
  *     'clock' =>   (string)  Time when message was added.
  *     'userid' =>  (string)  Author's user ID.
@@ -1259,7 +1259,7 @@ function getEventsMessages(array $events): array {
  * ]]
  *
  * $events[]['acknowledges'] = [[
- *     'action' =>       (int)     Action that was performed by problem update.
+ *     'action' =>       (string)  Action that was performed by problem update.
  *     'clock' =>        (string)  Time when severity was changed.
  *     'old_severity' => (string)  Severity before the change.
  *     'new_severity' => (string)  Severity after the change.
@@ -1478,8 +1478,8 @@ function getEventDetailsActions(array $event): array {
  * $alerts = [[
  *     'eventid' =>     (string)  ID of problem event for which this alert was generated.
  *     'mediatypeid' => (string)  ID for mediatype used for alert.
- *     'alerttype' =>   (int)     Type of alert.
- *     'status' =>      (int)     Alert status.
+ *     'alerttype' =>   (string)  Type of alert.
+ *     'status' =>      (string)  Alert status.
  *     'userid' =>      (string)  ID of alert recipient.
  * ]]
  *
@@ -1832,9 +1832,9 @@ function makeEventSeverityChangesIcon(array $data, array $users): ?CButtonIcon {
  *     'action_type' => (int)     Type of action table entry (ZBX_EVENT_HISTORY_*).
  *     'clock' =>       (string)  Time when action was performed.
  *     'message' =>     (string)  Message sent by alert, or written by manual update, or remote command text.
- *     'action' =>      (int)     Flag with problem update operation performed (only for
+ *     'action' =>      (string)  Flag with problem update operation performed (only for
  *                                ZBX_EVENT_HISTORY_MANUAL_UPDATE).
- *     'alerttype' =>   (int)     Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'alerttype' =>   (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  *     'mediatypeid' => (string)  ID for mediatype where alert message was sent (only for ZBX_EVENT_HISTORY_ALERT).
  *     'error' =>       (string)  Error message in case of failed alert (only for ZBX_EVENT_HISTORY_ALERT).
  * ]]
@@ -1945,7 +1945,7 @@ function makeEventActionsIcon(array $data, string $eventid): ?CButtonIcon {
  *     'action_type' =>   (int)     Type of action table entry (ZBX_EVENT_HISTORY_*).
  *     'clock' =>         (string)  Time, when action was performed.
  *     'message' =>       (string)  Message sent by alert, or written by manual update, or remote command text.
- *     'alerttype' =>     (int)     Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'alerttype' =>     (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  *     'esc_step' =>      (string)  Alert escalation step (only for ZBX_EVENT_HISTORY_ALERT).
  *     'subject' =>       (string)  Message alert subject (only for ZBX_EVENT_HISTORY_ALERT).
  *     'p_eventid' =>     (string)  Problem eventid that was reason for alert (only for ZBX_EVENT_HISTORY_ALERT).
@@ -2072,7 +2072,7 @@ function makeEventHistoryTable(array $actions, array $users, array $maintenances
  *
  * $action = [
  *     'action_type' => (int)     Type of event table action (ZBX_EVENT_HISTORY_*).
- *     'alerttype' =>   (int)     Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'alerttype' =>   (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  *     'userid' =>      (string)  ID of message author or alert receiver.
  * ]
  *
@@ -2099,7 +2099,7 @@ function makeActionTableUser(array $action, array $users): string {
  *
  * $action = [
  *     'action_type' => (int)     Type of event table action (ZBX_EVENT_HISTORY_*).
- *     'alerttype' =>   (int)     Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'alerttype' =>   (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  *     'userid' =>      (string)  ID of message author or alert receiver.
  *     'sendto' =>      (string)  Receiver media address for automatic action (only for ZBX_EVENT_HISTORY_ALERT and
  *                                ALERT_TYPE_MESSAGE).
@@ -2132,14 +2132,14 @@ function makeEventDetailsTableUser(array $action, array $users) {
  *
  * $action = [
  *     'action_type' =>    (int)     Type of action table entry (ZBX_EVENT_HISTORY_*).
- *     'action' =>         (int)     Flag with problem update operation performed (only for
+ *     'action' =>         (string)  Flag with problem update operation performed (only for
  *                                   ZBX_EVENT_HISTORY_MANUAL_UPDATE).
- *     'old_severity' =>   (int)     Severity before problem update (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE).
- *     'new_severity' =>   (int)     Severity after problem update (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE).
- *     'alerttype' =>      (int)     Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'old_severity' =>   (string)  Severity before problem update (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE).
+ *     'new_severity' =>   (string)  Severity after problem update (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE).
+ *     'alerttype' =>      (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  *     'suppress_until' => (string)  Time until suppression (only for ZBX_EVENT_HISTORY_MANUAL_UPDATE and
  *                                   ZBX_EVENT_HISTORY_MAINTENANCE).
- *     'status' =>         (int)     Alert status (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'status' =>         (string)  Alert status (only for ZBX_EVENT_HISTORY_ALERT).
  * ]
  *
  * @param array $maintenances  Maintenance data.
@@ -2272,9 +2272,9 @@ function makeActionTableIcon(array $action, array $maintenances): ?CTag {
  * @param array $action  Array with action data.
  *
  * $action = [
- *     'action_type' => (int)  Type of event table action (ZBX_EVENT_HISTORY_*).
- *     'status' =>      (int)  Alert status (only for ZBX_EVENT_HISTORY_ALERT).
- *     'alerttype' =>   (int)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'action_type' => (int)     Type of event table action (ZBX_EVENT_HISTORY_*).
+ *     'status' =>      (string)  Alert status (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'alerttype' =>   (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  * ]
  *
  * @return CSpan|string
@@ -2314,10 +2314,10 @@ function makeActionTableStatus(array $action) {
  *
  * $action = [
  *     'action_type' => (int)     Type of event table action (ZBX_EVENT_HISTORY_*).
- *     'status' =>      (int)     Alert status (only for ZBX_EVENT_HISTORY_ALERT).
- *     'alerttype' =>   (int)     Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'status' =>      (string)  Alert status (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'alerttype' =>   (string)  Type of alert (only for ZBX_EVENT_HISTORY_ALERT).
  *     'mediatypeid' => (string)  ID for mediatype where alert message was sent (only for ZBX_EVENT_HISTORY_ALERT).
- *     'retries' =>     (int)     Number of retries done for pending alert message (only for ZBX_EVENT_HISTORY_ALERT).
+ *     'retries' =>     (string)  Number of retries done for pending alert message (only for ZBX_EVENT_HISTORY_ALERT).
  *     'error' =>       (string)  Error message if alert failed (only for ZBX_EVENT_HISTORY_ALERT).
  * ]
  *
@@ -2325,7 +2325,7 @@ function makeActionTableStatus(array $action) {
  *
  * $mediatypes = [
  *     <mediatypeid> => [
- *         'maxattempts' => (int)  Maximum attempts for this mediatype.
+ *         'maxattempts' => (string)  Maximum attempts for this mediatype.
  *     ]
  * ]
  *
