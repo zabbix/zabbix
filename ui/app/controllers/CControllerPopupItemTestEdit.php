@@ -216,16 +216,10 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		// Get item and host properties and values from cache.
 		$data = $this->getInput('data', []);
 		if (array_key_exists('macros', $data)) {
-			// TODO: remove temporary fix so auto tests work
-			if (is_array($data['macros'])) {
-				$data['macros'] = array_combine(
-					array_column($data['macros'], 'name'),
-					array_column($data['macros'], 'value')
-				);
-			}
-			else {
-				$data['macros'] = json_decode($data['macros'], true);
-			}
+			$data['macros'] = array_combine(
+				array_column($data['macros'], 'name'),
+				array_column($data['macros'], 'value')
+			);
 		}
 
 		$inputs = $this->getItemTestProperties($this->getInputAll());

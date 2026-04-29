@@ -27,7 +27,8 @@ $form = (new CForm())
 	->addVar('interfaceid', $data['interfaceid'])
 	->addVar('valuemapid', $data['valuemapid'])
 	->addVar('test_type', $data['test_type'])
-	->addVar('show_final_result', $data['show_final_result']);
+	->addVar('show_final_result', $data['show_final_result'])
+	->addStyle('display: none;');
 
 if ($data['show_prev']) {
 	$form
