@@ -1,13 +1,13 @@
 diff --git a/src/libs/zbxhistory/history_elastic.c b/src/libs/zbxhistory/history_elastic.c
-index 0d2a9105a59..b4b35f5d0ef 100644
+index 763785e870a..8f8bb83ab4a 100644
 --- a/src/libs/zbxhistory/history_elastic.c
 +++ b/src/libs/zbxhistory/history_elastic.c
-@@ -35,7 +35,7 @@
- #define		ZBX_IDX_JSON_ALLOCATE		256
+@@ -36,7 +36,7 @@
  #define		ZBX_JSON_ALLOCATE		2048
  
--const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
-+const char	*value_type_str[] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text"};
+ /* bin is not used for elastic, but is needed for mapping consistency */
+-const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text", "bin", "json"};
++const char	*value_type_str[] = {"{DBNAME}_dbl", "{DBNAME}_str", "{DBNAME}_log", "{DBNAME}_uint", "{DBNAME}_text", "{DBNAME}_bin", "{DBNAME}_json"};
  
  static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
  
