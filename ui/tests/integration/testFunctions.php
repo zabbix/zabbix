@@ -33,7 +33,7 @@ class testFunctions extends CIntegrationTest{
 
 	private static $hostid;
 	private static $templateid;
-	private $timeOffset = 0;
+	private static $timeOffset = 0;
 
 	/**
 	 *
@@ -148,12 +148,12 @@ class testFunctions extends CIntegrationTest{
 			[
 				'hostid' => self::$hostid,
 				'macro' => '{$FIRSTCLOCK}',
-				'value' => (string)(self::FIRSTCLOCK + $this->timeOffset)
+				'value' => (string)(self::FIRSTCLOCK + self::$timeOffset)
 			],
 			[
 				'hostid' => self::$hostid,
 				'macro' => '{$LASTCLOCK}',
-				'value' => (string)(self::LASTCLOCK + $this->timeOffset)
+				'value' => (string)(self::LASTCLOCK + self::$timeOffset)
 			]
 		]);
 	}
@@ -183,7 +183,7 @@ class testFunctions extends CIntegrationTest{
 		$currentTime = time();
 		$timeDiff = $currentTime - $maxClock;
 		$daysToAdd = floor($timeDiff / 86400);
-		$this->timeOffset = $daysToAdd * 86400;
+		self::$timeOffset = $daysToAdd * 86400;
 	}
 
 	private function getSenderData($filename) {
@@ -210,7 +210,7 @@ class testFunctions extends CIntegrationTest{
 		}
 
 		foreach ($data as &$value) {
-			$value['clock'] += $this->timeOffset;
+			$value['clock'] += self::$timeOffset;
 		}
 
 		return $data;
