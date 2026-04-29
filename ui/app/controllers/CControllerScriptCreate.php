@@ -169,6 +169,7 @@ class CControllerScriptCreate extends CController {
 				]
 			],
 			'dropdown_options' => ['db scripts.manualinput_validator', 'required', 'not_empty',
+				'use' => [CUniqueValuesValidator::class],
 				'when' => [
 					['scope', 'in' => [ZBX_SCRIPT_SCOPE_HOST, ZBX_SCRIPT_SCOPE_EVENT]],
 					['manualinput', 'in' => [ZBX_SCRIPT_MANUALINPUT_ENABLED]],
