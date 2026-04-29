@@ -36,7 +36,7 @@ class CControllerUserDeviceInit extends CController {
 			$response = $form_errors
 				? ['form_errors' => $form_errors]
 				: ['error' => [
-					'title' => _('Cannot link a device'),
+					'title' => _('Cannot add a device'),
 					'messages' => array_column(get_and_clear_messages(), 'message')
 				]];
 
@@ -109,7 +109,7 @@ class CControllerUserDeviceInit extends CController {
 		}
 		else {
 			$output['error'] = [
-				'title' => _('Cannot link a device'),
+				'title' => _('Cannot add a device'),
 				'messages' => array_column(get_and_clear_messages(), 'message')
 			];
 		}

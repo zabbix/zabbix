@@ -70,10 +70,10 @@ $form->addItem(
 		->addStyle('display: none')
 );
 
-$title = _('Select user to link a device');
+$title = _('Select user to add a device');
 $buttons = [
 	[
-		'title' => _('Link device'),
+		'title' => _('Add device'),
 		'class' => 'js-submit',
 		'keepOpen' => true,
 		'isSubmit' => true
