@@ -102,18 +102,20 @@ $html_page
 
 (new CScriptTag('
 	view.init('.json_encode([
-		'layout_mode' => $web_layout_mode,
-		'filter_options' => $data['filter_options'],
-		'refresh_interval' => $data['refresh_interval'],
-		'filter_defaults' => $data['filter_defaults'],
-		'page' => $data['page'],
+		'csrf_token' => $csrf_token,
+		'default_sort_field' => $data['default_sort_field'],
+		'default_sort_order' => $data['default_sort_order'],
 		'filter' => $data['filter'],
-		'sort_field' => $data['sort'],
-		'sort_order' => $data['sortorder'],
-		'storage_idx' => $data['storage_idx'],
-		'user_configs' => $data['user_configs'],
+		'filter_defaults' => $data['filter_defaults'],
+		'filter_options' => $data['filter_options'],
+		'layout_mode' => $web_layout_mode,
+		'page' => $data['page'],
+		'refresh_interval' => $data['refresh_interval'],
 		'severities' => $data['severities'],
-		'csrf_token' => $csrf_token
+		'sort_field' => $data['sort_field'],
+		'sort_order' => $data['sort_order'],
+		'storage_idx' => $data['storage_idx'],
+		'user_configs' => $data['user_configs']
 	]).');
 '))
 	->setOnDocumentReady()

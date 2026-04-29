@@ -32,18 +32,20 @@
 		#csrf_token = null;
 
 		init({
-			layout_mode,
-			filter_options,
-			refresh_interval,
-			filter_defaults,
-			page,
+			csrf_token,
+			default_sort_field,
+			default_sort_order,
 			filter,
+			filter_defaults,
+			filter_options,
+			layout_mode,
+			page,
+			refresh_interval,
+			severities,
 			sort_field,
 			sort_order,
 			storage_idx,
-			user_configs,
-			severities,
-			csrf_token
+			user_configs
 		}) {
 			this.#layout_mode = layout_mode;
 			this.#refresh_interval = refresh_interval;
@@ -51,7 +53,8 @@
 			this.#csrf_token = csrf_token;
 
 			this.#initFilter(filter_options);
-			this.#initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities});
+			this.#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order,
+				storage_idx, user_configs, severities});
 
 			$.subscribe('event.rank_change', () => this.#refresh());
 
@@ -79,7 +82,9 @@
 			jqBlink.blink();
 		}
 
-		#initDataTable({page, filter, sort_field, sort_order, storage_idx, user_configs, severities}) {
+		#initDataTable({page, filter, default_sort_field, default_sort_order, sort_field, sort_order, storage_idx,
+				user_configs, severities}) {
+
 			const data_provider_url = new URL('zabbix.php', location.href);
 			data_provider_url.searchParams.set('action', 'problem.view.data');
 			data_provider_url.searchParams.set(CSRF_TOKEN_NAME, this.#csrf_token);
@@ -178,6 +183,8 @@
 				.setTabFilterItem(this.#active_filter)
 				.setSelectable('problem', 'eventids', ['eventid', 'nested', 'symptom_count', 'cause_eventid',
 					'severity'])
+				.setDefaultSortField(default_sort_field)
+				.setDefaultSortOrder(default_sort_order)
 				.setSortField(sort_field)
 				.setSortOrder(sort_order)
 				.setStorageIdx(storage_idx)
@@ -798,7 +805,7 @@
 					.setVisible(show_columns);
 			}
 
-			this.#datatable.updateUserConfig()
+			this.#datatable/*.updateUserConfig()*/
 				.setFilter(filter)
 				.dispatchEvent(CDataTable.EVENT_INIT, {
 					check_changes: false,

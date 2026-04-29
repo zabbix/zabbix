@@ -294,6 +294,10 @@ class CDataTable {
 
 	#pager = null;
 
+	#default_sort_field = null;
+
+	#default_sort_order = null;
+
 	#sort_field = null;
 
 	#sort_order = null;
@@ -424,9 +428,9 @@ class CDataTable {
 					header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER);
 
 					if (this.#sort_field === sort_field) {
-						sort_order = sort_order === 'ASC' ? 'DESC' : 'ASC';
+						sort_order = sort_order === ZBX_SORT_UP ? ZBX_SORT_DOWN : ZBX_SORT_UP;
 
-						icon.classList.add(sort_order === 'ASC' ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
+						icon.classList.add(sort_order === ZBX_SORT_UP ? ZBX_STYLE_ARROW_DOWN : ZBX_STYLE_ARROW_UP);
 						header_link.classList.add(CDataTable.ZBX_STYLE_LINK_HEADER_SORTED);
 					}
 
@@ -1047,6 +1051,26 @@ class CDataTable {
 		return this;
 	}
 
+	getDefaultSortField() {
+		return this.#default_sort_field;
+	}
+
+	setDefaultSortField(default_sort_field) {
+		this.#default_sort_field = default_sort_field;
+
+		return this;
+	}
+
+	getDefaultSortOrder() {
+		return this.#default_sort_order;
+	}
+
+	setDefaultSortOrder(default_sort_order) {
+		this.#default_sort_order = default_sort_order;
+
+		return this;
+	}
+
 	getSortField() {
 		return this.#sort_field;
 	}
@@ -1300,7 +1324,9 @@ class CDataTable {
 
 		this.#options_popup?.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
-		const force_load = this.#resetOptions();
+		const reset_options = this.#resetOptions();
+		const reset_sort = this.#resetSort();
+		const force_load = reset_options || reset_sort;
 
 		this.dispatchEvent(CDataTable.EVENT_INIT, {force_load, reset: true});
 		this.dispatchEvent(CDataTable.EVENT_SAVE);
@@ -1463,6 +1489,7 @@ class CDataTable {
 
 		this.#element.classList.add(ZBX_STYLE_LOADING);
 
+		this.dispatchEvent(CDataTable.EVENT_SAVE);
 		this.dispatchEvent(CDataTable.EVENT_INIT);
 	}
 
@@ -1724,6 +1751,8 @@ class CDataTable {
 		return {
 			columns: this.getColumnsInRange().map(column => column.diff()),
 			options,
+			sort_field: this.#sort_field,
+			sort_order: this.#sort_order
 		};
 	}
 
@@ -1944,6 +1973,17 @@ class CDataTable {
 		return force_load;
 	}
 
+	#resetSort() {
+		if (this.#sort_field != this.#default_sort_field || this.#sort_order != this.#default_sort_order) {
+			this.#sort_field = this.#default_sort_field;
+			this.#sort_order = this.#default_sort_order;
+
+			return true;
+		}
+
+		return false;
+	}
+
 	#setUserConfig(tabfilter_idx) {
 		if (!this.#customizable && !this.#resizable) {
 			return;
@@ -1954,6 +1994,14 @@ class CDataTable {
 		const user_config = this.#user_configs[tabfilter_idx];
 		if (!user_config) {
 			return this;
+		}
+
+		if (user_config.sort_field) {
+			this.#sort_field = user_config.sort_field;
+		}
+
+		if (user_config.sort_order) {
+			this.#sort_order = user_config.sort_order;
 		}
 
 		if (user_config.columns) {

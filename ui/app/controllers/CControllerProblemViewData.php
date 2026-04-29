@@ -20,6 +20,12 @@ class CControllerProblemViewData extends CControllerDataTable {
 		'recovery', 'status', 'info', 'host', 'description', 'duration', 'can_be_closed', 'actions', 'opdata', 'nested',
 		'symptom_count', 'cause_eventid', 'tags'];
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules(['sort_field' => 'string|in clock,host,severity,name']);
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS);
 	}
@@ -499,8 +505,8 @@ class CControllerProblemViewData extends CControllerDataTable {
 		$page = $this->getInput('page', 1);
 		$export = $this->getInput('export_file', '');
 
-		$sort_field = $this->getInput('sort_field', CControllerProblem::FILTER_FIELDS_DEFAULT['sort']);
-		$sort_order = $this->getInput('sort_order', CControllerProblem::FILTER_FIELDS_DEFAULT['sortorder']);
+		$sort_field = $this->getInput('sort_field', CControllerProblem::DEFAULT_SORT);
+		$sort_order = $this->getInput('sort_order', CControllerProblem::DEFAULT_SORTORDER);
 
 		$limit = (int) CSettingsHelper::get(CSettingsHelper::SEARCH_LIMIT);
 

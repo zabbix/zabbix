@@ -20,6 +20,12 @@ class CControllerTemplateListData extends CControllerDataTable {
 		'graphs', 'dashboards', 'discoveryRules', 'httpTests', 'vendor_name', 'vendor_version', 'parentTemplates',
 		'templates', 'tags'];
 
+	protected function init(): void {
+		parent::init();
+
+		$this->addValidationRules(['sort_field' => 'string|in name']);
+	}
+
 	protected function checkPermissions(): bool {
 		return $this->checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES);
 	}
@@ -28,8 +34,9 @@ class CControllerTemplateListData extends CControllerDataTable {
 		$data_fields = $this->getDataFields();
 		$filter = $this->getInput('filter', []);
 		$page = $this->getInput('page', 1);
-		$sort_field = $this->getInput('sort_field', 'name');
-		$sort_order = $this->getInput('sort_order', ZBX_SORT_UP);
+
+		$sort_field = $this->getInput('sort_field', CControllerTemplateList::DEFAULT_SORT);
+		$sort_order = $this->getInput('sort_order', CControllerTemplateList::DEFAULT_SORTORDER);
 
 		if ($filter['tags']) {
 			$filter['tags'] = array_filter($filter['tags'], static fn(array $tag) => $tag && $tag['tag'] != '');

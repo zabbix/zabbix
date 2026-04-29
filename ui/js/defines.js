@@ -24,6 +24,9 @@ const ZBX_PROPERTY_INHERITED = 0x01;
 const ZBX_PROPERTY_OWN = 0x02;
 const ZBX_PROPERTY_BOTH = 0x03;
 
+const ZBX_SORT_UP = 'ASC';
+const ZBX_SORT_DOWN = 'DESC';
+
 const ZBX_STYLE_LOADING = 'is-loading';
 
 const ZBX_STYLE_HIDDEN = 'hidden';

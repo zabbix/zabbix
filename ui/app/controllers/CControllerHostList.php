@@ -88,8 +88,10 @@ class CControllerHostList extends CController {
 
 		CArrayHelper::sort($filter['tags'], ['tag', 'value', 'operator']);
 
-		$sort_field = $this->getInput('sort', CProfile::get('web.hosts.sort', 'name'));
-		$sort_order = $this->getInput('sortorder', CProfile::get('web.hosts.sortorder', ZBX_SORT_UP));
+		$sort_field = $this->getInput('sort',
+			CProfile::get('web.hosts.sort', CControllerHost::DEFAULT_SORT));
+		$sort_order = $this->getInput('sortorder',
+			CProfile::get('web.hosts.sortorder', CControllerHost::DEFAULT_SORTORDER));
 
 		CProfile::update('web.hosts.sort', $sort_field, PROFILE_TYPE_STR);
 		CProfile::update('web.hosts.sortorder', $sort_order, PROFILE_TYPE_STR);
@@ -146,19 +148,21 @@ class CControllerHostList extends CController {
 
 		$data = [
 			'action' => $this->getAction(),
-			'page' => $page_num,
+			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
+			'csrf_token' => CCsrfTokenHelper::get('host'),
+			'default_sort_field' => CControllerHost::DEFAULT_SORT,
+			'default_sort_order' => CControllerHost::DEFAULT_SORTORDER,
 			'filter' => $filter,
+			'page' => $page_num,
 			'sort_field' => $sort_field,
 			'sort_order' => $sort_order,
+			'profileIdx' => 'web.hosts.filter',
 			'proxies_ms' => $proxies_ms,
 			'proxy_groups_ms' => $proxy_groups_ms,
-			'profileIdx' => 'web.hosts.filter',
-			'active_tab' => CProfile::get('web.hosts.filter.active', 1),
-			'uncheck' => ($this->getInput('uncheck', 0) == 1),
 			'storage_idx' => $storage_idx,
+			'uncheck' => ($this->getInput('uncheck', 0) == 1),
 			'user_configs' => array_map(static fn (string $user_config) => json_decode($user_config, true) ?? [],
-				CProfile::getArray($storage_idx, [])),
-			'csrf_token' => CCsrfTokenHelper::get('host')
+				CProfile::getArray($storage_idx, []))
 		];
 
 		$response = new CControllerResponseData($data);
