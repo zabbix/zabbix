@@ -390,7 +390,7 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 	{
 		struct zbx_json		json;
 		zbx_push_target_t	*t = targets.values[i];
-		zbx_push_alert_t	*alert;
+		zbx_push_alert_t	*push_alert;
 		char			*message_uuid7, *uuid7id;
 
 		zbx_json_init(&json, 1024);
@@ -459,13 +459,13 @@ void	get_build_push_params(const zbx_db_event *event, const zbx_db_event *r_even
 
 		zbx_json_close(&json);
 
-		alert = zbx_malloc(NULL, sizeof(zbx_push_alert_t));
-		alert->sendto = zbx_strdup(NULL, t->device_id);
-		alert->params = zbx_strdup(NULL, json.buffer);
-		alert->error = NULL;
-		alert->status = ALERT_STATUS_NEW;
+		push_alert = zbx_malloc(NULL, sizeof(zbx_push_alert_t));
+		push_alert->sendto = zbx_strdup(NULL, t->device_id);
+		push_alert->params = zbx_strdup(NULL, json.buffer);
+		push_alert->error = NULL;
+		push_alert->status = ALERT_STATUS_NEW;
 
-		zbx_vector_push_alert_append(alerts, alert);
+		zbx_vector_push_alert_append(alerts, push_alert);
 
 		zbx_free(message_uuid7);
 		zbx_free(uuid7id);
