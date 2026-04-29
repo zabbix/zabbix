@@ -407,7 +407,7 @@ class testFunctions extends CIntegrationTest{
 				$failures[] = "[2] State mismatch for trigger: $description: ".json_encode($trigger);
 			}
 			if ($expected['value'] != $trigger['value']) {
-				$failures[] = "[2] Value mismatch for trigger: $description";
+				$failures[] = "[2] Value mismatch for trigger: $description".json_encode($trigger);
 			}
 		}
 		return $failures === [] ? true : implode("\n", $failures);
