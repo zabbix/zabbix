@@ -428,8 +428,8 @@ void	zbx_this_should_never_happen_backtrace(void);
 do														\
 {														\
 	zbx_this_should_never_happen_backtrace();								\
-	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something unexpected has just "	\
-			"happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__);				\
+	zbx_error("ERROR [file and function: %s:%d,%s, revision:%s] Something unexpected has just"		\
+			" happened.", __FILE__, __LINE__, __func__, ZABBIX_REVISION);				\
 }														\
 while (0)
 
