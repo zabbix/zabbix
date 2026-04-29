@@ -1470,6 +1470,7 @@ class CDataTable {
 		const {column, handle} = e.detail;
 
 		if (this.#options_popup?.isOpen(handle)) {
+			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE);
 			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			return;
@@ -1545,6 +1546,7 @@ class CDataTable {
 		}
 
 		if (this.#options_popup?.isOpen(handle)) {
+			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_SAVE);
 			this.#options_popup.dispatchEvent(CDataTableOptionsPopup.EVENT_CLOSE);
 
 			return;
