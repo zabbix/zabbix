@@ -510,14 +510,12 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	/**
-	 * @configurationDataProvider serverConfigurationProvider
 	 */
 	public function testFunctions_Step1() {
 		$this->processStep1();
 	}
 
 	/**
-	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testFunctions_Step1
 	 */
 	public function testFunctions_Step2() {
@@ -525,7 +523,6 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	/**
-	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testFunctions_Step2
 	 */
 	public function testFunctions_Step3() {
@@ -533,7 +530,6 @@ class testFunctions extends CIntegrationTest{
 	}
 
 	/**
-	 * @configurationDataProvider serverConfigurationProvider
 	 * @depends testFunctions_Step3
 	 */
 	public function testFunctions_Step4_clearData() {
