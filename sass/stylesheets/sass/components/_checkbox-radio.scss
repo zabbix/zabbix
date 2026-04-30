@@ -51,7 +51,7 @@
 
 	&[type="checkbox"] {
 		& + label span {
-			border-radius: var(--input-border-radius);
+			border-radius: #{"max(0px, calc(var(--input-border-radius) - 2px))"};
 		}
 
 		&:checked + label span {

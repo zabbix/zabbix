@@ -128,11 +128,6 @@ z-select {
 	}
 
 	&.is-expanded {
-		.focusable {
-			border-bottom-left-radius: 0;
-			border-bottom-right-radius: 0;
-		}
-
 		> ul {
 			display: block;
 			position: fixed;

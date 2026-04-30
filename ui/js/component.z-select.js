@@ -318,6 +318,7 @@ class ZSelect extends HTMLElement {
 		this.classList.add('is-expanded');
 
 		const list_max_height = 362;
+		const list_offset = 2;
 		const offset_top = 4;
 		const offset_bottom = 38;
 		const list_height = Math.min(this._list.scrollHeight, list_max_height);
@@ -330,7 +331,7 @@ class ZSelect extends HTMLElement {
 
 		if (space_below - list_height > offset_bottom || space_below > space_above) {
 			this._list.classList.remove('fall-upwards');
-			this._list.style.top = `${button_y + button_height}px`;
+			this._list.style.top = `${button_y + button_height + list_offset}px`;
 			this._list.style.bottom = '';
 
 			if (space_below < list_height) {
@@ -340,7 +341,7 @@ class ZSelect extends HTMLElement {
 		else {
 			this._list.classList.add('fall-upwards');
 			this._list.style.top = '';
-			this._list.style.bottom = `${document_height - button_y}px`;
+			this._list.style.bottom = `${document_height - button_y + list_offset}px`;
 
 			if (space_above < list_height) {
 				this._list.style.maxHeight = `${space_above - offset_top}px`;
