@@ -2049,7 +2049,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 				continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, event->clock);
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, event->ns);
@@ -2167,7 +2167,7 @@ void	zbx_export_events(int events_export_enabled, zbx_vector_connector_filter_t 
 				continue;
 		}
 
-		zbx_json_clean(&json);
+		zbx_json_reset(&json);
 
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_CLOCK, recovery->r_event->clock);
 		zbx_json_addint64(&json, ZBX_PROTO_TAG_NS, recovery->r_event->ns);
