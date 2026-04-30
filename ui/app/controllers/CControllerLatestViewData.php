@@ -158,7 +158,7 @@ class CControllerLatestViewData extends CControllerDataTable {
 						->addClass(ZBX_STYLE_CURSOR_POINTER)
 						->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 						->setHint(
-							(new CTrim($last_history['value'], ZBX_HINTBOX_CONTENT_LIMIT))
+							(new CTrim($last_history['value'], ZBX_HINTBOX_HTML_LIMIT))
 								->addClass(ZBX_STYLE_HINTBOX_RAW_DATA)
 								->addClass(ZBX_STYLE_HINTBOX_WRAP),
 							'', true, '', 0
