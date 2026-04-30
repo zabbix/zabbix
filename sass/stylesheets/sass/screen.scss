@@ -2513,6 +2513,10 @@ select {
 	background-color: $lighter-yellow;
 	border: 1px solid $ui-border-color;
 	@extend %webkit-scrollbar;
+
+	&.debug-output-table-refresh {
+		margin: 10px 0 0 0;
+	}
 }
 
 .overlay-descr {
