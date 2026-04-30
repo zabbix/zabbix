@@ -293,8 +293,7 @@ class testFormMaintenance extends CWebTest {
 		}
 	}
 
-	// one screenshot failing
-	public function testFormMaintenance_PeriodFormLayout() {
+	public function testFormMaintenance_CheckPeriodForm() {
 		$this->page->login()->open('zabbix.php?action=maintenance.list')->waitUntilReady();
 		$this->query('button:Create maintenance period')->one()->waitUntilClickable()->click();
 
@@ -342,25 +341,6 @@ class testFormMaintenance extends CWebTest {
 				}
 
 				$period_overlay->waitUntilReady();
-
-				// Check screenshots.
-				if ($mode === 'Create') {
-					$this->page->removeFocus();
-
-					// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
-					$dialog_footer = $dialog->getFooter();
-					foreach (['Add', 'Cancel'] as $button) {
-						$this->page->getDriver()->executeScript('arguments[0].style.borderRadius=0;',
-							[$dialog_footer->query('button', $button)->one()]
-						);
-					}
-
-					if ($period_type === 'One time only') {
-						$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()], $period_type);
-					} else {
-						$this->assertScreenshot($period_overlay, $period_type);
-					}
-				}
 
 				// Initialize expectations.
 				$ui_period_type = ($period_type === 'Monthly with Day of week period') ? 'Monthly' : $period_type;
@@ -475,7 +455,7 @@ class testFormMaintenance extends CWebTest {
 				}
 
 				// Check screenshots.
-				/*if ($mode === 'Create') {
+				if ($mode === 'Create') {
 					$this->page->removeFocus();
 
 					// Remove Add and Cancel buttons edge curling from screenshots as their rendering is unstable.
@@ -491,7 +471,7 @@ class testFormMaintenance extends CWebTest {
 					} else {
 						$this->assertScreenshot($period_overlay, $period_type);
 					}
-				}*/
+				}
 			}
 
 			// Check maintenance duration dropdown (hours and minutes) values.
