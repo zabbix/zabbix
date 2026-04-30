@@ -207,6 +207,10 @@ class testPageProblems extends CWebTest {
 			]);
 		}
 
+		$this->setDatatableStartingLayout();
+	}
+
+	protected function setDatatableStartingLayout() {
 		$layout = '{"columns":[{"id":"time","width":"171px"},{"id":"severity","width":"94px"},{"id":"recovery","width":"99px"},'.
 				'{"id":"status","width":"74px"},{"id":"info","width":"50px"},{"id":"host","resized":true,"width":"160px"},'.
 				'{"id":"problem","width":"127px"},{"id":"duration","width":"77px"},{"id":"update","width":"59px"},'.
@@ -231,7 +235,8 @@ class testPageProblems extends CWebTest {
 
 		$filter_form = $filter_tab->getForm();
 		$this->assertEquals(['Show', 'Host groups', 'Hosts', 'Triggers', 'Problem', 'Severity', 'Age less than',
-				'Host inventory', 'Tags', 'Show symptoms', 'Acknowledgement status'], $filter_form->getLabels()->asText()
+				'Host inventory', 'Tags', 'Show symptoms', 'Show suppressed problems', 'Acknowledgement status'],
+				$filter_form->getLabels()->asText()
 		);
 
 		// Check the layout of filters that are hiddent in datatable headers.
@@ -246,9 +251,6 @@ class testPageProblems extends CWebTest {
 					'value' => false
 				],
 				'Show trigger expression' => [
-					'value' => false
-				],
-				'Show suppressed' => [
 					'value' => false
 				]
 			],
@@ -290,6 +292,7 @@ class testPageProblems extends CWebTest {
 			'name:age_state' => ['value' => false],
 			'name:age' => ['value' => 14, 'enabled' => false],
 			'Show symptoms' => ['value' => false],
+			'Show suppressed problems' => ['value' => false],
 			'Acknowledgement status' => ['value' => 'All'],
 			'id:acknowledged_by_me_0' => ['value' => false, 'enabled' => false],
 			'name:inventory[0][field]' => ['value' => 'Type'],
@@ -503,8 +506,7 @@ class testPageProblems extends CWebTest {
 				'column' => [
 					'Problem' => [
 						'Show operational data' => true,
-						'Show trigger expression' => true,
-						'Show suppressed' => true
+						'Show trigger expression' => true
 					]
 				],
 				'elements_present' => [
@@ -517,11 +519,6 @@ class testPageProblems extends CWebTest {
 						'row' => 'Filled opdata with macros',
 						'column' => 'Problem',
 						'locator' => 'class:opdata'
-					],
-					[
-						'row' => 'Trigger_for_suppression',
-						'column' => 'Info',
-						'locator' => 'class:zi-eye-off'
 					]
 				]
 			],
@@ -529,8 +526,7 @@ class testPageProblems extends CWebTest {
 				'column' => [
 					'Problem' => [
 						'Show operational data' => false,
-						'Show trigger expression' => false,
-						'Show suppressed' => false
+						'Show trigger expression' => false
 					]
 				],
 				'elements_not_present' => [
@@ -543,9 +539,6 @@ class testPageProblems extends CWebTest {
 						'row' => 'Filled opdata with macros',
 						'column' => 'Problem',
 						'locator' => 'class:opdata'
-					],
-					[
-						'row' => 'Trigger_for_suppression'
 					]
 				]
 			],
@@ -627,33 +620,20 @@ class testPageProblems extends CWebTest {
 			]
 		];
 
-		// Cgange header filter and check in corresponding elements are show or not shown in datatable.
+		// Change header filter and check in corresponding elements are show or not shown in datatable.
 		foreach ($header_options as $options) {
 			$this->filterFromHeader($options['column']);
 			$table->waitUntilReady()->invalidate();
 
 			// Check that expected elements are shown in the speciffic datatable row and column.
-			if (array_key_exists('elements_present', $options)) {
-				foreach ($options['elements_present'] as $element) {
-					$expected_element = $table->findRow('Problem', $element['row'], true)->getColumn($element['column'])
-							->query($element['locator'])->one(false);
-					$this->assertTrue($expected_element->isValid(), 'Element with locator '.$element['locator'].' is missing.');
-				}
-			}
-
-			// Check that elements are not present in corresponding datatable row and column.
-			if (array_key_exists('elements_not_present', $options)) {
-				foreach ($options['elements_not_present'] as $element) {
-					if (array_key_exists('column', $element)) {
-						$unexpected_element = $table->findRow('Problem', $element['row'], true)->getColumn($element['column'])
+			foreach (['elements_present' => true, 'elements_not_present' => false] as $key => $expected_presence) {
+				if (array_key_exists($key, $options)) {
+					foreach ($options[$key] as $element) {
+						$expected_element = $table->findRow('Problem', $element['row'], true)->getColumn($element['column'])
 								->query($element['locator'])->one(false);
-						$this->assertFalse($unexpected_element->isValid(), 'Element with locator '.$element['locator'].
-								' should not be present.'
+						$this->assertEquals($expected_presence, $expected_element->isValid(), 'Element with locator '.
+								$element['locator'].' should '.($expected_presence ? '' : 'not ').'be present.'
 						);
-					}
-					else {
-						// For "Show suppressed" the whole row should not be present in the datatable.
-						$this->assertFalse($table->findRow('Problem', $element['row'], true)->isValid());
 					}
 				}
 			}
@@ -760,10 +740,8 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Triggers' => ['Trigger_for_suppression', '2_trigger_Information']
-					],
-					'header_filter' => [
-						'Problem' => ['Show suppressed' => true]
+						'Triggers' => ['Trigger_for_suppression', '2_trigger_Information'],
+						'Show suppressed problems' => true
 					],
 					'result' => [
 						[
@@ -1347,6 +1325,7 @@ class testPageProblems extends CWebTest {
 							['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc']
 						]
 					],
+					'change_layout' => true,
 					'result' => [
 						[
 							'' => '',
@@ -1365,9 +1344,9 @@ class testPageProblems extends CWebTest {
 					],
 					'check_tags' => [
 						'Tag' => 'Tag4',
-						'Ser: abc' => 'Service: abc',
 						'Dat' => 'Database',
-						'...' => "Database\nService: abc\nservice: abcdef\nTag4\nTag5: 5"
+						'Ser: abc' => 'Service: abc',
+						'...' => "Tag4\nDatabase\nService: abc\nservice: abcdef\nTag5: 5"
 					]
 				]
 			],
@@ -1538,12 +1517,8 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Hosts' => 'Host for suppression'
-					],
-					'header_filter' => [
-						'Problem' => [
-							'Show suppressed' => false
-						]
+						'Hosts' => 'Host for suppression',
+						'Show suppressed problems' => false
 					],
 					'result' => []
 				]
@@ -1552,12 +1527,8 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Hosts' => 'Host for suppression'
-					],
-					'header_filter' => [
-						'Problem' => [
-							'Show suppressed' => true
-						]
+						'Hosts' => 'Host for suppression',
+						'Show suppressed problems' => true
 					],
 					'result' => [
 						[
@@ -1890,17 +1861,23 @@ class testPageProblems extends CWebTest {
 		];
 	}
 
-	protected function removeSavedLayout() {
-		DBexecute('DELETE FROM profiles WHERE idx=\'web.monitoring.problem.datatable\'');
-	}
-
 	/**
 	 * @dataProvider getFilterData
 	 *
 	 * @onAfter removeSavedLayout
 	 */
 	public function testPageProblems_Filter($data) {
-		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+
+		/**
+		 * For cases with trigger expression display, the Problem column needs to have certain width, otherwise, Selenium
+		 * method getText() will not return the closing bracket in the expression as it is a separate element (because it
+		 * is formatted as bald) and it is not visible due to small width of the column.
+		 */
+		if (array_key_exists('change_layout', $data)) {
+			$this->setDatatableStartingLayout();
+		}
+
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
 		$form = CFilterElement::find()->one()->getForm();
 		$table = $this->query('id:problems')->asDatatable()->one()->waitUntilReady();
 
@@ -1925,6 +1902,7 @@ class testPageProblems extends CWebTest {
 		}
 
 		$form->submit();
+
 		$table->waitUntilReady()->invalidate();
 
 		// If required, update the list of columns in problems datatable.
@@ -2369,5 +2347,9 @@ class testPageProblems extends CWebTest {
 		$table->waitUntilRowsCount($start_rows_count);
 		$this->assertDatatableStats($start_rows_count);
 		$this->assertEquals($start_contents, $this->getDatatableColumnData('Problem'));
+	}
+
+	protected function removeSavedLayout() {
+		DBexecute('DELETE FROM profiles WHERE idx=\'web.monitoring.problem.datatable\'');
 	}
 }

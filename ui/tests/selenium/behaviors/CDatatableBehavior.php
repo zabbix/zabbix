@@ -21,42 +21,42 @@ require_once __DIR__.'/CTableBehavior.php';
  */
 class CDatatableBehavior extends CTableBehavior {
 
-//	/**
-//	 * Table column names.
-//	 *
-//	 * @var array
-//	 */
-//	protected $column_names = null;
-//
-//	/**
-//	 * Set names of columns.
-//	 *
-//	 * @param array $names column names
-//	 */
-//	public function setColumnNames($names) {
-//		$this->column_names = $names;
-//	}
-//
-//	/**
-//	 * Perform data array normalization.
-//	 *
-//	 * @param array $data
-//	 *
-//	 * @return array
-//	 */
-//	protected function normalizeData($data) {
-//		foreach ($data as &$values) {
-//			foreach ($values as &$value) {
-//				if (!is_array($value)) {
-//					$value = ['text' => $value];
-//				}
-//			}
-//			unset($value);
-//		}
-//		unset($values);
-//
-//		return $data;
-//	}
+	/**
+	 * Table column names.
+	 *
+	 * @var array
+	 */
+	protected $column_names = null;
+
+	/**
+	 * Set names of columns.
+	 *
+	 * @param array $names column names
+	 */
+	public function setColumnNames($names) {
+		$this->column_names = $names;
+	}
+
+	/**
+	 * Perform data array normalization.
+	 *
+	 * @param array $data
+	 *
+	 * @return array
+	 */
+	protected function normalizeData($data) {
+		foreach ($data as &$values) {
+			foreach ($values as &$value) {
+				if (!is_array($value)) {
+					$value = ['text' => $value];
+				}
+			}
+			unset($value);
+		}
+		unset($values);
+
+		return $data;
+	}
 
 	const COMMON_SELECTOR = 'class:datatable';
 
@@ -107,52 +107,52 @@ class CDatatableBehavior extends CTableBehavior {
 		}
 	}
 
-//	/**
-//	 * Check if values in table rows have data from data provider.
-//	 *
-//	 * @param array   $data        data array to be matched with result in table
-//	 * @param string  $selector    table selector
-//	 *
-//	 * @throws Exception
-//	 */
-//	public function assertTableHasData($data = [], $selector = null) {
-//		$table = $this->getTable($selector);
-//
-//		if (!$data) {
-//			// Check that table contains one row with text "No data found."
-//			$this->test->assertEquals(['No data found'], $table->getRows()->asText());
-//
-//			return;
-//		}
-//
-//		foreach ($data as $data_row) {
-//			$found = false;
-//			$current = null;
-//
-//			foreach ($table->index() as $table_row) {
-//				$match = true;
-//
-//				foreach ($data_row as $key => $value) {
-//					if (!isset($table_row[$key]) || $table_row[$key] != $data_row[$key]) {
-//						$current = json_encode($table_row);
-//						$match = false;
-//						break;
-//					}
-//				}
-//
-//				if ($match) {
-//					$found = true;
-//					break;
-//				}
-//			}
-//
-//			if (!$found) {
-//				throw new \Exception('Row ('.implode(', ', array_map(function ($value) {
-//					return '"'.$value.'"';
-//				}, $data_row)).') was not found in table. Table row is: '.$current);
-//			}
-//		}
-//	}
+	/**
+	 * Check if values in table rows have data from data provider.
+	 *
+	 * @param array   $data        data array to be matched with result in table
+	 * @param string  $selector    table selector
+	 *
+	 * @throws Exception
+	 */
+	public function assertTableHasData($data = [], $selector = null) {
+		$table = $this->getTable($selector);
+
+		if (!$data) {
+			// Check that table contains one row with text "No data found."
+			$this->test->assertEquals(['No data found'], $table->getRows()->asText());
+
+			return;
+		}
+
+		foreach ($data as $data_row) {
+			$found = false;
+			$current = null;
+
+			foreach ($table->index() as $table_row) {
+				$match = true;
+
+				foreach ($data_row as $key => $value) {
+					if (!isset($table_row[$key]) || $table_row[$key] != $data_row[$key]) {
+						$current = json_encode($table_row);
+						$match = false;
+						break;
+					}
+				}
+
+				if ($match) {
+					$found = true;
+					break;
+				}
+			}
+
+			if (!$found) {
+				throw new \Exception('Row ('.implode(', ', array_map(function ($value) {
+					return '"'.$value.'"';
+				}, $data_row)).') was not found in table. Table row is: '.$current);
+			}
+		}
+	}
 
 	/**
 	 * Check if values in table column match data from data provider.
@@ -243,7 +243,7 @@ class CDatatableBehavior extends CTableBehavior {
 			$button_selector = (in_array($column, ['Name', 'Time', 'Problem']))
 				? 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($column).']/../../button'
 				: 'tag:button';
-			$button = $table->getHeaderByText($column)->query($button_selector)->one()->waitUntilClickable();
+			$button = $table->getHeaderByText($column)->query($button_selector)->one();
 
 			if (!$button->isClickable()) {
 				$table->scrollRightHorizontally();
