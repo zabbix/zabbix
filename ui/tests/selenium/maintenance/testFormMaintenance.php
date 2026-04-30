@@ -467,9 +467,9 @@ class testFormMaintenance extends CWebTest {
 					}
 
 					if ($period_type === 'One time only') {
-						$this->assertScreenshotExcept($period_overlay, [$period_overlay->query('id:start_date')->one()], $period_type);
+						$this->assertScreenshotExcept($dialog, [$dialog->query('id:start_date')->one()], $period_type);
 					} else {
-						$this->assertScreenshot($period_overlay, $period_type);
+						$this->assertScreenshot($dialog, $period_type);
 					}
 				}
 			}
