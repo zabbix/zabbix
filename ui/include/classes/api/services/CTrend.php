@@ -336,8 +336,7 @@ class CTrend extends CApiService {
 	 * @see CTrend::get
 	 */
 	private function getFromClickHouse(array $options) {
-		$result = [];
-		$rowcount = 0;
+		$result = $options['countOutput'] ? 0 : [];
 
 		foreach ($options['itemids'] as $value_type => $itemids) {
 			/** @var CClickHouseStorage $storage */
@@ -356,14 +355,11 @@ class CTrend extends CApiService {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $storage->getErrorMessage());
 			}
 
-			if ($options['countOutput']) {
-				$rowcount += $values[0]['rowscount'];
-			}
-			else {
-				$result = array_merge($result, $values);
-			}
+			$result = $options['countOutput']
+				? $result + $values[0]['rowscount']
+				: array_merge($result, $values);
 		}
 
-		return $options['countOutput'] ? $rowcount : $result;
+		return $result;
 	}
 }
