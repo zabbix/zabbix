@@ -535,8 +535,14 @@ class CHistoryManager {
 				return $this->getValueAtFromElasticsearch($item, $clock, $ns);
 
 			case ZBX_HISTORY_SOURCE_CLICKHOUSE:
-				$storage = $this->getStorageProviderInstance($item['value_type']);
-				return $storage->getValueAt($item, $clock, $ns);
+				$storage_provider = $this->getStorageProviderInstance($item['value_type']);
+				$result = $storage_provider->getValueAt($item, $clock, $ns);
+
+				if ($storage_provider->getErrorCode() !== null) {
+					error($storage_provider->getErrorMessage(), true);
+				}
+
+				return $result;
 
 			default:
 				return $this->primary_keys_enabled

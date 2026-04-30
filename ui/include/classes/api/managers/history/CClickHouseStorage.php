@@ -616,8 +616,12 @@ class CClickHouseStorage {
 			$result = json_decode($result_raw, true);
 			$http_code = 500;
 
-			if ($http_response_header) {
+			// The variable $http_response_header is defined only when file_get_contents succeeds.
+			if (isset($http_response_header)) {
 				sscanf($http_response_header[0], 'HTTP/%*s %d', $http_code);
+			}
+			elseif ($result_raw === false) {
+				['message' => $result_raw] = error_get_last();
 			}
 
 			if ($http_code != 200) {
