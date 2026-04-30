@@ -2470,10 +2470,10 @@ button {
       padding: 100px 0; }
     .datatable .datatable-body .row {
       display: contents; }
+      .datatable .datatable-body .row:not(.row-disabled):hover .row-spacer,
       .datatable .datatable-body .row:not(.row-disabled):hover .cell.cell-data:not(.cell-bg) {
         background-color: #383838; }
-      .datatable .datatable-body .row:not(.row-disabled):hover .row-spacer {
-        background-color: #383838; }
+      .datatable .datatable-body .row.nested:not(.row-selected) .row-spacer,
       .datatable .datatable-body .row.nested:not(.row-selected) .cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
         background-color: #1e1e1e; }
       .datatable .datatable-body .row.nested.nested-small {

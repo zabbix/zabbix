@@ -308,18 +308,18 @@
 			display: contents;
 
 			&:not(.row-disabled):hover {
+				.row-spacer,
 				.cell.cell-data:not(.cell-bg) {
-					background-color: $ui-hover-bg-color;
-				}
-
-				.row-spacer {
 					background-color: $ui-hover-bg-color;
 				}
 			}
 
 			&.nested {
-				&:not(.row-selected) .cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
-					background-color: darken($ui-bg-color, 5%);
+				&:not(.row-selected) {
+					.row-spacer,
+					.cell.cell-data:not(.cell-bg):not(.cell-bg-hover) {
+						background-color: darken($ui-bg-color, 5%);
+					}
 				}
 
 				&.nested-small {
