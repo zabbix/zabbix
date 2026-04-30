@@ -599,7 +599,7 @@ class CIntegrationTest extends CAPITest {
 		}
 
 		if (isset($HISTORY_PROVIDERS)) {
-			$db_history['HistoryProvider'] = 'elastic;'.
+			$db_history['HistoryProvider'] = 'elasticsearch;'.
 				'value_types="'.implode(',', $HISTORY_PROVIDERS[0]['types']).'",'.
 				'url='.$HISTORY_PROVIDERS[0]['url'];
 		}

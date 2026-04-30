@@ -73,7 +73,7 @@ define('ZBX_DATE',				'Y-m-d'); // Time selector date without minutes and second
 define('ZBX_DATA_CACHE_TTL', 60);
 
 define('ZBX_HISTORY_SOURCE_CLICKHOUSE',	'clickhouse');
-define('ZBX_HISTORY_SOURCE_ELASTIC',	'elastic');
+define('ZBX_HISTORY_SOURCE_ELASTIC',	'elasticsearch');
 define('ZBX_HISTORY_SOURCE_SQL',		'sql');
 
 define('ELASTICSEARCH_RESPONSE_PLAIN',			0);

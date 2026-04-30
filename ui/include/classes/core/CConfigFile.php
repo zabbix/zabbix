@@ -362,7 +362,7 @@ $IMAGE_FORMAT_DEFAULT		= IMAGE_FORMAT_PNG;
 // Uncomment this block if you are using Elasticsearch or ClickHouse for storing history data.
 // Supported configuration parameters:
 // \'types\' - An array with provider supported value types.
-// \'provider\' - History provider type, (elastic, clickhouse).
+// \'provider\' - History provider type, (elasticsearch, clickhouse).
 // \'url\' - History provider URL.
 // \'db\' - Database name. Used for ClickHouse.
 // \'username\' and \'password\' - Database user and password. Used for ClickHouse.

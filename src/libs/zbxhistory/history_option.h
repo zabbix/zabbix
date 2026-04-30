@@ -20,7 +20,7 @@
 #include "zbxalgo.h"
 
 #define HISTORY_PROVIDER_SQL		"sql"	/* default provider */
-#define HISTORY_PROVIDER_ELASTIC	"elastic"
+#define HISTORY_PROVIDER_ELASTICSEARCH	"elasticsearch"
 #define HISTORY_PROVIDER_CLICKHOUSE	"clickhouse"
 
 #define HISTORY_PROVIDER_OPTION_NAME			"name"

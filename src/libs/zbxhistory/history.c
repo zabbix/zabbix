@@ -143,7 +143,7 @@ static zbx_history_provider_t	*history_provider_open(const char *name, zbx_histo
 
 	if (0 == strcmp(name, HISTORY_PROVIDER_SQL))
 		provider = history_sql_open(options, options_num, error);
-	else if (0 == strcmp(name, HISTORY_PROVIDER_ELASTIC))
+	else if (0 == strcmp(name, HISTORY_PROVIDER_ELASTICSEARCH))
 		provider = history_elastic_open(options, options_num, error);
 	else if (0 == strcmp(name, HISTORY_PROVIDER_CLICKHOUSE))
 		provider = history_clickhouse_open(options, options_num, error);
@@ -364,7 +364,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 	zbx_vector_history_registry_ptr_create(&manager->registry);
 	zbx_vector_history_option_create(&options);
 
-	/* register elastic history provider using deprecated configuration parameters */
+	/* register elasticsearch history provider using deprecated configuration parameters */
 	if (NULL != config_history_storage_url && NULL != config_history_storage_opts)
 	{
 		zbx_vector_history_option_append(&options, history_option_str(HISTORY_PROVIDER_OPTION_URL,
@@ -384,7 +384,7 @@ static int	history_manager_init(zbx_history_manager_t *manager, const char *conf
 		mask = history_options_type_mask(options.values, options.values_num);
 		value_type_mask |= mask;
 
-		index = history_manager_register_provider(manager, HISTORY_PROVIDER_ELASTIC, &options);
+		index = history_manager_register_provider(manager, HISTORY_PROVIDER_ELASTICSEARCH, &options);
 		history_manager_map_value_types(manager, index, mask);
 
 		zbx_vector_history_option_clear(&options);

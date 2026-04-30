@@ -75,7 +75,7 @@ zbx_history_elastic_data_t;
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get elastic index name                                            *
+ * Purpose: get elasticsearch index name                                      *
  *                                                                            *
  * Parameters: value_type - [IN] the history value type                       *
  *                                                                            *
@@ -666,7 +666,7 @@ static int	history_elastic_perform_once(zbx_history_elastic_data_t *d, CURLM *mh
 			zabbix_log(LOG_LEVEL_WARNING, "cannot send data to Elasticsearch: %s", error);
 			zbx_free(error);
 
-			/* If the error is due to elastic internal problems (for example an index */
+			/* If the error is due to elasticsearch internal problems (for example an index */
 			/* became read-only), we put the handle in a retry list and */
 			/* remove it from the current execution loop */
 			zbx_vector_ptr_append(&retries, conn->handle);
@@ -791,7 +791,7 @@ static int	history_elastic_query(zbx_history_elastic_data_t *d, CURLM *mhandle, 
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: post historical data to elastic storage                                 *
+ * Purpose: post historical data to elasticsearch storage                           *
  *                                                                                  *
  ************************************************************************************/
 static zbx_uint64_t	history_elastic_flush(void *data)
@@ -1455,7 +1455,7 @@ static int	history_elastic_fetch_batch(void *data, zbx_vector_item_history_t *re
 
 	if (SUCCEED != history_elastic_conn_init(&conn, d, post_url, "application/json", NULL, error))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize curl for elastic connection");
+		zabbix_log(LOG_LEVEL_ERR, "cannot initialize curl for elasticsearch connection");
 		goto out;
 	}
 
@@ -1636,7 +1636,7 @@ static void	history_elastic_get_value_type_data(zbx_history_elastic_data_t *d, z
 
 /************************************************************************************
  *                                                                                  *
- * Purpose: query elastic search version and extracts the numeric version from      *
+ * Purpose: query elasticsearch version and extracts the numeric version from       *
  *          the response string                                                     *
  *                                                                                  *
  ************************************************************************************/
@@ -1693,7 +1693,7 @@ static int	history_elastic_get_info(void *data, zbx_history_provider_info_t *inf
 	}
 
 	info->database = zbx_strdup(NULL, "Elasticsearch");
-	info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTIC);
+	info->provider = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTICSEARCH);
 	info->current_version = version;
 	info->min_version = ZBX_ELASTIC_MIN_VERSION;
 	info->max_version = ZBX_ELASTIC_MAX_VERSION;
@@ -1844,7 +1844,7 @@ zbx_history_provider_t	*history_elastic_open(const zbx_history_option_t *options
 
 	provider = (zbx_history_provider_t *)zbx_malloc(NULL, sizeof(zbx_history_provider_t));
 
-	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTIC);
+	provider->name = zbx_strdup(NULL, HISTORY_PROVIDER_ELASTICSEARCH);
 	provider->traits = ZBX_HISTORY_TRAIT_TYPES_NOBIN | history_options_precache(options, options_num);
 	provider->impl.write = history_elastic_write;
 	provider->impl.flush = history_elastic_flush;
