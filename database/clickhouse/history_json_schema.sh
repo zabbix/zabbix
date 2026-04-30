@@ -17,5 +17,3 @@ PARTITION BY $CH_PARTITION(clock_ns)
 PRIMARY KEY (itemid, clock_ns)
 TTL clock_ns + toIntervalSecond($CH_TTL)
 EOF
-
-

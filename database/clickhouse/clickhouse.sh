@@ -52,7 +52,6 @@ while [ $# -gt 0 ]; do
 		display_help
 		;;
 	esac
-	
+
 	shift
 done
-

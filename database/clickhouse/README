@@ -1,6 +1,6 @@
 Zabbix ClickHouse schema and history migration scripts
 
-This collection of scripts facilitates creation of clickhouse tables 
+This collection of scripts facilitates creation of clickhouse tables
 and migration of Zabbix history data from MySQL or PostgreSQL to ClickHouse.
 
 Scripts Overview
@@ -53,7 +53,7 @@ PostgreSQL:
 - history_text_export_pgsql.sql
 - history_uint_export_pgsql.sql
 
-These SQL scripts export history data from MySQL or PostgreSQL databases to 
+These SQL scripts export history data from MySQL or PostgreSQL databases to
 /tmp/<history table>.csv files.
 
 Example for MySQL:
@@ -69,7 +69,7 @@ Data Import Scripts:
 - history_text_import.sh
 - history_uint_import.sh
 
-These scripts import exported history data into corresponding ClickHouse 
+These scripts import exported history data into corresponding ClickHouse
 tables.
 
 Usage:
@@ -84,5 +84,5 @@ Migration Process:
 2. Export data from MySQL or PostgreSQL using the export SQL scripts.
 3. Import the exported data into ClickHouse using the import scripts.
 
-Ensure you have the necessary permissions and ClickHouse is properly 
+Ensure you have the necessary permissions and ClickHouse is properly
 configured before running these scripts.
