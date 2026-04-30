@@ -255,9 +255,8 @@ class testFormAlertsScripts extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'xpath://z-textarea-flexible[@name="parameters[1][name]"]' => 'Entry "name=" is not unique.'
+						'xpath://z-textarea-flexible[@name="parameters[1][name]"]' => 'Name is not unique.'
 					]
-					// TODO: change error text after subissue 35 fixed
 				]
 			],
 			// #6
@@ -285,9 +284,8 @@ class testFormAlertsScripts extends CWebTest {
 						]
 					],
 					'inline_errors' => [
-						'xpath://z-textarea-flexible[@name="parameters[1][name]"]' => 'Entry "name=Param1" is not unique.'
+						'xpath://z-textarea-flexible[@name="parameters[1][name]"]' => 'Name is not unique.'
 					]
-					// TODO: change error text after subissue 35 fixed
 				]
 			],
 			// #7
