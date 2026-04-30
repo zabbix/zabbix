@@ -480,7 +480,7 @@ func TestNetif(t *testing.T) {
 				key:    "net.if.discovery",
 				params: []string{"eno1"},
 			},
-			want:    nil,
+			want:    "",
 			wantErr: true,
 		},
 		{

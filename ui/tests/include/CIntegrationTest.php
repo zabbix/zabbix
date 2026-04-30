@@ -577,13 +577,14 @@ class CIntegrationTest extends CAPITest {
 	 * @return array
 	 */
 	protected static function getDefaultComponentConfiguration() {
-		global $DB;
+		global $DB, $HISTORY;
 
 		$db = [
 			'DBName' => $DB['DATABASE'],
 			'DBUser' => $DB['USER'],
 			'DBPassword' => $DB['PASSWORD']
 		];
+		$db_history = [];
 
 		if ($DB['SERVER'] !== 'localhost' && $DB['SERVER'] !== '127.0.0.1') {
 			$db['DBHost'] = $DB['SERVER'];
@@ -597,15 +598,20 @@ class CIntegrationTest extends CAPITest {
 			$db['DBSchema'] = $DB['SCHEMA'];
 		}
 
+		if (isset($HISTORY)) {
+			$db_history['HistoryStorageURL'] = reset($HISTORY['url']);
+			$db_history['HistoryStorageTypes'] = implode(',', $HISTORY['types']);
+		}
+
 		$configuration = [
-			self::COMPONENT_SERVER => array_merge($db, [
+			self::COMPONENT_SERVER => array_merge($db, $db_history, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
 				'AllowUnsupportedDBVersions' => '1'
 			]),
-			self::COMPONENT_SERVER_HANODE1 => array_merge($db, [
+			self::COMPONENT_SERVER_HANODE1 => array_merge($db, $db_history, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
@@ -943,6 +949,47 @@ class CIntegrationTest extends CAPITest {
 	}
 
 	/**
+	 * Send item values using the agent data protocol (variant 2, itemid-based).
+	 *
+	 * @param array   $values        item values, each with keys: itemid, value, clock, ns
+	 * @param string  $host          Zabbix host name
+	 * @param string  $component     component name or null for active component
+	 * @param integer $delayOverride override default processing delay, or null to use default
+	 *
+	 * @return array    processing result
+	 */
+	protected function sendAgentDataValues($values, $host, $component = null, $delayOverride = null) {
+		$start = microtime(true);
+
+		if ($component === null) {
+			$component = $this->getActiveComponent();
+		}
+
+		$client = $this->getClient($component);
+		$session = md5(uniqid('', true));
+		$result = $client->sendAgentDataValues($values, $session, $host);
+
+		$this->assertTrue(($result !== false),
+			sprintf('Component "%s" failed to receive data: %s', $component, $client->getError())
+		);
+		$this->assertTrue(array_key_exists('processed', $result), 'Result doesn\'t contain "processed" count.');
+		$this->assertEquals(count($values), $result['processed'],
+			'Processed value count doesn\'t match sent value count.'
+		);
+
+		$delay = ($delayOverride !== null) ? $delayOverride : self::DATA_PROCESSING_DELAY;
+
+		if ($delay > 0) {
+			sleep($delay);
+		}
+		if (static::$trace_delays) {
+			self::recordDelay('wait_send', microtime(true) - $start);
+		}
+
+		return $result;
+	}
+
+	/**
 	 * Send single value for active agent item.
 	 *
 	 * @param string $host         host name
@@ -1113,6 +1160,73 @@ class CIntegrationTest extends CAPITest {
 		$this->fail('Data requested from '.$method.' API is not present within specified interval. Params used:'.
 				"\n".json_encode($params)
 		);
+	}
+
+	/**
+	 * Request data from API until result count matches expected value (@see call).
+	 *
+	 * @param string   $method          API method to be called
+	 * @param mixed    $params          API call params
+	 * @param integer  $expected_count  expected result count
+	 * @param integer  $iterations      iteration count
+	 * @param integer  $delay           iteration delay
+	 * @param callable $callback        Callback function to test if API response is valid.
+	 *
+	 * @return array
+	 */
+	public function callUntilCountIsPresent($method, $params, $expected_count, $iterations = null, $delay = null, $callback = null) {
+		if ($iterations === null) {
+			$iterations = self::WAIT_ITERATIONS;
+		}
+
+		if ($delay === null) {
+			$delay = self::WAIT_ITERATION_DELAY;
+		}
+
+		$count_params = array_merge($params, ['countOutput' => true]);
+		$exception = null;
+		$usleep_total = 0;
+		$start = microtime(true);
+		for ($i = 0; $i < $iterations; $i++) {
+			try {
+				$response = $this->call($method, $count_params);
+
+				if (isset($response['result']) && $response['result'] == $expected_count
+						&& ($callback === null || call_user_func($callback, $response))) {
+					if (static::$trace_delays) {
+						self::recordDelay('call_count_present', microtime(true) - $start);
+					}
+
+					return $response;
+				}
+			} catch (Exception $e) {
+				$exception = $e;
+			}
+
+			if ($usleep_total < 1000000 && $iterations > 1) {
+				$usleep_total += 100000;
+				usleep(100000);
+				$i = -1;
+				continue;
+			}
+
+			sleep($delay);
+		}
+
+		if (static::$trace_delays) {
+			self::recordDelay('call_count_present', microtime(true) - $start);
+		}
+
+		if ($exception !== null) {
+			throw $exception;
+		}
+
+		$message = 'Count requested from '.$method.' API did not match expected count ('.$expected_count.') within '.
+				'specified interval. Params used:'."\n".json_encode($params);
+		if (isset($response)) {
+			$message .= "\nLast response:\n".json_encode($response);
+		}
+		$this->fail($message);
 	}
 
 	/**

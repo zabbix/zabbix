@@ -15,7 +15,8 @@
 
 
 require_once dirname(__FILE__).'/../include/CAPITest.php';
-require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormula.php';
+require_once dirname(__FILE__).'/../../include/classes/parsers/CParser.php';
+require_once dirname(__FILE__).'/../../include/classes/parsers/CConditionFormulaParser.php';
 require_once dirname(__FILE__).'/../../include/classes/helpers/CConditionHelper.php';
 
 /**
