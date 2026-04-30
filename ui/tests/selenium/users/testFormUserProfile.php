@@ -610,44 +610,27 @@ class testFormUserProfile extends CLegacyWebTest {
 		}
 	}
 
-	public function triggerSeverity() {
-		return [
-			// #0. Scenario for ZBX-27632.
-			[
-				[	'expected' => TEST_BAD,
-					'error_title' => 'Cannot update user',
-					'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
-					'frontend_notifications' => [
-						'Frontend notifications' => true,
-						'Message timeout' => '86401'
-					],
-					'trigger_severity' => [
-						'Recovery' => false,
-						'Not classified' => false,
-						'Information' => false,
-						'Warning' => false,
-						'Average' => false,
-						'High' => false,
-						'Disaster' => false
-					],
-					'trigger_severity_status' => [
-						'messages[triggers.recovery]',
-						'messages[triggers.severities][0]',
-						'messages[triggers.severities][1]',
-						'messages[triggers.severities][2]',
-						'messages[triggers.severities][3]',
-						'messages[triggers.severities][4]',
-						'messages[triggers.severities][5]'
-					]
-				]
+	// Checkbox state does not revert after update.
+	public function testFormUserProfile_triggerSeverity() {
+		$data = [
+			'expected' => TEST_BAD,
+			'error_title' => 'Cannot update user',
+			'error_msg' => 'Incorrect value for field "timeout": value must be one of 30-86400.',
+			'frontend_notifications' => [
+				'Frontend notifications' => true,
+				'Message timeout' => '86401'
+			],
+			'trigger_severity' => [
+				'Recovery' => false,
+				'Not classified' => false,
+				'Information' => false,
+				'Warning' => false,
+				'Average' => false,
+				'High' => false,
+				'Disaster' => false
 			]
 		];
-	}
 
-	/**
-	 * @dataProvider triggerSeverity
-	 */
-	public function testFormUserProfile_triggerSeverity($data) {
 		$this->page->login()->open('zabbix.php?action=userprofile.notification.edit')->waitUntilReady();
 		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		$form->selectTab('Frontend notifications');
@@ -655,10 +638,10 @@ class testFormUserProfile extends CLegacyWebTest {
 		$form->fill($data['trigger_severity']);
 		$this->query('button:Update')->one()->click();
 		$this->assertMessage($data['expected'], $data['error_title'], $data['error_msg']);
+		$form = $this->query('id:userprofile-notification-form')->asForm()->one();
 		// Assert correct checkbox state.
-		foreach ($data['trigger_severity_status'] as $name) {
-			$this->assertTrue($form->getField('name:' . $name)->isAttributePresent(['type' => 'hidden'])
-			);
+		foreach ($data['trigger_severity'] as $сheckbox => $state) {
+			$this->assertEquals($state, $form->getField($сheckbox)->asCheckbox()->isChecked());
 		};
 	}
 }
