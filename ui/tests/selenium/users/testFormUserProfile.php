@@ -608,7 +608,7 @@ class testFormUserProfile extends CLegacyWebTest {
 		}
 	}
 
-	// Checkbox state does not revert after update.
+	// Verify that checkbox state is preserved after failed update.
 	public function testFormUserProfile_triggerSeverity() {
 		$data = [
 			'expected' => TEST_BAD,
