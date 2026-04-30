@@ -63,7 +63,7 @@ class CControllerBannerGet extends CController {
 
 		$output += [
 			'storage_idx' => 'web.banner.dismissed_ids',
-			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true),
+			'dismissed_banner_ids' => json_decode(CProfile::get('web.banner.dismissed_ids', '[]'), true)
 		];
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));
