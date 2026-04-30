@@ -16,12 +16,14 @@
 require_once dirname(__FILE__).'/../include/CIntegrationTest.php';
 
 /**
- * Test suite for history value storage.
+ * Test suite for history.get on different backends
  *
  * @required-components server
+ * @suite-components-reuse true
  * @configurationDataProvider serverConfigurationProvider
  * @hosts test_history_value
  * @backup history,history_uint,history_str,history_text,history_log,items
+ * @onAfterOnce clearData
  */
 class testHistoryGet extends CIntegrationTest {
 	const HOSTNAME = 'test_history_value';
@@ -30,11 +32,17 @@ class testHistoryGet extends CIntegrationTest {
 	private static $items = [];
 
 	public function prepareData() {
+		$response = $this->call('hostgroup.get', [
+			'filter' => ['name' => ['Zabbix servers']]
+		]);
+		$this->assertNotEmpty($response['result'], 'Host group "Zabbix servers" not found');
+		$groupid = $response['result'][0]['groupid'];
+
 		$response = $this->call('host.create', [
 			[
 				'host' => self::HOSTNAME,
 				'interfaces' => [],
-				'groups' => [['groupid' => 4]],
+				'groups' => [['groupid' => $groupid]],
 				'status' => HOST_STATUS_MONITORED
 			]
 		]);
@@ -58,8 +66,9 @@ class testHistoryGet extends CIntegrationTest {
 			['key_' => 'trapper_str_search', 'value_type' => ITEM_VALUE_TYPE_STR]
 		];
 
+		$item_params = [];
 		foreach ($item_defs as $def) {
-			$response = $this->call('item.create', [
+			$item_params[] = [
 				'hostid' => self::$hostid,
 				'name' => $def['key_'],
 				'key_' => $def['key_'],
@@ -73,15 +82,38 @@ class testHistoryGet extends CIntegrationTest {
 						'error_handler_params' => ''
 					]
 				]
-			]);
-			$this->assertArrayHasKey('itemids', $response['result']);
+			];
+		}
+
+		$response = $this->call('item.create', $item_params);
+		$this->assertArrayHasKey('itemids', $response['result']);
+
+		foreach ($item_defs as $i => $def) {
 			self::$items[$def['key_']] = [
-				'itemid' => $response['result']['itemids'][0],
+				'itemid' => $response['result']['itemids'][$i],
 				'value_type' => $def['value_type']
 			];
 		}
 
 		return true;
+	}
+
+	public static function clearData(): void {
+		if (self::$hostid !== null) {
+			CDataHelper::call('host.delete', [self::$hostid]);
+		}
+
+		self::$hostid = null;
+	}
+
+	private function timeMonotonic(): int {
+		static $last = 0;
+		$now = time();
+		if ($now <= $last) {
+			$now = $last + 1;
+		}
+		$last = $now;
+		return $now;
 	}
 
 	public function serverConfigurationProvider() {
@@ -95,7 +127,7 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_sendAndRetrieve() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 
 		$cases = [
 			'trapper_float' => [
@@ -126,7 +158,7 @@ class testHistoryGet extends CIntegrationTest {
 		];
 
 		foreach ($cases as $key => $values) {
-			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+			$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 			$item = self::$items[$key];
 			$this->callUntilDataIsPresent('history.get', [
@@ -145,7 +177,7 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_sendBulkAndRetrieve() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 
 		$tm_val_first = $tm + 10;
 		$tm_val_second = $tm + 11;
@@ -193,7 +225,7 @@ class testHistoryGet extends CIntegrationTest {
 			]
 		];
 
-		$this->sendDataValues('sender', array_merge(...array_values($cases)), self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', array_merge(...array_values($cases)), self::COMPONENT_SERVER, 0);
 
 		$by_type = [];
 		foreach ($cases as $key => $values) {
@@ -223,7 +255,7 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_timeRangeCountOutput() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 
 		$values = [
 			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 3.45, 'clock' => $tm, 'ns' => 834726191],
@@ -238,7 +270,7 @@ class testHistoryGet extends CIntegrationTest {
 			['host' => self::HOSTNAME, 'key' => 'trapper_float_range', 'value' => 5.14, 'clock' => $tm + 540, 'ns' => 580237419]
 		];
 
-		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 		$itemid = self::$items['trapper_float_range']['itemid'];
 		$this->callUntilDataIsPresent('history.get', [
@@ -254,7 +286,7 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_sortAndLimit() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 		$itemid = self::$items['trapper_float_sort']['itemid'];
 
 		$values = [
@@ -265,7 +297,7 @@ class testHistoryGet extends CIntegrationTest {
 			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 50.0, 'clock' => $tm + 4, 'ns' => 0]
 		];
 
-		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_FLOAT,
@@ -312,7 +344,7 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_countOutput() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 		$itemid = self::$items['trapper_uint_count']['itemid'];
 
 		$values = [
@@ -322,7 +354,7 @@ class testHistoryGet extends CIntegrationTest {
 			['host' => self::HOSTNAME, 'key' => 'trapper_uint_count', 'value' => 400, 'clock' => $tm + 3, 'ns' => 0]
 		];
 
-		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 		$this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_UINT64,
@@ -346,7 +378,7 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_search() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 		$itemid = self::$items['trapper_str_search']['itemid'];
 
 		$values = [
@@ -355,7 +387,7 @@ class testHistoryGet extends CIntegrationTest {
 			['host' => self::HOSTNAME, 'key' => 'trapper_str_search', 'value' => 'other_gamma', 'clock' => $tm + 2, 'ns' => 0]
 		];
 
-		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 		$this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_STR,
@@ -390,14 +422,14 @@ class testHistoryGet extends CIntegrationTest {
 	}
 
 	public function testHistoryValue_outputFields() {
-		$tm = time();
+		$tm = $this->timeMonotonic();
 		$itemid = self::$items['trapper_float_sort']['itemid'];
 
 		$values = [
 			['host' => self::HOSTNAME, 'key' => 'trapper_float_sort', 'value' => 99.9, 'clock' => $tm + 100, 'ns' => 0]
 		];
 
-		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER);
+		$this->sendDataValues('sender', $values, self::COMPONENT_SERVER, 0);
 
 		$response = $this->callUntilDataIsPresent('history.get', [
 			'history' => ITEM_VALUE_TYPE_FLOAT,
