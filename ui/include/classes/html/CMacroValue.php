@@ -227,7 +227,11 @@ class CMacroValue extends CDiv {
 		}
 
 		if ($this->revert_button !== null) {
-			$elements[] = $this->revert_button->addStyle($this->revert_visible ? 'display: block' : '');
+			if ($this->revert_visible) {
+				$this->revert_button->removeAttribute('hidden');
+			}
+
+			$elements[] = $this->revert_button;
 		}
 
 		$elements[] = (new CButtonDropdown($this->name.'[type]',  $this->type, [
